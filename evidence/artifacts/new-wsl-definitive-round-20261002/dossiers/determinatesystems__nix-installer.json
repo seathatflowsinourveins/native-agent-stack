@@ -1,0 +1,290 @@
+{
+  "contender": "determinatesystems/nix-installer",
+  "revision": {
+    "contender": "determinatesystems/nix-installer",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "DeterminateSystems/nix-installer",
+        "tag": "v3.22.5",
+        "commit": "76f61b5202e21eab17728915775da4ae5153a993",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v3.22.5",
+    "commit": "76f61b5202e21eab17728915775da4ae5153a993",
+    "read_at": "2026-10-02T03:02:03+00:00"
+  },
+  "dossier": {
+    "contender": "determinatesystems/nix-installer",
+    "revision": {
+      "tag": "v3.22.5",
+      "commit": "76f61b5202e21eab17728915775da4ae5153a993",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "LGPL-2.1",
+      "file": "LICENSE"
+    },
+    "purpose": "Rust CLI/library (`nix-installer` v3.22.5, Cargo.toml:1-4) that installs, repairs and uninstalls Nix on the local host by executing a serialized, reviewable plan of actions and recording the result as a JSON receipt at /nix/receipt.json (src/plan.rs:15,351-382; subcommands at src/cli/subcommand/mod.rs:16-24). By default it installs Determinate Nix; that tarball and the `determinate-nixd` daemon binary are embedded in the installer at build time (src/distribution.rs:45-56). Upstream Nix (2.35.2 pinned at flake.nix:37) is selectable with --prefer-upstream-nix, but README calls that unsupported (README.md:452-453). Targets: Linux x86_64/aarch64 (systemd or root-only), macOS Apple Silicon (APFS 'Nix Store' volume), Steam Deck, ostree, WSL2, containers (README.md:30-37; src/planner/mod.rs:157-173). Relative to the three stated needs: the code has no installer of language runtimes/CLI tools from a manifest (the only packages it puts in a profile are `nix` and `nss-cacert`, src/action/base/setup_default_profile.rs:121-126; src/profile/mod.rs:61-66), no backup or restore of application state, and no dotfile/config transfer. It edits system-wide shell rc files and /etc/nix config (src/action/common/configure_shell_profile.rs:34-72; src/action/common/place_nix_configuration.rs:17-29). It has no remote-host option; it runs locally and re-executes itself under sudo (src/cli/mod.rs:192-264; a search of src/ for ssh/--host/--target found only macOS remote-build zshenv code, src/action/macos/configure_remote_building.rs:9-33). After install, README examples use `nix run`, `nix profile add` and flakes (README.md:132-135,174-180); these are Nix features, not installer features. Pinning here means pinning the installer version, which fixes the bundled Nix version (README.md:319-335).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Determinate Nix Installer is 'the easiest and most reliable way to install Determinate Nix'. By default it installs Determinate Nix (flakes enabled). Installing upstream Nix is possible but 'isn't a supported configuration' and may be removed.",
+          "citation": "README.md:9-15, 452-453"
+        },
+        {
+          "claim": "One-liner install on 'just about any supported system': curl -fsSL https://install.determinate.systems/nix | sh -s -- install",
+          "citation": "README.md:19-23"
+        },
+        {
+          "claim": "Platform table: Linux x86_64 and aarch64 (multi-user via systemd, or root-only), macOS Apple Silicon (multi-user), Steam Deck, WSL2 (x86_64 and aarch64), Podman and Docker containers.",
+          "citation": "README.md:30-37"
+        },
+        {
+          "claim": "Installs Nix by following a plan made by a planner; plans can be reviewed before installation (`/nix/nix-installer install --help`, `install linux --help`).",
+          "citation": "README.md:71-83, 290"
+        },
+        {
+          "claim": "Keeps an installation receipt for easy uninstallation: receipt at /nix/receipt.json and a copy of the installer binary at /nix/nix-installer; `/nix/nix-installer uninstall [receipt]` removes Nix.",
+          "citation": "README.md:115-119, 289, 352, 413-417"
+        },
+        {
+          "claim": "Enables Nix to survive macOS upgrades; as a macOS remote build target it ensures Nix is on the PATH.",
+          "citation": "README.md:10, 288, 296"
+        },
+        {
+          "claim": "Enables a best-effort reversion in the face of a failed install.",
+          "citation": "README.md:291"
+        },
+        {
+          "claim": "Operates as a single, static binary ('with external dependencies such as OpenSSL' as written, which appears to mean 'without'), only calling existing system tools (like useradd) when necessary.",
+          "citation": "README.md:295"
+        },
+        {
+          "claim": "Pin an installer version by changing the download URL (.../nix/tag/${VERSION}); each installer version has an associated supported Nix version (README points at src/settings.rs); overriding with --nix-package-url is 'not recommended' because it is untested.",
+          "citation": "README.md:319-335"
+        },
+        {
+          "claim": "Installed nix.conf differs from upstream scripts: nix-command and flakes enabled, bash-prompt-prefix, auto-optimise-store=true (Linux only), always-allow-substitutes=true, extra-nix-path=nixpkgs=flake:nixpkgs, max-jobs=auto, upgrade-nix-store-path-url at install.determinate.systems; no `nix-channel --update`.",
+          "citation": "README.md:344-354"
+        },
+        {
+          "claim": "Determinate Nix is upgraded with `sudo determinate-nixd upgrade`, or by uninstalling and reinstalling with a different installer version.",
+          "citation": "README.md:103-111"
+        },
+        {
+          "claim": "All settings are available as flags or NIX_INSTALLER_* environment variables, including --extra-conf, --proxy, --ssl-cert-file, --init none (root-only Nix), --no-confirm, --force and --no-modify-profile.",
+          "citation": "README.md:358-392"
+        },
+        {
+          "claim": "The installer collects 'a little bit of anonymous diagnostic information' (installer version, planner, action, result, names but not values of customized settings, host OS/version/arch/binary format, CI or not, high-level failure description). Disable it with --diagnostic-endpoint=\"\" or NIX_INSTALLER_DIAGNOSTIC_ENDPOINT=\"\".",
+          "citation": "README.md:455-473"
+        },
+        {
+          "claim": "Available as a Rust library and buildable from source with Nix (`nix build -L \".#nix-installer-static\"`) or cargo; docs mark the library experimental and 'likely to be removed in the future without an advocate'.",
+          "citation": "README.md:310-317; docs/rust-library.md:3-6; docs/building.md:6-47"
+        }
+      ],
+      "install": [
+        {
+          "method": "One-liner (Linux and macOS)",
+          "command": "curl -fsSL https://install.determinate.systems/nix | sh -s -- install",
+          "citation": "README.md:21-23"
+        },
+        {
+          "method": "Pinned installer version (the README example uses v0.6.0; this revision is v3.22.5)",
+          "command": "VERSION=\"v0.6.0\"; curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix/tag/${VERSION} | sh -s -- install",
+          "citation": "README.md:324-328"
+        },
+        {
+          "method": "Non-interactive install",
+          "command": "curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --no-confirm",
+          "citation": "README.md:273-275"
+        },
+        {
+          "method": "macOS graphical package (README gives a link only, no shell command)",
+          "command": "https://install.determinate.systems/determinate-pkg/stable/Universal",
+          "citation": "README.md:25-26, 493"
+        },
+        {
+          "method": "Release binary run directly (offline or direct use): download the per-platform nix-installer binary from GitHub Releases, then run it",
+          "command": "./nix-installer install   (binaries: https://github.com/DeterminateSystems/nix-installer/releases)",
+          "citation": "README.md:93, 330; nix-installer.sh:4-6"
+        },
+        {
+          "method": "GitHub Actions (CI)",
+          "command": "uses: DeterminateSystems/determinate-nix-action@v3",
+          "citation": "README.md:41-59"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes. README.md:32 (Linux x86_64 and aarch64, multi-user via systemd or root-only, 'Stable'). flake.nix:38 lists x86_64-linux among supportedSystems and release-tags.yml:33-36 publishes nix-installer-x86_64-linux. CI runs install/uninstall end-to-end on x86_64 Linux with and without init (ci.yml:52-290). VM and container tests are x86_64 only (nix/tests/vm-test/default.nix:466-513; nix/tests/container-test/default.nix:9-36). The planner refuses NixOS and hosts where nix-env already runs (src/planner/linux.rs:206-212, 237-250).",
+        "wsl2": "yes. README.md:35 and 233-266 (systemd recommended, otherwise --init none). WSL1 is refused (src/planner/linux.rs:214-220) and a WSL2-specific systemd hint exists (src/planner/linux.rs:276-286). No WSL job in .github (search found no matches); WSL is covered only by a manual PowerShell script (tests/windows/test-wsl.ps1; CONTRIBUTING.md:321-345).",
+        "macos_arm64": "yes. README.md:33 (Apple Silicon, multi-user, 'Stable (see note)'; no matching note appears in the README). flake.nix:38 lists aarch64-darwin; self-test has an aarch64-darwin system constant (src/self_test.rs:104-105); CI job run-aarch64-darwin on macos-latest-xlarge (ci.yml:409-498). Running under Rosetta is refused (src/planner/macos/mod.rs:434-452). No x86_64-darwin artifact is built (release-tags.yml:33-49).",
+        "gpu": "no (not applicable). The installer neither uses nor configures a GPU; no GPU/CUDA/NVIDIA code (case-insensitive search of the repo). The only mention is README.md:248 (running OpenGL apps via nixGL under WSLg)."
+      },
+      "integrations": {
+        "cli": "Yes. Binary `nix-installer` (src/bin/nix-installer.rs) with subcommands install, repair [hooks|sequoia], uninstall, self-test, plan, split-receipt (src/cli/subcommand/mod.rs:16-24). Every flag can also be set via NIX_INSTALLER_* env vars (README.md:358-359; e.g. src/cli/subcommand/install/mod.rs:47-53). A copy is placed at /nix/nix-installer on success (src/cli/subcommand/install/mod.rs:308-310, 348-354). The embedded `determinate-nixd` has its own CLI (README.md:105-109), but its source is not in this repo.",
+        "mcp": "none found. A case-insensitive search of the repo for mcp, claude, codex, AGENTS.md and CLAUDE.md returned only unrelated substring matches.",
+        "sdk_or_api": "Rust library crate `nix-installer` (README.md:3, 314-317; docs/rust-library.md:1-25; public modules in src/lib.rs:72-86; `cli` feature gates clap code, Cargo.toml:11-14). Docs say it is experimental and 'likely to be removed in the future without an advocate' (docs/rust-library.md:3-6). Building it needs compile-time env vars (src/distribution.rs:45-56). No HTTP API or server found. GitHub Actions determinate-nix-action and nix-installer-action wrap the installer (README.md:41-67, 443-450); those repos were not read.",
+        "claude_code_or_codex": "none found."
+      },
+      "telemetry_and_network": "Diagnostics are on by default. Default cargo features are `cli` and `diagnostics` (Cargo.toml:12). main() builds the diagnostics client for every subcommand before executing it (src/bin/nix-installer.rs:27-37), through the external crate detsys-ids-client 0.7.0 (Cargo.toml:25; Cargo.lock:539-565). Its dependency list includes a DNS resolver (hickory-resolver, detsys-srv), host/locale/timezone crates (sysinfo, sys-locale, iana-time-zone) and xdg. The client waits up to 500 ms for a check-in (src/diagnostics.rs:148-151). It records plan/install/uninstall/self-test outcomes with failure-chain error-kind names (src/diagnostics.rs:36-43, 245-295). It sets the facts planner, install_determinate_nix and the NAMES of configured settings (src/diagnostics.rs:214-243). Process exit waits on the worker (src/bin/nix-installer.rs:41; src/diagnostics.rs:297-301). README lists what is collected and gives the opt-out `--diagnostic-endpoint=\"\"` or NIX_INSTALLER_DIAGNOSTIC_ENDPOINT=\"\" (README.md:455-473; global flag at src/cli/mod.rs:68-79). The default endpoint and the effect of an empty value live inside the external crate, not in this repo, so they cannot be confirmed here. On macOS, hint text on start/failure is fetched as remote 'feature pointer payloads' with built-in fallbacks (src/cli/mod.rs:137-140; src/cli/subcommand/install/determinate.rs:3-15). Other network use: the bootstrap script downloads the installer from https://install.determinate.systems/nix (override NIX_INSTALLER_BINARY_ROOT / NIX_INSTALLER_OVERRIDE_URL; nix-installer.sh:33, 55). The Determinate Nix tarball and determinate-nixd are embedded, so they are not downloaded at install time (src/distribution.rs:33-35, 45-56). Upstream or --nix-package-url tarballs are fetched over http(s)/file with optional proxy and CA file (src/action/base/fetch_and_unpack_nix.rs:115-172). --extra-conf URLs are fetched (src/action/common/place_nix_configuration.rs:209-243). For the upstream path the written nix.conf sets upgrade-nix-store-path-url to install.determinate.systems and adds cache.flakehub.com as an optional trusted substituter (src/action/common/place_nix_configuration.rs:137-177). No account, login or API-key handling was found in src/ (a search for token/login/api key/credential hit only retry counters and the macOS volume password). The embedded determinate-nixd daemon's own network behavior is not visible in this repo."
+    },
+    "code": {
+      "languages": [
+        "Rust (edition 2021, toolchain 'stable' per rust-toolchain.toml:1-3; needs RUSTFLAGS --cfg tokio_unstable, .cargo/config.toml:1-2)",
+        "Nix (flake.nix, nix/check.nix, nix/tests/**)",
+        "POSIX shell (nix-installer.sh, upload_s3.sh, enter-env.sh, src/action/linux/selinux/build.sh)",
+        "YAML (GitHub Actions workflows)",
+        "PowerShell (tests/windows/test-wsl.ps1)",
+        "SELinux policy source and prebuilt binaries (src/action/linux/selinux/*.te, *.fc, *.pp)",
+        "systemd unit/socket files (src/action/common/configure_determinate_nixd_init_service/)"
+      ],
+      "entry_points": [
+        {
+          "path": "src/bin/nix-installer.rs",
+          "what": "Binary `nix-installer` main (tokio async): installs the error hook, parses clap args, sets up tracing, builds the diagnostics/feedback client, runs the subcommand (lines 7-44). Requires the `cli` feature (Cargo.toml:16-18)."
+        },
+        {
+          "path": "src/cli/subcommand/",
+          "what": "Subcommands: install/mod.rs, repair.rs (hooks, sequoia), uninstall.rs, self_test.rs, plan.rs, split_receipt.rs; enum at mod.rs:16-24."
+        },
+        {
+          "path": "src/lib.rs",
+          "what": "Library crate `nix_installer` exposing action, planner, settings, feedback, self_test (lines 72-86); cli and diagnostics are feature-gated."
+        },
+        {
+          "path": "nix-installer.sh",
+          "what": "POSIX bootstrap script for `curl | sh`: detects <arch>-<os>, downloads nix-installer-<arch>-<os> from https://install.determinate.systems/nix (TLS 1.2 enforced), chmods and runs it, then deletes it (lines 33-124, 145-237, 298-397)."
+        },
+        {
+          "path": "flake.nix",
+          "what": "Build entry point: packages nix-installer / nix-installer-static (default), devShell, lint checks, hydraJobs vm-test and container-test (lines 97-196)."
+        },
+        {
+          "path": "upload_s3.sh",
+          "what": "Release publisher used by the tag, branch and PR workflows: copies binaries and nix-installer.sh to S3 paths by tag, rev and branch (all lines)."
+        }
+      ],
+      "architecture": "Plan/execute/revert model. A `Planner` (src/planner/{linux,macos,ostree,steam_deck}.rs; chosen by BuiltinPlanner::default, src/planner/mod.rs:177-216) emits an ordered list of `StatefulAction`s (src/action/stateful.rs; implementations under src/action/{base,common,linux,macos}), wrapped in an `InstallPlan` (src/plan.rs). The plan runs them sequentially (plan.rs:162-192) and writes the JSON receipt /nix/receipt.json atomically via tmp file and rename (plan.rs:351-382), also on failure or cancel (plan.rs:170-171, 182-184). It then runs a shell-based self-test: `nix build` of a trivial derivation in each discovered sh/bash/zsh/fish, 10 s timeout (src/self_test.rs:86-125). A self-test failure only logs a warning and the install still reports success (plan.rs:196-205). Uninstall deserializes the receipt and reverts actions in reverse order (plan.rs:286-334; src/cli/subcommand/uninstall.rs:114-217). `split-receipt` splits a receipt so the store survives phase 1 (src/cli/subcommand/split_receipt.rs:19-26). `repair` re-applies shell hooks or fixes macOS Sequoia build users (src/cli/subcommand/repair.rs:23-55). Default-distribution install flow: embedded Determinate Nix tarball unpacked to /nix/temp-install-dir (src/action/base/fetch_and_unpack_nix.rs), moved into /nix, then `nix-store --load-db` and `nix` plus `nss-cacert` installed into /nix/var/nix/profiles/default (src/action/base/setup_default_profile.rs:56-131). Then 32 nixbld users/group are created (src/action/common/create_users_and_groups.rs), shell profiles and nix.conf are written (configure_shell_profile.rs, place_nix_configuration.rs), and determinate-nixd is installed to /usr/local/bin and run as a systemd/launchd service (provision_determinate_nixd.rs:13; configure_determinate_nixd_init_service/mod.rs). macOS adds an encrypted APFS volume, synthetic.conf/fstab entries, launchd services and Time Machine exclusions (src/action/macos/; src/planner/macos/mod.rs:221-332). Telemetry/feedback hooks are in src/diagnostics.rs and src/feedback/. Compile-time inputs are env vars NIX_TARBALL_URL, DETERMINATE_NIX_TARBALL_PATH and DETERMINATE_NIXD_BINARY_PATH (src/distribution.rs:45-56; there is no build.rs).",
+      "packaging_and_release": "Built with Nix and crane (flake.nix:55-95). Packages: nix-installer and nix-installer-static (pkgsStatic), default = static (flake.nix:98-101, 173-176), for x86_64-linux, aarch64-linux and aarch64-darwin only (flake.nix:38). The build embeds the Determinate Nix tarball and determinate-nixd taken from FlakeHub flake inputs (flake.nix:9-25, 49-53, 89-94); flake.lock pins both at 3.22.5 (flake.lock:37, 151). Cargo release profile is strip, opt-level z, lto (Cargo.toml:65-68). Per-platform artifacts nix-installer-x86_64-linux, nix-installer-aarch64-linux and nix-installer-aarch64-darwin come from build-*.yml (e.g. build-x86_64-linux.yml:18-26). On a published GitHub release, release-tags.yml (lines 3-6, 51-68) uploads the three binaries and nix-installer.sh to S3 via upload_s3.sh, served at https://install.determinate.systems/nix/tag/<tag>, and attaches them to a DRAFT GitHub release. Pushes to main (release-branches.yml:59-65) and PRs labelled 'upload to s3' (release-prs.yml:19-25, 94-100) are also uploaded to S3. Release proposal is a workflow_dispatch that calls the external reusable workflow DeterminateSystems/propose-release@main (propose-release.yml:17-40). crates.io publishing is a manual `cargo publish` (CONTRIBUTING.md:349-386). No checksum files, signatures or provenance attestations are produced: a search of .github and upload_s3.sh for attest/cosign/sigstore/gpg/sha256sum/slsa found nothing, and md5 is used only to detect S3 re-uploads (upload_s3.sh:51-64). Building from source: `nix build -L \".#nix-installer-static\"` (docs/building.md:6-18).",
+      "tests_and_ci": "Frameworks: Rust built-in harness (#[test] and #[tokio::test]); NixOS-test VM tests (qemu with Vagrant boxes) in nix/tests/vm-test/default.nix (ubuntu-v16_04, ubuntu-v22_04, fedora-v37, rhel-v8, rhel-v9; ubuntu-v14_04 is commented out, lines 450-513); container tests with docker/podman in nix/tests/container-test/default.nix (ubuntu 18.04/20.04/22.04); a manual WSL script, tests/windows/test-wsl.ps1. Test files: 12 Rust files contain 43 test functions. Those are 11 under src/ (settings.rs, plan.rs, action/base/{create_file,create_directory,create_or_insert_into_file,create_or_merge_nix_config}.rs, action/common/place_nix_configuration.rs, planner/macos/{profiles,profile_queries}.rs, profile/{nixenv,nixprofile}/tests.rs) plus tests/plan.rs. The latter checks that three committed receipt fixtures (tests/fixtures/linux/linux.json, linux/steam-deck.json, macos/macos.json) still parse (tests/plan.rs:1-29). Workflows (9): ci.yml (triggers: workflow_dispatch, pull_request, push to main). Its lints job runs rustfmt, clippy, codespell, nixpkgs-fmt, editorconfig-checker and shellcheck on nix-installer.sh (lines 23-50; checks defined in nix/check.nix). End-to-end jobs install, uninstall, reinstall and uninstall again, with a matrix of determinate=true/false, on x86_64 Linux (with systemd and with --init none), aarch64 Linux and aarch64 macOS, testing sh/bash/zsh/fish (lines 52-498). Release-ref-only jobs run `nix flake check -L`, the container tests and the VM tests (lines 500-554). Also build-x86_64-linux.yml, build-aarch64-linux.yml, build-aarch64-darwin.yml (reusable builds), release-branches.yml, release-prs.yml, release-tags.yml, propose-release.yml, update.yml (weekly flake.lock update PR, lines 5-6). Dependabot monthly for cargo and github-actions (.github/dependabot.yml). No workflow runs `cargo test`, cargo-audit or cargo-semver-checks directly; cargo-audit and check-semver exist only in the devShell (flake.nix:126, 133). Unit tests appear to run only inside `nix build` via crane (`cargoTestExtraArgs = \"--all\"`, flake.nix:83). That is an inference, since crane's default check phase was not read here.",
+      "dependencies": "Only one language manifest: Cargo.toml has 40 direct [dependencies], 7 of them optional (clap, color-eyre, detsys-ids-client, eyre, tracing-error, tracing-subscriber, is_ci), plus 1 dev-dependency (eyre) (Cargo.toml:20-63). Cargo.lock lists 376 packages. Notable choices: reqwest with rustls-tls-native-roots (Cargo.toml:30), xz2 static (Cargo.toml:42), detsys-ids-client 0.7 for telemetry (Cargo.toml:25), nix-config-parser, plist. Nix flake inputs: nixpkgs, crane v0.20.0, nix (FlakeHub DeterminateSystems/nix-src) and determinate (FlakeHub DeterminateSystems/determinate) (flake.nix:4-26). Dependabot covers cargo and GitHub Actions monthly (.github/dependabot.yml:1-10).",
+      "security_policy": "none. No SECURITY.md or equivalent exists (case-insensitive file search for '*security*' returned nothing; .github contains only PULL_REQUEST_TEMPLATE.md, dependabot.yml and workflows). Only CODE_OF_CONDUCT.md and CONTRIBUTING.md exist; the latter sends bug reports to GitHub issues (CONTRIBUTING.md:65-67)."
+    },
+    "claim_checks": [
+      {
+        "claim": "By default it installs Determinate Nix with flakes enabled and the nix.conf differences listed (README.md:12, 287, 344-354).",
+        "verified": "partial",
+        "evidence": "The default distribution is Determinate Nix unless --prefer-upstream-nix is passed (src/settings.rs:324-333). The installer code that writes the listed nix.conf values (setup_standard_config, src/action/common/place_nix_configuration.rs:118-177) runs only when the distribution is NOT Determinate (place_nix_configuration.rs:66-72). For Determinate it instead executes `/usr/local/bin/determinate-nixd init --stop-after nix-configuration` (place_nix_configuration.rs:359-377). The source of that embedded binary is not in this repo (flake.nix:14-25, 53; src/distribution.rs:53-56). So the README's nix.conf list is verifiable here only for the upstream-Nix path. `--skip-nix-conf` (src/settings.rs:177-189) is undocumented in the README."
+      },
+      {
+        "claim": "Keeps an installation receipt for easy uninstallation, at /nix/receipt.json plus a copy of the binary at /nix/nix-installer (README.md:289, 352).",
+        "verified": "yes",
+        "evidence": "RECEIPT_LOCATION is /nix/receipt.json (src/plan.rs:15). The receipt is the serialized InstallPlan (version, actions with states, planner and settings; tests/fixtures/linux/linux.json:1-4, 1145-1167), written via tmp file and rename after install and on failure or cancel (src/plan.rs:170-171, 182-184, 194, 359-382). The binary is copied to /nix/nix-installer (src/cli/subcommand/install/mod.rs:308-310, 348-354). Uninstall defaults to the receipt path (src/cli/subcommand/uninstall.rs:41-43, 114-118). Receipts are version-gated (src/plan.rs:336-349). Beyond the README: if a receipt exists with the same planner and settings, `install` prints 'already completed' and exits 0 without re-running or re-verifying anything (src/cli/subcommand/install/mod.rs:133-161). Actions recorded as Completed in a loaded plan are skipped, not re-checked (src/action/stateful.rs:60-67)."
+      },
+      {
+        "claim": "Planners create plans that can be reviewed prior to installation (README.md:71-83, 290).",
+        "verified": "yes",
+        "evidence": "describe_install lists planned actions and, with --explain, all settings (src/plan.rs:73-145), and `install` prompts before executing unless --no-confirm (src/cli/subcommand/install/mod.rs:189-212). The `plan` subcommand writes the JSON plan to a file or stdout for manual editing (src/cli/subcommand/plan.rs:11-14, 40-66), and `install` accepts a plan path (src/cli/subcommand/install/mod.rs:69-71, 120-125)."
+      },
+      {
+        "claim": "Enables a best-effort reversion in the face of a failed install (README.md:291).",
+        "verified": "partial",
+        "evidence": "Revert is offered only in the interactive path, i.e. when !no_confirm (src/cli/subcommand/install/mod.rs:221-292). With --no-confirm a failed install returns the error and leaves the partial install (src/cli/subcommand/install/mod.rs:293-305). The receipt is still written on failure (src/plan.rs:182-184)."
+      },
+      {
+        "claim": "A planner can be given as the first argument (`nix-installer install <plan>`) or via NIX_INSTALLER_PLAN (README.md:394-404).",
+        "verified": "no",
+        "evidence": "The positional argument and NIX_INSTALLER_PLAN are `plan: Option<PathBuf>`, documented as 'A path to a non-default installer plan' (src/cli/subcommand/install/mod.rs:69-71). Planners are selected as subcommands (linux, steam-deck, ostree, macos; src/planner/mod.rs:157-173) and combining a plan path with a planner is an error (src/cli/subcommand/install/mod.rs:114-116). The README's own examples elsewhere use `install linux`. Code wins."
+      },
+      {
+        "claim": "Operates as a single static binary without OpenSSL, only calling existing system tools when necessary (README.md:295).",
+        "verified": "yes",
+        "evidence": "By build configuration; the produced artifacts were not inspected. reqwest uses rustls-tls-native-roots (Cargo.toml:30) and xz2 is built static (Cargo.toml:42). The release binaries come from the nix-installer-static (pkgsStatic) package (flake.nix:100, 173-176; build-x86_64-linux.yml:20; build-aarch64-darwin.yml:20). The Nix tarball and determinate-nixd are embedded (src/distribution.rs:45-56). It shells out to system tools such as useradd/dscl (src/action/base/create_user.rs), systemctl (src/settings.rs:341), diskutil and security (src/action/macos/encrypt_apfs_volume.rs:44, 205, 240)."
+      },
+      {
+        "claim": "Each installer version has an associated supported Nix version, found in src/settings.rs (README.md:332).",
+        "verified": "partial",
+        "evidence": "src/settings.rs contains no Nix version. The pin lives in flake.nix:37 (upstream tarball URL prefix nix-2.35.2, consumed as NIX_TARBALL_URL via src/distribution.rs:45) and in the FlakeHub input DeterminateSystems/nix-src, locked at 3.22.5 (flake.nix:9-12; flake.lock:151) and embedded via DETERMINATE_NIX_TARBALL_PATH (src/distribution.rs:47-51). The association itself holds; the pointer to src/settings.rs is wrong."
+      },
+      {
+        "claim": "Diagnostics are anonymous and are disabled by an empty --diagnostic-endpoint or NIX_INSTALLER_DIAGNOSTIC_ENDPOINT (README.md:455-473).",
+        "verified": "partial",
+        "evidence": "The global flag and env var exist (src/cli/mod.rs:68-79), and the value is passed to the external detsys-ids-client builder (src/diagnostics.rs:134-136). What is recorded in this repo matches the README: outcome enums, error-kind names, planner, determinate flag, names of configured settings (src/diagnostics.rs:36-43, 214-243). The code comment says error parameters that may contain secrets are excluded (src/diagnostics.rs:41). The default endpoint, any identifiers sent, and what an empty value does are inside the external crate (Cargo.lock:539-565) and cannot be checked here. The client is constructed for every subcommand and checks in with a 500 ms wait (src/bin/nix-installer.rs:27-37; src/diagnostics.rs:148-151)."
+      },
+      {
+        "claim": "Platform table: Linux x86_64/aarch64, macOS Apple Silicon, Steam Deck, WSL2, Podman and Docker containers (README.md:30-37).",
+        "verified": "yes",
+        "evidence": "flake.nix:38 and release-tags.yml:33-49 cover exactly x86_64-linux, aarch64-linux and aarch64-darwin. Planners exist for linux, steam-deck, ostree and macos (src/planner/mod.rs:157-173). There is no cfg-gated self-test system constant for x86_64-darwin (src/self_test.rs:100-105), so the crate appears not to compile there, and no Intel-Mac artifact is released (the bootstrap script maps Intel Macs to x86_64-darwin and treats a 404 as 'may be unsupported', nix-installer.sh:224-234, 356-358). Rosetta, WSL1, NixOS and hosts with existing Nix are refused (src/planner/macos/mod.rs:434-452; src/planner/linux.rs:206-250). CI exercises x86_64 Linux, aarch64 Linux and aarch64 macOS (ci.yml:52-498); WSL, Steam Deck and ostree are not exercised in GitHub workflows."
+      },
+      {
+        "claim": "Enables Nix to survive macOS upgrades (README.md:10, 288).",
+        "verified": "partial",
+        "evidence": "Mechanisms exist. CreateNixHookService installs a launchd service 'to re-add Nix to the zshrc after upgrades' (src/action/macos/create_nix_hook_service.rs:15-31), planned when modify_profile is true (src/planner/macos/mod.rs:299-306). A volume-mount launchd service and fstab/synthetic.conf entries are created (src/action/macos/create_determinate_nix_volume.rs:26-28, 61-117). `repair hooks` is the default repair and `repair sequoia` re-creates build users (src/cli/subcommand/repair.rs:23-26, 44-55, 189-210). Whether Nix actually survives a given macOS upgrade cannot be verified from source."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Scope: the CLI exposes only install, repair, uninstall, self-test, plan and split-receipt (src/cli/subcommand/mod.rs:16-24). No code reads a tool or runtime manifest, performs backup or restore, or manages user dotfiles. The only packages the installer places in a profile are `nix` and `nss-cacert` (src/action/base/setup_default_profile.rs:121-126). It operates on the local host as root (sudo re-exec, src/cli/mod.rs:192-264), writes system-wide shell snippets (/etc/bashrc, /etc/zshrc, fish conf.d: src/planner/mod.rs:301-353; src/action/common/configure_shell_profile.rs:34-146; /etc/zshenv on macOS: src/action/macos/configure_remote_building.rs:33), and has no remote-host option.",
+      "Receipts and credentials: /nix/receipt.json serializes the full planner settings, including `proxy` (a URL that can embed credentials), `extra_conf` (arbitrary text, URLs or paths) and `ssl_cert_file` (src/settings.rs:155-162; tests/fixtures/linux/linux.json:1145-1162). It is written with tokio::fs::write and no explicit file mode (src/plan.rs:374-376). `extra_conf` is also written to /etc/nix/nix.custom.conf (src/action/common/place_nix_configuration.rs:101-108, 267-311). An existing receipt with the same planner and settings short-circuits `install` to 'already completed', exit 0 (src/cli/subcommand/install/mod.rs:133-161). Actions marked Completed in a loaded plan are skipped without re-verification (src/action/stateful.rs:60-67). A post-install self-test failure only logs a warning and the install still reports success (src/plan.rs:196-205). Receipts are tied to installer versions (src/plan.rs:336-349; tests/plan.rs:7-29).",
+      "Telemetry is on by default: the `diagnostics` cargo feature is default (Cargo.toml:12) and every subcommand constructs the client, waits up to 500 ms for a check-in, and blocks exit on the worker (src/bin/nix-installer.rs:27-41; src/diagnostics.rs:148-151, 297-301). Transport, default endpoint and identifiers are in the external crate detsys-ids-client 0.7.0 (Cargo.lock:539-565), not in this repo. macOS hint text can be supplied remotely (src/cli/mod.rs:137-140). Opt-out is documented as an empty endpoint (README.md:471).",
+      "Embedded binary and root daemon: determinate-nixd is embedded as a prebuilt binary (src/distribution.rs:53-56), written to /usr/local/bin and run as a root systemd/launchd service with sockets under /nix/var/determinate or /var/run (src/action/common/provision_determinate_nixd.rs:13, 59-81; configure_determinate_nixd_init_service/nix-daemon.determinate-nixd.service:10; nixd.determinate-nixd.socket:10; mod.rs:207-243). Its source is not in this repository. It also owns /etc/nix/nix.conf on Determinate installs (place_nix_configuration.rs:359-377; provision_determinate_nixd.rs:100-106). The repo does not state license terms for the embedded Determinate Nix tarball or determinate-nixd; the --determinate flag help points to https://determinate.systems/enterprise (src/settings.rs:45). Builds depend on FlakeHub-hosted inputs (flake.nix:4-26).",
+      "Release integrity: no checksums, signatures or attestations are published (md5 only guards S3 re-uploads, upload_s3.sh:51-64). The documented path pipes a script that downloads and runs a binary over HTTPS with no hash check (README.md:22; nix-installer.sh:55, 92-116, 339-352). Upstream or user-supplied Nix tarballs are fetched and unpacked without hash verification (src/action/base/fetch_and_unpack_nix.rs:115-172). Third-party GitHub Actions are referenced by mutable refs such as @main, @v4 and @v1 rather than commit SHAs (build-x86_64-linux.yml:14-17; ci.yml:30-38; release-tags.yml:62; propose-release.yml:19). CI relies on vendor-specific runner labels (ci.yml:25, 54, 294, 411). GitHub releases are created as drafts (release-tags.yml:63-65).",
+      "Platform limits: builds and releases exist only for x86_64-linux, aarch64-linux and aarch64-darwin (flake.nix:38; release-tags.yml:33-49). Intel Macs map to x86_64-darwin in the bootstrap script and hit a 404 (nix-installer.sh:224-234, 356-358). Install refuses NixOS (src/planner/linux.rs:206-212), any host where `nix-env` already runs (src/planner/linux.rs:237-250), WSL1 (src/planner/linux.rs:214-220), macOS under Rosetta (src/planner/macos/mod.rs:434-452) and macOS hosts with 'Restrictions - Media' configuration profiles (src/planner/macos/mod.rs:454-489). systemd is required unless --init none, which makes Nix root-only (README.md:140-154; src/planner/linux.rs:177-195). SELinux hosts need restorecon/semodule (src/planner/linux.rs:222-235). It creates 32 build users and a group (src/action/common/create_users_and_groups.rs:30-55). WSL, Steam Deck and ostree are not exercised in GitHub workflows.",
+      "State handling: uninstall removes /nix including the store, because /nix is created with force_prune_on_revert (src/planner/linux.rs:55; src/action/base/create_directory.rs:15-19, 281-286; CI asserts /nix is gone, ci.yml:109-112). Keeping the store across a reinstall requires the two-phase `split-receipt` flow (src/cli/subcommand/split_receipt.rs:19-26). On macOS the store is an APFS 'Nix Store' volume encrypted with a random 32-character password kept in /Library/Keychains/System.keychain (src/action/macos/encrypt_apfs_volume.rs:159-233). A pre-existing encrypted volume without that keychain item makes install fail and tells the user to delete the volume (src/action/macos/encrypt_apfs_volume.rs:92-98, 384). /nix/store and /nix/var are excluded from Time Machine (src/planner/macos/mod.rs:277-285). The installer has no backup or restore of /nix.",
+      "Maintenance and licensing: documentation drifts from code. docs/rust-library.md:24 names NIX_INSTALLER_TARBALL_PATH, but the code needs compile-time NIX_TARBALL_URL, DETERMINATE_NIX_TARBALL_PATH and DETERMINATE_NIXD_BINARY_PATH (src/distribution.rs:45-56; no build.rs). docs/building.md:35-47 presents a plain `cargo install` as free of system dependencies. README.md:367 documents `--log-directives`, but the flag is `--log-directive` (src/cli/arg/instrumentation.rs:41). README.md:89,93 use NIX_BUILD_GROUP_NAME, but the env var is NIX_INSTALLER_NIX_BUILD_GROUP_NAME (src/settings.rs:84-89). The example output in CONTRIBUTING.md:158-176 lists VM-test distros (fedora-v36, rhel-v7) that nix/tests/vm-test/default.nix:466-513 does not define. The Rust library is 'experimental ... likely to be removed' (docs/rust-library.md:3-6). Upstream-Nix mode may be removed (README.md:452-453). The rust-toolchain is unpinned 'stable' (rust-toolchain.toml:2). License is declared as the SPDX id `LGPL-2.1` (Cargo.toml:7) with the stock LGPL-2.1 text in LICENSE and no per-file notices or -only/-or-later statement (search for SPDX/'later version' in the repo found nothing)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "determinatesystems/nix-installer",
+      "checks": [
+        {
+          "field": "install[0] (One-liner, Linux and macOS)",
+          "statement": "`curl -fsSL https://install.determinate.systems/nix | sh -s -- install` installs Determinate Nix on Linux and macOS.",
+          "citation": "README.md:21-23 (also opened nix-installer.sh:33-124, 196-237; release-tags.yml:33-49)",
+          "holds": true,
+          "note": "README.md:19-23 gives this exact command ('on just about any supported system'). The script it fetches maps Linux and Darwin to nix-installer-<arch>-<os> (nix-installer.sh:202-234), downloads it from https://install.determinate.systems/nix (nix-installer.sh:33, 55) and passes `install` through as \"$@\", using /dev/tty for the prompt when piped (nix-installer.sh:76-116). 'macOS' means Apple Silicon only: no x86_64-darwin binary is released (release-tags.yml:33-49)."
+        },
+        {
+          "field": "license",
+          "statement": "License is SPDX LGPL-2.1, with the text in LICENSE.",
+          "citation": "LICENSE:1-502; Cargo.toml:7",
+          "holds": true,
+          "note": "LICENSE:1-2 is the unmodified GNU LGPL v2.1 text, and Cargo.toml:7 declares license = \"LGPL-2.1\". The dossier reports the id as the project declares it. That id is deprecated in SPDX and does not say -only or -or-later, and no project notice settles it. A small error outside this field: the risks section says a search for 'later version' 'found nothing', but it matches the stock text at LICENSE:420-421 and 479. No SPDX headers exist."
+        },
+        {
+          "field": "platforms.linux_x86_64",
+          "statement": "yes: README lists Linux x86_64/aarch64 as Stable (systemd multi-user or root-only). x86_64-linux is a supported flake system and a released artifact. CI runs end-to-end install/uninstall with and without init. VM and container tests are x86_64 only. The planner refuses NixOS and hosts where nix-env already runs.",
+          "citation": "README.md:32; flake.nix:38; release-tags.yml:33-36; ci.yml:52-290; nix/tests/vm-test/default.nix:466-513; nix/tests/container-test/default.nix:9-36; src/planner/linux.rs:206-212, 237-250",
+          "holds": true,
+          "note": "Every citation matches. README.md:32 is the Linux row (✓ via systemd, ✓ root-only, Stable). flake.nix:38 has supportedSystems = [x86_64-linux aarch64-linux aarch64-darwin]. release-tags.yml:33-36 fetches nix-installer-x86_64-linux into the release job, and lines 56-68 upload it to S3 and a draft GitHub release. ci.yml:52-167 (systemd) and 169-290 (init: none) install, uninstall, reinstall and uninstall, with determinate true and false, and assert /nix is gone. Every VM image (vm-test/default.nix:466-513) and container image (container-test/default.nix:9-36) is x86_64-linux; those run only on release refs (ci.yml:500-510). linux.rs:206-212 rejects /etc/NIXOS, and linux.rs:237-250 rejects hosts where `nix-env --version` runs."
+        },
+        {
+          "field": "integrations.cli",
+          "statement": "Binary `nix-installer` with subcommands install, repair [hooks|sequoia], uninstall, self-test, plan, split-receipt. Every flag can also be set via NIX_INSTALLER_* env vars. A copy is placed at /nix/nix-installer on success. The embedded determinate-nixd has its own CLI, and its source is not in this repo.",
+          "citation": "src/bin/nix-installer.rs; src/cli/subcommand/mod.rs:16-24; README.md:358-359; src/cli/subcommand/install/mod.rs:47-53, 308-310, 348-354; README.md:105-109",
+          "holds": false,
+          "note": "Most of it holds. src/bin/nix-installer.rs is the binary (Cargo.toml:16-18). mod.rs:17-24 lists Install, Repair, Uninstall, SelfTest, Plan and SplitReceipt, and repair.rs:45-55 has Hooks and Sequoia. install/mod.rs:308-310 calls copy_self_to_nix_dir on success, which copies the binary with mode 0755 (349-353). README.md:105-109 shows `determinate-nixd upgrade`, and the binary is only embedded through include_bytes! (src/distribution.rs:53-56). The universal 'every flag' claim fails. These flags have no env var: `install ostree --persistence` (src/planner/ostree.rs:34-36), `install macos --use-ec2-instance-store` (src/planner/macos/mod.rs:90-94), `split-receipt --phase1-output` and `--phase2-output` (src/cli/subcommand/split_receipt.rs:39-42), and the hidden `--force-naive-json-method` (split_receipt.rs:47-48). README.md:358-359 makes the same overbroad claim. The defect is narrow but makes the statement wrong as written."
+        },
+        {
+          "field": "claim_checks[1] (installation receipt, verified: yes)",
+          "statement": "Keeps an installation receipt at /nix/receipt.json plus a copy of the binary at /nix/nix-installer. The receipt is the serialized plan, written via tmp file and rename after install and on failure or cancel. Uninstall defaults to it. Receipts are version-gated. A same-settings install exits 0 as 'already completed'. Completed actions are skipped, not re-checked.",
+          "citation": "README.md:289, 352; src/plan.rs:15, 170-171, 182-184, 194, 336-349, 359-382; tests/fixtures/linux/linux.json:1-4, 1145-1167; src/cli/subcommand/install/mod.rs:133-161, 308-310, 348-354; src/cli/subcommand/uninstall.rs:41-43, 114-118; src/action/stateful.rs:60-67",
+          "holds": true,
+          "note": "Every cited line matches. plan.rs:15 is RECEIPT_LOCATION = \"/nix/receipt.json\". write_receipt runs on cancel (170-171), on action failure (182-184) and after success (194), and writes <path>.tmp then renames it (359-382). The fixture has version and actions with per-action state (linux.json:1-4) and planner with settings and init (1145-1167). Uninstall's positional receipt defaults to RECEIPT_LOCATION (uninstall.rs:41-42) and is read and parsed (114-118). check_compatible is a semver gate (plan.rs:336-349). A receipt with the same planner and settings prints 'already completed' and returns ExitCode::SUCCESS before any planning or checks (install/mod.rs:133-161). try_execute returns Ok for Completed without re-running (stateful.rs:61-67). README.md:289 and 352 say what the claim quotes."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "integrations.cli: replace 'Every flag can also be set via NIX_INSTALLER_* env vars (README.md:358-359; e.g. src/cli/subcommand/install/mod.rs:47-53)' with 'Most flags can also be set via NIX_INSTALLER_* env vars (README.md:358-359 claims all; e.g. src/cli/subcommand/install/mod.rs:47-53). Exceptions with no env var: `install ostree --persistence` (src/planner/ostree.rs:34-36), `install macos --use-ec2-instance-store` (src/planner/macos/mod.rs:90-94), and `split-receipt --phase1-output/--phase2-output` (src/cli/subcommand/split_receipt.rs:39-42).'",
+        "risks 'Maintenance and licensing' item (outside the five checked statements): replace \"(search for SPDX/'later version' in the repo found nothing)\" with \"(no SPDX headers exist; the only 'later version' matches are the stock license text at LICENSE:420-421 and 479)\"."
+      ]
+    }
+  ]
+}

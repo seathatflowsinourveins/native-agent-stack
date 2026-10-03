@@ -1,0 +1,297 @@
+{
+  "contender": "huggingface/huggingface_hub",
+  "revision": {
+    "contender": "huggingface/huggingface_hub",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "huggingface/huggingface_hub",
+        "tag": "v2.1.0",
+        "commit": "43372b60841b5b9ee2724e1c9c19c3fede6d54b6",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v2.1.0",
+    "commit": "43372b60841b5b9ee2724e1c9c19c3fede6d54b6",
+    "read_at": "2026-10-02T03:02:15+00:00"
+  },
+  "dossier": {
+    "contender": "huggingface/huggingface_hub",
+    "revision": {
+      "tag": "v2.1.0",
+      "commit": "43372b60841b5b9ee2724e1c9c19c3fede6d54b6",
+      "read_at": "2026-10-02T03:02:15+00:00"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "huggingface_hub v2.1.0 is the Hugging Face Hub client: a Python SDK (HfApi, hf_hub_download, snapshot_download, HfFileSystem, InferenceClient) plus the `hf` CLI. It downloads and uploads files, manages repos, Spaces, Jobs, Inference Endpoints, buckets, collections, webhooks and discussions, runs inference through Inference Providers, and searches Hub metadata (README.md:88-98; setup.py:117-123). For the stated need (semantic code search over the project repositories, an embedding index plus queries, for both clients): no system in this repository provides it. This was established by reading the code and by repo-wide greps. The repo has no code-indexing, embedding-index, vector-store or local query component, and no MCP server. Its only 'semantic search' is a server-side Hub endpoint that searches Hub Spaces (src/huggingface_hub/hf_api.py:2851-2908). Its only embedding code is a remote-call client, InferenceClient.feature_extraction (src/huggingface_hub/inference/_client.py:1018-1099). Its agent integration is a generated `hf-cli` command-reference skill written to .agents/skills and symlinked into .claude/skills (src/huggingface_hub/cli/skills.py:421-472). No retrieval, embedding or search benchmarks are published in the repo.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "'The official CLI and Python client for the Hugging Face Hub.'",
+          "citation": "README.md:12"
+        },
+        {
+          "claim": "Standalone installer for macOS and Linux: `curl -LsSf https://hf.co/cli/install.sh | bash`",
+          "citation": "README.md:47-52"
+        },
+        {
+          "claim": "Log in with `hf auth login` (use `--token $HF_TOKEN` in non-interactive environments); 'The Hub uses tokens to authenticate applications'",
+          "citation": "README.md:62-63, 84"
+        },
+        {
+          "claim": "'Everything ships in one package with two interfaces: the `hf` CLI for your terminal and the `huggingface_hub` library for Python — both designed to work well for humans and AI agents.'",
+          "citation": "README.md:88"
+        },
+        {
+          "claim": "Capabilities list: download and upload files, manage repositories, 'Run Inference on deployed models', run Jobs on Hugging Face infrastructure, 'Search for models, datasets and Spaces', model cards, community PRs and comments, all from the CLI",
+          "citation": "README.md:90-98"
+        },
+        {
+          "claim": "CLI quick-start examples all run against Hub-hosted services: `hf models ls --warm`, `hf download`, `hf upload`, `hf buckets sync ... hf://buckets/...`, `hf jobs run python:3.12 ...`",
+          "citation": "README.md:65-78"
+        },
+        {
+          "claim": "'the same commands adapt their output when run by an agent'",
+          "citation": "README.md:102"
+        },
+        {
+          "claim": "'install the `hf` CLI Skill — a command reference generated from your installed CLI' with `hf skills add`; 'works with Claude Code, Codex, Cursor, OpenCode, Pi and any agent that loads skills from `.agents/skills`'",
+          "citation": "README.md:102-107"
+        },
+        {
+          "claim": "`pip install huggingface_hub` also installs the `hf` CLI; `uv pip install huggingface_hub` is recommended",
+          "citation": "README.md:113-123"
+        },
+        {
+          "claim": "Optional dependencies keep the package minimal; to use 'the MCP module' run `pip install \"huggingface_hub[mcp]\"`",
+          "citation": "README.md:125-129"
+        },
+        {
+          "claim": "'Files will be downloaded in a local cache folder.'",
+          "citation": "README.md:151"
+        },
+        {
+          "claim": "Hub storage is Xet ('the Hub's chunk-deduplicated storage backend') and downloads are served via CloudFront, a CDN",
+          "citation": "README.md:196, 199"
+        },
+        {
+          "claim": "Absence: the README makes no claim about semantic or code search, embeddings, a local index, an MCP server, telemetry or offline operation. The whole file was read; a term search for telemetry|embedding|semantic|index|vector|MCP matches only README.md:26, 125-128 and 196, none of which concern these topics.",
+          "citation": "README.md:1-209"
+        }
+      ],
+      "install": [
+        {
+          "method": "Standalone installer (macOS and Linux)",
+          "command": "curl -LsSf https://hf.co/cli/install.sh | bash",
+          "citation": "README.md:49-52 (also docs/source/en/installation.md:109-113; docs/source/en/guides/cli.md:27-31)"
+        },
+        {
+          "method": "pip",
+          "command": "pip install huggingface_hub",
+          "citation": "README.md:115-117"
+        },
+        {
+          "method": "uv pip",
+          "command": "uv pip install huggingface_hub",
+          "citation": "README.md:121-123"
+        },
+        {
+          "method": "pip with the MCP extra (installs an MCP client, not a server)",
+          "command": "pip install \"huggingface_hub[mcp]\"",
+          "citation": "README.md:127-129"
+        },
+        {
+          "method": "Homebrew",
+          "command": "brew install hf",
+          "citation": "docs/source/en/guides/cli.md:116-124"
+        },
+        {
+          "method": "conda-forge",
+          "command": "conda install -c conda-forge huggingface_hub",
+          "citation": "docs/source/en/installation.md:123-130"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - README documents the installer for Linux (README.md:50-51) and pip (README.md:116). setup.py:131 declares 'OS Independent' and installs hf-xet on x86_64/amd64 (setup.py:21). CI runs the test matrix on Ubuntu (.github/workflows/python-tests.yml:44-48, 55-66), the import check on ubuntu-latest (python-tests.yml:23-27) and the installer on ubuntu-latest (.github/workflows/check-installers.yml:20-23, 40). The workflows do not state the runner CPU architecture.",
+        "wsl2": "unknown - README.md, docs/source/en/installation.md and the installer say nothing about WSL2. The only mention is CONTRIBUTING.md:146 ('Windows users: we recommend using WSL for development'). No WSL job exists in .github/workflows. The code is pure Python, but WSL2 is neither documented nor tested.",
+        "macos_arm64": "yes (documented, not CI-tested) - README.md:50-51 documents the installer 'On macOS and Linux'. install.sh handles darwin (utils/installers/install.sh:182-190, 221-236). `brew install hf` is documented (docs/source/en/guides/cli.md:116-124) and `hf update` handles brew installs (src/huggingface_hub/cli/_cli_utils.py:1221-1222). The hf-xet marker includes arm64 (setup.py:21). No workflow runs on macOS: a case-insensitive search of .github for macos/darwin/arm64/aarch64 finds nothing. hf-xet wheel availability for macOS arm64 is not checkable from this repo.",
+        "gpu": "no - a GPU is not required or used locally. The package is an HTTP client with no local model inference (no transformers, sentence-transformers, onnx, llama_cpp, faiss or chroma imports in src/). torch is only an optional extra for checkpoint serialization (setup.py:38-41; src/huggingface_hub/serialization/_torch.py:42). GPUs appear only as remote hardware flavors for Jobs, Spaces and Endpoints (src/huggingface_hub/hf_api.py:11903, 11991-11992). Embeddings are computed remotely (src/huggingface_hub/inference/_client.py:1081-1099)."
+      },
+      "integrations": {
+        "cli": "Yes. The `hf` console script (setup.py:119; src/huggingface_hub/cli/hf.py:153-178) has groups auth, buckets, cache, collections, datasets, discussions, jobs, models, papers, repos, sandbox, skills, spaces, webhooks, endpoints and extensions, plus top-level download, upload, sync, cp, env, update and version (cli/hf.py:98-128). Search-type commands are Hub-side only. `hf models|datasets|spaces ls --search` matches a substring of repo IDs (src/huggingface_hub/hf_api.py:2334-2335, 2540-2541, 2774-2775; docs/source/en/guides/search.md:66-82). `hf spaces search` is the server-side semantic search of Spaces (cli/spaces.py:260-302). `hf papers search` is Hub-side (cli/papers.py:109-125). `hf datasets sql` runs DuckDB over dataset parquet URLs (cli/datasets.py:230-241; _dataset_viewer.py:39-60). No command indexes or searches local code. Output switches to an 'agent' format when an agent harness is detected (cli/_output.py:65-69).",
+        "mcp": "MCP client only; no MCP server. `MCPClient` connects to stdio, SSE or StreamableHTTP MCP servers (src/huggingface_hub/inference/_mcp/mcp_client.py:55-153) and `Agent` wraps it (inference/_mcp/agent.py:13). The `tiny-agents` console script runs agents (setup.py:120; inference/_mcp/cli.py:15-19). It needs the extra `huggingface_hub[mcp]` (setup.py:50) and is marked experimental (mcp_client.py:59-60; docs/source/en/guides/inference.md:410-471; docs/source/en/package_reference/mcp.md:1-17). A repo-wide grep for FastMCP, mcp.server and MCPServer returned no matches. The default tiny-agent config launches unpinned `npx` MCP servers (filesystem and playwright) (inference/_mcp/constants.py:12-31).",
+        "sdk_or_api": "Python SDK: `HfApi` (src/huggingface_hub/hf_api.py:2100), `hf_hub_download` and `snapshot_download` (file_download.py, _snapshot_download.py), fsspec `HfFileSystem` registered as protocol `hf` (hf_file_system.py:144, 212; setup.py:122), and `InferenceClient`/`AsyncInferenceClient` (inference/_client.py:122; inference/_generated/_async_client.py:112). `feature_extraction` returns embeddings as a float32 numpy array (inference/_client.py:1018-1099). It supports providers deepinfra, hf-inference, scaleway and together (inference/_providers/__init__.py:111, 143, 189, 193), or a URL passed as `model` (inference/_providers/__init__.py:228-231; hf_inference.py:35-37, 50-53). The package is a client of the Hub HTTP API (default https://huggingface.co, constants.py:67-69). Its only server is the experimental Gradio-based `WebhooksServer` (_webhooks_server.py:36-83), which is not a search API.",
+        "claude_code_or_codex": "Documented but limited to a command-reference skill. `hf skills add` writes a SKILL.md generated from the installed CLI's command tree to `.agents/skills` (or `~/.agents/skills` with --global) and symlinks it (copy fallback) into Claude Code's `.claude/skills`, honoring CLAUDE_CONFIG_DIR (src/huggingface_hub/cli/skills.py:243-308, 421-472; constants.py:228-234; README.md:100-109; docs/source/en/guides/cli.md:13-19). Codex is named only in README/docs text as an agent that reads `.agents/skills`; no Codex-specific code exists. The standalone installer installs the skill globally by default (utils/installers/install.sh:399-413; docs/source/en/guides/cli.md:39). `hf skills add <name>` can also fetch other skills from the Hub bucket `huggingface/skills` (cli/_skills.py:24-26, 97-132); that content is outside this repo. The generated skill also points agents to a separate tool, `hf-mount` (cli/skills.py:71-88). No hooks, slash commands, plugin manifest or semantic-search tool for either client were found: there is no .claude-plugin, .mcp.json, CLAUDE.md or .codex* file."
+      },
+      "telemetry_and_network": "README.md is silent on telemetry and offline mode; the docs and code say the following. (1) `send_telemetry()` sends a HEAD request to {ENDPOINT}/api/telemetry/<topic> from a daemon thread without a token. It exists for third-party libraries and is not called anywhere inside this package. It is disabled by HF_HUB_DISABLE_TELEMETRY, DISABLE_TELEMETRY or DO_NOT_TRACK, or by offline mode (src/huggingface_hub/utils/_telemetry.py:19-125; constants.py:243-248; docs/source/en/package_reference/environment_variables.md:173-178, 230-232). (2) Every Hub request's User-Agent carries the hf_hub and python versions; the torch version and `agent/<harness>` are added unless telemetry is disabled (utils/_headers.py:176-189). (3) The `hf` CLI resolves its output mode at import through agent detection. That detection fetches {ENDPOINT}/api/agent-harnesses (3 s timeout, cached 24 h at $HF_HOME/.agent_harnesses.json) and is gated only by HF_HUB_OFFLINE, not by the telemetry flag (cli/_output.py:65-69, 398; utils/_detect_agent.py:21-28, 189-204; constants.py:224-226). (4) At CLI start, at most once per 24 h, it queries https://pypi.org/pypi/huggingface_hub/json (the Homebrew API for brew installs) unless HF_HUB_DISABLE_UPDATE_CHECK is set. The skill-update hint is local-only (cli/hf.py:159-163; cli/_cli_utils.py:1111-1199; cli/_skills.py:326-374; docs/source/en/package_reference/environment_variables.md:180-186). (5) Every request through get_session gets a random trace-id header, and download calls get `X-HF-Download-Counter: 1`, regardless of the telemetry flag (utils/_http.py:298-304). Required network services: the Hub API at https://huggingface.co (override with HF_ENDPOINT), datasets-server.huggingface.co, api-inference.huggingface.co, router.huggingface.co/{provider}, api.endpoints.huggingface.cloud and endpoints.huggingface.co (constants.py:67-108). GitHub is used by `hf extensions`, and PyPI by the update check. HF_HUB_OFFLINE=1 makes every get_session request raise OfflineModeIsEnabled (utils/_http.py:293-296; constants.py:194-213; docs/source/en/package_reference/environment_variables.md:119-128). Accounts: a token is optional for public downloads (utils/_auth.py:133-136) and for the hf-inference provider (inference/_providers/hf_inference.py:30-32). A token is needed for write operations and other providers (utils/_headers.py:47-48; inference/_providers/_common.py:137-147). Token sources are OIDC, HF_TOKEN, the token file ~/.cache/huggingface/token (mode 0600) or Colab secrets (utils/_auth.py:37-50, 60-86; constants.py:250-258). `hf auth login` uses a browser device-code flow (utils/_oauth_device.py:16-17). Embedding calls go to the HF router (when the key starts with hf_) or directly to a provider (inference/_providers/_common.py:216-226)."
+    },
+    "code": {
+      "languages": [
+        "Python (>=3.10; classifiers 3.10-3.14; setup.py:124, 134-138)",
+        "Bash (utils/installers/install.sh)",
+        "PowerShell (utils/installers/install.ps1)",
+        "YAML (GitHub Actions workflows)",
+        "Markdown (docs/)"
+      ],
+      "entry_points": [
+        {
+          "path": "setup.py:119",
+          "what": "Console script `hf` -> huggingface_hub.cli.hf:main (src/huggingface_hub/cli/hf.py:153-178). It is a Click app with lazily loaded command groups (cli/hf.py:98-150) and is also runnable as `python -m huggingface_hub.cli.hf` (cli/hf.py:181-182)."
+        },
+        {
+          "path": "setup.py:120",
+          "what": "Console script `tiny-agents` -> huggingface_hub.inference._mcp.cli:app (src/huggingface_hub/inference/_mcp/cli.py:15-19), an MCP-client agent loop that needs the `mcp` extra."
+        },
+        {
+          "path": "setup.py:122",
+          "what": "fsspec entry point registering protocol `hf` -> huggingface_hub.HfFileSystem (src/huggingface_hub/hf_file_system.py:144, 212)."
+        },
+        {
+          "path": "src/huggingface_hub/hf_api.py:2100",
+          "what": "`HfApi`, the Python SDK for the Hub HTTP API (repos, commits, discussions, Spaces, Jobs, buckets, search_spaces, list_papers). Module-level helpers are exported lazily from src/huggingface_hub/__init__.py."
+        },
+        {
+          "path": "src/huggingface_hub/inference/_client.py:122",
+          "what": "`InferenceClient` (async twin at inference/_generated/_async_client.py:112); includes `feature_extraction` embeddings (L1018-1099)."
+        },
+        {
+          "path": "src/huggingface_hub/inference/_mcp/mcp_client.py:55",
+          "what": "`MCPClient` (client for stdio/SSE/StreamableHTTP MCP servers) and `Agent` (inference/_mcp/agent.py:13). No MCP server entry point exists."
+        },
+        {
+          "path": "utils/installers/install.sh",
+          "what": "Standalone installer served as https://hf.co/cli/install.sh (Windows: utils/installers/install.ps1). It creates a venv, installs huggingface_hub, links `hf` and installs the hf-cli skill."
+        },
+        {
+          "path": "utils/hf/setup.py:31",
+          "what": "Separate PyPI project `hf` (wheel only) exposing `hf=huggingface_hub.cli.hf:main`, pinned to the same huggingface_hub version (utils/hf/setup.py:16-18)."
+        }
+      ],
+      "architecture": "Single pure-Python distribution (src/huggingface_hub: 178 .py files, about 78.6k lines including generated code) with no server process. `__init__.py` (1,840 lines) is a lazy-import public API whose static-import block is generated by utils/check_static_imports.py (AGENTS.md:28). Core: `hf_api.py` (15,442 lines) holds `HfApi` with nearly all Hub REST calls (repos, commits, discussions, collections, Spaces, Jobs, buckets, search_spaces, list_papers). `file_download.py` and `_snapshot_download.py` handle cache, ETag and resume via `.incomplete` blobs (file_download.py:337-480, 1286), with `_local_folder.py` and `_tree_cache.py` for on-disk download metadata and tree listings. The upload stack is `_commit_api.py`, `_upload_pipeline.py` (streamed multi-commit upload over Xet; re-running the call resumes, :15-31), `_commit_scheduler.py`, `lfs.py` and `utils/_xet.py` (wraps the optional native `hf_xet`). Also present: `hf_file_system.py` (fsspec), `_buckets.py`, `hub_mixin.py`, `repocard*.py` and `serialization/` (torch, safetensors and DDUF helpers). Inference lives in `inference/_client.py` (3,365 lines) with an auto-generated async twin (`inference/_generated/_async_client.py`) and task types (`inference/_generated/types/`), provider adapters in `inference/_providers/` (19 providers, PROVIDER_T at __init__.py:72-92) and `inference/_mcp/` (MCPClient, Agent, tiny-agents). The CLI is `cli/hf.py` with lazily loaded modules (auth, buckets, cache, jobs, spaces, skills, extensions, sandbox and others). It is built directly on Click through a vendored Typer-style declaration layer (cli/_framework.py:14-36; there is no `typer` dependency), with output modes in `cli/_output.py`. Cloud features: `_jobs_api.py`, `_sandbox.py` (2,588 lines, experimental, runs on HF Jobs), `_inference_endpoints.py`, `_space_api.py`, `_webhooks_server.py`, `_oauth.py` and `_login.py`. Cross-cutting `utils/`: `_http.py` (httpx2 session, retry and offline gate), `_auth.py`, `_headers.py`, `_telemetry.py`, `_detect_agent.py` and `_runtime.py`. Local state is limited to HF_HOME caches, tokens and stamps (constants.py:158-226), `<local_dir>/.cache/huggingface/` download metadata, the sandbox-pool cache (_sandbox_cache.py:15) and installed extensions (~/.local/share/hf/extensions, cli/extensions.py:42). There is no indexing, embedding-store or semantic-query module.",
+      "packaging_and_release": "Built from setup.py with `python -m build`; pyproject.toml has no [project] or [build-system] table. The version string is in src/huggingface_hub/__init__.py:49 (2.1.0, matching the tag). Releases are manual `workflow_dispatch` only (.github/workflows/release.yml:55-67). The workflow creates a vX.Y-release branch and tag, then publishes `huggingface-hub` (sdist and wheel) and the stub `hf` wheel to PyPI via Trusted Publishing/OIDC in a gated `pypi` environment, with `attestations: true` (PEP 740/Sigstore) and `print-hash: true` (release.yml:32-34, 320-345, 375-401). It drafts GitHub releases with AI-generated notes (release.yml:496-532) but attaches no assets or checksum files: only `gh release create` calls at release.yml:452, 532 and 589. It opens RC test branches in transformers, datasets, diffusers and sentence-transformers (release.yml:859-960) and syncs the generated hf-cli SKILL.md to huggingface/skills (release.yml:1075-1161). Actions are pinned by commit SHA (e.g. release.yml:101) and updated weekly by Dependabot with a 7-day cooldown (.github/dependabot.yml). The installer scripts live in utils/installers/ (served from hf.co/cli; the hosting is not visible in this repo) and do no checksum or signature verification (utils/installers/install.sh:304-348). Homebrew (`hf`) and conda-forge packages are documented (docs/source/en/guides/cli.md:116-124; docs/source/en/installation.md:123-130) but are not built by this repo's workflows: .github contains no conda or brew mention, and docs/dev/release.md:18-22 describes a conda-build step for a `.github/conda` directory that does not exist.",
+      "tests_and_ci": "pytest (pyproject.toml:34-58; markers xet, no_xet, inference, production, deprecated, git_lfs) with pytest-cov, -env, -xdist, -vcr, -asyncio, -rerunfailures and -mock (setup.py:52-74). tests/ holds 78 `test_*.py` modules (test_endpoint_helpers.py is a license-header-only stub), plus conftest.py, testing_utils.py, testing_constants.py, 11 VCR cassettes (tests/cassettes) and card fixtures. There are about 2.3k `def test_` definitions by static count (parametrization expands this further). Many tests hit the staging Hub (HUGGINGFACE_CO_STAGING=1, pyproject.toml:53-58; tests/testing_constants.py:18-19), and 'many require network/auth' (AGENTS.md:20). CI has 15 workflow files in .github/workflows. python-tests.yml has: check-imports with base dependencies on Python 3.14; build-ubuntu on runner group aws-general-8-plus (Python 3.10 and 3.14 x {no hf_xet, Inference only, with hf_xet}, plus torch 1.11 on 3.10, torch latest on 3.12 and gradio on 3.13); build-windows (3.10 and 3.14 x {no hf_xet, with hf_xet}); `--reruns 8` on network errors; coverage upload to Codecov; and a '~20min' full-suite comment (python-tests.yml:49-50). python-quality.yml runs ruff lint and format, generated-file consistency scripts, `uvx ty check src` and mypy. check-installers.yml runs install.sh on ubuntu-latest and install.ps1 on windows-latest and checks `hf version` and the hf-cli skill file. trufflehog.yml scans for secrets on every push. Docs workflows are build_documentation, build_pr_documentation and upload_pr_documentation. Daily cron PR bots are update-inference-types.yaml (03:00) and update-hardware-flavors.yaml (04:00). release.yml is manual. The remaining workflows are style-bot, style-bot-action, close-unscoped-community-prs, model_card_consistency_reminder and build_repocard_examples. No macOS or WSL job exists.",
+      "dependencies": "Manifests: setup.py is the only runtime manifest; pyproject.toml holds tool config only, and there is no lockfile or requirements*.txt. utils/hf/setup.py is the stub-package manifest. setup.py install_requires has 10 direct dependencies (setup.py:17-28). Eight are unconditional: click>=8.4.2,<9; filelock>=3.10; fsspec>=2023.5; httpx2>=2.0.0,<3; packaging>=20.9; pyyaml>=5.1; tqdm>=4.42.1; typing-extensions>=4.1. Two are conditional: hf-xet>=1.6.0,<2 only on x86_64/amd64/arm64/aarch64, and tomli on Python<3.11. Extras (setup.py:32-101): oauth 3, torch 2, fastai 3, hf_xet 1, mcp 1 (mcp>=1.9.4,<2), gradio 2, typing 6, quality 4 (including mypy==1.15.0 and ty), testing 16 own plus oauth (including urllib3<2.0 for VCR), and all/dev = testing + quality + typing. utils/hf/setup.py has 1 dependency, huggingface_hub==<same version> (utils/hf/setup.py:16-18). numpy is not a runtime dependency but is needed for embeddings (src/huggingface_hub/inference/_common.py:94-100).",
+      "security_policy": "SECURITY.md exists. Only the latest release gets fixes, with no backports (SECURITY.md:5). Reports go privately through GitHub private vulnerability reporting or security@huggingface.co (SECURITY.md:9-12). There is no bounty; credit is given through the advisory and CVE (SECURITY.md:18). Reports must include version, PoC and impact (SECURITY.md:22-67). Loading untrusted artifacts is the user's trust decision, and scripts/, docs, tests, local DoS and third-party dependencies are out of scope (SECURITY.md:73-78, 98-108). A safe-harbor clause is included (SECURITY.md:110-112). The file carries template residue from other HF projects: a smolagents 'local code executor' paragraph and AutoModel.from_pretrained / v4.57.0 examples (SECURITY.md:29, 33, 80-82)."
+    },
+    "claim_checks": [
+      {
+        "claim": "The official CLI and Python client for the Hugging Face Hub; one package with two interfaces, the hf CLI and the huggingface_hub library (README.md:12, 88)",
+        "verified": "yes",
+        "evidence": "One distribution `huggingface_hub` exposes the `hf` console script (setup.py:103-123; src/huggingface_hub/cli/hf.py:153-178) and the SDK (`HfApi`, src/huggingface_hub/hf_api.py:2100). Beyond the claim: a second console script `tiny-agents` (setup.py:120) and a separate PyPI project `hf` that only depends on huggingface_hub==<same version> (utils/hf/setup.py:16-18, 31; .github/workflows/release.yml:375-401). 'Official' is a provenance statement and is not checkable from code."
+      },
+      {
+        "claim": "Search for models, datasets and Spaces (README.md:95)",
+        "verified": "yes",
+        "evidence": "Hub-side only. `list_models/list_datasets/list_spaces(search=...)` filter on a substring of IDs (src/huggingface_hub/hf_api.py:2334-2335, 2540-2541, 2774-2775). `search_spaces` calls the Hub's `/api/spaces/semantic-search`, embedding-based for multi-word queries and full-text for single words (hf_api.py:2861-2863, 2895). `list_papers` calls `/api/papers/search` (hf_api.py:11676). The embedding index lives on the Hub server. Nothing in the repo indexes or searches local code or project repositories: repo-wide greps for faiss/chroma/lancedb/qdrant/hnsw/vector store/code search found nothing, and 'index' hits are safetensors checkpoint indexes."
+      },
+      {
+        "claim": "`hf skills add` installs a command-reference Skill that works with Claude Code, Codex, Cursor, OpenCode, Pi and any agent loading `.agents/skills` (README.md:102-107)",
+        "verified": "partial",
+        "evidence": "Verified: SKILL.md is generated from the installed CLI's command tree (src/huggingface_hub/cli/skills.py:243-308), written to `.agents/skills`, then symlinked (copy fallback) to `.claude/skills` (cli/skills.py:421-472; constants.py:228-234). Not verifiable here: Codex, Cursor, OpenCode and Pi are not referenced by any code, only the `.agents/skills` convention. The skill documents the `hf` CLI only and contains no retrieval capability."
+      },
+      {
+        "claim": "The same commands adapt their output when run by an agent (README.md:102)",
+        "verified": "yes",
+        "evidence": "`Output.set_mode` selects the `agent` format when `is_agent()` is true (src/huggingface_hub/cli/_output.py:65-69). Detection uses environment variables listed in a registry fetched from {ENDPOINT}/api/agent-harnesses and cached for 24 h, with no hard-coded list, so it reports 'no agent' when the Hub is unreachable and no cache exists (utils/_detect_agent.py:21-28, 143-163). Docs say `auto` picks human for an interactive terminal (docs/source/en/guides/cli.md:149), but the code does not test for a TTY (cli/_output.py:67-69); the code takes precedence."
+      },
+      {
+        "claim": "To use the MCP module, install `huggingface_hub[mcp]` (README.md:125-129)",
+        "verified": "yes",
+        "evidence": "`extras['mcp'] = ['mcp>=1.9.4, <2.0.0']` (setup.py:50). The module src/huggingface_hub/inference/_mcp/ provides `MCPClient` (mcp_client.py:55), `Agent` (agent.py:13) and the `tiny-agents` CLI (setup.py:120). It is client-only: it connects to other MCP servers (mcp_client.py:123-153; docs/source/en/package_reference/mcp.md:5) and is flagged experimental (mcp_client.py:59-60). No MCP server implementation exists (a grep for FastMCP, mcp.server and MCPServer has no matches)."
+      },
+      {
+        "claim": "Files will be downloaded in a local cache folder (README.md:151)",
+        "verified": "yes",
+        "evidence": "Default `~/.cache/huggingface/hub` under HF_HOME, overridable via HF_HOME and HF_HUB_CACHE (src/huggingface_hub/constants.py:158-192). The cache stores downloaded blobs and metadata, with resumable `.incomplete` blobs (file_download.py:337-480, 1286), per-file `local_dir` metadata (_local_folder.py:14-48) and tree listings (_tree_cache.py:14-32). It is a transfer cache, not an embedding or retrieval index."
+      },
+      {
+        "claim": "Run Inference on deployed models (README.md:93), including embeddings",
+        "verified": "yes",
+        "evidence": "`InferenceClient.feature_extraction` generates embeddings and returns a float32 numpy array (src/huggingface_hub/inference/_client.py:1018-1099). Providers with feature-extraction are deepinfra, hf-inference, scaleway and together (inference/_providers/__init__.py:111, 143, 189, 193). A URL passed as `model` is routed to hf-inference and posted verbatim with a TEI-style `{'inputs': ...}` payload (inference/_providers/__init__.py:228-231; hf_inference.py:35-37, 50-53, 213-223). Non-HF providers accept only Hub model IDs resolved through a Hub lookup (inference/_providers/_common.py:149-184). It returns vectors only, with no storage, index or query step. numpy is not installed by default (inference/_common.py:94-100). The tests found for feature extraction mock the helper, assert payload/URL/response shapes, or call hosted clients (tests/test_inference_client.py:210-224, 467-477; tests/test_inference_providers.py:398-444); no test against a self-hosted embedding server was found."
+      },
+      {
+        "claim": "Standalone installer: `curl -LsSf https://hf.co/cli/install.sh | bash` on macOS and Linux (README.md:49-52)",
+        "verified": "partial",
+        "evidence": "utils/installers/install.sh handles linux and darwin (:182-190) and requires an existing Python>=3.10 (:192-256). It builds a venv in ~/.hf-cli or $HF_HOME/cli (:167-174, 293), pip/uv-installs the latest unpinned `huggingface_hub` (:304-348), links `hf` into ~/.local/bin (:366-397), installs the hf-cli skill globally unless --exclude-skill (:399-413) and appends to a shell rc file unless --no-modify-path (:478-483). It does no checksum or signature verification. CI exercises it only on ubuntu-latest and windows-latest (.github/workflows/check-installers.yml:20-23, 65-68), not macOS. Whether the file served at hf.co/cli/install.sh equals the repo copy is not checkable."
+      },
+      {
+        "claim": "Hub storage is Xet-backed and downloads are served via CloudFront (README.md:196, 199)",
+        "verified": "not_checkable",
+        "evidence": "Server-side infrastructure claims. Client side: hf-xet is a base dependency only on x86_64/amd64/arm64/aarch64 (setup.py:15, 21) and is used via src/huggingface_hub/utils/_xet.py and _upload_pipeline.py:15-31. The storage backend and the CDN are not in this repo."
+      },
+      {
+        "claim": "(docs, not README) Setting HF_HUB_DISABLE_TELEMETRY=1 'globally disable[s] telemetry' (docs/source/en/package_reference/environment_variables.md:173-178)",
+        "verified": "partial",
+        "evidence": "The flag is honored by `send_telemetry` (src/huggingface_hub/utils/_telemetry.py:66) and by the torch and agent fields of the User-Agent (utils/_headers.py:183-189); `send_telemetry` is never called inside this package. It does not gate the agent-harness registry fetch (utils/_detect_agent.py:189-204, triggered via cli/_output.py:65-69, 398), the random trace-id header or the `X-HF-Download-Counter` header (utils/_http.py:298-304). Offline mode (HF_HUB_OFFLINE=1) does stop all of these (utils/_http.py:293-296; utils/_detect_agent.py:191-192)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Sandbox (remote execution on HF Jobs) timings stated in a design doc. Unrelated to retrieval or embeddings; no retrieval, embedding or search benchmark is published in the repo.",
+        "metric": "latency",
+        "value": "~6 s VM cold start per dedicated sandbox; about 1 ms server-side to create a pooled sandbox (approximate prose figures, no methodology given)",
+        "source": "docs/source/en/concepts/sandbox.md:100, 105, 125",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope: this is a Hub client, not a retrieval system. No local index, vector store, embedding storage, chunking or code-search/query code exists (README.md:90-98; repo-wide greps). There is no MCP server: inference/_mcp/mcp_client.py:55 is a client. The agent integration is only a command-reference skill (src/huggingface_hub/cli/skills.py:243-308). The only semantic search is a Hub-hosted endpoint that searches Hub Spaces, not project code (hf_api.py:2851-2908), and embeddings exist only as remote calls (inference/_client.py:1018-1099).",
+      "Embedding-service coupling and network dependence: every embedding call leaves the machine. Non-HF providers accept only Hub model IDs resolved via a Hub lookup and route through router.huggingface.co when the key starts with `hf_` (src/huggingface_hub/inference/_providers/_common.py:149-184, 216-226). A self-hosted endpoint is reachable only by passing a URL as `model`, which posts a TEI-style `{'inputs': ...}` body verbatim (inference/_providers/hf_inference.py:35-37, 50-53, 213-223). `dimensions` and `encoding_format` are documented as available only on OpenAI-compatible endpoints (inference/_client.py:1054-1059). numpy is an undeclared runtime need for embeddings (setup.py:17-28; inference/_common.py:94-100). HF_HUB_OFFLINE=1 makes every Hub request raise (utils/_http.py:293-296).",
+      "Telemetry and phone-home go beyond the documented opt-out. The agent-harness registry fetch (GET {ENDPOINT}/api/agent-harnesses) happens on CLI start and is gated only by offline mode (src/huggingface_hub/utils/_detect_agent.py:189-204; cli/_output.py:65-69, 398). A PyPI/Homebrew update check runs once per 24 h unless HF_HUB_DISABLE_UPDATE_CHECK is set (cli/_cli_utils.py:1111-1199). The trace-id and download-counter headers are unconditional (utils/_http.py:298-304). The User-Agent always reveals hf_hub and python versions, and the torch version and agent id unless telemetry is disabled (utils/_headers.py:176-189).",
+      "Install and update supply chain: the recommended installer is `curl | bash` that installs the latest unpinned `huggingface_hub` from PyPI into ~/.hf-cli, edits shell rc files and installs a global agent skill by default, with no checksum or signature verification (utils/installers/install.sh:304-348, 399-413, 478-483). `hf update` re-runs the same remote script for installer-managed installs (src/huggingface_hub/cli/_cli_utils.py:1228-1230). There is no lockfile or pinned requirements file, only setup.py, so dependency versions float (setup.py:17-28). PyPI releases carry PEP 740 attestations (.github/workflows/release.yml:341-345) but GitHub releases carry no assets or checksums.",
+      "Third-party code-execution surfaces: `hf extensions install` runs community shell scripts or Python packages from GitHub repos named hf-* and exposes HF_TOKEN to them (src/huggingface_hub/cli/extensions.py:44-48; docs/source/en/guides/cli-extensions.md:22-35, 74). The default tiny-agent config launches unpinned `npx` MCP servers: @modelcontextprotocol/server-filesystem on the user's home or Desktop, and @playwright/mcp@latest (inference/_mcp/constants.py:12-31). The MCP client and sandbox APIs are labeled experimental and may change without notice (inference/_mcp/mcp_client.py:59-60; docs/source/en/concepts/sandbox.md:9).",
+      "Platform coverage: macOS, including Apple Silicon, is documented but absent from every CI workflow (python-tests.yml runs ubuntu and windows; check-installers.yml runs linux and windows). WSL2 is neither documented nor tested (CONTRIBUTING.md:146 only). The hf-xet native dependency is installed only on x86_64/amd64/arm64/aarch64 (setup.py:21), and its wheel coverage lives outside this repo.",
+      "Maintenance and stability: v2.0 was a breaking release that replaced the HTTP stack with `httpx2` and removed deprecated APIs and commands (docs/source/en/concepts/migration_v2.md:3-33; setup.py:22). Only the latest release gets security fixes, with no backports (SECURITY.md:5). Internal docs drift from the code. AGENTS.md says hf_api.py is ~11k lines with 24+ providers, against 15,442 lines and 19 providers in code (AGENTS.md:29, 52; src/huggingface_hub/inference/_providers/__init__.py:72-92). docs/dev/release.md describes a conda build directory that does not exist (docs/dev/release.md:18-22). The CLI help sample omits sandbox, discussions, webhooks and cp (docs/source/en/guides/cli.md:63-83 versus cli/hf.py:98-128).",
+      "Test reproducibility: the suite depends on network access to the staging and production Hub (pyproject.toml:53-58; tests/testing_constants.py:18-19), and 'many require network/auth' (AGENTS.md:20). CI reruns up to 8 times on network errors (.github/workflows/python-tests.yml:122). tests/testing_constants.py:6-16 embeds hard-coded CI tokens for the staging Hub, documented there as non-critical."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "huggingface/huggingface_hub",
+      "checks": [
+        {
+          "field": "readme.install[0] (Standalone installer)",
+          "statement": "Standalone installer (macOS and Linux): `curl -LsSf https://hf.co/cli/install.sh | bash`",
+          "citation": "README.md:49-52 (also docs/source/en/installation.md:109-113; docs/source/en/guides/cli.md:27-31)",
+          "holds": true,
+          "note": "README.md:50-51 reads '# On macOS and Linux.' followed by the exact command. installation.md:109-112 and cli.md:27-30 repeat it, and cli.md:23 labels it '(Recommended)'. The script it names, utils/installers/install.sh, detects linux-gnu and darwin (:182-190). Revision confirmed: .git/HEAD = 43372b60841b5b9ee2724e1c9c19c3fede6d54b6 and src/huggingface_hub/__init__.py:49 = \"2.1.0\"."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX Apache-2.0, file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE is the stock Apache License 2.0 text: the title is at lines 1-2, END OF TERMS AND CONDITIONS at 176 and the appendix boilerplate at 178-201. It is the only LICENSE/COPYING/NOTICE file in the tree. setup.py:112 (license=\"Apache-2.0\") and the classifier at setup.py:130 ('License :: OSI Approved :: Apache Software License') agree."
+        },
+        {
+          "field": "readme.platforms.macos_arm64",
+          "statement": "yes (documented, not CI-tested): the installer is documented 'On macOS and Linux'; install.sh handles darwin; `brew install hf` is documented and `hf update` handles brew installs; the hf-xet marker includes arm64; no workflow runs on macOS (a case-insensitive search of .github for macos/darwin/arm64/aarch64 finds nothing)",
+          "citation": "README.md:50-51; utils/installers/install.sh:182-190, 221-236; docs/source/en/guides/cli.md:116-124; src/huggingface_hub/cli/_cli_utils.py:1221-1222; setup.py:21; .github (search)",
+          "holds": true,
+          "note": "Every citation matches. install.sh:185-186 maps darwin to 'macos', and :221-236 is the macOS branch of ensure_python (Homebrew python paths and hint). cli.md:121 is `brew install hf`. _cli_utils.py:1221-1222 returns [\"brew\",\"upgrade\",\"hf\"]. The marker at setup.py:21 includes platform_machine=='arm64'. A case-insensitive grep of .github for macos|darwin|arm64|aarch64 returns no matches. The only runs-on values in .github/workflows are ubuntu-latest, windows-latest and the aws-general-8-plus group (python-tests.yml:47-48), so the 'not CI-tested' qualifier is accurate."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "MCP client only; no MCP server. MCPClient connects to stdio/SSE/StreamableHTTP servers and Agent wraps it; the tiny-agents script runs agents; it needs the [mcp] extra and is marked experimental; a repo-wide grep for FastMCP, mcp.server and MCPServer has no matches; the default tiny-agent config launches unpinned npx MCP servers (filesystem, playwright)",
+          "citation": "src/huggingface_hub/inference/_mcp/mcp_client.py:55-153; inference/_mcp/agent.py:13; setup.py:50, 120; inference/_mcp/cli.py:15-19; inference/_mcp/constants.py:12-31; docs/source/en/guides/inference.md:410-471; docs/source/en/package_reference/mcp.md:1-17",
+          "holds": true,
+          "note": "mcp_client.py:55 defines MCPClient. Its experimental warning is at :59-60, and add_mcp_server covers stdio, sse and http (:115-153). agent.py:13 is `class Agent(MCPClient)`. setup.py:50 is the mcp extra and setup.py:120 the tiny-agents script, with cli.py:15-19 the click group. A repo-wide grep for FastMCP|mcp\\.server|MCPServer finds no matches. Every mcp import in src is client-side: ClientSession, StdioServerParameters, types, mcp.client.stdio/sse/streamable_http (mcp_client.py:23, 154-186). _SandboxServer (_sandbox.py:614) is an HTTP client transport, not a server. DEFAULT_AGENT (constants.py:12-31: unversioned @modelcontextprotocol/server-filesystem and @playwright/mcp@latest) is used when no agent path is given (_mcp/utils.py:106-107). Minor: mcp.md:1-17 does not itself say 'experimental'. The warning reaches that page only through the autodoc'd docstrings; inference.md:412 states it outright."
+        },
+        {
+          "field": "claim_checks[1]",
+          "statement": "'Search for models, datasets and Spaces' (README.md:95) is verified yes. Search is Hub-side only: list_models/list_datasets/list_spaces(search=...) filter on a substring of IDs; search_spaces calls /api/spaces/semantic-search; list_papers calls /api/papers/search; nothing indexes or searches local code (greps for faiss/chroma/lancedb/qdrant/hnsw/vector store/code search find nothing)",
+          "citation": "README.md:95; src/huggingface_hub/hf_api.py:2334-2335, 2540-2541, 2774-2775, 2861-2863, 2895, 11676",
+          "holds": true,
+          "note": "README.md:95 matches. hf_api.py:2861-2864 documents embedding-based semantic search for multi-word queries and full-text search for single words. :2895 calls {endpoint}/api/spaces/semantic-search and :11676 calls {endpoint}/api/papers/search. A repo-wide case-insensitive grep for faiss|chroma|lancedb|qdrant|hnsw|vector.?store|code.?search finds no matches. Two wording slips in the evidence leave the verdict unchanged. (a) Only the list_models docstring says 'model ids' (:2335); list_datasets and list_spaces say 'contained in the returned datasets/Spaces' (:2541, :2775). (b) The 'index' hits are not all safetensors checkpoint indexes. They also include model-card model-index metadata (repocard_data.py:15, 366-396, 561-767), build_cache_index for the local download cache (cli/cache.py:145) and positional indices. None of these is a retrieval or embedding index."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

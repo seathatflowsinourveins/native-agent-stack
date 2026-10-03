@@ -1,0 +1,302 @@
+{
+  "contender": "astral-sh/uv",
+  "revision": {
+    "contender": "astral-sh/uv",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "astral-sh/uv",
+        "tag": "0.12.22",
+        "commit": "70fe1196a546e49148a73b1c592b2f74c33af80e",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "0.12.22",
+    "commit": "70fe1196a546e49148a73b1c592b2f74c33af80e",
+    "read_at": "2026-10-02T03:01:58+00:00"
+  },
+  "dossier": {
+    "contender": "astral-sh/uv",
+    "revision": {
+      "tag": "0.12.22",
+      "commit": "70fe1196a546e49148a73b1c592b2f74c33af80e",
+      "read_at": "2026-10-01"
+    },
+    "license": {
+      "spdx": "MIT OR Apache-2.0",
+      "file": "LICENSE-APACHE and LICENSE-MIT (dual license: Cargo.toml:16, pyproject.toml:14, README.md:308-316)"
+    },
+    "purpose": "uv is a Python package and project manager written in Rust, shipped as a single `uv` binary plus a `uvx` shim. It covers pip-style installs, virtualenvs, project lockfiles (`uv.lock`), PEP 723 scripts, installing Python interpreters (CPython, PyPy, GraalPy, Pyodide), installing and running Python-packaged CLI tools (`uv tool`), and building and publishing packages. It is Python-ecosystem only: searches of docs/ and crates/ find no backup, restore, encryption or dotfile-management feature, and its credential handling is limited to HTTP package-index credentials.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Describes uv as 'An extremely fast Python package and project manager, written in Rust.'",
+          "citation": "README.md:7"
+        },
+        {
+          "claim": "A single tool to replace pip, pip-tools, pipx, poetry, pyenv, twine, virtualenv, and more.",
+          "citation": "README.md:23-24"
+        },
+        {
+          "claim": "10-100x faster than pip (links to BENCHMARKS.md).",
+          "citation": "README.md:25"
+        },
+        {
+          "claim": "Provides comprehensive project management, with a universal lockfile.",
+          "citation": "README.md:26-27"
+        },
+        {
+          "claim": "Installs and manages Python versions: `uv python install 3.12 3.13 3.14`, `uv venv --python 3.12.0`, and `uv python pin 3.11` which writes `.python-version`.",
+          "citation": "README.md:30, 185-223 (esp. 192, 203, 218-219)"
+        },
+        {
+          "claim": "Runs and installs tools published as Python packages (`uvx pycowsay`, `uv tool install ruff`).",
+          "citation": "README.md:31, 147-183"
+        },
+        {
+          "claim": "Disk-space efficient, with a global cache for dependency deduplication.",
+          "citation": "README.md:36-37"
+        },
+        {
+          "claim": "Installable without Rust or Python via `curl` or `pip`.",
+          "citation": "README.md:38"
+        },
+        {
+          "claim": "Supports macOS, Linux, and Windows; platform details are in a separate platform-support document.",
+          "citation": "README.md:39, 285-287"
+        },
+        {
+          "claim": "If installed via the standalone installer, uv can update itself with `uv self update`.",
+          "citation": "README.md:70-74"
+        },
+        {
+          "claim": "Includes a pip-compatible interface; `uv pip compile --universal` writes a platform-independent requirements file and `uv pip sync` installs it.",
+          "citation": "README.md:225-266"
+        },
+        {
+          "claim": "uv manages dependencies and environments for single-file scripts via inline metadata.",
+          "citation": "README.md:123-145"
+        },
+        {
+          "claim": "States uv is stable and ready for production and points to a versioning policy document.",
+          "citation": "README.md:289-292"
+        },
+        {
+          "claim": "Dual-licensed Apache-2.0 or MIT at the user's option; uv is backed by Astral. README is silent on telemetry, backups, dotfiles and credential storage.",
+          "citation": "README.md:41-42, 308-316"
+        }
+      ],
+      "install": [
+        {
+          "method": "Standalone installer (macOS and Linux)",
+          "command": "curl -LsSf https://astral.sh/uv/install.sh | sh",
+          "citation": "README.md:48-51; docs/getting-started/installation.md:11-17"
+        },
+        {
+          "method": "Standalone installer, pinned version",
+          "command": "curl -LsSf https://astral.sh/uv/0.12.22/install.sh | sh",
+          "citation": "docs/getting-started/installation.md:25-29"
+        },
+        {
+          "method": "PyPI (pipx recommended, or pip)",
+          "command": "pipx install uv   (or: pip install uv)",
+          "citation": "README.md:58-68; docs/getting-started/installation.md:68-82"
+        },
+        {
+          "method": "Homebrew (macOS)",
+          "command": "brew install uv",
+          "citation": "docs/getting-started/installation.md:91-97"
+        },
+        {
+          "method": "Cargo (builds from source; needs a Rust toolchain)",
+          "command": "cargo install --locked uv",
+          "citation": "docs/getting-started/installation.md:138-148"
+        },
+        {
+          "method": "Docker image on GHCR (GitHub Release binaries are also documented at installation.md:130-136)",
+          "command": "docker run --rm -it ghcr.io/astral-sh/uv:debian uv --help",
+          "citation": "docs/guides/integration/docker.md:26; docs/getting-started/installation.md:123-128"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - Tier 1 ('Linux (x86_64)') with 'continuously built, tested' wording (docs/reference/policies/platforms.md:3-12); glibc (manylinux_2_17) and static musl builds are published (platforms.md:53-55, 63-74; dist-workspace.toml:34-35). CI runs cargo-nextest on Ubuntu for code-changing PRs (.github/workflows/test.yml:30-34, 106-126) and smoke/system tests of x86_64 binaries (test-smoke.yml:20-23; test-system.yml:16-19).",
+        "wsl2": "unknown - WSL is not named in the platform policy (docs/reference/policies/platforms.md:3-39). The only evidence is a CI job that runs the Linux musl binary under WSL 1 and WSL 2 (Ubuntu 22.04) and executes only `uv python list -v` (.github/workflows/test-integration.yml:921-979); uv-keyring notes the Secret Service keystore does not work out of the box on WSL (crates/uv-keyring/src/secret_service.rs:73-79).",
+        "macos_arm64": "yes - Tier 1 ('macOS (Apple Silicon)', docs/reference/policies/platforms.md:3-5), macOS 13+ (platforms.md:84-88), release target aarch64-apple-darwin (dist-workspace.toml:22), CPython darwin-aarch64 builds in the embedded catalog (crates/uv-python/download-metadata.json:64500). Caveat: the full macOS cargo-test job runs only on main or on PRs labelled test:macos/test:extended (.github/workflows/test.yml:151-154; plan.yml:224) and the macOS smoke test downloads the x86_64 artifact (test-smoke.yml:100-113).",
+        "gpu": "no - no GPU is required. uv only probes for NVIDIA/AMD ROCm/Intel XPU drivers (via /sys, /proc, nvidia-smi, rocm_agent_enumerator) to pick a PyTorch wheel index for the preview `--torch-backend auto` option (crates/uv-torch/src/accelerator.rs:69-81; docs/guides/integration/pytorch.md:503-530)."
+      },
+      "integrations": {
+        "cli": "yes - `uv` and `uvx` binaries (crates/uv/src/bin/uv.rs, uvx.rs); clap schema in crates/uv-cli/src/lib.rs:460-624; `uv help` (README.md:83); shell completions (docs/getting-started/installation.md:170-246); config via `uv.toml`/`[tool.uv]` and `UV_*` env vars (docs/concepts/configuration-files.md:30-74; crates/uv-static/src/env_vars.rs). Machine-readable `--output-format json` is behind the preview `json-output` feature (crates/uv-dev/src/generate_preview_features_reference.rs:135).",
+        "mcp": "none found - repo-wide case-insensitive search for MCP / Model Context Protocol outside lockfiles and changelogs returns only unrelated hits (test/ecosystem/semantic-kernel/pyproject.toml, two ecosystem snapshots, crates/uv-shell/src/runnable.rs).",
+        "sdk_or_api": "No HTTP API or server. No supported Rust SDK: crates other than `uv`, `uv-build`, `uv-version` 'provide no stability guarantees' and are versioned 0.0.x (docs/reference/policies/versioning.md:14-28). The PyPI package exposes only `find_uv_bin()` (python/uv/__init__.py:3-5) and `python -m uv`, which re-execs the bundled binary (python/uv/__main__.py:26-50); the PEP 517 backend is the separate `uv_build` package (python/uv/__init__.py:19-22). Preview `uv auth helper` speaks the Bazel credential-helper JSON-over-stdio protocol (docs/concepts/authentication/cli.md:64-83).",
+        "claude_code_or_codex": "No end-user integration documented (docs/ search for MCP/Claude/Codex/Copilot/Cursor returns nothing). Maintainer-side only: AGENTS.md contributor rules (AGENTS.md:1-33), `.codex/hooks.json`, `agents/` prompts and schemas, `agents/hooks/session-start.sh` special-casing CLAUDE_CODE_REMOTE (lines 5-7), GitHub workflows calling openai/codex-action (.github/workflows/release-prepare.yml:77-87). The docs site also emits an LLM-oriented index via the mkdocs-llmstxt plugin (mkdocs.yml:91-103)."
+      },
+      "telemetry_and_network": "Telemetry: none found. Searches of README, docs/ and crates/ for telemetry/analytics/phone-home return only unrelated resolver 'backtracking/tracking' hits; there is no periodic update check (version messages occur only inside `uv self update`, crates/uv/src/commands/self_update.rs:148-260). README is silent on telemetry. Closest equivalent: every HTTP client uv builds sends `User-Agent: uv/<version>` followed by a JSON 'linehaul' blob (uv version, subcommand, Python version/implementation, OS name/release, distro, libc, CPU, CI flag) copied from pip's convention 'to enrich PyPI statistics' (crates/uv-client/src/linehaul.rs:11-64, 127-151; crates/uv-client/src/base_client.rs:552-559); no documented switch to disable it was found in docs/ or crates/uv-static/src. Network services: PyPI is the default index (crates/uv-distribution-types/src/index_url.rs:22-23) plus any configured indexes, Git hosts and URLs; managed CPython downloads try Astral's mirror https://releases.astral.sh first and then the canonical github.com/astral-sh/python-build-standalone URL, unless a mirror env/option is set (then no fallback) (crates/uv-static/src/lib.rs:11-35; crates/uv-python/src/downloads.rs:1563-1619; crates/uv-static/src/env_vars.rs:535-553); the Python download catalog is compiled in (downloads.rs:967-968, 1056-1073) unless `--python-downloads-json-url` is given (crates/uv-cli/src/lib.rs:6422-6424); PyPy comes from downloads.python.org (downloads.rs:1600-1613); `uv self update` and the ruff/ty/uv binary downloader (used by preview `uv format`/`uv check`) use releases.astral.sh with GitHub and raw.githubusercontent.com (astral-sh/versions) fallbacks (crates/uv-bin-install/src/lib.rs:281-300; self_update.rs:158-220); preview `uv audit`/`uv tool audit` and the `malware-check` preview query OSV at https://api.osv.dev/ (crates/uv-audit/src/service/osv.rs:1-9, 27-29; crates/uv-preview/src/lib.rs:287-289, 301-303). Controls: `--offline`/`UV_OFFLINE` disables network (crates/uv-static/src/env_vars.rs:30-32); `--no-python-downloads` or `python-downloads = manual` stops automatic runtime downloads (docs/concepts/python-versions.md:372-384). Accounts: none required. Optional index credentials come from the URL, `~/.netrc`/NETRC, the uv credentials store (plaintext credentials.toml by default; system Keychain/Secret Service with the preview `native-auth`) or a `keyring` subprocess provider that is off by default (docs/concepts/authentication/http.md:5-60; crates/uv-auth/src/store.rs:31-55)."
+    },
+    "code": {
+      "languages": [
+        "Rust",
+        "Python",
+        "Shell",
+        "PowerShell"
+      ],
+      "entry_points": [
+        {
+          "path": "crates/uv/src/bin/uv.rs",
+          "what": "`uv` binary: main() calls `uv::main(std::env::args_os())` (crates/uv/src/lib.rs:3070) which runs `run` (lib.rs:136) and dispatches to crates/uv/src/commands/*"
+        },
+        {
+          "path": "crates/uv/src/bin/uvx.rs",
+          "what": "`uvx` shim: finds the sibling `uv` and exec-spawns `uv tool uvx <args>` (uvx.rs:71-91)"
+        },
+        {
+          "path": "crates/uv/src/bin/uvw.rs",
+          "what": "Windows GUI variant `uvw`, built only with feature `windows-gui-bin` (crates/uv/Cargo.toml:232-234); default-run is `uv` (Cargo.toml:12)"
+        },
+        {
+          "path": "crates/uv-cli/src/lib.rs",
+          "what": "clap CLI schema; `Commands` enum at :460-624 (auth, project commands, tool, python, pip, venv, build, publish, workspace, cache, self, help); `ToolCommand` :5476-5563; `PythonCommand` :6148-6249; `AuthCommand` :5440-5467"
+        },
+        {
+          "path": "crates/uv/src/commands/python/install.rs",
+          "what": "`uv python install`; with no targets it reads UV_PYTHON then `.python-versions`/`.python-version` (lines 382-432)"
+        },
+        {
+          "path": "crates/uv/src/commands/tool/install.rs",
+          "what": "`uv tool install`: one package per invocation, writes a per-tool venv and `uv-receipt.toml`"
+        },
+        {
+          "path": "python/uv/__main__.py",
+          "what": "`python -m uv` re-execs the bundled binary found by `find_uv_bin` (python/uv/__init__.py:3-5; __main__.py:26-50)"
+        },
+        {
+          "path": "crates/uv-build/Cargo.toml",
+          "what": "Separate `uv_build` PEP 517 backend binary/wheel, built and smoke-tested in .github/workflows/build-release-binaries.yml:84-109"
+        }
+      ],
+      "architecture": "Single Rust workspace (Cargo.toml:1-8; 73 member crates, `uv-trampoline` excluded because it needs nightly). Binary crate `crates/uv`: src/bin/{uv,uvx,uvw}.rs -> `uv::main` (src/lib.rs:3070) -> `run` (lib.rs:136) -> src/commands/* (python/, tool/, project/, pip/, auth/, workspace/, venv.rs, publish.rs, self_update.rs, cache_*.rs, update_shell.rs). CLI schema crates/uv-cli; settings merge crates/uv-settings and crates/uv/src/settings.rs; env-var registry crates/uv-static/src/env_vars.rs; preview gating crates/uv-preview/src/lib.rs. Runtimes: crates/uv-python (discovery.rs, managed.rs, downloads.rs with a compiled-in, zstd-compressed `download-metadata.json` built by build.rs, version_files.rs for `.python-version`/`.python-versions`). Tools: crates/uv-tool (per-tool venv at <state>/tools/<name>/ plus `uv-receipt.toml`, crates/uv-tool/src/lib.rs:143-145, 172, 225); under preview `tool-install-locks` a `uv.lock` is also written into each tool dir (crates/uv/src/commands/tool/common.rs:281-396). Resolution/locking: crates/uv-resolver (Astral PubGrub fork, Cargo.toml:216), crates/uv-lock (universal `uv.lock`, VERSION=1, REVISION=5: crates/uv-lock/src/lock/mod.rs:96, 130). Install: crates/uv-installer, crates/uv-install-wheel, crates/uv-fs/src/link.rs (clone -> hardlink -> copy fallback from the global crates/uv-cache). Network: crates/uv-client (reqwest + rustls, retries, HTTP cache, linehaul User-Agent), crates/uv-auth (netrc, plaintext credential store, keyring), crates/uv-keyring (macOS Keychain, Secret Service, Windows), crates/uv-bin-install (ruff/ty/uv binaries only), crates/uv-audit (OSV). State and paths: crates/uv-state (buckets `python`, `tools`, `credentials` under one root), crates/uv-dirs (XDG paths). Shell: crates/uv-shell (appends PATH lines to rc files). Build/publish: crates/uv-build-backend, crates/uv-build, crates/uv-build-frontend, crates/uv-publish. Support: crates/uv-test, crates/uv-dev (doc/schema generators), crates/uv-bench. Python shim package at python/uv. The repo itself commits a runtime manifest `.python-versions` (exact versions 3.8.20 ... 3.15.0rc2, lines 11-22) that CI installs with `uv python install` (test.yml:63-64).",
+      "packaging_and_release": "Releases are cut by manual workflow_dispatch of .github/workflows/release.yml behind a `release-gate` environment that requires approval from another team member (release.yml:20-52); cargo-dist 0.32.0 config is dist-workspace.toml. Artifacts: (1) GitHub Release archives uv-<target>.tar.gz/.zip for 18 targets including x86_64-unknown-linux-gnu/musl and aarch64-apple-darwin, each with a .sha256 sidecar (dist-workspace.toml:21-40; build-release-binaries.yml:148-165), checksums injected into the dist manifest (scripts/patch-dist-manifest-checksums.py:2-8, 43-55); (2) shell and PowerShell installers served from astral.sh / releases.astral.sh (dist-workspace.toml:15, 72-74), generated at release time and not present in the source tree; (3) PyPI wheels and sdists for `uv` and `uv_build` built with maturin and uploaded with `uv publish` under PyPI trusted publishing (build-release-binaries.yml:39-109; publish-pypi.yml:33-81); (4) crates.io (release.yml:350-364); (5) Docker images ghcr.io/astral-sh/uv (release.yml:314-328; docs/guides/integration/docker.md:26-63); (6) docs, versions manifest and the releases.astral.sh mirror after the GitHub release (release.yml:435-476). Integrity: macOS binaries are code-signed and notarized via Azure Key Vault and Windows binaries Authenticode-signed via Azure Artifact Signing, followed by verification jobs and test installs of the signed wheels (sign-release-binaries.yml:141-298, 455-589); GitHub build-provenance attestations cover *.json, *.sh, *.ps1, *.zip, *.tar.gz (release.yml:399-407; dist-workspace.toml:52-56); third-party Actions are pinned by commit SHA and setup-uv installs are pinned with checksums (release.yml:67-76). No detached GPG/minisign/cosign signature step was found in the workflows read; publish-docker.yml grants `attestations: write` to the image publish jobs (lines 53-57, 72-76) but the attest step lives in publish-docker-image.yml, which was not read. Release builds enable the `self-update` cargo feature (build-release-binaries.yml:137), described as only for the cargo-dist installer (crates/uv/Cargo.toml:167-169). Cadence: four releases between 2026-09-24 and 2026-10-01 (CHANGELOG.md:6, 48, 69, 109).",
+      "tests_and_ci": "Frameworks: Rust #[test]/#[tokio::test] run with cargo-nextest (.config/nextest.toml:1-53; test.yml:119-126), insta snapshots, assert_cmd/assert_fs, wiremock and hyper test servers (crates/uv/Cargo.toml:130-154). Locations (approximate, counted with grep): crates/uv/tests has 83 .rs files in 12 suites (build, it, lock, lock_scenarios, pip, pip_compile, pip_install, project, python, sync, tool, workspace; 12 are main.rs harnesses) holding about 3,740 test attributes; about 1,666 more test attributes sit in 203 files under other crates' src/ and tests/; fixtures live in test/ (about two dozen ecosystem projects, test packages) and helper Python scripts in scripts/. Default cargo feature `test-defaults` enables tests that need crates.io, Git/Git-LFS, PyPI, R2, local and managed Pythons, slow and ecosystem cases (crates/uv/Cargo.toml:160-211). CI: 45 workflow .yml files plus setup-dev-drive.ps1 in .github/workflows. ci.yml (push to main, PRs) calls plan.yml, which selects jobs from changed files and PR labels (plan.yml:136-249), then: check-fmt; check-lint (ruff, ty, shellcheck, validate-pyproject, clippy on Linux and Windows with warnings denied, cargo-deny licenses/sources/bans, hawk, cargo-shear, typos: check-lint.yml:25-241); check-docs; zizmor workflow-security lint; check-publish/release/crates-policies/lock/generated-files; test.yml (cargo-nextest on Linux for code changes; macOS only on main or labelled PRs; Windows in 3 partitions); test-smoke (Linux x86_64/aarch64/musl, macOS with the x86_64 artifact, Windows x86_64/arm64); test-system (Debian 12/13, Fedora, setup-python); test-integration (public registries, WSL 1/2 smoke, pyenv and more); test-ecosystem; build-dev-binaries; bench (CodSpeed walltime on aarch64 Linux, bench.yml:19-70); a live `test-publish` job against test PyPI/GitLab (ci.yml:211-315); and an aggregate `required-checks-passed` gate (ci.yml:317-352). An LLM-based PR security review job exists (ci.yml:29-45) and maintainer automations use Codex for issue triage, bug reproduction/fix, rebases and changelog rewriting (release-prepare.yml:70-87; issue-triage.yml, reproduce-bug.yml, fix-bug.yml, rebase-conflicted-pull-request.yml).",
+      "dependencies": "Rust: root Cargo.toml `[workspace.dependencies]` has 226 entries (70 path crates incl. `uv` and `uv-version`, 156 third-party; Cargo.toml:18-412); 74 crate manifests under crates/ (73 workspace members plus excluded `uv-trampoline`; Cargo.toml:1-7); crates/uv/Cargo.toml declares 97 `[dependencies]` (54 workspace crates + 43 third-party), 4 target-specific (windows: self-replace, uv-windows; unix: nix, uv-unix), 3 build-dependencies and 23 dev-dependencies (crates/uv/Cargo.toml:17-158); Cargo.lock lists 737 packages; edition 2024, MSRV 1.97.0 (Cargo.toml:11-12). Notable: reqwest with rustls (Cargo.toml:236-248), tokio, clap, axoupdater (optional, `self-update`: crates/uv/Cargo.toml:76-79, 169), and Astral-maintained forks (astral-pubgrub, astral_async_zip, astral-tokio-tar, astral-reqwest-*, astral-version-ranges, astral-tl: Cargo.toml:106, 114-116, 216, 249-255, 298, 340). Policy enforced by cargo-deny: license allow-list (includes MPL-2.0), unknown registries and git sources denied, build-script allow-list (.cargo/deny.toml:1-117). Python: root pyproject.toml uses maturin and has no runtime dependencies; dependency groups docs(9), docker(1), release(1), check(5), dev(6) = 22 requirements, locked in root uv.lock, with `exclude-newer = 'P7D'` (pyproject.toml:1-9, 99-135, 147). crates/uv/pyproject.toml and crates/uv-build/pyproject.toml also exist (not read).",
+      "security_policy": "SECURITY.md (16 lines) says uv can execute arbitrary code by design (invoking interpreters for metadata, PEP 517 builds, building packages from indexes) and that these are not vulnerabilities; in-scope reports go to the Astral organization policy at https://github.com/astral-sh/.github/blob/main/SECURITY.md (external, not fetched) (SECURITY.md:3-15). A detailed CLI threat model is in agents/references/threat-model.md (trust boundaries, hash/lock/credential invariants; lines 17-124) and links a separate repository threat model (lines 14-15)."
+    },
+    "claim_checks": [
+      {
+        "claim": "uv installs Python from committed version files: `uv python install` with no arguments reads `.python-versions`/`.python-version` (README.md:30; docs/concepts/python-versions.md:119-122)",
+        "verified": "yes",
+        "evidence": "Targets default to UV_PYTHON then version files (crates/uv-cli/src/lib.rs:6392-6401); install.rs:382-432 discovers a version file preferring `.python-versions`; format is one request per line with # comments skipped (crates/uv-python/src/version_files.rs:14-17, 172-182, 194-200). Downloads come from a compiled-in catalog (downloads.rs:967-968) and are SHA-256-checked when a digest is present (downloads.rs:216, 1501-1533); the catalog has 5,919 entries with a 64-hex sha256 and 5 with null, all Pyodide (crates/uv-python/download-metadata.json:26760-26773 and four others); linux-x86_64-gnu and darwin-aarch64 CPython builds exist (download-metadata.json:64500, 64653-64669). A custom catalog file or URL can replace the built-in one (downloads.rs:1041-1096). Python only: CPython/PyPy/GraalPy/Pyodide (docs/concepts/python-versions.md:429-441). The repo commits its own manifest (.python-versions:11-22) and installs it in CI (.github/workflows/test.yml:63-64)."
+      },
+      {
+        "claim": "uv runs and installs tools published as Python packages (README.md:31), i.e. could rebuild a set of CLI tools from a committed manifest",
+        "verified": "partial",
+        "evidence": "`uv tool install` takes one positional `package` per call (crates/uv-cli/src/lib.rs:5755-5758); ToolCommand has run/uvx/install/upgrade/list/audit/uninstall/update-shell/dir and no sync or manifest-import command (lib.rs:5476-5563); `--with-requirements` only adds packages to that tool's own environment (lib.rs:5770-5775). Tools are Python packages only (docs/concepts/tools.md:3). Preview `tool-install-locks` writes a `uv.lock` inside each tool dir (crates/uv/src/commands/tool/common.rs:355-396; crates/uv-preview/src/lib.rs:316-318), which is per-tool, host-local state rather than a cross-host manifest. A project `pyproject.toml` + `uv.lock` + `uv sync --locked` can install tool packages into the project .venv (docs/concepts/projects/layout.md:79-86; sync.md:14-25), not onto PATH."
+      },
+      {
+        "claim": "A single tool to replace pip, pip-tools, pipx, poetry, pyenv, twine, virtualenv, and more (README.md:23-24)",
+        "verified": "partial",
+        "evidence": "The command surface matches those tools (crates/uv-cli/src/lib.rs:460-624: pip, venv, build, publish, tool, python, project commands, auth, cache, self), but scope is Python packaging only. The generic binary installer supports only ruff, ty and uv (crates/uv-bin-install/src/lib.rs:35-41). Searches of docs/ and crates/ for backup/restore/snapshot/encrypt/dotfile find nothing relevant: the only hits are `uv upgrade` restoring pyproject.toml (CHANGELOG.md:100) and the preview native credential store described as encrypted (docs/concepts/authentication/cli.md:97-98). The only shell-config edits are PATH lines appended by `update-shell` and the installer (crates/uv/src/commands/update_shell.rs:64-110; crates/uv-shell/src/lib.rs:157-239; docs/reference/installer.md:27-37)."
+      },
+      {
+        "claim": "Credentials are stored in a plaintext file in uv's state directory by default (docs/concepts/authentication/http.md:32-34)",
+        "verified": "yes",
+        "evidence": "AuthBackend uses TextCredentialStore unless preview native-auth is on (crates/uv-auth/src/store.rs:31-55); the file is <state>/credentials/credentials.toml, or UV_CREDENTIALS_DIR (store.rs:244-261; crates/uv-static/src/env_vars.rs:71-73); the state root also holds `python` and `tools` buckets (crates/uv-state/src/lib.rs:39-41, 66-86; state root is $XDG_DATA_HOME/uv or ~/.local/share/uv, crates/uv-dirs/src/lib.rs:66-84, with a legacy macOS directory honored if it exists, uv-state lib.rs:50-60). It is written with a plain fs::write (store.rs:334-336) and no permission-setting call was found in crates/uv-auth/src. ~/.netrc is always read (docs/concepts/authentication/http.md:22-26)."
+      },
+      {
+        "claim": "uv will not persist index credentials to pyproject.toml or uv.lock, but does persist direct-URL credentials (docs/concepts/authentication/http.md:68-72)",
+        "verified": "partial",
+        "evidence": "IndexUrl's Serialize impl strips username and password (crates/uv-distribution-types/src/index_url.rs:108-119, 199-206), consistent with the first half. The direct-URL half, and whether tool receipts (ToolOptionsWire holds index/index-url/extra-index-url/find-links: crates/uv-settings/src/settings.rs:2341-2372) go through that serializer, were not traced."
+      },
+      {
+        "claim": "Disk-space efficient, with a global cache for dependency deduplication (README.md:36-37)",
+        "verified": "yes",
+        "evidence": "Package-level dedup only (not backup dedup): the cache is linked into environments, with default LinkMode Clone on macOS/iOS/Linux and Hardlink elsewhere, falling back Clone->Hardlink->Copy (crates/uv-fs/src/link.rs:26-51, 266-281; docs/concepts/cache.md:204-206). Code vs docs: BENCHMARKS.md:6-8 says reflinking on macOS and hardlinking on Linux, but the code default on Linux is also Clone (reflink) with hardlink as fallback; code takes precedence."
+      },
+      {
+        "claim": "Supports macOS, Linux and Windows (README.md:39)",
+        "verified": "yes",
+        "evidence": "Tier 1: macOS Apple Silicon and x86_64, Linux x86_64, Windows x86_64 (docs/reference/policies/platforms.md:3-8); 18 release targets (dist-workspace.toml:21-40); Linux tests run on code-changing PRs, macOS tests only on main or labelled PRs, Windows tests in 3 partitions (.github/workflows/plan.yml:209, 224; test.yml:30-34, 151-154, 249-257)."
+      },
+      {
+        "claim": "If installed via the standalone installer, uv can update itself with `uv self update` (README.md:70-74)",
+        "verified": "yes",
+        "evidence": "self_update requires an install receipt and otherwise errors that self-update is only for standalone-installer binaries (crates/uv/src/commands/self_update.rs:83-112), and also errors when the receipt belongs to a different executable path (self_update.rs:122-146); receipts live in $XDG_CONFIG_HOME/uv or ~/.config/uv as uv-receipt.json (self_update.rs:608-651); release binaries are built with the `self-update` feature (.github/workflows/build-release-binaries.yml:137; crates/uv/Cargo.toml:167-169); offline mode refuses (self_update.rs:70-81)."
+      },
+      {
+        "claim": "uv is stable and ready for production (README.md:289-292)",
+        "verified": "partial",
+        "evidence": "The stability facts in the repo: version is 0.12.22 (Cargo.toml:19; CHANGELOG.md:6); policy is that the minor version is bumped for breaking changes (docs/reference/policies/versioning.md:3-6); cache format versions are internal (versioning.md:30-33); `uv.lock` schema is public and only bumped in minor releases (versioning.md:35-39; lock VERSION=1/REVISION=5 at crates/uv-lock/src/lock/mod.rs:96, 130); 52 preview features are listed, including tool-install-locks, native-auth, audit-command and pylock (crates/uv-dev/src/generate_preview_features_reference.rs:110-177)."
+      },
+      {
+        "claim": "docs/guides/install-python.md:132-135 says support for upgrading Python patch versions is in preview",
+        "verified": "no",
+        "evidence": "Code has no preview gate for `uv python upgrade`: PythonCommand::Upgrade exists (crates/uv-cli/src/lib.rs:6184-6201), the only preview check in install.rs is for `--default` (crates/uv/src/commands/python/install.rs:345-350), and the preview feature list has no upgrade entry (crates/uv-dev/src/generate_preview_features_reference.rs:110-177). docs/concepts/python-versions.md:162-196 documents it without a preview caveat; the guide is stale and code wins."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "uv vs pip / pip-tools / Poetry / PDM on Trio's docs-requirements.in: warm and cold package installation and warm and cold dependency resolution; non-uv tools run on Python 3.12.4 on macOS",
+        "metric": "wall-clock time measured with hyperfine, presented as bar charts",
+        "value": "No numeric values appear in repo text (charts are external images). README headline claim: '10-100x faster than pip'. Caveats stated by the project: results vary by OS, filesystem and package set.",
+        "source": "README.md:9-25; BENCHMARKS.md:3-48, 50-98; docs/reference/benchmarks.md:3-7",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope gap versus recovery/portability needs: uv installs only Python interpreters and Python-packaged CLIs, one `uv tool install <package>` call at a time with no manifest/sync command (crates/uv-cli/src/lib.rs:5476-5563, 5755-5758; docs/concepts/tools.md:3). No backup, restore, encryption, snapshot or dotfile feature exists in docs/ or crates/; the only 'deduplication' is the wheel-cache link strategy (crates/uv-fs/src/link.rs:26-51).",
+      "Credential co-location: the default credential store is a plaintext credentials.toml in the same state root as managed Pythons and tools (<state>/{python,tools,credentials}: crates/uv-state/src/lib.rs:66-86; crates/uv-auth/src/store.rs:244-261; docs/concepts/authentication/http.md:32-34), so copying ~/.local/share/uv wholesale carries it; no permission hardening found (store.rs:334-336) and ~/.netrc is always read (http.md:22-26). The native Keychain/Secret Service store is preview-only and only sees entries uv created (http.md:36-49); Linux Secret Service does not work out of the box on WSL (crates/uv-keyring/src/secret_service.rs:73-79). Each location can be moved with UV_CREDENTIALS_DIR, UV_TOOL_DIR, UV_PYTHON_INSTALL_DIR (crates/uv-static/src/env_vars.rs:71-73; docs/reference/storage.md:130-158).",
+      "Host-bound state: tool receipts record absolute executable paths (crates/uv-tool/src/tool.rs:111-117) and each tool is a venv tied to the Python that built it (docs/concepts/tools.md:231-242; docs/reference/storage.md:134-136). `uv tool list` re-validates receipt against environment and asks for `--reinstall` when the env is missing or broken (crates/uv/src/commands/tool/list.rs:78-111), so a copied receipt is not evidence of a working install. The installer receipt ~/.config/uv/uv-receipt.json is bound to the executable path and self-update refuses on mismatch (crates/uv/src/commands/self_update.rs:122-146, 622-651).",
+      "Pinning limits: the set of downloadable Python builds is frozen per uv release (docs/concepts/python-versions.md:124-127), so the same patch/build needs the same uv version, `UV_PYTHON_CPYTHON_BUILD` (crates/uv-static/src/env_vars.rs:555-559) or a custom catalog (crates/uv-python/src/downloads.rs:1041-1096); `uv tool install <name>` without a version takes the latest (docs/concepts/tools.md:49-52); per-tool lockfiles (`tool-install-locks`) and `python install --default` are preview (crates/uv-preview/src/lib.rs:233, 316-318).",
+      "Third-party network dependence for runtimes: default CPython downloads go through Astral-operated releases.astral.sh with GitHub fallback (crates/uv-python/src/downloads.rs:1584-1596; crates/uv-static/src/lib.rs:11-12); PyPy comes from python.org (downloads.rs:1600-1613); the 5 Pyodide catalog entries have no SHA-256 (crates/uv-python/download-metadata.json:26760-26773 and four others); every request carries OS/CPU/Python metadata in the User-Agent with no documented opt-out (crates/uv-client/src/linehaul.rs:11-64; base_client.rs:552-559).",
+      "Maturity and cadence: 0.x versioning where the minor version is bumped for breaking changes (docs/reference/policies/versioning.md:3-6); four releases between 2026-09-24 and 2026-10-01 (CHANGELOG.md:6, 48, 69, 109); 52 preview features, several relevant here (crates/uv-dev/src/generate_preview_features_reference.rs:110-177); building from source needs Rust 1.97+ (Cargo.toml:12); the project is vendor-backed by Astral (README.md:41-42).",
+      "Platform evidence gaps: WSL2 is absent from the support policy (docs/reference/policies/platforms.md:3-39) and only smoke-tested with `uv python list -v` (.github/workflows/test-integration.yml:921-979); full macOS tests run only on main or labelled PRs (test.yml:151-154; plan.yml:224) and the macOS smoke test uses the x86_64 artifact (test-smoke.yml:100-113); glibc Linux builds need glibc 2.17+ for x86_64 and macOS needs 13+ (platforms.md:47-55, 84-88).",
+      "Security and licensing posture: SECURITY.md excludes arbitrary-code execution via interpreter queries, PEP 517 builds and index packages from vulnerability scope (SECURITY.md:3-11) and defers reporting to an external org policy (SECURITY.md:13-15); maintainers run LLM agents in automation (Codex changelog rewrite in .github/workflows/release-prepare.yml:70-87; PR security review in ci.yml:29-45). Licensing is MIT OR Apache-2.0 (Cargo.toml:16) with vendored files under their own licenses (crates/uv-netrc/LICENSE MIT, crates/uv-build-frontend/src/pipreqs/LICENSE Apache-2.0, crates/uv-extract/src/vendor/LICENSE MIT/Apache-2.0, plus crates/uv-python/python/packaging/LICENSE.* present but not read) and a cargo-deny allow-list that includes MPL-2.0 (.cargo/deny.toml:100-116)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "astral-sh/uv",
+      "checks": [
+        {
+          "field": "readme.install[0] (Standalone installer, macOS and Linux)",
+          "statement": "Standalone installer (macOS and Linux): `curl -LsSf https://astral.sh/uv/install.sh | sh`",
+          "citation": "README.md:48-51; docs/getting-started/installation.md:11-17",
+          "holds": true,
+          "note": "README.md:49-50 shows '# On macOS and Linux.' followed by the exact command. installation.md:11-17 shows the same command under the 'macOS and Linux' tab. dist-workspace.toml:15 configures the shell installer (installers = [\"shell\", \"powershell\"]). The script is generated at release time and is not in the source tree, as the dossier says."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX 'MIT OR Apache-2.0'; LICENSE-APACHE and LICENSE-MIT (dual license: Cargo.toml:16, pyproject.toml:14, README.md:308-316)",
+          "citation": "Cargo.toml:16; pyproject.toml:14; README.md:308-316; LICENSE-APACHE; LICENSE-MIT",
+          "holds": true,
+          "note": "Cargo.toml:16 and pyproject.toml:14 both read 'MIT OR Apache-2.0'. pyproject.toml:15 lists both license files, and crates/uv/Cargo.toml:11 inherits the workspace license. README.md:308-316 says 'either of' Apache-2.0 or MIT 'at your option'. The root LICENSE-MIT is the MIT text (Copyright (c) 2025 Astral Software Inc.) and LICENSE-APACHE is the Apache License 2.0."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - Tier 1 'Linux (x86_64)', 'continuously built, tested'; glibc (manylinux_2_17) and static musl builds published; CI runs cargo-nextest on Ubuntu for code-changing PRs; smoke/system tests of x86_64 binaries",
+          "citation": "docs/reference/policies/platforms.md:3-12, 53-55, 63-74; dist-workspace.toml:34-35; .github/workflows/test.yml:30-34, 106-126; test-smoke.yml:20-23; test-system.yml:16-19",
+          "holds": true,
+          "note": "platforms.md:7 lists Linux (x86_64) as Tier 1, and line 10 says it is 'continuously built, tested'. Line 55 gives x86_64-unknown-linux-gnu (manylinux_2_17_x86_64), and lines 65 and 73-74 the statically linked x86_64 musl build. dist-workspace.toml:34-35 lists both targets. test.yml:30-33 runs cargo-test-linux on depot-ubuntu-24.04-16 and lines 119-126 run nextest. plan.yml:209 runs these tests only on code changes or main, which confirms 'for code-changing PRs'. test-smoke.yml:20-23 and test-system.yml:16-19 run on x86_64 Ubuntu runners. They use the uv-linux-libc binary (built natively on an x86_64 runner, build-dev-binaries.yml:21-50) and the x86_64-unknown-linux-musl binary (build-dev-binaries.yml:171-176)."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "yes - `uv` and `uvx` binaries; clap schema crates/uv-cli/src/lib.rs:460-624; `uv help`; shell completions; config via uv.toml/[tool.uv] and UV_* env vars. 'Machine-readable `--output-format json` is behind the preview `json-output` feature (crates/uv-dev/src/generate_preview_features_reference.rs:135).'",
+          "citation": "crates/uv/src/bin/uv.rs, uvx.rs; crates/uv-cli/src/lib.rs:460-624; README.md:83; docs/getting-started/installation.md:170-246; docs/concepts/configuration-files.md:30-74; crates/uv-static/src/env_vars.rs; crates/uv-dev/src/generate_preview_features_reference.rs:135",
+          "holds": false,
+          "note": "Most of it holds. crates/uv/src/bin/uv.rs and uvx.rs exist, the Commands enum spans lib.rs:460-624, README.md:83 mentions `uv help`, installation.md:170-246 covers completions, configuration-files.md:30-74 covers uv.toml, merging and env-var precedence, and env_vars.rs defines the UV_* variables. The JSON sentence is wrong. Line 135 does describe json-output as 'Allows `--output-format json`', but the code never blocks JSON output with this flag. These commands produce JSON with no preview check at all: `uv python list --output-format json` (lib.rs:6294-6296; commands/python/list.rs:248-249), `uv version`/`uv self version --output-format json` (commands/project/version.rs:64-67, 755-758), `uv pip install`/`uv pip sync --output-format json` (lib.rs:2558-2563, 2199-2204) and `uv pip list --format json` (lib.rs:112-121, 2757-2758). For `uv tree`, `uv audit` and `uv tool audit`, the flag only silences an 'experimental' warning (project/tree.rs:75-80; project/audit.rs:89-96; tool/audit.rs:60-67). In `uv sync` the check is reversed, so the warning appears only when the flag is on (project/sync.rs:101-106). A repo-wide grep for JsonOutput/json-output found no other gating."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "uv installs Python from committed version files: `uv python install` with no arguments reads `.python-versions`/`.python-version` (verified: yes)",
+          "citation": "README.md:30; docs/concepts/python-versions.md:119-122; crates/uv-cli/src/lib.rs:6392-6401; crates/uv/src/commands/python/install.rs:382-432; crates/uv-python/src/version_files.rs:14-17, 172-182, 194-200; crates/uv-python/src/downloads.rs:216, 967-968, 1041-1096, 1501-1533; crates/uv-python/download-metadata.json:26760-26773, 64500, 64653-64669; .python-versions:11-22; .github/workflows/test.yml:63-64",
+          "holds": true,
+          "note": "lib.rs:6392-6401 documents that targets come from UV_PYTHON (a clap env setting), then from .python-versions or .python-version. With no targets and no upgrade, install.rs:402-407 calls PythonVersionFile::discover with FilePreference::Versions, and version_files.rs:176-181 checks .python-versions first. Lines are trimmed and empty or '#' lines skipped (194-200). The download catalog is compiled in via include_bytes (downloads.rs:967-968), a custom path or URL replaces it (1056-1073), and SHA-256 is checked only when a digest is present (216, 1501-1533). Grep counts 5,919 64-hex sha256 values and 5 nulls, all Pyodide xbuildenv URLs (the first at line 26773). cpython darwin-aarch64 is at 64500 and linux-x86_64-gnu at 64653-64669. The implementations list is at python-versions.md:429-441. .python-versions:11-22 holds 3.14.0 through 3.15.0rc2, and CI runs a bare `uv python install` at test.yml:63-64."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "readme.integrations.cli: replace 'Machine-readable `--output-format json` is behind the preview `json-output` feature (crates/uv-dev/src/generate_preview_features_reference.rs:135).' with: 'Machine-readable JSON output works without any preview flag: `uv python list --output-format json` (crates/uv-cli/src/lib.rs:6294-6296; crates/uv/src/commands/python/list.rs:248-249), `uv version`/`uv self version --output-format json` (crates/uv/src/commands/project/version.rs:64-67, 755-758), `uv pip install`/`uv pip sync --output-format json` (schema marked experimental: crates/uv-cli/src/lib.rs:2558-2563, 2199-2204) and `uv pip list --format json` (lib.rs:112-121, 2757-2758). The preview `json-output` feature only silences an \"experimental schema\" warning on `uv tree --format json` and `uv audit`/`uv tool audit --output-format json` (crates/uv/src/commands/project/tree.rs:75-80; project/audit.rs:89-96; tool/audit.rs:60-67); in `uv sync` the check is inverted, so the warning appears only when the feature is enabled (crates/uv/src/commands/project/sync.rs:101-106).'"
+      ]
+    }
+  ]
+}

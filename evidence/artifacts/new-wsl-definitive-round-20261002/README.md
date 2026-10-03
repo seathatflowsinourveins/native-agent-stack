@@ -29,4 +29,9 @@ sees an instruction file, hook, skill or MCP server (`clean-room.json`, with its
 | `reverify.py`, `preregistration-amendment-3.json` | The frozen verification loop re-run on the 13 dossiers whose verifier attempts a usage-limit stop ended, with no dossier repaired twice (before any packet or decision) |
 
 Private originals (clones, raw returns, event streams) stay outside the repository; the assembled record lists their
-sha256. This is source review by model judges with adversarial critics: no candidate is installed or measured here.
+sha256. One change to the committed copies: in three dossiers (`anthropics__claude-plugins-official.json`,
+`facebookincubator__glean.json`, `scip-code__scip.json`), 40-character commit hashes are shortened to 12 characters
+(3, 3 and 7 values). The repository's secret scanner reads a 40-character value in a file that mentions Sourcegraph
+as an access token. The values still resolve, and no other field changed. The assembled copies had sha256
+`7cb10c9c…`, `8d448c0a…` and `b7007f33…` before the change. The judges read the private originals, which keep the
+full hashes. This is source review by model judges with adversarial critics: no candidate is installed or measured here.

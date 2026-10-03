@@ -1,0 +1,277 @@
+{
+  "contender": "kapillamba4/code-memory",
+  "revision": {
+    "contender": "kapillamba4/code-memory",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "kapillamba4/code-memory",
+        "tag": "v1.0.33",
+        "commit": "5a8db166ca11a90c093ba4a9a54d266cde756f54",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v1.0.33",
+    "commit": "5a8db166ca11a90c093ba4a9a54d266cde756f54",
+    "read_at": "2026-10-02T03:02:17+00:00"
+  },
+  "dossier": {
+    "contender": "kapillamba4/code-memory",
+    "revision": {
+      "tag": "v1.0.33",
+      "commit": "5a8db166ca11a90c093ba4a9a54d266cde756f54",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Python MCP server (FastMCP) that indexes one project directory into a per-directory SQLite file (<directory>/code_memory.db, db.py:489-503) and answers code, documentation and Git questions through seven tools: search_code, search_docs, search_history, index_codebase, check_index_status, get_index_stats, find_dead_code (server.py:104-922). Semantic code retrieval is provided: tree-sitter symbols (10 grammars, whole-file fallback for other extensions) are embedded in-process with sentence-transformers (default jinaai/jina-code-embeddings-0.5b, db.py:39) into sqlite-vec tables and queried as hybrid FTS5-BM25 + vector KNN fused by Reciprocal Rank Fusion (queries.py:104-212). Embeddings come only from an in-process sentence-transformers model; the code has no remote or HTTP embedding-service backend and no API-key path (repo grep). Scope of an index is the single `directory` argument of each call; search_code has no path or language filter parameter (server.py:211-216). Clients: any MCP host over stdio (default) or SSE; Claude Code is documented via .mcp.json (README.md:176-189); Codex is not mentioned anywhere in the repo.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "A deterministic, high-precision code intelligence layer exposed as a Model Context Protocol (MCP) server.",
+          "citation": "README.md:11"
+        },
+        {
+          "claim": "Zero telemetry - your code never leaves your machine; No API key required - runs entirely locally with sentence-transformers.",
+          "citation": "README.md:13-14"
+        },
+        {
+          "claim": "1 min setup - just `uvx code-memory` and you're ready.",
+          "citation": "README.md:15"
+        },
+        {
+          "claim": "Token saving by 50% - precise code retrieval instead of dumping entire files.",
+          "citation": "README.md:16"
+        },
+        {
+          "claim": "code-memory runs semantic searches against a locally indexed codebase.",
+          "citation": "README.md:24"
+        },
+        {
+          "claim": "Full AST support (symbol extraction) for Python, JavaScript/TypeScript, Java, Go, Rust, C/C++, Ruby, Kotlin; whole-file fallback for C#, Swift, Scala, Lua, Shell, config, web, SQL, Markdown; files matching .gitignore patterns are automatically skipped.",
+          "citation": "README.md:28-32"
+        },
+        {
+          "claim": "Queries are routed through 'three purpose-built tools': search_code = BM25 + Dense Vector (SQLite vec); search_docs = Semantic / Fuzzy; search_history = Git + BM25 + Dense Vector (SQLite vec); index_codebase = AST Parser + sentence-transformers.",
+          "citation": "README.md:36-43"
+        },
+        {
+          "claim": "Prerequisites: Python >= 3.13 and the uv package manager (recommended) or pip.",
+          "citation": "README.md:97-100"
+        },
+        {
+          "claim": "Standalone binaries (Linux x86_64, macOS x86_64 and ARM64, Windows x86_64) need no Python installation; 'The first run will download the embedding model (~600MB) to ~/.cache/huggingface/'.",
+          "citation": "README.md:73-93"
+        },
+        {
+          "claim": "Claude Code (CLI) is configured by adding an mcpServers.code-memory entry (command uvx, args code-memory) to .mcp.json in the project root or ~/.mcp.json; Gemini CLI, Claude Desktop and VS Code are also documented; Codex is not mentioned.",
+          "citation": "README.md:144-204 (Claude Code: 176-189)"
+        },
+        {
+          "claim": "Shared SSE server: a single `code-memory --transport sse` process (default http://127.0.0.1:8765/sse) can serve all MCP hosts so the embedding model loads once; 'The SSE endpoint is unauthenticated'.",
+          "citation": "README.md:231-292"
+        },
+        {
+          "claim": "Embedding model is set with EMBEDDING_MODEL (default jinaai/jina-code-embeddings-0.5b); 'Changing the embedding model will invalidate existing indexes' and index_codebase must be re-run.",
+          "citation": "README.md:304-340"
+        },
+        {
+          "claim": "Search tools return empty results until index_codebase has run; the index is stored locally in code_memory.db.",
+          "citation": "README.md:407-409"
+        },
+        {
+          "claim": "Privacy: zero telemetry, 'Zero external API calls - all processing happens in-process', 'works without internet (after initial setup)'; air-gapped use by copying a pre-cached Hugging Face model directory plus the binary or an offline wheel.",
+          "citation": "README.md:419-459"
+        }
+      ],
+      "install": [
+        {
+          "method": "PyPI (pip)",
+          "command": "pip install code-memory",
+          "citation": "README.md:53"
+        },
+        {
+          "method": "uvx (run without installing)",
+          "command": "uvx code-memory",
+          "citation": "README.md:56"
+        },
+        {
+          "method": "From source (uv)",
+          "command": "git clone https://github.com/kapillamba4/code-memory.git\ncd code-memory\nuv sync\nuv run mcp run code_memory/server.py",
+          "citation": "README.md:63-70"
+        },
+        {
+          "method": "Pre-built standalone binary (GitHub Releases; Linux x86_64 file code-memory-linux-x86_64, macOS code-memory-macos-arm64 / code-memory-macos-x86_64)",
+          "command": "chmod +x code-memory-*\n./code-memory-*",
+          "citation": "README.md:75-87"
+        },
+        {
+          "method": "uv bootstrap (prerequisite for uvx and source install)",
+          "command": "curl -LsSf https://astral.sh/uv/install.sh | sh",
+          "citation": "README.md:105"
+        },
+        {
+          "method": "Offline wheel install (air-gapped, wheel downloaded from PyPI on a connected machine)",
+          "command": "pip install code-memory-*.whl",
+          "citation": "README.md:454-457"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - README lists a Linux x86_64 binary code-memory-linux-x86_64 (README.md:79); CI runs on ubuntu-latest (ci.yml:15) and the binary is built on ubuntu-latest (release-binaries.yml:23-25). Install pulls torch's Linux x86_64 wheel (915,716,445 bytes) plus 17 CUDA/triton packages (uv.lock:1614-1636, 1646).",
+        "wsl2": "unknown - WSL/WSL2 is not mentioned in any README, doc, code, workflow or manifest (grep of *.md/*.toml/*.yml/*.json/*.spec found none) and there is no WSL-specific CI job.",
+        "macos_arm64": "yes - README lists code-memory-macos-arm64 (README.md:81); CI runs on macos-latest (ci.yml:15) and the arm64 binary is built on macos-latest (release-binaries.yml:29-31); torch and sqlite-vec macOS arm64 wheels are in the lockfile (uv.lock:1652, 1531); Apple MPS is auto-detected (db.py:93-95). The binary is not code-signed (code-memory.spec:152).",
+        "gpu": "yes (optional; code only) - auto-detects CUDA, then Apple MPS, else CPU (db.py:65-97); override with CODE_MEMORY_DEVICE (db.py:44) or cpu=True on index_codebase (server.py:375, 402-405). The README does not document GPU use (only COMPARISON.md:73 says CPU/GPU); CPU-only operation works."
+      },
+      "integrations": {
+        "cli": "Console script `code-memory` = code_memory.server:main (pyproject.toml:54-55) with --transport {stdio,sse}, --port (default 8765) and --host (default 127.0.0.1) (server.py:926-949; README.md:296-302). It only launches the MCP server - no CLI subcommands for indexing or searching.",
+        "mcp": "yes - FastMCP server named 'code-memory' (server.py:72) with 7 tools: check_index_status (:104), get_index_stats (:172), search_code (:211), index_codebase (:374), search_docs (:566), search_history (:647), find_dead_code (:783); stdio by default, SSE optional (server.py:952-961; README.md:231-292). Server instructions tell the model to call index_codebase first and to prefer search_code over grep/glob (server.py:72-100). MCP Registry manifest: server.json:1-36.",
+        "sdk_or_api": "none found - no documented Python SDK or REST/HTTP API; the only network surface is MCP over SSE (unauthenticated, README.md:292). Internal modules (queries.py, db.py) are importable but not documented as a public API.",
+        "claude_code_or_codex": "Claude Code: documented as an MCP host through .mcp.json (project) or ~/.mcp.json (global) with command uvx code-memory (README.md:176-189), or a shared-SSE url entry (README.md:278-288); no skill, hook, plugin, CLAUDE.md or slash-command integration found. Codex: none found - the word 'codex' appears nowhere in the repo (grep excluding uv.lock and .git)."
+      },
+      "telemetry_and_network": "README and COMPARISON.md claim zero telemetry, zero external API calls and 'Runtime: ZERO network calls' (README.md:13, 423-426; COMPARISON.md:85, 110-121). Code check: code_memory/ contains no HTTP-client, analytics, error-reporting or API-key code (repo-wide grep for requests/httpx/urllib/aiohttp/socket/sentry/posthog/api_key/openai/ollama hit only docs, the spec file and server.json, never code). Network touchpoints that do exist: (1) the embedding model jinaai/jina-code-embeddings-0.5b is loaded by Hugging Face ID through SentenceTransformer(..., trust_remote_code=True) (db.py:39-40, 131-135); the README says the first run downloads ~600MB to ~/.cache/huggingface (README.md:93); (2) an optional cross-encoder cross-encoder/ms-marco-TinyBERT-L-2-v2 is fetched only when CODE_MEMORY_RERANK=true (default false; db.py:52-56, 258-270), not documented in the README; (3) --transport sse opens an unauthenticated HTTP listener, default 127.0.0.1:8765 (server.py:938-961; README.md:292); (4) no offline switches (HF_HUB_OFFLINE, TRANSFORMERS_OFFLINE, local_files_only) are set anywhere, so how the Hugging Face libraries behave offline with a warm cache cannot be determined from this repo; frozen binaries load a bundled model copy instead (db.py:58-62, 131-132; release-binaries.yml:54-55). No account or API key is required. Build-time only: publish workflows contact PyPI and the MCP Registry (publish.yml:32-43)."
+    },
+    "code": {
+      "languages": [
+        "Python"
+      ],
+      "entry_points": [
+        {
+          "path": "code_memory/server.py",
+          "what": "main() at :952-961 is the `code-memory` console script (pyproject.toml:54-55); argparse flags --transport/--port/--host at :926-949; calls mcp.run(transport=...)."
+        },
+        {
+          "path": "code_memory/server.py (module-level `mcp` FastMCP object, :72)",
+          "what": "Object used by `uv run mcp run code_memory/server.py` and `mcp dev` (README.md:70, 122); seven @mcp.tool functions at :104, :172, :211, :374, :566, :647, :783."
+        },
+        {
+          "path": "server.json",
+          "what": "MCP Registry manifest (io.github.kapillamba4/code-memory; one pypi package, stdio transport, optional env vars CODE_MEMORY_LOG_LEVEL and EMBEDDING_MODEL); published by publish.yml:42-43."
+        },
+        {
+          "path": "code-memory.spec",
+          "what": "PyInstaller one-file build entry (Analysis(['code_memory/server.py']) at :105-106); bundles bundled_model/ when present (:80-83); custom hooks in hooks/."
+        },
+        {
+          "path": "scripts/download_model.py",
+          "what": "Downloads jinaai/jina-code-embeddings-0.5b and saves it to bundled_model/ for binary builds (:8-10)."
+        }
+      ],
+      "architecture": "Single package code_memory/. server.py: FastMCP app, 7 tools, argparse main (stdio or SSE); every tool calls db.get_db(directory), which opens a new SQLite connection (no .close() anywhere in the package). db.py: SQLite at <directory>/code_memory.db (WAL, foreign keys) with tables files / symbols / references_ / doc_files / doc_chunks / index_metadata, FTS5 tables symbols_fts and doc_chunks_fts kept in sync by triggers, sqlite-vec vec0 tables symbol_embeddings and doc_embeddings (float[dim]); lazy module-level SentenceTransformer singleton (CUDA > MPS > CPU, trust_remote_code=True), optional CrossEncoder reranker (off by default); embedding model name and dimension are stored in index_metadata and a mismatch wipes and recreates the index (db.py:517-579). parser.py: os.walk with SKIP_DIRS plus nested .gitignore (pathspec); tree-sitter symbol extraction (function/method/class/variable) and identifier 'references' for 10 grammars, whole-file fallback (first 5000 chars) for other extensions; thread-pool parsing, then one batched embedding call over 'code2code: <kind> <name>: <first 1000 chars>', then per-file transactional writes; mtime-based skip; stale-row cleanup limited to rows under the indexed directory. doc_parser.py: markdown-it sections, chunks of at most 1000 chars with 100 overlap, nl2code embeddings, xxh64 hash skip; Python-only docstring extraction embedded as code2code. queries.py: top-50 BM25 + top-50 vector -> RRF (k=60) -> 0-100 score; find_definition (exact-name filter, else top 5), find_references (exact identifier lookup in references_), get_file_structure (exact absolute path), discover_topic (aggregates symbol hits by file, top 15), search_documentation, find_dead_code (reference-count heuristics). Query text is embedded with the nl2code prefix (db.py:168-178); the same jina-style prefixes are applied whatever EMBEDDING_MODEL is set to. git_search.py: GitPython commit-message substring search over the latest 100 commits, per-file log, blame, commit detail; no embeddings. Also validation.py, errors.py, logging_config.py (stderr), api_types.py (TypedDicts).",
+      "packaging_and_release": "Python package built with hatchling (pyproject.toml:1-3, 63-64) with console script code-memory. .github/workflows/publish.yml (on release published or manual dispatch): uv build, uv publish with OIDC trusted publishing (permissions id-token: write, publish.yml:12-14, 29-33), then installs mcp-publisher from the unpinned latest GitHub release via curl|tar (publish.yml:35-37) and publishes server.json to the MCP Registry via github-oidc (publish.yml:39-43). .github/workflows/release-binaries.yml (same triggers): PyInstaller one-file builds for linux-x86_64 (ubuntu-latest), macos-x86_64 (macos-15), macos-arm64 (macos-latest) and windows-x86_64 (release-binaries.yml:22-34), built from `pip install -e .` rather than uv.lock (:50-52), bundling the Jina model via scripts/download_model.py (:54-55) and uploading to the GitHub Release with softprops/action-gh-release (:109-115). No checksum, signature or provenance/attestation step exists in any workflow (grep); macOS builds use codesign_identity=None (code-memory.spec:152); no step runs the built binary. ci.yml also defines a `publish` job using a PyPI token (ci.yml:58-76) that cannot fire because the workflow only triggers on pushes to main and on PRs (ci.yml:3-7).",
+      "tests_and_ci": "pytest + pytest-asyncio + pytest-cov (pyproject.toml:46-52, 66-70). tests/ holds 6 test modules (test_dead_code, test_errors, test_logging, test_main, test_tools, test_validation) plus conftest.py and __init__.py; about 140 test functions (find_dead_code 59, validation 32, logging 14, errors 13, CLI args 11, tool input validation 11). Tests import only server, validation, errors, logging_config and the dead-code helpers of queries/db; none imports parser.py, doc_parser.py or git_search.py, and none exercises indexing, embedding, hybrid ranking or search-result quality (grep of tests/); test_dead_code.py:25-30 and 613-622 deliberately avoid loading the model. Two tests incidentally load the real embedding model (tests/test_tools.py:91-107 through index_codebase's warmup at server.py:413, and tests/test_tools.py:113-122 through search_docs on /tmp) without asserting retrieval results. CI (.github/workflows/ci.yml): matrix ubuntu/macos/windows-latest x Python 3.13; runs `uv sync --all-extras`, `ruff check .`, `mypy code_memory` (four modules have ignore_errors, pyproject.toml:86-94) and `pytest tests/ -v --tb=short`; then a build job (`uv build`, upload dist/). publish.yml and release-binaries.yml run only on release.",
+      "dependencies": "Single manifest pyproject.toml plus uv.lock; no requirements*.txt. 19 direct runtime dependencies (einops, gitpython, pathspec, markdown-it-py, mcp[cli], sentence-transformers, sqlite-vec, tree-sitter, ten tree-sitter-* grammars, xxhash; pyproject.toml:23-43) and 5 dev extras (pytest, pytest-asyncio, pytest-cov, ruff, mypy; pyproject.toml:45-52), all with >= lower bounds only. uv.lock has 110 package entries including the project itself (109 third-party), pinning torch 2.10.0, transformers 5.2.0, sentence-transformers 5.2.3, huggingface-hub 1.4.1, mcp 1.26.0, sqlite-vec 0.1.6 (uv.lock:1610, 1676, 1480, 454, 652, 1526). On Linux x86_64 torch pulls 17 extra packages (cuda-bindings, 15 nvidia-*-cu12, triton; uv.lock:1614-1636); its cp313 manylinux x86_64 wheel is 915,716,445 bytes versus 79,498,248 for macOS arm64 (uv.lock:1646, 1652). Python >= 3.13 required (pyproject.toml:11). torch (db.py:73) and typing_extensions (api_types.py:14) are imported directly but not declared, relying on transitive installs. GitPython wraps the git executable (library behaviour, not stated in this repo's docs); git is not listed as a prerequisite.",
+      "security_policy": "none - no SECURITY.md or other security-policy file (glob **/SECURITY* found nothing; .github/ contains only workflows). The only security note is inline: README.md:292 says the SSE endpoint is unauthenticated and should stay bound to 127.0.0.1."
+    },
+    "claim_checks": [
+      {
+        "claim": "Zero telemetry; no API key; 'Zero external API calls - all processing happens in-process'; works without internet after initial setup (README.md:13-14, 423-426)",
+        "verified": "partial",
+        "evidence": "No HTTP-client, telemetry, analytics or API-key code exists in code_memory/ (repo-wide grep), and embeddings are computed in-process (db.py:122-135). But the model is resolved by Hugging Face ID at load time with trust_remote_code=True (db.py:132-135), no offline flag (HF_HUB_OFFLINE, local_files_only) is set anywhere, and offline behaviour of the Hugging Face libraries with a warm cache cannot be determined from this repo. Frozen binaries load a bundled copy instead (db.py:58-62, 131-132)."
+      },
+      {
+        "claim": "search_code uses BM25 + Dense Vector (SQLite vec) (README.md:40)",
+        "verified": "partial",
+        "evidence": "True for topic_discovery and definition: both go through hybrid_search = FTS5 BM25 top-50 + sqlite-vec KNN top-50 fused by RRF k=60 (queries.py:104-212, 295, 730). `references` is an exact SQL match on symbol_name (queries.py:385-394) and `file_structure` an exact absolute-path match (queries.py:461-474); neither uses embeddings."
+      },
+      {
+        "claim": "search_history data source is 'Git + BM25 + Dense Vector (SQLite vec)' (README.md:42)",
+        "verified": "no",
+        "evidence": "Code differs from README. git_search.py uses GitPython only: a case-insensitive substring match over commit messages of the latest max_results*5 = 100 commits (git_search.py:83-114, 104-112), plus per-file log, blame and commit detail; no FTS or embeddings are built for history, and server.py:666 says it 'queries Git directly'. file_history also does not follow renames (git_search.py:210-211, 223-225) although server.py:677 and CHANGELOG.md:22 say it does."
+      },
+      {
+        "claim": "'three purpose-built tools' (README.md:36; table lists four)",
+        "verified": "no",
+        "evidence": "Code differs from README: server.py registers seven @mcp.tool functions - check_index_status (:104), get_index_stats (:172), search_code (:211), index_codebase (:374), search_docs (:566), search_history (:647), find_dead_code (:783). README documents four and does not mention the other three."
+      },
+      {
+        "claim": "README tool examples (README.md:356-360): search_code without a directory argument; a natural-language question with search_type='references'; file_structure on the directory 'src/auth/'",
+        "verified": "no",
+        "evidence": "`directory` is a required parameter of search_code, search_docs, search_history and index_codebase (server.py:212-216, 567, 648-655, 375). `references` is an exact identifier-name lookup (queries.py:385-394), so a sentence returns nothing; `file_structure` matches one exact absolute file path (queries.py:461-474), resolved with os.path.abspath against the server process's cwd, so a directory query returns nothing. topic_discovery, which the tool description calls the default choice (server.py:232-237), is absent from the README examples."
+      },
+      {
+        "claim": "'Changing the embedding model will invalidate existing indexes' (README.md:340)",
+        "verified": "yes",
+        "evidence": "db.get_db compares the stored embedding_model in index_metadata with EMBEDDING_MODEL and, on mismatch, drops the vec tables, deletes all files/symbols/references/doc rows and recreates the tables at the new dimension (db.py:517-555, 560-579). It happens automatically on the next tool call of any kind (every tool calls get_db, e.g. server.py:311, 608), not only on index_codebase, and only the model name is compared."
+      },
+      {
+        "claim": "Indexing is incremental - unchanged files are skipped (server.py:98; CHANGELOG.md:28; README.md:346 'ensure the database is up to date')",
+        "verified": "partial",
+        "evidence": "Code files are skipped when the stored mtime >= current mtime (parser.py:543-547); the stored xxh64 hash is not used for that decision, so content changes that keep an equal or older mtime are not detected. Deleted files are cleaned up only for rows under the indexed directory (parser.py:490-502). Doc files are skipped by xxh64 hash (doc_parser.py:259-266). A docstring chunk is skipped if one with the same (path, line_start, symbol name) already exists (doc_parser.py:446-456). index_codebase has no force-reindex or reset argument (server.py:375)."
+      },
+      {
+        "claim": "Full AST support for Python, JS/TS, Java, Go, Rust, C/C++, Ruby, Kotlin; other types indexed whole-file; .gitignore respected (README.md:28-32)",
+        "verified": "yes",
+        "evidence": "parser.py:156-188 loads grammars for .py, .js/.jsx, .ts/.tsx, .java, .go, .rs, .c/.h, .cpp/.hpp/.cc/.cxx, .rb, .kt/.kts. Other listed extensions (parser.py:129-136) become a single `file` symbol limited to the first 5000 chars (parser.py:584-593), with at most 1000 chars embedded (parser.py:440). Root and nested .gitignore files are honoured (parser.py:54-125, 374-379; doc_parser.py:359-378); SKIP_DIRS (.venv, node_modules, dist, build, target, bin, obj, ...) are always skipped (parser.py:29-33)."
+      },
+      {
+        "claim": "Binaries: 'The first run will download the embedding model (~600MB)' (README.md:93); air-gapped Method 1 copies the Hugging Face cache next to the binary (README.md:440-452)",
+        "verified": "partial",
+        "evidence": "Code differs from README: the release workflow bundles the model into the PyInstaller binary (release-binaries.yml:54-55; code-memory.spec:80-83; scripts/download_model.py:8-10) and a frozen build loads sys._MEIPASS/bundled_model instead of the cache and ignores EMBEDDING_MODEL for loading (db.py:58-62, 131-135). Release assets are not in the clone, so their contents and size could not be checked."
+      },
+      {
+        "claim": "Shared SSE server loads the embedding model once for all MCP hosts (README.md:233, 248)",
+        "verified": "yes",
+        "evidence": "The embedding model is a module-level singleton (db.py:35, 111-145) and `directory` is a per-call argument, so one SSE process can serve several projects, each with its own code_memory.db (db.py:502). --transport/--port/--host are implemented (server.py:926-961; tests/test_main.py:36-90). The /sse URL path comes from the MCP SDK, not this repo, so it is not checkable here. No authentication or directory allow-list exists (README.md:292; validation.py:16-43)."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "No pluggable embedding service: vectors come only from an in-process sentence-transformers model loaded by Hugging Face ID (db.py:100-145); no OpenAI-compatible, Ollama or other HTTP endpoint or API-key path exists in the code (repo grep). Footprint: Python >= 3.13 (pyproject.toml:11), torch 2.10 (Linux x86_64 wheel 915,716,445 bytes plus 17 CUDA/triton packages, uv.lock:1614-1636, 1646), a ~600MB model download (README.md:93) and ~1GB (README.md:417) to ~1-2GB (README.md:233) RAM per process. Models are loaded with trust_remote_code=True (db.py:133-135, 266).",
+      "README and tool-description gaps on the retrieval surface: search_history is substring matching over only the latest 100 commits, not BM25/vector (git_search.py:104-112); file_history does not follow renames (git_search.py:210-211); 7 tools exist versus 'three' documented; README examples omit the required `directory` and use `references` for a natural-language query (see claim_checks). CHANGELOG.md lists only 0.1.0 (2025-02-22) and names all-MiniLM-L6-v2 (CHANGELOG.md:8, 40) while the version is 1.0.33 and the default model is Jina (pyproject.toml:7; db.py:39); COMPARISON.md:99 links to AIRGAPPED.md, which does not exist in the repo.",
+      "Verification gap: the roughly 140 tests cover validation, errors, logging, CLI arguments and dead-code heuristics only; none imports parser.py, doc_parser.py or git_search.py, and none checks indexing, embeddings, hybrid ranking or index recovery (grep of tests/ imports; test_dead_code.py:25-30 builds databases without the model). No retrieval-quality benchmark or evaluation exists in the repo, and the README's 'Token saving by 50%' (README.md:16) has no supporting measurement (the only 'benchmark' text is expected indexing speed-ups in a prompt file, prompts/milestone_6.xml:649-668).",
+      "Recoverable-state weaknesses (from code reading, not executed): (a) doc_parser.index_doc_file commits the new file hash before chunks and embeddings are written (doc_parser.py:259-274 versus 309-332), so an exception or kill in between leaves a hash-matching file with no chunks that later runs skip as 'Unchanged'; (b) code change detection is mtime-only (parser.py:545-547); (c) absolute paths are stored (parser.py:610-621) and stale cleanup only touches rows under the current directory (parser.py:493-495), so a moved or renamed project leaves old-path rows in the index; (d) any process started with a different EMBEDDING_MODEL wipes the existing index on its first tool call (db.py:517-579); (e) no reset or force-reindex argument exists (server.py:375); (f) index_codebase runs ensure_model_warmup outside its try/except (server.py:413), so a model-load failure raises instead of returning a structured error.",
+      "Security: the SSE transport is unauthenticated (README.md:292) and every tool takes an arbitrary `directory` checked only for existence and is-directory (validation.py:16-43), so any client that can reach the listener can index and query any directory readable by the process, read Git history and blame of any reachable repository (git_search.py:59-76) and cause code_memory.db to be written there (db.py:502-503); --host 0.0.0.0 is accepted (tests/test_main.py:46-49). Model loading uses trust_remote_code=True (db.py:133-135).",
+      "Licensing and scope: the repo is MIT (LICENSE:1-21; pyproject.toml:10), but the default embedding model (db.py:39) and the optional reranker cross-encoder/ms-marco-TinyBERT-L-2-v2 (db.py:55) are separate Hugging Face downloads whose licence terms are not stated or checked anywhere in the repo; the release workflow bundles the Jina model weights into the binaries (release-binaries.yml:54-55) and there is no NOTICE or third-party licence file. Indexes (code_memory.db with full symbol source text, plus WAL files) are written into the indexed project directory, even by read-only search calls, and nothing adds them to that project's .gitignore (db.py:489-515; .gitignore is only read, parser.py:36-51).",
+      "Client coverage: documented hosts are Gemini CLI, Claude Desktop, Claude Code and VS Code (README.md:144-204); Codex is not mentioned anywhere in the repo (0 grep hits) and there is no skill, hook, plugin or instructions-file integration - behaviour relies on the MCP instructions string and tool descriptions that tell the model to call index_codebase first and prefer search_code over grep/glob (server.py:72-100). The interface is MCP only: no HTTP API or SDK, and the CLI only starts the server.",
+      "Release and maintenance: binaries are built from unlocked `pip install -e .` (release-binaries.yml:50-52), published without checksums, signatures or attestations (workflow grep) and macOS builds are unsigned (code-memory.spec:152); no workflow step smoke-tests them, and the macos-x86_64 target is built on label macos-15 (release-binaries.yml:26-28) without any architecture check. publish.yml installs mcp-publisher from the unpinned latest release with no checksum verification (publish.yml:37); ci.yml's publish job cannot trigger (ci.yml:3-7, 58-61). Single listed author (pyproject.toml:12-14), Development Status 4 - Beta (pyproject.toml:16), Makefile run/dev targets point to a non-existent root server.py (Makefile:5, 8). The clone is a single-commit shallow clone (.git/shallow), so commit cadence could not be assessed."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "kapillamba4/code-memory",
+      "checks": [
+        {
+          "field": "readme.install[1] (uvx, run without installing)",
+          "statement": "uvx code-memory (README.md:56)",
+          "citation": "README.md:55-56; pyproject.toml:6, 11, 54-55; server.py:952-961; publish.yml:29-33; server.json:10-16",
+          "holds": true,
+          "note": "README.md:56 is exactly `uvx code-memory` ('Or with uvx (for MCP hosts)', :55). The package name code-memory (pyproject.toml:6) matches the console script `code-memory = code_memory.server:main` (:54-55), so uvx resolves and runs it. main() starts the MCP server over stdio by default (server.py:952-961). publish.yml builds and publishes this package (:29-33), and server.json:10-16 lists PyPI identifier code-memory 1.0.33 over stdio. Needs Python >= 3.13 (pyproject.toml:11). Live PyPI availability was not checked because it is outside the repo."
+        },
+        {
+          "field": "license",
+          "statement": "spdx MIT, file LICENSE",
+          "citation": "LICENSE:1-21; pyproject.toml:10, 18; README.md:477-479",
+          "holds": true,
+          "note": "LICENSE is the standard MIT text ('MIT License', 'Copyright (c) 2026 Kapil Lamba'). pyproject.toml declares license = \"MIT\" and the 'License :: OSI Approved :: MIT License' classifier, and the README ends with 'MIT'. Revision confirmed: HEAD = 5a8db166ca11a90c093ba4a9a54d266cde756f54 = refs/tags/v1.0.33."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - README lists code-memory-linux-x86_64; CI runs on ubuntu-latest; binary built on ubuntu-latest; install pulls torch's Linux x86_64 wheel (915,716,445 bytes) plus 17 CUDA/triton packages",
+          "citation": "README.md:79; ci.yml:15; release-binaries.yml:23-25; uv.lock:1614-1636, 1641, 1646",
+          "holds": true,
+          "note": "All cited lines match. README.md:79 lists code-memory-linux-x86_64, and ubuntu-latest appears in the CI test matrix (ci.yml:15) and the release matrix (release-binaries.yml:23-25, target linux-x86_64). uv.lock:1614-1636 has exactly 17 deps marked platform_machine == 'x86_64' and sys_platform == 'linux' (cuda-bindings, 15 nvidia-*-cu12, triton). uv.lock:1646 is the torch 2.10.0 cp313 manylinux_2_28_x86_64 wheel at 915,716,445 bytes. Precision caveat: uv.lock:1641 lists a build-tag-3 re-upload of the same wheel (915,627,275 bytes), which the PEP 427 build-tag tie-break favours, and pip/uvx installs resolve without uv.lock. The ~915 MB magnitude holds; the exact figure may not be the file actually fetched."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Claude Code documented as an MCP host via .mcp.json (project) or ~/.mcp.json (global) with uvx code-memory, or a shared-SSE url entry; no skill, hook, plugin, CLAUDE.md or slash-command integration; 'codex' appears nowhere in the repo",
+          "citation": "README.md:176-189, 278-288; full repo file listing; case-insensitive grep for 'codex'",
+          "holds": true,
+          "note": "README.md:176-189 says to add to `.mcp.json` in the project root or `~/.mcp.json`, with command uvx and args [code-memory]. README.md:278-288 gives the SSE url entry. The tree has no CLAUDE.md, AGENTS.md, .claude/, .mcp.json, skill, plugin or command files, and hooks/ holds only PyInstaller hooks (hooks/hook-*.py). A case-insensitive grep for 'codex' finds 0 hits, including uv.lock, .github/ and .gitignore. Caveat: the statement reports the README accurately, but nothing in the repo confirms Claude Code reads ~/.mcp.json globally (Claude Code normally keeps user-scope servers in ~/.claude.json). Treat the global path as untested README guidance."
+        },
+        {
+          "field": "claim_checks[0] (zero telemetry / no API key / zero external API calls / works offline)",
+          "statement": "verified: partial - no HTTP-client, telemetry or API-key code in code_memory/; embeddings computed in-process; model resolved by Hugging Face ID with trust_remote_code=True; no HF_HUB_OFFLINE/local_files_only set anywhere; frozen binaries load a bundled copy",
+          "citation": "README.md:13-14, 423-426; db.py:39-40, 58-62, 122-135",
+          "holds": true,
+          "note": "The README quotes match README.md:13-14 and 423-426. A case-insensitive grep of code_memory/ for requests|httpx|urllib|aiohttp|socket|sentry|posthog|telemetry|analytics|api_key|openai|ollama|http(s):// finds 0 hits. db.py:122-135 builds SentenceTransformer in-process from EMBEDDING_MODEL_NAME (default jinaai/jina-code-embeddings-0.5b, db.py:39-40) with trust_remote_code=True. HF_HUB_OFFLINE, TRANSFORMERS_OFFLINE and local_files_only appear nowhere in the repo, including .github/. Frozen builds use sys._MEIPASS/bundled_model (db.py:58-62, 131-132). 'Partial' is the right grade."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

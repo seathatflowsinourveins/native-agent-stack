@@ -1,0 +1,304 @@
+{
+  "contender": "alphaxiv/openresearch",
+  "revision": {
+    "contender": "alphaxiv/openresearch",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "alphaXiv/OpenResearch",
+        "tag": "v0.2.14",
+        "commit": "ea3b9689c2e0d3820d07bd1f62a8b9592c5d7d95",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.2.14",
+    "commit": "ea3b9689c2e0d3820d07bd1f62a8b9592c5d7d95",
+    "read_at": "2026-10-02T03:01:53+00:00"
+  },
+  "dossier": {
+    "contender": "alphaxiv/openresearch",
+    "revision": {
+      "tag": "v0.2.14",
+      "commit": "ea3b9689c2e0d3820d07bd1f62a8b9592c5d7d95",
+      "read_at": "2026-10-01"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "OpenResearch (`orx`, crate `openresearch-cli` 0.2.14, from alphaXiv) is a local-first Rust CLI and desktop app. `orx up` serves a loopback dashboard plus JSON/SSE API (axum, embedded React SPA, SQLite store). It hosts vendor coding-agent CLIs (Claude Code, Codex, OpenCode, Cursor, Antigravity) as per-session chat/agent workers in private git worktrees, and tracks an experiment tree of git branches. It launches experiment runs on local, SSH, Slurm, Kubernetes, Ray, Hugging Face Jobs, Modal, Tinker or managed compute from immutable source snapshots. It exposes academic-literature retrieval primitives (`orx discover`, `orx paper` over alphaXiv, OpenAlex, bioRxiv, PubMed). No SDK/library target, no generic URL-fetch/main-text-extraction command and no browser-automation command were found in the code (Cargo.toml:9-11; AGENTS.md:5-7; src/local/harness/mod.rs:1-18; src/main.rs:57-181).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Tagline: 'The local-first workspace for research agents and autoresearch.'",
+          "citation": "README.md:5"
+        },
+        {
+          "claim": "Turns Claude Code, Codex, OpenCode, Cursor, or Google Antigravity into research agents that can review literature, develop hypotheses, run experiments, and produce research artifacts.",
+          "citation": "README.md:7-11"
+        },
+        {
+          "claim": "Parallel exploration: 'Give each research direction an independent agent session and isolated git worktree.'",
+          "citation": "README.md:79"
+        },
+        {
+          "claim": "Reproducible experiments: variants tracked in a git-native experiment tree; 'every run receives an immutable archive of its recorded commit.'",
+          "citation": "README.md:80"
+        },
+        {
+          "claim": "Your choice of agent: Claude Code, Codex, OpenCode, Cursor, or Google Antigravity, 'with the harness and model selected per session.'",
+          "citation": "README.md:82"
+        },
+        {
+          "claim": "Your choice of compute: the same committed source snapshot runs locally, over SSH, or on Slurm, Kubernetes, Ray, Hugging Face Jobs, Modal, Tinker, and managed OpenResearch compute; publishing the repository is not required.",
+          "citation": "README.md:83, 95-97"
+        },
+        {
+          "claim": "Local ownership: projects, conversations, experiments, runs, logs, code and artifacts stay on the machine; 'OpenResearch runs on 127.0.0.1 with a local SQLite store'; an openresearch.sh account 'is only used for service-owned capabilities such as organizations and managed compute.'",
+          "citation": "README.md:84, 133-136"
+        },
+        {
+          "claim": "Autoresearch: 'can run the full loop autonomously: propose an idea, change the code, launch an experiment, inspect the evidence, and decide what to try next'; multiple agents explore in parallel while the experiment tree preserves lineage.",
+          "citation": "README.md:88-91"
+        },
+        {
+          "claim": "`orx up --remote user@host` runs the workspace next to remote GPUs; 'The remote service binds to loopback and has no application-level authentication, so other users on that host can reach it.'",
+          "citation": "README.md:99-107"
+        },
+        {
+          "claim": "CLI and agent integration: `orx install-skills` installs the OpenResearch skill into supported coding agents; common commands include `orx projects`, `orx runs`, `orx logs`, `orx exp run`, `orx discover keyword <query>` and `orx paper <arxiv-id-or-doi>`.",
+          "citation": "README.md:111-129"
+        },
+        {
+          "claim": "Usage analytics: official release builds send opt-out, coarse usage events tied to a random installation ID, excluding code, prompts, file contents or paths, repository names, tokens, emails and project/experiment identifiers; `orx telemetry off|status` and `--no-telemetry`; 'Source and development builds do not send analytics.'",
+          "citation": "README.md:140-150"
+        },
+        {
+          "claim": "Coding agents may file product feedback with `orx feedback`; reports are sent only from official builds, linked to the account when logged in, and turned off by `orx telemetry off`.",
+          "citation": "README.md:152-159"
+        },
+        {
+          "claim": "Platform notes: macOS 11+; Windows beta requires Git for Windows; Linux app needs glibc 2.35+. The CLI that install.sh installs on macOS 'is not yet signed' whereas the app is Developer-ID signed and notarized.",
+          "citation": "README.md:24, 42-47"
+        },
+        {
+          "claim": "Local models (LM Studio, oMLX, Ollama or a custom endpoint) can be used with OpenCode.",
+          "citation": "README.md:69-70; docs/local-models.md:1-5"
+        }
+      ],
+      "install": [
+        {
+          "method": "Shell installer (macOS and Linux); the script is hosted on openresearch.sh and is not in this repository",
+          "command": "curl -LsSf https://openresearch.sh/install.sh | sh",
+          "citation": "README.md:33-38"
+        },
+        {
+          "method": "cargo-dist shell installer from the GitHub release (the hint `orx update` prints); installs static musl binaries into CARGO_HOME",
+          "command": "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/alphaXiv/OpenResearch/releases/latest/download/openresearch-cli-installer.sh | sh",
+          "citation": "src/updates.rs:512-519; docs/linux.md:36-40; dist-workspace.toml:20-24"
+        },
+        {
+          "method": "macOS desktop app (DMG) then link the bundled CLI onto PATH",
+          "command": "Download https://github.com/alphaXiv/OpenResearch/releases/latest/download/OpenResearch.dmg ; then run: /Applications/OpenResearch.app/Contents/MacOS/orx install-cli",
+          "citation": "README.md:14, 42-51"
+        },
+        {
+          "method": "Linux desktop app (AppImage, x86_64 or aarch64; needs glibc >= 2.35 and fusermount)",
+          "command": "chmod +x OpenResearch-x86_64.AppImage && ./OpenResearch-x86_64.AppImage",
+          "citation": "docs/linux.md:5-12, 24-27; README.md:62-67"
+        },
+        {
+          "method": "Build from source (CLI as in CI; Linux desktop app per docs)",
+          "command": "cargo build --release --locked   # CLI ; Linux app: sudo apt-get install libwebkit2gtk-4.1-dev libgtk-3-dev librsvg2-dev file patchelf && cargo build --release --features desktop && scripts/build-linux-appimage.sh target/release/orx dist",
+          "citation": ".github/workflows/ci.yml:105; docs/linux.md:62-68"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - static musl CLI archive for x86_64-unknown-linux-musl (dist-workspace.toml:22; docs/linux.md:36-40) and an x86_64 AppImage needing glibc >= 2.35 (docs/linux.md:24-27; README.md:24, 62-64); CI builds, tests and smoke-tests on ubuntu-latest and ubuntu-22.04 (.github/workflows/ci.yml:32, 114-169).",
+        "wsl2": "unknown - no WSL2 instructions or CI. The only WSL mentions are browser-opening interop (src/browser.rs:23-75) and Windows-side handling that rejects the System32 WSL-launcher bash.exe (docs/windows.md:9-12; src/local/bash.rs:1-25). The Linux musl CLI is the only plausible path and is undocumented for WSL2.",
+        "macos_arm64": "yes - aarch64-apple-darwin CLI archive, Developer-ID signed and notarized in the release pipeline (dist-workspace.toml:22; .github/workflows/sign-macos-cli.yml:86-111; macos/DISTRIBUTION.md:69-77) and a signed/notarized DMG app (README.md:14, 44-45; macos/DISTRIBUTION.md:1-15); macOS 11+ (macos/Info.plist:22-23; README.md:24). CI has no macOS test job (.github/workflows/ci.yml:32, 114-124, 173-175).",
+        "gpu": "unknown - orx itself needs no GPU and documents no local-GPU support; GPUs are only selected as remote-backend flavors (`orx exp run --flavor`, `orx compute --gpu`, `orx instance create --gpu`: src/main.rs:328-354, 497-523). The bundled nanochat demo evidence is described as an Apple-Silicon run (demo/nanochat/evidence/README.md:3)."
+      },
+      "integrations": {
+        "cli": "Yes - the `orx` binary (Cargo.toml:9-11) with 28 visible subcommands and 6 hidden internal ones (src/main.rs:57-181; README.md:117-129). Several accept `--json` (src/main.rs:199-210, 281-282); `orx discover` prints JSON to stdout (src/commands/discover.rs:50); `orx paper` prints markdown (src/commands/paper.rs:62-71); `orx skill [name]` prints the bundled agent manual (src/main.rs:104-105; src/local/harness/mod.rs:724-731).",
+        "mcp": "No user-facing MCP server or client found. Two hidden stdio MCP servers exist only as permission bridges spawned by the agent CLI: `orx mcp-gate` for Claude Code (--mcp-config and --permission-prompt-tool mcp__orx__approve; src/commands/mcp_gate.rs:1-21; src/local/claude.rs:560-579) and `orx antigravity-gate` (src/main.rs:171-172, 971-977). Other 'mcp' hits reviewed only render the vendor agent's own MCP tool calls (src/local/harness/codex.rs:1703-1709) or disable MCP servers for throwaway one-shot children (codex.rs:406-408).",
+        "sdk_or_api": "No SDK or library target (Cargo.toml:9-11 declares only a [[bin]]). Agents are driven by spawning vendor CLIs, not by SDK libraries (src/local/harness/mod.rs:1-18; src/local/claude.rs:1-31; src/local/harness/codex.rs:1-21). The only programmatic surface is the loopback JSON/SSE HTTP API of `orx up` (/api/*, including /api/chat/sessions, /message, /interrupt, /respond, /turns/{id}/recover: src/commands/up.rs:470-766, 717-751) and the `orx serve` daemon on 4790 (src/main.rs:136-138, 596-601). Neither is documented in README.md or docs/ (docs/ holds only linux.md, windows.md, local-models.md). A remote OpenResearch API (https://api.openresearch.sh) backs login, orgs and managed compute (src/config.rs:14-21).",
+        "claude_code_or_codex": "Yes, in two directions. (1) orx drives Claude Code as a resident `claude --print --input-format stream-json` child (src/local/claude.rs:1-31, 505-523; Claude Code >= 2.1.211, src/local/harness/claude.rs:64) and Codex through `codex app-server` JSON-RPC (src/local/harness/codex.rs:1-21; >= 0.144, legacy `codex exec --json` fallback, codex.rs:1047). (2) `orx install-skills` writes an `orx` SKILL.md shim into ~/.claude/skills/orx (src/local/harness/claude.rs:965-972) and ~/.agents/skills/orx plus a legacy ~/.codex/prompts/orx.md for Codex (codex.rs:915-927; harness/mod.rs:748-773); also OpenCode, Cursor, Antigravity (src/main.rs:113-115; src/commands/install_skills.rs:63-116). `orx agent spawn` delegates to a helper session on any registered harness and works only inside an `orx up` session (src/commands/agent.rs:126-143)."
+      },
+      "telemetry_and_network": "Official release builds (marked only in alphaXiv/OpenResearch GitHub Actions via ORX_OFFICIAL_RELEASE_BUILD=1: build.rs:6-26; .github/workflows/release.yml:134-136) send opt-out analytics to https://api.openresearch.sh/analytics/v1/cli-events (src/telemetry.rs:35, 45-47) under a random per-install UUID kept in settings.json (telemetry.rs:100-114, 505-521). Events are queued in a 0600 disk outbox at ~/.config/openresearch/telemetry-outbox and retried (telemetry.rs:365-367, 750-763, 854-887). Events: a `cli_command` per invocation with the command name (src/main.rs:1018-1020; telemetry.rs:1095), harness name on chat start/message (telemetry.rs:1042-1048), experiment start with a coarse compute target (telemetry.rs:1221-1227), onboarding steps and the onboarding research profile including free-text background (telemetry.rs:1003-1016), harness install/auth/usability snapshots (src/telemetry/harness.rs:13-41), and, new in v0.2.14, `chat_model_usage` (harness, model, provider, input/output/cache/reasoning token counters, outcome: src/store/telemetry.rs:432-438) and `experiment_finished` (harness, model, provider, status: src/compute.rs:812-823). Opt out with `orx telemetry off`, `--no-telemetry` or ORX_TELEMETRY_ENV other than production; the consent choice itself is still sent when opting out (telemetry.rs:974-1001); source/development builds never send (telemetry.rs:558-569; ci.yml:100-106). `orx feedback` sends agent-written reports from official builds (README.md:152-159). Other network use: an update check on most commands against https://github.com/alphaXiv/OpenResearch/releases/latest/download/dist-manifest.json, cached 24 h, silence with ORX_NO_UPDATE_CHECK (src/updates.rs:1-17, 44-45; src/main.rs:939-944, 1006-1010); auto-apply of updates for installer-channel installs, enabled by default (telemetry.rs:301-307; updates.rs:497-510); literature retrieval from api.alphaxiv.org, www.alphaxiv.org, api.openalex.org, api.biorxiv.org and eutils.ncbi.nlm.nih.gov, sending contact email orx@alphaxiv.org to NCBI/OpenAlex (src/config.rs:23-68); optional GitHub publication through the `gh` CLI, off by default (src/local/github.rs:1-61; telemetry.rs:291-295); vendor agent CLIs call their own model providers with the user's own login (src/local/chat/mod.rs:1-4); one-click vendor-CLI installers fetched from claude.ai, chatgpt.com, opencode.ai, cursor.com, antigravity.google (src/commands/up/harness_setup.rs:14-37); optional Overleaf sync (src/local/overleaf.rs). Accounts: none needed for local use; an openresearch.sh account (`orx login`, token in ~/.config/openresearch/credentials.json) is only needed for organizations and managed compute (README.md:72-73, 133-136; src/config.rs:1-21). The companion service (accounts, sandbox provisioning, managed-compute catalogs) is not in this repository (AGENTS.md:5-9)."
+    },
+    "code": {
+      "languages": [
+        "Rust (src/, tests/, build.rs, windows/launcher)",
+        "TypeScript/React 19 + Vite SPA (ui/src; built bundle committed in ui/dist)",
+        "JavaScript .mjs (UI tests, dev-slot and icon/dmg scripts)",
+        "Python (scripts/release_notes.py and compat test scripts)",
+        "Shell and PowerShell (build/packaging scripts, installers)",
+        "Markdown skill/playbook modules (agent-skills/, SKILL.md, SYSTEM_PROMPT.md)"
+      ],
+      "entry_points": [
+        {
+          "path": "src/main.rs",
+          "what": "`orx` binary (Cargo.toml:9-11): clap command tree (main.rs:57-181), #[tokio::main] main (main.rs:900), dispatch (main.rs:1181-1235)."
+        },
+        {
+          "path": "src/commands/up.rs",
+          "what": "`orx up`: axum server on 127.0.0.1:4791 (main.rs:611-613) serving the embedded SPA, JSON/SSE API under /api (up.rs:1-11, 470-766), chat-session routes (up.rs:717-751) and PTY terminals (up.rs:586)."
+        },
+        {
+          "path": "src/commands/agent.rs",
+          "what": "`orx agent spawn`: queues a helper agent session with its own worktree (agent.rs:117-211); refuses outside an `orx up` agent session (agent.rs:126-130); max 5 live helpers, no nesting (agent.rs:25-26, 73-88)."
+        },
+        {
+          "path": "src/commands/discover.rs, src/commands/paper.rs",
+          "what": "`orx discover keyword|embedding|openalex|biorxiv|pubmed` (JSON results) and `orx paper <id|url>` (markdown) literature primitives (discover.rs:11-52; paper.rs:26-35; main.rs:117-122)."
+        },
+        {
+          "path": "src/commands/mcp_gate.rs",
+          "what": "Hidden `orx mcp-gate`: stdio MCP server Claude Code spawns as a permission bridge to the running `orx up` (mcp_gate.rs:1-21; main.rs:164-169)."
+        },
+        {
+          "path": "src/commands/supervise.rs",
+          "what": "`orx supervise <run>`: detached per-run supervisor that tails logs, persists status and honors cancel (main.rs:140-142); `orx serve` loopback daemon on 4790 is src/commands/serve.rs (main.rs:136-138, 596-601)."
+        },
+        {
+          "path": "src/commands/app.rs",
+          "what": "Desktop-app mode (macOS .app, Windows OpenResearch.exe launcher, Linux AppImage with the `desktop` feature) wrapping the same dashboard in a wry/tao window (main.rs:907-926; Cargo.toml:13-17, 87-102)."
+        },
+        {
+          "path": "windows/launcher/Cargo.toml",
+          "what": "Separate crate building OpenResearch.exe, which starts the orx.exe beside it as the Windows app (windows/launcher/Cargo.toml:5-11; docs/windows.md:39-43)."
+        }
+      ],
+      "architecture": "Single Rust binary crate plus an embedded React SPA. Key modules: src/main.rs (clap tree, dispatch); src/commands/* (one module per subcommand; up.rs = axum dashboard/API server with SSE, PTY terminals and settings endpoints; up_remote.rs and remote_host.rs = SSH remote workspace with a bearer-authenticated persistent host; supervise.rs = per-run supervisor; agent.rs = helper-session spawning; mcp_gate.rs, plan_gate.rs, invocation_gate.rs = permission/attribution hooks for Claude Code/Antigravity); src/local/chat/mod.rs (ChatHost: sessions, turns, queues, steering, restart recovery, SQLite transcripts) and src/local/harness/{claude,codex,opencode,cursor,antigravity}.rs (Harness trait implementations that spawn the vendor CLI and normalise its event stream; detection, permission modes, skill shims), backed by src/local/claude.rs (resident `claude` stream-json child), src/local/codex.rs (`codex app-server` JSON-RPC client) and src/local/opencode*.rs (`opencode serve` host); src/local/git.rs and src/local/experiments.rs (per-session git worktrees, experiment-tree branches); src/store.rs and src/store/telemetry.rs (SQLite `orx.db` via bundled rusqlite, run logs as files, durable usage/telemetry tables); src/compute.rs and src/jobs/*.rs (immutable `git archive` source snapshots addressed by SHA-256 and backend adapters huggingface, kubernetes, localbox, modal, openresearch, ray, slurm, ssh, tinker); src/client.rs (openresearch.sh API client and alphaXiv/OpenAlex/bioRxiv/PubMed clients); src/telemetry.rs, src/updates.rs (+ macOS/Linux/Windows updaters); ui/ (React SPA built into the committed ui/dist and embedded with rust-embed); agent-skills/, SKILL.md and SYSTEM_PROMPT.md (skill modules and the per-session playbook, injected through each harness's native channel: SYSTEM_PROMPT.md:1-14); windows/launcher, macos/, scripts/ (app packaging); demo/nanochat (bundled demo project). Isolation model: agent processes run on the host in per-session git worktrees (src/local/git.rs:1249-1276) with per-session isolated provider state under <data dir>/agents/* that symlinks the user's credentials/config (src/local/native_store.rs:42-61, 329-379); sandboxing is whatever the vendor CLI provides (Codex workspace-write with network on, src/local/harness/codex.rs:1152-1175). Remote isolation applies only to experiment runs (Modal Sandbox, K8s Job, HF Jobs, managed boxes: src/main.rs:497-509); the `local` backend is a detached bash process (src/jobs/localbox.rs:1-10). Persistence/resume: SQLite is the system of record for transcripts and each harness keeps its native session for resume (`codex thread/resume`, `claude --resume`; src/local/chat/mod.rs:1-9; harness/codex.rs:1-6; local/claude.rs:12-16); after a restart in-flight turns are marked failed with a recovery action and nothing is replayed automatically (chat/mod.rs:7869-7873, 3828-3835, 4509-4515).",
+      "packaging_and_release": "cargo-dist 0.32.0 (dist-workspace.toml:7) builds CLI archives for aarch64/x86_64-apple-darwin, aarch64/x86_64-unknown-linux-musl and x86_64-pc-windows-msvc plus shell and PowerShell installers (dist-workspace.toml:20-22), installing into CARGO_HOME with no updater (dist-workspace.toml:24-25). Checksums: dist generates sha256.sum/.sha256 files and a dist-manifest.json (.github/workflows/release.yml:206-232; macos/DISTRIBUTION.md:57-58); sign-macos-cli.yml rewrites the macOS archive checksums after signing (sign-macos-cli.yml:105-111). Signing: macOS CLI archives are Developer-ID codesigned and notarized (sign-macos-cli.yml:86-100; macos/DISTRIBUTION.md:69-77); the macOS DMG is signed/notarized and published with macos-app.json carrying a sha256 (release-macos-app.yml:82, 110-143; DISTRIBUTION.md:32-65); Linux AppImages (x86_64, aarch64) are attached with linux-app.json carrying sha256 values (release-linux-app.yml:62-142); the Windows OpenResearch-Setup.exe and orx.exe are unsigned (docs/windows.md:67-74; release-windows-app.yml:1-8). No GitHub artifact attestations, cosign/sigstore or SLSA provenance were found in .github (grep for attest|cosign|sigstore|slsa). Release trigger: merging a PR that bumps Cargo.toml dispatches release.yml with the tag (release-on-bump.yml:1-35, 129-135); publishing requires plan, builds, macOS signing, verify-build-channel, telemetry-contract and the full ci.yml to succeed (release.yml:176-262, 264-278; verify-build-channel.yml:10-58; telemetry-contract.yml:10-29). `ui/dist` is committed and checked for staleness in CI (AGENTS.md:15; ci.yml:71-80).",
+      "tests_and_ci": "Rust: `cargo test --locked` (ci.yml:108-109). Grep counts: 947 `#[test]` in 87 .rs files and 66 `#[tokio::test]` in 22 .rs files (overlapping), i.e. about 90 Rust files with inline `#[cfg(test)]` modules, plus dedicated tests/compute_cli.rs and tests/logs_cli.rs and src/jobs/ssh/container/tests.rs. Three tests are #[ignore]d: live Slurm cluster (src/jobs/slurm.rs:548), SSH container fixtures (src/jobs/ssh/container/tests.rs:95), and the production telemetry contract run only in release (src/telemetry.rs:2021). Harness tests use recorded or hand-written fixture transcripts, not live vendor CLIs (harness/codex.rs:14-16; local/claude.rs:10-11). UI: Node's built-in test runner over 28 ui/tests/*.test.mjs files (ui/package.json:13; ci.yml:68-69), `tsc` typecheck, i18n and style lints (ci.yml:40-44, 64-66), and a check that committed ui/dist matches a fresh vite build (ci.yml:71-80). Script tests: scripts/dev-slot.test.mjs and scripts/test_release_notes.py (ci.yml:46-50); scripts/test-opencode-compat*.py and scripts/test-ssh-container.sh exist but are not run by ci.yml. Approximate total: ~120 test-bearing files. Workflows (.github/workflows): ci.yml (job `check` on ubuntu-latest: fmt, clippy -D warnings, build --locked, source-build-must-report-'development'-channel assertion, tests; job `linux-app` on ubuntu-22.04 and ubuntu-22.04-arm: clippy + tests with --features desktop, AppImage build and smoke test with WebKitGTK removed; job `windows` on windows-latest: clippy, build, tests, installer build; job `version-guard` on PRs: version must move forward with a fresh Cargo.lock; ci.yml:29-283), release.yml (cargo-dist plan/build/host, calls ci.yml, sign-macos-cli.yml, verify-build-channel.yml, telemetry-contract.yml), release-on-bump.yml, release-macos-app.yml, release-linux-app.yml, release-windows-app.yml, linked-issue.yml (fork PRs must link an issue; linked-issue.yml:17-49). No macOS test job exists in CI.",
+      "dependencies": "Cargo.toml: 31 unconditional direct dependencies (tokio, tokio-util, reqwest[rustls], clap, serde, serde_json, toml, anyhow, dirs, rusqlite[bundled], urlencoding, uuid, semver, fd-lock, base64, zip, axum, hyper, hyper-util, rust-embed, futures, portable-pty, async-trait, sha2, aes, cbc, pbkdf2, sha1, tokio-tungstenite, same-file, roxmltree) plus 14 target-specific entries (libc; windows-sys; tao/wry/rfd on macOS and Windows; optional tao/wry/gtk/png on Linux behind the `desktop` feature; objc2, objc2-app-kit, objc2-foundation, muda, block2 on macOS) and 1 build-dependency (embed-resource) (Cargo.toml:19-115). windows/launcher/Cargo.toml: 1 target dependency (windows-sys) + 1 build-dependency (embed-resource) (windows/launcher/Cargo.toml:13-17). ui/package.json: 25 dependencies + 9 devDependencies (ui/package.json:16-53). Lockfiles committed: Cargo.lock, windows/launcher/Cargo.lock, ui/pnpm-lock.yaml (CI uses --locked and --frozen-lockfile: ci.yml:58, 98). Runtime/external requirements: git (src/compute.rs:132-134), the vendor agent CLI(s) and their logins, bash (src/local/bash.rs:1), optionally `gh` (src/local/github.rs:61), ssh (src/commands/up_remote.rs:9-10), uv for the demo, latexmk/tectonic for LaTeX (src/local/latex.rs:9-13).",
+      "security_policy": "none - no SECURITY.md or vulnerability-reporting policy found (glob **/SECURITY* returned nothing). .github/CODEOWNERS assigns two handles to release workflows, signing actions, dist config and macOS packaging (.github/CODEOWNERS:5-13); AGENTS.md:19-24 documents branch-protection and release-gate expectations but is not a security policy. No Dependabot/Renovate/cargo-deny configuration found."
+    },
+    "claim_checks": [
+      {
+        "claim": "Parallel exploration: each direction gets an independent agent session and isolated git worktree (README.md:79).",
+        "verified": "yes",
+        "evidence": "src/local/git.rs:1249-1276 `ensure_session_worktree` creates a private worktree of the project hub clone per chat session, starting detached on the baseline tip; src/local/opencode.rs:5-9 runs one agent child per session with cwd = that worktree; src/commands/agent.rs:162-204 `orx agent spawn` writes a new top-level session and states the helper 'works in its own git worktree'. Isolation is git-level only: no OS/container sandbox for the agent process was found (src/local/harness/claude.rs has no sandbox handling)."
+      },
+      {
+        "claim": "Every run receives an immutable archive of its recorded commit (README.md:80).",
+        "verified": "yes",
+        "evidence": "src/compute.rs:1-6 and 33-69 `SourceSnapshot::create` runs `git archive` on the experiment branch head and stores it content-addressed by SHA-256 under <data dir>/source-snapshots; src/compute.rs:77-123 re-verifies digest and size before reuse; src/compute.rs:126-148 is the git archive call."
+      },
+      {
+        "claim": "Your choice of agent: Claude Code, Codex, OpenCode, Cursor, Antigravity, with harness and model selected per session (README.md:82).",
+        "verified": "yes",
+        "evidence": "src/local/harness/mod.rs:512-520 registers exactly these five; src/commands/agent.rs:140-170 selects harness and model per session. Every harness spawns the vendor CLI rather than linking an SDK: Claude `claude --print --input-format stream-json` (src/local/claude.rs:1-31, 505-523; needs Claude Code >= 2.1.211, harness/claude.rs:64); Codex `codex app-server` JSON-RPC with experimentalApi (harness/codex.rs:1-21, 184; >= 0.144 else legacy `codex exec --json`, codex.rs:1047); OpenCode `opencode serve` HTTP/SSE (harness/opencode.rs:1-22); Cursor `agent --print --output-format stream-json` (harness/cursor.rs:1-15); Antigravity `agy --output-format stream-json` (harness/antigravity.rs:1-13). Model ids are opaque: taken from each CLI's own catalog (harness/codex.rs:127-136) or typed manually (ui/tests/modelSelection.test.mjs:46-54). The string 'GPT-6.1 Sol' appears nowhere in the repo; 'gpt-5.6-sol' (codex.rs:5284-5285) and 'gpt-6-sol' (src/store/telemetry.rs:780) occur only in test fixtures."
+      },
+      {
+        "claim": "Autoresearch: 'can run the full loop autonomously' (README.md:88-91).",
+        "verified": "partial",
+        "evidence": "The loop is performed by the LLM agent following skill/playbook text (SKILL.md:147-163; SYSTEM_PROMPT.md:37-43), with orx supplying primitives: `orx exp run/wait/wake` (src/main.rs:457-484), a per-session goal reminder injected every turn (src/local/chat/mod.rs:1282-1288) and helper spawning (agent.rs:25-26, 73-88: max 5 live helpers, no nesting). No separate autonomous controller was found; after a restart in-flight turns become failed turns with a recovery card and nothing is replayed automatically (chat/mod.rs:7869-7873; recovery via POST /api/chat/sessions/{id}/turns/{turnId}/recover, up.rs:735-738)."
+      },
+      {
+        "claim": "Local ownership: local SQLite store on 127.0.0.1; account only for service-owned capabilities (README.md:133-136).",
+        "verified": "yes",
+        "evidence": "src/store.rs:1-9, 23-40 (SQLite orx.db and run-log files under the data dir); Cargo.toml:35-37 (bundled SQLite); src/commands/up.rs:1-11 (loopback, no OpenResearch API on dashboard paths); src/config.rs:1-21 and README.md:72-73 (account only for login/orgs/managed compute). Caveat: official builds still send telemetry and check for updates, and literature commands call public third-party APIs (see telemetry_and_network)."
+      },
+      {
+        "claim": "Run anywhere: local, SSH, Slurm, Kubernetes, Ray, Hugging Face Jobs, Modal, Tinker, managed compute (README.md:93-97).",
+        "verified": "yes",
+        "evidence": "src/main.rs:497-510 lists the backends hf, modal, k8s, ssh, slurm, ray, openresearch, tinker, local; adapters live in src/jobs/ (huggingface, kubernetes, localbox, modal, openresearch, ray, slurm, ssh, tinker). k8s/ssh/slurm/ray/openresearch/tinker/local are 'local experiments only' (main.rs:505-509). The `local` backend is a detached bash process under <data dir>/local-runs/<run id> with no container (src/jobs/localbox.rs:1-10, 42-70); a restarted supervisor reattaches from that directory (localbox.rs:8-10)."
+      },
+      {
+        "claim": "Literature commands `orx discover keyword <query>` and `orx paper <arxiv-id-or-doi>` (README.md:125-126).",
+        "verified": "yes",
+        "evidence": "src/main.rs:117-122, 731-743, 775-787; src/commands/discover.rs:11-52 (alphaXiv keyword/embedding, OpenAlex, bioRxiv via OpenAlex, PubMed; JSON output); src/commands/paper.rs:26-35, 260-294 (source auto-detected from an arXiv/alphaXiv id or URL, DOI, OpenAlex W-id or PMID/URL); fixed public endpoints in src/config.rs:23-55. Scope: `Call one paper-retrieval primitive; the caller owns the search loop` (main.rs:117); ranking, follow-up budgets and citation rules are prose instructions to the host agent (agent-skills/orx-lit-review/SKILL.md:97-182, 236-262), and the skill forbids delegating retrieval to sub-agents (SKILL.md:8-9; agent-skills/orx-agent-delegation/SKILL.md:32-34). `orx paper` resolves identifiers to these APIs only; arbitrary web URLs are not fetched or extracted."
+      },
+      {
+        "claim": "Official builds send opt-out, coarse usage events tied to a random install ID that exclude code, prompts, paths, repository names, tokens, emails and identifiers; source/dev builds send none (README.md:140-150).",
+        "verified": "partial",
+        "evidence": "Implemented as described for opt-out, random UUID and official-build-only (src/telemetry.rs:1-21, 505-521, 558-569, 609-623; build.rs:6-26; ci.yml:100-106). But payloads also carry harness, model and provider names and LLM token-usage counters (`chat_model_usage`, src/store/telemetry.rs:432-438; `experiment_finished`, src/compute.rs:812-823) and the onboarding research profile with free-text background (telemetry.rs:1007-1016); the README's exclusion of 'tokens' is ambiguous (credentials vs LLM token counts) and does not list model names or usage counters."
+      },
+      {
+        "claim": "`orx up --remote`: 'The remote service binds to loopback and has no application-level authentication, so other users on that host can reach it.' (README.md:105-107).",
+        "verified": "no",
+        "evidence": "Code differs from the README (code preferred): `orx up --remote` mints a bearer token, sends it over SSH stdin and authenticates its health check with it (src/commands/up_remote.rs:912-941, 996); the persistent remote host installs a bearer-checking middleware (src/commands/up.rs:55-62, 759-806) and returns 401 without it; the CLI help says 'Starts an authenticated server there' (src/main.rs:614-621). Only bare `orx up` has no application-level auth (src/remote.rs:4-9; up.rs:759-765)."
+      },
+      {
+        "claim": "The CLI that install.sh installs on macOS 'is not yet signed' (README.md:42-45).",
+        "verified": "no",
+        "evidence": "Code differs from the README: .github/workflows/sign-macos-cli.yml:1-3, 61-112 codesigns with a Developer ID, notarizes and repacks the darwin CLI archives that dist's installers use; macos/DISTRIBUTION.md:69-77 states these `install.sh` archives are signed and notarized, wired as a release gate in release.yml:176-184. DISTRIBUTION.md:76-77 notes the first real release was its first end-to-end run, so the README may be stale. The install.sh script itself is hosted on openresearch.sh and cannot be inspected here."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Claude Code adapter: per-turn spawn/config/MCP-handshake overhead of the earlier spawn-per-turn design, cited as the reason for the resident-child design",
+        "metric": "overhead per turn (seconds)",
+        "value": "~3-6 s",
+        "source": "src/local/claude.rs:5-8 (code comment citing an internal 'latency probe'; the probe itself is not in the repository)",
+        "independent": false
+      },
+      {
+        "what": "Bundled nanochat demo training run recorded on Apple Silicon (a demo artifact, not a measurement of orx itself)",
+        "metric": "validation bits-per-byte: base 1.165758; after SFT 0.7389",
+        "value": "base 1.165758; SFT 0.7389",
+        "source": "demo/nanochat/evidence/evaluation-metrics.json:32-36; demo/nanochat/evidence/README.md:3",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Integration shape and version coupling: no SDK or documented programmatic API (Cargo.toml:9-11 declares only a [[bin]]). Agents are driven by spawning vendor CLIs and parsing their streams (src/local/harness/mod.rs:1-18), so behavior is tied to vendor CLI versions/protocols: Claude Code >= 2.1.211 (harness/claude.rs:64) and Codex app-server >= 0.144 with `experimentalApi: true`, validated against codex-cli 0.144.0 (harness/codex.rs:14-16, 184, 1047). The only programmatic surface is the dashboard's loopback JSON/SSE API (src/commands/up.rs:717-751), undocumented in README/docs, and `orx agent spawn` refuses to run outside an `orx up` agent session (src/commands/agent.rs:126-130). Model ids are passed through; nothing in the repo mentions 'GPT-6.1 Sol' (only test fixtures such as gpt-5.6-sol, harness/codex.rs:5284-5285).",
+      "Isolation and bounded tool access are mostly delegated and permissive by default: agents run on the host in git worktrees (src/local/git.rs:1249-1276), not in an OS/container sandbox. Defaults: Codex 'approve-for-me' = workspace-write with networkAccess true and auto-review (harness/codex.rs:1105-1107, 1168-1172; harness/mod.rs:872), Bypass = danger-full-access/never (codex.rs:1094, 1154); Claude 'auto' with bypassPermissions available (harness/mod.rs:836; harness/claude.rs:1032-1043); Cursor 'auto' and Antigravity 'bypass' (harness/mod.rs:918, 938); the generated OpenCode project config sets bash, edit, webfetch, websearch and external_directory to allow (src/local/opencode.rs:91-113). The user's Claude/Codex credentials are symlinked or hard-linked into orx-managed agent homes (src/local/native_store.rs:329-379). The `local` run backend is a plain detached bash process (src/jobs/localbox.rs:1-10, 42-70). Bounds that exist: <=5 live helpers per session and no nested spawns (agent.rs:25-26, 73-88), a 30-minute no-event watchdog and 3 retries within a 15 s budget (harness/mod.rs:55-65), and a 16,000-character tool-output cap (src/local/chat/mod.rs:36-42).",
+      "Web-research scope gap: the command list (src/main.rs:57-181) has only literature primitives; `orx paper` maps identifiers/URLs to fixed academic APIs (src/commands/paper.rs:260-294; src/config.rs:23-55). A repo-wide search found no generic URL fetch/main-text extraction, and no Playwright/Puppeteer/CDP/headless-browser, form/sign-in/tab, screenshot or PDF-render automation code. The lit-review skill falls back to the host agent's own web search and PDF tooling (agent-skills/orx-lit-review/SKILL.md:11-16, 209-217; SYSTEM_PROMPT.md:50-52). The only browser-store access is a macOS-only, user-initiated Overleaf cookie import (src/local/browser_cookies.rs:1-12).",
+      "Telemetry is on by default in official builds (opt-out) and from v0.2.14 includes harness/model/provider names, token-usage counters and onboarding free-text profile fields, sent to api.openresearch.sh from a disk outbox (src/telemetry.rs:1-21, 45-47, 365-367, 1007-1016; src/store/telemetry.rs:432-438; src/compute.rs:812-823). The consent choice is sent even when opting out (telemetry.rs:974-1001), and `orx feedback` lets agents send free-text reports (README.md:152-159). Source builds do not send (build.rs:6-26).",
+      "Supply chain and update path: self-update is on by default for installer-channel installs and pulls from GitHub releases (src/telemetry.rs:301-307; src/updates.rs:497-510). Release integrity is SHA-256 manifests plus macOS Developer-ID signing/notarization (sign-macos-cli.yml:86-111); no artifact attestations/cosign/SLSA were found in .github, and Windows artifacts are unsigned (docs/windows.md:67-74). The README's primary install command pipes a script hosted on openresearch.sh that is not in this repository (README.md:36; no install.sh found), and the app can bootstrap vendor CLIs via curl|bash or irm|iex from vendor URLs (src/commands/up/harness_setup.rs:14-64).",
+      "Local API authentication: default `orx up` has no application-level authentication (src/remote.rs:4-9; src/commands/up.rs:55-65, 759-765). Protection is loopback binding plus Host/Origin/Sec-Fetch-Site checks that accept requests with no Origin header (src/commands/up_remote.rs:1147-1195), while the API exposes a per-session shell-command endpoint and PTY terminals (up.rs:586, 728, 7069-7085). A local process that can connect to 127.0.0.1:4791 can call them. The README's remote-auth statement is inaccurate for `--remote`, which uses a bearer token (see claim_checks).",
+      "Platform and test coverage: CI runs tests on Linux (ubuntu-latest, ubuntu-22.04, ubuntu-22.04-arm) and Windows only; macOS, the primary documented desktop target, is built only in release workflows (.github/workflows/ci.yml:32, 114-124, 173-175; release-macos-app.yml:82). Windows is beta and unsigned (docs/windows.md:3, 67-74); WSL2 is undocumented (docs/windows.md:9-12); the Linux AppImage needs glibc >= 2.35 and FUSE, lacks audio/video previews and HTTPS pages inside the window fail on Fedora/openSUSE (docs/linux.md:24-27, 44-49). Harness tests use fixture transcripts, not live vendor CLIs (harness/codex.rs:14-16).",
+      "Maintenance, governance and licensing: pre-1.0 version 0.2.14 (Cargo.toml:3); very large modules (src/local/chat/mod.rs exceeds 11,000 lines); releases are cut by merging a version-bump PR (release-on-bump.yml:1-35); two GitHub handles own release and signing paths (.github/CODEOWNERS:5-13); no SECURITY.md, CONTRIBUTING, Dependabot/Renovate or cargo-deny config found. Accounts, sandbox provisioning and managed-compute catalogs live in a separate companion service outside this repo (AGENTS.md:5-9). License is MIT (LICENSE:1-21; Cargo.toml:7), but the tree bundles third-party material under other terms (demo/nanochat/base/LICENSE MIT by Andrej Karpathy; ui/dist/pdfjs license files including PDFium/Foxit fonts and OpenJPEG BSD-2) with no consolidated NOTICE file."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "alphaxiv/openresearch",
+      "checks": [
+        {
+          "field": "install[0]",
+          "statement": "Shell installer (macOS and Linux): `curl -LsSf https://openresearch.sh/install.sh | sh`; the script is hosted on openresearch.sh and is not in this repository.",
+          "citation": "README.md:33-38",
+          "holds": true,
+          "note": "README.md:33 reads 'Install the CLI on macOS or Linux, then launch OpenResearch'. Line 36 is the exact command, followed by `orx up` at line 37. No install.sh exists anywhere in the tree at ea3b968: the glob **/install*.sh is empty, and **/*install* matches only src/commands/install_cli.rs, install_skills.rs and up/install_opencode.ps1. The script itself therefore can't be audited from the repo. README.md:54 ('remove ~/.cargo/bin/orx') and macos/DISTRIBUTION.md:69 indicate it installs the cargo-dist release archives into CARGO_HOME."
+        },
+        {
+          "field": "license",
+          "statement": "License is MIT (SPDX MIT), file LICENSE.",
+          "citation": "LICENSE:1-21; Cargo.toml:7",
+          "holds": true,
+          "note": "LICENSE is the unmodified MIT License text, 'Copyright (c) 2026 alphaXiv'. Cargo.toml:7 declares license = \"MIT\"."
+        },
+        {
+          "field": "platforms.macos_arm64",
+          "statement": "yes - aarch64-apple-darwin CLI archive, Developer-ID signed and notarized in the release pipeline, plus a signed/notarized DMG app; macOS 11+; CI has no macOS test job.",
+          "citation": "dist-workspace.toml:22; .github/workflows/sign-macos-cli.yml:86-111; macos/DISTRIBUTION.md:1-15, 69-77; README.md:14, 24, 44-45; macos/Info.plist:22-23; .github/workflows/ci.yml:32, 114-124, 173-175",
+          "holds": true,
+          "note": "aarch64-apple-darwin is in the dist targets. sign-macos-cli.yml:86-112 runs codesign with hardened runtime and a timestamp, verifies against a Developer ID requirement pinned to team 9P69UXUJUK, notarizes with notarytool (the job fails unless the result is Accepted), then repacks and rewrites the .sha256 and manifest checksum. release.yml:176-191 and 264-278 make custom-sign-macos-cli a prerequisite of build-global-artifacts and host. The DMG is built universal (ORX_APP_UNIVERSAL=1) on a macos-14 Apple Silicon runner (release-macos-app.yml:82, 110). Info.plist sets LSMinimumSystemVersion 11.0. CI runs only on ubuntu-latest, ubuntu-22.04, ubuntu-22.04-arm and windows-latest. Caveat, which the dossier already records in claim_checks: README.md:42-45 still calls the install.sh CLI 'not yet signed', and DISTRIBUTION.md:76-77 says dry runs skip signing."
+        },
+        {
+          "field": "integrations.claude_code_or_codex",
+          "statement": "Yes, in two directions. (1) orx drives Claude Code as a resident `claude --print --input-format stream-json` child (Claude Code >= 2.1.211) and Codex through `codex app-server` JSON-RPC (>= 0.144, with a legacy `codex exec --json` fallback). (2) `orx install-skills` writes orx SKILL.md shims to ~/.claude/skills/orx, to ~/.agents/skills/orx plus a legacy ~/.codex/prompts/orx.md, and for OpenCode, Cursor and Antigravity. `orx agent spawn` works only inside an `orx up` session.",
+          "citation": "src/local/claude.rs:1-31, 505-523; src/local/harness/claude.rs:64, 965-972; src/local/harness/codex.rs:1-21, 915-927, 1047; src/local/harness/mod.rs:748-773; src/main.rs:113-115; src/commands/install_skills.rs:63-116; src/commands/agent.rs:126-143",
+          "holds": true,
+          "note": "claude.rs:509-546 builds `claude --print --input-format stream-json --output-format stream-json --include-partial-messages --replay-user-messages ...` with optional --model and --resume. harness/claude.rs:64 sets MIN_CLAUDE_VERSION = (2,1,211). codex.rs:3-21 documents the app-server path and the exec fallback for codex < 0.144, and codex.rs:1047 sets MIN_APP_SERVER_VERSION = (0,144,0). The Claude shim goes to $CLAUDE_CONFIG_DIR or ~/.claude/skills/orx/SKILL.md (native_store.rs:54-61). The Codex shim goes to ~/.agents/skills/orx/SKILL.md, plus $CODEX_HOME or ~/.codex/prompts/orx.md (codex.rs:934-943). opencode.rs:500, cursor.rs:228 and antigravity.rs:199 also define skill targets. install_skills.rs:63-116 writes to the detected agents, or to all of them if none is detected. agent.rs:126-130 refuses outside a local `orx up` session, and 140-143 accepts any registered chat harness."
+        },
+        {
+          "field": "claim_checks[8]",
+          "statement": "README.md:105-107 ('The remote service binds to loopback and has no application-level authentication') is verified 'no'. `orx up --remote` mints a bearer token sent over SSH stdin, the persistent remote host requires it (401 otherwise), and the CLI help says 'Starts an authenticated server there'. Only bare `orx up` lacks application-level auth.",
+          "citation": "src/commands/up_remote.rs:912-941, 996; src/commands/up.rs:55-62, 759-806; src/main.rs:614-621; src/remote.rs:4-9",
+          "holds": true,
+          "note": "The full chain is confirmed. The token is two UUIDv4s (up_remote.rs:912), written to the SSH child's stdin (941). `orx remote-host attach` reads it and sends ControlRequest::Attach (remote_host.rs:569-584), and the host registers its SHA-256 (remote_host.rs:371-397). The host process is `orx up --no-browser --remote-host --port 0` (remote_host.rs:749), which sets remote_auth (up.rs:55-61) and layers require_remote_auth (up.rs:762-806). That middleware returns 401 'Remote session authentication required.' unless the bearer matches. The health check sends bearer_auth (up_remote.rs:1080-1091). Nuance: /api/internal/permissions skips the bearer check (up.rs:781-783) but is gated by the per-session gate token in its body (up.rs:7471-7479). The README sentence is stale, as the dossier says."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

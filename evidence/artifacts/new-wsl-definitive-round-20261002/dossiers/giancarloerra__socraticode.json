@@ -1,0 +1,378 @@
+{
+  "contender": "giancarloerra/socraticode",
+  "revision": {
+    "contender": "giancarloerra/socraticode",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "giancarloerra/SocratiCode",
+        "tag": "v1.16.0",
+        "commit": "3d3a4a4d427cb0f29de4f5dd1360da52896f62df",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v1.16.0",
+    "commit": "3d3a4a4d427cb0f29de4f5dd1360da52896f62df",
+    "read_at": "2026-10-02T03:02:09+00:00"
+  },
+  "dossier": {
+    "contender": "giancarloerra/socraticode",
+    "revision": {
+      "tag": "v1.16.0",
+      "commit": "3d3a4a4d427cb0f29de4f5dd1360da52896f62df",
+      "read_at": "2026-10-03"
+    },
+    "license": {
+      "spdx": "AGPL-3.0-only",
+      "file": "LICENSE"
+    },
+    "purpose": "SocratiCode is a Node/TypeScript MCP server (npm package `socraticode`, stdio transport only) that indexes a project directory into Qdrant and answers natural-language code queries with `codebase_search`. Each chunk gets a dense embedding plus a server-side BM25 sparse vector, and queries fuse both with RRF. Embeddings come from a configurable provider: Ollama by default (native, managed Docker container or remote), OpenAI, Google Gemini, LM Studio or any OpenAI-compatible /v1/embeddings server, or a LiteLLM proxy. All durable state (chunks, per-file content hashes, indexing status, effective embedding profile, graphs) lives in Qdrant; managed mode runs Qdrant (and optionally Ollama) as Docker containers. The engine exposes 26 MCP tools in total: index lifecycle (index, update, stop, remove, prune, watch), search/status/health, file- and symbol-level dependency/impact graphs, and a separate index of non-code 'context artifacts'. Plugins and extensions for Claude Code, Codex, Cursor, VS Code and Gemini CLI all launch the same `npx -y --prefer-online socraticode@latest` server. The code is dual-licensed AGPL-3.0-only / commercial.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "'Your AI reads code. SocratiCode understands it.' - the open-source codebase context engine: automated knowledge of an entire codebase, zero configuration, fully private, free.",
+          "citation": "README.md:28-30"
+        },
+        {
+          "claim": "Provides hybrid search, cross-project search, polyglot dependency graphs, symbol-level impact analysis, an interactive graph explorer and searchable context artifacts; zero configuration via any MCP host that supports local stdio servers, or a supported plugin or extension.",
+          "citation": "README.md:44"
+        },
+        {
+          "claim": "Batched, automatic resumable indexing checkpoints progress - pauses, crashes, restarts and interruptions do not lose work; a file watcher keeps the index updated across sessions; multi-branch, multi-repo and multi-agent, with multiple agents sharing a single index.",
+          "citation": "README.md:46"
+        },
+        {
+          "claim": "Production-ready, battle-tested on enterprise-level repositories 'up to and over ~40 million lines of code' (no data or method given).",
+          "citation": "README.md:46"
+        },
+        {
+          "claim": "Private and local by default: Docker handles everything, no API keys required, no data leaves your machine; cloud embeddings (OpenAI, Gemini) and Qdrant Cloud are optional.",
+          "citation": "README.md:48; README.md:564"
+        },
+        {
+          "claim": "Requirements: Node.js >= 18.17 with `npx` on PATH, plus Docker running for the default local Qdrant and Ollama stack.",
+          "citation": "README.md:83"
+        },
+        {
+          "claim": "First use pulls Docker images, starts managed Qdrant and Ollama (or reuses native Ollama in OLLAMA_MODE=auto), downloads the embedding model; ~5 minutes initial setup. First-time indexing: 'under 10 minutes to first-index +3 million lines of code on a Macbook Pro M4'.",
+          "citation": "README.md:125-127"
+        },
+        {
+          "claim": "By default, server startup resumes the indexed project of the MCP process's working directory: a complete index gets a watcher and an incremental catch-up; an interrupted index resumes from the last checkpoint.",
+          "citation": "README.md:129; README.md:580"
+        },
+        {
+          "claim": "Hybrid code search on Qdrant: each chunk stores a dense vector and a BM25 sparse vector; the Query API runs both sub-queries in one round-trip and fuses them with Reciprocal Rank Fusion.",
+          "citation": "README.md:560"
+        },
+        {
+          "claim": "Multi-provider embeddings - local Ollama, Docker Ollama, OpenAI, Google Gemini, LM Studio (OpenAI-compatible), LiteLLM proxy - switched with a single environment variable; the lmstudio provider also drives other OpenAI-embeddings servers such as HuggingFace TEI.",
+          "citation": "README.md:563; README.md:934-936"
+        },
+        {
+          "claim": "Incremental indexing with content hashes persisted in Qdrant so state survives restarts; files processed in batches of 50 with progress checkpointed to Qdrant after each batch; already-indexed files are skipped by hash on resume.",
+          "citation": "README.md:568-569"
+        },
+        {
+          "claim": "Multi-project: each project gets an isolated collection; cross-project search via .socraticode.json linkedProjects or SOCRATICODE_LINKED_PROJECTS with includeLinked:true (each project must be indexed separately); optional branch-aware indexing; committed projectId for team-shared indexes.",
+          "citation": "README.md:572-574; README.md:1059-1112"
+        },
+        {
+          "claim": "Existing collections keep their stored provider/model/dimensions/prefixes; changed settings are reported as pending by codebase_status and are not applied until the collection is removed and re-indexed.",
+          "citation": "README.md:1517; README.md:1598"
+        },
+        {
+          "claim": "Benchmarked on VS Code (2.45M lines) with Claude Opus 4.6: 61% less context, 84% fewer tool calls, 37x faster than grep-based exploration.",
+          "citation": "README.md:54; README.md:1662-1681"
+        }
+      ],
+      "install": [
+        {
+          "method": "Claude Code native plugin (user scope); README does not distinguish Linux from macOS",
+          "command": "claude plugin marketplace add giancarloerra/socraticode\nclaude plugin install --scope user socraticode@socraticode",
+          "citation": "README.md:165-168"
+        },
+        {
+          "method": "Claude Code MCP-only (user scope)",
+          "command": "claude mcp add --scope user socraticode -- npx -y --prefer-online socraticode@latest",
+          "citation": "README.md:220"
+        },
+        {
+          "method": "OpenAI Codex native plugin (user scope)",
+          "command": "codex plugin marketplace add giancarloerra/socraticode --ref main\ncodex plugin add socraticode@socraticode",
+          "citation": "README.md:231-232"
+        },
+        {
+          "method": "OpenAI Codex MCP-only",
+          "command": "codex mcp add socraticode -- npx -y --prefer-online socraticode@latest",
+          "citation": "README.md:270"
+        },
+        {
+          "method": "Any MCP host with a JSON mcpServers object (stdio launcher; needs Node >= 18.17 with npx and running Docker for the default stack)",
+          "command": "{\"mcpServers\": {\"socraticode\": {\"command\": \"npx\", \"args\": [\"-y\", \"--prefer-online\", \"socraticode@latest\"]}}}",
+          "citation": "README.md:92-103"
+        },
+        {
+          "method": "From source (contributors); then register `node /absolute/path/to/socraticode/dist/index.js` in the host",
+          "command": "git clone https://github.com/giancarloerra/socraticode.git\ncd socraticode\nnpm install\nnpm run build",
+          "citation": "README.md:792-799"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - README.md:579 says 'Works everywhere Docker runs'; CI runs unit tests and Qdrant-backed integration tests on ubuntu-latest (.github/workflows/ci.yml:15,29,55-90); package-lock.json lists linux-x64 prebuilds for @ast-grep/napi and @parcel/watcher (package-lock.json:440,456,2078,2098). README and docs/ never state supported CPU architectures. Source comments name linux-arm64 as lacking a tree-sitter-gdscript prebuild, so GDScript there falls back to line-based chunking and regex symbol extraction (src/services/indexer.ts:478-481; src/services/code-graph.ts:803-808; src/services/graph-symbols.ts:3764-3765), and a test comment names linux-x64 as an environment where that prebuild loads (tests/unit/graph-gdscript.test.ts:1156).",
+        "wsl2": "unknown - README, docs/ and src/ never mention WSL or WSL2 (grep). Windows appears only as one CI job running 3 git unit-test files (ci.yml:42-53); the general 'Works everywhere Docker runs' (README.md:579) is the only related statement.",
+        "macos_arm64": "yes - documented usage on macOS: native Ollama for Metal acceleration (README.md:135, 611) and a first-index timing 'on a Macbook Pro M4' (README.md:127); package-lock.json lists darwin-arm64 prebuilds for @ast-grep/napi and @parcel/watcher (package-lock.json:376,1938). Not covered by CI (no macOS runner in ci.yml).",
+        "gpu": "yes, only via native/external Ollama or a hosted/OpenAI-compatible provider (README.md:135, 609-613: Metal on macOS, CUDA on Windows/Linux with native Ollama). No for the managed Docker Ollama container: it is started without any GPU option (src/services/docker.ts:325-332) and README.md:609 says Docker containers on macOS/Windows cannot use the GPU."
+      },
+      "integrations": {
+        "cli": "none found - the only binary is `socraticode` -> dist/index.js (package.json:8-10), which is the stdio MCP server (src/index.ts:466-468); DEVELOPER.md:113 says it is meant to be launched by an MCP host, not run standalone. No CLI subcommands.",
+        "mcp": "yes - 26 tools registered with @modelcontextprotocol/sdk McpServer over StdioServerTransport only (src/index.ts:21-34, 46-462, 466-468): codebase_index/update/stop/remove/prune/watch, codebase_search, codebase_status, codebase_graph_*, codebase_impact/flow/symbol/symbols, codebase_context*, codebase_health/list_projects/about. Hosts that support only remote HTTP MCP servers cannot launch it (README.md:525). Project scope = `projectPath` argument or process.cwd() (src/tools/query-tools.ts:126,135); no MCP roots or host project env vars are used (grep).",
+        "sdk_or_api": "none found - no HTTP API and no documented programmatic/library API; package main is the server entry dist/index.js (package.json:7), no `exports` map, and the server opens no network listener (src/index.ts:467-468; SECURITY.md:27). DEVELOPER.md's Services Reference documents internals only.",
+        "claude_code_or_codex": "Claude Code: native plugin (README.md:161-224; docs/guides/claude-code.md) - .claude-plugin/plugin.json:21 points to .claude-plugin/mcp.json (npx launcher, SOCRATICODE_SPEC pin at :8), marketplace manifest .claude-plugin/marketplace.json, 2 skills (skills/codebase-exploration, skills/codebase-management), a sub-agent (agents/codebase-explorer.md) and hooks/hooks.json (a SessionStart hook with matcher '.*' that only echoes a duplicate-MCP-config advisory into the session). MCP-only alternative at README.md:220. Codex: plugin (README.md:226-263; docs/guides/codex.md) - .codex-plugin/plugin.json:21-22 declares skills ./skills/ and mcpServers ./.mcp.json; MCP-only at README.md:270. The tree has marketplace manifests only for Claude Code and Cursor (.claude-plugin/marketplace.json, .cursor-plugin/marketplace.json); no Codex-format marketplace file was found, so the documented `codex plugin marketplace add` flow cannot be confirmed from the repo. Both clients start their own engine process; per-client env must be set separately (README.md:248, 1438, 1446-1450). Other documented hosts: VS Code (agent plugin and extension), Cursor, Gemini CLI, Continue, Cline, Zed, OpenCode (README.md:149-159)."
+      },
+      "telemetry_and_network": "No telemetry, analytics, crash-reporting or self-update-check code in src/ (grep for telemetry|analytics|posthog|sentry|update-check|npm view found nothing); extension/README.md:180 states 'No telemetry from the extension'. No account is needed for the default stack; API keys are only for the optional OpenAI/Google/LiteLLM/Qdrant Cloud paths (README.md:1541-1546, 1573). Network/services touched: (1) Qdrant over HTTP(S) - managed Docker container on localhost:16333 (src/services/docker.ts:121-129; src/constants.ts:43-55) or external QDRANT_URL; an API key is refused over non-HTTPS unless the host is loopback (docker.ts:204-228). It stores chunk text, paths, hashes and graphs. (2) Embedding provider - default Ollama: probes http://localhost:11434/api/tags (src/services/provider-ollama.ts:186), otherwise a Docker container on localhost:11435, and pulls the nomic-embed-text model on first use (provider-ollama.ts:264-268); optional OpenAI API (provider-openai.ts:53), Google Generative AI API (provider-google.ts:65), LM Studio/any OpenAI-compatible server (provider-lmstudio.ts:63), LiteLLM proxy (provider-litellm.ts:92). With cloud providers, chunk text prefixed with the file path is sent off-machine (SECURITY.md:31-33; src/services/embeddings.ts:148-158). (3) Docker Hub pulls of qdrant/qdrant:v1.17.0 and ollama/ollama:latest (constants.ts:55,99; docker.ts:63-79,267-283). (4) npm registry: the documented launcher `npx -y --prefer-online socraticode@latest` checks npm on every server start (README.md:109,123; .claude-plugin/mcp.json:8). (5) codebase_graph_visualize writes an HTML file to the OS temp dir and opens the default browser; Cytoscape/Dagre are vendored, no CDN (src/services/graph-visualize-browser.ts:23-46; README.md:1258). Logs go to MCP notifications/stderr or an optional local SOCRATICODE_LOG_FILE (src/services/logger.ts:9-12,33-42). The server listens on no port (stdio only: src/index.ts:467-468; SECURITY.md:27; no http server code in src/). 'SocratiCode Cloud' is a separate hosted product (README.md:42, 1865-1880); src/ contains no reference to it."
+    },
+    "code": {
+      "languages": [
+        "TypeScript (engine in src/, tests in tests/, VS Code extension in extension/)",
+        "JavaScript (scripts/*.mjs, src/services/gdscript-preflight.cjs, vendored Cytoscape/Dagre viewer bundles in src/assets)",
+        "HTML/CSS (graph viewer template and styles in src/assets)"
+      ],
+      "entry_points": [
+        {
+          "path": "src/index.ts",
+          "what": "MCP server main; built to dist/index.js and exposed as the `socraticode` bin (package.json:8-10). Registers 26 zod-typed tools (index.ts:46-462), connects StdioServerTransport (index.ts:466-468), starts background auto-resume (index.ts:480-482), handles SIGINT/SIGTERM and stdin close (index.ts:505-529)."
+        },
+        {
+          "path": "src/tools/query-tools.ts",
+          "what": "Handlers for codebase_search (hybrid search call :145-160, minScore filter :163-167) and codebase_status."
+        },
+        {
+          "path": "src/tools/index-tools.ts",
+          "what": "Handlers for codebase_index/update/remove/prune/stop/watch (infrastructure setup :41-60, background indexing :186-275)."
+        },
+        {
+          "path": "src/tools/graph-tools.ts, src/tools/context-tools.ts, src/tools/manage-tools.ts",
+          "what": "Handlers for graph/impact/flow/symbol tools, context-artifact tools, and health/list-projects/about."
+        },
+        {
+          "path": "src/services/startup.ts",
+          "what": "autoResumeIndexedProjects (:57-116, per-project resume :222-332) and gracefulShutdown (:379-408)."
+        },
+        {
+          "path": ".claude-plugin/plugin.json, .codex-plugin/plugin.json, .mcp.json, mcp.json, gemini-extension.json, server.json",
+          "what": "Host plugin/registry manifests; all launch `npx -y --prefer-online socraticode@latest` (the Claude Code variant reads ${SOCRATICODE_SPEC:-socraticode@latest}, .claude-plugin/mcp.json:8)."
+        },
+        {
+          "path": "extension/src/extension.ts",
+          "what": "VS Code / Open VSX extension activation: registers an MCP stdio server definition provider (extension/src/mcpProvider.ts:34-65), sidebar, status bar and graph webview."
+        },
+        {
+          "path": "scripts/benchmark-graph.ts, scripts/verify-packaged-qdrant.mjs, scripts/check-release-versions.mjs",
+          "what": "Developer/CI scripts: graph-build benchmark, packaged-install Qdrant check, release-manifest version consistency."
+        }
+      ],
+      "architecture": "MCP stdio server. src/index.ts registers 26 tools and delegates to src/tools/{index,query,graph,context,manage}-tools.ts, which call src/services/*. Identity/scoping (src/config.ts): project id = first 12 hex chars of sha256(path.resolve(projectPath)) (config.ts:194-197), overridable by SOCRATICODE_PROJECT_ID or .socraticode.json projectId, optional git-branch suffix; collections codebase_<id>, codegraph_<id>, context_<id> (config.ts:221-239), optional QDRANT_COLLECTION_PREFIX; linkedProjects for cross-project search. Infra: services/docker.ts (docker CLI wrapper running managed qdrant/qdrant:v1.17.0 and ollama/ollama:latest containers; external-Qdrant health check with API-key/TLS guard). Storage/search: services/qdrant.ts (collections with Cosine dense + idf-BM25 sparse vectors, batched upserts with retry, hybrid prefetch+RRF query, multi-collection merge by cosine, and a `socraticode_metadata` collection holding per-project file-hash map, indexing status, effective profile and graph pointers; qdrant.ts:1336-1500). Indexing: services/indexer.ts (discovery with built-in ignores + .gitignore + .socraticodeignore via services/ignore.ts; 5 MB file cap; files <=100 lines become one chunk, larger ones are ast-grep AST-chunked with 100-line/10-overlap line fallback, character chunking for minified files, 2000-char cap; 50-file embed->upsert->checkpoint batches with cancellation; indexer.ts:740-822,1287-1399), services/index-profile.ts (per-collection effective profile pinning provider/model/dimensions/prefixes/chunk format). Embeddings: services/embeddings.ts (batch 32, 3 retries), embedding-provider.ts, provider-{ollama,openai,google,lmstudio,litellm}.ts, embedding-config.ts. Lifecycle: startup.ts (auto-resume, graceful shutdown), watcher.ts (@parcel/watcher, 2 s debounce), git-refresh.ts/git-state.ts (SOCRATICODE_WATCHER=git), lock.ts (proper-lockfile under os.tmpdir()/socraticode-locks, 2 min stale), reclamation-barrier.ts (codebase_prune). Graphs: code-graph.ts, graph-*.ts and symbol-graph-*.ts (static analysis persisted in Qdrant), graph-visualize-*.ts + src/assets (vendored Cytoscape/Dagre HTML). context-artifacts.ts indexes non-code documents listed in .socraticodecontextartifacts.json. Search returns top-N chunks (default 10, max 50) above minScore 0.10 (constants.ts:105-114).",
+      "packaging_and_release": "Artifacts: (a) npm package `socraticode` (package.json:2-4; `files` whitelist :53-65 = dist, .claude-plugin, skills, agents, hooks, .mcp.json, licenses, README; built by `tsc && node scripts/copy-assets.mjs` on prepublishOnly :12,19; dist/ is git-ignored, .gitignore:2). (b) VS Code extension .vsix published to the VS Code Marketplace and Open VSX and attached to the GitHub Release (.github/workflows/extension-release.yml:48-63, triggered by tags v* or manual). (c) MCP Registry entry server.json, published by .github/workflows/mcp-registry-release.yml on tags v*: verifies tag/manifest versions, waits until the exact npm version exists, installs mcp-publisher 1.8.1 after a sha256 check, authenticates with GitHub OIDC (id-token: write), publishes (mcp-registry-release.yml:10,29-90). (d) Plugin manifests (.claude-plugin, .codex-plugin, .cursor-plugin, gemini-extension.json) are distributed by git tag/clone (README.md:352-367). npm publish, git tag and GitHub Release are produced by a maintainer running `release-it` (.release-it.json:1-18; DEVELOPER.md:158-174); no file in .github/workflows publishes to npm. No checksums, signatures, SLSA/npm provenance or attestations for the npm tarball or .vsix were found (grep for provenance|attest|sigstore|cosign|slsa|checksum|gpg over workflows, package.json, scripts and release config returned only the mcp-publisher sha256 pin, mcp-registry-release.yml:70,79). Actions are tag-pinned (@v7) in ci.yml/extension-*.yml but SHA-pinned in mcp-registry-release.yml:22,24. Manifest version coupling is enforced by scripts/check-release-versions.mjs (run in ci.yml:23). Cadence: 49 changelog entries, 1.0.1 (2026-03-04) to 1.16.0 (2026-09-28) (CHANGELOG.md:7,827). The v1.16.0 tag is annotated and peels to the commit above (.git/packed-refs:2-3).",
+      "tests_and_ci": "Vitest (vitest.config.ts; vitest ^4.1.11), sequential forks, 120 s timeouts (vitest.config.ts:6-19). 126 test files under tests/: 107 unit (tests/unit, no Docker), 18 integration (tests/integration, need Qdrant and usually Ollama; self-skip without Docker unless REQUIRE_QDRANT=1), 1 e2e (tests/e2e/full-workflow.test.ts), plus 4 helper modules (tests/helpers); the extension has 1 test (extension/src/__tests__/manifest.test.ts, node:test). Lint with Biome, typecheck with `tsc --noEmit`. CI .github/workflows/ci.yml (push/PR on main): lint-and-typecheck (ubuntu, Node 22: check:release-versions, biome, tsc); unit-tests (ubuntu, matrix Node 18/20/22/26: npm run test:unit); git-refresh-windows (windows-latest: 3 git unit files); git-refresh-integration (service containers qdrant:v1.17.0 + ollama:latest, pulls nomic-embed-text, runs 2 integration files); node-floor-consumer-install (Node 18.17.0: npm pack, install --engine-strict, boots the server, scripts/verify-packaged-qdrant.mjs against Qdrant); node-26-consumer-qdrant (Node 26: 4 integration files incl. interrupted-resume-recovery and partial-upsert-skip with stubbed embeddings, then the packaged check); rust-graph-vs-cargo (real `cargo check` comparison). extension-ci.yml (paths extension/**): lint, typecheck, test, build, package .vsix, upload artifact (7-day retention). Not run in CI: tests/e2e and 11 of the 18 integration files; no macOS runner; no coverage threshold (vitest.config.ts:21-26).",
+      "dependencies": "Root package.json: 34 runtime dependencies (@ast-grep/napi plus 16 @ast-grep/lang-* grammars, @modelcontextprotocol/sdk, @qdrant/js-client-rest ~1.18, ollama, openai, @google/generative-ai, @parcel/watcher, proper-lockfile, glob, ignore, undici ^6, web-tree-sitter, @lumis-sh/wasm-eex/heex, smol-toml, open, zod, @hono/node-server), 1 optionalDependency (tree-sitter-gdscript 6.1.0) and 9 devDependencies, plus npm `overrides` for vite/postcss/undici (package.json:66-127); package-lock.json present. @hono/node-server is declared (package.json:85) but nothing in src/ imports it (grep). extension/package.json: 0 runtime dependencies and 8 devDependencies (extension/package.json:212-221); extension/package-lock.json present. Non-npm runtime requirements: Docker CLI (managed mode), Qdrant >= 1.15.2 (managed image v1.17.0), an embedding service (Ollama by default), optional git (branch-aware and git-refresh modes). THIRD-PARTY-LICENSES lists the runtime/dev dependencies as MIT, Apache-2.0, ISC or BSD-3-Clause.",
+      "security_policy": "SECURITY.md (root): report privately by email to giancarlo@altaire.com, not via public issues; acknowledgement within 48 hours and a detailed response within 7 days; only the latest release is supported; a GitHub security advisory is published after the fix; scope is the SocratiCode codebase and its managed Docker containers, not third-party services (SECURITY.md:3-48). No GitHub private-vulnerability-reporting configuration is present in .github/."
+    },
+    "claim_checks": [
+      {
+        "claim": "Hybrid search: dense vector + BM25 sparse vector fused with RRF in one Qdrant Query API call (README.md:560).",
+        "verified": "yes",
+        "evidence": "src/services/qdrant.ts:955-976 builds one `query` with two prefetch legs (dense `using:'dense'` and bm25 `{text, model:'qdrant/bm25'}`) and `query:{fusion:'rrf'}`; collections are created with a Cosine dense vector and an idf-modified sparse `bm25` vector (qdrant.ts:144-160). BM25 inference is server-side and needs Qdrant >= 1.15.2 (comment at qdrant.ts:873; README.md:1611); there is no runtime server-version check (client built with checkCompatibility:false, qdrant.ts:119,125)."
+      },
+      {
+        "claim": "Batched, resumable indexing: 50-file batches checkpointed to Qdrant; interruptions do not lose work; content hashes persisted in Qdrant so state survives restarts (README.md:568-569, 1709-1714).",
+        "verified": "yes",
+        "evidence": "INDEX_BATCH_SIZE=50 (src/constants.ts:120). Each batch embeds, upserts, then writes the hash map plus status 'in-progress' to a point in the `socraticode_metadata` collection (src/services/indexer.ts:1287-1399; qdrant.ts:1336,1462-1500). Unchanged files are skipped by content hash (indexer.ts:1226). A partial upsert throws before hashes advance (qdrant.ts:844-854; indexer.ts:1367-1379). Resume from 'in-progress' first reconciles hashes with stored points (indexer.ts:1115-1128) and is covered by tests/integration/interrupted-resume-recovery.test.ts, which CI runs against a real Qdrant with stubbed embeddings (ci.yml:183-187). Granularity is one batch, and the whole hash map is rewritten at each checkpoint (qdrant.ts:1475-1496)."
+      },
+      {
+        "claim": "Private and local by default; no API keys; no data leaves the machine; the default Docker setup makes no external API calls (README.md:48, 564; SECURITY.md:26).",
+        "verified": "partial",
+        "evidence": "Defaults are provider=ollama, OLLAMA_MODE=auto, QDRANT_MODE=managed (src/services/embedding-config.ts:271,339; src/constants.ts:52-53) and the only probe is to localhost (provider-ollama.ts:186), so code content stays local in default mode. First use still needs network: docker pull of qdrant/qdrant:v1.17.0 and ollama/ollama:latest (docker.ts:63-79,267-283), an Ollama model pull (provider-ollama.ts:264-268) and an npm lookup at every launch with @latest (README.md:109). docs/guides/local-only.md:16 acknowledges the downloads; SECURITY.md:26's 'No external API calls are made' is narrower in practice than worded."
+      },
+      {
+        "claim": "Multi-provider embeddings (Ollama, Docker Ollama, OpenAI, Gemini, LM Studio/OpenAI-compatible, LiteLLM) 'with a single environment variable' (README.md:563, 934-936).",
+        "verified": "partial",
+        "evidence": "Five providers are implemented and chosen by EMBEDDING_PROVIDER (src/services/embedding-provider.ts:48-79; embedding-config.ts:271-283). The 'lmstudio' provider uses the OpenAI SDK against any /v1/embeddings server with encoding_format 'float' (provider-lmstudio.ts:3-24,327-331) and an opt-in /v1/embeddings probe when /v1/models is missing (TEI). It is not a single variable: lmstudio and litellm refuse to start without EMBEDDING_MODEL and EMBEDDING_DIMENSIONS (litellm also LITELLM_API_KEY), and openai/google need API keys (embedding-config.ts:288-336; provider-openai.ts:46-52). The README itself states these extras at README.md:925-927, 988-991."
+      },
+      {
+        "claim": "Existing collections keep their stored provider/model/dimensions/prefixes; requested changes are reported as pending and never auto-applied; remove + re-index to activate (README.md:1517, 1598).",
+        "verified": "yes",
+        "evidence": "resolveEffectiveIndexProfile returns the stored profile when one exists (src/services/index-profile.ts:155-172); search, update and indexing run inside withEffectiveEmbedding(profile) (index-profile.ts:180-194; qdrant.ts:911-921; indexer.ts:1342); codebase_status lists pending differences (src/tools/query-tools.ts:292-315). Caveat: only vector-defining values are overridden - URLs and credentials still come from the live process env (embedding-config.ts:462-466)."
+      },
+      {
+        "claim": "Multiple agents share one index; cross-process file locks (proper-lockfile) with stale-lock reclaim after 2 minutes; one watcher per project (README.md:585-586, 1818-1824).",
+        "verified": "partial",
+        "evidence": "Locks are files in os.tmpdir()/socraticode-locks with stale=120 s (src/services/lock.ts:27-33), taken non-reentrantly by indexProject (indexer.ts:1056-1067) and startWatching (watcher.ts:261-266). The README itself limits this to one host with the same temp directory (README.md:1812-1814, 1197). Each process caches the file-hash map after first load (indexer.ts:253-274) and invalidates it only for Git-refresh runs (indexer.ts:1095,1612); watcher/resume settings are per process and must match across processes (README.md:1592; DEVELOPER.md:867)."
+      },
+      {
+        "claim": "By default, server startup resumes the indexed project of the MCP process's working directory (README.md:129, 580).",
+        "verified": "partial",
+        "evidence": "The resume logic matches (src/services/startup.ts:222-332), but in managed mode it returns early if Docker is unavailable or the Qdrant container is not already running - it does not start them (startup.ts:71-80) - and it skips when cwd is '/' or $HOME (startup.ts:103-107). SOCRATICODE_AUTO_RESUME=off returns before any Docker/Qdrant access (startup.ts:63-67). The README does not mention the not-running or cwd conditions; the code governs."
+      },
+      {
+        "claim": "README env table: OLLAMA_HOST is the 'Ollama base URL (alternative to OLLAMA_URL)' (README.md:1538).",
+        "verified": "no",
+        "evidence": "The Ollama client host comes only from OLLAMA_URL (src/services/embedding-config.ts:384; provider-ollama.ts:60). OLLAMA_HOST is read only at src/constants.ts:97 and used only for the Docker container readiness poll (docker.ts:318,341), so setting it alone does not redirect embedding calls. Code differs from README."
+      },
+      {
+        "claim": "Claude Code and Codex plugins bundle the MCP server (plus skills and instructions), so no separate MCP registration is needed (README.md:139, 163, 228).",
+        "verified": "partial",
+        "evidence": "Claude Code: .claude-plugin/plugin.json:21 points to .claude-plugin/mcp.json (npx launcher); skills/, agents/codebase-explorer.md and hooks/hooks.json ship in the tree and in package.json `files` (package.json:53-65). Codex: .codex-plugin/plugin.json:21-22 declares skills ./skills/ and mcpServers ./.mcp.json. Marketplace manifests exist only for Claude Code and Cursor (.claude-plugin/marketplace.json, .cursor-plugin/marketplace.json); no Codex-format marketplace file was found, so the `codex plugin marketplace add giancarloerra/socraticode --ref main` flow (README.md:231) cannot be confirmed from the repo. tests/unit/distribution-launchers.test.ts:72-79 asserts the bundled launcher definitions agree."
+      },
+      {
+        "claim": "Docker isolation: Qdrant and Ollama containers expose only the necessary ports on localhost (SECURITY.md:28).",
+        "verified": "partial",
+        "evidence": "src/services/docker.ts:121-129 and 325-332 publish `-p <port>:<container-port>` with no host address (docker-compose.yml:6-8,16-17 likewise) and configure no Qdrant API key. Docker's default for an unqualified -p is all host interfaces, so loopback-only exposure depends on the daemon configuration. Ports are the non-default 16333/16334/11435 (src/constants.ts:43-44,96)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "VS Code repo (~2.45M lines, 5,300+ files, 55,437 chunks), 5 architectural questions, Claude Opus 4.6: context bytes consumed by a scripted grep-style multi-step exploration vs one codebase_search call returning 10 chunks. Harness and raw data are not in the repo; n=5; no answer-quality or recall metric is reported.",
+        "metric": "context bytes consumed (lower is better)",
+        "value": "grep 250,510 B vs SocratiCode 96,485 B (-61.5%)",
+        "source": "README.md:1664-1676 (headline at README.md:54)",
+        "independent": false
+      },
+      {
+        "what": "Same VS Code benchmark: agent steps / tool calls across the 5 questions.",
+        "metric": "tool calls",
+        "value": "31 (grep) vs 5 (SocratiCode), -84%",
+        "source": "README.md:1679",
+        "independent": false
+      },
+      {
+        "what": "Same VS Code benchmark: retrieval wall time per question.",
+        "metric": "speedup",
+        "value": "37.2x overall (per-question 31.1x-49.7x); grep scans 2-3.5 s per question vs semantic search 'up to 60-90ms'",
+        "source": "README.md:1668-1675, 1681",
+        "independent": false
+      },
+      {
+        "what": "First full index of a 3M+ line codebase on a MacBook Pro M4 (embedding provider/model for the run not stated).",
+        "metric": "wall-clock time to first index",
+        "value": "under 10 minutes",
+        "source": "README.md:127",
+        "independent": false
+      },
+      {
+        "what": "Code-graph + symbol-graph build (not semantic search) via scripts/benchmark-graph.ts against Qdrant v1.15.5 (the repo now pins v1.17.0), captured 2026-04-21.",
+        "metric": "full build time, RSS, incremental update, cold query latency",
+        "value": "socraticode repo (82 files, 571 symbols, 9,914 call edges): 0.90 s, 167 MB RSS; synthetic Python (1,001 files, 20,000 symbols): 6.55 s, ~250 MB RSS; single-file incremental update 197 ms (~33x faster than the full rebuild); cold symbol queries ~70 ms",
+        "source": "DEVELOPER.md:984-993",
+        "independent": false
+      },
+      {
+        "what": "Research figures quoted in README 'Why Not Just Grep?': ~20% relevance gain from BM25F; AST-aware retrieval +4.3 recall points and +2.7 code-generation points on RepoEval/SWE-bench; hybrid beats grep in 70% of agentic code-search tasks with 56% fewer search operations and ~60,000 fewer tokens per complex query. The studies are not named or linked, so the figures cannot be traced; no independent measurement of SocratiCode itself was found in the repo.",
+        "metric": "as quoted (relevance gain, recall/accuracy points, win rate, operations, tokens)",
+        "value": "see 'what'",
+        "source": "README.md:1660, 1687-1689 (quoted by the project; origin unnamed)",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Update path and supply chain: every documented launcher runs `npx -y --prefer-online socraticode@latest`, so each MCP server start resolves and executes whatever npm tags `latest` (.mcp.json:4-6; .claude-plugin/mcp.json:5-9; README.md:109,195). Pinning via SOCRATICODE_SPEC exists for the Claude Code plugin only; Codex and Cursor read the fixed .mcp.json (README.md:211). Releases are published from a maintainer machine with release-it (.release-it.json:16-18; DEVELOPER.md:158-174); no workflow publishes to npm and no provenance, signature or checksum for the npm tarball or .vsix was found. The `ollama/ollama:latest` image is unpinned (src/constants.ts:99; docker-compose.yml:14; ci.yml:62) while Qdrant is pinned to v1.17.0 (constants.ts:55).",
+      "Container exposure: managed Qdrant and Ollama are started with `-p 16333:6333`, `-p 16334:6334`, `-p 11435:11434`, no host address and no Qdrant API key or auth (src/services/docker.ts:121-129, 325-332; docker-compose.yml:6-8,16-17). Docker publishes unqualified ports on all host interfaces unless the daemon is configured otherwise, whereas SECURITY.md:28 says 'exposed on localhost'. Qdrant payloads hold full chunk text (src/services/qdrant.ts:735-744; indexer.ts:1355-1364).",
+      "Data exposure: no secret detection or redaction exists in src/ (grep). The default index covers json/yaml/toml/ini/cfg/txt/md/sql (src/constants.ts:335-340) and `.env.example` (constants.ts:395); dot-directories are excluded unless INCLUDE_DOT_FILES=true (README.md:1581). Chunk text prefixed with the file path goes to the configured embedding endpoint (src/services/embeddings.ts:148-158) and leaves the machine with openai/google/litellm (SECURITY.md:31-33). Search results return raw chunk content to the host assistant (src/tools/query-tools.ts:204-209), which has its own provider boundary (docs/guides/local-only.md:16).",
+      "Two-client operation (Claude Code + Codex): each client starts its own engine process. Locks are files under os.tmpdir()/socraticode-locks (src/services/lock.ts:27), so they only coordinate processes on one host with the same temp dir (README.md:1812-1814, 1197). The per-process file-hash cache is loaded once and invalidated only for Git-refresh runs (indexer.ts:253-274, 1095, 1612). Watcher/resume modes are per-process settings that must match (README.md:1592; DEVELOPER.md:867). Index identity is sha256 of the absolute path (src/config.ts:194-197) unless a projectId is pinned. The Codex plugin has no documented per-user env override for its bundled server (README.md:248) and plugin-bundled servers may not inherit a direct server's env (README.md:1438); a collection's stored profile fixes provider/model/dimensions but credentials and URLs are read from each process's own env (src/services/embedding-config.ts:462-466).",
+      "State and scale: all durable state is in Qdrant; there is no export, backup or snapshot tooling in src/ (grep). The whole file-hash map is serialised as one JSON string in one metadata point and re-upserted after every 50-file batch (src/services/qdrant.ts:1475-1496; indexer.ts:1389-1397), unlike the sharded symbol graph (constants.ts:249-253); Qdrant's default request limit is 32 MiB (constants.ts:142-147). Managed data sits in the Docker volume `socraticode_qdrant_data` (docker.ts:126) and removing it discards the index (DEVELOPER.md:1713-1717). Server-side BM25 needs Qdrant >= 1.15.2 on external instances with no runtime version check (README.md:1611; qdrant.ts:119,125,873).",
+      "Platform and test coverage: CI uses ubuntu-latest plus one windows-latest job running 3 git unit-test files; there is no macOS or WSL2 runner (.github/workflows/ci.yml:15,29,42-53). tests/e2e and 11 of the 18 integration files do not run in CI (ci.yml:55-237). The managed Docker Ollama container has no GPU options (src/services/docker.ts:325-332), so GPU use needs native/external Ollama or a hosted provider (README.md:609-613). Default managed mode needs the `docker` CLI and a running daemon (docker.ts:41-48; README.md:83), and OLLAMA_MODE=auto falls back to Docker when nothing answers on localhost:11434 (provider-ollama.ts:198-202).",
+      "Maintenance and licensing: single copyright holder and listed author (Giancarlo Erra - Altaire Limited; package.json:39-43; README.md:1896); 49 changelog releases between 2026-03-04 and 2026-09-28 (CHANGELOG.md:7,827); only the latest release receives security fixes (SECURITY.md:35-42). Dual-licensed AGPL-3.0-only / commercial (LICENSE; LICENSE-COMMERCIAL:1-15) with a CLA granting the owner rights to relicense contributions (CLA.md:21-27); a hosted 'SocratiCode Cloud' is in private beta (README.md:42, 1865-1880). The vendored Cytoscape.js/Dagre bundles in src/assets, shipped in dist/assets via scripts/copy-assets.mjs:14-19, are not listed in THIRD-PARTY-LICENSES (:6-43).",
+      "Docs-vs-code and scoping behaviours: README.md:1538 presents OLLAMA_HOST as an alternative to OLLAMA_URL, but the client reads only OLLAMA_URL (src/services/embedding-config.ts:384; docker.ts:318,341). Startup auto-resume does nothing when Docker/Qdrant are not already running or cwd is '/' or $HOME (startup.ts:71-80,103-107). Context-artifact config silently falls back to ~/.claude/arch/.socraticodecontextartifacts.json or SOCRATICODE_GLOBAL_CONFIG_DIR, which README/DEVELOPER do not document (src/services/context-artifacts.ts:87-91). Scope is the `projectPath` argument or the server's cwd (src/tools/query-tools.ts:126,135), `fileFilter` is an exact relative-path match only (src/services/qdrant.ts:944-946), and a linked project whose query fails is dropped with only a log warning (qdrant.ts:1170-1176)."
+    ]
+  },
+  "repaired": true,
+  "verification": [
+    {
+      "contender": "giancarloerra/socraticode",
+      "checks": [
+        {
+          "field": "readme.install[0] (Claude Code native plugin)",
+          "statement": "Claude Code native plugin (user scope); README does not distinguish Linux from macOS. Commands: `claude plugin marketplace add giancarloerra/socraticode` then `claude plugin install --scope user socraticode@socraticode`.",
+          "citation": "README.md:165-168",
+          "holds": true,
+          "note": "README.md:166-167 carry both commands verbatim inside the bash block (165 opens it, 168 is `claude plugin list`). The repo backs them: .claude-plugin/marketplace.json:2,12 declares marketplace `socraticode` containing plugin `socraticode` (source ./), so `socraticode@socraticode` resolves; .claude-plugin/plugin.json:21 points to .claude-plugin/mcp.json, whose launcher is `npx -y --prefer-online ${SOCRATICODE_SPEC:-socraticode@latest}` (mcp.json:4-8). The README mentions Linux/macOS only for GPU/embedding performance (README.md:135, 607-611), never for this install."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX AGPL-3.0-only, file LICENSE (dual-licensed AGPL-3.0-only / commercial).",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-2 is the GNU AGPL v3 text. The appended project notice grants 'version 3 of the License' with no 'or later' clause (LICENSE:665-670), unlike the FSF template at :635-638. package.json:52 is \"AGPL-3.0-only\"; all 55 SPDX headers in src/ read AGPL-3.0-only; .claude-plugin/plugin.json:12, .codex-plugin/plugin.json:12, .cursor-plugin/plugin.json:11 and extension/package.json:7 agree. Commercial alternative: LICENSE-COMMERCIAL:1-8; README.md:1886-1894."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - README.md:579 'Works everywhere Docker runs'; CI runs unit and Qdrant-backed integration tests on ubuntu-latest; package-lock.json lists linux-x64 prebuilds for @ast-grep/napi and @parcel/watcher. 'The repo never names a CPU architecture.'",
+          "citation": "README.md:579; .github/workflows/ci.yml:15,29,55-90; package-lock.json:440,456,2078,2098",
+          "holds": false,
+          "note": "The 'yes' and every citation hold. README.md:579 has the quote. ci.yml:15 and :29 run lint and the Node 18/20/22/26 unit matrix on ubuntu-latest, and :55-90 runs integration tests on ubuntu-latest with qdrant:v1.17.0 + ollama service containers. package-lock.json:440/456 are @ast-grep/napi-linux-x64-gnu/-musl and :2078/:2098 are @parcel/watcher-linux-x64-glibc/-musl. The closing sentence is false as written: src/services/indexer.ts:478-481, src/services/code-graph.ts:803-808 and src/services/graph-symbols.ts:3764-3765 name linux-arm64 as having no tree-sitter-gdscript prebuild (GDScript then falls back to line-based chunking and regex extraction); tests/unit/graph-gdscript.test.ts:1156 names 'linux-x64 with prebuild'; and the cited lockfile entries themselves carry \"cpu\": [\"x64\"] (package-lock.json:444-446)."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "yes - 26 tools registered with @modelcontextprotocol/sdk McpServer over StdioServerTransport only; hosts that support only remote HTTP MCP servers cannot launch it; project scope = projectPath argument or process.cwd(); no MCP roots or host project env vars are used.",
+          "citation": "src/index.ts:21-34, 46-462, 466-468; README.md:525; src/tools/query-tools.ts:126,135",
+          "holds": true,
+          "note": "McpServer is constructed at src/index.ts:21-34. There are exactly 26 server.tool( calls at :46-462 (index/update/remove/prune/stop/watch, search/status, 7 graph tools, impact/flow/symbol/symbols, 4 context tools, health/list_projects/about), matching the dossier list. :467-468 connect a StdioServerTransport. Grep finds no StreamableHTTP/SSE transport, createServer or .listen( in src/. README.md:525: hosts that support only remote HTTP MCP servers 'cannot launch SocratiCode directly'. query-tools.ts:126 and :135 both use `args.projectPath || process.cwd()`. No roots/listRoots request and no host project variable (e.g. CLAUDE_PROJECT_DIR) is read; the process.env reads in src/ are SocratiCode, provider and Qdrant settings plus HOME."
+        },
+        {
+          "field": "claim_checks[0] (hybrid search)",
+          "statement": "Hybrid search: dense vector + BM25 sparse vector fused with RRF in one Qdrant Query API call (verified: yes); BM25 inference is server-side and needs Qdrant >= 1.15.2; no runtime server-version check (checkCompatibility:false).",
+          "citation": "README.md:560; src/services/qdrant.ts:955-976, 144-160, 873, 119, 125; README.md:1611",
+          "holds": true,
+          "note": "qdrant.ts:955-976 builds one payload with a dense prefetch (using 'dense') and a bm25 prefetch ({text, model:'qdrant/bm25'}, using 'bm25') plus query {fusion:'rrf'}, sent in a single qdrant.query call. Collections are created with a Cosine dense vector and a sparse 'bm25' vector with modifier 'idf' (:144-160). The :873 comment and README.md:1611 state the v1.15.2+ requirement. The client uses checkCompatibility:false (:119, :125). The only pre-client hook, ensureQdrantClientCompatibility (qdrant.ts:112; qdrant-client-compat.ts:145-167), checks the installed JS client version against the Node major to choose a fetch bridge; it never checks the Qdrant server version."
+        }
+      ],
+      "verdict": "fail",
+      "repairs": [
+        "readme.platforms.linux_x86_64: delete the sentence 'The repo never names a CPU architecture.' and replace it with: 'README and docs/ never state supported CPU architectures. Source comments name linux-arm64 as lacking a tree-sitter-gdscript prebuild, so GDScript there falls back to line-based chunking and regex symbol extraction (src/services/indexer.ts:478-481; src/services/code-graph.ts:803-808; src/services/graph-symbols.ts:3764-3765), and a test comment names linux-x64 as an environment where that prebuild loads (tests/unit/graph-gdscript.test.ts:1156).' Keep the 'yes' rating and the existing citations unchanged; they are correct."
+      ]
+    },
+    {
+      "contender": "giancarloerra/socraticode",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Claude Code native plugin (user scope): `claude plugin marketplace add giancarloerra/socraticode` then `claude plugin install --scope user socraticode@socraticode`; README does not distinguish Linux from macOS.",
+          "citation": "README.md:165-168",
+          "holds": true,
+          "note": "README.md:166-167 carry exactly these two commands (168 adds `claude plugin list` as a verification step); the Claude Code plugin section (161-213) has no OS-specific variant. The repo backs the identifier: .claude-plugin/marketplace.json:2,12 names both marketplace and plugin `socraticode` (source ./); .claude-plugin/plugin.json:21 points to .claude-plugin/mcp.json:4-8 (npx -y --prefer-online ${SOCRATICODE_SPEC:-socraticode@latest})."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX AGPL-3.0-only, file LICENSE (dual-licensed with a commercial option).",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-2 is the GNU AGPL v3 text. The project notice at LICENSE:665-670 grants 'version 3 of the License' with no 'or any later version' (the or-later wording at :637-638 belongs to the template appendix only). Consistent with package.json:52, .claude-plugin/plugin.json:12, .codex-plugin/plugin.json:12 and SPDX headers (src/index.ts:2, src/services/qdrant.ts:1). LICENSE-COMMERCIAL:5-8 is the commercial alternative. Checkout HEAD = 3d3a4a4d427cb0f29de4f5dd1360da52896f62df; tag v1.16.0 (a50f72c5) peels to it (.git/packed-refs:2-3)."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - 'Works everywhere Docker runs'; CI unit and Qdrant-backed integration tests on ubuntu-latest; lockfile linux-x64 prebuilds for @ast-grep/napi and @parcel/watcher; README/docs never state CPU architectures; source names linux-arm64 as lacking a tree-sitter-gdscript prebuild (line-based/regex fallback); a test comment names linux-x64 as an environment where that prebuild loads.",
+          "citation": "README.md:579; .github/workflows/ci.yml:15,29,55-90; package-lock.json:440,456,2078,2098; src/services/indexer.ts:478-481; src/services/code-graph.ts:803-808; src/services/graph-symbols.ts:3764-3765; tests/unit/graph-gdscript.test.ts:1156",
+          "holds": true,
+          "note": "README.md:579 ends 'Works everywhere Docker runs.' ci.yml:15 (lint), :29 (unit matrix Node 18/20/22/26) and :57 (Qdrant v1.17.0 + Ollama integration job, :55-90) use ubuntu-latest (an x64 runner). package-lock.json:440/456 = @ast-grep/napi-linux-x64-gnu/-musl; :2078/:2098 = @parcel/watcher-linux-x64-glibc/-musl (cpu x64, os linux). The three source comments state the linux-arm64 GDScript fallback (line-based chunking, syntax-aware/regex extraction), and the test comment at :1156 says 'linux-x64 with prebuild'. Grep of README.md and docs/ for arm64|aarch64|x86|x64|amd64|Apple Silicon finds no architecture statement."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "26 tools registered with @modelcontextprotocol/sdk McpServer over StdioServerTransport only; hosts supporting only remote HTTP MCP cannot launch it; project scope = projectPath argument or process.cwd(); no MCP roots or host project env vars used.",
+          "citation": "src/index.ts:21-34, 46-462, 466-468; README.md:525; src/tools/query-tools.ts:126,135",
+          "holds": true,
+          "note": "Counted 26 server.tool() registrations in src/index.ts:46-462 (6 index, 2 query, 7 graph, 4 impact/flow/symbol, 4 context, 3 manage), names matching the dossier list. McpServer and StdioServerTransport imported at :5-6, server built at :21-34, transport connected at :467-468. src/ has no StreamableHTTP/SSE transport, createServer, .listen( or @hono import. README.md:525 contains the remote-HTTP sentence. query-tools.ts:126,135 = `(args.projectPath as string) || process.cwd()`. No listRoots/roots handling or CLAUDE_PROJECT_DIR/workspace env reads in src/."
+        },
+        {
+          "field": "claim_checks[2]",
+          "statement": "'Private and local by default; no API keys; no data leaves the machine; default Docker setup makes no external API calls' - verified: partial (code stays local in default mode, but first use needs network for image pulls, model pull and npm lookup; SECURITY.md:26 narrower in practice than worded).",
+          "citation": "README.md:48, 564; SECURITY.md:26; src/services/embedding-config.ts:271,339; src/constants.ts:52-53; src/services/provider-ollama.ts:186,264-268; src/services/docker.ts:63-79,267-283; README.md:109; docs/guides/local-only.md:16",
+          "holds": true,
+          "note": "Quoted claims at README.md:48, :564 and SECURITY.md:26. Defaults confirmed: EMBEDDING_PROVIDER || 'ollama' (:271), OLLAMA_MODE || 'auto' (:339), QDRANT_MODE managed unless 'external' (constants.ts:52-53). The only fetch() calls in src/ are the localhost:11434/api/tags probe (provider-ollama.ts:186) and waitForService (docker.ts:394), which polls QDRANT_HOST:QDRANT_PORT (localhost:16333 by default). Network on first use: `docker pull` of qdrant/qdrant:v1.17.0 and ollama/ollama:latest (docker.ts:67,271), a model pull when missing (provider-ollama.ts:264-268), and an npm check on every start (README.md:109); local-only.md:16 acknowledges the downloads. The 'partial' verdict and its evidence are accurate."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

@@ -1,0 +1,295 @@
+{
+  "contender": "qdrant/qdrant",
+  "revision": {
+    "contender": "qdrant/qdrant",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "qdrant/qdrant",
+        "tag": "v1.19.1",
+        "commit": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v1.19.1",
+    "commit": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+    "read_at": "2026-10-02T03:02:41+00:00"
+  },
+  "dossier": {
+    "contender": "qdrant/qdrant",
+    "revision": {
+      "tag": "v1.19.1",
+      "commit": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Qdrant is an Apache-2.0 vector database / similarity-search server written in Rust (v1.19.1). It persists points (vectors + JSON payload) on local disk and serves REST (6333) and gRPC (6334) APIs for dense, sparse, multivector and hybrid (prefetch + RRF/DBSF) queries with payload filters, quantization, WAL, snapshots and optional Raft clustering. It also ships Qdrant Edge, an in-process embedded shard library (Rust, Python, UniFFI). Relative to the stated needs: it supplies the embedding index and its queries, but the tree contains no repository/code indexing, no bundled neural embedding model (only local BM25 sparse embeddings plus a client for an external inference endpoint speaking Qdrant's own protocol), and no MCP / Claude Code / Codex integration.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Qdrant is a vector similarity search engine and vector database; a production-ready service with an API to store, search and manage points (vectors plus payload), tailored for extended filtering support.",
+          "citation": "README.md:22-24"
+        },
+        {
+          "claim": "Written in Rust, 'fast and reliable even under high load'; points to an external benchmarks page (qdrant.tech/benchmarks), not included in the repo.",
+          "citation": "README.md:26"
+        },
+        {
+          "claim": "Agent Skills: ready-to-use skills (separate repo github.com/qdrant/skills) that bring Qdrant vector-search guidance (quantization, sharding, tenant isolation, hybrid search, model migration) into an AI coding assistant.",
+          "citation": "README.md:40-42"
+        },
+        {
+          "claim": "`docker run -p 6333:6333 qdrant/qdrant` runs the server; README warns this is an insecure deployment without authentication, open to all network interfaces.",
+          "citation": "README.md:46-52"
+        },
+        {
+          "claim": "Official client libraries (Go, Rust, JS/TS, Python, .NET/C#, Java) live in separate repositories; community Kotlin and PHP clients are listed.",
+          "citation": "README.md:66-77"
+        },
+        {
+          "claim": "Qdrant Edge is a lightweight in-process version: data is stored and queried locally, can be synchronized with a Qdrant server; from Python or Rust an EdgeShard manages data, queries it and restores snapshots (Python snippet given).",
+          "citation": "README.md:81-94"
+        },
+        {
+          "claim": "REST API with an OpenAPI 3.0 specification (raw JSON in docs/redoc/master/openapi.json) and a gRPC interface.",
+          "citation": "README.md:119-127"
+        },
+        {
+          "claim": "Supports dense, sparse and multivector (ColBERT-style) search, and payload filtering (keyword, full-text, range, geo) with should/must/must_not.",
+          "citation": "README.md:131-137"
+        },
+        {
+          "claim": "Hybrid search: combine multiple vectors in one query, merged by fusion strategies such as RRF and DBSF.",
+          "citation": "README.md:139-141"
+        },
+        {
+          "claim": "Built-in quantization cuts RAM usage by up to 97%; on-disk storage is supported.",
+          "citation": "README.md:143-145"
+        },
+        {
+          "claim": "Multitenancy for multi-user data partitioning; observability via metrics, telemetry and audit logging.",
+          "citation": "README.md:157-158"
+        },
+        {
+          "claim": "GPU support for accelerated indexing (NVIDIA and AMD); io_uring async I/O; Write-Ahead Logging 'ensures data persistence with update confirmation, even during power outages'.",
+          "citation": "README.md:161-163"
+        },
+        {
+          "claim": "Integrates with embedding providers, AI frameworks, data pipeline and observability tools; full list is on an external Ecosystem page.",
+          "citation": "README.md:171-173"
+        },
+        {
+          "claim": "Licensed under Apache License 2.0; development branch is `dev`, PRs against `master` are retargeted.",
+          "citation": "README.md:179-180,190"
+        }
+      ],
+      "install": [
+        {
+          "method": "Docker (published image)",
+          "command": "docker run -p 6333:6333 qdrant/qdrant",
+          "citation": "README.md:48-50"
+        },
+        {
+          "method": "Docker with persistent storage/snapshots/config (after `docker pull qdrant/qdrant`)",
+          "command": "docker run -p 6333:6333 -v $(pwd)/path/to/data:/qdrant/storage -v $(pwd)/path/to/snapshots:/qdrant/snapshots -v $(pwd)/path/to/custom_config.yaml:/qdrant/config/production.yaml qdrant/qdrant",
+          "citation": "docs/DEVELOPMENT.md:17-35"
+        },
+        {
+          "method": "Docker build from source",
+          "command": "docker build . --tag=qdrant/qdrant",
+          "citation": "docs/DEVELOPMENT.md:11-13"
+        },
+        {
+          "method": "Cargo build from source (documented for Linux/Debian/macOS; needs rustfmt, clang, cmake, jq, protoc 22.2 per the same section)",
+          "command": "cargo build --release --bin qdrant && ./target/release/qdrant",
+          "citation": "docs/DEVELOPMENT.md:71-110"
+        },
+        {
+          "method": "Nix dev shell (Linux/macOS) with all build and test dependencies",
+          "command": "nix-shell",
+          "citation": "docs/DEVELOPMENT.md:120-122"
+        },
+        {
+          "method": "Qdrant Edge Python package from source (PyPI/crates.io badges exist, but no pip/cargo install command is documented)",
+          "command": "cd lib/edge/python && pip install --user maturin && maturin develop --no-default-features",
+          "citation": "lib/edge/README.md:45-61"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - release workflow builds x86_64-unknown-linux-gnu and x86_64-unknown-linux-musl binaries plus .deb and AppImage (.github/workflows/release-artifacts.yml:14-18,47-61,109-167); Docker images for linux/amd64 (.github/workflows/docker-image.yml:55); CI tests run on ubuntu-latest (.github/workflows/rust.yml:20).",
+        "wsl2": "unknown - no WSL2 guidance for running Qdrant anywhere in the repo; the only mention is a comment that Nix is available on WSL2 (shell.nix:7). The server's storage-filesystem check rates NFS/FUSE/CIFS as Bad and unrecognised filesystems as Unknown (lib/common/common/src/fs/check.rs:136-171), which could matter for Windows-mounted paths, but this is not documented or tested.",
+        "macos_arm64": "yes - release workflow builds aarch64-apple-darwin (.github/workflows/release-artifacts.yml:63-71); tests run on macos-latest (.github/workflows/rust.yml:20); local build documented for Linux/Debian/MacOS (docs/DEVELOPMENT.md:71-110); Docker images include linux/arm64 (docker-image.yml:55). Caveats: io_uring is Linux-only (config/config.yaml:115-128; lib/common/common/Cargo.toml:68-71) and Pyroscope profiling is Linux-only (src/common/pyroscope_state.rs:169-180).",
+        "gpu": "yes (optional, HNSW indexing only, off by default) - Vulkan-based `gpu` cargo feature (Cargo.toml:38; lib/gpu/Cargo.toml:13-25), runtime switch `gpu.indexing` defaults to false (src/settings.rs:198-202), nvidia and amd Docker images (Dockerfile:146-177; docker-image.yml:114-146), README.md:161. GPU is not used for embedding or queries."
+      },
+      "integrations": {
+        "cli": "The `qdrant` binary is a server launcher, not a query/index CLI: clap flags --config-path, --disable-telemetry, --snapshot, --storage-snapshot, --force-snapshot, --bootstrap, --uri, --reinit, --stacktrace (src/main.rs:74-140). Other binaries: debug tools behind feature `service_debug` (wal_inspector, wal_pop, segment_inspector, schema_generator, model_testing: Cargo.toml:323-356), `wal-ctl` (lib/wal/src/bin/wal-ctl.rs:10-31), experimental Edge CLIs edge-tool / edge-shard-query / edge-shard-update (lib/edge/tools/*; lib/edge/tools/shard_query/SKILL.md:8). No end-user code-search CLI.",
+        "mcp": "none found - case-insensitive search of the whole tree for MCP, 'model context protocol', mcp-server found no matches (outside lockfiles/JSON).",
+        "sdk_or_api": "REST on :6333 (OpenAPI at docs/redoc/master/openapi.json; query POST /collections/{name}/points/query: src/actix/api/query_api.rs:31; upsert PUT /collections/{name}/points: src/actix/api/update_api.rs:32; snapshots incl. full-storage and per-shard/partial: src/actix/api/snapshot_api.rs:152-939); gRPC on :6334 (protos in lib/api/src/grpc/proto/*.proto; services registered at src/tonic/mod.rs:112-215, reflection at :133-134,181-182). Official client libraries are separate repos (README.md:66-77, not in this tree). Embedded Edge SDKs: Python `qdrant-edge-py` (lib/edge/python, stubs lib/edge/python/qdrant_edge.pyi:55-92), Rust `qdrant-edge` (lib/edge, lib/edge/publish), UniFFI `qdrant-edge-ffi` (lib/edge/ffi/Cargo.toml:1-36).",
+        "claude_code_or_codex": "none found as an integration - no plugin, hook, config or docs for Claude Code or Codex in the tree (searches for 'claude code' / 'codex' found nothing). README.md:42 links a separate `qdrant/skills` repo (not read); the server prints an 'Agentic Skills' URL banner (src/greeting.rs:128-132); the only SKILL.md in this repo documents the experimental edge-shard-query CLI (lib/edge/tools/shard_query/SKILL.md:1-8)."
+      },
+      "telemetry_and_network": "Telemetry is ON by default: reporting_enabled = !telemetry_disabled && !--disable-telemetry (src/main.rs:390; config/config.yaml:448-450; src/settings.rs:447-449). When on, a task POSTs anonymised JSON (collection stats, version/build features, OS distribution+version, CPU cores/flags, RAM/disk size, container runtime, GPU names, request counters) to https://telemetry.qdrant.io (staging host in debug builds) immediately at startup and then hourly (src/main.rs:697-703; src/common/telemetry_reporting.rs:14-19,36-48,75-87; src/common/telemetry.rs:50-75; src/common/telemetry_ops/app_telemetry.rs:38-107,168-250). Strings are hashed, large counts rounded, timestamps jittered (lib/segment/src/common/anonymize.rs:111-160). A panic hook also POSTs panic message, location and backtrace to the same endpoint when reporting is enabled (src/startup.rs:19-42; src/common/error_reporting.rs:9-50). Opt-out: `--disable-telemetry` (src/main.rs:120-124), `telemetry_disabled: true` in config, or env QDRANT__TELEMETRY_DISABLED=true (env source prefix QDRANT with `__` separator: src/settings.rs:327-329; usage example tools/compose/docker-compose.yaml:7). Other outbound traffic is conditional: a remote inference HTTP endpoint at `inference.address` with any request headers ending in `-api-key` forwarded (src/common/inference/service.rs:182-251; src/common/inference/api_keys.rs:8-35) - no default address and no `inference` key in shipped config; snapshot download/recovery from http(s) URLs, enabled by default (config/config.yaml:414-419; src/common/http_client.rs:52-66); S3/object-store snapshot storage (config/config.yaml:24-31; lib/collection/src/common/snapshots_manager.rs:85); Pyroscope push only if debugger.pyroscope is configured or PATCHed, Linux only (src/common/debugger.rs:10-22,61-78). No account, licence key or cloud service is needed to start the server (src/main.rs:368-836); Qdrant Cloud is an optional managed offering (README.md:30). The Web UI is not in the repo and is downloaded at image/package build time from the qdrant-web-ui `releases/latest` (tools/sync-web-ui.sh:11-17). Listens on REST 6333 and gRPC 6334 bound to 0.0.0.0 by default, plus p2p 6335 when clustering is enabled (config/config.yaml:331-352,426-428)."
+    },
+    "code": {
+      "languages": [
+        "Rust (cargo workspace, edition 2024, MSRV 1.97: Cargo.toml:13-14)",
+        "Python (tests/ and PyO3 Edge bindings in lib/edge/python)",
+        "C (SIMD kernels: lib/quantization/cpp, lib/segment/src/spaces/metric_f16/cpp)",
+        "GLSL compute shaders (lib/segment/src/index/hnsw_index/gpu/shaders)",
+        "Protocol Buffers (lib/api/src/grpc/proto)",
+        "Shell (tests/*.sh, tools/*.sh)",
+        "JavaScript (tools/schema2openapi, OpenAPI conversion tool)"
+      ],
+      "entry_points": [
+        {
+          "path": "src/main.rs",
+          "what": "`qdrant` server binary (default-run, Cargo.toml:15): loads Settings, starts storage/consensus, telemetry, inference service, REST, optional metrics port and gRPC threads (fn main at src/main.rs:368; clap Args at :74-140)."
+        },
+        {
+          "path": "src/actix/mod.rs",
+          "what": "REST server `init()` (src/actix/mod.rs:62-227): route modules in src/actix/api/*, conditional api-key/JWT middleware, CORS, web UI at /dashboard if a static folder exists (src/actix/web_ui.rs:13-38)."
+        },
+        {
+          "path": "src/tonic/mod.rs",
+          "what": "gRPC server `init()` (src/tonic/mod.rs:112) and `init_internal()` (:241) for peer-to-peer; called from src/main.rs:786-799."
+        },
+        {
+          "path": "Cargo.toml:323-356 (src/wal_inspector.rs, src/wal_pop.rs, src/segment_inspector.rs, src/schema_generator.rs, src/model_testing.rs)",
+          "what": "Debug/maintenance binaries gated behind the `service_debug` feature; not part of release artifacts (.github/workflows/debug-tools.yml:3-9)."
+        },
+        {
+          "path": "lib/wal/src/bin/wal-ctl.rs",
+          "what": "docopt CLI to check/read/append a write-ahead-log directory."
+        },
+        {
+          "path": "lib/edge/python",
+          "what": "PyO3 cdylib `qdrant_edge` (PyPI `qdrant-edge-py`): in-process `EdgeShard` create/load/update/query/snapshot API (lib/edge/python/qdrant_edge.pyi:55-260)."
+        },
+        {
+          "path": "lib/edge (+ lib/edge/publish, lib/edge/ffi)",
+          "what": "Rust `qdrant-edge` crate (EdgeShard, ReadOnlyEdgeShard, UpdateOnlyEdgeShard: lib/edge/src/lib.rs:24-40), amalgamated for crates.io (lib/edge/README.md:12), and UniFFI bindings crate `qdrant-edge-ffi` (lib/edge/ffi/Cargo.toml:34-36)."
+        },
+        {
+          "path": "lib/edge/tools/{edge_tool,shard_query,shard_update}",
+          "what": "Experimental CLIs `edge-tool`, `edge-shard-query` (query a read-only shard from S3/GCS or a live peer over gRPC), `edge-shard-update`."
+        }
+      ],
+      "architecture": "Single Rust cargo workspace (33 Cargo.toml manifests: root crate `qdrant` + 32 under lib/). src/main.rs boots Settings (src/settings.rs: embedded config/config.yaml, then config/{RUN_MODE}.yaml and config/local, optional --config-path, then env QDRANT__*: settings.rs:22,292-335), the TableOfContent storage manager, optional Raft consensus (src/consensus.rs, tikv/raft-rs), then threads for REST (src/actix; auth in src/actix/auth.rs + src/common/auth), gRPC (src/tonic) and an optional metrics port. lib/api = REST/gRPC schema types (rest/schema.rs, grpc/proto); lib/storage = TOC, dispatcher, consensus manager, RBAC, snapshot recovery; lib/collection = collections/shards/replica sets, update and flush workers, optimizers, query planning, snapshots; lib/shard = WAL wrapper and segment holder; lib/segment = on-disk vector/payload storage, HNSW (CPU and Vulkan GPU), payload and full-text indexes (tokenizers prefix/whitespace/word/multilingual: lib/segment/src/data_types/index.rs:250-255), quantization wiring (scalar/product/binary/turbo: lib/segment/src/types.rs:920-1130); lib/quantization, lib/sparse, lib/bm25, lib/posting_list, lib/blobstore, lib/wal, lib/gpu; lib/common/* (mmap/io_uring universal_io, disk cache, feature flags, budgets, object-store bridges). Inference: src/common/inference = HTTP client to a configured remote endpoint plus a local BM25 sparse model (local_model.rs:8-20). Edge: lib/edge (in-process shard, read-only follower, update-only), Python/FFI bindings, tools. Multi-tenancy/scoping primitives: many collections, aliases, `is_tenant` keyword/uuid payload indexes (lib/segment/src/data_types/index.rs:30-32,147-149), `shard_key` selectors (lib/api/src/rest/schema.rs:620). Recoverable-state primitives: WAL (lib/shard/src/wal.rs), collection/full-storage/shard/partial snapshots (src/actix/api/snapshot_api.rs:152-939), startup recovery via --snapshot/--storage-snapshot (src/snapshots.rs:57-77; src/main.rs:91-111), recovery mode (tools/entrypoint.sh:1-59), storage-compat tests against v1.16.0-v1.19.0 archives (tests/e2e_tests/test_data_compatibility.py:23-33). Default state lives under the working directory: ./storage, ./snapshots (config/config.yaml:19,22) and a `.qdrant-initialized` marker (src/startup.rs:11-17); Docker sets WORKDIR /qdrant and RUN_MODE=production (Dockerfile:229,233-234).",
+      "packaging_and_release": "Version 1.19.1 (Cargo.toml:3); annotated tag v1.19.1 peels to commit 6ab21cac (.git/packed-refs:2-3). On GitHub release 'published', release-artifacts.yml builds and uploads Linux binaries (x86_64-gnu, x86_64-musl, aarch64-musl), macOS (x86_64, aarch64), Windows, a .deb (cargo-deb, x86_64-musl) and an x86_64 AppImage (.github/workflows/release-artifacts.yml:4-7,10-167). That workflow sets no `checksum` input and has no GPG, attestation or provenance step (grep for attest|cosign|slsa|sha256|checksum|gpg|provenance across .github matched only docker-image.yml and unrelated AWS-CLI notes); whether the third-party upload action emits checksum files by default is not visible in the repo. On every pushed tag docker-image.yml builds multi-arch (amd64+arm64) images, an unprivileged variant (USER_ID=1000) and amd64-only GPU images (nvidia, amd) on a self-hosted runner, pushes to Docker Hub qdrant/qdrant and docker.pkg.github.com, builds with `--sbom=true` and signs each manifest digest with cosign keyless/OIDC (.github/workflows/docker-image.yml:13-17,55-61,72-78,123-146); the Dockerfile also writes an SPDX SBOM via `cargo sbom` into the image (Dockerfile:135-136,224). Branch images (dev/master) go to ghcr.io and Docker Hub (.github/workflows/dev-docker-image-build.yml:3-34). Edge: PyPI `qdrant-edge-py` abi3 wheels built with maturin and uploaded with twine using a token secret, dev wheels to a GCS bucket; crates.io `qdrant-edge` via `cargo publish` with a token secret (.github/workflows/edge-py-release.yml:81-88,332-338,341-428; .github/workflows/edge-rust-release.yml:102-109). Unpinned fetches in the release path: web UI `releases/latest` (tools/sync-web-ui.sh:11; release-artifacts.yml:150) and linuxdeploy `continuous` (release-artifacts.yml:139-141). Third-party GitHub Actions are pinned by commit SHA (e.g. release-artifacts.yml:32). Debian packaging metadata at Cargo.toml:433-470.",
+      "tests_and_ci": "Rust: cargo-nextest (.config/nextest.toml:1-22; .github/workflows/rust.yml:43-56); roughly 485 Rust source files contain #[test]/#[tokio::test]/#[rstest] attributes (about 2,467 occurrences; grep count) and 124 .rs files sit under tests/ directories (e.g. lib/collection/tests/integration, lib/segment/tests/integration, lib/quantization/tests/integration, lib/edge/tests, lib/edge/ffi/tests); about 58 Criterion/Tango bench files exist but are not run in CI (docs/DEVELOPMENT.md:126). Python (pytest via `uv --project tests`, tests/pyproject.toml:5-22): 185 test_*.py files - 88 in tests/openapi (REST API incl. test_bm25.py), 85 in tests/consensus_tests (cluster, snapshots, resharding; 5 in auth_tests), 11 in tests/e2e_tests (Docker-based: TLS, low RAM/disk, snapshot recovery, storage compatibility), 1 in tests/manual - plus 15 shell scripts in tests/*.sh (tests/integration-tests.sh:63-75). 18 workflow files in .github/workflows: rust.yml (build + nextest on ubuntu/windows/macos for PRs and pushes to master/dev), rust-lint.yml (nightly rustfmt, clippy -D warnings incl. all-targets/all-features, ast-grep rules: :41-62), integration-tests.yml (openapi + gRPC scripts, consensus pytest, docker-compose restart test, OpenAPI/gRPC consistency checks, S3/minio shard-snapshot tests, Docker e2e: :43-241), rust-gpu.yml (Vulkan/mesa GPU tests on master push or manual: :3-41), edge-test.yml (Edge Rust/Python on 3 OSes), io-bridge-object-store-tests.yml, codespell.yml, coverage.yml (nightly, uploads to Codecov: :101-106), long-e2e-tests.yml (nightly), nightly-model-testing.yml (randomised model testing, 200k ops: :25), plus release/publish workflows (release-artifacts, docker-image, dev-docker-image-build, dev-docker-image-build-gpu, dev-docker-image-prune, debug-tools, edge-py-release, edge-rust-release) and 4 composite actions in .github/actions. Remote inference is exercised only by a mocked-HTTP unit test (src/common/inference/service.rs:438-588); tests/basic_grpc_inference_test.sh (BM25 via gRPC) is referenced by no workflow or script.",
+      "dependencies": "Root Cargo.toml: 68 direct `[dependencies]` (2 optional; 11 are in-repo path crates), 3 Linux-only (procfs, pyroscope, rstack-self optional: Cargo.toml:153-157), 2 jemalloc target deps (Cargo.toml:160-167), 7 dev-dependencies (:42-50); `[workspace.dependencies]` pins 95 shared crates (:201-318); git/patched sources: raft and raft-proto from tikv/raft-rs by rev (:117,266) and tonic patched to the qdrant/tonic fork branch (:320-321). Cargo.lock holds 912 `[[package]]` entries, 3 git-sourced (Cargo.lock:6331,6344,8356). No neural-ML/embedding runtime packages (ort, candle, fastembed, tokenizers, tch, tract, burn) and no tree-sitter/notify/git2/gix packages appear in Cargo.lock. Direct `[dependencies]` per crate: lib/segment 68 (+1 Linux), lib/collection 54, lib/storage 44, lib/common/common 39 (+3 Linux), lib/shard 27, lib/api 21, lib/edge 21, lib/blobstore 19, lib/sparse 18, lib/edge/python 15, lib/wal 12, lib/edge/ffi 12, lib/quantization 11, lib/gpu 6 (3 optional), lib/common/{issues,io_bridge,io_bridge_object_store} 8 each, lib/uio-grpc-client 8, lib/common/dataset 7, lib/common/io_bridge_uio_grpc 6, lib/common/cancel 3, lib/posting_list 3, lib/macros 3, lib/bm25 2, lib/trififo 0 (dev-only); 33 manifests in total (root + 32 under lib/). Python: tests/pyproject.toml lists 16 test dependencies incl. pytest, schemathesis, qdrant-client>=1.19 (tests/pyproject.toml:5-22; lockfile tests/uv.lock); lib/edge/python/pyproject.toml requires only maturin>=1.0,<2.0 to build (:1-3). JS: tools/schema2openapi/package.json has 1 dependency (tooling only).",
+      "security_policy": "none - no SECURITY.md or other security-policy file anywhere in the tree (glob for **/SECURITY* and **/*ecurity* returned nothing; .github holds only issue/PR templates, review-rules.md, codecov.yml, dependabot.yml, actions and workflows). README only points to the docs-site security guide (README.md:52,62). Security fixes tied to GitHub advisories appear in code/tests: GHSA-3v92-w72v-j994 (src/actix/api/snapshot_api.rs:195-198; tests/consensus_tests/auth_tests/test_snapshot_upload_authorization.py:1-21) and GHSA-p9c2-9vq2-gxh8 (lib/collection/src/common/snapshots_manager.rs:568-569). Dependabot weekly for cargo, github-actions and docker (.github/dependabot.yml:1-21); no cargo-audit/cargo-deny/CodeQL/Scorecard workflow found."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:46-52 - `docker run -p 6333:6333 qdrant/qdrant` is an insecure deployment without authentication, open to all network interfaces.",
+        "verified": "yes",
+        "evidence": "Embedded default config binds host 0.0.0.0 and leaves api_key commented out (config/config.yaml:331,366-375); AuthKeys::try_create returns None when no key is set (src/common/auth/mod.rs:112-122) and the auth middleware is only added when keys exist (src/actix/mod.rs:118-120); CORS allows any origin (src/actix/mod.rs:102-105; config/config.yaml:358)."
+      },
+      {
+        "claim": "README.md:163 - Write-Ahead Logging 'ensures data persistence with update confirmation, even during power outages'.",
+        "verified": "partial",
+        "evidence": "Code differs in nuance: updates are appended to a memory-mapped WAL before being applied (lib/collection/src/wal_delta.rs:50-72; lib/shard/src/wal.rs:108-112) and replayed on restart, but the WAL is flushed to disk explicitly only when the request has wait=true (lib/collection/src/update_workers/update_worker.rs:348-355), and `wait` defaults to false (src/common/update.rs:38-45); otherwise a periodic flush worker runs every flush_interval_sec, default 5 (lib/collection/src/update_workers/flush_workers.rs:102-120; config/config.yaml:172). Durability on power loss therefore depends on wait=true or the flush interval."
+      },
+      {
+        "claim": "README.md:171-173 - Qdrant integrates with embedding providers (embedding step of an AI stack).",
+        "verified": "partial",
+        "evidence": "In this repo the only embedding hooks are a local BM25 sparse model (src/common/inference/local_model.rs:8-20) and a generic HTTP client to a configured `inference.address` using Qdrant's own JSON protocol (src/common/inference/service.rs:37-50,182-251); no provider-specific or OpenAI-style embeddings client exists, no neural model runtime is a dependency (Cargo.lock), and no `inference` section is in shipped config (config/*.yaml). The schema labels Document/Image/Object 'Work-in-progress, unimplemented ... Requires inference infrastructure' (lib/api/src/rest/schema.rs:341-397; docs/redoc/master/openapi.json:10663-10664) even though a client exists, i.e. docs and code differ. Provider integrations named by the README live in other repos/pages and could not be checked."
+      },
+      {
+        "claim": "README.md:40-42 - Agent skills bring Qdrant's vector search capabilities into an AI coding assistant.",
+        "verified": "not_checkable",
+        "evidence": "The skills live in a separate repo (github.com/qdrant/skills), not in this working tree. In-tree: only a startup banner URL (src/greeting.rs:128-132) and one SKILL.md for the experimental edge-shard-query CLI (lib/edge/tools/shard_query/SKILL.md:1-8). No MCP server, Claude Code or Codex integration exists in this repo (searches for MCP / claude code / codex found nothing)."
+      },
+      {
+        "claim": "README.md:81-94 - Qdrant Edge runs in-process, stores/queries data locally, can be synchronized with a Qdrant server, and exposes EdgeShard (create/update/snapshots) in Python and Rust.",
+        "verified": "yes",
+        "evidence": "EdgeShard.create/load/update/query/snapshot_manifest/update_from_snapshot exist (lib/edge/python/qdrant_edge.pyi:55-118,237-246) and the README snippet's names match EdgeConfig/EdgeVectorParams/Point signatures (qdrant_edge.pyi:264-306,348-360,838-855). Server-side partial-snapshot endpoints exist for sync (src/actix/api/snapshot_api.rs:642-939) and a read-only Rust follower can read a live peer or object storage (lib/edge/src/read_only/mod.rs:1-13; lib/edge/tools/shard_query/SKILL.md:26-31). Caveats: the Python binding exposes only the read-write EdgeShard, and the WAL takes an exclusive flock (lib/wal/src/lib.rs:154-163), so one directory has a single writer process."
+      },
+      {
+        "claim": "README.md:139-141 - Hybrid search combines multiple vectors in one query with RRF and DBSF fusion.",
+        "verified": "yes",
+        "evidence": "Prefetch sub-queries and Fusion enum {Rrf, Dbsf} plus RRF k/weights in the REST schema (lib/api/src/rest/schema.rs:528-555,570-575); MMR and relevance-feedback queries at :644-673,753-773; local BM25 sparse model usable alongside dense vectors (tests/openapi/test_bm25.py:77-120)."
+      },
+      {
+        "claim": "README.md:137,157 - rich payload filtering and multitenancy (scoped partitioning of data).",
+        "verified": "yes",
+        "evidence": "Query requests carry `filter` and `shard_key` (lib/api/src/rest/schema.rs:584-586,620); keyword and uuid payload indexes accept `is_tenant` (lib/segment/src/data_types/index.rs:30-32,147-149); full-text index with tokenizers prefix/whitespace/word/multilingual and phrase matching (index.rs:250-285); collections and aliases endpoints (src/actix/api/collections_api.rs:37-183)."
+      },
+      {
+        "claim": "README.md:161-162 - GPU support for accelerated indexing (NVIDIA/AMD) and io_uring async I/O.",
+        "verified": "partial",
+        "evidence": "GPU is an optional compile-time feature using Vulkan (Cargo.toml:38; lib/gpu/Cargo.toml:13-25) enabled at runtime by gpu.indexing, default false (src/settings.rs:198-202), for HNSW indexing only. io_uring is Linux-only and opt-in: async_scorer/io_uring are commented out in the default config (config/config.yaml:115-128) and use_io_uring is false off Linux (lib/segment/src/common/io_uring.rs:85-107)."
+      },
+      {
+        "claim": "README.md:158 - observability includes metrics, telemetry and audit logging.",
+        "verified": "partial",
+        "evidence": "All three exist (metrics port src/main.rs:760-777; audit config config/config.yaml:476-489; telemetry collection src/common/telemetry.rs:50-75), but the README omits that telemetry is also reported outward by default: hourly POST to telemetry.qdrant.io plus panic reports unless disabled (src/main.rs:390,697-703; src/common/telemetry_reporting.rs:19-87; src/common/error_reporting.rs:9-50)."
+      },
+      {
+        "claim": "README.md:26 - Qdrant is fast and reliable under high load; see benchmarks (qdrant.tech/benchmarks).",
+        "verified": "not_checkable",
+        "evidence": "No benchmark results or result files are in the repo. Criterion/Tango benchmark suites exist (e.g. lib/segment/benches/vector_search.rs) but are explicitly not part of CI (docs/DEVELOPMENT.md:126); docs/DEVELOPMENT.md:139-155 shows only illustrative sample output. The external benchmarks page was not read."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Scope: Qdrant stores and queries vectors; it does not index code. No file-walking, git, tree-sitter or chunking code exists in the tree (Cargo.lock has no tree-sitter*/notify/git2/gix packages; searches for code-search, chunker and file-watch terms matched only incidental text), and no MCP server, Claude Code or Codex integration exists (searches for MCP / 'model context protocol' / 'claude code' / codex found nothing outside lockfiles). README.md:40-42 defers agent integration to a separate repo (github.com/qdrant/skills) that was not read; the only in-tree skill file is lib/edge/tools/shard_query/SKILL.md for an experimental CLI. Repository scanning, chunking, embedding and a bridge for each client would have to come from outside this repo.",
+      "Embedding-service compatibility: the server bundles no neural embedder (no ort/candle/fastembed/tokenizers in Cargo.lock). Server-side `Document` inputs support only the local BM25 sparse model (src/common/inference/local_model.rs:8-20,46-54) or a remote HTTP endpoint that must speak Qdrant's own protocol - POST {inputs:[{data,data_type,model,options}], inference, token} returning {embeddings, usage} (src/common/inference/service.rs:37-50,182-251; inference_input.rs:11-17) - not an OpenAI-style /v1/embeddings API (no such client exists). `inference.address/timeout/token` (src/common/inference/config.rs:3-8; src/settings.rs:266-267) appear in no shipped config; with no address, non-BM25 models fail with 'InferenceService URL not configured' (service.rs:200-204). Schema marks Document/Image/Object 'Work-in-progress, unimplemented' (lib/api/src/rest/schema.rs:341-397; docs/redoc/master/openapi.json:10663-10664). The remote path is covered only by a mocked-HTTP unit test (service.rs:438-588). Client-computed dense vectors are accepted (size 1..65536; Cosine/Euclid/Dot/Manhattan: lib/api/build.rs:177, lib/api/src/grpc/qdrant.rs:2325-2331) but then the embedding model lives outside Qdrant; docs/roadmap/roadmap-2024.md:19 says embedding generation is kept out of the core.",
+      "Telemetry is on by default: unless --disable-telemetry, `telemetry_disabled: true` or QDRANT__TELEMETRY_DISABLED is set, the server POSTs anonymised usage/system data to https://telemetry.qdrant.io at startup and hourly, and sends panic messages with backtraces on crash (src/main.rs:390,697-703; src/common/telemetry_reporting.rs:19-87; src/common/error_reporting.rs:9-50; src/startup.rs:38-40; config/config.yaml:448-450). Some system fields are explicitly exempt from anonymisation (src/common/telemetry_ops/app_telemetry.rs:38-67).",
+      "Insecure defaults: bind host 0.0.0.0, no API key, CORS any origin, and snapshot recovery from remote http(s) URLs enabled (config/config.yaml:331,358,366-375,414-419; src/actix/mod.rs:102-105,118-120; src/common/auth/mod.rs:112-122); README.md:52 itself warns, and src/settings.rs:101-104 notes SSRF risk for URL recovery. This revision contains fixes for GitHub advisories GHSA-3v92-w72v-j994 (read-only key could force snapshot-upload disk I/O: tests/consensus_tests/auth_tests/test_snapshot_upload_authorization.py:1-21) and GHSA-p9c2-9vq2-gxh8 (traversing snapshot names on object storage: lib/collection/src/common/snapshots_manager.rs:568-569).",
+      "No security policy file in the tree and no cargo-audit/cargo-deny/CodeQL/Scorecard workflow (.github listing); Dependabot only (.github/dependabot.yml:1-21). Release integrity: binary, .deb and AppImage uploads have no checksum, signature or attestation step in the workflow (.github/workflows/release-artifacts.yml:10-167); only Docker images are cosign-signed with an SBOM (docker-image.yml:55-61) and they are built on a self-hosted runner (docker-image.yml:13). Release/build steps fetch unpinned artifacts: web UI `releases/latest` (tools/sync-web-ui.sh:11) and linuxdeploy `continuous` (release-artifacts.yml:139-141). Edge packages are published with long-lived token secrets (edge-py-release.yml:332-338; edge-rust-release.yml:105-109).",
+      "Durability and placement: WAL entries are appended via mmap and flushed by a periodic worker (flush_interval_sec default 5) unless the request sets wait=true, which defaults to false (lib/shard/src/wal.rs:108-112; lib/collection/src/update_workers/flush_workers.rs:102-120; update_worker.rs:348-355; src/common/update.rs:38-45; config/config.yaml:172). The storage filesystem check rates NFS, FUSE and CIFS as Bad and unrecognised/overlay/tmpfs as Unknown (lib/common/common/src/fs/check.rs:136-171); the WAL directory takes an exclusive flock so only one writer process can open a shard (lib/wal/src/lib.rs:154-163). Default state is relative to the working directory: ./storage, ./snapshots, .qdrant-initialized (config/config.yaml:19,22; src/startup.rs:11-17).",
+      "Build and run-from-source friction: MSRV Rust 1.97 (Cargo.toml:14; Docker uses 1.98.0: Dockerfile:19) and protoc, clang, cmake required (docs/DEVELOPMENT.md:78-104); 912 locked packages, three git-sourced (tikv/raft-rs rev pin, qdrant/tonic fork branch: Cargo.lock:6331,6344,8356; Cargo.toml:117,266,321); the Web UI is not in the repo and must be downloaded (tools/sync-web-ui.sh:11-17; src/actix/web_ui.rs:23-29). Running the binary from a checkout with RUN_MODE unset loads config/development.yaml (all feature flags on, audit on, bind 127.0.0.1) although its header says it is for development profiles (src/settings.rs:292,311-312; config/development.yaml:1-11,38-39); Docker sets RUN_MODE=production (Dockerfile:233-234).",
+      "Edge maturity and docs staleness: Edge packages are 0.x (qdrant-edge-py 0.8.0: lib/edge/python/Cargo.toml:3; edge 0.1.0: lib/edge/Cargo.toml:3), the UniFFI crate notes unfinished follow-up PRs (lib/edge/ffi/Cargo.toml:3-10), edge-shard-query is called experimental (lib/edge/tools/shard_query/SKILL.md:8); the Python binding exposes only the read-write EdgeShard (the read-only follower exists in Rust only: lib/edge/src/read_only/mod.rs:1-13) and no `pip install` command is documented (lib/edge/README.md:36-61). WSL2 use is undocumented. The roadmap in the tree is the 2025 one (docs/roadmap/README.md:1-4) and docs/DEVELOPMENT.md:191 references tools/coverage.sh, which is not present (tools/ has unit-test-coverage.sh and integration-test-coverage.sh)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "qdrant/qdrant",
+      "checks": [
+        {
+          "field": "readme.install[0] (Docker, published image)",
+          "statement": "`docker run -p 6333:6333 qdrant/qdrant` runs the server from the published image.",
+          "citation": "README.md:48-50",
+          "holds": true,
+          "note": "README.md:46-50 gives exactly this command; README.md:52 adds the 'insecure deployment without authentication, open to all network interfaces' warning. The image tags qdrant/qdrant:<tag>/latest are built and pushed for linux/amd64+arm64 by .github/workflows/docker-image.yml:47-55. Revision confirmed: .git/packed-refs:2-3 (tag v1.19.1 peels to 6ab21cac), Cargo.toml:3 version 1.19.1."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX Apache-2.0, file LICENSE.",
+          "citation": "LICENSE:1-2,176-201; Cargo.toml:12; README.md:190",
+          "holds": true,
+          "note": "LICENSE is the standard Apache License 2.0 text (header :1-2, END OF TERMS :176, appendix 'Copyright 2026 Qdrant Solutions GmbH' :189). It is the only LICENSE* file in the tree. The root Cargo.toml and every lib/* Cargo.toml declare license = \"Apache-2.0\". Only exception: the build-time OpenAPI conversion script tools/schema2openapi/package.json:14 declares \"ISC\"; it is not shipped."
+        },
+        {
+          "field": "platforms.linux_x86_64",
+          "statement": "yes - release workflow builds x86_64-unknown-linux-gnu and -musl binaries plus .deb and AppImage; Docker images for linux/amd64; CI tests on ubuntu-latest.",
+          "citation": ".github/workflows/release-artifacts.yml:14-18,47-61,109-167; .github/workflows/docker-image.yml:55; .github/workflows/rust.yml:20",
+          "holds": true,
+          "note": "release-artifacts.yml:14 x86_64-unknown-linux-gnu and :17 x86_64-unknown-linux-musl; :47-61 runs cargo deb for x86_64-musl and uploads the .deb; :109-167 AppImage job (ubuntu-22.04, linuxdeploy-x86_64, uploads qdrant-x86_64.AppImage); docker-image.yml:55 uses --platform='linux/amd64,linux/arm64'; rust.yml:20 test matrix is [ubuntu-latest, windows-latest, macos-latest]."
+        },
+        {
+          "field": "integrations.claude_code_or_codex",
+          "statement": "None found as an integration: no plugin, hook, config or docs for Claude Code or Codex. README.md:42 links the separate qdrant/skills repo; the server prints an 'Agentic Skills' banner (src/greeting.rs:128-132); the only SKILL.md documents the experimental edge-shard-query CLI.",
+          "citation": "README.md:42; src/greeting.rs:128-132; lib/edge/tools/shard_query/SKILL.md:1-8",
+          "holds": true,
+          "note": "README.md:42 links github.com/qdrant/skills. greeting.rs:128-132 prints 'Agentic Skills: https://skills.qdrant.tech/'. A glob finds exactly one SKILL.md (edge-shard-query; ':8 An experimental binary'). No CLAUDE.md, AGENTS.md, .claude, .codex or .mcp.json exists. A case-insensitive search for claude|codex finds only two hits, neither an integration: .gitignore:24 ignores '.claude/', and docs/CONTRIBUTING.md:70 is a policy line on AI-generated PRs. The strings 'claude code' and 'codex' match nothing, .github has no hits, and an MCP search (excluding lock/json files) has no hits."
+        },
+        {
+          "field": "claim_checks[2] (README.md:171-173 embedding providers, verified: partial)",
+          "statement": "The only in-repo embedding hooks are a local BM25 sparse model and a generic HTTP client to a configured inference.address speaking Qdrant's own JSON protocol. No OpenAI-style client, no neural runtime in Cargo.lock, no inference section in shipped config. The schema marks Document/Image/Object 'Work-in-progress, unimplemented'.",
+          "citation": "src/common/inference/local_model.rs:8-20; src/common/inference/service.rs:37-50,182-251; lib/api/src/rest/schema.rs:341-397; docs/redoc/master/openapi.json:10663-10664; config/*.yaml; Cargo.lock",
+          "holds": true,
+          "note": "local_model.rs:8-20 has only LocalModelName::Bm25, matching 'qdrant/bm25'/'bm25'. service.rs:37-50 defines InferenceRequest{inputs,inference,token} and InferenceResponse{embeddings,usage}. service.rs:182-251 POSTs JSON to config.address, fails with 'InferenceService URL not configured' (:200-204), and forwards '-api-key' headers (:220-222; api_keys.rs:8,31). schema.rs:341,361,380 and openapi.json:10664 carry 'WARN: Work-in-progress, unimplemented'. No 'inference' key in config/*.yaml. Cargo.lock has no ort/candle/fastembed/tokenizers/tch/tract/burn entries (search pattern checked against raft at :6329). 'openai' appears only in comments (api_keys.rs:11; lib/edge/ffi/src/config.rs:28). The 'partial' rating is fair. Uncited but consistent: Edge has its own copy of the BM25 sparse embedder (lib/edge/src/bm25_embed.rs:1-6; PyBm25 in lib/edge/python/src/bm25.rs:155-158)."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

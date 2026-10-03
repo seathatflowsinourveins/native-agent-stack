@@ -1,0 +1,285 @@
+{
+  "contender": "anthropics/sandbox-runtime",
+  "revision": {
+    "contender": "anthropics/sandbox-runtime",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "anthropics/sandbox-runtime",
+        "tag": "v0.0.78",
+        "commit": "6f0ce155ccb136bda33a8a72201fe7f54fe47d9b",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.0.78",
+    "commit": "6f0ce155ccb136bda33a8a72201fe7f54fe47d9b",
+    "read_at": "2026-10-02T03:01:54+00:00"
+  },
+  "dossier": {
+    "contender": "anthropics/sandbox-runtime",
+    "revision": {
+      "tag": "v0.0.78",
+      "commit": "6f0ce155ccb136bda33a8a72201fe7f54fe47d9b",
+      "read_at": "2026-10-01"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Anthropic Sandbox Runtime (CLI `srt`, npm package @anthropic-ai/sandbox-runtime): a Node/TypeScript CLI and library that wraps an arbitrary command in OS-level filesystem and network restrictions without a container. On Linux it generates a bubblewrap (bwrap) invocation (read-only root bind with selective writable binds, deny masks, network/PID/user namespaces, --cap-drop ALL) plus a bundled seccomp helper that blocks AF_UNIX socket creation. On macOS it generates a Seatbelt (SBPL) profile run through /usr/bin/sandbox-exec. Windows (alpha) uses a dedicated local user, WFP filters and ACLs. Network access is deny-by-default and mediated by host-side HTTP(S) and SOCKS5 proxies that enforce a domain allow/deny list (no network namespace interfaces on Linux; localhost-proxy-only Seatbelt rules on macOS). Reads are allow-by-default, writes deny-by-default. WSL2 is not mentioned in the README; the code treats WSL2 as ordinary Linux and rejects only WSL1. Built for Claude Code and published as a 0.0.x 'Beta Research Preview'. Method note: this dossier is a static reading of README, source, tests and CI at v0.0.78; nothing was built or executed (no shell was available in this session).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Lightweight tool for enforcing filesystem and network restrictions on arbitrary processes at the OS level, without requiring a container; uses sandbox-exec on macOS and bubblewrap on Linux plus proxy-based network filtering; usable for agents, local MCP servers and bash commands.",
+          "citation": "README.md:3-5"
+        },
+        {
+          "claim": "Beta Research Preview developed for Claude Code; APIs and configuration formats may evolve.",
+          "citation": "README.md:7-9"
+        },
+        {
+          "claim": "Secure-by-default: processes start with minimal access and the user pokes only the holes needed.",
+          "citation": "README.md:41"
+        },
+        {
+          "claim": "Filesystem: reads allowed everywhere by default (deny-then-allow; allowRead beats denyRead); writes denied everywhere by default (allow-only; denyWrite beats allowWrite); empty allowWrite means no write access.",
+          "citation": "README.md:117-120, 411-413, 733-734"
+        },
+        {
+          "claim": "Network is allow-only: all network access denied by default, empty allowedDomains means no network; HTTP/HTTPS go through a host HTTP proxy and other TCP through a SOCKS5 proxy, both enforcing domain allow/deny lists (deniedDomains checked first).",
+          "citation": "README.md:122, 130, 355-357"
+        },
+        {
+          "claim": "Linux: the sandboxed process's network namespace is removed entirely; all traffic must pass through host proxies reached over Unix sockets bind-mounted into the sandbox (socat bridging).",
+          "citation": "README.md:124, 705"
+        },
+        {
+          "claim": "macOS: the Seatbelt profile allows communication only to the specific localhost port(s) where the proxies listen.",
+          "citation": "README.md:126, 707"
+        },
+        {
+          "claim": "With no ~/.srt-settings.json, srt uses built-in defaults (no network, no writes outside the default write paths, unrestricted reads); a settings file that exists but is empty, unreadable or invalid (or a missing --settings file) is an error and srt exits instead of falling back.",
+          "citation": "README.md:177-185"
+        },
+        {
+          "claim": "Unix sockets are blocked by default on both platforms; on Linux via seccomp (x64/arm64 only); if seccomp is not available, sockets are unrestricted and a warning is shown.",
+          "citation": "README.md:396-399"
+        },
+        {
+          "claim": "Linux requires bubblewrap, socat and ripgrep; Ubuntu 24.04+ needs kernel.apparmor_restrict_unprivileged_userns=0 (or an AppArmor profile granting userns); a root caller needs CAP_SETFCAP in its bounding set.",
+          "citation": "README.md:547-572"
+        },
+        {
+          "claim": "Some files/directories are always write-blocked even inside allowed write paths (.bashrc, .zshrc, .gitconfig, .mcp.json, .vscode/, .idea/, .claude/commands/, .claude/agents/, .git/hooks/, .git/config); on Linux nested ones are found by a ripgrep scan to depth 3 by default.",
+          "citation": "README.md:756-772, 790-804"
+        },
+        {
+          "claim": "Violation detection: macOS taps the system sandbox log store; on Linux bubblewrap has no built-in violation reporting (use strace).",
+          "citation": "README.md:842-860"
+        },
+        {
+          "claim": "Known limits: domain allowlists can still permit exfiltration (e.g. github.com) and may be bypassed by domain fronting; allowUnixSockets can expose powerful services; enableWeakerNestedSandbox considerably weakens Linux security; Linux proxy use relies on environment variables that some programs ignore.",
+          "citation": "README.md:881-891, 897"
+        },
+        {
+          "claim": "Windows support is alpha (dedicated srt-sandbox local user, WFP egress fence, per-session ACLs; one-time elevated windows-install).",
+          "citation": "README.md:543, 594-612"
+        }
+      ],
+      "install": [
+        {
+          "method": "npm global install (package.json requires Node >=20.11.0)",
+          "command": "npm install -g @anthropic-ai/sandbox-runtime",
+          "citation": "README.md:13-15; package.json:11-13"
+        },
+        {
+          "method": "Linux system dependencies, Debian/Ubuntu (README lists each tool separately; dnf and pacman equivalents are given)",
+          "command": "apt-get install bubblewrap; apt-get install socat; apt-get install ripgrep",
+          "citation": "README.md:547-560"
+        },
+        {
+          "method": "Ubuntu 24.04+ prerequisite: allow capability-bearing unprivileged user namespaces",
+          "command": "sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0",
+          "citation": "README.md:562-566"
+        },
+        {
+          "method": "macOS dependency listed by README (code does not use ripgrep on macOS, see claim_checks)",
+          "command": "brew install ripgrep",
+          "citation": "README.md:584-588"
+        },
+        {
+          "method": "From source (development); Linux seccomp helper must be built separately (needs bun, gcc, libseccomp-dev)",
+          "command": "npm install && npm run build  (then, on Linux: npm run build:seccomp)",
+          "citation": "README.md:669-675, 689-691; package.json:14-18"
+        },
+        {
+          "method": "Optional toolchain the README documents as a seccomp fallback for other architectures (no runtime compile exists in code, see claim_checks)",
+          "command": "apt-get install gcc libseccomp-dev",
+          "citation": "README.md:574-582"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - README Linux section (README.md:547-572); CI job on ubuntu-latest x86-64, including a second run against source-built bubblewrap 0.12.0 (.github/workflows/integration-tests.yml:18-20, 205-225); release builds the x64 apply-seccomp helper (.github/workflows/release.yml:21-25).",
+        "wsl2": "unknown - README.md never mentions WSL. Code treats WSL2+ as ordinary Linux (src/utils/platform.ts:43-50) and rejects only WSL1 (src/sandbox/sandbox-manager.ts:1014-1019; WSL version read from /proc/version, src/utils/platform.ts:13-37). No WSL2 CI leg (integration-tests.yml:14-37) and no WSL2-specific test (test/utils/platform.test.ts:5-13). Works only if the WSL2 kernel permits bwrap user/PID/net namespaces (README.md:562-568), which the repo does not show.",
+        "macos_arm64": "yes - README macOS via sandbox-exec, no extra dependencies (README.md:107, 541); CI on macos-14 arm64 and macos-15-large x86-64 (integration-tests.yml:24-29); code runs /usr/bin/sandbox-exec (src/sandbox/macos-sandbox-utils.ts:1473-1484).",
+        "gpu": "unknown - no GPU/CUDA/Metal handling in README or src. On Linux /dev is replaced by bwrap's minimal devtmpfs (src/sandbox/sandbox-config.ts:905-906; src/sandbox/linux-sandbox-utils.ts:3215-3216) and /dev/* entries in write lists are skipped (linux-sandbox-utils.ts:1978-1982), so no documented option exposes GPU device nodes; the macOS profile allows only two IOKit user-client classes (src/sandbox/macos-sandbox-utils.ts:1039-1044)."
+      },
+      "integrations": {
+        "cli": "yes - `srt` binary (package.json:8-10; src/cli.ts:177-300): `srt [command...]`, `-c <command>`, `-d/--debug`, `-s/--settings <path>` (default ~/.srt-settings.json, src/cli.ts:19-21), `--control-fd <fd>` for live network-allowlist updates (README.md:187-221), `--version`; plus windows-install / windows-uninstall subcommands (src/cli.ts:190-269).",
+        "mcp": "none found as an MCP server or client (no MCP code in src/). README documents wrapping third-party MCP servers by using `srt` as the command in .mcp.json (README.md:50-101).",
+        "sdk_or_api": "TypeScript/Node library: `import { SandboxManager } from '@anthropic-ai/sandbox-runtime'` (src/index.ts:2; package.json:6-7; README.md:223-303) exposing initialize(), wrapWithSandbox(), wrapWithSandboxArgv(), updateConfig(), reset(), cleanupAfterCommand(), annotateStderrWithSandboxFailures(), violation store (src/sandbox/sandbox-manager.ts:2418-2517). No HTTP API or daemon.",
+        "claude_code_or_codex": "Claude Code: README says it was developed for Claude Code and links its sandboxing docs (README.md:9, 132-135); code carries Claude-specific names: /tmp/claude and ~/.claude/debug default write paths (src/sandbox/sandbox-utils.ts:527-546), .claude/commands and .claude/agents mandatory denies (sandbox-utils.ts:34-40), CLAUDE_CODE_TMPDIR (sandbox-utils.ts:704-708), claude-http-*.sock bridge sockets (src/sandbox/linux-sandbox-utils.ts:1189), CLAUDE_CODE_HOST_*_PROXY_PORT env vars (linux-sandbox-utils.ts:3182-3195). Codex: none found (no codex/openai mention anywhere in the repo)."
+      },
+      "telemetry_and_network": "No telemetry, analytics or call-home code found: src/ makes no fetch/http(s).request calls and contains no external URLs (only 127.0.0.1/localhost/placeholder strings); no accounts, API keys or cloud services are required; README says nothing about telemetry. Network behaviour: (1) the library starts a loopback-only mux proxy (HTTP/CONNECT + SOCKS5) on 127.0.0.1, port 0 on macOS/Linux, protected by a per-session random auth token (src/sandbox/sandbox-manager.ts:603-626, 926-941; src/sandbox/http-proxy.ts:250-264; src/sandbox/socks-proxy.ts:88-101); it dials upstream only for destinations the policy allows, after a resolved-address check (src/sandbox/resolved-address-guard.ts:1-24). (2) HTTP_PROXY/HTTPS_PROXY/NO_PROXY in srt's own environment are adopted as a parent proxy (src/sandbox/parent-proxy.ts:70-85), and the resolved-address check is skipped for that hop (README.md:365). (3) Local helper processes only: socat bridges on Linux (src/sandbox/linux-sandbox-utils.ts:1195-1204), `npm root -g` to locate a global install (src/sandbox/generate-seccomp-filter.ts:15-41), `log stream` on macOS (src/sandbox/macos-sandbox-utils.ts:1526). Install time: npm registry only (.npmrc:1); no consumer install hooks (package.json:14-27 has only `prepare: husky`, a dev hook). Windows only: windows-install creates a local user, registry state and WFP filters (README.md:602-610). The child gets SANDBOX_RUNTIME=1 (src/sandbox/sandbox-utils.ts:696)."
+    },
+    "code": {
+      "languages": [
+        "TypeScript",
+        "Rust",
+        "C",
+        "Java",
+        "PowerShell"
+      ],
+      "entry_points": [
+        {
+          "path": "src/cli.ts",
+          "what": "CLI built to dist/cli.js and exposed as bin `srt`: default command runs the wrapped command; options -c, -d/--debug, -s/--settings, --control-fd, --version; subcommands windows-install / windows-uninstall (src/cli.ts:177-300; package.json:8-10)."
+        },
+        {
+          "path": "src/index.ts",
+          "what": "Library entry (package main dist/index.js): exports SandboxManager, SandboxViolationStore, zod config schemas and types, LinuxSandboxProfileError, Windows install/status helpers, getWslVersion (src/index.ts:1-130; package.json:6-7)."
+        },
+        {
+          "path": "src/sandbox/sandbox-manager.ts",
+          "what": "SandboxManager singleton: initialize() (line 633), wrapWithSandbox() (1635), wrapWithSandboxArgv() (1878), updateConfig() (2034), plus the exported API object (2484-2517)."
+        },
+        {
+          "path": "vendor/seccomp-src/apply-seccomp.c",
+          "what": "Static C helper run inside bwrap on Linux: nested user+PID+mount namespaces, PR_SET_DUMPABLE=0 init, seccomp filter blocking socket(AF_UNIX) and io_uring, optional USER_NOTIF write observer; built by vendor/seccomp/build.ts into vendor/seccomp/<arch>/apply-seccomp."
+        },
+        {
+          "path": "vendor/srt-win-src/src/main.rs",
+          "what": "Rust Windows helper srt-win (user provisioning, WFP filters, ACLs, two-hop launch); built by vendor/srt-win/build.ts; Windows only, alpha."
+        },
+        {
+          "path": "vendor/java-proxy-agent-src/com/anthropic/srt/ProxyAgent.java",
+          "what": "JVM -javaagent injected through JAVA_TOOL_OPTIONS so Java tools honour the proxy; built to vendor/java-proxy-agent/srt-proxy-agent.jar (vendor/java-proxy-agent/build.ts)."
+        }
+      ],
+      "architecture": "TypeScript ESM package (Node >=20.11.0) with one CLI and one library sharing a module-level SandboxManager singleton (src/sandbox/sandbox-manager.ts:132-137, 2484-2517; about 2.5k lines). Config: zod v3 schemas (src/sandbox/sandbox-config.ts; `network` and `filesystem` blocks required, :1109-1112) loaded by the CLI from ~/.srt-settings.json via src/utils/config-loader.ts. initialize() checks dependencies, then starts a loopback mux proxy (mux-proxy.ts) fronting an HTTP/CONNECT proxy (http-proxy.ts) and a SOCKS5 proxy (socks-proxy.ts, library @pondwader/socks5-server); both call filterNetworkRequest (deny list, then allow list, else deny; sandbox-manager.ts:332-410) with a per-session auth token and a resolved-address guard (resolved-address-guard.ts). Optional extras: parent proxy (parent-proxy.ts), experimental TLS termination with per-host leaf certs (tls-terminate-proxy.ts, mitm-ca.ts, mitm-leaf.ts via node-forge, request-filter.ts), credential masking/injection (credential-*.ts, aws-sigv4.ts, body-substitution.ts), JVM proxy agent (java-proxy-agent.ts). wrapWithSandbox() returns a shell string for the caller to spawn. Linux backend (linux-sandbox-utils.ts, about 3.3k lines): bwrap argv with --ro-bind / / plus writable binds for allowWrite (:1950-1956), tmpfs or /dev/null masks for denyRead/denyWrite and mandatory paths (ripgrep scan, src/utils/ripgrep.ts), --unshare-net (:3115-3118), --unshare-pid, --unshare-user, --cap-drop ALL, fresh --proc, --new-session --die-with-parent (:3033, 3225-3255); host socat bridges Unix sockets to the proxy and in-sandbox socat listens on 3128/1080 (:1195-1204, 1377-1379); apply-seccomp adds a nested namespace and the AF_UNIX/io_uring seccomp filter; optional write-violation observer (linux-violation-monitor.ts). macOS backend (macos-sandbox-utils.ts, about 1.6k lines): SBPL profile starting `(deny default)` run via /usr/bin/sandbox-exec -p (:968-970, 1473-1484); violations read from `log stream` (:1526). Windows backend (windows-sandbox-utils.ts + Rust vendor/srt-win-src) is alpha. Denies and violations are collected in sandbox-violation-store.ts.",
+      "packaging_and_release": "Published to npm as @anthropic-ai/sandbox-runtime, version 0.0.78 equal to the tag (package.json:2-3). `files` ships dist/, vendor/seccomp, vendor/srt-win, vendor/java-proxy-agent, README.md, LICENSE (package.json:53-60). The helper binaries (apply-seccomp x64/arm64, srt-win.exe x64/arm64, srt-proxy-agent.jar) are gitignored build outputs (.gitignore:5-10), built in the release workflow (.github/workflows/release.yml:16-90), packed and content-checked (92-175), smoke-installed on Windows (177-218) and published from the packed tarball (220-243). Triggers: GitHub release published, plus pull_request which runs everything except publish (release.yml:3-8). Guards: release tag must be an ancestor of origin/main and match the package.json version (101-118). Publishing uses npm trusted publishing via OIDC (id-token: write, environment npm, 226-243); a workflow comment says provenance is attached automatically (242) - not verifiable from the repo. No checksum files, detached signatures or GitHub release assets are produced; all actions are pinned by commit SHA. No other distribution channel (image, brew, standalone binary) found in the repo.",
+      "tests_and_ci": "bun test (package.json:17) with bun:test and fast-check property tests: 83 *.test.ts files (7 in test/, 72 in test/sandbox/, 4 in test/utils/), plus test/utils/which-node-test.mjs, 7 helper modules in test/helpers/ and AWS SigV4 vectors in test/fixtures/. Tests are platform-gated (describe.if(isLinux) at test/sandbox/integration.test.ts:58; describe.if(isMacOS) at test/sandbox/macos-seatbelt.test.ts:34) and run real sandboxed commands (empty-allowlist network block, writes outside cwd blocked, PID namespace, symlink escape, mandatory deny, seccomp). Rust: vendor/srt-win-src/tests/sd_access_check_matrix.rs, in-source unit tests and 7 PowerShell smoke/cleanup scripts in vendor/srt-win-src/ci/. Two workflows only. .github/workflows/integration-tests.yml (push to main and every PR): matrix Linux x86-64 (ubuntu-latest) and arm64 (ubuntu-24.04-arm), macOS x86-64 (macos-15-large) and arm64 (macos-14), Windows x86-64 and arm64 (lines 14-37); Linux installs bubblewrap, libseccomp-dev, gcc, socat, ripgrep, apparmor-profiles, zsh, disables the AppArmor userns restriction and checks bwrap can nest namespaces (147-168); runs eslint (linux x86-64 only), tsc typecheck, builds the seccomp helper and JVM agent, `npm test`, then re-runs `npm test` against a source-built bubblewrap 0.12.0 (205-225) and a Node fallback test (227-229); Windows legs run cargo build/test/clippy, the smoke scripts and a subset of the TS tests (66-145); a docker-tests job runs test/docker-weak-sandbox.test.ts in ubuntu:24.04 as uid 0 with and without CAP_SYS_ADMIN (241-295). release.yml also runs on pull requests (build + pack, no publish). No WSL2 leg, no coverage step, no CodeQL or dependabot config. Local: husky pre-commit runs lint-staged (eslint, prettier) (.husky/pre-commit; package.json:82-87).",
+      "dependencies": "package.json: 4 runtime dependencies (@pondwader/socks5-server ^1.0.10, commander ^12.1.0, node-forge ^1.4.0 [lockfile license (BSD-3-Clause OR GPL-2.0)], zod ^3.25.0; imported as zod/v3, src/sandbox/sandbox-config.ts:14) and 17 devDependencies (package.json:28-52); package-lock.json (lockfileVersion 3) shows no nested dependencies for the four runtime packages. vendor/srt-win-src/Cargo.toml: 6 direct crates, all under cfg(windows) (anyhow, clap, serde, serde_json, windows, rusqlite[bundled]); Cargo.lock present; rust-toolchain.toml pins Rust 1.98.1. Build-time only: gcc + libseccomp-dev for the seccomp helper (vendor/seccomp/build.ts), JDK >=17 for the JVM agent targeting Java 8 (vendor/java-proxy-agent/build.ts:11, 57-58), Bun (pinned 1.4.2 in CI) to run build scripts and tests. Runtime system requirements: Linux bwrap, socat, ripgrep (plus bash and a `which` binary under Node, src/utils/which.ts:17); macOS /usr/bin/sandbox-exec and bash.",
+      "security_policy": "none - no SECURITY.md or disclosure/contact policy anywhere in the tree (globs for SECURITY*, *security*.md, CONTRIBUTING*, CHANGELOG* all empty); .github/ holds only the two workflow files. README has a 'Security Limitations' section (README.md:881-893) but no reporting process."
+    },
+    "claim_checks": [
+      {
+        "claim": "Linux: network namespace removed, all traffic via host proxies over bind-mounted Unix sockets; empty allowedDomains means no network (README.md:122-124, 355).",
+        "verified": "yes",
+        "evidence": "--unshare-net is added whenever network restriction is on (src/sandbox/linux-sandbox-utils.ts:3115-3118); proxy sockets are bound in (3123-3145) and bridged by socat (host 1195-1204, inside 1377-1379). filterNetworkRequest checks deniedDomains, then allowedDomains, else denies (src/sandbox/sandbox-manager.ts:366-393); the CLI passes no ask callback (src/cli.ts:431). Tests assert HTTP, HTTPS, DNS and wget are blocked with empty allowedDomains (test/sandbox/integration.test.ts:993-1147). Caveat: restriction is decided by allowedDomains !== undefined (sandbox-manager.ts:1741-1757); the zod schema requires the key (src/sandbox/sandbox-config.ts:720-726) but initialize() does not run the schema (only src/utils/config-loader.ts does), so a non-TypeScript library caller that omits it gets no network restriction. Static reading; not executed."
+      },
+      {
+        "claim": "macOS: Seatbelt profile run through sandbox-exec; network allowed only to the localhost proxy port(s) (README.md:107, 126).",
+        "verified": "yes",
+        "evidence": "Profile starts `(deny default ...)` (src/sandbox/macos-sandbox-utils.ts:968-970); `(allow network*)` is emitted only when no network restriction is configured (1144-1145), otherwise only localhost proxy ports plus optional allowLocalBinding / Unix-socket allowances (1147-1230); command is `/usr/bin/sandbox-exec -p <profile> <shell> -c <cmd>` (1473-1484). CI runs macOS arm64 and x86-64 (.github/workflows/integration-tests.yml:24-29). Not executed here."
+      },
+      {
+        "claim": "Filesystem model: reads allowed by default, writes denied by default (README.md:117-120).",
+        "verified": "yes",
+        "evidence": "Linux binds / read-only then adds writable binds only for allowWrite paths (src/sandbox/linux-sandbox-utils.ts:1950-1956); macOS emits `(allow file-read*)` then denies (src/sandbox/macos-sandbox-utils.ts:784-800) and restricts writes in generateWriteRules (869-885). Source comments call reads 'maximally permissive by default' and writes 'maximally restrictive' (src/sandbox/sandbox-schemas.ts:18, 42). Built-in CLI defaults have empty denyRead and allowWrite (src/cli.ts:65-78). `filesystem.disabled: true` drops all filesystem rules (network rules still apply) and is not in the README option list (src/sandbox/sandbox-config.ts:897-907)."
+      },
+      {
+        "claim": "Settings handling: missing default file gives built-in defaults; empty, unreadable or invalid file, or a missing --settings file, makes srt refuse to run (README.md:177-185).",
+        "verified": "yes",
+        "evidence": "src/cli.ts:309-343 and refuseSettings at 48-54; loader classes in src/utils/config-loader.ts:46-90; covered by test/cli.test.ts:163-277."
+      },
+      {
+        "claim": "Basic Usage transcript (README.md:19-37): `srt \"curl anthropic.com\"` succeeds with 'Running: ...' output and `srt \"cat ~/.ssh/id_rsa\"` is blocked.",
+        "verified": "no",
+        "evidence": "Code differs from README. Positional args are shell-quoted one by one (src/cli.ts:483-489; src/utils/shell-quote.ts:26-46) and a test pins that an argument containing spaces stays one token (test/cli.test.ts:130-138), so one quoted string runs as a single command name; 'Running:' is printed nowhere in src/ (only README.md:22-35); and the built-in defaults have empty allowedDomains and denyRead (src/cli.ts:65-78), so anthropic.com and ~/.ssh behave as shown only with a settings file that allows/denies them. Working forms are `srt curl anthropic.com` or `srt -c 'curl anthropic.com'`."
+      },
+      {
+        "claim": "Certain files/directories are always write-blocked even inside allowed write paths (README.md:756-772).",
+        "verified": "partial",
+        "evidence": "The lists match code (src/sandbox/sandbox-utils.ts:11-40; src/sandbox/linux-sandbox-utils.ts:282-318; src/sandbox/macos-sandbox-utils.ts:96-129) but are anchored at process.cwd() (test/sandbox/mandatory-deny-paths.test.ts:44-45), so write roots outside cwd get no such denies. On Linux nested matches come from a ripgrep scan of cwd limited to depth 3 by default (src/sandbox/sandbox-manager.ts:1543; linux-sandbox-utils.ts:360-373) that skips node_modules (367-368). `filesystem.disabled` turns them off (sandbox-config.ts:901-906)."
+      },
+      {
+        "claim": "Unix sockets blocked by default; on Linux via seccomp for x64/arm64, with a warning if seccomp is unavailable; gcc/libseccomp-dev needed as fallback on other architectures (README.md:396-399, 574-582, 808-832).",
+        "verified": "partial",
+        "evidence": "Filter blocks socket(AF_UNIX) and io_uring (vendor/seccomp-src/seccomp-unix-block.c:92-121); helper makes nested namespaces and aborts rather than falling back (vendor/seccomp-src/apply-seccomp.c:1-30, 711-757). Only x64/arm64 prebuilt binaries are looked up (src/sandbox/generate-seccomp-filter.ts:133-157); nothing compiles a filter at runtime, so the README's gcc/libseccomp 'fallback' does not exist in code (compilers are used only by `npm run build:seccomp`, vendor/seccomp/build.ts). Without the helper the wrap still proceeds with Unix sockets unrestricted (linux-sandbox-utils.ts:3046-3051); the 'warning' is a checkDependencies() warning that initialize() ignores (src/sandbox/sandbox-manager.ts:683-688; linux-sandbox-utils.ts:1075-1080) plus a debug log printed only when SRT_DEBUG is set (src/utils/debug.ts:11-13), so the srt CLI is silent unless run with --debug. The helper binaries are gitignored (.gitignore:5-6) and exist only in the npm package."
+      },
+      {
+        "claim": "README Platform Support lists macOS, Linux and Windows (alpha) (README.md:539-543); WSL2 is not mentioned.",
+        "verified": "partial",
+        "evidence": "README.md contains no WSL text. Code returns 'linux' for WSL2+ with the comment 'same sandboxing' (src/utils/platform.ts:47-50) and isSupportedPlatform() rejects only WSL1 (src/sandbox/sandbox-manager.ts:1014-1019). No WSL2 CI leg (.github/workflows/integration-tests.yml:14-37) and no WSL2 test (test/utils/platform.test.ts:5-13). Support is by code intent only; no run on WSL2 is evidenced in the repo."
+      },
+      {
+        "claim": "macOS requires ripgrep (README.md:584-588).",
+        "verified": "no",
+        "evidence": "ripgrep is invoked only from Linux code (src/sandbox/linux-sandbox-utils.ts:10, 360 via src/utils/ripgrep.ts); the dependency check is Linux-only (src/sandbox/sandbox-manager.ts:1047-1054) and a macOS comment says no ripgrep is needed there (src/sandbox/macos-sandbox-utils.ts:887-888). CI still installs it on macOS (integration-tests.yml:170-173). The README's architecture tree is also stale: it lists src/utils/settings.ts and exec.ts (README.md:143-147) which do not exist; src/utils holds config-loader, debug, platform, ripgrep, shell-quote, which."
+      },
+      {
+        "claim": "Linux: bubblewrap provides no violation reporting; use strace (README.md:849-860).",
+        "verified": "partial",
+        "evidence": "bwrap itself reports nothing, but the library ships an opt-in Linux monitor: apply-seccomp reports write-intent syscalls over a Unix socket and the manager filters them against allow/deny paths (src/sandbox/linux-violation-monitor.ts:61-81; src/sandbox/sandbox-manager.ts:699-744; vendor/seccomp-src/apply-seccomp.c:96, 254). It is on only when a library caller passes enableLogMonitor (sandbox-manager.ts:633-637); the srt CLI does not (src/cli.ts:431). Its own comment calls the events diagnostic hints because the reported path is attacker-controlled and racy (linux-violation-monitor.ts:72-75). Proxy denies are recorded on all platforms (sandbox-manager.ts:338-341); macOS reads the system log (macos-sandbox-utils.ts:1509-1532)."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "WSL2 and Linux prerequisites: WSL2 is neither documented, tested nor special-cased. README.md never mentions WSL; CI has no WSL2 leg (.github/workflows/integration-tests.yml:14-37); code treats WSL2+ as plain Linux and rejects only WSL1 (src/utils/platform.ts:43-50; src/sandbox/sandbox-manager.ts:1014-1019). Linux enforcement needs bwrap, socat and ripgrep on PATH and capability-bearing unprivileged user namespaces (README.md:547-568). initialize() checks the binaries but, for a non-root caller, does not probe whether namespaces can be created (src/sandbox/linux-sandbox-utils.ts:1050-1117), and CI must switch off Ubuntu's AppArmor userns restriction to pass (integration-tests.yml:153-168).",
+      "Secret exposure by default: reads are allow-by-default and the CLI's built-in config has empty denyRead (src/cli.ts:65-78; README.md:117-119, 177-180; src/sandbox/sandbox-schemas.ts:18), so files such as ~/.ssh stay readable unless the settings file denies them. The child inherits the caller's environment except variables named in the `credentials` config (no env clearing in src/; src/sandbox/linux-sandbox-utils.ts:3086-3095; src/sandbox/macos-sandbox-utils.ts:1460-1469). That credentials block (mask/deny files and env vars with proxy-side substitution, src/sandbox/sandbox-config.ts:319-700) is barely documented (README.md:457 only) and file masking degrades to deny on macOS (sandbox-config.ts:315-317).",
+      "Network policy limits: filtering is by host name, so allowed domains can still carry exfiltration and domain fronting may bypass it (README.md:879-887). The resolved-address guard denies loopback, link-local, metadata and this host's own addresses by default but private ranges only if listed in deniedResolvedAddresses, and it is skipped for parentProxy/mitmProxy hops, including a proxy picked up from HTTP_PROXY (README.md:361-367, 883; src/sandbox/resolved-address-guard.ts:59-76; src/sandbox/parent-proxy.ts:70-85). TLS termination and credential injection are marked experimental (src/sandbox/sandbox-config.ts:880-883). On macOS allowLocalBinding lets the child reach loopback ports without the proxy (README.md:365).",
+      "Linux Unix-socket blocking depends on a prebuilt helper that exists only in the npm tarball and only for x64/arm64 (src/sandbox/generate-seccomp-filter.ts:133-157; .gitignore:5-6; .github/workflows/release.yml:132). When absent the sandbox still runs with Unix sockets unrestricted and the CLI prints no warning unless --debug is set (src/sandbox/linux-sandbox-utils.ts:1075-1080, 3046-3051; src/utils/debug.ts:11-13; src/sandbox/sandbox-manager.ts:683-688). allowUnixSockets is ignored on Linux (README.md:391-393). enableWeakerNestedSandbox binds the host /proc instead of a fresh one (linux-sandbox-utils.ts:3246-3255; README.md:891).",
+      "Boundary scope and opt-outs: mandatory write-deny paths are anchored at the process cwd, the Linux nested scan is depth 3 by default and skips node_modules (src/sandbox/linux-sandbox-utils.ts:282-318, 360-373; src/sandbox/macos-sandbox-utils.ts:96-129; test/sandbox/mandatory-deny-paths.test.ts:44-45). Plain config flags weaken or disable the boundary: filesystem.disabled (src/sandbox/sandbox-config.ts:897-907), enableWeakerNestedSandbox, allowAllUnixSockets, enableWeakerNetworkIsolation (trustd exfil vector) and allowAppleEvents (child can launch unsandboxed apps) (README.md:462-465, 891-893). On Linux a file outside the write paths that already has a hard link inside one can be written through it (README.md:736).",
+      "macOS reliance on sandbox-exec: enforcement is a generated SBPL profile passed to /usr/bin/sandbox-exec -p (src/sandbox/macos-sandbox-utils.ts:968-970, 1473-1484); the code works around sandbox-exec limits (string literals over 1025 bytes invalidate a profile, thousands of path filters compile slowly: macos-sandbox-utils.ts:550-555, 580-589; test/sandbox/macos-profile-size.test.ts), and the README's only SBPL reference is a 2011 third-party PDF (README.md:107). Go programs need enableWeakerNetworkIsolation to verify TLS under a MITM proxy (README.md:464). The repo makes no statement about Apple's support policy for this interface.",
+      "Embedding model: SandboxManager is a module-level singleton, one config and one proxy allowlist per process (src/sandbox/sandbox-manager.ts:132-137, 2484-2517). Per-call customConfig can change filesystem rules but the domain lists are read from the shared global config by the proxy (sandbox-manager.ts:332-410, 1674-1697, 1741-1757), so concurrent tasks cannot hold different domain allowlists in one process. initialize() does not validate the config object (only src/utils/config-loader.ts runs the schema). updateConfig() and --control-fd change only network lists for a running command; filesystem rules are baked in at wrap time (sandbox-manager.ts:2015-2030; README.md:187-196).",
+      "Maturity, process and build: version 0.0.78 labelled 'Beta Research Preview ... APIs and configuration formats may evolve' (package.json:3; README.md:7-9). No SECURITY.md/disclosure policy, CONTRIBUTING or CHANGELOG in the tree. Tests record earlier enforcement bugs that were fixed: empty allowedDomains once meant unrestricted network (test/sandbox/wrap-with-sandbox.test.ts:547-557) and a macOS rename-based read bypass (test/sandbox/macos-seatbelt.test.ts:20-32). README lags the code: Basic Usage transcript (README.md:19-37), architecture tree (143-147), macOS ripgrep requirement (584-588), seccomp gcc fallback (574-582), and 'custom proxy not yet supported' (877) versus network.httpProxyPort/socksProxyPort/mitmProxy/parentProxy in src/sandbox/sandbox-config.ts:790-810, 885-890. A git checkout lacks the enforcement helpers (apply-seccomp, srt-win.exe, JVM jar are gitignored, .gitignore:5-10) and needs Bun plus gcc/libseccomp-dev, Rust 1.98.1 or a JDK to build them (package.json:15-18; rust-toolchain.toml:5); tests run under Bun 1.4.2 while the CLI runs on Node >=20.11 (integration-tests.yml:51-54; package.json:11-13). The only release artifact is the npm tarball; provenance relies on npm trusted publishing, asserted in a workflow comment (release.yml:242-243) and not checkable from the repo."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "anthropics/sandbox-runtime",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "npm global install: `npm install -g @anthropic-ai/sandbox-runtime` (package.json requires Node >=20.11.0)",
+          "citation": "README.md:13-15; package.json:11-13",
+          "holds": true,
+          "note": "README.md:13-15 has exactly this command under Installation. package.json:11-13 sets engines.node to \">=20.11.0\", and package.json:2-3 gives the name @anthropic-ai/sandbox-runtime and version 0.0.78 (matches the tag). Side note, not a dossier error: a CI comment (integration-tests.yml:47-48) still says 'engines is >=18.0.0', which is stale in the repo; CI pins Node 20 (line 49)."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX Apache-2.0, file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-3 is the 'Apache License, Version 2.0, January 2004' header. The terms run to 'END OF TERMS AND CONDITIONS' (176), followed by the standard appendix with 'Copyright 2025 Anthropic' (189) and the Apache 2.0 notice (191). package.json:73 declares \"license\": \"Apache-2.0\", and package.json:59 includes LICENSE in the published files. I found the standard structure but did not compare every line against the canonical text."
+        },
+        {
+          "field": "platforms.linux_x86_64",
+          "statement": "yes - README Linux section; CI job on ubuntu-latest x86-64, including a second run against source-built bubblewrap 0.12.0; release builds the x64 apply-seccomp helper",
+          "citation": "README.md:547-572; .github/workflows/integration-tests.yml:18-20, 205-225; .github/workflows/release.yml:21-25",
+          "holds": true,
+          "note": "README.md:547-572 lists the Linux requirements (bubblewrap, socat, ripgrep), the Ubuntu 24.04+ sysctl note and the root/CAP_SETFCAP rule. integration-tests.yml:18-20 is the x86-64/ubuntu-latest/linux matrix entry. Lines 205-225 build bubblewrap 0.12.0 from a pinned commit (217) and rerun `npm test` with it first on PATH (225). release.yml:21-25 is the build-seccomp matrix (x64 on ubuntu-latest, plus arm64). Its `npm run build:seccomp` (33) writes vendor/seccomp/x64/apply-seccomp (vendor/seccomp/build.ts:63; vendor/build-common.ts:29-36), which is uploaded with if-no-files-found: error (34-38). Read statically; I did not look at any CI run results."
+        },
+        {
+          "field": "integrations.cli",
+          "statement": "yes - `srt` binary: `srt [command...]`, `-c <command>`, `-d/--debug`, `-s/--settings <path>` (default ~/.srt-settings.json), `--control-fd <fd>` for live network-allowlist updates, `--version`; plus windows-install / windows-uninstall subcommands",
+          "citation": "package.json:8-10; src/cli.ts:177-300, 19-21, 190-269; README.md:187-221",
+          "holds": true,
+          "note": "package.json:8-10 maps bin `srt` to dist/cli.js. In src/cli.ts, main() starts at 177. Locations: .version() at 185, windows-install 190-244, windows-uninstall 246-269, `[command...]` 273, -d/--debug 274, -s/--settings 276, -c 280, --control-fd 284 (only fds >= 3 accepted, 132-140). The default path ~/.srt-settings.json is set at 19-21. README.md:189-195 says each control-fd line replaces the whole config but only allowedDomains/deniedDomains take effect in a running command. 'Live network-allowlist updates' is therefore accurate."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "Linux: network namespace removed, all traffic via host proxies over bind-mounted Unix sockets; empty allowedDomains means no network (verified: yes; caveat: restriction keys on allowedDomains !== undefined and initialize() does not run the zod schema)",
+          "citation": "README.md:122-124, 355; src/sandbox/linux-sandbox-utils.ts:3115-3118, 3123-3145, 1195-1204, 1377-1379; src/sandbox/sandbox-manager.ts:366-393, 1741-1757; src/cli.ts:431; src/sandbox/sandbox-config.ts:720-726; test/sandbox/integration.test.ts:993-1147",
+          "holds": true,
+          "note": "README.md:122-124 and 355 state the claim. Code: 3115-3118 add --unshare-net when network restriction is needed; 3139-3144 mount the proxy socket(s) into the sandbox. socat bridges: host side UNIX-LISTEN to TCP:localhost (1195-1204), sandbox side TCP-LISTEN:3128/1080 to UNIX-CONNECT (1377-1379). filterNetworkRequest checks the deny list, then the allow list, and denies otherwise unless an ask callback is set and strictAllowlist is off (366-393). initialize() takes an optional ask callback (sandbox-manager.ts:633-637); the CLI calls it with the config only (cli.ts:431). Caveat confirmed: restriction is on when allowedDomains !== undefined (1741-1747). The schema requires allowedDomains (sandbox-config.ts:720-726), but SandboxRuntimeConfigSchema.safeParse appears only in src/utils/config-loader.ts:20,78, and initialize() just assigns config = runtimeConfig (645). integration.test.ts:993 starts the 'Network blocked with empty allowedDomains' block, with HTTP (1010), HTTPS (1045), DNS (1072), wget (1099) and local-fs (1123) tests. Read statically; nothing was run."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

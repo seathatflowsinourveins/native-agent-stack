@@ -1,0 +1,317 @@
+{
+  "contender": "trufflesecurity/trufflehog",
+  "revision": {
+    "contender": "trufflesecurity/trufflehog",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "trufflesecurity/trufflehog",
+        "tag": "v3.97.9",
+        "commit": "4dd8831c5f12599465d4d45c3c447b4018a34c85",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v3.97.9",
+    "commit": "4dd8831c5f12599465d4d45c3c447b4018a34c85",
+    "read_at": "2026-10-02T03:02:54+00:00"
+  },
+  "dossier": {
+    "contender": "trufflesecurity/trufflehog",
+    "revision": {
+      "tag": "v3.97.9",
+      "commit": "4dd8831c5f12599465d4d45c3c447b4018a34c85",
+      "read_at": "2026-10-02T03:02:54+00:00"
+    },
+    "license": {
+      "spdx": "AGPL-3.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Go CLI by Truffle Security that scans git history plus staged changes, filesystems and about 15 other sources (GitHub/GitLab orgs, S3, GCS, Docker images, Postman, Jenkins, Elasticsearch, Hugging Face, syslog, stdin) for leaked credentials (main.go:100-295). About 890 regex detectors are registered (pkg/engine/defaults/defaults.go:905-1913). By default each candidate is verified against the issuing service's API and labelled verified, unverified or unknown (README.md:424-430). Verification is built into the same binary; there is no separate verifier component. `trufflehog analyze` is a separate subcommand that queries provider APIs for permissions on 43 credential types (pkg/analyzer/cli.go:63-155). Also shipped as a Docker image, a GitHub Action (action.yml) and a pre-commit hook manifest (.pre-commit-hooks.yaml). Truffle Security also sells a commercial monitoring product (README.md:31-35); CODEOWNERS assigns the repo to two Truffle teams, 'integrations' and 'scanning' (CODEOWNERS:1-17).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Looks for secrets in 'Git, chats, wikis, logs, API testing platforms, object stores, filesystems and more'.",
+          "citation": "README.md:45"
+        },
+        {
+          "claim": "Classifies 'over 800 secret types', mapping each back to the identity it belongs to.",
+          "citation": "README.md:49"
+        },
+        {
+          "claim": "'For every secret TruffleHog can classify, it can also log in to confirm if that secret is live or not.'",
+          "citation": "README.md:53"
+        },
+        {
+          "claim": "For '20 some' commonly leaked credential types, `trufflehog analyze` sends many requests to show who created the credential, what it can access and its permissions.",
+          "citation": "README.md:57"
+        },
+        {
+          "claim": "v3 added 'over 700 credential detectors that support active verification'. Verification yields three statuses: verified, unverified, unknown (unknown = verification failed due to a network or API error).",
+          "citation": "README.md:416"
+        },
+        {
+          "claim": "Local git repos are cloned to a temp dir before scanning to guard against malicious git configs (CVE-2025-41390). `--clone-path` picks the location; `--trust-local-git-config` scans in place (trusted repos only).",
+          "citation": "README.md:280"
+        },
+        {
+          "claim": "CI usage: `trufflehog git file://. --since-commit main --branch feature-1 --results=verified,unknown --fail`. 'The `--fail` flag will return an 183 error code if valid credentials are found.' Exit codes are 0 (clean), 1 (error), 183 (results found, only with --fail).",
+          "citation": "README.md:305"
+        },
+        {
+          "claim": "Available as a GitHub Action (`trufflesecurity/trufflehog@main`) and a pre-commit hook. PreCommit.md covers git core.hooksPath, the pre-commit framework and Husky, and says TruffleHog auto-detects the hook context and applies optimal settings.",
+          "citation": "README.md:420"
+        },
+        {
+          "claim": "Output formats are JSON (`--json`) and SARIF (`--sarif`) for GitHub code scanning. SARIF results are buffered in memory for the whole scan and written at the end.",
+          "citation": "README.md:236"
+        },
+        {
+          "claim": "'Checksums are applied to all artifacts, and the resulting checksum file is signed using cosign'. The install script's `-v` verifies the signature.",
+          "citation": "README.md:146"
+        },
+        {
+          "claim": "A `trufflehog:ignore` comment on the secret's line suppresses a finding if the source supports line numbers. `--no-ignore-tag` reports such findings anyway.",
+          "citation": "README.md:408"
+        },
+        {
+          "claim": "Flag `--no-update`: 'Don't check for updates.' (README has no telemetry section.)",
+          "citation": "README.md:490"
+        },
+        {
+          "claim": "Custom regex detectors (alpha) can verify via a user-run webhook (JSON POST; 200 OK = verified). The `verify` block is optional.",
+          "citation": "README.md:847"
+        },
+        {
+          "claim": "Library use: 'no guarantees can be made on the stability of the public APIs'. Released under AGPL-3.0; a CLA is required to contribute.",
+          "citation": "README.md:895"
+        }
+      ],
+      "install": [
+        {
+          "method": "Install script, Linux/macOS (default bindir ./bin; append a release tag such as v3.56.0 to pin, README.md:141)",
+          "command": "curl -sSfL https://raw.githubusercontent.com/trufflesecurity/trufflehog/main/scripts/install.sh | sh -s -- -b /usr/local/bin",
+          "citation": "README.md:129"
+        },
+        {
+          "method": "Install script with cosign signature verification of the checksum file (requires cosign)",
+          "command": "curl -sSfL https://raw.githubusercontent.com/trufflesecurity/trufflehog/main/scripts/install.sh | sh -s -- -v -b /usr/local/bin",
+          "citation": "README.md:135"
+        },
+        {
+          "method": "Docker (Linux/macOS; add `--platform linux/arm64` on Apple Silicon, README.md:110)",
+          "command": "docker run --rm -it -v \"$PWD:/pwd\" trufflesecurity/trufflehog:latest github --repo https://github.com/trufflesecurity/test_keys",
+          "citation": "README.md:92"
+        },
+        {
+          "method": "Homebrew (macOS). The README does not say whether this resolves to homebrew-core or the project's own tap, which the release pipeline updates (.goreleaser.yml:123-134).",
+          "command": "brew install trufflehog",
+          "citation": "README.md:82"
+        },
+        {
+          "method": "Binary release download plus manual cosign/sha256 verification (README.md:144-179)",
+          "command": "Download and unpack from https://github.com/trufflesecurity/trufflehog/releases",
+          "citation": "README.md:116"
+        },
+        {
+          "method": "Compile from source (Go; go.mod requires go 1.25.0, go.mod:3)",
+          "command": "git clone https://github.com/trufflesecurity/trufflehog.git; cd trufflehog; go install",
+          "citation": "README.md:122"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes: release builds for linux/amd64 (.goreleaser.yml:14-26), installer maps linux/amd64 (scripts/install.sh:74), Docker image for linux/amd64 (.goreleaser.yml:44-58).",
+        "wsl2": "yes (docs mention only): PreCommit.md:21 names WSL as covered by the install script. No WSL-specific CI or notes found; WSL2 would run the Linux build (scripts/install.sh:74-75).",
+        "macos_arm64": "yes: darwin/arm64 builds (.goreleaser.yml:27-37), installer maps darwin/arm64 (scripts/install.sh:73), README Docker note for M1/M2 (README.md:107-111), Homebrew (README.md:82).",
+        "gpu": "no: not applicable. CPU-only scanner; no GPU code found (a cuda/gpu/nvidia search only hit unrelated detector names such as pkg/detectors/nvapi/nvapi.go)."
+      },
+      "integrations": {
+        "cli": "Yes. `trufflehog <subcommand>` with git, github, github-experimental, gitlab, filesystem, s3, gcs, syslog, circleci, docker, travisci, postman, elasticsearch, jenkins, huggingface, stdin, multi-scan, json-enumerator, analyze (main.go:100-295; README.md:432-586). CI: composite GitHub Action that runs the Docker image (action.yml:33-111), GitLab CI snippet (README.md:808-831), `--sarif` for code-scanning upload (README.md:786-795), exit code 183 via `--fail` (README.md:697-701). Hooks: PreCommit.md (core.hooksPath, pre-commit framework, Husky) and root .pre-commit-hooks.yaml:1-6 (language: golang). Interactive TUI when run with no args on a TTY (main.go:345-369).",
+        "mcp": "none found (repo-wide case-insensitive search for 'mcp' and 'model context protocol' returned nothing relevant).",
+        "sdk_or_api": "No hosted API or server mode. The Go module github.com/trufflesecurity/trufflehog/v3 can be imported, but README says no API stability guarantees (README.md:893-896). Config-driven scanning via `multi-scan` with YAML `sources:` (README.md:594-619). `stdin` and `json-enumerator` subcommands accept piped input (main.go:289-293; README.md:393-397). Custom detectors can call a user-run verification webhook (README.md:847-849).",
+        "claude_code_or_codex": "none found. The only agent-related file is .cursor/skills/dep-updates/SKILL.md, a Cursor skill for maintainers' dependency updates, not an end-user integration."
+      },
+      "telemetry_and_network": "README has no telemetry section. Facts from code:\n(1) Update check on by default in release builds. Each run POSTs JSON {OS, Arch, CurrentVersion, Cmd (subcommand), TUI, Timezone, Binary} to https://oss.trufflehog.org/updates. The response is treated as a tar.gz/zip holding a replacement `trufflehog` binary that the overseer library is wired to swap in (pkg/updater/updater.go:39-124; main.go:424-442; overseer internals not inspected, not in the working dir). Disabled by `--no-update` (main.go:76) and when version.BuildVersion == \"dev\", the default for source builds (main.go:438-440; pkg/version/version.go:3). action.yml:109 passes --no-update; the PreCommit.md and README Docker/CLI examples do not.\n(2) Verification: outbound requests to each detected credential's provider (SECURITY.md:9-10). Off with `--no-verification` (main.go:60). Custom endpoints via `--verifier` and `--custom-verifiers-only` (main.go:79-80) or custom-detector webhooks (http:// requires `unsafe: true`, pkg/custom_detectors/validation.go:55-62). Private keys additionally GET https://keychecker.trufflesecurity.com/fingerprint/<hex> and attempt SSH logins to github.com and gitlab.com (pkg/detectors/privatekey/privatekey.go:106-154,222-223).\n(3) GitHub REST API call to resolve the date of `--since-commit` for github.com URLs (pkg/sources/git/git.go:1517-1526).\n(4) HTTP clients send `User-Agent: TruffleHog[ <suffix>]` and honour proxy env vars (pkg/common/http.go:92-101,247-257).\n(5) Sentry hooks exist (pkg/log/log.go:42-108; pkg/common/recover.go) but no non-test code creates a Sentry client or DSN. Prometheus metrics are registered in-process; no metrics HTTP endpoint found.\n(6) `--profile` starts pprof/fgprof on :18066 (main.go:496-507). The `syslog` source opens a listener (main.go:201-206).\n(7) Accounts: none needed for local scans. Per-source tokens come via flags or env (GITHUB_TOKEN main.go:120; the GitLab token is required, main.go:152).\n(8) `github-experimental --object-discovery` writes state files under $HOME/.trufflehog (README.md:361)."
+    },
+    "code": {
+      "languages": [
+        "Go (primary; go 1.25.0, go.mod:3)",
+        "Protocol Buffers (proto/, generated into pkg/pb)",
+        "Shell (scripts/*.sh, entrypoint.sh)",
+        "Python (scripts/test/diff_corpora_results.py only)"
+      ],
+      "entry_points": [
+        {
+          "path": "main.go",
+          "what": "package main: kingpin CLI declaring all subcommands and flags (main.go:46-295); main() wraps run() in the overseer self-updater (main.go:407-446); run() builds engine.Config (main.go:448-738); runSingleScan() dispatches to engine.Scan* per subcommand (main.go:793-1297); isPreCommitHook() env detection (main.go:1389-1424)."
+        },
+        {
+          "path": "action.yml",
+          "what": "Composite GitHub Action: picks base/head by event type, then runs `docker run ${IMAGE}:${VERSION} git file:///tmp/ --since-commit ... --branch ... --fail --no-update --github-actions` (action.yml:45-111). Default image ghcr.io/trufflesecurity/trufflehog:latest (action.yml:21-27)."
+        },
+        {
+          "path": "entrypoint.sh",
+          "what": "Docker ENTRYPOINT wrapper: sets git safe.directory '*', runs /usr/bin/trufflehog, and re-parses the last argument through `bash -c` (entrypoint.sh:3-13; Dockerfile.goreleaser:9)."
+        },
+        {
+          "path": ".pre-commit-hooks.yaml",
+          "what": "pre-commit.com hook manifest: `trufflehog git file://. --since-commit HEAD --results=verified --fail --trust-local-git-config`, language: golang (.pre-commit-hooks.yaml:1-6)."
+        },
+        {
+          "path": "scripts/install.sh",
+          "what": "POSIX installer used by `curl | sh`: downloads release tarball, always checks SHA-256 against the checksums file, optional cosign verification with -v (scripts/install.sh:44-55,347-354)."
+        },
+        {
+          "path": "pkg/engine/defaults/defaults.go",
+          "what": "Detector registry: buildDetectorList()/DefaultDetectors() (defaults.go:905-1934); 892 active entries, 28 commented out, with feature-flag gating at the end of the list."
+        },
+        {
+          "path": "hack/generate/generate.go",
+          "what": "Detector scaffolding generator (`go run hack/generate/generate.go detector <Name>`; hack/docs/Adding_Detectors_external.md:68-73)."
+        }
+      ],
+      "architecture": "Single Go module github.com/trufflesecurity/trufflehog/v3. Flow (docs/process_flow.md, docs/concurrency.md): sources -> units -> chunks -> Aho-Corasick keyword match -> detectors (regex, then optional verify) -> notifier -> printer.\n- main.go parses flags, builds engine.Config and calls eng.ScanGit/ScanGitHub/ScanFileSystem/ScanS3/... (main.go:874-1266). `--since-commit` forces concurrency 1 (main.go:491-494).\n- pkg/sources/*: one package per source (git, github, gitlab, filesystem, s3, gcs, docker, postman, jenkins, elasticsearch, huggingface, syslog, circleci, travisci, json_enumerator), driven by pkg/sources/source_manager.go; pkg/engine/<source>.go wrap each.\n- Git source (pkg/sources/git/git.go): clones to a temp dir, or opens in place with --trust-local-git-config, then ScanRepo walks commits via pkg/gitparse (`git rev-list/log`; base-only ranges are `--all ^base`, gitparse.go:481-564). ScanStaged then scans `git diff --cached --diff-filter=AM` (gitparse.go:566-579; git.go:1175-1320): added/modified staged files only, no unstaged edits (git.go:1596-1597). Needs external `git` 2.20 to <3.0 (pkg/sources/git/README.md:41).\n- Filesystem source (pkg/sources/filesystem/filesystem.go): walks files/dirs; symlinks skipped unless `--max-symlink-depth` > 0 (filesystem.go:110-111,165-170); no .gitignore handling found.\n- pkg/decoders (base64, utf8, utf16, escaped-unicode, html; chained to `--max-decode-depth`, default 5, main.go:71) and pkg/handlers (archives, APK, AR, RPM) preprocess content.\n- pkg/engine/engine.go: scanner/detector/verification-overlap/notifier worker pools, `trufflehog:ignore`, entropy and wordlist false-positive filters, result filtering by `--results` (engine.go:1318-1345); pkg/verificationcache holds an in-memory verification cache.\n- pkg/detectors/<name>/: about 920 detector packages, each implementing FromData(ctx, verify, data); IDs in proto/detector_type.proto; generated protobuf in pkg/pb. Regex uses wasilibs/go-re2 (stdlib regexp banned by .golangci.yml:5-11).\n- pkg/analyzer (`analyze`, 43 analyzers), pkg/custom_detectors (YAML regex detectors with webhook verification), pkg/output (plain, json, legacy_json, github_actions, sarif), pkg/updater (overseer fetcher), pkg/tui (Bubble Tea TUI), pkg/feature (runtime flags).",
+      "packaging_and_release": "Tags v* trigger .github/workflows/release.yml (release.yml:3-6): GoReleaser Pro (`distribution: goreleaser-pro`, needs GORELEASER_KEY, release.yml:66-75) with cosign installed (release.yml:41-42). .goreleaser.yml builds with CGO_ENABLED=0: linux amd64/arm64 (UPX-compressed), darwin and windows amd64/arm64 (:13-37). Archives contain LICENSE, README.md and docs/man/trufflehog.1 (:38-42). The checksums file is signed with cosign keyless via GitHub OIDC, producing .sig and .pem (:135-146). Multi-arch Docker images (linux/amd64 and linux/arm64/v8) go to Docker Hub trufflesecurity/trufflehog and ghcr.io/trufflesecurity/trufflehog with :<version> and :latest manifests (:43-122), labelled AGPL-3.0, with `--provenance=false`. The Homebrew tap trufflesecurity/homebrew-trufflehog is updated (:123-134). The release is created with make_latest:false and promoted by the `mark-latest` job (release.yml:77-96; .goreleaser.yml:6-12). release-bot.yml runs a Truffle-internal GCP release bot on publish. No SBOM, SLSA/provenance attestation or Docker image signing is configured; only the checksums file is signed. Third-party Actions are pinned by commit SHA. Dockerfile builds from golang:bullseye (unpinned tag) onto alpine:3.22 (Dockerfile:1,11); Dockerfile.goreleaser uses alpine:3.22 (:1). Neither sets USER (runs as root).",
+      "tests_and_ci": "Go `testing` with testify (go.mod:92), go-cmp, gock, rapid and testcontainers (go.mod:93-98). Tests are co-located `*_test.go` under pkg/: at least 2,000 files (the Glob tool capped at 2,000): pkg/detectors 1,857 (917 are `*_integration_test.go` behind `//go:build detectors` that fetch real credentials from GCP Secret Manager project `trufflehog-testing`, e.g. pkg/detectors/anthropic/anthropic_integration_test.go:1-24), pkg/analyzer 45, pkg/sources 44 (some tagged `integration`/`localInfra`), pkg/engine 8, plus others. No root-level main_test.go, so main.go's hook override is untested; git_test.go:1955-2096 does cover the HEAD..HEAD staged-only range.\nWorkflows (.github/workflows):\n- test.yml (PR, push to main, tags): gotestsum running `go test -json -tags=sources` over all packages except pkg/analyzer/analyzers, with GCP workload identity. No code in the repo uses a `sources` build tag. Fork PRs run `make test-community` (Makefile:65-66).\n- lint.yml: golangci-lint v2.13.2 plus bodyclose/copyloopvar/misspell, a man-page staleness check, semgrep detector rules, hack/checksecretparts.\n- smoke.yml: builds and scans public repos; checks for leftover git processes and zombies (#3379).\n- detector-tests.yml: nightly 08:00 UTC `captain run detectors`, which runs `go test -tags=detectors ./pkg/detectors/...` (.captain/config.yaml:3).\n- detector-corpora-test.yml: on PRs touching detectors, regex-match diff vs main over an S3 corpus, posted as a PR comment.\n- performance.yml: PR gate on average user time of 5 `filesystem --no-verification` scans of a v3.75.1 checkout, current vs previous tag. It fails above 1.5x although its message says 10% (performance.yml:92-95).\n- codeql-analysis.yml (Go; push, PR, weekly), secrets.yml (dogfoods the action with --results=verified), release.yml, release-bot.yml.\nCI uses Go 1.27 while go.mod declares go 1.25.0.",
+      "dependencies": "One manifest: root go.mod (only go.mod in the repo). 109 direct requirements (go.mod:13-121) and 202 `// indirect` (go.mod:125-326); go 1.25.0, toolchain go1.25.10 (go.mod:3-5). Two `replace` directives point to Truffle-maintained forks: jpillora/overseer -> trufflesecurity/overseer v1.2.8, and coinbase/waas-client-library-go -> trufflesecurity fork v1.0.9 (go.mod:7,10). Notable direct deps: kingpin v2 (CLI), overseer (self-update), go-git, wasilibs/go-re2, BobuSumisu/aho-corasick, AWS SDK v2, cloud.google.com/go/{storage,secretmanager}, go-containerregistry, bubbletea (TUI), sentry-go/zapsentry, prometheus client, protobuf. testcontainers, gock and rapid sit in the same direct block. Renovate manages updates (.github/renovate.json:3). The newest dated pseudo-version is trufflesecurity/ldap-verify, 2026-08-24 (go.mod:100).",
+      "security_policy": "SECURITY.md: report to security@trufflesec.com with `trufflehog` in the subject. Blind SSRF and outbound-request reports are treated as hardening, not vulnerabilities. A CVE is issued only for a demonstrated exploit chain such as credential exfiltration or internal exploitation (SECURITY.md:1-51). No supported-versions table."
+    },
+    "claim_checks": [
+      {
+        "claim": "Classifies over 800 secret types (README.md:49) and has over 700 detectors with active verification (README.md:416).",
+        "verified": "yes",
+        "evidence": "pkg/engine/defaults/defaults.go:905-1913 registers 892 active `&pkg.Scanner{}` entries (28 more are commented out; regex counts). proto/detector_type.proto:7 has an enum of about 1,032 numbered entries. 917 of 920 non-test detector files under pkg/detectors contain an `if verify`-style branch (regex count, approximate). The count includes versioned variants (e.g. accuweather v1/v2, defaults.go:910-911), so 'types' is looser than 'entries'. main.go:555-591 enables all feature-gated detectors in the OSS build."
+      },
+      {
+        "claim": "For every classifiable secret it can also log in to confirm it is live (README.md:53). The AWS detector performs GetCallerIdentity (README.md:430).",
+        "verified": "partial",
+        "evidence": "AWS verification is real: STS GetCallerIdentity at pkg/detectors/aws/access_keys/accesskey.go:258-306. But README's link target pkg/detectors/aws/aws.go does not exist; the dir holds access_keys/, session_keys/, appsync/, common.go and utils.go. 'Every' is not confirmed: 917 of 920 detector files have a verify branch (regex count). A private key counts as 'verified' if a GitHub/GitLab SSH login succeeds or its public-key fingerprint is found in Truffle's keychecker index (pkg/detectors/privatekey/privatekey.go:106-168,222-239); no live TLS handshake exists in this code, despite README.md:406. The 'millions of users / billions of certificates' scale (README.md:418) is server-side and not checkable here."
+      },
+      {
+        "claim": "Results come in three statuses: verified, unverified, unknown (README.md:424-428).",
+        "verified": "yes",
+        "evidence": "main.go:1299-1321 parses `--results` (verified, unknown, unverified, filtered_unverified). The notifier classifies by Verified and VerificationError() and filters accordingly (pkg/engine/engine.go:1318-1344). Nil `--results` means all three are reported (engine.go:334-348, 397-402)."
+      },
+      {
+        "claim": "`--fail` returns 183 'if valid credentials are found' (README.md:305).",
+        "verified": "partial",
+        "evidence": "Exit 183 happens when engine.HasFoundResults() and --fail (main.go:733-737). The counter increments for any result that passes the `--results` filter (engine.go:1345). Unverified or unknown matches therefore fail the run unless `--results=verified` is set; the flag's own help text says 'if results are found' (main.go:77). Error exit is 1 (main.go:1325-1335)."
+      },
+      {
+        "claim": "Pre-commit mode auto-detects the hook context and applies optimal settings: staged-only scan, only verified+unknown shown, fail on findings (PreCommit.md:47,116,175; pkg/sources/git/README.md:298-303).",
+        "verified": "partial",
+        "evidence": "main.go:896-915 does set base=head=HEAD (empty commit range, staged only), trust-local-git-config and fail=true; that range behaviour is tested in pkg/sources/git/git_test.go:2059-2076. But `*results = \"verified,unknown\"` at main.go:910 comes after parseResults (main.go:641) and after the engine was built from engConf (main.go:666,846), and `results` is never read again. From reading the code (not executed), the override has no effect, so the zero-flag hook reports and fails on unverified matches too, contrary to the docs. Detection env vars are PRE_COMMIT=1, HUSKY=1, HUSKY_GIT_PARAMS and TRUFFLEHOG_PRE_COMMIT=1 (main.go:1389-1424). No root-level test covers the override."
+      },
+      {
+        "claim": "Local git repos are cloned to a temp dir before scanning (CVE-2025-41390 guard); `--clone-path` and `--trust-local-git-config` adjust this (README.md:280).",
+        "verified": "yes",
+        "evidence": "pkg/sources/git/git.go:1576-1593: file:// URIs clone via CloneRepo unless trustLocalGitConfig, in which case the path is used in place. The index is copied and an alternates file added so staged blobs stay visible (git.go:1595-1634). Flags at main.go:109-111. The hook override turns trust on (main.go:901)."
+      },
+      {
+        "claim": "GitHub Action scans only the commits in the push/PR and fails on findings (README.md:705-728).",
+        "verified": "yes",
+        "evidence": "action.yml:58-97 derives base/head from the event (push, pull_request, workflow_dispatch/schedule); action.yml:101-111 runs the Docker image with --since-commit, --branch, --fail, --no-update and --github-actions. It needs Docker, uses jq (apt-get fallback), pulls ghcr.io/trufflesecurity/trufflehog:latest by default (action.yml:21-27), and relies on the caller's full-depth checkout (README.md:718-721)."
+      },
+      {
+        "claim": "Checksums cover all artifacts and the checksum file is cosign-signed (README.md:146).",
+        "verified": "yes",
+        "evidence": ".goreleaser.yml:135-146 (`signs` with cosign sign-blob, GitHub OIDC issuer, artifacts: checksum). scripts/install.sh:347-354 verifies with an identity regexp bound to this repo's workflows. Only the checksum file is signed; no docker_signs, sboms or attestations exist, and Docker builds use --provenance=false (.goreleaser.yml:58,74,89,105)."
+      },
+      {
+        "claim": "`--no-update`: 'Don't check for updates.' (README.md:490); README mentions no telemetry.",
+        "verified": "partial",
+        "evidence": "The default 'check' is a POST of OS, arch, version, subcommand, TUI flag and timezone to https://oss.trufflehog.org/updates, and the answer can be a replacement binary (pkg/updater/updater.go:39-124; main.go:424-442). main.go:430 is a TODO for a PreUpgrade signature check, so none is configured. `--no-update` and dev builds skip it (main.go:438-440; pkg/version/version.go:3). README's wording undersells this behaviour."
+      },
+      {
+        "claim": "A `trufflehog:ignore` comment suppresses a finding where the source supports line numbers (README.md:407-410).",
+        "verified": "yes",
+        "evidence": "pkg/engine/engine.go:1285-1304 drops a result whose line carries the tag unless --no-ignore-tag (main.go:69); the tag is matched at engine.go:1448. SupportsLineNumbers is true only for git, github, gitlab, bitbucket, gerrit, azure repos, filesystem and a few related source types (engine.go:1388-1400), so findings from S3, GCS, Docker, Postman etc. cannot be inline-ignored."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Filesystem scan of the trufflehog repo (~4,500 files), `--no-verification --concurrency=1`, varying `--max-decode-depth`",
+        "metric": "wall time",
+        "value": "depth 1: 8.05 s; depth 2: 8.18 s; depth 3: 8.09 s; depth 5 (default): 8.19 s; depth 10: 8.35 s. Hardware not stated.",
+        "source": "docs/iterative_decoding_performance.md:17-28",
+        "independent": false
+      },
+      {
+        "what": "Same scan: unique results found at each decode depth",
+        "metric": "unique results",
+        "value": "924 (depth 1), 927 (2), 928 (3), 928 (5), 932 (10). The doc attributes the depth-10 variance to nondeterministic dedup ordering.",
+        "source": "docs/iterative_decoding_performance.md:22-36",
+        "independent": false
+      },
+      {
+        "what": "base64 decoder microbenchmark on random data",
+        "metric": "latency per op",
+        "value": "100 B: ~250 ns (96 B, 2 allocs); 1 KB: ~2.25 us; 10 KB: ~44 ns (fast because random bytes rarely contain a valid base64 run). Hardware not stated.",
+        "source": "docs/iterative_decoding_performance.md:38-51",
+        "independent": false
+      },
+      {
+        "what": "Average user CPU time of `trufflehog git file://<repo> --no-verification --no-update` per release, v3.26.0 to v3.33.0 (script hack/bench/versions.sh, num_iterations=5)",
+        "metric": "average user time (s)",
+        "value": "v3.28.6 to v3.33.0 excluding v3.31.3-v3.31.6: 1.298-1.402 s. v3.31.3-v3.31.6: 2.418-2.470 s. v3.26.0-v3.28.5: 2.538-2.596 s. The repo under test is not recorded in plot.txt. versions.sh:57 uses `for i in {1..$num_iterations}`, which bash does not expand, so each figure may be a single run divided by 5 (my reading, not executed). Releases are old relative to v3.97.9; no current numbers are published.",
+        "source": "hack/bench/plot.txt:1-24; hack/bench/versions.sh:13,57-73; hack/bench/versions.png",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Self-update and phone-home are on by default in release binaries and Docker images. Every run POSTs OS, arch, version, subcommand, TUI flag and timezone to oss.trufflehog.org and may swap in a downloaded binary via overseer (pkg/updater/updater.go:39-124; main.go:424-442). main.go:430 still has a TODO for a PreUpgrade signature check. Opt out with `--no-update` (main.go:76); only action.yml:109 passes it, while the PreCommit.md hook examples and README Docker/CLI examples do not. Source builds report version 'dev' and skip the updater (main.go:438-440; pkg/version/version.go:3). README documents it only as 'Don't check for updates' (README.md:490).",
+      "Verification sends found secrets off-machine and has offline pitfalls (code reading, not executed). It is on by default and calls each provider's API with the candidate credential (SECURITY.md:9-10; main.go:60,656; e.g. AWS STS in pkg/detectors/aws/access_keys/accesskey.go:258-306). Private keys: the fingerprint goes to keychecker.trufflesecurity.com and SSH logins are attempted against github.com and gitlab.com (pkg/detectors/privatekey/privatekey.go:106-168,222-239). Network failures become 'unknown' results that count toward `--fail` when `unknown` is selected (pkg/engine/engine.go:1323-1345). With `--no-verification` every match is 'unverified', which the documented `--results=verified,unknown` setting drops (engine.go:334-348,1334-1338). I found no non-test caller of the AWS account allow/deny filter (pkg/detectors/account_filter.go), so verification cannot be limited to chosen accounts from the CLI.",
+      "Pre-commit auto-configuration differs from its docs (code reading, not executed). In hook mode, main.go:896-915 forces staged-only, trust-local-git-config and --fail, but the results override at main.go:910 runs after the filter was parsed (main.go:641-666) and the engine built (main.go:846), so it is inert. The zero-flag hook (`trufflehog git file://.`, PreCommit.md:47-53) therefore also reports and fails on unverified matches, contrary to pkg/sources/git/README.md:300-303. No root-level test covers it. The 'manual' configs (`--since-commit HEAD` with no `--branch`, PreCommit.md:58-61,137,182) outside a detected hook context walk `--all ^HEAD`, i.e. every ref not reachable from HEAD, plus staged changes (pkg/gitparse/gitparse.go:517-535; pkg/sources/git/git_test.go:1948-1958). Staged scanning covers added/modified files only (gitparse.go:569).",
+      "Plain and JSON output contain the full secret value (`Raw`, `RawV2`, `SecretParts`), so logs, CI artifacts or files saved in the checkout can themselves hold live credentials (pkg/output/plain.go:66; pkg/output/json.go:48-58,71-76). SARIF and GitHub-Actions output omit the value (pkg/output/sarif.go:81-94,195-206; pkg/output/github_actions.go:55-61). Source credentials are accepted as flags or URL userinfo (pkg/sources/git/README.md:96-100; main.go:120,152). By default tokens are handed to `git` as a `-c http.extraHeader=Authorization: Basic ...` argument, or embedded in the URL with `--auth-in-url` (pkg/sources/git/git.go:628-645).",
+      "No baseline or allowlist file. Suppression is limited to inline `trufflehog:ignore` (only for git, github, gitlab, filesystem and similar sources, pkg/engine/engine.go:1388-1400), regex path files (`--include-paths`/`--exclude-paths`) and detector include/exclude lists (main.go:85-86). Findings from sources without line numbers (S3, GCS, Docker, Postman, ...) cannot be inline-ignored.",
+      "Licensing and stability. AGPL-3.0 (LICENSE; README.md:12,900) with no per-file headers and no '-only' or '-or-later' statement found; contributions require a CLA (CONTRIBUTING.md:7). README says there is no API stability guarantee for library use (README.md:893-896); custom regex detectors are labelled alpha 'subject to change' (README.md:857) and `github-experimental` is alpha (README.md:355).",
+      "Release and supply-chain hygiene. Only the checksums file is cosign-signed (.goreleaser.yml:135-146); no SBOM, provenance attestation or Docker signing is configured, and Docker builds use --provenance=false (.goreleaser.yml:58,74,89,105). The install script checks SHA-256 from the same release host and runs cosign only with `-v` (scripts/install.sh:44-55); README's `curl | sh` pulls the script from the `main` branch (README.md:129). Linux binaries are UPX-packed (.goreleaser.yml:14-26). The Action is documented as `@main` and defaults to the `latest` image (README.md:723; action.yml:21-27). The release needs GoReleaser Pro (release.yml:67-75), and two dependencies are redirected to Truffle-maintained forks (go.mod:7,10).",
+      "Operational footguns. The git source needs `git` 2.20 to <3.0 on PATH (pkg/sources/git/README.md:41). `--since-commit` forces concurrency 1 (main.go:491-494). Default local scans first clone the repo to a temp dir (pkg/sources/git/git.go:1576-1593). With `--clone-path` set and no `--no-cleanup`, an in-place scan (`--trust-local-git-config`, or `directories` in YAML) deletes the scanned directory (pkg/sources/git/README.md:201; git.go:387-397). In-place directories whose path ends in 'git' are skipped silently (git.go:373-376). `--profile` binds pprof/fgprof on all interfaces at :18066 (main.go:496-507). The Docker image runs as root (Dockerfile.goreleaser has no USER) and its entrypoint passes the last argument through `bash -c`, so word-splitting, globbing and command substitution apply (entrypoint.sh:3-4). Detector verification tests need project-held GCP secrets, so only maintainers run them (pkg/detectors/anthropic/anthropic_integration_test.go:1-24; .github/workflows/test.yml:13)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "trufflesecurity/trufflehog",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Install script, Linux/macOS (default bindir ./bin; append a release tag such as v3.56.0 to pin, README.md:141): curl -sSfL https://raw.githubusercontent.com/trufflesecurity/trufflehog/main/scripts/install.sh | sh -s -- -b /usr/local/bin",
+          "citation": "README.md:129 (also README.md:141; scripts/install.sh:9-15,25,36)",
+          "holds": true,
+          "note": "README.md:129 has the command character for character. README.md:141 shows the pinned form with `<ReleaseTag like v3.56.0>`. scripts/install.sh:10 and :25 set the default BINDIR to ./bin, and :36 takes the tag as a positional argument. The script maps darwin, linux and windows on amd64/arm64 (install.sh:72-77). So 'Linux/macOS' is narrower than PreCommit.md:21 ('Linux, macOS, and Windows (and WSL)') but not wrong."
+        },
+        {
+          "field": "license",
+          "statement": "spdx: AGPL-3.0, file: LICENSE",
+          "citation": "LICENSE:1-2,619; README.md:12,900; .goreleaser.yml:57",
+          "holds": true,
+          "note": "LICENSE is the full GNU Affero GPL v3 text (header at lines 1-2, END OF TERMS at 619). README badge (line 12), README 'License Change' section (line 900) and Docker image labels (.goreleaser.yml:57) all say AGPL-3.0. No '-only' or '-or-later' choice is stated, so the bare 'AGPL-3.0' identifier is the faithful label. Side note: LICENSE:662-675 has leftover choosealicense.com page text pasted after the license ('Copy license text to clipboard', 'Suggest this license', ...). Its line 673 mentions AGPL-3.0-or-later/-only only as that site's generic advice, not as a project statement. This does not change the license identification."
+        },
+        {
+          "field": "readme.platforms.macos_arm64",
+          "statement": "yes: darwin/arm64 builds (.goreleaser.yml:27-37), installer maps darwin/arm64 (scripts/install.sh:73), README Docker note for M1/M2 (README.md:107-111), Homebrew (README.md:82).",
+          "citation": ".goreleaser.yml:27-37; scripts/install.sh:73; README.md:107-111; README.md:82",
+          "holds": true,
+          "note": "All four citations match. Build id 'trufflehog' targets goos darwin/windows with goarch amd64/arm64 (.goreleaser.yml:27-37). install.sh:73 maps darwin/arm64, and uname_arch passes 'arm64' through unchanged (install.sh:175-182). README.md:107-111 gives the `--platform linux/arm64` Docker command for M1/M2, and that arm64 image is built at .goreleaser.yml:59-74,90-105. README.md:82 is `brew install trufflehog`."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "Yes. `trufflehog <subcommand>` with git, github, github-experimental, gitlab, filesystem, s3, gcs, syslog, circleci, docker, travisci, postman, elasticsearch, jenkins, huggingface, stdin, multi-scan, json-enumerator, analyze (main.go:100-295; README.md:432-586). CI: composite GitHub Action that runs the Docker image (action.yml:33-111), GitLab CI snippet (README.md:808-831), --sarif for code-scanning upload (README.md:786-795), exit code 183 via --fail (README.md:697-701). Hooks: PreCommit.md (core.hooksPath, pre-commit framework, Husky) and root .pre-commit-hooks.yaml:1-6 (language: golang). Interactive TUI when run with no args on a TTY (main.go:345-369).",
+          "citation": "main.go:100-295,345-369; pkg/analyzer/cli.go:60; README.md:432-586,697-701,786-795,808-831; action.yml:33-111; .pre-commit-hooks.yaml:1-6; PreCommit.md:5-9",
+          "holds": true,
+          "note": "main.go:100-294 declares all 18 scan commands. 'analyze' is registered via analyzer.Command(cli) at main.go:295, which calls app.Command(\"analyze\", ...) at pkg/analyzer/cli.go:60. README.md:523-586 lists the same commands in its help output. action.yml:34 is `using: \"composite\"`, and lines 101-111 run `docker run \"${IMAGE}:${VERSION}\" git file:///tmp/ ... --fail --no-update --github-actions`. README.md:808-831 is the GitLab CI job, 786-795 the SARIF upload to github/codeql-action/upload-sarif, and 697-701 the exit codes 0/1/183. .pre-commit-hooks.yaml:5 is `language: golang`. PreCommit.md:5-9 covers hooksPath, the pre-commit framework and Husky. main.go:345 starts the TUI when stdout is a TTY and there are no args. It also starts it when the first arg is `analyze`, which the dossier leaves out but does not contradict."
+        },
+        {
+          "field": "claim_checks[4] (pre-commit auto-configuration, verified: partial)",
+          "statement": "Pre-commit mode auto-detects the hook context and applies optimal settings (PreCommit.md:47,116,175; pkg/sources/git/README.md:298-303). Verified: partial. main.go:896-915 sets base=head=HEAD, trust-local-git-config and fail=true (range tested at git_test.go:2059-2076). But `*results = \"verified,unknown\"` at main.go:910 runs after parseResults (main.go:641) and after the engine is built from engConf (main.go:666,846), and `results` is never read again, so the override is inert. Detection env vars are PRE_COMMIT=1, HUSKY=1, HUSKY_GIT_PARAMS, TRUFFLEHOG_PRE_COMMIT=1 (main.go:1389-1424). No root-level test.",
+          "citation": "main.go:636-671,733,846,896-915,1389-1424; pkg/engine/engine.go:279,334-348,400-402,1318-1345; pkg/sources/git/git_test.go:2059-2076; PreCommit.md:47,116,175; pkg/sources/git/README.md:298-303",
+          "holds": true,
+          "note": "The evidence matches the code. main.go:901-914 sets TrustLocalGitConfig, BaseRef and HeadRef to HEAD, `*results`, and `*fail`. The only read of `results` is parseResults at main.go:641 (grep finds uses only at lines 62, 639, 641 and 910; manpage.go does not use it). engConf.Results (line 666) goes to engine.NewEngine at line 846, which applies the filter once at engine.go:334-348 (after setDefaults at line 279). Writing `*results` at line 910 therefore cannot change filtering. `*fail` is read later, at main.go:733, so that override does take effect. With no flags, Results is nil, setDefaults notifies all three statuses (engine.go:400-402), and every notified result increments numFoundResults (engine.go:1345). Unverified matches therefore trigger exit 183, contrary to pkg/sources/git/README.md:302. The doc claims at PreCommit.md:47, 116 and 175 match the dossier's description. git_test.go:2059-2076 tests the HEAD..HEAD staged-only shape. No main_test.go exists. This is from reading the code, not running it, the same caveat the dossier gives."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

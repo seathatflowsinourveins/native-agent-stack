@@ -1,0 +1,317 @@
+{
+  "contender": "topoteretes/cognee",
+  "revision": {
+    "contender": "topoteretes/cognee",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "topoteretes/cognee",
+        "tag": "v1.6.2",
+        "commit": "ba3631f2ed363a6ea50d649c34c56885af6b36fe",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v1.6.2",
+    "commit": "ba3631f2ed363a6ea50d649c34c56885af6b36fe",
+    "read_at": "2026-10-02T03:02:56+00:00"
+  },
+  "dossier": {
+    "contender": "topoteretes/cognee",
+    "revision": {
+      "tag": "v1.6.2",
+      "commit": "ba3631f2ed363a6ea50d649c34c56885af6b36fe",
+      "read_at": "2026-10-02T03:02:56+00:00"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Cognee is an Apache-2.0 Python library, CLI, FastAPI server, MCP server and Next.js UI that stores agent memory as a knowledge graph plus vector index plus relational metadata, via remember/recall/improve/forget (README.md:42,180-185). Defaults are embedded local stores (SQLite, LanceDB, Ladybug graph, SQLite session cache) with per-user/dataset ACL isolation on; an optional keyless mode uses local GLiNER and fastembed. The Claude Code and Codex plugins the README advertises live in a separate repo (topoteretes/cognee-integrations), not in this checkout; the in-repo route for both agents is the cognee-mcp server (examples/demos/company_brain/multi_source/README.md:159-215).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Free open-source AI memory platform; persistent agent memory as a self-hosted knowledge graph.",
+          "citation": "README.md:42"
+        },
+        {
+          "claim": "Runs locally for free, no API key required; uses small CPU models.",
+          "citation": "README.md:44-45"
+        },
+        {
+          "claim": "With no LLM key: local GLiNER graph extraction and local embeddings (download on first use); ingestion, retrieval and session storage work without an LLM; LLM-dependent improve stages skip.",
+          "citation": "README.md:96,133"
+        },
+        {
+          "claim": "The bundled GLiNER extractor is a demo; a production version is offered on request.",
+          "citation": "README.md:137"
+        },
+        {
+          "claim": "With a key set, OpenAI is used for LLM and embeddings and processing makes provider calls.",
+          "citation": "README.md:150"
+        },
+        {
+          "claim": "Agents retain project context, decisions, fixes and learned rules; session lessons are distilled into durable knowledge another session can retrieve.",
+          "citation": "README.md:70"
+        },
+        {
+          "claim": "remember stores permanently, or in a session when a session ID is given; recall retrieves; improve bridges session knowledge into the graph; forget removes an item or dataset.",
+          "citation": "README.md:180-185"
+        },
+        {
+          "claim": "Claude Code plugin: claude plugin marketplace add topoteretes/cognee-integrations; claude plugin install cognee-memory@cognee. Codex plugin: enable hooks, codex plugin marketplace add ... --ref main, codex plugin add cognee@cognee. Setup guide covers local or remote memory.",
+          "citation": "README.md:191-218"
+        },
+        {
+          "claim": "Other interfaces: OpenClaw plugin, MCP clients via cognee-mcp, Python API, TypeScript SDK, Rust, REST API.",
+          "citation": "README.md:220-228"
+        },
+        {
+          "claim": "cognee-cli -ui starts a local UI; needs Node.js/npm, and Docker for its MCP service.",
+          "citation": "README.md:232-238"
+        },
+        {
+          "claim": "docker run cognee/cognee:main with ENABLE_BACKEND_ACCESS_CONTROL=false is the single-user posture; otherwise multi-tenant and every /api/v1 call needs authentication.",
+          "citation": "README.md:258-265"
+        },
+        {
+          "claim": "Whole memory layer can run on one Postgres, released as a demo; production version is a licensed product.",
+          "citation": "README.md:279-281"
+        },
+        {
+          "claim": "BEAM: 0.79 at 100K tokens, 0.67 at 10M (exploratory).",
+          "citation": "README.md:287-294"
+        },
+        {
+          "claim": "Memory can be imported from Mem0, Letta, Zep, Graphiti via the COGX format.",
+          "citation": "README.md:244"
+        }
+      ],
+      "install": [
+        {
+          "method": "pip/uv from PyPI",
+          "command": "uv pip install \"cognee[gliner]\"   (base package: pip install cognee)",
+          "citation": "README.md:88-91,162"
+        },
+        {
+          "method": "Docker image",
+          "command": "docker run --rm -it -p 8000:8000 -e LLM_API_KEY=\"sk-...\" -e ENABLE_BACKEND_ACCESS_CONTROL=false -v cognee_storage:/cognee-storage cognee/cognee:main",
+          "citation": "README.md:258-263"
+        },
+        {
+          "method": "Docker Compose from a source checkout (copy .env.template to .env first)",
+          "command": "docker compose --profile ui --profile mcp up",
+          "citation": "README.md:267-271"
+        },
+        {
+          "method": "MCP server via uvx, API mode (Claude Code; Codex uses an [mcp_servers.cognee] block in ~/.codex/config.toml with command uvx and args cognee-mcp --api-url)",
+          "command": "claude mcp add --scope user cognee -- uvx cognee-mcp --api-url http://localhost:8000",
+          "citation": "examples/demos/company_brain/multi_source/README.md:170-195"
+        },
+        {
+          "method": "Claude Code plugin",
+          "command": "claude plugin marketplace add topoteretes/cognee-integrations && claude plugin install cognee-memory@cognee",
+          "citation": "README.md:193-195"
+        },
+        {
+          "method": "Codex plugin",
+          "command": "codex features enable hooks && codex plugin marketplace add topoteretes/cognee-integrations --ref main && codex plugin add cognee@cognee",
+          "citation": "README.md:198-216"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - CI runs ubuntu-22.04 on Python 3.10, 3.11-3.13, 3.14 (.github/workflows/test_suites.yml:185-203; release_test.yml:90-98); Docker image is linux/amd64+arm64 (release.yml:217); ladybug 0.19.0 and enola-cli ship manylinux x86_64 wheels (uv.lock:2812,4837).",
+        "wsl2": "unknown - no WSL/WSL2 statement in README, docs or CI; the only WSL mention is a Windows test-helper comment (cognee-mcp/tests/test_entrypoint_args.py:32-35).",
+        "macos_arm64": "yes - CI includes macos-15 on Python 3.13 (test_suites.yml:205-211; runner arch not declared in the file); arm64 wheels exist for ladybug 0.19.0 (macosx_15_0, uv.lock:4834), ladybug 0.17.1 for macOS 13/14 (uv.lock:4808) and enola-cli (uv.lock:2809). macOS 13/14 are pinned to ladybug 0.17.x and stay exposed to storage-corruption defects (pyproject.toml:80-98). README has no macOS-specific steps.",
+        "gpu": "no - not required; CPU is the documented default (README.md:44-45); embeddings run on onnxruntime/fastembed (pyproject.toml:68-76); no cognee code selects a GPU device. The optional gliner extra installs PyPI torch, the CUDA build on Linux (pyproject.toml:242-248)."
+      },
+      "integrations": {
+        "cli": "yes - cognee-cli = cognee.cli._cognee:main (pyproject.toml:255-256); commands include remember, recall, improve, forget, add, cognify, search, datasets, sessions, agents, serve, push, doctor, upgrade/downgrade (cognee/cli/_cognee.py:95-121). --api-url/--api-key delegate to a running API so one process owns the file-based DBs (cognee/cli/_cognee.py:158-179,371-390; cognee/cli/api_dispatch.py:1-6).",
+        "mcp": "yes - separate package cognee-mcp 0.5.6 (cognee-mcp/pyproject.toml:3,99-101), FastMCP, transports stdio/http/sse (cognee-mcp/src/server.py:982-1008); advertises remember/recall/forget, cognify_status found via search_tools, improve not exposed (cognee-mcp/README.md:503-521,562-572). Modes: direct, API (--api-url), Cloud (--serve-url) (cognee-mcp/README.md:412-507). Default dataset per client name unless COGNEE_MCP_AGENT_SCOPED=false (cognee-mcp/README.md:589-601).",
+        "sdk_or_api": "yes - async Python SDK (cognee/__init__.py:18-119); FastAPI REST under /api/v1 incl. remember, recall, improve, forget, sessions, datasets, permissions, agents, integrations (cognee/api/client.py:362-476). TypeScript SDK and Rust client are linked (README.md:226-227) but live outside this repo; not checked.",
+        "claude_code_or_codex": "README documents a Claude Code plugin and a Codex plugin (hooks must be enabled) (README.md:191-218), but plugin code is in topoteretes/cognee-integrations, not in this checkout (catalog/entries/integrations/claude-code.yaml:22-24; codex.yaml:22-24), so capture/deletion behavior could not be inspected. In-repo: plugin registry (cognee/modules/integrations/plugins.py:17-25); per-plugin agent sub-user and API key provisioning (cognee/api/v1/integrations/routers/get_integrations_router.py:31-37,515-580); dashboard text saying hooks capture sessions and consolidate at session end (cognee-frontend/src/app/(app)/dashboard/partials/agentConnectionSteps.ts:117); MCP setup for both agents (examples/demos/company_brain/multi_source/README.md:159-215)."
+      },
+      "telemetry_and_network": "TELEMETRY (default on; README does not mention it): send_telemetry() POSTs JSON via aiohttp to https://test.prometh.ai, a Vercel-hosted analytics proxy (cognee/shared/utils.py:20-21,283-294,364-449; 5 s timeout, fire-and-forget). Disabled by any non-empty TELEMETRY_DISABLED or ENV=test|dev (utils.py:400-405; CLAUDE.md:905; .env.template:514). Payload: event name, anonymous_id (.anon_id above the package dir), persistent_id (~/.cognee/.persistent_id, survives forget(everything=True)), user_id, tenant_id, and api_key_tracking_id = PBKDF2 of LLM_API_KEY with a public default salt (utils.py:59-122,297-326). Only keys url, session_id, session_ids, datasets are hashed (utils.py:134); dataset_name is sent as-is by remember and forget events (cognee/api/v1/remember/remember.py:1275-1282; cognee/api/v1/forget/forget.py:92-102). Query text and system prompts go as lengths only (cognee/api/v1/search/routers/get_search_router.py:246-258). Events cover API calls, pipeline/task runs, search, remember/recall/forget/export, API exceptions and GLiNER installs (cognee/api/exception_telemetry.py:1-28; cognee/modules/cognify/config.py:139-141); 89 matches of send_telemetry( in 36 non-test files. Maintainers aggregate events daily from a MotherDuck warehouse (.github/workflows/telemetry-insights.yml:1-18). CI disables it except one job (release_test.yml:125-128). UI analytics are no-op stubs (cognee-frontend/src/modules/analytics/index.ts:1-5). OpenTelemetry/Langfuse export is opt-in (cognee/base_config.py:100-148). NETWORK/ACCOUNTS: none required for local use. With LLM_API_KEY set, LLM and embeddings default to OpenAI (README.md:150; .env.template:18-25). Keyless mode downloads models on first use (GLiNER about 750 MB, fastembed bge-small 67 MB; CLAUDE.md:844; cognee/infrastructure/databases/vector/embeddings/config.py:22-29) and runs pip/uv install of gliner2 and CPU torch from download.pytorch.org unless GLINER_AUTO_INSTALL=false (cognee/modules/cognify/config.py:34-35). cognee-cli -ui downloads frontend source from a GitHub tag zip and pulls docker image cognee/cognee-mcp:main (cognee/api/v1/ui/ui.py:184-197,647-652). Ladybug JSON extension is bundled with a remote fallback to extension.ladybugdb.com (cognee_db_workers/ladybug_extensions/README.md:3-16). Cognee Cloud is optional via serve/push (cognee/cli/commands/serve_command.py:27). Search queries/results are logged to the local DB by default (cognee/modules/search/operations/log_query.py:8); logs go to ~/.cognee/logs (cognee/base_config.py:27)."
+    },
+    "code": {
+      "languages": [
+        "Python (library, API, CLI, MCP server)",
+        "TypeScript/TSX (Next.js UI in cognee-frontend)",
+        "Shell",
+        "YAML (GitHub Actions, Helm, compose)"
+      ],
+      "entry_points": [
+        {
+          "path": "pyproject.toml:255-256",
+          "what": "cognee-cli console script -> cognee.cli._cognee:main (argparse; commands registered at cognee/cli/_cognee.py:95-121)"
+        },
+        {
+          "path": "cognee/api/client.py",
+          "what": "FastAPI app and start_api_server (python -m cognee.api.client, lines 487-539); default bind 0.0.0.0:8000"
+        },
+        {
+          "path": "entrypoint.sh",
+          "what": "Docker ENTRYPOINT: runs migrations, then gunicorn with one uvicorn worker on cognee.api.client:app (lines 32-63)"
+        },
+        {
+          "path": "cognee-mcp/src/server.py",
+          "what": "MCP server main() (console script cognee-mcp, cognee-mcp/pyproject.toml:99-101); stdio/http/sse; direct, API or Cloud mode"
+        },
+        {
+          "path": "cognee/__init__.py",
+          "what": "Python SDK exports (remember, recall, improve, forget, add, cognify, search, export, serve)"
+        },
+        {
+          "path": "cognee/api/v1/ui/ui.py",
+          "what": "cognee-cli -ui launcher: backend 8000, Next.js UI 3000, MCP docker container 8001 (cognee/cli/_cognee.py:318-330)"
+        },
+        {
+          "path": "cognee_db_workers/",
+          "what": "subprocess workers for embedded Ladybug and LanceDB that hold on-disk file locks (cognee/infrastructure/databases/graph/get_graph_engine.py:84-97)"
+        }
+      ],
+      "architecture": "Layered package cognee/: API (cognee/api/client.py + cognee/api/v1/*/routers) -> memory API (cognee/api/v1/{remember,recall,improve,forget}) over add/cognify/search/memify -> pipeline runner cognee/modules/pipelines/ -> tasks cognee/tasks/ -> domain modules cognee/modules/ (graph, retrieval/search, improve with 9 ordered stages, session_lifecycle, provenance, migration (COGX export/import), migrations, users/permissions, agents, integrations, observability) -> adapters cognee/infrastructure/ (relational SQLAlchemy/Alembic; graph Ladybug/Neo4j/Neptune/Postgres-demo; vector LanceDB/PGVector/Turso; session cache sqlite/postgres/redis/fs/tapes; LLM gateway on litellm). Per-user+dataset isolated databases when ENABLE_BACKEND_ACCESS_CONTROL (default true). cognee-mcp/ is a separate FastMCP package (in-process, via --api-url, or Cloud). cognee-frontend/ is the Next.js UI. Also cognee/eval_framework/, deployment/helm, distributed/deploy, catalog/. Optional agent mode makes the API exit when no agent connections remain (cognee/modules/agents/agent_mode.py:1-18).",
+      "packaging_and_release": "PyPI cognee: hatchling==1.32.0, pure-Python py3-none-any wheel plus sdist, packages cognee, cognee_db_workers, kuzu shim, bundled Ladybug JSON extension binaries (pyproject.toml:258-291; docs/supply_chain_provenance.md:94). Separate PyPI cognee-mcp (own version, tags cognee-mcp-v*) via release_mcp.yml, manual, main only (release_mcp.yml:16-17,61-81). release.yml is workflow_dispatch only: tags v<version>, GitHub Release with LLM-written notes, uv build, SLSA provenance attestation, PyPI Trusted Publishing with PEP 740 attestations, then uploads wheel, sdist, .sigstore.json and .intoto.jsonl to the release (release.yml:2-3,11-188). No standalone checksum file; verify with gh attestation verify or PyPI provenance (docs/supply_chain_provenance.md:76-110). Docker Hub cognee/cognee, cognee-ui, cognee-mcp for linux/amd64+arm64 with provenance mode=max and SBOM on release builds (release.yml:190-279,381-468); moving :main/:latest/main-<sha> tags come from dockerhub.yml without those options (dockerhub.yml:3-6,28-48). Weekly dev canaries .devYYYYMMDD (dev_canary_release.yml:3-7,56-57). Base images digest-pinned (Dockerfile:11,19,94); Dependabot covers Actions and Docker only (.github/dependabot.yml:1-6); uv exclude-newer 2 days (pyproject.toml:293-298).",
+      "tests_and_ci": "pytest (+asyncio, timeout, split, cov), ruff and ty via pre-commit (.pre-commit-config.yaml:1-21; pyproject.toml:204-223,315-321). Counted by file glob, not executed: 830 test_*.py under cognee/tests (634 unit/, 69 integration/, 72 top-level scenario scripts, plus e2e, journeys, cli_tests, api, deployment) plus 58 *_test.py; 7 files in cognee-mcp/tests; 60 jest files in cognee-frontend. unit/ and CLI unit tests need no credentials; integration/e2e need LLM keys or backends (cognee/tests/README.md:5-17,45-55); a bare pytest aborts at collection on 6 modules (README.md:32-38). 61 workflow files: PR gate test_suites.yml runs lock check + pre-commit, basic, e2e, CLI, mock-LLM product journeys, slow e2e, graph/vector/search DB matrices (Neo4j, Postgres), examples, notebooks, S3, MCP (ubuntu-22.04, Python 3.11 only: test_mcp.yml:14-17,31), docker compose, UI docker; OS matrix ubuntu-22.04 Python 3.10 and 3.14, macos-15 and windows-latest Python 3.13 (test_suites.yml:185-211), Python 3.11-3.13 on Ubuntu in release_test.yml:90-98; also nightly scheduler, nightly docker validation, performance reports, Scorecard. CI sets ENV=dev (telemetry off); one job runs telemetry on (release_test.yml:125-128). No test here exercises the Claude Code/Codex plugins; weekly-ticket-proposals.yml:96-109 installs the Claude plugin in an experiment.",
+      "dependencies": "pyproject.toml: 54 core requirement lines (52 distinct packages; onnxruntime and ladybug appear twice under markers), e.g. openai, litellm, instructor, sqlalchemy, alembic, fastapi, fastapi-users, lancedb, ladybug==0.19.0, fastembed, cryptography, dlt, pandas, enola-cli==0.4.26 (prebuilt Go binary) (pyproject.toml:22-119); 36 optional extras (121-249); dev dependency group 7 (416-425). cognee-mcp/pyproject.toml: 6 direct (cognee[postgres-binary,docs,neo4j]>=1.5.0,<2.0.0, fastmcp>=3.4.0, mcp, uv, httpx, torch) (lines 11-26). cognee-frontend/package.json: 26 dependencies + 23 devDependencies. Lockfiles: uv.lock, cognee-mcp/uv.lock, cognee-frontend/package-lock.json.",
+      "security_policy": "SECURITY.md: email security@cognee.ai with SECURITY in the subject; no supported-versions table or response-time commitment (SECURITY.md:1-6). Also an OSSF Scorecard workflow (.github/workflows/scorecard.yml), .gitguardian.yml, SHA-pinned actions and least-privilege token permissions in release workflows."
+    },
+    "claim_checks": [
+      {
+        "claim": "Runs locally with no API key; ingestion, retrieval and session storage work without an LLM; LLM-dependent improve stages skip (README.md:44-45,96,133)",
+        "verified": "yes",
+        "evidence": "Extractor auto picks local GLiNER without a key (cognee/modules/cognify/config.py:28,102-136); embeddings fall back to fastembed bge-small (cognee/infrastructure/databases/vector/embeddings/config.py:28-29,203-224); recall defaults to CHUNKS without an LLM (cognee/api/v1/recall/recall.py:648-660); improve stages return no_llm_configured (cognee/modules/improve/stages.py:189-190,241-242,466-467); cognee-cli demo needs no key (cognee/cli/commands/demo_command.py:55-66). Caveats: first-use model downloads and pip-installed torch (config.py:34-35). .agents/skills/cognee-install/SKILL.md:26 still says an LLM key is required; stale, README matches code."
+      },
+      {
+        "claim": "Session lessons are distilled into durable knowledge another session can retrieve (README.md:70)",
+        "verified": "partial",
+        "evidence": "improve() has nine ordered stages incl. persist_session_qa, extract_agent_context, distill_sessions (cognee/modules/improve/registry.py:27-36) but the text-drafting stages need an LLM (stages.py:189,241,466). MCP does not expose improve (cognee-mcp/README.md:503-507); in MCP API session mode entries stay in the session cache with no graph bridge (cognee-mcp/README.md:642-648); session cache has a default 7-day sliding TTL (cognee/infrastructure/databases/cache/config.py:67; cache/sql/SqlCacheAdapter.py:217-229)."
+      },
+      {
+        "claim": "Claude Code and Codex plugins install and capture memory (README.md:191-218)",
+        "verified": "not_checkable",
+        "evidence": "Plugin code is in topoteretes/cognee-integrations, outside this checkout (README.md:218; catalog/entries/integrations/claude-code.yaml:22-24; codex.yaml:22-24). In-repo docs disagree: README uses cognee-memory@cognee (README.md:195) but weekly-ticket-proposals.yml:101-104 uses cognee-memory@cognee-integrations with the comment 'Adjust the marketplace/plugin name if it differs'; the Codex catalog entry describes cognee-cli skill distribution (codex.yaml:10-20)."
+      },
+      {
+        "claim": "remember writes permanent memory, or a session when session_id is given (README.md:182)",
+        "verified": "yes",
+        "evidence": "cognee/api/v1/remember/remember.py:1265 sets mode session vs permanent; CLI supports -d and --session-id (cognee/cli/commands/remember_command.py:54-56; recall_command.py:51-53,68-69); MCP remember/recall take session_id (cognee-mcp/README.md:518-519)."
+      },
+      {
+        "claim": "forget removes a specific item or dataset (README.md:185)",
+        "verified": "yes",
+        "evidence": "cognee/api/v1/forget/forget.py:22-70 supports data_id, dataset, dataset_id, everything, memory_only and removes relational, graph, vector data and linked session entries (forget.py:191-366). Deletion is permanent: cognee-cli forget has no confirmation (CLAUDE.md:109; forget_command.py has no confirm option, unlike delete_command.py:30-32,81) and MCP forget(everything=True) deletes all owned data (cognee-mcp/src/server.py:631-701)."
+      },
+      {
+        "claim": "ENABLE_BACKEND_ACCESS_CONTROL=false is the single-user posture; default is multi-tenant with authentication (README.md:265)",
+        "verified": "yes",
+        "evidence": "cognee/modules/users/methods/get_authenticated_user.py:15-67: access control defaults on, auth required, REQUIRE_AUTHENTICATION=false ignored when access control is on; 401 help text at cognee/api/client.py:295-308."
+      },
+      {
+        "claim": "Requires Python 3.10-3.14 (README.md:86)",
+        "verified": "partial",
+        "evidence": "cognee: >=3.10,<3.15 (pyproject.toml:10); CI covers 3.10, 3.11-3.13, 3.14 on Ubuntu and 3.13 on macOS/Windows (test_suites.yml:185-211; release_test.yml:90-98). cognee-mcp, needed for MCP clients, is >=3.10,<3.14 (cognee-mcp/pyproject.toml:9) and its CI uses Python 3.11 on Ubuntu only (test_mcp.yml:14-17,31)."
+      },
+      {
+        "claim": "Entire memory layer can run on one Postgres (README.md:279-281)",
+        "verified": "partial",
+        "evidence": "Postgres graph adapter exists as postgres_demo, alias postgres (cognee/infrastructure/databases/graph/get_graph_engine.py:385-387) and is labelled demo, not production-ready (graph/postgres_demo/adapter.py:3-4); no raw Cypher or natural-language search (CLAUDE.md:381-383); PGVector and CACHE_BACKEND=postgres are supported (cognee/infrastructure/databases/cache/config.py:51)."
+      },
+      {
+        "claim": "BEAM scores 0.79 (100K) and 0.67 (10M) (README.md:287-294)",
+        "verified": "yes",
+        "evidence": "cognee/eval_framework/beam/REPORT.md:89-92 and the cross-run summary artifacts agree (means 0.7944 and 0.6674). Report is marked Preliminary, 10M is in-sample (REPORT.md:1,11,43); models were OpenAI gpt-5/gpt-5-mini with text-embedding-3-large, not keyless local mode (REPORT.md:130-139). All figures are project-run; no third-party measurement found in the repo."
+      },
+      {
+        "claim": "README presents a self-hosted, local knowledge graph (README.md:42-45) and says nothing about telemetry",
+        "verified": "partial",
+        "evidence": "Telemetry is on by default to https://test.prometh.ai (cognee/shared/utils.py:21,364-449); opt-out is documented only in CLAUDE.md:905 and .env.template:514; CI disables it except one job (release_test.yml:125-128)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "BEAM long-context conversational memory, 100K split: fixed hybrid retrieval, per-question-type prompts, 4 rounds x 20 questions on one held-out conversation; ingestion/answer/judge openai/gpt-5, embeddings text-embedding-3-large",
+        "metric": "mean BEAM rubric score (0-1)",
+        "value": "0.79 (artifact mean 0.7944, run std 0.0046)",
+        "source": "cognee/eval_framework/beam/REPORT.md:89-98,130-139; cognee/eval_framework/beam/report_artifacts/100k_fixed/hybrid_completion_20_20_qa_v1_cross_run_summary.json:2-12",
+        "independent": false
+      },
+      {
+        "what": "BEAM 10M split, exploratory: question-type routing selected and scored on the same 20 questions of one conversation, 5 rounds; distributed ingestion on Modal with gpt-5-mini (orchestration not public)",
+        "metric": "mean BEAM rubric score (0-1)",
+        "value": "0.67 (artifact mean 0.6674, run std 0.0197)",
+        "source": "cognee/eval_framework/beam/REPORT.md:89-92,102-108,271-289; cognee/eval_framework/beam/report_artifacts/10m_routed/routed_by_question_type_cross_run_summary.json:6-9",
+        "independent": false
+      },
+      {
+        "what": "BEAM 100K per-ability means (2 questions per ability, descriptive only)",
+        "metric": "mean BEAM rubric score (0-1)",
+        "value": "Information extraction 0.979; Knowledge updates 1.000; Preference following 1.000; Instruction following 1.000; Contradiction resolution 0.875; Summarization 0.802; Event ordering 0.788; Multi-session reasoning 0.500; Temporal reasoning 0.500; Abstention 0.500",
+        "source": "cognee/eval_framework/beam/REPORT.md:239-258",
+        "independent": false
+      },
+      {
+        "what": "Token cost of cognee memory vs full-context prompting on four 10-12k-token corpora; openai/gpt-5-mini, 3 sampled chunks each, single runs, chunk size 8191",
+        "metric": "ingestion multiplier / parity (queries)",
+        "value": "Fiction 5.7x / ~6; News 7.3x / ~8; Encyclopedic 6.5x / ~7; Dense synthetic 12.0x / ~13 (at chunk 4095: 8.0x/~9, 9.8x/~11, 10.3x/~12, 14.0x/~15)",
+        "source": "cognee/eval_framework/token_usage_analysis/README.md:54-67,83-86",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Telemetry is on by default and the README does not mention it. A persistent machine ID (~/.cognee/.persistent_id, kept across forget(everything=True)), user/tenant IDs and a key-derived ID go to https://test.prometh.ai unless TELEMETRY_DISABLED or ENV=test|dev is set (cognee/shared/utils.py:21,94-122,297-326,364-449). The sanitizer hashes only url/session_id/session_ids/datasets (utils.py:134), so dataset_name leaves in clear in remember and forget events (cognee/api/v1/remember/remember.py:1275-1282; cognee/api/v1/forget/forget.py:92-102); MCP default dataset names look like claude_code_memory (cognee-mcp/README.md:589-593).",
+      "The Claude Code and Codex integrations the README leads with are not in this repo, so capture hooks, deletion and recovery behavior are unverified here (README.md:218-230). In-repo docs disagree on plugin id and mode (weekly-ticket-proposals.yml:101-104; catalog/entries/integrations/codex.yaml:10-20), and the Claude Code catalog entry says local mode needs LLM_API_KEY and bootstraps a local cognee API (claude-code.yaml:12-16).",
+      "Sharing one memory between two agents needs a single process owning the embedded stores plus explicit scoping. Default stores are file-based; Ladybug holds an exclusive file lock in a worker, and the code says API delegation ensures a single process owns all file-based database connections (cognee/cli/api_dispatch.py:1-6; cognee/infrastructure/databases/graph/get_graph_engine.py:84-97). An MCP server without --api-url opens its own databases and sees a different, empty brain (examples/demos/company_brain/multi_source/README.md:161-164). MCP defaults each client to its own dataset (cognee-mcp/README.md:589-601); datasets made by a plugin sub-user are granted to that agent and its parent user only (cognee/modules/data/methods/create_authorized_dataset.py:21-23,39-53); with access control off all datasets share one graph and GRAPH_COMPLETION can cross datasets (cognee-mcp/README.md:603-609).",
+      "Learning features are LLM-gated and default to a hosted provider. With LLM_API_KEY set, LLM and embeddings default to OpenAI (README.md:150; .env.template:18-25); default recall routes to HYBRID_COMPLETION (an LLM call) and AUTO_FEEDBACK adds one LLM call per answered session turn (cognee/api/v1/recall/query_router.py:25; cognee/infrastructure/databases/cache/config.py:38-40,55). Keyless mode uses a GLiNER extractor the project calls a demo of an enterprise product, auto-runs pip installs from download.pytorch.org and downloads models at first use (cognee/modules/cognify/config.py:34-35,60-72). Adding an LLM key later flips the default embedder from fastembed to openai/text-embedding-3-large unless pinned (cognee/infrastructure/databases/vector/embeddings/config.py:19-29,203-224), and vectors from different embedding models are not comparable (.agents/skills/cognee-integrations/SKILL.md:65-73).",
+      "Deletion is permanent and sometimes unconfirmed; no backup/restore feature was found. cognee-cli forget has no confirmation and MCP forget(everything=True) wipes all owned data (CLAUDE.md:109; cognee-mcp/src/server.py:631-701); forget deletes relational, graph, vector and linked session data with no undo (cognee/api/v1/forget/forget.py:191-366). Recovery options are forget(memory_only=True) plus re-cognify, SDK-only COGX/JSON/GraphML/Cypher export (cognee/api/v1/export/export.py:12-69), CLI graph JSON export (cognee/cli/commands/datasets_command.py:53-55), HTTP markdown export (cognee/api/v1/activity/routers/get_activity_router.py:418-419) and stale-run recovery at startup (cognee/api/client.py:136-138). The hash-chained audit ledger is off by default (cognee/modules/cognify/config.py:20-22); session memory is a cache with a 7-day sliding TTL (cognee/infrastructure/databases/cache/config.py:67).",
+      "Durability of the default embedded storage. Ladybug had storage-corruption defects fixed in 0.18.2/0.19.1; macOS 13/14 stay on 0.17.x and remain exposed, and 0.19.1 segfaulted the DB worker in CI so 0.19.0 is pinned (pyproject.toml:80-98). A SIGTERM during a WAL write can leave a corrupted WAL on next start (cognee/api/client.py:169-186). A 100k-node graph cannot be written within the 300 s worker call limit on the file-based backend (.github/workflows/performance_report.yml:53-57). Default data roots resolve inside the cognee package directory (cognee/base_config.py:24-25; cognee/root_dir.py:3; CLAUDE.md:337), and a .env in the working directory or parents overrides shell env (cognee/shared/env_file.py:6,122), so location and provider config can vary by launch directory unless DATA_ROOT_DIRECTORY, SYSTEM_ROOT_DIRECTORY or COGNEE_ENV_FILE are set.",
+      "Network and auth defaults. The API binds 0.0.0.0 (cognee/api/client.py:487,537; entrypoint.sh:13); the README docker run publishes port 8000 with authentication off (README.md:258-265; cognee/modules/users/methods/get_authenticated_user.py:15-67). docker-compose.yml defaults CORS to *, a well-known default password, publishes debugger port 5678, runs gunicorn --reload via ENV=local, and starts RedisInsight:latest without a profile (docker-compose.yml:25,39,48,52-54,235-243; entrypoint.sh:54-60). API keys are stored in plaintext unless HASH_API_KEY=true (cognee/modules/users/api_key/hash_api_key.py:4). MCP http/sse bind 127.0.0.1 by default with Host/Origin guards (cognee-mcp/src/server.py:992; cognee-mcp/README.md:262-288).",
+      "Supply chain, scope and maintenance. Stable releases carry PEP 740/SLSA attestations and image provenance plus SBOM (release.yml:153-188,219-221), but README-documented moving tags (cognee/cognee:main; cognee/cognee-mcp:main pulled by cognee-cli -ui) come from dockerhub.yml without them (README.md:262; cognee/api/v1/ui/ui.py:647-652; dockerhub.yml:38-48). enola-cli, a prebuilt Go binary with wheels only in uv.lock, is a core dependency (pyproject.toml:112-114; uv.lock:2805-2816); Dependabot skips Python and npm (.github/dependabot.yml:1-6). Open-core: Postgres graph and GLiNER extraction are demos with licensed production versions (README.md:137,281). cognee-mcp has no license metadata, versions independently (0.5.6) and once sat unpublished for about seven weeks (cognee-mcp/pyproject.toml:1-32; release_mcp.yml:4-9). README news shows releases six days apart with a breaking dependency change (README.md:302-304); CODEOWNERS names six handles with one fallback owner (.github/CODEOWNERS:13-70)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "topoteretes/cognee",
+      "checks": [
+        {
+          "field": "readme.install[0] (pip/uv from PyPI)",
+          "statement": "uv pip install \"cognee[gliner]\" (base package: pip install cognee)",
+          "citation": "README.md:88-91,162 (corroborated by pyproject.toml:2,248; .github/workflows/release.yml:103-162)",
+          "holds": true,
+          "note": "README.md:88-91 gives `uv pip install \"cognee[gliner]\"` and says the gliner extra brings the local extractor used when no LLM key is set. README.md:162 says `cognee-cli demo` works with the base `pip install cognee`. The package name is cognee (pyproject.toml:2), the gliner extra is defined (pyproject.toml:248) and release.yml publishes to PyPI via pypa/gh-action-pypi-publish (lines 103-162). Whether PyPI actually serves 1.6.2 was not checked because that is outside the working directory."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX Apache-2.0, file LICENSE",
+          "citation": "LICENSE:1-3,189-201; pyproject.toml:12,16",
+          "holds": true,
+          "note": "LICENSE is the standard Apache License 2.0 text with 'Copyright 2024 Topoteretes UG' (line 189). pyproject.toml:12 declares license = \"Apache-2.0\" and line 16 has the OSI Apache Software License classifier."
+        },
+        {
+          "field": "platforms.linux_x86_64",
+          "statement": "yes - CI runs ubuntu-22.04 on Python 3.10, 3.11-3.13, 3.14; Docker image is linux/amd64+arm64 (release.yml:217); ladybug 0.19.0 and enola-cli ship manylinux x86_64 wheels (uv.lock:2812,4837)",
+          "citation": ".github/workflows/test_suites.yml:185-203; .github/workflows/release_test.yml:90-98; .github/workflows/release.yml:217; uv.lock:2812,4837",
+          "holds": true,
+          "note": "test_suites.yml:194-195 runs 3.10.x and 3.14.x on ubuntu-22.04. release_test.yml:95-96 runs 3.11-3.13 on ubuntu-22.04; that workflow triggers on PRs to main and workflow_dispatch (lines 14-24). The reusable workflow builds its matrix from those inputs (test_different_operating_systems.yml:50-55). uv.lock:2812 is the enola_cli-0.4.26 manylinux_2_17_x86_64 wheel and uv.lock:4837 is the ladybug-0.19.0 cp310 manylinux_2_27_x86_64 wheel. Citation nit: release.yml:217 is the dev-branch image step. The main-branch step (release.yml:234) and dockerhub.yml:43, which builds the README's cognee/cognee:main tag, also declare linux/amd64,linux/arm64, so the statement holds."
+        },
+        {
+          "field": "integrations.claude_code_or_codex",
+          "statement": "README documents a Claude Code plugin and a Codex plugin (hooks must be enabled), but plugin code is in topoteretes/cognee-integrations, not in this checkout. In-repo: plugin registry, per-plugin agent sub-user and API key provisioning, dashboard text about hook capture and consolidation at session end, MCP setup for both agents.",
+          "citation": "README.md:191-218; catalog/entries/integrations/claude-code.yaml:22-24; catalog/entries/integrations/codex.yaml:22-24; cognee/modules/integrations/plugins.py:17-25; cognee/api/v1/integrations/routers/get_integrations_router.py:31-37,515-580; cognee-frontend/src/app/(app)/dashboard/partials/agentConnectionSteps.ts:117; examples/demos/company_brain/multi_source/README.md:159-215",
+          "holds": true,
+          "note": "README.md:191-218 shows both install sequences, with hooks enabled first for Codex. Both catalog entries set repo: topoteretes/cognee-integrations (lines 22-24). A glob found no plugin.json, marketplace.json, .claude-plugin or top-level integrations/ in the checkout. KNOWN_PLUGINS lists claude-code and codex (plugins.py:17-25). provision_plugin creates or re-keys an agent sub-user with a labeled API key (router 31-37, 515-580). The dashboard text (line 117, Codex; line 91 is the Claude Code twin) says hooks capture the session and consolidate it at session end into 'your Cognee Cloud knowledge graph'; the dossier's paraphrase leaves out that it targets Cognee Cloud. The demo README (159-215) gives `claude mcp add ... uvx cognee-mcp --api-url` and the Codex [mcp_servers.cognee] block."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "Runs locally with no API key; ingestion, retrieval and session storage work without an LLM; LLM-dependent improve stages skip (verified: yes)",
+          "citation": "README.md:44-45,96,133; cognee/modules/cognify/config.py:28,34-35,102-136; cognee/infrastructure/databases/vector/embeddings/config.py:28-29,203-224; cognee/api/v1/recall/recall.py:648-660; cognee/modules/improve/stages.py:189-190,241-242,466-467; cognee/cli/commands/demo_command.py:55-66; .agents/skills/cognee-install/SKILL.md:26",
+          "holds": true,
+          "note": "graph_extractor defaults to \"auto\" (cognify/config.py:28), and resolve_extractor picks gliner_demo when keyless_local_defaults_apply() is true, meaning no usable LLM key and preflight not skipped (config_preflight.py:167-178). Embeddings fall back to fastembed BAAI/bge-small-en-v1.5 (embeddings/config.py:28-29, 216-223). recall defaults to SearchType.CHUNKS when no LLM is available (recall.py:653-660). Three improve gates return REASON_NO_LLM_CONFIGURED (stages.py:37, 189-190, 241-242, 466-467). The demo needs no key (demo_command.py:55-59). The caveats also hold: GLINER_AUTO_INSTALL defaults to true with a CPU torch index at download.pytorch.org (config.py:34-35), and SKILL.md:26 still says an LLM key is required. Session storage without an LLM is backed only by README.md:133; no cache code is cited for it."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

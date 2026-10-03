@@ -1,0 +1,366 @@
+{
+  "contender": "scip-code/scip",
+  "revision": {
+    "contender": "scip-code/scip",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "scip-code/scip",
+        "tag": "v0.10.0",
+        "commit": "1c2b6db7e560",
+        "exit": 0,
+        "error": null
+      },
+      {
+        "repository": "sourcegraph/zoekt",
+        "tag": null,
+        "commit": "153817f643cd",
+        "exit": 0,
+        "error": null
+      },
+      {
+        "repository": "universal-ctags/ctags",
+        "tag": "v6.2.1",
+        "commit": "b8eb0da41213",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.10.0",
+    "commit": "1c2b6db7e560",
+    "read_at": "2026-10-02T03:02:49+00:00"
+  },
+  "dossier": {
+    "contender": "scip-code/scip",
+    "revision": {
+      "tag": "v0.10.0",
+      "commit": "1c2b6db7e560",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "Apache-2.0 (scip, zoekt); GPL-2.0-or-later (universal-ctags)",
+      "file": "LICENSE (scip); _extra/sourcegraph__zoekt/LICENSE (zoekt); _extra/universal-ctags__ctags/COPYING (universal-ctags; sources say 'version 2 or (at your option) any later version', e.g. main/cmd.c:4-5, main/options.c:536-541)"
+    },
+    "purpose": "Three independent code-indexing components read together. Revisions read: scip-code/scip tag v0.10.0 (1c2b6db); sourcegraph/zoekt main @ 153817f643cd (no tag in the shallow clone; _extra/sourcegraph__zoekt/.git/packed-refs:2); universal-ctags/ctags tag v6.2.1 @ b8eb0da41213 (_extra/universal-ctags__ctags/.git/packed-refs:2-3). (1) SCIP: a Protobuf schema (scip.proto) for language-agnostic source-code index data (symbols, occurrences with definition/reference roles, relationships such as implementation and type definition, diagnostics), bindings in 7 languages, and a Go `scip` CLI that lints, prints, snapshots, tests, summarizes and converts index files; it contains no indexers, no query service and no MCP or language-server code (README.md:3-15; cmd/scip/main.go:22-30). (2) Zoekt: a positional-trigram source-code search engine with indexers, a web UI, a JSON HTTP API and a gRPC API; it shells out to Universal Ctags for symbol ranges used in ranking and `sym:` queries (_extra/sourcegraph__zoekt/README.md:7-23,35-36,131-140). (3) Universal Ctags: a C tag-file generator (116 C files in parsers/ plus parsers/cxx/ and 28 optlib/*.ctags definitions) with u-ctags/e-ctags/etags/xref/JSON output, a `readtags` query tool and a JSON-lines `--_interactive` mode (_extra/universal-ctags__ctags/README.md:11-16,34-40; man/ctags.1.rst.in:309-319). None of the three trees contains an MCP server, a language-server (LSP) client/server, symbol-level edit tooling, or a Claude Code/Codex integration (greps for mcp, claude, codex, language server, LSP found only comments, language names and zoekt's contributor-facing AGENT.md). Only the three directories in the working tree were read; linked external pages (docs.sourcegraph.com, sourcegraph.com/security, ctags-nightly-build, etc.) were not opened.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "SCIP is 'a language-agnostic protocol for indexing source code, which can be used to power code navigation functionality such as Go to definition, Find references, and Find implementations.'",
+          "citation": "README.md:3-6"
+        },
+        {
+          "claim": "Repository contents: a Protobuf schema (scip.proto); 'Rich Go and Rust bindings' with many utility functions for building tooling; auto-generated bindings for TypeScript and Haskell; and the `scip` CLI, 'which makes SCIP indexes a breeze to work with'.",
+          "citation": "README.md:8-15"
+        },
+        {
+          "claim": "Indexers that emit SCIP: scip-java (Java/Scala/Kotlin), scip-typescript, rust-analyzer, scip-clang, scip-ruby, scip-python, scip-dotnet, scip-dart, scip-php, debian-lsp. Other tools using SCIP: the Sourcegraph CLI (src-cli) and this repo's CLI.",
+          "citation": "README.md:35-52"
+        },
+        {
+          "claim": "CLI install: download binaries from the GitHub releases page, or `git clone https://github.com/scip-code/scip.git --depth=1; cd scip; go build ./cmd/scip`; usage via docs/CLI.md or --help.",
+          "citation": "README.md:54-65"
+        },
+        {
+          "claim": "Design doc (linked from the README): SCIP is 'a transmission format ... not a storage format for querying'.",
+          "citation": "docs/DESIGN.md:10-13 (linked from README.md:18)"
+        },
+        {
+          "claim": "Design doc non-goals: 'Support use cases involving code modifications' and 'Support efficient code navigation by itself' (navigation needs a bidirectional-lookup query engine); ease of writing consumers is also a non-goal.",
+          "citation": "docs/DESIGN.md:47-71"
+        },
+        {
+          "claim": "Zoekt is a 'text search engine intended for use with source code' with fast substring and regexp matching and a query language with boolean operators (and, or, not), over one or many repositories.",
+          "citation": "_extra/sourcegraph__zoekt/README.md:7-17"
+        },
+        {
+          "claim": "Zoekt ranks results using code-related signals such as whether the match is on a symbol; 'Because of its general design based on trigram indexing and syntactic parsing, it works well for a variety of programming languages'.",
+          "citation": "_extra/sourcegraph__zoekt/README.md:17-19"
+        },
+        {
+          "claim": "Zoekt recommends installing Universal ctags because 'symbol information is a key signal in ranking search results'.",
+          "citation": "_extra/sourcegraph__zoekt/README.md:35-36"
+        },
+        {
+          "claim": "Zoekt web server serves a search UI at http://localhost:6070; with `-rpc` it exposes a JSON search API at /api/search; it also exposes a gRPC API supporting structured queries and streaming results.",
+          "citation": "_extra/sourcegraph__zoekt/README.md:103-140"
+        },
+        {
+          "claim": "Zoekt publishes a container image ghcr.io/sourcegraph/zoekt containing the Zoekt binaries, git and universal-ctags; default command is zoekt-webserver against /data/index.",
+          "citation": "_extra/sourcegraph__zoekt/README.md:112-118"
+        },
+        {
+          "claim": "Universal Ctags is 'a maintained implementation of ctags' that generates an index (tag file) of language objects in source files so that editors and other tools can locate them.",
+          "citation": "_extra/universal-ctags__ctags/README.md:11-16"
+        },
+        {
+          "claim": "Major ctags features: more and improved language support (new C/C++ parser), fully extended optlib (define parsers from the command line), and interactive mode (experimental).",
+          "citation": "_extra/universal-ctags__ctags/README.md:34-40"
+        },
+        {
+          "claim": "ctags builds with Autotools on GNU/Linux, OSX or Windows 10 WSL; a Homebrew formula is offered for Mac; nightly (Unix-like) and daily (Windows) builds come from separate repositories.",
+          "citation": "_extra/universal-ctags__ctags/README.md:44-73"
+        }
+      ],
+      "install": [
+        {
+          "method": "scip CLI release binary (Linux and macOS). One-liner from the draft-release notes template; assets are scip-{linux,darwin}-{amd64,arm64}.tar.gz. TAG is the release tag. On Linux arm64 `uname -m` typically prints aarch64, which this sed does not map to the published 'arm64' asset name.",
+          "command": "env TAG=\"v0.10.0\" OS=\"$(uname -s | tr '[:upper:]' '[:lower:]')\" ARCH=\"$(uname -m | sed -e 's/x86_64/amd64/')\" bash -c 'curl -L \"https://github.com/scip-code/scip/releases/download/$TAG/scip-$OS-$ARCH.tar.gz\"' | tar xzf - scip",
+          "citation": ".github/workflows/release.yaml:73-82 (README.md:56 points to the releases page)"
+        },
+        {
+          "method": "scip CLI from source (needs Go >= 1.25.0)",
+          "command": "git clone https://github.com/scip-code/scip.git --depth=1 && cd scip && go build ./cmd/scip",
+          "citation": "README.md:59-63; go.mod:3"
+        },
+        {
+          "method": "zoekt from source with Go (Linux; Go >= 1.25.9 with toolchain go1.26.5; also needs `git` on PATH and, for symbols, a universal-ctags binary reachable as `universal-ctags` or via CTAGS_COMMAND)",
+          "command": "go install github.com/sourcegraph/zoekt/cmd/zoekt-git-index@latest && go install github.com/sourcegraph/zoekt/cmd/zoekt@latest && go install github.com/sourcegraph/zoekt/cmd/zoekt-webserver@latest",
+          "citation": "_extra/sourcegraph__zoekt/README.md:45,78,105; go.mod:150-152; doc/ctags.md:20-21; index/builder.go:290-300"
+        },
+        {
+          "method": "zoekt container image (linux/amd64 and linux/arm64; includes git and universal-ctags)",
+          "command": "docker run --rm -p 6070:6070 -v \"$PWD/index:/data/index\" ghcr.io/sourcegraph/zoekt",
+          "citation": "_extra/sourcegraph__zoekt/README.md:114-118; .github/workflows/docker.yml:57"
+        },
+        {
+          "method": "universal-ctags from source with Autotools (GNU/Linux, macOS, WSL). zoekt's doc/ctags.md additionally recommends `./configure --enable-json --enable-seccomp` (needs libjansson and libseccomp) for use with zoekt.",
+          "command": "git clone https://github.com/universal-ctags/ctags.git && cd ctags && ./autogen.sh && ./configure && make && make install",
+          "citation": "_extra/universal-ctags__ctags/README.md:65-73; _extra/sourcegraph__zoekt/doc/ctags.md:23-33"
+        },
+        {
+          "method": "universal-ctags prebuilt: Homebrew formula (Mac) or nightly tarballs from the ctags-nightly-build repo (Unix-like)",
+          "command": "No command is given in the README; it links the `universal-ctags` Homebrew formula (https://formulae.brew.sh/formula/universal-ctags) and https://github.com/universal-ctags/ctags-nightly-build/releases",
+          "citation": "_extra/universal-ctags__ctags/README.md:50-55"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - scip: release asset scip-linux-amd64 (.github/workflows/release.yaml:253-256) and CI on x86_64-linux (.github/workflows/ci.yaml:134-139); zoekt: CI on ubuntu-latest in an Alpine container (_extra/sourcegraph__zoekt/.github/workflows/ci.yml:10-11) and an amd64 container image (docker.yml:57); universal-ctags: tested on ubuntu-22.04/24.04 with gcc and clang (_extra/universal-ctags__ctags/.github/workflows/testing-on-ubuntu.yml:14-15).",
+        "wsl2": "unknown - no WSL mention for scip or zoekt (grep of *.md/*.rst/*.yml/*.nix found only one hit); universal-ctags README says the Autotools build works on 'GNU/Linux, OSX, or Windows 10 WSL' (_extra/universal-ctags__ctags/README.md:65).",
+        "macos_arm64": "unknown - scip: yes, release asset scip-darwin-arm64 built on macos-latest (release.yaml:261-263); universal-ctags: yes, Homebrew formula (README.md:54-55) and CI on macos-13/14/15 (testing-on-macos.yml:14; runner CPU architecture not stated in the workflow); zoekt: unknown - index/indexfile.go:15 build tag includes darwin and flake.nix:12-17 lists aarch64-darwin for its dev shell, but the README has no macOS instructions and CI is Linux-only (ci.yml:10-11); zoekt also expects a binary named `universal-ctags` (doc/ctags.md:20-21).",
+        "gpu": "no - none of the three uses a GPU; the only grep hits are language names (CUDA in scip.proto:864; ctags CUDA parser docs man/ctags-lang-cuda.7.rst.in)."
+      },
+      "integrations": {
+        "cli": "scip: `scip lint|print|snapshot|stats|test|expt-convert` (docs/CLI.md:28-35; cmd/scip/main.go:22-30). zoekt: 19 cmd/*/main.go binaries, e.g. `zoekt` search CLI with -jsonl and -sym flags (cmd/zoekt/main.go:166-177), zoekt-git-index, zoekt-index, zoekt-webserver, zoekt-indexserver, zoekt-local-sync and mirror tools (README.md:43-129). universal-ctags: `ctags` (u-ctags/e-ctags/etags/xref/json output), `readtags`, `optscript` (_extra/universal-ctags__ctags/Makefile.am:63,89,286; man/ctags.1.rst.in:309-319; man/readtags.1.rst.in:22-39).",
+        "mcp": "none found - grep for mcp / 'Model Context Protocol' across the scip tree, _extra/sourcegraph__zoekt and _extra/universal-ctags__ctags returned no hits.",
+        "sdk_or_api": "scip: Protobuf schema scip.proto plus bindings for Go (library with streaming parser, bindings/go/scip/parse.go:17-29), Rust (crate `scip`, bindings/rust/Cargo.toml:2), TypeScript (@scip-code/scip), Haskell, Java, Kotlin and .NET (buf.gen.yaml:3-25; release.yaml:85-244); no network API. zoekt: JSON HTTP API POST /api/search and /api/list when the webserver runs with -rpc (_extra/sourcegraph__zoekt/doc/json-api.md:3-31; web/server.go:242-244; internal/json/json.go:20-21), gRPC WebserverService Search/StreamSearch/List (grpc/protos/zoekt/webserver/v1/webserver.proto:11-18), and importable Go packages (root api.go types, query/, search/, index/). universal-ctags: JSON-lines `--_interactive` protocol over stdin/stdout with a `generate-tags` command (docs/interactive-mode.rst:7-67), tags/xref/etags/JSON output, and the libreadtags C library (libreadtags/readtags.c).",
+        "claude_code_or_codex": "none found - no plugin, skill, hook, slash-command or .mcp.json in any of the three trees; greps for claude|codex|LLM|copilot found only an unrelated zoekt test fixture. The only agent-related files are zoekt's AGENT.md (build/test/style guidance for coding agents working on zoekt itself, AGENT.md:1-26) and .agents/setup (environment bootstrap script for that repo)."
+      },
+      "telemetry_and_network": "scip CLI: no network code found - grep of cmd/ (non-test) and bindings/go for net/http, Dial, telemetry/analytics, Getenv found only help-text URLs (cmd/scip/main.go:65, test.go:30) and a NO_COLOR lookup (cmd/scip/print.go:43); it reads a .scip file or stdin (cmd/scip/option_from.go:16-29) and writes local files/SQLite; no account needed. Network appears only in CI/release: registry publishing (release.yaml) and scip-examples.yaml:111-126, which downloads src-cli from sourcegraph.com and uploads indexes with a repo secret. zoekt: no default phone-home found in the repo's own code; opt-in only: Google Cloud Profiler when GOOGLE_CLOUD_PROFILER_ENABLED is set (_extra/sourcegraph__zoekt/internal/profiler/profiler.go:12-25), Jaeger/OpenTelemetry (OTLP, endpoint from env) tracing when JAEGER_DISABLED / OPENTELEMETRY_DISABLED parse as false (internal/tracer/tracer.go:20-34; opentelemetry.go:49). The webserver serves Prometheus /metrics, /vars, /debug/* and optional /debug/pprof (internal/debugserver/debug.go:55-85), listens on ':6070' by default (cmd/zoekt-webserver/main.go:132), multiplexes gRPC on the same port (:289-291), runs a watchdog that GETs its own /healthz every 30 s with TLS verification disabled and exits with code 3 after 3 consecutive failures (:263-287, 424-452), and doc/design.md:309-315 states the UI is unauthenticated (no auth code appears in web/). Mirror tools call GitHub/GitLab/Gitea/Gerrit/Gitiles/Bitbucket Server APIs with user-supplied tokens (README.md:94-97); zoekt-sourcegraph-indexserver talks to a Sourcegraph frontend via -sourcegraph_url / SRC_FRONTEND_INTERNAL (cmd/zoekt-sourcegraph-indexserver/main.go:1457); the local path (zoekt-git-index + zoekt) needs no network. go.mod lists sourcegraph/log (line 31) and getsentry/sentry-go (line 94) but their code is not in the tree, so their runtime reporting behaviour is unverified. The container build downloads a ctags tarball from github.com/universal-ctags/ctags-nightly-build with a sha256 check (install-ctags-alpine.sh:40-45). universal-ctags: no sockets/HTTP/curl in main/, parsers/, libreadtags/, dsl/, extra-cmds/ (grep hits were comments/URLs); the only external process is `sort` via system() (main/sort.c:126-147; disable with configure --disable-external-sort, configure.ac:194-196); no telemetry; it auto-loads option files from ~/.ctags.d and ./.ctags.d (README.md:110-111)."
+    },
+    "code": {
+      "languages": [
+        "Go",
+        "Protocol Buffers",
+        "C",
+        "Rust",
+        "TypeScript",
+        "Java",
+        "Kotlin",
+        "C#",
+        "Haskell",
+        "Nix",
+        "Shell",
+        "JavaScript (reprolang tree-sitter grammar)",
+        "Python (ctags test helpers misc/units.py, misc/man-test.py)",
+        "Autotools (configure.ac, Makefile.am)"
+      ],
+      "entry_points": [
+        {
+          "path": "cmd/scip/main.go",
+          "what": "scip CLI main() (lines 15-20): urfave/cli v3 app with subcommands lint, print, snapshot, stats, test, expt-convert (lines 22-30, 60-69); version from cmd/scip/version.txt (0.10.0), '-dev' suffix with VCS info unless built with -X main.Reproducible=true (lines 35-58)."
+        },
+        {
+          "path": "scip.proto",
+          "what": "Protobuf schema (package scip): Index, Metadata, Document, Occurrence, SymbolInformation, Relationship, SymbolRole, Diagnostic, Language enum; symbol-string grammar at lines 148-194."
+        },
+        {
+          "path": "bindings/go/scip/parse.go",
+          "what": "Go library (module github.com/scip-code/scip/bindings/go/scip): IndexVisitor.ParseStreaming streaming reader (lines 17-29) plus canonicalize/flatten/sort/sanitize, symbol parse/format and range helpers; testutil/ backs `scip snapshot` and `scip test`."
+        },
+        {
+          "path": "_extra/sourcegraph__zoekt/cmd/zoekt-git-index/main.go",
+          "what": "zoekt indexer for a git repository: -branches (default HEAD), -incremental (default true), -delta, -submodules, -language_map (lines 38-50). 19 cmd/*/main.go binaries exist in total."
+        },
+        {
+          "path": "_extra/sourcegraph__zoekt/cmd/zoekt/main.go",
+          "what": "zoekt search CLI over a local index dir (-index_dir default ~/.zoekt); -jsonl output, experimental -sym symbol-only search (lines 166-177, 216-218)."
+        },
+        {
+          "path": "_extra/sourcegraph__zoekt/cmd/zoekt-webserver/main.go",
+          "what": "HTTP + gRPC search server: UI, optional JSON API (-rpc), optional pprof (-pprof), default listen :6070 (lines 128-312)."
+        },
+        {
+          "path": "_extra/universal-ctags__ctags/main/cmd.c",
+          "what": "ctags main() (line 19) -> ctags_cli_main (main/main.c:551); JSON-lines --_interactive loop at main/main.c:394 (built only with jansson); seccomp filter in main/seccomp.c:20-75."
+        },
+        {
+          "path": "_extra/universal-ctags__ctags/extra-cmds/readtags-cmd.c",
+          "what": "readtags main() (line 997): filter/sort/print entries of a tags file, binary search on sorted tag files (man/readtags.1.rst.in:22-60)."
+        }
+      ],
+      "architecture": "SCIP (Go workspace go.work with 3 modules: root github.com/scip-code/scip, bindings/go/scip, reprolang): scip.proto is the wire format; buf.gen.yaml generates Go (bindings/go/scip/scip.pb.go), TypeScript (bindings/typescript/scip_pb.ts), Rust (bindings/rust/src/generated/), Haskell, C#, Java, Kotlin bindings and docs/scip.md. bindings/go/scip adds hand-written helpers: parse.go (streaming IndexVisitor), canonicalize.go, flatten.go, sort.go (FindOccurrences by line/character), sanitize.go, symbol*.go (parser/formatter), position.go/occurrence_range.go, source_file.go, testutil/ (snapshot formatter and the `scip test` runner). cmd/scip/*.go are thin urfave/cli commands over that library: lint.go (symbol table, relationship, range and duplicate checks), print.go (pretty/JSON dump), snapshot.go, stats.go (gocloc + percentiles), test.go, convert.go (experimental SQLite export: documents, chunks with zstd-compressed occurrence blobs, global_symbols, mentions, defn_enclosing_ranges). reprolang/ is a tree-sitter toy language plus indexer used only to generate test indexes (docs/Development.md:19-23). Real language indexers live in other repositories (README.md:35-46). SCIP data model: Index{metadata, documents[], external_symbols[]}; Document{relative_path, language, occurrences[], symbols[], optional text}; Occurrence{range, symbol, symbol_roles bitset, syntax_kind, diagnostics[], enclosing_range}; SymbolInformation{symbol, kind, display_name, documentation, relationships[], signature_documentation, enclosing_symbol}; Diagnostic is per-occurrence index-time data (scip.proto:740-741, 810-835). Zoekt (Go module github.com/sourcegraph/zoekt): root api.go (result types: FileMatch with repo, commit Version, branches, Line/ChunkMatches, Symbol{Sym,Kind,Parent,ParentKind}), query/ (parser and AST), index/ (shard builder; mmap'ed on-disk shards with positional trigram posting lists, IndexFormatVersion 16; ctags integration in index/ctags.go; scoring in index/score.go and contentprovider.go), search/ (directory searcher with an fsnotify shard watcher, search/watcher.go), gitindex/ (git tree -> shards, shells out to `git cat-file`), web/ (HTML UI, /healthz), internal/json (/api/search, /api/list), grpc/ (WebserverService), internal/ctags (wrapper over sourcegraph/go-ctags speaking ctags --_interactive; can also drive a separate `scip-ctags` binary via SCIP_CTAGS_COMMAND, whose source is in none of the three trees), cmd/* (19 binaries: indexers, indexservers, mirrors for GitHub/GitLab/Gitea/Gerrit/Gitiles/Bitbucket Server, a Sourcegraph-specific indexserver). Universal Ctags (C, Autotools): main/ core (options, parse, entry, lregex regex engine, writer-{ctags,etags,json,xref}.c, interactive loop, seccomp), parsers/ (116 .c files, plus parsers/cxx/ with 23 .c files), optlib/ (28 regex/optscript-defined parsers), libreadtags/, extra-cmds/ (readtags), dsl/ (optscript), vendored gnulib/.",
+      "packaging_and_release": "scip: .github/workflows/release.yaml runs on push to main touching cmd/scip/version.txt or manual dispatch (lines 3-8); validates MAJOR.MINOR.PATCH (20-27); tags vX.Y.Z and bindings/go/scip/vX.Y.Z (41-56); creates a draft GitHub release with generated notes (58-83); then publishes crates.io (85-105), NuGet via OIDC trusted publishing (107-147), Hackage (149-171), Maven Central for Java and Kotlin with GPG signing configured (173-211), npm with provenance: true (213-244), and CLI binaries (246-304); a finalize job un-drafts the release only after all jobs succeed (306-316). CLI artifacts: scip-{linux,darwin}-{amd64,arm64}.tar.gz (contains `scip` and LICENSE; CGO_ENABLED=0; -X main.Reproducible=true) each with a sibling .sha256 (lines 253-304); no Windows asset; no signature, attestation or SBOM for the tarballs (grep for attest|cosign|slsa|sigstore found none); workflow actions are pinned by tag, not commit SHA (0 SHA-pinned `uses:` in .github/). Also `nix build .#scip` (flake.nix:23-42). zoekt: no release binaries; distribution is `go install ...@latest` plus a container image ghcr.io/sourcegraph/zoekt built by docker.yml on pushes to main and v* tags (linux/amd64+arm64, tags semver, major.minor, pseudo-version, latest, sha-<short>; lines 3-9, 39-44, 57); no signing/attestation steps found. Dockerfile:25 stamps `github.com/sourcegraph/zoekt.Version`, but the only package-level Version variable is index.Version (index/shard_builder.go:45-46), so the stamp likely has no effect. universal-ctags: manual release per docs/releasing.rst:75-95 (annotated tag, `make distcheck`/`make dist` tarball uploaded to a GitHub release; no checksum/signature step documented); a weekly auto-tag workflow (.github/workflows/tagging.yml:3-15); nightly/daily/snap builds live in separate repos (README.md:44-61) not present in the tree.",
+      "tests_and_ci": "scip: 19 Go test files (cmd/scip 4; bindings/go/scip 12 incl. memtest/ and testutil/; reprolang 3) using Go testing + testify (all modules), hexops/autogold (reprolang), rapid and gofuzz (bindings go.mod); reprolang/testdata holds 17 snapshot input + 17 output .repro files and 8 test_cmd files; Rust unit tests are inline in bindings/rust/src/symbol.rs (mod test, line 436). CI (all on ubuntu, Linux x86_64 only, pull_request trigger): ci.yaml runs a `fix` job (go mod tidy + nix-update on dependency PRs), then `nix build .#checks.x86_64-linux.<name>` for 9 checks (github-actions, formatting [prettier, buf format, gofmt, goimports, nixfmt], dotnet-bindings, go-bindings [build tag asserts], haskell-bindings, reprolang, reprolang-generated, rust-bindings, typescript-bindings; checks.nix) and `nix run .#<pkg>` followed by `git diff --exit-code` for scip and proto-generate (generated code must be current); dotnet-bindings.yaml and jvm-bindings.yaml check package versions against cmd/scip/version.txt and build/pack; scip-examples.yaml is a nightly cron that indexes 7 external OSS repos with scip-java/python/typescript/ruby/clang/dotnet and uploads to sourcegraph.com (not a test of this repo). That the Nix builds execute `go test`/`cargo test` is inferred from nixpkgs defaults (doCheck is not disabled in flake.nix/checks.nix); the repo does not state it. buf.yaml configures breaking-change rules (buf.yaml:15-17) but no CI step runs `buf breaking` or `buf lint` (grep found none). zoekt: 90 *_test.go files (unit, e2e ranking tests in internal/e2e, *_bench_test.go benchmarks); ci.yml runs `go test ./...` in an Alpine container with universal-ctags installed (lines 9-43), shellcheck, shfmt, buf lint/format/generate checks (45-101); buf-breaking-check.yml runs on PRs touching *.proto. universal-ctags: bespoke shell/Python harness; `make check` = tmain units tlib man-test check-genfile tutil (makefiles/testing.mak:8); about 1508 Units/**/expected.tags cases and 267 Tmain/*/run.sh cases; 22 active workflows (by file name: Ubuntu 22.04/24.04 with gcc+clang running `make check`, `roundtrip`, `dist` and sandbox tmain cases [testing-on-ubuntu.yml:14-56,74-76], macOS 13/14/15 [testing-on-macos.yml], Alpine, FreeBSD/NetBSD/OpenBSD, Cygwin, MSYS2, valgrind, coverage, cross-compiles, nmake, citre) plus circle.yml and appveyor.yml.",
+      "dependencies": "scip: root go.mod 9 direct + 20 indirect (go 1.25.0; urfave/cli/v3, protobuf, zombiezen.com/go/sqlite, klauspost/compress, hhatto/gocloc, k0kubun/pp/v3, montanaflynn/stats, testify, local bindings); bindings/go/scip/go.mod 8 direct (runtime: fatih/color, gotextdiff, sourcegraph/beaut, protobuf; test: go-cmp, gofuzz, testify, rapid) + 4 indirect; reprolang/go.mod 4 direct (autogold, go-tree-sitter, testify, local bindings) + 16 indirect; bindings/rust/Cargo.toml 1 dependency (protobuf =3.7.2) + 1 dev-dependency (pretty_assertions); bindings/typescript/package.json 1 dependency (@bufbuild/protobuf ^2.11.0) + 1 devDependency (typescript ^7.0.0); bindings/dotnet/Scip.csproj 1 (Google.Protobuf 3.34.2); bindings/haskell/scip.cabal 2 (proto-lens-runtime, base); bindings/java/pom.xml 2 (protobuf-java, protobuf-java-util); bindings/kotlin/pom.xml 3 (scip-java-bindings, protobuf-kotlin, kotlin-stdlib); flake.nix 2 inputs (nixpkgs nixos-26.05, flake-utils); lockfiles: go.sum, Cargo.lock, package-lock.json, flake.lock, bindings/dotnet/deps.json. zoekt: go.mod 58 direct + 80 indirect (138 requirements; go 1.25.9, toolchain go1.26.5) including grpc, protobuf, OpenTelemetry, Jaeger, Prometheus, go-git, go-enry, go-re2/wazero, cloud.google.com/go/profiler, code-host SDKs (GitHub, GitLab, Gitea, Gerrit, Bitbucket) and sourcegraph/{go-ctags,log,mountinfo}; runtime also needs the `git` binary (gitindex/catfile.go:41) and, for symbols, a universal-ctags binary built with +interactive (internal/ctags/parser_bins.go:104-105). universal-ctags: no package manifest; Autotools build needs a C compiler, GNU make, autoconf/automake (autogen.sh) and pkg-config; optional libraries auto-detected: libxml2 >= 2.7.7, jansson (JSON output and interactive mode), libseccomp (sandbox), libyaml, libpcre2-8 (configure.ac:706-868); vendored gnulib, libreadtags, dsl/optscript; packcc is built from source at build time (Makefile.am:72-86).",
+      "security_policy": "scip: none found (no SECURITY file at the root or in .github/, which holds only CODEOWNERS, ISSUE_TEMPLATE/sep.md, renovate.json and workflows). zoekt: _extra/sourcegraph__zoekt/SECURITY.md (3 lines) says 'Our security policy is documented at https://sourcegraph.com/security' (page not opened); doc/design.md:306-335 has a short security/threat-model section. universal-ctags: none found (no SECURITY file; README.md:130-132 only states CVE-2022-4515 does not affect it; docs/ grep for security/vulnerab found no reporting process)."
+    },
+    "claim_checks": [
+      {
+        "claim": "SCIP can power Go to definition, Find references and Find implementations (README.md:3-6).",
+        "verified": "partial",
+        "evidence": "Schema carries the data: Occurrence.symbol_roles (Definition, Import, WriteAccess, ReadAccess, Generated, Test, ForwardDefinition; scip.proto:524-546, 692-806) and Relationship.is_reference/is_implementation/is_type_definition/is_definition (scip.proto:465-517). But this repo ships no navigation/query component: CLI commands are lint, print, snapshot, stats, test, expt-convert (cmd/scip/main.go:22-30); docs/DESIGN.md:63-71 lists efficient navigation by itself as a non-goal; Go bindings only offer helpers such as FindOccurrences(line, character) (bindings/go/scip/sort.go:48). Producers (indexers) are in other repos (README.md:35-46); source text is not stored by default (scip.proto:101-106); Metadata has no commit/revision field (scip.proto:41-54); code modifications are a stated non-goal (docs/DESIGN.md:49-54); diagnostics are index-time Occurrence.diagnostics (scip.proto:740-741)."
+      },
+      {
+        "claim": "'Rich Go and Rust bindings ... include many utility functions' (README.md:11-12).",
+        "verified": "partial",
+        "evidence": "Go: yes - streaming parser (bindings/go/scip/parse.go:17-29), canonicalize/flatten/sort/sanitize, symbol parse/format, range helpers, SourceFile, testutil (bindings/go/scip/*.go). Rust: thin - hand-written code is write_message_to_file (bindings/rust/src/mod.rs:16-31) and symbol parse/format (bindings/rust/src/symbol.rs: parse_symbol, format_symbol_with, ...); everything else is generated (bindings/rust/src/generated/)."
+      },
+      {
+        "claim": "Docs describe the repo layout: TypeScript and Haskell bindings are auto-generated (README.md:13); `cmd/scip/tests/` holds test data and packages (docs/Development.md:18); TypeScript, Rust, Haskell, JVM and .NET bindings are auto-generated (docs/Development.md:13).",
+        "verified": "partial",
+        "evidence": "Code differs from the docs, prefer the code: bindings/java, bindings/kotlin and bindings/dotnet exist and are published (buf.gen.yaml:20-25; release.yaml:107-211) but README.md:13 omits them; `cmd/scip/tests/` does not exist at this revision (cmd/scip holds 13 files; test data is under reprolang/testdata/); the Rust binding is partly hand-written (bindings/rust/src/mod.rs, symbol.rs)."
+      },
+      {
+        "claim": "The `scip` CLI 'makes SCIP indexes a breeze to work with' (README.md:14-15); `expt-convert` converts an index to SQLite for inspection (docs/CLI.md:158-179).",
+        "verified": "partial",
+        "evidence": "Commands exist and match docs/CLI.md:28-35. `print --json` dumps the whole index (cmd/scip/print.go:64-66). Every command loads the entire index into memory via io.ReadAll + proto.Unmarshal (cmd/scip/option_from.go:31-37) even though a streaming parser exists (bindings/go/scip/parse.go:26-29). expt-convert is marked EXPERIMENTAL; it creates `signature` and `relationships` columns but never writes them, skips external and local symbols, and stores occurrences as zstd-compressed protobuf blobs in chunks of about 200 (cmd/scip/convert.go:26, 198-200, 289-291, 315, 423-486), so implementation/type-definition relationships are not queryable from the SQLite output at v0.10.0."
+      },
+      {
+        "claim": "Several indexers currently emit SCIP data: scip-java, scip-typescript, rust-analyzer, scip-clang, scip-ruby, scip-python, scip-dotnet, scip-dart, scip-php, debian-lsp (README.md:35-46).",
+        "verified": "not_checkable",
+        "evidence": "Indexers live in other repositories, not in the working tree. Indirect evidence only: .github/workflows/scip-examples.yaml:23-50 runs scip-java, scip-python, scip-typescript, scip-ruby, scip-clang and scip-dotnet nightly against 7 OSS repos (a Kotlin target is commented out with 'scip-java has problems with indexing Kotlin codebase', lines 27-30); scip-dart, scip-php, rust-analyzer and debian-lsp are not exercised here."
+      },
+      {
+        "claim": "scip CLI is available as release binaries or via `go build ./cmd/scip` (README.md:56-63).",
+        "verified": "yes",
+        "evidence": "release.yaml:246-304 builds linux/darwin x amd64/arm64 tarballs with a .sha256 each; go.mod:3 requires Go 1.25.0; a local build prints a '-dev' version with VCS info unless -X main.Reproducible=true is set (cmd/scip/main.go:35-58; release.yaml:285). No Windows asset. The curl one-liner in the release notes template maps only x86_64 to amd64 (release.yaml:80), so a Linux arm64 host reporting aarch64 would not match the published scip-linux-arm64 name."
+      },
+      {
+        "claim": "Zoekt's query language has boolean operators 'and, or, not' (_extra/sourcegraph__zoekt/README.md:15-17).",
+        "verified": "partial",
+        "evidence": "The parser reserves only `or` (query/parse.go:533-535); negation is the `-` prefix; conjunction is implicit; doc/query_syntax.md:91-92 states 'The word `and` is not an operator; it is interpreted as a search term.'"
+      },
+      {
+        "claim": "Zoekt exposes a JSON API with -rpc, a gRPC API, and a container image that runs zoekt-webserver (_extra/sourcegraph__zoekt/README.md:112-140).",
+        "verified": "yes",
+        "evidence": "-rpc defaults to false (cmd/zoekt-webserver/main.go:135) and mounts /api/ (web/server.go:242-244) serving /search and /list (internal/json/json.go:20-21); gRPC WebserverService has Search, StreamSearch, List (grpc/protos/zoekt/webserver/v1/webserver.proto:11-18) and is always multiplexed on the same port (main.go:289-291). Caveat not in the README: the image's default CMD is `zoekt-webserver -index /data/index -pprof -rpc` (Dockerfile:51), so the JSON API and pprof are enabled by default in the container; doc/design.md:309-315 describes the UI as unauthenticated and no auth code appears in web/."
+      },
+      {
+        "claim": "Zoekt uses ctags symbol info as a ranking signal and 'universal ctags will be called using seccomp' (README.md:35-36; doc/ctags.md:14-16).",
+        "verified": "partial",
+        "evidence": "Ranking use is confirmed: scoreSymbol = 7000 and symbol-kind boosts (index/contentprovider.go:596, 717-720; index/score.go:152-164). zoekt starts ctags through github.com/sourcegraph/go-ctags with only Options{Bin} set (internal/ctags/parser.go:99-105) and requires the binary to report +interactive (internal/ctags/parser_bins.go:104-105); whether sandbox mode is requested happens inside that dependency, which is not in the tree, so the seccomp claim is not checkable here. ctags itself implements the sandbox (_extra/universal-ctags__ctags/main/seccomp.c:20-75)."
+      },
+      {
+        "claim": "ctags generates reference tags only in limited areas, and interactive mode (JSON over stdio) is experimental (_extra/universal-ctags__ctags/README.md:40; man/ctags.1.rst.in:1655-1661).",
+        "verified": "yes",
+        "evidence": "Man page: reference-tag generation 'is new and limited to specific areas of specific languages' (man/ctags.1.rst.in:1655-1661); XTAG_REFERENCE_TAGS appears in 8 parsers/*.c files (python, cpreprocessor, c-based, gdscript, m4, ldscript, dtd, systemdunit). The interactive loop reads JSON-lines requests and is compiled only with libjansson (main/main.c:393-460; docs/interactive-mode.rst:7-13); configure auto-detects jansson and libseccomp instead of requiring them (configure.ac:818-838), so a default build can lack JSON output, interactive mode and the sandbox, and zoekt rejects a ctags without +interactive."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "zoekt query latency examples on the public cs.bazel.build instance (project calls them a historical snapshot; hardware and cache state unspecified; no independent measurement found in the working tree)",
+        "metric": "query time vs result count",
+        "value": "'hash host ssh': >20k results in 750 files in 3 s; 'hash host r:openssh': 6k results in 114 files in 20 ms; 'hash host r:openssh known_host': 4k results in 42 files in 13 ms",
+        "source": "_extra/sourcegraph__zoekt/doc/faq.md:20-27",
+        "independent": false
+      },
+      {
+        "what": "zoekt single-query latency, 'r:torvalds crazy' on cs.bazel.build (historical example)",
+        "metric": "latency",
+        "value": "about 7-10 ms; 'r:torvalds license' with 86k results takes 100 ms to 1 s, then several seconds to stream and render in a browser",
+        "source": "_extra/sourcegraph__zoekt/doc/faq.md:123-136",
+        "independent": false
+      },
+      {
+        "what": "zoekt indexing time (one historical benchmark)",
+        "metric": "wall time, single thread",
+        "value": "Linux kernel (55K files, 545M data) took about 160 s on an X250 laptop",
+        "source": "_extra/sourcegraph__zoekt/doc/faq.md:138-142",
+        "independent": false
+      },
+      {
+        "what": "zoekt resource footprint (project statements, not measurements with method)",
+        "metric": "index size relative to corpus; RAM",
+        "value": "index/shard about 3.5x corpus size (doc/design.md:68-70 says about 3x, :146-147 says about 3.5x); at least 20% more RAM than the corpus size",
+        "source": "_extra/sourcegraph__zoekt/doc/faq.md:109-115; _extra/sourcegraph__zoekt/doc/design.md:68-70,146-147",
+        "independent": false
+      },
+      {
+        "what": "SCIP range-encoding design benchmark (data and method not published)",
+        "metric": "total index payload size",
+        "value": "packed repeated-int32 ranges reduced payload by 50% versus a Range message; typed single/multi-line ranges add 'single-digit percent' overhead per index",
+        "source": "scip.proto:701-708; docs/DESIGN.md:73",
+        "independent": false
+      },
+      {
+        "what": "SCIP compression ratio (project statement, no method)",
+        "metric": "compressed size relative to uncompressed",
+        "value": "around 10%-20%",
+        "source": "docs/DESIGN.md:75",
+        "independent": false
+      },
+      {
+        "what": "SCIP Go streaming-parser regression test (a unit test, not a benchmark)",
+        "metric": "no out-of-memory under a Go runtime memory limit",
+        "value": "ParseStreaming over a synthetic ~128 MB index (1000 documents x 128 KiB text) with debug.SetMemoryLimit of about 1.25 MiB (10 documents' text) passes",
+        "source": "bindings/go/scip/memtest/low_mem_test.go:24-67",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope: none of the three trees contains an MCP server, language-server (LSP) client/server code, symbol-level edit tooling, or a Claude Code/Codex integration (greps for mcp|claude|codex|language server|LSP found only comments, language names and zoekt's contributor-facing AGENT.md:1-26 / .agents/setup). SCIP lists code modification and 'efficient code navigation by itself' as non-goals (docs/DESIGN.md:49-54, 63-71) and its diagnostics are index-time Occurrence.diagnostics (scip.proto:740-741, 810-835), not live post-edit diagnostics; any definition/reference/diagnostic answer from this bundle depends on separately built indexes.",
+      "Precision and freshness limits of structural indexes: ctags documents reference tags as 'new and limited to specific areas of specific languages' (_extra/universal-ctags__ctags/man/ctags.1.rst.in:1655-1661); zoekt's ctags-derived symbol offsets are best-effort ('For short symbol names, we will often determine the wrong offset'; Go multi-line declarations are skipped; _extra/sourcegraph__zoekt/index/ctags.go:152-158) and its results are text matches over whatever was last indexed from git branches (zoekt-git-index default -branches HEAD, cmd/zoekt-git-index/main.go:40; index refresh needs a re-run or zoekt-indexserver); SCIP precision depends on third-party indexers outside this repo (README.md:35-46; a Kotlin target is disabled in CI, scip-examples.yaml:27-30) and Metadata carries no commit/revision field to detect a stale index (scip.proto:41-54).",
+      "SCIP CLI/consumer gaps and write behaviour: no definition/reference lookup command (cmd/scip/main.go:22-30); the CLI loads the whole index into memory (cmd/scip/option_from.go:31-37) although a streaming parser exists (bindings/go/scip/parse.go:26-29); `expt-convert` is EXPERIMENTAL, never populates its signature/relationships columns, skips external and local symbols and stores occurrences as zstd blobs (cmd/scip/convert.go:198-200, 289-291, 315, 469-486); `scip snapshot` runs os.RemoveAll on its --to directory (default scip-snapshot) before writing (cmd/scip/snapshot.go:68) and `expt-convert` truncates its output file (convert.go:87).",
+      "zoekt network exposure and defaults: zoekt-webserver listens on ':6070' (all interfaces) by default (cmd/zoekt-webserver/main.go:132), serves indexed source via HTML, optional JSON API and always-on multiplexed gRPC (main.go:134-138, 289-291), and doc/design.md:309-315 describes the UI as unauthenticated (no auth code found in web/); the container image's default CMD enables -rpc and -pprof (Dockerfile:51); debugserver sets trace.AuthRequest to always allow (internal/debugserver/debug.go:58-60) and serves /metrics, /vars, /gc and /freeosmemory without auth (:55-85).",
+      "zoekt runtime dependencies and release hygiene: symbols require a universal-ctags binary built with +interactive on PATH as `universal-ctags` or via CTAGS_COMMAND (index/builder.go:290-300; internal/ctags/parser_bins.go:104-105); if none is found indexing proceeds without symbols unless -require_ctags is set, and ctags errors are otherwise logged and ignored (index/builder.go:969-978; index/ctags.go:73-81); `git` must be on PATH (gitindex/catfile.go:41); the image pins a ctags nightly dated 2024.01.07 (install-ctags-alpine.sh:10-15); distribution is `go install @latest` plus a container built from main/v* with no signing or attestation steps (docker.yml); Dockerfile:25 stamps a Version symbol that does not match index.Version (index/shard_builder.go:45-46); go.mod needs Go 1.25.9/toolchain 1.26.5 and has 138 requirements (go.mod:150-152); zoekt is read at main HEAD 153817f with no tag visible.",
+      "universal-ctags is C code parsing untrusted source: 6.2.1 is a bugfix release for crashes (R6 parser NULL dereference, Ada crash at EOF, C++ recursion limit; NEWS.rst:5-6, 21-39, 45-57); the seccomp sandbox exists only for `--_interactive=sandbox` on Linux, needs libseccomp and libjansson at build time, accepts only inline (stdin) content requests, and macOS support is a TODO (docs/interactive-mode.rst:71-104; main/seccomp.c:20-79; main/main.c:456-459); default `./configure` auto-detects rather than requires these (configure.ac:818-838); README calls interactive mode experimental (README.md:40); ctags auto-loads ./.ctags.d/*.ctags from the current directory (README.md:110-111); no security policy file.",
+      "Release integrity and maintenance: SCIP CLI tarballs ship only .sha256 files, no signatures/attestations (release.yaml:290-304), workflow actions are tag-pinned not SHA-pinned (0 SHA-pinned uses in .github/), schema is pre-1.0 (v0.10.0; ProtocolVersion has only an Unspecified value, scip.proto:56-58) and buf.yaml breaking-change rules are not run in CI; protocol changes need review by three CODEOWNERS handles (.github/CODEOWNERS:1-2); README/Development docs have drifted from the tree (README.md:13 omits JVM/.NET bindings; docs/Development.md:18 cites a nonexistent cmd/scip/tests/). ctags releases are manual tags and tarballs (docs/releasing.rst:75-95) with weekly auto-tags (tagging.yml:3-15) and no documented checksums/signatures; zoekt and ctags binaries come from workflows/repos that are not signed or not in the tree.",
+      "Licensing mix: scip and zoekt are Apache-2.0 (LICENSE; _extra/sourcegraph__zoekt/LICENSE); universal-ctags is GPL-2.0-or-later (COPYING; main/options.c:536-541) with some bundled files under other terms (dsl/es.c MIT-style permission notice, dsl/es.c:1-12; main/sort_r.h and main/portable-scandir.c public domain). zoekt's container image bundles a ctags binary alongside the Apache-2.0 zoekt binaries (Dockerfile:33-36; install-ctags-alpine.sh:3-50), while zoekt otherwise runs ctags as a separate process over stdio (internal/ctags/parser.go:99-105)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "scip-code/scip",
+      "checks": [
+        {
+          "field": "readme.install[0] (scip CLI release binary)",
+          "statement": "scip CLI release binary (Linux and macOS): `env TAG=\"v0.10.0\" OS=\"$(uname -s | tr '[:upper:]' '[:lower:]')\" ARCH=\"$(uname -m | sed -e 's/x86_64/amd64/')\" bash -c 'curl -L \"https://github.com/scip-code/scip/releases/download/$TAG/scip-$OS-$ARCH.tar.gz\"' | tar xzf - scip`; assets are scip-{linux,darwin}-{amd64,arm64}.tar.gz; on Linux arm64 `uname -m` prints aarch64, which the sed does not map to the published 'arm64' name.",
+          "citation": ".github/workflows/release.yaml:73-82 (README.md:56 points to the releases page)",
+          "holds": true,
+          "note": "release.yaml:76-81 echo lines unescape to exactly this command, with TAG filled from cmd/scip/version.txt (0.10.0; HEAD 1c2b6db = refs/tags/v0.10.0 in .git/packed-refs:2). Build matrix release.yaml:253-268 produces scip-linux-amd64, scip-linux-arm64, scip-darwin-arm64, scip-darwin-amd64, packed as $ASSET.tar.gz containing `scip` and LICENSE (:290), so `tar xzf - scip` extracts the binary. The sed at :79 maps only x86_64, so the aarch64 caveat is correct. README.md:56 links the releases page. The from-source alternative also holds: README.md:59-63 matches, and go.mod:3 and go.work:1 both say go 1.25.0. Nit: the asset names are at release.yaml:253-268/290, not inside 73-82."
+        },
+        {
+          "field": "license",
+          "statement": "Apache-2.0 (scip, zoekt); GPL-2.0-or-later (universal-ctags)",
+          "citation": "LICENSE; _extra/sourcegraph__zoekt/LICENSE; _extra/universal-ctags__ctags/COPYING; _extra/universal-ctags__ctags/main/cmd.c:4-5; _extra/universal-ctags__ctags/main/options.c:536-541",
+          "holds": true,
+          "note": "LICENSE:1-2 is the Apache License, Version 2.0, and every scip package manifest agrees (bindings/rust/Cargo.toml:5, bindings/typescript/package.json:11, bindings/haskell/scip.cabal:13, bindings/dotnet/Scip.csproj:28, bindings/java/pom.xml:18-23, bindings/kotlin/pom.xml:20-25, flake.nix:39 asl20). zoekt LICENSE:1-2 is Apache 2.0. ctags COPYING:1-2 is GNU GPL Version 2; main/cmd.c:4-5 says 'GNU General Public License version 2 or (at your option) any later version', and main/options.c:536-541 says 'either version 2 ... of the License, or (at your option) any later version', which is GPL-2.0-or-later."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - scip: release asset scip-linux-amd64 and CI on x86_64-linux; zoekt: CI on ubuntu-latest in an Alpine container and an amd64 container image; universal-ctags: tested on ubuntu-22.04/24.04 with gcc and clang.",
+          "citation": ".github/workflows/release.yaml:253-256; .github/workflows/ci.yaml:134-139; _extra/sourcegraph__zoekt/.github/workflows/ci.yml:10-11; _extra/sourcegraph__zoekt/.github/workflows/docker.yml:57; _extra/universal-ctags__ctags/.github/workflows/testing-on-ubuntu.yml:14-15",
+          "holds": true,
+          "note": "release.yaml:253-256 is runner ubuntu-latest, goos linux, goarch amd64, asset_name scip-linux-amd64. ci.yaml:134-139 runs `nix eval .#checks.x86_64-linux` and `.#packages.x86_64-linux`, and :157/:172 build and run them on ubuntu-latest. zoekt ci.yml:10-11 is `runs-on: ubuntu-latest` / `container: alpine:3`, running `go test ./...` at :43. docker.yml:57 is `platforms: linux/amd64,linux/arm64`. ctags testing-on-ubuntu.yml:14-15 has os [ubuntu-24.04, ubuntu-22.04] and compiler [gcc, clang], with `make check` at :54. All cited lines say what the dossier says."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "none found - grep for mcp / 'Model Context Protocol' across the scip tree, _extra/sourcegraph__zoekt and _extra/universal-ctags__ctags returned no hits.",
+          "citation": "grep over the working tree (scip root, _extra/sourcegraph__zoekt, _extra/universal-ctags__ctags)",
+          "holds": true,
+          "note": "I re-ran the grep, case-insensitive `\\bmcp\\b|model context protocol|modelcontextprotocol|mcp[-_]?server|\\.mcp\\.json`, excluding .git, across the whole working tree: 0 hits. A glob for files named *mcp*/*MCP* found nothing. A raw substring search for `mcp` matches only memcpy/wmemcpy/GetOEMCP in C sources and one go.sum hash (reprolang/go.sum:65), none of them MCP. So 'none found' holds; 'returned no hits' is literally true only for a word-bounded search."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "SCIP can power Go to definition, Find references and Find implementations (README.md:3-6) - verified: partial. The schema carries symbol roles and is_reference/is_implementation/is_type_definition/is_definition relationships, but the repo ships no navigation/query component (CLI: lint, print, snapshot, stats, test, expt-convert), efficient navigation by itself and code modification are non-goals, the Go bindings offer helpers such as FindOccurrences, indexers live in other repos, text is not stored by default, Metadata has no revision field, and diagnostics are index-time Occurrence.diagnostics.",
+          "citation": "README.md:3-6, 35-46; scip.proto:41-54, 101-106, 465-517, 524-546, 692-806, 740-741; cmd/scip/main.go:22-30; docs/DESIGN.md:49-54, 63-71; bindings/go/scip/sort.go:48",
+          "holds": true,
+          "note": "Every cited line checks out. README.md:3-6 has the quoted sentence. scip.proto:524-546 SymbolRole lists Definition, Import, WriteAccess, ReadAccess, Generated, Test, ForwardDefinition. :465-517 Relationship has the four booleans, with comments tying them to Find references/implementations and Go to (type) definition. symbol_roles is :728 inside Occurrence (:692-806), and :740-741 is per-occurrence diagnostics. :101-106 says indexers are not expected to include text by default. Metadata at :41-54 has only version/tool_info/project_root/text_document_encoding. main.go:22-30 registers lint, print, snapshot, stats, test and convert, and convert.go:33 names it expt-convert. DESIGN.md:49-54 and :63-71 are the code-modification and 'efficient code navigation by itself' non-goals. sort.go:48 is FindOccurrences; the non-generated Go bindings have no cross-document definition/reference lookup (only FindSymbol, FindSymbolBinarySearch, Document.SymbolTable, canonicalize/flatten/sort helpers). README.md:35-46 links every indexer to an external repo. 'partial' is a fair label."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

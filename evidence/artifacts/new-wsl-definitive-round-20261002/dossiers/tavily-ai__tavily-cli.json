@@ -1,0 +1,285 @@
+{
+  "contender": "tavily-ai/tavily-cli",
+  "revision": {
+    "contender": "tavily-ai/tavily-cli",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "tavily-ai/tavily-cli",
+        "tag": null,
+        "commit": "fd745230e6756933e3a190bfdc61ea1eb2db3993",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": null,
+    "commit": "fd745230e6756933e3a190bfdc61ea1eb2db3993",
+    "read_at": "2026-10-02T03:02:48+00:00"
+  },
+  "dossier": {
+    "contender": "tavily-ai/tavily-cli",
+    "revision": {
+      "tag": null,
+      "commit": "fd745230e6756933e3a190bfdc61ea1eb2db3993",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Python CLI (`tvly`, package `tavily-cli` 0.1.9, pyproject.toml:6-7) for Tavily's hosted web-data service: search, extract, crawl, map, deep research and feedback commands with Rich or `--json` output, plus `tvly init`, which authenticates and installs Tavily's eight agent skills for Claude Code, Codex and Cursor (README.md:3, 12, 85-91). The repo has no page-fetching, HTML/PDF-parsing or browser code; each command builds a kwargs dict and calls a remote client (e.g. `client.extract(**kwargs)`, tavily_cli/commands/extract.py:74). Need coverage: (1) Fetch chosen URLs and extract main text with metadata: `tvly extract <url>...` (max 20 URLs per call, extract.py:42,51-52; options --query, --chunks-per-source, --extract-depth basic|advanced, --format markdown|text, --include-images, --timeout, -o; extract.py:19-25) is shell-callable. The CLI reads, per URL, `url` + `raw_content`, plus `failed_results[].url/error` and `response_time` (tavily_cli/output.py:187-218). Page metadata beyond those fields (title, author, publish date, etc.) is not referenced anywhere in this repo; whatever else is returned is defined by the remote API/tavily-python SDK, which is not in this repo and was not read. (2) Bounded interaction with JavaScript-rendered pages (forms, sign-in, tabs, screenshots, PDF): no such command or code exists in this repo (repo-wide search for playwright/selenium/puppeteer/screenshot/pdf/chromium/webdriver/cookie found nothing; the only JS-related feature is the server-side `--extract-depth advanced` option, README.md:212-213).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "CLI and agent tools for the Tavily API: search, extract, crawl, map and research from the command line; the package provides the `tvly` command and depends on the official `tavily-python` SDK.",
+          "citation": "README.md:3-6"
+        },
+        {
+          "claim": "Content Extraction: 'Extract clean markdown from any URL'; `tvly extract` takes several URLs, optional `--query`, `--extract-depth basic|advanced`, `--format markdown|text`, `--include-images`, `--timeout` (1-60 s), `-o`.",
+          "citation": "README.md:14, 205-214, 426-437"
+        },
+        {
+          "claim": "'Advanced extraction for JS-heavy pages' is `tvly extract https://spa-app.com --extract-depth advanced`.",
+          "citation": "README.md:212-213"
+        },
+        {
+          "claim": "`tvly search` and `tvly extract` run without sign-in using keyless access with a fair-use rate-limit cap; `crawl`, `map`, `research` and `feedback` require authentication.",
+          "citation": "README.md:117-130"
+        },
+        {
+          "claim": "`--output` writes the structured JSON response regardless of file extension; `--format markdown` only controls content inside that response; `crawl --output-dir` saves each page as a Markdown file.",
+          "citation": "README.md:280-292"
+        },
+        {
+          "claim": "CLI for humans and AI agents: Rich output for humans, `--json` for agents; every command supports `--json`; `-` reads input from stdin for search and research.",
+          "citation": "README.md:12, 317-345"
+        },
+        {
+          "claim": "Exit codes: 0 success; 1 local setup/update error; 2 usage error; 3 auth failure, keyless cap or handled plan limit; 4 API error, setup live-search failure or update-check error.",
+          "citation": "README.md:358-366"
+        },
+        {
+          "claim": "`tvly init` detects Claude Code, Codex and Cursor, installs Tavily's eight core agent skills into `~/.agents/skills` (exposed to the selected agents), then verifies with a live search; no Node.js required.",
+          "citation": "README.md:85-91, 111"
+        },
+        {
+          "claim": "Browser OAuth uses Tavily's MCP endpoint and has known compatibility gaps; API-key authentication is needed for the full option set, streaming, structured output and async research.",
+          "citation": "README.md:163-165, 244-245"
+        },
+        {
+          "claim": "Setup always performs a live search, so it needs network access even with `--skip-skills`.",
+          "citation": "README.md:332-334"
+        },
+        {
+          "claim": "Requires Python 3.10+; install via guided curl|sh installer, uv, pipx, pip or from source; `tvly update` updates through the originating package manager.",
+          "citation": "README.md:23-71"
+        },
+        {
+          "claim": "Environment variables: `TAVILY_API_KEY` (highest priority, no login needed) and `TAVILY_HUMAN_ID` (optional identifier attached to every request for usage attribution).",
+          "citation": "README.md:519-532"
+        },
+        {
+          "claim": "`--include-domains` restricts search to listed domains (example sec.gov,reuters.com); `--client-name` sets `client_name` 'for attribution'.",
+          "citation": "README.md:194, 199-200, 400, 409"
+        },
+        {
+          "claim": "License: MIT.",
+          "citation": "README.md:539-541"
+        }
+      ],
+      "install": [
+        {
+          "method": "Guided installer (curl | sh)",
+          "command": "curl -fsSL https://raw.githubusercontent.com/tavily-ai/tavily-cli/main/install.sh | sh",
+          "citation": "README.md:27-29"
+        },
+        {
+          "method": "uv tool",
+          "command": "uv tool install tavily-cli",
+          "citation": "README.md:41-42"
+        },
+        {
+          "method": "pipx",
+          "command": "pipx install tavily-cli",
+          "citation": "README.md:44-45"
+        },
+        {
+          "method": "pip (inside a virtual environment)",
+          "command": "pip install tavily-cli",
+          "citation": "README.md:47-48"
+        },
+        {
+          "method": "From source",
+          "command": "git clone https://github.com/tavily-ai/tavily-cli.git\ncd tavily-cli\npip install -e .",
+          "citation": "README.md:55-59"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - README names no OS, but pyproject declares 'Operating System :: OS Independent' (pyproject.toml:20), the wheel is pure Python (pyproject.toml:56-57), Python >=3.10 (pyproject.toml:10), and installer/code special-case Linux display detection (install.sh:51-54, tavily_cli/oauth.py:413). No CI exists, so there is no upstream test-run evidence on Linux.",
+        "wsl2": "unknown - README and code never mention WSL (repo-wide search: no matches). On WSL sys.platform is 'linux' and, without DISPLAY/WAYLAND_DISPLAY, looks_headless() is true (tavily_cli/oauth.py:406-415), so no browser is auto-opened; the --no-browser OAuth flow still needs a 127.0.0.1 callback reachable from the browser (README.md:157-161). `tvly login --api-key` or TAVILY_API_KEY avoids the callback (README.md:145-148).",
+        "macos_arm64": "yes - same basis as Linux: OS-independent pure-Python package (pyproject.toml:20, 56-57), nothing architecture-specific in the code, installer's only OS branch is Linux (install.sh:51). README names no OS and there is no CI or test evidence on macOS.",
+        "gpu": "no - not used or needed; no local model or inference code, all processing is remote (tavily_cli/mcp_client.py:16; README.md:3)."
+      },
+      "integrations": {
+        "cli": "Yes - `tvly` console script (pyproject.toml:47-48) with subcommands init, login, logout, auth, search, extract, crawl, map, research [run|status|poll], feedback, update; no subcommand opens an interactive REPL; `--json` structured output, `--version`, `--status`, documented exit codes (tavily_cli/cli.py:19-55, 161-171; README.md:296-313, 358-366).",
+        "mcp": "No MCP server is provided (none found). The CLI is a client of Tavily's hosted remote MCP endpoint https://mcp.tavily.com/mcp, used only when the credential is an OAuth JWT: JSON-RPC tools/call for tavily_search, tavily_extract, tavily_crawl, tavily_map, tavily_research, tavily_get_research and tavily_feedback (tavily_cli/mcp_client.py:16, 33-75, 137-156; tavily_cli/config.py:538-545; README.md:163-165).",
+        "sdk_or_api": "No documented Python library API: tavily_cli/__init__.py only defines __version__. The CLI depends on the tavily-python SDK (>=0.7.25, pyproject.toml:30; README.md:5-6) and uses tavily.TavilyClient for API-key and keyless calls (tavily_cli/config.py:546-572) against Tavily's hosted API (api.tavily.com per tavily_cli/mcp_client.py:3-6). The base URL can be overridden through TAVILY_API_BASE_URL or config api_base_url, which the README does not document (config.py:277-283). `feedback` posts to {base_url}/feedback through the SDK session (feedback.py:50-55). Tavily API docs are at https://docs.tavily.com (README.md:3); not fetched.",
+        "claude_code_or_codex": "Yes, via skills: `tvly init --agent claude-code|codex|cursor` (or `--all`, `--yes`) installs eight Tavily skills (tavily-best-practices, tavily-cli, tavily-crawl, tavily-dynamic-search, tavily-extract, tavily-map, tavily-research, tavily-search) from tavily-ai/skills@ea5e8201b0d3ed9c10b70b71187589bd761fe2d2 into ~/.agents/skills. It links them into ~/.claude/skills, ~/.codex/skills and ~/.cursor/skills, honoring CLAUDE_CONFIG_DIR and CODEX_HOME (README.md:85-91, 93-115; tavily_cli/init_skills.py:17-30, 56-74, 100-157). The skill contents live in a separate repo and were not read. This repo contains no plugin manifest, MCP server config or hooks; .gitignore:33 only ignores a local .claude/ directory."
+      },
+      "telemetry_and_network": "No analytics/telemetry code: a repo-wide search for telemetry/analytics/sentry/posthog/mixpanel/opentelemetry and similar terms found nothing. No automatic update check or background call was found in cli.py; PyPI is contacted only by `tvly update` (tavily_cli/commands/update.py:37-47). Every Tavily request does carry identifiers by design: a per-terminal/agent session ID derived from the parent/grandparent PID and persisted in ~/.tavily/session.json (config.py:50-97), `client_source` ('tavily-cli' or 'tavily-cli-keyless'), optional `client_name`, and optional `human_id` from TAVILY_HUMAN_ID or config (config.py:266-274, 535-572). The MCP path sends them as headers x-client-source, x-client-name, mcp-session-id, X-Session-Id and X-Human-Id (mcp_client.py:52-67). Network endpoints: Tavily API via tavily-python (api.tavily.com per mcp_client.py:3-6); https://mcp.tavily.com for OAuth discovery/registration/token/revoke and MCP JSON-RPC (oauth.py:27-42, mcp_client.py:16); https://pypi.org/pypi/tavily-cli/json (update.py:23-24); https://codeload.github.com/tavily-ai/skills/tar.gz/<pinned commit> (only for `tvly init` with skills, init_skills.py:17-20). `tvly init` always runs a live search, even with --skip-skills (init.py:97-104; README.md:332-334). Accounts: none for keyless search/extract, which are rate-capped (README.md:117-130; config.py:557-572); a Tavily API key or Tavily OAuth login is required for crawl/map/research/feedback (crawl.py:55-60, map_cmd.py:45-51, research.py:155-168, feedback.py:89-98). URLs and queries passed to extract/search are sent to Tavily (extract.py:74). Credential resolution can refresh OAuth tokens over the network (config.py:443-475), including for `tvly auth` and `tvly --status`. Local state: ~/.tavily/config.json (0600, dir 0700; config.py:152-187), ~/.tavily/session.json (config.py:84-91), ~/.mcp-auth/ read and cleaned for Tavily tokens (config.py:354-389), skills under ~/.agents/skills (init_skills.py:117). OAuth login opens a loopback HTTP listener on 127.0.0.1 (random port, 180 s timeout; oauth.py:33, 452-476)."
+    },
+    "code": {
+      "languages": [
+        "Python",
+        "POSIX shell (install.sh)"
+      ],
+      "entry_points": [
+        {
+          "path": "pyproject.toml:47-48",
+          "what": "Console script `tvly` = tavily_cli.cli:main"
+        },
+        {
+          "path": "tavily_cli/cli.py:19-55,161-179",
+          "what": "click group `cli`; wires login/logout/auth/init/search/extract/crawl/map/research/feedback/update; no subcommand launches the REPL"
+        },
+        {
+          "path": "tavily_cli/commands/extract.py:17-82",
+          "what": "`tvly extract` - up to 20 URLs per call, keyless fallback, forwards options to client.extract"
+        },
+        {
+          "path": "tavily_cli/commands/search.py:19-117",
+          "what": "`tvly search` - supports --include-raw-content, domain/date filters, stdin query via '-'"
+        },
+        {
+          "path": "tavily_cli/commands/init.py:26-107",
+          "what": "`tvly init` - auth, skills install for claude-code/codex/cursor, CLI check, live search"
+        },
+        {
+          "path": "install.sh",
+          "what": "Guided POSIX installer; prefers uv, then pipx, then pip; hands off to `tvly init` on fresh interactive desktop installs"
+        },
+        {
+          "path": "tavily_cli/repl.py:106-176",
+          "what": "run_repl - interactive shell that dispatches into the click group"
+        },
+        {
+          "path": "tavily_cli/mcp_client.py:112-156",
+          "what": "McpTavilyClient - JSON-RPC client for https://mcp.tavily.com/mcp, used for OAuth credentials"
+        }
+      ],
+      "architecture": "Thin click-based client. cli.py defines the `tvly` group and imports one module per command in tavily_cli/commands/ (search, extract, crawl, map_cmd, research, feedback, init, auth, update). Commands assemble optional kwargs and call a client chosen in config.py (get_client / get_client_or_keyless): tavily.TavilyClient from the tavily-python SDK for tvly-* keys and for keyless mode, or mcp_client.McpTavilyClient (JSON-RPC tools/call to https://mcp.tavily.com/mcp) when the credential is an OAuth JWT. config.py also holds credential precedence (env > api_key > OAuth in ~/.tavily/config.json > legacy ~/.mcp-auth), file locking, session IDs and optional human_id/base URL. oauth.py implements native OAuth 2.1 + PKCE with dynamic client registration and a 127.0.0.1 callback. output.py renders Rich or JSON and sanitizes untrusted text via common.sanitize_control; common.py holds error/exit-code handling; keyless.py renders the keyless-cap envelope; init_skills.py downloads, checksum-verifies and installs the eight skills; commands/update.py detects pip/pipx/uv installs and shells out to the manager; repl.py is the interactive shell; theme.py is branding and spinner. All page fetching and extraction happens on the remote service; the repo contains no fetcher, parser or browser code.",
+      "packaging_and_release": "Build backend hatchling (pyproject.toml:1-3); wheel packages `tavily_cli` only (pyproject.toml:56-57); sdist includes tavily_cli, tests, install.sh, pyproject.toml, README.md and LICENSE (pyproject.toml:59-67); distributed on PyPI as `tavily-cli` (README.md:41-48; update.py:23-24). Version 0.1.9 (pyproject.toml:7); no git tag is visible in this shallow clone (.git/packed-refs lists only refs/remotes/origin/main; .git/shallow present). No release or publish workflow, checksums, signatures, SBOM or attestations exist in the repository (no .github/ directory; glob for .github/** is empty). The only integrity control in code is the skills archive, pinned to a commit and verified by SHA-256 (init_skills.py:17-20, 92-93). install.sh is fetched from the main branch and installs from PyPI via uv/pipx/pip without hash pinning (README.md:28; install.sh:137-175).",
+      "tests_and_ci": "pytest (dev extra, pyproject.toml:50-54). 5 test files in tests/: test_cli.py (3 tests), test_init.py (12), test_install_sh.py (10), test_oauth.py (36), test_update.py (29) = 90 `def test_` functions by grep; parametrization adds cases. Tests use click CliRunner, httpx.MockTransport, monkeypatch and pty-driven stub binaries for install.sh. Covered: CLI help and REPL text, `tvly init` and skills install/verify, install.sh behaviours, OAuth/config storage, update and install-method detection. A grep of tests/ finds no tests for the extract, crawl, map, research or feedback commands, output.py, sanitize_control or mcp_client.py. No CI: no .github/ directory and no other workflow, tox, nox or Makefile files in the repo. Ruff is configured (pyproject.toml:69-75) but nothing runs it automatically. Tests were not run for this dossier; counts are from static search.",
+      "dependencies": "pyproject.toml:29-39 lists 9 direct runtime dependencies: tavily-python>=0.7.25, click>=8.1.0, rich>=13.0.0, httpx>=0.27.0, packaging>=23.2, requests>=2.32.4, urllib3>=2.2.2, certifi>=2024.7.4, psutil>=5.9.0. requests, urllib3 and certifi are not imported anywhere in tavily_cli/ (grep), so they are declared but not used directly. Dev extra (pyproject.toml:50-54): pytest>=8.0.0, ruff>=0.4.0. Build requires hatchling (pyproject.toml:2). No lockfile or requirements*.txt exists. Transitive dependencies of tavily-python cannot be enumerated from this repo.",
+      "security_policy": "none - no SECURITY.md (and no .github/ directory). Not a policy, but in-code hardening exists: terminal-escape stripping of web/API-derived text (common.py:14-30, output.py:1-9); 0600/0700 permissions and atomic, flock-serialized config writes (config.py:139-187); OAuth PKCE S256, state check, HTTPS-only and issuer-pinned metadata (oauth.py:81-87, 107-132, 486-487); skills archive caps (25 MB total / 5 MB per file), SHA-256 pin, path/symlink rejection, no exec bits, scripts never executed (init_skills.py:32-33, 77-97, 178-226)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Extract clean markdown from any URL (README.md:14; `--format markdown|text`, README.md:433)",
+        "verified": "partial",
+        "evidence": "Option wiring is confirmed: `--format` markdown|text (extract.py:22) and the URL list are forwarded to the remote call `client.extract(**kwargs)` (extract.py:54-74). The repo has no local fetching or parsing code, so extraction quality, 'any URL' coverage and which metadata is returned are server-side and not checkable here. The CLI reads only results[].url/raw_content, failed_results[].url/error and response_time (output.py:187-218). The terminal view prints at most 3,000 characters per page (output.py:204); `--json`/`-o` emits the full response (output.py:96-108, 183-185). Code reading only, nothing executed."
+      },
+      {
+        "claim": "Advanced extraction for JS-heavy pages: `tvly extract <url> --extract-depth advanced` (README.md:212-213)",
+        "verified": "partial",
+        "evidence": "The option exists and is forwarded (extract.py:21, 59-60). Whether JavaScript is rendered is server-side behaviour and not checkable here. Nothing in the repo provides interactive browsing: the command list is init/login/logout/auth/search/extract/crawl/map/research/feedback/update (cli.py:161-171), and a repo-wide search for playwright/selenium/puppeteer/screenshot/pdf/chromium/webdriver/cookie found only OAuth 'headless' detection (oauth.py:406-415)."
+      },
+      {
+        "claim": "search/extract work without credentials via keyless access with a rate-limit cap; crawl, map, research and feedback require authentication (README.md:119-130)",
+        "verified": "yes",
+        "evidence": "config.py:557-572 builds a key-less TavilyClient when no credential resolves; extract.py:47,72,75-76 and search.py:65,107,110-111 handle TavilyKeylessLimitError (common.py:42-77, exit 3). crawl.py:60, map_cmd.py:50, research.py:167 and feedback.py:98 call require_api_key_friendly (config.py:575-605). The cap itself is enforced remotely; only its rendering is client-side. Code/README difference: README.md:502 says feedback 'Requires a Tavily API key', but require_api_key_friendly accepts any resolved credential including OAuth (config.py:575-587), and feedback routes OAuth credentials to MCP `tavily_feedback` (feedback.py:129-130)."
+      },
+      {
+        "claim": "Extract limits: `--chunks-per-source` 1-5 (requires `--query`), `--timeout` 1-60 s (README.md:431, 435); crawl `--allow-external` default true (README.md:454)",
+        "verified": "partial",
+        "evidence": "Only a 20-URL cap is enforced locally (extract.py:51-52); it is stated in the command docstring (extract.py:42) but not in the README. The 1-5 and 1-60 ranges and the --query dependency appear only in help text (extract.py:20, 24) and are forwarded unvalidated (extract.py:57-58, 65-66); enforcement, if any, is in the SDK/server (not read). crawl `--allow-external/--no-external` defaults to None and is sent only when given (crawl.py:23, 86-87), so 'default: true' is a server-side default."
+      },
+      {
+        "claim": "`--output` writes the structured JSON response regardless of file extension; `--format markdown` only affects content inside it (README.md:282-284)",
+        "verified": "yes",
+        "evidence": "print_extract_results routes both --json and -o through emit() (output.py:182-185), which json.dumps the full response to the file (output.py:96-106). Crawl is the only command that writes Markdown files (--output-dir; output.py:274-297, each file starting with `# <url>`)."
+      },
+      {
+        "claim": "`tvly init` detects Claude Code, Codex and Cursor and installs eight core skills into ~/.agents/skills, exposed to the selected agents; no Node.js (README.md:85-91, 111)",
+        "verified": "yes",
+        "evidence": "init_skills.py:21-30 lists exactly eight skills; 56-74 define and detect agent dirs (~/.claude, ~/.codex, ~/.cursor, honoring CLAUDE_CONFIG_DIR and CODEX_HOME); 117-147 install into ~/.agents/skills and symlink into each agent's skills dir (copy fallback at 288-293). The download is plain httpx from codeload.github.com, pinned to commit ea5e8201... and SHA-256 checked (17-20, 77-97), with no Node.js involved. The skill contents are in the separate tavily-ai/skills repo and were not read."
+      },
+      {
+        "claim": "`--json` for agents; every command supports `--json`; stdin via '-' for search/research (README.md:12, 337-345)",
+        "verified": "yes",
+        "evidence": "json_option is applied to search/extract/crawl/map/feedback/init/update (e.g. extract.py:27; common.py:100-110); research run/status/poll and login/logout/auth define their own --json (research.py:132,276,313; auth.py:29,190,255); group-level --json at cli.py:22. Stdin '-' is implemented for search (search.py:68-69) and research (research.py:162-163) but extract has no stdin handling; the README does not claim it for extract. In --json mode API errors print {error: ...} to stdout (common.py:127-131)."
+      },
+      {
+        "claim": "Exit codes 0/1/2/3/4 as tabulated (README.md:358-366)",
+        "verified": "yes",
+        "evidence": "Exit 3: keyless cap, OAuth refresh failure and 429/432 limits (common.py:54,77,90,97,154), missing key (config.py:525,605), init auth failure (init.py:68). Exit 4: API errors (common.py:131,157), init live-search failure (init.py:101,104), update-check failure (update.py:46). Exit 1: init skills/cli failures (init.py:89,94), update install/verify failures (update.py:51,66,84,90,104). Exit 2: click.UsageError (e.g. extract.py:52). Code reading only."
+      },
+      {
+        "claim": "Browser OAuth goes through Tavily's MCP endpoint and has known compatibility gaps; use an API key for the full option set, streaming, structured output and async research (README.md:163-165, 244-245)",
+        "verified": "yes",
+        "evidence": "OAuth JWT credentials select McpTavilyClient (config.py:538-545), which POSTs JSON-RPC tools/call to https://mcp.tavily.com/mcp (mcp_client.py:16, 33-75, 112-156). By code reading, `research --stream` iterates the client's return value as an SSE stream (research.py:185-209) while McpTavilyClient.research returns a parsed dict (mcp_client.py:149-150), so streaming yields nothing under OAuth, consistent with the README advice. Issue #24 (README.md:165) is outside the working directory and was not opened."
+      },
+      {
+        "claim": "`--client-name` sets client_name 'for attribution' (README.md:199-200, 409)",
+        "verified": "yes",
+        "evidence": "This is request/usage attribution sent to Tavily, not source citation: client_name is passed to TavilyClient (config.py:547-554, 563-571) or sent as the x-client-name header on the MCP path (mcp_client.py:58-59); TAVILY_HUMAN_ID is the analogous per-request identifier (config.py:266-274; README.md:523-524). Source attribution in outputs is by per-result `url` (output.py:191-197, 211-214), research `sources` with title/url (output.py:349, 378-381) and `--citation-format numbered|mla|apa|chicago` (research.py:128)."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Scope gap for page interaction: no forms, sign-in flows, tabs, screenshots or PDF commands and no browser-automation code; the command set is search/extract/crawl/map/research/feedback plus setup (tavily_cli/cli.py:161-171; README.md:296-313). The only JS-related feature is the server-side `--extract-depth advanced` (extract.py:21; README.md:212-213).",
+      "Retrieval happens on Tavily's servers, not locally: URLs and queries are sent to the service (extract.py:74), extract exposes no cookie/header/session options (extract.py:17-26), and pages needing the user's network or logged-in session are not addressable through it. Keyless search/extract is rate-capped (README.md:119-130); other commands need a Tavily key or OAuth login (crawl.py:55-60).",
+      "Output schema and metadata are not defined in this repo: extract fields come from the remote API/tavily-python (not read). The CLI references only url, raw_content, failed_results[].url/error and response_time (output.py:187-218). The terminal view prints at most 3,000 characters per page (output.py:204), so agents need `--json` or `-o` for the full payload (output.py:96-108, 183-185). README ranges (chunks 1-5, timeout 1-60) are not validated by the CLI (extract.py:20, 24, 57-66).",
+      "Weak assurance signals: no CI, release workflow, checksums, signatures or attestations; no SECURITY.md; no lockfile; pre-1.0 version 0.1.9 with 'Development Status :: 4 - Beta' (pyproject.toml:7, 17). The 90 test functions in 5 files do not exercise extract, crawl, map, research, feedback, output.py or mcp_client.py (grep of tests/).",
+      "Install/setup trust surface: README recommends `curl ... | sh` from the main branch (README.md:28); install.sh is unpinned and installs from PyPI without hash pinning (install.sh:137-175). `tvly init` writes third-party skill content from tavily-ai/skills (pinned commit + SHA-256, init_skills.py:17-20, 92-93) into ~/.agents/skills and the ~/.claude, ~/.codex and ~/.cursor skill dirs (init_skills.py:56-69, 117-147). Those skills steer agent behaviour and were not reviewed (separate repo), including `tavily-dynamic-search` (init_skills.py:25).",
+      "Credential and identity handling: OAuth access/refresh tokens (and client_secret when issued) are stored as plaintext JSON in ~/.tavily/config.json, mode 0600 (config.py:195-210, 167-187); legacy ~/.mcp-auth/**/*_tokens.json is scanned for Tavily tokens (config.py:354-366). Every request carries a persistent per-terminal/agent session ID, client_source and optional human_id/client_name (config.py:50-97, 535-572; mcp_client.py:52-67); no opt-out for the session ID or client_source was found.",
+      "OAuth/MCP path and config caveats: the README itself warns of compatibility gaps under OAuth (README.md:163-165); by code reading `research --stream` yields nothing useful with an OAuth credential (research.py:185-209 vs mcp_client.py:149-150). The undocumented TAVILY_API_BASE_URL can redirect SDK traffic (config.py:277-283). `tavily-python>=0.7.25` has no upper bound (pyproject.toml:30) and carries the keyless and response behaviour this CLI depends on.",
+      "Service and licensing scope: MIT covers the CLI code only (LICENSE:1-21; pyproject.toml:11); the hosted service's terms, its plan limits (HTTP 429/432 handled at common.py:123-154) and the licenses of dependencies such as tavily-python were not examined. Maintenance cadence is not assessable here: the clone is shallow (.git/shallow) and no tags are visible (.git/packed-refs)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "tavily-ai/tavily-cli",
+      "checks": [
+        {
+          "field": "readme.install[0] (Guided installer, curl | sh)",
+          "statement": "Install with `curl -fsSL https://raw.githubusercontent.com/tavily-ai/tavily-cli/main/install.sh | sh`.",
+          "citation": "README.md:27-29",
+          "holds": true,
+          "note": "README.md:28 matches the command character for character (lines 27 and 29 are the code fence). install.sh exists at this revision and installs the PyPI package `tavily-cli` (install.sh:4). For a fresh install it tries uv, then pipx, then pip. An existing uv, pipx or pip install is upgraded with the same tool (install.sh:137-175). Caveats that don't affect the statement: the pipe runs whatever install.sh is on `main` at run time, not this commit, and the pip fallback adds `--user` outside a virtual environment (install.sh:109-114)."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, license file LICENSE.",
+          "citation": "LICENSE:1-21; pyproject.toml:11, 19; README.md:539-541",
+          "holds": true,
+          "note": "LICENSE:1 reads 'MIT License', followed by the standard MIT permission and warranty text (LICENSE:5-21). pyproject.toml:11 `license = \"MIT\"` and the classifier 'License :: OSI Approved :: MIT License' (pyproject.toml:19) agree, as does README.md:539-541. The copyright holder is 'Alpha AI Technologies Inc.' (LICENSE:3), not 'Tavily' as in pyproject.toml:13. That doesn't change the license."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - README names no OS; pyproject declares OS Independent (pyproject.toml:20), pure-Python wheel (pyproject.toml:56-57), Python >=3.10 (pyproject.toml:10); installer/code special-case Linux display detection (install.sh:51-54, tavily_cli/oauth.py:413); no CI, so no upstream Linux test-run evidence.",
+          "citation": "pyproject.toml:10, 20, 56-57; install.sh:51-54; tavily_cli/oauth.py:413",
+          "holds": true,
+          "note": "Every citation matches. pyproject.toml:20 is 'Operating System :: OS Independent' and :10 is requires-python >=3.10. At :56-57 the wheel ships only `tavily_cli`, and that package contains only .py files. install.sh:51-54 checks `uname -s` = Linux with no DISPLAY/WAYLAND_DISPLAY, and oauth.py:413 checks `sys.platform == \"linux\"` the same way. A README grep for linux/macos/windows/wsl/darwin finds nothing. The full file listing has no .github/ or other CI. On Linux, config locking uses fcntl.flock; msvcrt is used only when os.name == 'nt' (config.py:110-136). The 'yes' rests on metadata and code reading, not a test run, which the dossier itself states."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Yes, via skills: `tvly init --agent claude-code|codex|cursor` (or --all, --yes) installs eight named Tavily skills from tavily-ai/skills@ea5e8201... into ~/.agents/skills and links them into ~/.claude/skills, ~/.codex/skills, ~/.cursor/skills, honoring CLAUDE_CONFIG_DIR and CODEX_HOME; no plugin manifest, MCP server config or hooks; .gitignore:33 only ignores .claude/.",
+          "citation": "README.md:85-91, 93-115; tavily_cli/init_skills.py:17-30, 56-74, 100-157; .gitignore:33",
+          "holds": true,
+          "note": "init.py:23-35 defines `--agent`, with choices taken from agent_specs() (claude-code, codex, cursor), plus `--all` and `--yes`. init.py:74-76 passes the selection to install_skills. init_skills.py:17-20 pins tavily-ai/skills@ea5e8201b0d3ed9c10b70b71187589bd761fe2d2 with a SHA-256 check (92-93). Lines 21-30 list exactly the eight named skills. Lines 60-68 use CLAUDE_CONFIG_DIR/CODEX_HOME or fall back to ~/.claude, ~/.codex and ~/.cursor. Line 117 sets the shared root ~/.agents/skills. Lines 142-147 expose each skill in the selected agents' skills dirs by relative symlink, copying if the symlink fails (288-293). .gitignore:33 is `.claude/`. The file listing has no plugin manifest, .mcp.json or hooks. Nuances: only selected agents get links; --all/--yes pick only agents whose config dir already exists (init.py:122-124); an existing real directory at the destination is replaced by a copy rather than a link (init_skills.py:283-286)."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "'Extract clean markdown from any URL' is verified=partial: --format markdown|text (extract.py:22) and URLs forwarded to client.extract(**kwargs) (extract.py:54-74); the repo has no local fetching or parsing code; the CLI reads only results[].url/raw_content, failed_results[].url/error and response_time (output.py:187-218); the terminal view prints at most 3,000 chars per page (output.py:204); --json/-o emit the full response (output.py:96-108, 183-185).",
+          "citation": "README.md:14, 433; tavily_cli/commands/extract.py:22, 54-74; tavily_cli/output.py:96-108, 182-218",
+          "holds": true,
+          "note": "README.md:14 and :433 match. extract.py:22 defines `--format` with choices markdown|text. extract.py:54-74 builds kwargs from the URLs and options and calls `client.extract(**kwargs)`. That covers both client types: the SDK TavilyClient for API-key and keyless use (config.py:546-572), and McpTavilyClient.extract for OAuth, which forwards kwargs unchanged as MCP tool arguments (mcp_client.py:140-141). output.py:187-218 reads only url, raw_content, failed_results url/error and response_time. Line 204 truncates each page to raw[:3000]. For --json or -o, lines 182-185 hand off to emit() (96-108), which json.dumps the whole response. Nothing in the repo fetches or parses pages, so 'partial' is the right rating."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

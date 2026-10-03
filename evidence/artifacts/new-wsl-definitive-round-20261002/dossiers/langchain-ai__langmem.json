@@ -1,0 +1,271 @@
+{
+  "contender": "langchain-ai/langmem",
+  "revision": {
+    "contender": "langchain-ai/langmem",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "langchain-ai/langmem",
+        "tag": null,
+        "commit": "9d033b47d9ce53e37e92c92241b0496c0278932e",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": null,
+    "commit": "9d033b47d9ce53e37e92c92241b0496c0278932e",
+    "read_at": "2026-10-02T03:02:20+00:00"
+  },
+  "dossier": {
+    "contender": "langchain-ai/langmem",
+    "revision": {
+      "tag": null,
+      "commit": "9d033b47d9ce53e37e92c92241b0496c0278932e",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Python library from LangChain (pyproject.toml version 0.0.30) for adding long-term memory to LLM agents. It provides: LLM-driven extraction and consolidation of memories (a stateless \"functional core\" plus a store-backed manager); LangChain tools an agent can call to create, update, delete and search memories in a LangGraph BaseStore; a background \"reflection\" executor; prompt optimizers; and message-history summarization. It ships no storage engine, CLI, MCP server, daemon, or Claude Code/Codex integration. Persistence is whatever LangGraph BaseStore the host application supplies, and every extraction step calls an external LLM provider.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "LangMem helps agents learn and adapt from their interactions over time; it provides tooling to extract important information from conversations, optimize agent behavior through prompt refinement, and maintain long-term memory.",
+          "citation": "README.md:3-5"
+        },
+        {
+          "claim": "It offers both functional primitives you can use with any storage system and native integration with LangGraph's storage layer.",
+          "citation": "README.md:7"
+        },
+        {
+          "claim": "Agents can continuously improve, personalize their responses, and maintain consistent behavior across sessions.",
+          "citation": "README.md:9"
+        },
+        {
+          "claim": "Key feature: 'Core memory API that works with any storage system'.",
+          "citation": "README.md:13"
+        },
+        {
+          "claim": "Key feature: 'Memory management tools that agents can use to record and search information during active conversations \"in the hot path\"'.",
+          "citation": "README.md:14"
+        },
+        {
+          "claim": "Key feature: 'Background memory manager that automatically extracts, consolidates, and updates agent knowledge'.",
+          "citation": "README.md:15"
+        },
+        {
+          "claim": "Key feature: 'Native integration with LangGraph's Long-term Memory Store, available by default in all LangGraph Platform deployments'.",
+          "citation": "README.md:16"
+        },
+        {
+          "claim": "Install with `pip install -U langmem`, then 'Configure your environment with an API key for your favorite LLM provider' (example: ANTHROPIC_API_KEY).",
+          "citation": "README.md:20-28"
+        },
+        {
+          "claim": "The memory tools work in any LangGraph app, and can be added to existing agents or used to build custom memory systems without agents.",
+          "citation": "README.md:60"
+        },
+        {
+          "claim": "InMemoryStore keeps memories in process memory and they are lost on restart; for production use AsyncPostgresStore or a similar DB-backed store to persist memories across server restarts.",
+          "citation": "README.md:62"
+        },
+        {
+          "claim": "The memory tools let you control what gets stored; the agent extracts key information, maintains memory consistency, and knows when to search past interactions.",
+          "citation": "README.md:64"
+        },
+        {
+          "claim": "The agent decides what and when to store a memory; no special commands needed, the agent uses create_manage_memory_tool.",
+          "citation": "README.md:82"
+        },
+        {
+          "claim": "The LLM can invoke create_search_memory_tool to search for memories with similar content; the hot path quickstart shows how to include memories without the agent explicitly searching.",
+          "citation": "README.md:84"
+        }
+      ],
+      "install": [
+        {
+          "method": "pip from PyPI (any platform; no Linux- or macOS-specific instructions given)",
+          "command": "pip install -U langmem",
+          "citation": "README.md:20-22"
+        },
+        {
+          "method": "From a source checkout with uv (used by the standalone examples README)",
+          "command": "uv venv && source .venv/bin/activate && uv sync",
+          "citation": "examples/standalone_examples/README.md:21-25"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes (indirect). The package is pure Python (no compiled code under src/, hatchling build backend: pyproject.toml:22-24). The docs workflow editable-installs it on ubuntu-latest with Python 3.12 (.github/workflows/deploy_docs.yml:34-62; Makefile:3-4). The README makes no platform statement, the CPU architecture is not stated, and no CI job runs the tests.",
+        "wsl2": "unknown. WSL/Windows is not mentioned anywhere in the README, docs, code or workflows (grep).",
+        "macos_arm64": "unknown. Not documented. The sample output in examples/standalone_examples/README.md:42-47 shows a run from a <private> path with Python 3.13, but gives no CPU architecture.",
+        "gpu": "no. No GPU or CUDA use or requirement: there is no local model inference, and LLM and embedding calls go to provider APIs through LangChain (README.md:24-28; runtime dependencies at pyproject.toml:8-17)."
+      },
+      "integrations": {
+        "cli": "none found. pyproject.toml has no [project.scripts]. The Makefile only wraps third-party `langgraph dev` and ruff for development (Makefile:17-25, 38-44).",
+        "mcp": "none found. No MCP server or client code or docs (grep for MCP / Model Context Protocol finds nothing).",
+        "sdk_or_api": "Python SDK only: functions exported at src/langmem/__init__.py:1-27 and listed in docs/docs/reference/index.md:8-34. It has no HTTP API of its own. When run under a LangGraph server, langgraph.json:3-17 exposes graphs `optimize_prompts` and `extract_memories` plus a store index config, and the server's store API is LangGraph's. RemoteReflectionExecutor calls a LangGraph server through langgraph_sdk (src/langmem/reflection.py:143-198).",
+        "claude_code_or_codex": "none found. No hooks, slash commands, plugin manifest, CLAUDE.md or AGENTS.md, and no Codex integration anywhere in the repo (grep). 'Claude' appears only as Anthropic model IDs (e.g. README.md:50). Docs show the tools used from custom Anthropic/OpenAI agent loops (docs/docs/guides/use_tools_in_custom_agent.md) and CrewAI (docs/docs/guides/use_tools_in_crewai.md)."
+      },
+      "telemetry_and_network": "No telemetry, analytics or phone-home code in src/ (grep for telemetry/analytics/posthog/sentry finds nothing there). The only analytics is Google Analytics on the docs website (docs/mkdocs.yml:179-181), which is docs-site only. src/ never reads os.environ and performs no file or database I/O. Required or likely network services: (1) An LLM provider API for every extraction, consolidation, query-generation, summarization and prompt-optimization step, via init_chat_model (src/langmem/knowledge/extraction.py:229, 779, 853); conversation text is embedded in the prompts (extraction.py:457-478). An API key is required (README.md:24-28), and langchain-openai and langchain-anthropic are both hard dependencies (pyproject.toml:11,14). (2) An embeddings provider for semantic search when the store is indexed; the README example uses `openai:text-embedding-3-small` (README.md:41-45), and the standalone README says to set OPENAI_API_KEY (examples/standalone_examples/README.md:27-31). (3) A persistent store backend (e.g. Postgres via LangGraph) for durability; langmem ships none (README.md:62). (4) Optional LangGraph server for RemoteReflectionExecutor (src/langmem/reflection.py:157-198; docs/docs/guides/delayed_processing.md:75-84). (5) Optional LangSmith: prompt-optimizer code wraps calls in langsmith `trace` spans (src/langmem/prompts/optimization.py:295,381; gradient.py:331,371; metaprompt.py:98,124; stateless.py:66,97,193,225). Whether spans are exported depends on LangSmith/LangChain environment settings outside this repo, which I did not verify. The repo's deployment auth module (src/langmem/graphs/auth.py:20-45, wired at langgraph.json:8-10) requires an X-Api-Key header validated against LangSmith's /auth/public endpoint. Docs build only: Google Analytics, a GitHub API key secret for git-committers (.github/workflows/deploy_docs.yml:63-64), and fetching docs.python.org objects.inv (docs/mkdocs.yml:65)."
+    },
+    "code": {
+      "languages": [
+        "Python (src/, tests/, examples/)",
+        "Jupyter notebooks (examples/intro_videos/*.ipynb)",
+        "Markdown/MkDocs docs (docs/)",
+        "YAML (GitHub Actions workflows, mkdocs.yml)",
+        "Makefile"
+      ],
+      "entry_points": [
+        {
+          "path": "src/langmem/__init__.py",
+          "what": "Public Python API (lines 1-27): create_memory_manager, create_memory_store_manager, create_manage_memory_tool, create_search_memory_tool, create_memory_searcher, create_thread_extractor, create_prompt_optimizer, create_multi_prompt_optimizer, ReflectionExecutor, Prompt. There are no console scripts."
+        },
+        {
+          "path": "src/langmem/knowledge/tools.py",
+          "what": "create_manage_memory_tool (create/update/delete by UUID key) and create_search_memory_tool; both return LangChain StructuredTools (lines 25-356 and 362-486)."
+        },
+        {
+          "path": "src/langmem/knowledge/extraction.py",
+          "what": "MemoryManager (stateless, returns ExtractedMemory lists), MemoryStoreManager (search, LLM, then put/delete in a BaseStore, plus get/search/put/delete helpers), create_memory_searcher, create_thread_extractor."
+        },
+        {
+          "path": "src/langmem/reflection.py",
+          "what": "ReflectionExecutor factory returning LocalReflectionExecutor (in-process thread plus in-memory priority queue, debounced per thread_id) or RemoteReflectionExecutor (LangGraph server runs via langgraph_sdk)."
+        },
+        {
+          "path": "src/langmem/short_term/__init__.py",
+          "what": "summarize_messages, asummarize_messages, SummarizationNode, RunningSummary, SummarizationResult (token-limit context summarization for LangGraph)."
+        },
+        {
+          "path": "langgraph.json",
+          "what": "LangGraph server deployment config: graphs optimize_prompts (src/langmem/graphs/prompts.py) and extract_memories (src/langmem/graphs/semantic.py:graph), auth (src/langmem/graphs/auth.py:auth), and store index (openai:text-embedding-3-small, 1536 dims)."
+        },
+        {
+          "path": "Makefile",
+          "what": "Dev targets: doctest (starts `langgraph dev` via uvx, then runs pytest on the docstring tests), ruff lint/format, mkdocs build/serve."
+        },
+        {
+          "path": "examples/standalone_examples/custom_store_example.py",
+          "what": "The only script with a __main__ guard: asyncio demo of create_memory_store_manager with an InMemoryStore and OpenAI embeddings."
+        }
+      ],
+      "architecture": "Pure-Python library (about 6.9k lines in src/langmem, much of it docstrings), layered on LangChain/LangGraph; there is no storage engine, server or local file I/O. src/langmem/knowledge/extraction.py: MemoryManager builds a `trustcall.create_extractor` call with Pydantic schemas and instructions, and returns inserts, updates and RemoveDoc items (deletes are off by default). MemoryStoreManager wraps it: it searches the BaseStore for up to query_limit (default 5) relevant memories, calls the manager, then writes `{kind, content}` values with store.aput and hard-deletes with store.adelete. Optional `phases` run extra consolidation passes. src/langmem/knowledge/tools.py provides the LLM-callable manage_memory and search_memory tools, taking the store from `store=` or the LangGraph context. src/langmem/utils.py: NamespaceTemplate resolves `{var}` namespace segments from RunnableConfig['configurable']. src/langmem/reflection.py is the background executor. src/langmem/prompts/ holds the gradient, metaprompt and prompt_memory optimizers (optimization.py, gradient.py, metaprompt.py, stateless.py); _layers.py is marked non-public and stateful.py is not imported anywhere. src/langmem/short_term/summarization.py provides message summarization. src/langmem/graphs/ holds the LangGraph-server graphs plus the LangSmith-header auth. src/langmem/graph_rag.py is entirely commented out. Persistence, vector indexing, TTL and history are delegated to whichever langgraph BaseStore the host supplies; langmem itself stores only `{kind, content}` (store manager, extraction.py:1114,1122) or `{content}` (tools, tools.py:301), with no provenance, author or version fields.",
+      "packaging_and_release": "Build backend is hatchling (pyproject.toml:22-24); wheel/sdist exclude tests, docs, evals and notebooks (pyproject.toml:76-92); version 0.0.30 (pyproject.toml:3). The only release workflow is .github/workflows/release.yml. It is manual (`workflow_dispatch`, line 7), runs on ubuntu-latest, pins uv 0.6.3 (lines 17-22), then `uv build` and `uv publish` with a long-lived `secrets.PYPI_API_TOKEN` (lines 30-36). Workflow permissions are `contents: read` only (lines 3-4), with no `id-token`, so there is no trusted-publishing or attestation step. I found no checksum, signature, SBOM or GitHub-release step, no test gate before publish, and no tag trigger. Actions are pinned by tag, not SHA (checkout@v4, setup-uv@v5, setup-python@v5). The checkout is shallow, so I could not list upstream tags.",
+      "tests_and_ci": "pytest (pytest.ini:1-4) with anyio (tests/conftest.py:4-6) and xdist (Makefile:23). There are 3 test modules under tests/: tests/test_docstring_examples.py, tests/short_term/test_summarization.py and tests/short_term/test_summarization_async.py. The two summarization modules hold 30 offline test functions (15 sync, 15 async) using a FakeChatModel (tests/short_term/utils.py:10). test_docstring_example (tests/test_docstring_examples.py:235-297) is one parametrized test that exec()s code blocks from README.md, docs/docs/**/*.md (CrewAI excluded, line 203-205) and every docstring in src/. It needs live LLM/embedding API keys and, per `make doctest`, a local `langgraph dev` server (Makefile:17-25), and it opens a LangSmith tracing context (line 272). I found no tests for knowledge/tools.py, MemoryStoreManager logic, reflection.py or utils.py beyond those docstring executions. tests/cassettes/ed2e87ca-...yaml records OpenAI and Anthropic HTTP traffic; no test code references it directly. CI is limited to .github/workflows/deploy_docs.yml (push/PR to main plus manual: `uv sync --group docs`, `make lint-docs` (ruff on docs/docs), `make build-docs` (mkdocs --strict), GitHub Pages deploy on main) and release.yml (manual publish). No workflow runs pytest or `make lint` (ruff on src/).",
+      "dependencies": "Manifests: pyproject.toml and uv.lock (revision 3, 163 locked packages including the dev and docs groups); no requirements.txt, setup.py or package.json. pyproject.toml:8-17 declares 8 direct runtime dependencies: langchain>=0.3.15, langchain-core>=0.3.46, langchain-openai>=0.3.1, trustcall>=0.0.39, langgraph>=0.6.0,<2, langchain-anthropic>=0.3.3, langsmith>=0.3.8, langgraph-checkpoint>=2.0.12. The dev group has 9 entries (pyproject.toml:26-37) and the docs group 14 (lines 38-53). uv.lock resolves langgraph 1.2.11, langchain 1.4.0, langchain-core 1.6.1, langchain-openai 1.6.0, langchain-anthropic 1.7.1, langsmith 0.12.1, langgraph-sdk 0.4.4 and trustcall 0.0.39 (uv.lock:1196-1273, 1401-1403, 1502-1503, 3443-3444). Imported but not declared directly: orjson (src/langmem/utils.py:5), langgraph_sdk (reflection.py:19), pydantic and typing_extensions (transitive); langgraph_api (graphs/auth.py:4) comes only from the dev extra or the LangGraph server runtime. langmem imports private/internal langgraph modules (`langgraph._internal._constants` at reflection.py:14; `langgraph.utils.config` at utils.py:9, tools.py:8, extraction.py:23). pyproject.toml:55-56 declares a uv workspace member `evals/gen` that is absent from the checkout because `evals/` is git-ignored (.gitignore:175); uv.lock has no entry for it.",
+      "security_policy": "none: no SECURITY.md or other security-policy file at the repo root, in .github/ (which holds only two workflow files), or elsewhere (glob for SECURITY*, CONTRIBUTING*, CODEOWNERS* finds nothing)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Core memory API that works with any storage system (README.md:13)",
+        "verified": "yes",
+        "evidence": "create_memory_manager returns MemoryManager (src/langmem/knowledge/extraction.py:217-534, 536-692), which takes an optional `existing` list and returns ExtractedMemory items with no store reference. docs/docs/guides/extract_semantic_memories.md:85 says it does not read or write a database. Caveats: the package hard-depends on langgraph and both LLM provider packages (pyproject.toml:8-17), and an LLM call is always required."
+      },
+      {
+        "claim": "Memory tools let agents record and search information during active conversations (README.md:14)",
+        "verified": "yes",
+        "evidence": "create_manage_memory_tool (src/langmem/knowledge/tools.py:25-356) supports create/update/delete by UUID key, writing `{content: ...}` (tools.py:297-303). create_search_memory_tool (tools.py:362-486) calls store.search. Both need a BaseStore, either `store=` or the LangGraph context (tools.py:489-497); otherwise they raise ConfigurationError."
+      },
+      {
+        "claim": "Background memory manager that automatically extracts, consolidates, and updates agent knowledge (README.md:15)",
+        "verified": "partial",
+        "evidence": "MemoryStoreManager.ainvoke/invoke (extraction.py:1006-1137, 1139-1280) does search, LLM and put/delete, but only when the host application calls it or calls ReflectionExecutor.submit; nothing schedules itself. The local executor is an in-process non-daemon thread with an in-memory PriorityQueue (reflection.py:264-270), so pending work is not persisted and the process will not exit until shutdown() is called (reflection.py:369-379). The remote executor creates LangGraph server runs (reflection.py:182-195). Consolidation only sees the top query_limit (default 5) retrieved memories (extraction.py:847, 1039)."
+      },
+      {
+        "claim": "Native integration with LangGraph's Long-term Memory Store, available by default in all LangGraph Platform deployments (README.md:16)",
+        "verified": "partial",
+        "evidence": "BaseStore integration is confirmed (tools.py:7-8, 489-497; extraction.py:12-16, 897-913; langgraph.json:11-17). 'Available by default in all LangGraph Platform deployments' depends on the platform and cannot be checked from this repo; docs/docs/hot_path_quickstart.md:111 says a Postgres-backed store is provided automatically."
+      },
+      {
+        "claim": "InMemoryStore loses memories on restart; use AsyncPostgresStore or a similar DB-backed store for persistence (README.md:62)",
+        "verified": "not_checkable",
+        "evidence": "Store implementations live in langgraph, which is not vendored here. In-repo facts: langmem contains no persistence code (no open()/sqlite/pathlib in src/). Every runnable sample constructs InMemoryStore (32 occurrences across 16 files) and there is no PostgresStore/from_conn_string usage anywhere (grep returns 0). examples/standalone_examples/README.md:13 lists a 'Persistent Store Example' as 'Coming Soon'."
+      },
+      {
+        "claim": "Quickstart needs only an LLM provider API key (README.md:24-28)",
+        "verified": "partial",
+        "evidence": "The README snippet also builds an index with `embed: openai:text-embedding-3-small` (README.md:41-45), which needs OpenAI credentials, but only ANTHROPIC_API_KEY is shown. examples/standalone_examples/README.md:27-31 does say to set OPENAI_API_KEY. The README uses the model alias `anthropic:claude-3-5-sonnet-latest` (README.md:50); whether that alias is still served was not checked."
+      },
+      {
+        "claim": "The agent 'knows when to search past interactions' (README.md:64)",
+        "verified": "partial",
+        "evidence": "The mechanism is plain LLM tool-calling. The search tool's default instructions are empty (`_MEMORY_SEARCH_INSTRUCTIONS = \"\"`, tools.py:359), so its description is one generic sentence (tools.py:476-478), while the manage tool carries explicit when-to-call guidance (tools.py:28-32). Behaviour depends on the model; the repo contains no evals (`evals/` is git-ignored, .gitignore:175; pyproject.toml:56)."
+      },
+      {
+        "claim": "create_memory_store_manager 'maintains a versioned history of all changes' (docstring, src/langmem/knowledge/extraction.py:1684-1685)",
+        "verified": "no",
+        "evidence": "Code differs from the docstring. The store manager writes with store.aput to the same namespace/key (extraction.py:1107-1124, 1132-1133) and hard-deletes with store.adelete (extraction.py:1126-1135, 1274-1278); the manage tool overwrites on update and hard-deletes on delete (tools.py:293-303). A grep of src/ for version/history/tombstone/restore/audit/undo finds only this docstring line. Any history would have to come from the BaseStore backend, not from this repo."
+      },
+      {
+        "claim": "create_memory_store_manager docstring: enable_deletes 'Defaults to True' (extraction.py:1706-1707)",
+        "verified": "no",
+        "evidence": "The factory default is False (extraction.py:1675). The MemoryStoreManager class default is True (extraction.py:845). Entries in `phases` default to enable_deletes=True (extraction.py:988), so phase managers can emit deletes even when the top-level flag is False. Deletes are applied as hard store.adelete / store.delete (extraction.py:1134, 1278). The manage_memory tool permits delete by default (tools.py:34-36)."
+      },
+      {
+        "claim": "'You can also process memories directly with `memory_manager.process(messages)`' (docs/docs/background_quickstart.md:82, linked from README.md:96)",
+        "verified": "no",
+        "evidence": "No `process` method exists in src/ (grep for `def process` finds nothing; the only occurrence is that docs line). Direct calls use invoke / ainvoke / __call__ (extraction.py:1006, 1139, 1282)."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Scope: this is a library, not a memory service. No CLI, MCP server, daemon, hook, or Claude Code/Codex integration exists (pyproject.toml has no scripts; grep for MCP/codex/claude-code finds nothing). Sharing one memory between two separate agent CLIs would need a host application or bridge that someone else writes. Durability and cross-process sharing depend entirely on an external LangGraph BaseStore, and every sample in the repo uses InMemoryStore (README.md:62; examples/standalone_examples/README.md:13).",
+      "Recovery and audit: updates overwrite the same key and deletes are hard deletes with no tombstone, undo or history (tools.py:293-303; extraction.py:1118-1135). The docstring promising a 'versioned history' (extraction.py:1684-1685) has no implementation. Stored values carry only {kind, content} or {content}, with no provenance, author, source-message or version fields (extraction.py:1114,1122; tools.py:301). No backup, export or audit feature is documented.",
+      "Delete controls are inconsistent and LLM-driven: manage_memory allows delete by default (tools.py:34-36); create_memory_store_manager defaults enable_deletes=False (extraction.py:1675) while its docstring says True (1706-1707), the class default is True (845), and `phases` default to True (988). The Local ReflectionExecutor queue is in memory and its worker is a non-daemon thread, so a short-lived process that never calls shutdown() will not exit (reflection.py:264-270, 369-379).",
+      "Every capture decision is an LLM prompt (extraction.py:185-206, 457-478), so results are non-deterministic and conversation text goes to the configured LLM provider. Semantic search needs an embeddings provider (README.md:41-45); the shipped langgraph.json and examples are wired to OpenAI/Anthropic, and a LangSmith key is required for the repo's deployment auth (graphs/auth.py:20-45). No benchmarks or evals are published, and `evals/` is git-ignored (.gitignore:175).",
+      "Test and CI coverage: no CI workflow runs pytest or ruff on src/ (only deploy_docs.yml and release.yml). The suite is 30 offline summarization tests plus a parametrized docstring runner that needs live API keys and a `langgraph dev` server (tests/test_docstring_examples.py:235-297; Makefile:17-25). There are no unit tests for tools.py, MemoryStoreManager, reflection.py or utils.py.",
+      "Compatibility: pyproject.toml:6 declares Python >=3.10, but extraction.py:69 evaluates `typing.NotRequired` (Python 3.11+) in a class body without `from __future__ import annotations`, and graphs/auth.py:2 imports it. By static reading, `import langmem` would fail on 3.10 (not executed here). The repo only exercises Python 3.11 and 3.12 (Makefile:19; deploy_docs.yml:43). langmem imports langgraph internals (`langgraph._internal._constants`, reflection.py:14; `langgraph.utils.config`, utils.py:9) against a wide range `langgraph>=0.6.0,<2` (pyproject.toml:13). The project is pre-1.0 (0.0.30), and _layers.py:1 says it is not public API and may change.",
+      "Release and supply chain: publishing is a manual workflow using a long-lived PyPI API token (release.yml:7,33-36), with no attestations, checksums or signatures, no tests before publish, and actions pinned by tag rather than SHA (release.yml:15,18,25; deploy_docs.yml:29). No SECURITY.md exists, so there is no documented vulnerability-reporting path. LICENSE is MIT (copyright 2025 LangChain); licenses of the 163 locked transitive packages were not audited.",
+      "Docs and code drift, plus dead code: docs reference a nonexistent `memory_manager.process` (background_quickstart.md:82) and missing scripts plus poetry (docs/README.md:5-6, 22-23). pyproject.toml:55-56 lists a workspace member that is not in the checkout. graph_rag.py is fully commented out. prompts/stateful.py is unused and hard-codes `claude-3-5-sonnet-latest` (stateful.py:17-19). _layers.py:139-142 calls create_memory_searcher with arguments its signature (extraction.py:695-700) does not accept. Examples pin Anthropic aliases such as `claude-3-5-sonnet-latest` (README.md:50), whose availability was not verified."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "langchain-ai/langmem",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Install from PyPI with `pip install -U langmem` (any platform; no Linux- or macOS-specific instructions given).",
+          "citation": "README.md:20-22",
+          "holds": true,
+          "note": "README.md:20-22 is a bash block containing exactly `pip install -U langmem`. The README gives no OS-specific instructions. The distribution name matches pyproject.toml:2 (`langmem`), and release.yml:30-36 builds and publishes to PyPI with `uv build` / `uv publish`. 'Any platform' is a fair reading of the single platform-neutral command. PyPI itself was not queried because it is outside the working directory."
+        },
+        {
+          "field": "license",
+          "statement": "License is MIT (SPDX MIT), in file LICENSE.",
+          "citation": "LICENSE:1-21; pyproject.toml:7",
+          "holds": true,
+          "note": "LICENSE:1 reads 'MIT License', LICENSE:3 reads 'Copyright (c) 2025 LangChain', and lines 5-21 are the standard, unmodified MIT permission and warranty text. pyproject.toml:7 declares `license = { file = \"LICENSE\" }`."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes (indirect): pure Python with a hatchling backend (pyproject.toml:22-24); the docs workflow editable-installs it on ubuntu-latest with Python 3.12 (deploy_docs.yml:34-62; Makefile:3-4); the README makes no platform statement, the CPU architecture is not stated, and no CI job runs the tests.",
+          "citation": "pyproject.toml:22-24; .github/workflows/deploy_docs.yml:34-62; Makefile:3-4",
+          "holds": true,
+          "note": "src/ contains only 24 .py files and no compiled code. pyproject.toml:22-24 sets hatchling. In deploy_docs.yml the job runs on ubuntu-latest (:34) with python-version '3.12' (:43), runs `uv sync --group docs` (:50) and `make build-docs` (:62); Makefile:3-4 runs `uv run --group docs --with-editable . python -m mkdocs build`. A repo-wide grep for x86/arm64/aarch64/amd64/macos/linux/windows/wsl finds no platform statement; the only hit is the identifier get_dialated_windows. pytest is installed (deploy_docs.yml:52) but never run, and release.yml:30-36 has no test step. The x86_64 part rests on GitHub's ubuntu-latest runner default, which matches the dossier's 'indirect'."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "None found: no hooks, slash commands, plugin manifest, CLAUDE.md/AGENTS.md or Codex integration (grep); 'Claude' appears only as Anthropic model IDs (e.g. README.md:50); the docs show the tools used from custom Anthropic/OpenAI agent loops and CrewAI.",
+          "citation": "README.md:50; docs/docs/guides/use_tools_in_custom_agent.md; docs/docs/guides/use_tools_in_crewai.md",
+          "holds": true,
+          "note": "A glob for CLAUDE.md, AGENTS.md, .claude/, .claude-plugin/, .codex/ and .mcp.json finds nothing. Greps for codex, 'claude code'/'claude desktop', slash, PreToolUse/PostToolUse/UserPromptSubmit and MCP/Model Context Protocol also find nothing. README.md:50 is 'anthropic:claude-3-5-sonnet-latest'. The custom-agent guide has an Anthropic loop (lines 17-141) and an OpenAI loop (143-264), and the CrewAI guide wires the tools into crewai Agents (21-48, 57-113). Minor wording slip that does not change the finding: 2 of 235 'claude' occurrences are model names in comments, not IDs ('Claude-based model' at src/langmem/prompts/stateless.py:45; 'Get next action from Claude' at use_tools_in_custom_agent.md:63). Both still refer to Anthropic models, never to Claude Code."
+        },
+        {
+          "field": "claim_checks[7]",
+          "statement": "The docstring claim that create_memory_store_manager 'maintains a versioned history of all changes' is verified 'no': updates overwrite the same key, deletes are hard deletes, and a grep of src/ for version/history/tombstone/restore/audit/undo finds only this docstring line.",
+          "citation": "src/langmem/knowledge/extraction.py:1684-1685, 1107-1124, 1126-1135, 1274-1278; src/langmem/knowledge/tools.py:293-303",
+          "holds": false,
+          "note": "The verdict 'no' and every code citation are correct. The docstring text is at extraction.py:1684-1685. Updates aput to the existing old_art.namespace/old_art.key (1107-1116, 1132-1133). Deletes go through store.adelete (1126-1135), or store.delete in the sync path (1274-1278). The manage tool calls adelete on delete (tools.py:293-295) and aput on the same key on update (297-302). Nothing in src/ keeps prior values. What fails as written is the evidence sentence 'a grep of src/ for version/history/tombstone/restore/audit/undo finds only this docstring line'. That case-insensitive grep returns 18 lines in src/, for example prompts/types.py:37 'Conversation history', gradient.py:168 'Async version of the reflection loop', short_term/summarization.py:303 'message history' and extraction.py:1734 'conversation history'. None of them is about memory versioning. Only the narrower pattern versioned|tombstone|restore|audit|undo returns extraction.py:1685 alone."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "claim_checks[7].evidence: replace 'A grep of src/ for version/history/tombstone/restore/audit/undo finds only this docstring line.' with 'A grep of src/ for versioned/tombstone/restore/audit/undo finds only this docstring line (extraction.py:1685); the other 17 lines in src/ that match \"version\" or \"history\" are unrelated, such as conversation/message history (prompts/types.py:37, prompts/optimization.py, short_term/summarization.py:303, extraction.py:1734) and \"Async/Sync version of ...\" docstrings (prompts/gradient.py:168, 209, 252, 277).' Keep verified: 'no' and the code citations unchanged."
+      ]
+    }
+  ]
+}

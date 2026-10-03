@@ -1,0 +1,250 @@
+{
+  "contender": "page:ubuntu-26-04-1-lts-canonical-wsl-image",
+  "revision": {
+    "contender": "page:ubuntu-26-04-1-lts-canonical-wsl-image",
+    "kind": "pages",
+    "pages": [
+      "https://releases.ubuntu.com/26.04.1/",
+      "https://documentation.ubuntu.com/wsl/latest/",
+      "https://ubuntu.com/about/release-cycle"
+    ],
+    "tag": null,
+    "commit": null,
+    "read_at": "2026-10-02T03:02:33+00:00"
+  },
+  "dossier": {
+    "contender": "page:ubuntu-26-04-1-lts-canonical-wsl-image",
+    "revision": {
+      "tag": null,
+      "commit": null,
+      "read_at": "2026-10-02T03:02:33+00:00"
+    },
+    "license": {
+      "spdx": null,
+      "file": null
+    },
+    "purpose": "Canonical's root-filesystem image of Ubuntu 26.04.1 LTS ('Resolute Raccoon') for the Windows Subsystem for Linux: file ubuntu-26.04.1-wsl-amd64.wsl (399M, modified 2026-08-27 14:17, 'WSL image for 64-bit PC (AMD64) computers'), listed at https://releases.ubuntu.com/26.04.1/ and described there as 'the root filesystem to be installed and launched by the Windows Subsystem for Linux'. Context pages: the Ubuntu on WSL docs landing page (the listed https://documentation.ubuntu.com/wsl/latest/ answers 301 to https://ubuntu.com/wsl/docs/latest/, which is the page actually read) and the Ubuntu release-cycle table (https://ubuntu.com/about/release-cycle). This is not a source repository: the working directory held only .round-meta.json, so there is no README, code, tag, commit or license file, and nothing could be checked against code; the README, install, platform and claim fields are filled from the three listed pages only. Pages were read with WebFetch, which summarizes, so quotes are as returned and may not be byte-exact; key values were cross-checked across 2 to 4 separate fetches. Not opened because they are outside the three listed pages: SHA256SUMS, SHA256SUMS.gpg, the *.manifest files, and every sub-page linked from the docs landing page (install how-to, CUDA how-to, data collection, firewall, distributions). This entry's 'repository' URL (https://ubuntu.com/download/server) is not in the page list and was not opened. The pages say nothing about any particular host; the one fact that bears on which image would be installed is that the /26.04.1/ directory lists two WSL images: ubuntu-26.04.1-wsl-amd64.wsl (399M, 2026-08-27 14:17) and ubuntu-26.04-wsl-amd64.wsl (396M, 2026-04-20 18:09).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Page title and heading: 'Ubuntu 26.04.1 LTS (Resolute Raccoon)'. The WSL section states: 'The WSL image is the root filesystem to be installed and launched by the Windows Subsystem for Linux.'",
+          "citation": "https://releases.ubuntu.com/26.04.1/"
+        },
+        {
+          "claim": "The link '64-bit PC (AMD64) WSL image' has href 'ubuntu-26.04.1-wsl-amd64.wsl' (relative; full URL https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl). Its table row: modified 2026-08-27 14:17, 399M, 'WSL image for 64-bit PC (AMD64) computers (standard download)'. Companion ubuntu-26.04.1-wsl-amd64.manifest: 16K, same timestamp, '(contents of live filesystem)'.",
+          "citation": "https://releases.ubuntu.com/26.04.1/"
+        },
+        {
+          "claim": "The same table also lists ubuntu-26.04-wsl-amd64.wsl (2026-04-20 18:09, 396M, '(standard download)') and ubuntu-26.04-wsl-amd64.manifest (16K), so two WSL images are present in the /26.04.1/ directory (13 files per version: 26.04 and 26.04.1, plus SHA256SUMS, SHA256SUMS.gpg and a netboot/ directory). No .torrent or .zsync is listed for either .wsl file (only for the ISOs).",
+          "citation": "https://releases.ubuntu.com/26.04.1/"
+        },
+        {
+          "claim": "Checksum files: SHA256SUMS (size column 588, 2026-08-27 22:43) and SHA256SUMS.gpg (833, 2026-08-27 22:43) are listed with empty description cells. The page has no sentence about verifying downloads, checksums, GPG or SHA256; its only help links are BitTorrent, Image Burning Guide and zsync.",
+          "citation": "https://releases.ubuntu.com/26.04.1/"
+        },
+        {
+          "claim": "Every image listed is AMD64 (page text: 'Choose this if you have a computer based on the AMD64 or EM64T architecture ... Choose this if you are at all unsure.'). The page opens with 'Ubuntu is distributed on eight types of images described below.' but has four image-type sections (Desktop image, Server install image, Netboot tarball, WSL image). Footer: '© 2025 Canonical Ltd. Ubuntu and Canonical are registered trademarks of Canonical Ltd.'",
+          "citation": "https://releases.ubuntu.com/26.04.1/"
+        },
+        {
+          "claim": "'Windows Subsystem for Linux (WSL) enables developers to run a GNU/Linux environment on Windows.' and 'Ubuntu on WSL provides a fully-featured Ubuntu experience on Windows, suitable for learning Linux, developing a personal open-source project, or building for production in an enterprise environment.'",
+          "citation": "https://ubuntu.com/wsl/docs/latest/ (301 target of the listed https://documentation.ubuntu.com/wsl/latest/)"
+        },
+        {
+          "claim": "'Ubuntu Pro for WSL is a tool for managing Ubuntu on WSL. It enables automatic attachment of your Pro subscription to Ubuntu instances, and remote deployment with Landscape.' Ubuntu on WSL is described as 'an open-source project'.",
+          "citation": "https://ubuntu.com/wsl/docs/latest/"
+        },
+        {
+          "claim": "Landing-page navigation (link titles only; targets not opened) includes: Install Ubuntu on WSL; Upgrade Ubuntu; Automatic setup of Ubuntu with cloud-init; Customize an Ubuntu image for WSL; Enabling GPU acceleration with CUDA; Ubuntu distributions; WSL instance configuration; Firewall requirements for Ubuntu on WSL; Comparing WSL versions for Ubuntu on WSL; Security overview for Ubuntu on WSL; Data collection and Ubuntu on WSL; GitHub actions for Ubuntu WSL; QA process.",
+          "citation": "https://ubuntu.com/wsl/docs/latest/"
+        },
+        {
+          "claim": "The landing-page prose never mentions 'WSL 2'/'WSL2'/'WSL 1', systemd, NVIDIA, checksum, download, Microsoft Store, 'wsl --install', Windows 10/11, LTS or any Ubuntu release number. CUDA, cloud-init and data collection occur only inside link titles. 'latest' is the only version label; no last-updated date is shown.",
+          "citation": "https://ubuntu.com/wsl/docs/latest/"
+        },
+        {
+          "claim": "26.04 LTS row: Released Apr 2026; Standard security maintenance May 2031; and, under the 'Ubuntu Pro' column group, Expanded security maintenance May 2036, Break/bug support May 2036, Legacy add-on for security maintenance and support May 2041.",
+          "citation": "https://ubuntu.com/about/release-cycle"
+        },
+        {
+          "claim": "'LTS are released every two years and receive 5 years of standard security maintenance' (CVE patches for packages in Main). ESM 'extends the life of LTS releases by providing 10 years of security updates for the Main repository and also adds 10 years of security coverage for the Universe repository.' The Legacy add-on 'can be purchased' at the end of the 10-year ESM period to cover an additional 5 years (15 in total).",
+          "citation": "https://ubuntu.com/about/release-cycle"
+        },
+        {
+          "claim": "'Ubuntu Pro subscriptions are free for personal use on up to five machines.' Ubuntu Pro is described as 'Canonical's enhanced security and support subscription for Ubuntu systems.'",
+          "citation": "https://ubuntu.com/about/release-cycle"
+        },
+        {
+          "claim": "Architectures listed for 26.04 LTS: 'amd64, armhf, arm64, s390x, riscv64, ppc64el-p9'. The page contains no point-release information and no 26.04.1 date (searches for point release, WSL, Windows and HWE found nothing).",
+          "citation": "https://ubuntu.com/about/release-cycle"
+        }
+      ],
+      "install": [
+        {
+          "method": "Direct download of the WSL root filesystem from the release directory (the only install path evidenced on the listed pages)",
+          "command": "No command is given on any listed page. The releases page links the file 'ubuntu-26.04.1-wsl-amd64.wsl' (relative href; full URL https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl) and says only that the WSL image is the root filesystem to be installed and launched by WSL. The docs landing page links an 'Install Ubuntu on WSL' how-to that was not opened.",
+          "citation": "https://releases.ubuntu.com/26.04.1/"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - the image is built for AMD64: 'WSL image for 64-bit PC (AMD64) computers (standard download)' for ubuntu-26.04.1-wsl-amd64.wsl (https://releases.ubuntu.com/26.04.1/). This is the Linux guest; it is a WSL root filesystem for a Windows host, not an installer for a native Linux host.",
+        "wsl2": "unknown - the listed pages say 'Windows Subsystem for Linux' but never 'WSL 2', 'WSL2' or 'WSL 1' (searched in the docs landing page text, https://ubuntu.com/wsl/docs/latest/) and give no minimum WSL version or kernel version. The landing page links 'Install Ubuntu on WSL' and 'Comparing WSL versions for Ubuntu on WSL'; neither was opened.",
+        "macos_arm64": "no - WSL is described as running 'a GNU/Linux environment on Windows' (https://ubuntu.com/wsl/docs/latest/) and the only WSL image listed is AMD64 (https://releases.ubuntu.com/26.04.1/); no arm64 or macOS artifact is listed in that directory.",
+        "gpu": "unknown - no NVIDIA, RTX or GPU statement appears in the releases page or in the docs landing page text; the landing page only links 'GPU and graphics' and 'Enabling GPU acceleration with CUDA' (https://ubuntu.com/wsl/docs/latest/), which were not opened."
+      },
+      "integrations": {
+        "cli": "none found for the image itself on the listed pages. The docs landing page lists reference pages titled 'Windows Agent CLI' and 'WSL Pro Service CLI' (for Ubuntu Pro for WSL; not opened) - https://ubuntu.com/wsl/docs/latest/",
+        "mcp": "none found in the text or link lists returned for the three listed pages",
+        "sdk_or_api": "none found for the image itself. The docs landing page lists 'Deploy instances with the Landscape API' and 'GitHub actions for Ubuntu WSL' (not opened) - https://ubuntu.com/wsl/docs/latest/",
+        "claude_code_or_codex": "none found in the text or link lists returned for the three listed pages"
+      },
+      "telemetry_and_network": "Not determinable from the listed pages. https://releases.ubuntu.com/26.04.1/ is a static file index with no telemetry text and no login or account requirement stated for downloads (.torrent/.zsync are offered for the ISOs but not for the .wsl files). The docs landing page (https://ubuntu.com/wsl/docs/latest/) links 'Data collection and Ubuntu on WSL' and 'Firewall requirements for Ubuntu on WSL', neither opened, so telemetry and required endpoints are unknown. Services named on the pages: Ubuntu Pro for WSL (automatic attachment of a Pro subscription; remote deployment with Landscape) on the docs page, and the Ubuntu Pro subscription ('free for personal use on up to five machines') whose column group holds the ESM, break/bug and Legacy dates on https://ubuntu.com/about/release-cycle; what registration Pro needs is not stated there."
+    },
+    "code": {
+      "languages": [],
+      "entry_points": [
+        {
+          "path": "ubuntu-26.04.1-wsl-amd64.wsl",
+          "what": "WSL root filesystem image for AMD64; 399M; modified 2026-08-27 14:17; target of the page's '64-bit PC (AMD64) WSL image' link - https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl"
+        },
+        {
+          "path": "ubuntu-26.04.1-wsl-amd64.manifest",
+          "what": "16K, same timestamp, '(contents of live filesystem)' for the 26.04.1 WSL image; not opened, so the package list and versions are unknown"
+        },
+        {
+          "path": "ubuntu-26.04-wsl-amd64.wsl",
+          "what": "Earlier WSL image in the same directory; 396M; modified 2026-04-20 18:09; companion ubuntu-26.04-wsl-amd64.manifest (16K)"
+        },
+        {
+          "path": "SHA256SUMS",
+          "what": "Checksum list in the same directory; size column 588; 2026-08-27 22:43; empty description; contents not opened"
+        },
+        {
+          "path": "SHA256SUMS.gpg",
+          "what": "Listed next to SHA256SUMS; size column 833; 2026-08-27 22:43; empty description; contents not opened"
+        },
+        {
+          "path": "https://ubuntu.com/wsl/docs/latest/",
+          "what": "Ubuntu on WSL documentation landing page (301 target of https://documentation.ubuntu.com/wsl/latest/); Diataxis layout: tutorials, how-to guides, reference, explanation"
+        },
+        {
+          "path": "https://ubuntu.com/about/release-cycle",
+          "what": "LTS support-window table (26.04, 24.04, 22.04) and support-phase definitions"
+        }
+      ],
+      "architecture": "No source tree is in scope. From the listed pages: the release directory https://releases.ubuntu.com/26.04.1/ is a flat file index holding, for each of 26.04 and 26.04.1, a desktop ISO and a live-server ISO (each with .torrent/.zsync/.list/.manifest), a netboot tarball, and a WSL image (.wsl plus .manifest), plus top-level SHA256SUMS, SHA256SUMS.gpg and a netboot/ directory. The .wsl artifact is described only as 'the root filesystem to be installed and launched by the Windows Subsystem for Linux'; its init system, default packages and user configuration are not described on any listed page. The Ubuntu on WSL docs (https://ubuntu.com/wsl/docs/latest/) use the Diataxis structure and link to a separate docs host (canonical-ubuntu-on-wsl.readthedocs-hosted.com). They also cover Ubuntu Pro for WSL, whose reference pages are titled 'Windows Agent CLI' and 'WSL Pro Service CLI' (link titles only; not opened).",
+      "packaging_and_release": "Artifacts per the listing (https://releases.ubuntu.com/26.04.1/): ubuntu-26.04.1-wsl-amd64.wsl and .manifest (both 2026-08-27 14:17), SHA256SUMS and SHA256SUMS.gpg (both 2026-08-27 22:43, i.e. later than the WSL image). Neither checksum row has a description, and the page gives no verification instructions. No provenance, attestation or SBOM is mentioned on the listed pages beyond the .manifest ('contents of live filesystem'). No release workflow can be cited: the build pipeline is not described on the listed pages (the docs landing page links 'Customize an Ubuntu image for WSL' and 'GitHub actions for Ubuntu WSL', not opened). The release-cycle page gives no 26.04.1 date; the only date evidence is the directory timestamps (26.04.1 files 2026-08-26/27, 26.04 files 2026-04-20/23).",
+      "tests_and_ci": "None found on the listed pages (no repository in scope). The docs landing page links 'QA process' and 'Run a WSL GitHub workflow on Azure' (not opened) - https://ubuntu.com/wsl/docs/latest/",
+      "dependencies": "No manifest files in scope; direct dependency count not applicable. The package list of the image would be in ubuntu-26.04.1-wsl-amd64.manifest (16K), which was not opened, so Python, Node and Rust versions in the image are not established by the listed pages.",
+      "security_policy": "none (no SECURITY.md or repository in scope). Related statements: the support phases and dates on https://ubuntu.com/about/release-cycle; the docs landing page links 'Security overview for Ubuntu on WSL' (not opened)."
+    },
+    "claim_checks": [
+      {
+        "claim": "The WSL image is the root filesystem to be installed and launched by the Windows Subsystem for Linux (releases page).",
+        "verified": "partial",
+        "evidence": "No code or file contents are in scope. The file table lists ubuntu-26.04.1-wsl-amd64.wsl (399M, 2026-08-27 14:17) as 'WSL image for 64-bit PC (AMD64) computers (standard download)' plus a 16K .manifest ('contents of live filesystem'), so the artifact exists and is labelled consistently. The file was not downloaded or inspected and the manifest was not opened. https://releases.ubuntu.com/26.04.1/"
+      },
+      {
+        "claim": "The page identifies one WSL image (a single 'WSL image' section whose link points to ubuntu-26.04.1-wsl-amd64.wsl).",
+        "verified": "partial",
+        "evidence": "The link href is ubuntu-26.04.1-wsl-amd64.wsl, but the file table also lists ubuntu-26.04-wsl-amd64.wsl (396M, 2026-04-20 18:09) and its manifest in the same directory (returned by three separate fetches; the first fetch omitted these rows). The page does not explain the relationship. https://releases.ubuntu.com/26.04.1/"
+      },
+      {
+        "claim": "Ubuntu is distributed on eight types of images described below.",
+        "verified": "no",
+        "evidence": "The page itself has four image-type sections (Desktop image, Server install image, Netboot tarball, WSL image), and the file table holds only those four AMD64 types per version (desktop ISO, live-server ISO, netboot tarball, WSL image). https://releases.ubuntu.com/26.04.1/"
+      },
+      {
+        "claim": "SHA256SUMS and SHA256SUMS.gpg accompany the images, so the WSL image's checksum can be verified.",
+        "verified": "not_checkable",
+        "evidence": "Both files are listed (2026-08-27 22:43, later than the WSL image's 2026-08-27 14:17) with no description, but their contents are outside the three listed pages and were not opened. Whether the .wsl file is covered, and which key signs the .gpg, is therefore not established, and the page gives no verification instructions. https://releases.ubuntu.com/26.04.1/"
+      },
+      {
+        "claim": "26.04 LTS dates: standard security maintenance May 2031, ESM May 2036, break/bug May 2036, Legacy add-on May 2041.",
+        "verified": "yes",
+        "evidence": "Checked against the page's own definitions (5 years standard, 10 years ESM, Legacy adds 5 for 15 in total): Apr 2026 release -> May 2031 -> May 2036 -> May 2041 is consistent. The 24.04 row (Apr 2024 -> May 2029/2034/2039) and 22.04 row (Apr 2022 -> May 2027/2032/2037) follow the same offsets. This is a page-internal check; no code exists. https://ubuntu.com/about/release-cycle"
+      },
+      {
+        "claim": "The 26.04 LTS support windows apply to the 26.04.1 point-release image.",
+        "verified": "partial",
+        "evidence": "The release-cycle table is per LTS series (26.04), and the page contains no point-release information or 26.04.1 date. The 26.04.1 file dates (2026-08-26/27) come only from the directory listing. Applicability to 26.04.1 is implied by the series name, not stated. https://ubuntu.com/about/release-cycle ; https://releases.ubuntu.com/26.04.1/"
+      },
+      {
+        "claim": "Ubuntu Pro for WSL enables automatic attachment of a Pro subscription and remote deployment with Landscape.",
+        "verified": "not_checkable",
+        "evidence": "No source, binary or reference page for Ubuntu Pro for WSL was opened; the related pages ('Windows Agent CLI', 'WSL Pro Service CLI', 'Architecture of Ubuntu Pro for WSL') are linked from the landing page but are outside the listed pages. https://ubuntu.com/wsl/docs/latest/"
+      },
+      {
+        "claim": "GPU acceleration with CUDA is available for Ubuntu on WSL (docs navigation entry 'Enabling GPU acceleration with CUDA').",
+        "verified": "not_checkable",
+        "evidence": "This is only a link title on the landing page. The target was not opened, and neither the landing page text nor the releases page mentions NVIDIA, RTX or driver requirements. https://ubuntu.com/wsl/docs/latest/"
+      },
+      {
+        "claim": "The image provides systemd user services and current Python 3.13, Node 24 and Rust toolchains.",
+        "verified": "not_checkable",
+        "evidence": "'systemd' does not occur in the landing page text, and none of the listed pages names any package or version. The package list would be in ubuntu-26.04.1-wsl-amd64.manifest (16K), which was not opened. https://ubuntu.com/wsl/docs/latest/ ; https://releases.ubuntu.com/26.04.1/"
+      },
+      {
+        "claim": "Ubuntu on WSL runs on WSL 2 (needed for a WSL 2.7.13 / kernel 6.18 host).",
+        "verified": "not_checkable",
+        "evidence": "The landing page text contains no 'WSL 2', 'WSL2' or 'WSL 1' and no minimum WSL or kernel version. It links 'Comparing WSL versions for Ubuntu on WSL' and 'Install Ubuntu on WSL', neither opened. https://ubuntu.com/wsl/docs/latest/"
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Two WSL images sit in the same directory: ubuntu-26.04-wsl-amd64.wsl (396M, 2026-04-20 18:09) and ubuntu-26.04.1-wsl-amd64.wsl (399M, 2026-08-27 14:17). The page's WSL link targets the .1 file, but nothing on the page explains the relationship, so the exact file name matters. https://releases.ubuntu.com/26.04.1/",
+      "Checksum verification is not documented on the listed pages. SHA256SUMS (588) and SHA256SUMS.gpg (833) are listed with empty descriptions and their contents were not read, so coverage of the .wsl file and the signing key are unverified. The page links only generic BitTorrent, Image Burning Guide and zsync help, and no .torrent or .zsync exists for the .wsl files. https://releases.ubuntu.com/26.04.1/",
+      "Facts the stated needs depend on are absent from the listed pages: WSL 2 and minimum WSL or kernel version, systemd, Python 3.13 / Node 24 / Rust versions, and NVIDIA RTX 4090 access. The docs landing page only links 'Enabling GPU acceleration with CUDA', 'Install Ubuntu on WSL' and 'Comparing WSL versions for Ubuntu on WSL' (not opened), and the image's package list (.manifest, 16K) was not opened. https://ubuntu.com/wsl/docs/latest/ ; https://releases.ubuntu.com/26.04.1/",
+      "Long-term support is tiered: standard security maintenance (to May 2031) covers packages in Main. ESM (to May 2036, adding Universe), break/bug support (May 2036) and the Legacy add-on (May 2041) sit under an 'Ubuntu Pro' column group. Pro is 'free for personal use on up to five machines'; terms for other use were not read, and the pages do not say whether any given toolchain package is in Main or Universe. https://ubuntu.com/about/release-cycle",
+      "Docs location and versioning are unclear: https://documentation.ubuntu.com/wsl/latest/ answers 301 to https://ubuntu.com/wsl/docs/latest/, whose sub-pages link to a third host (canonical-ubuntu-on-wsl.readthedocs-hosted.com). The page shows only a 'latest' label, no version or last-updated date, and names no Ubuntu release, so it is undetermined which Ubuntu release the docs describe. https://ubuntu.com/wsl/docs/latest/",
+      "Source-quality caveats: the releases page says 'eight types of images' but describes four, and carries a '© 2025' footer on a 2026 listing, which suggests reused template text. The pages were read through a summarizing fetcher: the first query omitted the 26.04 rows that later queries returned, and one query reported 31 table rows where the table text from another query has 29. Exact values should be re-read from the live pages. https://releases.ubuntu.com/26.04.1/",
+      "Licensing and scope: no license identifier or file appears on the listed pages. The releases footer carries only '© 2025 Canonical Ltd. Ubuntu and Canonical are registered trademarks of Canonical Ltd.' and a 'Legal information' link to https://www.ubuntu.com/legal (not opened). The image is a distribution aggregate whose per-package licenses were not examined. The entry's repository URL (https://ubuntu.com/download/server) is the Server download page, not a WSL page, and was not in the page list. https://releases.ubuntu.com/26.04.1/",
+      "Network and telemetry behaviour is undetermined: Ubuntu Pro for WSL (automatic Pro attachment, Landscape remote deployment) is described as a separate management tool, but 'Data collection and Ubuntu on WSL' and 'Firewall requirements for Ubuntu on WSL' were not opened, so outbound endpoints and any data collection by an Ubuntu WSL instance are unknown. https://ubuntu.com/wsl/docs/latest/"
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "page:ubuntu-26-04-1-lts-canonical-wsl-image",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Direct download of the WSL root filesystem from the release directory. No command is given on any listed page. The releases page links 'ubuntu-26.04.1-wsl-amd64.wsl' (relative href) and says only that the WSL image is the root filesystem to be installed and launched by WSL. The docs landing page links an 'Install Ubuntu on WSL' how-to.",
+          "citation": "https://releases.ubuntu.com/26.04.1/",
+          "holds": true,
+          "note": "The WSL section reads: 'The WSL image is the root filesystem to be installed and launched by the Windows Subsystem for Linux.' It is followed by the link '64-bit PC (AMD64) WSL image' with href 'ubuntu-26.04.1-wsl-amd64.wsl'. The table row is ubuntu-26.04.1-wsl-amd64.wsl, 2026-08-27 14:17, 399M, 'WSL image for 64-bit PC (AMD64) computers (standard download)'. No command appears on the releases page (2 fetches), the docs landing page (no code blocks or download links) or the release-cycle page. 'Install Ubuntu on WSL' is listed under How-to guides > Installation and setup on https://ubuntu.com/wsl/docs/latest/."
+        },
+        {
+          "field": "license (spdx: null, file: null; risks[6])",
+          "statement": "No license identifier or file appears on the listed pages. The releases footer carries only '© 2025 Canonical Ltd. Ubuntu and Canonical are registered trademarks of Canonical Ltd.' and a 'Legal information' link to https://www.ubuntu.com/legal.",
+          "citation": "https://releases.ubuntu.com/26.04.1/",
+          "holds": true,
+          "note": "The footer was returned as: '© 2025 Canonical Ltd. Ubuntu and Canonical are registered trademarks of Canonical Ltd. [Legal information](https://www.ubuntu.com/legal) [Report a bug on this site](https://bugs.launchpad.net/ubuntu-cdimage/+filebug)'. The page names no license (GPL, MIT, Apache, 'license', 'open source' all absent). The docs landing page says only 'It's an open-source project...' with no license identifier, and the release-cycle page gives no license for Ubuntu. Null spdx and file are correct."
+        },
+        {
+          "field": "readme.platforms.wsl2",
+          "statement": "unknown. The listed pages never say 'WSL 2', 'WSL2' or 'WSL 1' and give no minimum WSL or kernel version. The landing page links 'Install Ubuntu on WSL' and 'Comparing WSL versions for Ubuntu on WSL'.",
+          "citation": "https://ubuntu.com/wsl/docs/latest/ (301 target of https://documentation.ubuntu.com/wsl/latest/)",
+          "holds": true,
+          "note": "The 301 from documentation.ubuntu.com/wsl/latest/ to ubuntu.com/wsl/docs/latest/ is confirmed. Two fetches of the docs page found no 'WSL 2', 'WSL2', 'WSL 1', 'kernel', 'systemd' or 'Windows 10/11', link titles included. The releases page has none of these either. The release-cycle page has only a 'WSL' nav link (/download/wsl) and no kernel version. Both 'Install Ubuntu on WSL' (How-to) and 'Comparing WSL versions for Ubuntu on WSL' (Explanation) are present."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "None found for the image itself on the listed pages. The docs landing page lists reference pages titled 'Windows Agent CLI' and 'WSL Pro Service CLI' (for Ubuntu Pro for WSL; not opened).",
+          "citation": "https://ubuntu.com/wsl/docs/latest/",
+          "holds": true,
+          "note": "Both titles appear under the section 'Reference - Debugging and testing the Ubuntu Pro for WSL app', so attributing them to Ubuntu Pro for WSL is correct. Neither the releases page nor the docs landing page shows a command or code block for the image itself."
+        },
+        {
+          "field": "claim_checks[4]",
+          "statement": "26.04 LTS dates: standard security maintenance May 2031, ESM May 2036, break/bug May 2036, Legacy add-on May 2041 (verified: yes; the 24.04 and 22.04 rows follow the same offsets).",
+          "citation": "https://ubuntu.com/about/release-cycle",
+          "holds": true,
+          "note": "26.04 LTS row: Released Apr 2026, then May 2031, May 2036, May 2036, May 2041. 24.04: Apr 2024, then May 2029/2034/2034/2039. 22.04: Apr 2022, then May 2027/2032/2032/2037. The page's definitions match these offsets: 'LTS are released every two years and receive 5 years of standard security maintenance' and '...the Legacy add-on can be purchased to cover additional 5 years..., giving a total of 15 years...'. Two fetches returned the same dates."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

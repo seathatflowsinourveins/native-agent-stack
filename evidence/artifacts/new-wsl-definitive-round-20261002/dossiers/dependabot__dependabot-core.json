@@ -1,0 +1,305 @@
+{
+  "contender": "dependabot/dependabot-core",
+  "revision": {
+    "contender": "dependabot/dependabot-core",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "dependabot/dependabot-core",
+        "tag": "v0.398.0",
+        "commit": "a1750051287d1f3786081d3aa3e6e2b04a72edde",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.398.0",
+    "commit": "a1750051287d1f3786081d3aa3e6e2b04a72edde",
+    "read_at": "2026-10-02T03:02:07+00:00"
+  },
+  "dossier": {
+    "contender": "dependabot/dependabot-core",
+    "revision": {
+      "tag": "v0.398.0",
+      "commit": "a1750051287d1f3786081d3aa3e6e2b04a72edde",
+      "read_at": "2026-10-02T03:02:07+00:00"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Dependabot-Core is the Ruby monorepo behind GitHub's Dependabot version and security updates (README.md:32). Given a repository's dependency files it fetches and parses them, finds the latest resolvable (or minimum security-fix) version, rewrites manifests/lockfiles, builds PR text and opens/updates PRs on GitHub, GHE, Azure DevOps, GitLab, Bitbucket or CodeCommit (README.md:48; common/lib/dependabot/pull_request_creator.rb:275-281). It ships 33 ecosystem gems (rakelib/support/helpers.rb:21-58) including github_actions (rewrites `uses:` refs in workflows and action.yml, including commit-SHA pins and trailing '# vX.Y.Z' comments: github_actions/lib/dependabot/github_actions/update_checker.rb:285-289, .../file_updater/workflow_updater/version_commenter.rb:24-35) and docker. It is a library, not a standalone product: the in-repo `updater/` runner is documented as an internal component whose API is only reachable inside GitHub's network (updater/README.md:3-10) and the README sends self-hosters to the separate Dependabot CLI repo (README.md:55-62). The repo also runs Dependabot on itself, including a `github-actions` ecosystem entry (.github/dependabot.yml:89-97).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Dependabot-Core is the library at the heart of Dependabot security / version updates.",
+          "citation": "README.md:32"
+        },
+        {
+          "claim": "Generates automated PRs updating dependencies for Ruby, JavaScript, Python, PHP, Dart, Elixir, Elm, Go, Rust, Java, Julia and .NET; can also update git submodules, Docker files, Opentofu, Terraform files and Pre-Commit hooks (GitHub Actions is not named in the README).",
+          "citation": "README.md:34-35"
+        },
+        {
+          "claim": "Features: latest version that is resolvable given the project's other dependencies; updated manifest and lockfiles; PR descriptions with changelogs, release notes and commits.",
+          "citation": "README.md:38-40"
+        },
+        {
+          "claim": "On GitHub.com / GHE the hosted service is enabled by checking a dependabot.yml into the repo's .github directory.",
+          "citation": "README.md:44-45"
+        },
+        {
+          "claim": "Supports opening PRs against GitHub, GitHub Enterprise, Azure DevOps, GitLab, BitBucket and AWS CodeCommit.",
+          "citation": "README.md:47-48"
+        },
+        {
+          "claim": "Dependabot-Core is a library, so an entrypoint script of some kind is needed.",
+          "citation": "README.md:50-51"
+        },
+        {
+          "claim": "The open-source Dependabot CLI is the recommended standalone entrypoint, used in production at GitHub; it creates dependency diffs but does not create PRs.",
+          "citation": "README.md:57-62"
+        },
+        {
+          "claim": "A custom Ruby wrapper must itself provide an isolated throw-away environment, guard against arbitrary code execution exfiltrating credentials, supply language runtimes and handle changes Dependabot makes to its runtime environment.",
+          "citation": "README.md:66"
+        },
+        {
+          "claim": "The DEPENDABOT environment variable can be checked to detect the Dependabot container.",
+          "citation": "README.md:70"
+        },
+        {
+          "claim": "Pre-built images are only available for AMD64; on ARM they run 2x-3x slower than manually built ARM images.",
+          "citation": "README.md:142"
+        },
+        {
+          "claim": "Passing private-registry credentials to native package managers is a risk for ecosystems that run untrusted manifests; GitHub's service wraps Dependabot-Core in a credentials proxy so it never sees private-registry credentials.",
+          "citation": "README.md:503-520"
+        },
+        {
+          "claim": "Security vulnerabilities in Dependabot are reported per the project's security policy via the GitHub Bug Bounty program.",
+          "citation": "README.md:99"
+        },
+        {
+          "claim": "Tests run automatically on PRs and style is enforced by RuboCop.",
+          "citation": "README.md:110, 434"
+        },
+        {
+          "claim": "Release: run the 'Gems - Bump Version' workflow, merge the PR, tag vX.Y.Z, then another GitHub Action workflow pushes the release to RubyGems.",
+          "citation": "README.md:542-549"
+        }
+      ],
+      "install": [
+        {
+          "method": "Docker: pre-built ecosystem updater image (README example is Go modules)",
+          "command": "docker pull ghcr.io/dependabot/dependabot-updater-gomod",
+          "citation": "README.md:139"
+        },
+        {
+          "method": "Docker: pre-built updater core image",
+          "command": "docker pull ghcr.io/dependabot/dependabot-updater-core",
+          "citation": "README.md:179"
+        },
+        {
+          "method": "Build updater core image locally (recommended on ARM)",
+          "command": "docker build -f Dockerfile.updater-core . --tag=dependabot-manual-build/updater-core",
+          "citation": "README.md:180"
+        },
+        {
+          "method": "Build an ecosystem image locally (recommended on ARM)",
+          "command": "script/build go_modules",
+          "citation": "README.md:189"
+        },
+        {
+          "method": "Developer shell (builds missing images; Docker required; Docker Desktop mentioned for macOS/Windows)",
+          "command": "bin/docker-dev-shell go_modules",
+          "citation": "README.md:123, 147"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes: pre-built updater images are AMD64 (README.md:142) and are published from ubuntu-latest runners (.github/workflows/images-latest.yml:56); dev and test flow is Docker-only (.github/instructions/testing.instructions.md:13-14)",
+        "wsl2": "unknown: no WSL/WSL2 mention in README, *.md, bin/, script/, .devcontainer or .vscode (searched); a Docker-based flow is documented but WSL2 is not",
+        "macos_arm64": "yes, with caveats: Docker-based use on Docker Desktop is documented (README.md:123); pre-built images are AMD64-only and run 2x-3x slower on ARM, so ARM images should be built locally (README.md:142, 156-157); bin/docker-dev-shell has a Darwin branch for Docker/Rancher Desktop (bin/docker-dev-shell:112-116); CI builds only the bundler image on an ARM runner (.github/workflows/ci-arm64.yml:15-26)",
+        "gpu": "no: not applicable; no GPU/CUDA/NVIDIA references in README, *.md, bin/, script/, Dockerfiles, docker-bake.hcl or .github (searched)"
+      },
+      "integrations": {
+        "cli": "No standalone CLI binary in this repo. README recommends the separate Dependabot CLI (https://github.com/dependabot/cli; README.md:55-62; not opened). CI installs it with `go install github.com/dependabot/cli/cmd/dependabot@latest` (.github/workflows/ci.yml:178, smoke.yml:88) and drives updater images with `dependabot test/update ... --updater-image` (smoke.yml:132-138; silent/README.md:17-21). In-repo scripts: bin/dry-run.rb (dev container only, bin/dry-run.rb:53-60), bin/docker-dev-shell, bin/test, script/build, script/dependabot (wrapper around the CLI with source mounts, script/dependabot:5-43).",
+        "mcp": "none found (searched README, *.md, .github, scripts and config files for MCP / Model Context Protocol)",
+        "sdk_or_api": "Ruby library only: gems published to RubyGems with a `dependabot-omnibus` meta-gem (README.md:483-487, 542-549; omnibus/dependabot-omnibus.gemspec:29-62); integrators write their own Ruby wrapper (README.md:64-66). No HTTP API server in this repo: `updater/` is a client of an internal Dependabot service API not open to integrators (updater/lib/dependabot/api_client.rb:10-17), with a container contract of env vars (updater/lib/dependabot/environment.rb:12-44) and commands `update_files` / `update_graph` (updater/bin/run:4-16).",
+        "claude_code_or_codex": "none found. Only GitHub Copilot agent assets: .github/copilot-instructions.md:1, .github/instructions/*.instructions.md, .github/workflows/copilot-setup-steps.yml:1-17. No CLAUDE.md, AGENTS.md, .claude/, .codex/ or .mcp.json."
+      },
+      "telemetry_and_network": "No product-analytics/phone-home code found in the gems. Network use is functional: (1) git-host APIs and git clones for fetching files and opening PRs (common/lib/dependabot/pull_request_creator.rb:275-281; github_actions/lib/dependabot/github_actions/update_checker.rb:229-256 clones action repos); (2) package registries per ecosystem; (3) PR bodies route github.com links through redirect.github.com unless disabled (pull_request_creator.rb:21-31). The `updater/` runner additionally requires a Dependabot service API: DEPENDABOT_API_URL (default http://localhost:3001), DEPENDABOT_JOB_ID, DEPENDABOT_JOB_TOKEN, DEPENDABOT_JOB_PATH, DEPENDABOT_OUTPUT_PATH (updater/lib/dependabot/environment.rb:12-44); it posts PR payloads, errors, metrics (increment_metric), ecosystem/cooldown metadata and dependency-submission snapshots there (updater/lib/dependabot/api_client.rb:39-61, 247-366); the API is described as available only inside GitHub's hosted infrastructure, with the CLI's local API as a stand-in (api_client.rb:10-17, 344-345; updater/README.md:9-10). Error tracking: the Sentry SDK is initialised on updater start (updater/lib/dependabot/setup.rb:20-67) with a before_send sanitiser that redacts auth tokens and repo names (updater/lib/dependabot/sentry/exception_sanitizer_processor.rb:13-41); no DSN is set in repo code (searched), so whether events leave the container depends on SDK env configuration not verifiable here. OpenTelemetry export is opt-in via OTEL_ENABLED=true (updater/lib/dependabot/opentelemetry.rb:29-31, 39-61). Accounts/tokens: a token for the target git provider is needed to open PRs; bin/dry-run.rb treats LOCAL_GITHUB_ACCESS_TOKEN as optional (bin/dry-run.rb:179-186; README.md:277) although its header says it is needed (bin/dry-run.rb:15-16); tests use DEPENDABOT_TEST_ACCESS_TOKEN (updater/README.md:36-37). Hosted runs are tokenless behind a MITM credentials proxy that is not in this repo (github_actions/lib/dependabot/github_actions/lockfile/env.rb:12-34; deno/Dockerfile:10-16; README.md:508-520). Image builds fetch from Ubuntu mirrors, packagecloud, PPAs and GitHub releases (Dockerfile.updater-core:14-75, 159-160); CI smoke tests read scenarios from the dependabot/smoke-tests repo via the GitHub API (.github/workflows/smoke.yml:52, 100)."
+    },
+    "code": {
+      "languages": [
+        "Ruby",
+        "TypeScript",
+        "JavaScript",
+        "Go",
+        "Python",
+        "C#",
+        "PowerShell",
+        "PHP",
+        "Elixir",
+        "Dart",
+        "Julia",
+        "Shell",
+        "Dockerfile",
+        "HCL"
+      ],
+      "entry_points": [
+        {
+          "path": "updater/bin/run",
+          "what": "Container CMD dispatcher: `run update_files|update_graph` (Dockerfile.updater-core:209; updater/bin/run:4-16)"
+        },
+        {
+          "path": "updater/bin/update_files.rb",
+          "what": "Fetches dependency files then runs UpdateFilesCommand (updater/bin/update_files.rb:39-49)"
+        },
+        {
+          "path": "updater/bin/update_graph.rb",
+          "what": "Fetches files then runs UpdateGraphCommand, producing a GitHub Dependency Submission snapshot (updater/bin/update_graph.rb:39-49)"
+        },
+        {
+          "path": "bin/dry-run.rb",
+          "what": "Simulates a full update run and prints the diff without creating a PR; refuses to run outside the dev container unless ALLOW_DRY_RUN_STANDALONE=true (bin/dry-run.rb:5-13, 53-60)"
+        },
+        {
+          "path": "bin/docker-dev-shell",
+          "what": "Docker developer shell used for dry-runs and tests (README.md:147); bin/test runs suites in the dev image (bin/test:6-18)"
+        },
+        {
+          "path": "script/build",
+          "what": "Builds the updater-core and ecosystem images via docker_build in script/_common (script/build:1-13; script/_common:96-199)"
+        },
+        {
+          "path": "rakelib/gems.rake",
+          "what": "Rake tasks `gems:build` and `gems:release` (build, tag check, sigstore sign, gem push) (rakelib/gems.rake:7-63)"
+        },
+        {
+          "path": "script/dependabot",
+          "what": "Wrapper that runs the external `dependabot` CLI with local source directories mounted into the updater image (script/dependabot:5-43)"
+        }
+      ],
+      "architecture": "Monorepo of Ruby gems (Sorbet-typed). common/lib/dependabot/ holds shared base classes and registries (file_fetchers.rb, file_parsers.rb, update_checkers.rb, file_updaters.rb, metadata_finders.rb, dependency_graphers.rb), git helpers (git_commit_checker.rb, git_metadata_fetcher.rb, git_cooldown_date_resolver.rb), PR creators/updaters for five providers (pull_request_creator/{github,gitlab,azure,bitbucket,codecommit}.rb, pull_request_updater/*), shared_helpers.rb (spawns native helpers) and provider clients. Each of 33 ecosystem gems (<eco>/lib/dependabot/<eco>/) implements FileFetcher, FileParser, UpdateChecker, FileUpdater, MetadataFinder, Version, Requirement (README.md:469-477); many delegate to native helpers in the host language under <eco>/helpers (bundler v2/v4 Ruby, npm_and_yarn TypeScript, bun JS, go_modules Go, python/uv Python, composer PHP, hex Elixir, pub Dart, julia Julia, nuget C#/.NET in nuget/helpers/lib/NuGetUpdater). updater/lib/dependabot/ is the job runner GitHub uses (updater.rb, updater/operations/*, job.rb, file_fetcher_command.rb, update_files_command.rb, update_graph_command.rb, api_client.rb, service.rb, setup.rb) plus updater/lib/github_api/dependency_submission.rb; it reads a job definition and talks to a Dependabot service API (api_client.rb:10-17). omnibus/ is the meta-gem; silent/ is a no-network test ecosystem (silent/README.md:3-11). Containers: Dockerfile.updater-core (Ubuntu 24.04, Ruby 4.0.5, git/git-lfs/mercurial/bzr, git-shim) is the base of 33 per-ecosystem images (<eco>/Dockerfile; docker-bake.hcl:17-53). GitHub Actions support: github_actions/lib/dependabot/github_actions/{file_fetcher,file_parser,update_checker,file_updater}.rb, with workflow_file/uses_collector.rb collecting `uses:` under jobs/runs, tag-to-SHA handling behind option github_actions_pin_to_sha (update_checker.rb:285-313), version-comment rewriting (file_updater/workflow_updater/version_commenter.rb:24-56), cooldown filtering (update_checker/latest_version_finder.rb:195-249, settings in updater/lib/dependabot/job/cooldown_definition.rb:14-17), and an optional `.github/workflows/actions.lock` path that shells out to the gh-actions-lock binary (lockfile/cli_engine.rb:35-66), gated by experiment github_actions_lockfile and github.com only (file_fetcher.rb:83-84); the binary is installed with sha256 verification (github_actions/Dockerfile:5-17). Dependency-graph output: the update_graph command submits GitHub Dependency Submission snapshots (updater/lib/github_api/dependency_submission.rb:8-19, 118-146), not CycloneDX/SPDX. Security updates target the lowest non-vulnerable version (github_actions/.../update_checker.rb:273-275).",
+      "packaging_and_release": "ARTIFACTS: (a) 36 gems from */dependabot-*.gemspec (common, omnibus, silent and 33 ecosystems; rakelib/support/helpers.rb:21-58) plus a manually published placeholder gem dependabot-core (dependabot-core.gemspec:3-5), version 0.398.0 (common/lib/dependabot.rb:5); (b) GHCR images ghcr.io/dependabot/dependabot-updater-<ecosystem> for 33 ecosystems (docker-bake.hcl:17-53) tagged with commit SHA, `latest` and `v2.0.<timestamp>` on pushes to main (.github/workflows/images-latest.yml:4-9, 19-25, 121-124); dependabot-updater-core tagged `latest` and `<version>` on v* tags (docker-bake.hcl:89-92; images-updater-core.yml:4-9, 39-43); PR-branch images tagged with the commit SHA after PR approval (images-branch.yml:90, 102, 167-177). No `platforms` in docker-bake.hcl, so images are built for the runner's native platform (README.md:142). RELEASE FLOW: a weekly cron or workflow_dispatch 'Gems - Bump Version' opens a bump PR with a GitHub App token (gems-bump-version.yml:3-6, 24-29, 78-84); a maintainer merges and creates the GitHub release/tag vX.Y.Z by hand (gems-bump-version.yml:90-98; README.md:546-549); `release: published` triggers 'Gems - Release to RubyGems' (gems-release-to-rubygems.yml:2-7) with `id-token: write`, rubygems/configure-rubygems-credentials and `gem exec rake gems:release` (lines 15-17, 37, 41), which checks HEAD == tag (rakelib/support/helpers.rb:67-81), skips versions already on rubygems.org and, when GITHUB_ACTIONS=true, signs each gem with sigstore-cli 0.2.2 and pushes with `--attestation` (rakelib/gems.rake:34-47). Gemspecs set no rubygems_mfa_required, cert_chain or signing_key (searched) and RuboCop's Gemspec/RequireMFA is disabled (.rubocop.yml:25-26). No release assets, checksum files or signatures are attached to GitHub releases by any workflow. ATTESTATIONS/SBOM: images are attested with actions/attest-build-provenance with push-to-registry (images-latest.yml:126-132 also create-storage-record; images-branch.yml:179-185; images-updater-core.yml:53-58) from jobs holding id-token/attestations/artifact-metadata/packages: write; BuildKit-native provenance is disabled (`provenance: false`: images-latest.yml:96,119; images-branch.yml:151,174; images-updater-core.yml:51); no SBOM is generated or attached (no sbom option in docker-bake.hcl or workflows; no syft/trivy/cyclonedx/spdx tooling found). images-latest.yml also pulls each pushed tag through a backup registry (BACKUP_REGISTRY, lines 3, 134-138). Lockfile integrity: root Gemfile.lock and updater/Gemfile.lock carry CHECKSUMS sections (Gemfile.lock:530; updater/Gemfile.lock:661) and image builds run bundler with frozen=true (Dockerfile.updater-core:190-197).",
+      "tests_and_ci": "TESTS: RSpec, about 772 *_spec.rb files repo-wide (per-ecosystem spec/ dirs, common/spec, updater/spec, bin/spec, bundler/helpers/v2|v4/spec), run inside Docker via <eco>/script/ci-test, mostly `bundle exec turbo_tests2 --verbose` (e.g. github_actions/script/ci-test:6), with VCR/WebMock fixtures (common/dependabot-common.gemspec:62-63). Native-helper suites: jest/ts-jest for npm_and_yarn (6 .test.ts) and bun (6 .test.js) (npm_and_yarn/helpers/package.json:13; npm_and_yarn/script/ci-test:10-13), pytest for python helpers (5 files; python/script/ci-test:7), `go test` for go_modules (go_modules/script/ci-test:5-7), xunit.v3 C# tests (102 .cs files under nuget/helpers/lib/NuGetUpdater/*.Test; NuGetUpdater.Core.Test.csproj:16) plus PowerShell tests (nuget/script/ci-test:8-12), Julia runtests.jl (2 files). Updater e2e: 60 txtar scenarios in silent/tests/testdata run by `go test` with the Dependabot CLI (silent/README.md:13-21, 84-88; script/updater-e2e). Tests are Docker-only except NuGet C# (.github/instructions/testing.instructions.md:13-24). CI (19 workflows in .github/workflows): all `uses:` refs are pinned to 40-char SHAs with version comments (regex scan found no unpinned or local refs); runners are mostly floating `ubuntu-latest`. ci.yml 'Specs' (pull_request + daily cron, not push; 36-suite matrix built with script/build and ./script/ci-test, plus updater, lint [./bin/lint = shellcheck on repo scripts + RuboCop, then `yamllint .`], rakefile tests, and a CLI integration job using `go install ...@latest`: ci.yml:3-5, 21-57, 109-125, 177-183); ci-arm64.yml (bundler image on ubuntu-24.04-arm); smoke.yml (CLI-driven per-ecosystem smoke tests from dependabot/smoke-tests); sorbet.yml + check-sorbet-typing-mode.yml (tapioca verify, srb tc, spoom coverage, typed: strict ratchet); codespell.yml; dependency-review.yml; codeql-analysis.yml; zizmor.yml; scorecards.yaml; images-latest/images-updater-core/images-branch.yml (build, `bundle check` and layer-count<126 validation, push to GHCR, attest; branch images require an APPROVED review and re-check the checked-out SHA, fork PRs are skipped: images-branch.yml:26, 52-55, 124-127); gems-bump-version.yml and gems-release-to-rubygems.yml; labeler.yml (pull_request_target, labeler.yml:4), issue-labeler.yml, stalebot.yml, copilot-setup-steps.yml. PERMISSIONS: 12 workflows set top-level `permissions: {}` and grant per job; 7 set workflow-level permissions (contents: read in ci-arm64, codespell, dependency-review, sorbet; issues: write + contents: read in issue-labeler; issues/pull-requests: write in stalebot; read-all with job-level security-events and id-token write in scorecards); no `contents: write` and no workflow_run anywhere; secrets used are GITHUB_TOKEN and a GitHub App id/private key for the bump PR (gems-bump-version.yml:28-29). FACTS KEYED TO THE SUPPLY-CHAIN QUESTIONS: (1) workflow permission/pinning auditor: zizmor (zizmorcore/zizmor-action pinned to SHA, v0.6.4, zizmor.yml:24) on push to main and all PRs; OpenSSF Scorecard (ossf/scorecard-action, scorecards.yaml:28) also runs on main + weekly but is a repo-posture scorer. (2) attestation mechanism for hosted outputs: actions/attest-build-provenance for images (see packaging), sigstore-cli for gems (rakelib/gems.rake:42-43). (3) SBOM generator (CycloneDX/SPDX) for images or directories: none found. (4) pinned-dependency freshness through PRs: Dependabot itself, configured in .github/dependabot.yml (github-actions group 'all-actions' at lines 89-97; docker 66-88; bundler 10-40; npm, pip, gomod, nuget, maven and others), implemented by this repo's github_actions ecosystem. (5) static-analysis findings as code-scanning alerts: GitHub code scanning via SARIF/security-events: CodeQL analyze (codeql-analysis.yml:86-87; languages go, javascript, python, ruby at line 43; on PRs to main and a weekly cron, not on push: lines 14-23), Scorecard SARIF via github/codeql-action/upload-sarif (scorecards.yaml:34-36), and a zizmor job with security-events: write (zizmor.yml:15-16; the action's own upload behaviour is not visible in this repo). (6) workflow linter for syntax/expressions/action inputs/run scripts: none found (no actionlint anywhere in the repo); only yamllint (ci.yml:125; .yamllint.yaml) and shellcheck over repo scripts (bin/lint:5-21).",
+      "dependencies": "Direct dependency counts by manifest: common/dependabot-common.gemspec 20 runtime + 15 dev (lines 29-48, 50-64; Ruby >= 3.3.0 at line 23); root Gemfile 34 path gems + sorbet, tapioca, zeitwerk, plus dev deps copied from the common gemspec (Gemfile:5-73); updater/Gemfile 35 path gems + 17 external gems (http, octokit, sentry-ruby, sentry-opentelemetry, terminal-table, flamegraph, zeitwerk and 9 opentelemetry-* gems; lines 41-59) + common's dev deps in the :test group; omnibus/dependabot-omnibus.gemspec 34 gem deps (lines 29-62); each ecosystem gemspec depends on dependabot-common plus 0-5 extras (bundler: parallel; maven: rexml; git_submodules: parseconfig; pre_commit: 5 sibling gems). Native helpers: npm_and_yarn/helpers/package.json 8 runtime + 15 dev (+package-lock.json); bun/helpers/package.json 9 + 6 (+package-lock.json); go_modules/helpers/go.mod 2 (+go.sum); silent/tests/go.mod 1; python/helpers/requirements.txt 10 pinned with ==; uv/helpers/requirements.txt 10 pinned; composer/helpers/v2/composer.json 3 require + 2 dev (+composer.lock); pub/helpers/pubspec.yaml 7 (one git dep pinned to a commit SHA); hex/helpers/mix.exs 0; julia/helpers/Project.toml 1 (local path); nuget/helpers/lib/NuGetUpdater/Directory.Packages.props 35 PackageVersion entries; git submodules NuGet.Client (branch release/7.9.x) and dotnet-core (branch v10.0.8) (.gitmodules:1-9). Runtime in images: Ubuntu 24.04, Ruby 4.0.5 (Dockerfile.updater-core:2,149; .ruby-version:1), RubyGems 4.0.14 (line 188) plus per-ecosystem toolchains (e.g. Go 1.27.0 go_modules/Dockerfile:2, Rust 1.98.1 cargo/Dockerfile:2, Python 3.10-3.14 python/Dockerfile:46-118, uv 0.12.19 uv/Dockerfile:15).",
+      "security_policy": "none: no SECURITY.md found at the repo root, .github/ or docs/ (searched). README.md:99 links a GitHub-hosted policy (https://github.com/dependabot/dependabot-core/security/policy, disclosure via the GitHub Bug Bounty program) that was not opened because it is not a listed page. CODE_OF_CONDUCT.md exists; CODEOWNERS assigns everything to @dependabot/maintainers (CODEOWNERS:1)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Supports Ruby, JavaScript, Python, PHP, Dart, Elixir, Elm, Go, Rust, Java, Julia, .NET plus git submodules, Docker, Opentofu, Terraform and Pre-Commit (README.md:34-35)",
+        "verified": "yes",
+        "evidence": "Gems exist for all of them (rakelib/support/helpers.rb:21-58; docker-bake.hcl:17-53). Code also ships ecosystems the README does not list, notably github_actions (github_actions/lib/dependabot/github_actions/*.rb; ci.yml:37) plus bazel, bun, conda, deno, devcontainers, helm, nix, sbt, swift, uv, vcpkg, so the README list understates what the code does."
+      },
+      {
+        "claim": "Opens PRs against GitHub, GHE, Azure DevOps, GitLab, BitBucket and AWS CodeCommit (README.md:48)",
+        "verified": "yes",
+        "evidence": "PullRequestCreator#create dispatches on source.provider for github, gitlab, azure, bitbucket and codecommit (common/lib/dependabot/pull_request_creator.rb:275-281), with a creator class per provider under common/lib/dependabot/pull_request_creator/. GPG commit signing exists for GitHub (pull_request_creator/github.rb:313, 560) but needs the gpgme gem, which is only a dev dependency (commit_signer.rb:55-60; dependabot-common.gemspec:51)."
+      },
+      {
+        "claim": "This repo provides the logic for hosting your own standalone Dependabot; the library needs an entrypoint (README.md:47-51)",
+        "verified": "partial",
+        "evidence": "The in-repo runner updater/ is documented as an internal component whose API is only reachable inside GitHub's network, with no appetite for making it generic (updater/README.md:3-10; updater/lib/dependabot/api_client.rb:10-17). Standalone use relies on the separate Dependabot CLI standing in for that API (api_client.rb:344-345 treats job_id 'cli'; smoke.yml:132-138; silent/README.md:17-21), which is not in this repo."
+      },
+      {
+        "claim": "The Dependabot CLI creates dependency diffs but does not create PRs (README.md:61)",
+        "verified": "not_checkable",
+        "evidence": "CLI source is in another repository. In this repo the updater posts create_pull_request payloads to an API (updater/lib/dependabot/api_client.rb:39-61) and CI drives updater images through the CLI (.github/workflows/smoke.yml:132-138), but the CLI's own behaviour cannot be checked here."
+      },
+      {
+        "claim": "Pre-built images are only available for AMD64; on ARM they run 2x-3x slower (README.md:142)",
+        "verified": "partial",
+        "evidence": "AMD64-only is consistent with the code: docker-bake.hcl:1-124 has no platforms attribute and image jobs run on ubuntu-latest (images-latest.yml:56); only the bundler image is built on an ARM runner and not published (ci-arm64.yml:15-26). The 2x-3x figure has no method or data in the repo."
+      },
+      {
+        "claim": "Release is tagged by hand and another workflow automatically pushes it to RubyGems (README.md:542-549)",
+        "verified": "yes",
+        "evidence": "gems-release-to-rubygems.yml:2-7 triggers on release published and runs `gem exec rake gems:release` (line 41) with id-token: write (line 17). Code adds a HEAD==tag guard (rakelib/support/helpers.rb:67-81) and, on GitHub Actions, sigstore signing and `gem push --attestation` (rakelib/gems.rake:41-43), which the README does not mention."
+      },
+      {
+        "claim": "GitHub's service wraps Dependabot-Core in a credentials proxy so private-registry credentials are never exposed to it (README.md:503-520)",
+        "verified": "partial",
+        "evidence": "The proxy is not in this repo. Code only shows proxy-aware behaviour: tokenless hosted mode behind a MITM proxy (github_actions/lib/dependabot/github_actions/lockfile/env.rb:12-34) and images expecting a proxy CA (deno/Dockerfile:10-16). A related guard refuses external code execution for private registries unless `insecure-external-code-execution: allow` is set (updater/lib/dependabot/update_graph_processor.rb:23-29, 135-137)."
+      },
+      {
+        "claim": "Style is enforced by RuboCop (README.md:434)",
+        "verified": "yes",
+        "evidence": "The ci.yml lint job runs ./bin/lint (ci.yml:109-123), which runs shellcheck on repo scripts and then bin/rubocop (bin/lint:5-23), followed by `yamllint .` (ci.yml:125). Sorbet typing checks also run in CI (sorbet.yml:25-29; check-sorbet-typing-mode.yml) but are not mentioned in the README."
+      },
+      {
+        "claim": "dependabot-omnibus is a meta gem that simply depends on all the others (README.md:483-487)",
+        "verified": "partial",
+        "evidence": "omnibus/dependabot-omnibus.gemspec:29-62 lists 34 gems (common plus 33 ecosystems) but omits the test-only dependabot-silent, which exists in the gem list (rakelib/support/helpers.rb:53). The root Gemfile also omits dependabot-nix while updater/Gemfile includes it (Gemfile:5-38 vs updater/Gemfile:26)."
+      },
+      {
+        "claim": "Security updates upgrade to the minimum non-vulnerable version rather than the latest (README.md:386-389)",
+        "verified": "yes",
+        "evidence": "Checked for the github_actions ecosystem: updated_ref prefers finder.lowest_security_fix_release when the dependency is vulnerable (github_actions/lib/dependabot/github_actions/update_checker.rb:273-275) and lowest_resolvable_security_fix_version is implemented (lines 46-58). Other ecosystems were not individually checked."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Pre-built AMD64 updater images run on ARM hosts vs manually built ARM-specific images",
+        "metric": "relative slowdown",
+        "value": "2x-3x slower",
+        "source": "README.md:142 (project statement; no method or data in the repo)",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Standalone use depends on pieces outside this repo: the in-repo `updater/` runner is an internal component that talks to a service API 'only accessible inside the GitHub network' and takes no contributions to make it generic (updater/README.md:3-10; updater/lib/dependabot/api_client.rb:10-17); README steers self-hosters to the separate Dependabot CLI and example-cli-usage repos (README.md:57-62) and the hosted credentials proxy is also absent (README.md:508-520). The library is pre-1.0 (0.398.0, common/lib/dependabot.rb:5) and README says integrators must supply isolation themselves (README.md:66).",
+      "Image build inputs are mostly floating: base and tool images are tag-pinned, not digest-pinned (ubuntu:24.04 Dockerfile.updater-core:2; ruby:4.0.5-bookworm line 149; golang/rust/python/uv/maven/nix/cosign/regctl tags in */Dockerfile; only helm/Dockerfile:9-15 and gradle/Dockerfile:8 use @sha256); ecosystem images start FROM ghcr.io/dependabot/dependabot-updater-core with no tag (e.g. bundler/Dockerfile:2); `apt-get upgrade -y` and PPAs run at build (Dockerfile.updater-core:61-69). Several downloads are unverified: git-shim via `curl -sL` with no checksum (Dockerfile.updater-core:159-160) and curl|sh or 'latest' installers for deno, julia, composer and Miniconda (deno/Dockerfile:8, julia/Dockerfile:15, composer/Dockerfile:43, conda/Dockerfile:10). Other images do verify (github_actions/Dockerfile:12-16 sha256; terraform/Dockerfile:14-18; docker/Dockerfile:17-21 cosign).",
+      "Workflow hygiene gaps despite SHA-pinned actions: the Dependabot CLI is installed with `go install ...@latest` (ci.yml:177-178; smoke.yml:87-88); no actionlint or other workflow-expression linter exists (yamllint + shellcheck only: ci.yml:123-125, bin/lint:5-23); some run: steps interpolate expressions straight into shell (check-sorbet-typing-mode.yml:32 loops over ${{ steps.changed-files.outputs.all_changed_files }}; images-branch.yml:41,45,122; gems-bump-version.yml:50,66,70); runners are floating ubuntu-latest. The github_actions ecosystem only tracks `uses:` keys under jobs/runs and skips `./` and `docker://` refs (workflow_file/uses_collector.rb:36-47; file_parser.rb:80), so tools fetched inside run: steps are outside its scope.",
+      "No SBOM and no BuildKit provenance: no CycloneDX/SPDX tooling (searched), `provenance: false` on every bake build (images-latest.yml:96,119; images-branch.yml:151,174; images-updater-core.yml:51), only GitHub build-provenance attestations for images and sigstore attestations for gems, and no checksums or signatures attached to GitHub releases. Dependabot's own inventory output is a GitHub Dependency Submission snapshot (updater/lib/github_api/dependency_submission.rb:8-19, 118-146) with ecosystem-specific graphers only for bun, npm_and_yarn, go_modules, uv and pip; other ecosystems use a best-effort Generic grapher that takes the right-most file as the lockfile (common/lib/dependabot/dependency_graphers.rb:20-26; dependency_graphers/generic.rb:14-22).",
+      "Telemetry/third-party reporting code is present in the runner: the Sentry SDK is initialised at startup (updater/lib/dependabot/setup.rb:20-67) with no DSN in code (delivery depends on SDK env config, not verifiable here); OpenTelemetry is opt-in via OTEL_ENABLED with HTTP auto-instrumentation (updater/lib/dependabot/opentelemetry.rb:29-61); metrics and metadata are posted to the service API (api_client.rb:287-366). Operators running the updater outside GitHub must supply or redirect DEPENDABOT_API_URL (default http://localhost:3001, environment.rb:32-34).",
+      "Platform and reproducibility: tests and dev flow are Docker-only (.github/instructions/testing.instructions.md:13-14); pre-built images are AMD64-only and slow on ARM (README.md:142); CI covers ARM only for the bundler image build (ci-arm64.yml:15-26); WSL2 is undocumented; builds pull many toolchains at image-build time (Dockerfile.updater-core:14-109; nuget/Dockerfile:21-57). Update order is shuffled unless UPDATER_DETERMINISTIC=true (updater/lib/dependabot/updater/operations/update_all_versions.rb:90-93; environment.rb:62-66), which affects the reproducibility of PR sets.",
+      "Security-governance gaps visible in-repo: no SECURITY.md (README.md:99 links an external policy); RuboCop Gemspec/RequireMFA is disabled and gemspecs set no rubygems_mfa_required (.rubocop.yml:25-26); the CodeQL matrix covers go, javascript, python and ruby only, so the C# NuGetUpdater and PHP/Elixir/Dart helpers are not scanned, and it runs on PRs and a weekly cron rather than on push (codeql-analysis.yml:14-23, 43); releases depend on a maintainer manually tagging (README.md:546-549).",
+      "Scope, maintenance and licensing: 33 ecosystems with native helpers in about ten languages are owned by a single CODEOWNERS group (CODEOWNERS:1-4); MAINTENANCE_STANDARDS.md:3-4 reserves the right to 'cease guaranteeing support' for old package-manager versions; stalebot closes issues/PRs after 730 days plus 7 (stalebot.yml:25-28). License is MIT (LICENSE:1-3) but there is no NOTICE or third-party license inventory for the many toolchains baked into the images (searched)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "dependabot/dependabot-core",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Docker: pre-built ecosystem updater image (README example is Go modules): `docker pull ghcr.io/dependabot/dependabot-updater-gomod`",
+          "citation": "README.md:139",
+          "holds": true,
+          "note": "README.md:139 (Quickstart) contains this exact command. It matches what is published: docker-bake.hcl:14 sets prefix ghcr.io/dependabot/dependabot-updater-, docker-bake.hcl:33 maps go_modules to image 'gomod', and images-latest.yml:74,123 push UPDATER_IMAGE:latest on pushes to main, so the untagged pull resolves to :latest."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT; file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-21 is the standard MIT text ('MIT License', 'Copyright GitHub, Inc.'). common/dependabot-common.gemspec:15 sets spec.license = \"MIT\" and the ecosystem/omnibus gemspecs use common_gemspec.license. The only non-MIT license string ('Nonstandard', License Zero) is in a bundler spec fixture (bundler/spec/fixtures/projects/bundler2/local_gemspec_needs_updates/...), not project metadata."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes: pre-built updater images are AMD64 (README.md:142) and are published from ubuntu-latest runners (.github/workflows/images-latest.yml:56); dev and test flow is Docker-only (.github/instructions/testing.instructions.md:13-14)",
+          "citation": "README.md:142; .github/workflows/images-latest.yml:56; .github/instructions/testing.instructions.md:13-14",
+          "holds": true,
+          "note": "README.md:142: 'Pre-built images are currently only available for AMD64 / Intel architecture.' images-latest.yml:56 is 'runs-on: ubuntu-latest' on the push-updater-image (Deploy) job. testing.instructions.md:13-14: 'All tests must run inside Docker containers ... will not work on the host system.' The NuGet C# exception (lines 16-24) is outside the cited lines and is noted elsewhere in the dossier."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "No standalone CLI binary in this repo; README recommends the separate Dependabot CLI; CI installs it with `go install github.com/dependabot/cli/cmd/dependabot@latest` and drives updater images with `dependabot test/update ... --updater-image`; in-repo scripts bin/dry-run.rb (dev container only), bin/docker-dev-shell, bin/test, script/build, script/dependabot (CLI wrapper with source mounts)",
+          "citation": "README.md:55-62; .github/workflows/ci.yml:178; .github/workflows/smoke.yml:88, 132-138; silent/README.md:17-21; bin/dry-run.rb:53-60; script/dependabot:5-43",
+          "holds": true,
+          "note": "README.md:57 calls the CLI 'our recommended entrypoint for standalone use cases' (line 61: diffs, no PRs). ci.yml:178 and smoke.yml:88 both run the go install @latest command. smoke.yml:132-138 runs 'dependabot test ... --updater-image=...:latest'. silent/README.md:20 shows 'dependabot update ... --updater-image'. bin/dry-run.rb:53-60 exits unless the user is 'dependabot' or ALLOW_DRY_RUN_STANDALONE=true. script/dependabot:5-43 calls 'dependabot' with -v source mounts. bin/docker-dev-shell, bin/test and script/build exist. There is no CLI source in the repo (the only cmd/*.go files are go_modules spec fixtures)."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "Supports Ruby, JavaScript, Python, PHP, Dart, Elixir, Elm, Go, Rust, Java, Julia, .NET plus git submodules, Docker, Opentofu, Terraform and Pre-Commit (README.md:34-35): verified yes; code also ships github_actions, bazel, bun, conda, deno, devcontainers, helm, nix, sbt, swift, uv, vcpkg, which the README does not list",
+          "citation": "README.md:34-35; rakelib/support/helpers.rb:21-58; docker-bake.hcl:17-53; .github/workflows/ci.yml:37",
+          "holds": true,
+          "note": "README.md:34-35 matches. All 36 gemspecs listed in helpers.rb:21-58 exist on disk. Each README item maps to a gem and a published image (docker-bake.hcl:17-53): bundler, npm_and_yarn, python, composer, pub, hex, elm, go_modules, cargo, maven/gradle, julia, nuget/dotnet_sdk, git_submodules, docker/docker_compose, opentofu, terraform, pre_commit. github_actions has gem code (github_actions/lib/dependabot/github_actions/*.rb) and a CI suite (ci.yml:37). A README search finds none of the extra ecosystem names; the one 'devcontainers' hit (line 401) is a VS Code URL. Nuance: bun/deno and uv/conda belong to JavaScript and Python, which the README names as languages."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

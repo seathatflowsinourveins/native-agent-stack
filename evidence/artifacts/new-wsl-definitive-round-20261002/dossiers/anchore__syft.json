@@ -1,0 +1,272 @@
+{
+  "contender": "anchore/syft",
+  "revision": {
+    "contender": "anchore/syft",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "anchore/syft",
+        "tag": "v1.54.0",
+        "commit": "cc326e45a6213360266dda4b30cc68095946d676",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v1.54.0",
+    "commit": "cc326e45a6213360266dda4b30cc68095946d676",
+    "read_at": "2026-10-02T03:01:54+00:00"
+  },
+  "dossier": {
+    "contender": "anchore/syft",
+    "revision": {
+      "tag": "v1.54.0",
+      "commit": "cc326e45a6213360266dda4b30cc68095946d676",
+      "read_at": "2026-10-01"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Syft (Anchore) is a Go CLI and Go library that generates a Software Bill of Materials from container images (Docker/Podman daemon, registries, docker/OCI archives and layouts, Singularity SIF), directories, files and archives (README.md:7,22-24; cmd/syft/internal/commands/scan.go:46-65). Output formats: syft-json, CycloneDX (JSON/XML), SPDX (JSON/tag-value), a GitHub dependency-snapshot JSON, purls, table/text and templates (syft/format/encoders.go:56-74). It also has an experimental format converter and an `attest` command that shells out to cosign to publish in-toto SBOM attestations for registry images (cmd/syft/internal/commands/convert.go:54, attest.go:104-229). The repository also contains the project's own CI/release pipeline (zizmor, CodeQL via reusable workflow, Dependabot, SHA-pinned actions, cosign-signed checksums), which is documented below as evidence for the CI/supply-chain needs.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "A CLI tool and Go library for generating a Software Bill of Materials (SBOM) from container images and filesystems; 'Exceptional for vulnerability detection when used with a scanner like Grype'.",
+          "citation": "README.md:7"
+        },
+        {
+          "claim": "Generates SBOMs for container images, filesystems and archives (full list of scan targets is on an external docs page).",
+          "citation": "README.md:22"
+        },
+        {
+          "claim": "Supports dozens of packaging ecosystems (Alpine apk, Debian dpkg, RPM, Go, Python, Java, JavaScript, Ruby, Rust, PHP, .NET and many more).",
+          "citation": "README.md:23"
+        },
+        {
+          "claim": "Supports OCI, Docker, Singularity and more image formats.",
+          "citation": "README.md:24"
+        },
+        {
+          "claim": "Works seamlessly with Grype for vulnerability scanning.",
+          "citation": "README.md:25"
+        },
+        {
+          "claim": "Multiple output formats (CycloneDX, SPDX, Syft JSON and more), including the ability to convert between SBOM formats.",
+          "citation": "README.md:26"
+        },
+        {
+          "claim": "Create signed SBOM attestations using the in-toto specification.",
+          "citation": "README.md:27"
+        },
+        {
+          "claim": "Quickest install is `curl -sSfL https://get.anchore.io/syft | sudo sh -s -- -b /usr/local/bin`.",
+          "citation": "README.md:34-37"
+        },
+        {
+          "claim": "Installation docs (external page) list more ways to get Syft, including Homebrew, Docker, Scoop, Chocolatey, Nix and more.",
+          "citation": "README.md:40"
+        },
+        {
+          "claim": "Basic usage: `syft alpine:latest` for a container image and `syft ./my-project` for a directory.",
+          "citation": "README.md:44-52"
+        },
+        {
+          "claim": "Get an SBOM with `syft <image> -o cyclonedx-json`, or write several to files with `-o spdx-json=./spdx.json -o cyclonedx-json=./cdx.json`.",
+          "citation": "README.md:54-62"
+        },
+        {
+          "claim": "Syft development is sponsored by Anchore and released under the Apache-2.0 License; commercial support is available from Anchore.",
+          "citation": "README.md:79,83"
+        },
+        {
+          "claim": "CI status badge points at the 'Validations' workflow (validations.yaml).",
+          "citation": "README.md:10"
+        },
+        {
+          "claim": "Contributions and issues are encouraged; contributor docs, CLI docs, configuration docs and JSON schema docs live on oss.anchore.com (external).",
+          "citation": "README.md:68,73-74"
+        }
+      ],
+      "install": [
+        {
+          "method": "Install script (README quick install; script supports Linux and macOS)",
+          "command": "curl -sSfL https://get.anchore.io/syft | sudo sh -s -- -b /usr/local/bin",
+          "citation": "README.md:36 (script platform support: install.sh:125-142; macOS install tests: test/install/Makefile:34-35)"
+        },
+        {
+          "method": "Install script with cosign signature verification of checksums.txt (-v flag; requires cosign on PATH)",
+          "command": "install.sh -v -b /usr/local/bin   (usage text: install.sh [-v] [-b DIR] [-d] [TAG])",
+          "citation": "install.sh:817-822 (usage); test/install/Makefile:21 (exercised as `../../install.sh -v -b /usr/local/bin`)"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - .goreleaser.yaml:14-17 builds static linux/amd64 binaries (CGO_ENABLED=0, .goreleaser.yaml:10); also .deb/.rpm (.goreleaser.yaml:59-64) and linux/amd64 Docker images (.goreleaser.yaml:85-90); Linux CI jobs at .github/workflows/validations.yaml:68-87.",
+        "wsl2": "unknown - no WSL/WSL2 mention in the README or code (the only grep hit is the unrelated 'wsl' linter name at .golangci.yaml:102); Linux binaries are published but WSL2 is neither documented nor tested.",
+        "macos_arm64": "yes - darwin/arm64 build at .goreleaser.yaml:28-33 with a post-build quill sign-and-notarize hook (.goreleaser.yaml:35-39); CI job 'Acceptance tests (Mac)' on macos-latest (.github/workflows/validations.yaml:212-248). Note test/compare/mac.sh:42 runs the darwin amd64 snapshot binary.",
+        "gpu": "no - no GPU use or requirement; a search for gpu/cuda/nvidia only hit license-text data and comments (e.g. syft/pkg/cataloger/debian/parse_copyright.go:142)."
+      },
+      "integrations": {
+        "cli": "yes - `syft` binary with subcommands scan (root alias), packages (alias), cataloger list, attest, convert, version, config, login (cmd/syft/cli/cli.go:44-54; entry cmd/syft/main.go:22-34).",
+        "mcp": "none found (no mcp / model-context-protocol references in project files).",
+        "sdk_or_api": "Go library module github.com/anchore/syft (go.mod:1): syft.GetSource (syft/get_source.go:14), syft.CreateSBOM (syft/create_sbom.go:31), format.Encode/Decode, with runnable examples (examples/README.md:5-11; examples/create_simple_sbom/main.go:19-66); the whole CLI can be embedded via cli.Command (cmd/syft/cli/cli.go:25-30). No HTTP/gRPC server found (no ListenAndServe/grpc.NewServer in any .go file).",
+        "claude_code_or_codex": "none found (no CLAUDE.md, AGENTS.md, .claude/, .codex/, .cursor/ or .mcp.json in the tree)."
+      },
+      "telemetry_and_network": "No telemetry/analytics code found (searches for telemetry/analytics/sentry/segment/posthog/mixpanel hit only unrelated identifiers). One default-on outbound call: an update check that GETs https://toolbox-data.anchore.io/syft/releases/latest/VERSION with User-Agent 'syft <version>' (cmd/syft/internal/commands/update.go:22-28,92-98). It is enabled by default (cmd/syft/internal/options/update_check.go:11), runs in PreRunE of scan, attest and convert (scan.go:101, attest.go:67, convert.go:60), is skipped for non-production/SNAPSHOT builds (update.go:63-66,85-90) and is disabled with `check-for-app-update: false` (the repo's own tests set SYFT_CHECK_FOR_APP_UPDATE=false, test/cli/utils_test.go:110). The production Docker image ships CA certs for this HTTPS call (Dockerfile:5-6). Other network use: pulling images from a Docker/Podman daemon or registry (scan.go:47-58); 'snap' sources via api.snapcraft.io (syft/source/snapsource/snapcraft_api.go:30-31); opt-in enrichment via --enrich/config, default off (cmd/syft/internal/options/catalog.go:267-269), which can query Maven Central (syft/pkg/cataloger/java/config.go:25), npm (syft/pkg/cataloger/javascript/config.go:3), PyPI (syft/pkg/cataloger/python/config.go:3) and the Go module proxy (syft/pkg/cataloger/golang/config.go:14); opt-in vcpkg git clone (cmd/syft/internal/options/cpp.go:15-16); `syft attest` needs cosign on PATH and registry write access, and in keyless mode defers to whatever services cosign contacts (attest.go:104-106,217-229). No account or API key is required for core scanning; private-registry credentials go through `syft login`, which reuses crane's auth login (cli.go:53). A local cache of downloaded content defaults to $XDG_CACHE_HOME/syft with a 7-day TTL (options/cache.go:68-93). Installation contacts get.anchore.io, GitHub releases and a raw.githubusercontent.com fallback (install.sh:8-10,871-873)."
+    },
+    "code": {
+      "languages": [
+        "Go (primary; go 1.26.8 per go.mod:3; ~1,240 .go files including test fixtures)",
+        "Shell (install.sh, test/install/*.sh, test/compare/*.sh, .github/scripts/*.sh)",
+        "Python (.github/scripts/labeler.py, find_cache_paths.py, fingerprint_docker_fixtures.py, prune_orphan_fingerprints.py, test/compare/compare.py)",
+        "YAML (workflows, .goreleaser.yaml, Taskfile.yaml, per-cataloger capabilities.yaml data)"
+      ],
+      "entry_points": [
+        {
+          "path": "cmd/syft/main.go",
+          "what": "Binary main; build-time vars version/buildDate/gitCommit/gitDescription injected by ldflags (.goreleaser.yaml:19-26)."
+        },
+        {
+          "path": "cmd/syft/cli/cli.go",
+          "what": "Application()/Command() assemble the cobra/anchore-clio app; subcommands scan (root alias), packages, cataloger, attest, convert, version, config, login (cli.go:44-54)."
+        },
+        {
+          "path": "cmd/syft/internal/commands/scan.go",
+          "what": "`syft scan [SOURCE]` - primary SBOM generation; -o selects formats, --from/--scope/--enrich/--platform etc. via options/catalog.go."
+        },
+        {
+          "path": "cmd/syft/internal/commands/attest.go",
+          "what": "`syft attest` - builds an SBOM for a registry image and shells out to `cosign attest` (requires cosign on PATH)."
+        },
+        {
+          "path": "cmd/syft/internal/commands/convert.go",
+          "what": "`syft convert` - experimental SBOM format conversion (decode then re-encode)."
+        },
+        {
+          "path": "syft/get_source.go + syft/create_sbom.go",
+          "what": "Go library API: syft.GetSource (get_source.go:14) and syft.CreateSBOM (create_sbom.go:31); encoders/decoders in syft/format/; examples in examples/."
+        },
+        {
+          "path": "install.sh",
+          "what": "POSIX installer served from get.anchore.io/syft; downloads release archive + checksums.txt, optional cosign verification (-v)."
+        },
+        {
+          "path": ".make/main.go",
+          "what": "anchore/go-make entry behind `make <task>` (Makefile:18); defines unit/integration/cli/unit:windows tasks and wires Taskfile.yaml tasks."
+        }
+      ],
+      "architecture": "CLI (cmd/syft): main.go -> cli/cli.go builds a cobra/anchore-clio app; commands in cmd/syft/internal/commands/ (scan, attest, convert, cataloger, update), flags/config in cmd/syft/internal/options/, terminal UI in cmd/syft/cli/ui/. Library (syft/): get_source.go resolves user input through source providers (syft/source/sourceproviders/source_providers.go: stereoscope-backed images, directory, file, snap, OCI model); create_sbom.go + create_sbom_config.go run the selected catalogers (default tag set is `image` for images and `directory` for dirs/files, create_sbom_config.go:478-489; image scope defaults to squashed, with all-layers and deep-squashed available, syft/source/scope.go:11-16) through internal/task/ (package_tasks.go registers 67 package-cataloger factories, 4 deprecated), plus file catalogers (syft/file/) and relationship tasks. Per-ecosystem catalogers live in syft/pkg/cataloger/<ecosystem>/ (67 entries across 37 capabilities.yaml files); this includes `github-actions-usage-cataloger` and `github-action-workflow-usage-cataloger`, which read `uses:` in .github/workflows/*.y(a)ml and .github/actions/*/action.y(a)ml and run by default on directory scans (syft/pkg/cataloger/githubactions/cataloger.go:11-22; internal/task/package_tasks.go:181-182). Package model in syft/pkg/, SBOM model in syft/sbom/, encoders/decoders in syft/format/<format>/ (syftjson, cyclonedxjson/xml, spdxjson/tagvalue, github, purls, table, text, template). The SBOM records tool name/version and the configuration used (syft/create_sbom.go:51-66). Versioned syft-json schemas are in schema/json/ (current 16.1.11, internal/constants.go:6); vendored CycloneDX schemas for validation in schema/cyclonedx/. Build/test tooling: Makefile -> .make/main.go (anchore/go-make v0.8.1) + Taskfile.yaml syft-specific tasks; tests in test/ (cli, compare, install) and cmd/syft/internal/test/integration/.",
+      "packaging_and_release": "Release is a manual workflow_dispatch (.github/workflows/release.yaml:10-28), gated by a check-gate over 7 named checks (release.yaml:39-49; can be bypassed with the skip-checks input, release.yaml:24-28,40), runs in `environment: release` (release.yaml:61) with admin approval (RELEASE.md:23-24), and calls `make ci-release` (release.yaml:104-119; implemented in anchore/go-make, not in this tree) which drives GoReleaser v2 (.goreleaser.yaml:1). Artifacts: static binaries (CGO_ENABLED=0) for linux amd64/arm64/ppc64le/riscv64/s390x, darwin amd64/arm64 (signed + notarized with quill, .goreleaser.yaml:35-39), windows amd64/arm64 (zip) (.goreleaser.yaml:12-57); .deb/.rpm (.goreleaser.yaml:59-64); Homebrew tap anchore/homebrew-syft (.goreleaser.yaml:66-74); 4 Docker variants (production scratch, nonroot, debug, debug-nonroot) x 5 platforms pushed to docker.io/anchore/syft and ghcr.io/anchore/syft (.goreleaser.yaml:76-157; Dockerfile, Dockerfile.nonroot, Dockerfile.debug, Dockerfile.debug-nonroot); a syft-json SBOM per archive made with the binny-managed syft (.goreleaser.yaml:159-168); the checksums file is signed with cosign keyless `sign-blob` into a Sigstore bundle (.goreleaser.yaml:170-179; `id-token: write` at release.yaml:76). install.sh always verifies the archive's sha256 against checksums.txt (install.sh:684-687) and verifies the bundle with `cosign verify-blob` (certificate identity https://github.com/anchore/syft/.github/workflows/release.yaml@refs/heads/main, GitHub OIDC issuer) only when -v is given (install.sh:589-619,651-675,812); bundles are used from v1.53.0 (install.sh:22). No build-provenance or in-toto attestation for binaries/images: images are built with `--provenance=false` and `sbom: \"false\"` (.goreleaser.yaml:110-115), there is no docker-signing section, and no actions/attest*, SLSA generator or `attestations: write` permission exists in .github. release.yaml:121-125 additionally runs anchore/sbom-action on go.mod to produce sbom.spdx.json (continue-on-error: true). The install script is published to R2/S3 through the anchore/workflows reusable workflow (release.yaml:127-142). Target cadence 1-2 weeks (RELEASE.md:9-11); retraction procedure at RELEASE.md:27-37.",
+      "tests_and_ci": "Frameworks: Go testing + testify, go-snaps snapshots (cmd/syft/cli/ui/__snapshots__/), golden files for format encoders (Taskfile.yaml:110-117), docker-built image fixtures cached as an OCI artifact pulled with ORAS (Taskfile.yaml:19; .binny.yaml:16-22). Approx. 504 *_test.go files of ~1,240 .go files (testdata fixtures included): integration tests in cmd/syft/internal/test/integration/ (28 files), CLI tests in test/cli/ (20 files; need SYFT_BINARY_LOCATION snapshot binary, .make/main.go:82-98), shell tests of install.sh in test/install/ (Linux containers + macOS), acceptance comparison in test/compare/. SBOM validity is checked against CycloneDX XSD/JSON schema (schema/cyclonedx/Makefile:3-11), cyclonedx-cli and digest-pinned SPDX tools-java validators (test/cli/cyclonedx_valid_test.go:91-132; test/cli/spdx_tooling_validation_test.go:14-15). Unit coverage gate 62% and race detector in CI (.make/main.go:29-33,176-194); drift checks for JSON schema and cataloger capabilities (.github/scripts/json-schema-drift-check.sh, capability-drift-check.sh). Lint: golangci-lint with 25 linters incl. gosec/staticcheck/revive plus gci/gofmt (.golangci.yaml:3-31,113-128) via `make static-analysis` (validations.yaml:46-47; the generic lint task lives in go-make). Four workflows, each with top-level `permissions: {}` and per-job grants: validations.yaml (PR, push to main, manual: Static analysis, Unit tests Linux + Windows [Windows runs a curated subset, .make/main.go:100-115], Integration tests, Build snapshot artifacts, Acceptance Linux/Mac, CLI tests Linux); release.yaml (manual); codeql.yaml (push/PR to main + weekly cron; reusable anchore/workflows codeql.yaml@7212994d... with security-events: write, codeql.yaml:13-21); validate-github-actions.yaml (zizmorcore/zizmor-action@cc914d7f... v0.6.4, `inputs: .github`, `advanced-security: true`, `security-events: write # for uploading SARIF results`, validate-github-actions.yaml:15-32; config .github/zizmor.yml). All 28 external `uses:` refs are pinned to 40-hex commit SHAs with version comments (8 more are local ./ refs). .github/dependabot.yml:5-39 covers gomod (/, /.make) and github-actions (/, /.github/actions/*), weekly on Friday, 7-day cooldown, no docker ecosystem. No actionlint or other workflow syntax/expression/run-script linter exists in the repo. Linux build/test jobs run on runs-on.com-managed AWS runners (validations.yaml:30); the s3 cache is deliberately omitted on PR runs to prevent cache poisoning (validations.yaml:28-29); aggregator, zizmor, Windows and macOS jobs use GitHub-hosted runners.",
+      "dependencies": "go.mod: 97 direct requires (94 in the first block, 3 in the second; go.mod:5-107) + 241 '// indirect' (go.mod:109-351); go.sum present, no vendor/. .make/go.mod: 1 direct (github.com/anchore/go-make v0.8.1, .make/go.mod:5) + 4 indirect. 15 further go.mod files exist only as test fixtures under testdata/gotestdata dirs; no non-Go project manifests (no package.json/requirements/pyproject). Tool pins: .binny.yaml pins yajsv v1.4.1, oras v1.3.4 and yq v4.53.6 (.binny.yaml:7-30) with a 7-day cooldown (.binny.yaml:2); binny, chronicle, cosign, golangci-lint, goreleaser, gosimports, bouncer, quill, syft, task and gh are inherited from go-make's embedded .binny.yaml and their versions are not visible in this tree (.binny.yaml:3-6). Dependency freshness: .github/dependabot.yml:5-39 (gomod + github-actions only). License allow-list for Go deps in .bouncer.yaml:1-9 with documented exceptions at :11-66.",
+      "security_policy": "SECURITY.md: only the most recent release receives security updates (SECURITY.md:5); report privately to security@anchore.com (SECURITY.md:9-14; fuller policy on oss.anchore.com, :16); trust boundary - Syft is not designed to scan malicious content and confusion/omission caused by malicious inputs is not treated as a vulnerability, whereas arbitrary code execution, secret leakage, directory traversal and permanent temp-space exhaustion are (SECURITY.md:18-36)."
+    },
+    "claim_checks": [
+      {
+        "claim": "A CLI tool and Go library for generating an SBOM from container images and filesystems.",
+        "verified": "yes",
+        "evidence": "CLI: cmd/syft/main.go:22-34; library: syft.GetSource (syft/get_source.go:14), syft.CreateSBOM (syft/create_sbom.go:31); SDK usage example examples/create_simple_sbom/main.go:19-66."
+      },
+      {
+        "claim": "Generates SBOMs for container images, filesystems, archives; supports OCI, Docker, Singularity and more image formats.",
+        "verified": "yes",
+        "evidence": "scan.go:46-65 documents docker, podman, registry, docker-archive, oci-archive, oci-dir, singularity, oci-model-registry, dir and file sources; providers wired in syft/source/sourceproviders/source_providers.go:23-57 (also snap)."
+      },
+      {
+        "claim": "Supports dozens of packaging ecosystems.",
+        "verified": "yes",
+        "evidence": "internal/task/package_tasks.go:68-208 registers 67 package cataloger factories (4 deprecated, :204-207); 67 `- ecosystem:` entries across 37 syft/pkg/cataloger/*/capabilities.yaml files."
+      },
+      {
+        "claim": "Multiple output formats (CycloneDX, SPDX, Syft JSON and more).",
+        "verified": "yes",
+        "evidence": "syft/format/encoders.go:56-74 registers syft-json, table, text, purls, github-json, cyclonedx-xml/json, spdx-json/tag-value and template. CycloneDX JSON 1.2-1.7, XML 1.0-1.7, default 1.7 (syft/format/internal/cyclonedxutil/versions.go:15-51); SPDX tag-value 2.1-2.3, JSON 2.2/2.3/3.0, default 2.3 (syft/format/internal/spdxutil/versions.go:7-30). github-json leaves job/sha/ref unset (syft/format/github/internal/model/model.go:26) and hard-codes scope=runtime, relationship=direct (model.go:187-193)."
+      },
+      {
+        "claim": "Includes the ability to convert between SBOM formats.",
+        "verified": "partial",
+        "evidence": "The command exists (cmd/syft/internal/commands/convert.go:52-68) but is labelled '[Experimental]' (convert.go:54) and logs 'convert is an experimental feature' on every run (convert.go:75); the README does not say so. Code wins over README."
+      },
+      {
+        "claim": "Create signed SBOM attestations using the in-toto specification.",
+        "verified": "partial",
+        "evidence": "Works only by shelling out to an external cosign binary: errors if cosign is not on PATH (attest.go:104-106), runs `cosign attest <image> --predicate ... --type ... -y [--key]` (attest.go:217-229; keyless sets COSIGN_EXPERIMENTAL=1). Registry image sources only (attest.go:250-252); formats limited to syft-json, cyclonedx-json, spdx-json, spdx-tag-value (attest.go:90-95). Tests only assert command construction (attest_test.go:101-197); the Sigstore docker-compose fixture in test/cli/testdata/attestation/ is not referenced by any test, Makefile or workflow, so no end-to-end attestation test was found."
+      },
+      {
+        "claim": "Quickest install: curl -sSfL https://get.anchore.io/syft | sudo sh -s -- -b /usr/local/bin.",
+        "verified": "yes",
+        "evidence": "install.sh installs the release archive into -b DIR (install.sh:800-828,879-892). Behaviour not stated in the README: by default the script re-fetches the release-tagged install.sh from get.anchore.io (fallback raw.githubusercontent.com) and pipes it to sh (install.sh:865-877); archive sha256 is always checked against checksums.txt from the same release (install.sh:684-687) but cosign signature verification of checksums.txt is opt-in via -v (install.sh:651-675,812), which the README command omits."
+      },
+      {
+        "claim": "More ways to get Syft including Homebrew, Docker, Scoop, Chocolatey, Nix.",
+        "verified": "partial",
+        "evidence": "Homebrew tap anchore/homebrew-syft (.goreleaser.yaml:66-74) and Docker images on Docker Hub and GHCR (.goreleaser.yaml:76-157; RELEASE.md:5-7) are produced by this repo. No Scoop, Chocolatey or Nix packaging config exists in this tree (grep hits only README.md:40); the external install docs page was not opened."
+      },
+      {
+        "claim": "Works seamlessly with Grype for vulnerability scanning.",
+        "verified": "not_checkable",
+        "evidence": "Grype is a separate repository; this tree has no Grype dependency in go.mod and only comments referencing it (syft/pkg/url.go:18, syft/format/github/internal/model/model.go:198)."
+      },
+      {
+        "claim": "README badge advertises the 'Validations' workflow as the project's checks.",
+        "verified": "yes",
+        "evidence": ".github/workflows/validations.yaml exists and runs static analysis, unit (Linux + Windows subset), integration, snapshot build, acceptance (Linux/Mac) and CLI tests (validations.yaml:19-277); the release gate requires 7 of its named checks to have passed (release.yaml:39-49)."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Release provenance/attestation gap: only the checksums file is signed (cosign keyless Sigstore bundle, .goreleaser.yaml:170-179). Container images are built with `--provenance=false` and `sbom: \"false\"` (.goreleaser.yaml:110-115) and have no signing section; no actions/attest*, SLSA generator or `attestations: write` exists in .github (grep). The only workflow-level SBOM step is anchore/sbom-action on go.mod with continue-on-error: true (release.yaml:121-125). `syft attest` (a user feature) needs an external cosign and a registry image (attest.go:104-106,250-252) and has no end-to-end test.",
+      "No workflow syntax/expression linter: no actionlint (or equivalent) appears anywhere in the repo; only zizmor (security audit) runs on workflows (validate-github-actions.yaml:15-32). Concrete miss: validations.yaml:202 and :209 reference `steps.install-test-image-cache` but no step in .github defines that id, so 'Load test image cache' can never run and the cache-miss step always runs. .github/zizmor.yml:6 ignores detect-schema-changes.yaml, which does not exist in this tree, and .github/scripts/labeler.py refers to pull_request_target although no workflow invokes it. zizmor's pass/fail gating is stated to be a repo ruleset outside the tree (validate-github-actions.yaml:30), so it cannot be verified here.",
+      "Pinning gaps outside actions and Go modules: release Docker bases are floating distroless tags (gcr.io/distroless/static-debian13:latest / :debug / :nonroot / :debug-nonroot; Dockerfile:2, Dockerfile.debug:2, Dockerfile.nonroot:2, Dockerfile.debug-nonroot:2) and dependabot.yml has only gomod and github-actions ecosystems (dependabot.yml:5-39), so image bases and .binny.yaml tool pins (yajsv, oras, yq; .binny.yaml:7-30) are not covered by it. cosign/goreleaser/golangci-lint/quill/syft versions live in go-make's embedded .binny.yaml and are not visible here (.binny.yaml:3-6).",
+      "Build and CI logic sits partly outside this tree: Makefile delegates to `go run -C .make` using anchore/go-make v0.8.1 (.make/go.mod:5; .make/main.go:9-31), and CodeQL, check-gate, check-version-available and release-install-script are reusable workflows from anchore/workflows v0.8.0 (SHA-pinned: codeql.yaml:16, release.yaml:35,44,132), so what `make static-analysis` / `make ci-release` and those workflows actually run cannot be audited from this checkout. go.mod requires `go 1.26.8` (go.mod:3) while CI's configured Go is 1.26.2 (.github/actions/bootstrap/action.yaml:11-12; validations.yaml:104) and no GOTOOLCHAIN setting appears in repo build files.",
+      "Release credentials and controls: the release job uses long-lived secrets (Docker Hub PAT, TAG_TOKEN, Apple signing cert and notary key, Homebrew-tap token; release.yaml:94-95,107-119) plus R2/S3 keys for the install-script job (release.yaml:136-142), and its checkout sets `persist-credentials: true` (release.yaml:81) while every other checkout uses false. The check-gate can be skipped with the skip-checks dispatch input (release.yaml:24-28,40). Mitigations present: workflow-level `permissions: {}`, job-scoped grants, `environment: release` with manual approval (release.yaml:61; RELEASE.md:23-24), SHA-pinned actions.",
+      "Outputs are not reproducible byte-for-byte: CycloneDX gets a random URN serial number and wall-clock timestamp (syft/format/common/cyclonedxhelpers/to_format_model.go:42,212); SPDX gets a random UUID in documentNamespace and wall-clock `Created` (syft/format/internal/spdxutil/helpers/document_namespace.go:44; syft/format/common/spdxhelpers/to_format_model.go:151); github-json sets `scanned` to now and leaves job/sha/ref empty (syft/format/github/internal/model/model.go:19,26). Release binaries embed `{{.Date}}` as buildDate and no -trimpath flag is set (.goreleaser.yaml:19-26,92); no reproducible-build or SOURCE_DATE_EPOCH support or claim was found.",
+      "Network behaviour: a default-on update check calls https://toolbox-data.anchore.io/syft/releases/latest/VERSION from scan/attest/convert unless disabled (update.go:22-28; options/update_check.go:11; scan.go:101), so CI runs make an outbound call by default; opt-in --enrich can contact Maven Central, npm, PyPI and the Go proxy (options/catalog.go:267-269); the default image source tries a Docker daemon, then a registry (scan.go:47).",
+      "Scope/maintenance/platform: SECURITY.md supports only the latest release (SECURITY.md:5) and states Syft is not designed for malicious content (SECURITY.md:20); `convert` is experimental (convert.go:54); no MCP, HTTP API or Claude Code/Codex integration exists; WSL2 is undocumented; Windows CI runs only a curated unit-test subset (.make/main.go:100-115) and the macOS compare script runs the darwin amd64 binary (test/compare/mac.sh:42); breaking changes are deferred to 2.0 and some catalogers are deprecated for removal in v2.0 (.github/pull_request_template.md:15; internal/task/package_tasks.go:204-207). Licensing: stock Apache-2.0 whose copyright line is an unfilled placeholder (LICENSE:189); .bouncer.yaml:11-66 records manual license exceptions, e.g. spdx/tools-golang is dual-licensed Apache-2.0 / GPL-2.0-or-later and the project elects Apache-2.0 (.bouncer.yaml:25-31)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "anchore/syft",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Install script (README quick install; script supports Linux and macOS): curl -sSfL https://get.anchore.io/syft | sudo sh -s -- -b /usr/local/bin",
+          "citation": "README.md:36 (script platform support: install.sh:125-142; macOS install tests: test/install/Makefile:34-35)",
+          "holds": true,
+          "note": "README.md:36 is that exact command. install.sh:125-142 (uname_os_check) accepts linux and darwin, among other GOOS values. -b sets the install dir (install.sh:802), and the script downloads the release archive matching syft_*_<os>_<arch>.<format> from checksums.txt (install.sh:435,644). .goreleaser.yaml:50-53 publishes linux and darwin archives; only Windows is switched to zip (:54-57, matching install.sh:552). test/install/Makefile:34-35 defines ci-test-mac (unit-run + acceptance-local, which runs install.sh with -v -b and with plain -b, :21), and the macOS CI job calls it (validations.yaml:247-248 -> Taskfile.yaml:344-347)."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX Apache-2.0, file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-3 is the Apache License, Version 2.0 header, followed by the standard unmodified terms (sections 1-9) and the appendix. The copyright line at LICENSE:189 is the unfilled template placeholder. README.md:79 and the image labels at .goreleaser.yaml:99,102 also say Apache-2.0. No other LICENSE/NOTICE/COPYING file exists outside testdata fixtures."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - .goreleaser.yaml:14-17 builds static linux/amd64 binaries (CGO_ENABLED=0, .goreleaser.yaml:10); also .deb/.rpm (.goreleaser.yaml:59-64) and linux/amd64 Docker images (.goreleaser.yaml:85-90); Linux CI jobs at .github/workflows/validations.yaml:68-87.",
+          "citation": ".goreleaser.yaml:10,14-17,59-64,85-90; .github/workflows/validations.yaml:68-87",
+          "holds": true,
+          "note": ".goreleaser.yaml:16-17 set goos [linux] with goarch including amd64; :10 sets CGO_ENABLED=0 and :22 sets -extldflags '-static'. :59-64 is nfpms with formats [rpm, deb]. :85-90 lists docker platforms including linux/amd64. validations.yaml:68-87 is the 'Unit tests (Linux)' job (make unit + capability drift check). The macOS arm64 platform citations (.goreleaser.yaml:28-39, validations.yaml:212-248, test/compare/mac.sh:42) were also opened and hold."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "yes - `syft` binary with subcommands scan (root alias), packages (alias), cataloger list, attest, convert, version, config, login (cmd/syft/cli/cli.go:44-54; entry cmd/syft/main.go:22-34).",
+          "citation": "cmd/syft/cli/cli.go:44-54; cmd/syft/main.go:22-34",
+          "holds": true,
+          "note": "cli.go:41-42 makes root an alias of scan. :45-54 add scan, Packages, Cataloger, Attest, Convert, clio VersionCommand, clio ConfigCommand and crane NewCmdAuthLogin ('syft login', :53). main.go:22-34 builds and runs cli.Application. The Use strings confirm the names (scan.go:93, packages.go:17, cataloger.go:13 + cataloger_list.go:56, attest.go:59, convert.go:52), and test/cli runs version and config (version_cmd_test.go:24, config_test.go:198). The login name comes from crane, outside this tree; the only in-tree evidence is the comment at cli.go:53. Omissions only, not errors: packages is marked Deprecated 'use `syft scan` instead' (packages.go:34), and `cataloger info` exists but is registered only when SYFT_EXP_CAPABILITIES=true (cataloger.go:21-24)."
+        },
+        {
+          "field": "claim_checks[3]",
+          "statement": "Multiple output formats (CycloneDX, SPDX, Syft JSON and more) - verified: yes, with CycloneDX JSON 1.2-1.7 / XML 1.0-1.7 default 1.7, SPDX tag-value 2.1-2.3 / JSON 2.2,2.3,3.0 default 2.3, github-json job/sha/ref unset and scope/relationship hard-coded.",
+          "citation": "syft/format/encoders.go:56-74; syft/format/internal/cyclonedxutil/versions.go:15-51; syft/format/internal/spdxutil/versions.go:7-30; syft/format/github/internal/model/model.go:26,187-193",
+          "holds": true,
+          "note": "encoders.go:63-71 add syft-json, table, text, purls, github (ID 'github-json', github/encoder.go:11), cyclonedx-xml/json and spdx-json/tag-value; template is added only when a template path is set (:59-61). CycloneDX JSON covers 1.2-1.7, XML adds 1.0/1.1, and the default is 1.7 (cyclonedxutil/versions.go:20-44); cyclonedxjson/encoder.go:13,39 and cyclonedxxml/encoder.go:15,41 use these. SPDX is 2.2/2.3, plus 2.1 for tag-value only and 3.0 for JSON only, default 2.3 (spdxutil/versions.go:8,15-29). model.go:26 is the Job/Sha/Ref TODO and the struct literal leaves those unset; :187-193 return runtime/direct unconditionally."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

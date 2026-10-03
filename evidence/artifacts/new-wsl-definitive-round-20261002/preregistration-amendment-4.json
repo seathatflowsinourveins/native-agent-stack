@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "kind": "definitive_round_preregistration_amendment",
+  "amendment": 4,
+  "recorded_at_utc": "2026-10-03T13:13:22+00:00",
+  "after": "every decision, critic and adjudication of the round, and the first run of compare.py; this amendment is a defect fix made with the results known, disclosed as such",
+  "defect": "compare.py's row_picks() treated a row with installs_nothing_extra=true as a NONE pick. That flag also marks picks that run on GitHub rather than on the host: the manifest's build-provenance row (actions/attest, definitive, outcome final) and dependency-updates row (Dependabot, resolved, installed on a critic's verdict). Amendment 2's rule text says 'agree when the pick is the row's repository, or NONE on a row that installs nothing'; both rows name their repository, so the code contradicted the frozen text.",
+  "fix": "a row's pick is the repository it names; NONE only when it names none (a new test covers a named repository with installs_nothing_extra=true)",
+  "changes": [
+    {
+      "file": "compare.py",
+      "sha256_before": "4f6d4513362d4d40d33c04c3b24d74d6d8b2ce30067a8c8cb88e1e750fc6e32b",
+      "sha256_after": "31b72cacc33bdd311b72caa0341c3bfd7b29c894041403e4623fac27d0f78902"
+    }
+  ],
+  "added": [
+    {
+      "file": "audit-of-manifest.before-amendment-4.json",
+      "sha256": "49ec7a45bf52a1aaf38240d875a0bc224562be35ace4fd152456776b99c0efa8"
+    }
+  ],
+  "effect": {
+    "before": {
+      "agree": 20,
+      "contest": 9,
+      "not_settled": 7,
+      "pin_conflict": 1,
+      "pin_agree": 1,
+      "cross_check": 1,
+      "nominates": 4
+    },
+    "after": {
+      "agree": 22,
+      "contest": 7,
+      "not_settled": 7,
+      "pin_conflict": 1,
+      "pin_agree": 1,
+      "cross_check": 1,
+      "nominates": 4
+    },
+    "rows_changed": [
+      "ci-supply-chain/build-provenance: contest -> agree (actions/attest)",
+      "ci-supply-chain/dependency-updates: contest -> agree (dependabot/dependabot-core)"
+    ],
+    "unchanged": "the decision rule, every judgment, selection.json and every other verdict; compare.py reads selection.json and the pinned manifest only"
+  }
+}

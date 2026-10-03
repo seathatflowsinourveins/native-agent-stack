@@ -1,0 +1,353 @@
+{
+  "contender": "vshulcz/deja-vu",
+  "revision": {
+    "contender": "vshulcz/deja-vu",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "vshulcz/deja-vu",
+        "tag": "v0.21.4",
+        "commit": "bb93e229a5e2c2ccd1fe4444479e7ea98d765600",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.21.4",
+    "commit": "bb93e229a5e2c2ccd1fe4444479e7ea98d765600",
+    "read_at": "2026-10-02T03:03:04+00:00"
+  },
+  "dossier": {
+    "contender": "vshulcz/deja-vu",
+    "revision": {
+      "tag": "v0.21.4",
+      "commit": "bb93e229a5e2c2ccd1fe4444479e7ea98d765600",
+      "read_at": "2026-10-03"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "deja-vu (binary `deja`) is a local single-binary memory layer for coding agents. It parses the session transcripts that 35 agents (including Claude Code under ~/.claude/projects and Codex under ~/.codex/sessions) already write to disk, builds a redacted lexical (BM25) index under ~/.cache/deja, and serves it back through a CLI, a stdio MCP server (one tool, seven modes) and per-agent hooks, skills and plugins (README.md:8-12, 249-252; docs/ARCHITECTURE.md:5-50, 206-260). It also keeps an explicit notes store (`remember`, `promote` with accepted/rejected/superseded/stale states) in ~/.local/share/deja/notes.jsonl, plus forget/unforget tombstones, session handoff to another agent, span restore and SSH sync between machines (README.md:177-213; docs/ARCHITECTURE.md:82-90, 144-170).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "The one memory your coding agents share, built from the history already on your disk; it indexes what Claude Code, Codex, Cursor and 32 more agents already wrote to disk and hands it back in whichever agent asks.",
+          "citation": "README.md:8-12"
+        },
+        {
+          "claim": "Starts full: months of history from before install are searchable on day one.",
+          "citation": "README.md:53"
+        },
+        {
+          "claim": "One memory, every agent: a fix found in Codex comes back in Claude Code; all thirty-five agents read the same index.",
+          "citation": "README.md:54"
+        },
+        {
+          "claim": "Nobody has to ask: recall arrives at session start, before a file is edited or a command runs, and after a command fails.",
+          "citation": "README.md:55"
+        },
+        {
+          "claim": "Survives compaction: over 43 measured compactions the summary kept 77% of the decisions and 0.2% of the commands; deja hands back the rest.",
+          "citation": "README.md:56"
+        },
+        {
+          "claim": "Knows what held: `deja promote <id> --state rejected` marks a reverted decision and every later hit says it was tried; `--state accepted` takes the mark back.",
+          "citation": "README.md:58"
+        },
+        {
+          "claim": "Local and private: no model, no embeddings, no server; keys and tokens are stripped as the index is built.",
+          "citation": "README.md:60"
+        },
+        {
+          "claim": "Moves with you: `deja sync ssh laptop` between machines with no cloud in between; `deja handoff --to codex` continues in another agent.",
+          "citation": "README.md:61"
+        },
+        {
+          "claim": "Indexing and search are local. The network is used only by `deja update`, `deja sync ssh`, the version check in `deja doctor`, and `deja embed` against an endpoint you configure.",
+          "citation": "README.md:150-151"
+        },
+        {
+          "claim": "`deja forget` drops sessions and keeps them dropped across rebuilds; ~/.config/deja/exclude skips a project per line or a whole store with `harness:<name>`.",
+          "citation": "README.md:160-162"
+        },
+        {
+          "claim": "`deja promote <id>` distills a session into a curated note with provenance, tags and a lifecycle state, and notes outrank raw transcripts; the MCP `remember` mode 'stores a durable decision for later recall'. The comparison table lists the capture step as 'none, the transcripts are the memory'.",
+          "citation": "README.md:198, 245, 503"
+        },
+        {
+          "claim": "Claude Code deletes transcripts older than 30 days (cleanupPeriodDays); a session deja indexed before the cleanup stays searchable after the file is gone.",
+          "citation": "README.md:528-531"
+        },
+        {
+          "claim": "How do I wipe everything? `deja uninstall --all` then `rm -rf ~/.cache/deja`.",
+          "citation": "README.md:544-549"
+        },
+        {
+          "claim": "Windows: builds exist and CI runs the suite there; macOS and Linux are the battle-tested paths.",
+          "citation": "README.md:536-539"
+        }
+      ],
+      "install": [
+        {
+          "method": "install script (macOS and Linux) then wire agents",
+          "command": "curl -fsSL https://raw.githubusercontent.com/vshulcz/deja-vu/main/install.sh | sh\ndeja install --auto",
+          "citation": "README.md:20-23, 79-82"
+        },
+        {
+          "method": "Homebrew",
+          "command": "brew install deja-vu",
+          "citation": "README.md:100"
+        },
+        {
+          "method": "go install (needs Go 1.25 per go.mod)",
+          "command": "go install github.com/vshulcz/deja-vu/cmd/deja@latest",
+          "citation": "README.md:100; go.mod:3"
+        },
+        {
+          "method": "npx, to try without installing",
+          "command": "npx @vshulcz/deja-vu \"query\"",
+          "citation": "README.md:100-101"
+        },
+        {
+          "method": "Claude Code plugin marketplace (bundle carries no binary; the deja binary must be installed separately)",
+          "command": "claude plugin marketplace add vshulcz/deja-vu && claude plugin install deja-vu@deja-vu",
+          "citation": "README.md:109-111; claude-plugin/README.md:20-30"
+        },
+        {
+          "method": "Codex plugin marketplace (bundle carries no binary; the deja binary must be installed separately)",
+          "command": "codex plugin marketplace add https://github.com/vshulcz/deja-vu\ncodex plugin add deja-vu@deja-vu",
+          "citation": "README.md:318; codex-plugin/README.md:19-29"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - install.sh maps x86_64/amd64 to amd64 (install.sh:33-38); GoReleaser builds linux/amd64 with CGO_ENABLED=0 (.goreleaser.yaml:5-17); CI runs go test -race on ubuntu-latest (.github/workflows/ci.yml:168, 198-199).",
+        "wsl2": "unknown - no WSL mention in README or docs; the only hit is a code comment that a bash on a Windows PATH can be WSL's and cannot run Windows paths (cmd/deja/doctor_hook_runs.go:76-77). A static linux binary is released, but WSL is not in the CI matrix (ci.yml:168: ubuntu/macos/windows).",
+        "macos_arm64": "yes - install.sh maps arm64/aarch64 to arm64 on darwin (install.sh:27-38); GoReleaser builds darwin/arm64 plus a universal binary (.goreleaser.yaml:11-17, 25-29); CI runs go test -race and the e2e smoke on macos-latest (ci.yml:168, 201-203, 355-368).",
+        "gpu": "no (not used or needed) - retrieval is lexical BM25 (docs/ARCHITECTURE.md:102-114); no GPU/CUDA references in README, docs/*.md or the Go sources (searched). The optional semantic tier calls an external HTTP embedding endpoint (README.md:337-348; internal/embed/client.go:23-58), so any GPU use belongs to that separate runtime."
+      },
+      "integrations": {
+        "cli": "yes - `deja` binary with search, show, ctx, blame, files, how, fix, remember, promote, forget, handoff, resume, restore, secrets, sync, view, log, doctor, rules, install/uninstall and more (cmd/deja/main.go:205-321; usage text main.go:4069-4161); many take --json under a schema_version envelope (docs/INTEGRATING.md:62-64, docs/json-output.md).",
+        "mcp": "yes - `deja mcp` is a stdio JSON-RPC server exposing one tool `deja` with modes recall, context, blame, fix, how, orient, remember (cmd/deja/mcp.go:301-326; docs/ARCHITECTURE.md:206-235; README.md:221-245); no network listener; per-platform .mcpb bundles are attached to releases (.github/workflows/release.yml:74-77, 109-112).",
+        "sdk_or_api": "none found - no SDK and no HTTP API; the documented integration surfaces are the --json CLI envelopes, the MCP tool and the hook stdin/stdout contracts (docs/INTEGRATING.md:18-24, 60-64, 81-95). No net.Listen/ListenAndServe/http.Server exists in non-test Go code (searched).",
+        "claude_code_or_codex": "yes, both. Claude Code: `deja install claude-auto` writes the MCP entry in ~/.claude.json, five hook events (SessionStart, PreCompact, UserPromptSubmit, PreToolUse, PostToolUse) in ~/.claude/settings.json, a /deja command and a skill at ~/.claude/skills/deja-history (cmd/deja/install.go:1015-1029, 1688-1749, 1757-1807; cmd/deja/guidance.go:110-111); plugin bundle claude-plugin/ via marketplace (README.md:105-111). Codex: `deja install codex-auto` writes [mcp_servers.deja] in ~/.codex/config.toml, five hook events in ~/.codex/hooks.json and the shared skill at ~/.agents/skills (cmd/deja/install.go:1100-1117, 2327-2332; cmd/deja/install_auto.go:28-51; cmd/deja/guidance.go:79-97); Codex ignores a hook until the user approves it under /hooks (install.go:1113-1115; docs/guide/memory-for-codex.html:150); plugin bundle codex-plugin/ carries four hooks, without PostToolUse (codex-plugin/hooks/hooks.json:2-53; README.md:318). `deja rules sync` can add a marked block to CLAUDE.md and ~/.codex/AGENTS.md (cmd/deja/rules.go:34-64). PreCompact capture of a recovery packet works only for Claude Code and Codex transcripts (internal/sources/compaction.go:240-269)."
+      },
+      "telemetry_and_network": "No telemetry, analytics or account: cmd/deja/star_line.go:5-11 says 'deja has no telemetry and no account' (the only outward signal is a one-time star-request line); no telemetry SDKs found in Go code. No network listener in non-test Go code (searched); net/http is imported only by cmd/deja/update.go, cmd/deja/doctor.go and internal/embed/client.go outside tests and scripts. Outbound paths: (1) `deja update` - HTTPS GET of api.github.com/repos/vshulcz/deja-vu/releases/latest plus the archive and checksums.txt, sha256 check only, no cosign verification (cmd/deja/update.go:24-30, 64-94, 199-213; SECURITY.md:13-22). (2) `deja doctor` - the same release lookup with a 2 s timeout, skipped by --offline or DEJA_OFFLINE=1 (cmd/deja/doctor.go:31-45, 65-80). (3) `deja sync ssh` - system ssh/scp to a host the user names (docs/ARCHITECTURE.md:168; docs/SECURITY-MODEL.md:102-104). (4) `deja embed` and hybrid rerank - POST of redacted indexed text, truncated to about 2k chars, to DEJA_EMBED_URL; with none set the client probes localhost:11434 and localhost:1234 (internal/embed/client.go:23, 32-58, 64-112; README.md:353-373); the probe also runs inside `deja doctor` (cmd/deja/doctor_report.go:447-452); DEJA_EMBED_OFF=1 or DEJA_EMBED_URL=off disables it; OPENAI_API_KEY is sent only to https api.openai.com (client.go:114-123); rerank/semantic search contact an endpoint only when a current sidecar exists (cmd/deja/embed.go:114-172). (5) install.sh downloads from api.github.com and github.com and verifies sha256 (install.sh:40-68). Not in the README: `deja install sync-timer` schedules `deja sync` every 1800 s via launchd or a systemd user timer (cmd/deja/install_sync_timer.go:20-45). Hooks spawn a detached local `deja index` build when the index is cold or stale (cmd/deja/hook_context.go:1252-1263), local only. Plugin wrappers only locate a local binary and download nothing (claude-plugin/hooks/deja.sh:10-47; claude-plugin/mcp/deja-mcp.sh). Indexing and search need no account or network service (docs/SECURITY-MODEL.md:87-119)."
+    },
+    "code": {
+      "languages": [
+        "Go",
+        "JavaScript",
+        "TypeScript",
+        "Rust",
+        "Python",
+        "POSIX shell"
+      ],
+      "entry_points": [
+        {
+          "path": "cmd/deja/main.go:39",
+          "what": "main() and run() (323-403) dispatch the `commands` table (205-321) and bare-query search; `version` is set by ldflags (main.go:30; .goreleaser.yaml:21)."
+        },
+        {
+          "path": "cmd/deja/mcp.go:301",
+          "what": "dejaTool() schema of the stdio MCP server started by `deja mcp` (wired at main.go:235)."
+        },
+        {
+          "path": "cmd/deja/install.go:43",
+          "what": "runInstall: `deja install|uninstall <target>|--all|--auto`; installClaudeAuto (1015) and installCodexAuto (1100) write MCP, hooks, skills and commands into agent configs."
+        },
+        {
+          "path": "cmd/deja/hook_context.go:134",
+          "what": "runHookPrecompact; with main.go:236-284 these are the hook subcommands agents call (hook-context, hook-prompt, hook-tool, hook-tool-after, hook-precompact)."
+        },
+        {
+          "path": "cmd/deja/remember.go:32",
+          "what": "Durable-note commands: runRemember here, runPromote (cmd/deja/promote.go:25), runForget (cmd/deja/main.go:3548), runHandoff (cmd/deja/handoff.go:32)."
+        },
+        {
+          "path": "install.sh",
+          "what": "POSIX curl|sh installer: resolves latest release tag, verifies sha256, installs to ~/.local/bin (sudo fallback to /usr/local/bin)."
+        },
+        {
+          "path": "claude-plugin/ and codex-plugin/",
+          "what": "Marketplace plugin bundles (manifests, hooks/deja.sh bridges, mcp/deja-mcp.sh, skills); .claude-plugin/marketplace.json and .agents/plugins/marketplace.json point at them."
+        },
+        {
+          "path": "scripts/*/main.go",
+          "what": "About 31 dev programs (benchmarks, generators, release tooling such as scripts/mcpb and scripts/pinmanifests); not part of the shipped binary (ci.yml:225)."
+        }
+      ],
+      "architecture": "One Go module (github.com/vshulcz/deja-vu, go 1.25, no third-party requires; go.mod:1-3). cmd/deja holds the CLI (193 non-test files; main.go dispatcher, install*.go per-agent wiring, hook*.go hooks, mcp.go, update.go, sync*.go, remember/promote/handoff/rules/restore/secrets/view/log). internal/sources parses 35 harness stores plus deja's notes (registry.go, claude.go, codex.go, notes.go, compaction.go); internal/index does ingest, incremental append vs rewrite, manifest.gob/sessions.gob, records.bin and buckets/*.bin postings, tombstones (privacy.go) and sync (sync.go); internal/search ranks with BM25 plus bounded signals (decision, outcome, reuse, promoted note, freshness); internal/redact scrubs secrets before every record write; internal/digest builds digests, handoffs and the compaction packet; internal/embed is the optional external-endpoint vector sidecar; internal/policy is the recall trust policy; internal/usage is the local injection log; internal/bench holds the in-repo benches. Data locations: index ~/.cache/deja/index.db (documented as rebuildable cache; internal/index/index.go:767-773), notes ~/.local/share/deja/notes.jsonl (primary data; docs/ARCHITECTURE.md:82-90), privacy and wiring state under ~/.config/deja (tombstones, policy.json, peers.json, rules.md, wiring.json). SQLite stores are read through the external sqlite3 CLI (no CGO) and zstd stores through the zstd CLI (docs/ARCHITECTURE.md:52-56). Hooks are best-effort, exit 0 on any error and print bounded blocks (docs/ARCHITECTURE.md:253).",
+      "packaging_and_release": "GoReleaser (.goreleaser.yaml) builds CGO_ENABLED=0 -trimpath darwin/linux/windows x amd64/arm64 plus a macOS universal binary (5-29), tar.gz archives (zip on Windows) with LICENSE, README and the skill (31-53), checksums.txt (55-56), an SPDX SBOM per archive (58-62) and a keyless cosign signature over checksums.txt (.sig/.pem; 64-71). The tag-triggered release workflow (.github/workflows/release.yml:18-112) also attests build provenance of the checksum set (67-70), packs per-platform .mcpb bundles, a Kimi plugin zip and pinned scoop/winget manifests, updates the Homebrew tap, publishes npm packages (114-138, scripts/release-npm.mjs), opens a winget PR via Komac with a pinned sha256 (146-181) and publishes to ClawHub by OIDC (189-254); .github/workflows/mcp-registry.yml publishes to the MCP registry. Actions are pinned by commit SHA, but GoReleaser (release.yml:58-62) and golangci-lint (lint.yml:26-29) use version latest, and archives are not claimed byte-reproducible (docs/SECURITY-MODEL.md:238-242). Nightly prereleases are unsigned (nightly.yml:76-78). SECURITY.md:23-27 and docs/SECURITY-MODEL.md:196-201 give different cosign identity regexps (the former looser). At the tag, plugin manifests still say 0.21.3 (claude-plugin/.claude-plugin/plugin.json:3; codex-plugin/.codex-plugin/plugin.json:3) because catch-up is a manual follow-up (.github/workflows/release-followup.yml:3-13).",
+      "tests_and_ci": "Go standard `testing` only; CONTRIBUTING.md:60-61 says the project uses no testify or other framework. 2,125 *_test.go files among 2,504 .go files (cmd/deja 1,222; internal 888; scripts 15), plus 10 Node test files (extensions/*/test, scripts/*_test.mjs), a fuzz test (internal/sources/fuzz_test.go), scripts/e2e.sh, and synthetic fixtures per harness (fixtures/registry, fixtures/synthetic). ci.yml (.github/workflows/ci.yml) runs on ubuntu/macos/windows: go mod verify, go vet, go test -race -timeout 20m (Linux with coverage; macOS; Windows uses -count=1 without -race and runs the full suite only on pushes to main, the weekly canary, manual runs, windows-labelled or path-matched PRs, lines 49-107, 164, 246-247), a 87.5% total and per-package coverage floor (295-353), a `deja bench recall` gate (recall@5 >= 0.85, 250-256) and ingest-shape gate (267-290), e2e smoke on ubuntu/macOS (355-368), cross-compile of all six targets (370-386), .mcpb schema validation (388-413), manifest/generated-docs checks (415-520), govulncheck (522-540), goreleaser check (542-564), shellcheck and actionlint (566-584). Other workflows: lint.yml (golangci-lint), codeql.yml (Go), scorecard.yml, docker.yml (image builds and answers an MCP handshake), extensions.yml (opencode, openclaw, pi, dsh, zed, kimi, grok packages), hol-plugin-scanner.yml (codex-plugin, min score 80), main-red.yml, merge-result.yml, nightly.yml (go test plus an upgrade matrix over released binaries v0.19.0-v0.20.0, scripts/migrate-matrix.sh:37), release.yml, release-followup.yml, mcp-registry.yml, indexnow.yml (14 files).",
+      "dependencies": "go.mod: 0 direct dependencies (module line and go 1.25 only; no go.sum, no vendor directory). Repo-root package.json (private DeepSeek-harness shim): 1 (@vshulcz/deja-vu ^0.21.3). npm/package.json: 0 dependencies and 6 optionalDependencies (per-platform binaries). extensions: opencode 2 (@opencode-ai/plugin, @vshulcz/deja-vu), pi 1, openclaw 1 plus 1 peer, dsh 1, kimi 0; extensions/zed/Cargo.toml: 3 (schemars, serde, zed_extension_api). No lockfiles anywhere in the tree (searched). Runtime external tools: sqlite3 CLI for database-backed stores, zstd CLI for compressed stores including Codex .jsonl.zst rollouts, git for blame/freshness, ssh/scp for sync (internal/sources/skip.go:19-70; cmd/deja/doctor_report.go:438-445).",
+      "security_policy": "SECURITY.md (root; copies in claude-plugin/ and codex-plugin/): private reports via GitHub security advisories, initial response within 72 hours, only the latest release receives fixes (SECURITY.md:3-10, 46-48); docs/SECURITY-MODEL.md covers data flows, redaction limits, trust assumptions and release verification."
+    },
+    "claim_checks": [
+      {
+        "claim": "Local and private: no model, no embeddings, no server; the network is used only by update, sync ssh, the doctor version check and embed (README.md:60, 150-151).",
+        "verified": "partial",
+        "evidence": "Core holds: net/http is imported only by cmd/deja/update.go, cmd/deja/doctor.go and internal/embed/client.go outside tests and scripts, there is no net.Listen/ListenAndServe/http.Server in non-test code, and cmd/deja/star_line.go:5-11 states no telemetry or account. The code differs from the README list: internal/embed/client.go:23, 51-56 probes localhost:11434 and :1234 when DEJA_EMBED_URL is unset and `deja doctor` runs that probe (cmd/deja/doctor_report.go:447-452; loopback unless a remote URL is configured); an optional embedding tier exists (cmd/deja/embed.go:114-172); `deja install sync-timer` schedules `deja sync` every 1800 s (cmd/deja/install_sync_timer.go:20-45); hooks spawn a detached local `deja index` (cmd/deja/hook_context.go:1252-1263)."
+      },
+      {
+        "claim": "Capture step: none, the transcripts are the memory (README.md:503).",
+        "verified": "partial",
+        "evidence": "Transcripts are the main source (docs/ARCHITECTURE.md:5-50), but code has explicit capture paths: CLI `remember` (cmd/deja/remember.go:32-111) and MCP `remember` mode (cmd/deja/mcp.go:547-600) append to notes.jsonl (internal/sources/notes.go:183-216); `promote` writes lifecycle-state notes (cmd/deja/promote.go:25-204; notes.go:444-499); PreCompact captures continuation packets into manifest.gob (cmd/deja/hook_compaction.go:44-112). Scoping differs by path: CLI remember files under the cwd project (remember.go:77-83) while MCP remember defaults to project 'notes' (mcp.go:559-561); the session-start 'standing decisions' block lists only promoted, accepted notes, at most 6 lines and 800 bytes, for the cwd's project names (cmd/deja/hook_conventions.go:28-41; hook_context.go:1003); plain remember notes are indexed as day-bucket sessions of the 'deja' harness (docs/ARCHITECTURE.md:82-90)."
+      },
+      {
+        "claim": "`deja forget` drops sessions and keeps them dropped across rebuilds (README.md:160).",
+        "verified": "yes",
+        "evidence": "internal/index/privacy.go:393-569 appends tombstones before the rebuild (522-531), rebuilds with them (556) and mirrors them beside the index (125-135, 559-567); `--unforget` lifts and rebuilds (667-718); `--dry-run` previews (cmd/deja/main.go:3774-3809). Limits by static reading: source transcripts are not modified (docs/SECURITY-MODEL.md:17-19); `forget` removes note text from notes.jsonl only for promoted notes (internal/sources/notes.go:766-783, the only rewriteNotes callers; test cmd/deja/forget_note_removal_test.go:15-94), so a forgotten plain remember note keeps its line; copies already pushed to peers stay (cmd/deja/main.go:3917-3924)."
+      },
+      {
+        "claim": "A session deja indexed before the harness cleanup stays searchable after the file is gone (README.md:528-531).",
+        "verified": "yes",
+        "evidence": "internal/index/ingest.go:3403-3421 keeps rows for transcripts deleted while their directory remains, and the full-rebuild path carries them through orphanedSessions (ingest.go:550-571, 861-886). Caveat in the same code: a record-layout bump can leave such sessions unreadable, and they go with the rebuild with a message (ingest.go:866-873, 569-572); the nightly upgrade-matrix gate covers only released binaries v0.19.0-v0.20.0 (.github/workflows/nightly.yml:57-69; scripts/migrate-matrix.sh:16-18, 37). The statement about Claude Code's 30-day cleanup is about Claude Code and not checkable here."
+      },
+      {
+        "claim": "How do I wipe everything: `deja uninstall --all` and `rm -rf ~/.cache/deja` (README.md:544-549).",
+        "verified": "partial",
+        "evidence": "os.RemoveAll in non-test code touches only plugin/skill directories (e.g. cmd/deja/install_hermes.go:27, install_gemini.go:40) and nothing removes the notes file (~/.local/share/deja/notes.jsonl, primary data: internal/sources/notes.go:45-64; docs/ARCHITECTURE.md:90) or ~/.config/deja state (tombstones, policy.json, peers.json, rules.md, wiring.json: internal/index/privacy.go:114-123; internal/policy/policy.go:43-61; cmd/deja/wiring_state.go:100-119; cmd/deja/rules.go:66-68), so those survive the documented wipe. Default index is ~/.cache/deja/index.db (internal/index/index.go:767-773)."
+      },
+      {
+        "claim": "Survives compaction: 43 compactions, 77% of decisions and 0.2% of commands kept by the summary; deja hands back the rest (README.md:56).",
+        "verified": "partial",
+        "evidence": "Mechanism exists: PreCompact captures a bounded packet from the live transcript and the next hook returns it once, within 4 KiB (docs/compaction.md:3-25, 37-46; cmd/deja/hook_compaction.go:44-112). It supports only Claude Code and Codex transcripts (internal/sources/compaction.go:240-269; docs/ARCHITECTURE.md:260), is best-effort (cmd/deja/hook_context.go:132-148), and on Codex only runs after hook approval (cmd/deja/install.go:1113-1115). The 77%/0.2% figures come from 43 compactions of one machine's history (docs/guide/forgetting.html:150-153); that corpus is not in the repo, so not independently checkable."
+      },
+      {
+        "claim": "Codex CLI support-table row needs nothing extra ('Needs: -') (README.md:264). Code differs from README.",
+        "verified": "partial",
+        "evidence": "Plain Codex rollouts need nothing, but rollouts compressed to .jsonl.zst are read through the external zstd CLI (internal/sources/codex.go:124-125, 283-287; docs/ARCHITECTURE.md:16). SkipReason returns 'zstd CLI not found' when compressed Codex rollouts exist without it, and its comment says Codex compresses a rollout once it is seven days old (internal/sources/skip.go:35-44). README lists zstd as a prerequisite for DeepSeek and Zed (README.md:268, 291) but not for Codex."
+      },
+      {
+        "claim": "Most accurate: 97.2% R@5 on LongMemEval-S, with MemPalace publishing 96.6% and agentmemory 95.2% (README.md:30).",
+        "verified": "partial",
+        "evidence": "97.2% reproduces from the committed artifact as session-level hit@5 over all 500 questions (docs/benchmarks/longmemeval-s-full.json:73-81; harness scripts/longmemeval; dataset sha256 at :8). The same artifact's stricter dataset-official evidence-recall@5 is 90.98% (:84-93), and docs/benchmarks/SUBMISSION.md:5-6 says each tool publishes from its own harness so numbers do not compare. The comparator figures are not reproduced in the repo; every run is maintainer-run (README.md:36)."
+      },
+      {
+        "claim": "Cheapest (half the tokens of agentmemory, 58% fewer tokens) and fastest (17.6 s to index 19,195 sessions, next of seven tools 72 s) (README.md:31-32, 379-384).",
+        "verified": "partial",
+        "evidence": "Figures match docs/guide/day-zero.html: build 17.6 s vs ctx 72 s (:188); task median 53,558 vs 126,222 tokens with nothing wired, 57.6% lower, and agentmemory 104,974 (:223-227); later run 52,815 vs 103,443, 49% lower (:229-235). Page-stated caveats: maintainer-run (:168), the corpus is LongMemEval chat sessions rather than coding sessions (:175), the re-run on 0.21.1 measured a 20.4 s build (:204), one task, one repo, one model, 11 runs per arm (:219-220, 229). Drivers: scripts/day0bench, scripts/day0compare, scripts/taskcost."
+      },
+      {
+        "claim": "Claude plugin: having both the bundle and `deja install` is fine because the plugin hooks stand down when the installer already wired the same ones (claude-plugin/README.md:32-34).",
+        "verified": "partial",
+        "evidence": "The Claude bridge stands down only when settings.json matches grep -q 'deja hook-' (claude-plugin/hooks/deja.sh:30-34; asserted only as a substring in cmd/deja/plugin_manifest_test.go:132-140). On macOS/Linux `deja install claude-auto` writes hook commands through the launcher <config>/deja/bin/deja-hook (cmd/deja/launcher.go:28-35, 41-46; cmd/deja/install.go:1777-1792); by static reading '.../deja-hook hook-context' does not contain 'deja hook-', so the plugin would not stand down (not executed). The Codex bridge uses a regex that matches launcher paths (codex-plugin/hooks/deja.sh:34-40; cmd/deja/codex_plugin_test.go:194-207). `deja doctor` flags repeated injections (cmd/deja/doctor_double_injection.go:22-36)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "LongMemEval-S retrieval with the project's own harness (scripts/longmemeval): all 500 questions, and the 470-question cleaned subset",
+        "metric": "hit@1 / hit@5 / hit@10 / hit@20 / MRR (session-level; any evidence session in the top k)",
+        "value": "500 questions: 87.4 / 97.2 / 98.6 / 99.4 / 0.915, evidence-recall@5 90.98%, median search 14.07 ms, wall 116 s; 470 questions (-skip-abs): 88.1 / 97.4 / 98.7 / 99.6 / 0.920",
+        "source": "docs/benchmarks/longmemeval-s-full.json:73-90; docs/benchmarks/SUBMISSION.md:74-77",
+        "independent": false
+      },
+      {
+        "what": "LoCoMo retrieval with the project's harness (scripts/locomo), run 2026-09-22; no LLM answers",
+        "metric": "hit@1 / hit@5 / MRR over 1,982 questions",
+        "value": "70.5% / 90.9% / 0.794; median search 4.4 ms",
+        "source": "docs/benchmarks/locomo.json:10-12, 60-72",
+        "independent": false
+      },
+      {
+        "what": "Day-zero comparison: 8 tools over 19,195 LongMemEval sessions laid out as Claude/Codex trees, 100 questions, maintainer-run",
+        "metric": "hit@1 / hit@5 / found@50 of 100; index build; first answer; p50 search",
+        "value": "deja 19 / 36 / 65, build 17.6 s (20.4 s on the 0.21.1 re-run), first answer 26 ms, p50 97 ms; agentmemory 14 / 34 / 65, 95 s; ctx 7 / 14 / 34, 72 s; MemPalace 14 / 20 / 46, about 3 h; agentsview 7 / 13 / 19, 3 min 56 s; CASS 5 / 8 / 16, 56 min; funes 3 / 15 / 42, 31 min; claude-mem 0",
+        "source": "docs/guide/day-zero.html:183-195, 204",
+        "independent": false
+      },
+      {
+        "what": "Cost of one solved task (opencode, one Go repo, same model, 11 runs per arm), maintainer-run",
+        "metric": "median tokens per run",
+        "value": "nothing wired 126,222; agentmemory 104,974; deja 53,558 (57.6% lower than nothing wired). Later run with alternating arms: 103,443 vs 52,815 (49% lower)",
+        "source": "docs/guide/day-zero.html:217-235; scripts/taskcost/README.md:32-36",
+        "independent": false
+      },
+      {
+        "what": "Tool-definition tokens an MCP server adds to every turn (tools/list, tiktoken o200k_base), measured by the maintainer on 2026-09-24",
+        "metric": "tokens per turn (tool count)",
+        "value": "deja 477 (1); agentmemory 745 (7); ctx 1,897 (6); funes 2,289 (6); claude-mem 2,307 (15); MemPalace 8,183 (45); agentsview 8,283 (7)",
+        "source": "docs/guide/day-zero.html:187, 198",
+        "independent": false
+      },
+      {
+        "what": "Share of content surviving a harness compaction summary, 43 real compactions from one machine's history (corpus not published)",
+        "metric": "decisions kept / commands kept",
+        "value": "77% / 0.2%",
+        "source": "docs/guide/forgetting.html:150-153; README.md:56",
+        "independent": false
+      },
+      {
+        "what": "In-repo benches: `deja bench context` (30 seeded task chains plus 5 negative controls) and lookup latency on one real store (2,419 sessions, 179k messages, 1.9 GB)",
+        "metric": "median tokens and coverage; median lookup time; index size",
+        "value": "deja-recall 1,096 tokens at coverage 1.00 vs full-history 80,547 and naive-grep 273,238; lookup 0.7-0.8 ms in process, about 0.2 s end to end; index 200 MB (about 10% of corpus)",
+        "source": "README.md:406-443",
+        "independent": false
+      },
+      {
+        "what": "Comparator LongMemEval-S R@5 figures quoted by the README as published by the other projects; relayed by the maintainer, not reproduced in the repo, and from each tool's own harness (docs/benchmarks/SUBMISSION.md:5-6)",
+        "metric": "R@5",
+        "value": "MemPalace 96.6%; agentmemory 95.2%",
+        "source": "README.md:30",
+        "independent": true
+      }
+    ],
+    "risks": [
+      "Index durability: the index sits in ~/.cache/deja/index.db (internal/index/index.go:767-773) and is documented as a rebuildable cache (docs/ARCHITECTURE.md:90), but for transcripts the harness has deleted it is the only copy (internal/index/ingest.go:861-886). A record-layout bump already left such sessions unrecoverable on upgrade (ingest.go:866-873, 569-572), the format 'has moved fifty-odd times and will keep moving' (docs/INTEGRATING.md:103-107), and the README wipe recipe does not mention notes.jsonl or ~/.config/deja (README.md:544-549).",
+      "Scoped decisions and deletion are uneven: MCP `remember` files under project 'notes' unless the agent passes `project` (cmd/deja/mcp.go:559-561) while the CLI uses the cwd project (cmd/deja/remember.go:77-83); the session-start 'standing decisions' block carries only promoted, accepted notes, at most 6 lines / 800 bytes (cmd/deja/hook_conventions.go:28-41; hook_context.go:1003); by static reading `forget` removes note text only for promoted notes, so a plain remembered note keeps its line in notes.jsonl (internal/sources/notes.go:766-783); the source transcripts stay in the agents' own stores (docs/SECURITY-MODEL.md:17-19).",
+      "Local store is plaintext and broad: it holds redacted message text, tool output, shell commands and verbatim source spans that edits replaced (docs/SECURITY-MODEL.md:21-29), is not encrypted (:174-179), and redaction is pattern matching that 'can pass through unchanged' (:159-163); DEJA_NO_REDACT=1 turns it off (internal/redact/redact.go:335); `deja secrets --scrub` rewrites agent transcripts in place, keeping a backup (docs/SECURITY-MODEL.md:78-85).",
+      "Prompt injection through replayed history: past transcript text is injected at session start, per prompt (bounded 1,536 bytes) and around tool calls (docs/INTEGRATING.md:81-95). It is framed as untrusted (docs/SECURITY-MODEL.md:266-276), yet the maintainer's own test found a planted directive still obeyed 8 of 48 times with the frame, against 19 of 48 without it (CHANGELOG.md:74).",
+      "Platform and prerequisites: Codex rollouts older than about seven days are compressed and need the zstd CLI or they are skipped ('zstd CLI not found'), while the README lists no prerequisite for Codex (internal/sources/skip.go:35-44; README.md:264); database-backed stores need the sqlite3 CLI (docs/ARCHITECTURE.md:54). Windows is secondary ('macOS and Linux are the battle-tested paths', README.md:538-539); 0.21.4 fixed every Claude Code hook exiting 127 on Windows while doctor said wired (CHANGELOG.md:30-31); the full Windows suite runs only on main, weekly, manual or labelled/path-matched PRs (ci.yml:49-107). WSL2 is undocumented and untested.",
+      "Maintenance: a single code owner (.github/CODEOWNERS:1; README.md:36 'I maintain deja-vu'); only the latest release receives fixes (SECURITY.md:46-48); five releases in eight days, 0.21.0 on 2026-09-22 to 0.21.4 on 2026-09-29 (CHANGELOG.md:10, 35, 78, 102, 118); plugin and package manifests lag the tag and are caught up by hand (claude-plugin/.claude-plugin/plugin.json:3 and codex-plugin/.codex-plugin/plugin.json:3 say 0.21.3 at v0.21.4; .github/workflows/release-followup.yml:3-13).",
+      "Install and update trust: install.sh runs from the main branch and `deja update` both verify only a sha256 from the same release, not the cosign signature (install.sh:55-68; cmd/deja/update.go:199-213; SECURITY.md:13-22); install.sh may fall back to `sudo install` into /usr/local/bin (install.sh:73-87); GoReleaser and golangci-lint are unpinned (release.yml:58-62; lint.yml:26-29); hooks resolve the binary through a launcher that tries DEJA_BIN, the install path, PATH and common locations (docs/SECURITY-MODEL.md:285-291).",
+      "Footprint and licensing: install writes MCP entries, hooks, skills and a /deja command into agent configs and rewrites them after upgrades (cmd/deja/install.go:1015-1029, 1100-1117; cmd/deja/hook_context.go:236-247); `deja rules sync` can add a marked block to CLAUDE.md and ~/.codex/AGENTS.md (cmd/deja/rules.go:34-64). The Claude plugin's stand-down grep may not match launcher-style hook entries (see claim_checks; claude-plugin/hooks/deja.sh:31; cmd/deja/launcher.go:28-35), and the Codex plugin ships four hooks against five from `deja install codex-auto` (codex-plugin/hooks/hooks.json:2-53; cmd/deja/install_auto.go:28-51). Licensing: MIT (LICENSE:1-21) with no third-party Go modules; the CJK fold table is generated from Unicode's Unihan data (tools/gen_cjk_fold.py:1-14; internal/cjkfold/fold.go:3) and no NOTICE or third-party license file exists in the tree (searched)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "vshulcz/deja-vu",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Install script (macOS and Linux), then wire agents: `curl -fsSL https://raw.githubusercontent.com/vshulcz/deja-vu/main/install.sh | sh` followed by `deja install --auto`",
+          "citation": "README.md:20-23, 79-82",
+          "holds": true,
+          "note": "Both README blocks have the two commands word for word. install.sh:27-38 accepts only darwin/linux on amd64/arm64 and fails with 'unsupported OS' on anything else, which matches README.md:113. It checks the archive's sha256 against checksums.txt (install.sh:55-68). `--auto` is a recognised install target (cmd/deja/install.go:107, 129, 135)."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, file LICENSE",
+          "citation": "LICENSE:1-21",
+          "holds": true,
+          "note": "Standard MIT text, 'Copyright (c) 2026 Vladislav Shulcz'. It matches .goreleaser.yaml:157 (license: MIT) and every license field in the tree: package.json, npm/package.json, the claude-plugin and codex-plugin manifests, the extensions' package.json files and extensions/zed/Cargo.toml."
+        },
+        {
+          "field": "readme.platforms.macos_arm64",
+          "statement": "yes: install.sh maps arm64/aarch64 to arm64 on darwin; GoReleaser builds darwin/arm64 plus a universal binary; CI runs go test -race and the e2e smoke on macos-latest",
+          "citation": "install.sh:27-38; .goreleaser.yaml:11-17, 25-29; .github/workflows/ci.yml:168, 201-203, 355-368",
+          "holds": true,
+          "note": "install.sh:28-29 accepts darwin and :36 maps arm64|aarch64 to arm64. .goreleaser.yaml:9-17 builds darwin x arm64 with CGO_ENABLED=0, and :25-29 adds the universal binary. ci.yml:168 has macos-latest in the matrix; on macOS FULL is always true (:164), so :201-203 runs `go test -race -timeout 20m ./...`. The e2e job (:355-368) runs scripts/e2e.sh on ubuntu-latest and macos-latest. The repo does not say that macos-latest is an arm64 runner, and the dossier does not claim it. The linux_x86_64 citations also hold (install.sh:35; ci.yml:198-199)."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Claude Code: `deja install claude-auto` writes an MCP entry in ~/.claude.json, five hook events in ~/.claude/settings.json, a /deja command and a skill at ~/.claude/skills/deja-history; there is also a plugin bundle. Codex: `deja install codex-auto` writes [mcp_servers.deja] in ~/.codex/config.toml, five hooks in ~/.codex/hooks.json and the shared skill at ~/.agents/skills; Codex needs /hooks approval; the codex-plugin has four hooks, without PostToolUse. `deja rules sync` targets CLAUDE.md and ~/.codex/AGENTS.md. PreCompact capture works for Claude Code and Codex only.",
+          "citation": "cmd/deja/install.go:1015-1029, 1100-1117, 1688-1749, 1757-1807, 2327-2332; cmd/deja/install_auto.go:28-51; cmd/deja/guidance.go:79-97, 110-111; codex-plugin/hooks/hooks.json:2-53; cmd/deja/rules.go:34-64; internal/sources/compaction.go:240-269; README.md:105-111, 318; docs/guide/memory-for-codex.html:150",
+          "holds": true,
+          "note": "claude-auto dispatches to installClaudeAuto (install.go:742-746). That writes mcpServers to ClaudeJSONPath(), which defaults to ~/.claude.json (internal/sources/claude.go:25-27), and ~/.claude/commands/deja.md (install_commands.go:14-16). It also writes the five claudeHookWiring events (SessionStart, PreCompact, UserPromptSubmit, PreToolUse, PostToolUse) to <ClaudeConfigDir>/settings.json. codex-auto writes the [mcp_servers.deja] TOML block to CodexHome()/config.toml (default ~/.codex) and five codexHookWiring events to hooks.json. If the hook is not yet seen, it prints the /hooks approval line (install.go:1113-1115). The skill comes from the guidance step, which runs for every target unless --no-guidance is given (install.go:75, 235-236). claude-auto maps to ~/.claude/skills/deja-history and codex to ~/.agents/skills/deja-history (guidance.go:101-111, 617-620). codex-plugin hooks.json has only SessionStart, UserPromptSubmit, PreToolUse and PreCompact. rulesPath returns ~/.claude/CLAUDE.md and ~/.codex/AGENTS.md, and `rules sync` exists (rules.go:184). compactionHarness recognises only codex and claude and returns ErrUnsupportedCompactionTranscript for anything else."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "README 'Local and private: no model, no embeddings, no server; network only by update, sync ssh, doctor version check and embed' is verified 'partial': net/http is imported only by update.go, doctor.go and embed/client.go outside tests and scripts; no listener in non-test code; star_line says no telemetry; embed probes localhost:11434/:1234 when DEJA_EMBED_URL is unset and doctor runs that probe; an embedding tier exists; sync-timer runs every 1800 s; hooks spawn a detached local `deja index`.",
+          "citation": "README.md:60, 150-151; cmd/deja/star_line.go:5-11; internal/embed/client.go:23, 51-56; cmd/deja/doctor_report.go:447-452; cmd/deja/embed.go:114-172; cmd/deja/install_sync_timer.go:20-45; cmd/deja/hook_context.go:1252-1263",
+          "holds": true,
+          "note": "The 'partial' verdict and every citation check out. Outside tests and scripts, net/http is imported only by those three files; no shipped file imports package net, and the only ssh/scp calls are in cmd/deja/sync_ssh.go. star_line.go:7 says 'no telemetry and no account'. client.go:23 lists the two localhost probe URLs, used at :51-56 unless DEJA_EMBED_URL is set (or 'off') or DEJA_EMBED_OFF=1. doctor_report.go:386 always calls collectDoctorEmbed, which calls embed.New() (:450). maybeRerank and maybeSemantic call the endpoint only when a current sidecar exists. The sync-timer interval is 1800, using launchd on darwin and systemd on linux. startDetachedWarmup runs `<exe> index` detached. One overstatement: 'no net.Listen/ListenAndServe/http.Server in non-test code' is wrong as written, because scripts/mockmodel/main.go:641 calls http.ListenAndServe on 127.0.0.1. That is a dev-only `go run` program, not shipped, so the conclusion for the shipped binary stands."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "Non-blocking: in claim_checks[0].evidence, readme.integrations.sdk_or_api ('No net.Listen/ListenAndServe/http.Server exists in non-test Go code') and readme.telemetry_and_network ('No network listener in non-test Go code'), limit the no-listener claim to shipped code. For example: 'no net.Listen/ListenAndServe/http.Server under cmd/ or internal/ outside tests; the only listener is the dev-only scripts/mockmodel/main.go:641 bound to 127.0.0.1'."
+      ]
+    }
+  ]
+}

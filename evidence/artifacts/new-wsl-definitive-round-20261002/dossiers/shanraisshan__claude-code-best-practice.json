@@ -1,0 +1,312 @@
+{
+  "contender": "shanraisshan/claude-code-best-practice",
+  "revision": {
+    "contender": "shanraisshan/claude-code-best-practice",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "shanraisshan/claude-code-best-practice",
+        "tag": null,
+        "commit": "c7b1a7e4021a6d6ceb2667219a022dbec4281d09",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": null,
+    "commit": "c7b1a7e4021a6d6ceb2667219a022dbec4281d09",
+    "read_at": "2026-10-02T03:02:57+00:00"
+  },
+  "dossier": {
+    "contender": "shanraisshan/claude-code-best-practice",
+    "revision": {
+      "tag": null,
+      "commit": "c7b1a7e4021a6d6ceb2667219a022dbec4281d09",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Reference/educational repository about Claude Code usage: concept tables, best-practice and implementation notes, tips/report/video summaries, a weather 'command -> agent -> skill' demo, sound-notification hook scripts for Claude Code and Codex, and curated tables of third-party workflow, skill and agent collections (README.md:26-46, 113-195; CLAUDE.md:7). It describes itself as 'a course, not ... a workflow or skill' (README.md:507). At this revision no package, plugin/marketplace manifest, installer or installable skills bundle is shipped (no package.json/pyproject/.claude-plugin/marketplace.json/AGENTS.md found by glob).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Tagline: 'from vibe coding to agentic engineering - practice makes claude perfect'.",
+          "citation": "README.md:1-2"
+        },
+        {
+          "claim": "'Read this repo as a course, not as a workflow or skill. It's reference material first; you'll run things later.'",
+          "citation": "README.md:507"
+        },
+        {
+          "claim": "Run `claude` then `/weather-orchestrator` to see a complete command -> agent -> skill flow; 'Use it as a template for any dev workflow'.",
+          "citation": "README.md:104-107, 509"
+        },
+        {
+          "claim": "Skills concept row: skills live at `.claude/skills/<name>/SKILL.md`; links to best-practice and implementation docs, Anthropic's official skills repo, and a monorepo-skills report.",
+          "citation": "README.md:32"
+        },
+        {
+          "claim": "SKILL COLLECTIONS lists third-party 'curated libraries of SKILL.md files' with skill counts: mattpocock/skills 38, anthropics/skills 19, Egonex-AI/Understand-Anything 8, K-Dense-AI/scientific-agent-skills 166, wshobson/agents 184, VoltAgent/awesome-agent-skills 1,497+ (curated list, not files), pbakaus/impeccable 1, addyosmani/agent-skills 21, alirezarezvani/claude-skills 246, plus the author's own draw-json-architecture-skill 1.",
+          "citation": "README.md:167-182"
+        },
+        {
+          "claim": "DEVELOPMENT WORKFLOWS table: 12 third-party workflow repos with agent/command/skill counts (e.g. Superpowers 0/0/15, Everything Claude Code 68/94/293, agent-skills 3/7/21); 'All major workflows converge on the same architectural pattern: Research -> Plan -> Execute -> Review -> Ship'.",
+          "citation": "README.md:115-130"
+        },
+        {
+          "claim": "Cross-model workflows: Claude Code can be combined with Codex, Gemini and others via Plugin, MCP or Router; the repo's own methodology is a manual two-terminal flow (plan in Claude, QA-review in Codex); the named bridges (e.g. openai/codex-plugin-cc) are external projects.",
+          "citation": "README.md:148-161"
+        },
+        {
+          "claim": "`.claude/rules/*.md` auto-load into every session like CLAUDE.md; adding `paths:` YAML frontmatter lazy-loads them only when Claude touches files matching the glob.",
+          "citation": "README.md:255"
+        },
+        {
+          "claim": "CLAUDE.md should target under 200 lines per file; use multiple CLAUDE.md for monorepos and `.claude/rules/` to split large instructions.",
+          "citation": "README.md:254, 257-258"
+        },
+        {
+          "claim": "Skills are folders (references/, scripts/, examples/ for progressive disclosure); the description field is a trigger written for the model; add a Gotchas section; `context: fork` runs a skill in an isolated subagent.",
+          "citation": "README.md:284-288"
+        },
+        {
+          "claim": "Prefer scoped `/permissions` wildcards and auto mode over `--dangerously-skip-permissions`.",
+          "citation": "README.md:321, 324"
+        },
+        {
+          "claim": "Codex-specific best-practice and hooks content lives in separate repositories (codex-cli-best-practice, codex-cli-hooks).",
+          "citation": "README.md:547-554"
+        },
+        {
+          "claim": "The README tables are refreshed by eight maintainer slash commands (/workflows:development-workflows, /workflows:skill-collections, /workflows:agent-collections, /workflows:best-practice:*).",
+          "citation": "README.md:566-579"
+        }
+      ],
+      "install": [
+        {
+          "method": "Usage only - no install, clone, package or plugin command is documented for the repo itself (grep for git clone/npx/pip install/brew install found only Claude Code setup steps)",
+          "command": "claude   (run inside a local copy of the repo), then: /weather-orchestrator",
+          "citation": "README.md:104-107"
+        },
+        {
+          "method": "Prerequisite: install Claude Code via npm on Linux (guide says it also works inside WSL)",
+          "command": "npm install -g @anthropic-ai/claude-code",
+          "citation": "tutorial/day0/linux.md:92"
+        },
+        {
+          "method": "Prerequisite: Node.js via fnm on Linux (pipes a remote script to bash; then `source ~/.bashrc` and `fnm install 24`, lines 33 and 36)",
+          "command": "curl -fsSL https://fnm.vercel.app/install | bash",
+          "citation": "tutorial/day0/linux.md:30"
+        },
+        {
+          "method": "Prerequisite: Node.js via distro package on Ubuntu/Debian (preceded by `sudo apt update`, line 52)",
+          "command": "sudo apt install -y nodejs npm",
+          "citation": "tutorial/day0/linux.md:53"
+        },
+        {
+          "method": "Prerequisite: install Claude Code via Homebrew cask on macOS",
+          "command": "brew install --cask claude-code",
+          "citation": "tutorial/day0/mac.md:22"
+        },
+        {
+          "method": "Verify prerequisites",
+          "command": "node --version; claude --version",
+          "citation": "tutorial/day0/README.md:24-25"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - a Linux setup guide exists (tutorial/day0/linux.md:1-111) and the hook script has a Linux audio branch (.claude/hooks/scripts/hooks.py:94-118); content is Markdown plus stdlib-only Python with no compiled artifacts; x86_64 specifically is never stated.",
+        "wsl2": "yes - tutorial/day0/linux.md:117 says 'This guide works inside WSL too'; audio playback under WSL is not documented (hooks need paplay/aplay/ffplay/mpg123, .claude/hooks/scripts/hooks.py:97-102).",
+        "macos_arm64": "yes - tutorial/day0/mac.md:22 documents `brew install --cask claude-code`; hooks use built-in afplay (.claude/hooks/scripts/hooks.py:91-93); arm64 vs Intel is never stated.",
+        "gpu": "no - not used or required; there is no compute code (the only GPU mentions are explanatory text in reports/llm-day-to-day-degradation.md:66,73,258)."
+      },
+      "integrations": {
+        "cli": "No CLI or binary is shipped. Executable entry points are two hook scripts invoked by the host agent: `python3 ${CLAUDE_PROJECT_DIR}/.claude/hooks/scripts/hooks.py [--agent=<name>]` (.claude/settings.json:91; hooks.py:407-423) and `python3 .codex/hooks/scripts/hooks.py --hook <Event>` (.codex/hooks.json:9). Claude Code slash commands: /weather-orchestrator, /time-command, /workflows:* (.claude/commands/).",
+        "mcp": "Not an MCP server. .mcp.json:1-25 configures three third-party stdio MCP servers via `npx -y` (playwright, context7, deepwiki); .claude/settings.json:83 sets enableAllProjectMcpServers true; .claude/settings.json:10-17 pre-allow mcp__ide__*, chrome-devtools, claude-in-chrome, playwright, reddit-mcp-server and tavily-web-search tools (the last two are not defined in .mcp.json).",
+        "sdk_or_api": "none found - no SDK or HTTP API is provided and no code imports an SDK; README.md:61 only links Anthropic's Agent SDK docs as a Claude feature.",
+        "claude_code_or_codex": "Claude Code: the repo is itself a Claude Code project config (CLAUDE.md, .claude/{agents,commands,skills,rules,hooks,settings.json}); it is only active when Claude Code runs inside a clone, and there is no plugin/marketplace manifest, so nothing is installable per task. Codex: .codex/config.toml:1-2, .codex/hooks.json:1-101 and .codex/hooks/ (sound hooks only); no AGENTS.md and no Codex skills directory. Codex also appears in development-workflows/cross-model-workflow/cross-model-workflow.md:1-55 (manual two-terminal flow), implementation/claude-goal-implementation.md:16 (/goal) and README.md:148-161."
+      },
+      "telemetry_and_network": "No telemetry or phone-home code found in the project's own code: both hook scripts read stdin JSON, import only the stdlib and spawn a local audio player (.claude/hooks/scripts/hooks.py:15-21,188-193; .codex/hooks/scripts/hooks.py:20-25,144-149); the three HTML decks contain only outbound hyperlinks (grep of presentation/**/*.html for script src, stylesheet links, fetch/XHR/beacon/analytics found nothing). Local logging: hook payloads minus transcript_path/cwd are appended to .claude/hooks/logs/hooks-log.jsonl unless disableLogging is true (hooks.py:315-353); the shipped config sets true (.claude/hooks/config/hooks-config.json:32; Codex equivalent .codex/hooks/config/hooks-config.json:10, which would log hook/timestamp/last_assistant_message, .codex/hooks/scripts/hooks.py:250-260); logs are git-ignored as 'may contain sensitive tool input data' (.gitignore:8-9), but .claude/hooks/HOOKS-README.md:121 shows false. Network used by the repo's workflows when run: weather-fetcher fetches api.open-meteo.com, no API key (.claude/skills/weather-fetcher/SKILL.md:21-25,44); the research agent and maintainer commands call api.github.com (.claude/agents/development-workflows-research-agent.md:36-38; .claude/commands/workflows/skill-collections.md:62-64); .mcp.json starts three MCP servers via `npx -y` (npm download at launch, .mcp.json:3-23) and .claude/settings.json:83 auto-approves them; .claude/settings.json:8-9 allow WebFetch to any domain plus WebSearch. Accounts: Claude Code needs a Claude.ai subscription or Anthropic API key (tutorial/day0/README.md:34-59). The repo documents Claude Code's own telemetry switches (best-practice/claude-settings.md:959-966,1027) but .claude/settings.json sets none (env has only CLAUDE_AUTOCOMPACT_PCT_OVERRIDE, :80-82). README badges/images load from img.shields.io and api.star-history.com when rendered (README.md:4,535)."
+    },
+    "code": {
+      "languages": [
+        "Markdown (about 122 files)",
+        "Python 3 (2 hook scripts, 484 and 368 lines)",
+        "JSON and TOML config",
+        "YAML frontmatter in agents/commands/skills/rules",
+        "HTML/CSS/JS (single-file presentation decks)",
+        "SVG/PNG/mp3/wav assets"
+      ],
+      "entry_points": [
+        {
+          "path": ".claude/hooks/scripts/hooks.py",
+          "what": "Claude Code hook handler: main() reads hook JSON from stdin, optional --agent=<name>, plays a per-event sound, always exits 0 (hooks.py:426-484); wired for 30 events in .claude/settings.json:85-480"
+        },
+        {
+          "path": ".codex/hooks/scripts/hooks.py",
+          "what": "Codex CLI hook handler: `--hook <Event>` for 8 events (SessionStart, PreToolUse, PermissionRequest, PostToolUse, Stop, UserPromptSubmit, PreCompact, PostCompact); wired in .codex/hooks.json"
+        },
+        {
+          "path": ".claude/commands/weather-orchestrator.md",
+          "what": "Slash command /weather-orchestrator: asks C/F, delegates to weather-agent (preloaded weather-fetcher skill), then calls weather-svg-creator skill; the README's demo of command -> agent -> skill"
+        },
+        {
+          "path": ".claude/commands/workflows/",
+          "what": "Maintainer slash commands (/workflows:development-workflows, :skill-collections, :agent-collections, :best-practice:*) that refresh README tables and best-practice docs via research agents and the GitHub API"
+        },
+        {
+          "path": ".mcp.json",
+          "what": "Project MCP config: playwright, context7, deepwiki launched with `npx -y` at pinned versions"
+        },
+        {
+          "path": ".claude/settings.json",
+          "what": "Project settings: broad allow rules, 30 hook registrations, enableAllProjectMcpServers, author-branded spinner verbs/tips/status line"
+        },
+        {
+          "path": ".codex/config.toml",
+          "what": "Codex project config: sandbox_mode 'danger-full-access', approval_policy 'never' (2 lines)"
+        },
+        {
+          "path": "agent-teams/agent-teams-prompt.md",
+          "what": "Prompt for an agent-team demo (Dubai time orchestrator) run via `cd agent-teams && claude`; has its own agent-teams/.claude/ with 1 agent, 1 command, 2 skills"
+        }
+      ],
+      "architecture": "Documentation/content repo plus live Claude Code and Codex project config; no build step. Docs: README.md (index tables), CLAUDE.md (126 lines), best-practice/ (8 reference docs), implementation/ (6), reports/ (12), tips/ (9), videos/ (8), tutorial/ (day0 OS setup, day1), orchestration-workflow/ and agent-teams/ (command->agent->skill demos), development-workflows/ (RPI agents/commands, cross-model doc), changelog/ (12 files recording README-table refreshes, 3 verification checklists), presentation/ (3 single-file HTML decks), and a literal '!' directory of badge/image assets. Claude Code config under .claude/: settings.json, agents/ (11, 5 under workflows/best-practice/), commands/ (10, 8 under workflows/), skills/ (7 SKILL.md: agent-browser, presentation-structure, presentation-styling, vibe-to-agentic-framework, time-skill, weather-fetcher, weather-svg-creator), rules/ (2, both with paths: frontmatter), hooks/ (scripts/hooks.py, config/hooks-config.json, 74 mp3/wav sounds), agent-memory/weather-agent/. Codex config under .codex/ (config.toml, hooks.json, hooks/ with 16 sound files). Two more SKILL.md files live in agent-teams/.claude/skills/ (time-fetcher, time-svg-creator), for 9 SKILL.md in total. None of the skills covers general engineering or security procedures; frontmatter in all 9 uses only name, description, user-invocable, allowed-tools.",
+      "packaging_and_release": "None. No package manifest, no release/publish workflow (.github/ contains only FUNDING.yml), no checksums, signatures or attestations. No tags are visible in this shallow single-branch clone (.git/packed-refs lists only refs/remotes/origin/main; .git/shallow present), so upstream GitHub releases cannot be ruled out from the checkout. Distribution is by copying files; docs track a moving Claude Code version (badge v2.1.286, best-practice/claude-skills.md:3).",
+      "tests_and_ci": "Test frameworks: none. Test files: 0 (no file matching *test* or *spec* anywhere). CI: none - .github/ holds only FUNDING.yml, no workflows. The only test reference is an instruction to run `python3 -m unittest tests.test_hooks -v` (.codex/hooks/HOOKS-README.md:207-209) for a tests/ package that does not exist. Verification is manual via the maintainer /workflows:* commands (README.md:566-579; .claude/commands/workflows/) and three changelog/**/verification-checklist.md files.",
+      "dependencies": "No dependency manifests or lockfiles (no package.json, pyproject.toml, requirements*.txt, Cargo.toml, go.mod). Direct third-party Python packages: 0 (hook scripts import only stdlib plus optional Windows-only winsound: .claude/hooks/scripts/hooks.py:15-27, .codex/hooks/scripts/hooks.py:20-31); runtime needs python3, `which` and one audio player (afplay, paplay, aplay, ffplay or mpg123). .mcp.json declares 3 npm packages run via npx -y: @playwright/mcp@0.0.70, @upstash/context7-mcp@2.1.8, deepwiki-mcp@0.0.6 (.mcp.json:3-23). The agent-browser skill assumes an external `agent-browser` CLI that is not installed or documented anywhere else in the repo (all 84 matches are inside its SKILL.md).",
+      "security_policy": "none - no SECURITY.md or equivalent; .github/ contains only FUNDING.yml."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:507 - 'Read this repo as a course, not as a workflow or skill.'",
+        "verified": "yes",
+        "evidence": "No package/plugin manifest, installer, release workflow or AGENTS.md exists (globs returned nothing; .github/ holds only FUNDING.yml). The only code is two hook scripts (.claude/hooks/scripts/hooks.py, .codex/hooks/scripts/hooks.py). The 9 SKILL.md files are demos or maintenance aids (.claude/skills/*, agent-teams/.claude/skills/*). CLAUDE.md:7 says 'reference implementation rather than an application codebase'."
+      },
+      {
+        "claim": "README.md:255 - `.claude/rules/*.md` auto-load like CLAUDE.md; `paths:` frontmatter lazy-loads them only when matching files are touched.",
+        "verified": "partial",
+        "evidence": "The repo's two rules use the syntax (.claude/rules/markdown-docs.md:1-4 with '**/*.md'; .claude/rules/presentation.md:1-4 with 'presentation/**'). The loading behaviour itself is Claude Code runtime behaviour and cannot be tested from this repo; '**/*.md' matches nearly every doc here, so that rule is not narrow."
+      },
+      {
+        "claim": "README.md:284-288 - skills are folders with references/scripts/examples for progressive disclosure, trigger-style descriptions, `context: fork`.",
+        "verified": "partial",
+        "evidence": "Only weather-svg-creator (examples.md, reference.md) and agent-teams time-svg-creator have supporting files. .claude/skills/agent-browser/SKILL.md:194-217 links references/*.md and templates/*.sh that do not exist (directory holds only SKILL.md). None of the 9 SKILL.md frontmatters uses paths, disable-model-invocation, context, when_to_use or hooks (grep); those task-scoping fields are documented in best-practice/claude-skills.md:23-36 but not exercised by the shipped skills."
+      },
+      {
+        "claim": "README.md:32 links an 'Implemented' skills doc that says 'Two skills are implemented in this repo' (implementation/claude-skills-implementation.md:16).",
+        "verified": "no",
+        "evidence": "Nine SKILL.md files exist (7 under .claude/skills/, 2 under agent-teams/.claude/skills/). The doc is stale: its badge reads 'Last Updated Mar 02, 2026' (implementation/claude-skills-implementation.md:3) while the README badge reads Oct 01, 2026 (README.md:4)."
+      },
+      {
+        "claim": "README.md:34,510 and .claude/hooks/scripts/hooks.py:6 - hooks are implemented, 'all 30 Claude Code hooks'.",
+        "verified": "yes",
+        "evidence": "HOOK_SOUND_MAP has 30 events (hooks.py:31-62); .claude/settings.json:85-480 registers 30 hook events; .claude/hooks/config/hooks-config.json:2-31 has 30 toggles. Doc drift: CLAUDE.md:43 lists only 15 events; .claude/hooks/HOOKS-README.md:121 shows disableLogging false while the shipped config is true (hooks-config.json:32); HOOKS-README.md:265 cites .claude/agents/claude-code-hook-agent.md, which does not exist."
+      },
+      {
+        "claim": "README.md:572 - /workflows:development-workflows researches 'all 10 workflow repos in parallel'.",
+        "verified": "no",
+        "evidence": "Code differs from README: .claude/commands/workflows/development-workflows.md:2,7,11 say 11 repos, and the README table itself has 12 rows (README.md:119-130)."
+      },
+      {
+        "claim": "README.md:201 - 'TIPS AND TRICKS (83)'.",
+        "verified": "no",
+        "evidence": "Row counts per section between README.md:209-364 are 3+7+5+6+8+4+3+9+5+5+9+5+6+5+2 = 82; the anchor at README.md:512 repeats '83'."
+      },
+      {
+        "claim": "README.md:321,324 - prefer scoped /permissions wildcards or auto mode over --dangerously-skip-permissions.",
+        "verified": "partial",
+        "evidence": "Committed configs are broader than the advice: .claude/settings.json:4-9 allow Edit(*), Write(*), NotebookEdit(*), Bash(*), WebFetch(domain:*), WebSearch (with an ask-list for rm/chmod/docker/npm etc. at :30-53); .codex/config.toml:1-2 sets danger-full-access and approval_policy never; .claude/agents/development-workflows-research-agent.md:19 uses permissionMode bypassPermissions."
+      },
+      {
+        "claim": "README.md:167-182 - third-party skill collections and their skill counts.",
+        "verified": "not_checkable",
+        "evidence": "The counts describe external repos not in this checkout. The repo's own tracking shows they come from an LLM research agent querying the GitHub API (.claude/commands/workflows/skill-collections.md:48-80) and records instability (wshobson/agents count 'oscillated 152->...->184', changelog/skill-collections/changelog.md:857; VoltAgent badge vs enumeration differ by 308, :139). The README is also internally inconsistent for one repo (addyosmani/agent-skills appears at README.md:124 and README.md:180 with different popularity figures). Latest tracking entry is 2026-09-29 (changelog.md:853). The changelog notes Codex support for two third-party collections (:88, :136) - secondhand and unverified here."
+      },
+      {
+        "claim": "README.md:148-161,547-554 and .codex/hooks/HOOKS-README.md - Codex integration.",
+        "verified": "partial",
+        "evidence": "In-repo Codex material is config plus sound hooks (.codex/config.toml, .codex/hooks.json, .codex/hooks/scripts/hooks.py) and a manual workflow doc (development-workflows/cross-model-workflow/cross-model-workflow.md:1-55); no Codex skills or AGENTS.md. Docs differ from code: HOOKS-README.md:33-39 says SessionStart injects date/time, git branch and working-tree status, but get_session_context() returns the fixed string 'hooks context: run' (.codex/hooks/scripts/hooks.py:275-283); HOOKS-README.md:207-209 tells users to run `python3 -m unittest tests.test_hooks -v` but no tests/ exists; its hooks.json sample (:73-141) uses type 'shell' while .codex/hooks.json uses nested type 'command' entries."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Tool Search Tool: reduction in tool-definition tokens (Anthropic benchmark quoted in a repo report; not a measurement of this repo)",
+        "metric": "tool-definition tokens",
+        "value": "~85% reduction (77K -> 8.7K)",
+        "source": "reports/claude-advanced-tool-use.md:316",
+        "independent": true
+      },
+      {
+        "what": "/sandbox: reduction in permission prompts (reported 'internally' by Anthropic staff, quoted in a README tip; not a measurement of this repo)",
+        "metric": "permission prompts",
+        "value": "84% reduction",
+        "source": "README.md:322",
+        "independent": true
+      },
+      {
+        "what": "Day-to-day model score variance across providers (Scale AI figures quoted in a repo report; not a measurement of this repo)",
+        "metric": "day-to-day score variance",
+        "value": "+/-8-14% overall (Anthropic variants +/-8-11%)",
+        "source": "reports/llm-day-to-day-degradation.md:137-143, 256",
+        "independent": true
+      }
+    ],
+    "risks": [
+      "Scope: the repo is self-described reference material, not a skills package (README.md:507; CLAUDE.md:7). No plugin/marketplace manifest, installer or AGENTS.md exists; the 9 SKILL.md files are weather/time/presentation/browser-CLI demos (.claude/skills/, agent-teams/.claude/skills/) and none is a general engineering or security procedure. 'code-review' and 'security-review' appear only as Anthropic-bundled skills documented in best-practice/claude-skills.md:48,63, not shipped here.",
+      "Codex coverage is thin: .codex/ holds only config.toml, hooks.json and a sound-playing hook (.codex/hooks.json:1-101); no Codex skills, AGENTS.md or instruction files, and Codex best-practice/hooks content lives in separate repositories (README.md:547-554) that are not part of this checkout.",
+      "Committed defaults are very permissive and author-specific: .claude/settings.json:4-9 allow Edit/Write/Bash/any-domain WebFetch/WebSearch, :83 auto-approves all project MCP servers, :55-73 sets author-branded spinner verbs, tips and status line; .codex/config.toml:1-2 sets danger-full-access with approval never; .claude/agents/development-workflows-research-agent.md:19 uses bypassPermissions with Bash(*)/Write/Edit although described as read-only (:26). Copying these wholesale imports those defaults.",
+      "Agent/skill artifacts do not all match their own docs: agent files use an `allowedTools` frontmatter key (e.g. .claude/agents/weather-agent.md:4) that the repo's frontmatter table does not list (it documents `tools`/`disallowedTools`, best-practice/claude-subagents.md:23-24), while the prompt relies on it to exclude network tools (weather-agent.md:49); enforcement is not checkable here, and time-agent.md:4-15 grants Bash(*), Write, WebFetch(*) and mcp__* for a task that only runs `date`. The agent-browser skill links reference/template files that are absent (SKILL.md:194-217) and drives an external CLI documented nowhere else in the repo.",
+      "Runtime supply chain: .mcp.json:3-23 launches three third-party npm packages with `npx -y` (versions pinned, no lockfile or integrity data) and .claude/settings.json:83 auto-approves them; .claude/settings.json:14-17 pre-allows reddit-mcp-server and tavily-web-search tools that .mcp.json does not define.",
+      "Churn and drift: content is updated frequently (badges through 2026-10-01, README.md:4; best-practice/claude-skills.md:3). README tables of third-party repos are maintained by an LLM research command with documented unstable counts (changelog/skill-collections/changelog.md:857, :139) and internal mismatches (10 vs 11 vs 12 workflow repos; '83' vs 82 tips; stale implementation doc; HOOKS-README vs code). CLAUDE.md:86-88 tells Claude to treat this repo as authoritative over external docs, while its docs pin version-specific facts. No measurements of the project's own skills/rules/hooks are published; the only figures are quoted vendor/third-party numbers (see benchmarks).",
+      "No tests, CI, release process or security policy: .github/ has only FUNDING.yml; the documented test command (.codex/hooks/HOOKS-README.md:209) points to a nonexistent module; no tags are visible in this shallow single-branch clone (.git/packed-refs), so upstream releases cannot be ruled out.",
+      "Licensing/provenance: LICENSE is MIT with copyright 'Shayan Rais' (LICENSE:1-3) and is the only legal file (no NOTICE/third-party attribution file found by glob), while the tree also carries third-party-derived or generated content: ElevenLabs-generated audio (CLAUDE.md:41; .claude/hooks/HOOKS-README.md:173-175), summaries of others' posts and videos (README.md:139-140, 399-406; tips/, videos/) and logos under presentation/assets/logo/."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "shanraisshan/claude-code-best-practice",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Usage only - no install, clone, package or plugin command is documented for the repo itself (grep for git clone/npx/pip install/brew install found only Claude Code setup steps); command: `claude` (run inside a local copy of the repo), then `/weather-orchestrator`.",
+          "citation": "README.md:104-107",
+          "holds": true,
+          "note": "README.md:104-107 is a bash block containing `claude` and `/weather-orchestrator`, and the command exists at .claude/commands/weather-orchestrator.md. Nothing in the repo is a package/plugin manifest (globs for package.json, pyproject.toml, setup.py, requirements*.txt, marketplace.json, plugin.json and .claude-plugin/ found nothing). No clone or `/plugin install` command for this repo exists: the only 'git clone' hit is an env-var description (best-practice/claude-settings.md:1077). The parenthetical is loose: besides Claude Code setup (tutorial/day0/mac.md:22, presentation/vibe-coding-to-agentic-engineering/index.html:248), grep also hits `brew install python3` for the hooks (.claude/hooks/HOOKS-README.md:63, .codex/hooks/HOOKS-README.md:53), iTerm2/tmux for agent teams (implementation/claude-agent-teams-implementation.md:45-46) and `npx` MCP-server launches (.mcp.json:4,11,18; reports/claude-in-chrome-v-chrome-devtools-mcp.md:231-296). None of these installs the repo, so the statement holds in substance."
+        },
+        {
+          "field": "license",
+          "statement": "License is MIT (SPDX MIT), file LICENSE.",
+          "citation": "LICENSE:1-21",
+          "holds": true,
+          "note": "LICENSE:1 'MIT License', :3 'Copyright (c) 2025-2026 Shayan Rais', :5-21 standard MIT grant and warranty disclaimer. It is the only LICENSE/LICENCE/COPYING/NOTICE file in the tree, and grep finds no SPDX headers, license: frontmatter, Apache or GPL text anywhere else."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - a Linux setup guide exists (tutorial/day0/linux.md:1-111) and the hook script has a Linux audio branch (.claude/hooks/scripts/hooks.py:94-118); content is Markdown plus stdlib-only Python with no compiled artifacts; x86_64 specifically is never stated.",
+          "citation": "tutorial/day0/linux.md:1-111; .claude/hooks/scripts/hooks.py:94-118",
+          "holds": true,
+          "note": "linux.md:1-111 is the Linux guide (Node via fnm/apt/NodeSource, `npm install -g @anthropic-ai/claude-code` at :92, `claude --version` at :108). hooks.py:94-118 is the `system == \"Linux\"` branch, which probes paplay/aplay/ffplay/mpg123 via `which`. Both hook scripts import only stdlib plus optional winsound (.claude/hooks/scripts/hooks.py:15-27; .codex/hooks/scripts/hooks.py:20-31), and they are the only script files in the tree. A glob for compiled or binary extensions (.so/.dylib/.dll/.exe/.bin/.o/.a/.pyc/.whl/.jar/.wasm/.node/.class) found nothing. 'x86_64', 'amd64', 'aarch64' and 'arm64' never appear; the only 'x64' is 'x64 Windows' for the Desktop app (best-practice/claude-commands.md:115). 'Markdown plus Python' simplifies a tree that also holds JSON/TOML, HTML decks with inline JS and media assets, but none of these is architecture-specific."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Claude Code: the repo is itself a Claude Code project config (CLAUDE.md, .claude/{agents,commands,skills,rules,hooks,settings.json}), only active inside a clone, no plugin/marketplace manifest. Codex: .codex/config.toml:1-2, .codex/hooks.json:1-101 and .codex/hooks/ (sound hooks only); no AGENTS.md and no Codex skills directory; Codex also appears in cross-model-workflow.md:1-55 (manual two-terminal flow), claude-goal-implementation.md:16 (/goal) and README.md:148-161.",
+          "citation": ".codex/config.toml:1-2; .codex/hooks.json:1-101; development-workflows/cross-model-workflow/cross-model-workflow.md:1-55; implementation/claude-goal-implementation.md:16; README.md:148-161",
+          "holds": true,
+          "note": "CLAUDE.md and .claude/{agents,commands,skills,rules,hooks}/ plus .claude/settings.json all exist. There is no .claude-plugin/, marketplace.json or plugin.json. .codex/config.toml is exactly 2 lines (sandbox_mode 'danger-full-access', approval_policy 'never'). .codex/hooks.json is 101 lines and wires 8 events to `python3 .codex/hooks/scripts/hooks.py --hook <Event>`. .codex/hooks/ holds only HOOKS-README.md, config/, logs/.gitkeep, scripts/hooks.py and 16 sound files. No AGENTS.md exists in any case, and there is no .codex/skills or .agents/ directory. cross-model-workflow.md:1-55 is a Terminal 1 Claude Code / Terminal 2 Codex CLI diagram. claude-goal-implementation.md:16 says Claude Code, Codex and Hermes Agent support /goal. README.md:148-161 is the cross-model section listing external bridges. Minor nuance: besides sounds, the Codex hook prints a fixed 'hooks context: run' on SessionStart and can log locally (.codex/hooks/scripts/hooks.py:245-283, 347-351), so 'sound hooks only' is fair in substance."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "README.md:507 - 'Read this repo as a course, not as a workflow or skill.' verified: yes (no package/plugin manifest, installer, release workflow or AGENTS.md; .github/ holds only FUNDING.yml; only code is two hook scripts; the 9 SKILL.md files are demos or maintenance aids; CLAUDE.md:7 'reference implementation rather than an application codebase').",
+          "citation": "README.md:507; CLAUDE.md:7",
+          "holds": true,
+          "note": "README.md:507 reads exactly '**Read this repo as a course, not as a workflow or skill.** It's reference material first; you'll run things later.' CLAUDE.md:7 contains 'It serves as a reference implementation rather than an application codebase.' The rest of the evidence also holds: no manifest, installer or AGENTS.md (globs); .github/ holds only FUNDING.yml; exactly 9 SKILL.md files (7 under .claude/skills, 2 under agent-teams/.claude/skills). Two imprecisions don't change the 'yes'. First, 'the only code is two hook scripts' leaves out inline slide-navigation JS in four HTML files (presentation/claude-code-best-practice/index.html:2692-2755, the two other presentation/*/index.html decks, and !/video-presentation-transcript/1-video-workflow.html:501-582). Second, agent-browser (.claude/skills/agent-browser/SKILL.md:3) is a general-purpose browser-automation skill for an external CLI and is referenced nowhere else (all 84 matches are in its own file), so 'demos or maintenance aids' does not describe it."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

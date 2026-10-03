@@ -1,0 +1,341 @@
+{
+  "contender": "mksglu/context-mode",
+  "revision": {
+    "contender": "mksglu/context-mode",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "mksglu/context-mode",
+        "tag": "v1.0.169",
+        "commit": "589d8214d56740a28b5f7bf63167743d586b0b40",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v1.0.169",
+    "commit": "589d8214d56740a28b5f7bf63167743d586b0b40",
+    "read_at": "2026-10-02T03:02:26+00:00"
+  },
+  "dossier": {
+    "contender": "mksglu/context-mode",
+    "revision": {
+      "tag": "v1.0.169",
+      "commit": "589d8214d56740a28b5f7bf63167743d586b0b40",
+      "read_at": "2026-10-02T03:02:26+00:00"
+    },
+    "license": {
+      "spdx": "Elastic-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "MCP server plus per-client hook/plugin set that keeps large tool output out of an AI coding agent's context. Code runs in a local subprocess and only stdout returns. Big outputs, docs and fetched URLs are chunked into a local SQLite FTS5 (BM25) store and queried back with ctx_search. Hooks record session events (files, tasks, git, errors, decisions) in per-project SQLite and rebuild a resume snapshot after compaction. Supports 17 clients (Claude Code and Codex CLI among them) plus an OpenClaw gateway plugin. Savings are reported as byte-derived estimates. Provider-reported token usage from Claude Code/Codex logs is captured by Stop hooks but no tool in this repo reports it (see code.architecture).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Context Mode is an MCP server that solves four problems: context saving, session continuity, think-in-code, and no prose-style enforcement; 'mandatory paradigm across all 17 supported clients, plus the OpenClaw gateway integration'.",
+          "citation": "README.md:38-51"
+        },
+        {
+          "claim": "\"Sandbox tools keep raw data out of the context window. 315 KB becomes 5.4 KB. 98% reduction.\"",
+          "citation": "README.md:40"
+        },
+        {
+          "claim": "File edits, git ops, tasks, errors and decisions are tracked in SQLite; on compaction events are indexed into FTS5 and retrieved via BM25. \"If you don't `--continue`, previous session data is deleted immediately — a fresh session means a clean slate.\"",
+          "citation": "README.md:41"
+        },
+        {
+          "claim": "The Claude Code plugin registers all hooks (PreToolUse, PostToolUse, UserPromptSubmit, PreCompact, SessionStart, Stop) and 11 MCP tools: six sandbox tools plus ctx_stats, ctx_doctor, ctx_upgrade, ctx_purge, ctx_insight.",
+          "citation": "README.md:86"
+        },
+        {
+          "claim": "/context-mode:ctx-stats gives \"Context savings — per-tool breakdown, tokens consumed, savings ratio.\"",
+          "citation": "README.md:90"
+        },
+        {
+          "claim": "Optional status line: \"The bar shows `$ saved this session · $ saved across sessions · % efficient`\".",
+          "citation": "README.md:100-111"
+        },
+        {
+          "claim": "When output exceeds 5 KB and an `intent` is provided, the full output is indexed into the knowledge base, matching sections are searched, and only relevant matches plus a vocabulary of searchable terms are returned.",
+          "citation": "README.md:1184"
+        },
+        {
+          "claim": "ctx_search returns snippets of 'the actual indexed content'; ranking merges Porter-stemmed and trigram FTS5 results with Reciprocal Rank Fusion, then proximity reranking and Levenshtein typo correction; titles/headings weighted 5x.",
+          "citation": "README.md:1188-1207"
+        },
+        {
+          "claim": "Indexed content persists in a per-project SQLite DB at ~/.context-mode/content/; fetch cache TTL defaults to 24 h; \"14-day cleanup: Content databases and sources older than 14 days are removed on startup.\"",
+          "citation": "README.md:1215-1221"
+        },
+        {
+          "claim": "PreCompact builds a \"priority-tiered XML snapshot (≤2 KB)\"; if the 2 KB budget is tight, lower-priority events are dropped first.",
+          "citation": "README.md:1291-1305"
+        },
+        {
+          "claim": "Benchmark table: Playwright snapshot 56.2 KB -> 299 B (99%); GitHub issues 58.9 KB -> 1.1 KB (98%); access log 45.1 KB -> 155 B; repo research (subagent) 986 KB -> 62 KB (94%). \"Over a full session: 315 KB of raw output becomes 5.4 KB. Session time extends from ~30 minutes to ~3 hours.\"",
+          "citation": "README.md:1461-1472"
+        },
+        {
+          "claim": "With hooks the routing saves ~98%; without hooks (instruction file only) ~60%.",
+          "citation": "README.md:1408-1424"
+        },
+        {
+          "claim": "\"Nothing leaves your machine. No telemetry, no cloud sync, no usage tracking, no account required.\"",
+          "citation": "README.md:1524"
+        },
+        {
+          "claim": "ctx_execute_file is confined to the project root (#852); ctx_execute/ctx_batch_execute run arbitrary code with the process's filesystem access, so the guard is 'not a full OS sandbox'; ctx_fetch_and_index blocks link-local/IMDS targets and, with CTX_FETCH_STRICT=1, loopback/RFC1918.",
+          "citation": "README.md:1559-1592"
+        }
+      ],
+      "install": [
+        {
+          "method": "Claude Code plugin marketplace (same commands on Linux and macOS; no OS-specific steps documented). Restart or /reload-plugins afterwards.",
+          "command": "/plugin marketplace add mksglu/context-mode\n/plugin install context-mode@context-mode",
+          "citation": "README.md:72-76"
+        },
+        {
+          "method": "Claude Code MCP-only (11 tools, no hooks, no slash commands, no automatic routing or usage capture)",
+          "command": "claude mcp add context-mode -- npx -y context-mode",
+          "citation": "README.md:117-120"
+        },
+        {
+          "method": "Global npm install (required by the non-plugin clients; hook commands call the global `context-mode` binary; Node >= 22.5)",
+          "command": "npm install -g context-mode",
+          "citation": "README.md:136; docs/platform-support.md:19-29"
+        },
+        {
+          "method": "Codex CLI plugin marketplace, then enable [features] plugin_hooks = true and hooks = true in the Codex config and trust the plugin hooks",
+          "command": "codex plugin marketplace add mksglu/context-mode",
+          "citation": "README.md:590-629"
+        },
+        {
+          "method": "Codex CLI manual fallback (global npm install, then [features] hooks = true and [mcp_servers.context-mode] command = 'context-mode' with env CONTEXT_MODE_PLATFORM = 'codex' in ~/.codex/config.toml, plus $CODEX_HOME/hooks.json entries `context-mode hook codex <event>`)",
+          "command": "npm install -g context-mode",
+          "citation": "README.md:635-669"
+        },
+        {
+          "method": "From source (contributors)",
+          "command": "git clone https://github.com/mksglu/context-mode.git && cd context-mode && npm install && npm test",
+          "citation": "README.md:1612-1614"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - README documents Linux behaviour (prebuilt better-sqlite3 for glibc >= 2.31, README.md:1124; Linux + Node >= 22.5 uses built-in node:sqlite, README.md:1126); CI runs ubuntu-latest (.github/workflows/ci.yml:15); engines node >=22.5.0 (package.json:123-125). x86_64 is not named explicitly in the repo.",
+        "wsl2": "unknown - no README or docs statement about WSL2. Indirect only: scripts/ctx-debug.sh:9 says it works on 'Windows (Git Bash / MSYS2 / WSL)'; .github/ISSUE_TEMPLATE/bug_report.yml:171 lists 'Windows (WSL)' as a reportable environment; package.json:100 names WSL as a bash provider for install:openclaw on Windows; src/runtime.ts:182-185 deliberately skips WSL bash.exe on native Windows. No CI job runs WSL.",
+        "macos_arm64": "yes - code has explicit macOS-arm64 handling: Node >= 22.5 uses node:sqlite to sidestep a Node 26 better-sqlite3 build break on macOS arm64 (src/db-base.ts:226-230, 273-279; scripts/heal-better-sqlite3.mjs:17, 53); bug template offers 'macOS (Apple Silicon)' (.github/ISSUE_TEMPLATE/bug_report.yml:164); CI runs macos-latest (ci.yml:15; architecture not stated in the file); README.md:1124 lists macOS among platforms where better-sqlite3 prebuilds work.",
+        "gpu": "no - GPU is neither used nor required. Retrieval is SQLite FTS5 BM25 + trigram + Levenshtein (README.md:1188-1207; src/store.ts:592, 1244-1251) and package.json:103-112 has no ML/embedding dependency; grep for GPU/CUDA/ONNX/embedding in README, docs, src, hooks and package.json found no hits."
+      },
+      "integrations": {
+        "cli": "yes - `context-mode` binary (package.json:58-60 -> cli.bundle.mjs). No args starts the MCP stdio server; subcommands: index, search, doctor, upgrade, hook <platform> <event>, insight, statusline (src/cli.ts:193-261; README.md:1444-1453). There is no stats/usage/cost subcommand.",
+        "mcp": "yes - stdio MCP server (src/server.ts:143, 4895) with 11 tools: ctx_execute (1647), ctx_execute_file (2042), ctx_index (2236), ctx_search (2553), ctx_fetch_and_index (3412), ctx_batch_execute (3678), ctx_stats (3936), ctx_doctor (4139), ctx_upgrade (4270), ctx_purge (4445), ctx_insight (4816); README.md:86.",
+        "sdk_or_api": "none found as a general library or HTTP API: no HTTP server code in src/ (grep for createServer/listen/StreamableHTTP: none). package.json:51-57 exports host-plugin entry points (OpenCode/KiloCode build/adapters/opencode/plugin.js, ./openclaw, ./cli) rather than a general SDK. The only outbound API is the undocumented opt-in event forwarder (hooks/platform-bridge.mjs).",
+        "claude_code_or_codex": "Claude Code: plugin manifest .claude-plugin/plugin.json:22-29 (MCP server `node ${CLAUDE_PLUGIN_ROOT}/start.mjs`), marketplace .claude-plugin/marketplace.json, hooks/hooks.json (PreToolUse for Bash/WebFetch/Read/Grep/Agent/ctx_*/mcp__, PostToolUse, PreCompact, UserPromptSubmit, SessionStart, Stop), skills/ (ctx-stats, ctx-doctor, ctx-index, ctx-search, ctx-upgrade, ctx-purge, ctx-insight), optional statusLine `context-mode statusline` (README.md:100-111). Codex CLI: .codex-plugin/plugin.json + .codex-plugin/mcp.json (node ./start.mjs, CONTEXT_MODE_PLATFORM=codex, default_tools_approval_mode 'approve' at line 10) + .codex-plugin/hooks.json (PreToolUse, PostToolUse, SessionStart, PreCompact, UserPromptSubmit, Stop); .agents/plugins/marketplace.json; needs [features] hooks + plugin_hooks, PreToolUse can only deny, no input rewrite (README.md:590-690; docs/platform-support.md:191-255). Provider-usage capture lives in hooks/stop.mjs (Claude) and hooks/codex/stop.mjs (Codex)."
+      },
+      "telemetry_and_network": "README.md:1524 says nothing leaves the machine and there is no telemetry or account. Code check: no telemetry/analytics SDK (grep for posthog/sentry/mixpanel/segment/amplitude/opentelemetry in src, hooks, bin, scripts found only comments). Network touchpoints: (1) GET https://registry.npmjs.org/context-mode/latest at MCP-server start and hourly, and in doctor/upgrade; no payload, no opt-out env found (src/server.ts:780-800, 4956-4959; src/cli.ts:384-409, 1151). (2) ctx_fetch_and_index fetches user-supplied http(s) URLs behind an SSRF guard (src/server.ts:3168-3210). (3) ctx_insight and `context-mode insight` only open https://context-mode.com/insight in a browser; that hosted product has its own sign-in and pricing (src/server.ts:4814-4844; src/cli.ts:1224; skills/ctx-insight/SKILL.md:23). (4) Undocumented opt-in forwarder hooks/platform-bridge.mjs: only if ~/.context-mode/platform.json (or $XDG_CONFIG_HOME/context-mode/platform.json; %APPDATA% on Windows) holds {api_key starting 'ctxm_', platform_url}, every captured event is POSTed to <platform_url>/events with Bearer auth (2 s timeout). Payload includes agent_usage token/cost fields, bytes_avoided, a session rollup and a project identity from git remote.origin.url or package name, after regex redaction of tokens/emails and $HOME (hooks/platform-bridge.mjs:7-8, 13, 28-39, 55, 110-245, 268-308; hooks/session-loaders.mjs:112-163). README never mentions it (its only 'api_key' hit is MCP-argument redaction, README.md:1594) and nothing in the repo writes platform.json, so it is off unless a user or external flow creates the file. (5) Package downloads: start.mjs spawns unpinned background `npm install` of turndown, turndown-plugin-gfm and @mixmark-io/domino when missing, and hooks/ensure-deps.mjs runs `npm install better-sqlite3` / `npm rebuild` when missing (start.mjs:486-538; hooks/ensure-deps.mjs:70-81, 193-212); better-sqlite3 prebuilds come via prebuild-install. (6) ctx_upgrade / `context-mode upgrade` git-clones https://github.com/mksglu/context-mode.git then runs npm install + build (src/cli.ts:1305-1373; src/server.ts:4346). Local reads: the server and Stop hooks read Claude/Codex session JSONL (~/.claude/projects, ~/.codex/sessions) for cwd and token usage (src/util/project-dir.ts:74-219; src/server.ts:605, 640; hooks/stop.mjs:52-59; hooks/codex/stop.mjs:32-56). Accounts: none required for local use."
+    },
+    "code": {
+      "languages": [
+        "TypeScript (src/, ES2022/NodeNext, strict)",
+        "JavaScript ESM (.mjs hooks, start.mjs, bin/statusline.mjs, scripts/, committed minified esbuild bundles)",
+        "Shell (scripts/*.sh)"
+      ],
+      "entry_points": [
+        {
+          "path": "cli.bundle.mjs (src/cli.ts)",
+          "what": "`context-mode` bin (package.json:58-60). No args starts the MCP server; subcommands index, search, doctor, upgrade, hook <platform> <event>, insight, statusline (src/cli.ts:226-261)."
+        },
+        {
+          "path": "src/server.ts (server.bundle.mjs)",
+          "what": "MCP stdio server main (McpServer at :143, StdioServerTransport at :4895, main() at :4851); registers the 11 ctx_* tools."
+        },
+        {
+          "path": "start.mjs",
+          "what": "Plugin launcher referenced by .claude-plugin/plugin.json and .codex-plugin/mcp.json: self-heals, runs hooks/ensure-deps.mjs, background-installs turndown deps, then imports server.bundle.mjs (start.mjs:600-616)."
+        },
+        {
+          "path": "hooks/hooks.json + hooks/*.mjs",
+          "what": "Claude Code hook scripts (pretooluse, posttooluse, precompact, sessionstart, userpromptsubmit, stop). hooks/stop.mjs does the transcript token-usage capture; routing logic is in hooks/core/routing.mjs."
+        },
+        {
+          "path": ".codex-plugin/hooks.json + hooks/codex/*.mjs",
+          "what": "Codex hook scripts; hooks/codex/stop.mjs does the rollout token-usage capture via build/adapters/codex/usage.js."
+        },
+        {
+          "path": "bin/statusline.mjs",
+          "what": "Claude Code status line renderer (byte-based 'kept out' metrics), invoked as `context-mode statusline`."
+        },
+        {
+          "path": "build/adapters/{opencode,openclaw,pi,omp}/(plugin|extension).js",
+          "what": "Host-plugin entry points exported in package.json:30-57 for OpenCode/KiloCode, OpenClaw, Pi and OMP."
+        },
+        {
+          "path": "hooks/platform-bridge.mjs",
+          "what": "Optional fire-and-forget event forwarder to a user-configured hosted platform; inert without ~/.context-mode/platform.json."
+        }
+      ],
+      "architecture": "TypeScript in src/ is compiled by tsc to build/ and bundled (minified) by esbuild into server.bundle.mjs, cli.bundle.mjs and hooks/*.bundle.mjs. Key modules: src/server.ts (MCP server, 11 ctx_* tools, per-response byte accounting in trackResponse at :885-949, SSRF guard, project-boundary guard); src/executor.ts + src/runtime.ts (subprocess runner for 12 languages, env injection denylist, 100 MB output cap); src/store.ts (ContentStore: SQLite FTS5, chunks <= 4096 bytes, porter + trigram tables, bm25 title weight 5, RRF k=60, proximity rerank, Levenshtein correction); src/db-base.ts (bun:sqlite / node:sqlite / better-sqlite3 selection); src/session/{db,extract,snapshot,analytics,pricing}.ts (per-project session DB with session_events / session_meta / session_resume / tool_calls, event extractors, reference-based resume snapshot, ctx_stats report, vendored 61-row price table); src/adapters/* (17 client adapters plus per-adapter usage parsers); hooks/*.mjs (per-platform hooks); hooks/platform-bridge.mjs; bin/statusline.mjs. RECOVERABLE ORIGINALS: ctx_index, ctx_execute/ctx_execute_file with `intent` and output > 5 KB, any output > 100 KB, and ctx_fetch_and_index persist the full text as verbatim chunks in the local FTS5 store, retrievable with ctx_search (src/server.ts:1883-1935, 1979-1980; thresholds INTENT 5,000 B and LARGE 102,400 B). Content DBs older than 14 days are deleted at server start (src/server.ts:726-730); ctx_purge wipes on request. ctx_execute output <= 100 KB without intent is returned inline and not stored (src/server.ts:1937-1941). Native-tool (Bash/Read) outputs are not stored in full, only short extracted event strings (README.md:1258-1285), capped at 1000 events per session with lowest-priority eviction (src/session/db.ts:639). ctx_search is progressively throttled: results reduced after 3 calls and refused after 8 within a 60 s window, env-tunable (src/server.ts:2457-2459). Resume snapshot is a reference-based table of contents with runnable ctx_search calls, not size-capped (src/session/snapshot.ts:12-14, 470). PROVIDER-USAGE ANSWER: no single user-facing tool (MCP tool, slash command, CLI subcommand or statusline) reports provider-reported token usage, so the answer to 'which single tool' is none. Passive capture exists: hooks/stop.mjs (Claude Code Stop) reads the hook's transcript_path JSONL and sums message.usage input_tokens, output_tokens, cache_creation_input_tokens and cache_read_input_tokens per model over non-sidechain assistant lines (src/session/extract.ts:2096-2194; hooks/stop.mjs:51-72). hooks/codex/stop.mjs reads $CODEX_HOME/sessions/**/rollout-*-<session>.jsonl token_count events (src/adapters/codex/usage.ts: input_tokens, cached_input_tokens -> cache_read, output + reasoning_output -> output, cache_creation always 0) and loads only build/adapters/codex/usage.js (hooks/codex/stop.mjs:63-76), which is absent from a plain git checkout (build/ is git-ignored, .gitignore:2) and from the committed session-extract bundle. Both emit 'agent_usage' events (category 'cost'); locally these persist only as a text string 'tokens_in:.. tokens_out:.. cache_create:.. cache_read:.. cost_usd:..' in session_events.data (no token columns, no model id in the string; src/session/extract.ts:1921-1943; src/session/db.ts:827-843, 915-922); typed fields are forwarded only when ~/.context-mode/platform.json exists. Nothing in src/ or bin/ reads them back, so ctx_stats and the statusline show byte-derived estimates (tokens = bytes/4; 256 tokens per captured event; src/session/analytics.ts:459, 2696). Artifact reduction (bytes_avoided / bytes_returned) and provider usage are therefore never joined or reported together.",
+      "packaging_and_release": "npm package 'context-mode' v1.0.169 (package.json:2-3); bin -> cli.bundle.mjs; 'files' allowlist ships build/, hooks/, configs/, skills/, bundles, plugin manifests, start.mjs, selected scripts, README and LICENSE but not src/ or tests/ (package.json:61-80). Also distributed as Claude Code marketplace plugin (.claude-plugin/marketplace.json, source './'), Codex marketplace plugin (.agents/plugins/marketplace.json, .codex-plugin/) and Cursor/OpenClaw/Pi/OMP/Copilot CLI/Antigravity CLI bundles (.cursor-plugin/, .openclaw-plugin/, .pi/, configs/). scripts/version-sync.mjs syncs the version across 11 manifests (package.json:87). Release is manual: `npm version patch`, push tag, `gh release create`, local `npm publish` (.claude/skills/context-mode-ops/release.md:60-137); no release/publish workflow exists in .github/workflows, and no checksums, signatures, provenance or attestations are produced (grep of .github for provenance/id-token/attest/cosign/sha256sum: none). The minified bundles that plugin installs execute are git-ignored (.gitignore:9-15) but force-committed to main by bundle.yml:34-41 as github-actions[bot]; hooks/session-attribution.bundle.mjs is committed but is neither produced by the `bundle` script (package.json:85) nor listed in bundle.yml:38.",
+      "tests_and_ci": "Vitest ^4.0.18 (vitest.config.ts: include tests/**/*.test.ts, forks pool, maxWorkers 2 on CI, retry 2 on CI, 30 s timeouts). 210 test files under tests/ (subdirs adapters, analytics, cli, codex, core, executor, hooks, integration, plugins, security, session, util, plus top-level files). Fixtures in tests/fixtures include a synthetic claude-code-transcript.jsonl and kimi-wire.jsonl. Usage-capture tests exist: tests/session/extract-transcript-usage.test.ts, extract-transcript-usage-since.test.ts, tests/adapters/codex-usage.test.ts, tests/hooks/platform-bridge-wire.test.ts. Non-vitest scripts: tests/benchmark.ts, ecosystem-benchmark.ts, context-comparison.ts, use-cases.ts, live-benchmark*.ts, mcp-integration.ts. Workflows: ci.yml (push/PR to main,next; ubuntu/macos/windows-latest; Node 22.5, Python 3.12, Go, Elixir; npm install, tsc -b --noEmit, build, bundle, assert-bundle, vitest with custom summary parsing that accepts a non-zero exit when 'Tests ... passed' appears; `doctor` step is continue-on-error); bundle.yml (rebuild and commit bundles to main); openclaw-e2e.yml (ubuntu/macos, OpenClaw 2026.3.2); tier2-e2e-smoke.yml (manual only; Pi implemented using ANTHROPIC_API_KEY and claude-haiku-4-5, claude-code/opencode jobs are placeholders); update-stats.yml (6-hourly npm/GitHub download counts into stats.json for README badges). I did not run the tests or the tool.",
+      "dependencies": "package.json: 8 runtime dependencies (@clack/prompts ^1.0.1, @mixmark-io/domino ^2.2.0, @modelcontextprotocol/sdk ^1.26.0, better-sqlite3 ^12.6.2, picocolors ^1.1.1, turndown ^7.2.0, turndown-plugin-gfm ^1.0.2, zod ^3.25.0) and 7 devDependencies (@types/better-sqlite3, @types/node, @types/turndown, esbuild, tsx, typescript, vitest); engines node >=22.5.0; postinstall scripts/postinstall.mjs (package.json:101-125). packageManager says pnpm@10.23.0 but the only committed lockfile is bun.lock (package-lock.json is git-ignored, .gitignore:11) and CI runs `npm install`. .pi/extensions/context-mode/package.json: 1 dependency (better-sqlite3 ^11.0.0). .openclaw-plugin/package.json: 0. No ML/embedding dependencies.",
+      "security_policy": "none - no SECURITY.md anywhere in the tree (glob for security*.md found nothing); CONTRIBUTING.md has no vulnerability-reporting channel and .github/ISSUE_TEMPLATE/config.yml disables blank issues and says 'Open a PR instead'."
+    },
+    "claim_checks": [
+      {
+        "claim": "\"Nothing leaves your machine. No telemetry, no cloud sync, no usage tracking, no account required.\" (README.md:1524)",
+        "verified": "partial",
+        "evidence": "A default install sends no session data and no telemetry SDK exists, but the absolute wording has code exceptions: an hourly npm-registry version GET with no opt-out found (src/server.ts:4956-4959); an undocumented opt-in forwarder that POSTs every event, including token/cost fields and git-derived project identity, to a configured platform_url when ~/.context-mode/platform.json exists (hooks/platform-bridge.mjs:268-308; hooks/session-loaders.mjs:116); ctx_insight opens a hosted dashboard with sign-in/pricing (src/server.ts:4814; skills/ctx-insight/SKILL.md:23); runtime npm installs and git-clone upgrades (start.mjs:486-538; src/cli.ts:1305-1310)."
+      },
+      {
+        "claim": "Status line shows \"$ saved this session · $ saved across sessions · % efficient\" (README.md:111)",
+        "verified": "no",
+        "evidence": "bin/statusline.mjs:287-290 says the $ math was dropped in v1.0.118 for byte metrics; it renders '<kb> this chat · <kb> lifetime · across N tools · <pct>% kept out' (bin/statusline.mjs:352-368). Only an unused fmtUsd helper remains (bin/statusline.mjs:216-220). README is stale versus code."
+      },
+      {
+        "claim": "/context-mode:ctx-stats reports \"tokens consumed\" and savings ratio (README.md:90); this is also the only README hook for any usage reporting",
+        "verified": "partial",
+        "evidence": "ctx_stats is byte-derived: per-tool tokens = round(bytesReturned/4) (src/session/analytics.ts:455-460); conversation/lifetime tokens use bytes/4 and a flat 256 tokens per captured event (analytics.ts:2080-2090, 2696); cost examples apply fixed list prices (analytics.ts:1959-2000). Provider-reported usage is not read back: agent_usage events are written by the Claude/Codex Stop hooks (hooks/stop.mjs:51-72; hooks/codex/stop.mjs:109-128), but outside tests the only 'tokens_in:'/'cache_read:' strings are the writers (src/session/extract.ts:1527-1533, 1921-1923); server.ts, cli.ts, analytics.ts and db.ts never query them. No tool measures provider usage from the local Claude/Codex logs; capture only."
+      },
+      {
+        "claim": "PreCompact builds a \"priority-tiered XML snapshot (≤2 KB)\" and drops low-priority events when the 2 KB budget is tight (README.md:1294, 1305)",
+        "verified": "no",
+        "evidence": "src/session/snapshot.ts:30 marks maxBytes 'KEPT for backward compat but IGNORED'; :12-14 'Zero truncation'; :470 'Assemble ALL non-empty sections — no priority dropping, no byte budget'. The snapshot is a reference-based table of contents with runnable ctx_search calls and has no 2 KB cap."
+      },
+      {
+        "claim": "\"If you don't --continue, previous session data is deleted immediately\" (README.md:41)",
+        "verified": "no",
+        "evidence": "Claude Code's SessionStart 'startup' branch calls db.cleanupOldSessions(7) (deletes sessions older than 7 days, src/session/db.ts:1696-1705) and removes only orphan events (hooks/sessionstart.mjs:296-332); line 444 states 'ctx_purge is the only wipe mechanism'. The same 7-day call appears in the Kimi, JetBrains, OpenCode, Pi, OpenClaw and OMP adapters."
+      },
+      {
+        "claim": "Large outputs are indexed rather than discarded: >5 KB with intent -> indexed and searched; >100 KB -> pointer (README.md:1184; BENCHMARK.md:14, 79)",
+        "verified": "yes",
+        "evidence": "src/server.ts:1979-1980 sets INTENT_SEARCH_THRESHOLD=5,000 B and LARGE_OUTPUT_THRESHOLD=102,400 B; lines 1883-1935 route to intentSearch (indexes the full output via persistent.indexPlainText, :1993, returns titles/previews plus 'Use ctx_search to retrieve full content') or indexStdout. Chunks are verbatim, <= 4096 B each (src/store.ts:153). Caveats: output <= 100 KB without intent is returned inline and not stored (server.ts:1937-1941); ctx_search throttling can refuse retrieval after 8 calls in 60 s (server.ts:2457-2459)."
+      },
+      {
+        "claim": "98% reduction; benchmark table and 'session time ~30 min -> ~3 h' (README.md:40, 1461-1472)",
+        "verified": "partial",
+        "evidence": "BENCHMARK.md numbers are byte ratios on 15 captured fixtures (tests/fixtures/*; harness tests/ecosystem-benchmark.ts), arithmetic is self-consistent (315+60.3=~376 KB raw; 5.5+11.0=16.5 KB), but they are raw-bytes vs returned-bytes, not provider tokens. 'Repo research 986 KB -> 62 KB', the 7.5 MB JSON case and the 30 min -> 3 h figure have no harness in the repo. Hook-redirect savings use constants (src/hooks routing.mjs:779, 886). BENCHMARK.md:134-139 cites npm scripts test:store / test:all that package.json:81-102 does not define. I did not run the benchmarks."
+      },
+      {
+        "claim": "Indexed content lives in ~/.context-mode/content/, fetch TTL defaults to 24 h, content older than 14 days is removed on startup (README.md:1215-1221)",
+        "verified": "partial",
+        "evidence": "14-day cleanup and 24 h TTL are real (src/server.ts:726-730, 3118, 3305; src/store.ts:222-261, 1588). The path is not: default is <adapter config dir>/context-mode/content, e.g. ~/.claude/context-mode/content, or $CONTEXT_MODE_DIR/content (src/session/db.ts:86-96, 187-200; README.md:1600 and docs/platform-support.md:55 agree with code). Session DBs age out at 7 days, not 14."
+      },
+      {
+        "claim": "\"With hooks ~98% saved; without hooks ~60% saved\" (README.md:1408-1424)",
+        "verified": "not_checkable",
+        "evidence": "No measurement of a hooks-vs-no-hooks split exists in BENCHMARK.md, tests/ or docs; '~60% compliance' appears only as assertion (docs/platform-support.md:367, 752, 818)."
+      },
+      {
+        "claim": "ctx_execute_file is confined to the project root; out-of-project reads need a host Read allow rule (README.md:1561-1573)",
+        "verified": "yes",
+        "evidence": "src/server.ts:1184-1209 checkProjectBoundary refuses paths resolving outside the project (absolute, ../, symlink-out) unless a permissions.allow Read rule matches; it fails open if the resolver errors (:1180-1182, 1205-1207). Covers only ctx_execute_file; ctx_execute/ctx_batch_execute inherit full filesystem access (README.md:1575; src/executor.ts:573-697). Test: tests/security/project-boundary-852.test.ts."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "21-scenario fixture benchmark (ctx_execute_file + ctx_index/ctx_search) on captured real tool outputs",
+        "metric": "raw bytes vs bytes returned to context",
+        "value": "376 KB raw -> 16.5 KB context; 96% overall; code examples preserved 100%",
+        "source": "BENCHMARK.md:8-16",
+        "independent": false
+      },
+      {
+        "what": "ctx_execute_file on 14 fixtures (Playwright, GitHub, vitest, tsc, next build, nginx log, git log, CSV, Context7 docs, MCP tools list)",
+        "metric": "raw bytes vs context bytes",
+        "value": "315 KB -> 5.5 KB (98%); e.g. Playwright snapshot 56.2 KB -> 299 B, GitHub issues 58.9 KB -> 1,139 B, access log 45.1 KB -> 155 B, analytics CSV 85.5 KB -> 222 B",
+        "source": "BENCHMARK.md:34-51",
+        "independent": false
+      },
+      {
+        "what": "ctx_index + ctx_search retrieval on 6 doc/skill fixtures (3 queries each)",
+        "metric": "raw bytes vs search-result bytes",
+        "value": "60.3 KB -> 11.0 KB (82%); per-scenario savings 44-93%",
+        "source": "BENCHMARK.md:57-66",
+        "independent": false
+      },
+      {
+        "what": "Modeled debugging session of 6 tool calls against a 200,000-token window",
+        "metric": "bytes, tokens (bytes/4) and share of window",
+        "value": "177.1 KB -> 10.2 KB; ~45,300 -> ~2,600 tokens; 22.7% -> 1.3% of context",
+        "source": "BENCHMARK.md:100-118",
+        "independent": false
+      },
+      {
+        "what": "README headline table incl. 'Repo research (subagent)' and full-session claim",
+        "metric": "raw vs context size; session length",
+        "value": "986 KB -> 62 KB (94%); 315 KB -> 5.4 KB over a session; '~30 minutes to ~3 hours'",
+        "source": "README.md:1461-1472",
+        "independent": false
+      },
+      {
+        "what": "'Large JSON API' prompt (7.5 MB, 20,000 records)",
+        "metric": "raw vs context size",
+        "value": "7.5 MB -> 0.9 KB (99% saved)",
+        "source": "README.md:1499-1504",
+        "independent": false
+      },
+      {
+        "what": "Stats-formula audit on one reporter's machine (ADR-0004)",
+        "metric": "per-conversation % kept out under old vs new formula",
+        "value": "Without 3,038 KB / With 140 KB -> 95.4% (22x runway) vs 56% under the previous formula",
+        "source": "docs/adr/0004-stats-strict-compression-formula.md:124-132",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Provider-usage gap: the only provider-token capture is passive (Claude/Codex Stop hooks) and nothing in src/ or bin/ reads the agent_usage events back. Locally they survive only as text in session_events.data (no token columns, no model id), capped at 1000 events/session with lowest-priority eviction and deleted with sessions older than 7 days (src/session/db.ts:639, 827-843, 1696); typed fields leave only via the opt-in forwarder. Codex capture needs build/adapters/codex/usage.js, which a plain git/marketplace checkout lacks (hooks/codex/stop.mjs:63-76; .gitignore:2; start.mjs:466-470). MCP-only Claude installs have no hooks and therefore no capture (README.md:120).",
+      "Usage-capture accuracy is unverified: the transcript parser sums every non-sidechain assistant line with no message.id/requestId de-duplication (src/session/extract.ts:2045-2059, 2128-2144) and its only fixture is synthetic with one line per message id (tests/fixtures/claude-code-transcript.jsonl). After transcript compaction a lost cursor falls back to only the last turn (extract.ts:2166-2168). Sub-agent usage is captured separately as 'task_cumulative' without cost (extract.ts:1539-1570). Codex has no cache-creation bucket (src/adapters/codex/usage.ts:106-108). cost_usd comes from a vendored 61-row price table and unknown model ids get no cost (src/session/pricing.ts:12-25).",
+      "Savings figures are partly modelled, not measured: hook redirects credit hard-coded bytes (8192 for curl/wget, 16384 for WebFetch) and the full file size for Read calls that are only nudged, not blocked (hooks/core/routing.mjs:779, 853-861, 886; hooks/pretooluse.mjs:203-204 calls it 'estimated'); indexed bytes count as 'kept out' (src/server.ts:951-961); tokens = bytes/4 and 256 per event (src/session/analytics.ts:459, 2696). ADR-0004 shows the headline formula changed between versions (56% -> 95.4% on the same data). All benchmark numbers are project-reported; no independent measurement found in the repo.",
+      "Network/egress is broader than README.md:1524 implies: hourly npm-registry version check with no opt-out found (src/server.ts:4956-4959); an undocumented opt-in forwarder POSTs every event, including token/cost fields and git-remote-derived project identity, to a configured platform_url (hooks/platform-bridge.mjs:268-308); a hosted 'Insight' product with sign-in/pricing is opened by ctx_insight (src/server.ts:4814; skills/ctx-insight/SKILL.md:23); code comments tie usage capture to a paid-observability/FinOps platform (src/adapters/codex/usage.ts:11-12; hooks/session-loaders.mjs:146-149).",
+      "Supply chain and release hygiene: manual local npm publish with no provenance, signatures or checksums (.claude/skills/context-mode-ops/release.md:128-138); committed minified bundles built by a CI bot are what plugin installs run (.github/workflows/bundle.yml:34-41; start.mjs:600-602); `context-mode upgrade`/ctx_upgrade git-clones the default-branch HEAD and runs npm install + npm run build with no tag pin or signature check (src/cli.ts:1305-1373); runtime unpinned `npm install` of better-sqlite3 and turndown packages (hooks/ensure-deps.mjs:70-81; start.mjs:486-538); only bun.lock is committed while packageManager says pnpm and CI uses npm install (package.json:122; .gitignore:11; ci.yml:46-47).",
+      "Code-execution surface: ctx_execute/ctx_batch_execute run arbitrary code in 12 languages as the user, with the parent environment minus an injection denylist and the real HOME, explicitly 'not a full OS sandbox' (src/executor.ts:573-697; README.md:1575). The project-boundary guard covers only ctx_execute_file and fails open on resolver errors (src/server.ts:1180-1182, 1205-1207). .codex-plugin/mcp.json:10 sets default_tools_approval_mode 'approve' for the Codex plugin (effect depends on Codex semantics; not verified here). Hooks fail open by design (src/cli.ts:171-182) with opt-in fail-closed only via CONTEXT_MODE_REQUIRE_SECURITY=1 (hooks/core/routing.mjs:673-688).",
+      "Licensing: Elastic License 2.0 is source-available, not OSI-approved. It forbids offering the software as a hosted/managed service and removing licensor notices, and carries a license-key-circumvention clause (LICENSE:16-28). The licensor also runs a hosted commercial product (Insight, context-mode.com/insight).",
+      "Maintenance and doc drift: 17-client matrix, patch-release cadence (v1.0.169) and a single named author in manifests (package.json:6). Several docs disagree with code: statusline '$' vs bytes, '2 KB snapshot', 'deleted immediately', README's Linux-only node:sqlite vs any Node >= 22.5 (src/db-base.ts:273-279), docs/platform-support.md:42 lists Claude Code Stop as unsupported while hooks/hooks.json:131-141 registers it, BENCHMARK.md:120-139 cites 125 tests and npm scripts that do not exist versus 210 test files, plugin manifests say 11 languages versus 12 in src/runtime.ts:40-52. CI accepts non-zero vitest exits when the summary shows passed and retries tests twice on CI (ci.yml:61-96; vitest.config.ts:27)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "mksglu/context-mode",
+      "checks": [
+        {
+          "field": "readme.install[0] (Claude Code plugin marketplace)",
+          "statement": "`/plugin marketplace add mksglu/context-mode` then `/plugin install context-mode@context-mode`; same commands on Linux and macOS, no OS-specific steps documented; restart or /reload-plugins afterwards.",
+          "citation": "README.md:72-76",
+          "holds": true,
+          "note": "README.md:72-73 has both commands verbatim, and README.md:76 says 'Restart Claude Code (or run /reload-plugins)'. The Claude Code section (README.md:64-124) has no OS-specific steps; the prerequisite at :67 is only about updating Claude Code itself. .claude-plugin/marketplace.json:2 and :13 name both the marketplace and the plugin 'context-mode', so `context-mode@context-mode` resolves. .claude-plugin/plugin.json:22-29 launches `node ${CLAUDE_PLUGIN_ROOT}/start.mjs`."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX Elastic-2.0, file LICENSE",
+          "citation": "LICENSE:1-3; package.json:7",
+          "holds": true,
+          "note": "LICENSE:1 reads 'Elastic License 2.0 (ELv2)', copyright 2026 Mert Koseoglu (:3). package.json:7, .claude-plugin/plugin.json:11 and .codex-plugin/plugin.json:11 all say 'Elastic-2.0', and README.md:1619 agrees. The hosted-service, license-key and notice limitations cited in the risks section are at LICENSE:16-28."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - prebuilt better-sqlite3 for glibc >= 2.31 (README.md:1124); Linux + Node >= 22.5 uses built-in node:sqlite (README.md:1126); CI runs ubuntu-latest (ci.yml:15); engines node >=22.5.0 (package.json:123-125); x86_64 not named explicitly in the repo.",
+          "citation": "README.md:1124, 1126; .github/workflows/ci.yml:15; package.json:123-125",
+          "holds": true,
+          "note": "README.md:1124 lists glibc >= 2.31 systems (Ubuntu 20.04+, Debian 11+, Fedora 34+, macOS, Windows) where npm install needs no build tools. README.md:1126 says Linux + Node >= 22.5 uses node:sqlite automatically and Linux + Node < 22.5 is unsupported. ci.yml:15 has matrix os [ubuntu-latest, macos-latest, windows-latest]. package.json:123-125 has engines node '>=22.5.0'. A grep for x86_64/x86-64/amd64/x64 outside bun.lock, bundles and tests/ finds nothing. The only other hits are browser user-agent strings in tests/fixtures/analytics.csv and a terraform URL in tests/hooks/core-routing.test.ts:158; neither is a platform statement, so the 'not named' wording holds in substance."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Claude Code: plugin.json:22-29 MCP server `node ${CLAUDE_PLUGIN_ROOT}/start.mjs`, marketplace.json, hooks/hooks.json (PreToolUse Bash/WebFetch/Read/Grep/Agent/ctx_*/mcp__, PostToolUse, PreCompact, UserPromptSubmit, SessionStart, Stop), skills ctx-stats/doctor/index/search/upgrade/purge/insight, optional statusline. Codex: .codex-plugin/mcp.json (node ./start.mjs, CONTEXT_MODE_PLATFORM=codex, default_tools_approval_mode 'approve' at line 10) + .codex-plugin/hooks.json (6 events), .agents/plugins/marketplace.json; needs [features] hooks + plugin_hooks; PreToolUse deny-only. Usage capture in hooks/stop.mjs and hooks/codex/stop.mjs.",
+          "citation": ".claude-plugin/plugin.json:22-29; hooks/hooks.json:4-141; .codex-plugin/mcp.json:4-10; .codex-plugin/hooks.json:3-63; README.md:100-111, 596-607, 671-673, 690; docs/platform-support.md:207-210, 230-231; hooks/stop.mjs:51-72; hooks/codex/stop.mjs:109-128",
+          "holds": true,
+          "note": "hooks/hooks.json has PreToolUse matchers Bash, WebFetch, Read, Grep, Agent, the three ctx_execute* tools and mcp__ (:26-107), plus PostToolUse (:4), PreCompact (:15), UserPromptSubmit (:109), SessionStart (:120) and Stop (:131). The seven ctx-* skills exist; skills/context-mode/SKILL.md also exists but is not listed (an omission, not an error). .codex-plugin/mcp.json:10 is default_tools_approval_mode 'approve', and CONTEXT_MODE_PLATFORM=codex is at :8. .codex-plugin/hooks.json registers all six events. .agents/plugins/marketplace.json exists. README.md:596-607 requires plugin_hooks + hooks. README.md:673 and docs/platform-support.md:208, 230-231 say deny-only with no updatedInput. hooks/stop.mjs reads transcript_path, and hooks/codex/stop.mjs reads the $CODEX_HOME/sessions rollout."
+        },
+        {
+          "field": "claim_checks[0] (README.md:1524 'Nothing leaves your machine', verified: partial)",
+          "statement": "Default install sends no session data and has no telemetry SDK, but has exceptions: hourly npm-registry version GET with no opt-out; undocumented opt-in forwarder POSTing every event incl. token/cost fields and git-derived project identity when platform.json exists; ctx_insight opens a hosted dashboard with sign-in/pricing; runtime npm installs and git-clone upgrades.",
+          "citation": "README.md:1524; src/server.ts:780-800, 4956-4959, 4814-4844; hooks/platform-bridge.mjs:268-308; hooks/session-loaders.mjs:116; skills/ctx-insight/SKILL.md:23; start.mjs:486-538; src/cli.ts:1305-1310",
+          "holds": true,
+          "note": "README.md:1524 has the quote verbatim. main() calls fetchLatestVersion() at start and then every 60*60*1000 ms (src/server.ts:4956-4959), a GET of https://registry.npmjs.org/context-mode/latest (:780-800); src/ has no env opt-out. platform-bridge.mjs:268-308 POSTs {...ev, platform, ts} to `${platform_url}/events` with a Bearer api_key. It runs only when the config validates (api_key must start with 'ctxm_', :55), and session-loaders.mjs:116 gates on hasPlatformConfig(). Project identity comes from git remote.origin.url (:151-153, 188-200). agent_usage events carry typed input_tokens/output_tokens/cost_usd (src/session/extract.ts:1930-1941), which enrichEventForPlatform spreads into the payload. README never mentions platform.json; its only api_key hit is :1594. INSIGHT_URL is https://context-mode.com/insight (server.ts:4814), and SKILL.md:23 defers sign-in/pricing to that page. start.mjs:486-538 spawns background npm installs, and cli.ts:1305-1310 git-clones the repo. A telemetry-SDK grep matched only comments and identifiers (e.g. absEntry). 'partial' is accurate."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

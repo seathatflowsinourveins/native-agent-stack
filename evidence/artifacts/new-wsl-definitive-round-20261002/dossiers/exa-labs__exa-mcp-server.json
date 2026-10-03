@@ -1,0 +1,276 @@
+{
+  "contender": "exa-labs/exa-mcp-server",
+  "revision": {
+    "contender": "exa-labs/exa-mcp-server",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "exa-labs/exa-mcp-server",
+        "tag": null,
+        "commit": "f3d71fb6b0ff4b4683f108f05bc2bae61a9f7e97",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": null,
+    "commit": "f3d71fb6b0ff4b4683f108f05bc2bae61a9f7e97",
+    "read_at": "2026-10-02T03:02:05+00:00"
+  },
+  "dossier": {
+    "contender": "exa-labs/exa-mcp-server",
+    "revision": {
+      "tag": null,
+      "commit": "f3d71fb6b0ff4b4683f108f05bc2bae61a9f7e97",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Official Exa Labs MCP server (TypeScript, package version 3.4.1). It exposes Exa's hosted search, page-contents and agent APIs to AI agents as MCP tools. The defaults are web_search_exa and web_fetch_exa. web_fetch_exa takes URL(s) and returns title, URL, published date, author and page text via Exa's /contents endpoint. The opt-in tools are web_search_advanced_exa and agent_run (the hosted Exa Agent), and the registry also holds 8 deprecated tools. It runs as the hosted streamable-HTTP service at https://mcp.exa.ai/mcp (Vercel function in api/), as a local stdio server (npm bin exa-mcp-server, needs EXA_API_KEY), or as an AWS AgentCore container. It also ships as an Agent Plugin / Claude plugin with two skills. Facts relevant to the stated needs: the only URL-fetch tool is the MCP tool web_fetch_exa, with no CLI since the bin takes no arguments. The repo contains no browser or page-interaction tool (no forms, sign-in flows, tabs, screenshots or PDF rendering). No benchmarks are published in the repo.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Tagline: 'Connect AI agents to Exa for web search, content fetching, and multi-step research.'",
+          "citation": "README.md:7"
+        },
+        {
+          "claim": "The documented way to use it is Exa's hosted MCP server at https://mcp.exa.ai/mcp (or a plugin); no local build or run instructions are given.",
+          "citation": "README.md:26-32"
+        },
+        {
+          "claim": "Default tools: web_search_exa ('Search the web for any topic and get clean, ready-to-use content') and web_fetch_exa ('Read a webpage's full content as clean markdown from one or more URLs').",
+          "citation": "README.md:94-97"
+        },
+        {
+          "claim": "Optional tools: agent_run (multi-step research, list-building, enrichment, structured output) and web_search_advanced_exa (filters, domains, dates, highlights, summaries, subpage crawling).",
+          "citation": "README.md:101-104"
+        },
+        {
+          "claim": "Tools are enabled by appending them to the MCP URL (?tools=...), which replaces the defaults.",
+          "citation": "README.md:106-111"
+        },
+        {
+          "claim": "Exa Agent requires authentication (OAuth or an API key).",
+          "citation": "README.md:113"
+        },
+        {
+          "claim": "Two skills (search, exa-agent) live in skills/ and load with Agent Plugin / Claude plugin installs; MCP-only setups still get the tools.",
+          "citation": "README.md:117-124"
+        },
+        {
+          "claim": "'The hosted MCP server works anonymously with rate limits'; higher limits and Exa Agent need OAuth or an API key.",
+          "citation": "README.md:128"
+        },
+        {
+          "claim": "OAuth is preferred; ?login or /mcp/oauth force the login flow.",
+          "citation": "README.md:130"
+        },
+        {
+          "claim": "An API key can be passed as ?exaApiKey=, an Authorization: Bearer header, or an x-api-key header.",
+          "citation": "README.md:132"
+        },
+        {
+          "claim": "'This repository is an Agent Plugin'; Claude install: `claude plugin install exa@claude-plugins-official`; Codex/ChatGPT: `codex mcp add exa --url https://mcp.exa.ai/mcp`.",
+          "citation": "README.md:34-52"
+        },
+        {
+          "claim": "The Available Tools section lists exactly four tools (web_search_exa, web_fetch_exa, agent_run, web_search_advanced_exa). None relates to browser interaction, screenshots, PDF rendering or form/sign-in automation. The README has no telemetry, security-policy, platform-support or benchmark statements.",
+          "citation": "README.md:90-113 (tools); absences apply to README.md:1-134"
+        },
+        {
+          "claim": "Header links point to docs (https://docs.exa.ai/reference/exa-mcp), the npm package exa-mcp-server and the API-key dashboard. The npm package is only linked; no npx or local-install command is given.",
+          "citation": "README.md:17-21"
+        }
+      ],
+      "install": [
+        {
+          "method": "Hosted remote MCP URL set in any MCP client (client-side config, no local install, OS-independent). The README documents no npx, Docker, from-source or OS-specific command.",
+          "command": "https://mcp.exa.ai/mcp",
+          "citation": "README.md:26-30"
+        },
+        {
+          "method": "Claude plugin (Claude Code / Claude Plugin Marketplace)",
+          "command": "claude plugin install exa@claude-plugins-official",
+          "citation": "README.md:40-44"
+        },
+        {
+          "method": "Codex CLI, remote MCP server",
+          "command": "codex mcp add exa --url https://mcp.exa.ai/mcp",
+          "citation": "README.md:48-52"
+        },
+        {
+          "method": "Manual mcpServers JSON for other MCP clients. The README snippet has a trailing comma after the url value, so it is not strict JSON.",
+          "command": "{ \"mcpServers\": { \"exa\": { \"type\": \"streamable-http\", \"url\": \"https://mcp.exa.ai/mcp\", } } }",
+          "citation": "README.md:56-67"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes. Hosted and plugin setups are client-side URL config with no OS dependency (README.md:26-67). The local stdio bundle targets Node >=20 (package.json:39,78-80). CI runs tests on ubuntu-latest with Node 20.x (.github/workflows/ci.yml:15,24); the workflow does not state the CPU architecture.",
+        "wsl2": "unknown. README, workflows and code never mention WSL or Windows (grep). It is a pure-Node program with no OS-specific code, but nothing documents or tests it.",
+        "macos_arm64": "unknown. README names no OS; CI runs only on ubuntu-latest (.github/workflows/ci.yml:15); no darwin-specific code (grep). The only arm64 artefact is a linux/arm64 AgentCore container image (.github/workflows/publish-agentcore.yml:110).",
+        "gpu": "no. Not applicable: no local models or GPU code; search and page extraction run on Exa's hosted API (src/tools/webFetch.ts:86-99, src/tools/config.ts:46-59)."
+      },
+      "integrations": {
+        "cli": "none found as a task CLI. The npm bin exa-mcp-server (package.json:12-14 -> dist/stdio.cjs built from src/stdio-cli.ts, package.json:39) only starts a stdio MCP server. There is no argument parsing (grep for process.argv and arg-parser libraries finds none) and config is env-only (EXA_API_KEY, ENABLED_TOOLS/TOOLS, DEBUG, DEFAULT_SEARCH_TYPE, EXA_SOURCE, MCP_SESSION_ID, MCP_MAX_DURATION_SECONDS, AGENT_CALL_WINDOW_MS; src/stdio.ts:29-42). There are no fetch or search subcommands.",
+        "mcp": "yes. (1) Hosted streamable-HTTP at https://mcp.exa.ai/mcp (README.md:26-30; api/mcp.ts; server.json:10-15 registers it as remote-only ai.exa/exa) and /mcp/oauth (vercel.json:40-42). (2) Local stdio (src/stdio.ts:44-67). (3) HTTP wrapper for AgentCore (src/runtime-server.ts:79-107). Tools: web_search_exa and web_fetch_exa by default; web_search_advanced_exa and agent_run opt-in; 8 deprecated (src/toolRegistry.ts:11-94). Also one prompt (a second with agent tools) and resources exa://tools/list (plus exa://agent/skill and exa://agent/schema-templates with agent tools) (src/mcp-handler.ts:152-268). Gemini CLI manifest: gemini-extension.json:5-9.",
+        "sdk_or_api": "No SDK or library export: package.json has no main or exports, and `files` ships only dist/stdio.cjs, skills, plugin.json and mcp.json (package.json:15-20). The public interface is MCP over HTTP or stdio plus metadata endpoints /.well-known/mcp-config and /.well-known/oauth-protected-resource (api/well-known-mcp-config.ts, api/well-known-oauth-protected-resource.ts; vercel.json:24-34). Calls to Exa's REST/Agent APIs (/search, /contents, /research/v1, agent.runs.*) are made server-side through exa-js (package.json:61; src/tools/*.ts) and are not exposed as an API by this repo.",
+        "claude_code_or_codex": "Claude Code: .claude-plugin/plugin.json:10-18 and .claude-plugin/marketplace.json:33-41 register the remote server with `?client=claude-code-plugin` and header x-exa-source; README command `claude plugin install exa@claude-plugins-official` (README.md:43); skills/search and skills/exa-agent (README.md:117-124). skills/search/SKILL.md:76-78 tells the client to dispatch subagents with the client's Agent tool using model haiku. Codex: `codex mcp add exa --url https://mcp.exa.ai/mcp` (README.md:51); generic Agent Plugin manifests plugin.json:1-24 and mcp.json:3-11 (`?client=agent-plugin`). Plugin URLs contain `client=...plugin`, which makes the hosted server require OAuth (api/mcp.ts:707-722)."
+      },
+      "telemetry_and_network": "THIRD-PARTY ANALYTICS: src/mcp-handler.ts:270-295 calls trackMCP from the `agnost` package with a hard-coded project ID and endpoint https://api.agnost.ai, setting disableLogs/disableInput/disableOutput/disableError to true (lines 275-285). It runs in every entry point (stdio: src/stdio.ts:57; HTTP: api/mcp.ts:574). The repo has no opt-out switch for it: grep for DISABLE/TELEMETRY/OPT-OUT/DO_NOT_TRACK finds only those flags, and only AGNOST_LOG_LEVEL is set (src/stdio.ts:1, api/mcp.ts:1). The README does not mention it. The repo's own comment says trackMCP 'captures HTTP headers, query params, and the full URL from every request', so api/mcp.ts:815-830 strips exaApiKey, x-api-key and authorization before the request reaches it. Tools also call checkpoint(...) with stage names and a few non-content fields (agent_run: hasSchema, hasInputData, hasDataSources, hasPreviousRunId, effort, eventCount, status at src/tools/agentRun.ts:601,628-634,648-652; deep research: model at src/tools/deepResearchStart.ts:57-59). No query or URL text is passed to checkpoint. What the agnost package actually transmits is not verifiable here because it is not vendored. EXA-BOUND REPORTING HEADERS: every Exa call carries x-exa-integration (tool id plus optional EXA_SOURCE). The hosted HTTP path adds x-exa-mcp-session-id and an x-exa-mcp-client JSON with client name, version and user-agent (src/tools/config.ts:13-36; api/mcp.ts:741-750). REQUIRED NETWORK AND ACCOUNTS: every tool calls Exa's hosted API through exa-js (src/tools/config.ts:46-59; src/tools/*.ts); the repo never sets a base URL, so the exa-js default applies and is not verified here. stdio needs EXA_API_KEY (env.example:1-2) and has no anonymous mode in its code (src/tools/config.ts:53-58). Hosted use is anonymous (rate-limited), API key, or OAuth with an Exa account (README.md:128-132). OAuth JWTs are verified against https://auth.exa.ai/api/oauth/jwks (src/utils/auth.ts:3-15,36-41). agent_run and the deprecated deep-research and deep_search tools need a key or OAuth (src/toolRegistry.ts:50,57,78,92; src/tools/agentRun.ts:556-563). HOSTED-SIDE STORAGE (code in this repo; applies to mcp.exa.ai only if deployed with Redis env vars): Upstash/Vercel KV Redis holds IP-keyed rate-limit counters (api/mcp.ts:127-177,179-184), per-session MCP client metadata for 24h (api/mcp.ts:71-95; src/utils/mcpClientMetadata.ts:1) and, for clients matching RATE_LIMIT_BYPASS, IP/user-agent/timestamp records kept 7 days (api/mcp.ts:270-308). LOCAL LOGGING: the per-call logger writes the query or URL list to stderr on every call regardless of DEBUG (src/utils/logger.ts:4-6,14-16; src/tools/webFetch.ts:71)."
+    },
+    "code": {
+      "languages": [
+        "TypeScript",
+        "Markdown (skills/)"
+      ],
+      "entry_points": [
+        {
+          "path": "package.json:12-14",
+          "what": "npm bin exa-mcp-server -> dist/stdio.cjs, an esbuild CJS bundle of src/stdio-cli.ts (package.json:39); accepts no CLI arguments"
+        },
+        {
+          "path": "src/stdio-cli.ts",
+          "what": "CLI bootstrap: runs main() from src/stdio.ts; prints 'Server initialization error' and exits 1 on failure"
+        },
+        {
+          "path": "src/stdio.ts",
+          "what": "main(): builds McpConfig from env, creates McpServer 'exa-search-server' v3.4.1 and connects StdioServerTransport (lines 29-67)"
+        },
+        {
+          "path": "api/mcp.ts",
+          "what": "Vercel Function exporting GET/POST/DELETE/OPTIONS (lines 866-873): hosted streamable-HTTP MCP via the mcp-handler package, with per-request config (API key / OAuth JWT / ?tools), CORS, 401 OAuth challenges and IP rate limiting"
+        },
+        {
+          "path": "api/mcp-oauth.ts",
+          "what": "Same handler with OAuth forced; served at /mcp/oauth through vercel.json:40-42"
+        },
+        {
+          "path": "src/runtime-server.ts",
+          "what": "Plain Node http server on HOST/PORT (default 0.0.0.0:8000) wrapping the api/mcp.ts handlers, with a /ping route; the Dockerfile CMD for AWS AgentCore Runtime"
+        },
+        {
+          "path": "src/mcp-handler.ts",
+          "what": "initializeMcpServer(): shared registration of tools, prompts, resources and the Agnost analytics hook, used by the stdio and HTTP shells"
+        },
+        {
+          "path": "api/well-known-*.ts",
+          "what": "Metadata endpoints: mcp-config JSON schema, OAuth protected-resource metadata (RFC 9728), OpenAI apps domain-challenge token"
+        }
+      ],
+      "architecture": "One TypeScript package: a shared core behind three runtime shells. Core: src/mcp-handler.ts initializeMcpServer() registers the tools selected by src/toolRegistry.ts (12 registry entries; defaults web_search_exa and web_fetch_exa; tools flagged requiresUserProvidedApiKey register only when a key or OAuth token is present), plus prompts, resources and the Agnost hook. Tools in src/tools/*.ts are thin wrappers: build a request, call Exa through exa-js (exa.request for /search, /contents, /research/v1; client.agent.runs.* for agent_run), apply retry (2 retries on 500/502/503/504, 1s exponential backoff) and timeouts (60s search/fetch, 300s advanced search) from src/utils/errorHandler.ts and src/tools/config.ts, strip response fields via src/utils/exaResponseSanitizer.ts and format text. src/tools/config.ts builds the Exa client (API key or OAuth bearer) and the x-exa-* reporting headers. There is no local fetching, HTML parsing or browser code. Shells: (1) stdio: src/stdio-cli.ts -> src/stdio.ts, bundled to dist/stdio.cjs; (2) hosted HTTP: api/mcp.ts and api/mcp-oauth.ts, creating a fresh mcp-handler instance per request, with JWT verification in src/utils/auth.ts and Upstash Redis rate limiting; (3) src/runtime-server.ts, a Node http wrapper of the same handlers for AgentCore (Dockerfile). Content and manifests: skills/ (search, exa-agent; the exa-agent skill is also read at runtime by src/utils/agentSkill.ts to serve the agent prompt and resource), .claude-plugin/, plugin.json, mcp.json, gemini-extension.json, server.json.",
+      "packaging_and_release": "npm: .github/workflows/publish.yml publishes exa-mcp-server on a push to main that touches package.json, or on manual dispatch (publish.yml:3-9). It uses Node 24, `npm install -g npm@latest` ('Ensure npm supports trusted publishing', publish.yml:29-30), `id-token: write` (publish.yml:13) and no npm-token secret; it runs `npm publish --access public`, skipped if that version already exists (publish.yml:35-60). The tarball contains dist/stdio.cjs, skills/, plugin.json and mcp.json (package.json:15-20), built by prepare/prepublishOnly (package.json:51,56). No workflow passes --provenance or produces checksums, signatures, GitHub Releases or git tags (grep of .github). Whether npm attaches provenance attestations to published versions cannot be checked from the repo. Container: Dockerfile (node:22-bookworm-slim, non-root uid 10001, port 8000, CMD node dist/src/runtime-server.js) is built and pushed as linux/arm64 to an AWS Marketplace ECR repo by publish-agentcore.yml with `--provenance=false --sbom=false` (lines 101-117). MCP Registry: manual-only publish-mcp-registry.yml publishes remote-only ai.exa/exa (server.json) via DNS auth (lines 3-4,55-66). Hosted service: Vercel functions (vercel.json:1-13,44-45); no deploy workflow exists in the repo.",
+      "tests_and_ci": "Vitest 4.1.5 (package.json:76; vitest.config.ts:3-16). 12 *.test.ts files under tests/unit (api/ 1, tools/ 6, utils/ 2, top-level 3) plus tests/fixtures and tests/helpers; about 118 it() cases (line-count grep). All are unit tests with exa-js, agnost and @upstash/* mocked (e.g. tests/unit/tools/webFetch.test.ts:23-30, tests/unit/api/mcp.test.ts:74-93); there are no live-API or integration tests. There are no dedicated test files for web_search_advanced_exa, the deep/people/company/linkedin/code tools, src/utils/auth.ts or src/runtime-server.ts. CI: .github/workflows/ci.yml runs on PRs and pushes to main (ubuntu-latest, Node 20.x, `npm ci`, then `npm run ci` = prettier --check on js/jsx/ts/tsx + `tsc --noEmit -p tsconfig.test.json` + `vitest run`; package.json:44-50, ci.yml:3-31). Coverage (v8) is configured (vitest.config.ts:6-11) but not run in CI. The three publish workflows run no tests (publish.yml:21-60) and are not gated on CI.",
+      "dependencies": "package.json: 6 runtime dependencies and 10 devDependencies. Runtime: @modelcontextprotocol/sdk ^1.12.1 (locked 1.26.0, package-lock.json:726-727), agnost ^0.2.0 (analytics; lock entry at package-lock.json:2135-2146 has no license key), exa-js ^2.16.0 (locked 2.16.0), jose ^6.2.2, mcp-handler ^1.0.4 (locked 1.1.0, Apache-2.0, package-lock.json:4224-4229), zod ^3.22.4 (locked 3.25.76). Dev: @types/node, @upstash/ratelimit, @upstash/redis, @vitest/coverage-v8 4.1.5, esbuild, prettier 3.8.1, tsx, typescript, vercel ^37, vitest 4.1.5. `overrides` pins tar ^7.5.7 (package.json:81-83). package-lock.json (lockfileVersion 3) has 514 package entries. @upstash/* are devDependencies but imported at runtime by api/mcp.ts:145-148. No other manifests; there are no HTML-parsing or browser-automation dependencies.",
+      "security_policy": "none. No SECURITY.md in the repo root or .github/ (file listing); no dependabot config, CODEOWNERS, CONTRIBUTING or CHANGELOG either."
+    },
+    "claim_checks": [
+      {
+        "claim": "web_fetch_exa reads a webpage's full content as clean markdown from one or more URLs (README.md:97)",
+        "verified": "partial",
+        "evidence": "Accepts an array of URLs with no count limit (src/tools/webFetch.ts:46-57) and posts {urls, text:{maxCharacters}} to Exa's /contents endpoint (webFetch.ts:76-95). maxCharacters defaults to 3000 per page (webFetch.ts:58-60,79; src/tools/config.ts:87), so 'full content' holds only for short pages or when the caller raises the cap. skills/search/references/extraction.md:23 tells agents to avoid maxCharacters, which leaves the 3000 default in force. The tool takes no cookies, headers, wait or freshness parameters (webFetch.ts:45-61). Output is plain text blocks of '# title / URL / Published (date part only) / Author / text' (webFetch.ts:16-32). Markdown conversion and main-text extraction happen inside Exa's service, not in this repo. Tests mock exa-js (tests/unit/tools/webFetch.test.ts:23-26,38-76)."
+      },
+      {
+        "claim": "Default tools are web_search_exa and web_fetch_exa (README.md:94-97)",
+        "verified": "yes",
+        "evidence": "src/toolRegistry.ts:12-17 and 39-44 set enabled: true for exactly these two. src/mcp-handler.ts:58-63,80-98 registers them when no explicit selection is given. tests/unit/mcp-handler.test.ts:17-22 asserts the default tool list."
+      },
+      {
+        "claim": "?tools= replaces the defaults; optional tools are agent_run and web_search_advanced_exa (README.md:99-111)",
+        "verified": "yes",
+        "evidence": "api/mcp.ts:493-504 parses ?tools=; src/mcp-handler.ts:58-63 registers only the listed tools when a selection exists; src/toolRegistry.ts:18-24,86-93 mark both optional tools enabled: false. The registry also holds 8 deprecated tools the README does not mention, selectable the same way (toolRegistry.ts:25-37,45-85)."
+      },
+      {
+        "claim": "Exa Agent requires authentication, OAuth or API key (README.md:113)",
+        "verified": "yes",
+        "evidence": "src/toolRegistry.ts:92 flags agent_run requiresUserProvidedApiKey. src/mcp-handler.ts:65-75 refuses to register it without a user-provided key. src/tools/agentRun.ts:556-563 throws without an API key or OAuth token. api/mcp.ts:737-739 returns 401 when selected tools need a key and none is given. tests/unit/mcp-handler.test.ts:133-150 covers the no-auth case."
+      },
+      {
+        "claim": "The hosted MCP server works anonymously with rate limits (README.md:128)",
+        "verified": "partial",
+        "evidence": "The free tier is implemented: with no credentials the hosted handler uses the server's EXA_API_KEY env var and marks the caller free_tier (api/mcp.ts:433-437; tests/unit/api/mcp.test.ts:149-159,573-585). Rate limits exist only if Upstash/KV env vars are set (otherwise 'Rate limiting disabled', api/mcp.ts:137-142), default 2 QPS and 50/day per IP (api/mcp.ts:155-156), apply only to tools/call (api/mcp.ts:222-232,775-797), key on x-vercel-forwarded-for and are skipped when it is absent (api/mcp.ts:179-184,319-324), and fail open on Redis errors (api/mcp.ts:352-359). Anonymous access is not available to plugin installs or ?login and /mcp/oauth URLs: those get a 401 OAuth challenge when no credentials are sent (api/mcp.ts:707-722; plugin manifests use client=...plugin at .claude-plugin/plugin.json:13 and mcp.json:7). No test covers the plugin param without credentials (tests/unit/api/mcp.test.ts:441-461 covers an invalid JWT only). The live service's real limits cannot be checked from the repo."
+      },
+      {
+        "claim": "OAuth is preferred, ?login or /mcp/oauth force login, and API keys can be sent via ?exaApiKey=, Authorization: Bearer or x-api-key (README.md:130-132)",
+        "verified": "yes",
+        "evidence": "Precedence is x-api-key > OAuth JWT > plain Bearer key > ?exaApiKey > env (api/mcp.ts:443-491). ?login and /mcp/oauth trigger the 401 challenge (api/mcp.ts:711-722; api/mcp-oauth.ts:3-5; vercel.json:40-42; tests/unit/api/mcp.test.ts:619-650). JWTs are verified against auth.exa.ai (src/utils/auth.ts:3-15,36-41). The code strips these credentials from the request forwarded to the MCP handler (api/mcp.ts:815-830)."
+      },
+      {
+        "claim": "Claude install via `claude plugin install exa@claude-plugins-official` (README.md:43)",
+        "verified": "not_checkable",
+        "evidence": "The command names a marketplace, claude-plugins-official, that is not defined in this repo; the repo's own marketplace file is named 'exa' (.claude-plugin/marketplace.json:2). The plugin manifests only register the remote server https://mcp.exa.ai/mcp?client=claude-code-plugin with header x-exa-source (.claude-plugin/plugin.json:10-18). Whether the official listing exists and tracks this revision cannot be checked from the repo."
+      },
+      {
+        "claim": "README describes only client -> Exa hosted server data flows and lists no third-party analytics (README.md:26-30,126-132; no telemetry section)",
+        "verified": "no",
+        "evidence": "Code wires the third-party Agnost analytics hook into every entry point (src/mcp-handler.ts:270-295; src/stdio.ts:57), with endpoint https://api.agnost.ai, a hard-coded project ID and no opt-out switch. For HTTP requests the repo's own comment says it captures headers, query params and URL (api/mcp.ts:815-821), so credentials are stripped first (api/mcp.ts:821-830). The payload for stdio users is not verifiable because agnost is not vendored. Code takes precedence over the README here."
+      },
+      {
+        "claim": "web_search_advanced_exa offers filters, domains, dates, highlights, summaries and subpage crawling (README.md:104)",
+        "verified": "yes",
+        "evidence": "category incl. pdf, github, news, financial report (src/tools/webSearchAdvanced.ts:37-49); includeDomains/excludeDomains (:51-55); published/crawl date ranges (:57-72); includeText/excludeText (:74-81); summaries (:102-103,158-160); highlights (:105-115,162-169); subpages 1-10 with subpageTarget (:124-130,171-177); maxAgeHours/livecrawlTimeout freshness controls (:117-123,146-152). Documented ranges such as numResults 1-100 are not clamped locally (:29,182). It is enabled only via ?tools= or ENABLED_TOOLS (src/toolRegistry.ts:18-24). There is no dedicated test file for it."
+      },
+      {
+        "claim": "README.md:26-30 points users to Exa's hosted MCP server at https://mcp.exa.ai/mcp, implemented by this repo",
+        "verified": "not_checkable",
+        "evidence": "The repo contains a Vercel Function implementing that endpoint (api/mcp.ts; vercel.json:14-26), hard-codes https://mcp.exa.ai in OAuth metadata (api/well-known-oauth-protected-resource.ts:20; api/mcp.ts:628) and registers it in server.json:10-15. Whether the live service runs this revision, its real rate limits and its log/data retention cannot be verified from the repo."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Scope (page interaction): the repo has no browser or page-interaction capability. There are no tools or dependencies for forms, sign-in flows, tabs, clicks, screenshots or PDF rendering. The registry's 12 entries are all search, fetch or research (src/toolRegistry.ts:11-94). web_fetch_exa accepts only `urls` and `maxCharacters`, with no cookies, headers, wait or click parameters (src/tools/webFetch.ts:45-61). 'pdf' is only a search-category filter (src/tools/webSearchAdvanced.ts:37-49). Grep for puppeteer, playwright, chromium, headless, selenium and screenshot finds nothing, and package.json:58-65 lists no browser or HTML-parsing library.",
+      "Scope (fetch is remote and MCP-only): web_fetch_exa is an MCP tool whose work is done by Exa's hosted /contents endpoint (src/tools/webFetch.ts:86-99); the repo has no local fetch or extraction code. The exa-mcp-server bin accepts no arguments (no argv parsing; src/stdio-cli.ts:1-8, src/stdio.ts:29-67), so there is no shell-callable fetch command. JavaScript rendering, paywall handling and extraction fidelity are decided server-side and are not specified here; skills/search/references/searching.md:80-82 tells agents to fall back to another fetch tool when it fails, and extraction.md:41 mentions paywalled or inaccessible sources.",
+      "Bounds and attribution gaps in fetch: the default is 3000 characters per page (src/tools/config.ts:87; src/tools/webFetch.ts:58-60,79) while README.md:97 says 'full content', and skills/search/references/extraction.md:23 advises omitting maxCharacters. URL count and numResults are not clamped locally (webFetch.ts:46-57; webSearchAdvanced.ts:182). Fetch output has title, URL, date (date part only), author and text, but no fetch time, HTTP status or content hash. The per-URL statuses (id/status/source) are dropped except for errors (webFetch.ts:16-32,104-105,138; src/utils/exaResponseSanitizer.ts:39-62). The fetch tool has no freshness control; maxAgeHours/livecrawlTimeout exist only on web_search_advanced_exa (webSearchAdvanced.ts:117-123,146-152).",
+      "Telemetry: third-party Agnost analytics is hard-wired into both stdio and HTTP paths (endpoint https://api.agnost.ai, hard-coded project ID) with no opt-out switch in the repo, and the README does not mention it (src/mcp-handler.ts:270-295; src/stdio.ts:57). For HTTP, the repo's own comment says it captures headers, query params and URL, so credentials are stripped beforehand (api/mcp.ts:815-830). The agnost@0.2.0 lockfile entry records no license (package-lock.json:2135-2146) and the package is not vendored, so its payload and license are unverified. Separately, the per-call logger writes queries and fetched URLs to stderr regardless of DEBUG (src/utils/logger.ts:4-6,14-16; src/tools/webFetch.ts:71).",
+      "Accounts, network and limits: all tools need network access to Exa-hosted services, and local stdio needs EXA_API_KEY (no anonymous mode in its code, src/tools/config.ts:53-58). With an empty key the call becomes new Exa(''), whose behavior depends on exa-js and is unverified. Anonymous hosted use is IP rate limited only if Redis env vars are configured (defaults 2 QPS and 50/day) and fails open (api/mcp.ts:137-142,155-156,352-359). Plugin manifests append client=...plugin, which forces OAuth sign-in with an Exa account on /mcp (api/mcp.ts:707-722; .claude-plugin/plugin.json:13; mcp.json:7). agent_run and the deprecated deep-research tools need a key or OAuth (src/toolRegistry.ts:50,57,78,92). The README documents no local stdio install; that mode appears only in env.example:1-15 and skills/search/SKILL.md:15.",
+      "Self-hosting security: src/runtime-server.ts attaches the container's EXA_API_KEY as x-api-key to any request that carries no credentials (lines 20-25). api/mcp.ts treats x-api-key as a user-provided key (api/mcp.ts:443-449), which skips the free-tier rate limit and allows agent_run. The server has no inbound authentication (src/runtime-server.ts:79-102) and binds 0.0.0.0:8000 by default (src/runtime-server.ts:5-6; Dockerfile:14-15,27-28). The image installs with `npm ci --omit=dev` (Dockerfile:19), so the devDependency @upstash/* packages used for rate limiting and session metadata are absent (package.json:68-69; api/mcp.ts:145-148).",
+      "Release and supply chain: publish.yml publishes to npm on any push to main that touches package.json, with no test step and not gated on CI (publish.yml:3-9,21-60). It uses OIDC trusted publishing (publish.yml:13,29-30) but passes no --provenance flag, and no workflow produces checksums, signatures, GitHub Releases or tags. The AgentCore image is built with provenance and SBOM disabled (publish-agentcore.yml:113-114). The registry workflow downloads mcp-publisher from releases/latest with no checksum and runs it with a DNS private-key secret (publish-mcp-registry.yml:49-63). Actions are pinned by tag, not SHA (ci.yml:19,22; publish.yml:22,24; publish-agentcore.yml:26,59,92). There is no SECURITY.md or dependabot config.",
+      "Tests, maintenance and licensing: tests are unit-only with exa-js, agnost and Upstash mocked (12 files, about 118 cases); there are no live or quality tests for fetch extraction, no tests for web_search_advanced_exa, auth.ts or runtime-server.ts, and no published benchmarks. 8 of the 12 registry tools are deprecated but still shipped (src/toolRegistry.ts:25-85). The version string 3.4.1 is duplicated across 8 files (e.g. package.json:3, src/stdio.ts:50, api/mcp.ts:580, server.json:9) and only server.json vs package.json is checked (publish-mcp-registry.yml:32-35). plugin.json:5 still describes 'code search, and web crawling'. package.json has no license field (LICENSE is MIT). The README MCP JSON snippet has a trailing comma (README.md:63). Not covered here: the external docs site (README.md:17), the live service, and exa-js/agnost internals (node_modules is absent and the clone is shallow, .git/shallow)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "exa-labs/exa-mcp-server",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Install by setting the hosted remote MCP URL https://mcp.exa.ai/mcp in an MCP client (client-side config, no local install, OS-independent); the README documents no npx, Docker, from-source or OS-specific command.",
+          "citation": "README.md:26-30",
+          "holds": true,
+          "note": "README.md:26-30 reads 'Connect to Exa's hosted MCP server:' followed by https://mcp.exa.ai/mcp. A case-insensitive grep of README.md for npx, docker, git clone, npm install, brew, winget, apt, linux, macos, windows and wsl finds nothing. The only shell commands are the client-side `claude plugin install` (line 43) and `codex mcp add` (line 51). Wording nit, not material: the README says 'most clients' (lines 56, 72), not 'any', because the client must support remote streamable-HTTP servers."
+        },
+        {
+          "field": "license",
+          "statement": "License is MIT (SPDX MIT), in file LICENSE.",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-21 is the standard MIT License text, 'Copyright (c) 2025 Exa Labs'. plugin.json:12 and .claude-plugin/marketplace.json:23 also declare MIT, and no file declares a different license. package.json has no license field, which the dossier's risks already note."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes: hosted and plugin setups are client-side URL config with no OS dependency; the local stdio bundle targets Node >=20; CI runs on ubuntu-latest with Node 20.x and does not state the CPU architecture.",
+          "citation": "README.md:26-67; package.json:39,78-80; .github/workflows/ci.yml:15,24",
+          "holds": true,
+          "note": "README.md:26-67 has only URL, plugin and JSON client config. package.json:39 builds with esbuild `--target=node20`; package.json:78-80 sets engines node >=20.0.0. ci.yml:15 is `runs-on: ubuntu-latest`, ci.yml:24 is `node-version: 20.x`, and no architecture is set. Aside, outside the five checks: the facts behind the 'unknown' macos_arm64/wsl2 entries also hold (publish-agentcore.yml:110 is `--platform linux/arm64`; all four workflows use ubuntu-latest; grep finds no darwin/win32/process.platform code). But the OS-independence argument used here for hosted use applies to those platforms too."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "MCP: yes. Hosted streamable-HTTP at https://mcp.exa.ai/mcp (plus /mcp/oauth), local stdio, and an HTTP wrapper for AgentCore; web_search_exa and web_fetch_exa on by default, web_search_advanced_exa and agent_run opt-in, 8 deprecated; one prompt plus a second and two extra resources only with agent tools; Gemini CLI manifest.",
+          "citation": "README.md:26-30; api/mcp.ts; server.json:10-15; vercel.json:40-42; src/stdio.ts:44-67; src/runtime-server.ts:79-107; src/toolRegistry.ts:11-94; src/mcp-handler.ts:152-268; gemini-extension.json:5-9",
+          "holds": true,
+          "note": "api/mcp.ts:572-592 builds the endpoint with createMcpHandler (mcp-handler) and exports GET/POST/DELETE/OPTIONS at 866-871. server.json:3,10-15 is ai.exa/exa with one streamable-http remote and no packages. vercel.json:40-42 rewrites /mcp/oauth to api/mcp-oauth.ts, which sets forceOAuth. stdio.ts:44-67 connects StdioServerTransport. runtime-server.ts:79-107 is a node:http server ('AgentCore Runtime server listening'). toolRegistry.ts has 12 entries: exactly web_search_exa and web_fetch_exa enabled:true, web_search_advanced_exa and agent_run enabled:false, and 8 labelled Deprecated. mcp-handler.ts:152 registers web_search_help; 168-207 registers agent_research_help only with agent tools; 210-228 registers exa://tools/list; 230-268 registers exa://agent/skill and exa://agent/schema-templates only with agent tools. gemini-extension.json:5-9 sets httpUrl https://mcp.exa.ai/mcp."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "README.md:97 'web_fetch_exa reads a webpage's full content as clean markdown from one or more URLs' is graded partial: unlimited URL array posted to Exa /contents, 3000-char default per page (and a skill tells agents not to raise it), no cookie/header/wait/freshness parameters, plain-text title/URL/date/author/text output, extraction done by Exa's service, tests mock exa-js.",
+          "citation": "README.md:97; src/tools/webFetch.ts:16-32,45-61,76-95; src/tools/config.ts:87; skills/search/references/extraction.md:23; tests/unit/tools/webFetch.test.ts:23-26,38-76",
+          "holds": true,
+          "note": "README.md:97 matches word for word. webFetch.ts:46-57 is z.array(z.string()) with no max. 76-95 POSTs {urls, text:{maxCharacters}} to '/contents'. Line 79 uses `maxCharacters || API_CONFIG.DEFAULT_MAX_CHARACTERS`, which config.ts:87 sets to 3000. validation.ts:25-27 sets min 1 and no max, so the caller can raise it. The schema (45-61) has only urls and maxCharacters. The formatter (16-32) writes # title, URL, Published (split at 'T'), Author and text, plus per-URL error lines. extraction.md:23 says 'Avoid using `maxCharacters` param'. exaResponseSanitizer.ts only filters fields, and the repo has no HTML-parsing or markdown code. webFetch.test.ts:23-26 mocks exa-js. 'partial' is the correct grade."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

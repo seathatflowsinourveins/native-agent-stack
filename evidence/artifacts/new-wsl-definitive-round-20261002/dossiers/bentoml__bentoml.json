@@ -1,0 +1,294 @@
+{
+  "contender": "bentoml/bentoml",
+  "revision": {
+    "contender": "bentoml/bentoml",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "bentoml/BentoML",
+        "tag": "v1.4.39",
+        "commit": "e570eb2b1dd5ea49c09c261232a6b131a023d1b2",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v1.4.39",
+    "commit": "e570eb2b1dd5ea49c09c261232a6b131a023d1b2",
+    "read_at": "2026-10-02T03:01:59+00:00"
+  },
+  "dossier": {
+    "contender": "bentoml/bentoml",
+    "revision": {
+      "tag": "v1.4.39",
+      "commit": "e570eb2b1dd5ea49c09c261232a6b131a023d1b2",
+      "read_at": "2026-10-02T03:01:59+00:00"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "BentoML is an Apache-2.0 Python library and CLI (v1.4.39) for building online model-inference and AI-service APIs. A service is a Python class decorated with @bentoml.service whose @bentoml.api methods take their input/output schemas from Python type hints (pydantic); services call each other with bentoml.depends. `bentoml serve` runs the service graph locally (one OS process group per Service under a Circus supervisor, default port 3000). `bentoml build` packages code, models and a generated Dockerfile into a 'Bento'. `bentoml containerize` builds one OCI image per Bento through docker/buildx/podman/buildah/nerdctl/buildctl and prints a `docker run --rm -p 3000:3000 <tag>` hint. `bentoml deploy` targets BentoCloud, a hosted service that needs an account and API token. Relevant to the multi-service-application need: BentoML does not define or run multi-container applications. No Compose/stack/pod generation and no 'run container' command exist in the code; its container-engine interaction is image build only (src/bentoml/_internal/container/base.py:154-189; src/bentoml_cli/containerize.py:590-607). The only Compose file in the repo is an unreferenced docs snippet (docs/source/build-with-bentoml/snippets/tracing/docker-compose.yml:1-34).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "BentoML is a Python library for building online serving systems optimized for AI apps and model inference.",
+          "citation": "README.md:18"
+        },
+        {
+          "claim": "Easily build APIs for any AI/ML model: turn any model inference script into a REST API server with just a few lines of code and standard Python type hints.",
+          "citation": "README.md:20"
+        },
+        {
+          "claim": "Docker containers made simple: manage environments, dependencies and model versions with a simple config file; BentoML automatically generates Docker images, ensures reproducibility, and simplifies how you deploy to different environments.",
+          "citation": "README.md:21"
+        },
+        {
+          "claim": "Maximize CPU/GPU utilization with built-in dynamic batching, model parallelism, multi-stage pipeline and multi-model inference-graph orchestration.",
+          "citation": "README.md:22"
+        },
+        {
+          "claim": "Ready for production: develop, run and debug locally; seamlessly deploy to production with Docker containers or BentoCloud.",
+          "citation": "README.md:24"
+        },
+        {
+          "claim": "Install with `pip install -U bentoml`; requires Python>=3.9.",
+          "citation": "README.md:30-33"
+        },
+        {
+          "claim": "`bentoml serve` runs the service locally, serving at http://localhost:3000 by default.",
+          "citation": "README.md:65-69"
+        },
+        {
+          "claim": "`bentoml build` packages necessary code, models and dependency configs into a Bento, the standardized deployable artifact.",
+          "citation": "README.md:90-94"
+        },
+        {
+          "claim": "Ensure Docker is running; `bentoml containerize summarization:latest` generates a container image; run it with `docker run --rm -p 3000:3000 summarization:latest`.",
+          "citation": "README.md:96-105"
+        },
+        {
+          "claim": "BentoCloud provides compute infrastructure; sign up for personal access, run `bentoml cloud login` to create an API token, then `bentoml deploy` from the current directory.",
+          "citation": "README.md:110-120"
+        },
+        {
+          "claim": "Advanced topics linked from the README: model composition, workers and model parallelization, adaptive batching, GPU inference, distributed serving systems, model store, observability, BentoCloud deployment.",
+          "citation": "README.md:139-147"
+        },
+        {
+          "claim": "The framework collects anonymous usage data; only BentoML's internal API calls are reported, excluding sensitive information such as user code, model data, model names or stack traces.",
+          "citation": "README.md:176"
+        },
+        {
+          "claim": "Opt out of usage tracking with the `--do-not-track` CLI option or by setting BENTOML_DO_NOT_TRACK=True.",
+          "citation": "README.md:176-186"
+        },
+        {
+          "claim": "License: Apache License 2.0.",
+          "citation": "README.md:11,188-190"
+        }
+      ],
+      "install": [
+        {
+          "method": "pip from PyPI (README quick start)",
+          "command": "pip install -U bentoml",
+          "citation": "README.md:30-33 (Python>=3.9: README.md:31, pyproject.toml:5)"
+        },
+        {
+          "method": "pip from PyPI (docs landing page; package is distributed on PyPI)",
+          "command": "pip install bentoml",
+          "citation": "docs/source/index.rst:70-75"
+        },
+        {
+          "method": "venv + pip, Mac/Linux tutorial steps",
+          "command": "python3 -m venv quickstart\nsource quickstart/bin/activate\npip install bentoml torch transformers",
+          "citation": "docs/source/get-started/hello-world.rst:31-36,49-54"
+        },
+        {
+          "method": "pip with tracing extras (optional supporting-service exporters; other extras defined in pyproject.toml:81-115)",
+          "command": "pip install \"bentoml[tracing-zipkin]\"   (also [tracing-jaeger], [tracing-otlp])",
+          "citation": "docs/source/build-with-bentoml/observability/tracing.rst:32,38,44"
+        },
+        {
+          "method": "editable install from source with PDM (contributors)",
+          "command": "pdm install -G all",
+          "citation": "DEVELOPMENT.md:45-50"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - CI runs unit, e2e and framework-integration jobs on ubuntu-latest (.github/workflows/ci.yml:30,59,111,153); default package-lock target is x86_64-manylinux_2_36 (src/bentoml/_internal/configuration/__init__.py:32).",
+        "wsl2": "yes (code-level handling only) - WSL kernels are detected and loopback TCP sockets are used instead of Unix sockets (src/_bentoml_impl/server/serving.py:35,52-61; src/bentoml/serving.py:49,356-360); WSL is not mentioned in docs/source and no CI job runs on WSL (.github/workflows/ci.yml:30).",
+        "macos_arm64": "yes - CI runs unit and e2e jobs on macos-latest without pinning the architecture (.github/workflows/ci.yml:30,112,153); docs address Apple silicon and advise `--platform` for containerize (docs/source/get-started/packaging-for-deployment.rst:74-80); non-Linux-x86_64 hosts lock packages for x86_64-manylinux by default (src/_bentoml_sdk/images.py:317-322); container-mode e2e tests are skipped on macOS in GitHub Actions (src/bentoml/testing/pytest/plugin.py:116-121).",
+        "gpu": "yes, NVIDIA only - local allocation assigns NVIDIA devices through CUDA_VISIBLE_DEVICES (src/_bentoml_impl/server/allocator.py:15-22,99-114); docs require the NVIDIA Container Toolkit and `docker run --gpus all` (docs/source/build-with-bentoml/gpu-inference.rst:150-156); AMD/TPU names exist only as BentoCloud instance-type annotations (src/_bentoml_sdk/service/config.py:36-54,95-98); CI installs CPU-only torch (noxfile.py:54-60)."
+      },
+      "integrations": {
+        "cli": "yes - `bentoml` console script (pyproject.toml:79-80 -> src/bentoml_cli/cli.py:7-69): serve/serve-http (serve.py:62), build/list/get/delete/export/import/pull/push (bentos.py:100-505), containerize (containerize.py:392), deploy and deployment group (deployment.py:85,344), cloud login/current-context/list-context/update-current-context (cloud.py:26-172), secret (secret.py:28), api-token (api_token.py:13), models (models.py:60), env (env.py:113); extension commands load from the `bentoml.commands` entry-point group (cli.py:53-55); `python -m bentoml` works (src/bentoml/__main__.py:1-4).",
+        "mcp": "none found - case-insensitive search of the whole repository for MCP / Model Context Protocol / mcp-server returns no hits.",
+        "sdk_or_api": "yes - Python SDK exported from src/bentoml/__init__.py:22-68,323-410: @bentoml.service, @bentoml.api, @bentoml.task, bentoml.depends, bentoml.images.Image, bentoml.asgi_app, SyncHTTPClient/AsyncHTTPClient, bentoml.build/serve/push/pull, bentoml.container.build, bentoml.deployment, bentoml.models. HTTP API generated per service: one route per @bentoml.api, default `/<method name>` (src/_bentoml_sdk/method.py:115-119; POST per docs/source/get-started/hello-world.rst:110-111), plus /livez, /healthz, /readyz, /metrics (src/bentoml/_internal/server/base_app.py:104-139), /schema.json (src/_bentoml_impl/server/app.py:183) and /docs.json plus index UI on the entry service (app.py:195-213). A hidden `serve-grpc` command runs the legacy runner-based gRPC server (src/bentoml_cli/serve.py:335-346,509-546; proto at src/bentoml/grpc/v1/service.proto).",
+        "claude_code_or_codex": "none found - no MCP server, no CLAUDE.md/AGENTS.md/.claude/.codex files, no Claude Code or Codex integration in the repo; the only Claude mentions are an external Anthropic API option inside a LangGraph example (docs/source/examples/langgraph.rst:48,239-242,314-317)."
+      },
+      "telemetry_and_network": "Usage tracking is ON by default and posts JSON to https://t.bentoml.com (src/bentoml/_internal/utils/analytics/usage_stats.py:47,117-128; 1 s timeout, failures swallowed: usage_stats.py:49,70-87). Opt-out: env BENTOML_DO_NOT_TRACK=true (case-insensitive; usage_stats.py:45,58-61) or the global `--do-not-track` flag present on every command (src/bentoml_cli/utils.py:203-208,278-286). Events: every CLI command (name, duration, exception class name, return code; utils.py:299-350; schemas.py:147-153); `bentoml build` (bento/model size, model count, model module names; cli_events.py:11-38); model saves (src/bentoml/models.py:315,371); serve start plus a 12-hourly update carrying Prometheus request-counter samples (usage_stats.py:48,131-213,335-395). Every event also carries platform string, Python/BentoML versions, notebook flag, memory sizes, a session id, a persistent random client UUID stored at $BENTOML_HOME/client_id, and `yatai_user_email` read from the BentoCloud config when logged in (schemas.py:56-132; src/bentoml/_internal/configuration/containers.py:216-222). Images built by `bentoml containerize` do not set BENTOML_DO_NOT_TRACK (src/bentoml/_internal/container/frontend/dockerfile/templates/base_v2.j2:59-78), so opt-out must be supplied at run time. Separately, the default index page at `/` (main-openapi.html) loads Google Tag Manager container GTM-WNPGWRM from www.googletagmanager.com in the visitor's browser; it is static HTML not gated by BENTOML_DO_NOT_TRACK and is replaced only when BENTOML_ENABLE_FEATURES includes `new_index` (src/_bentoml_impl/server/main-openapi.html:6-12,19-22; src/_bentoml_impl/server/app.py:163-170; containers.py:472-479). Accounts: none are needed for `bentoml serve`, `build` or `containerize` themselves. BentoCloud (default endpoint https://cloud.bentoml.com, src/bentoml/_internal/cloud/config.py:62) is needed for `cloud login`, `deploy`, `push`/`pull` and bentoml.depends(deployment=...) (src/bentoml_cli/cloud.py:31-50; src/bentoml_cli/bentos.py:313-360,486-490; src/_bentoml_sdk/service/dependency.py:64-72). Login stores the API token and email in plain YAML at ~/bentoml/.yatai.yaml (cloud/config.py:25-30,96-103; containers.py:219-222); BENTO_CLOUD_API_KEY / BENTO_CLOUD_API_ENDPOINT env vars override it (cloud/config.py:73-78). HTTP clients and inter-service proxies fall back to BENTO_CLOUD_API_KEY and send it as an Authorization Bearer header to whatever URL they are given, with no host check (src/_bentoml_impl/client/http.py:134-137; proxy2.py:177-180). Build-time network: `bentoml build` locks Python packages with `uv pip compile` against the configured index (lock_python_packages defaults to True; src/_bentoml_sdk/images.py:53,293-336), auto-installs uv with pip when missing (configuration/__init__.py:232-257) and git-clones git-URL requirements (src/bentoml/_internal/bento/bentoml_builder.py:119-173); `bentoml containerize` pulls the base image (default python:<ver>-slim, dockerfile/__init__.py:111), pip-installs uv and requirements inside the image (base_v2.j2:85-102) and resolves Hugging Face models (container/__init__.py:183-189). Server defaults: HTTP listens on 0.0.0.0:3000, TLS and CORS disabled, no built-in authentication (default_configuration.yaml:42-56; authentication is left to user ASGI middleware, docs/source/build-with-bentoml/asgi.rst:17,264-307); generated images EXPOSE 3000 and the Prometheus port 3001 (base_v2.j2:113-117; default_configuration.yaml:76-78)."
+    },
+    "code": {
+      "languages": [
+        "Python (all runtime code under src/)",
+        "Protocol Buffers (src/bentoml/grpc/v1/service.proto, src/bentoml/grpc/v1alpha1/service.proto)",
+        "Jinja2 Dockerfile templates (src/bentoml/_internal/container/frontend/dockerfile/templates/*.j2)",
+        "Bash (container entrypoint.sh)",
+        "HTML/JavaScript (index pages; vendored Swagger UI under src/bentoml/_internal/server/static_content/)",
+        "Starlark/Bazel (BUILD.bazel, WORKSPACE, bazel/*.bzl)"
+      ],
+      "entry_points": [
+        {
+          "path": "pyproject.toml:79-80 -> src/bentoml_cli/cli.py:7-69",
+          "what": "`bentoml` console script (click group bentoml_cli.cli:cli): serve, build, containerize, deploy, cloud, models, secret, api-token, env; plugin commands via entry-point group `bentoml.commands` (cli.py:53-55)"
+        },
+        {
+          "path": "src/bentoml/__main__.py:1-4",
+          "what": "`python -m bentoml` calls the same CLI"
+        },
+        {
+          "path": "src/bentoml_cli/serve.py:62-333",
+          "what": "`bentoml serve` / `serve-http`: loads the service and calls _bentoml_impl.server.serve_http (src/_bentoml_impl/server/serving.py:159-406), which starts a Circus arbiter with one watcher per dependency Service plus the entry service"
+        },
+        {
+          "path": "src/_bentoml_impl/worker/service.py:21-48",
+          "what": "per-Service worker process (`python -m _bentoml_impl.worker.service`, spawned at serving.py:70,91-103); options --service-name, --fd, --runner-map (env BENTOML_RUNNER_MAP), --worker-id; builds the Starlette app with is_main only for the entry service (line 207)"
+        },
+        {
+          "path": "src/bentoml_cli/bentos.py:362-503",
+          "what": "`bentoml build` (optionally --containerize, or --push to BentoCloud)"
+        },
+        {
+          "path": "src/bentoml_cli/containerize.py:392-608",
+          "what": "`bentoml containerize` -> bentoml._internal.container.build; backends docker (default), buildx, buildah, podman, nerdctl, buildctl"
+        },
+        {
+          "path": "src/bentoml/_internal/container/frontend/dockerfile/entrypoint.sh:12-60",
+          "what": "ENTRYPOINT of generated images: no args -> `bentoml serve $BENTO_PATH`; serve/serve-http/serve-grpc -> `bentoml <cmd> $BENTO_PATH`; start-http-server etc. -> bentoml_cli._internal.start; any other command is exec'd"
+        },
+        {
+          "path": "src/bentoml_cli/_internal/start.py:25-247",
+          "what": "hidden `start-http-server` (python -m bentoml_cli._internal.start): runs one named Service (--service-name) with remote dependencies (--depends name=url); documented as 'used inside Yatai'"
+        }
+      ],
+      "architecture": "Layers. (1) CLI src/bentoml_cli/ (click): cli.py, serve.py, bentos.py, containerize.py, deployment.py, cloud.py, secret.py, api_token.py, models.py, env.py, env_manager.py; _internal/start.py is the hidden per-Service starter. (2) New SDK src/_bentoml_sdk/: service/factory.py (Service, @bentoml.service; attrs object holding apis, dependencies, models, image, envs, config), service/dependency.py (bentoml.depends -> in-process object, or RemoteProxy when a url/deployment/runner-map entry exists), decorators.py + method.py (@bentoml.api/@bentoml.task; type hints -> pydantic IODescriptors), io_models.py, images.py (Image: python version, distro, system packages, pip packages, uv locking, run/run_script), service/config.py (resources, traffic, workers, ssl, http, tracing, monitoring, endpoints), models/ (BentoModel, HuggingFaceModel). (3) Runtime src/_bentoml_impl/: server/serving.py (Circus arbiter; per-Service Unix-socket or loopback-TCP sockets), server/app.py (Starlette app per Service: /livez /readyz /metrics, CorkDispatcher adaptive batching, pickle refusal on the entry Service), server/allocator.py (NVIDIA GPU and worker allocation), client/ (HTTP clients, RemoteProxy), tasks/ (async task queue with SQLite result store), worker/service.py, docker.py (v2 Dockerfile generation), serde.py (JSON, multipart, pickle), loader.py. (4) Core and legacy src/bentoml/: _internal/bento/ (Bento build, bento.yaml, build_config), _internal/container/ (OCIBuilder backends, Jinja2 Dockerfile templates, entrypoint.sh, generate.py), _internal/cloud/ (BentoCloud/Yatai REST client, deployments, secrets, API tokens), _internal/configuration/ (simple-di BentoMLContainer, v1/v2 default_configuration.yaml), _internal/utils/analytics/ (usage tracking), _internal/server/ (Starlette base app, metrics, Swagger assets), legacy runner/gRPC server (serving.py, start.py, grpc/), _internal/frameworks/ (deprecated), container.py (public build API), testing/ (pytest plugin, server helpers). Application model: one @bentoml.service class = one Service; a Bento packages the whole Service graph plus models; `bentoml serve` runs all Services as separate processes on one host (serving.py:229-282,370-402); `bentoml containerize` builds one OCI image per Bento whose default entrypoint serves the whole graph in one container (entrypoint.sh:42-54). BentoML talks to the container engine only to build images (container/base.py:154-189) and never runs or networks containers (only test helpers do: src/bentoml/testing/server.py:184-251); no Compose, volume or network definitions are generated.",
+      "packaging_and_release": "Build backend hatchling + hatch-vcs; version comes from git tags with fallback 0.0.0 (pyproject.toml:117-136); sdist and wheel include src/bentoml, src/bentoml_cli, src/_bentoml_sdk, src/_bentoml_impl (pyproject.toml:139-142). .github/workflows/release.yml triggers on any pushed tag ('*') or manual dispatch (release.yml:2-10), builds with `pipx run build` on ubuntu-latest/Python 3.11 and uploads a `dist` artifact (release.yml:11-28), then publishes to PyPI with pypa/gh-action-pypi-publish@release/v1 using OIDC (`id-token: write`; release.yml:29-40). No checksum, signing, SBOM or provenance step appears in any of the five workflows (ci.yml, cleanup.yml, codeql-analysis.yml, cqa.yml, release.yml), no GitHub Release step, and no container image of the framework is built or pushed. Whether the PyPI action attaches PEP 740 attestations is not visible in this repo (not checkable). Release cadence per SECURITY.md:5-6 is every 2-3 weeks.",
+      "tests_and_ci": "pytest (+ pytest-asyncio, pytest-xdist, pytest-cov) driven by nox + pdm (noxfile.py:44-99; pyproject.toml:168-180,226-229). 65 test_*.py files plus 8 conftest.py: tests/unit 44, tests/e2e 11 (bento_new_sdk 3, bento_server_grpc 4, bento_server_http 4), tests/integration/frameworks 7, tests/monitoring 1, tests root 2. CI (.github/workflows/ci.yml; runs on push to main, PRs and cron `0 0 * * 1/2`): unit tests on ubuntu/macos/windows x Python 3.9/3.11/3.12 (ci.yml:26-56); framework integration on ubuntu/py3.9 for 15 of 17 frameworks, transformers and detectron excluded (ci.yml:57-107); monitoring e2e on 3 OS x 3 Pythons (ci.yml:108-148); e2e `bento_server_http` and `bento_new_sdk` on ubuntu/macos, bento_server_http excluded on 3.12 (ci.yml:149-197), with QEMU/Buildx set up only on ubuntu; coverage report and alls-green gate on PRs (ci.yml:198-263). cqa.yml runs a Sphinx spell-check of docs; codeql-analysis.yml runs CodeQL for Python; cleanup.yml deletes PR caches. Pre-commit: ruff, ruff-format, pdm-lock-check, buf (.pre-commit-config.yaml:9-33); Dependabot for pip (daily) and github-actions (weekly) (.github/dependabot.yml:1-15). Gaps: the bento_server_grpc e2e suite is in noxfile.py:74 but not in the CI matrix (ci.yml:155); container-mode e2e (docker run of a built image) applies only to the legacy-API bento_server_http suite on Ubuntu (src/bentoml/testing/pytest/plugin.py:101-129; tests/e2e/bento_server_http/service.py:57), while the new-SDK e2e suite builds and serves in-process without a container (tests/e2e/bento_new_sdk/test_quickstart.py:55-63); Dockerfile generation is unit-tested (tests/unit/_internal/container/test_generate.py).",
+      "dependencies": "pyproject.toml (PEP 621): 42 runtime requirement entries at lines 25-69 (41 unconditional + tomli for python<3.11), including starlette, uvicorn, pydantic<3, click, httpx, aiohttp, attrs, cattrs<23.2.0, numpy, nvidia-ml-py, psutil, prometheus-client, OpenTelemetry (~=1.20 / ~=0.41b0), Jinja2, PyYAML, fsspec, aiosqlite, watchfiles, rich/rich-toolkit, and kantoku (a Circus distribution: pdm.lock:1297-1300; code imports `circus`, src/bentoml/_internal/utils/circus/__init__.py:10). 15 optional extras at lines 81-115 (all, aws, io, io-image, io-pandas, triton, unsloth, grpc, grpc-reflection, grpc-channelz, tracing, tracing-jaeger, tracing-zipkin, tracing-otlp, monitor-otlp). Dependency groups at lines 147-180: docs 17, tooling 4, testing 11; build-system requires 2 (line 118). Lockfile pdm.lock (checked by the pdm-lock-check hook, .pre-commit-config.yaml:23-26). Extra manifests only for tests: tests/e2e/*/requirements.txt and tests/monitoring/task_classification/pyproject.toml. ML frameworks (torch, transformers, ...) are not dependencies; users add them via Image.python_packages.",
+      "security_policy": "SECURITY.md: security updates only for the latest release (SECURITY.md:3-13); report privately to security@bentoml.com or via a GitHub security advisory (SECURITY.md:16-25); out of scope: pickle-related vulnerabilities in the runner service or dependency service (SECURITY.md:27-34). CodeQL scanning runs in CI (.github/workflows/codeql-analysis.yml:1-40)."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:20 - Turn any model inference script into a REST API server with a few lines of code and standard Python type hints.",
+        "verified": "yes",
+        "evidence": "@bentoml.api wraps the function in APIMethod, which derives pydantic input/output specs from the signature and return annotation (src/_bentoml_sdk/method.py:115-132; src/_bentoml_sdk/decorators.py:60-109) and serves it at /<method name> (method.py:115-119; POST per docs/source/get-started/hello-world.rst:110-111). The e2e test serves the quickstart and calls it with SyncHTTPClient and AsyncHTTPClient (tests/e2e/bento_new_sdk/test_quickstart.py:21-46)."
+      },
+      {
+        "claim": "README.md:21 - BentoML automatically generates Docker images, ensures reproducibility, and simplifies how you deploy to different environments.",
+        "verified": "partial",
+        "evidence": "Generation is real: `bentoml build` writes env/docker/Dockerfile, requirements.txt and entrypoint.sh into the Bento (src/_bentoml_sdk/images.py:195-238) and `bentoml containerize` renders it and shells out to a builder (src/bentoml/_internal/container/__init__.py:253-306; container/base.py:154-189). Reproducibility is partial: Python packages are locked with `uv pip compile` by default (images.py:53,293-336; lock target is x86_64-manylinux_2_36 when the host is not Linux x86_64, images.py:317-322, configuration/__init__.py:32), but the base image is a floating tag python:<ver>-slim (src/bentoml/_internal/container/frontend/dockerfile/__init__.py:111), uv is installed unpinned inside the image (templates/base_v2.j2:85) and builds need network access to PyPI and registries."
+      },
+      {
+        "claim": "README.md:96-105 - `bentoml containerize summarization:latest`, then `docker run --rm -p 3000:3000 summarization:latest`.",
+        "verified": "yes",
+        "evidence": "The command builds an OCI image with the docker backend by default (src/bentoml_cli/containerize.py:404-413,531-537) and prints exactly `docker run --rm -p 3000:3000 <tag>` (containerize.py:593-596). The image EXPOSEs 3000 and its entrypoint runs `bentoml serve` when no argument is given (base_v2.j2:113-123; entrypoint.sh:28-44). BentoML never starts the container itself; only the test helpers do (src/bentoml/testing/server.py:184-251)."
+      },
+      {
+        "claim": "README.md:9,22 - multi-model serving systems and multi-model inference-graph orchestration (docs/source/build-with-bentoml/distributed-services.rst:14 adds that multiple Services 'run as processes in different containers').",
+        "verified": "partial",
+        "evidence": "Code differs from the docs (code preferred). Services link through bentoml.depends (src/_bentoml_sdk/service/dependency.py:139-171). `bentoml serve` starts every dependency Service as its own OS process under one Circus arbiter on the same host, over Unix sockets or loopback TCP (src/_bentoml_impl/server/serving.py:52-61,229-282,370-402). A containerized Bento's default entrypoint runs `bentoml serve` (entrypoint.sh:42-54), so the whole graph runs inside one container from one image; the docs concede a single runtime image per multi-Service Bento (docs/source/build-with-bentoml/runtime-environment.rst:41-43). Separate containers per Service need the hidden `start-http-server --service-name ... --depends name=url` mode documented as 'used inside Yatai' (src/bentoml_cli/_internal/start.py:25-62,126-152; entrypoint.sh:26-27); per-Service instance and scaling settings are documented only for BentoCloud (distributed-services.rst:130-190)."
+      },
+      {
+        "claim": "README.md:24 - Develop, run and debug locally; seamlessly deploy to production with Docker containers or BentoCloud.",
+        "verified": "partial",
+        "evidence": "Local run and image build are implemented (see above). On the container path BentoML's engine involvement stops at image build: no command defines or runs multi-container applications, supporting services, volumes or networks; no Dockerfile template under src/ contains VOLUME or HEALTHCHECK (case-insensitive search); the only Compose file is an unreferenced legacy docs snippet (docs/source/build-with-bentoml/snippets/tracing/docker-compose.yml:1-34 with bentoml_configuration.yaml:9-14). Docs start Zipkin/Jaeger/OTel collectors by hand with `docker run` (docs/source/build-with-bentoml/observability/tracing.rst:121-125,181-197,245-254) and tell users to mount a volume for monitoring logs (observability/monitoring-and-data-collection.rst:243). Container-mode e2e tests cover only the legacy-API suite (tests/e2e/bento_server_http/service.py:57; src/bentoml/testing/pytest/plugin.py:101-129); the new-SDK e2e suite builds and serves in-process without a container (tests/e2e/bento_new_sdk/test_quickstart.py:55-63)."
+      },
+      {
+        "claim": "README.md:176-186 - anonymous usage data, only internal API calls, no sensitive information such as user code, model data, model names or stack traces; opt out with --do-not-track or BENTOML_DO_NOT_TRACK=True.",
+        "verified": "partial",
+        "evidence": "Opt-out works as described (src/bentoml/_internal/utils/analytics/usage_stats.py:45,58-61,117-120; src/bentoml_cli/utils.py:203-208,278-286) and no code or stack traces are sent. Code differs from the README on content (code preferred): every event includes a persistent client UUID, platform, memory sizes and `yatai_user_email` when logged in to BentoCloud (src/bentoml/_internal/utils/analytics/schemas.py:56-86,96-132); serve events include dependency Service names (usage_stats.py:196-200) and API endpoint labels from request metrics (usage_stats.py:312-323,384); CLI failures send the exception class name (src/bentoml_cli/utils.py:341-347). The default index page also loads Google Tag Manager in the browser, outside the opt-out (src/_bentoml_impl/server/main-openapi.html:6-12)."
+      },
+      {
+        "claim": "README.md:65 - `bentoml serve` serves at http://localhost:3000 by default.",
+        "verified": "partial",
+        "evidence": "Port 3000 is the default (src/bentoml/_internal/configuration/v2/default_configuration.yaml:53). Code differs from the README (code preferred): the default host is 0.0.0.0, not loopback (default_configuration.yaml:52; src/_bentoml_impl/server/serving.py:159-163), and the startup log prints 'localhost' for 0.0.0.0 (serving.py:359). TLS and CORS default to off (default_configuration.yaml:42-43,55-56) and there is no built-in authentication (custom ASGI middleware per docs/source/build-with-bentoml/asgi.rst:17,264-307)."
+      },
+      {
+        "claim": "README.md:31 - Requires Python>=3.9.",
+        "verified": "yes",
+        "evidence": "pyproject.toml:5 sets requires-python >=3.9. Classifiers list 3.9-3.12 (pyproject.toml:17-20); CI tests 3.9, 3.11 and 3.12 (.github/workflows/ci.yml:31) and nox also defines 3.10 (noxfile.py:15); generated images accept Python 3.9-3.14 (src/bentoml/_internal/container/frontend/dockerfile/__init__.py:24)."
+      },
+      {
+        "claim": "README.md:22 - Maximize CPU/GPU utilization with dynamic batching, model parallelism, multi-stage pipelines and inference-graph orchestration.",
+        "verified": "partial",
+        "evidence": "The features exist: batchable APIs go through a CorkDispatcher (src/_bentoml_sdk/decorators.py:60-88; src/_bentoml_impl/server/app.py:124-135), `workers` sets process-level parallelism (src/_bentoml_sdk/service/config.py:103,267; app.py:103-109) and NVIDIA GPUs are assigned to workers via CUDA_VISIBLE_DEVICES (src/_bentoml_impl/server/allocator.py:15-22,99-114). The utilization/performance outcome is not checkable here: the repo carries no benchmark results (DEVELOPMENT.md:312-314 says benchmarks moved to the separate bentoml/benchmark repo, which was not opened)."
+      },
+      {
+        "claim": "README.md:110-120 - BentoCloud: `bentoml cloud login`, then `bentoml deploy`.",
+        "verified": "partial",
+        "evidence": "Both commands exist (src/bentoml_cli/cloud.py:31-150; src/bentoml_cli/deployment.py:85-212) and need a BentoCloud account and API token (default endpoint https://cloud.bentoml.com, src/bentoml/_internal/cloud/config.py:62). Only the client is in this repo; the hosted service's behavior is not checkable here."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Scope: not a multi-container application runner. The container engine is used only to build one image per Bento (src/bentoml/_internal/container/base.py:154-189; container/__init__.py:253-314); `bentoml containerize` prints a `docker run --rm -p 3000:3000 <tag>` hint and exits (src/bentoml_cli/containerize.py:590-607). No code generates or runs Compose/stack/pod definitions, so supporting services, volumes and networks must be defined with another tool. Within src/ the only 'compose' hits are a function-composition helper (usage_stats.py:219-273) and a docstring word; the single Compose file is an orphaned legacy docs snippet (docs/source/build-with-bentoml/snippets/tracing/docker-compose.yml:1-34) that no doc includes. Generated Dockerfiles declare no VOLUME or HEALTHCHECK (templates/base_v2.j2:1-125).",
+      "Multi-Service Bentos: one image and, by default, one container for the whole service graph (entrypoint.sh:42-54; src/_bentoml_impl/server/serving.py:229-282), with a single runtime Image taken from the entry Service (docs/source/build-with-bentoml/runtime-environment.rst:41-43). The docs' statement that multiple Services run in different containers (distributed-services.rst:14) holds only for BentoCloud or the hidden, experimental `start-http-server --service-name/--depends` mode documented as 'used inside Yatai' (src/bentoml_cli/_internal/start.py:126-152); per-Service instance types and scaling are documented only as BentoCloud deployment config (distributed-services.rst:130-190).",
+      "Network exposure: the HTTP server binds 0.0.0.0:3000 by default with TLS and CORS off and no built-in authentication (src/bentoml/_internal/configuration/v2/default_configuration.yaml:42-56; docs/source/build-with-bentoml/asgi.rst:17,264-307); /metrics, /livez and /readyz are unauthenticated (src/bentoml/_internal/server/base_app.py:104-139). Dependency (non-entry) Services accept application/vnd.bentoml+pickle; only the entry Service rejects it (src/_bentoml_impl/server/app.py:774-779; src/_bentoml_impl/worker/service.py:207; src/_bentoml_sdk/service/dependency.py:73-78). SECURITY.md declares pickle issues in the runner/dependency service out of scope (SECURITY.md:27-34), which matters if Services are split across containers or hosts.",
+      "Credentials: the BentoCloud API token and email are written as plain YAML to ~/bentoml/.yatai.yaml (src/bentoml/_internal/cloud/config.py:25-30,96-103; src/bentoml/_internal/configuration/containers.py:219-222) and no permission-restricting call exists in src/ (search for chmod/umask/0o600 finds only unrelated hits). HTTP clients and bentoml.depends(url=...) proxies attach BENTO_CLOUD_API_KEY as a Bearer header to any URL when no token is passed (src/_bentoml_impl/client/http.py:134-137; proxy2.py:177-180).",
+      "Telemetry: on by default, to https://t.bentoml.com, with a payload broader than the README describes (client UUID, platform, memory, BentoCloud email, Service and endpoint names; schemas.py:56-132; usage_stats.py:196-200,384). Images from `bentoml containerize` do not set BENTOML_DO_NOT_TRACK (base_v2.j2:59-78), and the default index page loads Google Tag Manager in the browser regardless of that setting (src/_bentoml_impl/server/main-openapi.html:6-12).",
+      "State and reproducibility: local state lives under BENTOML_HOME (~/bentoml: bentos, models, envs, tmp, .yatai.yaml, client_id, task_result.db; configuration/containers.py:147-171,219-222; analytics/schemas.py:61), which is <private> inside generated images with no declared volume (base_v2.j2:63; src/bentoml/_internal/container/generate.py:33). The async-task result store is an SQLite file deleted and recreated on every server start (src/_bentoml_impl/server/serving.py:153-156), although the docs describe it as 'non-persistent memory' (docs/source/get-started/async-task-queues.rst:23). Base images are floating tags (python:<ver>-slim, dockerfile/__init__.py:111) and builds need PyPI, registry and Hugging Face access (src/_bentoml_sdk/images.py:293-336; container/__init__.py:183-189).",
+      "Maintenance and compatibility: the 1.0-style API (bentoml.legacy, runners, bentoml.io) and legacy framework modules (bentoml.pytorch, tensorflow, transformers, ...) are deprecated since v1.4 (src/bentoml/__init__.py:195-279,302-320); the hidden `serve-grpc` path runs on the legacy server (src/bentoml_cli/serve.py:335-346,509-546) and the bento_server_grpc e2e suite is in noxfile.py:74 but absent from the CI matrix (.github/workflows/ci.yml:155). Python 3.10 is not in the CI matrix (ci.yml:31). Pins constrain resolution (cattrs<23.2.0, OpenTelemetry ~=0.41b0; pyproject.toml:30,38-44). The amazonlinux distro entry lists only Python 3.8 (dockerfile/__init__.py:83-84) while requires-python is >=3.9. Security fixes ship only in the latest release (SECURITY.md:3-13); governance is BDFL-led with two 'TBD' core-team seats (GOVERNANCE.md:81-94,122-128).",
+      "Release integrity and test gaps: release.yml publishes to PyPI on any pushed tag (release.yml:2-5,29-40) with no checksum, signature, SBOM or provenance step in the repo and no published container image; actions are referenced by mutable tags/branch (e.g. pypa/gh-action-pypi-publish@release/v1, release.yml:40); whether PyPI attestations are attached is not determinable here. The documented build -> containerize -> docker run path for @bentoml.service apps has no automated test: container-mode e2e exists only for the legacy-API suite on Ubuntu runners and is skipped on macOS/Windows in GitHub Actions (src/bentoml/testing/pytest/plugin.py:101-129; tests/e2e/bento_server_http/service.py:57; tests/e2e/bento_new_sdk/test_quickstart.py:55-63)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "bentoml/bentoml",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "pip from PyPI (README quick start): `pip install -U bentoml`; requires Python>=3.9",
+          "citation": "README.md:30-33 (Python>=3.9: README.md:31, pyproject.toml:5)",
+          "holds": true,
+          "note": "README.md:31 is '# Requires Python≥3.9' and README.md:32 is 'pip install -U bentoml'. pyproject.toml:2 names the distribution 'bentoml'; pyproject.toml:5 sets requires-python = \">=3.9\". Revision confirmed: .git/HEAD = e570eb2b1dd5ea49c09c261232a6b131a023d1b2 = refs/tags/v1.4.39 (.git/packed-refs:2). Not checked: whether the package is live on PyPI, since pypi.org is not a cited page."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX Apache-2.0, license file LICENSE",
+          "citation": "LICENSE:1-3,189-201 (also README.md:11,188-190; pyproject.toml:7,13)",
+          "holds": true,
+          "note": "LICENSE is the unmodified Apache License, Version 2.0 text, with the appendix notice 'Copyright 2020 Atalaya Tech. Inc'. pyproject.toml:7 declares license text 'Apache-2.0' and :13 has the OSI Apache classifier; the README badge (:11) and License section (:188-190) agree. LICENSE is the only license file in the repo. A vendored asset, src/bentoml/_internal/server/static_content/marked.min.js, has its own MIT header (line 3); this does not change the project license."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - CI runs unit, e2e and framework-integration jobs on ubuntu-latest; default package-lock target is x86_64-manylinux_2_36",
+          "citation": ".github/workflows/ci.yml:30,59,111,153; src/bentoml/_internal/configuration/__init__.py:32",
+          "holds": true,
+          "note": "ci.yml:30 (unit matrix) and :153 (e2e-test matrix) include ubuntu-latest; :59 runs framework-integration on ubuntu-latest. The e2e-monitoring os list is at :112; the cited :111 is its 'matrix:' key (one line off). configuration/__init__.py:32 sets DEFAULT_LOCK_PLATFORM = \"x86_64-manylinux_2_36\". Nuance: this value is passed to `uv pip compile` only when no --platform is given and the build host is not Linux x86_64 (src/_bentoml_sdk/images.py:315-322; src/bentoml/_internal/bento/build_config.py:640-647). On a Linux x86_64 host it locks for the host. The 'yes' conclusion stands."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "yes - `bentoml` console script: serve/serve-http, build/list/get/delete/export/import/pull/push, containerize, deploy and deployment group, cloud login/current-context/list-context/update-current-context, secret, api-token, models, env; extension commands from the `bentoml.commands` entry-point group; `python -m bentoml` works",
+          "citation": "pyproject.toml:79-80 -> src/bentoml_cli/cli.py:7-69; serve.py:62; bentos.py:100-505; containerize.py:392; deployment.py:85,344; cloud.py:26-172; secret.py:28; api_token.py:13; models.py:60; env.py:113; cli.py:53-55; src/bentoml/__main__.py:1-4",
+          "holds": true,
+          "note": "pyproject.toml:80 maps `bentoml = \"bentoml_cli.cli:cli\"`; cli.py:42-55 registers all listed groups, and every cited line is the right definition. serve.py:62 is `serve` with alias serve-http (function at :198). bentos.py:113-503 defines get/list/delete/export/import/pull/push/build, added at top level via add_subcommands. containerize.py:392 is the containerize command; deployment.py:85 is deploy and :344 the deployment group. cloud.py:26-172 holds login, current_context, list_context and update_current_context (click>=7 turns underscores into dashes). secret.py:28, api_token.py:13 (name 'api-token'), models.py:60 and env.py:113 are the named groups. cli.py:54-55 loads `bentoml.commands` entry points, and __main__.py:1-4 calls the same cli. Not listed: a `code` command (deployment.py:246, cli.py:49); the list does not claim to be complete."
+        },
+        {
+          "field": "claim_checks[3]",
+          "statement": "README.md:9,22 multi-model serving / inference-graph orchestration, verified 'partial': `bentoml serve` runs each dependency Service as its own process under one Circus arbiter on one host (Unix sockets or loopback TCP). A containerized Bento runs the whole graph in one container from one image. Separate containers per Service need the hidden `start-http-server --service-name/--depends` mode ('used inside Yatai'). Per-Service scaling is documented only for BentoCloud.",
+          "citation": "README.md:9,22; docs/source/build-with-bentoml/distributed-services.rst:14,130-190; src/_bentoml_sdk/service/dependency.py:139-171; src/_bentoml_impl/server/serving.py:52-61,229-282,370-402; entrypoint.sh:26-27,42-54; docs/source/build-with-bentoml/runtime-environment.rst:41-43; src/bentoml_cli/_internal/start.py:25-62,126-152",
+          "holds": true,
+          "note": "README.md:9/:22 carry the claims, and distributed-services.rst:14 has the quoted sentence. dependency.py:139-171 is depends(). serving.py:242-279 creates one Circus watcher per local dependency Service (URL/deployment deps are excluded, factory.py:257), and :384-402 starts them all under one standalone arbiter. Sockets are loopback TCP on Windows, WSL or with BENTOML_NO_UDS (:52-61), otherwise Unix sockets (:63-67, just outside the cited range). Dependency processes are spawned only outside --development (:240). The image ENTRYPOINT is env/docker/entrypoint.sh (base_v2.j2:4,123), which runs `bentoml serve $BENTO_PATH` when given no arguments (entrypoint.sh:42). runtime-environment.rst:43 says only the entry Service's image is used. start.py:25 is hidden=True, :126 marks it experimental and :151 says 'This will be used inside Yatai.' Its new-SDK branch passes service_name and the --depends map to serve_http (start.py:223-247); public `bentoml serve` has neither option (serve.py:62-218). distributed-services.rst:130-190 is BentoCloud-only per-Service config. Nuance: separate Bentos linked with bentoml.depends(url=...) are a documented alternative (distributed-services.rst:96-115), so 'need' holds within a single multi-Service Bento."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "Optional (non-blocking): in readme.platforms.linux_x86_64, change the citation .github/workflows/ci.yml:111 to ci.yml:112 (the e2e-monitoring `os:` line).",
+        "Optional (non-blocking): in readme.platforms.linux_x86_64, state that x86_64-manylinux_2_36 is passed to `uv pip compile` only when no --platform is given and the build host is not Linux x86_64 (src/_bentoml_sdk/images.py:315-322). On a Linux x86_64 host the lock resolves for the host platform.",
+        "Optional (non-blocking): in claim_checks[3], widen src/_bentoml_impl/server/serving.py:52-61 to 52-67 so the Unix-socket branch is cited. Also state that dependency Services get separate processes only outside --development mode (serving.py:240).",
+        "Optional (non-blocking): in claim_checks[3], limit 'Separate containers per Service need the hidden start-http-server mode' to a single multi-Service Bento. Separate Bentos wired with bentoml.depends(url=...) are documented at docs/source/build-with-bentoml/distributed-services.rst:96-115."
+      ]
+    }
+  ]
+}

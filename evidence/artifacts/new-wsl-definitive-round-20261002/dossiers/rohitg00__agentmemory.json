@@ -1,0 +1,350 @@
+{
+  "contender": "rohitg00/agentmemory",
+  "revision": {
+    "contender": "rohitg00/agentmemory",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "rohitg00/agentmemory",
+        "tag": "v0.9.29",
+        "commit": "2d38dafede67d0d4ed920cde94d2106e98825b8a",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.9.29",
+    "commit": "2d38dafede67d0d4ed920cde94d2106e98825b8a",
+    "read_at": "2026-10-02T03:02:44+00:00"
+  },
+  "dossier": {
+    "contender": "rohitg00/agentmemory",
+    "revision": {
+      "tag": "v0.9.29",
+      "commit": "2d38dafede67d0d4ed920cde94d2106e98825b8a",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Local memory server for AI coding agents (npm @agentmemory/agentmemory 0.9.29). Hook scripts, an MCP server and a REST API send an agent's prompts, tool calls and explicitly saved memories to a long-running Node worker that runs on the iii engine (pinned v0.11.2). The worker stores them in engine-managed file-based KV state, indexes them (BM25, optional vectors, knowledge graph) and serves recall, session context, a web viewer (:3113), an audit log, export/import and optional git snapshots. It ships native plugins for Claude Code (12 hooks) and Codex CLI (6 hooks) plus MCP wiring for about 20 other agents.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Persistent memory for Claude Code, GitHub Copilot CLI, Cursor, Gemini CLI, Codex CLI, Hermes, OpenClaw, pi, OpenCode, and any MCP client.",
+          "citation": "README.md:10"
+        },
+        {
+          "claim": "Works with any agent that supports hooks, MCP, or REST API; all agents share the same memory server ('One server, memories shared across all of them').",
+          "citation": "README.md:135, README.md:237"
+        },
+        {
+          "claim": "Claude Code: native plugin + 12 hooks + MCP, installed with /plugin marketplace add rohitg00/agentmemory then /plugin install agentmemory. Codex CLI: native plugin + 6 hooks (SessionStart, UserPromptSubmit, PreToolUse, PostToolUse, PreCompact, Stop) + MCP.",
+          "citation": "README.md:142, README.md:147, README.md:546, README.md:573-579"
+        },
+        {
+          "claim": "Codex Desktop builds do not dispatch plugin-local hooks.json (openai/codex#16430); MCP still works, lifecycle capture is missing; workaround is 'agentmemory connect codex --with-hooks' (writes ~/.codex/hooks.json with absolute paths, re-run after upgrades).",
+          "citation": "README.md:581-591"
+        },
+        {
+          "claim": "agentmemory silently captures what the agent does, compresses it into searchable memory, and injects the right context when the next session starts. SessionStart loads the project profile, runs hybrid search under a token budget (default 2000) and injects into the conversation.",
+          "citation": "README.md:242, README.md:909-914"
+        },
+        {
+          "claim": "Context injection is OFF by default (AGENTMEMORY_INJECT_CONTEXT=false); capture via PostToolUse continues regardless. The README config block says to set flags in ~/.agentmemory/.env.",
+          "citation": "README.md:1523-1536, README.md:1406"
+        },
+        {
+          "claim": "Default state location is outside the repo: ~/Library/Application Support/agentmemory (macOS), $XDG_DATA_HOME/agentmemory or ~/.local/share/agentmemory (Linux); override with --data-dir or AGENTMEMORY_DATA_DIR.",
+          "citation": "README.md:250"
+        },
+        {
+          "claim": "LongMemEval-S (500 questions): agentmemory R@5 95.2%, R@10 98.6%, MRR 88.2%; BM25-only fallback R@5 86.2%. In-house coding-agent-life-v1: R@5 1.000, P@5 0.240.",
+          "citation": "README.md:269-283"
+        },
+        {
+          "claim": "Local embeddings ship out of the box: EMBEDDING_PROVIDER=local (default) gives Xenova/all-MiniLM-L6-v2 (384-dim) entirely on-device, no extra config.",
+          "citation": "README.md:1329, README.md:991"
+        },
+        {
+          "claim": "By default no LLM calls are made; the no-op provider disables LLM compress/summarize but synthetic BM25 compression and recall still work. Consolidation is on by default only when an LLM provider is configured.",
+          "citation": "README.md:1271-1275, README.md:1424"
+        },
+        {
+          "claim": "54 MCP tools, 6 resources, 3 prompts, 17 skills. The @agentmemory/mcp shim exposes all 54 only when it can reach a running server via AGENTMEMORY_URL; with no server it falls back to a 7-tool local set.",
+          "citation": "README.md:1002-1004"
+        },
+        {
+          "claim": "Privacy first: API keys, secrets and <private> tags stripped before storage; every observation and memory carries an immutable origin channel; memory_governance_delete deletes with an audit trail; auto-forgetting by TTL, contradiction detection and importance eviction.",
+          "citation": "README.md:953-955, README.md:1046"
+        },
+        {
+          "claim": "Recovery-related features: git snapshots ('version, rollback, and diff memory state'), bi-directional sync with Claude's MEMORY.md, GET /agentmemory/export and POST /agentmemory/import, session replay and import of Claude Code JSONL transcripts.",
+          "citation": "README.md:957, README.md:961, README.md:1579-1580, README.md:513-529"
+        },
+        {
+          "claim": "REST API: 130 endpoints on :3111 bound to 127.0.0.1 by default, bearer auth when AGENTMEMORY_SECRET is set, viewer on loopback :3113. agentmemory pins iii-engine v0.11.2 and will not attach to another engine version. Native Windows is manual; fast path is WSL2. Prerequisites: Node >= 20 and iii-engine or Docker.",
+          "citation": "README.md:1562, README.md:755-757, README.md:127, README.md:102, README.md:1600"
+        }
+      ],
+      "install": [
+        {
+          "method": "npx (first run is interactive onboarding, starts server on :3111)",
+          "command": "npx @agentmemory/agentmemory",
+          "citation": "README.md:81"
+        },
+        {
+          "method": "npm global (sudo variant documented for EACCES on system Node)",
+          "command": "npm install -g @agentmemory/agentmemory",
+          "citation": "README.md:110-112"
+        },
+        {
+          "method": "Claude Code plugin (marketplace; registers hooks, skills and the @agentmemory/mcp stdio server)",
+          "command": "/plugin marketplace add rohitg00/agentmemory   then   /plugin install agentmemory   (server must be running: npx @agentmemory/agentmemory)",
+          "citation": "README.md:546"
+        },
+        {
+          "method": "Codex CLI plugin (marketplace)",
+          "command": "codex plugin marketplace add rohitg00/agentmemory && codex plugin add agentmemory@agentmemory",
+          "citation": "README.md:569-570"
+        },
+        {
+          "method": "From source (starts with local iii if installed, else Docker Compose)",
+          "command": "git clone https://github.com/rohitg00/agentmemory.git && cd agentmemory && npm install && npm run build && npm start",
+          "citation": "README.md:751-755"
+        },
+        {
+          "method": "iii engine runtime, pinned to 0.11.2 (needed for from-source runs; npx run fetches it into ~/.agentmemory/bin)",
+          "command": "curl -fsSL https://install.iii.dev/iii/main/install.sh | VERSION=0.11.2 sh   (or Docker image iiidev/iii:0.11.2; or prebuilt tarball: mkdir -p ~/.local/bin && curl -fsSL https://github.com/iii-hq/iii/releases/download/iii/v0.11.2/iii-aarch64-apple-darwin.tar.gz | tar -xz -C ~/.local/bin && chmod +x ~/.local/bin/iii)",
+          "citation": "README.md:759-765, README.md:816"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - CI runs on ubuntu-latest (.github/workflows/ci.yml:54); the CLI maps linux/x64 to the iii asset iii-x86_64-unknown-linux-gnu.tar.gz (src/cli.ts:123-124); INSTALL_FOR_AGENTS.md:14 lists macOS or Linux for the one-command path.",
+        "wsl2": "yes (documented route, not separately tested) - README.md:102 'The fast path is WSL2'; INSTALL_FOR_AGENTS.md:14 and :152. ci.yml:50-54 runs only ubuntu-latest and macos-latest (Windows deliberately excluded).",
+        "macos_arm64": "yes - src/cli.ts:119-120 maps darwin/arm64 to iii-aarch64-apple-darwin.tar.gz; ci.yml:54 runs macos-latest; the project's scorecard was run on macOS 15 Apple Silicon (docs/benchmarks/2026-05-20-coding-agent-life-v1.md:6).",
+        "gpu": "no - not required or configured. The optional local embedding provider calls @huggingface/transformers pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2', {dtype: 'q8'}) with no device option (src/providers/embedding/local.ts:40-44); no CUDA/WebGPU/device setting exists under src/providers/embedding."
+      },
+      "integrations": {
+        "cli": "bin 'agentmemory' -> dist/cli.mjs (package.json:16-18, src/cli.ts). Commands: (default) start server, init, connect <agent> [--with-hooks --dry-run --force --no-guidelines --all], status, doctor, remove, demo, upgrade, stop, mcp, import-jsonl (src/cli.ts:164-195, 3170-3181). 'agentmemory connect claude-code [--with-hooks]' merges mcpServers.agentmemory into ~/.claude.json (backup first) and, with --with-hooks, hooks into ~/.claude/settings.json (src/cli/connect/claude-code.ts:21-23, 51-118, 132-178). 'agentmemory connect codex [--with-hooks]' appends [mcp_servers.agentmemory] to ~/.codex/config.toml and, with --with-hooks, writes ~/.codex/hooks.json (src/cli/connect/codex.ts:20-30, 75-134, 142-184). Adapter registry lists 21 agents (src/cli/connect/index.ts:28-50).",
+        "mcp": "Stdio MCP server: npx -y @agentmemory/mcp (packages/mcp/bin.mjs imports dist/standalone.mjs) or 'agentmemory mcp'. Tool registry holds 54 tools (src/mcp/tools-registry.ts; AGENTMEMORY_TOOLS=core trims to 8). It proxies to the server at AGENTMEMORY_URL (default http://localhost:3111); if the livez probe fails it silently switches to a 7-tool local fallback backed by an in-process KV persisted to ~/.agentmemory/standalone.json (src/mcp/rest-proxy.ts:92-108, 115-172; src/mcp/standalone.ts:16-24, 38; src/config.ts:470-476). HTTP forms of the MCP surface also exist at /agentmemory/mcp/{tools,call,resources,prompts} (src/mcp/server.ts:71, 1294, 1347, 1633). 6 resources and 3 prompts (README.md:1071-1083).",
+        "sdk_or_api": "REST API on :3111 with 130 registered endpoints (src/triggers/api.ts, 130 registerFunction('api::...') calls), bearer auth via AGENTMEMORY_SECRET (src/triggers/api.ts:41-54). No agentmemory-specific SDK package; README documents calling the mem::* iii functions through the generic iii-sdk (npm/pip/cargo) over ws://localhost:49134 (README.md:724-746; examples/python/quickstart.py, examples/python/observe_and_recall.py). Extra connectors: @agentmemory/fs-watcher (integrations/filesystem-watcher), Hermes (Python, integrations/hermes), OpenClaw, pi.",
+        "claude_code_or_codex": "Claude Code: plugin source ./plugin (.claude-plugin/marketplace.json:7-12) with plugin/hooks/hooks.json (12 events: SessionStart, UserPromptSubmit, PreToolUse[Edit|Write|Read|Glob|Grep], PostToolUse, PostToolUseFailure, PreCompact, SubagentStart, SubagentStop, Notification, TaskCompleted, Stop, SessionEnd), plugin/.mcp.json (npx -y @agentmemory/mcp) and 17 skills incl. /recall /remember /handoff /forget /lesson (plugin/skills/). Codex CLI: .codex-plugin/marketplace.json:9-14 (git-subdir ./plugin, ref main) -> plugin/.codex-plugin/plugin.json:12-14 (skills, mcpServers ./.mcp.json, hooks ./hooks/hooks.codex.json with 6 events). Both use the same committed hook scripts plugin/scripts/*.mjs (built from src/hooks/*.ts, tsdown.config.ts:3-18, 79-85). Codex runs only trusted hooks: hooks stay inert until the user approves them in the interactive TUI (src/cli/connect/codex.ts:172-174). 'connect' does not write rules-file guidelines for Claude Code or Codex because they use lifecycle hooks (src/cli/connect/guidelines.ts:8-9)."
+      },
+      "telemetry_and_network": "No analytics, crash-reporting or update-check client found in src/ (greps for telemetry/analytics/posthog/sentry/npm view/registry hit only local OpenTelemetry counters in src/telemetry/setup.ts); the shipped iii-config.yaml sets iii-observability exporter 'memory' (local), sampling 0.1 (iii-config.yaml:38-55); README has no explicit no-telemetry statement. The viewer HTML loads no external resources (CSP default-src 'none', src/viewer/index.html:9; only outbound hyperlinks to GitHub). Required network at install/first run: npm registry (npx, and 'npx -y @agentmemory/mcp' on every MCP start - plugin/.mcp.json:4-5), GitHub releases to download the pinned iii engine tarball via 'curl | tar' with no checksum or signature check (src/cli.ts:116-142, 894-899; no checksum code anywhere in src/), or Docker image iiidev/iii:0.11.2 (docker-compose.yml:26); an interactive prompt may run 'curl https://install.iii.dev/iii/main/install.sh | VERSION=0.11.2 sh' for the optional iii console (src/cli.ts:764-823); plugin installs and 'npx skills add' fetch from GitHub. Optional outbound only when configured: LLM providers (src/config.ts:86-186; api.openai.com, api.minimax.io, generativelanguage.googleapis.com, openrouter.ai, Anthropic) and cloud embedding providers (api.openai.com, api.cohere.ai, api.voyageai.com, openrouter.ai, Gemini; src/providers/embedding/*). A cloud key set for any purpose auto-selects that provider for embeddings (src/config.ts:265-278), sending observation text to it. With an LLM key, every Stop/session-end triggers mem::summarize and a debounced (5 min) consolidation (src/triggers/events.ts:96-97, 137-143; src/config.ts:451-464). Local embeddings (EMBEDDING_PROVIDER=local) download the model through @huggingface/transformers on first use and cache it (src/providers/embedding/local.ts:40-44; CHANGELOG.md:16). Mesh sync contacts peers only if configured (src/functions/mesh.ts:262, 285). No account or hosted agentmemory service is required (ROADMAP.md:86 lists a hosted SaaS as out of scope). Local listeners: 3111 REST, 3112 streams, 3113 viewer, 49134 engine WebSocket (README.md:1382-1387); REST and streams bind 127.0.0.1 (iii-config.yaml:6, 32), the viewer defaults to 127.0.0.1 and refuses a non-loopback bind without AGENTMEMORY_SECRET (src/viewer/server.ts:68, 209-225). With no AGENTMEMORY_SECRET the REST API is unauthenticated (src/triggers/api.ts:152; .env.example:88-90). The iii engine is a separately distributed prebuilt binary; its own network behavior cannot be verified from this repository."
+    },
+    "code": {
+      "languages": [
+        "TypeScript (ESM, Node >= 20; 183 files under src/)",
+        "JavaScript (.mjs: committed built hook scripts plugin/scripts/*.mjs, packages/mcp/bin.mjs, integrations/*/*.mjs)",
+        "Python (integrations/hermes/__init__.py, examples/python/*.py)",
+        "Shell (deploy/*/entrypoint.sh, eval/scripts/sandbox.sh, scripts/backfill-imported-sessions.sh)",
+        "HTML/CSS/JS single-file viewer (src/viewer/index.html); Next.js marketing site in website/"
+      ],
+      "entry_points": [
+        {
+          "path": "src/cli.ts -> dist/cli.mjs (bin 'agentmemory', package.json:16-18)",
+          "what": "CLI: starts/stops the iii engine and worker, onboarding, connect/doctor/status/remove/demo/upgrade/import-jsonl."
+        },
+        {
+          "path": "src/index.ts -> dist/index.mjs (package.json main; run by iii-exec, iii-config.yaml:56-61)",
+          "what": "Worker main: registers all mem::* iii functions, REST/MCP triggers, viewer, health monitor and timers (auto-forget hourly, lesson decay daily, optional consolidation and snapshots; src/index.ts:355-376, 560-614)."
+        },
+        {
+          "path": "src/mcp/standalone.ts -> dist/standalone.mjs; packages/mcp/bin.mjs (bin 'agentmemory-mcp')",
+          "what": "Stdio MCP shim: proxy to REST server or 7-tool local fallback."
+        },
+        {
+          "path": "plugin/hooks/hooks.json, plugin/hooks/hooks.codex.json, plugin/scripts/*.mjs",
+          "what": "Claude Code (12) and Codex (6) hook definitions and the compiled hook scripts that POST to /agentmemory/* (source src/hooks/*.ts)."
+        },
+        {
+          "path": "src/triggers/api.ts",
+          "what": "130 REST endpoints under /agentmemory/* (observe, session start/end, search, remember, forget, export/import, audit, snapshots, governance, ...)."
+        },
+        {
+          "path": "src/viewer/server.ts + src/viewer/index.html",
+          "what": "Real-time viewer on :3113 (reverse-proxies to REST)."
+        },
+        {
+          "path": "src/cli/connect/index.ts",
+          "what": "21 connect adapters (claude-code.ts, codex.ts, codex-hooks.ts, ...)."
+        },
+        {
+          "path": "integrations/filesystem-watcher/bin.mjs",
+          "what": "Separate npm package @agentmemory/fs-watcher (bin agentmemory-fs-watcher)."
+        }
+      ],
+      "architecture": "Node/TypeScript worker built on iii-sdk 0.11.2: registerWorker opens a WebSocket to the iii engine (default ws://localhost:49134; src/index.ts:202-222). The engine (separate pinned prebuilt binary v0.11.2) provides http, state, queue, pubsub, cron, stream and observability workers per iii-config.yaml and launches the worker via iii-exec ('node dist/index.mjs'). State is the engine's kv adapter with store_method file_based at state_store.db (iii-config.yaml:10-16; AGENTS.md:8 calls it file-based SQLite - the on-disk format is engine-internal and not verifiable here); the README comparison table says 'SQLite + iii-engine' while its architecture table says 'iii KV State + in-memory vector index' (README.md:405, 1257). Business logic is ~90 mem::* functions in src/functions/ (observe.ts, compress*.ts, search.ts, smart-search.ts, context.ts, remember.ts incl. mem::forget, governance.ts, audit.ts, snapshot.ts, export-import.ts, auto-forget.ts, evict.ts, consolidate*.ts, lessons.ts, graph*.ts, claude-bridge.ts, mesh.ts, leases/signals/actions...). KV scope names are in src/state/schema.ts; BM25, vector and hybrid indexes live in-process and are persisted by src/state/index-persistence.ts. LLM and embedding providers are in src/providers/ (noop is the default LLM provider). Triggers: src/triggers/api.ts (REST), src/triggers/events.ts (session-stopped lifecycle), src/mcp/server.ts (MCP over HTTP). Hooks (src/hooks/*.ts) are compiled twice by tsdown (dist/hooks and plugin/scripts) and POST to AGENTMEMORY_URL with fire-and-forget fetch and 3-5 s timeouts. Project identity is the git-toplevel basename (src/hooks/_project.ts:5-20). Capture sanitizes observation payloads with regex redaction (src/functions/privacy.ts, src/functions/observe.ts:92-99).",
+      "packaging_and_release": "Published to npm by .github/workflows/publish.yml on GitHub release 'published' or manual dispatch (publish.yml:3-11): generates a lockfile in the runner, npm ci, build, npm test, then 'npm publish --provenance --access public' for @agentmemory/agentmemory, @agentmemory/mcp and @agentmemory/fs-watcher (publish.yml:43-109); job has id-token: write for Sigstore provenance and uses an NPM_TOKEN secret. No GitHub Release assets, checksums or signatures are produced by the workflow; registry-side provenance was not checked (no network). The npm tarball ships dist/, plugin/, integrations/pi/, iii configs, docker-compose.yml, .env.example (package.json:45-56). Lockfiles are gitignored and not committed (.gitignore:22-25; SECURITY.md:57-61). Marketplace plugin installs read the repo directly (Codex marketplace ref 'main', .codex-plugin/marketplace.json:9-14; Claude marketplace source ./plugin), not the npm artifact. GitHub Actions are referenced by major tag (actions/checkout@v6, actions/setup-node@v6), not commit SHA. Release cadence in CHANGELOG.md: 0.9.27 on 2026-06-07, 0.9.28 on 2026-07-19, 0.9.29 on 2026-08-16.",
+      "tests_and_ci": "Vitest 4 (package.json:82, vitest.config.ts isolates HOME). 153 test/*.test.ts files plus test/helpers/mocks.ts and 3 JSONL fixtures; a static count finds 1,669 it()/test() calls (README claims 1,674 tests; tests were not executed for this dossier). Unit tests run against a mocked iii SDK and in-memory KV (test/helpers/mocks.ts:5-50); the real-engine test/integration.test.ts needs a running server and is excluded from 'npm test' (package.json:24; test/integration.test.ts:3). CI (.github/workflows/ci.yml): on push/PR to main (doc-only paths ignored, ci.yml:6-33), matrix ubuntu-latest and macos-latest x Node 20/22/24/26 (Windows excluded, ci.yml:49-55): npm install --legacy-peer-deps, npm run build, npm run skills:check (skill generation drift check plus SKILL.md frontmatter/length lint, scripts/skills/check.ts), npm test. No lint step, no separate tsc check, no benchmark job (ROADMAP.md:42 'Benchmark harness in CI' unchecked), no engine-in-the-loop job, and no step comparing rebuilt plugin/scripts with the committed copies. Dependabot weekly for npm (root, website, three integrations) and GitHub Actions (.github/dependabot.yml). publish.yml additionally runs build and tests before publishing.",
+      "dependencies": "Root package.json:63-88 - 7 runtime deps (@anthropic-ai/claude-agent-sdk ^0.3.142, @anthropic-ai/sdk ^0.100.1, @clack/prompts ^1.2.0, dotenv ^17.4.2, iii-sdk 0.11.2 exact, picocolors ^1.1.1, zod ^4.0.0), 3 optionalDependencies (@huggingface/transformers ^4.2.0, @node-rs/jieba ^2.0.1, tiny-segmenter ^0.2.0), 5 devDependencies (@types/node, tsdown, tsx, typescript 6, vitest 4), 3 overrides (qs, ws, protobufjs); engines node >=20. packages/mcp/package.json:30-32 - 1 dep (@agentmemory/agentmemory ~0.9.0). integrations/filesystem-watcher/package.json - 0 deps. integrations/pi/package.json - 0 deps, 2 peer deps (private package). integrations/openclaw/package.json - 0 deps. website/package.json - 3 deps + 4 devDeps (marketing site, not shipped). Python hermes plugin has no manifest (plugin.yaml only). External runtime: iii-engine v0.11.2 prebuilt binary (or Docker image iiidev/iii:0.11.2); git is needed only for optional snapshots. SECURITY.md:55 says 6 production deps; the manifest lists 7 (picocolors added).",
+      "security_policy": "SECURITY.md: private reporting via GitHub Security Advisories (preferred) or PGP email; acknowledge within 72 h (target 24 h); disclosure window 30-90 days; supports the latest minor (0.9.x) and the previous minor for Critical/High only for 90 days (SECURITY.md:5-35); documents the no-committed-lockfile stance (SECURITY.md:53-77). It links .github/security-advisories/, which does not exist in this tree (.github contains only FUNDING.yml, dependabot.yml, workflows/)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Local on-device embeddings are the default: 'EMBEDDING_PROVIDER=local (default) ... No extra config needed' (README.md:1329; also README.md:497, INSTALL_FOR_AGENTS.md:9 and :127).",
+        "verified": "no",
+        "evidence": "Code differs. detectEmbeddingProvider returns EMBEDDING_PROVIDER if set, else the first of GEMINI/OPENAI/VOYAGE/COHERE/OPENROUTER keys, else null (src/config.ts:265-278); createEmbeddingProvider returns null for null (src/providers/embedding/index.ts:30-33), so the worker logs 'Embedding provider: none (BM25-only mode)' (src/index.ts:185-191, 542). A test asserts null with no keys (test/embedding-provider.test.ts:27-30). The CLI's own demo and doctor say semantic recall needs an embedding key (src/cli.ts:1832-1836, 2394-2403); deploy/README.md:58-62 and benchmark/COMPARISON.md:16 agree with the code. The local provider is built only when EMBEDDING_PROVIDER=local (src/providers/embedding/index.ts:45-46) and @huggingface/transformers is an optionalDependency (package.json:72-76). Conversely a cloud key set for LLM use (e.g. OPENAI_API_KEY) silently selects that cloud embedding provider (src/config.ts:272-277)."
+      },
+      {
+        "claim": "SessionStart captures and injects the right context at the start of the next session (README.md:242, 909-914).",
+        "verified": "partial",
+        "evidence": "Default is capture-only. session-start.ts writes context to stdout only when process.env.AGENTMEMORY_INJECT_CONTEXT === 'true' (src/hooks/session-start.ts:19, 84-105), matching the README config block (README.md:1523-1536). The hook scripts read only their own process env: nothing in src/hooks or plugin/scripts loads ~/.agentmemory/.env (grep for dotenv/.env/.agentmemory found none; only session-end.ts reads a transcript). The onboarding prompt and README put the flag in ~/.agentmemory/.env (src/cli/onboarding.ts:259-305), which hydrates the server process (src/index.ts:164-166) and the status display (src/triggers/api.ts:233-243) but not host-launched hooks, so the flag likely has to be exported in the agent's launch environment. PreCompact injects context regardless of the flag (src/hooks/pre-compact.ts:51-64). When injected, mem::context is built from pinned slots, project profile, up to 10 lessons and summaries/important observations of the 10 latest sessions with the same project string (src/functions/context.ts:73-179, 198-234); it never reads KV.memories, so memories saved with memory_save/remember are reachable by recall/search calls, not by automatic injection."
+      },
+      {
+        "claim": "All agents share the same memory server, so Claude Code and Codex see one store (README.md:135, 237).",
+        "verified": "yes",
+        "evidence": "Both plugins' hooks POST to the same AGENTMEMORY_URL (default http://localhost:3111): plugin/hooks/hooks.json, plugin/hooks/hooks.codex.json, plugin/scripts/session-start.mjs:41; both MCP configs use plugin/.mcp.json. Memory is keyed by 'project' = AGENTMEMORY_PROJECT_NAME, else git-toplevel basename, else cwd basename (src/hooks/_project.ts:5-20) and context filters by exact project string (src/functions/context.ts:167-174). Caveats: hooks never send a host identifier, so rows from Claude Code and Codex cannot be told apart; repos with the same directory name collide; if the MCP shim cannot reach the server it writes to a separate JSON store ~/.agentmemory/standalone.json (src/mcp/rest-proxy.ts:92-108, 162-165; src/config.ts:470-476; src/mcp/in-memory-kv.ts:45-60); ROADMAP.md:55 still lists a cross-agent shared namespace as a candidate ('Currently each agent installs its own instance'), which is stale against the code."
+      },
+      {
+        "claim": "Per-agent scoping: agentId threads through save and recall in shared or isolated mode (README.md:952, 1352-1376).",
+        "verified": "partial",
+        "evidence": "Implemented server-side: AGENT_ID and AGENTMEMORY_AGENT_SCOPE are read from the worker's env (src/config.ts:316-346), session/start accepts a body agentId (src/triggers/api.ts:616-623), observations inherit the session's agentId (src/functions/observe.ts:157-171), isolated mode filters search and context and fails closed (src/functions/context.ts:49-71). But the bundled hooks never send agentId (grep of src/hooks and plugin/scripts: only subagent hooks put agent_id inside observation data), so with one shared server all hook-captured rows carry the server's single AGENT_ID or none; separating Claude Code from Codex needs separate server instances (--instance N, src/cli.ts:206-208) or explicit agentId in MCP/REST saves. Isolation had leaks fixed late: recall path in 0.9.27 and /context in 0.9.28 (CHANGELOG.md:99-101, 83-85)."
+      },
+      {
+        "claim": "Deletion with an audit trail via memory_governance_delete and the /forget skill (README.md:954, 1046; plugin/skills/forget/SKILL.md).",
+        "verified": "partial",
+        "evidence": "mem::governance-delete hard-deletes Memory rows by id and removes them from indexes, then writes an audit row with ids, reason and count (src/functions/governance.ts:11-52); audit rows hold ids only, never the deleted content (src/functions/audit.ts:34-55), so a deletion is not recoverable from the audit log. It does not touch observations, sessions or lessons (the forget skill says lessons need memory_lesson_delete, plugin/skills/forget/SKILL.md:42-43). Raw captured observations and whole sessions are deleted via mem::forget (src/functions/remember.ts:246-340) exposed as REST POST /agentmemory/forget (src/triggers/api.ts:1060-1084); the MCP registry has no memory_forget tool (src/mcp/tools-registry.ts). mem::forget removes the rows it lists (memory, observations, session, summary) and index entries; graph nodes, lessons and other derived rows are not touched there. Auto-forget is on by default (see risks). The skill's description says 'observations' while its workflow deletes memories only."
+      },
+      {
+        "claim": "Git snapshots: 'Version, rollback, and diff memory state' (README.md:961).",
+        "verified": "partial",
+        "evidence": "Opt-in only: registered and timed only when SNAPSHOT_ENABLED=true (src/config.ts:355-374; src/index.ts:355-376). mem::snapshot-create writes state.json containing sessions, memories, graph nodes, observations and access logs - not summaries, lessons, profiles, semantic/procedural memory or actions - into a local git repo (default ~/.agentmemory/snapshots) and commits (src/functions/snapshot.ts:50-141). snapshot-list returns the latest 20 commits (snapshot.ts:143-166). snapshot-restore checks out state.json and re-sets rows with kv.set; it is additive and does not delete rows created after the snapshot (snapshot.ts:168-243). No diff function exists in snapshot.ts and the MCP registry only has memory_snapshot_create (src/mcp/tools-registry.ts:355); restore is REST-only (src/triggers/api.ts:1900-1919). Separate full-store recovery path: GET /agentmemory/export and POST /agentmemory/import with merge/replace/skip (src/functions/export-import.ts:62-202, 204-399), which refuses over-frame exports (> 16 MiB engine frame) instead of paginating non-session collections (CHANGELOG.md:71)."
+      },
+      {
+        "claim": "Claude bridge: bi-directional sync with Claude's MEMORY.md (README.md:957).",
+        "verified": "partial",
+        "evidence": "Opt-in (CLAUDE_MEMORY_BRIDGE=true plus CLAUDE_PROJECT_PATH; src/config.ts:280-305). The write direction overwrites the whole ~/.claude/projects/<slug>/memory/MEMORY.md with a line-budgeted render (default 200 lines) of isLatest memories using writeFileSync and no backup or merge (src/functions/claude-bridge.ts:36-70, 114-160). The read direction only parses the file and stores the sections under KV mem:claude-bridge/last-read (claude-bridge.ts:77-112); nothing in src/ turns them into memories. .env.example:176 describes the target as CLAUDE.md, the code writes MEMORY.md."
+      },
+      {
+        "claim": "Codex CLI: native plugin + 6 hooks + MCP (README.md:147, 573-579).",
+        "verified": "yes",
+        "evidence": ".codex-plugin/marketplace.json:9-14 -> plugin/.codex-plugin/plugin.json:12-14 declares skills, mcpServers ./.mcp.json and hooks ./hooks/hooks.codex.json; that file lists exactly 6 events (SessionStart, UserPromptSubmit, PreToolUse with matcher Edit|Write|Read|Glob|Grep, PostToolUse, PreCompact, Stop; plugin/hooks/hooks.codex.json). The 54-tool registry matches the claim (54 name entries in src/mcp/tools-registry.ts). The 17 skills directories exist under plugin/skills/ including handoff, recall, remember, forget and lesson. Caveats the project itself documents: Codex executes only trusted hooks and shows the approval prompt only in the TUI, so 'codex exec'-only use leaves hooks inert (src/cli/connect/codex.ts:172-174; CHANGELOG.md:30); Codex Desktop does not dispatch plugin hooks (README.md:581-583); user-scope hook paths must be refreshed after upgrades (README.md:591). The PreToolUse matcher lists Claude Code tool names."
+      },
+      {
+        "claim": "95.2% R@5 / 98.6% R@10 retrieval on LongMemEval-S (README.md:278-283, badge README.md:48).",
+        "verified": "partial",
+        "evidence": "The figure appears in benchmark/LONGMEMEVAL.md:17 with the harness in benchmark/longmemeval-bench.ts and result JSONs in benchmark/data/, but it is project-run, retrieval-only (no answer generation or judge; benchmark/LONGMEMEVAL.md:59-62) and uses BM25 plus all-MiniLM-L6-v2 vectors. The default code path has no embedder (see first check), i.e. the project's own BM25-only row, R@5 86.2% (benchmark/LONGMEMEVAL.md:18). Not re-run here and not run in CI (ci.yml; ROADMAP.md:42 unchecked). The coding-agent-life-v1 scorecard says 'Embedding provider: local default' (docs/benchmarks/2026-05-20-coding-agent-life-v1.md:9) but eval/scripts/sandbox.sh sets no embedding env, so whether vectors were active in that run is not checkable from the repo."
+      },
+      {
+        "claim": "130 REST endpoints on :3111, bound to 127.0.0.1; protected endpoints need the bearer token when AGENTMEMORY_SECRET is set; GET /agentmemory/health is 'always public' (README.md:1562, 1569).",
+        "verified": "partial",
+        "evidence": "130 registerFunction('api::...') calls exist in src/triggers/api.ts; iii-http binds 127.0.0.1 (iii-config.yaml:6); 121 handlers call checkAuth inline and 12 triggers attach middleware::api-auth, which passes everything when no secret is set (src/triggers/api.ts:41-54, 147-166). /agentmemory/health is registered WITH middleware::api-auth (api.ts:266-298), so it is protected when a secret is set; only /agentmemory/livez is unauthenticated (api.ts:181-191). The Docker config binds 0.0.0.0 inside the container while docker-compose publishes ports on 127.0.0.1 (iii-config.docker.yaml:6; docker-compose.yml:31-35). The native engine's 49134 WebSocket bind address is not set in iii-config.yaml and is not verifiable here."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "LongMemEval-S retrieval, agentmemory BM25 + vector (all-MiniLM-L6-v2), 500 questions, retrieval-only (no LLM, no QA)",
+        "metric": "R@5 / R@10 / R@20 / NDCG@10 / MRR",
+        "value": "95.2% / 98.6% / 99.4% / 87.9% / 88.2%",
+        "source": "benchmark/LONGMEMEVAL.md:15-17 (README.md:278-283)",
+        "independent": false
+      },
+      {
+        "what": "LongMemEval-S retrieval, agentmemory BM25-only (what the code runs when no embedding provider is configured)",
+        "metric": "R@5 / R@10 / MRR",
+        "value": "86.2% / 94.6% / 71.5%",
+        "source": "benchmark/LONGMEMEVAL.md:18; benchmark/COMPARISON.md:16",
+        "independent": false
+      },
+      {
+        "what": "coding-agent-life-v1: 15 fictional sessions, 15 hand-graded queries via POST /agentmemory/smart-search, v0.9.26, macOS Apple Silicon, vs grep baseline",
+        "metric": "P@5 / R@5 / top-5 hit rate / p50 latency",
+        "value": "hybrid 0.240 / 1.000 / 15 of 15 / 14 ms; grep 0.227 / 0.967 / 15 of 15 / 0 ms (P@5 ceiling 0.240; scorecard says embedding provider 'local default' but sandbox.sh sets none)",
+        "source": "docs/benchmarks/2026-05-20-coding-agent-life-v1.md:3-9, 42-45",
+        "independent": false
+      },
+      {
+        "what": "Internal synthetic quality eval (v0.6.0, 2026-03-18): 240 observations, 30 sessions, 20 labeled queries",
+        "metric": "Recall@5 / Recall@10",
+        "value": "BM25-only 43.8% / 55.9%; BM25+vector 42.4% / 58.6%; +graph 36.8% / 58.0%; grep 37.0% / 55.8%. With real Xenova MiniLM vectors: BM25 43.8% / 55.9%, BM25+vector 43.8% / 64.1%",
+        "source": "benchmark/QUALITY.md:12-18; benchmark/REAL-EMBEDDINGS.md:12-15",
+        "independent": false
+      },
+      {
+        "what": "Tokens returned per query vs loading all memory into context",
+        "metric": "tokens/query and reduction",
+        "value": "1,571 vs 19,462 (92% fewer) on the 240-observation set; scale run: ~1,924 vs 10,504 at 240 obs (82%), ~1,981 vs 2,216,173 at 50K obs",
+        "source": "benchmark/REAL-EMBEDDINGS.md:20; benchmark/SCALE.md:12-16",
+        "independent": false
+      },
+      {
+        "what": "Annual token and cost estimate for agent memory approaches (README table)",
+        "metric": "tokens/year; $/year",
+        "value": "agentmemory ~170K tokens, ~$10 (API embeddings) or $0 (local) vs ~650K tokens, ~$500 for LLM-summarized memory; no inputs or derivation published",
+        "source": "README.md:290-295; benchmark/COMPARISON.md:57-62",
+        "independent": false
+      },
+      {
+        "what": "Single-process load harness against a local daemon, N=1000 memories, concurrency 10, 200 ops per endpoint, git sha 96c0ed0 (2026-05-13)",
+        "metric": "p50 / p99 latency and throughput",
+        "value": "smart-search 160 ms / 224 ms, 61 ops/s; remember 577 ms / 675 ms, 17 ops/s; GET memories?latest=true 395 ms / 543 ms, 25 ops/s",
+        "source": "benchmark/results/load-100k-96c0ed0.json",
+        "independent": false
+      },
+      {
+        "what": "Scale eval v0.6.0 (darwin arm64, Node 20): hybrid search latency, index build and storage vs corpus size",
+        "metric": "hybrid search ms; index build; heap; storage",
+        "value": "hybrid search 0.63 ms (240 obs), 17.5 ms (10K), 108.7 ms (50K); index build 177 ms, 1.66 s, 9.18 s; heap 316 MB and storage 178.8 MB at 50K observations",
+        "source": "benchmark/SCALE.md:10-16, 26-34",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Docs and code disagree on core defaults. README.md:1329 and INSTALL_FOR_AGENTS.md:9 say local embeddings are on by default, but the code runs BM25-only unless EMBEDDING_PROVIDER=local or a cloud embedding key is set (src/config.ts:265-278; test/embedding-provider.test.ts:27-30; src/cli.ts:2394-2403). The headline 95.2% R@5 needs vectors; the project's own BM25-only figure is 86.2% (benchmark/LONGMEMEVAL.md:17-18). Other drift: README says /agentmemory/health is always public but it requires the bearer when a secret is set (src/triggers/api.ts:266-298); SECURITY.md:55 says 6 production deps, package.json lists 7; README comparison table says SQLite while the config shows engine KV (README.md:405; iii-config.yaml:10-16).",
+      "Automatic recall into the model is weak by default. Context injection is off (src/hooks/session-start.ts:19) and is gated on the hook process's own env, which does not read ~/.agentmemory/.env where onboarding and the README place the flag (src/cli/onboarding.ts:259-305). PreCompact injects regardless (src/hooks/pre-compact.ts:51-64). Injected context never includes explicit memory_save/remember records (src/functions/context.ts), and the LLM-dependent learning features (summaries, consolidation, reflect) do nothing without an LLM key (README.md:1275, 1424; src/config.ts:398-404). Decisions and handoffs therefore depend on the agent calling MCP tools or skills.",
+      "Scoping and attribution are coarse. Project identity is the directory basename (src/hooks/_project.ts:5-20), so same-named repos share a bucket; hooks never record which host (Claude Code vs Codex) wrote a row, and agentId comes from the server's single AGENT_ID env (src/functions/observe.ts:157-171; src/config.ts:316-346). Agent isolation had leaks fixed in 0.9.27 and 0.9.28 (CHANGELOG.md:99-101, 83-85). Data dir can resolve to ./data under the cwd when a legacy store exists there (src/cli-data-dir.ts:114-120).",
+      "Split or lost memory when the server is not running. Hooks use fire-and-forget fetch with short timeouts and no spool (src/hooks/post-tool-use.ts:42-59), so captures are dropped silently while the server is down. The MCP shim silently falls back to a separate JSON store (~/.agentmemory/standalone.json, 7 tools) and rewrites the whole file on every persist with no locking (src/mcp/rest-proxy.ts:92-108, 162-165; src/mcp/in-memory-kv.ts:45-60), which two host processes could clobber. The server is started by hand (npx or CLI); no systemd/launchd unit is shipped (ROADMAP.md:63 unchecked). It needs Node >= 20 plus the pinned iii engine binary or Docker; hook paths written by 'connect --with-hooks' embed the install location and must be refreshed after upgrades or npx cache clears (src/cli/connect/codex-hooks.ts:44-61; README.md:120, 551-559, 591).",
+      "Default-on deletion with thin recovery. Auto-forget runs hourly with dryRun false unless AUTO_FORGET_ENABLED=false (src/index.ts:560-571): it hard-deletes memories past a TTL, hard-deletes observations older than 180 days with importance <= 2, and flags the older of two memories with > 0.9 token overlap as not-latest (src/functions/auto-forget.ts:40-62, 118-142, 160-190). Audit rows keep ids only (src/functions/audit.ts:34-55). Snapshots are opt-in, partial (no summaries/lessons/profiles) and restore is additive (src/config.ts:370; src/functions/snapshot.ts:61-86, 168-243). 'agentmemory remove' plans to delete only ~/.agentmemory/data, not the platform data dir used by default (src/cli/remove-plan.ts:253-261; src/cli-data-dir.ts:44-64). Enabling the Claude bridge overwrites Claude Code's MEMORY.md without backup (src/functions/claude-bridge.ts:132-142), which overlaps another memory system.",
+      "Supply-chain surface. The iii engine binary is fetched with 'curl | tar' from GitHub releases with no checksum or signature verification (src/cli.ts:894-899) and is pinned to v0.11.2 because newer engines need an unfinished refactor (README.md:757; docker-compose.yml:17-23). The MCP entry runs 'npx -y @agentmemory/mcp' unpinned, which depends on @agentmemory/agentmemory ~0.9.0 (plugin/.mcp.json:4-5; packages/mcp/package.json:30-32). Marketplace plugin installs track the repo (Codex ref 'main', .codex-plugin/marketplace.json:9-14) and run committed built hook scripts on every tool call; ci.yml has no check that plugin/scripts match a fresh build. No lockfile is committed (SECURITY.md:57-61); GitHub Actions are tag-pinned, not SHA-pinned; npm provenance is requested in publish.yml but unverified here.",
+      "Security defaults are permissive. With no AGENTMEMORY_SECRET every REST endpoint is open to any local process on loopback (src/triggers/api.ts:152; .env.example:88-90). Hook scripts send the bearer token and captured data to whatever AGENTMEMORY_URL says, including plain http; the AGENTMEMORY_REQUIRE_HTTPS guard exists only in the pi, OpenClaw and Hermes integrations (grep). Hooks store up to 8,000 characters of every tool output (src/hooks/post-tool-use.ts:54); redaction is a fixed regex list applied only on the observe path, not to memory_save/remember content (src/functions/privacy.ts:5-20; src/functions/observe.ts:92-99; no stripPrivateData call in src/functions/remember.ts). With an LLM or cloud embedding key set, captured text is sent to that provider and each Stop triggers summarization (src/triggers/events.ts:96-97).",
+      "Maturity and measurement. Single active maintainer (MAINTAINERS.md:7-9) and pre-1.0 with frequent behavior changes (0.9.27 to 0.9.29 in about ten weeks; REST/MCP surface freeze planned for Q1 2027, ROADMAP.md:73); SECURITY.md supports only the latest minor plus the previous minor for 90 days (SECURITY.md:27-33); SSO, RBAC, audit export and the external security audit are unchecked roadmap items (ROADMAP.md:59-65). All published measurements are project-run on small or synthetic sets and none is independent (benchmark/, docs/benchmarks/; README.md:470); the real-engine integration test is excluded from CI (package.json:24)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "rohitg00/agentmemory",
+      "checks": [
+        {
+          "field": "license",
+          "statement": "License is Apache-2.0 (SPDX), file LICENSE.",
+          "citation": "LICENSE:1-3, 178-190; package.json:58",
+          "holds": true,
+          "note": "LICENSE is the Apache License, Version 2.0 (January 2004) text, with the appendix 'Copyright 2026 Rohit Ghumare'. package.json:58 declares \"Apache-2.0\", as do plugin/.claude-plugin/plugin.json:9 and plugin/.codex-plugin/plugin.json:9. Revision confirmed: .git/HEAD and refs/tags/v0.9.29 (packed-refs) both resolve to 2d38dafede67d0d4ed920cde94d2106e98825b8a."
+        },
+        {
+          "field": "readme.install[0]",
+          "statement": "npx install: `npx @agentmemory/agentmemory`; the first run is interactive onboarding and starts the server on :3111.",
+          "citation": "README.md:81",
+          "holds": true,
+          "note": "README.md:81 has the exact command, and README.md:84 describes the interactive first-run setup that starts the memory server on :3111. Code agrees: bin agentmemory -> dist/cli.mjs (package.json:16-18), main() calls runOnboarding() when isFirstRun() (src/cli.ts:1296-1307), and the REST port defaults to 3111 (src/config.ts:197). Not executed (no network)."
+        },
+        {
+          "field": "platforms.macos_arm64",
+          "statement": "macOS arm64: yes. src/cli.ts:119-120 maps darwin/arm64 to iii-aarch64-apple-darwin.tar.gz; ci.yml:54 runs macos-latest; the project's scorecard was run on macOS 15 Apple Silicon.",
+          "citation": "src/cli.ts:119-120; .github/workflows/ci.yml:54; docs/benchmarks/2026-05-20-coding-agent-life-v1.md:6",
+          "holds": true,
+          "note": "All three read as stated: the asset mapping (download URL pinned to iii v0.11.2 at src/cli.ts:111-112, 136-142), the CI matrix os [ubuntu-latest, macos-latest] x Node 20/22/24/26 (ci.yml:54-55), and 'Hardware: macOS 15 (Apple Silicon)'. The workflow names only the macos-latest label, not an architecture. The linux_x86_64 citations (ci.yml:54, src/cli.ts:123-124, INSTALL_FOR_AGENTS.md:14) were also checked and hold."
+        },
+        {
+          "field": "integrations.claude_code_or_codex",
+          "statement": "Claude Code plugin (source ./plugin) ships hooks.json with 12 events, .mcp.json running npx -y @agentmemory/mcp, and 17 skills. The Codex marketplace entry (git-subdir ./plugin, ref main) points to plugin.json:12-14 with a 6-event hooks.codex.json. Both run the committed plugin/scripts/*.mjs built from src/hooks/*.ts. Codex hooks stay inert until trusted in the TUI. connect writes no guidelines for Claude Code or Codex.",
+          "citation": ".claude-plugin/marketplace.json:7-12; plugin/hooks/hooks.json; plugin/.mcp.json:4-5; plugin/skills/; .codex-plugin/marketplace.json:9-14; plugin/.codex-plugin/plugin.json:12-14; plugin/hooks/hooks.codex.json; tsdown.config.ts:3-18, 79-85; src/cli/connect/codex.ts:172-174; src/cli/connect/guidelines.ts:8-9",
+          "holds": true,
+          "note": "Every citation reads as stated. hooks.json declares exactly the 12 listed events (PreToolUse matcher Edit|Write|Read|Glob|Grep). hooks.codex.json declares SessionStart, UserPromptSubmit, PreToolUse, PostToolUse, PreCompact and Stop. Both call node \"${CLAUDE_PLUGIN_ROOT}/scripts/<name>.mjs\", and all 12 scripts are committed. plugin/skills/ has 17 SKILL.md dirs, including recall, remember, handoff, forget and lesson. tsdown writes hookEntries to both dist/hooks and plugin/scripts. codex.ts:172-174 is the 'Codex runs only trusted hooks ... codex exec never shows the prompt' warning. Outside the claim: both plugin.json descriptions (line 4) say '8 skills'."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "Local on-device embeddings are the default (README.md:1329): verified 'no'. The code runs BM25-only unless EMBEDDING_PROVIDER is set or a cloud embedding key is present.",
+          "citation": "src/config.ts:265-278; src/providers/embedding/index.ts:30-33, 45-46; src/index.ts:185-191, 542; test/embedding-provider.test.ts:27-30; src/cli.ts:1832-1836, 2394-2403; deploy/README.md:58-62; benchmark/COMPARISON.md:16; package.json:72-76",
+          "holds": true,
+          "note": "The 'no' verdict is correct. README.md:1329 and INSTALL_FOR_AGENTS.md:9 and :127 do promise local embeddings by default. But detectEmbeddingProvider returns null when there is no override and no key, and LocalEmbeddingProvider is built only in case 'local', its only construction site in src/. Nothing sets the flag: onboarding never writes EMBEDDING_PROVIDER, .env.example:72 ships it commented out, and .env.example:67 itself says no embedding key means BM25-only. The boot log, the test, the doctor check (passiveServerChecks, called from runDoctor at src/cli.ts:1934), the demo note, deploy/README.md and COMPARISON.md:16 all agree. Not in the dossier: .env.example:68-70 lists 'local' as a final detection fallback, which the code does not implement."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

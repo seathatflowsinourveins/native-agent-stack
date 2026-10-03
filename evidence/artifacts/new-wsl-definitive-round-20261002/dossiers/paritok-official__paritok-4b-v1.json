@@ -1,0 +1,348 @@
+{
+  "contender": "paritok-official/paritok-4b-v1",
+  "revision": {
+    "contender": "paritok-official/paritok-4b-v1",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "paritok-official/paritok-4b-v1",
+        "tag": null,
+        "commit": "2c913302073367f2402d8bc4bb1a929a3f70a030",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": null,
+    "commit": "2c913302073367f2402d8bc4bb1a929a3f70a030",
+    "read_at": "2026-10-02T03:02:38+00:00"
+  },
+  "dossier": {
+    "contender": "paritok-official/paritok-4b-v1",
+    "revision": {
+      "tag": "v1.3.13",
+      "commit": "2c913302073367f2402d8bc4bb1a929a3f70a030",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Paritok (package `paritok` 1.3.13, pyproject.toml:7) is a drop-in HTTP proxy and Python SDK between a coding agent (Claude Code, Codex, OpenAI-compatible clients) and the Anthropic/OpenAI APIs that shrinks each outbound request. It (1) filters tool schemas with a bundled CPU embedding model (bge-small ONNX), (2) compresses tool results and file reads with its own Qwen3-4B-Instruct-2507 LoRA compressor ('Paritok-4B-v1', served by local Ollama or the paritok.com hosted GPU), tags the output `[REF:id]` and keeps the original in a shadow store that the model reads back through proxy-resolved virtual tools `read_original` / `gateway_search_tools`, and (3) summarizes stale history past a threshold. It reports its own estimated savings at `/stats`. Scope note for the context/usage-efficiency need: the project has recoverable originals and tokenizer-estimated artifact-reduction counters, but no tool that measures provider usage (input, output, cache-creation, cache-read tokens) from the local logs Claude Code or Codex write. Answer to the stated question: none found in this repo (see claim_checks and code.architecture).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Drop-in proxy between agent and LLM API: on every request it strips tool-schema bloat, compresses tool results and file reads, summarizes stale history, then forwards upstream (billed on the compressed tokens); response flows back unchanged and compressed refs expand on demand.",
+          "citation": "README.md:4; README.md:53-61"
+        },
+        {
+          "claim": "Non-destructive: 'Nothing is ever permanently discarded: the agent pulls back any exact original on demand' via `[REF:id]` tags and `read_original` / `expand_context`; filtered tools are recoverable through `gateway_search_tools`.",
+          "citation": "README.md:4; README.md:63; README.md:76-77; README.md:85-86; README.md:443"
+        },
+        {
+          "claim": "Works with Claude Code, Cursor, Codex, OpenHands and any agent that honors BASE_URL, 'you don't change a line of your agent'; Codex is the exception (reads ~/.codex/config.toml, which Paritok writes for you).",
+          "citation": "README.md:4; README.md:308; README.md:322-338"
+        },
+        {
+          "claim": "Tool-schema filter (embedding strategy) is the largest single-turn lever: ~29K -> ~8K tokens on a typical Claude Code turn; selection frozen per conversation so tools[] stays byte-stable (prompt-cache friendly); runs bge-small-en-v1.5 locally on CPU; core exec tools (shell/exec/apply_patch) never stubbed.",
+          "citation": "README.md:73-79"
+        },
+        {
+          "claim": "Content compression takes tool results, file reads and stale history to ~26% of original size, tagged [REF:id]; single-turn this is the smaller lever (a few %), its power shows across a session.",
+          "citation": "README.md:83-86; README.md:165"
+        },
+        {
+          "claim": "5-turn Claude Code A/B (Sonnet, GPU model, tool filter on for both sides): content-only saving 4.6% at turn 1 (72,041 vs 75,507 tokens) and 22.2% at turn 5 cumulative (293,389 vs 377,099).",
+          "citation": "README.md:98-105"
+        },
+        {
+          "claim": "Full stack vs no Paritok: ~25% at turn 1, ~39% by turn 5 (no-Paritok side adds back ~21K tool-schema tokens/turn); projections 54% (turn 10) and 63% (turn 20) capped at a ~200K budget; ceilings ~72% default, ~78% MCP-heavy, ~85%+ context-saturated; ~3x more turns per context budget.",
+          "citation": "README.md:107-116; README.md:124-145; README.md:151-157"
+        },
+        {
+          "claim": "Self-host (Apache 2.0): 'No telemetry, no key, no fees'. Hosted GPU: $0.30 per 1M tokens processed, 'Free through Oct. 1', full pricing from October 1st.",
+          "citation": "README.md:193-195"
+        },
+        {
+          "claim": "`/stats` reports cumulative savings (total_requests, input_tokens_original/compressed, compression_ratio, tokens_saved, estimated_cost_saved_usd), scoped to what Paritok intervenes in (compressed content + stubbed tool schemas; system prompt and model output excluded); cost estimate is cache-aware. `/health` returns status and version.",
+          "citation": "README.md:340-360"
+        },
+        {
+          "claim": "Quick start: `pip install \"paritok[proxy]\"` then `paritok up` (pulls the model through Ollama if missing, serves on port 8080); point the agent with ANTHROPIC_BASE_URL=http://127.0.0.1:8080; the real provider key stays with the agent and headers are forwarded upstream; no config file needed.",
+          "citation": "README.md:203-220; README.md:306"
+        },
+        {
+          "claim": "History summarization: turns beyond the recent window are summarized once the context fills up, so a long session stays inside the model's window.",
+          "citation": "README.md:88-90"
+        },
+        {
+          "claim": "SWE-bench Lite (300 instances): Paritok-4B-v1 retains 86.5% of uncompressed solve rate at 25.7% compression rate (raw source) and 89.3% at 27.8% with line-numbered input (paired difference p = 0.079); gpt-4.1-mini compressor 85.6% / 50.2%; gpt-5 compressor 93.6% / 61.9%.",
+          "citation": "README.md:421-423; README.md:431-441"
+        },
+        {
+          "claim": "Extractive and audited: 96.2% of identifier/path/number tokens emitted on held-out SWE-bench Lite are copied from the input; retained code lines and error strings are copied verbatim.",
+          "citation": "README.md:421; README.md:449-456"
+        },
+        {
+          "claim": "Also offered: Python SDK mode (`paritok.ParitokClient`) and a hosted direct compression endpoint (POST https://www.paritok.com/api/compress, API key required, returns text without [REF:]); roadmap lists an `mcp add paritok` plugin (not shipped).",
+          "citation": "README.md:362-399; README.md:490"
+        }
+      ],
+      "install": [
+        {
+          "method": "pip (README says PyPI package) plus one-command start; Ollama must be installed",
+          "command": "pip install \"paritok[proxy]\" && paritok up",
+          "citation": "README.md:203-210"
+        },
+        {
+          "method": "pip editable install from a clone",
+          "command": "pip install -e \".[proxy]\"",
+          "citation": "README.md:227-230"
+        },
+        {
+          "method": "optional extra for the tool-schema filter (pyproject's proxy extra already bundles fastembed + numpy)",
+          "command": "pip install \"paritok[toolselect]\"",
+          "citation": "README.md:232-236; pyproject.toml:38-41"
+        },
+        {
+          "method": "Ollama model for the self-host backend (~2.5GB q4; `paritok up` does this automatically)",
+          "command": "ollama pull paritok/paritok-4b-v1 && ollama cp paritok/paritok-4b-v1 paritok-4b-v1",
+          "citation": "README.md:248-253; README.md:210"
+        },
+        {
+          "method": "vLLM serving of the Hugging Face LoRA adapter (alternative backend; README says 24GB GPU)",
+          "command": "pip install vllm && vllm serve Qwen/Qwen3-4B-Instruct-2507 --enable-lora --lora-modules paritok-4b-v1=paritok/paritok-4b-v1 --max-lora-rank 32 --port 8000",
+          "citation": "README.md:259-271"
+        },
+        {
+          "method": "deploy.sh from a clone (documented in the script header and cli.py docstring, not in the README)",
+          "command": "./deploy.sh",
+          "citation": "deploy.sh:1-14; paritok/cli.py:366"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - CI runs ruff and pytest on ubuntu-latest with Python 3.10/3.11/3.12 (.github/workflows/ci.yml:5,18-33) and README shell examples are for 'macOS / Linux' (README.md:295-298); the package is pure Python built with hatchling (pyproject.toml:1-3). No architecture is named anywhere; x86_64 is implied only by the ubuntu-latest runner.",
+        "wsl2": "unknown - the gateway docs never mention WSL2. WSL appears only in the SWE-bench scoring harness, which routes through WSL on Windows hosts (eval_model/README.md:11-13; eval_model/harness.py:21-24,54-63,96-109). README documents native Windows PowerShell env-var syntax (README.md:300-304).",
+        "macos_arm64": "unknown - README gives macOS shell syntax (README.md:295-298) and says eval scoring runs in-process on Linux/macOS (eval_model/README.md:11-13), but there is no arm64 statement and no macOS CI job (.github/workflows/ci.yml:5,19 are ubuntu-latest only).",
+        "gpu": "yes (optional, not required) - hosted backend: 'No GPU required' (README.md:274); self-host default is the q4 model (~2.5GB) or f16 (~8GB) via Ollama, local GPU need not stated (README.md:210,222); vLLM alternative is described for a 24GB GPU (README.md:260); training env recommends CUDA 12.1+ (requirements.txt:4)."
+      },
+      "integrations": {
+        "cli": "yes - console script `paritok` (pyproject.toml:50-51) with commands init, config, doctor, proxy, up (paritok/cli.py:104,127,176,300,350). `paritok doctor` round-trips a block through the backend and exits non-zero if it does not shrink (paritok/cli.py:183-297; tests/test_doctor.py:1-11).",
+        "mcp": "none found - no MCP server in the code (no FastMCP / modelcontextprotocol / mcp.server hits); README lists a 'mcp add paritok' plugin only as a roadmap item (README.md:490). The proxy injects its own virtual tools read_original and gateway_search_tools into the model's tool list and answers them itself (paritok/pipelines/virtual.py:10-63; paritok/proxy/server.py:1280-1573).",
+        "sdk_or_api": "yes - (a) HTTP proxy, default 127.0.0.1:8080: POST /v1/messages, /v1/messages/count_tokens, /v1/chat/completions, /v1/responses; GET /stats, /health (paritok/proxy/server.py:2135-2142; paritok/cli.py:300-347); (b) Python SDK `paritok.ParitokClient(anthropic.Anthropic())` wrapping messages.create, plus ParitokEngine / CompressionPipeline exports (README.md:362-373; paritok/middleware/wrapper.py:275-334; paritok/__init__.py:5-26); (c) hosted POST https://www.paritok.com/api/compress with a Paritok API key (README.md:375-399; paritok/strategies/gpu_server.py:108-113).",
+        "claude_code_or_codex": "Claude Code: env ANTHROPIC_BASE_URL=http://127.0.0.1:8080 (README.md:217,296); the proxy answers Claude Code's /v1/messages/count_tokens locally from compressed token estimates (paritok/proxy/server.py:1135-1165) and rewrites lossy Edit calls (server.py:1355-1401). Codex: `codex.enabled: true` makes `paritok up`/`proxy` write ~/.codex/config.toml (backing up a non-Paritok file) pointing Codex at /v1/responses (README.md:322-338; paritok/proxy/codex_setup.py:29-86; paritok/cli.py:72-91). No Claude Code hooks, plugins, skills or slash commands ship in this repo; a separate VS Code extension repo is mentioned (README.md:42) and was not examined."
+      },
+      "telemetry_and_network": "README: self-host has 'No telemetry, no key, no fees' (README.md:193). Code agrees: no analytics/telemetry client was found in paritok/. Outbound traffic is limited to: (1) the agent's upstream - https://api.anthropic.com / https://api.openai.com or --anthropic-url / --openai-url - with the client's own headers (including provider API keys) forwarded unchanged except host/content-length/accept-encoding (paritok/proxy/server.py:376-380,1200-1201; paritok/cli.py:303-306); /v1/responses requests whose bearer token does not start with 'sk-' go to https://chatgpt.com/backend-api/codex/responses regardless of --openai-url (server.py:449-463); (2) the local compression backend, Ollama at http://localhost:11434/v1 by default (paritok/strategies/local_model.py:244-258; paritok/config.py:15) - `paritok up` may spawn `ollama serve` and run `ollama pull paritok/paritok-4b-v1` from the Ollama registry (paritok/cli.py:408-491); (3) only when use_gpu_server: true - https://www.paritok.com/api: POST /compress carrying the full segment text, an intent query (up to ~1.1K chars: latest assistant reasoning plus task), kind, level, upstream model and the Bearer Paritok API key (paritok/strategies/gpu_server.py:82-113; paritok/proxy/adapters/anthropic.py:114-124), GET /test at startup (gpu_server.py:149-201), and POST /meter with tool-schema token counts and cache role (server.py:689-723); hosted calls carry User-Agent paritok/<version> (gpu_server.py:39-48). Accounts: none for self-host; a paritok.com account and API key for hosted (README.md:274-280). Tokenizer vocabularies and the bge-small ONNX embedder are bundled so no runtime download is needed (paritok/token_counter.py:76-107; paritok/tool_topk.py:76-80), though tiktoken could still fetch from openaipublic.blob.core.windows.net if seeding its cache fails (token_counter.py:82-136). The /stats HTML dashboard is self-contained, no CDN (paritok/proxy/stats_dashboard.py:1-11). Local-only content capture exists but is off by default: `trace.enabled` / PARITOK_DEBUG_DUMP write original+compressed text to compress_trace.jsonl (paritok/pipelines/compress.py:115-130,394-404), and undocumented PARITOK_* debug env vars write request descriptors, request bodies+headers and upstream usage to local files (server.py:748-795,831-861,1609-1621,2092-2102). Hosted tier is billed at $0.30 per 1M tokens processed, 'Free through Oct. 1' (README.md:195)."
+    },
+    "code": {
+      "languages": [
+        "Python (shipped package, tests, eval, training, data pipeline)",
+        "JavaScript/HTML (Electron review app in data_pipeline/review_app/; inline dashboard in paritok/proxy/stats_dashboard.py)",
+        "Bash (deploy.sh)"
+      ],
+      "entry_points": [
+        {
+          "path": "pyproject.toml:50-51 -> paritok/cli.py:94-405",
+          "what": "`paritok` console script (click group): init, config, doctor, proxy, up"
+        },
+        {
+          "path": "paritok/proxy/server.py:614-2146 (create_app) and :2195-2238 (run_proxy)",
+          "what": "Starlette/uvicorn proxy main; routes /v1/messages, /v1/messages/count_tokens, /v1/chat/completions, /v1/responses, /stats, /health"
+        },
+        {
+          "path": "paritok/middleware/wrapper.py:127-270 (ParitokEngine) and :275-334 (ParitokClient)",
+          "what": "shared compression engine (process_request, resolve_virtual_call) and the Python SDK wrapper"
+        },
+        {
+          "path": "deploy.sh",
+          "what": "bash: ensure Ollama, pull/tag the model, pip install paritok[proxy], run `paritok proxy`"
+        },
+        {
+          "path": "eval_model/run.py (plus eval_model/audit_swebench.py, eval/extractiveness.py, eval/design_claims_audit.py)",
+          "what": "SWE-bench Lite quality-retained harness (needs Ollama, ANTHROPIC_API_KEY, Docker) and offline audits behind the extractiveness numbers"
+        },
+        {
+          "path": "training/train_sft_instruct.py with training/configs/sft_config_qwen3_4b.yaml",
+          "what": "LoRA SFT (r=32, 2 epochs, bf16) of Qwen3-4B-Instruct-2507; its input corpora under update/ are not committed"
+        },
+        {
+          "path": "data_pipeline/scripts/01_download.py ... 06_distill.py, data_pipeline/quality/*.py",
+          "what": "teacher-distillation data pipeline (needs OPENAI_API_KEY); *.jsonl data is gitignored"
+        },
+        {
+          "path": "examples/inference/basic.py",
+          "what": "transformers + peft example loading the HF adapter and compressing one snippet"
+        }
+      ],
+      "architecture": "Request path: paritok/proxy/server.py (Starlette app factory create_app; uvicorn via run_proxy) parses requests with paritok/proxy/adapters/{anthropic,openai,responses}.py and calls ParitokEngine.process_request (paritok/middleware/wrapper.py:147-227), which (1) filters tool schemas via paritok/pipelines/tool_discovery.py + paritok/tool_topk.py (bundled bge-small ONNX through fastembed; session-frozen top-k <= 8; core exec tools such as Read/Edit/Bash/shell/apply_patch always kept; unselected non-MCP tools are dropped, MCP tools are stubbed only when a rank-weighted MCP signal fires); (2) compresses tool_result blocks via paritok/pipelines/compress.py (skip < 512 or > 50,000 tokens; accept only >= 5% saving after the tag; SHA-256-derived content id; path-keyed re-read short-circuit; any backend failure forwards the original), which delegates to paritok/strategies/local_model.py (Ollama /v1/chat/completions, SEG prompt format, default level L1, <= 3000-token structural chunks from strategies/chunking.py, kind from strategies/tagger.py, verbatim training prompts in strategies/system_prompts/*.txt) or paritok/strategies/gpu_server.py (hosted paritok.com); (3) summarizes old turns above 0.8 x 200K estimated tokens, keeping the last 4 turns (wrapper.py:526-648); (4) injects the virtual tools read_original / gateway_search_tools (paritok/pipelines/virtual.py). Originals live in paritok/storage.py (in-process dict by default, optional Redis with TTL) under `[REF:<16-hex sha256 prefix> src=<path>]` tags; the proxy answers virtual tool calls itself in a <= 5-round loop and hides them from the client (server.py:1280-1573, 1739-1816, 1897-1965). paritok/pipelines/edit_recovery.py and codex_edit_recovery.py rewrite Edit / shell-replace / apply_patch calls authored against lossy summaries so they match the stored originals. Accounting: ProxyStats in server.py:64-303 (tokenizer estimates from paritok/token_counter.py; cache-aware cost model in paritok/proxy/pricing.py) served at GET /stats (JSON, or the HTML dashboard from paritok/proxy/stats_dashboard.py). No module reads Claude Code or Codex local logs (the only home-directory access is writing ~/.codex/config.toml, paritok/proxy/codex_setup.py:65-86); the only provider-usage capture is two undocumented env-gated per-request plain-text diagnostics, PARITOK_USAGE_LOG (Anthropic streaming: input, cache_creation, cache_read, output; server.py:1609-1621) and PARITOK_RESP_USAGE_LOG (Responses streaming: input, cached, uncached, output; server.py:2092-2102), with no reader in the repo. Evaluation/training code is separate from the shipped wheel: eval_model/, eval/, training/, data_pipeline/.",
+      "packaging_and_release": "Single distribution `paritok` 1.3.13 built with hatchling (pyproject.toml:1-9,53-56; paritok/__init__.py:3); the wheel bundles paritok/data/bge-small-onnx/*, cl100k_base.tiktoken, o200k_base.tiktoken and the system-prompt .txt files (pyproject.toml:34-37,53-56; .gitattributes:1-8). Local tag v1.3.13 points at the read commit 2c91330 (.git/refs/tags/v1.3.13:1). The only workflow is .github/workflows/ci.yml: there is no release/publish workflow and no checksums, signatures, provenance attestations or SBOM in the repo, so the README's 'Everything ships in the PyPI package' (README.md:203) cannot be tied to this source from the repo alone. Model weights are not in the repo: only training/models/checkpoint-2000/adapter_config.json is committed (.gitignore:35,83-92); weights are on Hugging Face and the Ollama registry per README (README.md:14,210,251). requires-python >=3.10 (pyproject.toml:11) while the README badge says 3.11+ (README.md:24).",
+      "tests_and_ci": "pytest. 51 test files: 49 in tests/ (plus tests/data/edit_recovery_cases.json) and 2 in eval_model/tests/. CI = .github/workflows/ci.yml on push and pull_request: job `lint` (ubuntu-latest, Python 3.11: `pip install ruff`, `ruff check .`) and job `test` (ubuntu-latest, matrix Python 3.10/3.11/3.12: `pip install -e . pytest starlette`, `pytest -q`) (ci.yml:1-33); ruff rules limited to E4/E7/E9/F (pyproject.toml:58-76). Tests stub the compression backend - the 4B model is 'unavailable in CI' (tests/test_expand_stats_integration.py:1-8; tests/test_openai_history_compression.py:9-13) - so CI never exercises real compression, Ollama, the hosted GPU or a provider API. CI does not install fastembed/numpy/uvicorn, so the real embedding ranker and run_proxy are not exercised (tests monkeypatch selection, e.g. tests/test_tool_discovery_core_tools.py:46-56); the BFCL ranking eval is opt-in via PARITOK_RUN_BFCL=1 (tests/test_tool_select_bfcl.py:9-12,23-25). Notable coverage: expansion accounting in /stats (tests/test_expand_stats_integration.py), original recoverability from shadow storage (tests/test_irrelevant_stub_recoverable.py), storage backends (tests/test_shadow_storage_config.py), pricing and token counting offline (tests/test_pricing*.py, tests/test_token_counter_*.py). No macOS/Windows jobs, no coverage config, no lockfiles.",
+      "dependencies": "pyproject.toml: 4 runtime dependencies (tiktoken, click, pyyaml, httpx); extras: dev 2 (pytest, ruff), proxy 4 (uvicorn, starlette, fastembed, numpy), toolselect 2 (fastembed, numpy), redis 1 (redis) (pyproject.toml:25-43). requirements.txt: 39 lines for the training / data-pipeline environment (datasets, transformers, trl, peft, deepspeed, wandb, llmlingua, openai, anthropic, ...), not used by the package. training/requirements_training.txt: 10. eval_model/requirements.txt: 5 (paritok, datasets, anthropic, swebench, httpx). data_pipeline/review_app/package.json: 1 devDependency (electron ^33). No lockfiles found. README says `paritok[toolselect]` adds sentence-transformers, but the extra is fastembed + numpy (README.md:235 vs pyproject.toml:41).",
+      "security_policy": "none - no SECURITY.md anywhere (searched **/SECURITY*); .github/ contains only ISSUE_TEMPLATE/bug_report.md, ISSUE_TEMPLATE/feature_request.md and workflows/ci.yml. README gives a contact email (README.md:502,563)."
+    },
+    "claim_checks": [
+      {
+        "claim": "'Nothing is ever permanently discarded: the agent pulls back any exact original on demand' (README.md:4,63,443)",
+        "verified": "partial",
+        "evidence": "True for compressed tool results/file reads: an accepted compression stores the original (paritok/pipelines/compress.py:388-392) and `read_original` returns it, resolved inside the proxy (paritok/middleware/wrapper.py:246-263; paritok/proxy/server.py:1500-1573). Limits: the default store is an in-process dict with no eviction, lost on restart (paritok/storage.py:87-105; paritok/config.py:151), after which read_original returns a 'can no longer be expanded' note (wrapper.py:254-262); Redis persistence is opt-in and falls back to memory with a warning if unreachable (storage.py:218-247). History summarization replaces old turns with a summary and stores no original (wrapper.py:526-648, no storage call), so no [REF] exists for it; only the client's own transcript keeps that text. Unselected tool schemas are recoverable only if the model calls gateway_search_tools (paritok/pipelines/tool_discovery.py:232-253)."
+      },
+      {
+        "claim": "Self-host has 'No telemetry, no key, no fees' (README.md:193)",
+        "verified": "yes",
+        "evidence": "No analytics/telemetry client or beacon in paritok/. HTTP use is limited to local Ollama (paritok/strategies/local_model.py:244,298), the configured upstreams (paritok/proxy/server.py:1200-1201,2198-2199), cli.py:275,431, and - only with use_gpu_server: true - paritok.com /compress, /test, /meter (gpu_server.py:108,172; server.py:689-723; compress.py:170-174). Dashboard has no CDN (paritok/proxy/stats_dashboard.py:5-6). Caveat: off-by-default hooks can write content, headers and usage to local files (server.py:748-795; compress.py:122-130,394-404)."
+      },
+      {
+        "claim": "`/stats` is 'scoped to what Paritok actually intervenes in' and `estimated_cost_saved_usd` is cache-aware (README.md:360)",
+        "verified": "yes",
+        "evidence": "ProxyStats counts only compressed content plus stubbed tool-schema tokens and excludes system prompt and model output (paritok/proxy/server.py:82-87,106-147); first-turn content/tools are priced at 1.25x cache-write and later turns at the model's cache-read multiplier (server.py:93-104,243-266; paritok/proxy/pricing.py:64-89); re-delivered originals are added back on the compressed side so tokens_saved can go negative (server.py:214-237; tests/test_expand_stats_integration.py:94-96). The figures are local tokenizer estimates - tiktoken cl100k_base is the stand-in for Claude and unknown models, o200k_base for recent OpenAI ids (paritok/token_counter.py:14-47,176-178) - not provider-reported usage, and are held in memory (reset on restart; server.py:64-91). Code vs README differ on prices: pricing.py has claude-opus $15/M, gpt-5 $1.25/M, unknown $3/M (pricing.py:16,19-43) while README cites Opus $5/M and GPT-5 $10/M (README.md:185,409)."
+      },
+      {
+        "claim": "[Need-driven; the README makes no such claim] A tool in this repo measures provider usage (input, output, cache-creation, cache-read tokens) from the local logs Claude Code and Codex write",
+        "verified": "no",
+        "evidence": "None found. No module reads Claude Code or Codex session/transcript logs: searches for .claude, projects/, sessions/, rollout-, CLAUDE_CONFIG_DIR and CODEX_HOME return only ~/.codex/config.toml references, and the sole home-directory access in the package is writing that file (paritok/proxy/codex_setup.py:65-86). The CLI offers only init/config/doctor/proxy/up (paritok/cli.py:94-405). The only provider-reported usage capture is proxy-side and opt-in: PARITOK_USAGE_LOG appends 'in/cache_cr/cache_rd/out' per Anthropic streaming response (paritok/proxy/server.py:1609-1621) and PARITOK_RESP_USAGE_LOG appends 'in/cached/uncached/out' per Responses streaming response (server.py:2092-2102). Both are commented 'TEMP ... not committed', are not documented in the README, have no reader/aggregator in the repo, and are absent from the non-streaming Anthropic path and the Chat Completions path. Paritok's own /stats is estimated artifact tokens (see previous check)."
+      },
+      {
+        "claim": "Tool filter keeps 'only the handful relevant' in full schema and 'stubs the rest'; 'Never destructive. Anything filtered is recoverable' via gateway_search_tools (README.md:73-77)",
+        "verified": "partial",
+        "evidence": "Embedding strategy: <= k_max=8 tools selected once per conversation and frozen (paritok/tool_topk.py:198-226; paritok/config.py:71); core exec tools force-kept (paritok/pipelines/tool_discovery.py:29-33,210-216). Unselected non-MCP tools are dropped from tools[] entirely rather than stubbed; unselected MCP tools are stubbed only if the rank-weighted MCP signal reaches the threshold, else dropped (tool_topk.py:247-257,260-288). All of them stay in the per-request stubbed list and are returned by gateway_search_tools (tool_discovery.py:225-230; wrapper.py:265-268), which is injected whenever any tool was filtered (wrapper.py:212-216,719-720); the model has to know to ask. The ~29K -> ~8K figure depends on the client's tool pool and is not reproducible from the repo (tests use synthetic pools, tests/test_tool_discovery_core_tools.py:30-37)."
+      },
+      {
+        "claim": "README install/quick-start statements: first request 'downloads bge-small once' and `paritok[toolselect]` 'adds sentence-transformers' (README.md:235-238); Python 3.11+ badge (README.md:24); a root `paritok.yaml` (README.md:242,255) and `paritok proxy --config-file paritok.yaml` (README.md:285)",
+        "verified": "partial",
+        "evidence": "Code wins over README. The quantized bge-small ONNX weights are bundled and run via fastembed/onnxruntime with no runtime download and no torch; sentence-transformers is only a fallback when fastembed is missing (paritok/tool_topk.py:76-80,99-116; pyproject.toml:34-41; .gitattributes:6-8), and the `proxy` extra already includes fastembed + numpy (pyproject.toml:38). README's 'locally on CPU, no API' (README.md:78) is accurate. pyproject allows Python >=3.10 and CI tests 3.10-3.12 (pyproject.toml:11; .github/workflows/ci.yml:21), looser than the 3.11+ badge. `paritok.yaml` is gitignored and absent from the tree (.gitignore:80) and `--config-file` requires the path to exist (paritok/cli.py:307); `paritok init` writes the starter (cli.py:104-124) and `paritok up` / `proxy` run on built-in defaults without it (cli.py:331-338,381-385), so the 'fastest path' (README.md:203-210) is consistent with the code."
+      },
+      {
+        "claim": "Works with Claude Code, Cursor, Codex, OpenHands and any agent that honors BASE_URL, 'you don't change a line of your agent' (README.md:4)",
+        "verified": "partial",
+        "evidence": "The proxy implements Anthropic Messages (+ local count_tokens), OpenAI Chat Completions and OpenAI Responses (paritok/proxy/server.py:2135-2142). Code and tests name Claude Code, Codex and gptme (server.py:336,913; tests/test_openai_upstream.py:126); Cursor and OpenHands have no integration code or tests (OpenHands appears only as a training-data source, data_pipeline/scripts/01_download.py:14-15). Codex needs a generated ~/.codex/config.toml rather than a base-URL variable (paritok/proxy/codex_setup.py:29-86), as README.md:308 admits. README's Codex YAML example sets `model: gpt-5` and an `api_key` (README.md:326-331), but the code default is `subscription: true` (api_key is used only when subscription is false) and its docstring warns a pinned gpt-5 is rejected for ChatGPT accounts (paritok/config.py:96-125; codex_setup.py:52-61)."
+      },
+      {
+        "claim": "Content compression takes tool results/file reads/history to '~26% of its original size' (README.md:83,165,422)",
+        "verified": "partial",
+        "evidence": "~25.7% is the corpus-level ratio on SWE-bench Lite oracle file context at level L1, chunk 3000 (eval_model/run.py:106-107; eval_model/README.md:22-26; paritok/strategies/local_model.py:49-52) - a benchmark figure, not a runtime guarantee. At runtime content under 512 or over 50,000 tokens is skipped, accepted results must save >= 5% after the [REF] tag, and any backend error forwards the original (paritok/config.py:53-56; paritok/pipelines/compress.py:282-288,341-350,360-386); skipped tokens are tallied separately and excluded from the ratio (wrapper.py:82-101; server.py:292-296). The README's own measured 5-turn session shows 4.6% (turn 1) and 22.2% (turn 5) content-only saving (README.md:102-105)."
+      },
+      {
+        "claim": "SWE-bench Lite is a 'real end-to-end evaluation' in which 'an agent scaffold receives its context through each compressor'; the 86.5% 'measures the raw 4B model with no recall enabled' (README.md:429,443)",
+        "verified": "partial",
+        "evidence": "The harness exists (eval_model/run.py) and prints resolved/total and quality retained = compressed/baseline (run.py:238-241). But the 'agent' is one no-tools LLM call per instance on oracle gold-patch files at temperature 0 (eval_model/agent.py:1-4; run.py:1-26), default agent claude-sonnet-4-5-20250929 (run.py:64-65) - the README does not name the agent model for the table - and both arms' patches are re-anchored through paritok.edit_recovery before scoring, which the harness calls 'the real work' on the compressed arm (run.py:175-196; eval_model/README.md:29-37). The gpt-4.1-mini / gpt-5 compressor rows and the LLMLingua-2 '~40%' have no implementation in the repo (eval_model/compress.py:1-18 drives only the local Paritok model; llmlingua appears only in requirements.txt:67-68). No run artifacts are committed (.gitignore:96); reproducing needs Ollama, ANTHROPIC_API_KEY and Docker (eval_model/README.md:11-13)."
+      },
+      {
+        "claim": "Savings compound: ~25% end-to-end at turn 1, ~39% at turn 5, 54%/63% at turn 10/20, and ~3x more turns per context budget (README.md:107-157)",
+        "verified": "not_checkable",
+        "evidence": "The turn-1/turn-5 content-only A/B (72,041 vs 75,507; 293,389 vs 377,099) comes from one Claude Code session with no raw logs or script in the repo. The no-Paritok side of the full-stack table is built by adding ~21K/turn of tool schema back (README.md:107-116), later rows are formula projections and 'in-window projections' (README.md:120-135), and the turns-per-budget table is derived, not measured (README.md:151-157). The only code that captures upstream usage is the undocumented PARITOK_USAGE_LOG / PARITOK_RESP_USAGE_LOG hooks (server.py:1609-1621,2092-2102), so how the cumulative token figures (input vs cache-read vs cache-creation) were counted is not stated."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "SWE-bench Lite (300 instances) one-shot, Paritok-4B-v1 on raw source",
+        "metric": "quality retained (compressor solve rate / uncompressed solve rate); compression rate",
+        "value": "86.5% retained; 25.7% compression rate",
+        "source": "README.md:436,439",
+        "independent": false
+      },
+      {
+        "what": "SWE-bench Lite, Paritok-4B-v1 on line-numbered input (recommended configuration)",
+        "metric": "quality retained; compression rate; resolved counts; paired test",
+        "value": "89.3% retained; 27.8% compression rate; resolved 109/300 compressed vs 122/300 uncompressed (30 solved only uncompressed, 17 only compressed); exact McNemar p = 0.079",
+        "source": "README.md:437,441",
+        "independent": false
+      },
+      {
+        "what": "SWE-bench Lite with teacher LLMs as compressors (project's own runs)",
+        "metric": "quality retained; compression rate",
+        "value": "gpt-4.1-mini 85.6% / 50.2%; gpt-5 93.6% / 61.9%; LLMLingua-2 compression '~40%' with quality 'not evaluated'",
+        "source": "README.md:434-435,478-479",
+        "independent": false
+      },
+      {
+        "what": "Extractiveness of compressor output",
+        "metric": "identifier/path/number tokens already present in the input; lines byte-identical to input",
+        "value": "held-out SWE-bench Lite 96.2% tokens, 92.2% lines (64,843 lines), median per-instance token copy 97.0%, 213/300 instances >= 95%; distilled training corpus 96.0% tokens, 82.3% lines (236,152 lines)",
+        "source": "README.md:451-456",
+        "independent": false
+      },
+      {
+        "what": "Claude Code 5-turn read-only 'find the bug' A/B (Sonnet, GPU backend, tool filter on for both sides)",
+        "metric": "content-only input-token saving",
+        "value": "turn 1: 72,041 vs 75,507 tokens (4.6%); turn 5 cumulative: 293,389 vs 377,099 (22.2%)",
+        "source": "README.md:98-105",
+        "independent": false
+      },
+      {
+        "what": "Same session, full stack vs no Paritok (no-Paritok side adds back ~21K tool-schema tokens per turn)",
+        "metric": "end-to-end input-token saving",
+        "value": "~25% at turn 1 (72,041 vs ~96,500); ~39% at turn 5 cumulative (293,389 vs ~482,000)",
+        "source": "README.md:107-116",
+        "independent": false
+      },
+      {
+        "what": "Tool-schema filter on a typical Claude Code turn, and tool-ranking quality",
+        "metric": "tool-block tokens; BFCL recall@10; 'fix the bug' median cost over 3 runs",
+        "value": "~29K -> ~8K tokens; BFCL recall@10 = 94% (457-tool pool); $0.2536 no compression vs $0.1118 frozen-drop (-56%) vs $0.1216 adaptive",
+        "source": "README.md:75; paritok/tool_topk.py:14,29-31",
+        "independent": false
+      },
+      {
+        "what": "Modelled projections (not measurements)",
+        "metric": "cumulative saving at turn N; turns before the context budget is reached",
+        "value": "54% (turn 10), 57% (12), 60% (15), 63% (20); ceilings ~72% default / ~78% MCP-heavy / ~85%+ saturated; turns without -> with Paritok: 128K ~10 -> ~30, 200K ~15 -> ~44, 1M ~75 -> ~220",
+        "source": "README.md:124-145,151-155",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Provider usage vs artifact reduction: /stats is an in-memory, tokenizer-estimated artifact counter (tiktoken cl100k_base stands in for Claude counts; resets on restart), scoped to compressed content and stubbed tool schemas, not provider-reported usage (paritok/proxy/server.py:64-91,268-303; paritok/token_counter.py:14-47). Provider-reported input/cache-creation/cache-read/output tokens are captured only by two undocumented env-gated plain-text hooks (PARITOK_USAGE_LOG for Anthropic streaming, PARITOK_RESP_USAGE_LOG for Responses streaming; server.py:1609-1621,2092-2102), commented 'TEMP ... not committed', with no reader in the repo and no coverage of non-streaming Anthropic or Chat Completions. Nothing reads Claude Code/Codex local logs. The proxy also answers Claude Code's /v1/messages/count_tokens from its own compressed local estimate, so the agent's context meter is not provider-measured while Paritok is in the path (server.py:1135-1165).",
+      "Recoverability is bounded: the default shadow store is an in-process dict with no size cap or eviction and is lost on proxy restart, after which read_original returns a 'can no longer be expanded' note (paritok/storage.py:87-105; paritok/middleware/wrapper.py:254-262); Redis persistence is opt-in and falls back to memory with a warning when unreachable (storage.py:218-247); history summarization stores no original (wrapper.py:526-648); unselected tool schemas come back only if the model calls gateway_search_tools (paritok/pipelines/tool_discovery.py:232-253).",
+      "The proxy changes what the agent sees and does: it injects virtual tools into tools[] and a [REF] guidance paragraph into the system prompt (wrapper.py:205-216,705-721; server.py:1283-1308), swaps old history for a summary (wrapper.py:626-648), and rewrites model-authored Edit / shell-replace / apply_patch calls by heuristic matching against stored originals (server.py:1355-1443; paritok/pipelines/edit_recovery.py:1-27). The compressor prompt expects whole-segment drops ('Drops are EXPECTED', paritok/strategies/system_prompts/file_read.txt:29-30); self-host treats an empty result as failed and forwards the original (paritok/pipelines/compress.py:357-358), while the hosted service returns an '(irrelevant to the current task)' stub with the original stored (tests/test_irrelevant_stub_recoverable.py:1-15). Quality evidence is the project's own one-shot, oracle-context SWE-bench Lite run with edit re-anchoring on both arms (eval_model/agent.py:1-4; eval_model/run.py:175-196); no independent or multi-turn agent-loop quality measurement is published.",
+      "Hosted-mode egress and billing: use_gpu_server: true sends the full text of every compressed segment, the intent query and the Paritok API key to https://www.paritok.com/api, plus tool-token counts to /meter (paritok/strategies/gpu_server.py:82-113; server.py:689-723). README prices hosted at $0.30 per 1M tokens processed and says it was 'Free through Oct. 1'; as of 2026-10-02 that window has passed per the README (README.md:195). The proxy has no authentication of its own (routes at server.py:2135-2142), forwards client credentials upstream (server.py:376-380), and sends /v1/responses requests with non-'sk-' bearer tokens to chatgpt.com regardless of --openai-url (server.py:449-463).",
+      "Latency and streaming: upstream SSE responses are buffered fully in memory and replayed as one chunk, so clients get no incremental streaming through the proxy (server.py:1575-1596,1608-1625,1847-1883,2056-2122). Compression is blocking per-segment 4B inference on the request path, run in a worker thread, with long files split into <= 3000-token chunks compressed sequentially (server.py:802-805; paritok/strategies/local_model.py:166-183; paritok/strategies/chunking.py:29-31). README publishes no compression-latency or throughput figure (only '~15 ms' for embeddings, README.md:238).",
+      "Side effects and debug hooks: `codex.enabled` rewrites ~/.codex/config.toml wholesale (backs up only a file Paritok did not generate; later manual edits are overwritten) (paritok/proxy/codex_setup.py:29-86; paritok/cli.py:72-91); `paritok up` can spawn `ollama serve` in the background (cli.py:440-447). Undocumented env-gated hooks can write full request bodies and all request headers, including provider API keys, to disk (PARITOK_PASSTHROUGH + PARITOK_CAPTURE, server.py:764-775) and other request/tool/expansion details (server.py:748-761,831-861,1553-1563); trace.enabled / PARITOK_DEBUG_DUMP store original file contents in compress_trace.jsonl (compress.py:394-404).",
+      "Maintenance and release hygiene: two-person, company-affiliated project (README.md:497; CITATION.cff:6,9) with a paid hosted tier; the only workflow is CI - lint plus mocked tests on ubuntu-latest, no real-backend, macOS or Windows jobs (.github/workflows/ci.yml:1-33); no release/publish workflow, checksums, signatures or attestations, so the PyPI package cannot be tied to this source from the repo; no SECURITY.md or vulnerability-reporting policy; no lockfiles; roadmap items (Paritok-4B-v2, 'mcp add paritok' plugin) are unshipped (README.md:485-491).",
+      "Doc/code drift and licensing: README quick-start links a root paritok.yaml that is gitignored and absent, and `paritok proxy --config-file paritok.yaml` fails if it does not exist (README.md:242,255,285; .gitignore:80; paritok/cli.py:307); Python badge says 3.11+ but pyproject allows >=3.10 (README.md:24; pyproject.toml:11); install notes about sentence-transformers and a model download are stale (see claim_checks); code references tools/view_trace.py, which is not in the repo (paritok/config.py:132; paritok/pipelines/compress.py:118); training data (data_pipeline/*.jsonl, update/) is not committed, so the training-corpus extractiveness row and the data pipeline cannot be rerun from the repo alone (.gitignore:29-32; eval/extractiveness.py:33-36,60-61). Bundled third-party binaries (BGE-small ONNX, tiktoken cl100k/o200k vocabularies) ship without NOTICE or third-party license files (only LICENSE exists, and its appendix copyright line is an unfilled template, LICENSE:190); the base model Qwen3-4B-Instruct-2507 is 'released under its own license' (README.md:554)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "paritok-official/paritok-4b-v1",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "pip (README says PyPI package) plus one-command start; Ollama must be installed: `pip install \"paritok[proxy]\" && paritok up`",
+          "citation": "README.md:203-210 (also opened pyproject.toml:38,50-51; paritok/cli.py:350-405,408-491)",
+          "holds": true,
+          "note": "README.md:203 says 'Everything ships in the PyPI package' and requires Ollama; :206-207 give the two commands (on separate lines, not chained with &&); :210 describes the pull/tag and port 8080. The code agrees: the `proxy` extra exists (pyproject.toml:38), the `paritok` script maps to paritok.cli:main (pyproject.toml:50-51), and `up` (cli.py:350-405) defaults to port 8080 (:352), exits if `ollama` is not on PATH (:418-421), and otherwise pulls paritok/paritok-4b-v1 and tags it paritok-4b-v1 (:481-491) before run_proxy. Whether PyPI actually serves this build can't be confirmed from the repo, and the statement attributes that claim to the README, which is accurate."
+        },
+        {
+          "field": "license",
+          "statement": "License is Apache-2.0, file LICENSE",
+          "citation": "LICENSE:1-203; pyproject.toml:10,20",
+          "holds": true,
+          "note": "LICENSE is the unmodified Apache License 2.0 text ('Apache License Version 2.0, January 2004' at LICENSE:2-3; 'END OF TERMS AND CONDITIONS' at :177). pyproject.toml:10 declares license = \"Apache-2.0\" and :20 the OSI Apache classifier. The appendix copyright line is still the unfilled template (LICENSE:190) and there is no NOTICE file, which the dossier's risks already note. Neither affects the SPDX identification."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - CI runs ruff and pytest on ubuntu-latest with Python 3.10/3.11/3.12; README shell examples are for 'macOS / Linux'; the package is pure Python built with hatchling; no architecture is named anywhere; x86_64 is implied only by the ubuntu-latest runner",
+          "citation": ".github/workflows/ci.yml:5,18-33; README.md:295-298; pyproject.toml:1-3",
+          "holds": true,
+          "note": "ci.yml:5 (lint) and :18 (test) are `runs-on: ubuntu-latest`, :21 is the 3.10/3.11/3.12 matrix, :31/:33 install and run pytest. README.md:295 is '# macOS / Linux'. pyproject.toml:1-3 is hatchling. The repo has no compiled sources (no .c/.pyx/.rs/.so files), and paritok/ is .py plus data files (ONNX weights, tokenizer JSON, tiktoken vocabularies, prompt .txt). A repo-wide grep for x86_64/amd64/arm64/aarch64 finds only MiniMax-M3 model ids. Wording nit, not an error: ruff runs only on Python 3.11 (ci.yml:10); the three-version matrix applies to the pytest job alone. CI also skips the proxy extra (fastembed/onnxruntime/uvicorn), so 'yes' rests on mocked tests, as tests_and_ci already says."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Claude Code via ANTHROPIC_BASE_URL; the proxy answers /v1/messages/count_tokens locally from compressed estimates and rewrites lossy Edit calls; Codex: codex.enabled makes paritok up/proxy write ~/.codex/config.toml (backing up a non-Paritok file) pointing at /v1/responses; no Claude Code hooks, plugins, skills or slash commands ship; a VS Code extension repo is mentioned at README.md:42",
+          "citation": "README.md:42,217,296,322-338; paritok/proxy/server.py:1135-1165,1355-1401; paritok/proxy/codex_setup.py:29-86; paritok/cli.py:72-91",
+          "holds": true,
+          "note": "README.md:217/:296 export ANTHROPIC_BASE_URL=http://127.0.0.1:8080. handle_count_tokens (server.py:1135-1165, route :2136) runs engine.process_request and counts the compressed payload with local tiktoken. _recover_edits (server.py:1355-1401) rewrites old_string/new_string on Edit/str_replace calls against shadow-stored originals. _maybe_write_codex_config (cli.py:72-91) is called from proxy (:336-338) and up (:395). render_codex_config sets base_url http://host:port/v1 with wire_api = \"responses\" (codex_setup.py:33,49-50), which is served at server.py:2139. write_codex_config copies an existing file to .paritok-bak only when it lacks the 'Generated by `paritok' marker (codex_setup.py:76-85). Glob finds no .claude/, .claude-plugin, plugin.json, hooks.json, SKILL.md, commands/ or skills/ (hooks/ exists only as .git samples). README.md:42 links the paritok-vscode repo."
+        },
+        {
+          "field": "claim_checks[3]",
+          "statement": "[Need-driven] A tool in this repo measures provider usage (input, output, cache-creation, cache-read tokens) from the local logs Claude Code and Codex write. Verified: no. The only provider-usage capture is two undocumented, env-gated, streaming-only hooks commented 'TEMP ... not committed', with no reader in the repo.",
+          "citation": "paritok/proxy/codex_setup.py:65-86; paritok/cli.py:94-405; paritok/proxy/server.py:1609-1621,2092-2102",
+          "holds": true,
+          "note": "Repo-wide greps for .claude, CLAUDE_CONFIG_DIR, CODEX_HOME, rollout-, .codex/sessions, projects/, sessions/ and transcript find no log reader. The only home-directory access in paritok/ is Path.home()/.codex/config.toml (codex_setup.py:70-71); tiktoken seeding writes to the temp dir or TIKTOKEN_CACHE_DIR (token_counter.py:96-98). The CLI has exactly init/config/doctor/proxy/up. PARITOK_USAGE_LOG (server.py:1609-1621, inside _stream_anthropic) appends in/cache_cr/cache_rd/out. PARITOK_RESP_USAGE_LOG (server.py:2092-2102, inside _stream_responses) appends input_items/in/cached/uncached/out. Both carry 'TEMP ... not committed' comments, and each name appears exactly once in the repo, so there is no README mention, no reader, and no coverage of the non-streaming or Chat Completions paths. The cache fields at server.py:1683-1684 only re-emit upstream usage to the client in a rebuilt SSE stream (_message_to_events); nothing is logged there."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

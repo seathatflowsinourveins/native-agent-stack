@@ -1,0 +1,301 @@
+{
+  "contender": "microsoft/wsl",
+  "revision": {
+    "contender": "microsoft/wsl",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "microsoft/WSL",
+        "tag": "3.0.1",
+        "commit": "91f161fa240dc355c1a88daabc8aac4273e35ba5",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "3.0.1",
+    "commit": "91f161fa240dc355c1a88daabc8aac4273e35ba5",
+    "read_at": "2026-10-02T03:02:26+00:00"
+  },
+  "dossier": {
+    "contender": "microsoft/wsl",
+    "revision": {
+      "tag": "3.0.1",
+      "commit": "91f161fa240dc355c1a88daabc8aac4273e35ba5",
+      "read_at": "2026-10-02T03:02:26+00:00"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Source repository of the Windows-hosted Windows Subsystem for Linux (WSL): wsl.exe, the auto-start LocalSystem WSL service, the Linux guest init/plan9/networking binaries (cross-compiled from Windows), a WinUI settings app (built when WSL_BUILD_WSL_SETTINGS=true), and, at this revision, 'WSLC': a container feature made of the wslc.exe CLI (also installed as container.exe) and the Microsoft.WSL.Containers SDK (C, C++/WinRT, C#/WinRT). WSLC starts containerd + dockerd inside a per-session Hyper-V (HCS) VM and manages individual containers, images, networks and volumes. The tree contains no compose/stack-style multi-service definition or runner (see claim_checks). Windows-only (x64 and ARM64), MIT-licensed.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "WSL lets you run Linux command-line tools, utilities and applications, all unmodified and directly on Windows, 'without the overhead of a traditional virtual machine or dual boot setup'.",
+          "citation": "README.md:11"
+        },
+        {
+          "claim": "Install by running `wsl --install` inside the Windows command line.",
+          "citation": "README.md:13-17"
+        },
+        {
+          "claim": "Setup best practices, overviews and full docs are at learn.microsoft.com/windows/wsl (external); downloads and release notes are on GitHub Releases.",
+          "citation": "README.md:7,19"
+        },
+        {
+          "claim": "Related open-source repos: microsoft/WSL2-Linux-Kernel (kernel), microsoft/wslg (GUI apps), microsoftdocs/wsl (docs).",
+          "citation": "README.md:23-27"
+        },
+        {
+          "claim": "Building from source and architecture details are in doc/docs/dev-loop.md.",
+          "citation": "README.md:35"
+        },
+        {
+          "claim": "The application logs basic diagnostic data (telemetry); see DATA_AND_PRIVACY.md.",
+          "citation": "README.md:47"
+        },
+        {
+          "claim": "The software may collect information and send it to Microsoft; telemetry may be turned off 'as described in the repository'; use of the software operates as consent.",
+          "citation": "README.md:49"
+        },
+        {
+          "claim": "(Package README) The WSL Containers SDK provides APIs for creating and managing Linux containers inside WSL plus MSBuild/CMake integration for building container images; supported platforms x64 and ARM64.",
+          "citation": "nuget/Microsoft.WSL.Containers/docs/README.MD:3-5"
+        },
+        {
+          "claim": "(Package README) The package integrates the `wslc` CLI into the build: WslcImage MSBuild items / wslc_add_image CMake function run image build + save to .tar with incremental rebuilds.",
+          "citation": "nuget/Microsoft.WSL.Containers/docs/README.MD:62-64,66-127"
+        },
+        {
+          "claim": "(Package README) Prerequisite: install WSL with `wsl --install --no-distribution`, which provides the wslc CLI.",
+          "citation": "nuget/Microsoft.WSL.Containers/docs/README.MD:152-154"
+        },
+        {
+          "claim": "(API docs) The WSL container API lets Windows app developers use Linux containers in app logic, layered Session -> Container -> Process, with C, C# and C++ projections.",
+          "citation": "doc/docs/api-reference/index.md:3,12-18"
+        },
+        {
+          "claim": "(API docs) The WSL container API is in preview and may have breaking changes; deploy production-grade code only after general availability in fall 2026.",
+          "citation": "doc/docs/api-reference/index.md:7"
+        },
+        {
+          "claim": "(wslc README) Stub only: 'This is the WSL Container CLI README'.",
+          "citation": "src/windows/wslc/README.md:1-2"
+        }
+      ],
+      "install": [
+        {
+          "method": "Windows only (README). No Linux or macOS install method is documented anywhere in the repo.",
+          "command": "wsl --install",
+          "citation": "README.md:15-17"
+        },
+        {
+          "method": "Windows: WSL runtime without a distro; documented prerequisite for the wslc CLI / container SDK",
+          "command": "wsl --install --no-distribution",
+          "citation": "nuget/Microsoft.WSL.Containers/docs/README.MD:154"
+        },
+        {
+          "method": "Build from source on Windows (CMake + Visual Studio 2022, Windows SDK 26100), then install the MSI",
+          "command": "cmake . ; cmake --build . ; install bin\\<platform>\\<target>\\wsl.msi  (or: powershell tools\\deploy\\deploy-to-host.ps1)",
+          "citation": "doc/docs/dev-loop.md:66-72,85"
+        },
+        {
+          "method": "NuGet package for the container SDK (Windows apps; sample pins 2.9.3)",
+          "command": "<PackageReference Include=\"Microsoft.WSL.Containers\" Version=\"2.9.3\" />   (CMake: find_package(Microsoft.WSL.Containers REQUIRED))",
+          "citation": "doc/samples/WSLC-CustomContainer/WSLCCustomContainer.csproj:18; nuget/Microsoft.WSL.Containers/docs/README.MD:21"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "no - Windows-only product (Hyper-V/HCS based). Builds only on Windows with Visual Studio and Windows SDK 10.0.26100.0 (CMakeLists.txt:2,26-28; .github/copilot-instructions.md:193-195: 'Full builds ONLY work on Windows ... DO NOT attempt to build the main WSL components on Linux'). The Linux-side binaries (init, plan9, netlinkutil, mountutil) are cross-compiled from Windows with clang for musl (CMakeLists.txt:461-528) and only run inside WSL/WSLC VMs. Only docs and validation scripts run on Linux (.github/workflows/documentation.yml:16, distributions.yml:16).",
+        "wsl2": "no (not applicable as an install target) - this repo is the Windows-side host that creates WSL2 VMs; it is not installed inside a WSL2 distro. wslc.exe is a Windows executable (src/windows/wslc/CMakeLists.txt:26) that drives its own per-session HCS VM (src/windows/service/exe/HcsVirtualMachine.h:11,79), separate from the shared WSL2 utility VM (doc/docs/technical-documentation/wslservice.exe.md:18-22), and needs the Windows VirtualMachinePlatform feature (src/windows/WslcSDK/wslcsdk.cpp:287-290).",
+        "macos_arm64": "no - no macOS/Darwin support or mention anywhere in the tree (case-insensitive search found none). Windows ARM64 is the supported ARM target (CMakeLists.txt:8-23; nuget/Microsoft.WSL.Containers/docs/README.MD:5).",
+        "gpu": "yes (Windows GPU paravirtualization via /dev/dxg; Windows hosts only) - .wslconfig gpuSupport defaults to true (src/windows/common/WslCoreConfig.h:251,335); WSLC enables the GPU feature by default for CLI sessions (src/windows/service/exe/WSLCSessionManager.cpp:129-130); `--gpus` flag on container run/create (src/windows/wslc/commands/ContainerRunCommand.cpp:45; src/windows/wslc/tasks/ContainerTasks.cpp:909; help text 'Add GPU devices to the container ('all' to pass all GPUs)' at localization/strings/en-US/Resources.resw:3328-3329); guest CDI spec exposes /dev/dxg plus driver mounts (src/linux/init/WSLCInit.cpp:74-110); SDK flag WSLC_SESSION_FEATURE_FLAG_ENABLE_GPU (src/windows/WslcSDK/wslcsdk.h:116)."
+      },
+      "integrations": {
+        "cli": "yes - wsl.exe (distro/VM management: --install, --update, --mount, --shutdown, --version, ...; src/windows/common/WslClient.cpp:1630-1775) and wslc.exe, also installed as container.exe (msipackage/package.wix.in:30-31). wslc root registers 7 groups (container, image, network, registry, settings, system, volume) plus 28 top-level shortcuts (attach, build, create, exec, events, export, images, import, info, inspect, kill, container list, load, login, logout, logs, pull, push, remove, restart, image remove, run, save, start, stats, stop, tag, version) (src/windows/wslc/commands/RootCommand.cpp:33-72; ContainerCommand.cpp:24-44; NetworkCommand.cpp:24-35; VolumeCommand.cpp:24-33; SystemCommand.cpp:24-31). `container run` supports --network, --network-alias, --publish, --volume, --mount, --tmpfs, --env, --env-file, --health-*, --gpus, --rm, --pull (ContainerRunCommand.cpp:27-80). No compose/up/stack command exists. Global --session selects a named session (RootCommand.cpp:81-87).",
+        "mcp": "none found - no MCP server, configuration or reference (case-insensitive search for 'MCP' and 'model context protocol' returned no matches).",
+        "sdk_or_api": "yes - WSLC SDK shipped as NuGet Microsoft.WSL.Containers: flat C API (src/windows/WslcSDK/wslcsdk.h: sessions, containers, processes, images, VHD volumes, install/version), C++/WinRT and C#/WinRT projections (src/windows/WslcSDK/winrt/, csharp/; docs in doc/docs/api-reference/{c,cpp,csharp}), MSBuild/CMake image-build integration (nuget/Microsoft.WSL.Containers/docs/README.MD:62-148). COM contracts: src/windows/service/inc/wslc.idl, WSLCCompat.idl (SDK-facing, kept ABI-stable per .github/copilot-instructions.md:143), wslservice.idl. WSL plugin API (src/windows/inc/WslPluginApi.h; NuGet Microsoft.WSL.PluginApi) and wslapi.dll (doc/docs/technical-documentation/index.md:19). No HTTP/REST or Docker-compatible endpoint is exposed to the Windows host: the Docker Engine API is reached only by wslcsession over hvsocket to /var/run/docker.sock inside the VM (src/windows/wslcsession/DockerHTTPClient.cpp:646-670) and wslc itself uses COM. The C SDK exposes only NONE/BRIDGED container networking and no network-create API (wslcsdk.h:78-82).",
+        "claude_code_or_codex": "none found - no CLAUDE.md, AGENTS.md, MCP config or Claude/Codex references (case-insensitive search for claude|codex|anthropic|openai|AGENTS.md|CLAUDE.md returned no matches). The repo only carries GitHub Copilot instruction files: .github/copilot-instructions.md and .github/copilot/*.md."
+      },
+      "telemetry_and_network": "TELEMETRY - README.md:47-49 says WSL logs basic diagnostic data and may send it to Microsoft; DATA_AND_PRIVACY.md:5 says it uses Windows telemetry and is disabled via Windows Settings > Privacy & security > Diagnostics & feedback > 'Diagnostic data' (viewable via 'View diagnostic data'). Code: TraceLogging providers Microsoft.Windows.Subsystem.Lxss, Microsoft.Windows.Lxss.Manager and (containers) Microsoft.Windows.Wslc, all created with TraceLoggingOptionMicrosoftTelemetry (src/windows/common/WslTelemetry.cpp:21-40). The in-tree src/windows/inc/traceloggingconfig.h zeroes the Microsoft keywords/privacy tags and static_asserts !OfficialBuild (lines 19-28); official release builds overwrite it from a pipeline variable (.pipelines/build-job.yml:95-102; wsl-build-release-onebranch.yml:78), so the shipped event routing cannot be reviewed from source. Non-official builds default telemetry off (WslTraceLoggingInitialize(..., !OfficialBuild): src/windows/wslc/core/Main.cpp:57, src/windows/wslcsession/main.cpp:62, src/windows/service/exe/ServiceMain.cpp:171), but wslcsdk.dll initializes the provider with DisableTelemetryByDefault=false inside host apps (src/windows/WslcSDK/wslcsdk.cpp:1851). A .wslconfig key wsl2.telemetry (default = OfficialBuild) exists (WslCoreConfig.h:254,338) and only gates connectivity telemetry (src/windows/common/NatNetworking.cpp:37; src/windows/service/exe/WslMirroredNetworking.cpp:631); it is not mentioned in DATA_AND_PRIVACY.md. WSLC events: WSLCCreateSession (session name, which for default sessions embeds the Windows username as wslc-cli[-admin]-<user>, plus elevation and flags) and WSLCCreateSessionCaller (calling exe file name) (src/windows/service/exe/WSLCSessionManager.cpp:354-372,512-525); WSLCCreateContainer (image reference, session name, creator process) (src/windows/wslcsession/WSLCSession.cpp:2374-2382); BuildImageStart logs the full `docker buildx build` command line including --build-arg values through plain WSL_LOG (WSLCSession.cpp:1275; secrets are kept off argv/telemetry, :1179-1189). NETWORK / ACCOUNTS - no WSL-specific account or sign-in is required by the code; registry credentials are optional. Network use: wsl --install/--update use the GitHub Releases API (https://api.github.com/repos/Microsoft/WSL/releases...) and Microsoft Store / Windows Update (src/windows/common/wslutil.cpp:35-36,52; Distribution.cpp:20-22); WslcInstallWithDependencies uses Windows Update then falls back to GitHub including pre-release builds and needs elevation (src/windows/WslcSDK/wslcsdk.cpp:1774-1777,1807-1837); `wsl --list --online` fetches https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json (Distribution.cpp:20-21); wslc login defaults to https://index.docker.io/v1/ (src/windows/wslc/services/RegistryService.h:34) with credentials in Windows Credential Manager (src/windows/common/wslc/services/WinCredStorage.cpp:39-46) or a DPAPI-encrypted file %LOCALAPPDATA%/wslc/registry-credentials.json (FileCredStorage.cpp:11,28; ICredentialStorage.cpp:22-31); host trusted root CAs are copied into the VM (WSLCSession.cpp:764-800); session networking modes none/nat/consomme and a host-loopback DNS name host.wslc.internal (src/windows/common/wslc/settings/WSLCUserSettings.cpp:56-62,107-123). Group-policy/Intune values AllowWSLContainer, AllowWSLContainerPrivileged and WSLContainerRegistryAllowlist can disable WSLC or restrict registries (src/windows/inc/wslpolicies.h:36-38,160-202; src/windows/service/exe/WSLCSessionManagerFactory.cpp:44-47). Build-time only: NuGet feed https://pkgs.dev.azure.com/shine-oss/wsl/_packaging/WslDependencies/nuget/v3/index.json (nuget.config:21) and hash-pinned FetchContent tarballs (CMakeLists.txt:68-105)."
+    },
+    "code": {
+      "languages": [
+        "C++20 (core host and guest code)",
+        "C (src/linux/mountutil, test/linux/unit_tests)",
+        "C# (WinUI 3 settings app src/windows/wslsettings; WinRT projection src/windows/WslcSDK/csharp; samples)",
+        "MIDL IDL (src/windows/service/inc/*.idl, WslcSDK/winrt/wslcsdk.idl)",
+        "PowerShell (tools/*.ps1)",
+        "Python (tools/devops, distributions/*.py)",
+        "CMake",
+        "XAML"
+      ],
+      "entry_points": [
+        {
+          "path": "src/windows/wslc/core/Main.cpp",
+          "what": "wslc.exe CLI (wmain at line 170; RootCommand tree in src/windows/wslc/commands/RootCommand.cpp); installed as wslc.exe and container.exe (msipackage/package.wix.in:30-31)."
+        },
+        {
+          "path": "src/windows/WslcSDK/wslcsdk.h",
+          "what": "Public C API of wslcsdk.dll (implementation wslcsdk.cpp; WinRT/C# projections under winrt/ and csharp/)."
+        },
+        {
+          "path": "src/windows/wslcsession/main.cpp",
+          "what": "wslcsession.exe: per-user, single-use COM server hosting a WSLCSession (starts containerd + dockerd in the VM)."
+        },
+        {
+          "path": "src/windows/service/exe/ServiceMain.cpp",
+          "what": "wslservice.exe: auto-start LocalSystem WSL service; hosts WSL2 utility VM management and the WSLC session manager (WSLCSessionManager.cpp, HcsVirtualMachine.cpp)."
+        },
+        {
+          "path": "src/windows/wsl/main.cpp",
+          "what": "wsl.exe client (command parsing in src/windows/common/WslClient.cpp)."
+        },
+        {
+          "path": "src/linux/init/main.cpp",
+          "what": "Linux guest init/mini-init; WSLCInit.cpp holds the WSLC guest init (CDI GPU spec, /etc/docker/daemon.json)."
+        },
+        {
+          "path": "src/windows/service/inc/wslc.idl",
+          "what": "WSLC COM contracts (IWSLCSession, IWSLCContainer, IWSLCProcess, IWSLCVirtualMachine...); SDK-facing layer in WSLCCompat.idl."
+        },
+        {
+          "path": "nuget/Microsoft.WSL.Containers/",
+          "what": "MSBuild/CMake integration shipped in the NuGet package (build/*.targets, cmake/Microsoft.WSL.ContainersConfig.cmake) that runs wslc image build/save."
+        }
+      ],
+      "architecture": "Windows host (C++20, MSVC, CMake generating a Visual Studio solution): wsl.exe (src/windows/wsl) and the shared client/command parser (src/windows/common, e.g. WslClient.cpp) call wslservice.exe (src/windows/service/exe; LocalSystem; ILxssUserSession in src/windows/service/inc/wslservice.idl) over COM; the service creates the WSL2 utility VM through HCS (WslCoreVm.cpp), networking engines (WslMirroredNetworking.cpp, BridgedNetworking.cpp, common/NatNetworking.cpp), plugins (PluginManager.cpp) and per-user helpers (wslrelay, wslhost, wslg). WSLC adds: WSLCSessionManager.cpp (service-side session registry, per-user default sessions wslc-cli-<user> / wslc-cli-admin-<user>, token checks, policy gate in WSLCSessionManagerFactory.cpp); HcsVirtualMachine.cpp (one HCS VM per session booting the shipped kernel + system.vhd, lines 252-255); wslcsession.exe (src/windows/wslcsession: WSLCSession starts containerd then dockerd in the VM, mirrors host root CAs, and drives the Docker Engine HTTP API over hvsocket to /var/run/docker.sock via DockerHTTPClient.cpp; WSLCContainer, WSLCProcess, WSLCVolumes, PortRelayHandle, EventStore; image builds run `docker buildx build` in the guest, WSLCSession.cpp:1082; idle VM teardown via WSLCIdleState.h); wslc.exe (src/windows/wslc: arguments/ commands/ core/ services/ tasks/, a layered CLI over COM IWSLCSession; YAML user settings and credential stores in src/windows/common/wslc); wslcsdk.dll (src/windows/WslcSDK: flat C API plus WinRT/C# projections over the WSLCCompat COM interfaces). Linux guest (src/linux, C++/C cross-compiled by clang to static musl binaries): init/mini-init, GNS networking, WSLCInit.cpp, plan9 server, netlinkutil, mountutil. src/shared holds the .wslconfig parser and protocol headers. The dockerd/containerd/docker-buildx binaries are not in this repo; they run from the prebuilt guest image system.vhd delivered by the Microsoft.WSLg NuGet package (msipackage/package.wix.in:45; CMakeLists.txt:134; packages.config:27). wslc has no multi-container definition layer: commands operate on single containers, images, networks and volumes, and `wslc system session shell|run` reach the session VM (SessionTasks.cpp:53-57,204-219).",
+      "packaging_and_release": "Artifacts: per-arch WiX MSI wsl.<ver>.<arch>.msi (installs wsl.exe, wslc.exe + container.exe alias, wslservice.exe as an auto-start LocalSystem service, adds the install dir to the system PATH, ships system.vhd; msipackage/package.wix.in:22-56,288-289); MSIX bundle Microsoft.WSL_<ver>_x64_ARM64.msixbundle plus appxupload for Microsoft Store flighting via StoreBroker (.pipelines/package-stage.yml:99-110,181-196; flight-stage.yml:73-109); NuGet packages Microsoft.WSL.PluginApi and Microsoft.WSL.Containers (nuget/*.nuspec.in, license expression MIT; pushed to an internal feed named 'wsl': nuget-stage.yml:9-10,45-53); release assets (msixbundle, two MSIs, Containers nupkg) are attached by tools/devops/create-release.py to a GitHub release created as draft + prerelease and published manually (flight-stage.yml:124-130; create-release.py:194-222); WinGet package Microsoft.WSL is updated from the released x64/arm64 MSIs by .github/workflows/winget.yml:20-32. Release trigger: OneBranch official pipeline on tags '*.*.*' (.pipelines/wsl-build-release-onebranch.yml:22-24; tag format enforced in create-release.py:103-108), stages build -> dcat -> test -> flight -> nuget (lines 72-98). Signing: ESRP code signing of binaries per build target (build-job.yml:136-140), SDL codesign break=true over dll/exe/sys/msi/msix/msixbundle/appx/nupkg (wsl-build-release-onebranch.yml:52-55), msixbundle SigntoolSign+SigntoolVerify (package-stage.yml:113-152), NuGetSign+NuGetVerify for nupkg (package-stage.yml:205-239); non-release builds use a generated dev certificate (CMakeLists.txt:279-289; package-stage.yml:154-162). No checksum files, SBOM or provenance attestations are produced by repo-visible scripts (search for sbom|checksum|attest|provenance only hit WiX PE Checksum=yes, msipackage/package.wix.in:544-545); anything the OneBranch templates add is outside the repo. The pipeline pulls external repos (OneBranch.Pipelines/GovernedTemplates, Microsoft.WSL/wsl-release-scripts: wsl-build-release-onebranch.yml:30-39) and runs on internal infrastructure (CloudTest, ESRP, StoreBroker).",
+      "tests_and_ci": "Framework: Microsoft TAEF run through TE.exe / test.bat (test/README.md:5-13; CMakeLists.txt:574-577); tests compile into wsltests.dll (test/windows/wslc/CMakeLists.txt:13) and are tagged WSL1/WSL2/WSLC (test/README.md:94-104). Layout, ~179 files under test/: test/windows/*.cpp (~16 suites incl. WSLCTests.cpp, WslcSdkTests.cpp, WslcSdkWinRTTests.cpp, PolicyTests.cpp, NetworkTests.cpp, MountTests.cpp, InstallerTests.cpp, Plan9Tests.cpp, PluginTests.cpp); test/windows/wslc/ (25 wslc CLI unit-test .cpp files plus ~49 e2e *Tests.cpp under e2e/ covering container/image/network/volume/registry/session/settings commands; none for compose); test/linux/unit_tests/ (~66 C files, in-guest syscall/behavior tests, build_tests.sh). CI: Azure DevOps OneBranch pipelines in .pipelines/ - PR (wsl-build-pr-onebranch.yml, wsl-build-pr.yml; triggers master and release/*) run build-stage.yml (x64 + arm64 Release builds; clang-format, copyright-header, line-ending and localization validators at lines 93-130; CodeQL task wired into the arm64 job but enabled only for nightly on refs/heads/main, build-job.yml:84-87) and test-stage.yml (CloudTest matrix wsl1/wsl2/wslc x 4 Windows images; WSLC suite skipped on Server images because of a Hyper-V VMBus PowerOff hang: test-stage.yml:14-52; test-job.yml:35-41); nightly (wsl-build-nightly-onebranch.yml), release (wsl-build-release-onebranch.yml), notice generation (wsl-build-notice.yml). GitHub Actions (.github/workflows): distributions.yml and modern-distributions.yml (validate distributions/DistributionInfo.json on ubuntu), documentation.yml (mkdocs build + Pages deploy), winget.yml (publish), new_issue.yml / new_issue_comment.yml / issue_edited.yml (triage); none builds or tests the C++ code. tools/benchmarking/*.ps1 time builds and test runs; no results are committed. Tests need Windows with Hyper-V and administrator rights (test/README.md:11).",
+      "dependencies": "packages.config: 29 NuGet packages (WinUI/CommunityToolkit/WindowsAppSDK/Extensions.Hosting for the settings app; Microsoft.WSL.Kernel, LinuxSdk, DeviceHost, bsdtar, Dependencies.(amd64|arm64)fre, TestDistro, TestData; Microsoft.WSLg; Direct3D.Linux; DXCore; MSAL.WSL.Proxy; MSRDC SessionHost; Taef; WIL; CsWinRT; vswhere; Wix 5.0.2; WinUIEx; Xaml.Behaviors; NETCore runtime; Windows.SDK.NET.Ref) restored from the Azure DevOps feed in nuget.config:21 (packages.config:3-31). CMakeLists.txt FetchContent: 4 SHA256-pinned tarballs - GSL 4.0.0, nlohmann/json 3.12.0, yaml-cpp 0.9.0 (used only for wslc user settings), Boost 1.90.0 headers (CMakeLists.txt:68-105); nuget.exe 5.10.0 hash-pinned (cmake/findNuget.cmake:12-15). cgmanifest.json: 11 registrations covering 6 components (LLVM, libarchive, Boost, yaml-cpp, GSL, nlohmann/json). Python tooling: doc/requirements.txt (4, unpinned >=), distributions/requirements.txt (5, pinned), tools/devops/requirements.txt (4, pinned). Samples carry their own packages.config/csproj (doc/samples/*). Guest engine binaries (dockerd, containerd, docker/buildx) are declared in no manifest here; they come inside the prebuilt Microsoft.WSLg system.vhd. Dependabot only updates GitHub Actions (.github/dependabot.yml:3).",
+      "security_policy": "SECURITY.md (standard Microsoft block: report to MSRC, not via public issues, coordinated disclosure; lines 9-17,37-39) plus a 'WSL security model' section stating WSL is not a security sandbox (lines 43-50; its link ./doc/docs/security.md is stale - the file is doc/docs/technical-documentation/security.md). Security model text: doc/docs/technical-documentation/security.md:3-45. CONTRIBUTING.md:41 also routes security and BSOD reports to MSRC."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:11 - Linux tools run on Windows 'without the overhead of a traditional virtual machine or dual boot setup'.",
+        "verified": "partial",
+        "evidence": "Code uses VMs: WSL2 distros run in a Hyper-V utility VM created through HCS (src/windows/service/exe/WslCoreVm.cpp; doc/docs/technical-documentation/wslservice.exe.md:18-22) and each WSLC session gets its own HCS VM (src/windows/service/exe/HcsVirtualMachine.h:11,79), torn down after a 30 s idle grace period (src/windows/wslcsession/WSLCSession.cpp:46-51,432). A VM-less WSL1 mode still exists (test-stage.yml:15-19; src/windows/common/WslClient.cpp:466 --enable-wsl1). The 'overhead' claim is not measurable from source."
+      },
+      {
+        "claim": "README.md:15-17 - `wsl --install` installs WSL.",
+        "verified": "yes",
+        "evidence": "src/windows/common/WslClient.cpp:1759-1761 dispatches --install to Install(); option parsing at :462-475; flag names in src/windows/inc/wsl.h:36-54 (including --no-distribution)."
+      },
+      {
+        "claim": "README.md:47-49 - basic diagnostic data is logged and telemetry can be turned off 'as described in the repository'.",
+        "verified": "partial",
+        "evidence": "DATA_AND_PRIVACY.md:5 documents the Windows 'Diagnostic data' switch; code emits through Windows TraceLogging providers (src/windows/common/WslTelemetry.cpp:21-40). A .wslconfig key wsl2.telemetry also exists in code (WslCoreConfig.h:254,338) but is undocumented there and only gates connectivity telemetry (NatNetworking.cpp:37; WslMirroredNetworking.cpp:631). In-tree traceloggingconfig.h zeroes the Microsoft keywords (src/windows/inc/traceloggingconfig.h:19-28) and official builds replace it from a pipeline variable (.pipelines/build-job.yml:95-102), so what an official build uploads cannot be verified from source."
+      },
+      {
+        "claim": "README.md:11 scope statement: WSL runs Linux command-line tools, utilities and applications on Windows (README never mentions containers).",
+        "verified": "partial",
+        "evidence": "Code and docs also ship a container CLI and SDK that the README does not mention: wslc command tree (src/windows/wslc/commands/RootCommand.cpp:33-72), wslc.exe/container.exe in the MSI (msipackage/package.wix.in:30-31), container API docs (doc/docs/api-reference/index.md:3-7). Code is preferred over the README here."
+      },
+      {
+        "claim": "Need-level question (not a README claim): a single tool in this project defines and runs a multi-service application (app + supporting services, volumes, networks) on the container engine.",
+        "verified": "no",
+        "evidence": "No such tool exists in the tree. RootCommand lists the full wslc command set (container, image, network, registry, settings, system, volume plus shortcuts) with no compose/up/stack/pod (src/windows/wslc/commands/RootCommand.cpp:33-72). 'compose' appears only as a parser unit-test fixture (test/windows/wslc/WSLCCLIExecutionUnitTests.cpp:65-101,552-572), in comments (test/windows/wslc/WSLCCLICommandUnitTests.cpp:715-721; src/windows/wslc/core/Main.cpp:141) and nowhere else; yaml-cpp is used only for wslc user settings (src/windows/common/wslc/settings/WSLCUserSettings.cpp). Container options have no restart-policy or depends-on field (src/windows/service/inc/wslc.idl:321-367); the C SDK offers only NONE/BRIDGED networking (wslcsdk.h:78-82); samples run one container (doc/samples/WSLC-NextCloud/Program.cs:64-97). Per-object building blocks exist: network create/connect/disconnect/list/inspect/prune/remove (NetworkCommand.cpp:24-35), volume create/inspect/list/prune/remove (VolumeCommand.cpp:24-33), run flags for network, alias, publish, volume, mount, env-file, health (ContainerRunCommand.cpp:27-80). `wslc system session shell|run` reach the session VM (SessionTasks.cpp:53-57,204-219), but whether a compose plugin exists in the guest image cannot be established from this repo (image is a prebuilt NuGet payload)."
+      },
+      {
+        "claim": "README.md:25-27 - kernel and WSLg live in separate repositories.",
+        "verified": "yes",
+        "evidence": "The kernel and WSLg are consumed as prebuilt NuGet packages Microsoft.WSL.Kernel 6.18.40.1-1 and Microsoft.WSLg 1.0.79 (packages.config:23,27; CMakeLists.txt:129,134), not built from this tree; the Microsoft.WSLg package also supplies system.vhd (msipackage/package.wix.in:45)."
+      },
+      {
+        "claim": "doc/docs/api-reference/index.md:7 and c/index.md:9 - container API is in preview (GA 'fall 2026'); cpp/index.md:5 - 'wslcsdk.h explicitly marks this API as preview'.",
+        "verified": "partial",
+        "evidence": "src/windows/WslcSDK/wslcsdk.h and the rest of src/windows/WslcSDK contain no 'preview' text (case-insensitive search), contradicting doc/docs/api-reference/cpp/index.md:5. Per the session's git metadata the HEAD commit subject is 'Remove references to WSLC being in a preview (#41704)' (not a file citation), while the api-reference docs still carry preview notices. SDK requires an installed WSL package >= 2.8.0 (wslcsdk.cpp:292-298); the sample pins Microsoft.WSL.Containers 2.9.3 (doc/samples/WSLC-CustomContainer/WSLCCustomContainer.csproj:18)."
+      },
+      {
+        "claim": "The API reference under doc/docs/api-reference accurately describes the shipped SDK.",
+        "verified": "partial",
+        "evidence": "Three mismatches found. (1) c/install-and-version-apis/wslcinstallwithdependencies.md:4 documents a 2-parameter WslcInstallWithDependencies(progressCallback, context); the header has 4 parameters (components, options, progressCallback, context) (src/windows/WslcSDK/wslcsdk.h:697-698). (2) c/not-yet-implemented-apis.md:8 says fixed VHDs return E_NOTIMPL for WslcCreateSessionVhdVolume and WslcSetSessionSettingsVhd; code rejects them only in WslcSetSessionSettingsVhd (wslcsdk.cpp:565) and WslcCreateSessionVhdVolume accepts WSLC_VHD_TYPE_FIXED (wslcsdk.cpp:516-519). (3) cpp/not-yet-implemented-and-known-gaps.md:8 lists PullImageOptions, PushImageOptions, TagImageOptions, VhdOptions, ServiceVersion wrappers as missing, but they exist in src/windows/WslcSDK/winrt/. The UDP port-mapping E_NOTIMPL note (c/not-yet-implemented-apis.md:7) matches code (wslcsdk.cpp:1065-1066)."
+      },
+      {
+        "claim": "SECURITY.md:48 - the WSL security model is documented at ./doc/docs/security.md.",
+        "verified": "no",
+        "evidence": "No doc/docs/security.md exists; the document is doc/docs/technical-documentation/security.md (referenced by doc/docs/index.md:7 and doc/mkdocs.yml:25)."
+      },
+      {
+        "claim": "DATA_AND_PRIVACY.md:18 - telemetry events can be found by searching for WSL_LOG_TELEMETRY.",
+        "verified": "partial",
+        "evidence": "WSL_LOG_TELEMETRY is used in service/common/wslhost code (e.g. src/windows/service/exe/PluginManager.cpp:101,396; WslCoreVm.cpp) but the WSLC events WSLCCreateSession, WSLCCreateSessionCaller and WSLCCreateContainer are written with WSL_LOG plus TelemetryPrivacyDataTag / MICROSOFT_KEYWORD_CRITICAL_DATA (src/windows/service/exe/WSLCSessionManager.cpp:355-372; src/windows/wslcsession/WSLCSession.cpp:2374-2382); no WSLC source file uses WSL_LOG_TELEMETRY."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Typical full Windows build duration (contributor-guide estimate for the dev loop; not product performance)",
+        "metric": "duration",
+        "value": "20-45 minutes (recommended minimum timeout 60+ minutes)",
+        "source": ".github/copilot-instructions.md:368-374",
+        "independent": false
+      },
+      {
+        "what": "Typical full test-suite duration (contributor-guide estimate; not product performance; unit-test subset 5-15 minutes)",
+        "metric": "duration",
+        "value": "30-60 minutes (recommended minimum timeout 90+ minutes)",
+        "source": ".github/copilot-instructions.md:368-374",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Platform scope: Windows-only product built on Hyper-V/HCS. It cannot be built or run on Linux or macOS hosts; builds need Visual Studio and Windows SDK 10.0.26100.0 and target x64/ARM64 only (CMakeLists.txt:2,8-28; .github/copilot-instructions.md:193-195). WSLC needs the VirtualMachinePlatform feature and elevation to install components (src/windows/WslcSDK/wslcsdk.cpp:287-290,1774-1789), and its e2e suite is skipped on Windows Server test images because of a Hyper-V VMBus PowerOff hang (.pipelines/test-stage.yml:50-52).",
+      "Scope gap for multi-service hosting: no compose/stack/pod tool, no restart-policy or dependency fields, the C SDK exposes only NONE/BRIDGED container networking plus VHD volumes, so multi-container apps would have to be scripted over wslc or the SDK (src/windows/wslc/commands/RootCommand.cpp:33-72; src/windows/service/inc/wslc.idl:321-367; src/windows/WslcSDK/wslcsdk.h:78-82,654-655; single-container sample doc/samples/WSLC-NextCloud/Program.cs:64-77).",
+      "Maturity and doc drift: container API documented as preview with GA targeted for fall 2026 (doc/docs/api-reference/index.md:7; c/index.md:9); only the SDK-facing WSLCCompat.idl and the plugin API are promised ABI-stable, other WSLC interfaces are internal and may change (.github/copilot-instructions.md:143); API docs are stale against code in several places (see claim_checks); src/windows/wslc/README.md is a stub and the user docs referenced (aka.ms/wslc, aka.ms/wslc-settings) are external and were not readable from this tree (localization/strings/en-US/Resources.resw:1740; src/windows/common/wslc/settings/WSLCUserSettings.cpp:37).",
+      "Engine provenance: dockerd, containerd and docker/buildx run from the guest system.vhd delivered by the prebuilt Microsoft.WSLg NuGet (src/windows/service/exe/HcsVirtualMachine.cpp:252-255; msipackage/package.wix.in:45; packages.config:27; src/windows/wslcsession/WSLCSession.cpp:734-762,1082). Their versions and CVE status are neither pinned nor visible in this repo, and NOTICE.txt at this revision has no docker/containerd/moby/buildkit entries (the notice pipeline appends the WSLg NOTICE separately: .pipelines/wsl-build-notice.yml:19-20). NOTICE.txt does list GPL/LGPL (PulseAudio, NOTICE.txt:2520) and MS-RL (WiX, NOTICE.txt:2009) components alongside the MIT repo license.",
+      "Build/release reproducibility: building needs prebuilt binary packages (kernel, WSLg, wsldeps, device host, Linux SDK) from an Azure DevOps NuGet feed (nuget.config:21; packages.config:18-27); official builds inject telemetry config from a pipeline variable (.pipelines/build-job.yml:95-102); the release pipeline depends on internal services and repos (OneBranch templates, ESRP, StoreBroker, wsl-release-scripts: wsl-build-release-onebranch.yml:30-39; flight-stage.yml:73-109). GitHub Actions do not build or test the C++ code, so build/test status is not visible from the workflows in .github/workflows.",
+      "Telemetry/privacy: official builds emit Windows diagnostic telemetry; WSLC events carry session names that embed the Windows username (wslc-cli[-admin]-<user>), calling-process file names and image references, and build command lines including --build-arg values are logged (src/windows/service/exe/WSLCSessionManager.cpp:354-372,512-525; src/windows/wslcsession/WSLCSession.cpp:1275,2374-2382). wslcsdk.dll enables its provider inside host apps by default (wslcsdk.cpp:1851). The documented opt-out is only the Windows-wide Diagnostic data setting (DATA_AND_PRIVACY.md:5).",
+      "Security boundaries and state scope: WSL is explicitly not a sandbox and containers do not create a boundary from the Windows host (doc/docs/technical-documentation/security.md:3,41-42); the WSL service runs as LocalSystem (msipackage/package.wix.in:289; doc/docs/technical-documentation/wslservice.exe.md:3); any elevated token can open every user's WSLC session and ACL checks are marked TODO (src/windows/service/exe/WSLCSessionManager.cpp:546-562); default sessions are per-user and per-elevation with storage at %LOCALAPPDATA%/wslc/sessions/<session>/storage.vhdx (WSLCSessionManager.cpp:86-97,512-525; src/windows/common/wslc/WSLCSessionDefaults.h:20-23); a container-visible host-loopback name host.wslc.internal is on by default (WSLCSessionDefaults.h:24; WSLCUserSettings.cpp:60-62).",
+      "Runtime lifecycle: a session VM is torn down after a 30 s idle grace period when no container is running/created and no operation is in flight (src/windows/wslcsession/WSLCSession.cpp:46-51,432; WSLCIdleState.h:25-41); all sessions are terminated when the service shuts down (WSLCSessionManager.cpp:151-165); non-persistent SDK sessions end when their COM reference is released (src/windows/service/inc/WSLCShared.idl:251); changing storagePath creates a new empty session without migrating images or containers (WSLCUserSettings.cpp:50-54); the SDK install path can fall back to pre-release WSL builds from GitHub (wslcsdk.cpp:1825-1831); policies can disable WSLC or restrict registries (src/windows/inc/wslpolicies.h:36-38; src/windows/service/exe/WSLCSessionManagerFactory.cpp:44-47)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "microsoft/wsl",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Windows only (README). No Linux or macOS install method is documented anywhere in the repo. Command: wsl --install",
+          "citation": "README.md:15-17",
+          "holds": true,
+          "note": "README.md:13 says 'inside of your Windows command line'; lines 15-17 hold the ```powershell block with `wsl --install`. Dispatch exists at src/windows/common/WslClient.cpp:1759-1761. A case-insensitive repo-wide search for macos|darwin returned no matches. The only hit for a broader 'linux install' pattern was the file description 'Windows Subsystem for Linux Installer Service' (src/windows/wslinstaller/exe/main.rc:24), which is not an install method."
+        },
+        {
+          "field": "license",
+          "statement": "License SPDX MIT, file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1 'MIT License', :3 'Copyright (c) Microsoft Corporation.', :5-21 standard MIT permission and warranty text."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "no - Windows-only; builds only on Windows with Visual Studio and Windows SDK 10.0.26100.0; Linux-side binaries (init, plan9, netlinkutil, mountutil) are cross-compiled from Windows with clang for musl; only docs and validation scripts run on Linux",
+          "citation": "CMakeLists.txt:2,26-28; .github/copilot-instructions.md:193-195; CMakeLists.txt:461-528; .github/workflows/documentation.yml:16, distributions.yml:16",
+          "holds": true,
+          "note": "CMakeLists.txt:2 sets CMAKE_SYSTEM_VERSION 10.0.26100.0; :26-28 FATAL_ERRORs unless the VS Windows target SDK matches. The copilot-instructions.md:193-194 quote is exact. CMakeLists.txt:462-464,516-528 use clang.exe/lld.exe targeting ${LLVM_ARCH}-unknown-linux-musl with -static; src/linux/{init,plan9,netlinkutil,mountutil}/CMakeLists.txt exist. documentation.yml:16 = runs-on: ubuntu-latest. Citation slip: in distributions.yml, runs-on: ubuntu-latest is line 15 (line 16 is 'steps:'). The only ubuntu jobs (documentation, distributions, modern-distributions) do docs or validation; the triage and winget workflows run on Windows."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "wsl.exe (--install, --update, --mount, --shutdown, --version, ...) and wslc.exe, also installed as container.exe; wslc root registers 7 groups plus 28 top-level shortcuts; container run supports --network, --network-alias, --publish, --volume, --mount, --tmpfs, --env, --env-file, --health-*, --gpus, --rm, --pull; no compose/up/stack command; global --session",
+          "citation": "src/windows/common/WslClient.cpp:1630-1775; msipackage/package.wix.in:30-31; src/windows/wslc/commands/RootCommand.cpp:33-72,81-87; ContainerCommand.cpp:24-44; NetworkCommand.cpp:24-35; VolumeCommand.cpp:24-33; SystemCommand.cpp:24-31; ContainerRunCommand.cpp:27-80",
+          "holds": true,
+          "note": "WslClient.cpp: --update :1630, --shutdown :1736, --mount :1750, --install :1759, --version :1771. package.wix.in:30-31 installs wslc.exe and container.exe, both from wslc.exe. RootCommand.cpp:36-42 registers exactly 7 groups and :43-70 exactly 28 shortcuts; the group files match their cited ranges. Flag spellings are confirmed in arguments/ArgumentDefinitions.h (env-file :63, gpus :74, health-cmd :76, network-alias :102, pull :119, rm :121, session :125, tmpfs :139), and all are registered at ContainerRunCommand.cpp:43-75. --session is global at RootCommand.cpp:84. There is no compose/up/stack/pod command under src/windows/wslc. Wording nit: the root image-remove shortcut is literally 'rmi' (ImageCommand.h:115,123), and the root container list is 'list' with aliases ls/ps (ContainerCommand.h:142-143)."
+        },
+        {
+          "field": "claim_checks[4]",
+          "statement": "Need-level: a single tool in this project defines and runs a multi-service application on the container engine - verified: no",
+          "citation": "src/windows/wslc/commands/RootCommand.cpp:33-72; test/windows/wslc/WSLCCLIExecutionUnitTests.cpp:65-101,552-572; test/windows/wslc/WSLCCLICommandUnitTests.cpp:715-721; src/windows/wslc/core/Main.cpp:141; src/windows/service/inc/wslc.idl:321-367; wslcsdk.h:78-82; doc/samples/WSLC-NextCloud/Program.cs:64-97; NetworkCommand.cpp:24-35; VolumeCommand.cpp:24-33; ContainerRunCommand.cpp:27-80; SessionTasks.cpp:53-57,204-219",
+          "holds": true,
+          "note": "No compose/stack/pod command in RootCommand. TestComposeCommand is a parser test fixture (:65-101, registered :128, exercised :552-730). WSLCCLICommandUnitTests.cpp:715-721 and Main.cpp:141 are comments. yaml-cpp is included only by src/windows/common/wslc/settings/WSLCUserSettings.cpp. WSLCContainerOptions (wslc.idl:321-367) has no restart-policy or depends-on field; the only 'restart' is the imperative Restart() at :588. wslcsdk.h:78-82 has only NONE/BRIDGED. All four samples create one container each (NextCloud Program.cs:77, CustomContainer Program.cs:83, Neofetch neofetch.cpp:87, HelloWorld helloworld.c:143). SessionCommand.h:52,67 define shell/run; SessionTasks.cpp:53-57,204-219 are AttachToSession and RunInSession. Literal nit: 'nowhere else' is too broad, because the word 'compose' also appears in unrelated comments and identifiers (stringshared.h:414, VTSupport.h:101, e2e/WSLCE2EContainerLogsTests.cpp:77, netlinkutil/NetlinkTransaction.h:15, IpNeighborManager.cpp:42). None of these relates to Docker Compose."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "Non-blocking: readme.platforms.linux_x86_64 - change citation '.github/workflows/distributions.yml:16' to '.github/workflows/distributions.yml:15' (line 15 is 'runs-on: ubuntu-latest'; line 16 is 'steps:').",
+        "Non-blocking: readme.integrations.cli - in the 28-shortcut list replace 'image remove' with 'rmi' (src/windows/wslc/commands/ImageCommand.h:115,123) and 'container list' with 'list (aliases ls, ps)' (ContainerCommand.h:142-143) so the list gives literal root command names.",
+        "Non-blocking: claim_checks[4] - change \"'compose' appears only as a parser unit-test fixture ... and nowhere else\" to say no Docker-Compose-related use exists elsewhere (the word also appears in unrelated comments/identifiers: src/shared/inc/stringshared.h:414, src/windows/common/VTSupport.h:101, test/windows/wslc/e2e/WSLCE2EContainerLogsTests.cpp:77, src/linux/netlinkutil/IpNeighborManager.cpp:42), and widen the fixture citation to test/windows/wslc/WSLCCLIExecutionUnitTests.cpp:65-101,128,552-730."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,342 @@
+{
+  "contender": "modelcontextprotocol/inspector",
+  "revision": {
+    "contender": "modelcontextprotocol/inspector",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "modelcontextprotocol/inspector",
+        "tag": "2.9.0",
+        "commit": "ae865a19178ddf6f375780a02e9c77c4cf4da184",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "2.9.0",
+    "commit": "ae865a19178ddf6f375780a02e9c77c4cf4da184",
+    "read_at": "2026-10-02T03:02:27+00:00"
+  },
+  "dossier": {
+    "contender": "modelcontextprotocol/inspector",
+    "revision": {
+      "tag": "2.9.0",
+      "commit": "ae865a19178ddf6f375780a02e9c77c4cf4da184",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "Apache-2.0 AND MIT AND CC-BY-4.0",
+      "file": "LICENSE"
+    },
+    "purpose": "MCP Inspector (npm `@modelcontextprotocol/inspector`, v2 line, 2.9.0) is a developer tool for inspecting Model Context Protocol servers. It acts as an MCP client and ships three front ends over one shared TypeScript core: a Vite/React/Mantine web UI with a Node (Hono) backend, a scriptable CLI (`--cli`: connect, run one `--method`, print the result with stable exit codes and `--format json`), and an Ink terminal UI (`--tui`). One `mcp-inspector` bin dispatches to them (README.md:3-15). It is not an LLM-evaluation framework. Facts relevant to the stated quality/evaluation needs: (a) the CLI can serve as a shell/CI assertion driver for MCP servers (docs/cli-smoke-testing.md); (b) the repo contains a bespoke, repo-internal skill trigger eval, `scripts/skill-eval.mjs` (`npm run skills:eval`). It runs committed labeled cases (`.claude/skills/*/evals/evals.json`) through headless `claude -p` (or `AGENT=copilot`) sessions and prints per-case hit rates, and it is deliberately outside CI and the local gate; (c) CI runs deterministic structural guards for those skills (`verify:skills`, a pinned `claude plugin validate`). No containerized end-to-end runner for Claude Code/Codex CLIs, no verifier-graded trials and no Codex reference were found (case-insensitive grep for `codex` over the repo, excluding lockfiles, returns no matches).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Ships as a single package, `@modelcontextprotocol/inspector`, with three ways to inspect a server: Web (Vite + React + Mantine SPA with a Node backend), CLI ('a scriptable command-line client for automation, CI, and fast agent feedback loops') and TUI (Ink).",
+          "citation": "README.md:3-7"
+        },
+        {
+          "claim": "All three modes run through one global `mcp-inspector` binary: `npx @modelcontextprotocol/inspector` (web, default), `--cli`, `--tui`.",
+          "citation": "README.md:9-15"
+        },
+        {
+          "claim": "WARNING: OAuth tokens, OAuth client secrets and stdio `env:` values are stored in the OS keychain if available; with no keychain (Linux without libsecret/Secret Service, headless/SSH, Termux, containers with a mounted volume) they go to `~/.mcp-inspector/secrets.json`, unencrypted unless a key is supplied.",
+          "citation": "README.md:18"
+        },
+        {
+          "claim": "v2 is the active line: development on `v2/main`, merged into default branch `main` at milestone releases and published to npm `latest`; v1 lives on `v1/main`, security fixes only, npm `v1-latest`.",
+          "citation": "README.md:22"
+        },
+        {
+          "claim": "Requires Node >=22.19.0.",
+          "citation": "README.md:26"
+        },
+        {
+          "claim": "Dev quick start is `npm install` at the repo root (postinstall cascades into every client) then `npm run build` (web -> cli -> tui -> launcher). v2 is not an npm workspace; shared `core/` is consumed through a build-time `@inspector/core` alias; every runtime dependency `core/` imports is declared once in the root package.json, so `clients/cli` and `clients/launcher` have no runtime dependencies of their own.",
+          "citation": "README.md:26-46"
+        },
+        {
+          "claim": "Docs index: a quality-gate guide (GitHub-CI-vs-local-gate split, supported browsers); a skill-authoring guide ('how to write a skill description that actually fires, and eval cases that measure it'); a CLI smoke-testing guide (connect -> list -> call -> assert with `--format json` + `jq`, exit-code map, non-interactive OAuth); an MCP-App review recipe (CLI-first -> one-shot web).",
+          "citation": "README.md:77-78, 86-87"
+        },
+        {
+          "claim": "There is no aggregate root `test` script: `npm run validate` (fast inner loop), `npm run coverage` (per-file >=90% gate on lines/statements/functions/branches) and `npm run local:gate` (MANDATORY before pushing: every GitHub CI check plus one local-only check; also runs smokes and Storybook tests).",
+          "citation": "README.md:94-102"
+        },
+        {
+          "claim": "`AGENTS.md` is the contract for changing the codebase for humans and AI agents; procedures live as skills in `.claude/skills/`; `CLAUDE.md` is the Claude Code entry point and includes `AGENTS.md`.",
+          "citation": "README.md:104-110"
+        },
+        {
+          "claim": "All work is issue-driven; external contributions are accepted as issues, not pull requests.",
+          "citation": "README.md:112"
+        },
+        {
+          "claim": "License: MCP project is transitioning from MIT to Apache-2.0; new contributions Apache-2.0, documentation CC-BY-4.0, contributions without relicensing consent remain MIT; LICENSE carries the full Apache-2.0 and MIT texts.",
+          "citation": "README.md:116"
+        },
+        {
+          "claim": "A container image is published to GHCR (`ghcr.io/modelcontextprotocol/inspector`, linux/amd64 + linux/arm64) by the release workflow (linked from the README docs table).",
+          "citation": "README.md:81 -> docs/docker.md:4-13"
+        }
+      ],
+      "install": [
+        {
+          "method": "npx (web UI, default mode)",
+          "command": "npx @modelcontextprotocol/inspector",
+          "citation": "README.md:12"
+        },
+        {
+          "method": "npx (CLI or TUI mode)",
+          "command": "npx @modelcontextprotocol/inspector --cli   |   npx @modelcontextprotocol/inspector --tui",
+          "citation": "README.md:13-14"
+        },
+        {
+          "method": "npx pinned to an exact version (advised for CI; the doc's example version is 2.5.0)",
+          "command": "npx --yes @modelcontextprotocol/inspector@2.5.0 --cli ...",
+          "citation": "docs/cli-smoke-testing.md:24-28"
+        },
+        {
+          "method": "Docker, GHCR image (linux/amd64 + linux/arm64)",
+          "command": "docker run --rm -p 127.0.0.1:6274:6274 ghcr.io/modelcontextprotocol/inspector",
+          "citation": "docs/docker.md:4-8"
+        },
+        {
+          "method": "Docker, local build",
+          "command": "docker build -t mcp-inspector . && docker run --rm -p 127.0.0.1:6274:6274 mcp-inspector",
+          "citation": "docs/docker.md:11-12"
+        },
+        {
+          "method": "From source (development; Node >=22.19.0)",
+          "command": "npm install && npm run build",
+          "citation": "README.md:26-30"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes: Docker image is published for linux/amd64 (docs/docker.md:4; .github/workflows/main.yml:489); every CI job runs on ubuntu-latest with Node 22.x (main.yml:56,70); `@napi-rs/keyring-linux-x64-gnu` and `-musl` binaries are in the root lockfile (package-lock.json:872,888).",
+        "wsl2": "unknown: README/docs make no WSL2 statement and there is no WSL CI runner; the only mention is incidental, that the `open` package may probe WSL's default browser (clients/cli/src/open-url.ts:7).",
+        "macos_arm64": "yes, but not CI-tested: docs name macOS Keychain as the secret store on desktop macOS (docs/secret-storage.md:27,36); the lockfile includes `@napi-rs/keyring-darwin-arm64` (package-lock.json:760); the TUI smoke's `script(1)` handling was measured on darwin (scripts/lib/pty.mjs:11-12,46). Every CI job is ubuntu-latest (main.yml:56,192,240,309,435) and the README gives no OS support matrix.",
+        "gpu": "no: not applicable. No GPU/CUDA/NVIDIA reference anywhere in the repo (case-insensitive grep returned none); it is a Node/TypeScript tool with no model inference."
+      },
+      "integrations": {
+        "cli": "yes: `mcp-inspector --cli` (README.md:13). Methods include initialize, tools/list|call, resources/list|read|templates/list, prompts/list|get, logging/setLevel, skills/list|get, resources/directory/read, servers/list|show (clients/cli/README.md:111). Flags include `--format json` (single envelope for `jq`), `--strict`, `--verify`, `--app-info`, `--stored-auth-only` (clients/cli/README.md:101-131). Exit codes 0-9 plus a one-line JSON ErrorEnvelope on stderr (clients/cli/README.md:446-481; clients/cli/src/error-handler.ts:27-71). CI recipe: docs/cli-smoke-testing.md.",
+        "mcp": "none found: the Inspector is an MCP client and does not expose itself as an MCP server (no production code under core/ or clients/ imports `@modelcontextprotocol/server`; only test-servers/src fixtures do). `.mcp.json:1-8` only points contributors' Claude Code sessions at https://modelcontextprotocol.io/mcp ('mcp-docs').",
+        "sdk_or_api": "No published SDK/library: `core/` has no package.json and is not published (docs/architecture.md:9-14; docs/v1-to-v2-migration.md:46); the root package ships only the `mcp-inspector` bin (package.json:20-31). The web backend exposes an internal HTTP API (`/api/config`, `/api/mcp/connect|send|events|disconnect|auth-state`, `/api/fetch`, `/api/storage/:storeId`, `/api/servers`, ...) guarded by `x-mcp-remote-auth: Bearer <token>` (core/mcp/remote/node/server.ts:1-5,455-465,773-1402; AGENTS.md:672-680); it is not documented as a third-party API. The documented automation contracts are the deep-link URL and the `data-testid`/`data-*` attributes (clients/web/README.md:109-210).",
+        "claude_code_or_codex": "Claude Code: no end-user integration, but heavy in-repo use. There are 11 committed skills in `.claude/skills/` (AGENTS.md:15-29), `CLAUDE.md` imports `AGENTS.md` (CLAUDE.md:1), `.claude/settings.json` enables the `playwright@claude-plugins-official` plugin (:1-5), and CI runs `claude plugin validate` pinned to Claude Code 2.1.250 (scripts/lib/skill-manifest.mjs:440; main.yml:98-114). `skills:eval` drives `claude -p` (scripts/skill-eval.mjs:550-589). Nightly `sdk-watch.yml` uses `anthropics/claude-code-action` with `--model claude-opus-5` and the org secret ANTHROPIC_API_KEY (sdk-watch.yml:177-304). The CLI is described as suited to AI coding assistants (clients/cli/README.md:488-492). GitHub Copilot CLI is also supported by `AGENT=copilot npm run skills:eval` (docs/skill-authoring.md:446-515). Codex: none found (no 'codex' string in the repo outside lockfiles; no `.codex/` or `.agents/`)."
+      },
+      "telemetry_and_network": "No telemetry, analytics or crash-reporting code or dependency found. A grep for telemetry/analytics/sentry/posthog/mixpanel/DO_NOT_TRACK matches only a local connect-latency UI hook named `useHandshakeTelemetry` (clients/web/src/hooks/useConnectionLifecycle.ts:65-98) and design specs, and the dependency lists contain no analytics SDKs (package.json:95-117; clients/web/package.json:36-53; clients/tui/package.json:30-34). Network use: (1) connections to whatever MCP servers the user configures (stdio spawn, Streamable HTTP, SSE), made from the Node backend, honoring HTTP(S)_PROXY/NO_PROXY (clients/cli/README.md:89-99); (2) OAuth discovery/token requests to the inspected servers' authorization servers, plus a best-effort RFC 7009 revocation request on CLI `--relogin` (opt out with `--no-revoke`) and TUI 'Clear OAuth state' (clients/cli/README.md:133-143; clients/tui/README.md:70); (3) the web UI page loads Google Fonts from fonts.googleapis.com / fonts.gstatic.com (clients/web/index.html:7-9; CSP allowance at clients/web/src/components/elements/ContentViewer/contentViewerUtils.ts:252-254); (4) the web client's seeded default catalog contains two `npx -y` stdio servers (`@modelcontextprotocol/server-filesystem`, `server-everything`, fetched from the npm registry when launched) and a remote server at https://example-server.modelcontextprotocol.io/mcp (core/mcp/serverList.ts:1133-1134,1149-1166; clients/launcher/README.md:34-39); (5) browser auto-open on web launch/OAuth, controlled by `MCP_AUTO_OPEN_ENABLED` (docs/environment-variables.md:50). Local listeners: web 6274, MCP Apps sandbox 6275, app-origin 6278, CLI/TUI OAuth callback 6276; loopback by default, guarded by a per-launch bearer token and an origin allow-list (docs/environment-variables.md:15-31; clients/web/README.md:389-395). No account is needed to run the Inspector itself; OAuth accounts matter only for the servers inspected. Dev/CI-only: `skills:eval` needs a signed-in `claude` (or `copilot`) CLI and spends metered model calls (scripts/skill-eval.mjs:14-20; docs/skill-authoring.md:441-444); `verify:skills:cli` may fetch `@anthropic-ai/claude-code@2.1.250` via npx but needs no auth (scripts/verify-skills-cli.mjs:19-20,58-73); `pack:verify` needs registry access (docs/publishing.md:18); `sdk-watch.yml` uses the ANTHROPIC_API_KEY org secret (sdk-watch.yml:46-52)."
+    },
+    "code": {
+      "languages": [
+        "TypeScript/TSX (primary: core/, clients/*, test-servers/)",
+        "JavaScript ESM `.mjs` (root scripts, guards, smokes)",
+        "JSON/YAML/Markdown config and docs",
+        "HTML (clients/web/static/sandbox_proxy.html)",
+        "Dockerfile"
+      ],
+      "entry_points": [
+        {
+          "path": "clients/launcher/src/index.ts",
+          "what": "`mcp-inspector` bin (package.json:20-22). Parses a leading `--web|--cli|--tui` and dynamically imports clients/{web,cli,tui}/build/index.js in-process (index.ts:10-14,61-93)."
+        },
+        {
+          "path": "clients/web/server/run-web.ts",
+          "what": "`runWeb(argv)` (:60): web mode. Hono prod server serves clients/web/dist plus `/api/*`; `--dev` uses Vite (start-vite-dev-server.ts)."
+        },
+        {
+          "path": "clients/cli/src/cli.ts",
+          "what": "`runCli(argv)` (:1315): commander-based CLI. Bin wrapper clients/cli/src/index.ts exports runCli/handleError and self-runs when invoked directly (index.ts:12-23)."
+        },
+        {
+          "path": "clients/tui/tui.tsx",
+          "what": "`runTui(args)` (:19): Ink TUI; tsup entry is clients/tui/index.ts (tsup.config.ts:75)."
+        },
+        {
+          "path": "scripts/skill-eval.mjs",
+          "what": "`npm run skills:eval` (package.json:93): skill trigger-eval harness driving headless `claude -p` or `copilot`."
+        },
+        {
+          "path": "scripts/gate-lease.mjs",
+          "what": "`npm run local:gate` wrapper (package.json:41): machine-wide lease around the ordered stage chain `local:gate:stages`."
+        },
+        {
+          "path": "scripts/pack-and-verify.mjs",
+          "what": "`npm run pack:verify`: builds, `npm pack`s, installs the tarball into a clean consumer and drives the installed bin (docs/publishing.md:16-18)."
+        },
+        {
+          "path": "test-servers/src/test-server-stdio.ts",
+          "what": "Composable MCP fixture servers (also test-server-http.ts, test-server-oauth.ts; 15 source files, 44 JSON configs in test-servers/configs/) used by integration tests and smokes."
+        }
+      ],
+      "architecture": "Four clients over one shared source tree; not an npm workspace (each client has its own package.json/node_modules). `clients/launcher` is the tsc-built `mcp-inspector` bin that dispatches in-process. `clients/web` has a browser SPA in `src/` (components/{elements,groups,screens,views}, hooks, lib, utils, theme; 123 Storybook stories) and a Node Hono backend in `server/` (run-web.ts, server.ts, sandbox-controller.ts for the MCP Apps sandbox, app-origin-controller.ts, inject-auth-token.ts, vite-hono-plugin.ts, plus static/sandbox_proxy.html). `clients/cli` is a commander CLI (src/cli.ts, handlers/{run-method,format-output,emit-result,skills-verify,schema-lint-report,collect-app-info}.ts, error-handler.ts exit-code map, cliOAuth.ts). `clients/tui` is Ink/React (tui.tsx, src/components/*Tab.tsx, utils/). Shared code is in `core/` (no package.json; bundled into each client through the `@inspector/core` alias, docs/architecture.md:7-14): `core/mcp/` (`InspectorClient`, transports, fetch/message tracking, state stores, config import, and `remote/node/server.ts`, the Hono `/api/*` server the browser talks to), `core/auth/` (OAuth, enterprise-managed auth, CIMD, secret stores incl. node/secret-store-selection.ts and file-secret-store.ts, keychain via @napi-rs/keyring), `core/json/` (schemaLint.ts shared by web/TUI/CLI), `core/react/` (hooks via useSyncExternalStore), `core/client/`, `core/storage/`, `core/logging/`, `core/node/`. MCP connections are made from Node (web backend, CLI, TUI), not from the browser. `test-servers/` holds the composable fixture servers; `scripts/` holds build/verify/smoke tooling, skill-eval.mjs and the dependency/alert/SDK sweeps; `.claude/skills/` plus AGENTS.md/CLAUDE.md hold the agent procedures and rules; `specification/` holds design docs. It is built on the MCP TypeScript SDK v2 packages (client/core/ext-apps) with Vite 8, tsup, Hono, Ink and Mantine.",
+      "packaging_and_release": "One npm package `@modelcontextprotocol/inspector` with a single version (only the root manifest has `version`; the four client manifests are private). The tarball ships the built clients/{launcher,cli,tui}/build, clients/web/{build,dist,static} and scripts/install-clients.mjs, with no source maps (package.json:23-31; docs/publishing.md:4-14). Release is maintainer-driven (`.claude/skills/release/SKILL.md:32-47,207-243`): a bump + `npm audit` report PR on `v2/main`, a milestone-merge PR to `main` smoke-tested with `local:gate` + `pack:verify`, then a GitHub Release with a bare `x.y.z` tag. Publishing is automated in `.github/workflows/main.yml` on `release: published`. `package` needs build+coverage, asserts tag == package.json version, runs `pack:verify`, packs and uploads the tarball (7-day retention), and holds no id-token (main.yml:239-306). `publish` runs in environment `release` with only `id-token: write`, installs a pinned npm 11.20.0, refuses a tarball declaring `publishConfig` or with the wrong name/version, and runs `npm publish --provenance --access public --tag latest|next` via OIDC trusted publishing with no NPM_TOKEN (main.yml:308-428). `publish-github-container-registry` pushes a multi-arch (linux/amd64, linux/arm64) image to ghcr.io/modelcontextprotocol/inspector with semver + latest tags and an `actions/attest-build-provenance` attestation (main.yml:434-530; `gh attestation verify oci://...` is cited in a comment, :497-499). Actions in credentialed jobs are SHA-pinned and enforced by `verify:action-pins` (docs/quality-gate.md:48). No checksum files, SBOM or detached signatures are produced (grep of workflows/release scripts for checksum/sha256/sigstore/cosign/sbom found only npm `--provenance` and the attestation). The Docker image is a two-stage node:22-slim build that installs the packed tarball globally, runs as non-root `node` and has a HEALTHCHECK (Dockerfile:9-25,58,68-73).",
+      "tests_and_ci": "Frameworks: Vitest 4.1.11 (exact pin) + @vitest/coverage-v8 (package.json:126,135). Web has three Vitest projects: `unit` (happy-dom, tests beside sources), `integration` (node; spawns the real stdio test server; src/test/integration/**) and `storybook` (Chromium via @vitest/browser-playwright; 123 `*.stories.tsx` files with play functions) (clients/web/README.md:359-383). CLI/TUI/launcher tests live in `__tests__/` (CLI also spawns the built binary in e2e.test.ts); ink-testing-library for the TUI (AGENTS.md:404-408). Root tooling uses Node's built-in `node --test` (`test:scripts`, package.json:50). Playwright headless smokes run Chromium in CI, Firefox only in the local gate, WebKit in neither (docs/quality-gate.md:21,64-85). Approximate test-file counts: ~447 web (`clients/web/**/*.test.{ts,tsx}`, including src/test/core and src/test/integration), 31 CLI, 31 TUI, 1 launcher, 36 root `scripts/**/*.test.mjs` (about 546 total) plus 123 stories; `core/` and `test-servers/` have no in-place test files (core is tested through clients/web/src/test/core). Gates: per-file >=90% on lines/statements/functions/branches (cli/tui/launcher vitest configs; web vite.config.ts:267-280); ESLint `--max-warnings 0` with type-aware `no-floating-promises` (AGENTS.md:552,573); Vitest `retry` asserted unset at runtime (vitest.setup.shared.mts:4-35); guards verify:install-fresh, verify:format-coverage, verify:skills, verify:typecheck-coverage, verify:dep-lockstep, verify:test-timeouts, verify:action-pins (package.json:52) plus verify:build-gate, verify:bundle-externals, verify:skills:cli. CI (`.github/workflows/main.yml`) triggers on every push and on published releases (no pull_request trigger; lines 3-9); all jobs ubuntu-latest, Node 22.x. `build` (25 min cap): npm install -> `npm run validate` -> `verify:skills:cli` -> `verify:build-gate` -> `verify:bundle-externals` -> Playwright Chromium -> `npm run smoke` -> `npm run test:storybook`; `coverage` (20 min cap): `npm run coverage`; release-only `package` -> `publish` and `publish-github-container-registry`. Scheduled workflows `sdk-watch.yml` (nightly: files an issue per MCP SDK release behind and runs a Claude Opus analysis job), `dependabot-alerts.yml` (daily) and `dependency-refresh.yml` (monthly) file issues, not PRs. `npm run local:gate` is the mandatory local pre-push superset (docs/quality-gate.md). Evaluation tooling relevant to the stated needs (facts only): (1) Labeled-case evaluation: `scripts/skill-eval.mjs` runs cases committed in `.claude/skills/<skill>/evals/evals.json` (10 files; 74 first-move cases = 54 positive `expect:<skill>` + 20 negative `expect:null`, plus 2 hand-off `chain` cases in test-servers). Scoring is two pure functions routed by case kind, `sampleHit` (first move, 1 turn) and `chainHit` (ordered subsequence in strictly later turns, up to 14) (scripts/skill-eval.mjs:400-462). Each case runs RUNS (default 3) fresh sessions; the per-sample record is the in-memory list of `Skill` tool invocations with turn numbers, and the report prints one PASS/FAIL line per case with its hit rate against THRESHOLD 0.8 (>=) or CHAIN_THRESHOLD 0.5 (>) (:66,93,799-879). Nothing is written to disk and no per-sample score is exported (:942-958). A run that observes nothing (auth error, rate limit, missing CLI) is rejected rather than counted (`runRejection`, :351-359). The tool policy is read-only (`--tools Read,Glob,Grep,Skill`, `--strict-mcp-config`; :482-520,550-589). (2) Containerized Claude Code/Codex end-to-end runner with a verifier: none. The eval spawns a host-installed `claude` or `copilot` via child_process (:668-700), the Dockerfile only packages the Inspector, there is no `.codex/`, `.devcontainer`, compose file or Codex reference, and there is no grader stage beyond the in-process hit check. (3) Declarative CI regression gate for prompts/skills/agents: no config-driven gate exists. CI enforces skill structure only: `verify:skills` inside `validate` (frontmatter parse, explicit invocation mode, >=5 distinct positive + >=1 negative eval case per model-invoked skill, 4,000-char listing budget; scripts/lib/skill-manifest.mjs:34,251,308-382) plus pinned `claude plugin validate` (main.yml:98-114). Trigger behavior is not gated in CI (`skills:eval`), and no `.claude/agents` or prompt files exist to gate. Independent-observation tooling for MCP servers: the Inspector CLI with `--format json`, stable exit codes and a stderr ErrorEnvelope (docs/cli-smoke-testing.md), `--strict` tool-schema portability lint (exit 6) and `--verify` SEP-2640 skill digest/frontmatter checks (exit 7/8/9) (clients/cli/README.md:101-131,346-444).",
+      "dependencies": "Direct dependency counts by manifest. package.json (root, the published package): 21 dependencies (@hono/node-server, @modelcontextprotocol/{client,core,server} pinned 2.2.0, @modelcontextprotocol/ext-apps ^2, @napi-rs/keyring, @vitejs/plugin-react, ajv, atomically, chokidar, commander, hono, ink, open, pino, proper-lockfile, react, undici, vite, yaml, zod) and 14 devDependencies. clients/web/package.json (private): 16 dependencies (Mantine 8, dnd-kit, ace-builds/react-ace, react-markdown, etc.), 25 devDependencies, 2 overrides. clients/tui/package.json: 3 dependencies (ink, ink-form, ink-scroll-view), 8 devDependencies, 2 overrides. clients/cli/package.json: 0 dependencies, 2 devDependencies, 2 overrides. clients/launcher/package.json: 0 dependencies, 0 devDependencies. `core/` and `test-servers/` have no manifest (tsconfig only). Lockfiles: root package-lock.json and one per client (web, cli, tui, launcher). Engine Node >=22.19.0 (package.json:118-120). `verify:dep-lockstep` enforces one version per install-crossing dependency (docs/quality-gate.md:46).",
+      "security_policy": "SECURITY.md: supported-versions table (2.x actively supported; 1.x security fixes only under npm `v1-latest`; <1.0.0 unsupported), reporting only via GitHub private Security Advisory (not public issues/PRs/discussions; the no-outside-PRs policy does not apply to security reports), and a checklist of what to include (SECURITY.md:5-53). Maintainers' handling is in `.claude/skills/security-advisory/SKILL.md`; accepting and publishing an advisory stay human-gated (AGENTS.md:371)."
+    },
+    "claim_checks": [
+      {
+        "claim": "`npm run local:gate` is the mandatory pre-push command and runs every GitHub CI check plus one local-only step (README.md:99-102; docs/quality-gate.md:8-25).",
+        "verified": "yes",
+        "evidence": "package.json:41-42 chains local:validate -> verify:skills:cli -> coverage -> verify:build-gate -> verify:bundle-externals -> smoke -> smoke:web:firefox -> local:storybook. main.yml runs validate (:96), verify:skills:cli (:114), verify:build-gate (:123), verify:bundle-externals (:134), smoke (:171), test:storybook (:175) and coverage (:220). Nuance the docs state themselves: the gate substitutes `local:validate` (no bare unit pass) for `validate`, so it covers every check but not every invocation (docs/quality-gate.md:23). scripts/lib/workflow-gate.mjs, run by `test:scripts` (package.json:50), fails if a workflow calls a `local:*` script or a non-Chromium engine pass."
+      },
+      {
+        "claim": "Per-file >=90% coverage gate on lines/statements/functions/branches, enforced in CI (README.md:97; AGENTS.md:401).",
+        "verified": "partial",
+        "evidence": "Per-file 90 thresholds exist in clients/cli/vitest.config.ts:47-52, clients/tui/vitest.config.ts:45-50, clients/launcher/vitest.config.ts:29-34 and clients/web/vite.config.ts:267-280, and CI runs them in the `coverage` job (main.yml:191-220). But the web gate is a whitelist: `include` names components/hooks/theme/lib/utils/server and selected core/* dirs, and excludes server/vite-hono-plugin.ts, server.ts, start-vite-dev-server.ts and type-only modules (vite.config.ts:210-266); `src/App.tsx` (~42% branch coverage) and the main.tsx/index.ts bootstraps fall outside it (AGENTS.md:594). `core/` has no in-place tests; it is measured through the web suite."
+      },
+      {
+        "claim": "`npm run skills:eval` runs every committed case in a fresh headless `claude -p` session RUNS times and scores the fraction of runs where the `Skill` tool fired with the expected name; first-move cases get 1 turn, hand-off (`chain`) cases up to 14 turns scored as an ordered subsequence (docs/skill-authoring.md:13-47, 194-260).",
+        "verified": "yes",
+        "evidence": "scripts/skill-eval.mjs: agentArgs builds `-p --output-format stream-json --max-turns N --tools Read,Glob,Grep,Skill --strict-mcp-config` (:550-589); runPrompt spawns a fresh process per sample (:668-760); sampleHit (:400-406) and chainHit (:436-449, later-turn rule at :443) are the scorers, routed by caseHit (:458-462); defaults RUNS=3 (:94), THRESHOLD 0.8 (:66), CHAIN_THRESHOLD 0.5 strict (:93, :799-801), CHAIN_MAX_TURNS 14 (:106). Per-sample results are held only in memory (:942-949) and reduced to one PASS/FAIL rate line per case by formatReport (:820-879); no file or per-sample score output exists. Tests: scripts/skill-eval.test.mjs (51 test() cases)."
+      },
+      {
+        "claim": "`skills:eval` is deliberately not part of validate, local:gate or CI (docs/skill-authoring.md:441-444; AGENTS.md:337-342; scripts/skill-eval.mjs:14-20).",
+        "verified": "yes",
+        "evidence": "package.json:41-42 (local:gate:stages) and :52 (validate:guards) do not reference it; it appears only as the script at package.json:93. A grep of .github/ finds `skill-eval.mjs` only in two comments in sdk-watch.yml (:149,:268), never in a run step."
+      },
+      {
+        "claim": "docs/skill-authoring.md says a full eval run is '~63 cases x RUNS' (:362), the Copilot run scored '63/63 first-move cases' (:518) and 'all 18' negative cases held (:190).",
+        "verified": "no",
+        "evidence": "Code differs (preferring code): the committed evals at this revision hold 74 first-move cases across 10 `.claude/skills/*/evals/evals.json` files (54 positive `expect:<skill>` + 20 `expect:null`) plus 2 hand-off `chain` cases in .claude/skills/test-servers/evals/evals.json:22-35. The doc's counts are stale; the harness behavior it describes is otherwise accurate. The 63/63 figure is date-stamped 2026-09-16 and cannot be re-verified without model calls."
+      },
+      {
+        "claim": "The skills eval bank 'is run against both Claude Code and the GitHub Copilot CLI' (docs/ai-software-factory.md:94-96).",
+        "verified": "yes",
+        "evidence": "scripts/skill-eval.mjs:109-110 (`AGENTS = [\"claude\", \"copilot\"]`, `AGENT` env), agentArgs branches for both (:550-589), collectCopilotSkillInvocations (:285-310). No other agent is supported, and no Codex reference exists anywhere in the repo (case-insensitive grep for `codex` outside lockfiles returns nothing)."
+      },
+      {
+        "claim": "The CLI has stable exit codes 0-9 and writes a one-line JSON ErrorEnvelope to stderr on any non-zero exit (clients/cli/README.md:446-481).",
+        "verified": "yes",
+        "evidence": "clients/cli/src/error-handler.ts:27-71 defines EXIT_CODES OK..SKILL_UNVERIFIABLE (0-9); classifyError/formatErrorOutput/handleError (:231-402) emit the envelope and exit. Drift elsewhere: docs/v1-to-v2-migration.md:23 still says CLI exit codes are `0`-`5`; the code wins."
+      },
+      {
+        "claim": "CI validates skills with the authoritative `claude plugin validate`, pinned to an exact CLI version and needing no authentication (AGENTS.md:223-246; docs/quality-gate.md:43).",
+        "verified": "yes",
+        "evidence": "PINNED_CLI_VERSION = '2.1.250' (scripts/lib/skill-manifest.mjs:440); validatorCommand uses a local CLI only on an exact match, else `npx -y @anthropic-ai/claude-code@2.1.250 plugin validate .claude/skills` (scripts/verify-skills-cli.mjs:50-73); invoked by main.yml:98-114. It checks skill structure, not trigger behavior."
+      },
+      {
+        "claim": "A release cannot publish with build or coverage red; npm publishes with provenance via OIDC; the GHCR image is multi-arch with an attestation (docs/publishing.md:27-34; docs/docker.md:4).",
+        "verified": "yes",
+        "evidence": ".github/workflows/main.yml: `package` needs [build, coverage] (:242) and `publish-github-container-registry` needs [build, coverage] (:438); `publish` needs [package] and runs `npm publish ... --provenance` with `id-token: write` (:308-428); platforms linux/amd64,linux/arm64 (:489); `actions/attest-build-provenance` (:526-530). No checksum, SBOM or detached-signature step exists."
+      },
+      {
+        "claim": "Vitest `retry` stays unset so a load-induced red is never silently green (AGENTS.md:471-476; docs/quality-gate.md:47).",
+        "verified": "yes",
+        "evidence": "vitest.setup.shared.mts:4-35 reads `ctx.task.retry` for every test and throws when it is a positive number; `verify:test-timeouts` checks every Vitest project loads that setup file (package.json:56; docs/quality-gate.md:47)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Skill trigger eval, first-move cases, GitHub Copilot CLI 1.0.85 (Claude Sonnet 5), full suite RUNS=3, 2026-09-16",
+        "metric": "first-move cases at 100% / negatives clean",
+        "value": "63/63 first-move cases at 100%, every negative clean",
+        "source": "docs/skill-authoring.md:517-520",
+        "independent": false
+      },
+      {
+        "what": "Skill hand-off cases `testing` -> `test-servers` (RUNS=5), Claude vs Copilot",
+        "metric": "hand-off rate",
+        "value": "tool-listing prompt: Claude 100%, Copilot 100%; pagination prompt: Claude 100%, Copilot 40% before the #2399 fix and 60%/60% (two runs) after",
+        "source": "docs/skill-authoring.md:520-552",
+        "independent": false
+      },
+      {
+        "what": "Effect of growing model-invoked skills from three to nine on existing skills' trigger rates (n=4)",
+        "metric": "trigger rate",
+        "value": "project-structure fell 100% -> 0% on two cases; testing 3/5 -> 2/5; the six new skills measured 100% and every negative stayed clean",
+        "source": "AGENTS.md:268-275",
+        "independent": false
+      },
+      {
+        "what": "Local pre-push gate wall time (`npm run local:gate`)",
+        "metric": "seconds",
+        "value": "~260s quiet gate after #2341 (268s in #2341's own before/after, 257s in #2339); ~358s before; the bare unit pass was ~81s of that",
+        "source": "docs/quality-gate.md:23",
+        "independent": false
+      },
+      {
+        "what": "GitHub CI job durations (ubuntu-latest)",
+        "metric": "minutes observed",
+        "value": "build 7.6-11.8 and coverage 5.9-8.5 across 40 push runs; npm package/publish 2.3-2.8 and GHCR publish 14.5-15.4 across three releases (2.4.0-2.6.0); timeout caps 25/20/10/10/35",
+        "source": "docs/quality-gate.md:27; .github/workflows/main.yml:57-61,193-194,243-246,439-441",
+        "independent": false
+      },
+      {
+        "what": "Two concurrent local gates on one machine (port-collision measurement, #2339)",
+        "metric": "wall time / outcome",
+        "value": "quiet gate 257s passed; with two started together one failed at 279s (smoke port 6298 collision) and the survivor took 338s (~1.3x)",
+        "source": "docs/quality-gate.md:103",
+        "independent": false
+      },
+      {
+        "what": "Vitest `maxWorkers: 4` cap vs default (#2336)",
+        "metric": "wall-time change and failures",
+        "value": "+14% wall on web unit, +39% on coverage:web, zero fewer failures (0 failures in all 18 runs)",
+        "source": "docs/quality-gate.md:36,105",
+        "independent": false
+      },
+      {
+        "what": "Agent-driven development throughput since v2.0.0 (2026-07-28 to 2026-09-25, ~8 weeks)",
+        "metric": "counts",
+        "value": "9 releases (roughly weekly); 268 merged PRs (~32/week); 265 agent-authored (99%)",
+        "source": "docs/ai-software-factory.md:37-48",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Evaluation scope: the only agent-behaviour eval is a bespoke repo-internal script, `skills:eval`. It is outside validate/local:gate/CI by design (scripts/skill-eval.mjs:14-20; docs/skill-authoring.md:441-444; AGENTS.md:337-342), is non-deterministic and metered, and needs a signed-in `claude`/`copilot` CLI. It keeps per-sample observations only in memory and prints per-case rates (scripts/skill-eval.mjs:942-958), runs on the host with no container isolation, supports only claude/copilot (:109), and is not in the npm tarball (package.json:23-31). CI gates skill structure only (main.yml:96,114); no Codex support, containerized runner or verifier-graded trials exist.",
+      "Roadmap, not shipped: assertion/conformance features that could act as a general CI gate for MCP servers (`mcp-inspector --conformance`, 'Assertions and CI flows') are marked 'design now, build on signal' in a draft roadmap (docs/inspector-roadmap-2026-h2.md:9,137-140,290-293,439-444). At 2.9.0 assertions are composed by hand from `--format json`, `jq` and exit codes (docs/cli-smoke-testing.md:87-199).",
+      "Maintenance model: no external pull requests are accepted (CONTRIBUTING.md:7-13,37-49; .github/pull_request_template.md:4-10); the project reports 265 of 268 merged PRs since v2.0.0 as agent-authored with one maintainer account opening nearly all (docs/ai-software-factory.md:23-31,44-48); releases are roughly weekly (:46), so CI use should pin an exact version (docs/cli-smoke-testing.md:24-28); v1 is security-fixes-only (SECURITY.md:7-14,20-28).",
+      "Secrets at rest: with no reachable OS keychain the Inspector falls back automatically to `~/.mcp-inspector/secrets.json`, plaintext unless a key is configured (README.md:18; docs/secret-storage.md:44-45; core/auth/node/secret-store-selection.ts:5-40). `headers` in mcp.json are stored as written (docs/secret-storage.md:18); CLI `servers/show` does not scrub credentials embedded in `url` or stdio `args` (clients/cli/README.md:150); stdio servers run as the same user and can read the secrets file (docs/secret-storage.md:107).",
+      "Web backend exposure and egress: the backend spawns processes on request; `GET /` embeds the API token in the HTML and a request with no `Origin` header skips the origin allow-list, so the token is the only guard for non-browser clients (docs/docker.md:33). All-interfaces binding is an opt-in (`DANGEROUSLY_BIND_ALL_INTERFACES`), auth can be switched off (`DANGEROUSLY_OMIT_AUTH`) (docs/environment-variables.md:19-21), and the docs describe `NODE_TLS_REJECT_UNAUTHORIZED=0` for self-signed servers, which disables TLS verification process-wide (:121-127). The web UI loads Google Fonts from third-party hosts at page load (clients/web/index.html:7-9).",
+      "Platform and CI coverage: every CI job runs on ubuntu-latest (main.yml:56,192,240,309,435), with no macOS, Windows or WSL runner although code has darwin/win32 branches (scripts/lib/pty.mjs:46; clients/cli/__tests__/windows-path-argv.test.ts). Firefox smokes are local-only and WebKit fails two of three smokes for unidentified reasons (docs/quality-gate.md:21,75). The Docker image build/HEALTHCHECK runs only in the release-triggered job (main.yml:434-491), not on push. The Node >=22.19.0 floor is only an npm `engines` warning unless engine-strict is set (package.json:118-120; docs/v1-to-v2-migration.md:33).",
+      "Docs drift (prefer code): docs/skill-authoring.md cites ~63 first-move cases and 18 negatives (:190,362,518) while the committed evals hold 74 first-move cases (20 negative) plus 2 chain cases; docs/v1-to-v2-migration.md says CLI exit codes `0`-`5` (:23) vs 0-9 in clients/cli/src/error-handler.ts:27-71, and a 'dynamic' sandbox port (:19) vs the fixed default 6275 (docs/environment-variables.md:29).",
+      "Licensing and release integrity: the license is mixed and transitional (Apache-2.0 for new contributions, MIT for earlier ones lacking relicensing consent, CC-BY-4.0 for docs; LICENSE:1-5,212-216; README.md:116), and package.json declares only 'SEE LICENSE IN LICENSE', not an SPDX id (package.json:17). Release integrity rests on npm provenance and a GHCR build-provenance attestation (main.yml:428,526-530); no checksum files, SBOM or detached signatures were found."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "modelcontextprotocol/inspector",
+      "checks": [
+        {
+          "field": "readme.install[0] (npx, web UI default)",
+          "statement": "npx (web UI, default mode): `npx @modelcontextprotocol/inspector`",
+          "citation": "README.md:12",
+          "holds": true,
+          "note": "README.md:12 reads `npx @modelcontextprotocol/inspector  # web UI (default)`. The code agrees. package.json:2-3,20-22 (name @modelcontextprotocol/inspector, version 2.9.0, bin mcp-inspector -> clients/launcher/build/index.js); clients/launcher/src/parse-launcher-argv.ts:31-36 picks mode 'web' when there is no prefix flag; clients/launcher/src/index.ts:61-64 dispatches to runWeb. The shipped postinstall exits early under node_modules (scripts/install-clients.mjs:39-42), so an npx install skips the per-client cascade. The Node >=22.19.0 floor is an engines field (package.json:118-120). Checked out at HEAD ae865a19178ddf6f375780a02e9c77c4cf4da184, matching the dossier."
+        },
+        {
+          "field": "license",
+          "statement": "spdx: \"Apache-2.0 AND MIT AND CC-BY-4.0\", file: LICENSE",
+          "citation": "LICENSE:1-5, 9-184, 188-208, 212-216; README.md:116",
+          "holds": true,
+          "note": "LICENSE:1-5 describes the MIT -> Apache-2.0 transition: new code and spec contributions are Apache-2.0, documentation (excluding specs) is CC-BY-4.0, and MIT contributions without relicensing consent stay MIT. The file carries the full Apache-2.0 text (:9-184) and the MIT text (:188-208, (c) 2024-2025 Model Context Protocol a Series of LF Projects, LLC), and points to the CC-BY-4.0 legal code (:212-216). README.md:116 says the same. Different parts carry different licenses, so AND is the correct SPDX conjunction. package.json:17 has only 'SEE LICENSE IN LICENSE'; the dossier already notes this under risks."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes: Docker image published for linux/amd64 (docs/docker.md:4; main.yml:489); every CI job runs on ubuntu-latest with Node 22.x (main.yml:56,70); @napi-rs/keyring-linux-x64-gnu and -musl in the root lockfile (package-lock.json:872,888)",
+          "citation": "docs/docker.md:4; .github/workflows/main.yml:56,70,489; package-lock.json:872,888",
+          "holds": true,
+          "note": "docs/docker.md:4 names linux/amd64 + linux/arm64. main.yml:489 is `platforms: linux/amd64,linux/arm64`, :56 is `runs-on: ubuntu-latest`, :70 is `node-version: '22.x'`. All five main.yml jobs run on ubuntu-latest (:56,192,240,309,435), and so do the scheduled workflows. package-lock.json:872 and :888 are exactly the keyring-linux-x64-gnu and keyring-linux-x64-musl entries (os linux, cpu x64). Minor imprecision, no repair needed: the GHCR job (:434-491) has no setup-node step; its Node 22 comes from the Dockerfile's node:22-slim base (Dockerfile:9,21)."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Claude Code: no end-user integration but heavy in-repo use (11 skills, CLAUDE.md imports AGENTS.md, playwright plugin enabled, CI runs `claude plugin validate` pinned to 2.1.250, skills:eval drives `claude -p`, nightly sdk-watch uses claude-code-action with --model claude-opus-5 and ANTHROPIC_API_KEY, CLI described as suited to AI coding assistants, Copilot CLI via AGENT=copilot); Codex: none found",
+          "citation": "AGENTS.md:15-29; CLAUDE.md:1; .claude/settings.json:1-5; scripts/lib/skill-manifest.mjs:440; .github/workflows/main.yml:98-114; scripts/skill-eval.mjs:550-589; .github/workflows/sdk-watch.yml:177-304; clients/cli/README.md:488-492; docs/skill-authoring.md:446-515",
+          "holds": true,
+          "note": "Every citation matches. AGENTS.md:15-29 lists 11 skills, and 11 SKILL.md dirs exist. CLAUDE.md:1 is `@./AGENTS.md`. settings.json enables playwright@claude-plugins-official. skill-manifest.mjs:440 sets PINNED_CLI_VERSION='2.1.250'; verify-skills-cli.mjs:50-73 runs `claude plugin validate`, or `npx -y @anthropic-ai/claude-code@2.1.250 plugin validate`, and main.yml:98-114 invokes it. skill-eval.mjs:571-588 builds the `-p` argv. sdk-watch.yml:177-181 uses anthropics/claude-code-action with secrets.ANTHROPIC_API_KEY, :298 sets `--model claude-opus-5`, :46-48 calls it an org secret, and :57 is the nightly cron. clients/cli/README.md:491 has 'AI Coding Assistants ... Cursor or Claude'. docs/skill-authoring.md:446-456 documents AGENT=copilot. A case-insensitive grep for 'codex' over the whole repo, lockfiles included, finds nothing, and there is no .codex/, .agents/, .devcontainer or compose file. Nuance, no correction needed: mcp.json follows Claude Code's .mcp.json shape (core/mcp/serverList.ts:950-956; core/mcp/import/clientConfig.ts:5-7), but only code comments say so, and the import picker offers Claude Desktop/Cursor/Cline/VS Code, not Claude Code (core/mcp/import/strategies.ts:102-107)."
+        },
+        {
+          "field": "claim_checks[2] (skills:eval harness)",
+          "statement": "`npm run skills:eval` runs every committed case in a fresh headless `claude -p` session RUNS times and scores the fraction of runs where the `Skill` tool fired with the expected name; first-move cases get 1 turn, hand-off (`chain`) cases up to 14 turns scored as an ordered subsequence (verified: yes)",
+          "citation": "docs/skill-authoring.md:13-47, 194-260; scripts/skill-eval.mjs:66,93,94,106,400-462,550-589,668-760,799-879,942-958",
+          "holds": true,
+          "note": "docs/skill-authoring.md:13-15 says this nearly verbatim. :20-23 gives the 1-turn budget for first-move cases and CHAIN_MAX_TURNS 14 with CHAIN_THRESHOLD 0.5 for chains. :242-253 gives the ordered-subsequence rule with every later link in a later turn. Code matches every cited line: THRESHOLD 0.8 (:66), CHAIN_THRESHOLD 0.5 (:93) compared strictly (:799-801), RUNS=3 (:94), CHAIN_MAX_TURNS 14 (:106). agentArgs (:550-589) builds `-p --output-format stream-json --verbose --max-turns N --tools Read,Glob,Grep,Skill ... --strict-mcp-config`. runPrompt spawns one process per sample (:668-760). sampleHit is :400-406, chainHit :436-449 with the later-turn guard at :443, caseHit :458-462. Results stay in memory (:942-949) and only formatReport's lines are printed (:820-879, :951-958); only read APIs are imported (:52). The dossier's counts hold too: 51 test() calls in scripts/skill-eval.test.mjs, and 54 expect:'<skill>' + 20 expect:null + 2 chain cases across 10 evals.json files. Nothing in .github runs it; it appears only in two comments, sdk-watch.yml:149 and :268."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

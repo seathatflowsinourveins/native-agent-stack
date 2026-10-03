@@ -1,0 +1,336 @@
+{
+  "contender": "openhands/software-agent-sdk",
+  "revision": {
+    "contender": "openhands/software-agent-sdk",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "OpenHands/software-agent-sdk",
+        "tag": "v1.50.1",
+        "commit": "1e1390acc8788346ba4804c34323284009bf3f5e",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v1.50.1",
+    "commit": "1e1390acc8788346ba4804c34323284009bf3f5e",
+    "read_at": "2026-10-02T03:02:33+00:00"
+  },
+  "dossier": {
+    "contender": "openhands/software-agent-sdk",
+    "revision": {
+      "tag": "v1.50.1",
+      "commit": "1e1390acc8788346ba4804c34323284009bf3f5e",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Python SDK (openhands-sdk, -tools, -workspace, -agent-server, all 1.50.1) plus a FastAPI Agent Server and a TypeScript client for building and running coding agents. Two agent kinds: a native LiteLLM-driven tool-calling loop (terminal, file editor, browser, sub-agents, MCP client), and an ACP-delegated agent that spawns Claude Code / Codex / Gemini CLI / Kimi / Pi / OpenCode adapters. Conversations are event-sourced to disk. They run on the host by default, or inside Docker, Apptainer, Kubernetes agent-sandbox, or hosted OpenHands runtimes. It is an agent framework and runtime, not a scheduler (scheduling lives in the separate OpenHands/automation repo) and not a dedicated research harness.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "The SDK 'provides Python, TypeScript, and REST APIs for building agents that work with code'.",
+          "citation": "README.md:30"
+        },
+        {
+          "claim": "Named use cases: one-off tasks (e.g. a README for your repo), routine maintenance (e.g. updating dependencies), and major multi-agent tasks (refactors, rewrites).",
+          "citation": "README.md:32-35"
+        },
+        {
+          "claim": "Agents can use the local machine as their workspace, or run inside ephemeral workspaces (e.g. in Docker or Kubernetes) using the Agent Server.",
+          "citation": "README.md:37-38"
+        },
+        {
+          "claim": "The SDK is 'the engine behind the OpenHands CLI and OpenHands Cloud'.",
+          "citation": "README.md:40-41"
+        },
+        {
+          "claim": "Quick Start: LLM(model='gpt-5.5', api_key=LLM_API_KEY) + Agent(TerminalTool, FileEditorTool, TaskTrackerTool) + Conversation(agent, workspace=cwd), then send_message(...) and run().",
+          "citation": "README.md:49-78"
+        },
+        {
+          "claim": "Installation is in the external Getting Started Guide (docs.openhands.dev/sdk/getting-started); for local development run `make build` (workspace dependencies + pre-commit hooks).",
+          "citation": "README.md:80-81"
+        },
+        {
+          "claim": "This repo owns the Python SDK, Agent Server, REST/WebSocket API and the browser-compatible TypeScript client. OpenHands/automation owns scheduling, webhooks, run history and dispatch. 'The SDK/Agent Server executes the conversations dispatched by automation.'",
+          "citation": "README.md:85-87"
+        },
+        {
+          "claim": "Docs at docs.openhands.dev/sdk cover architecture, guides (custom tools, MCP, skills) and an Agent Server REST API reference.",
+          "citation": "README.md:89-99"
+        },
+        {
+          "claim": "examples/ contains 01_standalone_sdk, 02_remote_agent_server, 03_github_workflows and 05_skills_and_plugins.",
+          "citation": "README.md:101-108"
+        },
+        {
+          "claim": "With AgentContext(load_public_skills=True) the default OpenHands/extensions marketplace supplies skills such as uv and deno, picked up from markers like uv.lock or deno.json.",
+          "citation": "README.md:110-118"
+        },
+        {
+          "claim": "SWE-bench score badge 'SWEBench-77.6' linking to a Google Sheet.",
+          "citation": "README.md:15"
+        },
+        {
+          "claim": "Tech report arXiv 2511.03690 ('The OpenHands Software Agent SDK: A Composable and Extensible Foundation for Production Agents'); license badge says MIT.",
+          "citation": "README.md:10,14,130-142"
+        },
+        {
+          "claim": "(AgentSandboxWorkspace README) Runs the agent server in a Kubernetes pod claimed from a SandboxWarmPool for sub-second starts. Adds native pause/resume, persistent-volume workspace state across suspend, and gVisor/Kata isolation via runtimeClass on the SandboxTemplate.",
+          "citation": "openhands-workspace/openhands/workspace/agent_sandbox/README.md:3-13"
+        },
+        {
+          "claim": "(agent-server README) Product-analytics telemetry is disabled by default and does nothing unless a deployment opts in; it never sends prompts, messages, file contents, paths, secrets or tracebacks.",
+          "citation": "openhands-agent-server/openhands/agent_server/README.md:102-115"
+        }
+      ],
+      "install": [
+        {
+          "method": "From source with uv (README and DEVELOPMENT.md); make build runs `uv sync --dev` plus `pre-commit install` and requires uv >= 0.8.13",
+          "command": "git clone https://github.com/OpenHands/software-agent-sdk.git && cd software-agent-sdk && make build",
+          "citation": "DEVELOPMENT.md:5-9; README.md:81; Makefile:14,34-42"
+        },
+        {
+          "method": "PyPI packages (openhands-sdk, openhands-tools, openhands-workspace, openhands-agent-server). The README defers to an external Getting Started page that was not opened; command and package names come from an issue-template placeholder and the release workflow",
+          "command": "pip install openhands-sdk",
+          "citation": ".github/ISSUE_TEMPLATE/bug_template.yml:81; .github/workflows/pypi-release.yml:63-67"
+        },
+        {
+          "method": "PyPI extra for the Kubernetes agent-sandbox workspace",
+          "command": "pip install openhands-workspace[agent-sandbox]",
+          "citation": "openhands-workspace/openhands/workspace/agent_sandbox/README.md:15-22"
+        },
+        {
+          "method": "Agent server from a source checkout (after make build)",
+          "command": "uv run python -m openhands.agent_server   (options: --host, --port, --reload)",
+          "citation": "openhands-agent-server/openhands/agent_server/README.md:25-44"
+        },
+        {
+          "method": "Agent-server Docker image on GHCR (linux/amd64 and linux/arm64). The tag in the doc is a specific commit tag; the code default is ghcr.io/openhands/agent-server:latest-python",
+          "command": "docker run -p 127.0.0.1:8000:8000 -p 127.0.0.1:8001:8001 -e SESSION_API_KEY=\"$SESSION_API_KEY\" -e OH_ALLOW_CORS_ORIGINS='[\"*\"]' ghcr.io/openhands/agent-server:71b070d-python",
+          "citation": "clients/typescript/README.md:83-88; openhands-workspace/openhands/workspace/docker/workspace.py:81-84"
+        },
+        {
+          "method": "pip install from git (used in the example CI workflows)",
+          "command": "uv pip install --system \"openhands-sdk @ git+https://github.com/OpenHands/software-agent-sdk.git@main#subdirectory=openhands-sdk\"",
+          "citation": "examples/03_github_workflows/04_datadog_debugging/workflow.yml:69-70"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - unit-test jobs run on Linux runners (.github/workflows/tests.yml:70,146,196,329,428,483); the agent-server binary is built and /health-smoke-tested on ubuntu-24.04 x86_64 (.github/workflows/release-binaries.yml:72-74,111-158); GHCR images are published for linux/amd64 (.github/workflows/server.yml:320-328).",
+        "wsl2": "unknown - no WSL2 documentation or CI. The only mention is an OS option 'WSL on Windows' in the bug template (.github/ISSUE_TEMPLATE/bug_template.yml:133). Native Windows is built and partly tested (tests.yml:253-325; release-binaries.yml:86-88), and the Linux terminal backends (tmux, else subprocess; openhands-tools/openhands/tools/terminal/terminal/factory.py:155-170) would apply, but that is not documented.",
+        "macos_arm64": "yes (build + smoke test only) - the agent-server binary is built and /health-smoke-tested on macos-14 arm64 (.github/workflows/release-binaries.yml:83-85,111-158) and server.yml's binary job includes macos-latest (server.yml:37-42). The pytest suites in tests.yml run only on Linux plus a Windows tools subset, none on macOS. DockerWorkspace defaults to platform linux/amd64 (openhands-workspace/openhands/workspace/docker/workspace.py:104-106), so Apple-silicon hosts run the amd64 image under emulation unless platform is overridden. Apptainer is documented only for Linux packages (apptainer/README.md:14-27).",
+        "gpu": "yes - optional passthrough only, not required. DockerWorkspace(enable_gpu=True) adds `--gpus all` (openhands-workspace/openhands/workspace/docker/workspace.py:111-114,226-228); ApptainerWorkspace(enable_gpu=True) uses `--nv` (openhands-workspace/openhands/workspace/apptainer/README.md:74-89). Inference is done by external endpoints via LiteLLM (openhands-sdk/openhands/sdk/llm/llm.py:79-92); an in-cluster Ollama test exists (agent_sandbox/README.md:62-65); no GPU CI."
+      },
+      "integrations": {
+        "cli": "No task-running CLI in this repo: README says the OpenHands CLI is a separate repo (README.md:40-41). Only the server entry ships: console script `agent-server` (openhands-agent-server/pyproject.toml:57-58) and `python -m openhands.agent_server` (agent-server README.md:29-44), plus dev utility scripts under scripts/.",
+        "mcp": "MCP client only. Agent(mcp_config={...}) consumes MCP servers through FastMCP (examples/01_standalone_sdk/07_mcp_integration.py:41-55; openhands-sdk/openhands/sdk/mcp/), and ACPAgent forwards them to the ACP CLI (openhands-sdk/openhands/sdk/agent/acp_agent.py:739-749). POST /api/mcp/test only probes a candidate MCP config (openhands-agent-server/openhands/agent_server/mcp_router.py:1-18). No MCP server exposing OpenHands found (no FastMCP server construction outside tests).",
+        "sdk_or_api": "Python SDK (`from openhands.sdk import LLM, Agent, Conversation, Tool`, README.md:52). REST+WebSocket Agent Server with OpenAPI at /docs (openhands-agent-server/openhands/agent_server/api.py:423-493; agent-server README.md:372-378). Stateless OpenAI-compatible /v1 gateway: no stream, store, previous_response_id, and tools are ignored (openhands-agent-server/openhands/agent_server/openai/README.md:1-31). TypeScript client @openhands/typescript-client (clients/typescript/package.json:2-4), labelled alpha and remote-only (clients/typescript/README.md:3-15).",
+        "claude_code_or_codex": "README: none found (README.md does not mention ACP, Claude Code or Codex). Code and examples: ACPAgent (Agent Client Protocol) delegates each turn to a spawned ACP CLI. Built-in providers: claude-code (@agentclientprotocol/claude-agent-acp 0.63.0), codex (@agentclientprotocol/codex-acp 1.10.0), gemini-cli, kimi-code, pi, opencode, plus 'custom' (openhands-sdk/openhands/sdk/settings/acp_providers.py:506-700; settings/acp_install_catalog.py:101-179; agent/acp_agent.py:1-15,1714-1808). Examples: examples/01_standalone_sdk/40_acp_agent_example.py (Claude Code via npx) and examples/02_remote_agent_server/09_acp_agent_with_remote_runtime.py (claude-agent-acp preinstalled in the agent-server image, run in a remote sandbox). A Codex ChatGPT-subscription auth.json can be supplied as reserved secret CODEX_AUTH_JSON (acp_providers.py:451-459). The ACP server owns its own LLM, tools and execution (acp_agent.py:3-8) and permission requests are auto-approved (acp_agent.py:1602-1619). Also: CLAUDE.md/AGENTS.md are read as third-party skill files (skills/utils.py:343-346), Claude-Code-format plugins and marketplaces are accepted (plugin/format/claude_code.py:1-5; marketplace/types.py:21), and hooks use Claude Code's exit-code contract (hooks/executor.py:34-43). The repo does not name or use the vendors' own SDK packages (no claude-agent-sdk or Codex SDK reference)."
+      },
+      "telemetry_and_network": "Opt-in only, nothing found that phones home by default. (1) Agent-server product telemetry: exporter defaults to 'none'. Delivery needs an exporter (posthog extra plus OH_TELEMETRY_POSTHOG_API_KEY, or an http endpoint) AND granted consent; DO_NOT_TRACK=1 forces it off; only allow-listed lifecycle/failure properties are sent (openhands-agent-server/openhands/agent_server/README.md:102-249; agent_server/config.py:133-161; telemetry/policy.py:98-102,160-216; telemetry/service.py:101-146). (2) Laminar/OpenTelemetry tracing: `lmnr` is a hard dependency (openhands-sdk/pyproject.toml:25) but initialises only when LMNR_PROJECT_API_KEY or an OTEL_* endpoint env var is set; default Laminar base URL https://api.lmnr.ai (openhands-sdk/openhands/sdk/observability/laminar.py:27-32,63-135,244-260). (3) LLM.log_completions defaults False and logs to local disk (llm/llm.py:519-529). (4) No update-check code found; importing the SDK prints a stderr banner, suppressible with OPENHANDS_SUPPRESS_BANNER (sdk/banner.py:15-43). (5) LiteLLM fetches its model-price/capability JSON from its upstream main at import, and the SDK sets no override (tests/sdk/llm/test_model_features.py:3-6; no LITELLM_LOCAL_MODEL_COST_MAP anywhere in the repo). (6) Accounts and services needed depend on mode: an LLM provider key via LiteLLM (LLM_API_KEY, README.md:60); or the OpenHands proxy for openhands/<model> ids (https://llm-proxy.app.all-hands.dev, llm/utils/openhands_provider.py:11); or ChatGPT-subscription OAuth against auth.openai.com with requests to chatgpt.com/backend-api/codex (llm/auth/openai.py:122-125,806-811); or an ACP vendor CLI with its own credentials (acp_providers.py:506-560). ACP adapters are fetched from npm with `npx -y --prefer-offline <pinned pkg>` at runtime unless baked into the image (acp_install_catalog.py:78-98; agent_server/docker/Dockerfile:178-236). (7) Optional hosted or third-party services: APIRemoteWorkspace calls the OpenHands runtime API with an API key (openhands-workspace/.../remote_api/workspace.py:19-27,44-45); OpenHandsCloudWorkspace calls app.all-hands.dev with a cloud API key (cloud/workspace.py:53-56,113-125); GraySwanAnalyzer sends conversation history to api.grayswan.ai (openhands-sdk/.../security/grayswan/analyzer.py:28-68); the built-in web-researcher subagent uses Tavily (TAVILY_API_KEY, npx tavily-mcp@0.2.1) and mcp-server-fetch via uvx (openhands-tools/openhands/tools/preset/subagents/web_researcher.md:10-18); public skills are a git clone of github.com/OpenHands/extensions, ref main by default, only if load_public_skills=True, which defaults to False (sdk/context/agent_context.py:101-109; sdk/skills/skill.py:1143-1146,1233-1238); an AUTOMATION_CALLBACK_URL completion POST is sent only if that env var is set (sdk/workspace/base.py:87-117). (8) browser-use (hard dependency of openhands-tools, openhands-tools/pyproject.toml:15, locked 0.11.9) pulls in posthog per the comment at openhands-agent-server/pyproject.toml:24-26. This repo has no setting for browser-use's own telemetry (no ANONYMIZED_TELEMETRY match); that library's upstream default was not verified. (9) CI-only: eval workflows dispatch to OpenHands/evaluation (.github/workflows/run-eval.yml:11-13) and example/integration runs use the OpenHands LLM proxy with repo secrets (run-examples.yml:68-80)."
+    },
+    "code": {
+      "languages": [
+        "Python (requires >=3.12; tooling and CI target 3.13: pyproject.toml:53-55)",
+        "TypeScript (clients/typescript)",
+        "Jinja2 prompt templates (*.j2; openhands-sdk/pyproject.toml:52-53)",
+        "JavaScript (browser session-recording scripts under openhands-tools/openhands/tools/browser_use/js/; VS Code extension)",
+        "Dockerfile, shell and YAML (CI)"
+      ],
+      "entry_points": [
+        {
+          "path": "openhands-agent-server/openhands/agent_server/__main__.py",
+          "what": "main() for the Agent Server. Exposed as console script `agent-server` (openhands-agent-server/pyproject.toml:57-58), `python -m openhands.agent_server`, the Docker ENTRYPOINT (docker/Dockerfile:571,590) and the PyInstaller binary `openhands-agent-server` (release-binaries.yml:119). Flags --host/--port/--reload/--check-browser/--import-modules/--extra-python-path; binds 127.0.0.1 unless a session API key is set (lines 210-294)."
+        },
+        {
+          "path": "openhands-agent-server/openhands/agent_server/api.py",
+          "what": "FastAPI app `api` served by uvicorn (__main__.py:313-315); /api/* routers (conversations, events, bash, file, git, tools, llm, settings, profiles, skills, plugins, hooks, mcp, workspaces, vscode, canvas extensions) plus the /v1 OpenAI-compatible gateway (lines 423-493)."
+        },
+        {
+          "path": "openhands-sdk/openhands/sdk/__init__.py",
+          "what": "Public Python SDK surface (LLM, Agent, Conversation, Tool; README.md:52)."
+        },
+        {
+          "path": "openhands-sdk/openhands/sdk/conversation/conversation.py",
+          "what": "Conversation(...) factory: returns LocalConversation for a local path/LocalWorkspace, RemoteConversation for a RemoteWorkspace (lines 122-235)."
+        },
+        {
+          "path": "openhands-sdk/openhands/sdk/agent/acp_agent.py",
+          "what": "ACPAgent: spawns an ACP CLI subprocess (Claude Code, Codex, Gemini CLI, Kimi, Pi, OpenCode) and relays turns (lines 1-15, 1714-1808, 2912-3010)."
+        },
+        {
+          "path": "openhands-tools/openhands/tools/preset/default.py",
+          "what": "get_default_agent()/get_default_tools() (terminal, file editor, task tracker, optional browser and TaskToolSet) and built-in sub-agent registration (lines 37-171); sibling presets gpt5.py, gemini.py, planning.py."
+        },
+        {
+          "path": "openhands-workspace/openhands/workspace/__init__.py",
+          "what": "Workspace classes: DockerWorkspace, DockerDevWorkspace, ApptainerWorkspace, AgentSandboxWorkspace, APIRemoteWorkspace, OpenHandsCloudWorkspace (lines 7-36)."
+        },
+        {
+          "path": "clients/typescript/package.json",
+          "what": "@openhands/typescript-client 1.50.1 (alpha): generated agent-server types plus remote-only clients; main dist/index.js."
+        }
+      ],
+      "architecture": "Monorepo of four PEP 420 namespace packages under openhands.* plus a TypeScript client. (1) openhands-sdk/openhands/sdk/: llm/ (LiteLLM wrapper llm.py; capability registry utils/model_features.py; curated lists utils/verified_models.py; ChatGPT-subscription OAuth auth/openai.py; fallback and router), agent/ (agent.py native tool loop; acp_agent.py ACP delegation; base.py), conversation/ (conversation.py factory -> impl/local_conversation.py or impl/remote_conversation.py; event-sourced state.py persisted as base_state.json + events/event-*.json, persistence_const.py; secret_registry.py), tool/ registry and built-ins (Finish, Think), security/ (confirmation policies; pattern, policy-rail, LLM, GraySwan and ToolShield analyzers), hooks/, mcp/ (client), context/ (prompts, condensers), skills/, plugin/, marketplace/, subagent/, workspace/ (Local/Remote bases), settings/ (AgentSettings; ACP provider registry acp_providers.py and npm pins acp_install_catalog.py), observability/laminar.py. (2) openhands-tools/openhands/tools/: terminal (tmux, subprocess or PowerShell), file_editor, apply_patch, grep, glob, browser_use (browser-use + Playwright/Chromium), task_tracker, task (sub-agent delegation), delegate, planning_file_editor, gemini/*, ask_oracle, tom_consult, workflow; presets in preset/ and built-in sub-agents as markdown in preset/subagents/ (default, code_explorer, bash_runner, web_researcher). (3) openhands-workspace/openhands/workspace/: docker/, apptainer/, agent_sandbox/ (Kubernetes agent-sandbox), remote_api/ (OpenHands runtime API), cloud/ (OpenHands Cloud). (4) openhands-agent-server/openhands/agent_server/: api.py, __main__.py, routers, conversation_service.py + event_service.py (lifecycle, resume, crash recovery), conversation_lease.py (ownership leases), docker_runtime/ (optional per-conversation hardened containers, code-only, no doc found), persistence/ (file-based settings and secrets), telemetry/, openai/ (OpenAI-compatible gateway), docker/Dockerfile + build.py, agent-server.spec (PyInstaller). (5) clients/typescript/: generated OpenAPI types plus handwritten remote-conversation clients. Control flow: Conversation(agent, workspace) with a local path runs the agent loop in-process and tools execute on the host. With a RemoteWorkspace (Docker, Apptainer, Kubernetes, API/Cloud) it becomes a RemoteConversation talking REST/WebSocket to an agent-server inside the sandbox. ACPAgent instead spawns an ACP CLI that owns its own LLM, tools and execution. Defaults: NeverConfirm policy (state.py:123), 500 iterations (conversation.py:132), tool_concurrency_limit 1 (agent/base.py:293-302), LLM default model gpt-5.6 (llm/llm.py:272-276).",
+      "packaging_and_release": "Artifacts: (a) four PyPI packages (openhands-sdk/-tools/-workspace/-agent-server, all 1.50.1) published by `uv publish --token` with the long-lived PYPI_TOKEN_OPENHANDS secret; the workflow has no id-token permission and no attestation step (.github/workflows/pypi-release.yml:20-22,51-87). (b) TypeScript client to npm via OIDC trusted publishing with `--provenance`, and to GitHub Packages (typescript-client-npm-publish.yml:16-18,68; .github/workflows/README-RELEASE.md:47-48). (c) agent-server PyInstaller binaries for linux x86_64/arm64, macOS x86_64/arm64 and windows x86_64, plus openapi.json and one combined unsigned SHA256SUMS attached to the GitHub release (release-binaries.yml:64-88,160-171,256-278). (d) multi-arch GHCR images ghcr.io/openhands/agent-server in variants python, python-slim, python-minimal, java and golang (server.yml:318-418); the default image bakes ACP providers claude-code,codex,gemini-cli and capabilities vscode,browser,docker (server.yml:430,433; docker/Dockerfile:22,28), runs as non-root user openhands UID 10001 (Dockerfile:7-9,343), pins Node tarballs by SHA-256 (Dockerfile:209-216) and Debian by snapshot (Dockerfile:43). No cosign, sigstore, SBOM or provenance steps for PyPI, binaries or images (grep over .github found only the npm --provenance). Process: prepare-release.yml -> release PR (integration + examples labels) -> create-release.yml dispatches every publisher against the immutable tag (README-RELEASE.md:7-52). Release PRs get an approval-drift check and an OSV dependency diff (security-scan.yml:1-27,74-93). Policy: breaking SDK/REST changes need a deprecation runway of 5 minor releases (AGENTS.md:131-154).",
+      "tests_and_ci": "pytest with asyncio auto mode, xdist, forked, timeout and cov (pyproject.toml:31-50,94-107); vitest for the TS client (clients/typescript/package.json:65-71). About 614 test_*.py files under tests/ (dirs sdk, tools, workspace, agent_server incl. stress/telemetry/docker_runtime/canvas_extensions, cross, examples, integration, fixtures; tests.yml:25-30), 28 LLM-backed integration scenario files (tests/integration/tests/{a,b,c,t}*.py), 31 vitest files (23 unit + 8 integration). 35 workflow files in .github/workflows. Main ones: tests.yml (per-package pytest gated by changed-files; Windows tools subset; live ACP/npm conformance only when ACP registry files change; stress suite; coverage run with --cov-fail-under=0, i.e. reported not enforced; lines 69-537); precommit.yml + .pre-commit-config.yaml (ruff, pycodestyle, pyright, yamlfmt, import-rule, tool-registration and dynamic-attribute gates; lines 3-63); server.yml (PyInstaller binary build and smoke test on ubuntu/macos/windows, OpenAPI check, 10-job multi-arch image build/push; lines 37-418); release-binaries.yml (5-runner binary matrix plus Docker manifest and /health smoke tests); agent-server-rest-api-breakage.yml (oasdiff, lines 31-37); persisted-settings-compat.yml; deprecation-check.yml; version-bump-guard.yml (SDK API breakage check, line 43); security-scan.yml; typescript-client-ci.yml (Node 22.12 and 24.x). Real-LLM runs (run-examples.yml, integration-runner.yml) go through the OpenHands proxy with repo secrets and are triggered only by labels or manual dispatch; default models are gpt-5.5, deepseek-v4-flash, minimax-m2.7, gemini-3.1-pro, claude-sonnet-4-6, with no GPT-6 entry (integration-runner.yml:6-12,57-58,117-132; run-examples.yml:68-80). tests/README.md:25 says integration tests run nightly, but integration-runner.yml has no schedule trigger.",
+      "dependencies": "Python uv workspace; one uv.lock with 418 locked packages (incl. the 4 members) and hashes; requires-python >=3.12. Manifests and direct counts: root pyproject.toml (no [project]; 17 dev-group deps; 12 workspace constraint-dependencies; exclude-newer = 7 days; lines 2-50); openhands-sdk/pyproject.toml 18 runtime deps + 3 optional extras (boto3, toolshield, vertex), incl. litellm>=1.93.0, fastmcp>=3.2.0,<4, agent-client-protocol>=0.12.1,<0.13.0, lmnr>=0.7.60,<0.8.0, pydantic, httpx, tenacity, tree-sitter; openhands-tools/pyproject.toml 10 (incl. openhands-sdk; browser-use>=0.8.0 locked 0.11.9, libtmux, tom-swe, binaryornot, func-timeout, cachetools); openhands-workspace/pyproject.toml 3 (+1 extra agent-sandbox -> k8s-agent-sandbox); openhands-agent-server/pyproject.toml 12 (incl. openhands-sdk and openhands-tools; fastapi, uvicorn, wsproto, openai, plus aiosqlite, alembic, sqlalchemy and docker, which no file in the repo imports) (+1 extra posthog). TypeScript: clients/typescript/package.json 2 runtime (@openrouter/sdk, ws) + 14 dev, package-lock.json present; the VS Code extension package.json has none. Runtime tools outside the manifests: Node/npx for ACP adapters and Tavily MCP, uvx for mcp-server-fetch, Playwright Chromium for the browser tool (openhands-tools/.../browser_use/impl.py:232-234), tmux optional (terminal/factory.py:111-170), Docker, Apptainer or kubectl for sandboxes.",
+      "security_policy": "none - no SECURITY.md or other security-policy file anywhere in the checkout (glob for SECURITY/security .md/.txt/.rst found nothing; grep for disclosure or reporting text found nothing). Related controls that do exist: third-party GitHub Actions pinned by SHA (AGENTS.md:94), Dependabot for actions, uv and npm (.github/dependabot.yml:9-32), release-PR security scan (.github/workflows/security-scan.yml), uv exclude-newer 7-day guard plus CVE floor constraints (pyproject.toml:6-22), Fernet encryption of persisted secrets keyed by OH_SECRET_KEY (openhands-sdk/openhands/sdk/utils/cipher.py:9-81)."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:30 - provides Python, TypeScript, and REST APIs for building agents that work with code",
+        "verified": "yes",
+        "evidence": "Python: four packages at v1.50.1 (openhands-sdk/pyproject.toml:1-6, openhands-tools/pyproject.toml:1-6, openhands-workspace/pyproject.toml:1-6, openhands-agent-server/pyproject.toml:1-6). REST/WebSocket: FastAPI app (openhands-agent-server/openhands/agent_server/api.py:386-400,423-493). TypeScript: @openhands/typescript-client (clients/typescript/package.json:2-4), but its README labels it alpha, not stable, and remote-conversation-only (clients/typescript/README.md:3-15)."
+      },
+      {
+        "claim": "README.md:37-38 - agents can use the local machine as workspace or run in ephemeral workspaces (Docker or Kubernetes) via the Agent Server",
+        "verified": "yes",
+        "evidence": "LocalWorkspace runs commands on the host and is what Conversation(workspace=path) uses (openhands-sdk/openhands/sdk/workspace/local.py:17-29,47-72; conversation/conversation.py:122-149,214-235). Sandbox options exist: DockerWorkspace (openhands-workspace/openhands/workspace/docker/workspace.py:53-68); Kubernetes via AgentSandboxWorkspace, which needs a cluster with the kubernetes-sigs/agent-sandbox controller and an optional extra (agent_sandbox/README.md:1-30); Apptainer, API-remote and Cloud workspaces (openhands/workspace/__init__.py:7-17). Isolation is opt-in and hardening differs by backend (docker/workspace.py:235-252 vs openhands-agent-server/.../docker_runtime/registry.py:409-434)."
+      },
+      {
+        "claim": "README.md:49-78 - Quick Start with LLM(model='gpt-5.5') + Terminal/FileEditor/TaskTracker tools + Conversation(...).run()",
+        "verified": "yes",
+        "evidence": "Referenced tool packages exist (openhands-tools/openhands/tools/{terminal,file_editor,task_tracker}); the Conversation factory accepts agent + workspace (conversation.py:122-149); gpt-5.5 matches the 'gpt-5' Responses-API substring rule (openhands-sdk/.../llm/utils/model_features.py:194-203). Differences: the LLM class default model is gpt-5.6, not gpt-5.5 (llm/llm.py:272-276); with no persistence_dir state is in-memory (conversation/state.py:509-519), so the quick start is not resumable; the README never mentions ACPAgent, GPT-6 ids or sandbox hardening."
+      },
+      {
+        "claim": "README.md:15 - SWE-bench score badge 'SWEBench-77.6' linked to a Google Sheet",
+        "verified": "not_checkable",
+        "evidence": "The badge points to an external spreadsheet (not opened) and states no model, benchmark variant, scaffold or date. The repo holds only evaluation trigger workflows that dispatch to OpenHands/evaluation (.github/workflows/run-eval.yml:11-13,32,93-112; default eval model gpt-5.5 at line 96) and no result data."
+      },
+      {
+        "claim": "README.md:85-87 - the SDK/Agent Server executes conversations dispatched by automation; scheduling, webhooks and run history live in OpenHands/automation",
+        "verified": "partial",
+        "evidence": "Executor side is present: agent-server start/resume by conversation_id (openhands-agent-server/.../conversation_service.py:1481-1570) and a best-effort completion callback POST (status, cost, conversation_id) when AUTOMATION_CALLBACK_URL is set (openhands-sdk/.../workspace/base.py:87-117; workspace/local.py:36-45; openhands-workspace/.../cloud/workspace.py:158-159). The scheduler/dispatcher is in a separate repo (listed as a downstream consumer at .github/workflows/README-RELEASE.md:102-103), so that half is not checkable here."
+      },
+      {
+        "claim": "agent-server README.md:40-44 - --host default is 0.0.0.0",
+        "verified": "no",
+        "evidence": "Code defaults to 127.0.0.1 unless a session API key is configured, then 0.0.0.0; an explicit wildcard bind without a key only logs a warning (openhands-agent-server/openhands/agent_server/__main__.py:215-222,282-294). Code preferred over README."
+      },
+      {
+        "claim": "agent-server README.md:95 - requests authenticate with an 'Authorization: Bearer <key>' header",
+        "verified": "partial",
+        "evidence": "Under /api/* the code reads the X-Session-API-Key header (openhands-agent-server/.../dependencies.py:19,25-37); Bearer is used by the OpenAI-compatible /v1 gateway (agent_server/openai/README.md:5). With no keys configured the server is unauthenticated (agent_server/config.py:224-234; dependencies.py:36)."
+      },
+      {
+        "claim": "agent-server README.md:421-434 - storage layout conversations/{id}/metadata.json + events.jsonl",
+        "verified": "no",
+        "evidence": "Code persists base_state.json plus one file per event, events/event-<idx>-<id>.json (openhands-sdk/.../conversation/persistence_const.py:4-10; state.py:521-568), and a meta.json per conversation (agent_server/docker_runtime/provisioning.py:132-134); settings/secrets are JSON files with 0600 permissions (agent_server/persistence/store.py:1-7,55-57)."
+      },
+      {
+        "claim": "agent-server README.md:56,270 - without OH_SECRET_KEY secrets are redacted and lost on restart",
+        "verified": "partial",
+        "evidence": "Encryption is Fernet keyed by SHA-256 of the key string (openhands-sdk/.../utils/cipher.py:73-81), but when OH_SECRET_KEY is unset the first session API key (SESSION_API_KEY or OH_SESSION_API_KEYS_0) is used as the secret key (agent_server/config.py:48-61,336-343), so persistence works without OH_SECRET_KEY when a session key exists. Docker runtime mode requires OH_SECRET_KEY (agent_server/docker_runtime/provisioning.py:50-51)."
+      },
+      {
+        "claim": "agent-server README.md:104-105 - telemetry is disabled by default and does nothing unless a deployment opts in",
+        "verified": "yes",
+        "evidence": "Exporter default is 'none' (openhands-agent-server/.../config.py:153-161); build_telemetry_sink returns a no-op sink unless an exporter is built and consent resolves to granted (telemetry/service.py:101-146; telemetry/policy.py:160-216); DO_NOT_TRACK kill switch (policy.py:98-102)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "SWE-bench score badge in the README (variant, model, scaffold and date not stated; linked Google Sheet not opened)",
+        "metric": "SWE-bench score (badge text 'SWEBench-77.6')",
+        "value": "77.6",
+        "source": "README.md:15",
+        "independent": false
+      },
+      {
+        "what": "Event-log persist latency per event: 2,644 real events from 29 sampled SWE-Bench conversations replayed through LocalFileStore lock+write on a local machine (hardware not stated)",
+        "metric": "median / mean / P95 per-event persist latency, all events",
+        "value": "0.166 ms / 0.180 ms / 0.267 ms",
+        "source": "scripts/event_sourcing_benchmarks/README.md:60",
+        "independent": false
+      },
+      {
+        "what": "Persist latency per action cycle (ActionEvent + ObservationEvent write)",
+        "metric": "median / mean",
+        "value": "0.36 ms / 0.37 ms",
+        "source": "scripts/event_sourcing_benchmarks/README.md:66",
+        "independent": false
+      },
+      {
+        "what": "Full replay of an on-disk event log (read + JSON parse) built from real payloads",
+        "metric": "replay time",
+        "value": "29.49 ms for 1,000 events (4.3 MB); 48.06 ms for 1,500 events (8.2 MB)",
+        "source": "scripts/event_sourcing_benchmarks/README.md:83-84",
+        "independent": false
+      },
+      {
+        "what": "Crash-recovery path: read all events and reverse-scan for unmatched actions (get_unmatched_actions)",
+        "metric": "time-to-recover",
+        "value": "57.50 ms for 1,000 events; 90.26 ms for 1,500 events",
+        "source": "scripts/event_sourcing_benchmarks/README.md:130-131",
+        "independent": false
+      },
+      {
+        "what": "Conversation size across 433 SWE-Bench Verified conversations (39,870 events) used as the workload",
+        "metric": "events per conversation (median / max) and on-disk storage (median / max)",
+        "value": "82 / 358 events; 380.0 KB / 3,357.0 KB",
+        "source": "scripts/event_sourcing_benchmarks/README.md:98-99",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "GPT-6.1 Sol is not a model id anywhere in the checkout (grep for 'gpt-6.1': no match). Nearest ids: gpt-6-sol (verified list, openhands-sdk/.../llm/utils/verified_models.py:14,115; routed to the Responses API by the 'gpt-6' substring, model_features.py:194-203) and gpt-5.6-sol (Codex-ACP picker, settings/acp_providers.py:376-382). The Codex-ACP curated list has only gpt-6-astra among GPT-6 ids, and ChatGPT-subscription login accepts only that list (llm/auth/openai.py:132-143,780-784), so gpt-6-sol would be rejected on that path. GPT-6 ids get no model-specific prompt variant (llm/utils/model_prompt_spec.py:37-51; context/prompts/sections/static.py:454-486) and no GPT-6 entry exists in the CI model table (.github/workflows/integration-runner.yml:117-132). Capability data comes from LiteLLM's model DB fetched from upstream main at import with no SDK override (tests/sdk/llm/test_model_features.py:3-6), and a LiteLLM supported_endpoints list overrides the SDK's substring fallback (model_features.py:344-359).",
+      "No dedicated deep-research harness in the repo (grep for 'deep research'/'citation': nothing relevant). The closest piece is the built-in web-researcher sub-agent: a markdown prompt plus the browser toolset, Tavily MCP (npx tavily-mcp@0.2.1, TAVILY_API_KEY) and mcp-server-fetch via uvx (openhands-tools/.../preset/subagents/web_researcher.md:1-19). Its 'include source URLs' and 'cross-reference at least 2 sources' rules are prompt text only (lines 62-88); no code verifies citations. It needs TaskToolSet, which is off by default, and built-in registration (preset/default.py:37-68,141-171); tests only assert registration (tests/tools/test_builtin_agents.py:95,107-111).",
+      "Isolation is opt-in and the default posture is permissive. Conversation(workspace=path) runs tools on the host (openhands-sdk/.../workspace/local.py:17-29; README.md:73); the default confirmation policy is NeverConfirm (conversation/state.py:123; conversation/request.py:131-135). The agent shell env strips only SESSION_API_KEY, OH_SECRET_KEY and OH_SESSION_API_KEYS_* (utils/command.py:25-30,57-67), so provider keys in the host env stay visible to agent commands. For ACP workers, request_permission auto-approves everything and default session modes are bypassPermissions / agent-full-access (agent/acp_agent.py:1602-1619; settings/acp_providers.py:514,550). The CLI subprocess gets the entire host os.environ plus the whole secret registry (acp_agent.py:2937-2951; conversation/secret_registry.py:262-264, where least-privilege scoping is marked deferred). One ACP step() is one complete remote turn (acp_agent.py:10-12), so an SDK per-step iteration cap does not appear to bound tool calls inside a turn (inference from the docstring).",
+      "Container hardening is uneven and the control plane is broad. DockerWorkspace runs `docker run` with no cap-drop, security-opt, memory/CPU or network-restriction flags and defaults to platform linux/amd64 (openhands-workspace/.../docker/workspace.py:104-106,235-252). The per-conversation Docker runtime (code-only, no README or doc found) adds --cap-drop ALL, no-new-privileges, memory/CPU/pids limits and a loopback port, but keeps default networking and adds host.docker.internal (openhands-agent-server/.../docker_runtime/registry.py:409-434). The default image also bundles Docker Engine, gh and an OpenVSCode server (docker/Dockerfile:28,426,505,522). The server exposes bash, file and git endpoints (api.py:458-462) and is unauthenticated when no session key is configured (config.py:224-234; dependencies.py:36); loopback bind is the only default mitigation (__main__.py:282-294).",
+      "Supply-chain and release integrity. PyPI publishing uses a long-lived token with no OIDC or attestation (.github/workflows/pypi-release.yml:20-22,53,86); binaries ship with an unsigned SHA256SUMS (release-binaries.yml:256-278); image workflows have no signing or attestation step (server.yml:516-533); only the npm client uses --provenance (typescript-client-npm-publish.yml:68). ACP adapters are version-pinned but fetched from npm with `npx -y` at runtime unless baked in (settings/acp_install_catalog.py:78-98,101-116). load_public_skills=True (default False) clones github.com/OpenHands/extensions at ref main (sdk/skills/skill.py:1143-1146). CI model resolution clones another repo at run time (.github/run-eval/resolve_model_config.py:21-59). There is no SECURITY.md or disclosure policy in the checkout.",
+      "Telemetry and third-party surface (all off by default). `lmnr` is a hard dependency that activates on env keys (openhands-sdk/pyproject.toml:25; observability/laminar.py:244-260). posthog is already in the lock via browser-use (openhands-agent-server/pyproject.toml:24-26); the repo has no setting for browser-use's own telemetry, upstream default unverified. GraySwanAnalyzer sends conversation history to api.grayswan.ai when used (security/grayswan/analyzer.py:28-68). The ChatGPT-subscription path sends headers copied from the Codex CLI (originator codex_cli_rs) to chatgpt.com using a Codex public client id (llm/auth/openai.py:122-125,806-811); the SDK prints a consent banner citing OpenAI's consumer Terms of Use (openai.py:53-57).",
+      "Documentation and packaging drift. Agent-server README default host 0.0.0.0 vs loopback in code (README.md:42 vs __main__.py:282-285); Bearer header vs X-Session-API-Key (README.md:95 vs dependencies.py:19); storage layout (README.md:425-433 vs persistence_const.py:4-10); tests/README.md:25 'nightly' vs no schedule trigger (integration-runner.yml:6-12); the LLM.subscription_login docstring lists gpt-5.6/gpt-5.4/gpt-5.4-mini (llm/llm.py:3506-3513) though the accepted set is the Codex registry (openai.py:132-143,780-784); apptainer README names example 07 but the file is 08. openhands-agent-server declares aiosqlite, alembic, sqlalchemy and docker (pyproject.toml:8-10,16) that nothing in the repo imports. aiohttp and authlib are imported directly (llm/auth/openai.py:24-26) but declared in no dependency list (aiohttp only as a root constraint, pyproject.toml:11; authlib arrives via fastmcp, uv.lock:1059). The four package pyproject files have no license field and no LICENSE file sits in the package dirs (only repo-root LICENSE and clients/typescript/LICENSE). Root constraint-dependencies and exclude-newer (pyproject.toml:6-22) govern this repo's lock, while published metadata carries lower bounds (e.g. litellm>=1.93.0, openhands-sdk/pyproject.toml:18).",
+      "Resume, budget and maturity gaps. Without persistence_dir the SDK falls back to an in-memory store with a warning (conversation/state.py:509-519). The Conversation() factory defaults delete_on_close=True, including for RemoteConversation, whose close() sends DELETE for the server-side conversation (conversation.py:84,113,142,205; remote_conversation.py:1853-1863). ACP resume needs the persisted session id plus the CLI's own on-disk session store (agent/acp_agent.py:2989-3010). The cost cap max_budget_per_run exists only as a LocalConversation constructor argument and sub-agent frontmatter key, not in the Conversation() factory signature or the agent-server start request (local_conversation.py:237; conversation.py:122-149; conversation/request.py:93-160). The TypeScript client self-describes as alpha although versioned 1.50.1, and its pinned server contract is image 1.47.0 (clients/typescript/README.md:3-12; package.json:49-51). The critic is marked EXPERIMENTAL (agent/base.py:283-291). ACP integration shows churn: model lists are 'rollout/account-dependent' with dead entries removed, and agent-client-protocol is pinned <0.13 after a 0.11 break (settings/acp_providers.py:366-375; openhands-sdk/pyproject.toml:8)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "openhands/software-agent-sdk",
+      "checks": [
+        {
+          "field": "readme.install[1] (PyPI)",
+          "statement": "PyPI packages (openhands-sdk, openhands-tools, openhands-workspace, openhands-agent-server). The README defers to an external Getting Started page that was not opened; command and package names come from an issue-template placeholder and the release workflow. Command: pip install openhands-sdk",
+          "citation": ".github/ISSUE_TEMPLATE/bug_template.yml:81; .github/workflows/pypi-release.yml:63-67",
+          "holds": true,
+          "note": "bug_template.yml:81 placeholder reads 'ex. pip install openhands-sdk, uv pip install openhands-sdk, pip install -e ., etc.'. pypi-release.yml:63-68 PACKAGES lists exactly the four names, each built with `uv build --package` (79-82) and published with `uv publish` (86). The four pyproject.toml files declare those names at version 1.50.1 (lines 2-3 each). README.md:80 does send installation to the external Getting Started guide. Caveat, not an error: openhands-sdk does not depend on openhands-tools (only tools, workspace and agent-server depend on sdk), so `pip install openhands-sdk` alone cannot run the README Quick Start, which imports openhands.tools.* (README.md:53-55)."
+        },
+        {
+          "field": "license",
+          "statement": "spdx: MIT, file: LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-21 is the standard MIT text ('MIT License', 'Copyright (c) 2026 OpenHands contributors'). README.md:10 badge alt text is 'MIT License'. The only other project license, clients/typescript/LICENSE:1 ('The MIT License (MIT)') plus package.json:87 \"license\": \"MIT\", agrees. The third LICENSE in the checkout is a test fixture. The four Python pyproject.toml files carry no license field, which matches the dossier's own risk note."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - unit-test jobs run on Linux runners; the agent-server binary is built and /health-smoke-tested on ubuntu-24.04 x86_64; GHCR images are published for linux/amd64.",
+          "citation": ".github/workflows/tests.yml:70,146,196,329,428,483; .github/workflows/release-binaries.yml:72-74,111-158; .github/workflows/server.yml:320-328",
+          "holds": true,
+          "note": "tests.yml:70,146,196,329,428,483 are all `runs-on: blacksmith-2vcpu-ubuntu-2404` (the sdk, acp-live, tools, agent-server, workspace and cross pytest jobs). release-binaries.yml:72-74 is the ubuntu-24.04 / linux / x86_64 matrix leg, and 111-158 starts the binary and polls /health for up to 90s. server.yml:320-328 is the python variant for linux/amd64 on ubuntu-24.04, pushed (push: true, :524) to ghcr.io/openhands/agent-server (:423). Nit: line 146 is the live ACP conformance job rather than a unit-test job. The Blacksmith label's CPU architecture is not stated in the repo; x86_64 is shown by the binary and image legs."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "README mentions none. ACPAgent delegates each turn to a spawned ACP CLI; built-in providers claude-code (@agentclientprotocol/claude-agent-acp 0.63.0), codex (@agentclientprotocol/codex-acp 1.10.0), gemini-cli, kimi-code, pi, opencode, plus 'custom'; examples 40 (Claude Code via npx) and 09 (claude-agent-acp preinstalled, remote sandbox); CODEX_AUTH_JSON reserved secret; the ACP server owns its LLM/tools/execution; permission requests auto-approved; CLAUDE.md/AGENTS.md read as skills, Claude-Code plugin/marketplace formats accepted, hooks use Claude Code's exit-code contract; no vendor SDK packages referenced.",
+          "citation": "openhands-sdk/openhands/sdk/settings/acp_providers.py:451-459,506-700; settings/acp_install_catalog.py:101-179; agent/acp_agent.py:1-15,1602-1619,1714-1808; examples/01_standalone_sdk/40_acp_agent_example.py; examples/02_remote_agent_server/09_acp_agent_with_remote_runtime.py; skills/utils.py:343-346; plugin/format/claude_code.py:1-5; marketplace/types.py:21; hooks/executor.py:34-43",
+          "holds": true,
+          "note": "Grep of README.md for ACP|Claude|Codex: no match. acp_agent.py:3-12: the ACP server 'manages its own LLM, tools, and execution', and one step() is one remote turn. acp_agent.py:1714-1808: ACPAgent 'delegates to an ACP-compatible subprocess server'; acp_server is 'any ACP_PROVIDERS key, or 'custom''. acp_providers.py:506-700 registers exactly claude-code, codex, gemini-cli, kimi-code, pi and opencode. acp_install_catalog.py:105-106,119-132 pins claude-agent-acp 0.63.0 and codex-acp 1.10.0. acp_providers.py:451-459: CODEX_AUTH_JSON goes to auth.json under CODEX_HOME. acp_agent.py:1602-1619 auto-approves every permission request. Example 40 launches ACP_PROVIDERS['claude-code'].default_command (npx); example 09 uses acp_command=['claude-agent-acp'] '# Pre-installed in Docker image' inside APIRemoteWorkspace. Also matching: skills/utils.py:343 ('.cursorrules, AGENTS.md, CLAUDE.md'), claude_code.py:1-5, marketplace/types.py:21 ('.claude-plugin') and executor.py:34 ('matching Claude Code's hook contract'). A repo-wide case-insensitive grep for claude-agent-sdk, codex-sdk and @openai/codex finds no package reference, only the OPENAI_CODEX_MODELS constant."
+        },
+        {
+          "field": "claim_checks[5] (agent-server README.md:40-44)",
+          "statement": "'--host default is 0.0.0.0' verified: no. Code defaults to 127.0.0.1 unless a session API key is configured, then 0.0.0.0; an explicit wildcard bind without a key only logs a warning.",
+          "citation": "openhands-agent-server/openhands/agent_server/README.md:40-44; openhands-agent-server/openhands/agent_server/__main__.py:215-222,282-294",
+          "holds": true,
+          "note": "Agent-server README.md:30 and :42 say the default host is 0.0.0.0. __main__.py:215-222 sets default=None, with help text 'Defaults to 127.0.0.1 (loopback) when no session API key is configured'. Lines 282-285 resolve to '0.0.0.0' only when _auth_enabled() is true, otherwise to _LOOPBACK_HOST = '127.0.0.1' (:27). _auth_enabled() checks config.session_api_keys, from SESSION_API_KEY / OH_SESSION_API_KEYS_0 or the config file (:30-48). Lines 286-294: an explicit wildcard host without a key only logs a warning. The dossier's 'no' verdict and its evidence are correct."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

@@ -1,0 +1,297 @@
+{
+  "contender": "microsoft/markitdown",
+  "revision": {
+    "contender": "microsoft/markitdown",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "microsoft/markitdown",
+        "tag": "v0.1.8",
+        "commit": "b8f79c57ebc0044be41323d89b2a45d3fda8460e",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.1.8",
+    "commit": "b8f79c57ebc0044be41323d89b2a45d3fda8460e",
+    "read_at": "2026-10-02T03:02:25+00:00"
+  },
+  "dossier": {
+    "contender": "microsoft/markitdown",
+    "revision": {
+      "tag": "v0.1.8",
+      "commit": "b8f79c57ebc0044be41323d89b2a45d3fda8460e",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "MarkItDown is a Python library (`markitdown`), CLI and MCP server (`markitdown-mcp`) that converts one file, stream or URI at a time (PDF, DOCX, PPTX, XLSX/XLS, HTML, EPUB, CSV, ZIP, Outlook .msg, JPEG/PNG, audio, YouTube/Wikipedia/Bing pages, RSS/Atom, ipynb, plain text) into a single Markdown string plus an optional title, for LLM and text-analysis pipelines (README.md:9-24; packages/markitdown/src/markitdown/_base_converter.py:5-39). It is a stateless converter: no index, search, vector/lexical retrieval, document store, JSON output or provenance map exists in any packages/**/src (greps found none). Scans and hard layouts need an optional remote service: Azure Document Intelligence, Azure Content Understanding, or an OpenAI-compatible LLM through the markitdown-ocr plugin.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "MarkItDown is a lightweight Python utility for converting various files to Markdown for use with LLMs and related text analysis pipelines; most comparable to textract, with a focus on preserving important document structure (headings, lists, tables, links).",
+          "citation": "README.md:9"
+        },
+        {
+          "claim": "Output is meant to be consumed by text analysis tools and 'may not be the best option for high-fidelity document conversions for human consumption'.",
+          "citation": "README.md:9"
+        },
+        {
+          "claim": "Supported inputs: PDF, PowerPoint, Word, Excel, Images (EXIF metadata and OCR), Audio (EXIF metadata and speech transcription), HTML, text-based formats (CSV, JSON, XML), ZIP (iterates over contents), YouTube URLs, EPubs, 'and more'.",
+          "citation": "README.md:11-24"
+        },
+        {
+          "claim": "Requires Python 3.10 through 3.14; a virtual environment is recommended.",
+          "citation": "README.md:36"
+        },
+        {
+          "claim": "Install with `pip install 'markitdown[all]'`; optional extras exist for pptx, docx, xlsx, xls, pdf, outlook, az-doc-intel, az-content-understanding, audio-transcription, youtube-transcription.",
+          "citation": "README.md:62, 99-111"
+        },
+        {
+          "claim": "CLI: `markitdown path-to-file.pdf > document.md`, `-o` for an output file, or pipe content on stdin.",
+          "citation": "README.md:72-88"
+        },
+        {
+          "claim": "3rd-party plugins are disabled by default; enable with `--use-plugins` (CLI) or `enable_plugins=True`; `--list-plugins` lists installed plugins.",
+          "citation": "README.md:115-125"
+        },
+        {
+          "claim": "markitdown-ocr adds OCR to PDF, DOCX, PPTX and XLSX converters by sending embedded images to an LLM through the same `llm_client`/`llm_model` pattern; 'No new ML libraries or binary dependencies required'; without `llm_client` OCR is silently skipped and the standard built-in converter is used.",
+          "citation": "README.md:131, 157"
+        },
+        {
+          "claim": "Azure Content Understanding gives cloud, billable multimodal conversion (documents, images, audio, video) with YAML front-matter fields; built-in converters are 'Offline, format-specific extraction' with cost 'Local compute only'; each CU-routed convert() call is a billable Azure API call.",
+          "citation": "README.md:163-182, 232"
+        },
+        {
+          "claim": "Azure Document Intelligence conversion: `markitdown path-to-file.pdf -o document.md -d -e \"<endpoint>\"`, or set MARKITDOWN_DOCINTEL_ENDPOINT and pass only `-d`; billable Azure API calls.",
+          "citation": "README.md:247-258, 182"
+        },
+        {
+          "claim": "LLM image descriptions via `llm_client`/`llm_model` apply 'currently only for pptx and image files'.",
+          "citation": "README.md:284-294"
+        },
+        {
+          "claim": "Security: MarkItDown performs I/O with the privileges of the current process; sanitize inputs; `convert()` is intentionally permissive (local files, remote URIs, streams); prefer `convert_local()` / `convert_stream()`.",
+          "citation": "README.md:7, 396-400"
+        },
+        {
+          "claim": "Scope: web servers, REST/HTTP APIs and hosted conversion services are out of scope for the repo; the `markitdown` CLI and `markitdown-mcp` package are in scope.",
+          "citation": "README.md:325-343"
+        },
+        {
+          "claim": "markitdown-mcp 'exposes one tool: convert_to_markdown(uri)' for http:, https:, file: or data: URIs; STDIO by default, Streamable HTTP/SSE with --http; meant for local use with trusted agents; the server has no authentication.",
+          "citation": "packages/markitdown-mcp/README.md:4, 11-13, 134"
+        }
+      ],
+      "install": [
+        {
+          "method": "pip from PyPI (all optional extras)",
+          "command": "pip install 'markitdown[all]'",
+          "citation": "README.md:62"
+        },
+        {
+          "method": "pip from source (editable)",
+          "command": "git clone git@github.com:microsoft/markitdown.git\ncd markitdown\npip install -e 'packages/markitdown[all]'",
+          "citation": "README.md:64-68"
+        },
+        {
+          "method": "pip, selected extras only",
+          "command": "pip install 'markitdown[pdf, docx, pptx]'",
+          "citation": "README.md:94"
+        },
+        {
+          "method": "OCR plugin (LLM-vision OCR; usable only through the Python API)",
+          "command": "pip install markitdown-ocr\npip install openai",
+          "citation": "README.md:136-137"
+        },
+        {
+          "method": "MCP server from PyPI",
+          "command": "pip install markitdown-mcp",
+          "citation": "packages/markitdown-mcp/README.md:20"
+        },
+        {
+          "method": "Docker (CLI image built locally; the MCP image is built the same way from packages/markitdown-mcp, see packages/markitdown-mcp/README.md:42-52)",
+          "command": "docker build -t markitdown:latest .\ndocker run --rm -i markitdown:latest < ~/your-file.pdf > output.md",
+          "citation": "README.md:303-304"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - CI matrix runs ubuntu-latest on Python 3.10-3.14 for the core, OCR and MCP packages (.github/workflows/tests.yml:15-19, 45, 74); the workflow does not state the CPU architecture. The Dockerfile uses python:3.13-slim-trixie (Dockerfile:1). Package metadata: requires-python >=3.10,<3.15 (packages/markitdown/pyproject.toml:10).",
+        "wsl2": "unknown - no mention of WSL anywhere in the repo (grep for wsl / windows subsystem across docs, code and CI found nothing). The Linux path is CI-tested on ubuntu-latest, but WSL2 itself is not covered.",
+        "macos_arm64": "unknown - README and CI never mention macOS; the CI matrix is ubuntu-latest, windows-latest and windows-11-vs2026-arm only (.github/workflows/tests.yml:17-24). The only macOS-related reference is '/opt/homebrew/bin' in the exiftool search directories (packages/markitdown/src/markitdown/_markitdown.py:210-221). Source is pure Python, but third-party wheels were not inspected.",
+        "gpu": "no - GPU is neither used nor required: grep for cuda/gpu/torch/tensorflow found no code or docs. Local conversion is CPU Python; OCR and layout analysis are delegated to a remote LLM or Azure service (packages/markitdown-ocr/src/markitdown_ocr/_ocr_service.py:82-101; packages/markitdown/src/markitdown/converters/_doc_intel_converter.py:248-254)."
+      },
+      "integrations": {
+        "cli": "yes - `markitdown` console script (packages/markitdown/pyproject.toml:74-75; README.md:72-88; main() at packages/markitdown/src/markitdown/__main__.py:16). Options: -o, -x/-m/-c hints, -d/-e (Document Intelligence), --use-cu/--cu-endpoint/--cu-analyzer/--cu-file-types (Content Understanding), -p/--use-plugins, --list-plugins, --keep-data-uris (__main__.py:51-145). Single filename or stdin per run (no batch or directory mode, lines 145, 251-261); output is Markdown text only, to stdout or -o (lines 266-277). The CLI has no LLM-client option (grep for 'llm' in __main__.py: zero matches).",
+        "mcp": "yes - `markitdown-mcp` (packages/markitdown-mcp/README.md:11-13; packages/markitdown-mcp/src/markitdown_mcp/__main__.py:19-47, 83-135). One tool, `convert_to_markdown(uri)`, accepting http/https/file/data URIs and returning the converted Markdown string only (line 24). STDIO by default; `--http` serves Streamable HTTP (/mcp) and SSE (/sse) on 127.0.0.1:3001 by default (lines 58-79, 114-133; README:116-124). It constructs a new MarkItDown(enable_plugins=MARKITDOWN_ENABLE_PLUGINS) on every call (line 22; the constructor builds magika.Magika(), _markitdown.py:168), so no LLM, Document Intelligence or Content Understanding settings can be passed. Tests drive both the legacy `initialize` and the 2026-07-28 `server/discover` handshakes (packages/markitdown-mcp/tests/test_stdio_protocols.py:1-6, 77-139). Documented sandboxing is Docker with a mounted directory (README:38-55).",
+        "sdk_or_api": "SDK: yes - Python `MarkItDown` class with convert / convert_local / convert_stream / convert_uri / convert_response and register_converter (README.md:262-272; packages/markitdown/src/markitdown/__init__.py:6-10; _markitdown.py:322-604, 709-739); plugin entry-point group `markitdown.plugin` (_markitdown.py:113-130). HTTP API: none - REST/HTTP APIs and hosted services are explicitly out of scope (README.md:337-340); the MCP server's HTTP/SSE endpoints speak the MCP protocol only.",
+        "claude_code_or_codex": "none found - the only client documentation is a Claude Desktop `claude_desktop_config.json` example using `docker run` (packages/markitdown-mcp/README.md:57-99). A grep of the repo for claude/codex/cursor/copilot/AGENTS.md/CLAUDE.md/.mcp.json found no Claude Code or Codex instructions."
+      },
+      "telemetry_and_network": "No first-party telemetry or phone-home code found (grep for telemetry/analytics/usage across the repo). Related items only: (a) both Dockerfiles set ORT_DISABLE_TELEMETRY=1 (Dockerfile:6; packages/markitdown-mcp/Dockerfile:7), an ONNX Runtime variable; Magika (local file-type model) is constructed in every MarkItDown() (packages/markitdown/src/markitdown/_markitdown.py:168); that third-party code was not inspected, and the variable is not set by the library or by the non-Docker instructions; (b) the Azure Content Understanding client is created with user agent `markitdown-cu/<version>` (converters/_cu_converter.py:496-508). Local conversion of PDF/Office/HTML/EPUB/CSV needs no network. Network is used only when: convert()/convert_uri() is given an http(s) URL (`requests.Session().get(uri, stream=True)` with an `Accept: text/markdown, ...` header, no timeout, whole body buffered: _markitdown.py:160-164, 518-527, 594-598); an audio file is converted (`recognizer.recognize_google(audio)`, SpeechRecognition's Google client, a remote call; _transcribe_audio.py:57; installed by [all] or [audio-transcription]; the repo's own speech test is skipped in CI: tests/test_module_misc.py:1157-1174); a YouTube URL is converted (youtube_transcript_api fetches transcripts: _youtube_converter.py:166-188; installed by [all]); an `llm_client` is supplied (image captions, PPTX pictures and the OCR plugin send base64 images to the OpenAI-compatible endpoint: _llm_caption.py:20-50; markitdown_ocr/_ocr_service.py:82-101); or Document Intelligence / Content Understanding is configured, which uploads the whole file to Azure (_doc_intel_converter.py:248-253; _cu_converter.py:553-561). Accounts and credentials: none for core; an Azure resource plus AZURE_API_KEY or DefaultAzureCredential for DI/CU (_doc_intel_converter.py:175-179; _cu_converter.py:489-494); LLM credentials are the caller's own client. The MCP server cannot configure LLM/DI/CU (markitdown_mcp/__main__.py:22), and in --http mode it listens on 127.0.0.1:3001 with no authentication (lines 116-133; packages/markitdown-mcp/README.md:134)."
+    },
+    "code": {
+      "languages": [
+        "Python",
+        "Dockerfile (packaging only)",
+        "YAML (GitHub Actions only)"
+      ],
+      "entry_points": [
+        {
+          "path": "packages/markitdown/src/markitdown/__main__.py:16",
+          "what": "`markitdown` CLI main() (console script declared at packages/markitdown/pyproject.toml:74-75; also `python -m markitdown`, used in tests/test_cli_misc.py:15-18)"
+        },
+        {
+          "path": "packages/markitdown/src/markitdown/_markitdown.py:141",
+          "what": "`MarkItDown` class - Python API (convert, convert_local, convert_stream, convert_uri, convert_response, register_converter), re-exported in packages/markitdown/src/markitdown/__init__.py:6-10"
+        },
+        {
+          "path": "packages/markitdown-mcp/src/markitdown_mcp/__main__.py:83",
+          "what": "`markitdown-mcp` server main() (script at packages/markitdown-mcp/pyproject.toml:40-41): STDIO via mcp.run() (line 135) or --http Streamable HTTP + SSE via uvicorn (lines 114-133); the single tool is defined at lines 19-47"
+        },
+        {
+          "path": "packages/markitdown/src/markitdown/_base_converter.py:42",
+          "what": "`DocumentConverter` base class (accepts/convert) for custom converters and plugins; result type DocumentConverterResult(markdown, title) at lines 5-39"
+        },
+        {
+          "path": "packages/markitdown-ocr/src/markitdown_ocr/_plugin.py:19",
+          "what": "OCR plugin register_converters(); entry-point group `markitdown.plugin`, name `ocr` (packages/markitdown-ocr/pyproject.toml:56-57), discovered at _markitdown.py:123"
+        },
+        {
+          "path": "Dockerfile:34",
+          "what": "CLI container ENTRYPOINT [\"markitdown\"] (python:3.13-slim-trixie + ffmpeg + exiftool; installs markitdown[all] and the sample plugin; runs as nobody:nogroup, lines 1-32)"
+        },
+        {
+          "path": "packages/markitdown-mcp/Dockerfile:27",
+          "what": "MCP container ENTRYPOINT [\"markitdown-mcp\"] (pip install /app at line 18 pulls markitdown[all] from PyPI via the package dependency; sets MARKITDOWN_ENABLE_PLUGINS=True at line 6)"
+        }
+      ],
+      "architecture": "Monorepo of four Hatch-built Python packages under packages/: markitdown (core), markitdown-mcp, markitdown-ocr (plugin) and markitdown-sample-plugin (RTF example). Core: _markitdown.py `MarkItDown` registers `DocumentConverter` subclasses (_base_converter.py: accepts()/convert() -> DocumentConverterResult(markdown, title)) with priorities - lower is tried first; generic PlainText/HTML/ZIP at 10, others 0, plugins any; later registrations first within a priority (_markitdown.py:101-107, 709-739). Any input (path, http/https/file/data URI, requests.Response, stream) is turned into a seekable binary stream (322-604); type is guessed from extension/MIME, Magika content detection and charset_normalizer (741-840); each accepting converter is tried until one returns, failures are collected into FileConversionException, and output whitespace is normalised (606-699). Converters (packages/markitdown/src/markitdown/converters/): PDF - pdfplumber word-position heuristics for form/table-like pages, else pdfminer text; text layer only, no OCR (_pdf_converter.py:120-395, 540-589); DOCX - mammoth to HTML to markdownify, OMML to LaTeX (_docx_converter.py, converter_utils/docx/); PPTX - python-pptx with `<!-- Slide number: N -->` markers, notes, tables, charts (_pptx_converter.py:88-149); XLSX/XLS - pandas, one `## sheet` table each (_xlsx_converter.py:143-170); HTML - BeautifulSoup + markdownify of <body> (_html_converter.py, _markdownify.py); EPUB - zip/OPF spine to the HTML converter plus a metadata block (_epub_converter.py:55-134); CSV; plain text (.txt/.md/.json pass through unchanged, _plain_text_converter.py:6-19); ipynb; RSS/Atom; Wikipedia/Bing/YouTube URL special cases; Outlook .msg; ZIP (in memory, recursive, failing or unsupported members silently skipped, _zip_converter.py:108-130); image (exiftool metadata + optional LLM caption; JPEG/PNG only); audio (exiftool + Google speech recognition); and the cloud converters DocumentIntelligenceConverter (prebuilt-layout to markdown, HTML comments stripped) and ContentUnderstandingConverter (to_llm_input), registered at the top of the stack only when an endpoint is passed (_markitdown.py:254-296). Plugins: entry-point group `markitdown.plugin`, `register_converters(markitdown, **kwargs)` (_markitdown.py:113-130, 302-320); markitdown-ocr registers PDF/DOCX/PPTX/XLSX OCR converters at priority -1.0 (_plugin.py:49-68): its PDF converter is a separate pipeline (`## Page N` headings, no table heuristics, 300-DPI full-page fallback, PyMuPDF retry), while DOCX/PPTX/XLSX subclass the core converters and override `_image_to_html`. MCP: markitdown_mcp/__main__.py builds a new MarkItDown per call (line 22) and exposes one tool; /mcp (Streamable HTTP) and /sse are mounted on one Starlette/uvicorn app (lines 58-79). No database, index, cache or persistent state; whole inputs are buffered in memory. `_extract_tables_from_words` and `_to_markdown_table` in _pdf_converter.py are defined but never called (grep).",
+      "packaging_and_release": "All four packages use hatchling with the version read from `__about__.py` (packages/markitdown/pyproject.toml:1-3, 71-72; sdist limited by only-include at :115-116). Versions: markitdown 0.1.8 (packages/markitdown/src/markitdown/__about__.py:4), markitdown-mcp 0.0.1a7, markitdown-ocr 0.1.1, sample plugin 0.1.0a1 (their __about__.py:4). PyPI publication is indicated only by README badges (README.md:3; packages/markitdown-mcp/README.md:7). There is NO release or publish workflow in the repo: .github/workflows contains only tests.yml and pre-commit.yml (both `on: pull_request`); a grep of .github for publish/pypi/attest/sigstore/cosign/slsa/checksum/release matched only a comment (tests.yml:58). So no in-repo evidence of release artifacts, checksums, signatures, SBOMs, provenance attestations or trusted publishing. Docker images are built locally from the Dockerfiles (README.md:303; packages/markitdown-mcp/README.md:42); no published image is documented, and the base image is unpinned `python:3.13-slim-trixie` (Dockerfile:1). The git tag v0.1.8 is an annotated tag (.git/packed-refs:2-3); tag signature not inspected.",
+      "tests_and_ci": "pytest, run through Hatch (`hatch test`, README.md:369-383; hatch-test env installs all extras + openai, packages/markitdown/pyproject.toml:80-84). 46 test files: 34 in packages/markitdown/tests, 8 in packages/markitdown-ocr/tests, 3 in packages/markitdown-mcp/tests, 1 in packages/markitdown-sample-plugin/tests; about 479 `def test_` definitions (grep count, before parametrization). Tests are mostly substring assertions on converted fixtures (packages/markitdown/tests/_test_vectors.py) plus PDF snapshot comparisons (tests/test_files/expected_outputs/). Cloud paths are mocked (tests/test_cu_converter.py has ~100 Mock/patch hits; OCR tests use MockOCRService, packages/markitdown-ocr/tests/test_pdf_converter.py:36-42); live-network tests (remote URL, speech transcription) are skipped when GITHUB_ACTIONS is set (tests/test_module_misc.py:32-34, 1139-1161) and live LLM tests need OPENAI_API_KEY (:38, 1291-1294). Regression tests include CVE-2025-11849 DOCX rlink (:1098-1136); exiftool is version-gated for CVE-2021-22204 (converters/_exiftool.py:29-33). CI: .github/workflows/tests.yml (on pull_request only, permissions contents: read) runs three jobs - `tests` (hatch test in packages/markitdown), `ocr-tests` (pytest in packages/markitdown-ocr), `mcp-tests` (pytest in packages/markitdown-mcp) - each on ubuntu-latest x Python 3.10-3.14 plus windows-latest and windows-11-vs2026-arm on 3.12 (lines 13-92); no macOS runner. .github/workflows/pre-commit.yml runs `pre-commit run --all-files` (black rev 23.7.0, .pre-commit-config.yaml:1-5). .github/dependabot.yml updates GitHub Actions only (weekly, 7-day cooldown). Actions are pinned by commit SHA (tests.yml:27-28). A mypy env exists (pyproject.toml:86-94) but no workflow runs it. Memory test class is skipped unless fpdf2 is installed (tests/test_pdf_memory.py:296-299).",
+      "dependencies": "Four manifests, all pyproject.toml, no lockfile or requirements*.txt (glob found none). packages/markitdown/pyproject.toml: 6 core dependencies (beautifulsoup4, requests, markdownify, magika~=0.6.1, charset-normalizer, defusedxml; lines 27-34) + 15 optional packages behind 10 extras (`all` = python-pptx, mammoth~=1.11.0, pandas, openpyxl, xlrd, lxml, pdfminer.six>=20251230, pdfplumber>=0.11.9, olefile, pydub, SpeechRecognition, youtube-transcript-api~=1.2.3, azure-ai-documentintelligence, azure-ai-contentunderstanding>=1.2.0b1 (pre-release), azure-identity; lines 36-64) = 21 distinct direct runtime packages; dev/test extras: openai, mypy (lines 80-91). packages/markitdown-mcp/pyproject.toml: 3 (mcp>=2.1.1,<3.0.0; markitdown[all]>=0.1.1,<0.2.0; requests>=2.0.0,<3.0.0; lines 26-30). packages/markitdown-ocr/pyproject.toml: 10 (markitdown>=0.1.8,<0.2.0, pdfminer.six, pdfplumber, PyMuPDF>=1.24.0, mammoth, python-docx, python-pptx, pandas, openpyxl, Pillow>=9.0.0; lines 27-38) + 1 optional (`llm` = openai>=1.0.0; lines 42-45). packages/markitdown-sample-plugin/pyproject.toml: 2 (markitdown>=0.1.0a1, striprtf; lines 26-29). .github/constraints.txt: one CI-only pin (cryptography==46.0.3 on Windows ARM64; line 3). External binaries for some features: ffmpeg (mp3/mp4 transcription) and exiftool (image/audio metadata), installed in the Dockerfiles (Dockerfile:9-11).",
+      "security_policy": "SECURITY.md (Microsoft MSRC template v0.0.9): report privately via https://msrc.microsoft.com/create-report or secure@microsoft.com, not via public issues; coordinated vulnerability disclosure (SECURITY.md:9-17, 37-39). Additional guidance: README.md:394-400 and packages/markitdown-mcp/README.md:132-134. SUPPORT.md is an unedited template (SUPPORT.md:1-21)."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:11-24 - supported inputs include 'Images (EXIF metadata and OCR)', 'Audio (EXIF metadata and speech transcription)', EPubs, ZIP, YouTube, text formats (CSV, JSON, XML).",
+        "verified": "partial",
+        "evidence": "Converters exist for PDF, DOCX, PPTX, XLSX/XLS, HTML, EPUB, CSV, ZIP, YouTube, Outlook .msg, RSS/Atom, ipynb (packages/markitdown/src/markitdown/_markitdown.py:229-252; converters/__init__.py:5-29). Not as stated: ImageConverter accepts only .jpg/.jpeg/.png (_image_converter.py:8-13) and performs no OCR - only exiftool metadata and, if llm_client is set, a 'detailed caption' prompt (lines 48-85); with neither it returns empty Markdown. JSON/.md/.txt pass through unchanged (_plain_text_converter.py:6-19, 66); XML is converted only when it is RSS/Atom (_rss_converter.py:129-139). Not supported in core: .doc, .ppt, .odt, .rtf (RTF exists only in the sample plugin: packages/markitdown-sample-plugin/src/markitdown_sample_plugin/_plugin.py:17-22)."
+      },
+      {
+        "claim": "README.md:9 - preserves important document structure as Markdown (headings, lists, tables, links).",
+        "verified": "partial",
+        "evidence": "Holds for DOCX (mammoth styles to HTML to markdownify with ATX headings: converters/_docx_converter.py:95-123; _markdownify.py:35-54), PPTX (title as '# ', tables, charts, notes: _pptx_converter.py:88-147) and HTML/EPUB (markdownify). The built-in PDF path emits plain text lines, or pipe tables for pages the word-position heuristics classify as form-like (_pdf_converter.py:120-395, 554-589); there is no heading or list detection and no page markers; the project's own snapshot shows 'Introduction' as plain text and hyphenated line breaks left as 'con-' / 'firming' (packages/markitdown/tests/test_files/expected_outputs/test.md:3, 15-16)."
+      },
+      {
+        "claim": "packages/markitdown-ocr/README.md:34 - CLI usage: `markitdown document.pdf --use-plugins --llm-client openai --llm-model gpt-4o`.",
+        "verified": "no",
+        "evidence": "packages/markitdown/src/markitdown/__main__.py defines no --llm-client or --llm-model option (all options at lines 51-145; grep for 'llm' in the file returns zero matches) and builds MarkItDown(enable_plugins=...) without any llm_client (lines 216-249). The string occurs only in the OCR README (repo-wide grep). With the CLI the plugin therefore loads with ocr_service=None (packages/markitdown-ocr/src/markitdown_ocr/_plugin.py:41-47); LLM OCR is reachable only via the Python API (README.md:140-155). Code preferred over README."
+      },
+      {
+        "claim": "README.md:157 / packages/markitdown-ocr/README.md:55 - without llm_client the plugin still loads, OCR is silently skipped and the standard built-in converter is used.",
+        "verified": "partial",
+        "evidence": "True for DOCX/PPTX/XLSX: they subclass the core converters and `_image_to_html` returns None without a service (markitdown_ocr/_docx_converter_with_ocr.py:43-45; _pptx_converter_with_ocr.py:42-44; _xlsx_converter_with_ocr.py:42-44). Not true for PDF: PdfConverterWithOCR is always registered at priority -1.0 (_plugin.py:49-56) and runs its own pipeline - a `## Page N` heading per page, page.extract_text() text, no form/table heuristics, pdfminer only as fallback (_pdf_converter_with_ocr.py:186-190, 283-295) - so enabling the plugin changes PDF output even with no LLM; its test only asserts no OCR tags appear (packages/markitdown-ocr/tests/test_pdf_converter.py:239-247). When OCR is on and a page has images, lines are rebuilt from page.chars (_pdf_converter_with_ocr.py:197-226) and the repo's snapshot shows table cells fused ('ItemQuantity', 'Widget A5': tests/test_pdf_converter.py:134-143)."
+      },
+      {
+        "claim": "packages/markitdown-ocr/README.md:112 - scanned PDFs (pages with no extractable text) are detected automatically and each page is rendered at 300 DPI and sent to the LLM as a full-page image.",
+        "verified": "partial",
+        "evidence": "Static reading, not executed. The 300-DPI path `_ocr_full_pages` is called only when the whole-document markdown is empty (markitdown_ocr/_pdf_converter_with_ocr.py:305-309), but convert() appends a '## Page N' heading for every page (line 189), so for any PDF pdfplumber can open the markdown is never empty and that path is not reached through convert(). Scanned pages are instead OCR'd as embedded images found by pdfplumber (`_extract_images_from_page`, lines 28-126; per-page loop 191-251), which depends on image objects being detected on the page. The full-page path is reached mainly when pdfplumber raises and pdfminer yields nothing (lines 297-309; PyMuPDF retry 386-420). Tests use a mock OCR service, so OCR accuracy is not measured (packages/markitdown-ocr/tests/test_pdf_converter.py:36-42, 180-202); test_pdf_scanned_fallback_format calls `_ocr_full_pages` directly (lines 210-231)."
+      },
+      {
+        "claim": "README.md:131 / packages/markitdown-ocr/README.md:5 - 'No new ML libraries or binary dependencies required.'",
+        "verified": "partial",
+        "evidence": "No local OCR/ML engine is added - recognition is a remote call through the caller's OpenAI-compatible client (markitdown_ocr/_ocr_service.py:82-101). But packages/markitdown-ocr/pyproject.toml:27-38 hard-requires PyMuPDF>=1.24.0 and Pillow>=9.0.0 (compiled wheels) plus pandas, openpyxl, python-pptx, python-docx, mammoth, pdfplumber and pdfminer.six, and the OpenAI-compatible client must be installed separately (pyproject.toml:40-45)."
+      },
+      {
+        "claim": "packages/markitdown-ocr/README.md:176 - the plugin propagates LLM API errors as warnings and continues conversion.",
+        "verified": "partial",
+        "evidence": "Office converters warn and keep the native image (markitdown_ocr/_docx_converter_with_ocr.py:54-60; same pattern in the pptx and xlsx converters). The PDF path discards OCRResult.error: image results with empty text are dropped without a warning (_pdf_converter_with_ocr.py:239-251) and the full-page path writes '*[No text could be extracted from this page]*' for both empty pages and API failures (lines 369-378); LLMVisionOCRService.extract_text catches every exception into `error` (_ocr_service.py:108-109), so a failed API call is indistinguishable from an empty page in PDF output."
+      },
+      {
+        "claim": "README.md:176-182 - built-in converters are 'Offline, format-specific extraction' with cost 'Local compute only'.",
+        "verified": "partial",
+        "evidence": "PDF/Office/HTML/EPUB/CSV conversion is local code. Built-ins also reach the network: convert()/convert_uri() fetch http(s) URLs (packages/markitdown/src/markitdown/_markitdown.py:336-349, 518-527); audio transcription calls recognizer.recognize_google (converters/_transcribe_audio.py:57); YouTube pages fetch transcripts through youtube_transcript_api (converters/_youtube_converter.py:166-188); image and PPTX captions call the supplied LLM client when configured (converters/_llm_caption.py:49; _pptx_converter.py:181-195)."
+      },
+      {
+        "claim": "packages/markitdown-mcp/README.md:13 - the server 'exposes one tool: convert_to_markdown(uri)' for http:, https:, file: or data: URIs.",
+        "verified": "yes",
+        "evidence": "Exactly one @mcp.tool() exists (packages/markitdown-mcp/src/markitdown_mcp/__main__.py:19-47; grep for @mcp.tool/resource/prompt matched only line 19). It returns `convert_uri(uri).markdown` - a Markdown string only (line 24); there is no search, index, listing, original-bytes or metadata tool, and it constructs MarkItDown(enable_plugins=...) with no LLM/DI/CU settings (line 22). convert_uri accepts file/data/http/https and raises ValueError for other schemes (_markitdown.py:471-531)."
+      },
+      {
+        "claim": "README.md:247-258 - Document Intelligence conversion via `-d -e <endpoint>` or MARKITDOWN_DOCINTEL_ENDPOINT.",
+        "verified": "yes",
+        "evidence": "CLI options -d/--use-docintel and -e/--endpoint (env default MARKITDOWN_DOCINTEL_ENDPOINT) are defined (packages/markitdown/src/markitdown/__main__.py:83-105) and wired to MarkItDown(docintel_endpoint=...) (lines 207-218; a filename is required, lines 213-214). The converter sends the whole file to Azure `prebuilt-layout` with output_content_format='markdown' (converters/_doc_intel_converter.py:248-254), strips every <!-- ... --> comment from the result (lines 256-257) and returns Markdown only (no JSON/analyze result). Default types are DOCX, PPTX, XLSX, PDF, JPEG, PNG, BMP, TIFF - HTML is excluded unless passed (lines 139-148); formula/high-resolution-OCR/font features are requested only for PDF and images (lines 211-239)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "PDF converter peak memory on a generated 200-page table PDF - an in-repo test threshold and code comment, not a published benchmark; the test class is skipped unless fpdf2 is installed, and fpdf2 is not declared in any pyproject.toml",
+        "metric": "tracemalloc peak memory for 200 pages; peak ratio 200 pages vs 50 pages",
+        "value": "asserted < 30 MiB with per-page page.close(); comment states ~225 MiB without it; ratio asserted < 2.0x",
+        "source": "packages/markitdown/tests/test_pdf_memory.py:296-331, 333-364",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope (retrieval): no collection search, indexing or retrieval. The only MCP tool is `convert_to_markdown(uri)` returning converted Markdown (packages/markitdown-mcp/src/markitdown_mcp/__main__.py:19-24); greps of packages/**/src for embedding/vector/bm25/index/sqlite/collection found no index, store or original-body read-back; the result type carries only markdown + title (packages/markitdown/src/markitdown/_base_converter.py:8-25); README declares servers, HTTP APIs and hosted services out of scope (README.md:337-340). Source-position metadata is limited to PPTX `<!-- Slide number: N -->` (converters/_pptx_converter.py:88), XLSX `## sheet` headings (_xlsx_converter.py:152) and the OCR plugin's `## Page N` (markitdown_ocr/_pdf_converter_with_ocr.py:189); built-in PDF output has no page markers.",
+      "Conversion limits: the built-in PDF converter reads the text layer only, and scanned PDFs yield empty output (project's own test: packages/markitdown/tests/test_pdf_tables.py:629-652); table detection is word-position heuristics (converters/_pdf_converter.py:120-395). OCR needs a remote service: LLM OCR works only through the Python API (the CLI has no LLM flags despite packages/markitdown-ocr/README.md:34, and the MCP server cannot pass llm_client), while Azure DI/CU are cloud and billable (README.md:182, 232). Output is Markdown only - no JSON (__main__.py:266-277). Core covers no .doc/.ppt/.odt/.rtf and only JPEG/PNG images (converters/_image_converter.py:8-13); ZIP members that fail or are unsupported are silently skipped (converters/_zip_converter.py:125-128).",
+      "Data egress and cost: audio is sent to Google speech recognition (converters/_transcribe_audio.py:57), YouTube transcripts are fetched online (converters/_youtube_converter.py:166-188), DI/CU upload whole files to Azure (converters/_doc_intel_converter.py:248-253; _cu_converter.py:553-561), and LLM/OCR sends base64 images to the configured endpoint (markitdown_ocr/_ocr_service.py:82-101). `[all]` installs the audio and YouTube dependencies (packages/markitdown/pyproject.toml:37-52), so those paths are active for audio/YouTube inputs unless extras are chosen individually; README labels built-ins 'Offline' (README.md:178).",
+      "Security (MCP and URI fetching): the MCP server has no authentication and can read any file the user can (file: URIs) or fetch any URL (packages/markitdown-mcp/README.md:134; __main__.py:19-47); convert_uri applies no path or host allow-list (packages/markitdown/src/markitdown/_markitdown.py:485-527). HTTP fetch has no timeout and no size cap and buffers the whole body (_markitdown.py:519, 594-598; the string 'timeout' appears nowhere in packages/**/src); ZIP members are read fully into memory with no size limit (converters/_zip_converter.py:112). HTTP mode hard-codes Starlette debug=True (markitdown_mcp/__main__.py:128), and a non-localhost --host only prints a warning (lines 116-127).",
+      "Platform and CI coverage: CI runs only on Linux (ubuntu-latest) and Windows (x64 and ARM64); there is no macOS runner and no WSL mention (.github/workflows/tests.yml:17-24), and workflows trigger only on pull_request, with no scheduled or main-branch runs (tests.yml:2; pre-commit.yml:2). Windows ARM64 CI needs a pinned `cryptography` workaround (.github/constraints.txt:1-3). Some features need external binaries: ffmpeg for mp3/mp4 transcription and exiftool for image/audio metadata (Dockerfile:9-11; converters/_exiftool.py:10-37).",
+      "Dependencies and licensing: `[all]` pulls a pre-release Azure SDK (`azure-ai-contentunderstanding>=1.2.0b1`, packages/markitdown/pyproject.toml:51, 63-64) and about 21 direct packages in total; markitdown-mcp requires `markitdown[all]` plus MCP SDK 2.x (`mcp>=2.1.1,<3.0.0`, packages/markitdown-mcp/pyproject.toml:26-30); `magika~=0.6.1` is narrowly pinned (packages/markitdown/pyproject.toml:31); there is no lockfile or hash pinning. markitdown-ocr hard-requires PyMuPDF (packages/markitdown-ocr/pyproject.toml:31); its licence terms are not stated in this repo and were not checked. The repo is MIT (LICENSE:1-21) with vendored Apache-2.0 dwml files under converter_utils/docx/math (packages/markitdown/ThirdPartyNotices.md:9-25); licences of third-party dependencies were not inspected.",
+      "Release integrity: no release/publish workflow, checksum, signature, SBOM or provenance attestation exists in the repo (.github/workflows has only tests.yml and pre-commit.yml; grep for publish/attest/sigstore/cosign/slsa/checksum matched only a comment at tests.yml:58); Dependabot covers GitHub Actions only, not pip (.github/dependabot.yml:3); Docker images are built locally from an unpinned base image (Dockerfile:1).",
+      "Maturity and docs drift: core is 'Development Status :: 4 - Beta' (packages/markitdown/pyproject.toml:17) and its class docstring says '(In preview)' (_markitdown.py:142); markitdown-mcp is 0.0.1a7 and the sample plugin 0.1.0a1 (their __about__.py:4); SUPPORT.md is an unedited template (SUPPORT.md:1-21). This is a shallow single-commit clone, so commit and release cadence were not assessed. README/code mismatches (see claim_checks): image 'OCR' (README.md:17), OCR CLI flags (packages/markitdown-ocr/README.md:34), no-LLM fallback and scanned-PDF behaviour (OCR README:55, 112), error handling (OCR README:176). No published accuracy or throughput benchmarks exist for conversion quality (greps of README/docs for benchmark/accuracy found none)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "microsoft/markitdown",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "pip from PyPI (all optional extras): `pip install 'markitdown[all]'`",
+          "citation": "README.md:62; packages/markitdown/pyproject.toml:10, 37-53, 54-64, 74-75",
+          "holds": true,
+          "note": "README.md:62 reads exactly \"To install MarkItDown, use pip: `pip install 'markitdown[all]'`\". The `all` extra exists with 15 optional packages (pyproject.toml:37-53), the `markitdown` console script is declared at :74-75, and requires-python >=3.10,<3.15 (:10) matches README.md:36. The per-format extras listed at README.md:101-111 match pyproject.toml:54-64."
+        },
+        {
+          "field": "license",
+          "statement": "spdx MIT, file LICENSE",
+          "citation": "LICENSE:1-21; packages/markitdown/pyproject.toml:11; packages/markitdown-mcp/pyproject.toml:11; packages/markitdown-ocr/pyproject.toml:11; packages/markitdown-sample-plugin/pyproject.toml:11",
+          "holds": true,
+          "note": "LICENSE is the standard MIT text ('Copyright (c) Microsoft Corporation.'). All four packages declare license = \"MIT\" at pyproject.toml:11. The vendored Apache-2.0 files mentioned in the dossier's risks were not re-checked."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - CI matrix runs ubuntu-latest on Python 3.10-3.14 for the core, OCR and MCP packages; workflow does not state CPU architecture; Dockerfile uses python:3.13-slim-trixie; requires-python >=3.10,<3.15",
+          "citation": ".github/workflows/tests.yml:15-19, 45, 74; Dockerfile:1; packages/markitdown/pyproject.toml:10",
+          "holds": true,
+          "note": "tests.yml:18-19 set os [ubuntu-latest] x Python 3.10-3.14 for the `tests` job; :44-45 and :73-74 repeat this for `ocr-tests` and `mcp-tests`. No architecture is specified anywhere in the workflow, as the dossier says. Dockerfile:1 is `FROM python:3.13-slim-trixie`, and pyproject.toml:10 is `requires-python = \">=3.10,<3.15\"`."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "yes - markitdown-mcp exposes one tool convert_to_markdown(uri) (http/https/file/data) returning Markdown only; STDIO default, --http serves Streamable HTTP (/mcp) and SSE (/sse) on 127.0.0.1:3001; new MarkItDown(enable_plugins=...) per call so no LLM/DI/CU settings; tests cover legacy initialize and 2026-07-28 server/discover; Docker with mounted directory documented",
+          "citation": "packages/markitdown-mcp/README.md:11-13, 38-55, 116-124; packages/markitdown-mcp/src/markitdown_mcp/__main__.py:19-47, 50-55, 58-79, 83-135; packages/markitdown/src/markitdown/_markitdown.py:168, 471-531; packages/markitdown-mcp/tests/test_stdio_protocols.py:1-7, 77-139",
+          "holds": true,
+          "note": "There is a single @mcp.tool() (__main__.py:19-20). Line 22 builds `MarkItDown(enable_plugins=check_plugins_enabled())` (env MARKITDOWN_ENABLE_PLUGINS, :50-55), and line 24 returns `convert_uri(uri).markdown`. mcp.run() is the default (:135). --http/--sse mounts the SSE and Streamable HTTP routes in one Starlette app (:58-79), defaulting to host 127.0.0.1 and port 3001 (:115, :132); /mcp and /sse are documented at README:118, 123. The constructor builds magika.Magika() (_markitdown.py:168). convert_uri accepts file/data/http/https and raises ValueError for other schemes (:485-531). Both handshake tests exist (test_legacy_initialize_handshake :77-108, test_modern_discover_handshake :111-139). README:38-55 documents Docker with a -v mount."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "README.md:11-24 inputs claim is 'partial': ImageConverter is JPEG/PNG-only with no OCR; JSON/.md/.txt pass through unchanged; XML is converted only when RSS/Atom; 'Not supported in core: .doc, .ppt, .odt, .rtf (RTF exists only in the sample plugin ...)'",
+          "citation": "README.md:11-24; packages/markitdown/src/markitdown/_markitdown.py:229-252, 276-296; packages/markitdown/src/markitdown/converters/__init__.py:5-29; converters/_image_converter.py:8-13, 48-85, 97; converters/_plain_text_converter.py:6-19, 66; converters/_rss_converter.py:129-139; converters/_cu_converter.py:66-67, 110-111, 159-160, 248, 484; packages/markitdown-sample-plugin/src/markitdown_sample_plugin/_plugin.py:17-22",
+          "holds": false,
+          "note": "The 'partial' verdict is right, and most of the evidence checks out. ImageConverter accepts only .jpg/.jpeg/.png (:8-13). It emits exiftool fields, plus an LLM description using the default prompt 'Write a detailed caption for this image.' when both llm_client and llm_model are set (:68-85, 97). Otherwise it returns ''. PlainTextConverter returns the decoded text unchanged (:66), and RssConverter accepts XML only with an rss or atom root (:129-139). The wrong part is 'RTF exists only in the sample plugin'. The core package's ContentUnderstandingConverter maps .rtf, text/rtf and application/rtf (_cu_converter.py:66, 110, 159), and also .xml (:67, 111, 160). By default it takes every listed type (_ALL_FILE_TYPES :248, :484) once a CU endpoint is configured (_markitdown.py:276-296). So RTF and XML are converted in core via Azure. The statement holds only for local built-in converters; a grep of packages/markitdown/src for rtf matches only _cu_converter.py."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "claim_checks[0].evidence: replace 'Not supported in core: .doc, .ppt, .odt, .rtf (RTF exists only in the sample plugin: packages/markitdown-sample-plugin/src/markitdown_sample_plugin/_plugin.py:17-22).' with 'No local built-in converter handles .doc, .ppt, .odt or .rtf. The core package's cloud ContentUnderstandingConverter does accept .rtf (and .xml) and handles all its file types by default once a CU endpoint is configured (packages/markitdown/src/markitdown/converters/_cu_converter.py:66-67, 110-111, 159-160, 248, 484; _markitdown.py:276-296). Local RTF conversion exists only in the sample plugin (packages/markitdown-sample-plugin/src/markitdown_sample_plugin/_plugin.py:17-22).' In the same entry, change 'XML is converted only when it is RSS/Atom' to 'among local built-in converters, XML is converted only when it is RSS/Atom; with a CU endpoint configured, .xml is sent to Azure'."
+      ]
+    }
+  ]
+}

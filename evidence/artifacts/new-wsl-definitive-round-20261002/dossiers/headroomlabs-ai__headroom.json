@@ -1,0 +1,352 @@
+{
+  "contender": "headroomlabs-ai/headroom",
+  "revision": {
+    "contender": "headroomlabs-ai/headroom",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "headroomlabs-ai/headroom",
+        "tag": "v0.39.1",
+        "commit": "d13e1966f820220b482a33c30bde1e926743939a",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.39.1",
+    "commit": "d13e1966f820220b482a33c30bde1e926743939a",
+    "read_at": "2026-10-02T03:02:17+00:00"
+  },
+  "dossier": {
+    "contender": "headroomlabs-ai/headroom",
+    "revision": {
+      "tag": "v0.39.1",
+      "commit": "d13e1966f820220b482a33c30bde1e926743939a",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Headroom (PyPI and npm package `headroom-ai`) is a local context-compression layer for LLM agents. It ships as a Python library (`compress(messages)`), an HTTP proxy with Anthropic/OpenAI/Gemini/Bedrock-compatible routes, an MCP server (`headroom_compress`, `headroom_retrieve`, `headroom_stats`), and `wrap`/`init` helpers that route coding agents (Claude Code, Codex and about 15 others) through the proxy. It shrinks tool outputs, logs, JSON, code and text (Rust SmartCrusher, tree-sitter CodeCompressor, the Kompress-v2-base model), keeps the originals in a TTL-bounded local store (CCR) that the model can pull back with `headroom_retrieve`, and reports its own before/after token counts (tiktoken-based) through `headroom savings`, `headroom perf`, the dashboard and `headroom_stats`. Answer to the need's question: no single Headroom tool reads both Claude Code and Codex local logs for input/output/cache-creation/cache-read tokens. The nearest is a Claude-only transcript tally inside the proxy's subscription tracker (headroom/subscription/session_tracking.py:123-212). Codex logs are read only for read-pattern byte counts and tool failures (headroom/audit/codex.py:163-229; headroom/learn/plugins/codex.py:204-276). Provider-reported usage is otherwise captured only for requests that pass through the proxy (see claim_checks[0]).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Headroom compresses everything your AI agent reads (tool outputs, logs, RAG chunks, files, conversation history) before it reaches the LLM. 'Same answers, fraction of the tokens. Compression runs on your machine; no prompt or file content is sent anywhere to be compressed.'",
+          "citation": "README.md:35-38"
+        },
+        {
+          "claim": "Delivery modes: Library `compress(messages)` in Python or TypeScript; Proxy `headroom proxy --port 8787`; Agent wrap `headroom wrap claude|codex|grok|copilot|cursor|aider|opencode|cline|continue|goose|openhands|openclaw|vibe|omp|zcode`, undone with `headroom unwrap <tool>`; MCP server with `headroom_compress`, `headroom_retrieve`, `headroom_stats`.",
+          "citation": "README.md:47-50"
+        },
+        {
+          "claim": "Reversible (CCR): 'originals are cached locally and retrieved on demand'; CCR stores originals locally so the model can call `headroom_retrieve` when it needs the full text.",
+          "citation": "README.md:54,81"
+        },
+        {
+          "claim": "Compression that is reversible: 'originals stay retrievable through CCR for the configured TTL.'",
+          "citation": "README.md:350-353"
+        },
+        {
+          "claim": "Live-zone compression: only new bytes (fresh tool output, the latest turn) are compressed; the frozen prefix stays byte-identical so the provider cache survives, and history is never dropped.",
+          "citation": "README.md:390"
+        },
+        {
+          "claim": "CacheAligner flags volatile content that would bust a provider KV-cache prefix and 'never rewrites prompts'.",
+          "citation": "README.md:80"
+        },
+        {
+          "claim": "Savings are checked with `headroom doctor`, `headroom perf`, `headroom dashboard` ('live savings (proxy must be running)'); 'Run `headroom savings` against your own traffic for the number that applies to you.'",
+          "citation": "README.md:101-104,149-153"
+        },
+        {
+          "claim": "Proof: four scenarios built from real MCP server output formats, 'measured with the provider tokenizer and the shipped compress()', seeded and offline, reproducible with `uv run python benchmarks/index_proof_table.py --seed 20260902` (21% / 57% / 42% / 30% saved).",
+          "citation": "README.md:132-147"
+        },
+        {
+          "claim": "'Compression costs well under a millisecond: 0.21 ms p50 on a 10K-token JSON search result, 1.4 ms at 100K tokens, so it does not show up in agent latency.'",
+          "citation": "README.md:154-155"
+        },
+        {
+          "claim": "Accuracy (`python -m headroom.evals suite --tier 1`, N=100): GSM8K 0.870 to 0.870, TruthfulQA 0.530 to 0.560 (within the confidence interval), SQuAD v2 97% at 19% compression, BFCL 97% at 32% compression.",
+          "citation": "README.md:157-168"
+        },
+        {
+          "claim": "Output savings are counterfactual, so Headroom 'reports an estimate with a confidence range and labels it as one' (`headroom output-savings`); `HEADROOM_OUTPUT_HOLDOUT=0.1` leaves 10% of conversations unshaped for a measured number. The shaper is off by default (`HEADROOM_OUTPUT_SHAPER=1`).",
+          "citation": "README.md:170-222"
+        },
+        {
+          "claim": "`headroom learn` mines failed sessions and writes corrections to CLAUDE.local.md (default, gitignored), CLAUDE.md, AGENTS.md, GEMINI.md or GROK.md; plugin-based failure mining for Claude, Codex and Gemini.",
+          "citation": "README.md:52,394,591-594"
+        },
+        {
+          "claim": "`headroom wrap` starts a local proxy, installs Serena for code navigation (registered at user scope, in ~/.claude.json for Claude Code, until `headroom unwrap`; skip with `--code-memory none`). The `headroom` CLI ships only in the PyPI package; the npm package is the TypeScript SDK with no CLI.",
+          "citation": "README.md:121-130"
+        },
+        {
+          "claim": "Telemetry: 'An anonymous beacon is on by default.' It reports ratios, counters, provider and model IDs, OS and architecture, and never prompts, completions, code or file paths. Turn it off with `HEADROOM_BEACON=off`, `DO_NOT_TRACK=1`, or `--offline`. The proxy also checks PyPI at most once a day for updates (opt out with `HEADROOM_UPDATE_CHECK=off`).",
+          "citation": "README.md:500-502,596-606"
+        }
+      ],
+      "install": [
+        {
+          "method": "uv tool (CLI in an isolated env; Linux and macOS Apple Silicon)",
+          "command": "uv tool install --python 3.13 \"headroom-ai[all]\"",
+          "citation": "README.md:91; docs/content/docs/installation.mdx:27-36"
+        },
+        {
+          "method": "pip (Python library plus the `headroom` CLI)",
+          "command": "pip install \"headroom-ai[all]\"",
+          "citation": "README.md:92,425; docs/content/docs/installation.mdx:77-81"
+        },
+        {
+          "method": "npm (TypeScript SDK only; no CLI; needs a running proxy)",
+          "command": "npm install headroom-ai",
+          "citation": "README.md:93,128-130; docs/content/docs/installation.mdx:189-219"
+        },
+        {
+          "method": "Docker image from GHCR",
+          "command": "docker pull ghcr.io/headroomlabs-ai/headroom:latest",
+          "citation": "README.md:427; docs/content/docs/installation.mdx:231-235"
+        },
+        {
+          "method": "Docker-native one-line installer, Linux (installs a host `headroom` wrapper that runs Headroom in Docker)",
+          "command": "curl -fsSL https://raw.githubusercontent.com/headroomlabs-ai/headroom/main/scripts/install.sh | bash",
+          "citation": "docs/content/docs/docker-install.mdx:10-14"
+        },
+        {
+          "method": "Docker-native one-line installer, macOS (needs bash 4.3+ from Homebrew)",
+          "command": "curl -fsSL https://raw.githubusercontent.com/headroomlabs-ai/headroom/main/scripts/install.sh | \"$(brew --prefix bash)/bin/bash\"",
+          "citation": "docs/content/docs/docker-install.mdx:16-22"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes. Release wheels are manylinux_2_28 x86_64 for CPython 3.10-3.13 with stable-ABI forward compatibility, built and smoke-imported in CI (docs/content/docs/installation.mdx:19-25; .github/workflows/release.yml:226-228,494-495). The Docker image is built for linux/amd64 (.github/workflows/docker.yml:71). ONNX-backed features need AVX2 on x86; without it Headroom falls back to non-ONNX paths (README.md:478-482).",
+        "wsl2": "unknown. No WSL2-specific support statement or CI job found. A WSL2 distro is Linux, so the Linux wheels would apply, but upstream only mentions WSL in passing (docs/content/docs/vscode-claude-code.mdx:136; docs/content/docs/vscode-copilot.mdx:141; TESTING-copilot-subscription.md:129).",
+        "macos_arm64": "yes. aarch64-apple-darwin wheels are built on macos-14 and smoke-imported (.github/workflows/release.yml:248-250,501); README.md:475 says native wheels cover Apple Silicon. Use `--python 3.13` if the default python3 is newer (README.md:446-455). watchdog is skipped on macOS with Python 3.14 (pyproject.toml:92-95). Intel macOS is contradictory: README.md:475-476 says use Docker, while README.md:523-526 and release.yml:245-247 say Intel wheels are published.",
+        "gpu": "yes, optional only; CPU is the default and sufficient. Kompress loads ONNX CPU first (headroom/transforms/kompress_compressor.py:965-969,1011-1016). Optional CUDA/MPS via PyTorch (kompress_compressor.py:916-919), CoreML or MPS via HEADROOM_KOMPRESS_BACKEND (kompress_compressor.py:971-973), and a `[pytorch-mps]` extra for the memory embedder (pyproject.toml:152-157; README.md:433-434). CI uses CPU-only torch (.github/workflows/ci.yml:35-38)."
+      },
+      "integrations": {
+        "cli": "Yes. `headroom` click CLI, entry point headroom.cli:main (pyproject.toml:355; headroom/cli/main.py:18-103). Relevant commands: proxy, dashboard (opens http://127.0.0.1:8787/dashboard, headroom/cli/proxy.py:197-220), wrap/unwrap, init, mcp install/serve/status, learn, savings, perf, output-savings, audit-reads [--codex], agent-savings, inspect, doctor, telemetry, install/deploy, memory, evals, recover codex, update.",
+        "mcp": "Yes. `headroom mcp serve` (stdio; `--transport http` serves Streamable HTTP, default :8788/mcp) exposes headroom_compress(content), headroom_retrieve(hash) and headroom_stats, plus headroom_read when HEADROOM_MCP_READ=on (headroom/ccr/mcp_server.py:76-85,636-727; docs/content/docs/mcp.mdx:42-121,160). `headroom mcp install` registers it with Claude Code; `pip install \"headroom-ai[mcp]\"` is the MCP-only install (docs/content/docs/mcp.mdx:10-26); server.json describes the uvx launch (server.json:13-44). Originals stored by headroom_compress live 3600 s (mcp_server.py:201,441-452). The docs list an optional `query` argument for headroom_retrieve that the code does not implement (mcp.mdx:78-84 vs mcp_server.py:660-678).",
+        "sdk_or_api": "Yes. Python: `from headroom import compress` returns messages plus tokens_before/after/saved, compression_ratio and transforms_applied (headroom/compress.py:150-179); also HeadroomClient (headroom/client.py:256), LangChain HeadroomChatModel (headroom/integrations/langchain/chat_model.py:119), Agno (headroom/integrations/agno/model.py:68), LiteLLM callback (headroom/integrations/litellm_callback.py:34), ASGI CompressionMiddleware (headroom/integrations/asgi.py:50), SharedContext (headroom/shared_context.py:67). TypeScript SDK `headroom-ai` with OpenAI/Anthropic/Gemini/Vercel AI adapters; its compress() calls the proxy (sdk/typescript/package.json:14-64; sdk/typescript/src/compress.ts:12-18,59-61). Proxy HTTP API on 127.0.0.1:8787 by default: provider-compatible routes (/v1/messages, OpenAI chat/responses, Gemini, Bedrock invoke; headroom/providers/proxy_routes.py:271-537), POST /v1/compress and POST /v1/usage (headroom/proxy/server.py:5662-5671), /v1/retrieve (loopback-only, by hash, returns the full original; server.py:5159-5208,5507-5536), /stats, /stats-history, /metrics (Prometheus), /subscription-window, /quota, /dashboard (server.py:4931-5108).",
+        "claude_code_or_codex": "Claude Code: `headroom wrap claude` sets ANTHROPIC_BASE_URL, starts the proxy, registers the headroom MCP server and Serena, with options --memory, --code-graph, --1m, --tool-search, --no-mcp (headroom/cli/wrap.py:5112-5228); `headroom mcp install`; `headroom init claude` for durable hooks and routing (headroom/cli/init.py:1055-1067); plugin plugins/headroom-agent-hooks whose SessionStart and PreToolUse(Bash|PowerShell) hooks run `headroom init hook ensure` (plugins/headroom-agent-hooks/hooks/hooks.json:3-28; .claude-plugin/marketplace.json:10-29); VS Code Claude extension via `headroom wrap vscode-claude` (README.md:315-346). Codex: `headroom wrap codex` sets OPENAI_BASE_URL and process-local `--config` overrides and registers the headroom MCP server in the active Codex home (headroom/cli/wrap.py:2678-2738,6394-6419,6496-6545); persistent flows (`headroom init codex`) inject model_provider=\"headroom\" into config.toml with a backup and retag Codex thread rows (wrap.py:3090-3125; headroom/providers/codex/threads.py:67-86); `headroom unwrap codex`, `headroom recover codex` (docs/content/docs/codex-recovery.mdx). Both agents' session logs are read by `headroom learn` (headroom/learn/plugins/claude.py, codex.py) and `headroom audit-reads` (--codex for Codex)."
+      },
+      "telemetry_and_network": "No Headroom account is needed for local use; the proxy forwards the client's own provider credentials to the upstream API. Network and telemetry facts: (1) Anonymous beacon is ON by default (BEACON_DEFAULT_ON=True, headroom/telemetry/beacon.py:56). Off via HEADROOM_BEACON=off|false|0|no|disable(d), DO_NOT_TRACK, or HEADROOM_OFFLINE (beacon.py:59-92); it is fail-open, so an unrecognised HEADROOM_BEACON value still uploads (beacon.py:76-78). It POSTs OTLP/HTTP JSON session summaries to https://headroom-beacon.headroom-beacon.workers.dev/v1/logs, an address the code comments call TEMPORARY (headroom/telemetry/session.py:125-131), when a session idles (900 s) and every 300 s while live (session.py:136-140). Payload: counters, ratios, provider/model ids, config slugs, cache stats, plus resource attributes os.type, host.arch and a random persisted headroom.install_id UUID (session.py:556-647). The receiver is an in-repo Cloudflare Worker that allowlists keys, stores to R2 and never reads the source IP (deploy/beacon/worker.js:26-28,37-112; deploy/beacon/wrangler.toml:26-28); `headroom telemetry --show` prints the payload (headroom/cli/telemetry.py:105-134). README/docs say `--offline` also disables it (README.md:604-605; docs/content/docs/proxy.mdx:39) but no `--offline` CLI option exists; only the HEADROOM_OFFLINE env var is read (headroom/cli/proxy.py:1429; headroom/offline.py:19-24). (2) HEADROOM_TELEMETRY (local aggregate stats) is off by default and never uploads (beacon.py:31-45). (3) HEADROOM_OFFLINE=1 is a master egress switch for beacon, update check, license reporter and HF downloads (headroom/offline.py:1-36). (4) Update check: GET https://pypi.org/pypi/headroom-ai/json at most daily from a background thread started on every CLI invocation except `update` (headroom/cli/main.py:48-57); skipped for HEADROOM_UPDATE_CHECK=off, offline, stateless, CI, Docker and git checkouts (headroom/update_check.py:15-18,34-72). (5) Quota pollers started with the proxy (headroom/proxy/server.py:2185-2216): Anthropic OAuth usage poll GET https://api.anthropic.com/api/oauth/usage with a token from CLAUDE_CODE_OAUTH_TOKEN or ~/.claude/.credentials.json (headroom/subscription/client.py:3-12,28-29,51-80), enabled by default (headroom/proxy/models.py:469; disable with --no-subscription-tracking, headroom/cli/proxy.py:445-453); Codex window poll GET https://chatgpt.com/backend-api/wham/usage with the Codex client's bearer token and ChatGPT-Account-Id seen on proxied requests, throttled to 60 s (headroom/subscription/codex_rate_limits.py:57-66,417-486); GitHub Copilot quota poll to https://api.github.com/copilot_internal/user only when a GitHub token env var is set (headroom/subscription/copilot_quota.py:1-15,48-54). (6) Managed-license phone-home exists only when HEADROOM_LICENSE_KEY is set: validates at https://app.headroomlabs.ai/v1/license/validate and reports aggregate counts every 300 s, and compression is license-gated in that mode (headroom/telemetry/reporter.py:1-40,98-132; headroom/proxy/server.py:1418-1425; headroom/proxy/compression_decision.py:109-120). (7) Downloads: Kompress-v2-base and other ONNX/HF assets from huggingface.co at first use, commit-pinned for four repos (headroom/onnx_runtime.py:66-88) while the ModernBERT tokenizer is fetched unpinned (headroom/transforms/kompress_compressor.py:771-792). README.md:531 says the Rust core downloads ONNX Runtime from cdn.pyke.io, but the code resolves the pip onnxruntime library (headroom/_ort.py:1-35; crates/headroom-core/Cargo.toml:159-177). difft/scc binaries come from SHA-256-pinned GitHub releases only with --intercept-tool-results (headroom/binaries.py:1-28; headroom/cli/proxy.py:1198-1231). `headroom wrap` registers Serena via unpinned `uvx --from serena-agent` (headroom/mcp_registry/install.py:46-76). (8) Content leaving the machine beyond the LLM request: `headroom learn` sends a digest (up to ~80k tokens) of past session tool calls/outputs through litellm to a provider picked from ANTHROPIC_API_KEY/OPENAI_API_KEY/GEMINI_API_KEY, or shells out to the claude/gemini/codex CLI (headroom/learn/analyzer.py:1-13,43-78,316-411,967-1001), although docs call it 'offline' (docs/content/docs/failure-learning.mdx:3); optional remote Kompress POSTs text to HEADROOM_KOMPRESS_ENDPOINT (headroom/transforms/kompress_remote.py:1-52). (9) OTLP metrics go only to your own collector and are off by default (docs/metrics-technical-guide.md:244-269); no third-party analytics SDKs were found. (10) Local state under ~/.headroom includes logs, ccr_store.db (0600, plaintext originals), savings_events.jsonl, install_id and subscription_state.json (headroom/cache/backends/sqlite.py:55-62,87-113; docs/content/docs/savings.mdx:37; headroom/subscription/tracker.py:50-54). The proxy binds 127.0.0.1 by default (headroom/cli/proxy.py:224-229) and /v1/compress and /v1/retrieve* are loopback-gated unless opened (headroom/proxy/server.py:5648-5662)."
+    },
+    "code": {
+      "languages": [
+        "Python (headroom/, 544 files, ~228k lines)",
+        "Rust (crates/, 199 files, ~81k lines: PyO3 extension, axum proxy, simulators, parity harness)",
+        "TypeScript (sdk/typescript, plugins/openclaw, plugins/opencode; SDK src ~3.4k lines)",
+        "JavaScript (deploy/beacon/worker.js Cloudflare Worker; docs site)",
+        "Shell/PowerShell (scripts/install.sh, scripts/install.ps1)"
+      ],
+      "entry_points": [
+        {
+          "path": "headroom/cli/main.py",
+          "what": "`headroom` click group; console script `headroom = headroom.cli:main` (pyproject.toml:355). headroom/cli.py is a back-compat shim."
+        },
+        {
+          "path": "headroom/cli/proxy.py",
+          "what": "`headroom proxy` and `headroom dashboard` (cli/proxy.py:197-223); the FastAPI/uvicorn app and routes live in headroom/proxy/server.py (routes at 3832-5671)."
+        },
+        {
+          "path": "headroom/ccr/mcp_server.py",
+          "what": "MCP server behind `headroom mcp serve` (headroom/cli/mcp.py:341); stdio, or Streamable HTTP via headroom/ccr/mcp_http.py."
+        },
+        {
+          "path": "headroom/compress.py",
+          "what": "Library API `compress(messages, model=..., config=...)` returning CompressResult (compress.py:150-179)."
+        },
+        {
+          "path": "headroom/cache/ttl_estimator.py",
+          "what": "Second console script `headroom-cache-ttl = headroom.cache.ttl_estimator:main` (pyproject.toml:356)."
+        },
+        {
+          "path": "crates/headroom-py/",
+          "what": "PyO3 cdylib built by maturin and injected into the wheel as `headroom._core` (pyproject.toml:416-440; crates/headroom-py/Cargo.toml:20-24)."
+        },
+        {
+          "path": "crates/headroom-proxy/src/main.rs",
+          "what": "`headroom-proxy` Rust axum reverse-proxy binary (crates/headroom-proxy/Cargo.toml:10-12); bundled in Docker images but the image entrypoint is `headroom proxy` (Dockerfile:148-173,204). Also crates/headroom-simulators (provider simulators) and `parity-run` (crates/headroom-parity)."
+        },
+        {
+          "path": "sdk/typescript/src/index.ts",
+          "what": "npm `headroom-ai` TypeScript SDK entry (package.json exports, main ./dist/index.cjs); plugin packages plugins/openclaw and plugins/opencode publish as headroom-openclaw and headroom-opencode."
+        }
+      ],
+      "architecture": "Layered. (1) Rust core crates/headroom-core (SmartCrusher, tokenizers, CCR key hashing and SQLite store, tree-sitter code compressor, ONNX via ort/fastembed/magika) is exposed to Python by crates/headroom-py as headroom._core. (2) Python pipeline: headroom/compress.py with lifecycle events in headroom/pipeline.py and the transform pipeline headroom/transforms/pipeline.py, then headroom/transforms/content_router.py routing content types to SmartCrusher, CodeCompressor and Kompress (kompress_compressor.py ONNX/PyTorch model; optional kompress_remote.py); cache_aligner.py is detect-only. (3) CCR originals: headroom/cache/compression_store.py with backends in headroom/cache/backends/ (default SQLite ccr_store.db, or memory), and headroom/ccr/ (mcp_server.py, mcp_http.py, tool_injection.py, response_handler.py, marker_resolution.py, context_tracker.py). (4) Proxy: headroom/proxy/server.py, handlers/{anthropic,openai,gemini,streaming}.py (parse provider usage blocks incl. cache read/creation), savings_tracker.py, output_shaper.py, gateway_turn.py; headroom/providers/ holds per-agent and per-provider adapters (claude, codex, copilot, grok, openclaw, proxy_routes.py). (5) Measurement and telemetry: headroom/savings_ledger.py (~/.headroom/savings_events.jsonl), headroom/perf/analyzer.py (parses proxy logs), headroom/observability/metrics.py (OTel/Prometheus), headroom/telemetry/ (beacon.py, session.py, reporter.py, toin.py), headroom/subscription/ (Anthropic/Codex/Copilot quota trackers and the Claude transcript tally), headroom/audit/, headroom/learn/ (plugins reading Claude, Codex, Gemini, Grok and OpenCode session logs). (6) headroom/cli/ (wrap.py, init.py, install.py, mcp.py, learn.py, ...). (7) Integrations: headroom/integrations/ (langchain, agno, litellm callback, asgi, mcp), headroom/memory/, headroom/shared_context.py, sdk/typescript/, plugins/{openclaw,opencode,headroom-agent-hooks,headroom-oauth2}. The in-tree Rust reverse proxy crates/headroom-proxy is part of an in-progress plan to retire the Python proxy (REALIGNMENT/00-overview.md:22-32; crates/headroom-proxy/Cargo.toml:8). Several modules are very large: headroom/proxy/handlers/openai.py (>11k lines), headroom/cli/wrap.py (>8.5k), headroom/proxy/server.py (>6.5k).",
+      "packaging_and_release": "maturin builds one wheel containing the Python package plus the Rust extension (pyproject.toml:416-440), release-please tags drive .github/workflows/release.yml (release.yml:29-36). Wheel matrix: manylinux_2_28 x86_64 and aarch64, macOS x86_64 (macos-15-intel) and arm64 (macos-14), Windows x86_64, plus one sdist (release.yml:206-262,314-319), with a glibc-symbol audit (release.yml:390-396) and smoke-import gates across containers/hosts that block publishing (release.yml:466-761). PyPI publish uses OIDC trusted publishing with `attestations: false` (release.yml:763-792). npm packages headroom-ai, headroom-openclaw and headroom-opencode are published with NPM_TOKEN, and also to GitHub Packages (release.yml:794-984). GitHub Release assets are the wheels, sdist and npm tarballs; no checksum or signature files are produced for them (release.yml:1003-1077). Docker: 8 variants x amd64/arm64 on GHCR, smoke-tested, and the multi-arch index is signed with cosign keyless, signatures stored in a sibling `<image>-signatures` repo (.github/workflows/docker.yml:36-39,55-72,186-202,390-419). A CycloneDX SBOM is generated only in the manual fallback workflow publish.yml:46-56. Downloaded helper binaries are SHA-256-pinned (headroom/binaries.py:12-15) and four HF model repos are pinned to commit SHAs (headroom/onnx_runtime.py:66-78).",
+      "tests_and_ci": "pytest (+pytest-asyncio, pytest-cov; pyproject.toml:514-531): tests/ has 915 .py files, 873 containing tests (~12.3k test functions), plus scripts/tests (7 files, 78 tests). Rust: 154 files with #[test]/#[tokio::test] (~1.5k markers) incl. property tests and wiremock/simulator e2e. TypeScript vitest: 22 test files in sdk/typescript/test, 7 in plugins/openclaw/test, 2 in plugins/opencode/src. Playwright dashboard tests. CI workflows in .github/workflows/: ci.yml (change filter; ruff + mypy; wheel build; Windows wheel; Python 3.14 prebuilt-wheel install and proxy start; 4 pytest shards with coverage to Codecov; extras/agno/dashboard-UI jobs; commitlint; sdist+wheel build with twine check; actionlint/act workflow validation; Docker-native, Windows and macOS installer e2e), rust.yml (cargo fmt, clippy -D warnings, cargo test --workspace, simulator e2e, wheels, cargo audit, cargo deny licenses, parity harness; nightly), security.yml (pip-audit on the [all] lock export, npm audit x5, CodeQL python and javascript-typescript, gitleaks; weekly), eval.yml (zero-cost CCR round-trip and tool-schema gates on PRs; the live Tier-1 accuracy suite only runs when OPENAI_API_KEY is set, otherwise skipped with a warning), release.yml, docker.yml, plus wrap/init/install e2e workflows, release-please, docs, stale, pr-health.",
+      "dependencies": "Python (pyproject.toml): 10 direct core deps (tiktoken, pydantic, litellm>=1.96.2,<2, click, rich, opentelemetry-api, ast-grep-cli!=0.44.1, pyyaml, tomli on py<3.11, tomlkit; pyproject.toml:47-68) and 29 optional extras; `proxy` has 14 requirement lines (fastapi, uvicorn, orjson, httpx[http2], openai, mcp<2, magika, zstandard, websockets, onnxruntime, transformers, watchdog, sqlite-vec; pyproject.toml:72-97); `all` bundles 13 extras including ml (torch, transformers, huggingface-hub), memory (sentence-transformers), image, voice, evals (pyproject.toml:331-333). Lockfiles: uv.lock, Cargo.lock, 5 npm package-lock.json. Rust workspace of 5 crates (Cargo.toml:1-20): headroom-core 34 direct deps (4 optional: magika, redis, fastembed, ort; crates/headroom-core/Cargo.toml:10-177), headroom-proxy 36 (+13 dev), headroom-py 4 (+1 build), headroom-simulators 11 (+3 dev), headroom-parity 6. TypeScript sdk/typescript: 0 runtime deps, 4 optional peer deps, 11 devDependencies (sdk/typescript/package.json:75-107); plugins/openclaw 1 dep + 5 dev; plugins/opencode 2 deps + 5 dev; plugins/headroom-oauth2 has no deps (stdlib only).",
+      "security_policy": "SECURITY.md exists: report by email to security@headroomlabs.ai (not public issues), 48 h acknowledgement and a 7-day target for critical issues; scope is the Python package, the proxy and official integrations (SECURITY.md:10-54). Its Supported Versions table lists only 0.27.x as supported although the repo is at 0.39.1 (SECURITY.md:3-8). It also records unpatched optional-dependency advisories (ChromaDB via the crewai extra; Accelerate via voice-train), reviewed 2026-09-10 (SECURITY.md:67-116). Supporting config: .gitleaks.toml, .github/dependabot.yml, deny.toml, .cargo/audit.toml, security.yml. No .github/SECURITY.md."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:101-104,149-153 present `headroom perf`, `headroom dashboard` and `headroom savings` for seeing savings. Need question: does one Headroom tool measure provider usage (input, output, cache-creation, cache-read tokens) from the local logs that Claude Code and Codex write?",
+        "verified": "no",
+        "evidence": "None found. (a) `headroom perf` parses Headroom's own proxy logs ~/.headroom/logs/proxy-*.log, not agent logs (headroom/cli/perf.py:28-33; headroom/perf/analyzer.py:1-10,390-435); `headroom savings` reads Headroom's own ledger ~/.headroom/savings_events.jsonl written by the proxy and MCP tool (headroom/cli/savings.py:1-7; docs/content/docs/savings.mdx:35-46). (b) Claude-only: headroom/subscription/session_tracking.py:1-14,60-65,108-120,123-212 reads $CLAUDE_CONFIG_DIR/projects/**/*.jsonl (default ~/.claude/projects) and sums input, output, cache_read and cache-creation (5m/1h/total) per window, de-duplicated by message.id, with per-model split and Sonnet-normalised weights (WindowTokens, headroom/subscription/models.py:338-349). It has no CLI, runs only inside the proxy's SubscriptionTracker (headroom/subscription/tracker.py:308-330,391-420,516-530) after a successful poll of Anthropic's OAuth usage API (API-key accounts get 404, headroom/subscription/client.py:28-29,115-118), is enabled by default (headroom/proxy/models.py:469) and is surfaced via GET /subscription-window (headroom/proxy/server.py:5078-5101). Other Claude-only readers: headroom/learn/plugins/claude.py:197-243 (merges input+cache into one total for the learn digest), headroom/learn/verbosity.py:202-251, repo-root claude_analysis_ttl.py:1-78 and benchmarks/claude_session_mode_benchmark.py:1-60 (ad hoc replay/cost simulation). (c) Codex: headroom/audit/codex.py:163-229 (`headroom audit-reads --codex`, headroom/cli/audit.py:25-89) reads ~/.codex/sessions/**/*.jsonl but counts only exec_command output bytes and read patterns; headroom/learn/plugins/codex.py:204-276 reads tool calls/outputs for failures; headroom/subscription/codex_rate_limits.py:1-40,417-486 reports rate-limit window percentages from x-codex-* headers or GET chatgpt.com/backend-api/wham/usage, not token counts. A repo-wide search of headroom/, crates/, scripts/ and benchmarks/ found no parser for Codex token_count/total_token_usage records. (d) Provider usage is otherwise captured only from live responses through the proxy (headroom/proxy/handlers/anthropic.py, openai.py, streaming.py feed perf-log fields cache_read/cache_write/tok_out and Prometheus headroom_tokens_input_total, headroom_tokens_output_total, headroom_cache_read_tokens_total, headroom_cache_write_tokens_total with a 5m/1h split; docs/metrics-technical-guide.md:20-27,76-87). POST /v1/usage lets a sidecar caller relay only cache_read_input_tokens/cache_creation_input_tokens (headroom/proxy/handlers/openai.py:10588-10654). Answer: none covers both agents' logs."
+      },
+      {
+        "claim": "Reversible (CCR): originals are cached locally and retrievable on demand 'for the configured TTL' (README.md:54,81,350-353).",
+        "verified": "yes",
+        "evidence": "Default store is SQLite ccr_store.db (0600, WAL) with DEFAULT_CCR_TTL_SECONDS=1800 and max_entries=1000 (headroom/cache/compression_store.py:52,234-235,1108-1125; headroom/cache/backends/sqlite.py:55-62,87-113); override via HEADROOM_CCR_TTL_SECONDS or HEADROOM_CCR_BACKEND=memory. headroom_compress stores originals with a 3600 s TTL (headroom/ccr/mcp_server.py:201,441-452); SharedContext keeps originals in-process for 3600 s / 100 entries (headroom/shared_context.py:73-88). Retrieval is by hash and returns the full original only (headroom/proxy/server.py:5191,5519; mcp_server.py:481-503). After expiry the caller gets a 'not found or expired; re-read the file or re-run the command' message (headroom/cache/compression_store.py:148-158). The doc headline 'Nothing is ever thrown away' (docs/content/docs/ccr.mdx:8-10) overstates this: originals are time- and capacity-bound, and the CCR HTTP routes are loopback-only (server.py:5159-5161,5507). A zero-cost CCR round-trip gate runs in public CI (.github/workflows/eval.yml:49-58)."
+      },
+      {
+        "claim": "MCP server exposes headroom_compress, headroom_retrieve, headroom_stats (README.md:50); docs also give headroom_retrieve an optional `query` argument (docs/content/docs/mcp.mdx:78-84).",
+        "verified": "partial",
+        "evidence": "Tool names confirmed (headroom/ccr/mcp_server.py:76-79,636-691), plus a flag-gated headroom_read (HEADROOM_MCP_READ=on, mcp_server.py:83-85,694-725). Code differs from the docs: the headroom_retrieve schema has only `hash` (mcp_server.py:660-678), the handler and _retrieve_content never read a `query` (mcp_server.py:481-557,846-865; the string 'query' does not occur in the file), and the proxy route is also hash-only (headroom/proxy/server.py:5191). headroom_stats reports compression counts and tokens saved from Headroom's own counts with a flat ~$3/M-token cost estimate (mcp_server.py:335-354,902) and appends proxy /stats when reachable (mcp_server.py:905-928); each compress call also appends to the durable savings ledger (mcp_server.py:788-819) and, when enabled, to the beacon (mcp_server.py:820-829)."
+      },
+      {
+        "claim": "'Compression runs on your machine; no prompt or file content is sent anywhere to be compressed.' (README.md:37-38)",
+        "verified": "partial",
+        "evidence": "Holds for the default path (Rust/ONNX compressors in-process; ONNX Kompress tried first, headroom/transforms/kompress_compressor.py:960-1016). Exceptions in code: (1) opt-in HEADROOM_KOMPRESS_ENDPOINT POSTs {content,target_ratio} to an operator-chosen URL (headroom/transforms/kompress_remote.py:1-52; headroom/transforms/content_router.py:4932-4960); (2) `headroom learn` sends a digest of past session tool calls/outputs to an LLM provider via litellm or the claude/gemini/codex CLI (headroom/learn/analyzer.py:1-13,967-1001) with no redaction step found under headroom/learn/, while docs call it 'offline' (docs/content/docs/failure-learning.mdx:3); (3) model weights are downloaded from huggingface.co at first use (headroom/onnx_runtime.py:91-134)."
+      },
+      {
+        "claim": "'An anonymous beacon is on by default... never sends prompts, completions, code or file paths... Turn it off with HEADROOM_BEACON=off, DO_NOT_TRACK=1, or --offline.' (README.md:598-605)",
+        "verified": "partial",
+        "evidence": "On by default and the two env switches work (headroom/telemetry/beacon.py:56-92); HEADROOM_OFFLINE also disables it (headroom/offline.py:1-24). There is no `--offline` CLI option: none is defined under headroom/cli/ and only the HEADROOM_OFFLINE env var is read (headroom/cli/proxy.py:1429), although README.md:604-605 and docs/content/docs/proxy.mdx:39,338 cite the flag. is_beacon_enabled() is fail-open for unrecognised values (beacon.py:76-78). The payload is counters, ratios, slugs and a random install_id; the receiver allowlists keys and never reads the source IP (headroom/telemetry/session.py:556-647; deploy/beacon/worker.js:26-28,37-112). The endpoint is a workers.dev address flagged TEMPORARY in code (session.py:125-131)."
+      },
+      {
+        "claim": "'Library: compress(messages) in Python or TypeScript, inline in any app.' (README.md:47)",
+        "verified": "partial",
+        "evidence": "Python compress() runs in-process via the bundled Rust extension (headroom/compress.py:171-179; pyproject.toml:416-440). The TypeScript compress() sends messages to the proxy's POST /v1/compress (sdk/typescript/src/compress.ts:12-18,59-61; sdk/typescript/src/client.ts:270-275), so it needs `headroom proxy` running (docs/content/docs/installation.mdx:202-219); the npm package has no CLI (README.md:128-130)."
+      },
+      {
+        "claim": "Proof table (Code search 17,199 to 13,597 = 21%; SRE 55,957 to 24,340 = 57%; Codebase exploration 58,801 to 33,895 = 42%; Issue triage 46,067 to 32,429 = 30%), 'measured with the provider tokenizer and the shipped compress()', seeded and offline (README.md:132-147).",
+        "verified": "partial",
+        "evidence": "The harness exists, is seeded (DEFAULT_SEED=20260902, benchmarks/real_world_agent_benchmark.py:53-59) and the committed output matches the README numbers exactly (benchmarks/results/index_proof_table.txt:4-22); I did not re-run it. Caveats: payloads are synthetic generators modelled on MCP output formats; tokens are counted only over tool-message content with a local tiktoken counter for model 'gpt-5.6', not a provider API count (benchmarks/index_proof_table.py:54-75,83-101; output prints tokenizer=TiktokenCounter). For Claude models Headroom prices tokens with tiktoken o200k_base as a proxy 'within ~10-20%' (headroom/tokenizers/registry.py:378-405). docs/content/docs/limitations.mdx:10-21 says its own compression table is single-sample, not from a published benchmark suite."
+      },
+      {
+        "claim": "'Compression costs well under a millisecond: 0.21 ms p50 on a 10K-token JSON search result, 1.4 ms at 100K tokens' (README.md:154-155).",
+        "verified": "partial",
+        "evidence": "docs/content/docs/benchmarks.mdx:70-72 lists JSON search results at 10.2K tokens with p50 0.20 ms (p95 0.21) and at 100.5K tokens with p50 1.4 ms, on Apple M-series CPU, Headroom 0.37.0, via benchmarks/bench_latency.py (benchmarks.mdx:12,66). So the README's 0.21 matches the p95, and 1.4 ms is not 'well under a millisecond'. The numbers cover JSON-array (SmartCrusher) scenarios only; the older wiki lists Kompress ONNX P90 576 ms and tree-sitter P90 886 ms as overhead sources (wiki/benchmarks.md:89-94, measured at v0.5.18, wiki/benchmarks.md:12)."
+      },
+      {
+        "claim": "Accuracy table: GSM8K 0.870 to 0.870, TruthfulQA 0.530 to 0.560, SQuAD v2 97% at 19% compression, BFCL 97% at 32% compression, N=100 (README.md:157-168).",
+        "verified": "not_checkable",
+        "evidence": "Reproduction needs paid LLM calls and dataset downloads (`python -m headroom.evals suite --tier 1`; headroom/evals/suite_runner.py:62-128 sets sample_size=100). The same numbers appear in headroom/evals/README.md:9-23, which names the model (gpt-4o-mini, not stated in the main README) and a ~$3 cost. Public CI skips the live suite when OPENAI_API_KEY is unset (.github/workflows/eval.yml:70-83,118-128) and no raw result artifacts are committed. README.md:166-168 itself says the TruthfulQA delta is inside the confidence interval."
+      },
+      {
+        "claim": "Output savings are counterfactual, so `headroom output-savings` reports an estimate with a confidence range labelled estimated; HEADROOM_OUTPUT_HOLDOUT=0.1 gives a measured number (README.md:211-222).",
+        "verified": "yes",
+        "evidence": "headroom/cli/output_savings.py:10-64 prints 'MEASURED (A/B holdout)' vs 'ESTIMATED (synthetic control)' with a 95% CI and the hold-out hint. The shaper is off by default and HEADROOM_OUTPUT_SHAPER=1 enables it (headroom/rollout.py:105-113; headroom/proxy/output_shaper.py:119), although the CLI's empty-state text still says it needs HEADROOM_ROLLOUT_CHANNEL=beta (output_savings.py:30-34). The estimate's baseline is learned by `headroom learn --verbosity` from Claude Code transcripts only (headroom/learn/verbosity.py:202-251)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Proof table: 4 seeded synthetic agent scenarios, tool-message tokens before/after compress() (tiktoken counter, model gpt-5.6)",
+        "metric": "tokens before to after (saved %)",
+        "value": "Code search (100 results) 17,199 to 13,597 (21%); SRE incident debugging 55,957 to 24,340 (57%); Codebase exploration 58,801 to 33,895 (42%); GitHub issue triage 46,067 to 32,429 (30%); total 178,024 to 104,261 (41%)",
+        "source": "README.md:142-147; benchmarks/results/index_proof_table.txt:4-22; benchmarks/index_proof_table.py:54-75",
+        "independent": false
+      },
+      {
+        "what": "Accuracy preservation, Tier-1 eval suite (model gpt-4o-mini, N=100 each)",
+        "metric": "accuracy baseline vs Headroom; QA accuracy at stated compression",
+        "value": "GSM8K 0.870 vs 0.870; TruthfulQA 0.530 vs 0.560 (README says within the confidence interval); SQuAD v2 97% at 19% compression; BFCL 97% at 32% compression",
+        "source": "README.md:157-168; headroom/evals/README.md:9-23",
+        "independent": false
+      },
+      {
+        "what": "Compression latency of SDK compress() on JSON search-result arrays (Apple M-series CPU, Headroom 0.37.0, 10 warm iterations)",
+        "metric": "p50 (p95) ms by input size",
+        "value": "10.2K tokens in: 0.20 ms (0.21); 50.2K: 0.77 ms (1.1); 100.5K: 1.4 ms (1.6). README quotes 0.21 ms at 10K and 1.4 ms at 100K",
+        "source": "docs/content/docs/benchmarks.mdx:12,66-78; README.md:154-155",
+        "independent": false
+      },
+      {
+        "what": "Compression by content type via benchmarks/bench_latency.py (Apple M-series CPU, Headroom 0.37.0)",
+        "metric": "tokens original to compressed (ratio), p50 latency",
+        "value": "JSON search results 100 items 10,200 to 5,300 (48%, 0.20 ms); 500 items 50,200 to 25,800 (49%, 0.77 ms); structured logs 100 entries 7,600 to 3,600 (53%); 500 entries 35,700 to 16,200 (54%); documentation text 20,100 to 1,600 (92%, 1.4 ms); Python source 2,600 to 2,600 (0%); total 126,400 to 55,100 (56%)",
+        "source": "docs/content/docs/benchmarks.mdx:12-22",
+        "independent": false
+      },
+      {
+        "what": "CCR lossless round-trip / needle retention (eval README row; zero-cost gate also runs in public CI)",
+        "metric": "exact-match retention at stated compression",
+        "value": "100% retention (n=50) at 77% compression; built-in tool outputs 100% at 20% (n=8)",
+        "source": "headroom/evals/README.md:20-21; .github/workflows/eval.yml:49-58",
+        "independent": false
+      },
+      {
+        "what": "HTML main-content extraction on the Scrapinghub article-extraction benchmark, 181 pages (third-party dataset, measurement run by the project)",
+        "metric": "F1 / precision / recall / compression",
+        "value": "F1 0.919, precision 0.875, recall 0.985, compression 94.8% (docs, v0.37.0); wiki for v0.5.18 lists 0.919 / 0.879 / 0.982 / 94.9%",
+        "source": "docs/content/docs/benchmarks.mdx:30-41; wiki/benchmarks.md:31-46",
+        "independent": false
+      },
+      {
+        "what": "SmartCrusher needle test: JSON log array with one anomalous error entry at position 67, via the public compress() API",
+        "metric": "tokens before to after; needle preserved",
+        "value": "docs: 4,937 to 3,053 tokens (38.2%), error entry kept (substring check); README demo caption: 10,144 to 1,260 tokens with the FATAL line kept",
+        "source": "docs/content/docs/benchmarks.mdx:43-54; README.md:40-43",
+        "independent": false
+      },
+      {
+        "what": "Example output of `headroom output-savings` shown in the README (no dataset, model or run described)",
+        "metric": "estimated output-token reduction with 95% CI",
+        "value": "31.7% (95% CI 27.7% to 35.7%) [estimated]",
+        "source": "README.md:215-218",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope gap for log-based usage measurement: no tool covers both agents' logs (claim_checks[0]). The Claude-only token tally exists solely inside the proxy's subscription tracker, depends on an Anthropic OAuth usage poll (API-key accounts get 404, headroom/subscription/client.py:115-118) and has no CLI; Codex quota data comes from a ChatGPT backend endpoint, not logs (headroom/subscription/codex_rate_limits.py:57-62). Provider-usage numbers elsewhere exist only for traffic that passes through the proxy.",
+      "Reported savings are Headroom-side estimates, not billed usage: Claude token counts use tiktoken o200k_base as a proxy 'within ~10-20%' (headroom/tokenizers/registry.py:378-405). The default proxy mode is `cache` (headroom/cli/proxy.py:1263-1266), in which tokens_saved is near-always 0 by design per CHANGELOG.md:22. Requests that fail upstream drop out of every savings/token counter and 55 of 60 Prometheus families reset on restart (docs/metrics-technical-guide.md:220-230). MCP stats use a flat ~$3/M-token estimate (headroom/ccr/mcp_server.py:341-342).",
+      "Recoverable originals are bounded and unencrypted: 30-minute default TTL and 1000 entries for the proxy store, 1 hour for headroom_compress and for in-process SharedContext (100 entries) (headroom/cache/compression_store.py:52,234-235; headroom/ccr/mcp_server.py:201; headroom/shared_context.py:73-88). ccr_store.db holds raw tool output in plaintext (0600 file mode, headroom/cache/backends/sqlite.py:87-113), and the retrieval HTTP routes are loopback-only (headroom/proxy/server.py:5159-5161,5507).",
+      "Default-on egress and credential use: an anonymous beacon with a persistent install_id to a workers.dev address (headroom/telemetry/beacon.py:56; headroom/telemetry/session.py:125-131) with fail-open parsing (beacon.py:76-78) and a documented `--offline` flag that does not exist; background polling of Anthropic's OAuth usage API with the token read from ~/.claude/.credentials.json (headroom/subscription/client.py:33-80; headroom/proxy/models.py:469); a PyPI update check on CLI start (headroom/cli/main.py:48-57); and `headroom learn` shipping session digests to a third-party LLM (headroom/learn/analyzer.py:967-1001) while the docs call it 'offline'.",
+      "Invasive changes to agent state: `headroom wrap` registers the headroom MCP server and, by default, Serena via unpinned `uvx --from serena-agent` at user scope (README.md:121-126; headroom/mcp_registry/install.py:46-76). Persistent Codex flows rewrite config.toml and UPDATE rows in Codex's own state_*.sqlite threads table (headroom/providers/codex/threads.py:67-86; headroom/cli/init.py:379; headroom/providers/codex/install.py:243). An earlier wrap version left Codex chats in a temporary CODEX_HOME (docs/content/docs/codex-recovery.mdx:6-8).",
+      "Release integrity: PyPI publish sets `attestations: false` (.github/workflows/release.yml:792) and no checksums or signatures are produced for wheels or sdist; only the GHCR images are cosign-signed, with signatures in a separate -signatures repo needing COSIGN_REPOSITORY (.github/workflows/docker.yml:390-419). A CycloneDX SBOM comes only from the manual fallback workflow (.github/workflows/publish.yml:46-56). A core dependency, ast-grep-cli 0.44.1, was a compromised PyPI release (pyproject.toml:59-64), and runtime model downloads are commit-pinned for four HF repos only (headroom/onnx_runtime.py:66-78).",
+      "Maintenance and documentation drift: pre-1.0 (Beta classifier, pyproject.toml:34) with 17 minor releases between 0.22.4 on 2026-05-26 and 0.39.1 on 2026-09-26 (CHANGELOG.md:287,2219). SECURITY.md supports only 0.27.x (SECURITY.md:5-8); docs cite 0.37.0 (docs/content/docs/benchmarks.mdx:12) and the wiki v0.5.18 (wiki/benchmarks.md:12); the metrics guide lists documented metrics that do not exist (docs/metrics-technical-guide.md:234-240). The README contradicts itself on Intel macOS wheels (README.md:475-476 vs 523-526) and cites `unwrap kimi`, cdn.pyke.io and `--offline`, none of which the code provides (README.md:251-252,531,604-605; headroom/cli/wrap.py:5584-8489).",
+      "Architecture in flux and heavy footprint: the Python proxy is the default while a Rust proxy is being built to replace it (REALIGNMENT/00-overview.md:22-32; crates/headroom-proxy/Cargo.toml:8; Dockerfile:148-173). Handler, proxy and CLI modules run 6.5k-11k lines and the handlers are excluded from mypy checking (pyproject.toml:503-507). The `[all]` install pulls torch, transformers, sentence-transformers, onnxruntime and litellm (pyproject.toml:47-68,119-129,331-333)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "headroomlabs-ai/headroom",
+      "checks": [
+        {
+          "field": "license",
+          "statement": "License is Apache-2.0, declared in the file LICENSE.",
+          "citation": "LICENSE:1-3,176-190; pyproject.toml:10",
+          "holds": true,
+          "note": "LICENSE is the full Apache License 2.0 text ('Copyright 2025 Headroom Contributors'), and pyproject.toml:10 declares license = \"Apache-2.0\". Cargo.toml:25, sdk/typescript/package.json:111 and the plugin package.json files agree. plugins/headroom-oauth2/LICENSE is an Apache-2.0 SPDX stub. Checkout is at d13e196 and pyproject.toml:7 has version 0.39.1, which matches the dossier revision."
+        },
+        {
+          "field": "readme.install[1] (pip)",
+          "statement": "pip (Python library plus the `headroom` CLI): pip install \"headroom-ai[all]\"",
+          "citation": "README.md:92,425; docs/content/docs/installation.mdx:77-81",
+          "holds": true,
+          "note": "README.md:92 says the command 'ships the `headroom` CLI' and README.md:425 says it 'includes the CLI'. installation.mdx:79-81 gives the same command. pyproject.toml:331-333 defines the `all` extra, and pyproject.toml:354-355 registers the console script `headroom = \"headroom.cli:main\"`."
+        },
+        {
+          "field": "platforms.linux_x86_64",
+          "statement": "yes. Release wheels are manylinux_2_28 x86_64 for CPython 3.10-3.13 with stable-ABI forward compatibility, built and smoke-imported in CI. The Docker image is built for linux/amd64. ONNX-backed features need AVX2 on x86; without it Headroom falls back to non-ONNX paths.",
+          "citation": "docs/content/docs/installation.mdx:19-25; .github/workflows/release.yml:226-228,494-495; .github/workflows/docker.yml:71; README.md:478-482",
+          "holds": true,
+          "note": "release.yml:226-228 builds x86_64-unknown-linux-gnu with manylinux 2_28, and release.yml:289 passes interpreters python3.10-3.13. The stable-ABI part is backed by Cargo.toml:64 (pyo3 features [\"abi3-py310\"]). release.yml:494-495 smoke-imports headroom._core in the quay.io/pypa/manylinux_2_28_x86_64 and ubuntu:22.04 containers, and the comment at 455-459 says a failure there blocks publishing. docker.yml:71 builds linux/amd64 on ubuntu-24.04. README.md:478-482 states the AVX2 requirement and the fallback to BM25/heuristic paths."
+        },
+        {
+          "field": "integrations.claude_code_or_codex",
+          "statement": "Claude Code: `headroom wrap claude` sets ANTHROPIC_BASE_URL ... options --memory, --code-graph, --1m, --tool-search, --no-mcp; `headroom init claude`; plugin hooks run `headroom init hook ensure`; `headroom wrap vscode-claude`. Codex: `headroom wrap codex` sets OPENAI_BASE_URL and process-local `--config` overrides and registers the headroom MCP server; persistent flows (`headroom init codex`) inject model_provider=\"headroom\" into config.toml with a backup and retag Codex thread rows (wrap.py:3090-3125; threads.py:67-86); unwrap/recover codex; learn and audit-reads read both agents' logs.",
+          "citation": "headroom/cli/wrap.py:5112-5228,2678-2738,6394-6419,6496-6545,3090-3125; headroom/cli/init.py:1055-1067; plugins/headroom-agent-hooks/hooks/hooks.json:3-28; .claude-plugin/marketplace.json:10-29; README.md:315-346; headroom/providers/codex/threads.py:67-86",
+          "holds": false,
+          "note": "Everything except the backup checks out. The Claude Code parts match wrap.py:5112-5228, init.py:1055-1067, hooks.json:3-28 and marketplace.json:10-29; `wrap vscode-claude` is defined at wrap.py:6120. The Codex wrap parts match wrap.py:2678-2738 (OPENAI_BASE_URL and --config overrides) and wrap.py:6276-6282 (MCP registration via CodexRegistrar). `unwrap codex` is at wrap.py:8231, `recover codex` at recover.py:25, and the learn plugins and `audit-reads --codex` exist. The wrong part: `headroom init codex` (init.py:1085-1097, then 882-886, then `_ensure_codex_provider` at 331-379) writes model_provider=\"headroom\" and retags thread rows (init.py:379), but takes no backup. init.py has no backup or snapshot code, and lines 364-365 delete any existing root model_provider/openai_base_url lines. The cited wrap.py:3090-3125 is a different function, `_inject_codex_provider_config`. It does save config.toml.headroom-backup (wrap.py:3208), but only `_prepare_codex_wrap_state(persistent_routing=True)` calls it (wrap.py:6346-6347). That path is reached only from the hidden `headroom wrap codex --prepare-only` (wrap.py:6374-6383), and plain `wrap codex` passes persistent_routing=False (wrap.py:6402)."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "Verified: no. No single Headroom tool measures input/output/cache-creation/cache-read tokens from both Claude Code and Codex local logs. The nearest is a Claude-only transcript tally inside the proxy's subscription tracker. Codex logs are read only for read-pattern bytes and tool failures. Provider usage is otherwise captured only for traffic through the proxy.",
+          "citation": "headroom/subscription/session_tracking.py:1-14,60-65,108-120,123-212; headroom/audit/codex.py:163-229; headroom/learn/plugins/codex.py:204-276; headroom/cli/perf.py:28-33; headroom/cli/savings.py:1-7",
+          "holds": true,
+          "note": "The Claude tally matches. session_tracking.py:60-65 reads $CLAUDE_CONFIG_DIR/projects/**/*.jsonl. Lines 108-120 sum input, output, cache_read and cache_creation (5m/1h/total), and lines 137-196 de-duplicate by message.id and split per model. Only tracker.py calls it (322-327, 413, 516-527), so it has no CLI, and it runs after client.fetch returns a snapshot (405-413). client.py:115-118 treats a 404 as an API-key account, proxy/models.py:469 turns tracking on by default, and server.py:5078-5101 serves /subscription-window. The Codex readers match too. audit_codex counts exec_command calls and output bytes; `--codex` defaults to ~/.codex/sessions (cli/audit.py:31-37,62-89). The learn plugin collects tool calls and errors, and codex_rate_limits.py:1-40,417-486 reports window percentages only. `perf` reads ~/.headroom/logs/proxy-*.log (analyzer.py:390-435) and `savings` reads ~/.headroom/savings_events.jsonl. A repo-wide grep for total_token_usage, last_token_usage and reasoning_output_tokens finds nothing. The quoted \"token_count\" keys in cache/google.py and json_handler.py are unrelated. POST /v1/usage relays only the cache read/creation fields (openai.py:10588-10654)."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "integrations.claude_code_or_codex: replace 'persistent flows (`headroom init codex`) inject model_provider=\"headroom\" into config.toml with a backup and retag Codex thread rows (wrap.py:3090-3125; headroom/providers/codex/threads.py:67-86)' with: '`headroom init codex` writes a marker block with model_provider=\"headroom\" and openai_base_url to the root of ./.codex/config.toml (the user config with -g/--global). It deletes any existing root model_provider/openai_base_url lines, keeps no backup, and retags Codex thread rows (headroom/cli/init.py:331-379,882-886,974; headroom/providers/codex/threads.py:67-86). The config.toml.headroom-backup snapshot and `# was:` comments come only from wrap's `_inject_codex_provider_config` (headroom/cli/wrap.py:3090-3125,3208). That code runs only via the hidden `headroom wrap codex --prepare-only` (wrap.py:6346-6347,6374-6383); plain `headroom wrap codex` uses process-local overrides (wrap.py:6402).'"
+      ]
+    }
+  ]
+}

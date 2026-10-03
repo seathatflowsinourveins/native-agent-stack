@@ -1,0 +1,284 @@
+{
+  "contender": "ymtdzzz/otel-tui",
+  "revision": {
+    "contender": "ymtdzzz/otel-tui",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "ymtdzzz/otel-tui",
+        "tag": "v0.7.5",
+        "commit": "3b25779a083469b732e3c628b4a412ee05cf9948",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.7.5",
+    "commit": "3b25779a083469b732e3c628b4a412ee05cf9948",
+    "read_at": "2026-10-02T03:03:05+00:00"
+  },
+  "dossier": {
+    "contender": "ymtdzzz/otel-tui",
+    "revision": {
+      "tag": "v0.7.5",
+      "commit": "3b25779a083469b732e3c628b4a412ee05cf9948",
+      "read_at": "2026-10-03"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "otel-tui is a single-binary terminal OpenTelemetry viewer built as a custom OpenTelemetry Collector distribution (README.md:3; main.go:27-33; components.go:21-64). It ingests OTLP gRPC (default :4317) and HTTP (default :4318), and optionally Zipkin, Datadog/DogStatsD, Prometheus scrapes and an OTLP-JSON file. It keeps recent traces, metrics and logs in process memory (caps: 1000 service root spans, 3000 metric entries, 1000 log records; tuiexporter/internal/telemetry/store.go:18-22) and shows them in an interactive tview terminal UI with Traces, Timeline, Topology, Metrics and Logs pages (tuiexporter/internal/tui/component/page.go:28-140). Facts for the stated needs: (1) it is an OTLP ingestion point, but no processors are compiled in, so there is no redaction or privacy filtering, and the only exporter is the in-process TUI (components.go:44-59); (2) it has no persistent store, query API or MCP server, and its only dashboard is the built-in TUI; (3) it has no dataset, experiment or replay capability for qualifying model routes (--from-json-file is a one-time OTLP-JSON import for viewing, config.yml.tpl:67-72); (4) it has no model-serving or GPU code.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "A terminal OpenTelemetry viewer inspired by otel-desktop-viewer.",
+          "citation": "README.md:3"
+        },
+        {
+          "claim": "Currently supports OpenTelemetry, Zipkin (Traces), Prometheus (Metrics) and Datadog (Traces, Metrics, Logs) formats.",
+          "citation": "README.md:5"
+        },
+        {
+          "claim": "Exposes 4317 (OTLP gRPC) and 4318 (OTLP HTTP); 9411 Zipkin (--enable-zipkin); 8126 Datadog and 8125 DogStatsD (--enable-datadog).",
+          "citation": "README.md:20-26"
+        },
+        {
+          "claim": "The Access-Control-Allow-Origin header includes localhost, so browser apps on localhost can send telemetry directly.",
+          "citation": "README.md:28"
+        },
+        {
+          "claim": "Flags: --host (default 0.0.0.0, 'the host where we expose our OTLP endpoints'), --grpc 4317, --http 4318, --prom-target, --from-json-file (file exported by a JSON exporter), --debug-log (writes /tmp/otel-tui.log).",
+          "citation": "README.md:30-47"
+        },
+        {
+          "claim": "Install via Homebrew, go install, Docker, Docker Compose, Nix, GitHub release binary, or from source.",
+          "citation": "README.md:49-139"
+        },
+        {
+          "claim": "Docker: run with -it and 'docker attach' to see the TUI (detach with Ctrl+p Ctrl+q); the Compose service sets stdin_open and tty.",
+          "citation": "README.md:61-121"
+        },
+        {
+          "claim": "Compose example forwards traces and logs from an app's otelcol to oteltui:4317 with insecure TLS.",
+          "citation": "README.md:95-109"
+        },
+        {
+          "claim": "Traces, metrics and logs can be displayed, filtered and inspected; metric charts exist for Gauge, Sum and Histogram but not ExponentialHistogram or Summary; logs related to a trace or span can be shown.",
+          "citation": "README.md:155-179"
+        },
+        {
+          "claim": "Data rotation with a current buffer size of 1000 service root spans and logs; refresh interval and buffer size are not yet configurable.",
+          "citation": "README.md:183-189"
+        },
+        {
+          "claim": "The y key copies the log body to the clipboard; Linux needs xclip or xsel; the app runs normally without them.",
+          "citation": "README.md:141-149"
+        },
+        {
+          "claim": "Contribution flow: make lint, make lint-exporter, make test, make test-exporter.",
+          "citation": "README.md:213-218"
+        }
+      ],
+      "install": [
+        {
+          "method": "Homebrew tap (README does not say which OS)",
+          "command": "brew install ymtdzzz/tap/otel-tui",
+          "citation": "README.md:52"
+        },
+        {
+          "method": "go install (needs Go >= 1.26.0 per go.mod:5)",
+          "command": "go install github.com/ymtdzzz/otel-tui@latest",
+          "citation": "README.md:58"
+        },
+        {
+          "method": "Docker image (a Docker Compose snippet is at README.md:81-121)",
+          "command": "docker run --rm -it --name otel-tui ymtdzzz/otel-tui:latest",
+          "citation": "README.md:66"
+        },
+        {
+          "method": "Nix dev shell",
+          "command": "nix develop github:ymtdzzz/otel-tui",
+          "citation": "README.md:126"
+        },
+        {
+          "method": "Prebuilt binary from GitHub Releases (no command documented; archive names per .goreleaser.yaml:21-32, e.g. otel-tui_Linux_x86_64.tar.gz, otel-tui_Darwin_arm64.tar.gz)",
+          "command": "https://github.com/ymtdzzz/otel-tui/releases",
+          "citation": "README.md:131"
+        },
+        {
+          "method": "From source",
+          "command": "git clone https://github.com/ymtdzzz/otel-tui.git && cd otel-tui && go run ./...",
+          "citation": "README.md:136-138"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - release builds include linux/amd64 (.goreleaser.yaml:13-19) and a linux/amd64 Docker image (.goreleaser.yaml:47-55); CI tests run on Ubuntu runners (.github/workflows/lint-and-test.yml:53).",
+        "wsl2": "unknown - WSL is not mentioned anywhere in the repo (searched); the linux/amd64 binary would be the applicable artifact but nothing documents or tests it.",
+        "macos_arm64": "yes - release builds include darwin/arm64 (.goreleaser.yaml:13-19) plus a Homebrew formula (.goreleaser.yaml:41-45); README says macOS clipboard needs no extra tools (README.md:146). It is cross-compiled with CGO_ENABLED=0 (.goreleaser.yaml:11-12) and not exercised on macOS in CI (lint-and-test.yml uses Ubuntu runners only).",
+        "gpu": "no - terminal UI only; no GPU/CUDA/NVIDIA code or documentation found (searched); CPU-only Go binary (.goreleaser.yaml:11-12)."
+      },
+      "integrations": {
+        "cli": "Interactive TUI binary 'otel-tui' with flags (README.md:30-47; main.go:109-139) and an AUTH_TOKEN env var (main.go:117-118). No non-interactive query or export command found.",
+        "mcp": "none found (the only 'MCP' text is a .gitignore comment for a '.serena' directory, .gitignore:8-9; it is not a server).",
+        "sdk_or_api": "none found for reading stored data. Ingestion-only endpoints: OTLP gRPC 4317 / HTTP 4318 (README.md:22-23), optional Zipkin 9411, Datadog 8126, DogStatsD 8125 (README.md:24-26). The 'tuiexporter' Go module is a collector exporter component (tuiexporter/factory.go:17-25; manifest.yml:9-14, which is stale at otelcol 0.96.0, manifest.yml:2).",
+        "claude_code_or_codex": "none found: no mention of Claude Code, Codex, GenAI or LLM in README or code. anthropic-sdk-go and google.golang.org/genai appear only as '// indirect' entries in go.mod:71 and go.mod:403 and are not imported by any source file."
+      },
+      "telemetry_and_network": "No phone-home, analytics or update-check code found: a search of all .go files for net/http, dial, sentry, analytics and update-check patterns returned nothing. Inbound: OTLP gRPC/HTTP listen on --host (default 0.0.0.0, main.go:123) with no TLS block and no auth unless the AUTH_TOKEN env var is set, which adds bearertokenauth to both OTLP receivers (config.yml.tpl:2-25; main.go:78, 117-118; not in the README). Zipkin 9411, Datadog 8126 and DogStatsD 8125 are hard-coded to 0.0.0.0 (config.yml.tpl:27-39). The OTLP HTTP CORS allow-list is localhost only (config.yml.tpl:12-15). Outbound only when --prom-target is used: the Prometheus receiver scrapes each target every 5s (config.yml.tpl:40-66). Internal telemetry: --disable-internal-metrics (not in README) sets service.telemetry.metrics.level none (main.go:137; config.yml.tpl:82-86). Without it the default comes from the upstream collector (components.go:61), which is not in this repo and was not verified. Collector logs are discarded unless --debug-log is set; then they go to <tmpdir>/otel-tui.log (main.go:141-166). No account or external service is required; Docker Hub, the Homebrew tap and GitHub are used only for distribution."
+    },
+    "code": {
+      "languages": [
+        "Go (go 1.26.0, go.mod:5)",
+        "Go text/template YAML (config.yml.tpl)",
+        "Nix (flake.nix, otel-tui.nix)",
+        "Shell (update-nix.sh)"
+      ],
+      "entry_points": [
+        {
+          "path": "main.go:26",
+          "what": "main(): builds otelcol.CollectorSettings (BuildInfo 'otel-tui', Factories: components); 'var version' defaults to 'unknown' (main.go:24)."
+        },
+        {
+          "path": "main.go:109",
+          "what": "newCommand(): custom cobra root command replacing otelcol.NewCommand (main.go:39-40); flags at main.go:129-137; preRunE renders the collector config (main.go:62-99); runE runs otelcol.NewCollector (main.go:101-107). There is no --config flag."
+        },
+        {
+          "path": "components.go:21",
+          "what": "Generated component registry: receivers otlp, zipkin, datadog, statsd, prometheus, otlpjsonfile; exporter tui; extension bearertokenauth; zero processors and zero connectors (components.go:25-59)."
+        },
+        {
+          "path": "config.go:45",
+          "what": "NewConfig/RenderYml: renders the embedded config.yml.tpl (config.go:15-16, 125-142) into the in-memory collector YAML."
+        },
+        {
+          "path": "main_others.go:9",
+          "what": "Non-Windows run wrapper; main_windows.go:15 adds a Windows service handler with an interactive fallback."
+        },
+        {
+          "path": "tuiexporter/factory.go:17",
+          "what": "NewFactory(): 'tui' exporter for traces, metrics and logs at development stability (factory.go:12-25)."
+        },
+        {
+          "path": "tuiexporter/internal/tui/tui.go:30",
+          "what": "NewTUIApp()/Run(): tview application; redraws every 500ms when the store changed (tui.go:17, 96-122)."
+        },
+        {
+          "path": "tuiexporter/internal/telemetry/store.go:188",
+          "what": "NewStore(): the in-memory store for spans, metrics and logs."
+        }
+      ],
+      "architecture": "Two Go modules in a workspace (go.work:1-6). The root module github.com/ymtdzzz/otel-tui is a generated-style OpenTelemetry Collector distribution (main.go, components.go, config.go, config.yml.tpl). The tuiexporter module is the custom 'tui' exporter: factory.go, exporter.go, config.go, internal/telemetry (Store plus trace/log/metric caches, sort, dependency graph) and internal/tui (tview/tcell pages for traces, timeline, topology, metrics, logs). Flow: CLI flags -> config.go renders config.yml.tpl into collector YAML (otlp gRPC/HTTP always; zipkin, datadog+statsd, prometheus, otlp_json_file optional; empty 'processors:' in every pipeline; one exporter 'tui' on the traces, metrics and logs pipelines; config.yml.tpl:7-130) -> otelcol.Collector -> tuiExporter.push* (exporter.go:38-54) -> telemetry.Store (in-memory slices and maps, caps 1000 root spans / 3000 metrics / 1000 logs, store.go:18-22) -> tview pages. Detail panes show resource, scope and record attributes (page/log/detail.go:60-138); the log table has an 'Event Name' column read from the event.name attribute (table/log.go:34-39; store.go:148-154). Filters are substring matches (store.go:279-332). No disk persistence, query API or other exporter exists. Optional bearertokenauth extension protects the OTLP receivers (config.yml.tpl:2-25). tuiexporter is referenced from the root go.mod by commit pseudo-version (go.mod:16; RELEASING.md:7).",
+      "packaging_and_release": "GoReleaser (.goreleaser.yaml): builds linux, windows and darwin on amd64 and arm64 with CGO_ENABLED=0 (:10-19); tar.gz archives (zip on Windows) named otel-tui_<Os>_<x86_64|arm64> (:21-32); a Homebrew formula pushed to ymtdzzz/homebrew-tap (:41-45); multi-arch Docker images ymtdzzz/otel-tui:<tag> and :latest on distroless static-debian12 running as nonroot (:47-74; Dockerfile.goreleaser:1-7). .github/workflows/release.yml triggers on tags v* (:3-6) and runs goreleaser-action v6 'release --clean' (:39-46) plus a Nix flake update job that opens a PR (:47-71). No explicit checksum, signing, SBOM or attestation config appears in .goreleaser.yaml or release.yml; GoReleaser's default behaviour was not checked and the release page was not opened. Release is manual (RELEASING.md:9-29; prepare-release.yml:21-36). At this revision otel-tui.nix pins v0.7.4 (otel-tui.nix:9). A root Dockerfile builds from golang:1.24 (Dockerfile:4) but is not used by the release config (.goreleaser.yaml:55,64).",
+      "tests_and_ci": "Go testing with testify (assert/require) and gotest.tools/v3, run as 'TZ=UTC go test -race -v' (Makefile:10-12). 32 _test.go files (2 in the root, 30 under tuiexporter/), about 88 top-level Test functions, including a race test (tuiexporter/internal/telemetry/cache_race_test.go) and TUI component tests; main_test.go:11-49 covers AUTH_TOKEN wiring and config_test.go:105-230 covers the rendered YAML. CI: .github/workflows/lint-and-test.yml on push to main and PRs: detect-modules, golangci-lint per module (.golangci.yml:7-15: standard linters plus prealloc, gosec, gofmt), 'make test-coverage' and 'make test-coverage-exporter', then Codecov upload (lint-and-test.yml:10-113). All jobs use Ubuntu runners (ubuntu-latest or ubuntu-slim); there are no macOS or Windows jobs. prepare-release.yml is workflow_dispatch; release.yml has no test gate. Dependabot updates both go modules weekly (.github/dependabot.yml:1-22).",
+      "dependencies": "go.mod (root): 22 direct requires (go.mod:8-29), 391 indirect (go.mod:33-423), 3 'tool' entries prealloc/gosec/staticcheck (go.mod:426-430). tuiexporter/go.mod: 15 direct (:6-20), 57 indirect (:24-80). go.work uses both modules (go.work:3-6). Key direct deps: OpenTelemetry collector core (otelcol v0.158.0, component/confmap v1.66.0, otlpreceiver v0.158.0) and contrib receivers datadog, otlpjsonfile, prometheus, statsd and zipkin (v0.158-v0.159) plus bearertokenauth v0.160.0; cobra v1.10.2; zap v1.28.0; tview v0.42.0; tcell v2.13.10; tvxwidgets v0.14.0; atotto/clipboard v0.1.4; the author's fork github.com/ymtdzzz/mermaid-ascii (pseudo-version, tuiexporter/go.mod:13). The indirect set includes AWS, Azure, GCP and Kubernetes client libraries (go.mod:37-42, 75-95, 402, 414-419).",
+      "security_policy": "none - no SECURITY.md or vulnerability-reporting document found at the repo root or in .github/ (only README.md, RELEASING.md, update-nix.sh and CODEOWNERS)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Exposes 4317 (OTLP gRPC) and 4318 (OTLP HTTP) to receive OpenTelemetry signals (README.md:22-23).",
+        "verified": "yes",
+        "evidence": "main.go:121-123 sets defaults httpPort 4318, grpcPort 4317, host 0.0.0.0; config.yml.tpl:7-21 configures the otlp receiver gRPC and HTTP endpoints from them; the same receiver feeds the traces, logs and metrics pipelines (config.yml.tpl:87-130)."
+      },
+      {
+        "claim": "Supports OpenTelemetry, Zipkin (Traces), Prometheus (Metrics) and Datadog (Traces, Metrics, Logs) (README.md:5).",
+        "verified": "yes",
+        "evidence": "components.go:32-39 registers otlp, zipkin, datadog, statsd, prometheus and otlpjsonfile receivers; config.yml.tpl wires zipkin to traces (:26-29, 91-93), datadog to traces/logs/metrics (:30-33, 94-96, 106-108, 121-124), statsd/dogstatsd to metrics (:34-38, 123), prometheus scrape to metrics (:40-66, 118-120). Wiring is checked; whether the upstream datadog receiver emits all three signals was not."
+      },
+      {
+        "claim": "Data rotation (current buffer size: 1000 service root spans and logs) (README.md:185).",
+        "verified": "partial",
+        "evidence": "store.go:19-21 sets MAX_SERVICE_SPAN_COUNT=1000 and MAX_LOG_COUNT=1000 but also MAX_METRIC_COUNT=3000, which the README omits; rotation is at store.go:446-453, 491-497, 534-540; caps are hard-coded with 'TODO: make this configurable' (store.go:201-203). The README does not say the data is memory-only; the only file the code opens is the optional debug log (tuiexporter/internal/tui/tui.go:36-45)."
+      },
+      {
+        "claim": "The README flag list and docs describe the CLI surface (README.md:30-47, 213-218).",
+        "verified": "partial",
+        "evidence": "Code differs: main.go:129-137 defines --disable-internal-metrics, which the README omits; the AUTH_TOKEN env var that enables bearer auth on the OTLP receivers (main.go:78, 117-118; config.yml.tpl:2-6, 16-25) is not in the README; README.md:215 'make lint-exporter' is not a Makefile target (Makefile:1-35; 'make lint' already lints both modules, Makefile:6-8)."
+      },
+      {
+        "claim": "--host: 'The host where we expose our OTLP endpoints' (default 0.0.0.0) (README.md:44).",
+        "verified": "yes",
+        "evidence": "main.go:123 and 131; config.yml.tpl:11 and 21 use it for OTLP only. The Zipkin, Datadog and DogStatsD listeners are hard-coded to 0.0.0.0 and ignore --host (config.yml.tpl:28, 32, 35)."
+      },
+      {
+        "claim": "Access-Control-Allow-Origin includes localhost (README.md:28).",
+        "verified": "yes",
+        "evidence": "config.yml.tpl:12-15 sets cors allowed_origins http://localhost:* and https://localhost:* on the OTLP HTTP receiver only. No TLS block is configured on any receiver (config.yml.tpl:7-39)."
+      },
+      {
+        "claim": "Metric charts: Gauge, Sum, Histogram done; ExponentialHistogram and Summary not (README.md:164-169).",
+        "verified": "yes",
+        "evidence": "tuiexporter/internal/tui/component/page/metric/chart.go:79-89 and 207-214 handle Gauge, Sum and Histogram; other types hit 'This metric type is not supported' (chart.go:255-259). The detail pane handles all five types (metric/detail.go:114-297)."
+      },
+      {
+        "claim": "Traces, metrics and logs can be filtered (README.md:157, 162, 177).",
+        "verified": "partial",
+        "evidence": "The filter is a case-sensitive strings.Contains on service name plus span name, metric name or log body only (store.go:279-285, 304-309, 327-332; page/log/table.go:43-54). Attributes are not searched and there is no query language (filter/filter.go:25-52 is a plain input field)."
+      },
+      {
+        "claim": "Show logs related to a specific trace or span (README.md:179).",
+        "verified": "yes",
+        "evidence": "LogCache is keyed by trace ID (telemetry/cache.go:186-209, 228-234); timeline/log.go:37-61 lists logs for a trace and narrows by span ID unless the 'all logs' toggle is on."
+      },
+      {
+        "claim": "Install paths: Homebrew, go install, Docker, Nix and release binaries (README.md:49-131).",
+        "verified": "partial",
+        "evidence": "Release tooling builds binaries, a Homebrew formula and amd64+arm64 Docker images (.goreleaser.yaml:10-74). go.mod has no replace or exclude directives and pins tuiexporter by pseudo-version (go.mod:16; RELEASING.md:7), so 'go install' is plausible; the binary then reports version 'unknown' (main.go:24). 'nix develop' builds otel-tui.nix, which pins v0.7.4 at this revision (otel-tui.nix:9; flake.nix:19-33). The published artifacts themselves were not checked."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "No privacy-filter capability: components.go:51 and :56 register zero processors and zero connectors; every pipeline has an empty 'processors:' (config.yml.tpl:73-74, 100-101, 112-113, 128-129); main.go:39-40 swaps the stock otelcol command for one with no --config flag (flags at main.go:129-137), so users cannot supply their own collector YAML; the only exporter is 'tui' (components.go:44-46), so received telemetry cannot be forwarded to or stored in another backend.",
+      "Memory-only, bounded retention: at most 1000 service root spans, 3000 metric entries and 1000 log records (tuiexporter/internal/telemetry/store.go:18-22, 446-453, 491-497, 534-540), hard-coded (store.go:201-203; README.md:188-189); the only file written is the optional debug log (tuiexporter/internal/tui/tui.go:36-45); data is lost on exit or on Ctrl+X (page/log/table.go:118-126). No query API, export or persistence mechanism found.",
+      "Interactive-only: the UI needs a terminal (README.md:66, 89-90). If the TUI fails to start, the exporter only prints an error and the collector keeps running (tuiexporter/exporter.go:57-65). Collector logs are discarded unless --debug-log is set (main.go:141-166). No MCP server, HTTP query API or scripted export, and no Claude Code, Codex or GenAI-specific views or docs were found.",
+      "Exposure defaults: OTLP gRPC/HTTP bind 0.0.0.0 (main.go:123) with no TLS block and no auth unless the AUTH_TOKEN env var is set (config.yml.tpl:2-25), which the README does not document (README.md:30-47); Zipkin, Datadog and DogStatsD listeners ignore --host and bind 0.0.0.0 (config.yml.tpl:28, 32, 35); the README docker run examples publish no ports (README.md:66, 73).",
+      "Limited exploration: filters match only service name plus span name, metric name or log body, as case-sensitive substrings (tuiexporter/internal/telemetry/store.go:279-285, 304-309, 327-332); attribute values can only be read in the detail pane (page/log/detail.go:136-138); charts cover Gauge, Sum and Histogram only (page/metric/chart.go:207-214, 255-259).",
+      "Release integrity: no explicit checksum, signing, SBOM or provenance-attestation config in .goreleaser.yaml:1-74 or .github/workflows/release.yml:1-71; release.yml:18 uses 'jlumbroso/free-disk-space@main' (a moving branch ref) and the other actions are pinned by tag only (release.yml:27-39, 50-63), in a workflow holding DOCKERHUB_TOKEN and TAP_GITHUB_TOKEN (release.yml:34-46); the release job has no test gate and the release process is manual (RELEASING.md:9-29).",
+      "Platform and packaging gaps: CI runs only on Ubuntu runners (.github/workflows/lint-and-test.yml:11, 26, 53, 78, 103); darwin and windows binaries are cross-compiled with CGO_ENABLED=0 and not exercised in CI (.goreleaser.yaml:11-19); WSL2 is not mentioned anywhere; the Nix package pins v0.7.4 at this revision (otel-tui.nix:9); the root Dockerfile uses golang:1.24 while go.mod requires 1.26.0 (Dockerfile:4; go.mod:5); manifest.yml is stale at otelcol 0.96.0 (manifest.yml:2).",
+      "Maintenance, dependency and licensing: single code owner (CODEOWNERS:1); 22 direct and 391 indirect modules in the root go.mod (go.mod:8-29, 33-423) with weekly Dependabot bumps (.github/dependabot.yml:1-22); tuiexporter is pinned by commit pseudo-version and needs a manual prepare-release step (go.mod:16; RELEASING.md:7-14); no SECURITY.md found; LICENSE is Apache-2.0 but its copyright line reads 'Copyright 2023 Amelia Ardath' (LICENSE:189), which differs from the repo owner, and there is no NOTICE file. Commit history and activity could not be assessed because the clone is shallow (.git/shallow)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "ymtdzzz/otel-tui",
+      "checks": [
+        {
+          "field": "readme.install[1] (go install)",
+          "statement": "go install (needs Go >= 1.26.0 per go.mod:5): `go install github.com/ymtdzzz/otel-tui@latest`",
+          "citation": "README.md:58; go.mod:5",
+          "holds": true,
+          "note": "README.md:58 shows this exact command (after a `$` prompt), and go.mod:5 is `go 1.26.0`. go.mod has no replace or exclude directive (the file ends with a `tool` block at go.mod:426-430), so `go install …@version` is not blocked. The tuiexporter submodule is required by pseudo-version (go.mod:16). With the default GOTOOLCHAIN=auto, an older Go 1.21+ would download go1.26.0 itself. The module proxy and published module were not checked because they are outside the working directory."
+        },
+        {
+          "field": "license",
+          "statement": "spdx: Apache-2.0, file: LICENSE",
+          "citation": "LICENSE:1-202",
+          "holds": true,
+          "note": "LICENSE:1-3 reads 'Apache License Version 2.0, January 2004'. Sections 1-9 (LICENSE:7-176) are the standard, unmodified text. The appendix boilerplate is filled in as 'Copyright 2023 Amelia Ardath' (LICENSE:189), as the dossier's risks note. LICENSE is the only license file in the tree (none under tuiexporter/) and there is no NOTICE file."
+        },
+        {
+          "field": "readme.platforms.macos_arm64",
+          "statement": "yes - release builds include darwin/arm64 (.goreleaser.yaml:13-19) plus a Homebrew formula (.goreleaser.yaml:41-45); README says macOS clipboard needs no extra tools (README.md:146). It is cross-compiled with CGO_ENABLED=0 (.goreleaser.yaml:11-12) and not exercised on macOS in CI (lint-and-test.yml uses Ubuntu runners only).",
+          "citation": ".goreleaser.yaml:11-19, 41-45; README.md:146; .github/workflows/lint-and-test.yml:11,26,53,78,103",
+          "holds": true,
+          "note": "goos [linux, windows, darwin] x goarch [amd64, arm64] with no ignore list (.goreleaser.yaml:13-19), and CGO_ENABLED=0 at :11-12. The brews block targets ymtdzzz/homebrew-tap (:41-45). README.md:146 says 'macOS: No additional tools required'. All five lint-and-test jobs run on ubuntu-slim or ubuntu-latest, and release.yml:14 and :48 are also Ubuntu, so the darwin build is cross-compiled and never run in CI. release.yml:41 pins GoReleaser '~> v1', which is consistent with the config's `version: 1` (.goreleaser.yaml:4). The published release assets and the tap formula were not checked."
+        },
+        {
+          "field": "readme.integrations.sdk_or_api",
+          "statement": "none found for reading stored data. Ingestion-only endpoints: OTLP gRPC 4317 / HTTP 4318 (README.md:22-23), optional Zipkin 9411, Datadog 8126, DogStatsD 8125 (README.md:24-26). The 'tuiexporter' Go module is a collector exporter component (tuiexporter/factory.go:17-25; manifest.yml:9-14, which is stale at otelcol 0.96.0, manifest.yml:2).",
+          "citation": "README.md:22-26; tuiexporter/factory.go:17-25; manifest.yml:2, 9-14",
+          "holds": true,
+          "note": "README.md:22-26 lists exactly those ports. factory.go:17-25 is NewFactory() for the 'tui' exporter (traces, metrics and logs, development stability). manifest.yml:2 is `otelcol_version: 0.96.0` while go.mod:23 uses otelcol v0.158.0, and manifest.yml:9-14 lists tuiexporter with a local replace. components.go:44-46 registers only the tui exporter. A case-insensitive search of all .go files for net/http, ListenAndServe, http.Server, grpc.NewServer, net.Listen, websocket and mcp matched only a comment (tuiexporter/internal/sharedcomponent/sharedcomponent.go:6), so no read or query server exists in this repo. Caveat: any listener created by the upstream collector's internal-telemetry defaults (components.go:61) is outside the repo and was not checked; it would expose collector self-metrics, not stored data."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "Exposes 4317 (OTLP gRPC) and 4318 (OTLP HTTP) to receive OpenTelemetry signals (README.md:22-23). verified: yes (main.go:121-123; config.yml.tpl:7-21; config.yml.tpl:87-130).",
+          "citation": "README.md:22-23; main.go:121-123; config.yml.tpl:7-21, 87-130",
+          "holds": true,
+          "note": "main.go:121-123 sets httpPort 4318, grpcPort 4317 and host 0.0.0.0. main.go:68-79 passes (host, httpPort, grpcPort) in the order NewConfig declares them (config.go:45-60), so the ports aren't swapped. config.yml.tpl:10-11 renders the HTTP endpoint and :20-21 the gRPC endpoint. The otlp receiver appears in the traces (:90), logs (:105) and metrics (:117) pipelines. components.go:33 registers otlpreceiver. The --http and --grpc flags can change the defaults (main.go:129-130)."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

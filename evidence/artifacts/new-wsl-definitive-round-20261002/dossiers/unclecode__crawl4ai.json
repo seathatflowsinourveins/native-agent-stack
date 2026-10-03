@@ -1,0 +1,376 @@
+{
+  "contender": "unclecode/crawl4ai",
+  "revision": {
+    "contender": "unclecode/crawl4ai",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "unclecode/crawl4ai",
+        "tag": "v0.9.4",
+        "commit": "133e1d92e37885dfccc03ea2e3687d06c98b7ceb",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.9.4",
+    "commit": "133e1d92e37885dfccc03ea2e3687d06c98b7ceb",
+    "read_at": "2026-10-02T03:02:57+00:00"
+  },
+  "dossier": {
+    "contender": "unclecode/crawl4ai",
+    "revision": {
+      "tag": "v0.9.4",
+      "commit": "133e1d92e37885dfccc03ea2e3687d06c98b7ceb",
+      "read_at": "2026-10-02T03:02:57+00:00"
+    },
+    "license": {
+      "spdx": "Apache-2.0 AND LicenseRef-Crawl4AI-Attribution",
+      "file": "LICENSE (lines 1-51: Apache-2.0 text; lines 53-68: appended 'Attribution Requirement', named here LicenseRef-Crawl4AI-Attribution. It requires all distributions, publications or public uses of the software or derivative works to include the fixed sentence at LICENSE:58, shown in a NOTICE/README or equivalent documentation for distributions, in acknowledgments or a footnote for publications, in an About/Credits section for web apps, and in the help/usage output for command-line tools (LICENSE:56-65). Package metadata (pyproject.toml:11, setup.py:52) declares plain 'Apache-2.0'; README.md:1164 ('recommended') and README.md:1167 ('must') contradict each other; no NOTICE file exists. See risks.)"
+    },
+    "purpose": "Open-source async Python web crawler/scraper that drives Playwright browsers (Chromium/Firefox/WebKit, plus a Patchright 'undetected' mode) to turn pages into Markdown, cleaned HTML, links/media/head metadata and optional structured data (CSS/XPath/regex/LLM extraction). Ships as a pip library with a `crwl` CLI, and as an optional Docker FastAPI server exposing REST and MCP (SSE/WebSocket). Sources: README.md:38; pyproject.toml:78-83; deploy/docker/server.py.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Crawl4AI turns the web into clean, LLM ready Markdown for RAG, agents, and data pipelines.",
+          "citation": "README.md:38"
+        },
+        {
+          "claim": "Why developers pick it: LLM ready output (smart Markdown with headings, tables, code, citation hints); full control (sessions, proxies, cookies, user scripts, hooks); deploy anywhere, zero keys, CLI and Docker.",
+          "citation": "README.md:70-74"
+        },
+        {
+          "claim": "CLI `crwl`: `crwl <url> -o markdown`; `--deep-crawl bfs --max-pages 10`; `-q` asks an LLM a question about the crawled content.",
+          "citation": "README.md:116-126"
+        },
+        {
+          "claim": "Markdown generation: clean Markdown, Fit Markdown (heuristic noise filtering), citations and references (numbered reference list), BM25 filtering.",
+          "citation": "README.md:160-164"
+        },
+        {
+          "claim": "Browser integration: managed/own browser, remote CDP control, Browser Profiler with persistent profiles holding saved authentication state, session management for multi-step crawling, Chromium/Firefox/WebKit.",
+          "citation": "README.md:181-188"
+        },
+        {
+          "claim": "Crawling: execute JS and wait for dynamic content, screenshots, raw HTML / file:// input, hooks 'at every step', metadata extraction, iframe content, lazy-load handling, full-page scan.",
+          "citation": "README.md:195-205"
+        },
+        {
+          "claim": "Stealth Mode: avoid bot detection by mimicking real users; v0.7.3 'Undetected Browser Support' claims to bypass Cloudflare, Akamai and custom bot detection.",
+          "citation": "README.md:223, 938-954"
+        },
+        {
+          "claim": "Docker: FastAPI server, built-in JWT token authentication, monitoring dashboard, playground, browser pooling, MCP integration for AI tools like Claude Code, endpoints for HTML extraction, screenshots, PDF generation and JavaScript execution, multi-arch AMD64/ARM64.",
+          "citation": "README.md:212-214, 317-323"
+        },
+        {
+          "claim": "Docker quick start: `docker run -d -p 11235:11235 --name crawl4ai --shm-size=1g unclecode/crawl4ai:latest`, then POST http://localhost:11235/crawl.",
+          "citation": "README.md:327-360"
+        },
+        {
+          "claim": "v0.9.4 is a security release closing three advisories (two SSRF paths, one config trust-boundary bypass) and adds PruningContentFilterLXML, ~10x faster pruning, 'now the default'.",
+          "citation": "README.md:42, 574-576"
+        },
+        {
+          "claim": "v0.9.0: Docker API is secure-by-default: auth on by default, loopback bind unless given a token, request body treated as an untrusted trust boundary.",
+          "citation": "README.md:48, 638"
+        },
+        {
+          "claim": "Prefetch mode (`prefetch=True`) returns HTML and links only and is '5-10x faster' for URL discovery.",
+          "citation": "README.md:52, 734-742"
+        },
+        {
+          "claim": "License: Apache License 2.0, 'attribution is recommended via the badges below' (line 1164), yet 'you must include one of the following attribution methods' (line 1167): a 'Powered by' badge or the text line 'This project uses Crawl4AI (https://github.com/unclecode/crawl4ai) for web data extraction.'",
+          "citation": "README.md:1164, 1167-1216"
+        },
+        {
+          "claim": "Crawl4AI Cloud API is a closed beta with an early-access form.",
+          "citation": "README.md:16-21"
+        }
+      ],
+      "install": [
+        {
+          "method": "pip (PyPI)",
+          "command": "pip install -U crawl4ai",
+          "citation": "README.md:83"
+        },
+        {
+          "method": "post-install setup (code: creates ~/.crawl4ai, runs `playwright install --with-deps --force chromium` and the same for patchright, initialises the DB)",
+          "command": "crawl4ai-setup",
+          "citation": "README.md:89 (code: crawl4ai/install.py:42-65,94-147)"
+        },
+        {
+          "method": "verify install (code: crawls https://crawl4ai.com; always exits 0)",
+          "command": "crawl4ai-doctor",
+          "citation": "README.md:92 (code: crawl4ai/install.py:167-212)"
+        },
+        {
+          "method": "manual browser install fallback",
+          "command": "python -m playwright install --with-deps chromium",
+          "citation": "README.md:97"
+        },
+        {
+          "method": "Docker Hub image (as written in README; v0.9.x docs add the required `-e CRAWL4AI_API_TOKEN=\"$CRAWL4AI_API_TOKEN\"`, see docs/md_v2/core/self-hosting.md:136-154)",
+          "command": "docker pull unclecode/crawl4ai:latest && docker run -d -p 11235:11235 --name crawl4ai --shm-size=1g unclecode/crawl4ai:latest",
+          "citation": "README.md:329-330"
+        },
+        {
+          "method": "from source (editable)",
+          "command": "git clone https://github.com/unclecode/crawl4ai.git && cd crawl4ai && pip install -e .",
+          "citation": "README.md:292-294"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - pip path installs Playwright Chromium via `crawl4ai-setup` (crawl4ai/install.py:94-108) and the Docker image is built for linux/amd64 (.github/workflows/docker-release.yml:79; Dockerfile:1). README has no explicit platform statement; the only CI job runs ubuntu-latest (.github/workflows/security.yml:23).",
+        "wsl2": "unknown - no mention of WSL in any .md/.py/.yml/.toml/.sh/.txt file in the repo (searched); no WSL-specific code or docs.",
+        "macos_arm64": "yes (implicit; not stated in README) - v0.9.4 fixes a Chrome-for-Testing crash under --headless=new on macOS arm64 (CHANGELOG.md:41; crawl4ai/browser_manager.py:88-90) and the code has darwin branches (crawl4ai/cli.py:825; crawl4ai/browser_manager.py:358). No macOS CI job (.github/workflows/security.yml:23). On Apple silicon the Docker image resolves to linux/arm64 (docker-release.yml:79).",
+        "gpu": "yes (optional, not required) - core crawling is CPU/browser only. Docker build arg ENABLE_GPU=true installs nvidia-cuda-toolkit on amd64 only (Dockerfile:27,92-100; docker-compose.yml:69); torch/transformers extras are optional (pyproject.toml:63-76). docker-compose.yml has no GPU device passthrough."
+      },
+      "integrations": {
+        "cli": "yes - `crwl` (pyproject.toml:83 -> crawl4ai/cli.py:1648-1652). Subcommands: crawl (default), browser {status,start,stop,view,restart}, cdp, config {list,get,set}, profiles {create,list,delete}, shrink, examples, cloud {auth, profiles upload/list/delete} (cli.py:629-1646; crawl4ai/cloud/cli.py:72-473). Crawl options: -B/-C config files, -f filter, -e/-s extraction, -b/-c key=value overrides, -o {all,json,markdown,md,markdown-fit,md-fit}, -O file, -q, -p profile, --deep-crawl, --max-pages (cli.py:1014-1032). No dedicated flags for screenshot, PDF, JS, waits, sessions or cookies (searched cli.py); those must go through -c/-C into CrawlerRunConfig.",
+        "mcp": "yes, but only via the Docker server (no stdio server; needs the standing container with Redis + gunicorn + browser pool): SSE /mcp/sse (+ /mcp/messages/), WebSocket /mcp/ws, schema /mcp/schema (deploy/docker/mcp_bridge.py:196-262; server.py:1183-1191). Tools: md, html, screenshot, pdf, execute_js, crawl, ask (server.py:616,654,743,784,823,957,1099; docs deploy/docker/README.md:314-324). All MCP paths sit behind the bearer-token auth gate (server.py:440-448; auth_gate.py:50-66); execute_js is disabled by default (server.py:98,874-875); the md tool returns Markdown only, no metadata (server.py:642-649).",
+        "sdk_or_api": "yes - Python async SDK `AsyncWebCrawler.arun/arun_many` (crawl4ai/async_webcrawler.py:58,210,974; crawl4ai/__init__.py:4; README.md:100-114). Docker REST API: POST /crawl, /crawl/stream, /md, /html, /screenshot, /pdf, /execute_js, GET /llm/{url}, /ask, /hooks/info, /health, /metrics, /artifacts/{id}, plus job endpoints (deploy/docker/server.py:585-1100; job.py). Python HTTP client `Crawl4aiDockerClient` (crawl4ai/docker_client.py:28).",
+        "claude_code_or_codex": "Claude Code: documented `claude mcp add --transport sse c4ai-sse http://localhost:11235/mcp/sse` (deploy/docker/README.md:300-312; docs/md_v2/core/self-hosting.md:409-421; README.md:320) - the documented command carries no Authorization header although the server requires one (see claim_checks). Codex: none found. `.claude/commands/c4ai-check.md` and `.claude/settings.local.json` are contributor tooling for working on the repo, not a user integration."
+      },
+      "telemetry_and_network": "No telemetry, analytics or phone-home SDK found in crawl4ai/ or deploy/docker/*.py (searched telemetry|posthog|sentry|mixpanel|amplitude|opentelemetry; the only relevant hits are analytics-domain block-lists applied to crawled pages, crawl4ai/browser_manager.py:1334,1351; the one other hit is an unrelated 'amplitude modulation' docstring, crawl4ai/deep_crawling/crazy.py:260). Network activity is user-initiated or setup-time: (1) the browser fetches whatever URLs are requested; (2) `crawl4ai-setup` downloads Playwright and Patchright Chromium with --with-deps (crawl4ai/install.py:94-147); (3) `crawl4ai-doctor` crawls https://crawl4ai.com (install.py:194) and the Docker build runs it (Dockerfile:186); (4) optional LLM features (-q, -j, LLM extraction, Docker /md?f=llm) call the configured provider through the `unclecode-litellm` fork with the user's own key; the CLI prompts interactively and stores provider+token in plaintext ~/.crawl4ai/global.yml with default file permissions (crawl4ai/cli.py:39,57-85); (5) `crwl cloud ...` talks to https://api.crawl4ai.com with an API key from a Crawl4AI Cloud account - opt-in; Cloud API is 'closed beta' (crawl4ai/cloud/cli.py:31,89-195; README.md:16-21); (6) URL seeder / DomainMapper contact Common Crawl and web.archive.org when used (crawl4ai/async_url_seeder.py:65,858; crawl4ai/domain_mapper.py:61); `check_robots_txt` (default False) fetches robots.txt (crawl4ai/async_webcrawler.py:384; async_configs.py:1808); `crawl4ai-download-models` pulls Hugging Face/NLTK data (crawl4ai/model_loader.py:78-183); (7) importing crawl4ai runs `load_dotenv()` (crawl4ai/config.py:4). Local state under ~/.crawl4ai: global.yml, SQLite crawl4ai.db (async_database.py:17-21), profiles (browser_profiler.py:167), builtin-browser data; the CLI always uses CacheMode.BYPASS (no read, no write) so crawled content is not written to the cache DB (cli.py:1170-1171; cache_context.py:59-87). Docker server: bundles Redis (loopback + password) and gunicorn under supervisord (deploy/docker/supervisord.conf:6-23), exposes Prometheus /metrics (config.yml:122-128), and its /playground and /dashboard pages load third-party CDN assets in the operator's browser (cdn.tailwindcss.com, fonts.googleapis.com, cdnjs.cloudflare.com, img.shields.io: deploy/docker/static/playground/index.html:8-45; static/monitor/index.html:7,30,91). No account is needed for core crawling; the Docker server needs a self-generated CRAWL4AI_API_TOKEN to be reachable from the host (deploy/docker/entrypoint.sh:25-36). Legacy crawl4ai/legacy/crawler_strategy.py:73 posts to http://crawl4ai.uccode.io/crawl but is not imported by the package (searched)."
+    },
+    "code": {
+      "languages": [
+        "Python (79 modules under crawl4ai/: library, CLI, Docker server in deploy/docker/)",
+        "JavaScript (in-page snippets crawl4ai/js_snippet/*.js; Docker playground/dashboard HTML+JS; Chrome extension docs/md_v2/apps/crawl4ai-assistant)",
+        "Shell (deploy/docker/entrypoint.sh, scripts/gen-sbom.sh)",
+        "YAML / Dockerfile (deploy/docker/config.yml, docker-compose.yml, .github/workflows)"
+      ],
+      "entry_points": [
+        {
+          "path": "crawl4ai/cli.py:1648",
+          "what": "`crwl` console script (pyproject.toml:83): main() prepends the `crawl` subcommand unless argv[1] is a known command; Click group with crawl, browser, cdp, config, profiles, shrink, examples, cloud."
+        },
+        {
+          "path": "crawl4ai/install.py:42",
+          "what": "`crawl4ai-setup` (post_install) and `crawl4ai-doctor` (install.py:207) console scripts (pyproject.toml:81-82)."
+        },
+        {
+          "path": "pyproject.toml:78-83",
+          "what": "Console scripts: crawl4ai-download-models -> crawl4ai.model_loader:main, crawl4ai-migrate -> crawl4ai.migrations:main, crawl4ai-setup, crawl4ai-doctor, crwl."
+        },
+        {
+          "path": "crawl4ai/async_webcrawler.py:58",
+          "what": "Python SDK: AsyncWebCrawler with arun (:210) and arun_many (:974); exported with BrowserConfig/CrawlerRunConfig from crawl4ai/__init__.py."
+        },
+        {
+          "path": "deploy/docker/server.py:295",
+          "what": "FastAPI app `server:app` (REST endpoints, auth gate, rate limiting, /playground, /dashboard). Started by gunicorn under supervisord (deploy/docker/supervisord.conf:18-23) via deploy/docker/entrypoint.sh; `python server.py` runs uvicorn (server.py:1194-1202)."
+        },
+        {
+          "path": "deploy/docker/mcp_bridge.py:85",
+          "what": "attach_mcp(): MCP server over SSE (/mcp/sse, /mcp/messages/) and WebSocket (/mcp/ws), schema at /mcp/schema; tools are server.py routes decorated with @mcp_tool."
+        },
+        {
+          "path": "crawl4ai/docker_client.py:28",
+          "what": "Crawl4aiDockerClient: Python HTTP client for the Docker server."
+        },
+        {
+          "path": "crawl4ai/cloud/cli.py:72",
+          "what": "`crwl cloud` group: auth, profiles upload/list/delete against https://api.crawl4ai.com (opt-in)."
+        }
+      ],
+      "architecture": "Pipeline: AsyncWebCrawler.arun/arun_many (crawl4ai/async_webcrawler.py:58,210,974) -> cache check (cache_context.py, async_database.py SQLite) -> fetch through a crawler strategy: AsyncPlaywrightCrawlerStrategy (async_crawler_strategy.py:46; navigation, hooks, js_code/c4a_script, wait_for, screenshot/PDF/MHTML export at :1121-1149 and :1619-1630) or AsyncHTTPCrawlerStrategy (:2496) -> LXMLWebScrapingStrategy (content_scraping_strategy.py:101; cleaned HTML, links, media, head metadata via utils.extract_metadata_using_lxml) -> DefaultMarkdownGenerator (markdown_generation_strategy.py:55; raw Markdown, numbered citations + references, optional fit markdown through a content filter in content_filter_strategy.py / content_filter_strategy_lxml.py) -> optional extraction strategies (extraction_strategy.py: CSS/XPath/regex/cosine/LLM) -> CrawlResult (models.py:130). Browser layer: browser_manager.py (Playwright/Patchright launch, contexts, in-process session dict, managed/CDP/builtin browsers), browser_profiler.py (profiles under ~/.crawl4ai/profiles, detached builtin browser), browser_adapter.py. Config: async_configs.py (BrowserConfig, CrawlerRunConfig, LLMConfig, JSON (de)serialisation with a TRUSTED/UNTRUSTED provenance gate at :160-410). Other modules: deep_crawling/ (BFS/DFS/best-first), async_dispatcher.py, async_url_seeder.py, domain_mapper.py, adaptive_crawler.py, script/ (C4A-Script DSL compiled to JavaScript), processors/pdf/, antibot_detector.py, egress_policy.py. CLI: cli.py + cloud/cli.py; installer: install.py. Docker server (deploy/docker/): FastAPI server.py + api.py, AuthGateMiddleware (auth_gate.py), pinning egress proxy/broker (egress_proxy.py, egress_broker.py), browser pool (crawler_pool.py), declarative hooks (hook_registry.py), job queue (job.py, work_queue.py), monitor, artifact store, MCP bridge (mcp_bridge.py); supervisord runs Redis + gunicorn/uvicorn.",
+      "packaging_and_release": "PyPI: .github/workflows/release.yml triggers on tag v* (release.yml:3-6), checks tag == crawl4ai/__version__.py (:34-47), builds with `python -m build`, `twine check`, then `twine upload` using the PYPI_TOKEN secret (:54-67); no test step, no signing, checksums or attestations; a GitHub Release is created with generated notes and no attached assets (:69-97). Docker: .github/workflows/docker-release.yml (on release published or `docker-rebuild-v*` tags) builds linux/amd64 + linux/arm64 and pushes unclecode/crawl4ai:{version,minor,major,latest} to Docker Hub (docker-release.yml:3-8,69-82); no signing/attestation step. Version is single-sourced in crawl4ai/__version__.py:4 (0.9.4) and Dockerfile:4. setup.py creates ~/.crawl4ai folders and deletes ~/.crawl4ai/cache when run (setup.py:9-31), as does crawl4ai-setup (install.py:27-29). SBOM: sbom/sbom.cdx.json is CycloneDX 1.6 generated 2026-01-27 for crawl4ai 0.7.8 (stale vs 0.9.4); sbom/README.md:5-7 disclaims completeness; scripts/gen-sbom.sh regenerates it. Tag v0.9.4 is an annotated tag peeling to 133e1d9 (.git/packed-refs:2-3); a docker-rebuild-v0.9.4 tag exists at the same commit.",
+      "tests_and_ci": "pytest + pytest-asyncio (no pytest config in pyproject.toml; a `network` marker is defined only in tests/regression/conftest.py:25-26). tests/ holds 211 test_*.py files (182 contain test functions; ~1,905 `def test_` by regex) across async/, browser/, cli/, deep_crawling/, docker/, general/, regression/, unit/, proxy/, mcp/ and others; deploy/docker/tests/ holds 30 test_*.py (18 are test_security_*.py). Many tests drive a real browser or real URLs (e.g. tests/cli/test_cli.py:110-112). CI (.github/workflows): security.yml runs only `pytest deploy/docker/tests/test_security_*.py` plus the default-posture gate (offline, Python 3.10, ubuntu-latest) on pushes to main/develop/security/** and PRs touching deploy/docker/**, crawl4ai/async_configs.py or the workflow (security.yml:8-65); release.yml and docker-release.yml publish without running tests; main.yml only posts Discord notifications for issues/PRs/stars; release.yml.backup and test-release.yml.disabled are inactive. No workflow runs tests/ (searched .github for pytest: only security.yml:37,41,61,65).",
+      "dependencies": "Python >=3.10 (pyproject.toml:10). pyproject.toml [project].dependencies: 34 entries (33 distinct packages; httpx listed twice), including playwright, patchright, playwright-stealth, lxml, beautifulsoup4, aiohttp, httpx[http2], aiosqlite, pydantic>=2.10, click, rich, nltk, numpy, pillow, shapely, alphashape, rank-bm25, pyOpenSSL>=25.3.0 and `unclecode-litellm==1.81.13` (pyproject.toml:15-50). Optional extras (pyproject.toml:61-76): pdf (pypdf; required for PDF text extraction, crawl4ai/processors/pdf/processor.py:63-65), torch (3), transformer (3), cosine (4), sync (selenium), all (8). requirements.txt has 33 entries and is not identical to pyproject.toml (adds colorama, pdf2image, pypdf; lacks click, humanize, lark; requirements.txt:1-36). deploy/docker/requirements.txt has 17 entries (fastapi, uvicorn, gunicorn, slowapi, prometheus-fastapi-instrumentator, redis, dnspython, email-validator, sse-starlette, pydantic, rank-bm25, anyio, PyJWT, mcp>=1.18,<2, websockets, httpx[http2], pypdf). uv.lock present (revision 3). The Docker image also installs Redis 7.2.7 from packages.redis.io, supervisor, a build toolchain and Chromium libraries (Dockerfile:30-90,126-186).",
+      "security_policy": "SECURITY.md exists: report privately via GitHub Security Advisories or email; targets acknowledgment within 48h, assessment within 7 days, fixes critical 24-72h / high 7d / medium 30d / low 90d (SECURITY.md:14-46); only 0.9.x is supported, fixes are not backported (SECURITY.md:3-12); lists fixed advisories per release (GHSA ids for 0.9.3/0.9.4) and security features (SECURITY.md:97-254); reporter credits in SECURITY-CREDITS.md."
+    },
+    "claim_checks": [
+      {
+        "claim": "Deploy anywhere, zero keys, CLI and Docker (README.md:74)",
+        "verified": "partial",
+        "evidence": "A plain `crwl <url>` needs no key: setup_llm_config is only called for -j and -q (crawl4ai/cli.py:1105-1107,1229-1234). But -q/-j prompt interactively for an LLM provider and token on first use and save them to ~/.crawl4ai/global.yml (cli.py:62-85); `crwl cloud` needs a Crawl4AI Cloud API key (crawl4ai/cloud/cli.py:89-195); the Docker server is unreachable from the host without a self-set CRAWL4AI_API_TOKEN (deploy/docker/entrypoint.sh:25-36)."
+      },
+      {
+        "claim": "PruningContentFilterLXML is ~10x faster and 'now the default' (README.md:42,576)",
+        "verified": "partial",
+        "evidence": "Default only for the Docker /md fit filter (deploy/docker/api.py:366) and CLI `-o markdown-fit` (crawl4ai/cli.py:1079-1102); the release notes state this narrower scope (docs/blog/release-v0.9.4.md:77). The library default is no content filter: DefaultMarkdownGenerator(content_filter=None) (markdown_generation_strategy.py:74-80) with the default-filter lines commented out (async_webcrawler.py:861-863), so fit_markdown is empty unless a filter is configured (markdown_generation_strategy.py:229-249). PruningContentFilter does emit a DeprecationWarning (content_filter_strategy.py:589-597). The timing figures were not reproduced."
+      },
+      {
+        "claim": "Citations and References: converts page links into a numbered reference list (README.md:162)",
+        "verified": "yes",
+        "evidence": "convert_links_to_citations produces <n> markers and a '## References' list (crawl4ai/markdown_generation_strategy.py:82-146); MarkdownGenerationResult carries raw_markdown, markdown_with_citations, references_markdown, fit_markdown (crawl4ai/models.py:120-125). CLI `-o markdown` prints raw_markdown only (cli.py:1249-1256); the citation variants appear only in `-o all` JSON."
+      },
+      {
+        "claim": "Metadata Extraction: retrieve structured metadata from web pages (README.md:202)",
+        "verified": "partial",
+        "evidence": "CrawlResult.metadata comes from head <meta> tags only: title (with og/twitter fallback), description, keywords, author, og:*, twitter:*, article:* (crawl4ai/utils.py:1540-1623, called at content_scraping_strategy.py:698); no JSON-LD or canonical-link handling there. CrawlResult also carries url, redirected_url, status_code, response_headers (models.py:130-153). There is no retrieval-timestamp or content-hash field on a plain single-page result (models.py:130-162; none set in async_webcrawler.py)."
+      },
+      {
+        "claim": "Docker quick start: `docker run -d -p 11235:11235 ... unclecode/crawl4ai:latest`, then POST /crawl with no auth header (README.md:327-360)",
+        "verified": "no",
+        "evidence": "Under v0.9.x defaults the container binds loopback inside the container unless CRAWL4AI_API_TOKEN is set (deploy/docker/entrypoint.sh:25-36; server.py:455-490) and every non-public path requires `Authorization: Bearer` (auth_gate.py:50-66; server.py:440-448). The README command sets no token and its Python snippet sends no Authorization header, so it does not work as written (code reading; not executed). The working form is documented in docs/md_v2/core/self-hosting.md:128-175. Code differs from README; code is authoritative."
+      },
+      {
+        "claim": "MCP integration for direct connection to AI tools like Claude Code (README.md:320)",
+        "verified": "partial",
+        "evidence": "An MCP server with 7 tools over SSE and WebSocket exists, but only inside the Docker server (deploy/docker/mcp_bridge.py:85-262; server.py:616,654,743,784,823,957,1099,1183-1191). The documented command `claude mcp add --transport sse c4ai-sse http://localhost:11235/mcp/sse` (deploy/docker/README.md:306; docs/md_v2/core/self-hosting.md:415) has no auth header, while AuthGateMiddleware rejects any /mcp/* request lacking a Bearer token (SSE) or ?token= (WebSocket only) with 401 (auth_gate.py:92-126; server.py:440-448; deploy/docker/MIGRATION.md:47). Code is authoritative; not executed."
+      },
+      {
+        "claim": "Comprehensive API endpoints including HTML extraction, screenshots, PDF generation, and JavaScript execution (README.md:321)",
+        "verified": "partial",
+        "evidence": "Endpoints exist: /html, /screenshot, /pdf, /execute_js (deploy/docker/server.py:652,741,782,821). /execute_js returns 403 unless CRAWL4AI_EXECUTE_JS_ENABLED=true (server.py:98,874-875). /screenshot and /pdf accept only a url (plus screenshot_wait_for / wait_for_images for screenshots) (schemas.py:88-117) and return base64 plus an artifact id (server.py:766-808). /crawl bodies cannot carry js_code/c4a_script/session_id/cookies/headers/user_data_dir (crawl4ai/async_configs.py:203-240; MIGRATION.md:59-72). The CLI has no screenshot/PDF flag and, by code reading, json.dumps(model_dump()) cannot serialise PDF bytes (cli.py:1243 vs the base64 step in api.py:797-798); not executed."
+      },
+      {
+        "claim": "Customizable hooks at every step; full control: sessions, proxies, cookies, user scripts, hooks (README.md:72,200)",
+        "verified": "partial",
+        "evidence": "True for in-process Python use: js_code, js_code_before_wait, c4a_script, wait_for, session_id, scan_full_page, virtual_scroll_config, set_hook (crawl4ai/async_configs.py:1572-1610,1756-1773; deploy/docker/hook_registry.py:15-16). Over the Docker REST/MCP boundary those fields are rejected with HTTP 400 and hooks are limited to five declarative actions (block_resources, add_cookies, set_headers, scroll_to_bottom, wait_for_timeout - no click/type/fill) that are disabled unless CRAWL4AI_HOOKS_ENABLED=true (hook_registry.py:161-192; server.py:95,970-971). C4A-Script offers click/type/press/set/if/repeat but no tab-switch or file-upload command, and GO compiles to window.location.href (crawl4ai/script/c4ai_script.py:131-193,389)."
+      },
+      {
+        "claim": "Browser Profiler (persistent profiles with saved authentication state) and Session Management for multi-step crawling (README.md:183-184)",
+        "verified": "partial",
+        "evidence": "Profiles exist (crawl4ai/browser_profiler.py:144-168,382-514; `crwl profiles create`, `crwl <url> -p <name>`: cli.py:1043-1065,1440-1469) but creation opens a visible browser and waits for a keypress in a terminal (browser_profiler.py:438-444,514-545), i.e. needs a human and a display. session_id pages live in an in-process dict with a 30-minute TTL (browser_manager.py:741-742,1586-1589) and are documented for Python use (docs/md_v2/advanced/session-management.md:14-37); each `crwl` call opens and closes its own AsyncWebCrawler (cli.py:153-164), so sessions do not persist between shell calls. Cross-call state is possible via profiles or the detached builtin browser (`crwl browser start`, `-b browser_mode=builtin`; browser_profiler.py:1179-1271)."
+      },
+      {
+        "claim": "CLI usage: `crwl <url> -o markdown`, `--deep-crawl bfs --max-pages 10`, `-q` (README.md:116-126; docs/md_v2/core/cli.md:35)",
+        "verified": "partial",
+        "evidence": "`-o markdown` prints raw_markdown (cli.py:1249-1256); deep crawl is bounded by --max-pages (default 10) with max_depth fixed at 3 (cli.py:1176-1191; crawl4ai/deep_crawling/bfs_strategy.py:25-45). `-q` prompts interactively for provider/token on first use (cli.py:62-85). docs/md_v2/core/cli.md:35 shows `-o json` with no extraction strategy; the code prints extracted_content then json.loads() it (cli.py:1244-1247) and extracted_content is None without a strategy (async_webcrawler.py:271,896-900), so that command is expected to error (code reading; not executed). `-c key=value` splits on every comma (cli.py:111-134), so JS, selectors or lists containing commas need -C YAML/JSON files. The CLI always forces CacheMode.BYPASS and LXMLWebScrapingStrategy (cli.py:1170-1173), so PDF-URL extraction (api.py:703-713) is not reachable from `crwl`."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "PruningContentFilterLXML vs PruningContentFilter pruning time (hardware and method not stated)",
+        "metric": "ms per page",
+        "value": "medium page 134 -> 13 ms; 200 cards 67 -> 7 ms; 6000 cards 2200 -> 260 ms",
+        "source": "docs/blog/release-v0.9.4.md:71-75; CHANGELOG.md:24",
+        "independent": false
+      },
+      {
+        "what": "Prefetch mode vs full pipeline per-page time (no method given)",
+        "metric": "time per page",
+        "value": "~2-5 s full pipeline vs ~200-500 ms prefetch ('5-10x faster')",
+        "source": "docs/md_v2/core/deep-crawling.md:831-836; README.md:736",
+        "independent": false
+      },
+      {
+        "what": "URL seeding throughput 'on a standard connection' (no method given)",
+        "metric": "URLs per second",
+        "value": "sitemap 100-1,000; Common Crawl 50-500; HEAD check 10-50; head extraction 5-20; BM25 scoring 10,000+",
+        "source": "docs/md_v2/core/url-seeding.md:1108-1116",
+        "independent": false
+      },
+      {
+        "what": "LXML scraping strategy vs BeautifulSoup-based strategy (claim, no data or method)",
+        "metric": "relative processing speed",
+        "value": "'up to 10-20x faster' on large HTML documents",
+        "source": "docs/md_v2/core/content-selection.md:476-478",
+        "independent": false
+      },
+      {
+        "what": "Docker browser pool reuse vs starting a browser per request (design note, not a measurement log)",
+        "metric": "per-request overhead",
+        "value": "browser startup 3-5 s vs pool reuse <100 ms ('30-50x faster')",
+        "source": "deploy/docker/STRESS_TEST_PIPELINE.md:170-173",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Interaction is not exposed as bounded shell steps. `crwl` has no flags for screenshot, PDF, JS, waits, sessions or cookies (crawl4ai/cli.py:1014-1032) and every call starts and closes its own browser (cli.py:153-164); it cannot write PNG/PDF files and, by code reading, json.dumps(model_dump()) cannot serialise PDF bytes (cli.py:1243 vs the base64 step in deploy/docker/api.py:797-798). Multi-step state needs Python (session_id, hooks), profiles, or the builtin browser. The Docker/MCP path rejects js_code, c4a_script, session_id, cookies, headers and user_data_dir (crawl4ai/async_configs.py:203-240), disables /execute_js and hooks by default (deploy/docker/server.py:95-98), and its declarative hooks have no click/type/fill action (deploy/docker/hook_registry.py:161-192). Capturing a sign-in profile needs a human and a display (crawl4ai/browser_profiler.py:438-444,514-545). No tab-switch primitive found (crawl4ai/script/c4ai_script.py:131-193).",
+      "Docs/code drift: MCP docs omit the auth header the server requires (deploy/docker/README.md:306 vs auth_gate.py:50-66); the README Docker quick start lacks the required token (README.md:329-360 vs deploy/docker/entrypoint.sh:25-36); docs/md_v2/core/installation.md is titled '2023 Edition', calls Docker experimental and says crawl4ai-doctor checks Python version/env (installation.md:1,32-35,101-110) whereas the code only crawls https://crawl4ai.com and always exits 0 (crawl4ai/install.py:167-212); deploy/docker/README.md pins image tags 0.8.6 / 'latest stable 0.9.2' (README.md:62-66,103); the bundled Crawl4aiDockerClient defaults to port 8000 and authenticate() sends only an email although /token requires api_token, and it still sends removed hooks.code (crawl4ai/docker_client.py:33,49-58,102-105; deploy/docker/server.py:585-600); requirements.txt diverges from pyproject.toml; CHANGELOG.md has no 0.9.1/0.9.2 entries although SECURITY.md lists them (SECURITY.md:117-127; CHANGELOG.md:8-125).",
+      "Security/maintenance churn: eight releases from 0.8.7 to 0.9.4 between 2026-06-01 and 2026-09-23 (SECURITY.md:99-158; CHANGELOG.md:8,65,125,170,182,208), eight named GHSA advisories in 0.9.3-0.9.4 alone (SSRF, arbitrary file write, DoS, XSS, config-gate bypass; SECURITY.md:99-115) and critical Docker RCE/auth fixes earlier (SECURITY.md:129-171). Only 0.9.x is supported with no backports (SECURITY.md:3-12). Package status is 'Development Status :: 4 - Beta' (pyproject.toml:52) and 0.9.0 changed Docker defaults in breaking ways (deploy/docker/MIGRATION.md:3-6). The Docker config keeps Chromium --no-sandbox by default (deploy/docker/config.yml:99-108); managed browsers in library mode always add --no-sandbox (crawl4ai/browser_manager.py:73).",
+      "Attribution-fidelity defaults in library/CLI mode: TLS errors are ignored by default (BrowserConfig.ignore_https_errors=True, crawl4ai/async_configs.py:922; managed browsers always add --ignore-certificate-errors, browser_manager.py:79) - the Docker server turns verification on (deploy/docker/egress_broker.py:179-192); check_robots_txt defaults to False (async_configs.py:1808); the default User-Agent is a generic Chrome/116 string (async_configs.py:928-933); results have no retrieval timestamp or content hash (crawl4ai/models.py:130-162); Markdown conversion errors are returned as in-band text (markdown_generation_strategy.py:211-212,240-241,251-260), so a shell pipeline can see exit 0 with error text; main-text isolation (fit_markdown) needs an explicitly configured heuristic filter (crawl4ai/async_webcrawler.py:861-863; content_filter_strategy_lxml.py:1-48).",
+      "Licensing: LICENSE is the Apache-2.0 text (LICENSE:1-51) plus an appended 'Attribution Requirement' (LICENSE:53-68) stating that all distributions, publications, or public uses of the software or derivative works 'must include' the fixed sentence 'This product includes software developed by UncleCode (https://x.com/unclecode) as part of the Crawl4AI project (https://github.com/unclecode/crawl4ai).' (LICENSE:56-58), displayed prominently: in a NOTICE file, README or equivalent documentation for distributions; in the acknowledgments or a footnote for publications; in an 'About' or 'Credits' section for websites/web applications; 'In the help/usage output' for command-line tools (LICENSE:60-65). The sentence appears nowhere else in the repository (searched whole tree), no NOTICE file exists, so neither a NOTICE nor the `crwl` help/usage output carries it. Package metadata declares plain 'Apache-2.0' (pyproject.toml:11, setup.py:52; the committed SBOM for 0.7.8 likewise, sbom/sbom.cdx.json:1), the README is internally inconsistent ('attribution is recommended', README.md:1164, vs 'you must include one of the following attribution methods', README.md:1167) and its text-attribution option uses different wording ('This project uses Crawl4AI (https://github.com/unclecode/crawl4ai) for web data extraction.', README.md:1215) from the LICENSE sentence; CHANGELOG.md:716-718 and docs/md_v2/blog/releases/0.5.0.md:452-455 describe the license as 'Apache 2.0 with a required attribution clause'. Effectively Apache-2.0 plus a non-standard attribution condition (SPDX: Apache-2.0 AND LicenseRef-Crawl4AI-Attribution); how it applies to a given use is not settled by the repository's own documents.",
+      "Release/supply chain: PyPI uploads use a long-lived PYPI_TOKEN secret on any v* tag with no test gate, signing, checksums or attestations (.github/workflows/release.yml:5,54-67); Docker Hub images are pushed with no signing/attestation step (docker-release.yml:69-82); CI runs only the offline security suite and none of the ~211 files in tests/ (security.yml:41,65; searched .github); the committed SBOM is stale (CycloneDX for crawl4ai 0.7.8, 2026-01-27; sbom/sbom.cdx.json); a core dependency is `unclecode-litellm==1.81.13`, a maintainer-published fork substituted after the PyPI compromise of `litellm` (pyproject.toml:21; SECURITY.md:177; README.md:664); the committed .claude/settings.local.json pre-approves Bash(rm:*), Bash(curl:*) and Bash(docker compose:*) for anyone opening the checkout in Claude Code (.claude/settings.local.json:3-25).",
+      "Scope: anti-bot evasion is part of the product - enable_stealth (playwright-stealth), 'undetected' Patchright browser type, --disable-blink-features=AutomationControlled, simulate_user / magic / override_navigator, proxy escalation (README.md:223,677-689,938-954; pyproject.toml:25,29; crawl4ai/browser_manager.py:81; crawl4ai/async_configs.py:879-880,1603-1608). Compliance with site terms and robots.txt for primary-source retrieval is left to the caller (robots check is opt-in). A hosted Crawl4AI Cloud product is promoted in the README and CLI (README.md:16-21; crawl4ai/cloud/cli.py:72-84).",
+      "Footprint/platform: heavy install - 34 direct dependencies (numpy, pillow, shapely/alphashape, nltk, lxml, ...) plus two Chromium downloads (Playwright and Patchright) with --with-deps system packages (crawl4ai/install.py:94-147; pyproject.toml:15-50). MCP/REST needs the standing Docker stack (Redis + supervisor + gunicorn + browser pool); the container healthcheck fails below 2 GB RAM and compose caps memory at 4 GB (Dockerfile:211-219; docker-compose.yml:39-47). The README documents no platform matrix: WSL2 is undocumented, macOS arm64 is only implicit, and no macOS/Windows CI exists (security.yml:23). Optional extras pull large ML models (pyproject.toml:63-76; crawl4ai/model_loader.py:78-183)."
+    ]
+  },
+  "repaired": true,
+  "verification": [
+    {
+      "contender": "unclecode/crawl4ai",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "pip (PyPI): `pip install -U crawl4ai`",
+          "citation": "README.md:83",
+          "holds": true,
+          "note": "README.md:83 has the exact command. The package is named Crawl4AI (pyproject.toml:6), which pip normalises to crawl4ai, and needs Python >=3.10 (pyproject.toml:10). release.yml:60-67 uploads it to PyPI on v* tags; crawl4ai/__version__.py:4 = 0.9.4. Browsers come from the separate crawl4ai-setup step (README.md:89; install.py:94-147)."
+        },
+        {
+          "field": "license",
+          "statement": "spdx: Apache-2.0, file: LICENSE",
+          "citation": "LICENSE:1-51, LICENSE:53-68; pyproject.toml:11; README.md:1164-1167",
+          "holds": false,
+          "note": "LICENSE:1-51 is the Apache 2.0 terms, but LICENSE:53-68 appends an 'Attribution Requirement'. All distributions, publications or public uses must show a fixed attribution sentence: in NOTICE/README, an About/Credits page for websites and web apps, or the help/usage output for CLI tools. That extra obligation is not part of SPDX Apache-2.0, so a bare 'Apache-2.0' misstates the cited file. Only the project's metadata says plain Apache-2.0 (pyproject.toml:11), and the README contradicts itself ('attribution is recommended' at :1164 vs 'you must include' at :1167). The dossier mentions the extra clause only in risks, not in the license field."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - crawl4ai-setup installs Playwright Chromium (install.py:94-108); Docker image built for linux/amd64 (docker-release.yml:79; Dockerfile:1); README has no explicit platform statement; the only CI job runs ubuntu-latest (security.yml:23)",
+          "citation": "crawl4ai/install.py:94-108; .github/workflows/docker-release.yml:79; Dockerfile:1; .github/workflows/security.yml:23",
+          "holds": true,
+          "note": "install.py:94-108 runs `python -m playwright install --with-deps --force chromium`. docker-release.yml:79 builds linux/amd64,linux/arm64. Dockerfile:1 uses python:3.12-slim-bookworm (Debian). The README has no OS support statement, only the Docker 'AMD64/ARM64' line (:322) and a Windows bug-fix note (:625). Minor wording slip: security.yml has two jobs, security-offline (:22-23) and posture-gate (:43-47), not 'the only CI job'. Both run ubuntu-latest, so the substance holds."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "MCP only via the Docker server (no stdio): SSE /mcp/sse (+ /mcp/messages/), WebSocket /mcp/ws, /mcp/schema; tools md, html, screenshot, pdf, execute_js, crawl, ask; all MCP paths behind the bearer-token gate; execute_js disabled by default; md returns Markdown only",
+          "citation": "deploy/docker/mcp_bridge.py:196-262; deploy/docker/server.py:98,407,440-448,616,642-649,654,743,784,823,874-875,957,1099,1183-1191; deploy/docker/auth_gate.py:50-66; deploy/docker/README.md:314-324",
+          "holds": true,
+          "note": "Routes: /mcp/ws at mcp_bridge.py:197, /mcp/sse and /mcp/messages at :241 and :252-253, /mcp/schema at :256. attach_mcp is called at server.py:1185. The seven @mcp_tool decorators sit at the cited lines and match docs README.md:318-324. No stdio MCP server exists in the repo (searched). The auth gate is public only for health, /token, / and /monitor plus the /dashboard, /playground and /static prefixes (server.py:407,446-447), so every /mcp/* path needs a credential. EXECUTE_JS_ENABLED defaults to false (server.py:98) and returns 403 (:874-875). /md returns only url, filter, query, cache, markdown and success (:642-649). The server needs Redis (server.py:344), which supervisord runs alongside gunicorn (supervisord.conf:6-23)."
+        },
+        {
+          "field": "claim_checks[4]",
+          "statement": "README Docker quick start (`docker run -d -p 11235:11235 ... unclecode/crawl4ai:latest`, then POST /crawl with no auth header) does not work as written - verified: no",
+          "citation": "README.md:327-360; deploy/docker/entrypoint.sh:25-36; Dockerfile:229-232; deploy/docker/config.yml:8,63; deploy/docker/auth_gate.py:50-66,109-126; deploy/docker/server.py:440-448,455-490; docs/md_v2/core/self-hosting.md:128-175",
+          "holds": true,
+          "note": "The README run (:329-330) passes no token. The image sets none and starts via entrypoint.sh (Dockerfile:229-232). Without CRAWL4AI_API_TOKEN, entrypoint.sh:25-36 binds 127.0.0.1:11235 inside the container and warns that published ports will reset. Even if reachable, the README snippet (:344-347) sends no Authorization header, and the gate answers 401 (auth_gate.py:109-126). self-hosting.md:128-175 documents the working -e CRAWL4AI_API_TOKEN form. Code reading only; not executed."
+        }
+      ],
+      "verdict": "fail",
+      "repairs": [
+        "license.spdx: replace 'Apache-2.0' with an expression covering the extra term, e.g. 'Apache-2.0 AND LicenseRef-Crawl4AI-Attribution' (or a single LicenseRef for the modified text). Add to the license field that LICENSE:53-68 requires a fixed attribution sentence for all distributions, publications and public uses: NOTICE/README for distributions, an About/Credits page for web apps, help/usage output for CLI tools. Note that only pyproject.toml:11 declares plain 'Apache-2.0' and that README.md:1164 ('recommended') and :1167 ('must') contradict each other."
+      ]
+    },
+    {
+      "contender": "unclecode/crawl4ai",
+      "checks": [
+        {
+          "field": "install[0]: pip (PyPI)",
+          "statement": "`pip install -U crawl4ai` (README.md:83)",
+          "citation": "README.md:78-98; pyproject.toml:6,78-83; crawl4ai/install.py:12-65,94-147,150-164,167-212",
+          "holds": true,
+          "note": "README.md:83 is exactly `pip install -U crawl4ai` in the Quick Start, followed by `crawl4ai-setup` (:89) and `crawl4ai-doctor` (:92). The dossier's description of the companion steps matches install.py. Setup runs `playwright install --with-deps --force chromium` and the same for patchright (:94-147), unless CRAWL4AI_MODE=api (:52-60), then initialises the DB (:150-164). Doctor crawls https://crawl4ai.com and always calls sys.exit(0) (:194,207-212). Not in the dossier: setup also creates an empty global.yml directly in $HOME, not in ~/.crawl4ai, because the path is built before '.crawl4ai' is appended (install.py:15-17,37-40)."
+        },
+        {
+          "field": "license",
+          "statement": "Apache-2.0 AND LicenseRef-Crawl4AI-Attribution: Apache text at LICENSE:1-51 plus an appended 'Attribution Requirement' at LICENSE:53-68 that mandates the sentence at LICENSE:58. Package metadata says plain 'Apache-2.0' (pyproject.toml:11, setup.py:52). README.md:1164 ('recommended') and README.md:1167 ('must') contradict each other. No NOTICE file exists.",
+          "citation": "LICENSE:1-69; pyproject.toml:11; setup.py:52; README.md:1162-1217; repo-wide search for NOTICE* and for the LICENSE:58 sentence",
+          "holds": true,
+          "note": "Every cited fact checks out. LICENSE:51 is 'END OF TERMS AND CONDITIONS' and LICENSE:53-68 is the 'Attribution Requirement'. The sentence at :58 appears nowhere else in the tree, and there is no NOTICE file. pyproject.toml:11 and setup.py:52 both say 'Apache-2.0'. README.md:1164 says 'attribution is recommended', :1167 says 'you must include one of the following attribution methods', and the text option at :1215 uses different wording. One precision issue: LICENSE:60 requires display 'in a prominent and easily accessible location, such as:'. The four placements at :62-65 are therefore examples, but the dossier presents them as required locations."
+        },
+        {
+          "field": "platforms.linux_x86_64",
+          "statement": "yes - the pip path installs Playwright Chromium via `crawl4ai-setup` (install.py:94-108) and the Docker image is built for linux/amd64 (docker-release.yml:79; Dockerfile:1). README has no explicit platform statement; the only CI job runs ubuntu-latest (security.yml:23).",
+          "citation": "crawl4ai/install.py:94-108; .github/workflows/docker-release.yml:11,79; Dockerfile:1,102-108; .github/workflows/security.yml:21-23,43-47; .github/workflows/release.yml:10; .github/workflows/main.yml:17; README.md:309-323",
+          "holds": false,
+          "note": "The 'yes' is supported: install.py:94-108 installs Playwright Chromium, and docker-release.yml:79 builds 'linux/amd64,linux/arm64' from a Debian base (Dockerfile:1). Two supporting claims are false as written. (a) The README does make a platform statement: README.md:322, in the Docker Deployment section, says 'Multi-architecture support with automatic detection (AMD64/ARM64)'. The dossier's own readme.claims cites this line (README.md:317-323). (b) There is no single CI job: security.yml has two, security-offline (:23) and posture-gate (:47), both on ubuntu-latest. The publish and notify workflows also run on ubuntu-latest (release.yml:10, docker-release.yml:11, main.yml:17), and no workflow uses a non-Linux runner."
+        },
+        {
+          "field": "integrations.mcp",
+          "statement": "MCP is available only through the Docker server, with no stdio server. Endpoints: SSE /mcp/sse (+ /mcp/messages/), WebSocket /mcp/ws, schema /mcp/schema. Tools: md, html, screenshot, pdf, execute_js, crawl, ask. All MCP paths are behind the bearer-token gate, execute_js is disabled by default, and the md tool returns Markdown only.",
+          "citation": "deploy/docker/mcp_bridge.py:85-262; deploy/docker/server.py:95-98,237-238,440-448,614-649,654,743,784,823,874-875,957,1099,1183-1191; deploy/docker/auth_gate.py:50-126; deploy/docker/README.md:293-324; repo search for stdio/FastMCP",
+          "holds": true,
+          "note": "The routes are at mcp_bridge.py:197 (/mcp/ws), :241 and :252-253 (/mcp/sse and /mcp/messages/) and :256 (/mcp/schema), attached at server.py:1185-1191. The only @mcp_tool decorators in deploy/docker are the seven at server.py:616, 654, 743, 784, 823, 957 and 1099, matching deploy/docker/README.md:318-324. No stdio server exists anywhere; stdio is mentioned only in logger comments (crawl4ai/async_logger.py:136,146). /mcp/* is not a public path or prefix (server.py:446-447), so a request without a token gets HTTP 401 or WebSocket close 4401 (auth_gate.py:63-66,109-126). WebSocket also accepts ?token= (:101-106). execute_js returns 403 unless CRAWL4AI_EXECUTE_JS_ENABLED=true (server.py:98,874-875). md returns only url/filter/query/cache/markdown/success (:642-649). The server's lifespan uses Redis (:237-238)."
+        },
+        {
+          "field": "claim_checks[4]: Docker quick start (verified: no)",
+          "statement": "The README's `docker run -d -p 11235:11235 ... unclecode/crawl4ai:latest` followed by POST /crawl with no auth header does not work as written. Without CRAWL4AI_API_TOKEN the container binds loopback, and every non-public path requires a Bearer token. The working form is in docs/md_v2/core/self-hosting.md:128-175.",
+          "citation": "README.md:325-360; Dockerfile:229-232; deploy/docker/entrypoint.sh:20-39; deploy/docker/config.yml:8; deploy/docker/server.py:432-490; deploy/docker/auth_gate.py:50-66; docs/md_v2/core/self-hosting.md:128-175",
+          "holds": true,
+          "note": "README.md:330 passes no -e CRAWL4AI_API_TOKEN, and the snippet at :344-347 sends no Authorization header. The image's CMD is `bash entrypoint.sh` (Dockerfile:232). With no token and no CRAWL4AI_JWT_ENABLED, gunicorn binds 127.0.0.1:11235, and the script itself warns that published ports will not work (entrypoint.sh:27-35). config.yml:8 sets host 127.0.0.1, so _resolve_auth mints an ephemeral token rather than exiting (server.py:483-490). /crawl is not a public path (server.py:446), so even with a token the README snippet would get 401 (auth_gate.py:63-66). self-hosting.md:128-175 gives the working form: set a token, pass it with -e, and send `Authorization: Bearer`. This is code reading only; nothing was executed. Minor omission: setting CRAWL4AI_JWT_ENABLED=true also opens the bind (entrypoint.sh:27)."
+        }
+      ],
+      "verdict": "fail",
+      "repairs": [
+        "platforms.linux_x86_64: replace 'README has no explicit platform statement' with 'README's only platform statement is the Docker bullet \"Multi-architecture support with automatic detection (AMD64/ARM64)\" (README.md:322); it gives no OS/platform matrix for the pip install'.",
+        "platforms.linux_x86_64: replace 'the only CI job runs ubuntu-latest (.github/workflows/security.yml:23)' with 'both CI test jobs, security-offline and posture-gate, run on ubuntu-latest (.github/workflows/security.yml:23,47); every other workflow job is also ubuntu-latest (release.yml:10, docker-release.yml:11, main.yml:17), and no macOS or Windows runner exists'.",
+        "license.file and the Licensing risk: LICENSE:60 requires the sentence to be displayed 'in a prominent and easily accessible location, such as:'. Present the four placements at LICENSE:62-65 (NOTICE/README for distributions, acknowledgments/footnote for publications, About/Credits for web apps, help/usage output for CLI tools) as the license's examples, not as mandatory locations."
+      ]
+    }
+  ]
+}

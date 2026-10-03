@@ -1,0 +1,321 @@
+{
+  "contender": "koalaman/shellcheck",
+  "revision": {
+    "contender": "koalaman/shellcheck",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "koalaman/shellcheck",
+        "tag": "v0.11.0",
+        "commit": "aac0823e6b58f8a499e856e93738082691cbf212",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.11.0",
+    "commit": "aac0823e6b58f8a499e856e93738082691cbf212",
+    "read_at": "2026-10-02T03:02:18+00:00"
+  },
+  "dossier": {
+    "contender": "koalaman/shellcheck",
+    "revision": {
+      "tag": "v0.11.0",
+      "commit": "aac0823e6b58f8a499e856e93738082691cbf212",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "GPL-3.0-or-later",
+      "file": "LICENSE"
+    },
+    "purpose": "Static-analysis (lint) tool for shell scripts (dialects sh, bash, dash, ksh, busybox sh; src/ShellCheck/Interface.hs:228), written in Haskell and shipped as the `shellcheck` CLI plus an exposed Haskell library (ShellCheck.cabal:42-124). It reports diagnostics with stable SCxxxx codes at four severities (error, warning, info, style). It can emit auto-fix patches (`-f diff`) and structured output (json1, checkstyle, gcc), and it signals results through exit codes (shellcheck.hs:151-160, 200-206). It reads local scripts only; nothing in the repo evaluates LLM output, prompts, skills or agents. For the three evaluation questions this repo has: (1) no labeled-case evaluation framework with per-sample scorers (its own tests are fixed-example QuickCheck properties with pass/fail only); (2) no runner for containerized Claude Code or Codex CLI task suites with verifiers; (3) no declarative CI regression gate for prompts, skills or agents. The only gate-like use is linting shell scripts via exit codes (README.md:86-97) with `.shellcheckrc` key=value settings (shellcheck.1.md:291-322). Version 0.11.0 is dated 2025-08-03 (CHANGELOG.md:1).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "ShellCheck is a GPLv3 tool that gives warnings and suggestions for bash/sh shell scripts.",
+          "citation": "README.md:6"
+        },
+        {
+          "claim": "Goals: point out beginner syntax issues, intermediate semantic problems, and subtle caveats/corner cases that may make an otherwise working script fail under future circumstances.",
+          "citation": "README.md:10-19"
+        },
+        {
+          "claim": "Usable on the web (shellcheck.net, 'always synchronized to the latest git commit') or from a terminal with `shellcheck yourscript`.",
+          "citation": "README.md:56-64"
+        },
+        {
+          "claim": "In build/test suites: 'It makes canonical use of exit codes, so you can just add a `shellcheck` command as part of the process' (Makefile and Travis examples: 'Fail if any of these files have warnings').",
+          "citation": "README.md:86-105"
+        },
+        {
+          "claim": "Services/platforms said to have ShellCheck pre-installed: Travis CI, Codacy, Code Climate, Code Factor, Codety, CircleCI orb, GitHub Actions (only Linux), Trunk Code Quality, CodeRabbit; elsewhere install it via package manager or binary release.",
+          "citation": "README.md:107-121"
+        },
+        {
+          "claim": "'It's a good idea to manually install a specific ShellCheck version regardless. This avoids any surprise build breaks when a new version with new warnings is published.'",
+          "citation": "README.md:123-124"
+        },
+        {
+          "claim": "For customized filtering or reporting, ShellCheck can output simple JSON, CheckStyle-compatible XML, GCC-compatible warnings and human-readable text (with or without ANSI colors); further docs are on the Integration wiki page (not part of the checkout).",
+          "citation": "README.md:126-128"
+        },
+        {
+          "claim": "Documented installs: cabal, stack, apt, pacman/AUR, emerge, yum/dnf, FreeBSD pkg, Homebrew, MacPorts, OpenBSD, zypper, Solus, Windows (choco/winget/scoop), conda-forge, Snap (edge channel), Docker Hub (koalaman/shellcheck, koalaman/shellcheck-alpine), nix, Flox, a pre-commit hook, and pre-compiled tar.xz/zip binaries.",
+          "citation": "README.md:130-294"
+        },
+        {
+          "claim": "Pre-compiled binaries listed: Linux x86_64, armv6hf and aarch64 (statically linked), macOS aarch64 and x86_64, Windows x86, plus a 'latest' meta-release of daily git builds.",
+          "citation": "README.md:238-248"
+        },
+        {
+          "claim": "'There are currently no official binaries for Apple Silicon' (third-party builds via the VS Code shellcheck-binaries repository).",
+          "citation": "README.md:250-251"
+        },
+        {
+          "claim": "'ShellCheck is written in Haskell and requires 2GB of RAM to compile'; built and packaged using Cabal.",
+          "citation": "README.md:298-302"
+        },
+        {
+          "claim": "'To run the unit test suite: cabal test'.",
+          "citation": "README.md:350-354"
+        },
+        {
+          "claim": "Portability warnings follow the shebang: with `#!/bin/sh` ShellCheck warns about portability issues similar to checkbashisms.",
+          "citation": "README.md:484-486"
+        },
+        {
+          "claim": "Issues can be ignored via environment variable, command line, or per-command/file-wide directives (details only on the Ignore wiki page); contributions go through GitHub PRs and must be licensed GPLv3.",
+          "citation": "README.md:532-536, 544-551"
+        }
+      ],
+      "install": [
+        {
+          "method": "Debian-based distro package (Linux)",
+          "command": "sudo apt install shellcheck",
+          "citation": "README.md:144-146"
+        },
+        {
+          "method": "Homebrew (macOS)",
+          "command": "brew install shellcheck",
+          "citation": "README.md:171-173"
+        },
+        {
+          "method": "Cabal from Hackage (Linux/macOS; installs to ~/.cabal/bin)",
+          "command": "cabal update\ncabal install ShellCheck",
+          "citation": "README.md:134-137"
+        },
+        {
+          "method": "Pre-compiled static binary tarball, Linux x86_64 (README shows scversion as 'stable', a version tag such as v0.4.7, or 'latest'; macOS tarballs are listed at README.md:243-244)",
+          "command": "scversion=\"stable\" # or \"v0.4.7\", or \"latest\"\nwget -qO- \"https://github.com/koalaman/shellcheck/releases/download/${scversion?}/shellcheck-${scversion?}.linux.x86_64.tar.xz\" | tar -xJv\ncp \"shellcheck-${scversion}/shellcheck\" /usr/bin/\nshellcheck --version",
+          "citation": "README.md:289-294"
+        },
+        {
+          "method": "Docker Hub image (works on Linux/macOS with Docker; ':v0.4.7'-style version tags and ':latest' daily builds are also mentioned)",
+          "command": "docker run --rm -v \"$PWD:/mnt\" koalaman/shellcheck:stable myscript",
+          "citation": "README.md:221-224"
+        },
+        {
+          "method": "Build from source in a git clone (needs cabal-install and about 2GB RAM)",
+          "command": "cabal update\ncabal install   # run inside the cloned ShellCheck source directory",
+          "citation": "README.md:298-320"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - README.md:240 lists a statically linked linux.x86_64 tarball, built with --enable-executable-static (builders/linux.x86_64/build:8); distro packages at README.md:144-186; Docker image for linux/amd64 (.multi_arch_docker:80).",
+        "wsl2": "unknown - WSL/Windows Subsystem is not mentioned anywhere in the repo (case-insensitive search of all files). The Linux artifacts above are the applicable ones, but WSL2 itself is neither documented nor tested upstream.",
+        "macos_arm64": "yes - README.md:243 lists a macOS aarch64 tarball; .github/workflows/build.yml:73 builds darwin.aarch64 (cross-compiled on Linux, builders/darwin.aarch64/Dockerfile:3); CHANGELOG.md:34 records it as added in v0.10.0; Homebrew is documented at README.md:171-173. README.md:250-251 contradicts this ('no official binaries for Apple Silicon'); code and CHANGELOG preferred.",
+        "gpu": "no - not used or required. CPU-only static analysis; no GPU-related dependency in ShellCheck.cabal:47-69 and no GPU/CUDA/Metal/OpenCL mention anywhere in the repo."
+      },
+      "integrations": {
+        "cli": "yes - `shellcheck [OPTIONS...] FILES...` (shellcheck.hs:94-138; shellcheck.1.md:9), '-' reads stdin (shellcheck.1.md:131-133). Formats tty, gcc, checkstyle, diff, json, json1, quiet (shellcheck.hs:151-160; shellcheck.1.md:136-216). Exit codes 0/1/2/3/4 (shellcheck.hs:200-206; shellcheck.1.md:342-348). SHELLCHECK_OPTS env var (shellcheck.hs:184-194). Editor plugins (Vim, Emacs, Sublime, Pulsar, VS Code) are third-party and only listed at README.md:66-84.",
+        "mcp": "none found - no MCP server, config or mention anywhere in the repo (case-insensitive search for MCP / Model Context Protocol; no .mcp.json).",
+        "sdk_or_api": "Haskell library only: ShellCheck.cabal:42-97 exposes the modules; entry `ShellCheck.Checker.checkScript` (src/ShellCheck/Checker.hs:64) with the types exported from src/ShellCheck/Interface.hs:21-62. The README does not document library use. No HTTP API or server code in this repo (the hosted site shellcheck.net is only referenced, README.md:58-60). Machine-readable output is available through `-f json1` (src/ShellCheck/Formatter/JSON1.hs:44-110).",
+        "claude_code_or_codex": "none found - no Claude Code/Codex hooks, skills, plugins, CLAUDE.md/AGENTS.md, or mentions of either (case-insensitive repo-wide search for claude, codex, anthropic, openai)."
+      },
+      "telemetry_and_network": "No telemetry, analytics or phone-home found. No network/HTTP/socket library is in ShellCheck.cabal:47-69. Nothing in shellcheck.hs or src/**/*.hs imports Network, HTTP, socket or System.Process (`process` is declared at ShellCheck.cabal:69 but not imported anywhere). The only URL string used at runtime is `wikiLink = \"https://www.shellcheck.net/wiki/\"` (src/ShellCheck/Formatter/TTY.hs:38), printed as text in tty output (default 3 links, Interface.hs:210; `-W 0` disables, shellcheck.1.md:116-119) and never fetched. Runtime I/O is local: input files/stdin (shellcheck.hs:569-582); .shellcheckrc/shellcheckrc in the script dir and its parents, ~/.shellcheckrc and the XDG config dir (shellcheck.hs:509-523); `source`d files only if listed as inputs or when -x / external-sources=true (shellcheck.hs:459-464; shellcheck.1.md:121-129, 265-271). Environment variables read: SHELLCHECK_OPTS (shellcheck.hs:184-189) and TERM (src/ShellCheck/Formatter/Format.hs:78). No account or service is needed to run it. Network is used only for building and releasing: Hackage via `cabal update` (README.md:310-312; build.yml:55-56); GHC/cabal/curl downloads in builder Dockerfiles (e.g. builders/windows.x86_64/Dockerfile:16,20-21); a git clone of github.com/koalaman/qemu and an http:// Raspbian mirror in builders/linux.armv6hf/Dockerfile:14,25; GitHub and Docker Hub deploys using GITHUB_TOKEN and DOCKER_* secrets (build.yml:140-157). The README also points to the hosted web checker shellcheck.net (README.md:58-60); its server code is not in this repo. The README makes no statement about telemetry."
+    },
+    "code": {
+      "languages": [
+        "Haskell (29 .hs files: shellcheck.hs, test/shellcheck.hs and 27 modules under src/ShellCheck; about 19.1k lines in src/ and 635 in shellcheck.hs)",
+        "Bash/POSIX sh (release, builder and test helper scripts: .prepare_deploy, .github_deploy, .multi_arch_docker, builders/*/build, builders/run_builder, test/*, quicktest, quickrun, striptests, setgitversion, nextnumber, manpage)",
+        "Dockerfile (builders/*/Dockerfile, Dockerfile.multi-arch)",
+        "Markdown (README.md, CHANGELOG.md, shellcheck.1.md man-page source built with pandoc via ./manpage)"
+      ],
+      "entry_points": [
+        {
+          "path": "shellcheck.hs",
+          "what": "CLI main of cabal executable `shellcheck` (ShellCheck.cabal:102-124): GetOpt flags (:95-138), SHELLCHECK_OPTS (:184-194), formatter selection (:151-160), exit-code mapping (:200-206), rc/source resolution in ioInterface (:422-567)."
+        },
+        {
+          "path": "src/ShellCheck/Checker.hs",
+          "what": "Library entry `checkScript` (:64): parse + analyze + filter by include/exclude/severity, sort and de-duplicate one script; takes CheckSpec and SystemInterface from Interface.hs."
+        },
+        {
+          "path": "src/ShellCheck/Interface.hs",
+          "what": "Public library types: SystemInterface, CheckSpec, CheckResult, PositionedComment, Fix/Replacement, Severity, Shell (:21-62, 76-130, 228-340)."
+        },
+        {
+          "path": "test/shellcheck.hs",
+          "what": "cabal test-suite main (ShellCheck.cabal:126-146): runs runTests of 13 modules, prints failing module names and exits non-zero (:19-41)."
+        },
+        {
+          "path": "quicktest, quickrun",
+          "what": "Dev helpers: quicktest runs the unit tests interpreted through ghci ('cabal test remains the source of truth', quicktest:4); quickrun runs the CLI via runghc (quickrun:13)."
+        },
+        {
+          "path": "src/ShellCheck/Debug.hs",
+          "what": "REPL helpers for `cabal repl` (shellcheckString, stringToAst, stringToCfg, CFG-to-GraphViz) (:1-22)."
+        },
+        {
+          "path": "Dockerfile.multi-arch",
+          "what": "Container image definition: final stage `FROM scratch` with WORKDIR /mnt and ENTRYPOINT /bin/shellcheck (:19-24); an `alpine` target keeps the binary inside an Alpine image (:1-17)."
+        },
+        {
+          "path": "builders/run_builder",
+          "what": "Release build entry: pipes a `cabal sdist` tarball into a per-target Docker builder image (:29) that runs builders/<target>/build; CI calls it at .github/workflows/build.yml:86."
+        }
+      ],
+      "architecture": "Pipeline: shellcheck.hs (CLI: GetOpt flags + SHELLCHECK_OPTS; `ioInterface` implements file reads, .shellcheckrc discovery and `source` resolution; picks a Formatter; maps results to exit codes) -> src/ShellCheck/Checker.hs `checkScript` (:64; parse, analyze, then filter/sort/de-duplicate) -> src/ShellCheck/Parser.hs `parseScript` (:3623; hand-written Parsec parser producing the AST defined in AST.hs, parse-error comments, `# shellcheck` directive handling, rc-file reading at :3280-3290, follows `source` through SystemInterface) -> src/ShellCheck/Analyzer.hs `analyzeScript` (:34) runs the checkers: Analytics.hs (AST checks plus the optional-check list, 5,242 lines), Checks/Commands.hs (per-command checks, 1,475 lines), Checks/ShellSupport.hs (dialect/portability checks, 701 lines), Checks/ControlFlow.hs (control-flow-graph checks; scaffolding with an empty effect-check list, :23, :74-76) and Checks/Custom.hs (empty hook for site-specific patches, :1-4). Supporting modules: AnalyzerLib.hs (Parameters, Checker monoid, annotation filtering at :881), ASTLib.hs, CFG.hs (control-flow graph via fgl) and CFGAnalysis.hs (data-flow analysis in the ST monad), Fixer.hs (applies auto-fix Replacements), Interface.hs (public types), Data.hs (known commands/variables, version string), Regex.hs (regex-tdfa wrapper), Debug.hs (REPL helpers), Formatter/{Format,TTY,GCC,JSON,JSON1,CheckStyle,Diff,Quiet}.hs (output). Directives are the Annotation type in AST.hs:149-156 (disable, enable, source, shell, source-path, external-sources, extended-analysis).",
+      "packaging_and_release": "Artifacts: `cabal sdist` source tarball (build.yml:33-37); Linux/macOS/Windows binaries for 7 targets built in Docker (build.yml:73: linux.x86_64, linux.aarch64, linux.armv6hf, linux.riscv64, darwin.x86_64, darwin.aarch64, windows.x86_64), packaged as shellcheck-<tag>.<target>.tar.xz (Linux/macOS) and shellcheck-<tag>.zip (Windows) for tag `latest`, plus `stable` and the version tag on exact-tag builds (.prepare_deploy:33-46; build.yml:22-31); multi-arch Docker Hub images `koalaman/shellcheck` (FROM scratch) and `-alpine` for amd64, arm64, arm/v6, riscv64 (.multi_arch_docker:35-41, 80-83; Dockerfile.multi-arch); Snap recipe (snap/snapcraft.yaml: core24, strict confinement, built with `cabal install -j`); Hackage upload and builder-image pushes are manual steps (test/check_release:63-66, 75-81). The workflow runs on every push (build.yml:4); deploy uploads with `gh release upload --clobber` (.github_deploy:27), sleeps 300s, then pushes images using DOCKER_* secrets (build.yml:140-159). Integrity: .prepare_deploy:48-52 writes a .sha512sum per archive, but .github_deploy:23 only uploads *.xz/*.gz/*.zip, so by script logic checksum files are not attached to releases (what the release page actually shows is not checkable here). No signatures, attestations, provenance, cosign or gpg tooling anywhere in the repo (searched). Archives embed the build date and `git log` in README.txt (.prepare_deploy:9-24). Actions are pinned by major tag (@v4), not SHA, with daily Dependabot updates (.github/dependabot.yml:4-7). Builders: CI pulls prebuilt images by unversioned Docker Hub tags (builders/*/tag; builders/run_builder:29); Dockerfiles use floating bases (alpine:3.22, ubuntu:25.04) except the two macOS builders pinned by digest (builders/darwin.aarch64/Dockerfile:1; builders/darwin.x86_64/Dockerfile:1), and download GHC/cabal with curl without checksum checks (e.g. builders/linux.aarch64/Dockerfile:10, 14). Release builds first run `striptests` to remove tests and QuickCheck from the sources (builders/linux.x86_64/build:5; striptests:2-4, 69-72) and smoke-test only with `--version` (darwin.aarch64 only runs `file`, builders/darwin.aarch64/build:14; darwin.x86_64 has no check). The macOS arm64 binary is left unstripped because stripping invalidates the code signature (builders/darwin.aarch64/build:10-12). Version is ShellCheck.cabal:2 = 0.11.0; non-tag builds hard-code `git describe` into Data.hs via setgitversion (build.yml:35).",
+      "tests_and_ci": "Tests are inline QuickCheck properties (`prop_*`, Template Haskell quickCheckAll/forAllProperties) inside the src modules, run by `cabal test` (test-suite test-shellcheck, exitcode-stdio-1.0, ShellCheck.cabal:126-146). The driver test/shellcheck.hs:19-41 runs runTests of 13 modules, then prints the failing module names and exits non-zero. Static count of `^prop_` definitions: about 2,210 in 11 modules (Analytics 1189, Commands 350, Parser 320, ShellSupport 174, Checker 80, ASTLib 51, Fixer 21, AnalyzerLib 14, Formatter.Diff 7, CFG 3, Custom 1); CFGAnalysis and Checks.ControlFlow expose runTests but define no `prop_`. Almost all are argument-less fixed examples: positive/negative `verify`/`verifyNot` over script strings (Analytics.hs:299-309) and the documented example pairs of each optional check (`prop_verifyOptionalExamples`, Analytics.hs:213-217), run once each (`maxSuccess = 1`, e.g. Analytics.hs:5242). The only property with arguments found is Fixer.hs:296. There are no scorers and no per-sample score store: output is QuickCheck console text plus the module summary, and CI uploads no test logs (build.yml:63-66). test/ holds 5 files: shellcheck.hs plus shell scripts buildtest (configure/build/test/haddock plus an exit-code smoke test, :29-55), distrotest (manual multi-distro Docker builds, 'takes hours, and is still highly experimental', :20-32), stacktest, and check_release (maintainer checklist; it reads `$current` at :20 before assigning it at :31). CI is a single workflow, .github/workflows/build.yml, triggered only `on: push` (no pull_request trigger). Jobs: package_source (sdist), run_tests (ubuntu-latest, apt ghc/cabal-install, `cabal test`, :45-66), build_source (7-target Docker matrix), package_binary, deploy (GitHub release plus Docker Hub with image smoke tests `--version` and a trivial script on 4 platforms, .multi_arch_docker:44-77). `deploy` depends only on package_binary -> build_source -> package_source, so run_tests is not a prerequisite (build.yml:47, 69, 95, 124). No step runs shellcheck on the repo's own scripts. Nothing was executed while compiling this dossier (read-only file tools, no shell), so no test result is claimed; counts come from static search.",
+      "dependencies": "ShellCheck.cabal (Cabal-Version 1.18; bounds 'based on GHC 7.10.3' to 'GHC 9.12.1', :48-49): library has 16 direct dependencies (aeson, array, base, bytestring, containers, deepseq, Diff, fgl, filepath, mtl, parsec, QuickCheck, regex-tdfa, transformers, directory, process; :50-69) plus `semigroups` only for GHC < 8.0 (:44-46); the executable lists 15 external packages plus the library (:106-122); the test-suite lists 15 external packages plus the library (:128-144). `process` is declared but no .hs file imports it (searched). Release builds remove QuickCheck and Template Haskell via striptests (striptests:2-4, 69-72). stack.yaml: resolver lts-18.15, extra-deps empty (:5, :11). builders/linux.armv6hf/cabal.project.freeze pins 76 packages (the only freeze file; a root cabal.project.freeze is git-ignored, .gitignore:15). No lock file for the other targets: dependencies resolve from Hackage at build time (build.yml:55-56; builders/linux.x86_64/build:7).",
+      "security_policy": "none - no SECURITY.md, security contact or disclosure process (file-name search and text search for security/vulnerab/CVE). Bugs go to GitHub issues (README.md:538-542; .github/ISSUE_TEMPLATE/). Tool default worth noting: `source`d files outside the given inputs are not read unless -x or external-sources=true, because of ShellCheck's origin as a remote service for checking untrusted scripts (shellcheck.1.md:121-129, 265-271)."
+    },
+    "claim_checks": [
+      {
+        "claim": "ShellCheck 'makes canonical use of exit codes, so you can just add a `shellcheck` command as part of the process' (README.md:88-89).",
+        "verified": "yes",
+        "evidence": "shellcheck.hs:200-206 maps NoProblems->0, SomeProblems->1, RuntimeException->2, SyntaxFailure->3, SupportFailure->4, matching shellcheck.1.md:342-348. Any comment at any severity gives exit 1 by default (shellcheck.hs:256-259; default minimum severity is style, src/ShellCheck/Interface.hs:127); --severity raises the floor (shellcheck.hs:126-128). `-f quiet` exits 1 at the first issue and on any file failure (src/ShellCheck/Formatter/Quiet.hs:34-35). Verified by reading; nothing executed."
+      },
+      {
+        "claim": "ShellCheck can output simple JSON, CheckStyle XML, GCC-compatible warnings and human-readable text (README.md:126-128).",
+        "verified": "yes",
+        "evidence": "shellcheck.hs:151-160 registers checkstyle, diff, gcc, json, json1, tty and quiet; the README omits json1, diff and quiet (code preferred). Failure reports go to stderr for tty, json, json1, gcc and diff (src/ShellCheck/Formatter/TTY.hs:112-114; JSON.hs:100; JSON1.hs:112; GCC.hs:37; Diff.hs:66-68) but to stdout as an XML error element for checkstyle (CheckStyle.hs:75-85), so exit code plus stderr must be captured to keep failure evidence."
+      },
+      {
+        "claim": "'To run the unit test suite: cabal test' (README.md:352-354).",
+        "verified": "yes",
+        "evidence": "ShellCheck.cabal:126-146 defines test-suite test-shellcheck (exitcode-stdio-1.0, main-is test/shellcheck.hs); test/shellcheck.hs:19-41 runs 13 modules and exits non-zero on any failure; build.yml:63-66 runs `cabal test`. About 2,210 `^prop_` definitions in 11 modules, run once each (Analytics.hs:5242). Read statically, not executed."
+      },
+      {
+        "claim": "'There are currently no official binaries for Apple Silicon' (README.md:250-251).",
+        "verified": "no",
+        "evidence": "The README itself lists a macOS aarch64 tarball (README.md:243); build.yml:73 builds darwin.aarch64; CHANGELOG.md:34 'Precompiled binaries for macOS ARM64 (darwin.aarch64)' under v0.10.0; builders/darwin.aarch64/Dockerfile:3-4 and build:14; .prepare_deploy:41-44 packages {linux,darwin}.*. The sentence is stale; code and CHANGELOG preferred."
+      },
+      {
+        "claim": "Pre-compiled binaries are: Linux x86_64/armv6hf/aarch64, macOS aarch64/x86_64, Windows x86 (README.md:240-245).",
+        "verified": "partial",
+        "evidence": "build.yml:73 also builds linux.riscv64 (CHANGELOG.md:11 'Precompiled binaries for Linux riscv64'), which the README list omits. Windows is built as windows.x86_64 (builders/windows.x86_64/Dockerfile:3, 16), not 'x86' as README.md:245 says; the Windows zip has no arch in its name (.prepare_deploy:38). Linux builds use --enable-executable-static (builders/linux.x86_64/build:8), consistent with 'statically linked' at README.md:240-242."
+      },
+      {
+        "claim": "'ShellCheck is a GPLv3 tool' / 'licensed under the GNU General Public License, v3' (README.md:6, 555).",
+        "verified": "partial",
+        "evidence": "LICENSE:1-2 is the GPL v3 text. But 25 Haskell files (shellcheck.hs:7-10 and 24 under src/) grant 'version 3 ... or (at your option) any later version', and shellcheck.1.md:401 says 'version 3 or later', while ShellCheck.cabal:4 says `License: GPL-3`. src/ShellCheck/Data.hs, Debug.hs, Checks/Custom.hs and test/shellcheck.hs carry no license header."
+      },
+      {
+        "claim": "The README gallery lists `cat file | grep foo  # Useless use of cat` among issues ShellCheck recognizes (README.md:448).",
+        "verified": "partial",
+        "evidence": "Since v0.11.0 SC2002 is disabled by default (CHANGELOG.md:14-15). The check exists only as the optional `useless-use-of-cat` (src/ShellCheck/Analytics.hs:284-289) and checkUuoc is not in the default nodeChecks list (Analytics.hs:104-208), so it fires only with --enable=useless-use-of-cat or an enable directive."
+      },
+      {
+        "claim": "'It's a good idea to manually install a specific ShellCheck version ... This avoids any surprise build breaks when a new version with new warnings is published' (README.md:123-124).",
+        "verified": "yes",
+        "evidence": "CHANGELOG.md:1-30 (v0.11.0) adds SC2327-SC2332/SC3062, changes defaults (SC2002 now off; SC2015 and SC2236/SC2237 behavior changed) and removes SC3013; CHANGELOG.md:69-72 (v0.9.0) says the new data-flow engine 'may cause [existing checks] to trigger differently'. So identical scripts and flags can give different results across versions."
+      },
+      {
+        "claim": "A simple installer may `wget -qO- .../shellcheck-${scversion}.linux.x86_64.tar.xz | tar -xJv` then `cp \"shellcheck-${scversion}/shellcheck\" /usr/bin/` (README.md:287-294).",
+        "verified": "partial",
+        "evidence": "The archive layout matches: .prepare_deploy:44 builds the tar.xz with `--transform=s:^:shellcheck-$tag/:`, and builds exist for latest, stable and each exact version tag (build.yml:22-31). The snippet performs no integrity check: .prepare_deploy:48-52 writes .sha512sum files, but .github_deploy:23 uploads only *.xz/*.gz/*.zip, and no signature or attestation tooling exists in the repo (searched). Whether the release page offers checksums is not checkable from the checkout."
+      },
+      {
+        "claim": "Services such as Travis CI, Codacy, Code Climate, Code Factor, Codety, CircleCI, GitHub Actions (only Linux), Trunk and CodeRabbit 'have ShellCheck pre-installed and ready to use' (README.md:107-117).",
+        "verified": "not_checkable",
+        "evidence": "This describes third-party platform state; nothing in the repo can confirm or refute it. Repo-side artifacts relevant to using ShellCheck elsewhere are the release binaries and Docker images (build.yml:73, 151-159) and the pin-a-version advice at README.md:119-124."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Size of the Linux x86_64 build by Alpine/GHC version (maintainer comment in the builder Dockerfile; the comment does not say what is measured, presumably the built binary)",
+        "metric": "megabytes",
+        "value": "alpine 3.16/GHC 9.0.1: 5.8; 3.17/9.0.2: 15.0; 3.18/9.4.4: 29.0; 3.19/9.4.7: 29.0; 3.20, 3.21 and 3.22/GHC 9.8.2: 16.0 (3.16-3.19 annotated 'certs expired')",
+        "source": "builders/linux.x86_64/Dockerfile:2-8",
+        "independent": false
+      },
+      {
+        "what": "Size of the Windows binary by GHC version (maintainer comment)",
+        "metric": "binary size",
+        "value": "GHC 9.12.2: 37M; GHC 9.0.2: 28M; GHC 8.10.4: 16M",
+        "source": "builders/windows.x86_64/Dockerfile:12-14",
+        "independent": false
+      },
+      {
+        "what": "Memory needed to compile ShellCheck from source",
+        "metric": "RAM",
+        "value": "2GB of RAM (README statement; the Snap build creates a 2G swap file 'to give ourselves enough memory to build'); no measurement data published",
+        "source": "README.md:298; snap/snapcraft.yaml:44-46",
+        "independent": false
+      },
+      {
+        "what": "Data-flow-analysis implementation: plain ST with manual STRefs versus RWST attempts (code comment, qualitative)",
+        "metric": "relative speed (no figures given)",
+        "value": "'literally thousands of times faster than my several attempts using RWST'",
+        "source": "src/ShellCheck/CFGAnalysis.hs:43-46",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope: shell-script linter only. Case-insensitive repo-wide searches for claude, codex, anthropic, openai, MCP, LLM, agent, skill, prompt, scorer, verifier, promptfoo and trial, plus file searches for CLAUDE.md, AGENTS.md and .mcp.json, returned only shell-language hits (e.g. PROMPT_COMMAND at src/ShellCheck/Analytics.hs:1131, `eval` checks at Analytics.hs:1822). So the repo has no evaluation framework, per-sample scorers, container task runner, MCP server or prompt/skill/agent regression gate; its tests are fixed-example pass/fail (Analytics.hs:299-309) and no accuracy, precision/recall or speed benchmark is published in the checkout.",
+      "Release integrity: no signatures, attestations or provenance in the repo. sha512 files are generated (.prepare_deploy:48-52) but the upload filter (.github_deploy:23) only matches *.xz/*.gz/*.zip. The README installer pipes the download into tar unverified (README.md:289-291), and the Docker image build does `wget | tar` of the release tarball with no checksum (Dockerfile.multi-arch:16). CI pulls mutable-tag builder images from Docker Hub that are built and pushed manually (builders/*/tag; test/check_release:63-66), toolchains are fetched with curl without checksums (builders/linux.aarch64/Dockerfile:10, 14), CI runs a privileged third-party container (multiarch/qemu-user-static, .multi_arch_docker:7), and Actions are tag-pinned, not SHA-pinned (build.yml:18, 40, 51).",
+      "CI gating gaps: `deploy` does not depend on `run_tests` (build.yml:47, 69, 95, 124) and the workflow fires on every push (build.yml:4), refreshing the 'latest' release with --clobber (build.yml:25; .github_deploy:27). Protection rules on the 'Deploy' environment (build.yml:127) are not visible in the checkout. Tests run only on ubuntu-latest with apt GHC (build.yml:48, 55). Shipped binaries are built from test-stripped sources (builders/linux.x86_64/build:5) and macOS/Windows binaries are cross-compiled on Linux (builders/README.md:5-8) with differing toolchains (darwin.aarch64 uses GHC 8.10.7, builders/darwin.aarch64/Dockerfile:17, 22; linux.aarch64, linux.riscv64 and Windows use GHC 9.12.2), with only `--version`/`file` smoke checks.",
+      "Maintenance: releases per CHANGELOG.md:1, 32, 54, 76, 115 are v0.7.2 2021-04-19, v0.8.0 2021-11-06 (+201 days), v0.9.0 2022-12-12 (+401), v0.10.0 2024-03-07 (+451), v0.11.0 2025-08-03 (+514), so gaps are lengthening; v0.11.0 is about 14 months before this read. One named author/maintainer, Vidar Holen (ShellCheck.cabal:7-8; shellcheck.1.md:395-396), with unnamed contributors. The checkout is a shallow single-commit clone (.git/shallow), so activity after the tag cannot be assessed here.",
+      "Licensing: GPL-3.0 copyleft; contributions must be GPLv3 (README.md:550). Declarations are inconsistent about 'or later': ShellCheck.cabal:4 `GPL-3` and README.md:6, 555 'v3' versus 'any later version' in 25 .hs headers and shellcheck.1.md:401; Data.hs, Debug.hs, Checks/Custom.hs and test/shellcheck.hs have no header. The library stanza (ShellCheck.cabal:42-97) is published under the same terms; no separate license for it was found. README.md:557 says 'Copyright 2012-2019' while shellcheck.1.md:400 says 2012-2025.",
+      "Result drift and reproducibility: output depends on the version (CHANGELOG.md:1-30 changes defaults and codes; :69-72 data-flow engine changes existing checks). It also depends on ambient config: `.shellcheckrc`/`shellcheckrc` is searched in the script's directory and every parent, then ~/.shellcheckrc and the XDG dir, first file found wins (shellcheck.hs:509-523; shellcheck.1.md:319-322), unless --norc (src/ShellCheck/Parser.hs:3282-3283). SHELLCHECK_OPTS is prepended to the arguments (shellcheck.hs:184-194), so by code reading an env-supplied --format wins over a later CLI -f (shellcheck.hs:212; shellcheck.1.md:68-69). A malformed rc file adds an SC1134 error to the results (Parser.hs:3299). The default severity includes style, so any finding gives exit 1 (shellcheck.hs:256-259).",
+      "Failure-evidence channels: read/runtime errors give exit 2 and go to stderr for tty, json, json1, gcc and diff (TTY.hs:112-114; JSON.hs:100; JSON1.hs:112; GCC.hs:37; Diff.hs:66-68), so they are absent from structured stdout. checkstyle prints them as an XML error element on stdout (CheckStyle.hs:75-85). `-f quiet` stops at the first issue and exits 1 even for read failures (Quiet.hs:34-35). json1 substitutes empty content if re-reading a file fails (JSON1.hs:121-123). The project's own tests leave no per-case record beyond QuickCheck console output, and CI uploads no test logs (build.yml:63-66).",
+      "Docs and platform drift: README.md:243 versus 250-251 contradict each other on Apple Silicon binaries (build.yml:73 builds them); riscv64 is missing from the README list (CHANGELOG.md:11); 'Windows, x86' is built as x86_64 (builders/windows.x86_64/Dockerfile:3); the pre-commit example pins `rev: v0.7.2` (README.md:267). WSL2 is not mentioned anywhere. The Snap package is strictly confined to non-hidden files under /home unless removable-media is connected (snap/snapcraft.yaml:19-23, 28, 33), and Docker use cannot see ~/.shellcheckrc (shellcheck.1.md:327-328). Wiki pages the README relies on (Ignore, Integration, DevGuide, Checks) are not part of the checkout and were not read."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "koalaman/shellcheck",
+      "checks": [
+        {
+          "field": "readme.install[3]",
+          "statement": "Pre-compiled static binary tarball, Linux x86_64: scversion=\"stable\" (or \"v0.4.7\"/\"latest\"); wget -qO- \".../releases/download/${scversion?}/shellcheck-${scversion?}.linux.x86_64.tar.xz\" | tar -xJv; cp \"shellcheck-${scversion}/shellcheck\" /usr/bin/; shellcheck --version (README.md:289-294; macOS tarballs at README.md:243-244)",
+          "citation": "README.md:289-294 (also README.md:240, 243-244; .prepare_deploy:33-46; .github_deploy:21-27; builders/linux.x86_64/build:8)",
+          "holds": true,
+          "note": "The four command lines match README.md:290-293 word for word, including the 'stable'/'v0.4.7'/'latest' comment. README.md:240 marks the x86_64 tarball as statically linked, and README.md:243-244 lists the macOS tarballs. The repo's packaging agrees with the path: .prepare_deploy:44 writes shellcheck-$tag.linux.x86_64.tar.xz with a shellcheck-$tag/ prefix, and .github_deploy:23-27 uploads *.xz files to the release for each tag. The build uses --enable-executable-static (builders/linux.x86_64/build:8). The snippet copies into /usr/bin without sudo and doesn't verify the download; neither point changes the statement."
+        },
+        {
+          "field": "license",
+          "statement": "spdx GPL-3.0-or-later, file LICENSE",
+          "citation": "LICENSE:1-2; shellcheck.hs:7-10; shellcheck.1.md:400-402; ShellCheck.cabal:4",
+          "holds": true,
+          "note": "LICENSE contains the GPL version 3 text. The or-later grant comes from the copyright notices: 25 .hs files (shellcheck.hs plus 24 under src/) say 'either version 3 of the License, or (at your option) any later version', and the man page says 'version 3 or later' (shellcheck.1.md:401). Every other mention just says v3 without excluding later versions: README.md:6 and 555, the --version output at shellcheck.hs:623, .prepare_deploy:14. The one mismatch is the package metadata, ShellCheck.cabal:4 'License: GPL-3'. That's the legacy Cabal form, which can't say 'or later', and package tooling may show it as GPL-3.0-only. The dossier already records this in claim_checks and risks."
+        },
+        {
+          "field": "readme.platforms.macos_arm64",
+          "statement": "yes - README.md:243 lists a macOS aarch64 tarball; build.yml:73 builds darwin.aarch64 (cross-compiled on Linux, builders/darwin.aarch64/Dockerfile:3); CHANGELOG.md:34 records it as added in v0.10.0; Homebrew at README.md:171-173; README.md:250-251 contradicts this; code and CHANGELOG preferred.",
+          "citation": "README.md:171-173, 243, 250-251; .github/workflows/build.yml:73-74; builders/darwin.aarch64/Dockerfile:1-3; builders/darwin.aarch64/build:14; CHANGELOG.md:32-34; .prepare_deploy:41-44",
+          "holds": true,
+          "note": "All the cited lines say what the dossier claims. build.yml:73 has darwin.aarch64 in the matrix, and the job runs on ubuntu-latest (:74). The Dockerfile uses a macos-cross-compiler base (:1) with TARGET=aarch64-apple-darwin22 (:3). build:14 checks for 'Mach-O 64-bit arm64 executable'. .prepare_deploy:41-44 packages darwin.* directories into the shellcheck-<tag>.darwin.aarch64.tar.xz that README.md:243 links to. CHANGELOG.md:34 sits under v0.10.0 (:32), and Homebrew is at README.md:171-173. README.md:250-251 does contradict all this; the dossier correctly calls it stale. Line 3 alone only gives the target triple, and :1 together with build.yml:74 shows the cross-compile on Linux, but the citation is still adequate."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "yes - `shellcheck [OPTIONS...] FILES...`, '-' reads stdin, formats tty/gcc/checkstyle/diff/json/json1/quiet, exit codes 0/1/2/3/4, SHELLCHECK_OPTS env var; editor plugins are third-party and only listed at README.md:66-84.",
+          "citation": "shellcheck.hs:94-138, 151-160, 184-194, 200-206; shellcheck.1.md:9, 131-133, 136-216, 342-348; README.md:66-84",
+          "holds": true,
+          "note": "Each sub-claim checks out against its citation. Usage header is at shellcheck.hs:94 with the GetOpt option table at :95-138, and the man synopsis at shellcheck.1.md:9. The man page documents '-' for stdin at :133, and the code backs it at shellcheck.hs:571-572 (file == \"-\" reads stdin). The formats map at :151-160 has exactly checkstyle, diff, gcc, json, json1, tty and quiet, and the man FORMATS section at :136-216 covers all seven. statusToCode at :200-206 gives 0/1/2/3/4, matching man :342-348. SHELLCHECK_OPTS is read at :184-189 and prepended to the arguments at :194. The Vim, Emacs, Sublime, Pulsar and VS Code plugins are links to other owners' repos (README.md:70-82)."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "ShellCheck 'makes canonical use of exit codes, so you can just add a `shellcheck` command as part of the process' (README.md:88-89) - verified: yes.",
+          "citation": "README.md:88-89; shellcheck.hs:84, 126-128, 200-206, 256-259, 354-360; src/ShellCheck/Interface.hs:127; src/ShellCheck/Checker.hs:101-102; src/ShellCheck/Formatter/Quiet.hs:34-35; shellcheck.1.md:342-348",
+          "holds": true,
+          "note": "The quote is at README.md:89. The evidence holds too. Exit codes map NoProblems->0, SomeProblems->1, RuntimeException->2, SyntaxFailure->3, SupportFailure->4 (shellcheck.hs:200-206, same as man :342-348). A file returns SomeProblems whenever crComments is non-empty (:256-259). The default csMinSeverity is StyleC (Interface.hs:127, via defaultOptions at shellcheck.hs:84), and Checker.hs:102 keeps comments with severity <= csMinSeverity, so by default any finding gives exit 1. --severity (:126-128) sets csMinSeverity (:354-360). Quiet.hs:34-35 calls exitFailure (exit 1) on the first issue and on any read failure. 'verified: yes' is justified; nothing was executed."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

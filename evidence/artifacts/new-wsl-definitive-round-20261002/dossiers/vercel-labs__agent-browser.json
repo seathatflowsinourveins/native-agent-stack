@@ -1,0 +1,336 @@
+{
+  "contender": "vercel-labs/agent-browser",
+  "revision": {
+    "contender": "vercel-labs/agent-browser",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "vercel-labs/agent-browser",
+        "tag": "v0.38.2",
+        "commit": "39a74c70d7759d5a6de7a22c04570bb626bbd081",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.38.2",
+    "commit": "39a74c70d7759d5a6de7a22c04570bb626bbd081",
+    "read_at": "2026-10-02T03:02:58+00:00"
+  },
+  "dossier": {
+    "contender": "vercel-labs/agent-browser",
+    "revision": {
+      "tag": "v0.38.2",
+      "commit": "39a74c70d7759d5a6de7a22c04570bb626bbd081",
+      "read_at": "2026-10-02T03:02:58+00:00"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "agent-browser is a Rust command-line tool (a client plus an auto-started background daemon) that drives Chrome/Chromium over the Chrome DevTools Protocol for AI agents. It offers accessibility-tree snapshots with @eN refs, click/fill/tab/screenshot/PDF commands, an HTTP-only `read` command that fetches page text, an auth vault with session persistence, an MCP stdio server, and optional cloud-browser providers. Nothing was built or run for this dossier; it is a static read of the source at the tagged commit.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Positioning: 'Browser automation CLI for AI agents. Fast native Rust CLI.' The daemon needs no Playwright or Node.js.",
+          "citation": "README.md:3,85"
+        },
+        {
+          "claim": "`read [url]` fetches agent-readable text without launching Chrome (or, with no URL, reads the rendered DOM of the active tab). Explicit-URL reads send Accept: text/markdown, try the URL with .md appended, walk ancestor paths for the nearest llms.txt, and fall back to readable text extracted from HTML.",
+          "citation": "README.md:120,219"
+        },
+        {
+          "claim": "`read` options: --raw, --require-md, --outline, --llms index|full, --filter, --timeout, --json. Global --allowed-domains, --content-boundaries and --max-output also apply to read fetches and output.",
+          "citation": "README.md:206-221"
+        },
+        {
+          "claim": "Page interaction as CLI steps: click, fill, type, press, select, check, upload, scroll, drag, wait, find. `snapshot` returns an accessibility tree with @eN refs. Clicks fail early when another element covers the click point.",
+          "citation": "README.md:101,117-138,231-282,1249-1277"
+        },
+        {
+          "claim": "Screenshots (--full, --annotate numbered labels, --if-changed to skip unchanged images) and `pdf <path>` (save page as PDF).",
+          "citation": "README.md:139-145,1012-1033"
+        },
+        {
+          "claim": "Tabs: `tab new/list/switch/close`, stable ids t1, t2, ..., optional user labels; new tabs inherit session headers, credentials, init scripts and emulation.",
+          "citation": "README.md:377-404"
+        },
+        {
+          "claim": "Sign-in handling: Chrome profile reuse, persistent profiles, --restore session persistence, state files, --auto-connect import, and an encrypted auth vault (`auth save` / `auth login`, `--no-navigate`). Docs cover OAuth/2FA.",
+          "citation": "README.md:653-720,785-868"
+        },
+        {
+          "claim": "Security features are all opt-in: auth vault (encrypted, LLM never sees passwords), content boundary markers, domain allowlist (blocks navigation, sub-resources, WebSocket, sendBeacon, WebRTC), action policy, action confirmation, output length limits, plugins.",
+          "citation": "README.md:870-892"
+        },
+        {
+          "claim": "Agent ergonomics: `--json` machine-readable output; `batch` runs several commands in one invocation (quoted args or JSON on stdin, --bail); commands can be chained with &&.",
+          "citation": "README.md:284-302,1301-1344"
+        },
+        {
+          "claim": "MCP: `agent-browser mcp` starts a stdio MCP server (protocol 2025-11-25) with a default `core` tool profile and `--tools all` for full CLI parity; typed tools accept allowedDomains and session.",
+          "citation": "README.md:585-651"
+        },
+        {
+          "claim": "Client/daemon architecture: the daemon auto-starts, persists between commands and exits after 1 hour idle by default; default operation timeout is 25 s.",
+          "citation": "README.md:1232-1247,1701-1710"
+        },
+        {
+          "claim": "Platforms: native Rust binaries for macOS ARM64/x64, Linux ARM64/x64 and Windows x64.",
+          "citation": "README.md:1712-1720"
+        },
+        {
+          "claim": "Install: npm (global or project), Homebrew (macOS), Cargo, from source. `agent-browser install` downloads Chrome for Testing; `install --with-deps` installs Linux libraries; `agent-browser upgrade` updates.",
+          "citation": "README.md:13-87"
+        },
+        {
+          "claim": "Claude Code/Codex: `npx skills add vercel-labs/agent-browser` installs a thin skill stub that points to `agent-browser skills get core`. README lists Claude Code, Codex, Cursor, Gemini CLI, Copilot and others as supported.",
+          "citation": "README.md:571-583,1734-1752"
+        }
+      ],
+      "install": [
+        {
+          "method": "npm global (installs the native binary), then download Chrome for Testing",
+          "command": "npm install -g agent-browser\nagent-browser install",
+          "citation": "README.md:19-22"
+        },
+        {
+          "method": "npm project-local dependency (docs also show running through npx without installing)",
+          "command": "npm install agent-browser\nagent-browser install",
+          "citation": "README.md:28-31; docs/src/app/installation/page.mdx:14-19"
+        },
+        {
+          "method": "Homebrew (documented for macOS only)",
+          "command": "brew install agent-browser\nagent-browser install",
+          "citation": "README.md:37-40"
+        },
+        {
+          "method": "Cargo (builds from source)",
+          "command": "cargo install agent-browser\nagent-browser install",
+          "citation": "README.md:44-47"
+        },
+        {
+          "method": "From source (Node.js 24+, pnpm 11+, Rust)",
+          "command": "git clone https://github.com/vercel-labs/agent-browser\ncd agent-browser\npnpm install\npnpm build\npnpm build:native\npnpm link --global\nagent-browser install",
+          "citation": "README.md:51-61"
+        },
+        {
+          "method": "Linux system libraries for Chrome (needs sudo and apt-get, dnf or yum)",
+          "command": "agent-browser install --with-deps",
+          "citation": "README.md:65-71; cli/src/install.rs:649-703"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - README.md:1719 lists Linux x64 as a native Rust binary. release.yml:99-104,111-116 builds a glibc binary (floor 2.28, checked at release.yml:216-224) and a musl x64 binary. install.rs:163-166 downloads Chrome for Testing linux64. ci.yml:44-69,171-196 run unit tests and Chrome e2e tests on ubuntu-latest (e2e only on non-PR events). `install --with-deps` needs sudo (install.rs:649-703).",
+        "wsl2": "unknown - no mention of WSL or WSL2 in the README, docs, code or CI (searched). WSL2 would use the Linux x64 binary, but upstream states no support and no caveats.",
+        "macos_arm64": "yes - README.md:1716; release.yml:135-140 builds agent-browser-darwin-arm64; install.rs:155-158 selects Chrome for Testing mac-arm64; ci.yml:140-169,255-272 run cargo test and an npm global-install check on aarch64-apple-darwin (no Chrome e2e on macOS).",
+        "gpu": "no (not required) - headless Chrome runs with software rendering (--enable-unsafe-swiftshader, cli/src/native/cdp/chrome.rs:517-521). The opt-in `--webgpu` preset uses hardware Metal/D3D on macOS/Windows and SwiftShader software Vulkan on Linux (README.md:1362-1375; chrome.rs:482-497). There is no ML or GPU-compute component."
+      },
+      "integrations": {
+        "cli": "yes - `agent-browser` native binary (npm bin launcher bin/agent-browser.js; cli/src/main.rs:1331). Commands at README.md:117-158; `--json` output at README.md:1301-1311; `batch` at README.md:284-302 and cli/src/main.rs:2133.",
+        "mcp": "yes - `agent-browser mcp [--tools <profiles>]` stdio JSON-RPC server, protocol 2025-11-25 with older versions accepted (README.md:585-651; cli/src/mcp.rs:21-24,510). The default `core` profile includes agent_browser_read, open, snapshot, click, fill, screenshot, tab_* and eval (mcp.rs:339-369). `agent_browser_pdf` is only in the `debug`/`all` profiles (mcp.rs:420-422). Each tool call spawns the same binary as a subprocess (mcp.rs:3885-3898) with a 120 s default call limit (mcp.rs:181,2053).",
+        "sdk_or_api": "No general-purpose SDK or documented HTTP API found; the Rust package is a binary crate with no lib target (cli/Cargo.toml). Related pieces: TypeScript helper packages @agent-browser/sandbox (runs the CLI inside Vercel Sandbox microVMs; packages/@agent-browser/sandbox/README.md:1-35) and @agent-browser/eve (eve agent extension; README.md:1464-1475); a per-session loopback WebSocket stream protocol (README.md:1574-1699); a dashboard HTTP server on 127.0.0.1:4848 (README.md:1097-1136); the plugin protocol agent-browser.plugin.v1 over stdio JSON (README.md:875,970).",
+        "claude_code_or_codex": "yes, skills-based - `npx skills add vercel-labs/agent-browser` (README.md:1738-1752) installs a thin discovery SKILL.md (skills/agent-browser/SKILL.md:1-23, allowed-tools Bash(agent-browser:*)). The full workflow text is served by `agent-browser skills get core` (cli/src/skills.rs:30-85). README names Claude Code and Codex among supported assistants (README.md:1742) and gives an AGENTS.md/CLAUDE.md snippet (README.md:1754-1769). `.claude-plugin/marketplace.json:1-19` is a Claude Code plugin marketplace manifest that the README does not describe. A generic mcpServers JSON config is at README.md:625-636; no `claude mcp add` or Codex-specific command is documented."
+      },
+      "telemetry_and_network": "No telemetry, analytics or phone-home code was found in cli/ (searched for telemetry, analytics, posthog, sentry, mixpanel; the only hit is the docs website's @vercel/analytics at docs/src/app/layout.tsx:13,89, which is not in the CLI). There is no background update check; `upgrade` only runs when invoked. Outbound network use is user-triggered: (1) `install` and `doctor` fetch Chrome for Testing metadata from googlechromelabs.github.io and download the zip URL listed there (cli/src/install.rs:7-8,185-227); `doctor` also probes that CDN, the AI Gateway and the selected provider unless --offline (docs/src/app/installation/page.mdx:111; cli/src/doctor/network.rs:48-83). (2) `upgrade` queries registry.npmjs.org/agent-browser/latest and then shells out to npm/pnpm/yarn/bun/brew/cargo (cli/src/upgrade.rs:6,142-185). (3) npm postinstall downloads the platform binary from GitHub Releases only when bin/ lacks it (scripts/postinstall.js:50-52,111-155). (4) `read <url>` and the browser contact only the URLs the user gives, plus derived .md and llms.txt probes on the same origin; read identifies itself as User-Agent agent-browser/<version> read (cli/src/read.rs:13,323-343). (5) Optional `chat` and dashboard chat call the Vercel AI Gateway and need AI_GATEWAY_API_KEY (cli/src/native/stream/chat.rs:9; README.md:1138-1164). (6) Optional cloud providers (Browserbase, Browserless, Browser Use, Kernel, AWS AgentCore) need their own API keys and are used only with -p/--provider (cli/src/native/providers.rs:10,135,257,308,533; README.md:1870-2037). (7) `plugin add` runs `npx -y <package>` (cli/src/plugins.rs:714-715,751-771). No account is needed for local Chrome use. Chrome is launched with --disable-background-networking, --disable-component-update, --disable-sync and --metrics-recording-only (cli/src/native/cdp/chrome.rs:465-480). Local listeners: the daemon Unix socket under XDG_RUNTIME_DIR/agent-browser or ~/.agent-browser (cli/src/connection.rs:99-131; cli/src/native/daemon.rs:233-234); a loopback WebSocket stream server on an OS-assigned port started by every daemon (daemon.rs:100-125; cli/src/native/stream/mod.rs:315-319); the dashboard on 127.0.0.1/[::1]:4848 only when started (cli/src/native/stream/dashboard.rs:617-631)."
+    },
+    "code": {
+      "languages": [
+        "Rust (CLI, daemon, MCP server)",
+        "JavaScript (Node ESM launcher and postinstall scripts)",
+        "TypeScript/TSX (dashboard, docs site, @agent-browser/sandbox and eve packages, benchmarks, evals)",
+        "Embedded JavaScript (axe-core, React DevTools hook, recording cursor overlay)",
+        "Python (evals/webmcp-context.py)"
+      ],
+      "entry_points": [
+        {
+          "path": "bin/agent-browser.js",
+          "what": "npm `bin` launcher: picks agent-browser-<os>-<arch>[-musl] and spawns it with inherited stdio; postinstall repoints global shims straight at the native binary"
+        },
+        {
+          "path": "cli/src/main.rs:1331",
+          "what": "native binary main(): CLI dispatch; runs as the daemon when AGENT_BROWSER_DAEMON is set (:1347) and as the dashboard server when AGENT_BROWSER_DASHBOARD is set (:1361)"
+        },
+        {
+          "path": "cli/src/native/daemon.rs:23",
+          "what": "run_daemon: Unix-socket (TCP loopback on Windows) JSON command server, per-session loopback stream server, 1 h idle shutdown"
+        },
+        {
+          "path": "cli/src/native/actions.rs:2661",
+          "what": "execute_command: dispatcher from JSON actions (read, navigate, click, fill, screenshot, pdf, tab_*, auth_login, ...) to handlers"
+        },
+        {
+          "path": "cli/src/read.rs:189",
+          "what": "run_read: reqwest-based URL fetch, markdown/llms.txt negotiation, HTML-to-text conversion, domain allowlist"
+        },
+        {
+          "path": "cli/src/mcp.rs:510",
+          "what": "run_mcp: MCP stdio JSON-RPC server behind `agent-browser mcp`; tool profiles; shells out to the same binary per tool call"
+        },
+        {
+          "path": "cli/src/install.rs:400",
+          "what": "run_install: Chrome for Testing downloader and Linux dependency installer"
+        },
+        {
+          "path": "scripts/postinstall.js",
+          "what": "npm postinstall: downloads the platform binary from GitHub Releases if bin/ lacks it, writes an install-method marker, patches global shims"
+        }
+      ],
+      "architecture": "One Rust binary (cli/Cargo.toml, package agent-browser, no lib target) acts as both client and daemon. Client half: cli/src/main.rs (dispatch), flags.rs (flag/env/config merge), commands.rs (argv to JSON command), connection.rs (auto-spawns the daemon with AGENT_BROWSER_DAEMON=1 and exchanges newline-delimited JSON over a Unix socket, or TCP loopback on Windows), output.rs (text and --json rendering, --content-boundaries, --max-output, --help text). Daemon half under cli/src/native/: daemon.rs (socket server, idle shutdown), actions.rs (execute_command dispatcher and DaemonState; 18,320 lines including tests), browser.rs (tabs and sessions), cdp/ (CDP websocket client; Chrome and Lightpanda launch, attach and discovery), snapshot.rs (accessibility tree and @eN refs), element.rs and interaction.rs (locators, clicks, fills), screenshot.rs, network.rs and policy.rs (routes, domain filter, action policy), state.rs, auth.rs, cookies.rs and storage.rs (state files, encrypted vault), providers.rs (Browserbase, Browserless, Browser Use, Kernel, AWS AgentCore), webdriver/ (Safari/iOS via Appium), stream/ (loopback WebSocket stream plus a dashboard HTTP server serving the Next.js UI from packages/dashboard/out embedded with rust-embed), webmcp.rs, react/, a11y/ (embedded axe-core), recording.rs, diff.rs. Other modules: read.rs (reqwest-based URL fetch and tag-stripping HTML-to-text, executed inside the daemon without launching Chrome), mcp.rs (stdio MCP server that shells out to the same binary), install.rs, upgrade.rs and doctor/ (installer, updater, diagnostics), plugins.rs (out-of-process plugin protocol), skills.rs (serves skill-data/ and skills/ markdown shipped in the npm package), chat.rs (Vercel AI Gateway chat). cli/build.rs generates CDP types from the vendored cli/cdp-protocol/*.json and creates a placeholder dashboard page if packages/dashboard/out is missing. JS side: bin/agent-browser.js and scripts/postinstall.js; packages/dashboard (Next.js), packages/@agent-browser/{sandbox,eve} (TypeScript helpers), docs/ (docs site), examples/, benchmarks/, evals/.",
+      "packaging_and_release": "release.yml runs on push to main and workflow_dispatch (release.yml:3-7). It compares package.json's version with npm (release.yml:15-88) and, if different, builds 7 binaries (release.yml:90-231): linux x64 and arm64 glibc via cargo-zigbuild against glibc 2.28 (with an objdump floor check at :216-224), linux musl x64/arm64, windows x64 via the x86_64-pc-windows-gnu target, macOS x64/arm64. Artifacts are kept 7 days. The publish-packages job (environment: Release, id-token: write; release.yml:233-363) copies the binaries into bin/ and runs `pnpm publish --provenance --no-git-checks` for agent-browser, @agent-browser/sandbox and @agent-browser/eve (release.yml:334,348,362), so the npm tarball embeds all 7 binaries (package.json:11-18) and requests an npm provenance attestation. The github-release job uploads the raw bin/agent-browser-* files with notes extracted from CHANGELOG.md (release.yml:365-432). The workflows contain no checksum files, GPG/cosign signatures or GitHub artifact attestations (searched .github/ for sha256, checksum, cosign, attest, sigstore, gpg: no matches). release.yml has no cargo publish or Homebrew step, and it neither depends on nor re-runs ci.yml. postinstall.js downloads from GitHub Releases without hash verification (scripts/postinstall.js:54-84). The Chrome for Testing zip is likewise downloaded without a checksum, though extraction guards against path traversal (cli/src/install.rs:248-333,347-371). pnpm-workspace.yaml sets minimumReleaseAge 2880 and disables several dependency build scripts (pnpm-workspace.yaml:6-17). Releases are manual version-bump PRs (AGENTS.md:41-54).",
+      "tests_and_ci": "Rust: built-in `cargo test` with tokio async tests, about 1,550 test functions (about 1,522 #[test]/#[tokio::test] plus about 30 #[tokio::test(...)]) in about 58 Rust files (55 under cli/src, including native/e2e_tests.rs and native/parity_tests.rs, plus 3 integration tests in cli/tests/). Of these, 136 e2e tests are #[ignore]d and need Chrome (cli/src/native/e2e_tests.rs:4,85). Node: `node --test` on test/launcher.test.mjs and 4 files under packages/@agent-browser/{eve,sandbox}/test (about 64 cases). That gives about 63 test files in total. AGENTS.md:108,116 still say about 320 unit tests and 18 e2e tests, which is stale. CI is .github/workflows/ci.yml (push and PR to main, plus manual): version-sync check (scripts/check-version-sync.js); launcher tests; Rust fmt, clippy -D warnings and `cargo test --profile ci` on ubuntu-latest; dashboard build; sandbox and eve package tests/typecheck. On non-PR events it also runs cargo test on macOS arm64/x64 and Windows msvc, Linux e2e (installs Chrome via `agent-browser install --with-deps` plus ffmpeg, then `cargo test e2e -- --ignored --test-threads=1`), a Windows daemon lifecycle test, and npm global-install checks on ubuntu, macOS and Windows (ci.yml:140-337). .github/ contains only ci.yml and release.yml: no coverage, cargo-audit/deny, CodeQL, Dependabot or issue/PR templates. evals/ and benchmarks/ are manual harnesses, not run in CI.",
+      "dependencies": "Root package.json: 0 dependencies and an empty devDependencies (package.json:54); it has a postinstall script (:32) that uses only Node built-ins. cli/Cargo.toml: 26 [dependencies] (serde, serde_json, dirs, base64, getrandom, tokio, tokio-tungstenite, rustls, rustls-pemfile, futures-util, url, uuid, image, reqwest, sha2, aes-gcm, async-trait, socket2, similar, zip, time, hmac, hex, chrono, urlencoding, rust-embed), plus 1 unix-only (libc), 1 windows-only (windows-sys), 1 dev (tempfile) and 2 build (serde, serde_json), 31 declarations in all (cli/Cargo.toml:13-52). cli/Cargo.lock lists 338 packages. TLS is rustls with webpki roots and reqwest default features are off, so there is no OpenSSL; there is no rust-toolchain pin or MSRV. packages/dashboard/package.json: 18 dependencies and 6 devDependencies (private; built to static files embedded in the binary). packages/@agent-browser/sandbox: 0 dependencies, 1 optional peer (@vercel/sandbox), 1 dev. packages/@agent-browser/eve: 2 dependencies (@agent-browser/sandbox, zod), 1 peer (eve), 4 dev. docs/, evals/, benchmarks/ and examples/* have their own package.json files (not enumerated).",
+      "security_policy": "none - no SECURITY.md or vulnerability-reporting instructions were found (Glob for SECURITY* returned nothing; searches of README, AGENTS.md, docs and .github found none). docs/src/app/security/page.mdx documents the threat model and the opt-in security features only. CHANGELOG.md:1051 records a past fix for a zip path-traversal bug in the Chrome installer (v0.20.0)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Forms, tabs and screenshots are available as shell-callable steps: fill/select/check/upload, tab new/list/switch/close with labels, screenshot (--full, --annotate).",
+        "verified": "yes",
+        "evidence": "Parsers: cli/src/commands.rs:458 (fill), 536 (select), 567 (upload), 812 (screenshot), 1566-1612 (tab incl. --label). Daemon dispatch: cli/src/native/actions.rs:3008-3017, 3054-3057, 3090. Screenshots use CDP Page.captureScreenshot (native/screenshot.rs:210) and default to ~/.agent-browser/tmp/screenshots (screenshot.rs:580-584). Tab ids come from a monotonic counter (native/browser.rs:407,725-726,1453-1454). Overlay guard: native/element.rs:930-1019. Only the #[ignore]d e2e tests drive real Chrome (native/e2e_tests.rs:4,85; run in CI on non-PR events, ci.yml:171-196). Static read only; nothing was executed."
+      },
+      {
+        "claim": "`read <url>` fetches without launching Chrome, sends Accept: text/markdown, tries .md, finds the nearest llms.txt, then falls back to HTML text.",
+        "verified": "yes",
+        "evidence": "read.rs:12 sets Accept: text/markdown, text/plain;q=0.9, text/html;q=0.7. run_read (read.rs:189-267) tries the URL, then the .md variant (602-615), accepts plain text, then looks for a matching link in the nearest ancestor llms.txt (293-321, 662-693), then falls back to HTML conversion. Only reqwest is used (read.rs:1-8,203-207). `read` is in skip_launch_action (actions.rs:2572-2581) and handled by handle_read (actions.rs:5533-5575), so Chrome is not launched. Caveats: a daemon process is still auto-started for the command (main.rs:1731); one HTML read can issue several requests (.md probe plus one llms.txt probe per ancestor path) and the timeout applies per request; the default read timeout is 10 s (read.rs:10)."
+      },
+      {
+        "claim": "`read` falls back to readable text extracted from HTML, and `--json` returns metadata with the content.",
+        "verified": "partial",
+        "evidence": "html_to_markdownish (read.rs:1013-1041) removes script/style/noscript/svg/head blocks (1043-1049), emits markdown for h1-h6, li and pre plus line breaks for block tags (1092-1137), and discards every other tag, so link targets and image data are dropped while nav/header/footer text is kept. There is no content scoring or boilerplate removal, and because <head> is stripped, <title> and meta tags are lost. JSON fields are only url, finalUrl, status, contentType, source, truncated and content (read.rs:400-410; active-tab mode omits status, 430-458): no title, author, publish date, canonical URL, fetch timestamp, response headers or content hash. Text mode prints only the content (output.rs:629-637). Page title via `get title` needs a launched browser (actions.rs:3003,5621-5631; 'title' is not a skip_launch action)."
+      },
+      {
+        "claim": "--allowed-domains, --content-boundaries and --max-output also apply to read fetches and output.",
+        "verified": "partial",
+        "evidence": "allowed-domains: yes for the initial URL, every probe and each redirect hop (read.rs:189-202,522-547; flags passed at commands.rs:2396-2398; daemon-enforced lists merged at actions.rs:5535-5542). content-boundaries: yes in text mode with origin = finalUrl (output.rs:61-76,629-637) and as a `_boundary` object in --json (output.rs:508-525). max-output: applied only by the text printer (output.rs:36-76,629-637); the --json path prints the response unmodified (output.rs:508-531) and no other file applies max_output, so --json content is not truncated by --max-output. Independently of flags, the fetch body is capped at 2 MiB and flagged `truncated` (read.rs:11,992-1011)."
+      },
+      {
+        "claim": "`pdf <path>` saves the page as PDF.",
+        "verified": "yes",
+        "evidence": "handle_pdf (actions.rs:8106-8150) calls CDP Page.printToPDF on the active page and writes the file; the CLI exposes only `pdf <path>` (commands.rs:905-911), although the daemon also reads printBackground, landscape and preferCSSPageSize. It exports the rendered page and does not extract text from PDF files: `read` returns non-text bodies as lossy-UTF-8 'raw' text (read.rs:365-384,1010). In MCP, agent_browser_pdf is only in the debug/all profiles (mcp.rs:420-422)."
+      },
+      {
+        "claim": "Sign-in flows: the auth vault is encrypted, the LLM never sees passwords and credentials do not pass through the daemon IPC; docs cover OAuth/2FA.",
+        "verified": "partial",
+        "evidence": "Vault encryption holds: AES-256-GCM with a key auto-created at ~/.agent-browser/.encryption-key (0600/0700) (native/auth.rs:58-138,152-185). `auth login` receives only the profile name and the daemon reads the vault (actions.rs:12591-12660). But it handles one document with username, password and submit controls found by heuristic selectors (actions.rs:12698-12880); multi-step, OAuth and 2FA flows rely on manual commands, imported Chrome state or a profile (skill-data/core/references/authentication.md:306-320; docs/src/app/sessions/page.mdx:108). The statement that credentials do not pass through the daemon IPC (docs/src/app/security/page.mdx:11) does not hold for `auth save`: the password is put in the command JSON (main.rs:1561-1589), handled inside the daemon (actions.rs:12447-12476), and execute_command broadcasts command params to stream subscribers with no redaction (actions.rs:2705-2729; stream/mod.rs:515-524; no redaction code in cli/src). Code preferred over docs; not executed."
+      },
+      {
+        "claim": "The domain allowlist restricts navigation and sub-resources, and all security features are opt-in.",
+        "verified": "yes",
+        "evidence": "Enforcement is CDP Fetch interception: non-allowed documents get a 403 'Blocked' page and other requests fail with BlockedByClient (actions.rs:11739-11818; Fetch.enable at native/network.rs:451). Defaults impose no restrictions (docs/src/app/security/page.mdx:5). The allowlist is rejected with --restore, --state, --cdp, --auto-connect, --profile, iOS/Safari, unsafe --args and direct-page providers (actions.rs:3543-3622). The docs state it is browser-level and not an OS firewall (page.mdx:22)."
+      },
+      {
+        "claim": "Platforms include Linux ARM64, and `agent-browser install` downloads Chrome for Testing.",
+        "verified": "partial",
+        "evidence": "release.yml:105-110,117-122 builds linux-arm64 glibc and musl binaries. But install.rs:401-411 makes `agent-browser install` exit 1 on Linux ARM64 (Chrome for Testing has no such build) and tells the user to install Chromium and pass --executable-path. platform_key supports only mac-arm64, mac-x64, linux64 and win64 (install.rs:154-183)."
+      },
+      {
+        "claim": "Default operation timeout is 25 s, the CLI IPC read timeout is 30 s (values above 30 s may cause EAGAIN), and the daemon exits after 1 h idle.",
+        "verified": "partial",
+        "evidence": "The 25 s default is in actions.rs:766-769, and the 1 h idle default in daemon.rs:167-204 (headed, Safari/iOS and user-attached browsers are exempt from the default, daemon.rs:318-324, as documented). The IPC read timeout differs from the README: connection.rs:1085-1104 uses max(30 s, command timeout + 10 s) for commands that carry a `timeout` field, so the README's EAGAIN caveat (README.md:1243) is outdated for those. `read` has its own 10 s default (read.rs:10), and MCP tool calls default to 120 s (mcp.rs:181,2053). Code preferred over README."
+      },
+      {
+        "claim": "`brew install agent-browser` and `cargo install agent-browser` are supported install channels, and Node.js/pnpm are only needed for source builds.",
+        "verified": "not_checkable",
+        "evidence": "The repo contains no Homebrew formula, and release.yml has no cargo publish or Homebrew step (release.yml:15-432), so the existence of those packages cannot be verified from the checkout. upgrade.rs:61-70,166-175 only detects them. The README says Node 24+/pnpm 11+ are only for source builds (README.md:51,86-87), but docs/src/app/installation/page.mdx:46 lists them as requirements under Cargo. cli/build.rs:9-19 writes a placeholder dashboard page when packages/dashboard/out is absent, so a Rust-only build does not strictly need Node."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Native Rust daemon vs the removed Node.js/Playwright daemon: install size",
+        "metric": "install size",
+        "value": "710 MB -> 7 MB (99x smaller)",
+        "source": "CHANGELOG.md:1044-1047 (v0.20.0 release note)",
+        "independent": false
+      },
+      {
+        "what": "Native Rust daemon vs the removed Node.js/Playwright daemon: daemon memory",
+        "metric": "daemon memory",
+        "value": "143 MB -> 8 MB (18x less)",
+        "source": "CHANGELOG.md:1048 (v0.20.0 release note)",
+        "independent": false
+      },
+      {
+        "what": "Native Rust daemon vs the removed Node.js/Playwright daemon: cold start",
+        "metric": "cold start time",
+        "value": "1002 ms -> 617 ms (1.6x faster)",
+        "source": "CHANGELOG.md:1049 (v0.20.0 release note)",
+        "independent": false
+      },
+      {
+        "what": "benchmarks/ harness (Node vs Rust daemon inside a Vercel Sandbox microVM); the README only describes the comparison, and no result files are committed (benchmarks/.gitignore:2 ignores results.json)",
+        "metric": "daemon RSS",
+        "value": "about 140 MB (Node.js V8 overhead) vs about 7 MB (Rust daemon)",
+        "source": "benchmarks/README.md:74",
+        "independent": false
+      },
+      {
+        "what": "Dashboard/stream JPEG frame size on a busy 1280x720 page",
+        "metric": "bytes per frame",
+        "value": "quality 80 about 54 KB; quality 20 about 25 KB; quality 20 at 640x360 about 9 KB",
+        "source": "README.md:1600",
+        "independent": false
+      },
+      {
+        "what": "Snapshot text size versus full DOM (claim; no methodology or dataset given)",
+        "metric": "tokens per page",
+        "value": "about 200-400 tokens vs about 3000-5000",
+        "source": "docs/src/app/page.mdx:49; skill-data/core/SKILL.md:9",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Maintenance/stability: pre-1.0 (v0.38.2) with 20 releases between 2026-06-26 and 2026-10-01 (docs/src/app/changelog/page.mdx:3-306; 108 release headings in CHANGELOG.md), so flags, output shapes and the MCP tool surface change often. The largest source file, cli/src/native/actions.rs, is 18,320 lines. Doc/code drift exists: AGENTS.md:108,116 cite about 320 unit and 18 e2e tests against about 1,550 test functions (136 e2e); docs/src/app/installation/page.mdx:46 vs README.md:86-87 on cargo prerequisites; README.md:1243 vs cli/src/connection.rs:1085-1104 on IPC timeouts.",
+      "Scope limits of `read`, the only URL-fetch command: HTML goes through a tag stripper, not a main-content extractor (cli/src/read.rs:1013-1137); JSON carries no title, author, date, canonical URL or fetch time (read.rs:400-410); body cap is 2 MiB (read.rs:11); non-text responses such as PDF come back as lossy-UTF-8 'raw' text (read.rs:365-384,1010); `read <url>` does not execute JavaScript (rendered pages need `open` first, then `read` with no URL, actions.rs:5548-5574); no robots.txt handling or rate limiting exists anywhere in cli/src (searched); one HTML read can issue extra .md and llms.txt probe requests (read.rs:226-257,662-693).",
+      "Release integrity: the workflows publish no checksums, signatures or attestations for GitHub-release or npm-embedded binaries; only `pnpm publish --provenance` is requested for npm (.github/workflows/release.yml:334,348,362). postinstall downloads a binary over HTTPS with no hash check when bin/ lacks it (scripts/postinstall.js:54-84,140-155), and the Chrome for Testing zip is downloaded and extracted with no checksum (cli/src/install.rs:248-333,466-474). release.yml triggers on push to main and neither depends on nor re-runs the CI workflow (release.yml:3-7,90-93); the Windows release target is x86_64-pc-windows-gnu (release.yml:123-128) while CI tests x86_64-pc-windows-msvc (ci.yml:149-152). The Homebrew and crates.io channels in README.md:35-47 are not built or published by these workflows. There is no security policy file.",
+      "Chrome's OS sandbox is turned off automatically: `--no-sandbox` is appended when the CI env var is set, when running as root, or inside Docker/Podman/lxc/kubepods containers (cli/src/native/cdp/chrome.rs:584-586,1536-1570), which are typical agent-hosting setups, so pages the agent visits then run in Chrome without its sandbox.",
+      "Plugin and supply-chain surface: `plugin add <ref>` stores a command of `npx -y <package>` and executes the package to read its manifest (cli/src/plugins.rs:714-715,751-771). Plugins are unsandboxed local executables that can hold capabilities such as credential.read, launch.mutate, browser.provider and command.run (README.md:875,970; docs/src/app/security/page.mdx:26). `agent-browser upgrade` shells out to npm/pnpm/yarn/bun/brew/cargo (cli/src/upgrade.rs:142-185).",
+      "Credential and session exposure: (a) the default unnamed session is shared by every agent on the machine (skill-data/core/SKILL.md:36-44); (b) every daemon starts an unauthenticated loopback WebSocket stream server whose handshake only checks Origin (a missing Origin is allowed) and which accepts input events (cli/src/native/daemon.rs:100-125; native/stream/mod.rs:624-639; stream/websocket.rs:281-345; README.md:1617-1699); (c) `auth save` sends the plaintext password in the CLI-to-daemon command and command params are broadcast without redaction (cli/src/main.rs:1561-1589; actions.rs:2705-2729,12447-12476; stream/mod.rs:515-524), contradicting docs/src/app/security/page.mdx:11; (d) `--profile <name>` copies the user's real Chrome profile (cookies, sessions) into a temp dir and enables the real keychain (chrome.rs:738-770,1437-1467); (e) state files hold session tokens in plaintext unless AGENT_BROWSER_ENCRYPTION_KEY is set (README.md:716-718); (f) allowlist, policy, boundaries and max-output are all opt-in (docs/src/app/security/page.mdx:5) and the allowlist is rejected with --cdp, --auto-connect, --profile and state replay (actions.rs:3543-3622).",
+      "Platform gaps: `agent-browser install` fails on Linux ARM64 because Chrome for Testing has no such build (cli/src/install.rs:401-411); the Chrome download depends on googlechromelabs.github.io (install.rs:7-8); `install --with-deps` runs sudo apt-get/dnf/yum (install.rs:649-703); WSL2 is undocumented; Chrome e2e tests run only on Linux while macOS and Windows get unit tests only (ci.yml:140-196); iOS/Safari providers need macOS, Xcode and Appium (README.md:1775-1782).",
+      "Licensing and scope: the repo is Apache-2.0 (LICENSE:189, Copyright 2025 Vercel Inc.), but the binary embeds axe-core under MPL-2.0 with MIT third-party notices via include_str! (cli/src/native/a11y/mod.rs:19; cli/src/native/a11y/LICENSE-axe-core.txt:1; LICENSE-axe-core-THIRD-PARTY.txt:1-21). README documents optional stealth and CAPTCHA-solving plugin hooks and provider stealth settings (README.md:924-931,1896,1995), and docs describe proxy rotation to avoid rate limits (skill-data/core/references/proxy-support.md:3,107). `read` identifies itself as User-Agent agent-browser/<version> read (read.rs:13)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "vercel-labs/agent-browser",
+      "checks": [
+        {
+          "field": "readme.install[0] (npm global)",
+          "statement": "npm global (installs the native binary), then download Chrome for Testing: `npm install -g agent-browser` followed by `agent-browser install`.",
+          "citation": "README.md:19-22",
+          "holds": true,
+          "note": "README.md:19-22 has exactly these two commands under 'Global Installation (recommended)'. The native-binary part is confirmed by package.json:19-20,32 (bin launcher plus postinstall), scripts/postinstall.js:111-155 (uses the bundled bin/agent-browser-<os>-<arch> or downloads it from GitHub Releases) and postinstall.js:239-271 (repoints the global symlink at the native binary), which ci.yml:303-322 checks. Aside: package.json:7-10 declares engines node >=24 / pnpm >=11, which README.md:86 does not mention for npm installs (it lists Node 24+ only for source builds)."
+        },
+        {
+          "field": "license",
+          "statement": "spdx Apache-2.0, file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-2 is the 'Apache License, Version 2.0, January 2004' text, with 'Copyright 2025 Vercel Inc.' at LICENSE:189 and the standard boilerplate at :191. package.json:45 and cli/Cargo.toml:6 both declare \"Apache-2.0\". The separate axe-core license files under cli/src/native/a11y/ are outside this statement."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - README.md:1719 lists Linux x64 as a native Rust binary. release.yml builds a glibc binary (floor 2.28, checked) and a musl x64 binary. install.rs downloads Chrome for Testing linux64. CI runs unit tests and Chrome e2e tests on ubuntu-latest (e2e only on non-PR events). `install --with-deps` needs sudo.",
+          "citation": "README.md:1719; .github/workflows/release.yml:99-104,111-116,216-224; cli/src/install.rs:163-166,649-703; .github/workflows/ci.yml:44-69,171-196",
+          "holds": true,
+          "note": "All citations match. README.md:1719 reads 'Linux x64 | Native Rust'. release.yml:99-104 builds x86_64-unknown-linux-gnu.2.28 via zigbuild, :111-116 builds x86_64-unknown-linux-musl, and :216-224 fails on GLIBC symbols newer than 2.28. install.rs:163-166 maps linux/x86_64 to 'linux64'. ci.yml:44-68 runs fmt, clippy and cargo test on ubuntu-latest; :171-196 (native-e2e, if event != pull_request) runs `install --with-deps` and then the ignored e2e tests. sudo: install.rs:657 and :700 (inside the cited range) call sudo apt-get; the actual install commands are at :770-783 (sudo apt-get install -y, and `sh -c \"sudo dnf|yum install -y ...\"`), just past the cited range."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "yes - `agent-browser mcp [--tools <profiles>]` stdio JSON-RPC server, protocol 2025-11-25 with older versions accepted. The default `core` profile includes agent_browser_read, open, snapshot, click, fill, screenshot, tab_* and eval. `agent_browser_pdf` is only in the `debug`/`all` profiles. Each tool call spawns the same binary as a subprocess with a 120 s default call limit.",
+          "citation": "README.md:585-651; cli/src/mcp.rs:21-24,181,339-369,420-422,510,2053,3885-3898",
+          "holds": true,
+          "note": "README.md:587-595 documents `agent-browser mcp`, `--tools`, stdio newline-delimited JSON-RPC and protocol 2025-11-25. mcp.rs:21-23 sets PROTOCOL_VERSION 2025-11-25 and also accepts 2025-06-18, 2025-03-26 and 2024-11-05. run_mcp is at :510. CORE_PROFILE_TOOLS (:339-369) contains TOOL_READ, OPEN, SNAPSHOT, CLICK, FILL, SCREENSHOT, TAB_NEW/LIST/SWITCH/CLOSE and EVAL. TOOL_PDF is listed only in DEBUG_PROFILE_TOOLS (:422); its other occurrence (:1045) is the tool definition, and `all` disables filtering (:294-299, :321-325). run_cli (:3885-3898) spawns env::current_exe(). DEFAULT_TIMEOUT_MS = 120_000 (:181) is the timeoutMs schema default (:2053) and the fallback (:3805)."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "Forms, tabs and screenshots are available as shell-callable steps: fill/select/check/upload, tab new/list/switch/close with labels, screenshot (--full, --annotate). (verified: yes)",
+          "citation": "cli/src/commands.rs:458,536,567,812,1566-1612; cli/src/native/actions.rs:3008-3017,3054-3057,3090; cli/src/native/screenshot.rs:210,580-584; cli/src/native/browser.rs:407,725-726,1453-1454; cli/src/native/element.rs:930-1019; cli/src/native/e2e_tests.rs:4,85",
+          "holds": true,
+          "note": "Parser arms are at commands.rs:458 (fill), :522 (check), :536 (select), :567 (upload) and :812 (screenshot: --full/-f at :823; annotate comes from the global flag, :880 and flags.rs:981). The tab arm at :1566-1614 handles `new [--label]`, `list` and `close`, and treats any other token as tab_switch. Daemon dispatch matches at actions.rs:3008-3017, 3054-3057 and 3090. Also confirmed: screenshot.rs:210 (Page.captureScreenshot) and :580 (~/.agent-browser/tmp/screenshots), browser.rs:407/725-726/1453-1454 (next_tab_id counter), element.rs:926-1022 (blocker check and 'is covered by' error), e2e_tests.rs:3-5 and :85 (#[ignore]). Caveat: there is no literal `tab switch` subcommand. Switching is `tab <t<N>|label>` (README.md:383), and `tab switch t2` would be parsed as a switch to a tab named 'switch' (commands.rs:1607-1611)."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

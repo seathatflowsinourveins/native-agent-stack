@@ -1,0 +1,280 @@
+{
+  "contender": "page:debian-13-wsl-distribution",
+  "revision": {
+    "contender": "page:debian-13-wsl-distribution",
+    "kind": "pages",
+    "pages": [
+      "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json",
+      "https://www.debian.org/releases/trixie/",
+      "https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux"
+    ],
+    "tag": null,
+    "commit": null,
+    "read_at": "2026-10-02T03:02:33+00:00"
+  },
+  "dossier": {
+    "contender": "page:debian-13-wsl-distribution",
+    "revision": {
+      "tag": null,
+      "commit": null,
+      "read_at": "2026-10-02T03:02:33+00:00"
+    },
+    "license": {
+      "spdx": null,
+      "file": null
+    },
+    "purpose": "Debian GNU/Linux as shipped for WSL: the manifest entry named 'Debian' in Microsoft's WSL distribution list (microsoft/WSL, distributions/DistributionInfo.json, read from master with no tag or commit). That entry points to Debian-project-hosted .wsl images (amd64 and arm64) on salsa.debian.org, each with a SHA-256. The other two sources are the Debian 13 'trixie' release page (lifecycle, architectures) and the Debian wiki's WSL guide. There is no source clone: the working directory holds only .round-meta.json, so only the three listed pages were read. Answer to the open question, from those pages: the manifest gives one Debian image per architecture. For x86_64 it is Debian_WSL_AMD64_v1.26.0.0.wsl (salsa.debian.org CI job 9606244), SHA-256 5ec7dc68216e75d1d4d4761474e99d8461a98d316537110314b137122a879e0f. The manifest names no Debian release, so 'this image is Debian 13' is an inference from the wiki ('Debian stable') and the release page (trixie 'declared stable'), not something the pages state.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Manifest group 'Debian' under ModernDistributions has exactly one entry: Name 'Debian', FriendlyName 'Debian GNU/Linux', Default true. No field names a Debian release (no '13' or 'trixie').",
+          "citation": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json (ModernDistributions.Debian[0])"
+        },
+        {
+          "claim": "x86_64 image: Amd64Url.Url = https://salsa.debian.org/debian/WSL/-/jobs/9606244/artifacts/raw/Debian_WSL_AMD64_v1.26.0.0.wsl ; Amd64Url.Sha256 = 5ec7dc68216e75d1d4d4761474e99d8461a98d316537110314b137122a879e0f",
+          "citation": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json (ModernDistributions.Debian[0].Amd64Url)"
+        },
+        {
+          "claim": "arm64 image: Arm64Url.Url = https://salsa.debian.org/debian/WSL/-/jobs/9606244/artifacts/raw/Debian_WSL_ARM64_v1.26.0.0.wsl ; Arm64Url.Sha256 = 09120df4fadc36fb2a0f7298e197785e6f599f12aaf95d43cba07a8ac7fb316b",
+          "citation": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json (ModernDistributions.Debian[0].Arm64Url)"
+        },
+        {
+          "claim": "The manifest's top-level 'Default' key is 'Ubuntu', not Debian. The file carries no comments, license header, version field or date field (as fetched).",
+          "citation": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json (top-level Default)"
+        },
+        {
+          "claim": "The legacy 'Distributions' list also has a 'Debian' entry: StoreAppId 9MSVKQC78PK6, Amd64PackageUrl and Arm64PackageUrl both https://publicwsldistros.blob.core.windows.net/wsldistrostorage/TheDebianProject.DebianGNULinux_1.12.2.0_neutral___76v4gfsz19hv4.AppxBundle, PackageFamilyName TheDebianProject.DebianGNULinux_76v4gfsz19hv4. No Sha256 field was listed for it.",
+          "citation": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json (Distributions[Name=Debian])"
+        },
+        {
+          "claim": "Release page: 'Debian 13.7 was released on September 12th, 2026. Debian 13.0 was initially released on August 9th, 2025.' The page title is 'Debian \"trixie\" Release Information' and it says the release is 'declared stable'.",
+          "citation": "https://www.debian.org/releases/trixie/"
+        },
+        {
+          "claim": "Release page lifecycle: 'The Debian 13 life cycle encompasses five years: the initial three years of full Debian support, until August 9th, 2028, and two years of Long Term Support (LTS), until June 30th, 2030. The set of supported architectures is reduced during the LTS term.' Further detail is deferred to the Security Information page (link target ../../security/, i.e. https://www.debian.org/security/) and https://wiki.debian.org/LTS (neither opened).",
+          "citation": "https://www.debian.org/releases/trixie/"
+        },
+        {
+          "claim": "Architectures at initial release of trixie include 64-bit PC (amd64) and 64-bit ARM (AArch64), plus armhf, POWER (ppc64el), riscv64 and s390x. The page does not mention WSL, systemd, GPU/NVIDIA, Python/Node.js/Rust, checksums or signatures, or cloud/container images.",
+          "citation": "https://www.debian.org/releases/trixie/"
+        },
+        {
+          "claim": "Wiki install: 'Install Debian: wsl --install -d Debian' (after 'wsl --set-default-version 2'). Older route: install the Debian app from the Microsoft Store; first start asks for a user and password, and that user gets sudo rights. Also: 'There is a way to install the Debian WSL distro offline & without using Microsoft Market' (linked to Microsoft Learn; no command given).",
+          "citation": "https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux (Install; WSL 2 with systemd support)"
+        },
+        {
+          "claim": "Wiki describes the image only as 'a Debian stable command line environment' (WSL1 or WSL 2). No release number is given. GUI apps need an update 'to Debian bookworm or later'. trixie and Debian 13 are never mentioned.",
+          "citation": "https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux (About; Advanced Usage)"
+        },
+        {
+          "claim": "Wiki systemd procedure: add '[boot]' and 'systemd=true' to /etc/wsl.conf 'to activate systemd mode on next boot of WSL 2', then 'wsl --shutdown -d Debian' and restart with 'wsl -d Debian -u <username>'. 'WSL 2 with systemd is probably what you want... as WSL 2 is a prerequisite for GUI application support, and systemd is a prerequisite for many Debian packages.' The procedure says 'Reboot Windows 11' and notes 'a Windows 11 operating system for hosting WSL is assumed'.",
+          "citation": "https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux (WSL 2 with systemd support)"
+        },
+        {
+          "claim": "Wiki Known Issues: 'Any software relying on systemd or low-level hardware accessibility might fail due to missing support from the current Windows kernel or virtualization interface.' No mention of NVIDIA, CUDA, GPU, Linux kernel versions, 'systemctl --user' or checksums.",
+          "citation": "https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux (Known Issues)"
+        },
+        {
+          "claim": "Wiki FAQ: keep up to date 'as with any other Debian installation use apt/apt-get to install and update software from the official Debian mirrors (e.g., apt update && apt dist-upgrade)'. For a newer release: 'change your sources.list and upgrade your install as with every other Debian installation.'",
+          "citation": "https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux (FAQ)"
+        },
+        {
+          "claim": "Wiki dating and source: top note reads 'As of the time of writing, 2024-06-28, your best option for installing and using Debian GNU/Linux on WSL will probably be to use the WSL 2 subsystem and systemd mode.' Footer shows last modified 2026-03-13 21:54:12. App code and build dependencies are in the 'WSL repo on salsa' (https://salsa.debian.org/Debian/WSL, not opened); feedback goes through Microsoft Store reviews, IRC #debian-wsl on OFTC, or that repo.",
+          "citation": "https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux (top note; Feedback; Code & Issues; page footer)"
+        }
+      ],
+      "install": [
+        {
+          "method": "WSL CLI from PowerShell on the Windows host (the only Debian-documented command route; no Linux or macOS install exists)",
+          "command": "wsl --install -d Debian",
+          "citation": "https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux (WSL 2 with systemd support, 'Installing Debian GNU/Linux' step 3)"
+        },
+        {
+          "method": "Make WSL 2 the default version before installing",
+          "command": "wsl --set-default-version 2",
+          "citation": "https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux (step 2)"
+        },
+        {
+          "method": "Prerequisite: enable Windows features (administrator PowerShell, then reboot)",
+          "command": "dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart\ndism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart",
+          "citation": "https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux (System Preparation, step 2)"
+        },
+        {
+          "method": "Prerequisite: update WSL (installs and updates WSL from the Microsoft Store)",
+          "command": "wsl.exe --update",
+          "citation": "https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux (System Preparation, step 4)"
+        },
+        {
+          "method": "Microsoft Store app (older wiki route, Store ID 9MSVKQC78PK6); no command given",
+          "command": "none documented: 'install the Debian app from the Microsoft Store'",
+          "citation": "https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux (Install); Store ID from https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json (Distributions[Name=Debian].StoreAppId)"
+        },
+        {
+          "method": "Post-install inside Debian: enable systemd, then restart the instance",
+          "command": "sudo echo '\n[boot]\nsystemd=true' >> /etc/wsl.conf\nwsl --shutdown -d Debian",
+          "citation": "https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux (steps 5-9)"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes, as WSL guest userland only. The manifest has an amd64 image (Amd64Url, Debian_WSL_AMD64_v1.26.0.0.wsl; https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json), and amd64 is a supported Debian 13 architecture (https://www.debian.org/releases/trixie/). It is not an installer for a native Linux host: every documented procedure runs on Windows (https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux).",
+        "wsl2": "yes. The wiki documents 'wsl --set-default-version 2' then 'wsl --install -d Debian' and says 'WSL 2 with systemd is probably what you want' (https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux). No listed page mentions WSL 2.7.13 or kernel 6.18, and the wiki names no kernel version, so compatibility with that exact host is not stated. The wiki assumes a Windows 11 host.",
+        "macos_arm64": "no. WSL is a Windows feature: every documented step is PowerShell or dism.exe on Windows (wiki URL above) and no listed page mentions macOS. The manifest's Arm64Url is an arm64 WSL image for Windows hosts, not a macOS artifact.",
+        "gpu": "unknown. None of the three listed pages mentions NVIDIA, CUDA or GPU compute, and the manifest has no GPU fields. The wiki covers only GUI apps (install mesa-utils on 'Debian bookworm or later') and warns that software relying on 'low-level hardware accessibility might fail due to missing support from the current Windows kernel or virtualization interface' (https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux)."
+      },
+      "integrations": {
+        "cli": "Windows wsl.exe only: wsl --install -d Debian, wsl --set-default-version 2, wsl --shutdown -d Debian, wsl -d Debian -u <username>, wsl.exe --update (https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux). No Debian-specific CLI is documented.",
+        "mcp": "none found",
+        "sdk_or_api": "none found. The only machine-readable interface in the listed pages is the JSON manifest https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json.",
+        "claude_code_or_codex": "none found"
+      },
+      "telemetry_and_network": "No telemetry or phone-home statement appears on any of the three pages. Network dependencies the pages show: (1) the manifest is hosted at raw.githubusercontent.com/microsoft/WSL/master (where it was read; whether wsl.exe fetches it from that URL at install time is not stated on the pages); (2) the image is downloaded from salsa.debian.org (job-artifact URL in the manifest), and the legacy Store package from publicwsldistros.blob.core.windows.net (DistributionInfo.json); (3) 'wsl.exe --update' and the Debian app come from the Microsoft Store (wiki, Install and systemd sections); (4) inside the distro, packages come from 'the official Debian mirrors' via apt (wiki FAQ). The wiki FAQ also cites Microsoft Partner Center 'unique installs', so the Store route is counted on Microsoft's side; nothing says whether the .wsl route reports anywhere. No account requirement is stated on any page. Sources: https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json ; https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux"
+    },
+    "code": {
+      "languages": [
+        "JSON"
+      ],
+      "entry_points": [
+        {
+          "path": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json",
+          "what": "WSL distribution manifest. ModernDistributions.Debian[0] holds the per-architecture .wsl URL and SHA-256; the legacy 'Distributions' list holds the Store AppxBundle entry."
+        },
+        {
+          "path": "wsl --install -d Debian (https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux)",
+          "what": "Documented install command, run in PowerShell on the Windows host."
+        },
+        {
+          "path": "https://salsa.debian.org/debian/WSL/-/jobs/9606244/artifacts/raw/Debian_WSL_AMD64_v1.26.0.0.wsl",
+          "what": "x86_64 image artifact named by the manifest (not downloaded or opened); SHA-256 5ec7dc68216e75d1d4d4761474e99d8461a98d316537110314b137122a879e0f."
+        },
+        {
+          "path": "https://salsa.debian.org/debian/WSL/-/jobs/9606244/artifacts/raw/Debian_WSL_ARM64_v1.26.0.0.wsl",
+          "what": "arm64 image artifact named by the manifest (not downloaded or opened); SHA-256 09120df4fadc36fb2a0f7298e197785e6f599f12aaf95d43cba07a8ac7fb316b."
+        },
+        {
+          "path": "https://salsa.debian.org/Debian/WSL",
+          "what": "Debian WSL app source and build dependencies per the wiki's 'Code & Issues' section. Not opened because it is outside the listed pages."
+        },
+        {
+          "path": "/etc/wsl.conf ([boot] systemd=true)",
+          "what": "In-distro file the wiki edits to enable systemd on next WSL 2 boot."
+        }
+      ],
+      "architecture": "Not a code repository: the working directory is empty apart from .round-meta.json, so everything below comes from the three listed pages. Components: (1) microsoft/WSL distributions/DistributionInfo.json, a JSON manifest whose top-level keys are ModernDistributions (10 groups: Ubuntu, openSUSE, RLCPlus, SUSE, kali, Debian, AlmaLinux, archlinux, Fedora, eLxr), Default ('Ubuntu') and the legacy Distributions list (Store packages). The Debian group has one entry with Name, FriendlyName, Default, Amd64Url{Url,Sha256} and Arm64Url{Url,Sha256}. It is cited by JSON path because the fetch tool returns summaries and gave inconsistent line numbers. (2) The Debian WSL app and image: source and build dependencies live at salsa.debian.org/Debian/WSL per the wiki (not opened); the artifact URL form '/-/jobs/9606244/artifacts/raw/' shows a GitLab CI job produced the .wsl files. (3) The distro itself: Debian stable managed with apt from the official Debian mirrors (wiki FAQ), with systemd opt-in via /etc/wsl.conf. Sources: https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json ; https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux",
+      "packaging_and_release": "Artifacts: two .wsl files (AMD64 and ARM64) with 'v1.26.0.0' in the file name, served as salsa.debian.org CI job-artifact URLs (job 9606244). Integrity: a SHA-256 per file in the manifest (https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json, ModernDistributions.Debian[0]). No signature, attestation, checksum file or release workflow is cited on any listed page, and the Debian repository's workflows were not read. The legacy route is a Store AppxBundle (version 1.12.2.0) on publicwsldistros.blob.core.windows.net, with no Sha256 field listed.",
+      "tests_and_ci": "None found on the listed pages. There are no test directories or workflow files to count (0 files in the working directory apart from .round-meta.json). The artifact URL form implies a GitLab CI job on salsa.debian.org, but its pipeline definition was not read.",
+      "dependencies": "No manifest files exist in the working directory. The JSON manifest has no code dependencies. Per the wiki, the host needs the Windows features Microsoft-Windows-Subsystem-Linux and VirtualMachinePlatform plus the WSL package ('wsl.exe --update'), and in-distro packages come from apt on the official Debian mirrors (https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux).",
+      "security_policy": "none found: no SECURITY.md or equivalent in the working directory or the listed pages. The Debian 13 release page defers security-support details to its Security Information page (link target ../../security/) and the LTS section of the Debian Wiki (https://wiki.debian.org/LTS); neither was opened (https://www.debian.org/releases/trixie/)."
+    },
+    "claim_checks": [
+      {
+        "claim": "The base image is a vendor image whose checksum can be verified",
+        "verified": "partial",
+        "evidence": "The manifest lists a Sha256 for both architectures (ModernDistributions.Debian[0].Amd64Url.Sha256 = 5ec7dc68216e75d1d4d4761474e99d8461a98d316537110314b137122a879e0f; Arm64Url.Sha256 = 09120df4fadc36fb2a0f7298e197785e6f599f12aaf95d43cba07a8ac7fb316b; https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json). Those digests are published only in Microsoft's manifest: neither Debian page mentions checksums, signatures or a verification command (https://www.debian.org/releases/trixie/, https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux). I did not download the .wsl file or recompute its digest (salsa.debian.org is outside the listed pages)."
+      },
+      {
+        "claim": "The image comes from the Debian project (the vendor)",
+        "verified": "yes",
+        "evidence": "The image URLs are on salsa.debian.org/debian/WSL (DistributionInfo.json, ModernDistributions.Debian[0]), and the wiki says 'The full app code and all build dependencies can be found in the WSL repo on salsa' (https://salsa.debian.org/Debian/WSL, https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux, Code & Issues). The file contents were not inspected."
+      },
+      {
+        "claim": "The WSL 'Debian' image is Debian 13 (trixie)",
+        "verified": "not_checkable",
+        "evidence": "The manifest entry says only Name 'Debian' / FriendlyName 'Debian GNU/Linux' with no release field (DistributionInfo.json). The wiki says 'a Debian stable command line environment' and names only bookworm, as the minimum for GUI apps. The release page calls trixie 'declared stable' but never mentions WSL (https://www.debian.org/releases/trixie/). The release and point release inside v1.26.0.0 are not stated anywhere I could read, and the image contents were not inspected."
+      },
+      {
+        "claim": "Long-term security support",
+        "verified": "partial",
+        "evidence": "The release page states a five-year life cycle: three years of full Debian support to 2028-08-09, then LTS to 2030-06-30 (https://www.debian.org/releases/trixie/). The same page says 'The set of supported architectures is reduced during the LTS term' without listing which, so amd64 coverage during LTS is not stated there. The manifest does not tie the WSL image to Debian 13. The wiki says updates come from the official Debian mirrors via apt (FAQ)."
+      },
+      {
+        "claim": "systemd with user services",
+        "verified": "partial",
+        "evidence": "The wiki documents enabling systemd by adding '[boot]' and 'systemd=true' to /etc/wsl.conf, effective on next WSL 2 boot (https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux, WSL 2 with systemd support). It does not say whether the image enables systemd by default, and it never mentions systemctl --user or user services. Known Issues warns that software relying on systemd or low-level hardware accessibility 'might fail'."
+      },
+      {
+        "claim": "NVIDIA GPU access through WSL (RTX 4090)",
+        "verified": "not_checkable",
+        "evidence": "No listed page mentions NVIDIA, CUDA or GPU compute: the Debian wiki WSL page and the trixie release page are silent, and the manifest has no GPU fields. Only GUI app support (mesa-utils) and the 'low-level hardware accessibility' caveat appear (https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux)."
+      },
+      {
+        "claim": "Current toolchains: Python 3.13, Node 24, Rust",
+        "verified": "not_checkable",
+        "evidence": "The release page and the wiki name no package versions and do not mention Python, Node.js or Rust (https://www.debian.org/releases/trixie/, https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux). The image contents were not inspected."
+      },
+      {
+        "claim": "Works as a WSL 2 distribution on a WSL 2.7.13 / kernel 6.18 host",
+        "verified": "partial",
+        "evidence": "WSL 2 use is documented ('wsl --set-default-version 2', 'wsl --install -d Debian'; 'WSL 2 with systemd is probably what you want') on https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux. No listed page mentions WSL 2.7.13 or any Linux kernel version, so that specific host combination is not stated."
+      },
+      {
+        "claim": "Exactly one Debian base image is what gets installed",
+        "verified": "partial",
+        "evidence": "ModernDistributions.Debian has a single entry with one image per architecture (DistributionInfo.json). The legacy Distributions list holds a second, different Debian package (Store AppxBundle 1.12.2.0, StoreAppId 9MSVKQC78PK6), and the wiki's older route installs the Store app. The top-level Default is 'Ubuntu', so Debian has to be named with -d Debian. How wsl.exe 2.7.13 chooses between the two lists is not documented on the listed pages."
+      },
+      {
+        "claim": "The Debian wiki's WSL guide is current for Debian 13",
+        "verified": "partial",
+        "evidence": "The page was last modified 2026-03-13 21:54:12, but its top note is dated 2024-06-28, it still describes WSL1 and Windows 10 release versions, assumes Windows 11, and never mentions trixie or Debian 13 (https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux)."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Release identity not established. The manifest's Debian entry is just 'Debian' / 'Debian GNU/Linux' with no release field (DistributionInfo.json, ModernDistributions.Debian[0]). The wiki says only 'Debian stable' and 'bookworm or later' and never mentions trixie or Debian 13. The release page never mentions WSL. 'Image = Debian 13' is therefore an inference, and the point release inside the image is unstated (the wiki runs 'sudo apt update' and 'sudo apt dist-upgrade' after install). 'v1.26.0.0' in the file name appears to be the Debian WSL app version (the legacy Store package is 1.12.2.0), not a Debian release number. The wiki is also dated: its top note says 2024-06-28 and it still describes WSL1 and Windows 10 (https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux, https://www.debian.org/releases/trixie/).",
+      "Moving target. The project spec has no tag or commit, and the manifest on master has no version or date field as fetched. The Debian URL embeds CI job id 9606244 and v1.26.0.0, so a later manifest commit can change the URL and digest. Line numbers for the entry could not be established (fetch summaries disagreed), so it is cited by JSON path (https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json).",
+      "Hosting and checksum provenance. The image URL is a GitLab CI job-artifact path on salsa.debian.org ('/-/jobs/9606244/artifacts/raw/'), not a release page or mirror, and no listed page states artifact retention. The SHA-256 digests appear only in Microsoft's manifest. Neither Debian page mentions checksums, signatures or a verification command. I did not download the file or recompute its digest (DistributionInfo.json; https://www.debian.org/releases/trixie/; wiki URL above).",
+      "Two Debian routes with different artifacts. The modern .wsl image (v1.26.0.0, with Sha256) and the legacy Store AppxBundle (1.12.2.0, StoreAppId 9MSVKQC78PK6, no Sha256 field listed). The wiki's older route is 'install the Debian app from the Microsoft Store'. The manifest's top-level Default is 'Ubuntu', so Debian must be requested by name (-d Debian). How wsl.exe 2.7.13 picks between the lists is not documented on the listed pages.",
+      "systemd is a manual post-install step in the wiki ('[boot] systemd=true' in /etc/wsl.conf, effective on next WSL 2 boot). The wiki does not cover systemctl --user or user services, or whether the image enables systemd by default. Its example 'sudo echo ... >> /etc/wsl.conf' performs the redirect in the unprivileged shell, so it may fail with a permission error (my reading of shell semantics, not tested); the wiki follows with a verify step. Known Issues warns that software relying on systemd or low-level hardware accessibility 'might fail' (wiki URL above).",
+      "Coverage gaps. None of the three pages says anything about NVIDIA/CUDA GPU use, Python / Node.js / Rust package versions, or compatibility with WSL 2.7.13 and kernel 6.18, so those needs cannot be confirmed from them (https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux; https://www.debian.org/releases/trixie/).",
+      "Long-term support detail is incomplete on the page read. Full support runs to 2028-08-09 and LTS to 2030-06-30, but 'The set of supported architectures is reduced during the LTS term' and the page does not list which. Details are deferred to the Security Information page and the Debian Wiki LTS section, which were not opened (https://www.debian.org/releases/trixie/).",
+      "Licensing not stated. The manifest has no license header or field as fetched, and neither the release page body nor the wiki page gives a license. The license of the microsoft/WSL repository and of the packages inside the image was not read (https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json; https://www.debian.org/releases/trixie/)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "page:debian-13-wsl-distribution",
+      "checks": [
+        {
+          "field": "install[0]",
+          "statement": "WSL CLI from PowerShell on the Windows host (the only Debian-documented command route; no Linux or macOS install exists): wsl --install -d Debian",
+          "citation": "https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux (WSL 2 with systemd support, 'Installing Debian GNU/Linux' step 3)",
+          "holds": true,
+          "note": "Under the heading 'To install Debian GNU/Linux', step 3 reads 'Install Debian' with the code block `wsl --install -d Debian` ('This takes some time'). Step 1 says 'you must open normal PowerShell without administrator mode for the steps in this section.' The wiki's only other routes give no command: 'install the Debian app from Microsoft Store' (Install) and 'There is a way to install the Debian WSL distro offline & without using Microsoft Market' (a link only). Minor citation-label slip: the real sub-headings are 'To install Debian GNU/Linux' and 'To prepare your system:', not 'Installing Debian GNU/Linux' / 'System Preparation'. The step numbers are correct."
+        },
+        {
+          "field": "license",
+          "statement": "spdx: null, file: null (risks[7]: 'The manifest has no license header or field as fetched, and neither the release page body nor the wiki page gives a license.')",
+          "citation": "Working directory (.round-meta.json only); https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json; https://www.debian.org/releases/trixie/; https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux",
+          "holds": true,
+          "note": "The working directory has only .round-meta.json, so file: null holds. No cited page states a license for the Debian WSL image. The manifest has no license or copyright text; its top-level keys are only ModernDistributions, Default and Distributions. The release page body has no license sentence; its footer reads 'Copyright © 1997-2026 SPI and others; See license terms', which covers the website. spdx: null is therefore correct. Wording slip in the supporting risk: the wiki footer does carry a license, 'Changes made after 24 July 2025 00:00 UTC are available under Creative Commons Attribution-ShareAlike 4.0 International unless otherwise noted'. It covers only the wiki's own text, not the image, so the null value is unaffected."
+        },
+        {
+          "field": "readme.platforms.wsl2",
+          "statement": "yes. The wiki documents 'wsl --set-default-version 2' then 'wsl --install -d Debian' and says 'WSL 2 with systemd is probably what you want'. No listed page mentions WSL 2.7.13 or kernel 6.18, and the wiki names no kernel version, so compatibility with that exact host is not stated. The wiki assumes a Windows 11 host.",
+          "citation": "https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux",
+          "holds": true,
+          "note": "Steps 2 and 3 show exactly `wsl --set-default-version 2` and `wsl --install -d Debian`. The wiki has the verbatim sentence 'WSL 2 with systemd is probably what you want for your freshly installed Debian GNU/Linux system, as WSL 2 is a prerequisite for GUI application support, and systemd is a prerequisite for many Debian packages.' It also says 'Note that a Windows 11 operating system for hosting WSL is assumed.' None of the pages gives a kernel or WSL version number: the wiki says only 'Update your WSL Linux kernel update package', the release page never mentions a kernel, and the manifest has no '2.7' or 'kernel' string."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "Windows wsl.exe only: wsl --install -d Debian, wsl --set-default-version 2, wsl --shutdown -d Debian, wsl -d Debian -u <username>, wsl.exe --update. No Debian-specific CLI is documented.",
+          "citation": "https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux",
+          "holds": true,
+          "note": "All five commands appear on the wiki: `wsl.exe --update` ('To prepare your system:' step 4), `wsl --set-default-version 2` and `wsl --install -d Debian` ('To install Debian GNU/Linux' steps 2-3), `wsl --shutdown -d Debian` (step 8) and `wsl -d Debian -u <username>` (step 9). No distro launcher (debian.exe or similar) or other contender-specific CLI is documented. The page's remaining commands are Windows setup (dism.exe) and generic in-distro tools (sudo, editor, apt, logout)."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "'The base image is a vendor image whose checksum can be verified', graded partial. The manifest lists a Sha256 for both architectures (amd64 5ec7dc68216e75d1d4d4761474e99d8461a98d316537110314b137122a879e0f, arm64 09120df4fadc36fb2a0f7298e197785e6f599f12aaf95d43cba07a8ac7fb316b). The digests are published only in Microsoft's manifest, neither Debian page mentions checksums, signatures or a verification command, and the .wsl file was not downloaded or re-hashed.",
+          "citation": "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json (ModernDistributions.Debian[0].Amd64Url / Arm64Url); https://www.debian.org/releases/trixie/; https://wiki.debian.org/InstallingDebianOn/Microsoft/Windows/SubsystemForLinux",
+          "holds": true,
+          "note": "Two separate reads of the manifest return the same values, and they match the dossier character for character (checked in 8-character groups). Amd64Url.Url is https://salsa.debian.org/debian/WSL/-/jobs/9606244/artifacts/raw/Debian_WSL_AMD64_v1.26.0.0.wsl with Sha256 5ec7dc68216e75d1d4d4761474e99d8461a98d316537110314b137122a879e0f. Arm64Url is the matching ...Debian_WSL_ARM64_v1.26.0.0.wsl with 09120df4fadc36fb2a0f7298e197785e6f599f12aaf95d43cba07a8ac7fb316b. ModernDistributions.Debian has exactly 1 entry and no release field. Neither the release page nor the wiki contains checksum/SHA/hash/signature/GPG/verify. 'Partial' is the right grade. Scope caveat: 'published only in Microsoft's manifest' is true of the three listed pages only, since salsa.debian.org was not opened."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "Optional, non-blocking (risks[7], Licensing): replace 'neither the release page body nor the wiki page gives a license' with 'neither page states a license for the image; the wiki footer licenses only the wiki text (CC BY-SA 4.0 for changes after 24 July 2025 00:00 UTC) and the release page footer links the website's license terms'.",
+        "Optional, non-blocking (citations of install[0], install[2], install[3]): use the wiki's actual sub-headings, 'To install Debian GNU/Linux' instead of 'Installing Debian GNU/Linux' and 'To prepare your system:' instead of 'System Preparation'."
+      ]
+    }
+  ]
+}

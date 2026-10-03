@@ -1,0 +1,258 @@
+{
+  "contender": "actions/attest",
+  "revision": {
+    "contender": "actions/attest",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "actions/attest",
+        "tag": "v4.2.2",
+        "commit": "1e69f48acb82d1966a394da916b4c1698aa569d6",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v4.2.2",
+    "commit": "1e69f48acb82d1966a394da916b4c1698aa569d6",
+    "read_at": "2026-10-02T03:01:52+00:00"
+  },
+  "dossier": {
+    "contender": "actions/attest",
+    "revision": {
+      "tag": "v4.2.2",
+      "commit": "1e69f48acb82d1966a394da916b4c1698aa569d6",
+      "read_at": "2026-10-02T03:01:52+00:00"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "actions/attest is a GitHub JavaScript Action (runs on node24, action.yml:102-104) that creates signed in-toto attestations for artifacts produced by a GitHub Actions workflow. The mode is auto-detected from the inputs: SLSA v1 build provenance (default), an SPDX or CycloneDX attestation built from a user-supplied SBOM JSON file, or a custom predicate. Signing is keyless Sigstore (workflow OIDC token -> Fulcio certificate): public-good Fulcio + Rekor for public repositories, GitHub-operated Fulcio + timestamp authority otherwise. The Sigstore bundle is written to the runner, uploaded to GitHub's repository attestations API, and can optionally be attached to an OCI image in a registry, with an optional artifact-metadata storage record. It is a thin wrapper over the @actions/attest toolkit package (src/attest.ts:1-7,35-41). The 11 files in src/ contain no SBOM generation, workflow auditing or linting, dependency updating, or code-scanning upload logic; src/sbom.ts only parses an existing SBOM file.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Generates signed attestations for workflow artifacts; internally powered by the @actions/attest package.",
+          "citation": "README.md:3-4"
+        },
+        {
+          "claim": "Attestations bind a subject (named artifact + digest) to a predicate (type URI + JSON params) using the in-toto format.",
+          "citation": "README.md:6-9"
+        },
+        {
+          "claim": "The signature uses a short-lived Sigstore-issued signing certificate; public repositories use the public-good Sigstore instance, private/internal repositories use GitHub's private Sigstore instance.",
+          "citation": "README.md:11-15"
+        },
+        {
+          "claim": "Signed attestations are uploaded to the GH attestations API and associated with the originating repository; the bundle is also stored on the runner and its path appended to ${RUNNER_TEMP}/created_attestation_paths.txt.",
+          "citation": "README.md:17-25"
+        },
+        {
+          "claim": "Attestations can be verified with the `attestation` command of the GitHub CLI (gh attestation verify).",
+          "citation": "README.md:27-28, 440"
+        },
+        {
+          "claim": "Availability: public repositories on all current GitHub plans; private/internal repositories require GitHub Enterprise Cloud; NOT supported on GitHub Enterprise Server.",
+          "citation": "README.md:34-41"
+        },
+        {
+          "claim": "Three modes are auto-detected from the inputs: Provenance (default, auto-generated SLSA build provenance), SBOM (sbom-path, SPDX or CycloneDX), Custom (predicate-type/predicate/predicate-path).",
+          "citation": "README.md:46-55, 86-88"
+        },
+        {
+          "claim": "The workflow must grant id-token: write (mint OIDC token for the Sigstore certificate), attestations: write (persist the attestation) and artifact-metadata: write (storage record).",
+          "citation": "README.md:64-76"
+        },
+        {
+          "claim": "Subjects: at most one of subject-path (glob/list), subject-digest (+ subject-name) or subject-checksums; no more than 1024 subjects; if none is given, subjects are discovered from the runner-provided $GITHUB_ARTIFACTS_LIST.",
+          "citation": "README.md:97-120, 182-185, 191-228"
+        },
+        {
+          "claim": "SBOM files, predicate files and predicate strings are capped at 16MB.",
+          "citation": "README.md:121-139, 186-189"
+        },
+        {
+          "claim": "The SBOM is generated in a separate step (example: `syft . -o spdx-json`) and then attested via sbom-path; the action consumes an existing SBOM.",
+          "citation": "README.md:263-274"
+        },
+        {
+          "claim": "push-to-registry attaches the attestation to the image in the registry and requires a single fully-qualified OCI image reference with a SHA-256 digest; storage records (create-storage-record, default true) are only for organization-owned repositories.",
+          "citation": "README.md:141-151, 367-380"
+        },
+        {
+          "claim": "Outputs are attestation-id, attestation-url, bundle-path and storage-record-ids; bundles are JSON-serialized Sigstore bundles; multiple subjects produce a single attestation.",
+          "citation": "README.md:162-178"
+        }
+      ],
+      "install": [
+        {
+          "method": "GitHub Actions workflow step (`uses:`); the README documents no separate Linux/macOS install",
+          "command": "- uses: actions/attest@v4\n  with:\n    subject-path: '<PATH TO ARTIFACT>'",
+          "citation": "README.md:78-84"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes (inferred) - the project's own CI and the README container example use `runs-on: ubuntu-latest` (.github/workflows/ci.yml:17,51; README.md:399); the README has no explicit supported-OS or CPU-architecture statement.",
+        "wsl2": "unknown - WSL2 is not mentioned in the README, code or workflows; the action only executes as a step inside a GitHub Actions runner job (action.yml:102-104), not as a local tool.",
+        "macos_arm64": "unknown - the README lists no supported runner OSes and no CI job runs on macOS (every job is `runs-on: ubuntu-latest`: ci.yml:17,51; check-dist.yml:26; codeql-analysis.yml:18; commit-dist.yml:24; rebuild-dist.yml:22; prober.yml:13). The code is a plain Node 24 JavaScript bundle with no native binaries (only a lazy optional `kerberos` import stub, dist/50.index.js:8).",
+        "gpu": "no - not used or applicable; the action hashes files and calls HTTPS APIs (src/subject.ts:290-301)."
+      },
+      "integrations": {
+        "cli": "none found - not a CLI; package.json has no `bin` field (package.json:1-109). Verification of produced attestations is delegated to the separate GitHub CLI command `gh attestation verify` (README.md:27-28; used in .github/workflows/prober.yml:42).",
+        "mcp": "none found - searching the repository (excluding dist/ and the lockfile) for 'mcp' returned no matches.",
+        "sdk_or_api": "No published library or server API; it is consumed as a workflow action through `with:` inputs and four outputs (action.yml:8-100; README.md:90-178). package.json:6 sets `private: true` and `exports` points at the action bundle (package.json:20-22). The underlying library is the separate @actions/attest npm package (README.md:3-4; package.json:81). HTTP APIs it calls: GitHub `POST /repos/{owner}/{repo}/attestations` (dist/index.js:121078) and `POST /orgs/{owner}/artifacts/metadata/storage-record` (dist/index.js:120904).",
+        "claude_code_or_codex": "none found. The only agent-related file is a maintainer-only GitHub Copilot CLI extension for cutting releases (.github/extensions/release-cutter/extension.mjs:3-16, imports @github/copilot-sdk/extension); it is not a consumer-facing integration and not Claude Code or Codex."
+      },
+      "telemetry_and_network": "No telemetry, analytics or phone-home code was found in src/ or the bundled dist/index.js (a grep for telemetry|analytics|datadog|sentry|posthog|mixpanel|applicationinsights matched only .github/workflows/prober.yml). Network calls the action makes at run time, all from the runner: (1) the GitHub Actions OIDC token endpoint ($ACTIONS_ID_TOKEN_REQUEST_URL), audience 'sigstore' for signing (dist/index.js:121015,121035) and audience 'nobody' for provenance claims (dist/index.js:122601,122623); (2) Sigstore Fulcio - public-good https://fulcio.sigstore.dev plus Rekor https://rekor.sigstore.dev for public repos (dist/index.js:120946-120951), or https://fulcio.githubapp.com plus TSA https://timestamp.githubapp.com derived from GITHUB_SERVER_URL for private/internal repos (dist/index.js:120973-120983); (3) the GitHub REST API at $GITHUB_API_URL, default https://api.github.com (dist/index.js:116773-116775): POST /repos/{owner}/{repo}/attestations (dist/index.js:121078), and for storage records GET /repos/{owner}/{repo} (src/attest.ts:119-126) and POST /orgs/{owner}/artifacts/metadata/storage-record (dist/index.js:120904); (4) provenance mode also fetches the OIDC issuer's /.well-known/openid-configuration and JWKS (https://token.actions.githubusercontent.com or the *.ghe.com equivalent) to verify the token (dist/index.js:122648-122659,122672-122683); (5) with push-to-registry, the image registry named in subject-name, authenticated from ~/.docker/config.json (dist/index.js:62803-62831; src/attest.ts:51-65). https://search.sigstore.dev is only printed as a log link, not fetched (src/endpoints.ts:1; src/main.ts:200). Requests send User-Agent `@actions/attest-<version>` plus `actions_orchestration_id/<id>` when set (dist/index.js:120868-120878), and the sigstore-js client sends Node version/platform/arch (dist/index.js:66466-66472). Accounts: a GitHub repository running Actions with an OIDC token (id-token: write); public repos on any plan, private/internal repos need GitHub Enterprise Cloud, GHES unsupported (README.md:34-41); no separate Sigstore account or key (keyless). The project's own CI, not the action, sends probe status to Datadog using repository secrets (.github/workflows/prober.yml:49-84), gated to repository_owner == 'actions' (.github/workflows/prober-github.yml:11)."
+    },
+    "code": {
+      "languages": [
+        "TypeScript (src/, __tests__/)",
+        "JavaScript (generated ESM bundle in dist/; maintainer extension .github/extensions/release-cutter/*.mjs)",
+        "YAML (action.yml, .github/workflows/*)"
+      ],
+      "entry_points": [
+        {
+          "path": "action.yml:102-104",
+          "what": "Action runtime declaration: `using: node24`, `main: ./dist/index.js` (inputs at action.yml:8-91, outputs at 92-100)."
+        },
+        {
+          "path": "src/index.ts:7-28",
+          "what": "Entry module: reads inputs via @actions/core (including the undocumented `private-signing`) and calls run()."
+        },
+        {
+          "path": "src/main.ts:56-167",
+          "what": "run(): selects Sigstore instance, detects mode, resolves subjects, builds the predicate, signs/uploads, writes the bundle, sets outputs and summary."
+        },
+        {
+          "path": "src/attest.ts:23-114",
+          "what": "createAttestation(): calls attest() from @actions/attest; optional OCI push via @sigstore/oci and storage-record creation."
+        },
+        {
+          "path": "dist/index.js",
+          "what": "Generated ncc bundle actually executed by the runner (src plus all dependencies, ~129k lines); lazy chunks dist/184.index.js and dist/606.index.js (p-map copies) and dist/50.index.js (kerberos stub)."
+        },
+        {
+          "path": ".github/extensions/release-cutter/extension.mjs",
+          "what": "Maintainer-only GitHub Copilot CLI canvas extension that cuts a release and force-moves the major tag; not part of the action runtime."
+        },
+        {
+          "path": ".github/workflows/prober.yml",
+          "what": "Reusable workflow doing a real attest + `gh attestation verify` probe, invoked every 5 minutes by prober-github.yml and prober-public-good.yml."
+        }
+      ],
+      "architecture": "Single-process GitHub Action. src/index.ts reads inputs and calls run() in src/main.ts, which: (1) picks the Sigstore instance from repository visibility ('public-good' only if visibility is 'public' and the undocumented private-signing flag is unset, else 'github') and requires the OIDC token env (src/main.ts:62-73); (2) src/detect.ts decides the mode (provenance | sbom | custom) and validates input combinations; (3) src/subject.ts resolves subjects - paths/globs hashed with streaming sha256, `algorithm:hex` digest, checksums file or inline string, max 1024 - or src/artifacts.ts reads the runner-provided $GITHUB_ARTIFACTS_LIST (version 1 JSON, kinds file/oci, sha256 only); (4) builds the predicate: src/provenance.ts delegates to buildSLSAProvenancePredicate() in @actions/attest (SLSA provenance v1, GitHub workflow buildType, built from verified OIDC claims such as workflow ref/path, commit SHA, repository and owner IDs, event name, runner_environment, builder id = job_workflow_ref, invocationId = run URL + attempt; dist/index.js:122697-122755), src/sbom.ts maps SPDX/CycloneDX JSON to predicate types, src/predicate.ts handles custom predicates (<=16 MiB, JSON.parse); (5) src/attest.ts calls attest() from @actions/attest (in-toto Statement v1 -> DSSE payload -> Fulcio certificate plus Rekor or TSA witness -> Sigstore bundle v0.3 -> POST /repos/{owner}/{repo}/attestations; dist/index.js:120986,121015-121108), then optionally pushes the bundle to the registry via @sigstore/oci attachArtifactToImage and creates a storage record (organization-owned repos only); (6) main.ts writes the bundle JSON to $RUNNER_TEMP/<tmpdir>/attestation.json, appends the path to $RUNNER_TEMP/created_attestation_paths.txt, sets outputs and an optional step summary. src/endpoints.ts (Sigstore search URL constant) and src/style.ts (ANSI colors) are helpers. All signing, OIDC, HTTP and registry logic lives in dependencies bundled into dist/.",
+      "packaging_and_release": "Artifact = the repository at a tag: action.yml:102-104 runs ./dist/index.js (node24). dist/ (index.js, chunks 184/606/50.index.js, licenses.txt, package.json `{\"type\":\"module\"}`) is generated by `ncc build src/index.ts --license licenses.txt` (package.json:34) and committed; .github/workflows/check-dist.yml:44-59 fails when dist/ differs from a fresh build. Not published to npm (package.json:6 `private: true`). Releases are manual: RELEASE.md:1-25 (bump package.json version, `gh release create vX.X.X`, force-move the major tag `vX` with `git tag -fa` / `git push --force`, then update dependents such as actions/attest-build-provenance and actions/attest-sbom). A Copilot CLI extension automates this: it publishes a release 'never a draft, never with assets' and force-moves the major tag (.github/extensions/release-cutter/extension.mjs:3-9; backend.mjs:199-255). No release workflow exists among the 8 workflow files, and no checksum file, signature, SBOM or attestation of the release artifacts was found. ci.yml:49-81 attests the GitHub-generated source tarball of each CI run (custom release predicate, GitHub private Sigstore) as a test, not as a release process. package.json and package-lock.json still say version 4.1.0 at tag v4.2.2 (package.json:4; package-lock.json:3,9).",
+      "tests_and_ci": "Framework: Jest 30 with the ts-jest ESM preset, run as `NODE_OPTIONS=--experimental-vm-modules jest` (package.json:28,36,40-79); coverage is collected from src/** (json-summary/text/lcov) with no coverage threshold configured. 11 test files, about 297 describe/it calls by grep count: __tests__/index.test.ts; __tests__/integration/{attest,main,provenance}.test.ts; __tests__/unit/{artifacts,detect,predicate,sbom,style,subject,validate-registry-subjects}.test.ts; fixtures in __tests__/fixtures (mocks.ts plus SPDX, CycloneDX and predicate JSON samples). @actions/attest, @sigstore/oci, @actions/core and @actions/github are mocked, so Sigstore signing and API upload are not exercised by Jest. Lint/format: ESLint 9 flat config with typescript-eslint type-checked rules plus jest and import plugins (eslint.config.mjs), Prettier, markdownlint on *.md (package.json:29-33). CI workflows in .github/workflows: ci.yml (PR->main and push to main/releases/*; workflow-level `permissions: {}`; job test-typescript runs npm ci, format:check, lint, ci-test with contents: read; job test-attest runs the local action `./` with a custom in-toto release predicate against GitHub's private Sigstore via INPUT_PRIVATE-SIGNING, with attestations/id-token: write, then dumps the bundle); check-dist.yml (rebuild dist/ and fail on diff; uploads the rebuilt dist as an artifact); codeql-analysis.yml (CodeQL for TypeScript on PR/push to main plus weekly cron, security-events: write, github/codeql-action init/autobuild/analyze, which publishes code-scanning alerts); rebuild-dist.yml + commit-dist.yml (Dependabot direct-production bumps: unprivileged rebuild with `npm ci --ignore-scripts`, then a workflow_run job with contents: write that commits dist/); prober.yml + prober-github.yml + prober-public-good.yml (every 5 minutes, only when repository_owner is 'actions': real provenance attestation with actions/attest@main on each Sigstore instance, `gh attestation verify`, Datadog service check). .github/dependabot.yml: weekly github-actions and npm updates, minor/patch grouped, 3-day cooldown. Third-party actions in the workflows are pinned to full commit SHAs with version comments (e.g. ci.yml:24,28), except `actions/attest@main` at prober.yml:32.",
+      "dependencies": "Manifests: package.json and package-lock.json (npm, lockfileVersion 3); dist/package.json only holds {\"type\":\"module\"}. package.json declares 6 direct runtime dependencies (@actions/attest ^3.2.0, @actions/core ^3.0.1, @actions/github ^9.1.1, @actions/glob ^0.7.0, @sigstore/oci ^0.7.2, csv-parse ^7.0.1; package.json:80-87) and 19 devDependencies (package.json:88-108). The lockfile has 747 package entries, 599 flagged `dev: true`; @actions/attest 3.2.0 pulls in @sigstore/sign 3.1.0, @sigstore/bundle 3.1.0, jose 5.10.0, @octokit/plugin-retry 8.0.3 and @actions/http-client 4.0.0 (package-lock.json:44-57,158-160,1709,1991,2077,6880). The runtime needs Node 24 (action.yml:103; package.json:23-25; .node-version:1 = 24.5.0). Four devDependencies (@sigstore/mock, nock, js-yaml, undici; package.json:91,100,102,107) are not imported anywhere in src/ or __tests__/ (grep). dist/licenses.txt lists only two packages (@vercel/ncc, p-map).",
+      "security_policy": "none - no SECURITY.md (a glob for SECURITY*, CONTRIBUTING*, CODE_OF_CONDUCT*, CHANGELOG*, SUPPORT*, GOVERNANCE* and NOTICE* found no files). Only CODEOWNERS exists (CODEOWNERS:3: `* @actions/package-security`). An organization-level policy outside this repository was not checked."
+    },
+    "claim_checks": [
+      {
+        "claim": "Three attestation modes are auto-detected from the inputs (provenance by default, SBOM when sbom-path is set, custom when predicate inputs are set).",
+        "verified": "yes",
+        "evidence": "src/detect.ts:10-27 implements that precedence (sbom-path -> sbom; predicate-type/predicate/predicate-path -> custom; else provenance); src/detect.ts:29-45 rejects sbom-path combined with predicate inputs and requires predicate-type with predicate/predicate-path; exercised in __tests__/integration/main.test.ts:188-257."
+      },
+      {
+        "claim": "Public repositories sign with the Sigstore public-good instance; private/internal repositories with GitHub's private Sigstore instance.",
+        "verified": "yes",
+        "evidence": "src/main.ts:62-66 selects 'public-good' only when payload.repository.visibility === 'public' and the private-signing flag is not set, otherwise 'github'. Bundled @actions/attest endpoints: public-good = fulcio.sigstore.dev + rekor.sigstore.dev; github = fulcio.<host> + timestamp.<host> with githubapp.com for github.com (dist/index.js:120946-120983). Caveat: an undocumented override exists (INPUT_PRIVATE-SIGNING env / 'private-signing', src/index.ts:21-24; used in .github/workflows/ci.yml:71-72). Tests: __tests__/integration/main.test.ts:322-350."
+      },
+      {
+        "claim": "A verifiable signature is produced with a short-lived Sigstore-issued certificate and the attestation is uploaded to the GitHub attestations API.",
+        "verified": "yes",
+        "evidence": "src/attest.ts:35-41 calls attest() from @actions/attest; the bundled implementation requests an OIDC token with audience 'sigstore', signs through FulcioSigner/DSSEBundleBuilder with a Rekor (public-good) or TSA (GitHub) witness (dist/index.js:121015-121063) and POSTs the bundle to /repos/{owner}/{repo}/attestations (dist/index.js:121078-121108). The Jest suite mocks @actions/attest entirely (__tests__/integration/attest.test.ts:31-34; main.test.ts:78-82), so this real path is only exercised by .github/workflows/ci.yml:49-81 and the prober workflows."
+      },
+      {
+        "claim": "The workflow must set id-token: write, attestations: write and artifact-metadata: write.",
+        "verified": "partial",
+        "evidence": "The code hard-fails only when the OIDC token env is missing (src/main.ts:69-73). attestations: write is enforced server-side by the API call (dist/index.js:121078), not checked in code. artifact-metadata: write is used only for storage records and its absence is downgraded to a warning (src/attest.ts:73-110; storage records need push-to-registry, src/attest.ts:45). The README's own provenance example omits artifact-metadata: write (README.md:243-250)."
+      },
+      {
+        "claim": "At most one of subject-path/subject-digest/subject-checksums; no more than 1024 subjects; otherwise subjects come from the runner-provided $GITHUB_ARTIFACTS_LIST.",
+        "verified": "partial",
+        "evidence": "The one-of rule is enforced (src/subject.ts:73-77). The 1024 cap is enforced for subject-path (src/subject.ts:127-131) and discovered lists (src/subject.ts:60-64) but there is no count check in the subject-checksums parser (src/subject.ts:204-285; only a 512 KiB size cap for files at 224-228, none for inline strings) and no empty-result guard (compare src/subject.ts:150-152 for paths). The fallback to $GITHUB_ARTIFACTS_LIST is implemented (src/artifacts.ts:5,74-91); that the runner populates it (actions/runner#4527) is not checkable from this repository."
+      },
+      {
+        "claim": "subject-digest must be in the form sha256:hex_digest.",
+        "verified": "partial",
+        "evidence": "The README is narrower than the code: parseSubjectDigest accepts sha224, sha256, sha384, sha512, sha512_224 and sha512_256 with hex-length checks (src/subject.ts:19-26,160-188); action.yml:19-25 documents the general 'algorithm:hex_digest' form, matching the code. subject-path always hashes with sha256 (src/subject.ts:15,138). The code is preferred over the README."
+      },
+      {
+        "claim": "push-to-registry requires the resolved subject to be a single fully-qualified OCI image reference with a SHA-256 digest.",
+        "verified": "partial",
+        "evidence": "The code checks exactly one subject whose digest map is sha256-only (src/main.ts:277-293; discovered lists additionally require kind 'oci', src/artifacts.ts:188-206) but does not validate that the name is an OCI reference; a plain subject-path file is accepted (__tests__/integration/main.test.ts:486-501). Registry credentials come only from the 'auths' map of ~/.docker/config.json (dist/index.js:62803-62831)."
+      },
+      {
+        "claim": "A storage record is emitted when generating a build provenance attestation with push-to-registry (create-storage-record defaults to true), for organization-owned repositories.",
+        "verified": "partial",
+        "evidence": "The org-only rule is enforced (src/attest.ts:76-82,119-126). The code is not limited to provenance: any attestation type with a single subject, push-to-registry and create-storage-record true creates a record (src/attest.ts:45-111). Failures such as a missing permission only warn (src/attest.ts:104-109). The README omits the subject-version input that feeds the record (action.yml:38-42; src/attest.ts:88)."
+      },
+      {
+        "claim": "SBOM mode attests an SPDX or CycloneDX JSON SBOM of at most 16MB.",
+        "verified": "yes",
+        "evidence": "src/sbom.ts:11,25-29 (16 MiB cap), 34-42 (format detection), 64-96 (predicate types https://spdx.dev/Document/v<version> and https://cyclonedx.org/bom). Detection is field-presence only (SPDX: spdxVersion + SPDXID; CycloneDX: bomFormat + serialNumber + specVersion, src/sbom.ts:45-62), with no schema validation, and the action does not generate SBOMs. Tests: __tests__/unit/sbom.test.ts."
+      },
+      {
+        "claim": "Artifact attestations are NOT supported on GitHub Enterprise Server; private/internal repositories need GitHub Enterprise Cloud.",
+        "verified": "partial",
+        "evidence": "Plan/entitlement limits are server-side and not checkable here. In code, provenance mode accepts only a GITHUB_SERVER_URL of https://github.com or https://<slug>.ghe.com (dist/index.js:122602-122605,122672-122683) and throws 'Invalid server URL' otherwise; custom and SBOM modes skip that check and derive Fulcio/TSA hosts from GITHUB_SERVER_URL (dist/index.js:120973-120983), so there is no explicit GHES rejection outside provenance mode."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Platform/service dependence: it runs only inside a GitHub Actions job and hard-fails without an OIDC token (src/main.ts:69-73); action.yml:103 requires a runner with the node24 runtime. Private/internal repos need GitHub Enterprise Cloud and GHES is unsupported (README.md:34-41); provenance mode accepts only github.com or *.ghe.com server URLs (dist/index.js:122602-122605). Signing and storage have no offline mode and depend on external services: Sigstore public-good Fulcio/Rekor (dist/index.js:120946-120951), GitHub-operated Fulcio/TSA (dist/index.js:120973-120983) and the GitHub attestations API (dist/index.js:121078).",
+      "Scope: attestation only. SBOMs must be produced elsewhere (README.md:267-273 runs syft in a separate step); src/sbom.ts only parses an existing SPDX/CycloneDX file by top-level field presence, requires `serialNumber` for CycloneDX and does no schema validation (src/sbom.ts:45-62). Workflow auditing or linting, dependency updating and code-scanning upload are not part of the action; they appear only as the project's own CI (.github/workflows/codeql-analysis.yml, .github/dependabot.yml).",
+      "Release/pinning: consumers reference a floating major tag that maintainers force-move on each release (RELEASE.md:14-20; .github/extensions/release-cutter/backend.mjs:228-249), and README examples use mutable tags (`actions/attest@v4`, `actions/checkout@v4`, `docker/login-action@v3`: README.md:81,252,414). There is no release workflow and releases are published 'never with assets' (extension.mjs:8), so no checksums, signatures or attestations accompany the action's own releases. Manifest version 4.1.0 (package.json:4; package-lock.json:3,9) does not match tag v4.2.2 although RELEASE.md:5 says to bump it.",
+      "Test gap on the core path: every Jest integration test mocks @actions/attest and @sigstore/oci (__tests__/integration/attest.test.ts:31-40; main.test.ts:78-88; provenance.test.ts:8-11), so OIDC claims, Sigstore signing, API upload and registry push are not exercised there. Real-path coverage comes from ci.yml test-attest (custom predicate only, GitHub instance via the undocumented INPUT_PRIVATE-SIGNING, ci.yml:49-81) and the 5-minute prober workflows, which run only when repository_owner == 'actions' (prober-github.yml:5-11; prober.yml:31-42) and report to Datadog with repository secrets (prober.yml:49-84). No coverage threshold is set (package.json:40-79).",
+      "Bundle and runtime inventory: the code that runs is a generated, checked-in ncc bundle (dist/index.js, ~129k lines), not installed packages. dist/licenses.txt lists only 2 packages (@vercel/ncc, p-map; dist/licenses.txt:1-21) although the bundle also contains Apache-2.0 Sigstore code (dist/index.js:66448-66462), @actions/*, octokit and jose, so it is not a complete inventory; package-lock.json (747 entries, 599 flagged dev) is the fuller list. check-dist.yml verifies dist/ on PR/push to main (check-dist.yml:12-59), but dist/ commits pushed by the bot for Dependabot bumps do not re-trigger it (commit-dist.yml:7-9). A grep of lockfile license fields found no GPL/LGPL/AGPL/MPL/EPL-style licenses.",
+      "README/code drift and undocumented behavior: subject-digest is documented as sha256-only but the code accepts six SHA-2 variants (README.md:105-109 vs src/subject.ts:19-26); the subject-version input is undocumented in the README (action.yml:38-42); private-signing is read from INPUT_PRIVATE-SIGNING and marked 'undocumented -- not part of public interface' (src/index.ts:21-24); subject-checksums falls back to treating the value as inline content when no such file exists and, unlike subject-path, has no empty-result or 1024-count guard (src/subject.ts:92-93,204-213,234-285 vs 150-152), and downstream behavior for zero subjects was not verified; the README provenance example lacks `runs-on` and artifact-metadata: write (README.md:243-250).",
+      "Registry push constraints: credentials are read only from the `auths` map in ~/.docker/config.json (no credential-helper support) and the step throws if the file or entry is missing (dist/index.js:62803-62831); exactly one subject with only a sha256 digest is required (src/main.ts:277-293) but it is not verified to be an OCI image (main.test.ts:486-501). Storage-record failures only warn (src/attest.ts:104-109) and records are created only for organization-owned repositories (src/attest.ts:76-82; README.md:378-380), so a successful run can lack the storage record.",
+      "Security/maintenance signals: no SECURITY.md or in-repo vulnerability-reporting policy and no CHANGELOG (release notes live only on GitHub Releases); a single team owns the repo (CODEOWNERS:3). The shallow clone holds one commit (.git/shallow:1), so commit cadence cannot be assessed here. The project's workflows SHA-pin third-party actions, but prober.yml:32 uses `actions/attest@main` with attestations/id-token: write and inherited secrets (prober-github.yml:12-15), and rebuild-dist.yml:62-68 interpolates github.event.pull_request.head.ref into a shell script (gated to dependabot[bot] at rebuild-dist.yml:21 and re-validated by regex in commit-dist.yml:61-68)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "actions/attest",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Install as a GitHub Actions workflow step: `- uses: actions/attest@v4` with `subject-path: '<PATH TO ARTIFACT>'`; the README documents no separate Linux/macOS install.",
+          "citation": "README.md:78-84",
+          "holds": true,
+          "note": "README.md:78-84 contains exactly this step (`uses: actions/attest@v4`, `with: subject-path: '<PATH TO ARTIFACT>'`). No other install method appears anywhere in the full 447-line README. In this clone, both .git/refs/tags/v4 and the packed ref v4.2.2 resolve to 1e69f48acb82d1966a394da916b4c1698aa569d6, so @v4 points at the dossier revision. action.yml:102-104 runs ./dist/index.js on node24."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, license file LICENSE.",
+          "citation": "LICENSE:1-21",
+          "holds": true,
+          "note": "LICENSE is the standard MIT License text (header 'MIT License', 'Copyright GitHub'). package.json:39 also declares \"license\": \"MIT\"."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes (inferred) - the project's own CI and the README container example use `runs-on: ubuntu-latest` (.github/workflows/ci.yml:17,51; README.md:399); the README has no explicit supported-OS or CPU-architecture statement.",
+          "citation": ".github/workflows/ci.yml:17,51; README.md:399",
+          "holds": true,
+          "note": "ci.yml:17 (test-typescript) and ci.yml:51 (test-attest, which runs the action itself via `uses: ./` at ci.yml:73) both use `runs-on: ubuntu-latest`, and so does README.md:399. The README never states a supported OS or CPU architecture; the only OS/arch strings are example artifact names (README.md:216, 352-353). The 'yes' is labeled as an inference, which is accurate: that ubuntu-latest means x86_64 comes from GitHub's runner docs, not from this repo."
+        },
+        {
+          "field": "readme.integrations.sdk_or_api",
+          "statement": "No published library or server API; consumed as a workflow action through `with:` inputs and four outputs; package.json sets private: true and exports points at the action bundle; underlying library is the separate @actions/attest npm package; HTTP APIs it calls: POST /repos/{owner}/{repo}/attestations and POST /orgs/{owner}/artifacts/metadata/storage-record.",
+          "citation": "action.yml:8-100; README.md:90-178; package.json:6,20-22,81; README.md:3-4; dist/index.js:121078; dist/index.js:120904",
+          "holds": true,
+          "note": "action.yml:8-91 declares the inputs and 92-100 the four outputs (bundle-path, attestation-id, attestation-url, storage-record-ids); README.md:90-178 documents them. package.json:6 is \"private\": true, package.json:20-22 exports \".\" -> ./dist/index.js, and package.json:81 is \"@actions/attest\": \"^3.2.0\". dist/index.js:121078 is CREATE_ATTESTATION_REQUEST = 'POST /repos/{owner}/{repo}/attestations' and dist/index.js:120904 is CREATE_STORAGE_RECORD_REQUEST = 'POST /orgs/{owner}/artifacts/metadata/storage-record'. Minor gap, not an error: the list of GitHub API calls leaves out GET /repos/{owner}/{repo} (src/attest.ts:116-126, the org-owner check before a storage record), which the dossier's telemetry section does list."
+        },
+        {
+          "field": "claim_checks[1]",
+          "statement": "Public repositories sign with the Sigstore public-good instance; private/internal repositories with GitHub's private Sigstore instance (verified: yes, with an undocumented private-signing override caveat).",
+          "citation": "src/main.ts:62-66; dist/index.js:120946-120983; src/index.ts:21-24; .github/workflows/ci.yml:71-72; __tests__/integration/main.test.ts:322-350",
+          "holds": true,
+          "note": "src/main.ts:62-66 picks 'public-good' only when payload.repository.visibility === 'public' and privateSigning is false; otherwise it picks 'github'. src/attest.ts:39 passes this as `sigstore` to attest(). The bundled attest() calls signingEndpoints(options.sigstore) (dist/index.js:121156), where an explicit instance takes precedence (120957-120958). public-good uses https://fulcio.sigstore.dev and https://rekor.sigstore.dev (120946-120951). github uses fulcio.<host> and timestamp.<host>, with github.com mapped to githubapp.com (120973-120983). The override caveat is accurate: src/index.ts:21-24 marks private-signing 'undocumented', and ci.yml:71-72 sets INPUT_PRIVATE-SIGNING: 'true'. main.test.ts:322-350 tests three cases (private->github, public->public-good, privateSigning->github), with attest mocked."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

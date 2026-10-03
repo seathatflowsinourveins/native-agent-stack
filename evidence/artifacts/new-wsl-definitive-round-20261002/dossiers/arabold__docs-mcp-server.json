@@ -1,0 +1,331 @@
+{
+  "contender": "arabold/docs-mcp-server",
+  "revision": {
+    "contender": "arabold/docs-mcp-server",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "arabold/docs-mcp-server",
+        "tag": "v3.2.1",
+        "commit": "f2938c47bb8937c650f0d5ddb614f867773b29f4",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v3.2.1",
+    "commit": "f2938c47bb8937c650f0d5ddb614f867773b29f4",
+    "read_at": "2026-10-02T03:01:56+00:00"
+  },
+  "dossier": {
+    "contender": "arabold/docs-mcp-server",
+    "revision": {
+      "tag": "v3.2.1",
+      "commit": "f2938c47bb8937c650f0d5ddb614f867773b29f4",
+      "read_at": "2026-10-01"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Node.js/TypeScript server + CLI that crawls/ingests documentation (websites, GitHub repos, npm/PyPI pages, local folders and zip/tar archives; HTML, Markdown/MDX, PDF, Office, OpenDocument, RTF, EPUB, Jupyter, source code, JSON) into a local SQLite store as semantic chunks (FTS5 lexical index, optional sqlite-vec embeddings) and exposes search/list/version/fetch operations over MCP (stdio, SSE, Streamable HTTP), a yargs CLI and a React web UI (README.md:3,16-17; ARCHITECTURE.md:5-23). Facts for the stated needs: (1) Search = MCP tool `search_docs` and CLI `search`, both thin wrappers over `SearchTool`; hybrid FTS5 + vector (Reciprocal Rank Fusion) when an embedding provider is configured, FTS5-only otherwise; scoped per library[/version]; results are context-expanded chunk text plus source URL, not full original bodies, and the store keeps no source body (src/tools/SearchTool.ts:42-129; src/store/DocumentRetrieverService.ts:28-145; db/migrations/009-add-pages-table.sql:7-36). (2) The only body read-back is `fetch_url` (MCP) / `fetch-url` (CLI): a live re-fetch of an http(s) or file:// source converted to Markdown, without indexing (src/tools/FetchUrlTool.ts:47-146). No tool returns a stored page. (3) No standalone converter tool exists: document-to-Markdown conversion (PDF, docx/xlsx/pptx, doc/xls/ppt, ODF, RTF, EPUB, FB2, ipynb via @xberg-io/xberg; HTML via the HTML pipeline) is built into ingestion, and `fetch_url`/`fetch-url` exposes it one-shot as Markdown text (no JSON output). No OCR/scan option is configured or mentioned anywhere; image/video/audio/font types are skipped (src/scraper/pipelines/DocumentPipeline.ts:105-109; src/utils/mimeTypeUtils.ts:390-430).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Fetches official docs from websites, GitHub, npm, PyPI and local files so the AI can query the exact version in use.",
+          "citation": "README.md:3"
+        },
+        {
+          "claim": "Private & Local: 'Runs entirely on your machine; your code never leaves your network.'",
+          "citation": "README.md:14"
+        },
+        {
+          "claim": "Multiple sources: index websites, GitHub repositories, local folders and zip archives.",
+          "citation": "README.md:16"
+        },
+        {
+          "claim": "Rich file support: HTML, Markdown, PDF, Office (Word, Excel, PowerPoint), OpenDocument, RTF, EPUB, Jupyter Notebooks and '90+ source code languages'.",
+          "citation": "README.md:17"
+        },
+        {
+          "claim": "Supported-formats table: Documents (PDF, .docx/.doc, .xlsx/.xls, .pptx/.ppt, .odt/.ods/.odp, RTF, EPUB, FictionBook, Jupyter), Archives (ZIP, TAR, tar.gz extracted and processed individually), Markup (Markdown, MDX, reStructuredText, AsciiDoc, Org Mode, Textile, R Markdown).",
+          "citation": "README.md:21-33"
+        },
+        {
+          "claim": "CLI first: `scrape <library> <url>` indexes, `search <library> 'query' --output yaml` queries, `fetch-url <url>` returns a single page as Markdown; requires Node.js 22+.",
+          "citation": "README.md:39-65"
+        },
+        {
+          "claim": "Structured commands default to JSON on stdout in non-interactive runs; --output json|yaml|toon; diagnostics kept off stdout; --quiet/--verbose.",
+          "citation": "README.md:67-73"
+        },
+        {
+          "claim": "Agent Skills in skills/ teach AI coding assistants to use the CLI (documentation search, index management, URL fetching).",
+          "citation": "README.md:75-77"
+        },
+        {
+          "claim": "MCP server: `npx @arabold/docs-mcp-server@latest`, web UI on http://localhost:6280, client config type sse with url http://localhost:6280/sse; `scrape_docs` accepts preserveHashes.",
+          "citation": "README.md:79-107"
+        },
+        {
+          "claim": "Docker alternative: ghcr.io/arabold/docs-mcp-server:latest with /data and /config volumes on port 6280.",
+          "citation": "README.md:109-121"
+        },
+        {
+          "claim": "Embedding model is optional but 'dramatically improves search quality by enabling semantic vector search'; OpenAI example, Ollama/Gemini/Azure and others documented.",
+          "citation": "README.md:123-133"
+        },
+        {
+          "claim": "Web scrapes probe llms.txt and send 'Accept: text/markdown, text/html;q=0.9, */*;q=0.8'; automatic, no configuration needed.",
+          "citation": "README.md:153-156"
+        },
+        {
+          "claim": "Search Quality Benchmark measures retrieval with IR metrics plus LLM-judged scores; Telemetry described as 'privacy-first usage data collection'.",
+          "citation": "README.md:146,162"
+        },
+        {
+          "claim": "Licensed under the MIT License.",
+          "citation": "README.md:171-173"
+        }
+      ],
+      "install": [
+        {
+          "method": "npx, CLI (Node.js 22+; same commands on Linux and macOS)",
+          "command": "npx @arabold/docs-mcp-server@latest scrape react https://react.dev/reference/react",
+          "citation": "README.md:43-47"
+        },
+        {
+          "method": "npx, MCP server + web UI on :6280 (stdio automatically when no TTY)",
+          "command": "npx @arabold/docs-mcp-server@latest",
+          "citation": "README.md:83-87; docs/setup/installation.md:9-19; src/cli/utils.ts:111-118"
+        },
+        {
+          "method": "Docker (ghcr.io image, linux/amd64 + linux/arm64)",
+          "command": "docker run --rm -v docs-mcp-data:/data -v docs-mcp-config:/config -p 6280:6280 ghcr.io/arabold/docs-mcp-server:latest --protocol http --host 0.0.0.0 --port 6280",
+          "citation": "README.md:109-121; .github/workflows/release.yml:192"
+        },
+        {
+          "method": "Docker Compose (worker + mcp + web; documented as three steps)",
+          "command": "git clone https://github.com/arabold/docs-mcp-server.git && cd docs-mcp-server && export OPENAI_API_KEY=\"your-key-here\" && docker compose up -d",
+          "citation": "docs/setup/installation.md:137-158; docker-compose.yml:8-114"
+        },
+        {
+          "method": "Claude Code MCP registration (stdio via npx)",
+          "command": "claude mcp add docs-mcp-server -- npx -y @arabold/docs-mcp-server@latest",
+          "citation": "docs/guides/mcp-clients.md:184-191"
+        },
+        {
+          "method": "Agent Skills (copy skill folders from the GitHub repo; no install command documented)",
+          "command": "copy skills/docs-search, skills/docs-manage and skills/fetch-url into the agent's skills directory",
+          "citation": "docs/setup/installation.md:127-133; README.md:75-77"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes — Docker image built for linux/amd64 (.github/workflows/release.yml:192); CI runs on ubuntu-latest with Node 22.x (.github/workflows/ci.yml:12,34,57,77); Xberg ships linux-x64 gnu and musl prebuilds (package-lock.json:5541-5572); Docker base is node:22-trixie-slim (Dockerfile:2) and the Linux gnu Xberg binary needs a recent glibc (GLIBC_2.38 error pinned in src/scraper/pipelines/DocumentPipeline.test.ts:464-492; CHANGELOG.md:205).",
+        "wsl2": "unknown — WSL/WSL2 is not mentioned in the README, docs or code (repo searched); it would take the Linux path but is neither documented nor CI-tested.",
+        "macos_arm64": "yes — macOS paths are documented (docs/setup/configuration.md:9; docs/concepts/data-storage.md:202; .env.example:51), Xberg has a darwin-arm64 prebuild (package-lock.json:5493-5508) and the Docker image is built for arm64 ('Mac Silicon', release.yml:192); CI does not run on macOS (ci.yml uses ubuntu-latest only) and the lockfile lists no darwin-x64 Xberg prebuild (package-lock.json:5484-5491).",
+        "gpu": "no — no GPU use or requirement anywhere in the repo; embeddings come from remote APIs or an external OpenAI-compatible server such as Ollama or LM Studio (docs/guides/embedding-models.md:59-79), which may use a GPU outside this project."
+      },
+      "integrations": {
+        "cli": "yes — `docs-mcp-server` yargs CLI (package.json:6-8; src/cli/index.ts:168-180): default/server, mcp, web, worker, scrape, refresh, search, list, find-version, remove, fetch-url, compact, config. `search <library> <query> [--version X|range] [--limit 1-100, default 5] [--exact-match]` prints an array of {url, contentUrl, content, score, mimeType, sourceMimeType} as JSON (default), YAML or TOON (src/cli/commands/search.ts:13-109; src/cli/output.ts:19-43; src/store/types.ts:86-102). `fetch-url <url>` prints Markdown text only (src/cli/commands/fetchUrl.ts:14-81). Every invocation first runs the Playwright Chromium check (src/index.ts:16).",
+        "mcp": "yes — stdio (src/mcp/startStdioServer.ts:14-28); SSE GET /sse + POST /messages and Streamable HTTP POST /mcp (stateless; GET returns 405) (src/services/mcpService.ts:54-196). Tools (src/mcp/mcpServer.ts): scrape_docs:97, refresh_version:206, search_docs:257, list_libraries:320, find_version:354, list_jobs:396, get_job_info:441, cancel_job:474, remove_docs:504, fetch_url:542; resources docs://libraries, docs://libraries/{library}/versions, docs://jobs, docs://jobs/{jobId} (:577-722). `search_docs` takes library, version (exact or X-range), query, limit (default 5), always uses non-exact version matching and returns plain text blocks 'Result N: <url>' + content without score or mime type (:257-316). No tool or resource returns a stored page or original body. `--read-only` (or DOCS_MCP_READ_ONLY) removes scrape_docs, refresh_version, list_jobs, get_job_info, cancel_job, remove_docs and the job resources (:95,394,621). Optional OAuth2/OIDC on /mcp and /sse (docs/infrastructure/authentication.md:5-19). Smithery install is documented (docs/guides/mcp-clients.md:284-289).",
+        "sdk_or_api": "No SDK or library entry: package.json declares `bin` only, no main/exports/types (package.json:1-22). HTTP API: tRPC (superjson) router at /api over HTTP plus WebSocket subscriptions, enabled in the default unified command and in worker mode but not in `mcp` HTTP mode (src/services/trpcService.ts:28-82; src/cli/commands/default.ts:186-191; src/cli/commands/mcp.ts:199-205). Procedures include search, listLibraries, removeVersion, removeAllDocuments, compact, listVersionChunks (stored chunks, used by the admin UI), enqueueScrapeJob, getJobs (src/store/trpc/router.ts:40-355; src/pipeline/trpc/router.ts:67-153). Documented as internal worker/coordinator and web-UI plumbing and not protected by OAuth (docs/infrastructure/authentication.md:11); no OpenAPI/REST reference found.",
+        "claude_code_or_codex": "Claude Code: yes — `claude mcp add docs-mcp-server -- npx -y @arabold/docs-mcp-server@latest` (docs/guides/mcp-clients.md:184-191) plus Agent Skills docs-search, docs-manage and fetch-url under skills/ (skills/docs-search/SKILL.md; docs/setup/installation.md:127-133; docs/guides/basic-usage.md:106-122); skills are not in the npm `files` list (package.json:15-22), so they must be copied from GitHub. Codex: none found (no Codex mention in docs or code). The .claude/, .agents/, .github/prompts and openspec/ files are the maintainers' own OpenSpec development workflow, not an integration."
+      },
+      "telemetry_and_network": "TELEMETRY: on by default (src/utils/config.ts:81; src/telemetry/TelemetryConfig.ts:13). Events (app_started/shutdown, cli_command, tool_used, pipeline_job_*, captured exceptions with stack traces) go to PostHog at https://app.posthog.com via posthog-node (src/telemetry/postHogClient.ts:92,121-126; src/telemetry/telemetry.ts:18-26) only when the build embedded a key (vite.config.ts:29; telemetry.ts:45,54-55). The release workflow injects secrets.POSTHOG_API_KEY into the npm build and the Docker build (.github/workflows/release.yml:73-74,193-194; Dockerfile:17-19), so published artifacts can transmit; a source build without the variable sends nothing (.env.example:11-14). A persistent UUID in <store>/installation.id is the distinct id (TelemetryConfig.ts:41-70); geoip disabled (postHogClient.ts:99). Opt-out: --no-telemetry (src/cli/index.ts:63-71), DOCS_MCP_TELEMETRY=false (src/utils/config.ts:444), app.telemetryEnabled: false (docs/infrastructure/telemetry.md:271-281). Docs say no URLs, document content or search queries are collected (telemetry.md:9) but code sends the full search query from the CLI (src/cli/commands/search.ts:69-77), full URLs from CLI scrape/fetch-url (scrape.ts:165-181; fetchUrl.ts:50-56), the first 100 characters of the query from MCP search_docs (src/mcp/mcpServer.ts:281-288), library names, and unsanitized job error messages (src/telemetry/TelemetryService.ts:80-90); the sanitizer helpers are never called outside tests (src/telemetry/sanitizer.ts). OTHER NETWORK: crawling targets over HTTP or Playwright, with private/loopback ranges blocked by default and a file-access allowlist defaulting to $DOCUMENTS (docs/infrastructure/security.md:30-43,76-78; src/utils/config.ts:126-139); GitHub API (src/scraper/strategies/GitHubScraperStrategy.ts:382,428) with optional GITHUB_TOKEN/GH_TOKEN or `gh auth token` (src/scraper/strategies/github-auth.ts:12-14,54); npm/PyPI strategies (src/scraper/ScraperRegistry.ts:41-49); embedding providers: OpenAI by default model name, or Vertex, Gemini, Bedrock, Azure, or any OpenAI-compatible endpoint via OPENAI_API_BASE (src/store/embeddings/EmbeddingFactory.ts:113-276) — optional: without credentials the store logs a warning and runs FTS5-only (src/store/DocumentStore.ts:688-697), while with credentials every query is also sent to the provider (:2340-2343). Each CLI/MCP start runs `npm exec -y playwright install --no-shell --with-deps chromium` if no Chromium is found (src/cli/utils.ts:64-105; src/index.ts:16); PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 skips it. dotenv loads a .env from the working directory (src/index.ts:4). The web UI in the browser calls api.github.com for an update check (src/web/client/hooks/useUpdateCheck.ts:11-12) and tries https://{host}/favicon.ico per library (src/web/client/components/LibIcon.tsx:57). No account or hosted service is required to run it."
+    },
+    "code": {
+      "languages": [
+        "TypeScript (server, CLI, React TSX web client)",
+        "SQL (SQLite migrations, db/migrations 000-016)",
+        "YAML (GitHub workflows, config)",
+        "Shell and CommonJS (search-eval harness wrappers under tests/search-eval)"
+      ],
+      "entry_points": [
+        {
+          "path": "src/index.ts",
+          "what": "Process entry, built to dist/index.js and exposed as bin `docs-mcp-server` (package.json:6-8): loads dotenv, normalizes env vars, calls ensurePlaywrightBrowsersInstalled(), then runCli() (src/index.ts:4-22)."
+        },
+        {
+          "path": "src/cli/main.ts and src/cli/index.ts",
+          "what": "yargs program with global flags (--output, --quiet, --verbose, --store-path, --config, --no-telemetry) and command registration (src/cli/index.ts:46-180); SIGINT and cleanup handling in main.ts:30-113."
+        },
+        {
+          "path": "src/cli/commands/default.ts",
+          "what": "`$0` / `server`: unified mode — stdio MCP when no TTY, otherwise Fastify HTTP with MCP (/mcp, /sse), tRPC /api, embedded worker and web UI on :6280 (default.ts:93-213)."
+        },
+        {
+          "path": "src/cli/commands/mcp.ts",
+          "what": "MCP-only server over stdio or HTTP (web UI and /api disabled), optional --server-url external worker, --read-only, OAuth flags (mcp.ts:94-231)."
+        },
+        {
+          "path": "src/mcp/mcpServer.ts",
+          "what": "createMcpServerInstance registers the 10 MCP tools and 4 resources (mcpServer.ts:74-726); tool wiring in src/mcp/tools.ts:47-67; HTTP/SSE routes in src/services/mcpService.ts:31-218; stdio in src/mcp/startStdioServer.ts."
+        },
+        {
+          "path": "src/cli/commands/search.ts, scrape.ts, fetchUrl.ts",
+          "what": "CLI wrappers over SearchTool, ScrapeTool and FetchUrlTool in src/tools/ (same business logic the MCP tools call)."
+        },
+        {
+          "path": "src/cli/commands/worker.ts and web.ts",
+          "what": "Distributed mode: worker (pipeline + store + /api on :8080) and web coordinator using --server-url (docs/infrastructure/deployment-modes.md:32-52; docker-compose.yml:8-114)."
+        }
+      ],
+      "architecture": "Layered: interfaces (src/cli; src/mcp + src/services/mcpService.ts; React SPA in src/web/client served by src/app/AppServer.ts) -> shared business logic in src/tools (SearchTool, ScrapeTool, FetchUrlTool, RefreshVersionTool, RemoveTool, job tools) -> pipeline (src/pipeline: PipelineManager/Worker/Client, persisted job state; src/events EventBus; tRPC in src/services/trpcService.ts) -> scraper (src/scraper: strategies Web/LocalFile/GitHub/Npm/PyPi; fetchers Http/Browser(Playwright)/File/AutoDetect; content pipelines in src/scraper/pipelines in order Json, SourceCode, Document (@xberg-io/xberg -> Markdown), Html, Markdown, Text; include/exclude, scope and access-policy utilities) -> splitter (src/splitter: SemanticMarkdownSplitter + GreedySplitter, JSON/text/tree-sitter splitters) -> store (src/store: DocumentStore on better-sqlite3 with FTS5 `documents_fts` and sqlite-vec `documents_vec`; DocumentRetrieverService + assembly strategies; LangChain embedding providers in src/store/embeddings; 17 SQL migrations in db/migrations). Cross-cutting: Zod config loader src/utils/config.ts (defaults < config.yaml < env < CLI), OAuth2/JWT proxy src/auth, PostHog telemetry src/telemetry. Search path: SearchTool -> DocumentManagementService.searchStore (src/store/DocumentManagementService.ts:697-705) -> DocumentRetrieverService.search -> DocumentStore.findByContent: FTS5 (porter unicode61; bm25 weights 10/1/5/1 over content/title/url/path; query = exact phrase OR any term) plus sqlite-vec KNN when embeddings are active, fused by Reciprocal Rank Fusion (k=60, weights 1/1, FTS overfetch x2, vector x10), no lexical-only/vector-only switch (src/store/DocumentStore.ts:212-257,988-993,2312-2487; db/migrations/009-add-pages-table.sql:97-103; src/utils/config.ts:163-168). Hits are grouped per URL, clustered by sort_order distance <= 3, expanded with parent, 1 preceding sibling, 3 children and 2 subsequent siblings, and joined with blank lines (src/store/DocumentRetrieverService.ts:28-193; src/store/assembly/strategies/MarkdownAssemblyStrategy.ts:54-148; src/utils/config.ts:172-178). Chunk metadata holds only level/path/types, so results carry URL and mime types but no page numbers or offsets (src/store/types.ts:32-40,86-102). reStructuredText, AsciiDoc, Org and Textile are indexed as source-code text, not converted to Markdown (docs/concepts/supported-formats.md:165-178).",
+      "packaging_and_release": "npm package @arabold/docs-mcp-server v3.2.1 (tag f2938c4, CHANGELOG.md:1; .git/packed-refs:2), bin docs-mcp-server -> dist/index.js, files: dist, public, db, README.md, LICENSE, package.json (package.json:6-22), built with Vite (package.json:25; vite.config.ts:9-74). Release workflow .github/workflows/release.yml is workflow_dispatch only (:3-9) and does not run lint or tests: npm ci, build with POSTHOG_API_KEY and APP_VERSION (:71-76), semantic-release (commit-analyzer, notes, changelog, npm publish, git commit of package.json/CHANGELOG, GitHub release with no assets: .releaserc.json:1-35) using the NPM_TOKEN secret, or a manual `npm publish --access public` path (:86-93). `id-token: write` is commented out (:20), so no npm provenance is configured. docker_publish job builds multi-arch linux/amd64 + linux/arm64 and pushes ghcr.io/arabold/docs-mcp-server tags (version, major.minor, major, latest) (:130-194) plus a GitHub build-provenance attestation pushed to the registry (actions/attest-build-provenance@v4, :196-201). No checksums, cosign signatures, standalone binaries or release assets found; actions are pinned by tag, not commit SHA. Dockerfile runs as non-root `node` with /app root-owned and /data,/config volumes (Dockerfile:64-90).",
+      "tests_and_ci": "Vitest (vite.config.ts:75-101; package.json:33-43) with MSW, nock and memfs mocks. About 146 test files: 124 unit tests under src/ (*.test.ts), 20 e2e files under test/ (incl. mcp-stdio, mcp-http, cli, vector-search, local-file-pdf, docker-e2e; *-live-e2e excluded by default), 2 under tests/search-eval; roughly 2,700 describe/it/test calls (grep count). Real fixtures for pdf/docx/xlsx/pptx/ipynb in test/fixtures; Xberg is partly mocked in DocumentPipeline.test.ts:16. CI .github/workflows/ci.yml (push/PR to main, ubuntu-latest, Node 22.x only): lint (biome + tsc typecheck), test (installs Playwright Chromium, `npm test`), build, docker-test (builds image, runs test:docker incl. Xberg PDF extraction). .github/workflows/eval.yml: weekly (Mon 07:00 UTC) + manual search benchmark needing OpenAI/Anthropic/Google keys, not PR-gating. No macOS/Windows/WSL CI, no CodeQL/dependabot/renovate found. Husky pre-commit runs lint-staged (.husky/pre-commit:1); commits enforced by commitlint (CONTRIBUTING.md:41-53).",
+      "dependencies": "package.json: 63 direct dependencies (:51-115) and 37 devDependencies (:116-154); package-lock.json (npm). engines node >=22 (:155-157); overrides npm 10.9.3 (:158-160). Notable: better-sqlite3 and sqlite-vec (native), tree-sitter + js/python/ts grammars (native), @xberg-io/xberg ~1.0.14 (MIT; optional native prebuilds darwin-arm64, linux arm64/x64 gnu+musl, win32-x64: package-lock.json:5476-5588), playwright, @modelcontextprotocol/sdk ^1.29.0, langchain + @langchain/{openai,aws,google-genai,google-vertexai,core,textsplitters}, fastify 5, @trpc/*, react 19 + react-router + tanstack query, cheerio, jsdom, linkedom, turndown, remark/unified, defuddle, posthog-node, jose, zod 4, yargs 18, axios. Dockerfile notes npm 10 installs both glibc and musl native builds (~190 MB, over half Xberg) and prunes the musl ones (Dockerfile:27-33).",
+      "security_policy": "none — no SECURITY.md, CODEOWNERS, dependabot or renovate config found; docs/infrastructure/security.md is a deployment-hardening guide (trust boundaries, outbound network and file-access policy), not a vulnerability-reporting policy."
+    },
+    "claim_checks": [
+      {
+        "claim": "Private & Local: runs entirely on your machine; your code never leaves your network (README.md:14)",
+        "verified": "partial",
+        "evidence": "Indexing/search storage is local SQLite (src/store/DocumentStore.ts:259-280), but telemetry defaults on (src/utils/config.ts:81; src/telemetry/TelemetryConfig.ts:13) and posts to https://app.posthog.com (src/telemetry/postHogClient.ts:92) in builds that embed a key, which the release workflow injects (.github/workflows/release.yml:73-74,193-194; vite.config.ts:29). The default embedding model text-embedding-3-small uses OpenAI whenever OPENAI_API_KEY is present, sending chunk text at index time and the query at every search (src/utils/config.ts:83; src/store/embeddings/EmbeddingFactory.ts:136-163; src/store/DocumentStore.ts:2340-2343). Crawling fetches remote sites, and the web UI browser calls api.github.com (src/web/client/hooks/useUpdateCheck.ts:11-12). Fully local use needs telemetry opted out and FTS-only or a local OpenAI-compatible embedder."
+      },
+      {
+        "claim": "Rich File Support: PDF, Word/Excel/PowerPoint, OpenDocument, RTF, EPUB, Jupyter and '90+ source code languages' (README.md:17)",
+        "verified": "partial",
+        "evidence": "Document formats confirmed: isSupportedDocument covers PDF, docx/xlsx/pptx, doc/xls/ppt, odt/ods/odp, RTF, EPUB, FB2, ipynb (src/utils/mimeTypeUtils.ts:390-400); DocumentPipeline calls Xberg extract() with Markdown output (src/scraper/pipelines/DocumentPipeline.ts:105-109) and is in the standard pipeline list (src/scraper/pipelines/PipelineFactory.ts:32-41). The '90+' figure is not supported: the language map has 77 distinct ids including markup/config/data formats (src/utils/mimeTypeUtils.ts:495-632) and the docs list about 74 (docs/concepts/supported-formats.md:103-207). Scanned or image-only inputs: no OCR option is passed or mentioned anywhere; image/video/audio/font types are skipped (src/utils/mimeTypeUtils.ts:421-430; src/scraper/strategies/LocalFileStrategy.ts:19-23,333-337)."
+      },
+      {
+        "claim": "Using an embedding model is optional but dramatically improves search quality (README.md:125)",
+        "verified": "partial",
+        "evidence": "Optional is confirmed: with no credentials the store warns and runs FTS5-only (src/store/DocumentStore.ts:688-697; FTS-only branch :2443-2487); with credentials it runs hybrid vector + FTS with RRF (:2340-2442; :212-221). 'Dramatically' is not measured: the only checked-in benchmark was recorded with text-embedding-3-small (tests/search-eval/baseline.json:5) and there is no FTS-only baseline. Hybrid always includes FTS; search has no vector-only or lexical-only switch (src/tools/SearchTool.ts:7-13)."
+      },
+      {
+        "claim": "Fetch a single page as Markdown with fetch-url (README.md:61-65)",
+        "verified": "yes",
+        "evidence": "src/cli/commands/fetchUrl.ts:14-81 and MCP fetch_url (src/mcp/mcpServer.ts:542-575) call FetchUrlTool, which fetches http(s) or file:// (file access subject to the policy: src/scraper/fetcher/FileFetcher.ts:18-38), runs the standard pipelines including DocumentPipeline for PDF/Office/EPUB, and returns textContent without indexing (src/tools/FetchUrlTool.ts:47-146). Markdown sources pass through unchanged (src/scraper/pipelines/MarkdownPipeline.ts:77-84). Output is Markdown text only, never JSON; the 10 MB document cap applies (src/scraper/pipelines/DocumentPipeline.ts:72-85)."
+      },
+      {
+        "claim": "MCP server reachable at http://localhost:6280/sse (README.md:79-102)",
+        "verified": "yes",
+        "evidence": "SSE route src/services/mcpService.ts:54-127, Streamable HTTP /mcp :153-196, stdio src/mcp/startStdioServer.ts:14-28; default bind host 127.0.0.1 and port 6280 (src/utils/config.ts:87-93; AppServer listen at src/app/AppServer.ts:153-156). The standalone `mcp` command serves MCP only, without web UI or /api (src/cli/commands/mcp.ts:199-205)."
+      },
+      {
+        "claim": "Telemetry is privacy-first and 'Never collects URLs, document content, search queries, or authentication tokens' (README.md:162 -> docs/infrastructure/telemetry.md:9)",
+        "verified": "no",
+        "evidence": "CLI `search` sends the full query (src/cli/commands/search.ts:69-77); CLI `scrape` and `fetch-url` send the full url (src/cli/commands/scrape.ts:165-181; src/cli/commands/fetchUrl.ts:50-56); MCP search_docs sends the first 100 characters of the query plus library/version (src/mcp/mcpServer.ts:281-288); job failures send job.error.message unsanitized (src/telemetry/TelemetryService.ts:80-90). The sanitizer helpers (extractHostname, analyzeSearchQuery, sanitizeErrorMessage) have no non-test call sites (src/telemetry/sanitizer.ts). Opt-out exists: --no-telemetry, DOCS_MCP_TELEMETRY=false (src/cli/index.ts:63-71; src/utils/config.ts:444). Code wins over the doc."
+      },
+      {
+        "claim": "Read-only mode 'Prevent modification of data (scraping/indexing)' (docs/setup/configuration.md:159; CLI help src/cli/commands/default.ts:67-73)",
+        "verified": "partial",
+        "evidence": "Enforced only by not registering MCP write/job tools and job resources (src/mcp/mcpServer.ts:95,394,621); config.app.readOnly is otherwise only surfaced as a status display (src/services/systemInfo.ts:82). The tRPC /api enabled in the default and worker modes has no read-only or auth check and exposes enqueueScrapeJob and removeAllDocuments (src/services/trpcService.ts:36-49; src/pipeline/trpc/router.ts:69-89; src/store/trpc/router.ts:121-135). CLI scrape/remove operate directly on the local store."
+      },
+      {
+        "claim": "MCP and CLI tools keep identical interfaces (ARCHITECTURE.md:320)",
+        "verified": "partial",
+        "evidence": "Both call the same SearchTool (src/tools/SearchTool.ts:42-129) but the surfaces differ: CLI search has --exact-match, --embedding-model, --server-url and emits structured results with score, mimeType, sourceMimeType, contentUrl (src/cli/commands/search.ts:30-58,109; src/store/types.ts:86-102); MCP search_docs fixes exactMatch=false and returns plain text blocks without score/mime/contentUrl (src/mcp/mcpServer.ts:290-312). CLI scrape/fetch-url accept --header, --scrape-mode, --clean, --max-concurrency that MCP scrape_docs and fetch_url do not expose (src/cli/commands/scrape.ts:51-129; src/mcp/mcpServer.ts:97-140,542-552)."
+      },
+      {
+        "claim": "Reference benchmark table comparing default Cheerio, Defuddle and Context7 (docs/guides/benchmarking.md:332-393)",
+        "verified": "partial",
+        "evidence": "The Cheerio column matches the checked-in baseline (MRR 0.747, Hit@5 0.881: tests/search-eval/baseline.json:36-46, recorded 2026-05-19). The Context7 column (MRR 0.733) is stale: tests/search-eval/baseline.context7.json, recorded 2026-09-20, has MRR 0.695 and Hit@1 0.559 and lists regressions against the earlier 0.733 baseline (baseline.context7.json:2,36-46,104-168). The dataset is status: draft with 59 queries over five web-doc libraries (tests/search-eval/dataset.yaml:17; baseline.json:10); every run is project-run with an LLM judge."
+      },
+      {
+        "claim": "Quick start `npx @arabold/docs-mcp-server@latest search ...` needs only Node.js 22+ (README.md:43-58)",
+        "verified": "partial",
+        "evidence": "Node >=22 matches engines (package.json:155-157), but AGENTS.md:38 and docs/guides/benchmarking.md:101-104 say to stay on Node 22 because better-sqlite3 is ABI-pinned (tests/search-eval/README.md:137-138: preflight fails on Node 24+). Not in the README: every invocation, including `search` and `list`, first runs ensurePlaywrightBrowsersInstalled(), which executes `npm exec -y playwright install --no-shell --with-deps chromium` when no Chromium is found and exits 1 on failure (src/index.ts:16; src/cli/utils.ts:64-105); PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 skips it (src/cli/utils.ts:65-70; Dockerfile:45-46)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Hybrid search retrieval quality, project 'local' provider (SearchTool, top_k=5), on the project's 59-query draft dataset over 5 web-doc libraries (react, python, fastapi, vite, tailwindcss); text-embedding-3-small; recorded 2026-05-19",
+        "metric": "MRR / Recall@3 / Recall@5 / nDCG@5 / Hit@1 / Hit@3 / Hit@5",
+        "value": "0.747 / 0.647 / 0.732 / 0.699 / 0.678 / 0.831 / 0.881",
+        "source": "tests/search-eval/baseline.json:2-46; docs/guides/benchmarking.md:341-362",
+        "independent": false
+      },
+      {
+        "what": "Same run: LLM-judged scores (judge openai:gpt-5.4-mini, temperature 0) and deterministic structural pass rates",
+        "metric": "chunk_coherence / content_faithfulness / answerability means (1-5); code_block_balance / non_empty_content / url_presence pass rates",
+        "value": "3.53 / 3.20 / 4.49; 1.00 / 1.00 / 1.00",
+        "source": "tests/search-eval/baseline.json:81-102",
+        "independent": false
+      },
+      {
+        "what": "Context7 (third-party hosted service) run through the same project harness and dataset, recorded 2026-09-20 (checked-in file); docs table still lists an older MRR of 0.733",
+        "metric": "MRR / Recall@3 / Recall@5 / nDCG@5 / Hit@1 / Hit@3 / Hit@5; chunk_coherence",
+        "value": "0.695 / 0.695 / 0.729 / 0.673 / 0.559 / 0.831 / 0.864; 4.83",
+        "source": "tests/search-eval/baseline.context7.json:2-46,86-91; docs/guides/benchmarking.md:341-362",
+        "independent": false
+      },
+      {
+        "what": "HTML extractor comparison on the same dataset: Defuddle vs default Cheerio (5 libraries, 1,155 pages re-indexed 2026-05-18)",
+        "metric": "MRR / Recall@5 / Hit@5",
+        "value": "Defuddle 0.718 / 0.689 / 0.814 vs Cheerio 0.747 / 0.732 / 0.881",
+        "source": "docs/guides/benchmarking.md:341-353,372-384",
+        "independent": false
+      },
+      {
+        "what": "Crawl efficiency of unprocessable-content filtering on the reference crawl for issue #490",
+        "metric": "HTTP requests; discarded image download volume; documents indexed",
+        "value": "2158 -> 1013 requests; ~265 MB of image downloads avoided; same 806 documents indexed",
+        "source": "ARCHITECTURE.md:286",
+        "independent": false
+      },
+      {
+        "what": "Benchmark-harness latency: each query cold-starts a vite-node process and re-initialises the store (not steady-state search latency)",
+        "metric": "seconds per query; duration of a full 60-query run",
+        "value": "~10-15 s per query; ~10-15 min per run",
+        "source": "docs/guides/benchmarking.md:211-217",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Privacy/egress differs from README.md:14: telemetry is on by default (src/utils/config.ts:81) and release builds receive a PostHog key (.github/workflows/release.yml:73-74,193-194); the CLI sends raw search queries and URLs (src/cli/commands/search.ts:69-77; scrape.ts:165-181), contradicting docs/infrastructure/telemetry.md:9, and the sanitizer helpers are unused (src/telemetry/sanitizer.ts). An OPENAI_API_KEY in the environment or a .env in the working directory (loaded at src/index.ts:4) silently activates OpenAI embeddings of all chunks and every query (src/utils/config.ts:83; src/store/DocumentStore.ts:2340-2343), and there is no query-time FTS fallback if the embedding call fails (src/store/DocumentStore.ts:2488-2493).",
+      "No index-backed original-body read-back: the store keeps chunks and page metadata only (db/migrations/009-add-pages-table.sql:7-36). Markdown is re-serialized via remark -> HTML -> Turndown, frontmatter becomes its own chunk, horizontal rules are dropped and heading anchors stripped (src/splitter/SemanticMarkdownSplitter.ts:19-43,137-199,360-362), so chunk text is not byte-identical to the source; results are context-expanded groups (src/store/DocumentRetrieverService.ts:101-145), carry no page numbers or offsets (src/store/types.ts:32-40,86-102), and MCP output omits score/mime/contentUrl (src/mcp/mcpServer.ts:299-312). The only read-back is a live `fetch_url` of the source (it may differ from what was indexed or be gone; limited by the file/network policy) or the unauthenticated tRPC listVersionChunks (src/store/trpc/router.ts:274).",
+      "Exposure and auth: OAuth2 covers only /mcp and /sse, and POST /messages has no auth preHandler (src/services/mcpService.ts:129-151); the tRPC /api (search, enqueueScrapeJob, removeAllDocuments, compact) is unauthenticated by design (docs/infrastructure/authentication.md:11; src/services/trpcService.ts:36-49) and is on in the default command (src/cli/commands/default.ts:186-191); --read-only only hides MCP write tools. The README Docker command, Dockerfile and compose bind 0.0.0.0 and publish ports (README.md:113-119; Dockerfile:80-81; docker-compose.yml:15-19,59-60,94-95). No Origin/Host validation or CORS handling found in src/app, src/services or src/mcp (grep). `fetch_url` lets an MCP client trigger outbound requests and read files under the allowed roots, default $DOCUMENTS (src/tools/FetchUrlTool.ts:40-46; docs/infrastructure/security.md:76-78).",
+      "Startup side effect: every CLI or MCP start may run `npm exec -y playwright install --no-shell --with-deps chromium` (network download; Playwright's --with-deps installs OS packages, which on Linux normally needs elevated rights) and calls process.exit(1) if that fails, even for read-only `search`/`list` (src/index.ts:16; src/cli/utils.ts:64-105). The README does not mention it; offline or sandboxed hosts must set PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 or a Chromium path. A first-run download could also delay an MCP client's stdio startup (inference).",
+      "Ingestion controls that silently drop content: default exclude patterns (CHANGELOG.md, LICENSE*, CODE_OF_CONDUCT.md, *.test.*, **/archive|old|legacy|test|tests|spec|build|dist|out/**, *.conf/ini/cfg/log, i18n locales) apply unless the caller passes its own excludes (src/scraper/utils/defaultPatterns.ts:11-140); for file:// URLs they are matched against the absolute pathname, so a collection under an ancestor directory with such a name would match (inferred from src/scraper/utils/patternMatcher.ts:146-185; not run). Defaults maxDepth 3 and maxPages 1000 also bound local directory trees, where each directory level counts as depth (src/utils/config.ts:103-104; src/scraper/strategies/BaseScraperStrategy.ts:639-640; inferred), and file access allows only $DOCUMENTS, which resolves to nothing on hosts without ~/Documents (docs/setup/configuration.md:241-262). Re-scraping defaults to clean=true, replacing the version's content (src/cli/commands/scrape.ts:125-129).",
+      "Document conversion rests on @xberg-io/xberg ~1.0.14 prebuilt native binaries (extraction was switched from Kreuzberg to Xberg in v2.5.0: CHANGELOG.md:96,205); glibc-sensitive on Linux (GLIBC_2.38 error pinned in src/scraper/pipelines/DocumentPipeline.test.ts:464-492), no darwin-x64 build (package-lock.json:5484-5491), 10 MB default size cap (src/utils/config.ts:124). Nothing in the repo configures or tests OCR, scanned PDFs or complex layouts: fixtures are small samples and Xberg is partly mocked in unit tests (src/scraper/pipelines/DocumentPipeline.test.ts:16; test/fixtures/), and no conversion-quality benchmark exists.",
+      "Platform/runtime constraints: Node 22 in practice because better-sqlite3 ships a Node-ABI-pinned binary (AGENTS.md:38; docs/guides/benchmarking.md:101-104); CI runs only on ubuntu-latest with Node 22 (.github/workflows/ci.yml:12,34,57,77); WSL2 is undocumented and macOS is not CI-tested; native modules (better-sqlite3, sqlite-vec, tree-sitter, Xberg) must be installable on the host, and the Docker image needs Chromium from apt (Dockerfile:45-52).",
+      "Maintenance and provenance: CONTRIBUTING.md:16 says most code was generated by an AI assistant; docs drift from code (ARCHITECTURE.md:29,305-309 still describe an HTMX/Alpine UI and line 44 links a missing docs/concepts/configuration.md; docs/setup/configuration.md:199 gives fetcher.maxRetries 6 vs 3 in src/utils/config.ts:113; docs/infrastructure/deployment-modes.md:93-97 says the standalone server recovers jobs by default but --resume defaults false at src/cli/commands/default.ts:62-66,162; the MCP server reports a hard-coded version 0.1.0 at src/mcp/mcpServer.ts:81-82). CHANGELOG has no v3.0.0 entry (CHANGELOG.md:77-84) amid fast releases (v2.5.0 on 2026-08-06 to v3.2.1 on 2026-09-27); 3.2.0 changed index text normalization and version-label handling (CHANGELOG.md:35-47). No SECURITY.md, npm provenance or artifact signatures (release.yml:20); the only benchmarks are self-run on a draft 59-query web-docs dataset with an LLM judge."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "arabold/docs-mcp-server",
+      "checks": [
+        {
+          "field": "readme.install[1] (npx, MCP server + web UI on :6280, stdio automatically when no TTY)",
+          "statement": "`npx @arabold/docs-mcp-server@latest` starts the MCP server plus web UI on :6280, switching to stdio automatically when there is no TTY.",
+          "citation": "README.md:83-87; docs/setup/installation.md:9-19; src/cli/utils.ts:111-118",
+          "holds": true,
+          "note": "README.md:86 and installation.md:14 give the exact command. installation.md:17 and README.md:89 put the web UI at http://localhost:6280. utils.ts:111-118: resolveProtocol('auto') returns 'stdio' when neither stdin nor stdout is a TTY, otherwise 'http'. Also confirmed: the default command's --protocol defaults to 'auto' (src/cli/commands/default.ts:36-41). The stdio branch starts only MCP (:171-183). The http branch enables the web UI, MCP, /api and the worker on ports.default (:184-197), which is 6280 on host 127.0.0.1 (src/utils/config.ts:87-92)."
+        },
+        {
+          "field": "license",
+          "statement": "License is MIT (SPDX MIT), file LICENSE; README states the project is licensed under the MIT License.",
+          "citation": "LICENSE:1-21; README.md:171-173",
+          "holds": true,
+          "note": "LICENSE is the standard MIT text ('MIT License', Copyright (c) 2025 Andre Rabold). README.md:173 says MIT and package.json:9 declares \"license\": \"MIT\"."
+        },
+        {
+          "field": "platforms.macos_arm64",
+          "statement": "yes — macOS paths documented; Xberg has a darwin-arm64 prebuild; Docker image built for arm64 ('Mac Silicon'); CI does not run on macOS; lockfile lists no darwin-x64 Xberg prebuild.",
+          "citation": "docs/setup/configuration.md:9; docs/concepts/data-storage.md:202; .env.example:51; package-lock.json:5484-5508; .github/workflows/release.yml:192; .github/workflows/ci.yml:12,34,57,77",
+          "holds": true,
+          "note": "Every citation matches. configuration.md:9, data-storage.md:202 and .env.example:51 all give macOS paths. package-lock.json:5493-5508 is @xberg-io/xberg-darwin-arm64 (os darwin, cpu arm64). The optionalDependencies at :5484-5491 list darwin-arm64, linux arm64/x64 gnu+musl and win32-x64, with no darwin-x64. release.yml:192 reads 'platforms: linux/amd64,linux/arm64 # Build for both x86_64 and arm64 (Mac Silicon)'. All four ci.yml jobs use runs-on: ubuntu-latest. Nothing else contradicts the 'yes': sqlite-vec also ships a darwin-arm64 package (package-lock.json:18880). The arm64 image is a Linux image, and the dossier does not claim otherwise."
+        },
+        {
+          "field": "integrations.mcp",
+          "statement": "MCP over stdio, SSE (GET /sse + POST /messages) and stateless Streamable HTTP POST /mcp (GET 405); ten tools at the stated lines and four resources; search_docs takes library/version/query/limit (default 5), always non-exact, returns plain 'Result N: <url>' + content; --read-only/DOCS_MCP_READ_ONLY removes write/job tools and job resources; optional OAuth on /mcp and /sse; Smithery install documented.",
+          "citation": "src/mcp/startStdioServer.ts:14-28; src/services/mcpService.ts:54-196; src/mcp/mcpServer.ts:95-722; docs/infrastructure/authentication.md:5-19; docs/guides/mcp-clients.md:284-289",
+          "holds": true,
+          "note": "Transports: StdioServerTransport (startStdioServer.ts:22); GET /sse (mcpService.ts:55-127); POST /messages (:130-151); POST /mcp with sessionIdGenerator undefined (:154-187); GET /mcp returns 405 (:189-196). All ten server.tool line numbers are exact (97, 206, 257, 320, 354, 396, 441, 474, 504, 542). Resource URIs sit at :579, :597, :629 and :676. search_docs: limit defaults to 5 (:272), exactMatch is always false (:296), and output is 'Result N: url' + content with no score or mime (:299-305). The !readOnly guards are at :95, :394 and :621, and DOCS_MCP_READ_ONLY maps to app.readOnly (src/utils/config.ts:445). authentication.md:11 limits OAuth to /mcp and /sse. mcp-clients.md:284-289 is the Smithery install."
+        },
+        {
+          "field": "claim_checks[5] (Telemetry privacy-first / never collects URLs or queries — verified: no)",
+          "statement": "Docs say telemetry never collects URLs, document content, search queries or auth tokens, but code sends full CLI search queries and URLs, the first 100 chars of MCP queries and unsanitized job error messages; sanitizer helpers have no non-test call sites; opt-out via --no-telemetry or DOCS_MCP_TELEMETRY=false.",
+          "citation": "README.md:162; docs/infrastructure/telemetry.md:9; src/cli/commands/search.ts:69-77; src/cli/commands/scrape.ts:165-181; src/cli/commands/fetchUrl.ts:50-56; src/mcp/mcpServer.ts:281-288; src/telemetry/TelemetryService.ts:80-90; src/telemetry/sanitizer.ts; src/cli/index.ts:63-71; src/utils/config.ts:444",
+          "holds": true,
+          "note": "telemetry.md:9 makes the 'never collects' promise. The code sends: search.ts:73 query: argv.query; scrape.ts:169 url, the raw argv.url from :143; fetchUrl.ts:52 url: argv.url; mcpServer.ts:286 query.substring(0, 100); TelemetryService.ts:89 errorMessage: job.error?.message. Nothing on the send path cleans these values: telemetry.ts:96-106 and postHogClient.ts:139-153 only merge context and rename keys to snake_case before posthog capture. extractHostname and analyzeSearchQuery are called only in sanitizer.test.ts. sanitizeErrorMessage is called once, at sanitizer.ts:91, inside sanitizeError, which only tests call. So 'no non-test call sites' is slightly loose wording, but none of these helpers ever runs in production. Opt-out: the --telemetry boolean (cli/index.ts:63-71) feeds initTelemetry at :106-118, and DOCS_MCP_TELEMETRY maps at config.ts:444."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

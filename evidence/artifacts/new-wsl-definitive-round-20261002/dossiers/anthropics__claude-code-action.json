@@ -1,0 +1,289 @@
+{
+  "contender": "anthropics/claude-code-action",
+  "revision": {
+    "contender": "anthropics/claude-code-action",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "anthropics/claude-code-action",
+        "tag": "v1",
+        "commit": "97c53473391bff1901034d4b454b5bac7ab7a029",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v1",
+    "commit": "97c53473391bff1901034d4b454b5bac7ab7a029",
+    "read_at": "2026-10-02T03:01:54+00:00"
+  },
+  "dossier": {
+    "contender": "anthropics/claude-code-action",
+    "revision": {
+      "tag": "v1",
+      "commit": "97c53473391bff1901034d4b454b5bac7ab7a029",
+      "read_at": "2026-10-01"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Composite GitHub Action (TypeScript run directly by Bun; action.yml:189-190) that runs Claude Code on a GitHub Actions runner in response to GitHub events. Tag mode answers @claude mentions, issue assignment or label triggers by updating one tracking comment, optionally pushing commits to a claude/ branch and linking a pre-filled PR page. Agent mode runs an explicit `prompt` on any supported event (for example PR review with inline comments, or scheduled tasks) (src/modes/detector.ts:14-81; docs/capabilities-and-limitations.md:3-14). The repo also ships a standalone base-action/ (mirrored to anthropics/claude-code-base-action) and a separate Python agent-approval-check/ sub-action that sets an `agent-approval-check` commit status requiring N human approvals on PRs containing agent-authored commits (agent-approval-check/README.md:3-31). Facts relevant to the stated needs: it is GitHub-side automation (runs on Actions runners), not a host-side tool; it has no git-worktree management; it has no structural, syntax-aware or entity-level diff tooling (diffs are plain git diff); PR, review, comment and CI operations are as detailed in claim_checks.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "General-purpose Claude Code action for GitHub PRs and issues that can answer questions and implement code changes; detects when to activate from workflow context (@claude mentions, issue assignments, or explicit-prompt automation).",
+          "citation": "README.md:5"
+        },
+        {
+          "claim": "Supports Anthropic direct API (API key or workload identity federation), Amazon Bedrock, Google Vertex AI and Microsoft Foundry authentication.",
+          "citation": "README.md:5"
+        },
+        {
+          "claim": "Intelligent Mode Detection: automatically selects the execution mode from workflow context, no configuration needed.",
+          "citation": "README.md:9"
+        },
+        {
+          "claim": "Code Review: analyzes PR changes and suggests improvements. Code Implementation: can implement simple fixes, refactoring and even new features.",
+          "citation": "README.md:11-12"
+        },
+        {
+          "claim": "PR/Issue Integration: works with GitHub comments and PR reviews.",
+          "citation": "README.md:13"
+        },
+        {
+          "claim": "Flexible Tool Access: access to GitHub APIs and file operations; additional tools can be enabled via configuration.",
+          "citation": "README.md:14"
+        },
+        {
+          "claim": "Progress Tracking: visual progress indicators with checkboxes that update as Claude completes tasks.",
+          "citation": "README.md:15"
+        },
+        {
+          "claim": "Structured Outputs: validated JSON results that automatically become GitHub Action outputs.",
+          "citation": "README.md:16"
+        },
+        {
+          "claim": "Runs on Your Infrastructure: the action executes entirely on your own GitHub runner (Anthropic API calls go to your chosen provider).",
+          "citation": "README.md:17"
+        },
+        {
+          "claim": "Unified `prompt` and `claude_args` inputs aligned with the Claude Code SDK.",
+          "citation": "README.md:18"
+        },
+        {
+          "claim": "Quickstart: open `claude` and run `/install-github-app`; requires repo admin; only for direct Anthropic API users (Bedrock/Vertex/Foundry setup is in docs/cloud-providers.md).",
+          "citation": "README.md:26-33"
+        },
+        {
+          "claim": "Solutions Guide lists patterns: automatic PR code review, path-specific reviews, external-contributor reviews, custom review checklists, scheduled maintenance, issue triage/labeling, documentation sync, security-focused reviews.",
+          "citation": "README.md:37-47"
+        },
+        {
+          "claim": "Docs index describes docs/experimental.md as covering 'Execution modes and network restrictions'.",
+          "citation": "README.md:59"
+        },
+        {
+          "claim": "Licensed under the MIT License.",
+          "citation": "README.md:71"
+        }
+      ],
+      "install": [
+        {
+          "method": "GitHub Actions workflow step (the documented way to use it; nothing is installed on a host)",
+          "command": "- uses: anthropics/claude-code-action@v1  (with: anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }})",
+          "citation": "docs/usage.md:21-23"
+        },
+        {
+          "method": "Guided setup from a Claude Code terminal session (direct Anthropic API users only; repo admin required)",
+          "command": "claude   then   /install-github-app",
+          "citation": "README.md:26-33"
+        },
+        {
+          "method": "Manual setup",
+          "command": "Install the Claude GitHub app (https://github.com/apps/claude); add repo secret ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN; copy examples/claude.yml into .github/workflows/",
+          "citation": "docs/setup.md:5-11"
+        },
+        {
+          "method": "Standalone lower-level base action (mirror repo)",
+          "command": "- uses: anthropics/claude-code-base-action@beta",
+          "citation": "base-action/README.md:22"
+        },
+        {
+          "method": "PR approval-gate sub-action (Python; no Claude call)",
+          "command": "- uses: anthropics/claude-code-action/agent-approval-check@main",
+          "citation": "agent-approval-check/README.md:61"
+        },
+        {
+          "method": "Local development only",
+          "command": "bun install ; bun test",
+          "citation": "CONTRIBUTING.md:23-25,38"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - the documented runner is `ubuntu-latest` (docs/usage.md:19) and all repo CI runs on ubuntu-latest or ubuntu-24.04-firewall (.github/workflows/ci.yml:9, claude.yml:22); bun.lock:50 carries @anthropic-ai/claude-agent-sdk-linux-x64. CPU architecture is not stated in the docs.",
+        "wsl2": "unknown - WSL is not mentioned in README, docs or code; the action targets GitHub Actions runners (composite steps with `shell: bash`, action.yml:278).",
+        "macos_arm64": "unknown - not documented and not exercised by CI (every workflow runs on Linux). Hints only: bun.lock:42 lists @anthropic-ai/claude-agent-sdk-darwin-arm64@0.3.287 and some steps are gated on `runner.os != 'Windows'` (action.yml:269).",
+        "gpu": "no - not used; no GPU/CUDA references in the repo, inference is a remote model API call (README.md:5)."
+      },
+      "integrations": {
+        "cli": "No CLI is shipped. The action drives the Claude Code CLI (v2.1.287 installed via the claude.ai install script, src/entrypoints/run.ts:52-53,80) through the Agent SDK. The README quickstart relies on Claude Code's `/install-github-app` slash command (README.md:26), which is implemented outside this repo (not checkable).",
+        "mcp": "Launches stdio MCP servers for the Claude session: github_comment, github_inline_comment, github_ci (Actions runs/logs) and github_file_ops (API commits), wired in src/mcp/install-mcp-server.ts:107-211 from src/mcp/*.ts. An optional Docker-based GitHub MCP server (ghcr.io/github/github-mcp-server:sha-23fa0dd) is added only when mcp__github__* tools are allowed (install-mcp-server.ts:213-231). Users add their own servers via --mcp-config (docs/configuration.md:3-108). These are not exposed as a standalone MCP server for outside hosts.",
+        "sdk_or_api": "No SDK or HTTP API of its own. The interface is GitHub Actions inputs/outputs (action.yml:7-187; outputs conclusion, execution_file, branch_name, github_token, structured_output, session_id). Internally it uses @anthropic-ai/claude-agent-sdk query() (base-action/src/run-claude-sdk.ts:4,190) and Octokit REST/GraphQL (src/github/api/client.ts:10-23).",
+        "claude_code_or_codex": "Claude Code: yes - built on the Claude Code CLI and Agent SDK; honours repo .claude/ config (restored from the PR base branch on PRs, src/github/operations/restore-config.ts:26-35), the `settings` input, `claude_args` passthrough (docs/usage.md:67), plugins and plugin_marketplaces inputs (action.yml:160-167; base-action/src/install-plugins.ts:212-243) and slash commands in prompts (.github/workflows/claude-review.yml:34). Codex: none found (grep for codex/openai in the repo found only unrelated test text)."
+      },
+      "telemetry_and_network": "README and docs contain no telemetry statement (README.md:1-71; no match for 'telemetry' under docs/). Code: the action has no analytics or error-reporting SDK of its own. It forwards CLAUDE_CODE_ENABLE_TELEMETRY and OTEL_* variables from the calling workflow env to the Claude Code CLI (action.yml:383-392), so telemetry export is opt-in by the workflow author; no DISABLE_* opt-out variable is set anywhere in the repo, and what the pinned CLI does by default is not checkable here. The action passes the CLI a JSON map of which inputs were set to non-default values (booleans only, no values: src/entrypoints/collect-inputs.ts:36-59; env GITHUB_ACTION_INPUTS at base-action/src/parse-sdk-options.ts:280-281), plus CLAUDE_CODE_ENTRYPOINT=claude-code-github-action (parse-sdk-options.ts:284) and CLAUDE_CODE_ACTION=1 (src/entrypoints/run.ts:245); how the CLI uses them is not visible here. Required network services and accounts, per code: (1) unless `github_token` is supplied, the GitHub OIDC token (needs id-token: write) is POSTed to https://api.anthropic.com/api/github/github-app-token-exchange to get a Claude GitHub App token (src/github/token.ts:56-67,103-185), so the Claude GitHub App must be installed (docs/setup.md:7); the token is revoked in a post step via DELETE ${GITHUB_API_URL}/installation/token (action.yml:448-459). (2) Claude Code CLI 2.1.287 is installed with `curl -fsSL https://claude.ai/install.sh | bash` (src/entrypoints/run.ts:52-53,80; binary host downloads.claude.ai per .github/egress-firewall.yaml:15-17) unless path_to_claude_code_executable is set. (3) `bun install --production` from registry.npmjs.org (action.yml:223; .npmrc:2) and Bun 1.3.14 via oven-sh/setup-bun (action.yml:192-206). (4) GitHub REST/GraphQL at GITHUB_API_URL / GITHUB_GRAPHQL_URL, default api.github.com (src/github/api/config.ts:1-17). (5) A model-provider account: Anthropic API key, OAuth token or workload identity federation, or Bedrock/Vertex/Foundry credentials (docs/setup.md:8-10; base-action/src/validate-env.ts:30-83). (6) When ANTHROPIC_API_KEY is set and classify_inline_comments is on (default), buffered inline-comment bodies are sent to https://api.anthropic.com/v1/messages (model claude-haiku-4-5) before posting (src/entrypoints/post-buffered-inline-comments.ts:46-72; skipped under federation per docs/setup.md:57). (7) Optional: Docker plus the ghcr.io github-mcp-server image when mcp__github__* tools are allowed (src/mcp/install-mcp-server.ts:213-231); apt packages bubblewrap and socat when allowed_non_write_users is set on Linux (action.yml:225-247); plugin marketplaces by Git URL (base-action/src/install-plugins.ts:7-8,184-202). Logging: tag mode prints the full prompt, including issue/PR text and comments, to the Actions log (src/create-prompt/index.ts:963-966); full tool output is off by default but auto-enabled when ACTIONS_STEP_DEBUG=true (docs/security.md:179-192; parse-sdk-options.ts:195-196). The repo's own Claude-calling workflows run behind an egress-firewall allow list of api.anthropic.com, api.github.com, claude.ai, downloads.claude.ai, release-assets.githubusercontent.com, registry.npmjs.org, bun.sh and Ubuntu apt mirrors (.github/egress-firewall.yaml:4-29)."
+    },
+    "code": {
+      "languages": [
+        "TypeScript on Bun (about 63 source files: 52 in src/, 11 in base-action/src/)",
+        "Python 3.12 (agent-approval-check/agent_approval_check.py; .github/scripts/check_workflow_hardening.py)",
+        "Bash helper scripts (scripts/git-push.sh, scripts/gh.sh, scripts/edit-issue-labels.sh, hook installers)",
+        "YAML (action.yml and .github/workflows)",
+        "JavaScript (.claude/workflows/pr-stamp-sweep.js, maintainer tooling)"
+      ],
+      "entry_points": [
+        {
+          "path": "action.yml",
+          "what": "Composite action manifest: installs Bun, runs `bun install --production`, runs src/entrypoints/run.ts, then post steps (SSH key cleanup, buffered inline-comment poster, app-token revoke) (action.yml:276-459)."
+        },
+        {
+          "path": "src/entrypoints/run.ts",
+          "what": "Single orchestrator: token, permission and trigger checks, prepare (tag or agent), install Claude Code, run via Agent SDK, cleanup and outputs (run.ts:150-374)."
+        },
+        {
+          "path": "src/entrypoints/post-buffered-inline-comments.ts",
+          "what": "Post step: Haiku-classifies buffered inline PR comments (when ANTHROPIC_API_KEY is set) and posts them with pulls.createReviewComment."
+        },
+        {
+          "path": "src/mcp/github-inline-comment-server.ts",
+          "what": "stdio MCP server exposing create_inline_comment; siblings: github-comment-server.ts (update_claude_comment), github-actions-server.ts (get_ci_status, get_workflow_run_details, download_job_log), github-file-ops-server.ts (commit_files, delete_files)."
+        },
+        {
+          "path": "scripts/git-push.sh",
+          "what": "Allow-listed `git push origin <ref>` wrapper (no flags) used as the only push tool in tag mode (scripts/git-push.sh:4-36; src/modes/tag/index.ts:128-153)."
+        },
+        {
+          "path": "base-action/action.yml",
+          "what": "Standalone base action (mirrored to claude-code-base-action): installs Claude Code and runs base-action/src/index.ts (base-action/action.yml:144-186)."
+        },
+        {
+          "path": "agent-approval-check/action.yml",
+          "what": "Python composite sub-action running agent_approval_check.py to post the agent-approval-check commit status and a sticky PR comment (action.yml:49-72)."
+        }
+      ],
+      "architecture": "Composite action (action.yml) -> Bun runs src/entrypoints/run.ts. Flow: parse event (src/github/context.ts) -> detectMode (src/modes/detector.ts; tag vs agent) -> GitHub token: user `github_token`, or OIDC exchanged at an Anthropic endpoint (src/github/token.ts) -> gates: write-permission and human-actor checks (src/github/validation/permissions.ts, actor.ts) and trigger matching (validation/trigger.ts) -> prepare. Tag mode (src/modes/tag/index.ts) creates a tracking comment (operations/comments/create-initial.ts), pulls PR/issue data by GraphQL (src/github/data/fetcher.ts, api/queries/github.ts), checks out the PR branch or creates a claude/ branch (operations/branch.ts), sets git credentials and optional SSH or API commit signing (operations/git-config.ts, mcp/github-file-ops-server.ts), builds the prompt (src/create-prompt/index.ts) and the allowed-tool list plus MCP config (mcp/install-mcp-server.ts). Agent mode (src/modes/agent/index.ts) writes the user's prompt as-is and adds MCP servers only for explicitly allowed tools. -> install Claude Code CLI 2.1.287 (run.ts:52-118) -> on PRs restore .claude/, .mcp.json, CLAUDE.md and similar paths from the base branch (operations/restore-config.ts) -> run Claude by importing base-action/src (run-claude.ts -> parse-sdk-options.ts -> run-claude-sdk.ts, which calls @anthropic-ai/claude-agent-sdk query(); workload-identity.ts handles federation) -> cleanup: update tracking comment and PR link (entrypoints/update-comment-link.ts), delete an empty claude branch (operations/branch-cleanup.ts), step summary (entrypoints/format-turns.ts), outputs. MCP servers are stdio processes started with bun from src/mcp/. Content hardening lives in src/github/utils/sanitizer.ts. Sibling components: base-action/ (standalone, own action.yml, mirrored by sync-base-action.yml) and agent-approval-check/ (Python, GraphQL and REST via httpx). The action works in the single runner checkout; there is no worktree handling.",
+      "packaging_and_release": "No build artifacts: the action runs TypeScript source directly with Bun from the git checkout of the referenced tag (no dist/; root package.json is private: true, package.json:4). Releases come from .github/workflows/release.yml, triggered manually or when 'CI All' succeeds on main for a push whose commit message starts with 'chore: bump Claude Code to' (release.yml:11-28). It tags the next patch version vMAJOR.MINOR.PATCH (release.yml:39-84), creates a GitHub Release with generated notes and --latest=false (release.yml:86-96), then force-moves the major tag (e.g. v1) to that release (release.yml:112-124); jobs run in the `production` environment. No checksums, signatures, provenance attestations or SBOM are produced (grep for checksum/attest/cosign/sigstore/slsa/sbom found nothing). A job releasing base-action to anthropics/claude-code-base-action is commented out (release.yml:126-170); instead sync-base-action.yml mirrors base-action/ to that repo on push to main using an SSH deploy key (sync-base-action.yml:3-9,26-43,85). Third-party actions inside the shipped actions are SHA-pinned (action.yml:195; base-action/action.yml:113; agent-approval-check/action.yml:52). v1 peels to 97c5347 (.git/packed-refs:2-3); the clone also has a loose ref .git/refs/tags/v1.0.239 (object 88eabbf...) that I could not resolve to a commit.",
+      "tests_and_ci": "Framework: Bun's built-in runner (`bun:test`, test/action-metadata.test.ts:2; `bun test`, package.json:9). 57 test files (*.test.ts): 46 under test/ (including test/modes/) and 11 under base-action/test/, plus fixtures and a base-action/test/mcp-test project. No coverage thresholds configured (bunfig.toml is a near-empty stub). CI workflows in .github/workflows: ci.yml (PR and workflow_call: `bun test` and typecheck on Bun 1.2.12, prettier check on setup-bun@v1 with latest, ci.yml:1-51); ci-all.yml (push to main, PRs, dispatch; calls ci.yml plus test-base-action, test-custom-executables, test-mcp-servers, test-settings and test-structured-output, ci-all.yml:18-35). Those five run ./base-action against the live Claude API through workload identity federation on ubuntu-24.04-firewall runners and are skipped for fork PRs (e.g. test-base-action.yml:27-29). Also: workflow-hardening.yml (python3 .github/scripts/check_workflow_hardening.py), non-write-users-check.yml (comments on PRs that add allowed_non_write_users), claude.yml / claude-review.yml / issue-triage.yml (the repo's own @claude, PR-review and triage automations), release.yml, sync-base-action.yml. CLAUDE.md:37 says end-to-end testing of the action happens in a separate repo (install-test) that is not part of this checkout. CI tests run on Bun 1.2.12 while the action installs Bun 1.3.14 at run time (ci.yml:15 vs action.yml:197).",
+      "dependencies": "package.json (root): 10 runtime deps (@actions/core, @actions/github, @anthropic-ai/claude-agent-sdk ^0.3.287, @modelcontextprotocol/sdk, @octokit/graphql, @octokit/rest, @octokit/webhooks-types, node-fetch, shell-quote, zod) and 6 devDeps (package.json:12-31); bun.lock holds about 191 package entries with sha512 integrity hashes and resolves the SDK to 0.3.287 (bun.lock:40). base-action/package.json: 3 runtime deps (@actions/core, @anthropic-ai/claude-agent-sdk, shell-quote) and 5 devDeps (base-action/package.json:12-23); base-action/bun.lock is in sync, but base-action/package-lock.json lacks the agent SDK (package-lock.json:7-20). base-action/test/mcp-test/package.json: 1 dep (@modelcontextprotocol/sdk). agent-approval-check/action.yml:55 pip-installs 3 pinned packages (httpx==0.28.1, pyyaml==6.0.3, tenacity==9.1.4); no requirements file. No `--frozen-lockfile` appears in any install command (action.yml:223; base-action/action.yml:142). Pinned external tooling: Bun 1.3.14 (action.yml:197), Claude Code CLI 2.1.287 (src/entrypoints/run.ts:80), optional Docker image ghcr.io/github/github-mcp-server:sha-23fa0dd (src/mcp/install-mcp-server.ts:224).",
+      "security_policy": "SECURITY.md: vulnerabilities go through Anthropic's HackerOne submission form, with bug-bounty guidelines on HackerOne (SECURITY.md:5-15). Internal hardening rules for the repo's own workflows are in CLAUDE.md:46-58 and enforced by .github/workflows/workflow-hardening.yml with .github/scripts/check_workflow_hardening.py."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:5,9 and docs/experimental.md:5-49: mode is auto-detected from context; mention, assignee and label triggers start tag mode; an explicit `prompt` starts agent mode.",
+        "verified": "yes",
+        "evidence": "src/modes/detector.ts:14-81 (prompt -> agent; @claude, assignee or label -> tag; track_progress forces tag; otherwise agent, which does nothing without a prompt per src/entrypoints/run.ts:210-223). Trigger matching in src/github/validation/trigger.ts:14-145 (word-boundary phrase regex, assignee, label, issue/PR title and body, review body, comments). Supported events: issues, issue_comment, pull_request(_target), pull_request_review(_comment), workflow_dispatch, repository_dispatch, schedule, workflow_run (src/github/context.ts:55-68,170-251)."
+      },
+      {
+        "claim": "README.md:11 and docs/solutions.md:18-72: PR code review that posts inline comments on the PR.",
+        "verified": "yes",
+        "evidence": "src/mcp/github-inline-comment-server.ts:37-239 implements create_inline_comment via pulls.createReviewComment (single- and multi-line, suggestion blocks; line 182), included only for PRs when the tool is allowed (src/mcp/install-mcp-server.ts:150-170). Unconfirmed calls are buffered and, if ANTHROPIC_API_KEY is set, Haiku-classified before posting (github-inline-comment-server.ts:111-146; src/entrypoints/post-buffered-inline-comments.ts:46-110,147-229). Top-level review text relies on user-allowed `gh pr comment` (docs/solutions.md:57-62; .claude/commands/review-pr.md:2)."
+      },
+      {
+        "claim": "docs/capabilities-and-limitations.md:18-19,23 and docs/faq.md:64-73: Claude cannot submit formal PR reviews, approve PRs, merge, rebase or force-push.",
+        "verified": "partial",
+        "evidence": "Enforced mainly by system prompt and tool allowlist, not a hard block. Prompt text at src/create-prompt/index.ts:593,855-860; docs/faq.md:71 itself says it is enforced in the system prompt. Tag-mode tools are limited to git add/commit/rm plus scripts/git-push.sh, which accepts only `origin <ref>` with no flags (src/modes/tag/index.ts:134-153; scripts/git-push.sh:13-36). The inline-comment server deliberately omits review submission (src/mcp/github-inline-comment-server.ts:29-31). The action's own code never calls pulls.create, pulls.merge or pulls.createReview (grep of src/), but there is no code-level denylist (the only deny logic is a dead WebSearch/WebFetch default, src/create-prompt/index.ts:79-102,984-997), the token requests pull_requests: write (src/github/token.ts:69-73), and agent mode uses the user's prompt verbatim (src/modes/agent/index.ts:85-90), so workflows that widen --allowedTools (e.g. Bash(gh:*) in examples/ci-failure-auto-fix.yml:117) are not blocked by the action."
+      },
+      {
+        "claim": "docs/capabilities-and-limitations.md:5,20 and docs/faq.md:103-105: Claude only updates a single initial comment and does not post multiple comments.",
+        "verified": "partial",
+        "evidence": "True for tag mode: the prompt says never create new comments (src/create-prompt/index.ts:817-819) and the default comment tool only updates the tracking comment (src/mcp/github-comment-server.ts:27-91; src/modes/tag/index.ts:134-144). Not true for agent mode: no tracking comment is created (src/modes/agent/index.ts:135), and the repo's own PR-review workflow posts inline comments plus `gh pr comment` top-level comments (.github/workflows/claude-review.yml:34-41; .claude/commands/review-pr.md:2-16; docs/solutions.md:57-62). The capabilities doc is out of date for agent mode."
+      },
+      {
+        "claim": "docs/security.md:66-74 and docs/faq.md:75-77: Claude does not create pull requests; it pushes a branch and links a pre-filled PR page.",
+        "verified": "yes",
+        "evidence": "Tag-mode prompt asks for a `[Create a PR](.../compare/<base>...<branch>?quick_pull=1...)` link (src/create-prompt/index.ts:601-606,782-795); the post-run step adds the link only when the branch has commits (src/entrypoints/update-comment-link.ts:130-171) and deletes empty claude branches (src/github/operations/branch-cleanup.ts:143-156). No code path in src/ calls pulls.create. In agent mode, PR creation would depend on tools the user allows."
+      },
+      {
+        "claim": "docs/capabilities-and-limitations.md:14 and docs/faq.md:79-101: Claude can see GitHub Actions results (runs, job logs) on the PR when `actions: read` is configured.",
+        "verified": "yes",
+        "evidence": "src/mcp/install-mcp-server.ts:172-211 adds the github_ci server only for PRs with a workflow token and a successful actions:read probe; tools get_ci_status, get_workflow_run_details and download_job_log are in src/mcp/github-actions-server.ts:41-292. Scope is Actions workflow runs, jobs and logs for the PR head SHA (src/mcp/github-actions-pagination.ts:13-18; github-actions-server.ts:72-85). No Checks API (check runs) or commit-status calls exist in src/ (grep). In agent mode the server is added only if mcp__github_ci__* tools are allowed (install-mcp-server.ts:176-180)."
+      },
+      {
+        "claim": "docs/faq.md:196-201: the action automatically configures two MCP servers (GitHub MCP server and a file operations server).",
+        "verified": "no",
+        "evidence": "The code builds up to five, conditionally: github_comment (always in tag mode; agent mode only with explicit tools), github_file_ops (only with use_commit_signing), github_inline_comment (PR plus allowed inline tools or mcp__github__*), github_ci (PR, workflow token and actions:read), and `github` (Docker image ghcr.io/github/github-mcp-server:sha-23fa0dd) only when mcp__github__* tools are allowed (src/mcp/install-mcp-server.ts:86-231). The FAQ is out of date."
+      },
+      {
+        "claim": "README.md:17: the action executes entirely on your own GitHub runner (Anthropic API calls go to your chosen provider). Related: docs/security.md:19-21 says the GitHub token is short-lived and repo-scoped.",
+        "verified": "partial",
+        "evidence": "Execution is on the runner (src/entrypoints/run.ts:150-374). But by default the GitHub token comes from an Anthropic-hosted endpoint (https://api.anthropic.com/api/github/github-app-token-exchange, src/github/token.ts:120-123,158-185) regardless of model provider unless `github_token` is passed. Claude Code is downloaded from claude.ai (src/entrypoints/run.ts:52-53) and npm packages are installed at run time (action.yml:223); with ANTHROPIC_API_KEY set, comment text is also sent to api.anthropic.com for classification (post-buffered-inline-comments.ts:46-72). Token revocation after the run is implemented (action.yml:448-459); the repo-scoping of the token is a server-side property and is not checkable from this repo."
+      },
+      {
+        "claim": "docs/security.md:5-18,54-60,76-80: write-access gate, human-actor gate, restore of Claude config from the PR base branch, and content sanitization.",
+        "verified": "yes",
+        "evidence": "checkWritePermissions (admin or write via the collaborator-permission API; bypass only with allowed_non_write_users AND a user-supplied github_token) in src/github/validation/permissions.ts:57-163, called at src/entrypoints/run.ts:196-208; non-human actors rejected unless allowed_bots (src/github/validation/actor.ts:30-88). The restore list matches the doc exactly (src/github/operations/restore-config.ts:26-35; invoked run.ts:263-276). sanitizeContent strips HTML comments, invisible characters, image alt text, link titles, hidden attributes and numeric HTML entities and redacts tokens (src/github/utils/sanitizer.ts:68-77). Comments and bodies edited after the trigger are excluded (src/github/data/fetcher.ts:244-333)."
+      },
+      {
+        "claim": "Not claimed in README or docs (needed context): git worktree management and structural / syntax-aware / entity-level diffs.",
+        "verified": "yes",
+        "evidence": "Absence confirmed. The only 'worktree' hits are a branch-name allowance for Claude Code's own EnterWorktree tool (src/github/operations/branch.ts:65-66; test/validate-branch-name.test.ts:58-62). Branch handling is plain `git checkout` and `checkout -b` in the single runner checkout (branch.ts:216,337). Searches for tree-sitter, difftastic, semantic, structural, syntax-aware and entity-diff terms returned no matches. Diff access is line-based: the prompt tells Claude to run `git diff origin/<base>...HEAD` (src/create-prompt/index.ts:590,739,834), and PR context holds only per-file path, change type, +/- counts and blob SHA for the first 100 files (src/github/api/queries/github.ts:47-54; src/github/data/formatter.ts:144-162)."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Anthropic-hosted dependencies on the default path: unless `github_token` is supplied, every run POSTs the GitHub OIDC token to https://api.anthropic.com/api/github/github-app-token-exchange and needs the Claude GitHub App installed (src/github/token.ts:120-123,158-185; docs/setup.md:7). Claude Code 2.1.287 is fetched with `curl -fsSL https://claude.ai/install.sh | bash` on each run (src/entrypoints/run.ts:52-53,80) and npm packages via `bun install --production` (action.yml:223). No checksum, signature or attestation step exists anywhere in the repo (grep for checksum/attest/cosign/sigstore/slsa/sbom: no matches).",
+      "Mutable references: the documented ref `@v1` is a major tag force-pushed on every release (.github/workflows/release.yml:112-124). The repo's own workflows and some doc snippets use `@main` (.github/workflows/claude.yml:36, issue-triage.yml:27, docs/security.md:110,122, examples/agent-approval-check.yml:31). ci.yml, release.yml, claude.yml, issue-triage.yml and claude-review.yml use tag/branch refs for third-party actions, while test-*.yml, sync-base-action.yml and workflow-hardening.yml pin 40-hex SHAs. There are no release artifacts, so consumers run source straight from git.",
+      "Scope boundary (facts, not a fit judgement): Actions-runner-side automation, not a host-side CLI. No git-worktree create/list/merge/clean-up. No structural, syntax-aware or entity-level diff (plain git diff). Branch handling is one checkout per run with claude/ branches and empty branches deleted (src/github/operations/branch.ts:155-352; branch-cleanup.ts:143-156). The action never calls pulls.create, pulls.merge or pulls.createReview (src/ grep shows only createReviewComment plus reply/update/get calls). CI visibility is limited to Actions workflow runs, jobs and logs, not the Checks API or commit statuses. PR context is capped at the first 100 files, comments, reviews and commits (src/github/api/queries/github.ts:34,47,55,70).",
+      "Docs lag code: the capabilities doc says only a single comment is posted (docs/capabilities-and-limitations.md:20) but agent mode posts multiple comments (.github/workflows/claude-review.yml:34-41); the FAQ lists two default MCP servers (docs/faq.md:196-201) vs up to five in code (src/mcp/install-mcp-server.ts:107-231); README.md:59 says docs/experimental.md covers 'network restrictions' but it covers only modes (docs/experimental.md:1-63); action.yml reads an undeclared `inputs.mode` (action.yml:290) and a non-existent slash-commands directory (action.yml:322); base-action/package-lock.json omits the agent SDK that base-action/package.json declares (package-lock.json:7-20 vs package.json:12-16); ROADMAP.md is still titled 'Path to 1.0' with open items (ROADMAP.md:5-14); docs/usage.md:113 calls the action beta.",
+      "Safety depends on workflow-author configuration: prompt injection from untrusted content is an acknowledged residual risk (docs/security.md:78); allowed_bots '*' and allowed_non_write_users weaken the gates (docs/security.md:6-18); show_full_output or debug mode can expose secrets in public logs (docs/security.md:179-192) and tag mode logs the full prompt including issue/PR text (src/create-prompt/index.ts:963-966). GH_TOKEN and GITHUB_TOKEN are exported and the whole process env, including ANTHROPIC_API_KEY, is passed to the Claude subprocess (src/entrypoints/run.ts:189-191; base-action/src/parse-sdk-options.ts:279), with env scrubbing only when allowed_non_write_users is set (action.yml:301; docs/security.md:16). By default the installation token is embedded in the origin remote URL in .git/config (src/github/operations/git-config.ts:129-135), unless allowed_non_write_users switches to a credential helper (git-config.ts:108-128). The no-merge/approve/rebase limits are prompt- and allowlist-based (docs/faq.md:71) and apply to tag mode only.",
+      "Maintenance and testing: single-vendor project (Anthropic, PBC; SECURITY.md:7; LICENSE:3) with frequent version pins; Claude Code and Agent SDK versions (src/entrypoints/run.ts:80; package.json:15) are bumped by commits whose message prefix auto-triggers a release (release.yml:22-27). Live-API workflows need Anthropic org variables and are skipped for fork PRs (test-base-action.yml:27-29; claude-review.yml:9), CLAUDE.md:37 places end-to-end testing in a separate repo not included here, and no coverage thresholds are configured. I did not assess commit history or release cadence (shallow clone).",
+      "Platform evidence is narrow: GitHub Actions only; every workflow runs on ubuntu-latest or ubuntu-24.04-firewall, and macOS, Windows and WSL2 are neither documented nor CI-tested. The subprocess-isolation setup (bubblewrap and socat via apt and sudo) is Linux-only best-effort (action.yml:225-247). Self-hosted runners appear only in code comments (src/create-prompt/index.ts:946-950; action.yml:227). The repo's own hardening assumes a GitHub egress-firewall runner label (CLAUDE.md:50).",
+      "Licensing: this repo is MIT (LICENSE; Copyright 2025 Anthropic, PBC), but the runtime it drives (Claude Code CLI downloaded from claude.ai at run time, the Anthropic API and the Claude GitHub App service) is not in the repo, and its terms are not covered by this LICENSE (not checkable here). Comments include claude.ai/code 'Fix this' links by default (include_fix_links default true, action.yml:140-143)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "anthropics/claude-code-action",
+      "checks": [
+        {
+          "field": "license",
+          "statement": "license.spdx = MIT, file LICENSE; README says the project is licensed under the MIT License.",
+          "citation": "LICENSE:1-21; README.md:71",
+          "holds": true,
+          "note": "LICENSE:1 is 'MIT License' with the standard MIT text; LICENSE:3 reads 'Copyright (c) 2025 Anthropic, PBC'. README.md:71: 'This project is licensed under the MIT License—see the LICENSE file for details.' The revision also checks out: .git/HEAD is 97c53473391bff1901034d4b454b5bac7ab7a029, and refs/tags/v1 peels to the same commit (.git/packed-refs:2-3)."
+        },
+        {
+          "field": "readme.install[0]",
+          "statement": "GitHub Actions workflow step: `- uses: anthropics/claude-code-action@v1` with `anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}` (nothing installed on a host).",
+          "citation": "docs/usage.md:21-23",
+          "holds": true,
+          "note": "docs/usage.md:21 is `- uses: anthropics/claude-code-action@v1`, :22 is `with:` and :23 is `anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}`. The step sits inside a job with `runs-on: ubuntu-latest` (:19). Lines 24-25 show claude_code_oauth_token as the alternative."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - documented runner is ubuntu-latest; all repo CI runs on ubuntu-latest or ubuntu-24.04-firewall; bun.lock:50 carries @anthropic-ai/claude-agent-sdk-linux-x64; CPU architecture is not stated in the docs.",
+          "citation": "docs/usage.md:19; .github/workflows/ci.yml:9; .github/workflows/claude.yml:22; bun.lock:50",
+          "holds": true,
+          "note": "docs/usage.md:19 is `runs-on: ubuntu-latest`, ci.yml:9 is `runs-on: ubuntu-latest`, claude.yml:22 is `runs-on: ubuntu-24.04-firewall`, and bun.lock:50 is the linux-x64 entry of @anthropic-ai/claude-agent-sdk 0.3.287. Every runs-on line in .github/workflows is ubuntu-latest or ubuntu-24.04-firewall. Nothing under docs/ mentions x86, x64, amd64 or arm64. The only architecture mention in the repo is contributor tooling (base-action/CONTRIBUTING.md:65, `--container-architecture linux/amd64` for local act runs)."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Claude Code: yes - built on the Claude Code CLI and Agent SDK; honours repo .claude/ config (restored from the PR base branch on PRs), the settings input, claude_args passthrough, plugins/plugin_marketplaces inputs and slash commands in prompts. Codex: none found.",
+          "citation": "src/github/operations/restore-config.ts:26-35; docs/usage.md:67; action.yml:160-167; base-action/src/install-plugins.ts:212-243; .github/workflows/claude-review.yml:34",
+          "holds": true,
+          "note": "restore-config.ts:26-35 is SENSITIVE_PATHS (.claude, .mcp.json, .claude.json, CLAUDE.md and others), restored only when context.isPR (src/entrypoints/run.ts:263-276). docs/usage.md:67 documents claude_args as passed to the Claude CLI. action.yml:160-167 declares the plugins and plugin_marketplaces inputs; install-plugins.ts:212-243 is installPlugins(). claude-review.yml:34 passes '/review-pr ...' as the prompt. The settings input is at action.yml:61-64. base-action/src/run-claude-sdk.ts:4 and :190 import and call the Agent SDK query(). The Codex conclusion holds. Minor wording error: a case-insensitive search for codex/openai matches nothing anywhere in the checkout, so the parenthetical 'found only unrelated test text' is slightly off."
+        },
+        {
+          "field": "claim_checks[9] (git worktree management / structural diffs)",
+          "statement": "verified yes: no git worktree management and no structural, syntax-aware or entity-level diff tooling; the only worktree hits are the EnterWorktree branch-name allowance; branch handling is plain checkout and checkout -b; diff access is git diff; PR context holds per-file path, change type, +/- counts and blob SHA for the first 100 files.",
+          "citation": "src/github/operations/branch.ts:65-66,216,337; test/validate-branch-name.test.ts:58-62; src/create-prompt/index.ts:590,739,834; src/github/api/queries/github.ts:47-54; src/github/data/formatter.ts:144-162",
+          "holds": true,
+          "note": "branch.ts:65-66 is the '+' allowance for Claude Code's EnterWorktree branch names. branch.ts:216 runs `checkout <branch> --` and :337 runs `checkout -b <newBranch>`. create-prompt/index.ts:590, 739 and 834 tell Claude to use `git diff origin/<base>...HEAD`. github.ts:47-54 is files(first: 100) { path additions deletions changeType }. formatter.ts:144-162 formats path, changeType, +/- and SHA; the SHA comes from `git hash-object` (src/github/data/fetcher.ts:494-495). Searches for tree-sitter, difftastic, syntax-aware, entity-diff and structural return 0 matches, and nothing in README or docs mentions worktrees. Minor wording errors: a bare 'semantic' search does return 3 unrelated hits (base-action/test/install-plugins.test.ts:299, src/modes/agent/parse-tools.ts:48, test/install-pipefail.test.ts:24). A case-insensitive 'worktree' search also matches the workTreeRealPath variable in restore-config.ts, which handles working-directory paths. Neither affects the absence finding."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

@@ -1,0 +1,296 @@
+{
+  "contender": "dagucloud/dagu",
+  "revision": {
+    "contender": "dagucloud/dagu",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "dagucloud/dagu",
+        "tag": "v2.18.1",
+        "commit": "3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v2.18.1",
+    "commit": "3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7",
+    "read_at": "2026-10-02T03:02:02+00:00"
+  },
+  "dossier": {
+    "contender": "dagucloud/dagu",
+    "revision": {
+      "tag": "v2.18.1",
+      "commit": "3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "GPL-3.0-or-later",
+      "file": "LICENSE"
+    },
+    "purpose": "Dagu is a local-first workflow engine: YAML-defined DAGs of shell commands, containers, SSH/HTTP and other built-in actions, executed by a single Go binary that also provides the CLI, an embedded React Web UI, a REST API, an MCP endpoint, a cron/queue scheduler, retries, and file-backed run history with no external database or broker (README.md:18-20; ARCHITECTURE.md:7-33). An optional gRPC coordinator plus workers distribute runs (README.md:224-228). Surface relevant to scheduled local runs: `dagu start-all` or `dagu scheduler` for scheduling; `dagu start|stop|retry|enqueue|status|history|ps` and the Web UI for supervision. The docs site (docs.dagu.sh) that the README links throughout is not part of the checkout (no docs/ directory) and was not read.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Dagu is a local-first workflow engine for operations and internal automation: a single binary with a built-in Web UI, no external database or message broker, on Linux, macOS and Windows.",
+          "citation": "README.md:18"
+        },
+        {
+          "claim": "Turns existing scripts and runbooks into production workflows with scheduling, retries, human tasks and run history; runs on-prem, air-gapped, edge or cloud.",
+          "citation": "README.md:20"
+        },
+        {
+          "claim": "Run existing shell commands, Docker containers, Kubernetes Jobs and remote SSH commands without modifications.",
+          "citation": "README.md:28"
+        },
+        {
+          "claim": "Schedule workflows with cron syntax, timezones, overlap policies and catch-up windows.",
+          "citation": "README.md:30 (example README.md:416-430)"
+        },
+        {
+          "claim": "Keep logs, run history, retries, notifications and webhook triggers in one place.",
+          "citation": "README.md:31"
+        },
+        {
+          "claim": "Overlap policies: skip (default: skip if previous run is still active), all (queue all), latest (keep only the most recent); catch-up automatically runs missed intervals when the scheduler was down.",
+          "citation": "README.md:779-780"
+        },
+        {
+          "claim": "Zombie detection identifies and handles stalled DAG runs (configurable interval, default 45s).",
+          "citation": "README.md:781"
+        },
+        {
+          "claim": "Per-step retry policies with limits, intervals and exit-code filtering; lifecycle hooks (onInit/onSuccess/onFailure/onAbort/onExit/onWait); preconditions.",
+          "citation": "README.md:782-785"
+        },
+        {
+          "claim": "High availability: scheduler lock with stale detection for failover.",
+          "citation": "README.md:786"
+        },
+        {
+          "claim": "`dagu start-all` runs the server, scheduler, and steps in one process on one machine.",
+          "citation": "README.md:199"
+        },
+        {
+          "claim": "A single machine can run thousands of workflow runs per day (capacity depends on CPU, memory, disk, workflow shape); queues, concurrency limits and resource limits control how many runs execute at once and where.",
+          "citation": "README.md:81-82"
+        },
+        {
+          "claim": "Built-in MCP server at http://localhost:8080/mcp: inspect workflows and runs, maintain Wiki pages, apply changes, control runs through the same authenticated boundary as the REST API.",
+          "citation": "README.md:32, 580"
+        },
+        {
+          "claim": "With builtin auth, five roles (admin, manager, developer, operator, viewer) control access; API keys have independent roles; audit logging tracks all actions.",
+          "citation": "README.md:690-700"
+        },
+        {
+          "claim": "Community self-host needs no license key; a self-host license adds SSO, RBAC, audit logging and incident SaaS integration.",
+          "citation": "README.md:205-206"
+        }
+      ],
+      "install": [
+        {
+          "method": "Installer script (Linux/macOS)",
+          "command": "curl -fsSL https://raw.githubusercontent.com/dagucloud/dagu/main/scripts/installer.sh | bash",
+          "citation": "README.md:102-105 (behaviour: scripts/installer.sh:1520-1546 verifies SHA-256 against the release checksums.txt; optional systemd unit / LaunchAgent running `dagu start-all`: scripts/installer.sh:1629-1698,1740-1837)"
+        },
+        {
+          "method": "Homebrew",
+          "command": "brew install dagu",
+          "citation": "README.md:108-111 (formulae published by .goreleaser.yaml:54-88)"
+        },
+        {
+          "method": "npm",
+          "command": "npm install -g --ignore-scripts=false @dagucloud/dagu",
+          "citation": "README.md:114-117 (npm/dagu/package.json:30-49)"
+        },
+        {
+          "method": "Docker",
+          "command": "docker run --rm -v ~/.dagu:/var/lib/dagu -p 8080:8080 ghcr.io/dagucloud/dagu:latest dagu start-all",
+          "citation": "README.md:126-135"
+        },
+        {
+          "method": "Kubernetes (Helm)",
+          "command": "helm repo add dagu https://dagucloud.github.io/dagu\nhelm repo update\nhelm install dagu dagu/dagu --set persistence.storageClass=<your-rwx-storage-class>",
+          "citation": "README.md:137-145"
+        },
+        {
+          "method": "Build from source (needs Go, Node.js, pnpm)",
+          "command": "git clone https://github.com/dagucloud/dagu.git && cd dagu\nmake build",
+          "citation": "README.md:1057-1064 (Makefile:251-253)"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - release archives for linux/amd64 (.goreleaser.yaml:14-19), unit and integration tests on ubuntu-latest in CI (.github/workflows/ci.yaml:185-200), installer handles x86_64 (scripts/installer.sh:617-631), linux/amd64 Docker image (.github/workflows/docker.yaml:29-33).",
+        "wsl2": "unknown - no WSL/WSL2 mention anywhere in the repo (repo-wide search); Linux binaries exist, but WSL2 is neither documented nor exercised in CI.",
+        "macos_arm64": "yes - darwin/arm64 archives (.goreleaser.yaml:14-22), npm package dagu-darwin-arm64 (.github/workflows/npm-publish.yaml:62-65), installer writes a user LaunchAgent (scripts/installer.sh:1740-1837). Caveats: CI has no macOS test job (tests run on ubuntu-latest and windows-latest only: ci.yaml:185-189,631-635; macOS appears only as a GOOS=darwin lint at ci.yaml:150 and an npm install smoke test at npm-publish.yaml:277-282); `resources.limits` are not enforced on macOS (internal/runtime/resourcelimit/native_unsupported.go:14-16); config dir is fixed to ~/.config (internal/cmn/config/loader.go:185-188) while data/log dirs come from adrg/xdg DataHome (loader.go:186), so the macOS data location may differ from the README's Linux defaults (library behaviour not verified).",
+        "gpu": "no - no GPU detection, scheduling or accounting in the code; only user-defined worker labels (for example gpu=true) used for routing (README.md:794,804; internal/cmd/worker.go:52). The Helm chart README shows nvidia.com/gpu requests for worker pools (charts/dagu/README.md:216-232)."
+      },
+      "integrations": {
+        "cli": "Yes. The `dagu` binary registers 33 subcommands (cmd/main.go:36-68) including start, start-all, scheduler, server, stop, restart, retry, enqueue/dequeue, status, history, ls, ps, validate, dry, cleanup, schema, example, upgrade, exec. README lists 18 'common' commands and says 31 total (README.md:811-832). A persistent `--context` flag targets a remote Dagu server's API (cmd/main.go:35; internal/cmd/context_command.go:43).",
+        "mcp": "Yes. Built-in MCP server, Streamable HTTP only (no stdio transport found), at `<base>/mcp` of the Dagu server, registered on every server start (internal/service/mcp/server.go:58-65; internal/service/frontend/server.go:896,1345-1363). Tools: dagu_read, dagu_change (preview/apply), dagu_execute (start/enqueue/retry/stop) (server.go:26-28,113-154); `dagu://` resources; auth follows the server auth mode and API keys need the `mcp` surface (specs/020-mcp-server.md:37-73). specs/020-mcp-server.md:3 says Draft and specs/README.md:31 lists it as 'Not implemented'.",
+        "sdk_or_api": "REST API: OpenAPI 3.0.0 at api/v1/api.yaml (173 paths, 230 operationIds; server base /api/v1, api.yaml:2,14-16), Go server code generated into api/v1/api.gen.go; SSE streams back the UI. Embedded Go API: root package github.com/dagucloud/dagu/v2, explicitly experimental (doc.go:4-9; README.md:1010-1047; examples/embedded); embedding in a distributed binary carries GPL obligations (LICENSING.md:7-13). No other-language SDKs found.",
+        "claude_code_or_codex": "(1) A bundled `dagu` agent skill (skills/dagu/SKILL.md; skills/README.md:3-6) that the installer can place into detected Claude Code (~/.claude), Codex (~/.codex or ~/.agents), OpenCode, Gemini and Copilot locations via `gh skill install dagucloud/dagu dagu` or `npx skills add https://github.com/dagucloud/dagu --skill dagu` (scripts/installer.sh:634-655,2076-2105). (2) The `harness.run` action runs external coding-agent CLIs from DAG steps, including `claude -p` and `codex exec` (skills/dagu/references/harnesses.md:5-24; README.md:600). (3) AGENTS.md is a repository guide for coding agents (AGENTS.md:1-119). No Claude-Code-specific MCP configuration instructions were found (search for `claude mcp` / `.mcp.json` returned nothing)."
+      },
+      "telemetry_and_network": "No product-usage telemetry or analytics code found (repo-wide search for telemetry/analytics/posthog/sentry etc.). `internal/telemetry` is OpenTelemetry tracing that only activates when a DAG sets otel.enabled with an endpoint (internal/telemetry/tracer.go:42-45) plus a pull-based Prometheus collector whose endpoint access defaults to `private` (internal/service/frontend/server.go:316-321; internal/cmn/config/loader.go:2011). Outbound calls that do exist: (1) Update check, ON by default for the server process: queries https://api.github.com/repos/dagucloud/dagu/releases/latest at start and every 24h, skipped for dev builds, failures logged at debug; disable with `check_updates: false` / DAGU_CHECK_UPDATES (internal/service/frontend/server.go:916,1018-1045; internal/upgrade/cache.go:12-62; internal/upgrade/github.go:19,47-75; loader.go:1170,2009,2096; internal/service/frontend/file/stores.go:119-129; documented only in internal/cmn/schema/config.schema.json:37-41, not in the README). `dagu upgrade` is an explicit command (internal/cmd/upgrade.go:94-158). (2) Licensing, only when a key is configured: Dagu POSTs the key, a locally generated server ID, the hostname and the client version to https://console.dagu.sh and heartbeats every 24h; with no key it logs 'community mode' and makes no call; licence errors never block startup (internal/license/client.go:18,44-63,109; internal/license/manager.go:19-20,120-141,287-317,356-373). (3) Feature-specific: `tools:` provisioning via aqua and `action: owner/repo@version` packages fetched from GitHub (internal/tools/aqua/registryref.go:26; internal/runtime/builtin/action/resolver.go:295-304); LLM, browser, mail, S3 and similar steps contact whatever services they are configured for; the Tailscale tunnel is opt-in and off by default (loader.go:1642-1650). The Go-served page template references no external hosts (internal/service/frontend/templates/base.gohtml:1-78); the webpack HTML template ui/index.html:8-13 links Google Fonts (which one reaches a browser was not run). No account or hosted service is required for community use; a Dagu licence key (console.dagu.sh) is needed only for licensed features. Local listeners by default: HTTP 127.0.0.1:8080 (loader.go:2004-2005) and, under `start-all`, the coordinator gRPC on 127.0.0.1:50055, enabled by default with plaintext h2c (loader.go:1313-1321,2017-2019,2050; internal/cmd/startall.go:44-45). Step processes receive a filtered environment (PATH, HOME, USER, SHELL, TMPDIR, TERM, LANG, LC_*, TZ, LD_LIBRARY_PATH, XDG_*, DOCKER_* plus DAGU_/DAG_/LC_/KUBERNETES_ prefixes; extras via DAGU_ENV_PASSTHROUGH[_PREFIXES]) (internal/cmn/config/env.go:23-33,106-116; env_unix.go:16-49)."
+    },
+    "code": {
+      "languages": [
+        "Go (go.mod: go 1.27.0; 1,916 .go files including generated and test files)",
+        "TypeScript/React (ui/: webpack, vitest, Playwright)",
+        "JavaScript (npm wrapper in npm/dagu)",
+        "Shell (scripts/installer.sh, scripts/ci/*.sh)",
+        "PowerShell, CMD and Inno Setup (Windows installers)",
+        "Zig (Docker keepalive helper: internal/runtime/builtin/docker/keepalive/main.zig)",
+        "Protobuf (proto/coordinator, proto/index)",
+        "OpenAPI/JSON Schema/YAML (api/v1/api.yaml, internal/cmn/schema/*.json)"
+      ],
+      "entry_points": [
+        {
+          "path": "cmd/main.go",
+          "what": "`dagu` binary: cobra root registering 33 subcommands (start, start-all, scheduler, server, coordinator, worker, stop, retry, enqueue, status, history, ...); version injected via -ldflags main.version (cmd/main.go:17-73)."
+        },
+        {
+          "path": "internal/cmd/startall.go",
+          "what": "`dagu start-all`: server + scheduler + (default-enabled) coordinator in one process; scheduler health server disabled in this mode (startall.go:99-253)."
+        },
+        {
+          "path": "internal/cmd/scheduler.go; internal/service/scheduler/scheduler.go",
+          "what": "`dagu scheduler` foreground scheduler: tick planner, catch-up, queue processor, retry scanner, zombie detector, directory lock."
+        },
+        {
+          "path": "internal/cmd/start.go; internal/launcher/launcher.go",
+          "what": "`dagu start <dag>` runs one DAG-run; the scheduler spawns this as a child process for each local scheduled run (launcher.go:134-135,457-488)."
+        },
+        {
+          "path": "internal/service/frontend/server.go",
+          "what": "HTTP server: REST API (api/v1), SSE, embedded UI template/assets, /mcp route, optional web terminal, periodic update check."
+        },
+        {
+          "path": "internal/service/mcp/server.go",
+          "what": "MCP Streamable-HTTP handler exposing dagu_read / dagu_change / dagu_execute."
+        },
+        {
+          "path": "doc.go; engine.go; internal/engine/",
+          "what": "Experimental embedded Go API (package dagu)."
+        },
+        {
+          "path": "scripts/installer.sh",
+          "what": "Linux/macOS installer wizard: downloads the release archive, verifies SHA-256 from checksums.txt, optionally writes a systemd unit or LaunchAgent running `dagu start-all` (installer.sh:1520-1546,1629-1698,1740-1837)."
+        }
+      ],
+      "architecture": "One Go module (github.com/dagucloud/dagu/v2) builds one binary holding every role. Pipeline: YAML -> internal/spec (decode/validate) -> internal/ir (canonical DAG + persisted run state) -> internal/intake (admission) -> internal/runtime (runner.go, node.go, plan.go; per-run agent in internal/runtime/agent/) -> executors in internal/runtime/builtin/ (registry in internal/executor/registry/) -> file persistence in internal/persis/file/ (ARCHITECTURE.md:7-33; AGENTS.md:13-50). Services: internal/service/frontend (HTTP API/SSE/embedded UI), internal/service/mcp, internal/service/scheduler (tick_planner.go, catchup.go, queue_processor.go, retry_scanner.go, zombie_detector.go), internal/service/coordinator + internal/service/worker (gRPC, proto/), internal/license, internal/upgrade, internal/telemetry. State is plain files under data_dir: per-run directories dag-run_* with dag.json and an append-only status.jsonl fsynced on each write (internal/persis/file/dagrun/dagrun.go:44-60; writer.go:81-104,148-164), proc heartbeat files (internal/persis/file/proc/store.go), queue and scheduler-state dirs (internal/persis/file/backend.go:38-71); the scheduler lock is a lock directory (internal/cmn/dirlock/dirlock.go). Execution model for a local scheduled run: the scheduler spawns `dagu start` as a child process (internal/service/scheduler/dag_executor.go:305-321; internal/launcher/launcher.go:134-135,500) in its own process group; each step command runs under cmdutil.StartManagedProcess (internal/runtime/builtin/command/command.go:105) with Setpgid and group-wide signals on Unix, a /bin/sh parent-exit watchdog that SIGKILLs the group if the run process dies (internal/cmn/cmdutil/cmd_unix.go:19-25; lifecycle_unix.go:33-57; parent_exit_watcher_unix.go:18-67) and Job Objects on Windows (lifecycle_windows.go:30-92). Cancellation: `dagu stop` reaches the live run via a local socket (internal/runtime/manager.go:83-215), sends the stop signal, resends every 5s and forces termination after max_clean_up_time_sec, default 5s (internal/runtime/agent/agent.go:2267-2341; internal/ir/dag.go:505-519). Specs live in specs/ with black-box tests in conformance/.",
+      "packaging_and_release": "Tag-driven: release.yaml fires on v*.*.* tags, builds the UI with pnpm, then runs GoReleaser (.github/workflows/release.yaml:3-7,25-61). .goreleaser.yaml: CGO_ENABLED=0 archives for linux/darwin/windows x amd64/386/arm(v6,v7)/arm64/ppc64le/s390x (windows/arm excluded) (:8-35), checksums.txt SHA-256 list (:41-42), Homebrew formulae pushed to dagucloud/homebrew-brew and a deprecated yohamta/homebrew-tap, with a service block running `dagu start-all` (:54-88). Provenance: actions/attest records build provenance for the archives from dist/checksums.txt but is `continue-on-error: true` (release.yaml:63-71); a signed 'packslip' inventory (workflow-identity signing via jdx/packslip) is published for verifiers such as mise (release.yaml:73-110). No GPG/cosign signing of checksums.txt or images and no SBOM generation found in .goreleaser.yaml, release.yaml or docker.yaml. Other artifacts: Inno Setup Windows installer attached to the release (release.yaml:112-182); Docker images ghcr.io/dagucloud/dagu (latest, -dev, -alpine; linux/amd64, arm64, arm/v7) built on tags by docker.yaml (:3-41,84-86,156-176); npm @dagucloud/dagu plus 12 platform packages published with `npm publish --provenance` (npm-publish.yaml:42-101,192,258); Helm chart via chart-releaser to gh-pages (chart-release.yaml:41-50). Third-party actions are pinned to commit SHAs. Source builds need the UI built and copied into internal/service/frontend/assets, which is git-ignored (.gitignore:3-4; Makefile:251-253,380-382; release.yaml:45-53). At this revision the Helm chart defaults its image tag to Chart.appVersion 2.11.1 (charts/dagu/Chart.yaml:5-7; values.yaml:13-17; templates/_helpers.tpl:46).",
+      "tests_and_ci": "Go: testify + gotestsum (go.mod; Makefile:165-171). 941 *_test.go files of 1,916 Go files, including 114 under conformance/ (binary-level tests per spec, driven by DAGU_BIN; specs/README.md:95-102) and 84 under internal/intg/. About 319 test functions with names matching Schedul|Cron|Catchup|Overlap|Zombie|Stop|Cancel|Kill|Orphan|ParentExit across 118 files in internal/. 9 Benchmark functions in 5 files, no published results. UI: vitest (168 *.test.ts(x) files in ui/src) and Playwright e2e (15 specs in ui/e2e, including scheduler-recovery, zombie-recovery, worker-failover). Workflows in .github/workflows: ci.yaml (path-filtered; golangci-lint for linux/windows/darwin :140-183; go fmt / go fix checks; unit and integration suites in 3 shards each on ubuntu-latest with -race and Codecov upload, integration pre-pulls alpine/busybox/redis/minio images :185-284; compat job for OpenCode, GOEXPERIMENT=nojsonv2 and 386 jq :287-325; Playwright e2e in 3 shards :327-383; Windows installer tests :385-629; Windows unit+integration shards :631-686); conformance.yml (ubuntu + windows, 2 shards each, :45-105); frontend-ci.yaml (vitest + build); desktop-e2e.yaml (Windows desktop driver); docker-browser-smoke.yaml (dev image browser steps on amd64/arm64); image-security.yaml (Trivy image scan + govulncheck on PR/main and weekly cron, :28-29,69-78,94-103); chart-ci.yaml (helm lint/template/package); release.yaml, manual-release.yaml, docker.yaml, docker-manual.yaml, npm-publish.yaml, npm-publish-test.yaml, chart-release.yaml. No macOS test job. Dependabot: gomod/npm/actions monthly (patch-only groups, major/minor ignored), docker quarterly (.github/dependabot.yaml). Linting: golangci-lint v2 with gosec, staticcheck, errcheck, revive, exhaustive (.golangci.yml:4-22).",
+      "dependencies": "go.mod (module github.com/dagucloud/dagu/v2, go 1.27.0): 97 direct requires + 447 indirect = 544 modules; no replace or tool directives. About 10 of the direct modules are dev tools pinned through tools.go (golangci-lint, gotestsum, oapi-codegen, protolint, golines, addlicense, changelog-from-release, protoc-gen-go and -go-grpc, kin-openapi validate) (tools.go:12-23). Notable runtime modules: cobra/viper, chi, robfig/cron/v3, gopsutil, modernc.org/sqlite, pgx, go-redis, moby client, k8s client-go, go-git, aws-sdk-go-v2, Azure/GCP/Alibaba/Vault secret SDKs, OpenTelemetry, grpc, modelcontextprotocol/go-sdk, tailscale.com, aqua (go.mod:5-103). ui/package.json: 50 dependencies + 41 devDependencies (ui/package.json:34-128); npm/dagu/package.json: 1 dependency (tar) + 12 optionalDependencies (platform binaries) (npm/dagu/package.json:33-49); .github/opencode/package.json: 1 CI-fixture dependency (opencode-ai 1.18.11). Lockfiles present: go.sum, ui/pnpm-lock.yaml, npm/dagu/package-lock.json, .github/opencode/package-lock.json.",
+      "security_policy": "SECURITY.md: supported = main and the latest stable release series, older releases unsupported (SECURITY.md:3-13); report privately to contact@dagu.sh or via GitHub private vulnerability reporting if enabled, no public issues (SECURITY.md:15-23); acknowledgement within 5 business days and status updates at least every 7 days (SECURITY.md:37-43); coordinated disclosure (SECURITY.md:45-47)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Single binary with built-in Web UI, no external database or message broker (README.md:18, 24-25).",
+        "verified": "yes",
+        "evidence": "File-backed persistence only: collections map to directories under data_dir (internal/persis/file/backend.go:38-71); run status is appended as JSON lines and fsynced per write (internal/persis/file/dagrun/writer.go:81-104,148-164; dag.json + status.jsonl per run: dagrun/dagrun.go:44-60, attempt.go:42); UI embedded with go:embed (internal/service/frontend/templates.go:30). No DB/broker adapter found for control-plane state; pgx/sqlite/redis in go.mod back step actions (README.md:603-605). Caveat: internal/service/frontend/assets/ is git-ignored (.gitignore:3-4), so a plain `go build ./cmd` has no UI until `make ui` (Makefile:251-253,380-382); release builds run the UI build first (release.yaml:45-53)."
+      },
+      {
+        "claim": "Cron scheduling with timezones, overlap policies (skip/all/latest) and catch-up windows (README.md:30, 779-780).",
+        "verified": "partial",
+        "evidence": "Code takes precedence over the README wording. Cron via robfig/cron (go.mod:69), TZ=/CRON_TZ= prefixes and @descriptors (specs/063-schedule.md:18-50), one-off RFC3339 schedules and separate stop/restart schedules (internal/service/scheduler/tick_planner.go:636-724). overlap_policy governs catch-up/resume buffers only: the schema says it controls what happens 'when a catchup run is ready but the DAG is still running' (internal/cmn/schema/dag.schema.json:155-160; tick_planner.go:546-612); a live cron tick is always dropped while the DAG is running or queued (tick_planner.go:749-776), so 'all' and 'latest' never queue live ticks. Catch-up: default window 6h comes from the auto-created base.yaml (internal/persis/file/baseconfig/default_base_config.go:52-56; store.go:80-88), replays at most 1000 missed intervals from max(now-window, last tick, last scheduled) (internal/service/scheduler/catchup.go:20-34,54-90), is computed at scheduler start and on resume from pause (tick_planner.go:394-486,1423-1444) and needs queues enabled (tick_planner.go:395-405). Schedules are evaluated on whole-minute ticks and scheduler timing guarantees are outside the conformance suite (specs/063-schedule.md:7-10,45-48)."
+      },
+      {
+        "claim": "Zombie detection (default 45s) and a scheduler lock with stale detection for failover (README.md:781, 786).",
+        "verified": "yes",
+        "evidence": "Zombie detector default interval 45s, 0 disables (internal/cmn/config/loader.go:1462-1464; internal/service/scheduler/zombie_detector.go:54-56); a run is repaired to failed only after failure_threshold (default 3) consecutive stale heartbeat checks and only if the recorded PID start-time no longer matches a live process (loader.go:1470-1471; zombie_detector.go:210-219,250-285). Proc heartbeat files are written every 5s and go stale after 90s by default (internal/persis/file/proc/store.go:112-117; configurable via proc.* at loader.go:1476-1494), so with defaults a hard-killed local run is marked failed after roughly 3-4 minutes (derived from these constants, not measured). e2e coverage: ui/e2e/zombie-recovery.spec.ts:17-72. Scheduler lock: lock directory under <data>/scheduler/locks with heartbeat and 30s stale threshold (internal/service/scheduler/scheduler.go:207-213; internal/cmn/dirlock/dirlock.go:68-129; loader.go:2045)."
+      },
+      {
+        "claim": "Per-step retry with limits, intervals and exit-code filtering; failed runs can be retried (README.md:782, 809-832).",
+        "verified": "yes",
+        "evidence": "Step retry_policy supports limit, interval, backoff, max interval and exit-code filter (internal/runtime/node.go:1759-1823; documented in default_base_config.go:109-121). DAG-level auto-retry (internal/ir/dag.go:306-318) is enqueued by a scheduler scan every 30s within a retry window defaulting to 24h (internal/service/scheduler/retry_scanner.go:19,68-90; loader.go:2047); retries are opt-in because steps may be non-idempotent (default_base_config.go:58-62). `dagu retry --run-id [--step] [--downstream]` reuses the run ID: failed/retrying/aborted/rejected nodes and all their descendants are reset and re-run, succeeded upstream nodes keep their status (internal/cmd/retry.go:30-55; internal/runtime/plan.go:449-499). Compensation is left to workflow-defined handlers (README.md:784); no automatic rollback of step side effects was found."
+      },
+      {
+        "claim": "`dagu start-all` runs the server, scheduler, and steps in one process (README.md:199).",
+        "verified": "partial",
+        "evidence": "Code takes precedence. Server, scheduler and the default-enabled coordinator share one process (internal/cmd/startall.go:36-45,141-253), but every local DAG run is a separate OS process: the scheduler builds `dagu start ...` and spawns it (internal/service/scheduler/dag_executor.go:305-321; internal/launcher/launcher.go:134-135,457-488) in its own process group (launcher.go:500; internal/cmn/cmdutil/cmd_unix.go:19-25), and step commands are children of that run process (internal/runtime/builtin/command/command.go:105). Scheduler.Stop() stops the planner, queue processor and zombie detector and releases the lock; it does not signal in-flight run processes (internal/service/scheduler/scheduler.go:895-941)."
+      },
+      {
+        "claim": "Runs on Linux, macOS, and Windows (README.md:18, 26).",
+        "verified": "partial",
+        "evidence": "Release binaries are built for all three (.goreleaser.yaml:14-35), but automated tests run only on ubuntu-latest and windows-latest (ci.yaml:185-189,631-635; conformance.yml:52); macOS appears only as a GOOS=darwin lint (ci.yaml:150) and an npm install smoke test (npm-publish.yaml:277-282). `resources.limits` are unsupported on macOS (internal/runtime/resourcelimit/native_unsupported.go:14-16). WSL2 is not mentioned."
+      },
+      {
+        "claim": "RBAC with five roles under builtin auth; audit logging tracks all actions (README.md:690-700).",
+        "verified": "partial",
+        "evidence": "Code takes precedence. The five roles exist (internal/auth/role.go:20-35), but without a license the API rejects creating, updating and deleting users with 'User management requires a Dagu Pro license' (internal/service/frontend/api/v1/api.go:897-901; users.go:107,211,334), LogAudit returns without recording unless the audit feature is licensed (api.go:977-1006; audit endpoints api.go:956-965; terminal/handler.go:111-113), OIDC and trusted-proxy SSO need the sso feature (internal/service/frontend/server.go:655-659) and community API keys are capped at 2 (internal/service/frontend/api/v1/apikeys.go:18,360-379). README.md:205-206 does list RBAC and audit as licensed add-ons, but the Security section states them without that caveat. Default auth mode is builtin (loader.go:668-673)."
+      },
+      {
+        "claim": "Built-in MCP server for inspecting workflows and runs and controlling runs (README.md:32, 580).",
+        "verified": "yes",
+        "evidence": "A Streamable HTTP MCP handler on modelcontextprotocol/go-sdk is registered at <base>/mcp on every server start, behind the server's auth (internal/service/mcp/server.go:58-65; internal/service/frontend/server.go:896,1345-1363). Tools dagu_read, dagu_change (preview/apply) and dagu_execute (start/enqueue/retry/stop) exist (server.go:26-28,113-154); conformance tests exist (conformance/spec020_mcp_server, spec021, spec022, spec036). No stdio transport. Spec status is inconsistent: specs/020-mcp-server.md:3 'Draft' and specs/README.md:31 'Not implemented' while the endpoint ships."
+      },
+      {
+        "claim": "Queues, concurrency limits and resource limits control how many runs execute at once and where they run (README.md:82).",
+        "verified": "partial",
+        "evidence": "max_active_runs is deprecated and ignored for DAG-named local queues (schema default 1; other values only produce a deprecation warning): internal/cmn/schema/dag.schema.json:587-593; internal/spec/dag.go:807-817. Cross-DAG concurrency uses global queues configured in config plus the `queue:` field (dag.schema.json:594-597); worker max_active_runs defaults to 100 (loader.go:2022). `resources.limits` is a per-run CPU/memory cap, not a run-count limiter: cgroup v2 on Linux, needing a writable cgroup under the current one (internal/runtime/resourcelimit/native_linux.go:26-60,80-97), Job Object on Windows (native_windows.go:38-94), unsupported elsewhere including macOS (native_unsupported.go:14-16); enforcement is best-effort and only warns when it cannot be applied (resourcelimit/guard.go:43-67; internal/runtime/builtin/command/command.go:116-120)."
+      },
+      {
+        "claim": "A single machine can run thousands of workflow runs per day (README.md:81).",
+        "verified": "not_checkable",
+        "evidence": "No throughput benchmark, load test or published result exists in the repo, and the README gives no hardware, workload or method. Only 9 Go Benchmark functions exist, in 5 test files (internal/cmn/stringutil/hash_test.go, internal/service/auth/service_test.go, internal/persis/store/distributed_test.go, internal/persis/file/dagrun/latest_attempt_external_test.go, internal/persis/file/dagrun/attempt_test.go), with no results published. The docs site (docs.dagu.sh) is outside the checkout."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Licence-gated features inside the GPL code base: without a licence key the API rejects user create/update/delete ('User management requires a Dagu Pro license', internal/service/frontend/api/v1/api.go:897-901; users.go:107,211,334), records no audit entries (api.go:977-1006), disables OIDC/trusted-proxy SSO (internal/service/frontend/server.go:655-659), blocks incident management (api.go:967-975) and caps API keys at 2 (apikeys.go:18,360-379). The README's Security section presents five roles and audit logging without this caveat (README.md:690-700 vs 205-206).",
+      "Licensing: GPL-3.0-or-later (LICENSING.md:3). Importing the experimental embedded Go API into a distributed binary triggers GPL obligations, and proprietary embedding is routed to a separate commercial licence (LICENSING.md:7-13). Licence metadata is inconsistent across files: README 'GNU GPLv3' (README.md:1119), npm and OpenAPI 'GPL-3.0' (npm/dagu/package.json:25; api/v1/api.yaml:10-12, which links a LICENSE.md that does not exist), ui/package.json 'SEE LICENSE.md' (ui/package.json:29).",
+      "Platform coverage: no macOS test job in CI (ci.yaml:185-189,631-635; conformance.yml:52), `resources.limits` unsupported on macOS (internal/runtime/resourcelimit/native_unsupported.go:14-16), WSL2 undocumented (no mention in repo), and data/log directories come from adrg/xdg DataHome while config is fixed to ~/.config (internal/cmn/config/loader.go:185-188), so macOS paths may differ from README defaults (library behaviour not verified).",
+      "Process-tree containment on Unix is process-group based: step commands start with Setpgid and stop is kill(-pgid) (internal/cmn/cmdutil/cmd_unix.go:19-25; lifecycle_unix.go:33-57); cgroups are used only for CPU/memory caps, not for killing (resourcelimit/native_linux.go:62-67) and no subreaper/cgroup.kill logic was found in internal/, so descendants that leave the group are outside these signals. Stop is a graceful signal then forced kill after max_clean_up_time_sec, default 5s (internal/runtime/agent/agent.go:2267-2341; internal/ir/dag.go:505-519); a DAG/step timeout force-kills immediately with exit code 124 (internal/runtime/builtin/command/command.go:132-140). Scheduler shutdown does not signal in-flight runs (scheduler.go:895-941); hard-killed runs are recovered by heartbeat staleness, roughly 3-4 minutes with defaults (derived from proc/store.go:112-117 and loader.go:1462-1471).",
+      "Scheduling defaults: the auto-created base.yaml is inherited by all DAGs and sets catchup_window 6h, overlap_policy skip, hist_retention_days 30, max_active_steps 10, max_clean_up_time_sec 5 (internal/persis/file/baseconfig/default_base_config.go:11-56; store.go:80-88). A scheduler restart can replay up to 1000 missed runs per DAG inside the window (internal/service/scheduler/catchup.go:31-34), while retries are opt-in because steps may be non-idempotent (default_base_config.go:58-62). Live ticks that fire while a run is active or queued are silently dropped regardless of overlap_policy (tick_planner.go:749-776). Scheduler timing/dispatch guarantees are explicitly outside the conformance suite (specs/063-schedule.md:7-10).",
+      "Network and security defaults: the server's automatic update check to api.github.com is on by default and not mentioned in the README (loader.go:2009; internal/service/frontend/server.go:916; config.schema.json:37-41); `start-all` enables the coordinator gRPC listener on 127.0.0.1:50055 with plaintext h2c by default (loader.go:1320,2017-2019,2050); the Docker image runs as user `dagu` with passwordless sudo and DAGU_HOST=0.0.0.0 (Dockerfile:105-112,123); container steps need Docker daemon access that the README says grants control of the host daemon (README.md:132-135); steps run with a filtered environment, so variables outside the allowlist (for example HTTP_PROXY or AWS_*) are not forwarded unless configured (internal/cmn/config/env.go:23-33; env_unix.go:16-49).",
+      "Packaging and supply chain: the README installer is fetched from the main branch and verifies only a SHA-256 taken from the same release's checksums.txt (README.md:105; scripts/installer.sh:1520-1536); the build-provenance attestation step is continue-on-error and the installer does not check it (release.yaml:67-71); no GPG/cosign signing or SBOM generation found for binaries or images; the npm postinstall fallback downloads a tarball from registry.npmjs.org without a separate checksum (npm/dagu/install.js:81-117); the Dockerfile temporarily disables apt signature checks to install ubuntu-keyring (Dockerfile:41-61); the Helm chart's default image tag is appVersion 2.11.1 (charts/dagu/Chart.yaml:6; values.yaml:15-16; templates/_helpers.tpl:46), inside the range the README calls broken for scoped notification routing (README.md:764); a plain `go build`/`go install` produces a binary without the Web UI (.gitignore:3-4).",
+      "Maturity and scope: large, fast-moving surface (33 CLI commands, 230 REST operations, 544 Go modules, Go 1.27.0 toolchain required: cmd/main.go:36-68; api/v1/api.yaml; go.mod:3). specs/README.md:13-77 lists 63 specs of which 32 are Implemented, 29 Partially implemented and 2 Not implemented (including the MCP endpoint contract, which ships). The embedded Go API is 'experimental and may change' (doc.go:7-8; README.md:1047). Security fixes are provided only for main and the latest stable series (SECURITY.md:5-11). Public documentation lives off-repo (docs.dagu.sh), so doc-site claims could not be verified here."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "dagucloud/dagu",
+      "checks": [
+        {
+          "field": "readme.install[0] (Installer script, Linux/macOS)",
+          "statement": "`curl -fsSL https://raw.githubusercontent.com/dagucloud/dagu/main/scripts/installer.sh | bash`; the installer verifies SHA-256 against the release checksums.txt and can optionally write a systemd unit / LaunchAgent running `dagu start-all`.",
+          "citation": "README.md:102-105; scripts/installer.sh:1520-1546, 1629-1698, 1740-1837",
+          "holds": true,
+          "note": "README.md:102 '**macOS/Linux:**', :105 has the command verbatim. installer.sh:7 RELEASES_URL=https://github.com/dagucloud/dagu/releases; :1526 downloads ${RELEASES_URL}/download/${VERSION}/checksums.txt, :1527 filters the asset's line, :1532 verify_sha256sum_file (sha256sum -c or shasum -a 256 -c; returns 1 if neither tool exists, :265-279) and exits 1 on failure; :1544 verification runs before the archive is used. Service is optional: wizard prompt 'Install Dagu as a background service?' (:940) and --service <yes|no> (:113). systemd unit ExecStart=${INSTALL_PATH} start-all (:1681), system or user scope (:1629-1639); macOS plist at ~/Library/LaunchAgents with ProgramArguments [dagu, start-all] (:1741, :1794-1798)."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX GPL-3.0-or-later; file LICENSE.",
+          "citation": "LICENSE; LICENSING.md:3",
+          "holds": true,
+          "note": "LICENSE is the unmodified GNU GPL v3 text ('Version 3, 29 June 2007', END OF TERMS at :621, standard 'How to Apply' appendix to :674, no added terms). LICENSING.md:3: 'distributed under the GNU General Public License version 3 or later (`GPL-3.0-or-later`)'. 2,348 files carry 'SPDX-License-Identifier: GPL-3.0-or-later'; a repo-wide search found no file with any other SPDX identifier."
+        },
+        {
+          "field": "readme.platforms.macos_arm64",
+          "statement": "yes - darwin/arm64 archives, npm package dagu-darwin-arm64, installer writes a user LaunchAgent; caveats: no macOS CI test job (only a GOOS=darwin lint and an npm install smoke test), resources.limits not enforced on macOS, config dir fixed to ~/.config while data/log dirs come from adrg/xdg DataHome.",
+          "citation": ".goreleaser.yaml:14-22; .github/workflows/npm-publish.yaml:62-65, 277-282; scripts/installer.sh:1740-1837; .github/workflows/ci.yaml:150, 185-189, 631-635; internal/runtime/resourcelimit/native_unsupported.go:14-16; internal/cmn/config/loader.go:185-188",
+          "holds": true,
+          "note": ".goreleaser.yaml:16 darwin and :22 arm64; the ignore list only drops windows/arm (:28-35). npm-publish.yaml:62-65 maps darwin/arm64 to dagu-darwin-arm64 from darwin_arm64.tar.gz; :279 macos-latest appears only in verify-packages, which runs npm install plus 'dagu version'/'dagu help' (:312-322). Across all workflows the only macOS runner is npm-publish.yaml:279; ci.yaml:150 darwin is a golangci-lint GOOS; test jobs use ubuntu-latest (:189) and windows-latest (:635). native_unsupported.go:4 '//go:build !linux && !windows' (covers darwin); :14-16 returns 'native resource limits are unsupported on darwin'. loader.go:22 imports github.com/adrg/xdg; :186 DataHome: xdg.DataHome; :187 ConfigHome: ~/.config; path.go:103-110 derive data/log dirs from DataHome, and README.md:885-886 list ~/.local/share/dagu defaults. Non-blocking imprecision: the XDG layout is only the fallback when DAGU_HOME is unset and ~/.dagu does not exist (path.go:59-94), and the installer's LaunchAgent sets DAGU_HOME (installer.sh:1811-1812)."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "Yes. Built-in MCP server, Streamable HTTP only (no stdio transport), at <base>/mcp, registered on every server start; tools dagu_read, dagu_change (preview/apply), dagu_execute (start/enqueue/retry/stop); dagu:// resources; auth follows the server auth mode and API keys need the mcp surface; specs/020 is 'Draft' and specs/README lists it 'Not implemented'.",
+          "citation": "internal/service/mcp/server.go:26-28, 58-65, 113-154; internal/service/frontend/server.go:896, 1345-1363; specs/020-mcp-server.md:3, 37-73; specs/README.md:31",
+          "holds": true,
+          "note": "mcp/server.go:58-65 NewHTTPHandler returns mcpsdk.NewStreamableHTTPHandler (modelcontextprotocol/go-sdk, :22); :26-28 tool names; :113-154 AddTool for dagu_read (ReadOnlyHint), dagu_change ('mode=preview before mode=apply'), dagu_execute ('action=start or enqueue ... retry ... stop'). frontend/server.go:896 calls setupMCPRoute unconditionally in Serve (:834); :1346 path = BuildPublicEndpointPath(BasePath, \"mcp\"); :1349 RequiredAPIKeySurface = APIKeySurfaceMCP; :1356 auth.Middleware. No Stdio/IOTransport in any .go file, and there is no MCP on/off key in internal/cmn/config. dagu:// resource URIs exist (mcp/server_test.go:574-764; spec 020:77). specs/020-mcp-server.md:3 'Status: Draft.'; :37-73 auth-mode and mcp-surface rules; specs/README.md:31 '020: MCP Server | Not implemented'."
+        },
+        {
+          "field": "claim_checks[1] (cron/timezones/overlap/catch-up, verified: partial)",
+          "statement": "Cron via robfig/cron with TZ=/CRON_TZ= and @descriptors; overlap_policy governs catch-up/resume buffers only, live ticks are dropped while the DAG is running or queued, so 'all'/'latest' never queue live ticks; catch-up default 6h from auto-created base.yaml, at most 1000 missed intervals from max(now-window, last tick, last scheduled), computed at start and on resume, needs queues enabled; whole-minute ticks, timing outside conformance.",
+          "citation": "go.mod:69; specs/063-schedule.md:7-10, 18-50; internal/service/scheduler/tick_planner.go:394-486, 546-612, 636-724, 749-776, 1423-1444; internal/cmn/schema/dag.schema.json:155-160; internal/persis/file/baseconfig/default_base_config.go:52-56; store.go:80-88; internal/service/scheduler/catchup.go:20-34, 54-90",
+          "holds": true,
+          "note": "go.mod:69 github.com/robfig/cron/v3 v3.0.1. spec 063: :31-34 TZ=/CRON_TZ= kept, :18-28 descriptors, :10 dispatch/timing outside conformance, :47-48 whole-minute ticks. dag.schema.json:159 says overlap_policy 'Controls what happens when a catchup run is ready but the DAG is still running'. The policy is read only by catch-up ScheduleBuffers (tick_planner.go:453, 473, 575-611, 1407, 1456, 1472, 1508); nothing else in internal/ consumes it. Live cron path :663-680 goes to shouldRun (:750), which returns false when running (:760-762) or queued (:774-776) and never checks the policy. :636-661 one-off, :686-710 stop (only if running), :712-724 restart. default_base_config.go:56 catchup_window: \"6h\"; store.go:71-88 writes base.yaml on first run (called from internal/cmd/context.go:366; skipped when skip_examples is set, :361); spec/dag.go:1004-1005 DAGs inherit it unless they set it. catchup.go:20-29 replayFrom = max(now-window, lastTick, lastScheduled), :34 MaxMissedRuns = 1000, :84-87 keeps the newest 1000. Queues required at :395-405 and :1427-1429. Non-blocking omission: catch-up buffers are also recomputed when a DAG definition is updated (tick_planner.go:1240-1241; recomputeBuffer :1486)."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

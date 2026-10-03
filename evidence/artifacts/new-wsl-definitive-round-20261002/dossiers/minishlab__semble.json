@@ -1,0 +1,343 @@
+{
+  "contender": "minishlab/semble",
+  "revision": {
+    "contender": "minishlab/semble",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "minishlab/semble",
+        "tag": "v0.6.1",
+        "commit": "24497845460960db1839c8485319df189a889225",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.6.1",
+    "commit": "24497845460960db1839c8485319df189a889225",
+    "read_at": "2026-10-02T03:02:25+00:00"
+  },
+  "dossier": {
+    "contender": "minishlab/semble",
+    "revision": {
+      "tag": "v0.6.1",
+      "commit": "24497845460960db1839c8485319df189a889225",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Python library, CLI and stdio MCP server for local code search aimed at coding agents. It chunks files with tree-sitter (about 750 characters per chunk) and embeds the chunks with a static Model2Vec model (default minishlab/potion-code-16M-v2). It also builds a BM25 index, fuses the two rankings with RRF and reranks with code-aware boosts and penalties. It indexes local directories or git URLs, searches several repos as one corpus, and caches indexes on disk with incremental mtime-based reindexing. `semble install` writes MCP, instruction and sub-agent configs for 19 coding agents, including Claude Code and Codex. Version 0.6.1, Python >=3.10. The embedding model runs in-process: no embedding-service client was found in src/.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Semble is a code search library built for agents; 'Everything runs on CPU with no API keys, GPU, or external services.'",
+          "citation": "README.md:27, README.md:83"
+        },
+        {
+          "claim": "Usable as an MCP server, a CLI tool via AGENTS.md, or a dedicated sub-agent; any coding agent (Claude Code, Cursor, Codex, OpenCode, etc.) gets access to any repo.",
+          "citation": "README.md:27"
+        },
+        {
+          "claim": "Install uv, run `uv tool install semble` then `semble install`. The installer detects installed agents (Claude Code, Codex, OpenCode...) and lets you enable an MCP server, AGENTS.md/CLAUDE.md instructions and a `semble-search` sub-agent. `semble uninstall` undoes it.",
+          "citation": "README.md:38-51"
+        },
+        {
+          "claim": "Retrieval = tree-sitter code-aware chunks scored by two retrievers (static Model2Vec embeddings with potion-code-16M-v2, plus BM25), fused with Reciprocal Rank Fusion and reranked with code-aware signals. There is no transformer forward pass at query time.",
+          "citation": "README.md:264-279"
+        },
+        {
+          "claim": "Local and remote: pass a local path or a git URL, or several of them, to search related repos together. Each repo index is cached separately and merged at query time; result paths are prefixed with the repo name and the output includes a `repos` map.",
+          "citation": "README.md:85, README.md:116"
+        },
+        {
+          "claim": "Indexes are built and cached on first run and invalidated automatically when files change. On later runs file modification times are compared and only added/removed/changed files are reindexed; a full rebuild happens only if indexing settings change.",
+          "citation": "README.md:89, README.md:281"
+        },
+        {
+          "claim": "MCP server exposes `search` and `find_related`; repos are indexed on demand and cached; local paths are re-indexed automatically on file changes ('checked and refreshed automatically as files change').",
+          "citation": "README.md:239-244, README.md:281"
+        },
+        {
+          "claim": "Scoping: reads .gitignore and .sembleignore (gitignore syntax, recursive; `!*.ext` force-includes), always skips node_modules/.venv/dist/build/__pycache__; `--content code|docs|config|all`; files over 1 MB are skipped (SEMBLE_MAX_FILE_BYTES).",
+          "citation": "README.md:114, README.md:121-139, README.md:187"
+        },
+        {
+          "claim": "Indexes and savings stats are stored in the OS cache folder (~/.cache/semble/ on Linux, ~/Library/Caches/semble/ on macOS), overridable with SEMBLE_CACHE_LOCATION; `semble clear index|savings|orphans|all` removes cached data.",
+          "citation": "README.md:185, README.md:191"
+        },
+        {
+          "claim": "On first use Semble downloads the embedding model from Hugging Face into the standard HF cache; this happens once and requires network access.",
+          "citation": "README.md:189"
+        },
+        {
+          "claim": "SEMBLE_MODEL_NAME can point to a local path or Hugging Face repo containing a Model2Vec-compatible model; useful if Hugging Face is not reachable at runtime.",
+          "citation": "README.md:285"
+        },
+        {
+          "claim": "Performance: indexes an average repo in ~500 ms and answers queries in ~1 ms on CPU; NDCG@10 0.854, on par with code-specialized transformers; ~99% fewer tokens than grep+read; ~380x faster indexing and ~17x faster queries than CodeRankEmbed.",
+          "citation": "README.md:4, README.md:27, README.md:80-82, README.md:260"
+        },
+        {
+          "claim": "Python library API: SembleIndex.from_path / from_git / merge / search / find_related with ContentType selection (code, docs, config).",
+          "citation": "README.md:200-233"
+        },
+        {
+          "claim": "Configs written by `semble install` (MCP entry, instructions, sub-agent files) pin uvx to the installed version (`semble[mcp]==X.Y.Z`); rerun `semble install` after upgrading.",
+          "citation": "docs/installation.md:44"
+        }
+      ],
+      "install": [
+        {
+          "method": "uv tool (recommended; uv must be installed first)",
+          "command": "uv tool install semble\nsemble install",
+          "citation": "README.md:38-43; docs/installation.md:11-16"
+        },
+        {
+          "method": "Unattended installer for scripted/sandboxed environments (--agent takes one or more ids such as claude, codex, pi)",
+          "command": "semble install --agent claude --type mcp subagent --yes",
+          "citation": "README.md:68-74; docs/installation.md:28-40"
+        },
+        {
+          "method": "Run without installing (uvx fallback when `semble` is not on PATH)",
+          "command": "uvx --from \"semble[mcp]\" semble",
+          "citation": "README.md:114; docs/installation.md:447"
+        },
+        {
+          "method": "Manual MCP registration for Claude Code (user scope; requires uv)",
+          "command": "claude mcp add semble -s user -- uvx --from \"semble[mcp]\" semble",
+          "citation": "docs/installation.md:52-59"
+        },
+        {
+          "method": "Manual MCP registration for Codex (edit ~/.codex/config.toml; requires uv)",
+          "command": "[mcp_servers.semble]\ncommand = \"uvx\"\nargs = [\"--from\", \"semble[mcp]\", \"semble\"]",
+          "citation": "docs/installation.md:82-92"
+        },
+        {
+          "method": "Upgrade (documented upgrade path; docs/installation.md:44 also mentions `pip install --upgrade semble`)",
+          "command": "uv tool upgrade semble\nuv cache clean semble    # for MCP users; restart the MCP client afterwards",
+          "citation": "README.md:58-61; docs/installation.md:44"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - README documents the Linux cache path (README.md:185); CI runs on ubuntu-latest (.github/workflows/ci.yaml:18); semble-grammars manylinux2014_x86_64 wheel is locked (uv.lock:3908).",
+        "wsl2": "unknown - WSL is not mentioned anywhere in the repo (case-insensitive search for 'wsl' returned nothing), and CI does not test it. It would report sys.platform == 'linux' and take the Linux code path (src/semble/cache.py:85-86), but that is an inference.",
+        "macos_arm64": "yes - README documents the macOS cache path (README.md:185); CI runs on macos-latest (ci.yaml:18; the workflow does not state the architecture); semble-grammars macosx_11_0_arm64 wheel is locked (uv.lock:3906).",
+        "gpu": "no - not used or required: 'runs on CPU with no API keys, GPU, or external services' (README.md:27, README.md:83). Embeddings are a static Model2Vec lookup (src/semble/index/dense.py:44-50), and src/ has no CUDA/GPU code path (only a '.cu' to cuda file-extension mapping, src/semble/index/files.py:79-80)."
+      },
+      "integrations": {
+        "cli": "yes - `semble search`, `find-related`, `savings`, `clear`, `install`, `uninstall`, `--version`; JSON output by default (src/semble/cli.py:266-346, cli.py:69; README.md:91-116).",
+        "mcp": "yes - stdio MCP server, started by running `semble` with no subcommand; needs the `mcp` extra (cli.py:96-115; pyproject.toml:40-42). Tools: `search` and `find_related` (src/semble/mcp.py:85-169; README.md:241-246). Transport is stdio only (mcp.py:194).",
+        "sdk_or_api": "SDK: yes - Python library `from semble import SembleIndex, ContentType` with from_path / from_git / merge / search / find_related / save / load_from_disk (src/semble/__init__.py:1-13; src/semble/index/index.py:132-407; README.md:200-233). HTTP API: none found (no HTTP server code; only stdio, mcp.py:194).",
+        "claude_code_or_codex": "Both documented. Claude Code: `claude mcp add semble -s user -- uvx --from \"semble[mcp]\" semble` (docs/installation.md:58). `semble install` writes the MCP entry to ~/.claude.json, an instruction block to ~/.claude/CLAUDE.md and a sub-agent to ~/.claude/agents/semble-search.md (src/semble/installer/agents.py:186-194). Codex: [mcp_servers.semble] in ~/.codex/config.toml (docs/installation.md:84-90), instructions in ~/.codex/AGENTS.md and sub-agent ~/.codex/agents/semble-search.toml (agents.py:240-248; templates src/semble/agents/claude.md, src/semble/agents/codex.toml). Installer paths are user-level/global only; no project-scope config is written."
+      },
+      "telemetry_and_network": "No telemetry, analytics or phone-home code found. A regex search of src/ for HTTP clients (requests/httpx/aiohttp/urllib.request/socket), telemetry SDKs and API-key/base-URL settings matched only `urllib.parse`/`url2pathname` for path conversion (src/semble/installer/agents.py:12-13) and a Hugging Face log filter (src/semble/index/dense.py:19-21). Local-only usage stats: each search/find_related appends {timestamp, call type, result count, snippet chars, file chars} to <cache>/savings.jsonl, with no query text or paths (src/semble/stats.py:21-23, stats.py:57-94). Network IS used for: (1) first-use unauthenticated model download from the Hugging Face Hub into the HF cache (README.md:189; dense.py:19-33; the model2vec/huggingface_hub code was not read); (2) `git clone --depth 1` for git-URL repos, 60 s default timeout via the undocumented SEMBLE_CLONE_TIMEOUT (src/semble/index/index.py:31, index.py:249-259); (3) uv fetching the pinned `semble[mcp]==<version>` from PyPI when an agent launches the MCP command (agents.py:62-69, agents.py:93-126; docs/installation.md:44). No account, token or API key is required (README.md:27, README.md:83). Env vars read: SEMBLE_CACHE_LOCATION, SEMBLE_MODEL_NAME, SEMBLE_MAX_FILE_BYTES, SEMBLE_MCP_IDLE_TIMEOUT, SEMBLE_CLONE_TIMEOUT, XDG_CACHE_HOME, XDG_CONFIG_HOME."
+    },
+    "code": {
+      "languages": [
+        "Python (src/semble, tests/, benchmarks/)",
+        "Markdown and TOML (agent templates in src/semble/agents/, docs)"
+      ],
+      "entry_points": [
+        {
+          "path": "pyproject.toml:65-66",
+          "what": "Console script `semble = semble.cli:main`."
+        },
+        {
+          "path": "src/semble/cli.py:90-99",
+          "what": "main(): dispatches to CLI subcommands (search, find-related, install, uninstall, savings, clear, --version) when argv[1] is one of them; otherwise starts the MCP server."
+        },
+        {
+          "path": "src/semble/cli.py:102-115",
+          "what": "_mcp_main(): checks that the `mcp` extra is installed, then runs semble.mcp.serve."
+        },
+        {
+          "path": "src/semble/mcp.py:174-197",
+          "what": "serve(): FastMCP stdio server with tools `search` (line 85) and `find_related` (line 124); the model is preloaded in a background thread."
+        },
+        {
+          "path": "src/semble/__init__.py:1-13",
+          "what": "Library API: SembleIndex, ContentType, Chunk, SearchResult, IndexStats."
+        },
+        {
+          "path": "src/semble/installer/installer.py:197-242",
+          "what": "run(): interactive or unattended install/uninstall across 19 agent targets."
+        },
+        {
+          "path": "benchmarks/README.md:165-209",
+          "what": "Benchmark runners (`python -m benchmarks.run_benchmark`, speed_benchmark, baselines.*); not part of the shipped package."
+        }
+      ],
+      "architecture": "Single Python package src/semble. Pipeline: index/file_walker.py walks files (.gitignore + .sembleignore + default-ignored dirs, symlinks skipped). index/files.py holds a large extension-to-language table and the code/docs/config content-type split. chunking/ splits files with tree-sitter grammars from the separate `semble-grammars` package into ~750-char chunks (chunking.py:12), with a line-based fallback. index/dense.py embeds chunks with a Model2Vec StaticModel (default minishlab/potion-code-16M-v2, loaded from Hugging Face or a local path) and searches them by brute-force cosine in memory (SelectableBasicBackend over vicinity). index/bm25.py is an in-memory BM25 inverted index persisted as JSON. search.py runs both retrievers, converts scores to RRF (k=60) and blends them with alpha 0.3 for symbol-like queries or 0.5 for natural language (ranking/boosting.py:81-82). ranking/ then applies definition, stem and file-coherence boosts plus test/compat/example/.d.ts penalties. index/index.py is the SembleIndex facade: from_path, from_git (shallow clone into a temp dir), merge for multi-repo, search, find_related, save/load_from_disk. cache.py persists indexes under the OS cache dir at <sha256(resolved path or URL)>/index[-<content scopes>]/ with chunks.json, bm25_index/index.json, semantic_index/ (written by vicinity, not read) and metadata.json (model name, chunk size, cache version, per-file mtime manifest). It validates and incrementally reuses them (cache.py:27-41, 98-202; index/types.py:9-40). mcp.py runs one stdio server process per client launch, with an in-process LRU of at most 10 indexes, optional idle eviction (SEMBLE_MCP_IDLE_TIMEOUT) and an mtime revalidation cooldown. The on-disk cache is shared by CLI and MCP. installer/ plus agents/ write MCP entries, instruction blocks and sub-agent files for 19 agents. stats.py appends local token-savings records.",
+      "packaging_and_release": "Pure-Python distribution built with setuptools (pyproject.toml:1-3). Both `[tool.setuptools.dynamic] version = attr semble.version.__version__` (pyproject.toml:82-83) and `[tool.setuptools_scm]` (lines 79-80) are configured. src/semble/version.py:1-2 reads 0.6.1, matching tag v0.6.1 (.git/packed-refs:2). Agent templates ship as package-data (pyproject.toml:76-77). The sdist excludes benchmarks/, assets/ and uv.lock (MANIFEST.in:1-4). Release: .github/workflows/release.yaml is workflow_dispatch only (lines 3-4). It builds with `uv build` (line 17), uploads dist/ as an artifact, then publishes to PyPI via pypa/gh-action-pypi-publish@release/v1 using OIDC trusted publishing (environment `release`, `id-token: write`; lines 25-40). The workflow has no test gate (publish only needs `build`), no checksum, signature or SBOM step, no explicit attestation setting, and creates no GitHub Release or binary assets. Its actions use mutable tag/branch refs (release.yaml:11, 14, 20, 34, 40), whereas ci.yaml pins checkout, setup-uv and codecov by SHA (ci.yaml:22, 31, 56). Whether PEP 740 attestations are produced depends on the third-party action's defaults, which were not verified.",
+      "tests_and_ci": "pytest>=8 with pytest-cov (pyproject.toml:51-58, 135-137). tests/ has 15 test files (11 in tests/, 4 in tests/index/) plus conftest.py, and 199 `def test_` definitions (many parametrized): cache, chunker, CLI incl. clear, file walker, files, git (local repos), installer (50), MCP (23, fake indexes), ranking, search, stats, bm25/create/dense/index. The embedding model is mocked throughout (tests/conftest.py:75-90; every load_model/from_pretrained call in tests/ is patched), so no test runs the real model end-to-end. CI: .github/workflows/ci.yaml runs on push and PR to main, matrix ubuntu/macos/windows-latest x Python 3.10-3.14 (15 jobs). Steps: `uv venv`, `uv pip install '.[dev,mcp]'`, `pytest` (with coverage), Codecov upload. CI has no lint, mypy or pydoclint step; those run only via pre-commit (.pre-commit-config.yaml:23-41) and the Makefile (Makefile:22-27). The tests were not run for this dossier.",
+      "dependencies": "pyproject.toml: 8 runtime deps (lines 28-37): model2vec>=0.4.0,<0.10, vicinity>=0.4.4,<0.5, numpy>=1.24.0, pathspec>=0.12, orjson, questionary>=2.0,<3.0, semble-grammars>=0.1.2,<0.2, tqdm>=4.60. Extras: mcp = 1 (mcp>=1.0,<2.0; lines 40-42), benchmark = 6 (lines 43-50), dev = 6 (lines 51-58). Build requires: 2 (setuptools>=64, setuptools_scm>=8; line 2). requires-python >=3.10 (line 12); classifiers list 3.10-3.13 while CI also runs 3.14. uv.lock has 145 [[package]] entries; locked versions include model2vec 0.9.0 (uv.lock:1879), vicinity 0.4.4 (4388), mcp 1.29.1 (1845), semble-grammars 0.1.2 (3898) and tree-sitter 0.26.0 (4253). Code imports huggingface_hub, tree_sitter and pydantic directly without declaring them (index/dense.py:9; chunking/core.py:8; installer/config.py:9; mcp.py:14). semble-grammars ships only py3-none platform wheels (uv.lock:3905-3910); its source repo is outside this repo and was not read. [tool.uv] exclude-newer = '1 week' (pyproject.toml:146-150).",
+      "security_policy": "none - no SECURITY.md at the repo root or under .github/ (.github/ contains only PULL_REQUEST_TEMPLATE.md and the two workflows)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Everything runs on CPU with no API keys, GPU, or external services (README.md:27, 83).",
+        "verified": "partial",
+        "evidence": "True for query time. src/ has no HTTP client, API-key or embedding-service code (regex search matched only urllib.parse in installer/agents.py:12-13 and a log filter in index/dense.py:19-21), and embeddings are an in-process Model2Vec StaticModel (index/dense.py:24-50). But first use downloads the model from Hugging Face (README.md:189; dense.py:31-33), git-URL repos need `git clone` (index/index.py:249-253), and uvx fetches the pinned package from PyPI when an MCP client launches the server (installer/agents.py:62-69). Fully offline use requires SEMBLE_MODEL_NAME to be a local Model2Vec path (utils.py:67-69)."
+      },
+      {
+        "claim": "Indexes are cached to disk, reindexed incrementally by modification time, and fully rebuilt only if indexing settings change (README.md:281).",
+        "verified": "yes",
+        "evidence": "cache.py:98-110 invalidates on model-name, content-set, chunk-size (750, chunking/chunking.py:12) or CACHE_FORMAT_VERSION (index/types.py:9) mismatch. cache.py:128-156 compares file mtimes with the index write time and the stored file set. index/create.py:128-134 reuses chunks and vectors for files whose mtime_ns is unchanged and re-embeds only changed files; removed files are dropped (create.py:144-145). Caveats: staleness is mtime-only (no content hash), and git-URL indexes skip revalidation entirely (cache.py:136-137; tests/test_cache.py:268-275). Not executed here."
+      },
+      {
+        "claim": "In MCP mode the index is checked and refreshed automatically as files change, so results stay current (README.md:239, 281).",
+        "verified": "partial",
+        "evidence": "mcp.py:273-293 revalidates a local-path entry on each tool call through get_validated_cache and evicts it if stale, so the next call rebuilds incrementally. It is polling on request (no file watcher). Revalidation is skipped for 3x the last build duration (mcp.py:34, 258, 288) and never done for git URLs (mcp.py:282; tests/test_mcp.py:170-191). The README does not mention the cooldown or the git-URL exception."
+      },
+      {
+        "claim": "Local and remote: pass a local path or git URL, or several, to search related repos together (README.md:85, 116).",
+        "verified": "yes",
+        "evidence": "cli.py:131-143 builds one index per path/URL and merges them. index/index.py:168-213 SembleIndex.merge checks that all indexes use the same model, labels by repo name, and rejects duplicates. mcp.py:49-57 accepts a string or a list (tests/test_mcp.py:361-376). Difference between clients: MCP rejects non-http(s) git schemes (mcp.py:41-42; tests/test_mcp.py:489-507), while the CLI accepts ssh://, git://, file:// and scp-style URLs (utils.py:9-16; cli.py:34-41)."
+      },
+      {
+        "claim": "`semble install` detects Claude Code, Codex, etc. and enables an MCP server, instructions and a sub-agent; `semble uninstall` undoes it (README.md:45-51).",
+        "verified": "yes",
+        "evidence": "installer/agents.py:185-360 defines 19 agent targets (Claude Code at 186-194, Codex at 240-248). installer/installer.py:67-107 applies or removes the three integration types. installer/config.py:135-200 and 268-292 edit JSON5/TOML in place and re-parse before writing. tests/test_installer.py covers merge/remove (50 test defs). All target paths are user-level; no project-scope config is written, and no backup of edited files is made (no backup logic found in src/)."
+      },
+      {
+        "claim": "Scoping via .gitignore/.sembleignore, default-skipped directories, and a 1 MB file cap (README.md:121-139, 187).",
+        "verified": "yes",
+        "evidence": "index/file_walker.py:14-34 lists the default-ignored dirs; 37-49 reads .gitignore and .sembleignore per directory (recursive walk, 107-131); `!ext` negations force-include (97-102, 130); symlinks are skipped (122-123). index/files.py:9 and 493-495 apply the 1 MB default cap (SEMBLE_MAX_FILE_BYTES), and create.py:32-42 warns about skipped files. Doc nit: the README example (README.md:126-129) puts inline `#` comments after patterns and shows `*.pb.go.`; lines are passed unmodified to pathspec (file_walker.py:42-48) and gitignore syntax has no inline comments. This was inferred from the code and not executed."
+      },
+      {
+        "claim": "SEMBLE_MODEL_NAME may be a local path or Hugging Face repo containing a Model2Vec-compatible model (README.md:285).",
+        "verified": "yes",
+        "evidence": "utils.py:67-69 reads the variable; index/dense.py:24-41 loads it with StaticModel.from_pretrained. The model name is stored in index metadata and a mismatch forces a rebuild (cache.py:107). No other embedding backend (for example an HTTP or OpenAI-style service) exists in src/. The cache directory is keyed by path and content scope, not by model (cache.py:37-41), so two clients running with different SEMBLE_MODEL_NAME values on one repo would overwrite each other's index. That follows from the code and was not run."
+      },
+      {
+        "claim": "NDCG@10 of 0.854, on par with code-specialized transformers; ~380x faster indexing and ~17x faster queries than CodeRankEmbed (README.md:27, 81, 260).",
+        "verified": "partial",
+        "evidence": "0.8544 appears in benchmarks/results/semble-hybrid-a772a37d558c.json:5 (model potion-code-16M-v2; the four committed semble runs range 0.8519-0.8544). The CodeRankEmbed row (0.839 / 116 s / 16 ms, benchmarks/README.md:21) is a semantic-only dense baseline (benchmarks/README.md:150) compared with semble's hybrid pipeline. Its 63-repo average was not recomputed from coderankembed-812d8e74b9d0.json. Ground-truth queries and labels are LLM-generated and LLM-judged (benchmarks/README.md:136). README ablation values differ from the committed ablation file by up to ~0.012 (benchmarks/README.md:104-106 vs benchmarks/results/semble-ablations-a772a37d558c.json:5-41). Nothing was re-run."
+      },
+      {
+        "claim": "~99% fewer tokens than grep+read (README.md:4, 82, 260).",
+        "verified": "partial",
+        "evidence": "benchmarks/results/token-efficiency-0e2d85215c7e.json:62-68 gives an expected cost of 45,587 tokens for the keyword ripgrep+read baseline vs 347.8 for semble over 1,251 queries, capped at 32k tokens when nothing is found (benchmarks/README.md:48). The baseline is a simulated keyword-grep plus read-whole-file pipeline (benchmarks/README.md:67), not measured agent sessions. A weaker `grep+read` variant in the same file reaches only 0.125 recall at 32k (token-efficiency-0e2d85215c7e.json:24-32). `semble savings` uses an estimate of (file chars - snippet chars)/4 (stats.py:73-83, 175)."
+      },
+      {
+        "claim": "Indexes an average repo in ~500 ms and answers queries in ~1 ms (README.md:80).",
+        "verified": "partial",
+        "evidence": "Six committed speed runs that include semble list avg_index_ms 247.6-590.5 and avg_p50_ms 0.58-0.98 (summary blocks, e.g. speed-eb6676ad14ec.json:25-26 = 305.6 ms / 0.95 ms; speed-0e2d85215c7e.json:25-26 = 590.5 / 0.98; speed-204547031f12.json:25-26 = 247.6 / 0.58). The all-repo quality run reports p50 2.0 ms and index 527 ms (semble-hybrid-a772a37d558c.json:7-11). The benchmark machine's hardware/OS is not recorded in the files or docs I read; benchmarks/README.md:38 says only 'CPU only, one repo per language'. Nothing was re-run."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Retrieval quality of semble hybrid (potion-code-16M-v2 + BM25 + ranking) over ~1,250 queries / 63 repos / 19 languages",
+        "metric": "NDCG@10",
+        "value": "0.854 overall (committed semble runs: 0.8519-0.8544). README by-category table: architecture 0.802, semantic 0.846, symbol 0.958.",
+        "source": "benchmarks/README.md:20, 117; benchmarks/results/semble-hybrid-a772a37d558c.json:5",
+        "independent": false
+      },
+      {
+        "what": "Project-reported comparison baseline: CodeRankEmbed (137M-param transformer, semantic-only dense search) on the same benchmark",
+        "metric": "NDCG@10 / cold index time / query p50",
+        "value": "0.839 / 116 s / 16 ms (semble row in the same table: 0.854 / 306 ms / 0.91 ms; project states ~380x index and ~17x query speedup)",
+        "source": "benchmarks/README.md:20-21, 36, 150",
+        "independent": false
+      },
+      {
+        "what": "semble speed benchmark (one repo per language, CPU only, cold-start index, warm query p50 over 5 runs); hardware not recorded",
+        "metric": "average index time; average query p50",
+        "value": "README table: 306 ms; 0.91 ms. Six committed semble speed runs: 247.6-590.5 ms and 0.58-0.98 ms.",
+        "source": "benchmarks/README.md:20, 38; benchmarks/results/speed-eb6676ad14ec.json:25-26 (and sibling speed-*.json files)",
+        "independent": false
+      },
+      {
+        "what": "Token cost to first relevant hit vs a simulated keyword ripgrep + read-file baseline (1,251 queries, cl100k_base, 32k cap when nothing is found)",
+        "metric": "expected tokens per query",
+        "value": "semble 348 vs baseline 45,587 (99% fewer)",
+        "source": "benchmarks/README.md:46-53, 67; benchmarks/results/token-efficiency-0e2d85215c7e.json:62-68",
+        "independent": false
+      },
+      {
+        "what": "Recall at fixed token budgets, semble vs the simulated ripgrep + read-file baseline",
+        "metric": "recall at 500 / 2k / 8k / 32k tokens",
+        "value": "semble 0.842 / 0.967 / 0.995 / 0.995 vs baseline 0.001 / 0.037 / 0.207 / 0.583",
+        "source": "benchmarks/README.md:59-62; benchmarks/results/token-efficiency-0e2d85215c7e.json:14-41",
+        "independent": false
+      },
+      {
+        "what": "Ablation of retrievers and the ranking stack",
+        "metric": "NDCG@10",
+        "value": "README: BM25 raw 0.675 -> 0.834 with ranking; potion-code-16M-v2 raw 0.650 -> 0.821; BM25 + potion-code-16M-v2 with ranking 0.854. Committed ablation file shows 0.8378 / 0.8241 ranked, 0.6865 / 0.6537 unranked, 0.8544 hybrid.",
+        "source": "benchmarks/README.md:102-106; benchmarks/results/semble-ablations-a772a37d558c.json:5-41",
+        "independent": false
+      },
+      {
+        "what": "Per-language retrieval quality (weakest and strongest languages for semble)",
+        "metric": "NDCG@10",
+        "value": "typescript 0.706, c 0.741, haskell 0.765 (weakest); javascript 0.917, cpp 0.915, zig 0.913 (strongest)",
+        "source": "benchmarks/README.md:77-79, 93-95",
+        "independent": false
+      },
+      {
+        "what": "Benchmark dataset size and provenance",
+        "metric": "queries / repos / languages; label generation",
+        "value": "~1,250 queries (711 semantic, 343 architecture, 204 symbol), 63 repos, 19 languages; queries and relevance labels generated by Claude Sonnet 4.6 and verified by the same model as LLM-judge. No third-party measurements found in the repo.",
+        "source": "benchmarks/README.md:123-136",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "No embedding-service integration: embeddings come from an in-process static Model2Vec model (default minishlab/potion-code-16M-v2; src/semble/utils.py:11; index/dense.py:24-50), and SEMBLE_MODEL_NAME accepts only a Model2Vec-compatible local path or HF repo (README.md:285). A regex search of src/ found no HTTP embedding client, API-key variable or base-URL setting, so an externally hosted or OpenAI-compatible embedding endpoint cannot be configured. The license of the default model weights is not stated in this repo.",
+      "First-run network dependencies despite the 'no external services' headline: Hugging Face model download (README.md:189), uv fetching the pinned `semble[mcp]==X.Y.Z` from PyPI whenever a client launches the MCP command unless uv has it cached (installer/agents.py:62-69; docs/installation.md:44, 52), and `git clone` for URL repos with a 60 s default timeout (index/index.py:31, 249-259). SEMBLE_CLONE_TIMEOUT is not documented in README or docs. Offline use is documented only as the SEMBLE_MODEL_NAME local-path note (README.md:285).",
+      "Index persistence is neither atomic nor locked. SembleIndex.save writes bm25, vectors, chunks and finally metadata straight into the final cache dir (index/index.py:386-407), and only savings.jsonl uses a non-blocking flock (stats.py:88-91; no other locking or rename logic in src/). The cache is shared by CLI and MCP and keyed by resolved path + content set, not by client (cache.py:27-41), so two clients (for example Claude Code and Codex MCP servers) can race on the same repo. `from_path` does not catch errors from load_from_disk (index.py:159-161) or from reading metadata.json (cache.py:120). Inconsistent component counts or unreadable files therefore raise (index.py:352-362) until `semble clear index` is run (cli.py:207-218); in MCP this surfaces as a 'Failed to index' error string (mcp.py:44-46). Missing files and version/model/chunk-size mismatches do trigger a silent rebuild (cache.py:98-125). Tests cover rejection of bad state (tests/index/test_index.py:297-316) but not concurrent writers. This reading is from code and was not executed.",
+      "Freshness is mtime-based only: an index is stale when a file's `st_mtime` is later than the index write time or the file set differs (cache.py:139-154; index/files.py:486-491), and per-file reuse compares mtime_ns equality (index/create.py:128). There is no content hashing, so a file restored with an older mtime can be served stale. Git-URL indexes are never revalidated (cache.py:136-137; tests/test_cache.py:268-275), so remote-repo results stay frozen until `semble clear index`. Moving or renaming a local repo changes the sha256 key (cache.py:27-34) and leaves an orphan until `semble clear orphans` (cli.py:231-252). MCP also applies a revalidation cooldown of 3x the last build time (mcp.py:34, 288).",
+      "Scope is caller-supplied, not server-enforced. The MCP `repo` argument accepts any local directory path or any http(s) URL the agent passes, with no allowlist or root setting (mcp.py:41-47, 88, 230); the CLI also accepts ssh://, git://, file:// and scp-style URLs (utils.py:9-16). Cached chunks store verbatim source text in plaintext JSON under the user cache dir (index/index.py:395; cache.py:56-89). The installer edits user-level agent configs in place (~/.claude.json, ~/.codex/config.toml) with no backup (installer/agents.py:191, 245; installer/config.py:172, 276) and pins uvx to the installed version, so upgrades require re-running `semble install` (docs/installation.md:44).",
+      "Platform coverage depends on the separate `semble-grammars` wheel set: macOS x86_64/arm64, manylinux2014 x86_64/aarch64 and Windows amd64/arm64 only (uv.lock:3905-3910). On other platforms chunking falls back to line-based with only a logged warning (chunking/core.py:24-35), which degrades retrieval quality. WSL2 is not mentioned in the docs or CI. The package imports huggingface_hub, tree_sitter and pydantic directly without declaring them (index/dense.py:9; chunking/core.py:8; installer/config.py:9; mcp.py:14; pyproject.toml:28-37). Retrieval is a brute-force in-memory cosine scan plus an in-memory BM25 persisted as JSON (index/dense.py:53-98; index/bm25.py:102-120); the benchmarks use 63 repos (one per language for speed), with no large-monorepo scaling data in the repo.",
+      "All published measurements are project-run with LLM-generated ground truth and no third-party replication in the repo (benchmarks/README.md:136). The headline quality baseline is a semantic-only CodeRankEmbed run compared with semble's hybrid pipeline (benchmarks/README.md:150). The result files do not record hardware, and README table values do not exactly match any committed result file (see claim_checks). The 99% token figure is modeled against a simulated grep+read workflow capped at 32k tokens, not measured agent sessions (benchmarks/README.md:48, 67). The test suite mocks the real embedding model everywhere (tests/conftest.py:75-90), so CI does not exercise the real default model end-to-end.",
+      "Release and governance: pre-1.0 (v0.6.1, classifier 'Development Status :: 4 - Beta'; pyproject.toml:15; src/semble/version.py:1). PyPI publishing is a manual workflow_dispatch with no test gate, no checksum/signature/SBOM step, and mutable action refs (release.yaml:3-4, 11-40). CI runs tests only; ruff, mypy and pydoclint are not in CI (ci.yaml:49-53; .pre-commit-config.yaml:23-41). There is no SECURITY.md. CONTRIBUTING requires a linked issue and says it will not accept dependency additions or large features (CONTRIBUTING.md:7-8, 30-35). The LICENSE copyright holder is an individual (LICENSE:3). v0.6.1's release date cannot be determined from the shallow clone."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "minishlab/semble",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "uv tool (recommended; uv must be installed first): `uv tool install semble` then `semble install`",
+          "citation": "README.md:38-43; docs/installation.md:11-16",
+          "holds": true,
+          "note": "README.md:38-43 says 'Install uv, then run:' and gives exactly these two commands. docs/installation.md:3 is headed 'Recommended: `semble install`' and lines 11-16 repeat the commands. Supporting code: console script `semble = semble.cli:main` (pyproject.toml:65-66) and the `install` subparser (src/semble/cli.py:290). Revision confirmed: .git/HEAD and refs/tags/v0.6.1 (.git/packed-refs:2) are both 24497845460960db1839c8485319df189a889225."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT; license file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1 reads 'MIT License', followed by the standard MIT text (lines 5-21). Consistent with pyproject.toml:11 (license = {file = \"LICENSE\"}), pyproject.toml:20 ('License :: OSI Approved :: MIT License') and README.md:293 ('MIT'). The copyright holder is an individual, 'Thomas van Dongen' (LICENSE:3), as the risks section says."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - README documents the Linux cache path (README.md:185); CI runs on ubuntu-latest (.github/workflows/ci.yaml:18); semble-grammars manylinux2014_x86_64 wheel is locked (uv.lock:3908)",
+          "citation": "README.md:185; .github/workflows/ci.yaml:18; uv.lock:3908",
+          "holds": true,
+          "note": "All three citations match. README.md:185 lists `~/.cache/semble/` on Linux. ci.yaml:18 matrix includes ubuntu-latest (with Python 3.10-3.14, line 19). uv.lock:3908 is semble_grammars-0.1.2-py3-none-manylinux2014_x86_64.whl. Spot-check of the adjacent wsl2 entry also holds: a case-insensitive 'wsl' search of the repo finds nothing, and src/semble/cache.py:85-86 is the non-win32/non-darwin `_linux_cache_dir` fallback."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Both documented. Claude Code: `claude mcp add semble -s user -- uvx --from \"semble[mcp]\" semble`; `semble install` writes ~/.claude.json, ~/.claude/CLAUDE.md, ~/.claude/agents/semble-search.md. Codex: [mcp_servers.semble] in ~/.codex/config.toml, ~/.codex/AGENTS.md, ~/.codex/agents/semble-search.toml. Installer paths are user-level only.",
+          "citation": "docs/installation.md:58, 84-90; src/semble/installer/agents.py:186-194, 240-248; src/semble/agents/claude.md, codex.toml",
+          "holds": true,
+          "note": "docs/installation.md:58 is the exact command, and docs:84-90 is the exact TOML block. agents.py:191-193 sets ~/.claude.json (key mcpServers), ~/.claude/CLAUDE.md and ~/.claude/agents/semble-search.md. agents.py:245-247 sets ~/.codex/config.toml (key mcp_servers, format toml), ~/.codex/AGENTS.md and ~/.codex/agents/semble-search.toml. Both templates exist in src/semble/agents/. installer.py writes only agent.mcp.path, instructions_path and subagent_path (lines 56-88), all under the home directory or the XDG config folder, so 'user-level only' holds. Note: installer-written entries pin `semble[mcp]==<version>` (agents.py:62, 67-71), whereas the manual docs command is unpinned."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "'Everything runs on CPU with no API keys, GPU, or external services' - verified: partial (true at query time; first-use HF model download, git clone for URL repos, uvx fetch of pinned package on MCP launch)",
+          "citation": "README.md:27, 83, 189; src/semble/index/dense.py:19-50; src/semble/index/index.py:31, 249-253; src/semble/installer/agents.py:12-13, 62-69; src/semble/utils.py:67-69",
+          "holds": true,
+          "note": "Every citation matches: README:27/83 quote, README:189 first-use HF download, dense.py:24-50 in-process StaticModel.from_pretrained + encode, index.py:249-253 `git clone --depth 1` subprocess with 60 s default (index.py:31), agents.py:62-71 uvx --from `semble[mcp]==__version__`, utils.py:67-69 SEMBLE_MODEL_NAME. An independent case-insensitive search of src/ for requests/httpx/aiohttp/urllib.request/urllib3/http.client/socket/telemetry/api_key/base_url/openai matched only agents.py:13 and dense.py:21 (log-filter string). A cuda/gpu/torch/device search matched only file-extension maps (files.py:79-80). Minor precision points that do not change 'partial': (a) the line-13 hit is `urllib.request.url2pathname`, not urllib.parse; (b) 'fully offline use requires SEMBLE_MODEL_NAME to be a local path' goes further than utils.py:67-69, because README:189 says the download happens only once, so a pre-populated HF cache may suffice (huggingface_hub behaviour not verifiable in this repo); (c) the PyPI fetch applies only to the default pin, since agents.py:50-59 pins a local path or git commit for directory or VCS installs."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

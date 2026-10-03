@@ -1,0 +1,398 @@
+{
+  "contender": "oraios/serena",
+  "revision": {
+    "contender": "oraios/serena",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "oraios/serena",
+        "tag": "v1.7.0",
+        "commit": "949a27ef1e5fda1a6e7b561e777bcece345c6ffd",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v1.7.0",
+    "commit": "949a27ef1e5fda1a6e7b561e777bcece345c6ffd",
+    "read_at": "2026-10-02T03:02:33+00:00"
+  },
+  "dossier": {
+    "contender": "oraios/serena",
+    "revision": {
+      "tag": "v1.7.0",
+      "commit": "949a27ef1e5fda1a6e7b561e777bcece345c6ffd",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Serena (PyPI package serena-agent 1.7.0, MIT, by Oraios AI) is a Python MCP server/toolkit that gives coding agents IDE-like, symbol-level code tools (pyproject.toml:6-8,69-70). With its default LSP backend it launches per-project language servers (74 Python modules directly under src/solidlsp/language_servers/) and exposes, from one MCP server: exact symbol bodies/definitions (find_symbol with include_body, get_symbols_overview, find_declaration), references and implementations (find_referencing_symbols, find_implementations), symbol-level edits (replace_symbol_body, insert_before_symbol, insert_after_symbol, rename_symbol, safe_delete_symbol) and explicit diagnostics (get_diagnostics_for_file; optional get_diagnostics_for_symbol) (src/serena/tools/symbol_tools.py:36-738). Dedicated contexts for Claude Code (claude-code) and Codex (codex), `serena setup` commands and `serena-hooks` helpers exist (docs/02-usage/030_clients.md). It runs as an external MCP server process (tools appear as mcp__serena__*), not as a native Claude Code plugin, and its automatic before/after-edit diagnostics are implemented but switched off by default (src/serena/tools/tools_base.py:471). A separate paid JetBrains plugin is an alternative backend that adds move, inline, type hierarchy and debugging (README.md:98-120,141-182). Nothing was executed for this dossier; all statements come from reading the source tree at the tag.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "'Serena provides essential semantic code retrieval, editing, refactoring and debugging tools that are akin to an IDE's capabilities, operating at the symbol level and exploiting relational structure.'",
+          "citation": "README.md:17-18"
+        },
+        {
+          "claim": "'It integrates with any client/LLM via the model context protocol (MCP).' Clients either launch Serena as a subprocess via a launch command, or connect by URL to a Serena MCP server started in HTTP mode.",
+          "citation": "README.md:19, 83-85"
+        },
+        {
+          "claim": "Agent-first tool design with high-level abstractions (symbols) instead of line numbers or primitive search patterns; 'your agent operates faster, more efficiently and more reliably, especially in larger and more complex codebases'.",
+          "citation": "README.md:21-25"
+        },
+        {
+          "claim": "'Do not install Serena via an MCP or plugin marketplace! They contain outdated and suboptimal installation commands.'",
+          "citation": "README.md:27-29"
+        },
+        {
+          "claim": "Two alternative backends: language servers over LSP ('the free/open-source alternative which is used by default') and the Serena JetBrains Plugin ('paid plugin; free trial available').",
+          "citation": "README.md:98-105, 115-120"
+        },
+        {
+          "claim": "Language-server backend provides 'support for over 40 programming languages' (the README lists roughly 70 names, e.g. Python, TypeScript, Java, Go, Rust, C/C++, C#, Ruby, PHP, Kotlin, Swift, Zig).",
+          "citation": "README.md:112-113"
+        },
+        {
+          "claim": "Retrieval via language servers: find symbol yes; symbol overview yes; find referencing symbols yes; find declaration yes* (generally not for external dependencies); find implementations yes** (only some languages); query external projects yes; diagnostics/inspections yes. Search in project dependencies and type hierarchy are JetBrains-only.",
+          "citation": "README.md:141-154"
+        },
+        {
+          "claim": "Refactoring via language servers: rename yes (symbols only). Move, inline and propagate-deletions are JetBrains-only.",
+          "citation": "README.md:160-165"
+        },
+        {
+          "claim": "Symbolic editing via language servers: replace symbol body, insert after symbol, insert before symbol, safe delete.",
+          "citation": "README.md:171-176"
+        },
+        {
+          "claim": "Interactive debugging (breakpoints, variables, expressions, REPL-style) is exclusive to the JetBrains plugin.",
+          "citation": "README.md:178-182"
+        },
+        {
+          "claim": "Inside an agentic harness such as Claude Code or Codex, the basic tools (search_for_pattern, replace_content, list_dir/find_file, read_file, execute_shell_command) 'are typically disabled by default' because the harness already provides them.",
+          "citation": "README.md:186-194"
+        },
+        {
+          "claim": "uv is 'the only required prerequisite' (language servers may need extra per-language dependencies); install with `uv tool install -p 3.13 serena-agent`, initialise with `serena init`, then configure the MCP client with a launch command.",
+          "citation": "README.md:220-245"
+        },
+        {
+          "claim": "Evaluation: agents ran ~20 routine tasks and gave one-sentence verdicts (Opus 4.6 in Claude Code on a large Python codebase; GPT 5.4 in Codex CLI on Java; GPT 5.4 in Copilot CLI on a multi-language monorepo); 'Different agents in different settings independently converge on the same verdict.'",
+          "citation": "README.md:37-65"
+        },
+        {
+          "claim": "A memory system for long-lived workflows can be disabled; configuration is multi-layered YAML (global, MCP launch command, per-project with local overrides, context, modes).",
+          "citation": "README.md:196-214"
+        }
+      ],
+      "install": [
+        {
+          "method": "uv tool (documented primary method; the docs state no OS restriction, Windows paths are documented at docs/02-usage/050_configuration.md:48 and CI covers ubuntu, windows and macos at .github/workflows/pytest.yml:83; uv is the prerequisite)",
+          "command": "uv tool install -p 3.13 serena-agent",
+          "citation": "README.md:229; docs/02-usage/010_installation.md:21-25"
+        },
+        {
+          "method": "Post-install initialisation (default LSP backend; add -b JetBrains for the JetBrains backend)",
+          "command": "serena init",
+          "citation": "README.md:237-240; docs/02-usage/010_installation.md:27-32"
+        },
+        {
+          "method": "uvx straight from the git repository (no install; always latest source)",
+          "command": "uvx -p 3.13 --from git+https://github.com/oraios/serena serena",
+          "citation": "docs/02-usage/020_running.md:187-196"
+        },
+        {
+          "method": "From a cloned source tree",
+          "command": "git clone https://github.com/oraios/serena && cd serena && uv run serena",
+          "citation": "docs/02-usage/020_running.md:198-218"
+        },
+        {
+          "method": "Docker image from GHCR (DOCKER.md labels Docker support experimental; the documented example ends in bare `serena` without the start-mcp-server subcommand)",
+          "command": "docker run --rm -i --network host -v /path/to/your/projects:/workspaces/projects ghcr.io/oraios/serena:latest serena",
+          "citation": "docs/02-usage/020_running.md:225-249; DOCKER.md:1-3"
+        },
+        {
+          "method": "Nix flake (requires nix-command and flakes)",
+          "command": "nix run github:oraios/serena -- <command> [options]",
+          "citation": "docs/02-usage/020_running.md:251-259"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - CI runs the full test matrix on ubuntu-latest (.github/workflows/pytest.yml:83); uv-based install is documented (docs/02-usage/010_installation.md:21-25); a linux/amd64 Docker image is built (.github/workflows/docker.yml:53). The README itself has no platform table.",
+        "wsl2": "yes, with caveats - documented only in the JetBrains-backend context: docs/02-usage/025_jetbrains_plugin.md:155-176 recommends running Serena inside WSL with the project on the WSL filesystem; code normalises WSL/UNC paths (src/serena/jetbrains/jetbrains_plugin_client.py:248-272) and treats WSL as headless for opening GUI windows (src/serena/util/exception.py:14,33-36; test/serena/util/test_exception.py:28-35). No WSL-specific CI job or install section found.",
+        "macos_arm64": "yes (indirect evidence; the README does not state architectures) - CI includes macos-latest, 4 of the 13 pytest jobs (.github/workflows/pytest.yml:21-24,83) with steps that branch on `uname -m` for arm64 (pytest.yml:378-383); docs list macOS ARM64 for the auto-downloaded C# server (docs/02-usage/050_configuration.md:483,508). The GUI log window is not supported on macOS (docs/02-usage/060_dashboard.md:12-16); Swift/sourcekit tests run only on macOS (test/conftest.py:450-451).",
+        "gpu": "no - not used. No GPU/accelerator dependency or code path (pyproject.toml:19-55 lists no torch/onnx/CUDA packages); the only 'CUDA' hit is a .cu file-extension mapping for clangd (src/solidlsp/ls_config.py:437-438)."
+      },
+      "integrations": {
+        "cli": "yes - console scripts `serena` and `serena-agent` (serena.cli:top_level) and `serena-hooks` (pyproject.toml:64-67). click commands include init, setup <client>, start-mcp-server, start-project-server, dashboard-viewer, project create/index/index-file/health-check/is_ignored_path, tools list/description, config edit, context/mode/prompts management and memories subcommands (src/serena/cli.py:172-1520; docs/02-usage/020_running.md:105-178). Tools can also be run without an LLM or MCP through the Python API (CONTRIBUTING.md:52-57; scripts/demo_run_tools.py:25-51).",
+        "mcp": "yes - `serena start-mcp-server` (src/serena/cli.py:232-400) built on the MCP Python SDK's FastMCP (src/serena/mcp.py:385-392). Transports: stdio (default), streamable-http (/mcp) and legacy sse, default bind 127.0.0.1:8000 (cli.py:264-280; docs/02-usage/020_running.md:34-79). Each Serena tool is published with readOnlyHint/destructiveHint annotations (mcp.py:106-112). By counting class definitions in src/serena/tools/*.py there are 52 registered tool classes, 29 enabled by default and 23 optional (e.g. all 13 JetBrains tools); the active set depends on context, modes and project config (docs/02-usage/050_configuration.md:59-139). One active project per server instance (docs/02-usage/020_running.md:72-77). By default every started server also opens its dashboard (src/serena/resources/serena_config.template.yml:38-49).",
+        "sdk_or_api": "No separately published SDK or stable HTTP API contract found. (1) The Python package is importable and tools can be called programmatically (scripts/demo_run_tools.py:25-51; CONTRIBUTING.md:52-57). (2) Optional Agno agent integration via the `agno` extra (pyproject.toml:100; docs/03-special-guides/custom_agent.md:1-45). (3) HTTP: MCP over streamable-http/SSE (above) and the 'Project Server' (`serena start-project-server`, Flask, default 127.0.0.1:24225, POST /query_project and GET /heartbeat; src/serena/project_server.py:34-85; src/serena/constants.py:41; docs/02-usage/040_workflow.md:190-210). The dashboard exposes local JSON endpoints for its own UI without authentication (src/serena/dashboard.py:267-480); they are not documented as a public API. (4) A guide exposes Serena to ChatGPT via the third-party MCPO proxy plus a Cloudflare tunnel (docs/03-special-guides/serena_on_chatgpt.md:14-60).",
+        "claude_code_or_codex": "Yes, both documented. CLAUDE CODE: `serena setup claude-code` runs `claude mcp add --scope user serena -- serena start-mcp-server --context=claude-code --project-from-cwd` (src/serena/config/client_setup.py:51-69; docs/02-usage/030_clients.md:102-141); per-project variant `claude mcp add serena -- serena start-mcp-server --context claude-code --project \"$(pwd)\"` (030_clients.md:141). The claude-code context excludes create_text_file, read_file, execute_shell_command, find_file, list_dir and search_for_pattern, is single-project and disables structured output (src/serena/resources/config/contexts/claude-code.yml:36-56). Optional alpha-labelled hooks go in .claude/settings.json: PreToolUse `serena-hooks remind` (emits a deny for built-in Grep/Read after about 3 consecutive calls, at most once per 120 s), PreToolUse `auto-approve` (allows Serena tool calls in acceptEdits/auto permission modes), SessionStart `activate`, SessionEnd `cleanup` (030_clients.md:149-226; src/serena/hooks.py:115-144,546-583). The docs state recent Claude Code/Opus versions show 'drastically reduced adherence' to Serena's tools and recommend `claude --system-prompt=\"$(serena prompts print-cc-system-prompt-override)\"`, which replaces Claude Code's system prompt (030_clients.md:111-129; src/serena/resources/config/prompt_templates/system_prompt.yml:60-214); they also advise raising MCP_TIMEOUT if startup is slow (030_clients.md:144-147). No Claude Code plugin manifest, .claude-plugin directory or .mcp.json is in the repo (none found), and no PostToolUse diagnostics hook exists (hooks.py:595-634). Post-edit diagnostics therefore require the agent to call get_diagnostics_for_file itself (symbol_tools.py:482-533). CODEX: `serena setup codex` runs `codex mcp add serena -- serena start-mcp-server --context=codex --project-from-cwd`, or edit ~/.codex/config.toml; optional hooks need `codex_hooks = true` plus ~/.codex/hooks.json, and SessionEnd cleanup needs Codex >= 0.145.0 (030_clients.md:302-387; client_setup.py:72-88). The codex context excludes create_text_file, read_file, execute_shell_command, replace_content, find_file and list_dir (contexts/codex.yml:12-18) and tool schemas are rewritten for OpenAI-style clients (mcp.py:170-275,404)."
+      },
+      "telemetry_and_network": "README.md is silent on telemetry. The docs say Serena 'reports anonymous usage data' on startup (version, OS, language backend, dashboard on/off) and give an opt-out, env SERENA_USAGE_REPORTING=false (docs/02-usage/050_configuration.md:1306-1312). Code confirms: SerenaAgent.__init__ ends by calling _send_usage_info() (src/serena/agent.py:722), which GETs https://oraios-software.de/serena_usage.php with params os, dashboard, version, backend, context (1 s timeout, errors swallowed) unless CI=true, GITHUB_ACTIONS=true or SERENA_USAGE_REPORTING=false (agent.py:724-737). `version` is serena_version(), which appends the git commit prefix and '-dirty' of Serena's own checkout when run from one (src/serena/__init__.py:8-23; src/serena/util/git.py:11-22). NOT covered by that opt-out and not described in the docs: with the dashboard enabled (default web_dashboard: True, src/serena/resources/serena_config.template.yml:38) two background threads start (src/serena/dashboard.py:226-228) - one fetches https://oraios-software.de/serena_news.json with ETag caching (dashboard.py:719-762), one queries https://pypi.org/pypi/serena-agent/json for a newer version (dashboard.py:234-249; src/serena/util/pypi.py:12-32) - and the dashboard page's JavaScript GETs https://oraios-software.de/serena-banners/manifest.php for sponsor banners (src/serena/resources/dashboard/dashboard.js:94-113). The dashboard binds 127.0.0.1 (port 24282, higher if busy) and opens automatically on launch by default (serena_config.template.yml:49,70; docs/02-usage/060_dashboard.md:30,57-63). No account, license key or API key is needed for core operation; the LLM client is external. Optional network use: token_count_estimator ANTHROPIC_CLAUDE_SONNET_4 calls Anthropic's token-count API with an API key (src/serena/analytics.py:46-69; default is CHAR_COUNT, template lines 176-183) and TIKTOKEN_GPT4O downloads tokenizer data on first use (analytics.py:26-40). Runtime downloads: language servers and their dependencies are fetched on demand (GitHub releases, npm, NuGet, PyPI via uvx, Open VSX), version-pinned, host-allow-listed and SHA-256-checked for most (docs/02-usage/070_security.md:118-169; src/solidlsp/ls_utils.py:432-475; src/solidlsp/dependency_provider.py:180-248,317-369); the default Python server (Pyright) is launched via uvx and needs uv plus network on first use (docs/01-about/020_programming-languages.md:139-145). Local network services Serena can open: MCP over HTTP/SSE (default 127.0.0.1:8000, only if chosen; cli.py:264-280), the dashboard, the Project Server (127.0.0.1:24225, only if started; constants.py:41) and the JetBrains plugin client (port base 24226; constants.py:42); all loopback by default (docs/02-usage/070_security.md:100-116)."
+    },
+    "code": {
+      "languages": [
+        "Python (src/serena, src/solidlsp, src/interprompt, scripts/, test/)",
+        "JavaScript/HTML/CSS (dashboard front-end in src/serena/resources/dashboard, incl. bundled jquery.min.js)",
+        "YAML + Jinja2 templates (contexts, modes, prompts, config templates under src/serena/resources/config)",
+        "Nix (flake.nix), Dockerfile and shell (Dockerfile, docker_build_and_run.sh)",
+        "Test fixture repositories in many languages under test/resources/repos"
+      ],
+      "entry_points": [
+        {
+          "path": "pyproject.toml:64-67",
+          "what": "Console scripts: `serena` and `serena-agent` -> serena.cli:top_level (click group, src/serena/cli.py:141-162,1515); `serena-hooks` -> serena.hooks:hook_commands (src/serena/hooks.py:595-634), kept as a separate entrypoint for speed (cli.py:147-149)."
+        },
+        {
+          "path": "src/serena/cli.py:232-400",
+          "what": "`serena start-mcp-server`: MCP server (stdio default; sse; streamable-http) with --project, --project-from-cwd, --context, --mode/--add-mode, --language-backend, --transport/--host/--port, --enable-web-dashboard/--open-web-dashboard."
+        },
+        {
+          "path": "src/serena/mcp.py:144-423",
+          "what": "SerenaMCPFactory: creates the FastMCP server named 'Serena', wraps each Serena Tool as an MCP tool (SerenaFastMCPTool) and supplies the initial instructions prompt."
+        },
+        {
+          "path": "src/serena/cli.py:206-230",
+          "what": "`serena setup <claude-code|codex|codebuddy|grok>`: registers Serena as MCP server in the client CLI (handlers in src/serena/config/client_setup.py:51-146)."
+        },
+        {
+          "path": "src/serena/hooks.py:595-634",
+          "what": "serena-hooks subcommands activate / cleanup / remind / auto-approve for Claude Code, Codex, Grok, VSCode and CodeBuddy clients."
+        },
+        {
+          "path": "src/serena/cli.py:443-493",
+          "what": "`serena start-project-server`: Flask server for cross-project queries (src/serena/project_server.py:34-85)."
+        },
+        {
+          "path": "src/serena/cli.py:915-1047",
+          "what": "`serena project health-check`: starts a real SerenaAgent on a project and exercises get_symbols_overview, find_symbol and find_referencing_symbols; exits 1 on failure (used in CI: .github/workflows/python-versions.yml:94)."
+        },
+        {
+          "path": "scripts/demo_run_tools.py:25-51",
+          "what": "Programmatic use: constructs SerenaAgent and calls tool objects directly, without MCP or an LLM."
+        }
+      ],
+      "architecture": "Three Python packages under src/ (pyproject.toml:106-107). (1) src/serena - agent/MCP layer: agent.py (SerenaAgent: config, project activation, tool-set computation from context + modes + project config, dashboard, usage ping; serial task executor in task_executor.py), mcp.py (FastMCP wrapper turning each Tool into an MCP tool), cli.py (click CLI), tools/ (Tool classes: symbol_tools.py = LSP retrieval/edit/diagnostics, file_tools.py, memory_tools.py, cmd_tools.py = shell, config_tools.py, workflow_tools.py, jetbrains_tools.py = optional JetBrains-backend tools, query_project_tools.py; base class, registry and markers in tools_base.py), symbol.py (LanguageServerSymbol / LanguageServerSymbolRetriever, name-path matching, diagnostics grouping), code_editor.py (symbol-level edit operations and application of LSP rename WorkspaceEdits; JetBrains variant), ls_manager.py (several language servers per project, restart on death), project.py and config/ (serena_config.py; context_mode.py = contexts and modes; YAML in resources/config/{contexts,modes,internal_modes,prompt_templates}), dashboard.py (Flask dashboard, tray manager, viewer), hooks.py, memories/ (project memories), jetbrains/ (HTTP client for the paid IDE plugin). (2) src/solidlsp - synchronous LSP client library forked from microsoft/multilspy (src/README.md:1-4): ls.py (SolidLanguageServer: request_* APIs, document-symbol and full-symbol-tree with pickle cache, pull + published diagnostics, rename), ls_process.py and lsp_protocol_handler/ (JSON-RPC transport), language_servers/ (74 per-language adapter modules that locate/download/launch servers; Elixir and OmniSharp keep resources in subfolders), dependency_provider.py and ls_utils.py (download with host and SHA-256 checks; hashes in resources/downloaded_dependency_hashes.json). (3) src/interprompt - Jinja prompt templating library (src/README.md:1-4). Data flow: MCP client -> FastMCP tool -> Tool.apply_ex (default 240 s timeout; language-server restart-and-retry if the server died: tools_base.py:330-441; serena_config.template.yml:141-142) -> LanguageServerSymbolRetriever / CodeEditor -> SolidLanguageServer -> external language-server subprocess. Global find_symbol walks the project's document-symbol tree (slow on first call, cached) rather than workspace/symbol (solidlsp/ls.py:2059-2065; serena/symbol.py:735-765). Symbol edits are computed by Serena from LSP symbol ranges and written to disk (code_editor.py:89-124,142-209); rename applies the server's WorkspaceEdit (code_editor.py:381-415). Per-project state (memories, caches, logs) lives in <project>/.serena by default (serena_config.template.yml:197-203).",
+      "packaging_and_release": "Build backend hatchling; wheel packages src/serena, src/interprompt, src/solidlsp; distribution name serena-agent (pyproject.toml:1-3,6,106-107). Release flow is manual (README-dev.md:8-29): scripts/bump_version.py commits 'Release vX.Y.Z' and tags, updating only pyproject.toml, src/serena/__init__.py and CHANGELOG.md (bump_version.py:51-60,111-152). A pushed `v*` tag triggers .github/workflows/create-release.yml, which creates a DRAFT GitHub release whose body only links CHANGELOG.md; no artifacts attached (create-release.yml:4-19). Publishing that release triggers .github/workflows/publish.yml: `uv build` + `uv publish` to PyPI with OIDC trusted publishing (`id-token: write`) (publish.yml:4-30). Neither workflow contains a checksum, signature or explicit attestation step. .github/workflows/docker.yml builds multi-arch (linux/amd64, linux/arm64) images to ghcr.io/oraios/serena on pushes to main and `v*` tags, with BuildKit provenance (mode=max) and SBOM but no signing step; tags are branch, PR, semver and `latest` for the default branch (docker.yml:3-6,42-60). The Dockerfile uses python:3.11-slim, has no USER (runs as root) and bootstraps nvm, uv and rustup via curl|sh (Dockerfile:2,30,42,48-51). Other distribution: `uvx --from git+...`, `nix run github:oraios/serena` (flake.nix via uv2nix), and an MCP-registry manifest server.json that is stale at 1.5.3 (server.json:6,15). uv.lock exists but uvx-from-git ignores it, hence exact pins in pyproject.toml (pyproject.toml:44-45; docs/02-usage/070_security.md:171-175). Runtime-downloaded language-server artifacts are checked against src/solidlsp/resources/downloaded_dependency_hashes.json (src/solidlsp/dependency_provider.py:250-369).",
+      "tests_and_ci": "pytest 8.4.1 (+ pytest-xdist, pytest-timeout, syrupy snapshots), ruff 0.12.5 and ty 0.0.24 configured in pyproject.toml:76-92,164-184,319-385. About 188 test_*.py files under test/: 28 in test/serena (agent, tools, CLI, hooks, MCP, dashboard, symbol editing, memories) and roughly 160 in test/solidlsp (mostly per-language integration tests that start real language servers against fixture repos in test/resources/repos); central skip logic in test/conftest.py:405-504. CI = 8 workflow files in .github/workflows: pytest.yml (OS matrix ubuntu/windows/macos x 5 marker-based batches jvm/native/other-langs/niche[ubuntu only]/catch-all = 13 jobs, Python 3.11 only; runs `uv run poe test -m <markers>`; ruff lint/format and ty type-check once per OS; language-server caches; no xdist by design: pytest.yml:4-24,83-99,151-155,774-781), python-versions.yml (`uv sync --extra dev --locked` plus `serena project health-check` smoke test on Python 3.11-3.14, Linux only: lines 58-94), codeql.yml (actions, javascript-typescript, python; push/PR to main + weekly cron), codespell.yml, docs.yaml (sphinx/jupyter-book build, GitHub Pages deploy from main), docker.yml, create-release.yml, publish.yml. Known gaps visible in the repo: F# and BSL tests are always disabled, Kotlin tests are disabled on CI, Erlang is not run in CI, Swift runs only on macOS, Haskell/QML/Gleam only on Linux (test/conftest.py:424-426,450-451,492-493; pytest.yml:172-185,586-611). CI results themselves were not inspected.",
+      "dependencies": "pyproject.toml: 33 direct runtime dependencies in [project].dependencies (32 cross-platform + pythonnet for win32), every one pinned with ==, including 7 transitive packages pinned for security alerts (urllib3, werkzeug, starlette, python-multipart, filelock, cryptography, regex: pyproject.toml:44-52). Optional extras: dev (21), agno (2), google (1) (pyproject.toml:72-101). Notable: mcp 1.28.1, flask 3.1.3, pydantic 2.12.5, anthropic 0.117.0 and tiktoken 0.12.0 (used only by optional token-count estimators, yet anthropic is imported at module import time: src/serena/analytics.py:11), pywebview 6.2 and pystray 0.19.5 (dashboard app window/tray), pygls 2.1.1 (custom mSL language server), sensai-utils 1.5.0. Lockfile: uv.lock at repo root (CI installs with --locked: pytest.yml:147); flake.nix/flake.lock (5 flake inputs) for Nix. Requires Python >=3.11,<3.15 (pyproject.toml:11). Per-language servers and toolchains (Node/npm, JDK, .NET, rustup, gopls, etc.) are additional runtime dependencies, downloaded or required per language (docs/01-about/020_programming-languages.md:28-188). Vendored/forked code: src/solidlsp (fork of microsoft/multilspy) and src/interprompt (src/README.md:1-4).",
+      "security_policy": "none - no SECURITY.md in the repo root, .github/ or docs/ (glob found none). Closest: docs/02-usage/070_security.md:1-34 states the trust model (local machine, MCP client/LLM, repository, user config and package-manager config are trusted), says shell execution and file modification are intended functionality, welcomes advisories only for violations of that model and recommends sandboxing. Related controls: trusted_project_path_patterns (src/serena/resources/serena_config.template.yml:205-218; 070_security.md:47-98), per-project read_only flag that disables editing tools (project.template.yml:112-115), pinned + hashed language-server downloads (070_security.md:137-154), CodeQL workflow (.github/workflows/codeql.yml)."
+    },
+    "claim_checks": [
+      {
+        "claim": "'It integrates with any client/LLM via the model context protocol (MCP).' (README.md:19)",
+        "verified": "yes",
+        "evidence": "MCP server implemented with FastMCP (src/serena/mcp.py:385-392) over stdio/sse/streamable-http (src/serena/cli.py:264-269); tools carry readOnlyHint/destructiveHint annotations (mcp.py:106-112). Client-specific workarounds exist (OpenAI-style schema rewriting mcp.py:170-275,404; Claude Code structured-output workaround contexts/claude-code.yml:54-56; Antigravity 'does not fully support the MCP specifications' docs/02-usage/030_clients.md:610-614), so 'any' client is not verifiable from code but MCP itself is real."
+      },
+      {
+        "claim": "Language-server backend is the default and provides find symbol / symbol overview / find referencing symbols / find declaration / find implementations (README.md:100-101,141-151)",
+        "verified": "yes",
+        "evidence": "Default backend LSP: serena_config.template.yml:8 and src/serena/cli.py:178-185. Tools exist and are default-enabled: GetSymbolsOverviewTool, FindSymbolTool (name-path patterns, include_body, depth, substring matching), FindReferencingSymbolsTool (returns referencing symbols with 1 line of context before/after, symbol_tools.py:296-307), FindImplementationsTool, FindDeclarationTool (regex with one group that must match uniquely, symbol_tools.py:399-479) at src/serena/tools/symbol_tools.py:36-479. Caveats: global find_symbol scans the document-symbol tree of all project files, slow on first call (src/solidlsp/ls.py:2059-2065; src/serena/symbol.py:735-765); find_implementations availability depends on the language server (ls_config.py:377-381)."
+      },
+      {
+        "claim": "Symbolic editing (replace symbol body, insert before/after, safe delete) and rename 'yes (only symbols)' via language servers (README.md:160-176)",
+        "verified": "yes",
+        "evidence": "ReplaceSymbolBodyTool, InsertAfterSymbolTool, InsertBeforeSymbolTool (symbol_tools.py:585-667), RenameSymbolTool (670-695, applies the server's rename WorkspaceEdit: src/serena/code_editor.py:381-415), SafeDeleteSymbol (refuses and lists references if any exist, symbol_tools.py:698-738). Body/insert edits are computed by Serena from LSP symbol ranges and written to disk (code_editor.py:89-124,142-209), not delegated as LSP edits. Move/inline/type hierarchy exist only as jet_brains_* tools (tools/jetbrains_tools.py:145,235,409), matching the README table."
+      },
+      {
+        "claim": "Diagnostics/inspections: 'yes' for language servers (README.md:151)",
+        "verified": "yes",
+        "evidence": "README.md:151 (Retrieval table) is met by the default-on get_diagnostics_for_file (src/serena/tools/symbol_tools.py:482-533; optional get_diagnostics_for_symbol at src/serena/tools/symbol_tools.py:536-582); the README makes no claim about automatic diagnostics. Separately, an undocumented per-edit diagnostics mechanism exists but is disabled (src/serena/tools/tools_base.py:471-477). Caveats: default-on applies to the default language-server backend, because the JetBrains backend's internal mode excludes both LSP diagnostics tools (src/serena/resources/config/internal_modes/jetbrains.yml:12-13; src/serena/agent.py:1117-1118). The before/after-edit mechanism (EditingToolWithDiagnostics.DiagnosticsContext) is switched off by ENABLE_DIAGNOSTICS = False with the stated reason that per-edit diagnostics are 'a questionable feature' (src/serena/tools/tools_base.py:466-519); only tests and a demo script flip it (test/serena/test_serena_agent.py:1258,1289; scripts/demo_diagnostics.py:78) and no config key or doc exposes it. Diagnostics come from LSP pull requests with a fallback wait of 2.5 s for published diagnostics and an empty result if none arrive (src/solidlsp/ls.py:915-919,963-1038)."
+      },
+      {
+        "claim": "Inside Claude Code or Codex the basic tools 'are typically disabled by default' (README.md:186-194)",
+        "verified": "partial",
+        "evidence": "True only per context, and the sets differ. claude-code excludes create_text_file, read_file, execute_shell_command, find_file, list_dir, search_for_pattern but keeps replace_content/replace_in_files and memory tools (contexts/claude-code.yml:36-42); codex excludes create_text_file, read_file, execute_shell_command, replace_content, find_file, list_dir but keeps search_for_pattern (contexts/codex.yml:12-18). With the default context (desktop-app) or other MCP clients the full set is active (docs/02-usage/050_configuration.md:73-78)."
+      },
+      {
+        "claim": "'support for over 40 programming languages' (README.md:112-113)",
+        "verified": "partial",
+        "evidence": "Count is met and exceeded: 74 modules under src/solidlsp/language_servers/ and a LanguageServerId enum (src/solidlsp/ls_config.py:90-210+). Quality varies: docs mark Angular, Ansible, HTML, JSON, LaTeX, SCSS, Solidity, TOML, Deno and Erlang experimental and the Kotlin server 'pre-alpha' (docs/01-about/020_programming-languages.md:39-47,70-72,96-108,158-186); F# and BSL tests are always disabled, Kotlin tests disabled on CI (test/conftest.py:424-426,492-493); Erlang is not run in CI (.github/workflows/pytest.yml:172-185); many languages need manual toolchain installs."
+      },
+      {
+        "claim": "'your agent operates faster, more efficiently and more reliably, especially in larger and more complex codebases' (README.md:24-25)",
+        "verified": "not_checkable",
+        "evidence": "Performance claims cannot be verified from code. The project's own evaluations are agent self-assessments run with the JetBrains backend; 'the LSP backend ... has not yet been evaluated' (docs/04-evaluation/030_results/000_evaluation-results.md:9-11; docs/04-evaluation/010_methodology.md:102-107) and they report built-in tools being more payload-efficient for small edits (010_cc_on_tianshou.md:138-147). No third-party benchmark found."
+      },
+      {
+        "claim": "'Do not install Serena via an MCP or plugin marketplace! They contain outdated and suboptimal installation commands.' (README.md:27-29)",
+        "verified": "yes",
+        "evidence": "Consistent with the repo's own MCP-registry manifest: server.json pins version 1.5.3 (server.json:6,15) while the release is 1.7.0 (pyproject.toml:7), scripts/bump_version.py never updates it (bump_version.py:111-152), and its --context list omits codebuddy and grok (server.json:41). CHANGELOG.md:381-383 shows it was added in 1.5.3."
+      },
+      {
+        "claim": "`uv tool install -p 3.13 serena-agent` makes `serena` available, and uv is 'the only required prerequisite' (README.md:220,229-232)",
+        "verified": "partial",
+        "evidence": "Command and entry points verified: distribution name serena-agent, requires-python >=3.11,<3.15, scripts serena/serena-agent/serena-hooks (pyproject.toml:6,11,64-67); PyPI publishing workflow (.github/workflows/publish.yml:26-30). 'Only prerequisite' is qualified by the README itself (README.md:222-224): many languages need Node/npm, JDK, .NET or other toolchains (docs/01-about/020_programming-languages.md:28-188), and the default Python server runs via uvx with network access on first use (same file :139-145)."
+      },
+      {
+        "claim": "End-user verdict quotes: Opus 4.6 (high) in Claude Code, GPT 5.4 (high) in Codex CLI, GPT 5.4 (medium) in Copilot CLI (README.md:48-59)",
+        "verified": "partial",
+        "evidence": "The README differs from the results docs: README.md:48 says Opus 4.6 '(high)' but the result is titled '(Opus 4.6, medium)' (docs/04-evaluation/030_results/010_cc_on_tianshou.md:8; 000_evaluation-intro.md:3); the Codex quote at README.md:52-54 appears nowhere in docs (the Codex result has a different sentence: 020_codex_on_jbplugin.md:11-12); the Copilot CLI quote matches 030_copilot_cli_on_ente.md:10-12 although 000_evaluation-intro.md:7-9 labels it Codex. All runs used the JetBrains backend (000_evaluation-results.md:9-11)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Claude Code (Opus 4.6, medium) on Tianshou (Python RL library, ~26K lines, 43 files), Serena JetBrains backend: rename a symbol across 4 files",
+        "metric": "tool calls to complete",
+        "value": "Serena 1 call vs 9 built-in calls (1 Grep + 4 Read + 4 Edit); self-reported, run 2026-04-13",
+        "source": "docs/04-evaluation/030_results/010_cc_on_tianshou.md:171-180",
+        "independent": false
+      },
+      {
+        "what": "Same run: edit payload for replacing a symbol body (replace_symbol_body vs built-in Edit)",
+        "metric": "characters sent in the edit call",
+        "value": "1-line change in 13-line method: ~550 vs ~120 chars (built-in ~4.5x smaller); 19-line rewrite ~550 vs ~1000; 55-line rewrite ~2200 vs ~4400 (Serena ~2x smaller)",
+        "source": "docs/04-evaluation/030_results/010_cc_on_tianshou.md:138-169,245-250",
+        "independent": false
+      },
+      {
+        "what": "Same run: find all references to a symbol (find_referencing_symbols vs Grep)",
+        "metric": "files returned",
+        "value": "Serena 63 code files vs Grep 83 files (including README/CHANGELOG/notebooks)",
+        "source": "docs/04-evaluation/030_results/010_cc_on_tianshou.md:104-115",
+        "independent": false
+      },
+      {
+        "what": "GLM 5.1 in Claude Code on Tianshou (JetBrains backend): rename CollectStatsBase across 4 files / 10 occurrences",
+        "metric": "tool calls",
+        "value": "Serena 1 call vs 8 built-in (1 Grep + 3 Read + 4 Edit); the same report notes the symbol-move tool created a circular import (run 2026-04-14)",
+        "source": "docs/04-evaluation/030_results/040_glm_on_tianshou.md:31-43",
+        "independent": false
+      },
+      {
+        "what": "GLM 5.1 same run: references to CollectStats and a 1-line edit in a 22-line method",
+        "metric": "output size / edit payload",
+        "value": "Serena reference output ~64KB vs Grep ~5KB; edit payload ~800 chars (replace_symbol_body) vs ~200 chars (Edit)",
+        "source": "docs/04-evaluation/030_results/040_glm_on_tianshou.md:45-49,75-79",
+        "independent": false
+      },
+      {
+        "what": "Copilot CLI (GPT-5.4 medium) on the ente monorepo (TypeScript/Rust/Dart/Go), JetBrains backend: references to `wait` and cross-file refactors",
+        "metric": "files returned; calls saved",
+        "value": "Serena 3 code-use files vs rg 7 files; refactors typically saved 2-5 calls (a rename updated 4 files) (run 2026-04-14)",
+        "source": "docs/04-evaluation/030_results/030_copilot_cli_on_ente.md:33-34,79-93",
+        "independent": false
+      },
+      {
+        "what": "Codex (GPT-5.4 high) on the Serena JetBrains plugin repo (Java), JetBrains backend: references and type hierarchy",
+        "metric": "results returned",
+        "value": "find_referencing_symbols returned 6 precise code usages (rg also returned the declaration, a route string and comments); one type_hierarchy call returned 18 direct subclasses plus a transitive branch (run 2026-04-13)",
+        "source": "docs/04-evaluation/030_results/020_codex_on_jbplugin.md:24-25",
+        "independent": false
+      },
+      {
+        "what": "JetBrains Junie plugin (Opus 4.6) on Tianshou, JetBrains backend: move a function between modules vs cross-file rename",
+        "metric": "tool calls",
+        "value": "Move: 1 Serena call vs ~7 built-in; cross-file rename: 1 call with either toolset (built-in rename_element equivalent, value per hit 'zero') (run 2026-04-17)",
+        "source": "docs/04-evaluation/030_results/050_junie_plugin_on_tianshou.md:48,56",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Post-edit diagnostics are off by default and Serena is an external MCP server, not a native Claude Code LSP integration. EditingToolWithDiagnostics.ENABLE_DIAGNOSTICS = False, with the comment that per-edit diagnostics are 'a questionable feature' (src/serena/tools/tools_base.py:471-477); no config key or doc exposes a switch (flipped only in test/serena/test_serena_agent.py:1258,1289 and scripts/demo_diagnostics.py:78). Diagnostics are available only when the agent explicitly calls get_diagnostics_for_file (default-on) or get_diagnostics_for_symbol (optional) (symbol_tools.py:482-582); the LSP pull request falls back to waiting 2.5 s for published diagnostics and returns an empty list if none arrive (src/solidlsp/ls.py:915-919,963-1038). The Claude Code integration is `claude mcp add` plus optional hooks (docs/02-usage/030_clients.md:102-226); no PostToolUse diagnostics hook exists (src/serena/hooks.py:595-634).",
+      "Claude Code use depends on prompt and hook steering. Docs state recent Claude Code/Opus versions show 'drastically reduced adherence' to Serena's tools and recommend replacing Claude Code's system prompt with `claude --system-prompt=...` plus alpha-labelled hooks (docs/02-usage/030_clients.md:111-129,149-157). The remind hook can deny built-in Grep/Read after about 3 consecutive calls (src/serena/hooks.py:149-163,479-521). The auto-approve hook allows any Serena MCP tool call whose name contains 'serena' and none of a short list of substrings (so editing tools like replace_content qualify) when Claude Code is in acceptEdits/auto mode (hooks.py:52-66,109-112,546-583). The override prompt is static text that names tools (type_hierarchy, inline_symbol, _move) which exist only as jet_brains_* tools under the JetBrains backend, and hard-codes a 'Co-Authored-By: Claude Opus 4.7 (1M context)' commit trailer (src/serena/resources/config/prompt_templates/system_prompt.yml:84-94,181-182; src/serena/resources/config/internal_modes/jetbrains.yml:14-27).",
+      "Network calls beyond the documented opt-out. Besides the documented startup usage ping (opt-out SERENA_USAGE_REPORTING=false; src/serena/agent.py:724-737; docs/02-usage/050_configuration.md:1306-1312), the default-on dashboard fetches https://oraios-software.de/serena_news.json and queries PyPI for newer versions in background threads (src/serena/dashboard.py:226-249,719-762), and the dashboard page loads a banner manifest from https://oraios-software.de/serena-banners/manifest.php and builds HTML from its fields by string concatenation (src/serena/resources/dashboard/dashboard.js:94-113). The env opt-out is read only at agent.py:725; the docs do not describe the news/PyPI/banner requests (docs/02-usage/010_installation.md:42-45 only says the dashboard announces releases); the only switch visible in code is disabling the dashboard (web_dashboard: False, serena_config.template.yml:38). The usage ping runs on every SerenaAgent construction (agent.py:722), including CLI commands that build an agent.",
+      "Local HTTP surfaces are unauthenticated. The dashboard API has state-changing endpoints (PUT /shutdown, POST /save_serena_config, /save_memory, /delete_memory, /add_language) and no authentication code (src/serena/dashboard.py:314-414); protection is loopback binding plus a Flask TRUSTED_HOSTS host allow-list (dashboard.py:211-212; serena_config.template.yml:69-78). The global config it can rewrite holds trusted_project_path_patterns and ls_specific_settings (serena_config.template.yml:97-101,205-218). MCP over HTTP/SSE and the Project Server are likewise unauthenticated; the docs tell users to add authentication via reverse proxy or firewall if they bind beyond localhost (docs/02-usage/070_security.md:100-116). The Docker image sets the dashboard listen address to 0.0.0.0 (Dockerfile:67).",
+      "Published effectiveness evidence is self-reported and covers only the paid JetBrains backend. Five agent self-evaluations written by the project (2026-04-13 to 2026-04-17) all used the JetBrains-powered backend; the methodology page says the LSP backend 'has not yet been evaluated' (docs/04-evaluation/030_results/000_evaluation-results.md:9-11; docs/04-evaluation/010_methodology.md:102-107), and the methodology assessment was itself written by Claude Opus 4.6 (010_methodology.md:65-70). Reports show larger payloads than built-ins for small edits (010_cc_on_tianshou.md:138-147) and a move that created a circular import (040_glm_on_tianshou.md:38-43). README attribution differs from the result docs (README.md:48 vs 010_cc_on_tianshou.md:8; README.md:52-54 quote absent from docs). No third-party measurements were found.",
+      "Language coverage is uneven and partly unverified in CI; many servers are fetched at runtime. F# and BSL tests are always disabled, Kotlin tests are disabled on CI and Erlang is not run in CI (test/conftest.py:424-426,492-493; .github/workflows/pytest.yml:172-185); docs label many languages experimental and the Kotlin server pre-alpha (docs/01-about/020_programming-languages.md:39-47,70-72,96-108,158-186). Tests run on Python 3.11 only; 3.12-3.14 get install + smoke test (pytest.yml:84; python-versions.yml:1-18). Runtime downloads (GitHub releases, npm, NuGet, Open VSX, PyPI via uvx) are version- and hash-pinned for most, but a missing hash entry only logs a warning outside CI (src/solidlsp/dependency_provider.py:356-365), npm installs are not lockfile-based (docs/02-usage/070_security.md:169), and the Haxe VSIX is verified only for pinned versions (src/solidlsp/language_servers/haxe_language_server.py:141-162). The config doc says .NET is auto-installed for C#, but the script-based installer is documented in code as unused (docs/02-usage/050_configuration.md:478; src/serena/util/dotnet.py:76-80; only definition found by grep).",
+      "Security model is trust-based and repository-supplied data is processed. All of local machine, MCP client/LLM, repository, user config and package-manager config are assumed trusted; shell execution and file modification are 'intended functionality' and advisories about them are rejected; there is no SECURITY.md (docs/02-usage/070_security.md:7-27). Pickle caches under the project's .serena/cache are unpickled before any version check (src/solidlsp/util/cache.py:9-18; src/solidlsp/ls.py:357-366,3019-3059). Project activation_command and ls_specific_settings are honoured only for trusted projects, but the code default for trusted_project_path_patterns is ['**'] and pre-1.6 configs keep trust-all, while the template ships an empty list (src/serena/config/serena_config.py:924-927; serena_config.template.yml:205-218; 070_security.md:95-98). Hook state is unpickled from, and cleanup rmtree's, ~/.serena/hook_data/<session_id> with the session id taken unsanitised from hook input (hooks.py:38-42,200-207,541-543). Recent releases contain security fixes (memory-name path traversal in v1.6.0; sandboxed prompt templating and trusted hosts in v1.7.0: CHANGELOG.md:31-35,373-376).",
+      "Packaging/doc drift, release provenance, maintenance and licensing. server.json (MCP registry manifest) is stuck at 1.5.3 (server.json:6,15); compose.yaml and DOCKER.md use a `serena-mcp-server` script that pyproject.toml does not define and a `production` build target absent from the Dockerfile (compose.yaml:11,18; DOCKER.md:116; Dockerfile:2; pyproject.toml:64-67); the documented Docker run example ends in bare `serena` without start-mcp-server (docs/02-usage/020_running.md:238; not executed here); Docker support is labelled experimental (DOCKER.md:1-3). GitHub releases are drafts without attached artifacts, checksums or signatures; PyPI upload uses trusted publishing with no explicit attestation step; Docker images carry SBOM/provenance but are unsigned, and `latest` is also built from main (.github/workflows/create-release.yml:15-19; publish.yml:12-30; docker.yml:3-6,47,55-56). Maintenance: run by the founders of Oraios AI, funded by sponsors and JetBrains-plugin sales with 'no business model' otherwise (docs/01-about/050_acknowledgements.md:3-11; docs/02-usage/025_jetbrains_plugin.md:35-36); CHANGELOG shows v1.0.0 to v1.7.0 between 2026-04-03 and 2026-08-09 (13 version headings, CHANGELOG.md:5-603) and this clone cannot show later releases. Downloaded language servers keep their own licenses (texlab GPL-3.0 as a separate process; Intelephense premium needs a license key: docs/01-about/020_programming-languages.md:104-107,133-136)."
+    ]
+  },
+  "repaired": true,
+  "verification": [
+    {
+      "contender": "oraios/serena",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "uv tool (documented primary method; Linux and macOS; uv is the prerequisite): `uv tool install -p 3.13 serena-agent`",
+          "citation": "README.md:229; docs/02-usage/010_installation.md:21-25",
+          "holds": false,
+          "note": "The command is verbatim at README.md:229 and docs/02-usage/010_installation.md:23. It is the only install method in the README Quick Start. uv as the sole prerequisite is at README.md:220 and 010_installation.md:5-8,21. The distribution name and the `serena` script are confirmed at pyproject.toml:6,65. However, the 'Linux and macOS' qualifier is in neither citation; both are OS-agnostic. The repo also documents Windows as a host for the same, only, install path: Windows config path at docs/02-usage/050_configuration.md:48, Windows log path at docs/02-usage/065_logs.md:10, windows-latest in the CI matrix at .github/workflows/pytest.yml:83, and a win32-only pythonnet dependency at pyproject.toml:53. The qualifier is unsupported and implies a narrower platform scope than the project documents."
+        },
+        {
+          "field": "license",
+          "statement": "spdx MIT, file LICENSE (purpose also cites pyproject.toml:69-70)",
+          "citation": "LICENSE; pyproject.toml:69-70",
+          "holds": true,
+          "note": "LICENSE:1-21 is the standard MIT License text, 'Copyright (c) 2025 Oraios AI'. pyproject.toml:69-70 has [project.license] text = \"MIT\", and the classifier at pyproject.toml:13 is 'License :: OSI Approved :: MIT License'. Globbing for LICENSE/LICENCE/COPYING/NOTICE finds only the root LICENSE."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - CI runs the full test matrix on ubuntu-latest (pytest.yml:83); uv-based install is documented (010_installation.md:21-25); a linux/amd64 Docker image is built (docker.yml:53). The README itself has no platform table.",
+          "citation": ".github/workflows/pytest.yml:83; docs/02-usage/010_installation.md:21-25; .github/workflows/docker.yml:53",
+          "holds": true,
+          "note": "pytest.yml:83 lists ubuntu-latest. The batch list is at line 88, and the niche batch is excluded only for windows/macos (97-99), so Ubuntu runs all 5 batches (13 jobs in total, as the comment at line 23 says). All CI runs on Python 3.11 only (line 84). docker.yml:53 builds linux/amd64 and linux/arm64. 010_installation.md:21-25 documents the uv install. A grep of README.md for Linux/macOS/Windows finds nothing, so there is no platform table. That ubuntu-latest is x86_64 is GitHub's runner default, not stated in the repo; amd64 is explicit only in docker.yml:53."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Yes, both documented: `serena setup claude-code` runs `claude mcp add --scope user serena -- serena start-mcp-server --context=claude-code --project-from-cwd`. Per-project variant; claude-code context exclusions, single-project, no structured output. Alpha hooks (remind/auto-approve/activate/cleanup). System-prompt override; MCP_TIMEOUT. No plugin manifest or .mcp.json, and no PostToolUse diagnostics hook. `serena setup codex` / config.toml / codex_hooks; codex context exclusions; OpenAI schema rewriting.",
+          "citation": "src/serena/config/client_setup.py:51-88; docs/02-usage/030_clients.md:102-226,302-387; contexts/claude-code.yml:36-56; contexts/codex.yml:12-18; src/serena/hooks.py:115-144,546-583,595-634; system_prompt.yml:60-214; mcp.py:170-275,404",
+          "holds": true,
+          "note": "client_setup.py:59-63 builds exactly the stated claude command, after a `claude --version` check (55-57). The per-project variant is at 030_clients.md:141. claude-code.yml:36-42 excludes exactly the six named tools; single_project: true is at 52 and structured_tool_output: false at 56. The hooks for .claude/settings.json are at 030_clients.md:159-213, labelled alpha at 155-157. remind uses thresholds of 3 grep / 3 read (4 for a mixed run) and _MIN_DENY_INTERVAL_SECONDS = 120 (hooks.py:149-163). auto-approve covers acceptEdits/auto (hooks.py:567-575), but only for Serena tools whose names avoid the non-symbolic substrings (52-66,109-112), a slight simplification. 'drastically reduced adherence' is at 030_clients.md:112-113, the --system-prompt command at 124 and MCP_TIMEOUT at 144-147. `prompts print-cc-system-prompt-override` exists (cli.py:1383,1496-1503) and renders system_prompt.yml:60-214. Globbing finds no .claude-plugin, plugin.json or .mcp.json. The hook commands are only activate/cleanup/remind/auto-approve (hooks.py:595-634); the one PostToolUse in the docs is a CodeBuddy remind hook (030_clients.md:646-652). Codex: client_setup.py:84-88 builds the stated command. config.toml, codex_hooks, hooks.json and Codex >= 0.145.0 are at 030_clients.md:306-376. codex.yml:12-18 excludes the six named tools. mcp.py:170-275 sanitizes schemas, and mcp.py:404 enables that for chatgpt/codex/oaicompat-agent."
+        },
+        {
+          "field": "claim_checks[3]",
+          "statement": "Diagnostics/inspections: 'yes' for language servers (README.md:151) -> verified 'partial': 'CODE DIFFERS FROM README for the automatic case'. Explicit get_diagnostics_for_file default-on, get_diagnostics_for_symbol optional; per-edit DiagnosticsContext disabled (ENABLE_DIAGNOSTICS = False); only tests/demo flip it; 2.5 s published-diagnostics fallback, empty result if none.",
+          "citation": "README.md:151; src/serena/tools/symbol_tools.py:482-582; src/serena/tools/tools_base.py:466-519; test/serena/test_serena_agent.py:1258,1289; scripts/demo_diagnostics.py:78; src/solidlsp/ls.py:915-919,963-1038",
+          "holds": false,
+          "note": "Every cited fact checks out. GetDiagnosticsForFileTool (symbol_tools.py:482-533) lacks ToolMarkerOptional, which marks tools 'disabled by default' (tools_base.py:98-100), so it is default-on. GetDiagnosticsForSymbolTool is optional (536). ENABLE_DIAGNOSTICS = False with the 'questionable feature' comment is at tools_base.py:471-477. A grep finds it set to True only at test_serena_agent.py:1258,1289 and demo_diagnostics.py:78, and no doc or config key mentions it. The 2.5 s fallback and the [] result are at ls.py:915-919 and 1028-1038. But the 'partial' verdict and the headline 'CODE DIFFERS FROM README for the automatic case' are unsupported. README.md:151 is a row in the Retrieval table (136-151) and says only 'yes'. It makes no claim about automatic or per-edit diagnostics; CHANGELOG.md:458-459 introduces the feature as the two explicit tools; and the dossier itself says no doc exposes the per-edit mechanism. The README claim is met as written by the default-on tool."
+        }
+      ],
+      "verdict": "fail",
+      "repairs": [
+        "readme.install[0].method: delete the unsupported 'Linux and macOS;' qualifier, e.g. change it to 'uv tool (documented primary method; the docs state no OS restriction, Windows paths are documented at docs/02-usage/050_configuration.md:48 and CI covers ubuntu, windows and macos at .github/workflows/pytest.yml:83; uv is the prerequisite)'. The command and citations can stay as they are.",
+        "claim_checks[3] (README.md:151 diagnostics): change \"verified\": \"partial\" to \"verified\": \"yes\". Replace the opening sentence 'CODE DIFFERS FROM README for the automatic case.' with: 'README.md:151 (Retrieval table) is met by the default-on get_diagnostics_for_file (symbol_tools.py:482-533; optional get_diagnostics_for_symbol at 536-582); the README makes no claim about automatic diagnostics. Separately, an undocumented per-edit diagnostics mechanism exists but is disabled (tools_base.py:471-477).' Keep the remaining evidence (test/demo flips, the 2.5 s fallback) as caveats."
+      ]
+    },
+    {
+      "contender": "oraios/serena",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "`uv tool install -p 3.13 serena-agent` is the documented primary install method. The docs state no OS restriction, Windows paths are documented (050_configuration.md:48), CI covers ubuntu, windows and macos (pytest.yml:83), and uv is the prerequisite.",
+          "citation": "README.md:229; docs/02-usage/010_installation.md:21-25",
+          "holds": true,
+          "note": "README.md:229 and 010_installation.md:23 give the exact command, and 010_installation.md:25 says `serena` is then available. uv is named as the only prerequisite at README.md:220 and 010_installation.md:5-8. 010_installation.md states no OS restriction. 050_configuration.md:48 gives the Windows path %USERPROFILE%\\.serena\\serena_config.yml. pytest.yml:83 is `os: [ubuntu-latest, windows-latest, macos-latest]`. This agrees with pyproject.toml:6,11,65 (package serena-agent, requires-python >=3.11,<3.15 so -p 3.13 is in range, `serena` script). CI installs with `uv sync --extra dev --locked` (pytest.yml:147), not `uv tool install`, so CI does not exercise this command; the dossier does not claim it does. Not executed."
+        },
+        {
+          "field": "license",
+          "statement": "License is SPDX MIT, file LICENSE (the purpose section also cites pyproject.toml:69-70).",
+          "citation": "LICENSE; pyproject.toml:69-70",
+          "holds": true,
+          "note": "LICENSE:1-21 is the unmodified MIT License text, 'Copyright (c) 2025 Oraios AI'. pyproject.toml:69-70 has [project.license] text = \"MIT\", and :13 has the classifier 'License :: OSI Approved :: MIT License'."
+        },
+        {
+          "field": "readme.platforms.macos_arm64",
+          "statement": "yes, on indirect evidence (README states no architectures). CI includes macos-latest, 4 of the 13 pytest jobs, with steps that branch on `uname -m` for arm64. Docs list macOS ARM64 for the auto-downloaded C# server. The GUI log window is unsupported on macOS. Swift tests run only on macOS.",
+          "citation": ".github/workflows/pytest.yml:21-24,83,378-383; docs/02-usage/050_configuration.md:483,508; docs/02-usage/060_dashboard.md:12-16; test/conftest.py:450-451",
+          "holds": true,
+          "note": "pytest.yml:23 says 'the current matrix is 13 jobs (4 of them macOS)'. That matches 3 OSes x 5 batches minus the two niche excludes (:83,88,97-99). Lines 377-384 are the macOS branch of the Lua LS install. That step is gated to the other-langs batch (:355), which runs on macOS, and it downloads darwin-arm64 unless `uname -m` is x86_64. 050_configuration.md:483 says 'macOS (x64, ARM64)' and :508 lists osx-arm64. 060_dashboard.md:16 says 'macOS is unsupported' for the GUI log viewer. conftest.py:450-451 disables SWIFT unless on macOS. The README makes no architecture statement. The repo itself never says macos-latest runners are arm64; the dossier's 'indirect evidence' label covers this."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Both clients are documented. `serena setup claude-code` runs `claude mcp add --scope user serena -- serena start-mcp-server --context=claude-code --project-from-cwd`; there is a per-project variant. The claude-code context excludes 6 tools, is single-project and disables structured output. Optional alpha hooks: remind (deny after ~3 calls, at most once per 120 s), auto-approve (acceptEdits/auto), activate, cleanup. The docs give the --system-prompt override advice and MCP_TIMEOUT. There is no plugin manifest, .claude-plugin or .mcp.json, and no PostToolUse diagnostics hook. Codex: setup command, config.toml, codex_hooks plus hooks.json, Codex >= 0.145.0 for SessionEnd, the codex context's exclusions, and OpenAI-style schema rewriting.",
+          "citation": "src/serena/config/client_setup.py:51-88; docs/02-usage/030_clients.md:102-226,302-387; src/serena/resources/config/contexts/claude-code.yml:36-56; contexts/codex.yml:12-18; src/serena/hooks.py:115-144,546-583,595-634; prompt_templates/system_prompt.yml:60-214; src/serena/tools/symbol_tools.py:482-533; src/serena/mcp.py:170-275,404",
+          "holds": true,
+          "note": "client_setup.py:59-63 builds exactly that command, and `serena setup` dispatches to it (cli.py:206-230). 030_clients.md:134/141 give the global and per-project variants; :112-113 'drastically reduced adherence'; :124 the --system-prompt command (the subcommand exists at cli.py:1383,1498-1503 and its template is system_prompt.yml:60-214); :146-147 MCP_TIMEOUT; :155-213 the alpha note and the four hooks in .claude/settings.json. claude-code.yml:37-42 lists the six exclusions, :52 sets single_project: true and :56 sets structured_tool_output: false. hooks.py:149-150 sets thresholds of 3 (combined counter 4 at :152) and :163 the 120 s interval; :567-583 allows only in acceptEdits/auto. Small imprecision: auto-approve covers only 'symbolic' Serena tools and skips names containing read, pattern, diagnostics, memory, shell, etc. (hooks.py:52-66,109-112,574). The docs use the same broad wording (:221), and the dossier's risks section gives the exact filter. Globs for .mcp.json, .claude*/ and *plugin*.json found nothing. HookCommands (hooks.py:595-634) has only activate, cleanup, remind and auto-approve. The repo's only PostToolUse is the CodeBuddy `remind` example (030_clients.md:646). Codex: client_setup.py:84-88; 030_clients.md:304-313,324-331,372; codex.yml:13-18; the schema sanitiser is at mcp.py:65-66,170-275 and is enabled for chatgpt, codex and oaicompat-agent at :404."
+        },
+        {
+          "field": "claim_checks[3]",
+          "statement": "Diagnostics/inspections is 'yes' for language servers (README.md:151). This is met by the default-on get_diagnostics_for_file (get_diagnostics_for_symbol is optional). The per-edit EditingToolWithDiagnostics mechanism is off via ENABLE_DIAGNOSTICS = False ('a questionable feature'); only tests and a demo flip it, and no config key or doc exposes it. The JetBrains backend excludes both tools. Diagnostics use LSP pull requests with a 2.5 s fallback wait for published diagnostics, and an empty result if none arrive.",
+          "citation": "README.md:151; src/serena/tools/symbol_tools.py:482-582; src/serena/tools/tools_base.py:466-519; src/serena/resources/config/internal_modes/jetbrains.yml:12-13; src/serena/agent.py:1117-1118; test/serena/test_serena_agent.py:1258,1289; scripts/demo_diagnostics.py:78; src/solidlsp/ls.py:915-919,963-1038",
+          "holds": true,
+          "note": "The README.md:151 row reads yes/yes. symbol_tools.py:482 GetDiagnosticsForFileTool has no ToolMarkerOptional (the marker that means 'disabled by default', tools_base.py:98-101); :536 GetDiagnosticsForSymbolTool has it. tools_base.py:471 has ENABLE_DIAGNOSTICS: bool = False and :474 says 'questionable feature'. Grep for ENABLE_DIAGNOSTICS finds only that line, test_serena_agent.py:1258/1289 (reset at 1274/1307) and demo_diagnostics.py:78. There is no diagnostics key in src/serena/config or the docs. jetbrains.yml:12-13 excludes both tools, and agent.py:1117-1118 applies that mode for the JetBrains backend. ls.py:963-1038 sends the pull request, falls back to published diagnostics, and returns [] if nothing arrives. Imprecision: the 2.5 s at ls.py:919 is only the base-class default. TypeScript waits 5.0 s (typescript_language_server.py:110,537-538), Rust at least 8 s (rust_analyzer.py:688-692) and Julia 30 s (julia_server.py:129-135). The 'yes' verdict and the other evidence are unaffected."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "Non-blocking (verdict is pass): in claim_checks[3].evidence and risks[0], change 'a fallback wait of 2.5 s' / 'waiting 2.5 s' to '2.5 s by default (5 s for TypeScript, at least 8 s for Rust, 30 s for Julia: src/solidlsp/language_servers/typescript_language_server.py:110,537-538; rust_analyzer.py:688-692; julia_server.py:129-135)'.",
+        "Non-blocking: in integrations.claude_code_or_codex, change 'auto-approve (allows Serena tool calls in acceptEdits/auto permission modes)' to 'auto-approve (allows symbolic Serena tool calls, meaning names not containing read, pattern, diagnostics, memory, shell, etc., in acceptEdits/auto permission modes; src/serena/hooks.py:52-66,109-112,574)'."
+      ]
+    }
+  ]
+}

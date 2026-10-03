@@ -1,0 +1,292 @@
+{
+  "contender": "openai/openai-agents-python",
+  "revision": {
+    "contender": "openai/openai-agents-python",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "openai/openai-agents-python",
+        "tag": "v0.23.0",
+        "commit": "ce8ae9f368e7e3e2f495fc80a0c44137e88b78c4",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.23.0",
+    "commit": "ce8ae9f368e7e3e2f495fc80a0c44137e88b78c4",
+    "read_at": "2026-10-02T03:02:31+00:00"
+  },
+  "dossier": {
+    "contender": "openai/openai-agents-python",
+    "revision": {
+      "tag": "v0.23.0",
+      "commit": "ce8ae9f368e7e3e2f495fc80a0c44137e88b78c4",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Python library (PyPI `openai-agents` 0.23.0, MIT; pyproject.toml:2-7) providing an Agent/Runner loop with function, hosted, MCP-client and agent-as-tool tools, handoffs, guardrails, sessions, tracing, Realtime/Voice, and a `SandboxAgent` runtime (manifest-defined workspaces; shell/filesystem/skills/memory/compaction capabilities; Unix-local, Docker and seven hosted sandbox clients; snapshots; resumable `RunState` and sandbox session state). The docs call the sandbox runtime an 'execution harness' (docs/sandbox_agents.md:5). It is a library only: no CLI, daemon, server or MCP server is shipped (pyproject.toml has no [project.scripts]). Default model provider is OpenAI (Responses API); other providers go through OpenAI-compatible endpoints or best-effort beta LiteLLM/Any-LLM adapters (docs/models/index.md:683-705). There is no packaged deep-research harness: research exists only as examples (examples/research_bot, examples/financial_research_agent) built on the OpenAI-hosted WebSearchTool. Model names in code, docs and examples top out at `gpt-5.6-sol` (src/agents/models/default_models.py:66); the string 'GPT-6.1 Sol' (or any `gpt-6*` identifier) appears nowhere in the repository (repo-wide search, generated translations excluded).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "\"The OpenAI Agents SDK is a lightweight yet powerful framework for building multi-agent workflows. It is provider-agnostic, supporting the OpenAI Responses and Chat Completions APIs, as well as 100+ other LLMs.\"",
+          "citation": "README.md:3"
+        },
+        {
+          "claim": "Sandbox agents: \"Agents preconfigured to work with a container to perform work over long time horizons.\"",
+          "citation": "README.md:13"
+        },
+        {
+          "claim": "Tools: \"Various Tools let agents take actions (functions, MCP, hosted tools)\"",
+          "citation": "README.md:17"
+        },
+        {
+          "claim": "Human in the loop: \"Built-in mechanisms for involving humans across agent runs\"",
+          "citation": "README.md:19"
+        },
+        {
+          "claim": "Sessions: \"Automatic conversation history management across agent runs\"",
+          "citation": "README.md:20"
+        },
+        {
+          "claim": "Tracing: \"Built-in tracking of agent runs, allowing you to view, debug and optimize your workflows\"",
+          "citation": "README.md:21"
+        },
+        {
+          "claim": "\"Python 3.10 or newer required\"",
+          "citation": "README.md:27"
+        },
+        {
+          "claim": "\"Set the `OPENAI_API_KEY` environment variable before running any of these examples.\"",
+          "citation": "README.md:52"
+        },
+        {
+          "claim": "\"Use a SandboxAgent when the agent needs to inspect files, run commands, apply patches, or preserve workspace state across longer tasks.\"",
+          "citation": "README.md:75"
+        },
+        {
+          "claim": "\"This example uses UnixLocalSandboxClient, which is supported on macOS and Linux. On Windows, use DockerSandboxClient with the openai-agents[docker] extra or a hosted sandbox client instead\"",
+          "citation": "README.md:77"
+        },
+        {
+          "claim": "The sandbox example clones `GitRepo(repo=\"openai/openai-agents-python\", ref=\"main\")` into the manifest and runs with `UnixLocalSandboxClient()`",
+          "citation": "README.md:86-98"
+        },
+        {
+          "claim": "\"Pull requests are limited to repository collaborators; we do not accept pull requests from non-collaborators.\" Security issues: follow SECURITY.md",
+          "citation": "README.md:168-170"
+        },
+        {
+          "claim": "Optional dependencies include websockets, SQLAlchemy, any-llm and LiteLLM",
+          "citation": "README.md:181-185"
+        }
+      ],
+      "install": [
+        {
+          "method": "pip in a virtualenv (Linux/macOS)",
+          "command": "python -m venv .venv && source .venv/bin/activate && pip install openai-agents",
+          "citation": "README.md:31-34"
+        },
+        {
+          "method": "uv",
+          "command": "uv init && uv add openai-agents",
+          "citation": "README.md:44-46"
+        },
+        {
+          "method": "pip optional extras (voice, redis)",
+          "command": "pip install 'openai-agents[voice]'   # or 'openai-agents[redis]'",
+          "citation": "README.md:37"
+        },
+        {
+          "method": "pip extra for the Docker sandbox client",
+          "command": "pip install \"openai-agents[docker]\"",
+          "citation": "docs/sandbox_agents.md:21-25"
+        },
+        {
+          "method": "pip extras for hosted sandbox clients (blaxel, cloudflare, daytona, e2b, modal, runloop, vercel) and model adapters (litellm, any-llm)",
+          "command": "pip install \"openai-agents[e2b]\"   # likewise [modal], [daytona], [litellm], [any-llm] ...",
+          "citation": "docs/sandbox/clients.md:145-153"
+        },
+        {
+          "method": "development checkout (contributors)",
+          "command": "make sync   # runs: uv sync --all-extras --all-packages --group dev",
+          "citation": "CONTRIBUTING.md:17"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - pure-Python package (hatchling wheel of src/agents only, pyproject.toml:140-154), requires-python >=3.10 (pyproject.toml:6); CI test matrix runs on ubuntu-latest for Python 3.10-3.14 (.github/workflows/tests.yml:119-161); runner CPU arch is not stated in the workflow. UnixLocalSandboxClient is supported on Linux (README.md:77) but adds no OS-level confinement there (src/agents/sandbox/sandboxes/unix_local.py:752-753).",
+        "wsl2": "unknown - no WSL2 mention in README or docs and no WSL2 CI job (only reference is a comment about Git for Windows Bash vs the WSL launcher, tests/test_change_detection.py:72). Code branches on sys.platform, so a WSL2 distro would presumably take the Linux paths (inference only, not tested).",
+        "macos_arm64": "yes - README.md:77 says Unix-local sandboxing is supported on macOS; CI job `native-macos-sandbox` runs `uv run pytest -m requires_native_macos_sandbox` on macos-latest (.github/workflows/tests.yml:191-219; runner arch not stated). macOS commands are wrapped in `sandbox-exec` (filesystem restrictions only, no network isolation) and fail with ExecTransportError if `sandbox-exec` is not on PATH (src/agents/sandbox/sandboxes/unix_local.py:745-774).",
+        "gpu": "no - client library with no local GPU use. Only the Modal hosted sandbox client exposes a `gpu` option (src/agents/extensions/sandbox/modal/sandbox.py:295); the Docker client options are image, exposed_ports, network_mode ('none' only) and labels (src/agents/sandbox/sandboxes/docker.py:220-250)."
+      },
+      "integrations": {
+        "cli": "none found - pyproject.toml has no [project.scripts]; the only terminal helper is the Python function `run_demo_loop` (src/agents/repl.py:15); the only `__main__` blocks are internal helper workers (src/agents/sandbox/sandboxes/_docker_removal_worker.py:337, src/agents/sandbox/sandboxes/_unix_local_file_ops.py:318).",
+        "mcp": "client side only: MCPServerStdio/MCPServerSse/MCPServerStreamableHttp (src/agents/mcp/server.py:1962,2112,2290), MCPServerManager (src/agents/mcp/manager.py:260) and the OpenAI-hosted `HostedMCPTool` (src/agents/tool.py:1136; docs/mcp.md:20-25). No MCP server exposing the SDK was found (src imports only mcp client modules, src/agents/mcp/server.py:20-24).",
+        "sdk_or_api": "Python SDK: `agents.Runner` (src/agents/run.py:259), `agents.sandbox.SandboxAgent` (src/agents/sandbox/sandbox_agent.py:31). The JS/TS SDK is a separate repository (README.md:8). No HTTP API server is shipped: FastAPI is a dev-only dependency (pyproject.toml:121) and the only `FastAPI(` string in src is a docstring example (src/agents/mcp/manager.py:283).",
+        "claude_code_or_codex": "Codex: experimental `codex_tool` runs the separately installed `codex` CLI as a subprocess (`codex exec --experimental-json`) with sandbox_mode read-only/workspace-write/danger-full-access and approval policies (src/agents/extensions/experimental/codex/exec.py:61-132; thread_options.py:9-12; docs/tools.md:890-952). The repo also carries maintainer-facing Codex skills under .agents/skills/*/agents/openai.yaml (AGENTS.md:27-34; .agents/skills/code-change-verification/agents/openai.yaml:1-4) - not a user integration. Claude Code: none found (no CLAUDE.md, .claude/, plugin or MCP server)."
+      },
+      "telemetry_and_network": "Tracing is ON by default and exports to OpenAI: BatchTraceProcessor + BackendSpanExporter post traces/spans to https://api.openai.com/v1/traces/ingest with the OPENAI_API_KEY bearer token (src/agents/tracing/processors.py:46,175-179,903-922; src/agents/tracing/setup.py:52-60; docs/tracing.md:5-13,29-45). `trace_include_sensitive_data` (LLM and tool inputs/outputs) defaults to true (src/agents/run_config.py:53-56,414-420). Disable with OPENAI_AGENTS_DISABLE_TRACING=1, set_tracing_disabled(True) or RunConfig.tracing_disabled (src/agents/tracing/provider.py:339-356; docs/tracing.md:7-11); tracing is unavailable for ZDR orgs (docs/tracing.md:13); with no key the exporter logs a warning and skips export (processors.py:146); custom processors can add or replace destinations (docs/tracing.md:59); non-OpenAI setups get 401s unless tracing is disabled or given a key (docs/models/index.md:609-615). A configured harness ID is added to trace metadata only (src/agents/models/openai_agent_registration.py:74-87; docs/config.md:111-127). No analytics/telemetry library found in src (searched); model calls send header `User-Agent: Agents/Python <version>` (src/agents/models/openai_responses.py:113-114); the MongoDB session identifies the library in the driver handshake (src/agents/extensions/memory/mongodb_session.py:72). Model/tool payload logging is off by default (docs/config.md:236-250; src/agents/_debug.py:13-17). Required services/accounts: an OpenAI API key for the default provider (docs/config.md:36; OPENAI_BASE_URL can redirect, docs/config.md:84). Optional: Docker daemon and image pulls for the Docker client (src/agents/sandbox/sandboxes/docker.py:1868-1870); a separate provider account/key for each hosted sandbox (examples/sandbox/extensions/README.md:11,23,88-89,128-134,181-190,222,246,328-329), whose adapters are not live-validated in CI (examples/sandbox/extensions/README.md:165); `GitRepo` manifest entries `git clone` from github.com (default host) inside the sandbox (src/agents/sandbox/entries/artifacts.py:739-769); rclone-based mounts apt-install tools and download a SHA-256-pinned rclone from downloads.rclone.org inside the sandbox (src/agents/extensions/sandbox/_rclone.py:11-26,51-90); the Codex tool needs a separately installed codex CLI plus CODEX_API_KEY or OPENAI_API_KEY (docs/tools.md:939-941)."
+    },
+    "code": {
+      "languages": [
+        "Python (src/agents, tests, examples; >=3.10)",
+        "Markdown docs with generated ja/ko/zh translations (pyproject.toml:161-163)",
+        "YAML (GitHub Actions)",
+        "Shell/PowerShell (CI and repo-skill scripts)",
+        "JavaScript/HTML (examples only: examples/realtime/app/static, examples/live/app/static)"
+      ],
+      "entry_points": [
+        {
+          "path": "src/agents/run.py",
+          "what": "`Runner.run` / `run_sync` / `run_streamed` (run.py:259-469) delegating to `AgentRunner` (run.py:548); main programmatic entry point (README.md:58-69)."
+        },
+        {
+          "path": "src/agents/sandbox/sandbox_agent.py",
+          "what": "`SandboxAgent` (:31) with `default_manifest`, `capabilities`, `run_as`; executed through `Runner` with `RunConfig(sandbox=SandboxRunConfig(...))` (src/agents/run_config.py:219-265; README.md:79-100)."
+        },
+        {
+          "path": "src/agents/sandbox/sandboxes/unix_local.py",
+          "what": "`UnixLocalSandboxClient` (:1518): host-process sandbox; sandbox-exec filesystem restrictions on macOS only, no confinement on Linux (:745-774)."
+        },
+        {
+          "path": "src/agents/sandbox/sandboxes/docker.py",
+          "what": "`DockerSandboxClient` / `DockerSandboxClientOptions` (:220): container backend, optional network_mode='none'; needs the `docker` extra and a Docker daemon."
+        },
+        {
+          "path": "src/agents/extensions/sandbox/",
+          "what": "Hosted sandbox clients blaxel/, cloudflare/, daytona/, e2b/, modal/, runloop/, vercel/ (same-named extras; src/agents/extensions/sandbox/__init__.py:1-80)."
+        },
+        {
+          "path": "src/agents/extensions/experimental/codex/",
+          "what": "Experimental `codex_tool` that spawns `codex exec --experimental-json` (exec.py:61-132); docs/tools.md:890-952."
+        },
+        {
+          "path": "src/agents/mcp/server.py",
+          "what": "MCP client wrappers MCPServerStdio (:1962), MCPServerSse (:2112), MCPServerStreamableHttp (:2290); MCPServerManager in manager.py:260. No MCP server."
+        },
+        {
+          "path": "src/agents/repl.py",
+          "what": "`run_demo_loop` terminal REPL helper (:15) - a function, not a console script. No binary, CLI or server main exists in the package."
+        }
+      ],
+      "architecture": "Single package `src/agents` (the wheel packages only this directory, pyproject.toml:153-154). Core loop: agent.py, run.py (Runner/AgentRunner), run_config.py (RunConfig, ToolExecutionConfig, SandboxRunConfig, DEFAULT_MAX_TURNS=10), run_state.py (resumable JSON RunState, schema 1.18, forward-incompatible by design: lines 205-212), run_internal/ (run loop, tool execution, approvals, session persistence, retries), tool.py (FunctionTool, hosted tools, ShellTool, ApplyPatchTool, CustomTool), guardrail.py and tool_guardrails.py, handoffs/, items.py, result.py. Models: models/ (OpenAIResponsesModel, OpenAIChatCompletionsModel, OpenAIProvider, MultiProvider prefix routing openai/, litellm/, any-llm/; default_models.py with regex-based GPT-5.x settings) and extensions/models/ (LiteLLM and Any-LLM adapters). Persistence: memory/ (Session ABC, SQLiteSession defaulting to ':memory:', OpenAI conversation/compaction sessions) and extensions/memory/ (SQLAlchemy, Redis, MongoDB, Dapr, encrypted, async/advanced SQLite). Tracing: tracing/ (spans, BatchTraceProcessor, default exporter to OpenAI). MCP client: mcp/. Sandbox: sandbox/ (SandboxAgent, Manifest and entries/mounts, capabilities Shell/Filesystem/Skills/Memory/Compaction, session and client abstractions, snapshots incl. LocalSnapshot/RemoteSnapshot/NoopSnapshot, runtime and runtime_session_manager, memory generation), sandbox/sandboxes/ (unix_local, docker, docker_removal opt-in host-side removal service), extensions/sandbox/<provider>/ plus shared _rclone.py. Other: extensions/experimental/codex/ (Codex CLI tool), extensions/experimental/hosted_multi_agent/ (OpenAI beta, WebSocket), realtime/, voice/, testing/ (ScriptedModel etc., tests/README.md:7), repl.py. Research content is example-only and not in the wheel: examples/research_bot (planner -> parallel WebSearchTool search agents -> writer; no citation handling) and examples/financial_research_agent (adds URL-citation and retrieved-source extraction via examples/web_search_utils.py:20-79, writer instructed to cite supplied URLs, an LLM verifier agent comparing against allowed_source_urls, one revision pass then RuntimeError, MAX_SEARCHES=15; manager.py:106-123,256-273; planner_agent.py:5,36).",
+      "packaging_and_release": "Build backend hatchling (pyproject.toml:140-142); wheel contains only src/agents (pyproject.toml:153-154); sdist excludes .agents, .github, .tmp*, .uv*, integration_tests (pyproject.toml:144-151). Artifacts: wheel + sdist from `uv build` (.github/workflows/publish.yml:114-116), kept as a 7-day workflow artifact (publish.yml:117-124), published to PyPI by `pypa/gh-action-pypi-publish` (SHA-pinned) in a job with environment `pypi` and `id-token: write` (OIDC trusted publishing, no registry token; publish.yml:126-158). No checksum files, signing, SBOM or explicit `attestations:` input appear in the workflows (searched .github and Makefile); .github/RELEASING.md:39,81 says provenance must be verified separately. Release flow: Release Please PR (release-please.yml; release-please-config.json:1-32) -> Release Candidate freezes the public-API contract (release-candidate.yml:55-123) -> maintainer runs a local Codex review and posts a GitHub Approve with a marker line that gates 'Release readiness' (release-readiness.yml:14-32; RELEASING.md:3-44) -> merge -> tag/GitHub Release (when RELEASE_AUTOMATION_ENABLED) -> publish.yml checks tag == release SHA, ancestry in main and tag == pyproject version (.github/scripts/verify_release.py:26-45), re-runs `make sync tests` on Python 3.10-3.14 plus typecheck (publish.yml:66-70), builds on a separate runner and re-verifies approval before upload (publish.yml:143-158). 0.23.0 is dated 2026-10-01 (CHANGELOG.md:3); tag v0.23.0 = commit ce8ae9f (.git/packed-refs:2). Versioning is 0.Y.Z where minor bumps may break non-beta interfaces and patch releases may change beta features (docs/release.md:3-18).",
+      "tests_and_ci": "Frameworks: pytest>=9.0.3 with pytest-asyncio (auto mode), pytest-xdist (`-n auto --maxprocesses=9 --dist worksteal` plus a serial phase), pytest-mock, inline-snapshot; coverage gate `--fail-under=85` (Makefile:84-94,205-210; pyproject.toml:95-102,256-272); mypy --strict, pyright, ruff (pyproject.toml:157-197; Makefile:34-67). Test dirs: tests/ holds about 376 test_*.py files (159 top-level; 63 in tests/sandbox; 103 across tests/{models,mcp,realtime,voice,fastapi}; 26 in tests/extensions; 9 in tests/memory; 11 in tests/tracing; 5 elsewhere; counted from file listings); integration_tests/ holds 31 test_*.py files (packaged wheel/sdist contract, Docker security and containers profiles, live OpenAI/provider/hosted/realtime/voice profiles that need a service-account key; excluded from distributions; integration_tests/README.md:3-17); 6 helper-script tests under .agents/skills and .github/scripts. Provider-neutral fakes (ScriptedModel, scripted_sandbox_session) are the preferred test double (tests/README.md:7); hosted-sandbox adapter tests are fake/mock based (tests/extensions/sandbox/) and the hosted examples are not live-validated in CI (examples/sandbox/extensions/README.md:165). Coverage measurement omits src/agents/sandbox/sandboxes/*.py, mounts, materialization and several sandbox utils (pyproject.toml:227-243), although those modules have dedicated tests (tests/sandbox/test_unix_local*.py, test_docker*.py). A Docker-backed security test checks a model-driven shell cannot read the trusted client credential (integration_tests/security/test_local_sandbox_isolation.py:113-140). CI workflows in .github/workflows: tests.yml (lint; typecheck; mypy --platform win32; tests on ubuntu for Python 3.10-3.14 with coverage on 3.14 and asyncio-stability on 3.10/3.14; Docker `containers`; macOS `native-macos-sandbox`; MCP v1 compat; packaged-contract on 3.10, 3.14 and Windows; prospective-release-contract; tests-windows 3.10/3.13; build-docs), codeql.yml (python + actions; push, PR, merge queue, weekly), docs.yml (build and deploy docs to gh-pages), publish.yml, release-please.yml, release-candidate.yml, release-readiness.yml, repo-skills.yml, issues.yml (stale-issue closer). Test jobs use OPENAI_API_KEY=fake-for-tests; actions are pinned to full commit SHAs.",
+      "dependencies": "Manifests: pyproject.toml plus a hash-pinned uv.lock (204 package entries, 2646 sha256 hashes; resolved with a 7-day exclude-newer span, uv.lock:1-16; pyproject.toml:274-283). Direct runtime dependencies: 12 (pyproject.toml:9-23) - openai>=3.0.0,<4; pydantic>=2.12.2,<3; griffelib>=2,<3; typing-extensions; requests; websockets>=15,<17; mcp>=1.19,<3; plus 5 'security floors' on transitive packages (httpx2, pyjwt, python-multipart, starlette, urllib3). 20 optional extras (pyproject.toml:42-93): voice, viz, litellm, any-llm, realtime, sqlalchemy, encrypt, redis, dapr, mongodb, docker, blaxel, daytona, cloudflare, e2b, modal, runloop, vercel, s3, temporal (1-6 direct deps each; e2b, modal and temporalio are exact-pinned: pyproject.toml:71-72,78,89; any-llm needs Python >=3.11: pyproject.toml:47-50). Dev group: 35 entries (pyproject.toml:95-132). Example requirement files for examples/realtime/twilio and twilio_sip sit outside the root lock (.github/dependabot.yml:26-38). Dependabot: uv weekly, pip examples, github-actions monthly, all with a 7-day cooldown (.github/dependabot.yml:13-56).",
+      "security_policy": "SECURITY.md exists: private reporting through OpenAI's Coordinated Vulnerability Disclosure Policy and security.txt PGP info, scope and trust-boundary statements including that tool implementations and local subprocesses use the host application's privileges (SECURITY.md:5,19,25). Contributor security checklist at CONTRIBUTING.md:55-80; CodeQL workflow (.github/workflows/codeql.yml:1-46); CODEOWNERS covers all files (.github/CODEOWNERS:3)."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:3 - provider-agnostic: OpenAI Responses and Chat Completions APIs plus '100+ other LLMs'",
+        "verified": "partial",
+        "evidence": "Responses and Chat Completions model classes exist (src/agents/models/openai_responses.py, openai_chatcompletions.py). Other providers work only via OpenAI-compatible endpoints or the LiteLLM/Any-LLM adapters, which the docs label 'best-effort, beta' (docs/models/index.md:683-705). The default MultiProvider routes only no-prefix/`openai/`, `litellm/` and `any-llm/` and raises UserError for any other prefix such as `anthropic/` (src/agents/models/multi_provider.py:63-67,214-225). There is no Anthropic-native client in src; Claude appears only via LiteLLM/OpenRouter in an example (examples/model_providers/litellm_provider.py:14-18) and in opt-in integration tests (integration_tests/conftest.py:47-72; integration_tests/README.md:21). The '100+' count is not verifiable from this repo."
+      },
+      {
+        "claim": "README.md:13 - sandbox agents work 'with a container' (docs/index.md:21: 'real isolated workspaces')",
+        "verified": "partial",
+        "evidence": "Container isolation exists only for DockerSandboxClient (src/agents/sandbox/sandboxes/docker.py:1855-1906) and hosted clients. The README's own example uses UnixLocalSandboxClient, which runs host processes with no OS-level confinement on Linux and only sandbox-exec filesystem restrictions on macOS (src/agents/sandbox/sandboxes/unix_local.py:266-268,745-774; docs/sandbox/clients.md:17-23). Isolation therefore depends on the backend chosen; code and docs agree, the README wording does not."
+      },
+      {
+        "claim": "README.md:77 - UnixLocalSandboxClient is supported on macOS and Linux; Windows needs Docker or a hosted client",
+        "verified": "yes",
+        "evidence": "src/agents/sandbox/sandboxes/__init__.py:13-28 exposes Unix-local only when sys.platform != 'win32'; macOS wraps commands in sandbox-exec (unix_local.py:745-774). The README omits the no-confinement caveat that docs/sandbox_agents.md:31-33 and the class docstring (unix_local.py:1519-1525) state, and by default the client passes the full host environment to commands (unix_local.py:1537; docs/sandbox/clients.md:44)."
+      },
+      {
+        "claim": "README.md:19 - Human in the loop: built-in mechanisms for involving humans across agent runs",
+        "verified": "yes",
+        "evidence": "needs_approval/on_approval, run interruptions and RunState.to_json/to_string/from_json/from_string with schema version 1.18 including a sandbox payload (src/agents/run_state.py:212,1836,1980-1991,2193,2251,2339). Approval is opt-in: shell, apply_patch and custom tools default needs_approval=False (src/agents/tool.py:1476,1531,1571; src/agents/sandbox/capabilities/tools/shell_tool.py:181-183), and the default Shell capability passes no approval setting (src/agents/sandbox/capabilities/shell.py:50-54; customisable via configure_tools, shell.py:43,60-61)."
+      },
+      {
+        "claim": "README.md:20 - Sessions: automatic conversation history management",
+        "verified": "yes",
+        "evidence": "Session ABC and SQLiteSession (src/agents/memory/sqlite_session.py:31-43) default to an in-memory database (db_path=':memory:'); durable backends are optional extras (src/agents/extensions/memory/: SQLAlchemy, Redis, MongoDB, Dapr, encrypted; pyproject.toml:52-61). Sandbox workspace persistence is separate: default local snapshots go to a state directory (src/agents/sandbox/snapshot_defaults.py:25-54; runtime_session_manager.py:506-515)."
+      },
+      {
+        "claim": "README.md:21 - Tracing: built-in tracking of agent runs",
+        "verified": "yes",
+        "evidence": "The default provider registers a BatchTraceProcessor whose BackendSpanExporter posts to https://api.openai.com/v1/traces/ingest (src/agents/tracing/setup.py:52-60; src/agents/tracing/processors.py:46,903-922). It is on by default and includes sensitive data by default (docs/tracing.md:7-13; src/agents/run_config.py:53-56,414-420). The README does not mention the OpenAI-hosted export."
+      },
+      {
+        "claim": "README.md:17 - Tools include hosted tools (README research/coding use cases rely on them)",
+        "verified": "partial",
+        "evidence": "Hosted tools such as WebSearchTool are 'only supported with OpenAI models, using the Responses API' (src/agents/tool.py:836-839; docs/tools.md:25-35). Chat Completions-based adapters convert only FunctionTool and raise UserError otherwise (src/agents/models/chatcmpl_converter.py:1017-1037; used by litellm_model.py:555 and any_llm_model.py:875). The sandbox Filesystem capability's apply_patch is a Responses `CustomTool` (src/agents/sandbox/capabilities/tools/apply_patch_tool.py:175; src/agents/tool.py:1563-1565) and Capabilities.default() = Filesystem + Shell + Compaction (src/agents/sandbox/capabilities/capabilities.py:9-10). Compaction injects Responses-style `context_management` into extra_args (src/agents/sandbox/capabilities/compaction.py:188-208; src/agents/sandbox/runtime_agent_preparation.py:107-116), which Chat Completions/LiteLLM/Any-LLM calls forward verbatim (src/agents/models/openai_chatcompletions.py:740; src/agents/extensions/models/litellm_model.py:607-609; src/agents/extensions/models/any_llm_model.py:1351-1352). Inferred from code paths; not executed against any non-OpenAI model."
+      },
+      {
+        "claim": "README.md:27 - Python 3.10 or newer required",
+        "verified": "yes",
+        "evidence": "pyproject.toml:6 requires-python >=3.10; CI matrix Python 3.10-3.14 (.github/workflows/tests.yml:119-130). The any-llm extra is limited to Python >=3.11 (pyproject.toml:47-50; integration_tests/README.md:37)."
+      },
+      {
+        "claim": "docs/models/index.md:26-28 (not README) - frontier capability is selected with model='gpt-5.6-sol'; the need names 'GPT-6.1 Sol'",
+        "verified": "yes",
+        "evidence": "`gpt-5.6-sol` is known to the code (src/agents/models/default_models.py:66; src/agents/sandbox/capabilities/compaction.py:37) and used by the docs' sandbox coding example (docs/sandbox_agents.md:83; examples/sandbox/docs/coding_task.py:25). No `gpt-6*` / 'GPT-6.1' string exists anywhere in the repo, so 'GPT-6.1 Sol' is not_checkable here: unlisted names get generic ModelSettings (default_models.py:79-87,106-120; docs/models/index.md:109-111) and Compaction falls back to a static 240000-token threshold (compaction.py:12,193-199)."
+      },
+      {
+        "claim": "docs/tools.md:941 (not README) - Codex tool resolves `codex` from PATH 'then falls back to the bundled vendor binary'",
+        "verified": "no",
+        "evidence": "src/agents/extensions/experimental/codex/exec.py:275-290 resolves CODEX_PATH, then PATH, then <package>/extensions/vendor/<target-triple>/codex/codex, but no `vendor` directory exists under src/agents/extensions in this revision and pyproject.toml has no build step that adds one (pyproject.toml:140-154), so the codex CLI must be installed separately. Code wins over docs."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Model naming/compat: the repo never mentions GPT-6.1 Sol or any gpt-6* name; the top named tier is `gpt-5.6-sol` (src/agents/models/default_models.py:66; docs/models/index.md:26-28). Unlisted names only get generic ModelSettings (default_models.py:79-87,106-120) and a static 240000-token Compaction threshold (src/agents/sandbox/capabilities/compaction.py:12,193-199); GPT-5.6-specific reasoning mode/context/'max' effort work only on the Responses path and are ignored with a warning on Chat Completions (docs/models/index.md:76-97; src/agents/models/openai_chatcompletions.py:102-125). Nothing in the repo tests a GPT-6.x model.",
+      "Claude path is indirect and sandbox-defaults may not fit it: Claude is reachable only through best-effort beta LiteLLM/Any-LLM adapters or OpenAI-compatible gateways (docs/models/index.md:683-705; src/agents/models/multi_provider.py:214-225). The default SandboxAgent capabilities include `apply_patch` as a Responses-only CustomTool and a Compaction capability that injects Responses-style `context_management` (src/agents/sandbox/capabilities/tools/apply_patch_tool.py:175; src/agents/sandbox/capabilities/compaction.py:188-208), while the Chat Completions converter accepts only FunctionTool (src/agents/models/chatcmpl_converter.py:1017-1037). Expect to replace Filesystem/Compaction via configure_tools or capabilities=[...] (src/agents/sandbox/capabilities/filesystem.py:29-52); inferred from code, not run.",
+      "Isolation depends on the backend: UnixLocal adds no OS confinement on Linux, only filesystem restrictions via sandbox-exec on macOS (no network isolation), and by default inherits the whole host environment including API keys (docs/sandbox/clients.md:17-23,44; src/agents/sandbox/sandboxes/unix_local.py:752-774,1537). The Docker client exposes only image, ports (bound to 127.0.0.1), network_mode='none', labels and mounts - no CPU/memory/pids/read-only options in SDK code (src/agents/sandbox/sandboxes/docker.py:220-250,1876-1906) - and FUSE/SYS_ADMIN mounts add cap_add SYS_ADMIN plus apparmor:unconfined (docker.py:1891-1901). Docker networking is on by default (docs/sandbox/clients.md:91). Hosted adapters are mock-tested only, not live-validated in CI (examples/sandbox/extensions/README.md:165).",
+      "Bounded tool access is opt-in, not default: exec_command takes arbitrary cmd/shell/login/tty arguments with no allowlist (src/agents/sandbox/capabilities/tools/shell_tool.py:114-142); needs_approval defaults to False (src/agents/tool.py:1476,1531,1571); max_turns defaults to 10 but None disables it (src/agents/run_config.py:45; docs/running_agents.md:600); function-tool timeout_seconds defaults to None (src/agents/tool.py:514); archive extraction limits default to none (src/agents/run_config.py:247-252); all tool calls in a turn start concurrently unless max_function_tool_concurrency is set (run_config.py:139-144). The SDK's own docs say applications must authorize tool capabilities and isolate untrusted execution (SECURITY.md:25).",
+      "Default telemetry/data flow: tracing is enabled by default, exports LLM and tool inputs/outputs to https://api.openai.com/v1/traces/ingest using the OpenAI key, and is unavailable under ZDR (src/agents/tracing/processors.py:46; src/agents/run_config.py:53-56,414-420; docs/tracing.md:7-13). Runs driven by non-OpenAI models need tracing disabled or a separate key to avoid 401s (docs/models/index.md:609-615). The sandbox Memory capability sends run transcripts to a memory-generating model when the session closes (docs/sandbox/memory.md:51-58).",
+      "No research harness: deep-research behaviour exists only as examples that are not shipped in the wheel (pyproject.toml:153-154). They depend on the OpenAI-hosted WebSearchTool (Responses API only, src/agents/tool.py:836-839); citation extraction lives in examples/web_search_utils.py:20-79; the financial example's citation check is an LLM verifier prompted to compare URLs against an allowed list, with no deterministic URL check in code (examples/financial_research_agent/agents/verifier_agent.py:9-21; manager.py:256-273) and a planner on `o3-mini` (agents/planner_agent.py:36); examples/research_bot has no source or citation handling. No published benchmark or task-success data for coding or research quality exists in the repo (searched).",
+      "Stability and maintenance: 0.x versioning where minor bumps may break non-beta interfaces and patch releases may change beta features (docs/release.md:3-18); sandboxes were introduced as a 'beta' surface in 0.14.0 (docs/release.md:150-154); the Codex tool and hosted multi-agent model are explicitly experimental (docs/tools.md:892; docs/models/index.md:242), and an in-flight hosted multi-agent response cannot be restored in another process (docs/models/index.md:303). Recent minors carried breaking changes (0.17, 0.20, 0.21 openai v3 + httpx2 migration, 0.22: docs/release.md:24-62,86). RunState schema has been bumped 18 times and older SDKs reject newer state (src/agents/run_state.py:205-258), so resume across SDK versions is one-directional. Pull requests are accepted only from collaborators (CONTRIBUTING.md:7).",
+      "Docs-vs-code and operational gaps: the Codex tool's documented bundled-binary fallback does not exist (docs/tools.md:941 vs src/agents/extensions/experimental/codex/exec.py:275-290; codex CLI must be installed and inherits os.environ unless codex_options.env is set, exec.py:225-231). The 30-day cleanup helper for default local sandbox snapshots is defined but only referenced by a unit test (src/agents/sandbox/snapshot_defaults.py:57-84; tests/sandbox/test_snapshot_defaults.py:135-151), so snapshots under the user state directory accumulate. Vercel sessions with mounts cannot be resumed (docs/sandbox/clients.md:186). No checksum/signature/attestation step is configured in the release workflow (.github/workflows/publish.yml:126-158)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "openai/openai-agents-python",
+      "checks": [
+        {
+          "field": "readme.install[0] (pip in a virtualenv, Linux/macOS)",
+          "statement": "python -m venv .venv && source .venv/bin/activate && pip install openai-agents",
+          "citation": "README.md:31-34",
+          "holds": true,
+          "note": "README.md:31 opens a bash block. Lines 32-34 are exactly 'python -m venv .venv', 'source .venv/bin/activate  # On Windows: .venv\\Scripts\\activate' and 'pip install openai-agents'. The package name matches pyproject.toml:2 (name = \"openai-agents\", version 0.23.0 at :3)."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1 reads 'MIT License', Copyright (c) 2025 OpenAI, followed by the standard MIT grant and warranty text. Consistent with pyproject.toml:7 (license = \"MIT\") and the classifier 'License :: OSI Approved :: MIT License' (pyproject.toml:35)."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - pure-Python package (hatchling wheel of src/agents only), requires-python >=3.10; CI test matrix on ubuntu-latest for Python 3.10-3.14, runner CPU arch not stated; UnixLocalSandboxClient supported on Linux but adds no OS-level confinement there",
+          "citation": "pyproject.toml:6,140-154; .github/workflows/tests.yml:119-161; README.md:77; src/agents/sandbox/sandboxes/unix_local.py:752-753",
+          "holds": true,
+          "note": "pyproject.toml:6 is requires-python >=3.10. Lines 140-154 set the hatchling backend with wheel packages ['src/agents'] and no build hooks; no C/Cython/Rust sources exist under src/agents. tests.yml:119-161 is job 'tests': runs-on ubuntu-latest, matrix 3.10/3.11/3.12/3.13/3.14, no arch key. README.md:77 says Unix-local is supported on macOS and Linux. unix_local.py:752-753 ('if sys.platform != \"darwin\": return command_parts') leaves commands unwrapped; the docstrings at :266-268 and :1521 confirm no Linux confinement. 'x86_64' is supported by a pure-Python wheel plus Linux CI with an unstated arch, as the dossier itself says."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "client side only: MCPServerStdio/MCPServerSse/MCPServerStreamableHttp, MCPServerManager and OpenAI-hosted HostedMCPTool; no MCP server exposing the SDK (src imports only mcp client modules)",
+          "citation": "src/agents/mcp/server.py:20-24,1962,2112,2290; src/agents/mcp/manager.py:260; src/agents/tool.py:1136; docs/mcp.md:20-25",
+          "holds": true,
+          "note": "Classes are at exactly server.py:1962/2112/2290, manager.py:260 and tool.py:1136. docs/mcp.md:20-25 is the integration table (HostedMCPTool via the Responses API, StreamableHttp, SSE, stdio). server.py:20-24 imports mcp ClientSession/StdioServerParameters/stdio_client, mcp.client.session, mcp.client.sse, mcp.shared.message and mcp.types. A src-wide search finds no 'mcp.server' or 'FastMCP' reference. The only other mcp imports are mcp.types (mcp/util.py:57, extensions/experimental/codex/items.py:12)."
+        },
+        {
+          "field": "claim_checks[0] (README.md:3 provider-agnostic, '100+ other LLMs')",
+          "statement": "verified: partial - Responses and Chat Completions models exist; other providers work only via OpenAI-compatible endpoints or best-effort beta LiteLLM/Any-LLM adapters; default MultiProvider routes only no-prefix/openai/, litellm/, any-llm/ and raises UserError for other prefixes such as anthropic/; no Anthropic-native client in src; Claude appears only via LiteLLM/OpenRouter in an example and in opt-in integration tests; '100+' not verifiable",
+          "citation": "src/agents/models/openai_responses.py; src/agents/models/openai_chatcompletions.py; docs/models/index.md:683-705; src/agents/models/multi_provider.py:63-67,214-225; examples/model_providers/litellm_provider.py:14-18; integration_tests/conftest.py:47-72; integration_tests/README.md:21",
+          "holds": true,
+          "note": "The 'partial' verdict and its substance hold. Both model files exist. docs/models/index.md:685,689,701 say 'best-effort, beta'. multi_provider.py:63-67 documents the default map; :214-225 routes litellm/any-llm/openai and raises UserError('Unknown prefix') under the default unknown_prefix_mode='error' (opt-in 'model_id' passes through, :222-223). src has no anthropic SDK import, only Anthropic workarounds inside the Chat Completions/LiteLLM/Any-LLM paths. litellm_provider.py:18 shows openrouter/anthropic/claude-4.5-sonnet. conftest.py:47-72 has OpenRouter anthropic/claude-sonnet-5 and a direct ANTHROPIC_API_KEY entry, and integration_tests/README.md:21 matches. '100+' occurs only at README.md:3. Two details are imprecise without changing the conclusion: (1) Claude also appears in examples/model_providers/any_llm_provider.py:19 (Any-LLM over OpenRouter), so it is in two examples, not one LiteLLM example; (2) docs/models/index.md:316,349 also allow a user-supplied ModelProvider/Model implementation, though every shipped path uses an OpenAI-compatible client or an adapter."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "Optional (non-blocking): in claim_checks[0].evidence, change 'Claude appears only via LiteLLM/OpenRouter in an example (examples/model_providers/litellm_provider.py:14-18)' to 'Claude appears only via LiteLLM or Any-LLM over OpenRouter in two examples (examples/model_providers/litellm_provider.py:14-18; examples/model_providers/any_llm_provider.py:19)'.",
+        "Optional (non-blocking): in claim_checks[0].evidence (and the matching purpose/risk wording), qualify 'Other providers work only via OpenAI-compatible endpoints or the LiteLLM/Any-LLM adapters' with 'among shipped paths; users may also supply their own Model/ModelProvider implementation (docs/models/index.md:316,349)'."
+      ]
+    }
+  ]
+}

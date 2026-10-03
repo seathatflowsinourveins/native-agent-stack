@@ -1,0 +1,329 @@
+{
+  "contender": "diegosouzapw/omniroute",
+  "revision": {
+    "contender": "diegosouzapw/omniroute",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "diegosouzapw/OmniRoute",
+        "tag": "v3.8.51",
+        "commit": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v3.8.51",
+    "commit": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+    "read_at": "2026-10-02T03:02:16+00:00"
+  },
+  "dossier": {
+    "contender": "diegosouzapw/omniroute",
+    "revision": {
+      "tag": "v3.8.51",
+      "commit": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "read_at": "2026-10-02T03:02:16+00:00"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Self-hosted AI gateway/router (Node.js + TypeScript; Next.js dashboard, an 'omniroute' CLI, Docker and Electron packaging). It serves OpenAI Chat Completions, Responses, Anthropic and Gemini compatible endpoints at http://localhost:20128/v1 and forwards to several hundred upstream providers, with per-provider multi-connection pooling, 19 combo routing strategies, cooldown/circuit-breaker fallback, optional prompt-compression engines, local SQLite usage/call logging, and built-in MCP and A2A servers (README.md:8-10, 599, 887-893). For the Codex lane it ships a 'codex' provider (alias cx/) that replays pooled ChatGPT OAuth connections to chatgpt.com/backend-api/codex, lists GPT-6 Astra/Sol/Luna plus effort-suffixed ids (open-sse/config/providers/registry/codex/index.ts:9-84), Codex CLI helpers (omniroute run|configure|setup-codex|launch-codex), HTTP /v1/responses and a Codex-only Responses-over-WebSocket endpoint (docs/reference/API_REFERENCE.md:640-699). The README makes no GPT-6-specific statement; GPT-6 support is evidenced only by code, tests and CHANGELOG. No Codex-SDK-specific integration was found; SDK or other OpenAI-compatible workers would use the generic HTTP API.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "One endpoint for every tool: 'One config — http://localhost:20128/v1 — and every AI IDE or CLI runs on free & low-cost models'; Codex CLI is listed among the compatible CLIs.",
+          "citation": "README.md:599, 605"
+        },
+        {
+          "claim": "'omniroute run codex --model …' launches Codex through OmniRoute with no config files written and credentials injected per process; 'omniroute configure codex' writes the tool's own config; --dry-run previews env/args; honors remote contexts.",
+          "citation": "README.md:648-666"
+        },
+        {
+          "claim": "19 combo routing strategies (priority, fill-first, round-robin, p2c, least-used, cost-optimized, cache-optimized — pins a reusable prompt prefix to the same account —, lkgp, auto, fusion, pipeline…) plus 4-tier fallback Subscription → API → Cheap → Free.",
+          "citation": "README.md:252, 365-470"
+        },
+        {
+          "claim": "Account/key pooling: 'Quota-Share routing — split a shared account's quota fairly across pooled keys, work-conserving'; 'team sharing one subscription → key pools with fair-share quotas'.",
+          "citation": "README.md:248, 576"
+        },
+        {
+          "claim": "Compression: 'Every request passes through OmniRoute's compression pipeline transparently'; default stacked combo RTK → Caveman; preset 'Lite ~15% — Always-on safe default'; 12 composable engines.",
+          "citation": "README.md:915, 925, 927-957"
+        },
+        {
+          "claim": "Compression is decided by precedence: per-request x-omniroute-compression header › routing-combo override › active named profile › adaptive/auto-trigger › panel default › off; the applied plan is echoed in the X-OmniRoute-Compression response header.",
+          "citation": "README.md:988"
+        },
+        {
+          "claim": "Usage observation: 'X-OmniRoute-* cost/usage headers on every endpoint', per-key USD spend quotas, 'live analytics (usage, quota, savings, p95 latency)'; every response carries X-OmniRoute-Decision (strategy/provider/latency).",
+          "citation": "README.md:248, 582, 589"
+        },
+        {
+          "claim": "Local-first/private: gateway and control plane run on your machine, 'no hosted prompt-processing hop', 'telemetry is disabled by default', credentials encrypted at rest with AES-256-GCM (stated in the privacy diagram alt text).",
+          "citation": "README.md:836"
+        },
+        {
+          "claim": "Radar (signed free-catalog overlay) is opt-in and GET-only; the client does not upload prompts, traffic, provider configuration, usage telemetry or dismiss state.",
+          "citation": "README.md:544-559"
+        },
+        {
+          "claim": "Agent workloads need far more memory than the image default: the image pins OMNIROUTE_MEMORY_MB=1024; Codex/Claude Code POST /v1/responses needs ~8192 MB heap (container >=10 g); two concurrent long contexts 10240-12288 MB (>=12-16 g); otherwise FATAL ERROR at ~12 GiB.",
+          "citation": "README.md:1061-1075"
+        },
+        {
+          "claim": "Interfaces: MCP stdio (omniroute --mcp), MCP HTTP /api/mcp/stream ('110 tools, 33 scopes, enforcement opt-in'), MCP SSE, A2A (/.well-known/agent.json, JSON-RPC 2.0), REST /v1/*, webhooks, remote CLI; a Claude Code MCP add command is shown.",
+          "citation": "README.md:883-899"
+        },
+        {
+          "claim": "Runtime/stack: Node.js >=22.22.2 <23 || >=24.0.0 <27; TypeScript; Next.js 16; better-sqlite3 with 193 migrations; 'Node.js test runner + Vitest — 39,000+ static test declarations across 5,100+ tracked test files'.",
+          "citation": "README.md:1275-1288"
+        },
+        {
+          "claim": "Install/run targets: npm global, Docker (multi-arch AMD64 + ARM64), Electron desktop, macOS menu-bar tray (community project), native arm64, Termux, PWA, from source.",
+          "citation": "README.md:747-759"
+        },
+        {
+          "claim": "MIT-licensed and self-hostable; 'Sponsorship never affects routing priority'.",
+          "citation": "README.md:498, 1734"
+        }
+      ],
+      "install": [
+        {
+          "method": "npm global package (Linux/macOS; also Windows/Termux)",
+          "command": "npm install -g omniroute   (then run: omniroute)",
+          "citation": "README.md:1004-1007"
+        },
+        {
+          "method": "Docker image, multi-arch; a larger-heap variant for coding agents is at README.md:1070-1072",
+          "command": "docker run -d --name omniroute --restart unless-stopped --stop-timeout 40 -p 127.0.0.1:20128:20128 -v omniroute-data:/app/data diegosouzapw/omniroute:latest",
+          "citation": "README.md:1057-1058"
+        },
+        {
+          "method": "pnpm global",
+          "command": "pnpm add -g omniroute@latest --allow-build=better-sqlite3 --allow-build=@swc/core && omniroute",
+          "citation": "README.md:1107"
+        },
+        {
+          "method": "Arch Linux AUR package (binary package maintained outside this repo)",
+          "command": "yay -S omniroute-bin && systemctl --user enable --now omniroute.service",
+          "citation": "README.md:1113"
+        },
+        {
+          "method": "Podman Compose (Linux rootless; on macOS Podman Machine skip the unshare step)",
+          "command": "mkdir -p data; podman unshare chown 1000:1000 ./data; echo \"CONTAINER_HOST=podman\" >> .env; podman compose --profile base up -d --build",
+          "citation": "README.md:1131-1146"
+        },
+        {
+          "method": "macOS menu-bar app via Homebrew cask (community project, not an official OmniRoute release)",
+          "command": "brew install --cask zoispag/tap/omniroute-tray",
+          "citation": "README.md:752, 819-826"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes — npm global install (README.md:1004-1007); Docker image built for linux/amd64 and linux/arm64 (.github/workflows/docker-publish.yml:153-156; README.md:750); wreq-js native bindings for linux-x64-gnu/musl (config/release/wreq-js-native-manifest.json:84-107); CI unit/integration/e2e jobs run on ubuntu-latest (.github/workflows/ci.yml:885); AUR package (README.md:1113). Other documented methods not listed under install: from source `cp .env.example .env && npm install` then `PORT=20128 npm run dev` (README.md:1099-1102), Bun (README.md:1083-1095), Termux (README.md:754), Electron `npm run electron:build` (README.md:751).",
+        "wsl2": "unknown — README and guides make no WSL2 install/support statement for the gateway itself; the only WSL text is docs/guides/TROUBLESHOOTING.md:322-326, which says intercepting Windows-host desktop apps with the MITM feature from inside WSL is 'an unsupported, fragile setup'.",
+        "macos_arm64": "yes — README.md:753 lists native arm64 incl. Apple Silicon; macOS menu-bar tray via Homebrew cask (README.md:752, 819-826, community-maintained); wreq-js darwin-arm64 binding (config/release/wreq-js-native-manifest.json:34-41); Electron mac-arm64 build target (electron/package.json:23; .github/workflows/electron-release.yml:158-163, whose arm64 smoke step is best-effort, lines 294-305). The server CI jobs run on ubuntu only (ci.yml:885); there is no macOS runner for the npm server.",
+        "gpu": "no — no GPU use or requirement: the only ML component (optional LLMLingua-2 ONNX engine, optional dep onnxruntime-node 1.30.0, package.json:393) is pinned to CPU (open-sse/services/compression/engines/llmlingua/onnxWorker.ts:80); no GPU/CUDA path is described in README, guides or compression docs."
+      },
+      "integrations": {
+        "cli": "Yes. Binary 'omniroute' (package.json:6-8; bin/omniroute.mjs; Commander program bin/cli/program.mjs per bin/omniroute.mjs:14). 'omniroute' serves gateway + dashboard on 20128; 'omniroute run <claude|codex|aider|goose|opencode|qwen|gemini>' launches the tool with the provider injected (README.md:651-662; bin/cli/cli-manifest.mjs:21-106; for Codex it passes -c model_providers.omniroute.* with wire_api=responses, env_key=OMNIROUTE_API_KEY: bin/cli/commands/launch-codex.mjs:173-197); 'omniroute configure codex', 'omniroute setup-codex', 'omniroute launch-codex' (docs/guides/CODEX-CLI-CONFIGURATION.md:277-331); remote mode 'omniroute connect <host>' (README.md:859-873).",
+        "mcp": "Yes. Built-in MCP server: stdio via 'omniroute --mcp' (README.md:887; bin/omniroute.mjs:10, 92-97), HTTP /api/mcp/stream and SSE /api/mcp/sse (README.md:888-889); code in open-sse/mcp-server/ (server.ts, httpTransport.ts); scope enforcement is opt-in via OMNIROUTE_MCP_ENFORCE_SCOPES (open-sse/mcp-server/README.md:49-51). Tool/scope counts differ across docs (110 vs 107 in open-sse/mcp-server/README.md:3,23; 33 scopes README.md:888 vs 32 SECURITY.md:51).",
+        "sdk_or_api": "HTTP API only; no general-purpose OmniRoute client SDK. OpenAI-compatible POST /v1/chat/completions and POST /v1/responses (src/app/api/v1/chat/completions/route.ts, src/app/api/v1/responses/route.ts; both delegate to handleChat), /v1/models, embeddings etc. (README.md:891; docs/openapi.yaml; docs/reference/API_REFERENCE.md); Codex-only Responses-over-WebSocket on the same port (API_REFERENCE.md:640-699); header-less alias paths /vscode/<KEY>/... (README.md:1037-1048); A2A JSON-RPC (README.md:890). Quickstarts use plain curl/requests/axios (examples/quickstart/). Codex SDK-specific docs or tests: none found (repo-wide search for codex-sdk / @openai/codex-sdk returned nothing). OpenCode packages @omniroute/opencode-plugin(-v2) exist; @omniroute/opencode-provider is marked DEPRECATED in its package.json:4.",
+        "claude_code_or_codex": "Codex: documented. ~/.codex/config.toml provider block with base_url=http://<host>:20128/v1, env_key=OMNIROUTE_API_KEY, wire_api=responses (docs/guides/CODEX-CLI-CONFIGURATION.md:22-46; docs/reference/CLI-TOOLS.md:435-457); WebSocket variant with supports_websockets=true and bare model ids (docs/reference/API_REFERENCE.md:663-699); dashboard generator /api/cli-tools/apply (CODEX-CLI-CONFIGURATION.md:13-20). Provider 'codex' (alias cx) uses OAuth against chatgpt.com/backend-api/codex (registry/codex/index.ts:9-29); alternative provider 'codex-app-server' drives the Codex CLI's own app-server sidecar instead of replaying a token (docs/guides/CODEX-APP-SERVER-PROVIDER.md:9-18). Claude Code: 'omniroute run claude' (README.md:652), docs/guides/CLAUDE-CODE-CONFIGURATION.md, Anthropic-compatible /v1/messages (src/app/api/v1/messages/route.ts); README shows 'claude mcp add-server omniroute --type http --url http://localhost:20128/api/mcp/stream' (README.md:898; same text docs/guides/SETUP_GUIDE.md:231) — no code or test in the repo exercises that syntax."
+      },
+      "telemetry_and_network": "No analytics/crash-reporting SDK among the 83 production dependencies (package.json:302-385); README says telemetry is disabled by default (README.md:836); 'telemetry' in the code/docs is local request-latency aggregation (docs/architecture/ARCHITECTURE.md:55, 253). Required network: the upstream endpoints of the providers you configure — Codex lane: https://chatgpt.com/backend-api/codex/responses, optional wss://chatgpt.com/backend-api/codex/responses, OAuth refresh at https://auth.openai.com/oauth/token (open-sse/config/providers/registry/codex/index.ts:17,28; open-sse/executors/codex.ts:152). Accounts: the Codex lane needs ChatGPT OAuth connections added in the dashboard (docs/guides/USER_GUIDE.md:148-153); the zero-config 'auto' model can answer via keyless OpenCode Free with no account (README.md:216-225). Default-ON background outbound GETs (no prompt data): Arena ELO leaderboard sync from api.wulong.dev, opt out ARENA_ELO_SYNC_ENABLED=false (src/lib/arenaEloSync.ts:5-10, 104, 223; src/instrumentation-node.ts:663-673); OpenRouter public provider/catalog/rankings fetch, opt out OPENROUTER_PROVIDER_STATS_ENABLED=false (src/lib/catalog/openrouterProviderStats.ts:26-28, 297; instrumentation-node.ts:697-711); CLI update-notifier npm check once per 24 h, suppressed by OMNIROUTE_NO_UPDATE_NOTIFIER or CI (bin/omniroute.mjs:306-315); dashboard update banner queries registry.npmjs.org and api.github.com (src/lib/system/versionCheck.ts:28-36). Opt-in/off by default: Radar feed https://radar.omniroute.online, flag RADAR_ENABLED default off, GET requests (.env.example:3373-3384; src/lib/radar/offersSync.ts:96; intelSync.ts:108; instrumentation-node.ts:675-686); LiteLLM pricing sync PRICING_SYNC_ENABLED=false (.env.example:2118-2125); models.dev sync (.env.example:2157-2160; instrumentation-node.ts:713-720); Cloud sync needs CLOUD_URL (empty by default) plus cloudEnabled (.env.example:699-701; docs/security/SOCKET_DEV_FINDINGS.md:174-209). OMNIROUTE_DISABLE_BACKGROUND_SERVICES=true disables the background services (docs/reference/ENVIRONMENT.md:566; instrumentation-node.ts:105-109, 610). Prompts/usage are stored locally in SQLite (usage_history, call_logs: src/lib/db/core.ts:316-379); call-log retention default 7 days (.env.example:1948-1950). A STORAGE_ENCRYPTION_KEY is auto-generated and persisted in the data dir on first CLI run (bin/omniroute.mjs:227-259)."
+    },
+    "code": {
+      "languages": [
+        "TypeScript (src/, open-sse/, dashboard; README.md:1276)",
+        "JavaScript (ESM .mjs: bin/ CLI, scripts/, electron/ main process)",
+        "SQL (193 SQLite migrations in src/lib/db/migrations/)",
+        "C (optional Linux TPROXY addon: src/mitm/tproxy/native/transparent.c, built via node-gyp, package.json:119)",
+        "Bash (ops scripts under bin/*.sh)"
+      ],
+      "entry_points": [
+        {
+          "path": "bin/omniroute.mjs",
+          "what": "The 'omniroute' binary (package.json:6-8): version fast-path, Node-runtime check, env loading, storage-key provisioning, '--mcp' stdio MCP bypass (lines 10, 92-97), then the Commander CLI in bin/cli/program.mjs (~70-86 commands)."
+        },
+        {
+          "path": "bin/cli/commands/serve.mjs",
+          "what": "'omniroute serve' (default command): starts the standalone Next.js server; default port 20128 (lines 122, 153); bind host defaults to 0.0.0.0 unless OMNIROUTE_SERVER_HOST is set (bin/cli/utils/serverHost.mjs:16-26)."
+        },
+        {
+          "path": "src/app/api/v1/responses/route.ts",
+          "what": "POST /v1/responses — the Codex CLI HTTP lane; prefixes bare model ids with codex/ when they resolve to Codex (lines 61-95) then calls handleChat (@/sse/handlers/chat)."
+        },
+        {
+          "path": "src/app/api/v1/chat/completions/route.ts",
+          "what": "POST /v1/chat/completions — OpenAI-compatible endpoint for SDK/other workers; delegates to handleChat."
+        },
+        {
+          "path": "open-sse/handlers/chatCore.ts",
+          "what": "Central request pipeline (>5,800 lines): memory/skills injection (1363-1380), compression resolution and application (1426-2045), translation, executor dispatch, usage/call-log writes (716, 4311+)."
+        },
+        {
+          "path": "open-sse/executors/codex.ts",
+          "what": "CodexExecutor: header identity, transformRequest (model suffix → reasoning.effort, clamping, store=false, field allowlist), SSE/WS transports, quota header parsing, 429/capacity handling."
+        },
+        {
+          "path": "open-sse/mcp-server/",
+          "what": "MCP server implementation (server.ts, httpTransport.ts, scopeEnforcement.ts, audit.ts); stdio via 'omniroute --mcp', HTTP at /api/mcp/stream."
+        },
+        {
+          "path": "bin/reset-password.mjs",
+          "what": "Second bin entry 'omniroute-reset-password' (package.json:6-9) for resetting the dashboard password."
+        }
+      ],
+      "architecture": "One Node process hosts dashboard, API, schedulers and CLI-launched server (docs/reference/ENVIRONMENT.md:1017). src/app/ is the Next.js 16 App Router (dashboard pages plus src/app/api/** handlers: /v1/chat/completions, /v1/responses (HTTP + Codex-only WebSocket bridge in src/app/api/internal/codex-responses-ws/), /v1/models, MCP and A2A endpoints). src/sse/ holds request handlers and credential/connection selection (src/sse/services/auth.ts: fill-first default, round-robin, p2c, random, least-used, expiry-first, cost-optimized, strict-random, session affinity, quota gating at lines 1953-2158; model.ts bare-id/provider inference). The open-sse/ workspace is the streaming engine: handlers/chatCore.ts, executors/ (one per provider family; codex.ts, codex-app-server.ts), translator/ (format translation), services/ (combo and autoCombo routing, accountFallback, thinkingBudget.ts, compression/ with 12 engines plus strategySelector.ts/planResolution.ts, codexAccount/ parent+codex/spark child account model), config/providers/registry/<provider>/index.ts (static catalogs; codex/index.ts lists GPT-6) and mcp-server/. Persistence: src/lib/db/ (SQLite via better-sqlite3, bun:sqlite, node:sqlite or sql.js; 193 migrations; tables provider_connections, usage_history, call_logs, key_value settings), src/lib/usage/ (usage and call-log persistence, cost calculation), plus src/lib/{memory,skills,a2a,radar,quota}. Also src/mitm/ (MITM/TPROXY), electron/ (desktop shell), bin/ (CLI), @omniroute/opencode-* (OpenCode plugin packages). Request flow: route handler → handleChat → chatCore (sanitize, optional memory/skills injection, compression only if enabled, translation) → provider executor → upstream; usage written by saveRequestUsage/appendRequestLog.",
+      "packaging_and_release": "npm: .github/workflows/npm-publish.yml runs on GitHub release 'released' or manual dispatch; builds the standalone bundle (npm run build:cli), gates on check:pack-artifact, check:pack-boot and check:install-upgrade (lines 259-313), generates a CycloneDX SBOM attached to the GitHub Release (263-289), then a GitHub-hosted job publishes with 'npm publish --provenance' through npm Trusted Publishing/OIDC (377-443; staged and direct token fallbacks 445-486); also publishes to GitHub Packages as @diegosouzapw/omniroute (362-375) and the OpenCode plugin packages with --provenance (560-575, 649-664). Build/publish runners may be self-hosted (line 66). Docker: .github/workflows/docker-publish.yml builds linux/amd64 and linux/arm64 by digest and merges manifests on Docker Hub (diegosouzapw/omniroute) and ghcr.io (153-156, 418-468); :latest only for the highest stable semver (89-110, 491-521); :next/:main float (README.md:1077-1081); smoke test (470-489); advisory CycloneDX image SBOM (528-536); Trivy SARIF advisory plus blocking CRITICAL gate (549-582). Desktop: .github/workflows/electron-release.yml builds Windows, macOS x64/arm64 and Linux (144-170) and attaches .dmg/.exe/.AppImage/.deb/.blockmap/.yml and source archives to the GitHub Release (435-457). No explicit cosign/image-attestation step, checksum file, GPG or code-signing/notarization configuration was found in any workflow (workflow grep). The wreq-js native binaries ship with per-target sha256/integrity receipts (config/release/wreq-js-native-manifest.json; THIRD_PARTY_NOTICES.md:3-27).",
+      "tests_and_ci": "Frameworks: Node.js built-in test runner via tsx (tests/unit, tests/integration; package.json:133-137, 256), Vitest for MCP/autoCombo/UI components (package.json:267-268), Playwright e2e (package.json:265), fast-check property tests (148), Stryker mutation tests (269), c8 coverage gate at 60% statements/lines/functions/branches (273). Test files (approximate, from file globs): ~6,700 = 6,502 tests/**/*.test.{ts,tsx,mjs,js} (5,231 directly in tests/unit/) + 162 colocated *.test/*.spec files outside tests/ (open-sse/**/__tests__, src/**/__tests__, @omniroute/*/tests) + 41 tests/**/*.spec.ts(x); dirs include tests/unit, integration (incl. combo-matrix, codex-account-pool and codex-chat-reasoning tests), e2e, golden-set, boundary (live), benchmarks. 27 workflows in .github/workflows. ci.yml (push/PR to main): change classification, lint plus ~25 check:* gates, quality ratchets, docs/i18n checks, Build, Package Artifact, Electron smoke (ubuntu, windows), unit tests in 8 shards, Bun SQLite compatibility, Vitest, coverage, SonarQube, e2e in 9 shards, integration in 2 shards, security tests, ecosystem and protocol-client e2e (advisory) (ci.yml:28-1469). Other workflows by name only (not read in detail): quality, codeql, semgrep, scorecard (weekly OpenSSF), dast-smoke, release-acceptance, nightly-compat/llm-security/mutation/property/resilience/schemathesis/release-green, deploy-vps, wiki-sync, radar-export, opencode-plugin/provider CI, claude, lock-released-branch, build, api-route-typecheck.",
+      "dependencies": "Root package.json: 83 dependencies, 8 optionalDependencies (better-sqlite3 ^13, wreq-js 3.2.0, onnxruntime-node 1.30.0, @huggingface/transformers, @atjsh/llmlingua-2, keytar, sqlite-vec, js-tiktoken), 59 devDependencies (package.json:302-457); Node engines '>=22.22.2 <23 || >=24.0.0 <27' (69-71); package-lock.json present. Other manifests: open-sse/package.json 0 (private workspace); electron/package.json 1 dep + 2 dev; packages/browser-pool/package.json 1 dep (playwright 1.62.1) + 1 dev; @omniroute/opencode-plugin 1 dep + 1 peer + 5 dev; @omniroute/opencode-plugin-v2 1 dep + 1 peer + 5 dev; @omniroute/opencode-provider 0 deps + 4 dev (deprecated). Production deps include next 16.3.5, react 19, express 5, undici 8, @modelcontextprotocol/sdk, @aws-sdk/client-bedrock-runtime, @ngrok/ngrok, ioredis, playwright, sharp; CI enforces an SPDX license allowlist with documented LGPL-3.0 (libvips) and MPL-2.0 (lightningcss) exceptions (config/quality/.license-allowlist.json:36-65).",
+      "security_policy": "SECURITY.md (root): report privately via GitHub Security Advisories, acknowledgment target 48 h, triage 5 business days, patch 14 business days for critical; supported versions 3.8.x active, 3.7.x security-only, <3.7.0 unsupported (SECURITY.md:1-25). Also .gitleaks.toml, .zizmor.yml, .trivyignore, CodeQL, Semgrep and OpenSSF Scorecard workflows."
+    },
+    "claim_checks": [
+      {
+        "claim": "README says compression is transparent/always-on: 'Every request passes through OmniRoute's compression pipeline transparently' and Lite is the 'Always-on safe default' (README.md:925, 951). Needed fact: is request compression off unless chosen?",
+        "verified": "no",
+        "evidence": "As written the README overstates; code wins and the shipped default is OFF. DEFAULT_COMPRESSION_CONFIG has enabled:false and defaultMode:'off' (open-sse/services/compression/types.ts:421-423); migration seeds enabled=false, defaultMode='off' (src/lib/db/migrations/034_compression_settings.sql:5-6); the master switch is a hard kill that header, combo override, auto-trigger and adaptive planning cannot override (open-sse/services/compression/strategySelector.ts:134, 234-236; docs/reference/API_REFERENCE.md:206); with it off, prompt compression, reactive compaction and output styles are all skipped (open-sse/handlers/chatCore.ts:1446-1448, 1692, 2047-2054); the Codex WebSocket bridge also returns the body untouched when disabled (src/app/api/internal/codex-responses-ws/compression.ts:55-56). Even with the switch on, legacy installs stay on defaultMode 'off' until a mode/engine is chosen (open-sse/services/compression/planResolution.ts:141-160). The x-omniroute-compression header works only on the HTTP path (chatCore.ts:1638-1653); the WS bridge passes a null header (compression.ts:77-85). Other body rewrites that are not compression remain on (see risks). No measured gateway latency/throughput benchmark was found in docs; published savings figures are derived or upstream-quoted (see benchmarks)."
+      },
+      {
+        "claim": "Codex CLI runs through the gateway: 'omniroute run codex' / 'omniroute configure codex' (README.md:651-662), and README.md:577 says run launches 7 CLIs and configure supports 10 targets.",
+        "verified": "yes",
+        "evidence": "bin/cli/cli-manifest.mjs:21-106 has 7 run:true targets (claude, codex, aider, goose, opencode, qwen, gemini) and 10 configure:true targets (claude, codex, aider, goose, opencode, qwen, cline, continue, kilo, 5dive); launch-codex.mjs:173-197 injects model_provider=omniroute, base_url=<host>/v1, env_key=OMNIROUTE_API_KEY, wire_api=responses, requires_openai_auth=false; docs/guides/CODEX-CLI-CONFIGURATION.md:22-46, 277-331 and docs/reference/API_REFERENCE.md:640-699 (WebSocket mode, bare model ids) document manual setup."
+      },
+      {
+        "claim": "GPT-6 family is routable through the Codex lane (the README itself makes no GPT-6 claim; only AgentRouter's model list mentions gpt-5.6-sol, README.md:324).",
+        "verified": "partial",
+        "evidence": "Code/tests support it: the codex provider lists gpt-6-astra, gpt-6-sol, gpt-6-luna and -low…-ultra/-max variants (Luna to -max) with 872k context (open-sse/config/providers/registry/codex/index.ts:33-84; tests/unit/codex-gpt6-sol-luna.test.ts:30-62); pricing rows exist (src/shared/constants/pricing/oauth-subscriptions.ts:111-130); CHANGELOG.md:288, 301, 375 record the additions in the 3.8.51 cycle. Caveats: only gpt-6-astra* is in CODEX_NATIVE_UNPREFIXED_MODELS (open-sse/services/model.ts:127-162; tests/unit/codex-gpt6-astra-bare-id.test.ts:57-80); the OpenAI API-key provider's static catalog lists only gpt-6-astra (open-sse/config/providers/registry/openai/index.ts:17-23); the ChatGPT backend gates new models on the caller's Codex client version, which OmniRoute forwards (open-sse/executors/codex.ts:1129-1136). No GPT-6 documentation exists outside CHANGELOG."
+      },
+      {
+        "claim": "SDK and other OpenAI-compatible workers can use the same gateway ('any OpenAI-compatible tool', README.md:639; REST /v1/*, README.md:891). Codex SDK specifically.",
+        "verified": "partial",
+        "evidence": "HTTP routes exist and delegate to the same handler (src/app/api/v1/chat/completions/route.ts:1-60; src/app/api/v1/responses/route.ts:97-139); header-less alias paths exist (README.md:1037-1048). No Codex-SDK mention anywhere in code/docs (repo search for codex-sdk, @openai/codex-sdk, 'Codex SDK' found nothing), and quickstarts use plain HTTP clients (examples/quickstart/), so SDK compatibility rests on the generic OpenAI wire format rather than documented or tested SDK flows."
+      },
+      {
+        "claim": "The requested model and reasoning effort reach upstream (docs: Thinking Budget must be 'passthrough' for Codex effort/summary to reach upstream; CODEX-CLI-CONFIGURATION.md:191-197).",
+        "verified": "partial",
+        "evidence": "Model: the effort suffix is split off and the base model is sent (open-sse/executors/codex/reasoningSuffix.ts:33-58; codex.ts:1401-1408; tests/unit/codex-gpt6-sol-luna.test.ts:54-62); no seeded alias or family-fallback template touches gpt-6/Codex ids (src/lib/modelAliasSeed.ts:3-9; open-sse/services/modelFamilyFallback.ts:30-101). Effort: default Thinking Budget mode is passthrough (open-sse/services/thinkingBudget.ts:66-70); precedence is forced rule > model suffix > reasoning.effort > reasoning_effort (codex.ts:1428-1433); explicit 'max' is not clamped for Sol/Luna (tests/unit/codex-gpt6-sol-luna.test.ts:64-70). Deviations: 'ultra' is sent as 'max' (codex.ts:1439-1440); effort is clamped to a per-model cap with default 'xhigh' for ids outside the alias sets (codex.ts:319-340); with no client effort, 'medium' is injected in passthrough mode (codex.ts:1416-1418); Thinking Budget 'auto' strips reasoning fields (docs/guides/THINKING_BUDGET.md:20-32)."
+      },
+      {
+        "claim": "Account pooling across native accounts with routing strategies and fair-share quotas (README.md:248, 365-470, 576).",
+        "verified": "yes",
+        "evidence": "Multi-connection selection per provider with strategies fill-first (default), round-robin (sticky limit default 3), p2c, random, least-used, expiry-first, cost-optimized, strict-random plus session affinity (src/sse/services/auth.ts:1953-2158); Codex connections are modelled as a parent plus codex/spark child quota accounts with persisted cooldowns (open-sse/services/codexAccount/index.ts:40-50; open-sse/config/codexQuotaScopes.ts:9-23; tests/integration/codex-account-pool-restart-http.test.ts); Quota-Share combos exist (docs/architecture/RESILIENCE_GUIDE.md:309-334). Caveat: session affinity TTL defaults to 0, so without opt-in a multi-turn Codex conversation can move between accounts (src/sse/services/sessionAffinityPin.ts:443-453; docs/guides/CODEX-CLI-CONFIGURATION.md:468-493). The WebSocket bridge also selects a Codex OAuth connection (API_REFERENCE.md:651-656)."
+      },
+      {
+        "claim": "Usage is observed: X-OmniRoute-* cost/usage headers and live analytics (README.md:248, 582, 589).",
+        "verified": "yes",
+        "evidence": "Per-request rows are written to SQLite usage_history (provider, model, connection_id, account, api_key, tokens incl. cache/reasoning, service_tier, latency, status) and call_logs (model and requested_model, tokens, combo, errors) (src/lib/db/core.ts:316-379; src/lib/usage/usageHistory.ts:755-869) from the streaming, non-streaming, failure and Codex-WS paths (open-sse/handlers/chatCore/streamingUsageStats.ts:37; nonStreamingUsageStats.ts:46; chatCore.ts:716; src/app/api/internal/codex-responses-ws/history.ts:252). Caveat: reasoning_effort_requested/_upstream columns are populated only when the response carried encrypted reasoning (src/lib/usage/callLogs.ts:649-668); call logs are retained 7 days by default (.env.example:1948-1950)."
+      },
+      {
+        "claim": "Telemetry is disabled by default and there is no hosted prompt-processing hop; Radar is opt-in and GET-only (README.md:557-559, 836).",
+        "verified": "partial",
+        "evidence": "No analytics SDK in dependencies (package.json:302-385); Radar is gated by RADAR_ENABLED (default off) and uses GET (.env.example:3373-3384; src/lib/radar/offersSync.ts:96; intelSync.ts:108); Cloud sync needs CLOUD_URL (.env.example:699-701). But several outbound GET syncs are on by default: Arena ELO from api.wulong.dev (src/lib/arenaEloSync.ts:10, 104, 223), OpenRouter public catalog (src/lib/catalog/openrouterProviderStats.ts:297), npm update check (bin/omniroute.mjs:306-315) and update-banner lookups (src/lib/system/versionCheck.ts:28-36). None of these send prompt data in the code read, but they are network calls beyond the chosen providers."
+      },
+      {
+        "claim": "MCP/A2A interface and Claude Code integration: MCP stdio 'omniroute --mcp', HTTP /api/mcp/stream with '110 tools, 33 scopes', and 'claude mcp add-server omniroute --type http --url …' (README.md:887-899).",
+        "verified": "partial",
+        "evidence": "The --mcp stdio bypass and an MCP server tree exist (bin/omniroute.mjs:10, 92-97; open-sse/mcp-server/). Counts are inconsistent inside the docs: open-sse/mcp-server/README.md:3 says 110 tools but its diagram says 107 (line 23); README.md:888 says 33 scopes while SECURITY.md:51 says 32; tool count is computed at runtime (open-sse/mcp-server/toolCount.ts) and was not executed. The 'claude mcp add-server …' syntax appears only in README.md:898 and docs/guides/SETUP_GUIDE.md:231 with no code or test, and depends on the external Claude Code CLI, so it cannot be checked from this repo."
+      },
+      {
+        "claim": "'39,000+ static test declarations across 5,100+ tracked test files' (README.md:237, 1288).",
+        "verified": "partial",
+        "evidence": "File count is understated rather than overstated: ~6,700 test files by glob (6,502 under tests/ matching *.test.{ts,tsx,mjs,js}, 162 colocated *.test/*.spec outside tests/, 41 tests/**/*.spec.ts(x)). The 39,000 declaration count was not independently counted."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Stacked RTK→Caveman compression savings (derived by formula from upstream figures, not measured end-to-end)",
+        "metric": "combined token savings = 1-(1-RTK)*(1-Caveman_input)",
+        "value": "average 89.2% (80% RTK, 46% Caveman input); range 78.4-94.6%",
+        "source": "README.md:915-921; docs/compression/COMPRESSION_GUIDE.md:137-147",
+        "independent": false
+      },
+      {
+        "what": "Caveman savings as reported by the upstream Caveman project (quoted second-hand, not re-measured)",
+        "metric": "output-token and input-token reduction",
+        "value": "~75% fewer output tokens headline; 65% benchmark average output savings; 22-87% range; ~46% input compression tool",
+        "source": "docs/compression/COMPRESSION_GUIDE.md:126-128, 146-147",
+        "independent": true
+      },
+      {
+        "what": "RTK savings as reported by the upstream RTK project (quoted second-hand, not re-measured)",
+        "metric": "command-output token reduction",
+        "value": "60-90%; sample session ~118,000 -> ~23,900 tokens (79.7%)",
+        "source": "docs/compression/COMPRESSION_GUIDE.md:129",
+        "independent": true
+      },
+      {
+        "what": "OmniRoute unit test: stacked RTK+Caveman on an Anthropic-shape tool_result containing 300 identical error lines (docs say near-zero savings on non-redundant tool output)",
+        "metric": "token savings / character savings",
+        "value": "95.93% / 96.26%",
+        "source": "docs/compression/COMPRESSION_GUIDE.md:155-161 (test file tests/unit/compression/stacked-compression-tool-result-savings.test.ts; not run here)",
+        "independent": false
+      },
+      {
+        "what": "README illustrative Standard-mode (Caveman) prose examples",
+        "metric": "tokens before -> after",
+        "value": "69 -> 19 tokens (72% fewer); PT-BR example 42 -> 12 (~70%)",
+        "source": "README.md:959-973",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Provider-authorization/ban exposure on the Codex lane: provider 'codex' replays the ChatGPT OAuth token to chatgpt.com/backend-api/codex (open-sse/config/providers/registry/codex/index.ts:17-29), sets originator 'codex_cli_rs' and Codex-CLI-style Version/User-Agent headers (open-sse/executors/codex.ts:1129-1151; open-sse/config/codexClient.ts:85-97), and its WebSocket leg uses browser TLS impersonation (browser 'chrome_142', codex.ts:999-1003). The project's own doc says the official session 'is not authorized for proxy/router use' (docs/guides/CODEX-APP-SERVER-PROVIDER.md:13) and ban detection lists Codex among providers with real ban risk (docs/security/BAN_DETECTION.md:114-117). The 'codex-app-server' alternative needs a signed-in Codex CLI sidecar (CODEX-APP-SERVER-PROVIDER.md:14-18).",
+      "Open-by-default network posture: the CLI server binds 0.0.0.0 unless OMNIROUTE_SERVER_HOST is set (bin/cli/utils/serverHost.mjs:16-26) and REQUIRE_API_KEY defaults to false (.env.example:400-404), so /v1/* (which spends the pooled accounts' quota) is reachable by any LAN peer; the code only prints a boot-time warning (serverHost.mjs:30-57, GHSA-wmgv-ph3p-rv57). The README Docker command publishes on 127.0.0.1 (README.md:1057-1058) and compose defaults APP_BIND_HOST to 127.0.0.1 (.env.example:128-135).",
+      "Model/effort fidelity is conditional: 'ultra' is sent upstream as 'max' (open-sse/executors/codex.ts:1439-1440); effort is clamped to a per-model cap, default 'xhigh' for ids outside the alias sets (codex.ts:319-340; open-sse/executors/codex/reasoningSuffix.ts:11-31); 'medium' is injected when the client sends no effort in passthrough mode (codex.ts:1416-1418); Thinking Budget 'auto' strips all client reasoning fields (docs/guides/THINKING_BUDGET.md:20-32); server-side reasoning-routing rules can force an effort (codex.ts:805-820, 1429); requested vs upstream effort is logged only for encrypted-reasoning responses (src/lib/usage/callLogs.ts:661-668).",
+      "GPT-6 bare-id routing is catalog-dependent: only gpt-6-astra* ids are in CODEX_NATIVE_UNPREFIXED_MODELS (open-sse/services/model.ts:127-162); bare gpt-6-sol/gpt-6-luna on /v1/chat/completions follow provider-inference rules (model.ts:592-688); /v1/responses separately prefixes bare ids with codex/ when they resolve to Codex (src/app/api/v1/responses/route.ts:61-95; src/app/api/internal/codex-responses-ws/modelResolution.ts:79-118); the OpenAI API-key provider's static catalog lists only gpt-6-astra (open-sse/config/providers/registry/openai/index.ts:17-23). An explicit provider prefix always wins (model.ts:118-126).",
+      "Request bodies are rewritten even with compression off: the Codex transform forces store=false and stream=true, drops max_tokens/max_output_tokens/truncation/background, adds reasoning.summary='auto' plus include reasoning.encrypted_content, injects prompt_cache_key, converts system→developer, removes orphaned tool outputs and, on the translated path, applies a field allowlist (open-sse/executors/codex.ts:250-301, 342-370, 1319-1337, 1364-1382, 1461-1491, 1527-1556); tools are sorted by name whenever more than one is sent (open-sse/handlers/chatCore/memorySkillsInjection.ts:257-262). Memory is off by default in code (src/lib/memory/settings.ts:26-33) though docs/reference/ENVIRONMENT.md:1021 says 'default on'; input sanitizer defaults to warn-only (ENVIRONMENT.md:276-277).",
+      "Fast-moving, very large surface with documentation drift: v3.8.51 (2026-09-29) follows 3.8.50 (2026-08-25) and 3.8.49 (2026-07-28) (CHANGELOG.md:93, 2502, 4096); GPT-6 handling was added and patched repeatedly inside the 3.8.51 cycle (CHANGELOG.md:288, 375, 1566-1567, 1609, 1644); README quotes 358, 357 and 352 providers in different places (README.md:10, 588, 672); README points users to @omniroute/opencode-provider (README.md:642, 756) whose package.json marks it DEPRECATED (@omniroute/opencode-provider/package.json:4); the core handler open-sse/handlers/chatCore.ts exceeds 5,800 lines; the dependency set is large (83 prod + 8 optional).",
+      "Operational limits for long agent runs: default Docker heap is 1024 MB (Dockerfile:233-234) while the README says one coding agent needs an ~8 GB heap/>=10 GB container and two long concurrent /v1/responses need 10-12 GB heap (README.md:1061-1075); the stream idle watchdog defaults to 10 minutes and synthetic heartbeats do not reset it, so quiet high-effort reasoning turns can be cut unless STREAM_IDLE_TIMEOUT_MS/FETCH_BODY_TIMEOUT_MS are raised (docs/guides/CODEX-CLI-CONFIGURATION.md:495-525); session affinity is off by default (CODEX-CLI-CONFIGURATION.md:468-493).",
+      "Supply-chain and network surface: npm releases carry provenance and an SBOM (.github/workflows/npm-publish.yml:263-289, 442), but no explicit cosign/image-attestation, checksum, GPG or code-signing/notarization step was found for Docker or Electron artifacts (docker-publish.yml:528-582 has SBOM + Trivy only; electron-release.yml:435-457 just uploads assets); build/publish may run on self-hosted runners (npm-publish.yml:66; docker-publish.yml:138); default-on background GETs go to api.wulong.dev, openrouter.ai, registry.npmjs.org and api.github.com (src/lib/arenaEloSync.ts:104, 223; src/lib/catalog/openrouterProviderStats.ts:26-28; src/lib/system/versionCheck.ts:28-36); an auto-update route can run git checkout + npm install (docs/security/ROUTE_GUARD_TIERS.md:62)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "diegosouzapw/omniroute",
+      "checks": [
+        {
+          "field": "readme.install[0] (npm global)",
+          "statement": "npm global package (Linux/macOS; also Windows/Termux): `npm install -g omniroute` (then run: `omniroute`)",
+          "citation": "README.md:1004-1007",
+          "holds": true,
+          "note": "README.md:1004-1007 has exactly `npm install -g omniroute` / `omniroute`. package.json:2 names the package \"omniroute\" and package.json:6-8 maps the `omniroute` bin to bin/omniroute.mjs. package.json has no os/cpu/libc restriction, and README.md:749 says 'One command, any OS'."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1 reads 'MIT License' (Copyright (c) 2026 diegosouzapw) and has the standard MIT text. package.json:87 also declares \"license\": \"MIT\"."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes — npm global install; Docker image built for linux/amd64 and linux/arm64; wreq-js native bindings for linux-x64-gnu/musl; CI unit/integration/e2e jobs run on ubuntu-latest; AUR package",
+          "citation": "README.md:1004-1007; .github/workflows/docker-publish.yml:153-156; README.md:750; config/release/wreq-js-native-manifest.json:84-107; .github/workflows/ci.yml:885; README.md:1113",
+          "holds": true,
+          "note": "All parts verified. The docker-publish.yml:153-156 build matrix is linux/amd64 + linux/arm64. The manifest's lines 84-107 are the linux-x64-gnu and linux-x64-musl addons. README.md:750 says 'Multi-arch AMD64 + ARM64' and README.md:1113 has the AUR command. The other methods listed also match (README.md:751, 754, 1083-1095, 1099-1102). Citation nit: ci.yml:885 is only the test-unit job; test-e2e (ci.yml:1278) and test-integration (ci.yml:1359) are also ubuntu-latest."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Codex: documented ~/.codex/config.toml provider block (base_url=http://<host>:20128/v1, env_key=OMNIROUTE_API_KEY, wire_api=responses); WebSocket variant with supports_websockets=true and bare ids; dashboard generator /api/cli-tools/apply; provider 'codex' (alias cx) OAuth to chatgpt.com/backend-api/codex; 'codex-app-server' alternative drives the Codex CLI sidecar; Claude Code via 'omniroute run claude', /v1/messages, and a README 'claude mcp add-server …' line with no code/test exercising it",
+          "citation": "docs/guides/CODEX-CLI-CONFIGURATION.md:13-46; docs/reference/CLI-TOOLS.md:435-457; docs/reference/API_REFERENCE.md:663-699; open-sse/config/providers/registry/codex/index.ts:9-29; docs/guides/CODEX-APP-SERVER-PROVIDER.md:9-18; README.md:652, 898; docs/guides/SETUP_GUIDE.md:231; src/app/api/v1/messages/route.ts",
+          "holds": true,
+          "note": "CODEX-CLI-CONFIGURATION.md:35-41 has base_url, env_key=OMNIROUTE_API_KEY and wire_api=\"responses\"; lines 17-20 name /api/cli-tools/apply. API_REFERENCE.md:679-689 shows supports_websockets=true with a bare model id. The codex registry entry is id 'codex', alias 'cx', baseUrl chatgpt.com/backend-api/codex/responses, authType oauth (index.ts:10-19). CODEX-APP-SERVER-PROVIDER.md:13-18 matches. README.md:652 and 898 match. /v1/messages exists, uses handleChat and an Anthropic ping frame. A repo grep for 'add-server' finds only README.md:898 and SETUP_GUIDE.md:231. Nit: the CLI-TOOLS.md:443-451 snippet leaves out wire_api and points to the full guide, so wire_api=responses comes only from the first citation."
+        },
+        {
+          "field": "claim_checks[1] (Codex CLI runs through the gateway)",
+          "statement": "verified: yes — cli-manifest.mjs:21-106 has 7 run:true and 10 configure:true targets (claude, codex, aider, goose, opencode, qwen, cline, continue, kilo, 5dive); launch-codex.mjs:173-197 injects model_provider=omniroute, base_url=<host>/v1, env_key=OMNIROUTE_API_KEY, wire_api=responses, requires_openai_auth=false; CODEX-CLI-CONFIGURATION.md:277-331 documents setup",
+          "citation": "bin/cli/cli-manifest.mjs:21-106; bin/cli/commands/launch-codex.mjs:173-197; README.md:577, 651-662; docs/guides/CODEX-CLI-CONFIGURATION.md:277-331",
+          "holds": true,
+          "note": "Counted 7 run:true targets: claude, codex, aider, goose, opencode, qwen, gemini. The configure:true targets are exactly the 10 listed (gemini is configure:false at cli-manifest.mjs:72). buildCodexProviderArgs (launch-codex.mjs:173-197) emits exactly those -c assignments, and `omniroute run codex` uses it (run.mjs:162). README.md:577 states 7 run and 10 configure targets. CODEX-CLI-CONFIGURATION.md:277-331 documents setup-codex, launch-codex, configure codex and run codex. Not in the dossier: the comment at README.md:661 lists gemini as a configure target and leaves out 5dive."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

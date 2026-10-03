@@ -1,0 +1,345 @@
+{
+  "contender": "abhigyanpatwari/gitnexus",
+  "revision": {
+    "contender": "abhigyanpatwari/gitnexus",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "abhigyanpatwari/gitnexus",
+        "tag": "v1.6.12",
+        "commit": "c4ecf398de637cf779ab2238e69958cfd5d601ce",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v1.6.12",
+    "commit": "c4ecf398de637cf779ab2238e69958cfd5d601ce",
+    "read_at": "2026-10-02T03:01:56+00:00"
+  },
+  "dossier": {
+    "contender": "abhigyanpatwari/gitnexus",
+    "revision": {
+      "tag": "v1.6.12",
+      "commit": "c4ecf398de637cf779ab2238e69958cfd5d601ce",
+      "read_at": "2026-10-01"
+    },
+    "license": {
+      "spdx": "PolyForm-Noncommercial-1.0.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Node/TypeScript CLI + MCP server (npm package `gitnexus`, branded 'GitNexus (Akon Labs)') that indexes a git repository with Tree-sitter plus its own heuristic scope-resolution pass into an embedded LadybugDB property graph. The graph holds symbols, CALLS/IMPORTS/EXTENDS/IMPLEMENTS/ACCESSES edges with confidence scores, Leiden communities, execution flows, optional CFG/PDG/taint layers, and BM25 plus optional embedding search. It is stored in <repo>/.gitnexus/. The graph is exposed to agents through 17 MCP tools, resources and prompts (stdio or HTTP), a CLI that mirrors the tools, an Express HTTP API (`serve`) with a React web UI, and agent skills plus Claude Code/Codex/Cursor/Antigravity hook and plugin configs. Navigation answers come from this static symbol-level graph, not from language servers. The only file-editing MCP tool is a text-based `rename`.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Indexes any codebase into a knowledge graph (every dependency, call chain, cluster, execution flow) and exposes it through MCP tools 'so AI agents never miss code'.",
+          "citation": "README.md:29-32"
+        },
+        {
+          "claim": "Precomputes structure at index time (clustering, tracing, scoring) so tools return complete context in one call, instead of handing the LLM a raw graph to explore.",
+          "citation": "README.md:129"
+        },
+        {
+          "claim": "17 MCP tools (15 per-repo + 2 group): query (BM25+semantic+RRF), context ('360-degree symbol view - categorized refs, process participation'), impact, trace (shortest directed path between two symbols), detect_changes (maps changed lines to affected processes), check, rename, cypher, route_map, explain, pdg_query, and more.",
+          "citation": "README.md:162-182"
+        },
+        {
+          "claim": "rename = 'Multi-file coordinated rename with graph + text search'; the example output separates graph_edits (high confidence) from text_search_edits ('review carefully'); dry_run preview.",
+          "citation": "README.md:173, README.md:823-834"
+        },
+        {
+          "claim": "Parsing uses Tree-sitter ASTs; imports, calls, heritage, constructor inference and self/this receivers are resolved across files 'with language-aware logic'.",
+          "citation": "README.md:644-651"
+        },
+        {
+          "claim": "Supported-language table lists 16 languages (TS, JS, Python, Java, Kotlin, C#, Go, Rust, PHP, Ruby, Swift, C, C++, Objective-C, Dart, Zig); CFG/PDG (opt-in --pdg) is 'currently TypeScript & JavaScript'.",
+          "citation": "README.md:653-676"
+        },
+        {
+          "claim": "Claude Code and Codex get the deepest integration: MCP tools + agent skills + PreToolUse hooks that enrich searches with graph context + PostToolUse hooks that detect a stale index after commits and prompt the agent to reindex.",
+          "citation": "README.md:231-242"
+        },
+        {
+          "claim": "`analyze` indexes the codebase, installs agent skills, registers Claude Code hooks, and creates AGENTS.md / CLAUDE.md context files; `setup` writes the MCP config.",
+          "citation": "README.md:58"
+        },
+        {
+          "claim": "CLI: 'everything runs locally on your machine. No network calls.' (comparison table: Privacy = 'Everything local, no network').",
+          "citation": "README.md:1101, README.md:117"
+        },
+        {
+          "claim": "GITNEXUS_MCP_READ_ONLY=1 exposes only the single-repository read surface (raw cypher, rename and group tools omitted); any other value fails server startup.",
+          "citation": "README.md:358-360"
+        },
+        {
+          "claim": "Docker images (GHCR + Docker Hub, same digest) are signed with Cosign keyless signing and ship build-provenance and SBOM attestations; stable images only from vX.Y.Z tags matching the npm version.",
+          "citation": "README.md:916, README.md:970-976"
+        },
+        {
+          "claim": "Requirements: Node.js >= 22; a Git repository; Linux glibc 2.34+; on Windows, full-text search needs the VC++ redistributable plus OpenSSL 3.",
+          "citation": "gitnexus/README.md:461-471"
+        },
+        {
+          "claim": "Update notifier checks the npm registry 'latest' dist-tag at most once per 24h; skipped when CI is truthy, for npx/dev/Docker installs, or when GITNEXUS_NO_UPDATE_NOTIFIER / NO_UPDATE_NOTIFIER is set.",
+          "citation": "gitnexus/README.md:496-528"
+        },
+        {
+          "claim": "PolyForm Noncommercial 1.0.0: free for non-commercial use, contact for commercial licensing; an enterprise SaaS / self-hosted offering exists and 'commercial use of the OSS version is also available with proper licensing'.",
+          "citation": "gitnexus/README.md:897-901, README.md:1030-1045"
+        }
+      ],
+      "install": [
+        {
+          "method": "npm global (Linux/macOS/Windows)",
+          "command": "npm install -g gitnexus",
+          "citation": "README.md:114 (also `npm i -g gitnexus` at README.md:71)"
+        },
+        {
+          "method": "npx (no install; indexes the repo, then writes editor MCP config)",
+          "command": "npx gitnexus analyze && npx gitnexus setup",
+          "citation": "README.md:50-56"
+        },
+        {
+          "method": "pnpm dlx (documented workaround for the npm 11 npx crash)",
+          "command": "pnpm --allow-build=@ladybugdb/core --allow-build=gitnexus --allow-build=tree-sitter dlx gitnexus@latest analyze",
+          "citation": "README.md:63-69"
+        },
+        {
+          "method": "Claude Code MCP registration (macOS/Linux)",
+          "command": "claude mcp add gitnexus -- npx -y gitnexus@latest mcp",
+          "citation": "README.md:253-256"
+        },
+        {
+          "method": "Codex MCP registration",
+          "command": "codex mcp add gitnexus -- npx -y gitnexus@latest mcp",
+          "citation": "README.md:261-265"
+        },
+        {
+          "method": "Docker Compose (GHCR images, server on :4747, web UI on :4173)",
+          "command": "docker compose up -d",
+          "citation": "README.md:908-914"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - primary CI target: full test suite on ubuntu-latest (.github/workflows/ci-tests.yml:16-19), vendored-grammar prebuild linux-x64 (.github/workflows/build-tree-sitter-prebuilds.yml:182), Docker image linux/amd64 (.github/workflows/docker.yml:216). Requires glibc >= 2.34 and Node ^22.18.0 || >=24.11.0 (gitnexus/README.md:465-468; gitnexus/package.json:133-135). musl/Alpine is not addressed (unknown).",
+        "wsl2": "unknown - no upstream statement that the CLI/MCP server is supported on WSL2. Only incidental mentions: the dev container lists WSL2 hosts (.devcontainer/README.md:3), the eval workflow bench says native benchmark execution is 'Linux/WSL2-only' (eval/workflow_bench/README.md:138), and a code comment names WSL as a constrained environment (gitnexus/src/core/lbug/lbug-config.ts:230). WSL2 is a Linux userland, so the Linux glibc/Node requirements would apply.",
+        "macos_arm64": "yes - darwin-arm64 grammar prebuilds are cross-built (.github/workflows/build-tree-sitter-prebuilds.yml:184); local embeddings are blocked only on darwin/x64 and the code points Intel users to Apple Silicon (gitnexus/src/core/embeddings/runtime-support.ts:53-69); Apple-Silicon 16 KiB page-size handling for LadybugDB (gitnexus/README.md:686); macOS build-tool note (gitnexus/README.md:640). CI runs only a ~50-file platform-sensitive subset on macos-latest; the full suite is Ubuntu-only (.github/workflows/ci-tests.yml:180-258; TESTING.md:85).",
+        "gpu": "yes (optional, embeddings only; not required) - indexing, graph queries and all MCP tools are CPU-only. A GPU only accelerates opt-in local embeddings: device auto|dml|cuda|cpu|wasm (gitnexus/src/core/embeddings/config.ts:60-72), CUDA on Linux x64 and DirectML on Windows via onnxruntime-node (gitnexus/src/core/embeddings/onnxruntime-node-resolver.ts:36-37; gitnexus/src/core/embeddings/embedder.ts:108-110). Embeddings are off by default (README.md:446-447)."
+      },
+      "integrations": {
+        "cli": "Yes. `gitnexus` bin (gitnexus/package.json:30-32 -> dist/cli/index.js; source gitnexus/src/cli/index.ts:26-522): setup, uninstall, analyze [--watch|--pdg|--embeddings|--skills], index, serve, mcp, list, status, doctor, update, embeddings, clean, remove, wiki, augment, publish, eval-server, auto-sync, group, plus direct tool mirrors query/context/impact/trace/cypher/detect-changes/check (README.md:384-400; gitnexus/README.md:231-288). A `rename` CLI mirror is not listed.",
+        "mcp": "Yes. `gitnexus mcp` serves MCP over stdio by default, or `--http` for a Streamable-HTTP/SSE server (default 127.0.0.1:3000; bearer token required for a non-loopback bind) (gitnexus/src/cli/index.ts:267-284; gitnexus/src/cli/mcp.ts:97-192; gitnexus/src/mcp/http-transport.ts:27-30). `gitnexus serve` also exposes /api/mcp (gitnexus/src/server/mcp-http.ts:32). 17 tools (gitnexus/src/mcp/tools.ts:91-986): list_repos, query, cypher, context, detect_changes, check, rename, impact, explain, pdg_query, route_map, tool_map, shape_check, api_impact, group_list, group_sync, trace; plus resources (gitnexus://...) and prompts detect_impact/generate_map (README.md:186-206). Only `rename` (and group_sync's contracts.json) writes files; no LSP-backed tool, no symbol-body edit/insert tool, no diagnostics tool. Source text is returned only via `context`/`query` with include_content=true, from text stored in the index at analyze time (gitnexus/src/mcp/local/local-backend.ts:4131-4152, 4860-4896).",
+        "sdk_or_api": "No library SDK found: gitnexus/package.json declares only `bin` (no main/exports/types). HTTP API via `gitnexus serve` (Express, default bind 127.0.0.1:4747): /api/repos, /api/repo, /api/graph, /api/query, /api/search, /api/file, /api/grep, /api/processes, /api/clusters, /api/analyze, /api/embed, /api/mcp (gitnexus/src/server/api.ts:905-1680; gitnexus/src/cli/index.ts:260-265); `gitnexus eval-server` lightweight tool HTTP server (default 127.0.0.1:4848; non-loopback bind needs GITNEXUS_AUTH_TOKEN) (gitnexus/src/cli/index.ts:511-520; README.md:425-435).",
+        "claude_code_or_codex": "Claude Code: (a) `gitnexus setup` (only if ~/.claude exists) writes the MCP entry to ~/.claude.json (gitnexus/src/cli/setup.ts:319-340), copies skills to ~/.claude/skills (setup.ts:345-358) and merges a PreToolUse hook (matcher Grep|Glob|Bash) and a PostToolUse hook (matcher Bash) into ~/.claude/settings.json (setup.ts:501-625); (b) manual `claude mcp add gitnexus -- npx -y gitnexus@latest mcp` (README.md:255); (c) a plugin directory gitnexus-claude-plugin/ (.claude-plugin/plugin.json, hooks/hooks.json, .mcp.json, 12 skills) listed by .claude-plugin/marketplace.json - README documents no install command for it; (d) `analyze` writes AGENTS.md/CLAUDE.md sections and .claude/skills/gitnexus-* into the repo (gitnexus/src/cli/ai-context.ts:605-690). The hooks only append graph context to grep/glob/bash-search results and warn that the index is stale after git commit/merge/rebase/cherry-pick/pull (gitnexus/hooks/claude/gitnexus-hook.cjs:301-439). Native language-server navigation and post-edit diagnostics: none found (no LSP config or lspServers in gitnexus-claude-plugin/.claude-plugin/plugin.json, no Edit/Write hook, no diagnostics tool). Codex: `codex mcp add gitnexus -- npx -y gitnexus@latest mcp` or ~/.codex/config.toml (README.md:261-273); hooks in ~/.codex/hooks.json installed by `gitnexus setup -c codex` (README.md:275; setup.ts:501-503); optional Codex plugin `codex plugin marketplace add abhigyanpatwari/GitNexus` (README.md:277-282; .agents/plugins/marketplace.json; gitnexus-claude-plugin/.codex-plugin/plugin.json); Codex skills go to ~/.agents/skills (gitnexus/src/cli/editor-targets.ts:177). README warns not to combine the plugin and `setup -c codex` (duplicate hooks) (README.md:284)."
+      },
+      "telemetry_and_network": "No analytics/telemetry client found in gitnexus/src (searched telemetry|analytics|sentry|posthog|mixpanel|amplitude|segment|plausible); 'telemetry' in code means local counters/logs, e.g. per-query timing logged to stderr at debug level (gitnexus/src/mcp/local/local-backend.ts:627-641). Outbound network that does exist: (1) Update notifier - GET <npm registry>/gitnexus/latest, cached 24h, also armed inside `gitnexus mcp` (gitnexus/src/core/update-check.ts:176-209; gitnexus/src/core/update-cache.ts:7-9; gitnexus/src/cli/mcp.ts:185,191); off for CI, npx/dev/Docker installs, or GITNEXUS_NO_UPDATE_NOTIFIER / NO_UPDATE_NOTIFIER (update-cache.ts:29-36; gitnexus/README.md:496-528; Dockerfile.cli:123-126). (2) `analyze` by default INSTALLs missing LadybugDB FTS/VECTOR extensions over the network (extension.ladybugdb.com); GITNEXUS_LBUG_EXTENSION_INSTALL=load-only|never disables it; MCP/serve only LOAD (gitnexus/README.md:670-676; gitnexus/src/cli/doctor.ts:304-314). (3) Opt-in `--embeddings` downloads Snowflake/snowflake-arctic-embed-xs from huggingface.co (HF_ENDPOINT mirror) and onnxruntime-node's postinstall may fetch CUDA binaries from api.nuget.org (gitnexus/src/core/embeddings/embedder.ts:229-238; gitnexus/README.md:647-651); remote embeddings go to GITNEXUS_EMBEDDING_URL (gitnexus/README.md:362-388). (4) `wiki` sends graph/code context to an LLM endpoint; the code's default provider is MiniMax (https://api.minimax.io/v1, model MiniMax-M3), otherwise OpenRouter/OpenAI/Azure/local agent CLIs, with the key from env or ~/.gitnexus/config.json (gitnexus/src/core/wiki/llm-client.ts:99-165; README.md:855-859 states a different default model). (5) `auto-sync` clones/pulls over SSH from GitHub/GitLab/Gitee (README.md:517); `publish` sends a repository_dispatch only when UNDERSTAND_QUICKLY_TOKEN is set (README.md:636-638). (6) `@scarf/scarf` ^1.4.0 is a runtime dependency with an install script (gitnexus/package.json:62; gitnexus/package-lock.json:1740-1745) and is never imported in gitnexus/src; the project's own CI sets SCARF_ANALYTICS=false and DO_NOT_TRACK=1 when installing (.github/workflows/gitnexus-review-agent.yml:497-500). The package itself was not inspected (no node_modules in the clone). (7) Plugin and manual MCP configs launch `npx -y gitnexus@latest mcp` (gitnexus-claude-plugin/.mcp.json:3-7; README.md:255), so an npm fetch of the latest release happens at server start unless GitNexus is globally installed (README.md:71). No account is needed to index or use MCP tools; keys/accounts apply only to the optional wiki/embedding endpoints, Docker/Render/RepoCloud deploys and the commercial offering. The hosted web UI (gitnexus.vercel.app) is a static client whose AI chat is built on LangChain provider SDKs (OpenAI, Anthropic, Google, Ollama; gitnexus-web/package.json:21-26), which implies requests to the chosen provider; this was not traced in detail."
+    },
+    "code": {
+      "languages": [
+        "TypeScript (primary: ~947 .ts files under gitnexus/src, plus gitnexus-web and gitnexus-shared)",
+        "JavaScript (CJS/ESM build scripts, hooks, benches)",
+        "Python (eval/ SWE-bench and workflow-bench harness)",
+        "C/C++ (vendored Tree-sitter grammar sources and committed prebuilds under gitnexus/vendor)",
+        "Shell/PowerShell/YAML/Dockerfile (CI, hooks, deploy)"
+      ],
+      "entry_points": [
+        {
+          "path": "gitnexus/package.json:30-32 -> gitnexus/src/cli/index.ts",
+          "what": "`gitnexus` binary (dist/cli/index.js): commander CLI with setup, uninstall, analyze, index, serve, mcp, list, status, doctor, update, embeddings, clean, remove, wiki, augment, publish, query, context, impact, trace, cypher, detect-changes, check, eval-server, auto-sync, watch, group (index.ts:26-522)."
+        },
+        {
+          "path": "gitnexus/src/cli/mcp.ts -> gitnexus/src/mcp/server.ts (startMCPServer)",
+          "what": "`gitnexus mcp`: MCP server over stdio by default; `--http` starts the HTTP/SSE transport in gitnexus/src/mcp/http-transport.ts."
+        },
+        {
+          "path": "gitnexus/src/mcp/tools.ts + gitnexus/src/mcp/local/local-backend.ts",
+          "what": "The 17 MCP tool schemas and their implementations (LocalBackend: context at :4425, rename at :5996, trace at :6212)."
+        },
+        {
+          "path": "gitnexus/src/cli/analyze.ts -> gitnexus/src/core/run-analyze.ts -> gitnexus/src/core/ingestion/pipeline.ts",
+          "what": "Indexing entry point (incremental analyze, --watch, --pdg, --embeddings, --skills)."
+        },
+        {
+          "path": "gitnexus/src/cli/serve.ts -> gitnexus/src/server/api.ts (createServer)",
+          "what": "`gitnexus serve` Express HTTP API (default 127.0.0.1:4747) plus /api/mcp; `eval-server` in gitnexus/src/cli/eval-server.ts (default :4848)."
+        },
+        {
+          "path": "gitnexus/hooks/claude/gitnexus-hook.cjs; gitnexus-claude-plugin/hooks/hooks.json",
+          "what": "Claude Code/Codex PreToolUse + PostToolUse hook adapter and the plugin's hook registration."
+        },
+        {
+          "path": "gitnexus/src/cli/setup.ts; gitnexus/src/cli/editor-targets.ts",
+          "what": "`gitnexus setup`: writes MCP config, skills and hooks into Claude Code, Codex, Cursor, Antigravity and other editors' config files."
+        },
+        {
+          "path": "gitnexus-web/ ; eval/run_eval.py ; Dockerfile.cli, Dockerfile.web, docker-compose.yaml, render.yaml",
+          "what": "Vite/React web UI over `serve`; Python `gitnexus-eval` harness (eval/pyproject.toml:30-32); container and Render deployment definitions."
+        }
+      ],
+      "architecture": "Monorepo: gitnexus/ (npm package: CLI, MCP server, HTTP API, ingestion pipeline), gitnexus-web/ (Vite+React thin client over `serve`), gitnexus-shared/ (shared types), eval/ (Python benchmarks), and gitnexus-claude-plugin/, gitnexus-cursor-integration/, .claude/skills (static plugin/skill/hook configs) (ARCHITECTURE.md:3-14). Flow (ARCHITECTURE.md:16-27, 83-115): cli/analyze.ts -> core/run-analyze.ts -> core/ingestion/pipeline.ts runs a 19-phase DAG in core/ingestion/pipeline-phases/ (scan, structure, parse in a worker pool under core/ingestion/workers/, routes/tools/orm, crossFile, scopeResolution, mro, di, communities via Leiden, processes; --pdg adds taint/call-summary phases). Each of 18 languages has a LanguageProvider and ScopeResolver (core/ingestion/languages/, core/ingestion/scope-resolution/) with Tree-sitter queries and custom heuristic import/call/heritage resolution using confidence tiers 0.95/0.9/0.5 (ARCHITECTURE.md:420-424). Results are persisted by core/lbug/ into LadybugDB (@ladybugdb/core): node tables carry filePath/startLine/endLine/content (core/lbug/schema.ts:31-66) and a single CodeRelation edge table carries type, confidence, reason, step, staticGated and no source positions (schema.ts:683-692); registry at ~/.gitnexus/registry.json. Query layer: mcp/server.ts + mcp/tools.ts + mcp/local/local-backend.ts (stdio or HTTP), server/api.ts (Express), cli/tool.ts (direct CLI), core/search/ (BM25 FTS + optional vectors, RRF), core/embeddings/ (opt-in), core/wiki/ (LLM docs), core/group/ (cross-repo contracts), core/augmentation/engine.ts (used by hooks). The index is a snapshot keyed to lastCommit: `analyze` is incremental and `analyze --watch` refreshes from working-tree changes; MCP reopens a newly published index within ~5 s (README.md:402-422). There is no language-server component.",
+      "packaging_and_release": "npm package `gitnexus` (gitnexus/package.json: files = dist, hooks, scripts, skills, vendor, web; prepack builds CLI + web UI and asserts grammar coverage, :56). The sole publisher is .github/workflows/publish.yml (header :3-16): RC mode on every push to main touching non-doc paths publishes npm `--tag rc` plus a GitHub prerelease and RC Docker images (also gitnexus/README.md:473-494); stable mode on a v<X.Y.Z> tag publishes `--tag latest` and creates a GitHub Release whose body comes from gitnexus/CHANGELOG.md (publish.yml:810-860). npm auth uses Trusted Publishing/OIDC with registry-attached provenance (publish.yml:285-289, 785-815). The GitHub Release has no uploaded assets or checksum files (publish.yml:833-860). Docker: Dockerfile.cli and Dockerfile.web are built by .github/workflows/docker.yml on v* tag push or workflow_call, linux/amd64+arm64, pushed to ghcr.io/abhigyanpatwari/{gitnexus,gitnexus-web} and docker.io/akonlabs/*, with the tag required to equal gitnexus/package.json's version (docker.yml:3-6, 113-135, 216), keyless Cosign signature per tag (docker.yml:235-250), actions/attest-build-provenance for both registries (docker.yml:257-271), and buildx provenance mode=max + sbom: true (.github/actions/docker-build-push-retry/action.yml:61-62, 86-87). A Kubernetes ClusterImagePolicy is provided (deploy/kubernetes/cluster-image-policy.yaml; README.md:1008-1023). 42 prebuilt Tree-sitter .node binaries (7 vendored grammars x 6 platform-arch) are cross-built by .github/workflows/build-tree-sitter-prebuilds.yml and committed to git (workflow header :3-53; .gitattributes:12). Third-party Actions are pinned by commit SHA. Deploy blueprints: render.yaml and a RepoCloud button (README.md:81-105). Stable cadence from the changelog: 1.6.11 on 2026-09-04, 1.6.12 on 2026-09-12 (gitnexus/CHANGELOG.md:7, 53).",
+      "tests_and_ci": "Frameworks: Vitest 4 for gitnexus with three projects lbug-db / default / cli-e2e (gitnexus/vitest.config.ts:67,146,207; TESTING.md:58-68); Vitest+jsdom and Playwright for gitnexus-web (gitnexus-web/package.json:13-17); pytest for eval/ (eval/pyproject.toml:22-28); node:test for docker-server.test.mjs. Test-file count: ~1,070 in gitnexus/test (753 under test/unit, 317 under test/integration, plus 1 fixture spec), ~52 in gitnexus-web (11 Playwright specs in e2e/, 41 Vitest files), 30 pytest files in eval/tests, plus docker-server.test.mjs and .devcontainer/translate-plugin-registries.test.cjs. Coverage floors: statements 26 / branches 23 / functions 28 / lines 27, with `dangerouslyIgnoreUnhandledErrors: true` for LadybugDB N-API destructor issues (gitnexus/vitest.config.ts:24-25, 38-43). CI: 29 workflow files in .github/workflows/. ci.yml orchestrates ci-quality.yml (prettier --check, eslint, tsc --noEmit for gitnexus and gitnexus-web, workflow concurrency convention), ci-tests.yml (Ubuntu 3-shard full suite + merged coverage + web unit + docker-server test; windows-latest and macos-latest platform-sensitive subset in 3 shards each; Tree-sitter ABI gate on 3 OSes; packaged-install smoke on Windows and Ubuntu; Node 22.18 engines-floor import-link; GITNEXUS_BENCH scaling/fingerprint guards; eval pytest; Bubblewrap and Windows job-object containment tests) and ci-e2e.yml (Playwright chromium, only when gitnexus-web/ changes). Security workflows: codeql.yml (PR/push/weekly), dependency-review.yml (blocks high+), gitleaks.yml, scorecard.yml, trivy.yml, workflow-lint.yml (zizmor) (SECURITY.md:72-85). A husky pre-commit hook runs prettier + tsc only (TESTING.md:46-56). TESTING.md is partly stale: it cites `npm run test:parity` and ci-scope-parity.yml, neither of which exists (TESTING.md:25,117), and '373' test files (TESTING.md:85).",
+      "dependencies": "gitnexus/package.json: 39 runtime dependencies, 2 optional (@huggingface/transformers, onnxruntime-node), 15 dev; engines node ^22.18.0 || >=24.11.0. Notable runtime deps: @ladybugdb/core 0.18.3 (native), tree-sitter 0.21.1 plus 10 tree-sitter-* grammar packages, @modelcontextprotocol/sdk ^1.0.0, express ^5, graphology, pino, commander ^15, @scarf/scarf ^1.4.0. gitnexus-web/package.json: 37 runtime + 19 dev (React 19, Vite 8, LangChain provider SDKs, sigma, mermaid). gitnexus-shared/package.json: 0 runtime + 1 dev (typescript). Root package.json: 0 runtime + 10 dev (eslint, prettier, husky, lint-staged). eval/pyproject.toml: 12 runtime (mini-swe-agent, litellm[proxy], datasets, pandas, ...) + 4 dev. CI-only manifests: .github/gitnexus-review-runtime/package.json (1: gitnexus 1.6.9) and .github/claude-canary-runtime/package.json (1: @anthropic-ai/claude-code 2.1.214). Vendored: 7 Tree-sitter grammars in gitnexus/vendor (c, dart, kotlin, objc, proto, swift, zig) with committed prebuilds, and a Leiden implementation in gitnexus/vendor/leiden. Lockfiles: package-lock.json for gitnexus, gitnexus-web and gitnexus-shared; eval/uv.lock.",
+      "security_policy": "SECURITY.md (repo root): supported = latest released minor on npm and the published Docker images, older minors not back-patched; private reporting via GitHub Private Vulnerability Reporting; best-effort acknowledgement within 5 business days; scope and out-of-scope lists; hardening notes for Render deploys (token is the only control, /api/mcp auth) and /api/grep regex/ReDoS mitigations; table of automated CI scans (CodeQL, dependency-review, Gitleaks, Scorecard, zizmor, Trivy) (SECURITY.md:1-85)."
+    },
+    "claim_checks": [
+      {
+        "claim": "CLI: 'everything runs locally ... No network calls' (README.md:1101, 117)",
+        "verified": "partial",
+        "evidence": "The core index/query path is local (Tree-sitter, LadybugDB under .gitnexus/, MCP stdio), but code and the package README document outbound traffic: an npm-registry update check (gitnexus/src/core/update-check.ts:176-209, also armed in `gitnexus mcp`, gitnexus/src/cli/mcp.ts:185,191), a default network INSTALL of LadybugDB FTS/VECTOR extensions during analyze (gitnexus/README.md:670-676; gitnexus/src/cli/doctor.ts:304-314), the HuggingFace model download for opt-in embeddings (gitnexus/src/core/embeddings/embedder.ts:229-238) and LLM calls from `wiki` (gitnexus/src/core/wiki/llm-client.ts:134-142). Code over README: the 'No network calls' line overstates."
+      },
+      {
+        "claim": "17 MCP tools (15 per-repo + 2 group) (README.md:162)",
+        "verified": "yes",
+        "evidence": "GITNEXUS_TOOLS in gitnexus/src/mcp/tools.ts:91-986 has 17 entries: list_repos, query, cypher, context, detect_changes, check, rename, impact, explain, pdg_query, route_map, tool_map, shape_check, api_impact, group_list, group_sync, trace. None is LSP-backed, and none edits symbol bodies."
+      },
+      {
+        "claim": "rename: 'Multi-file coordinated rename with graph + text search' (README.md:173)",
+        "verified": "partial",
+        "evidence": "It works as a textual rename. Candidate files are the symbol's own file, files of graph incoming refs (calls/imports/extends/implements), and files with a word-boundary hit from `rg` (execFileSync('rg'), 5 s timeout, fixed extension list). The apply step then does a whole-file global word-boundary regex replace on every such file (gitnexus/src/mcp/local/local-backend.ts:6071-6122, 6130-6171). It is not scope-aware: unrelated same-named identifiers, strings and comments in those files are rewritten, and the 'graph'/'text_search' confidence tag is per file, not per occurrence (:6134-6148). Preview is the default (tools.ts:459-463); the tool is annotated destructive (tools.ts:448). No language-server rename."
+      },
+      {
+        "claim": "context: '360-degree symbol view - categorized refs' (README.md:168)",
+        "verified": "partial",
+        "evidence": "Returns symbol uid/name/kind/filePath/1-based startLine/endLine and optional `content` (only when include_content=true and retention is not 'none'; text comes from the index, not the live file) (gitnexus/src/mcp/local/local-backend.ts:4131-4152, 4860-4896). Incoming/outgoing refs are categorized lists of related symbols {uid,name,filePath,kind}, each direction limited to 30 rows (:4521-4531, 4677-4688, 4729-4743). The edge table has no call-site line/column (gitnexus/src/core/lbug/schema.ts:683-692). Results self-report incompleteness via epistemic/causes fields (gitnexus/src/mcp/tools.ts:295-306)."
+      },
+      {
+        "claim": "Claude Code gets PreToolUse + PostToolUse hooks that enrich searches and detect a stale index after commits (README.md:233, 242)",
+        "verified": "yes",
+        "evidence": "gitnexus/hooks/claude/gitnexus-hook.cjs: PreToolUse handles Grep/Glob/Bash(rg|grep) by running `gitnexus augment -- <pattern>` and returning additionalContext (:301-367); PostToolUse handles only Bash commands matching git commit|merge|rebase|cherry-pick|pull and only emits an 'index is stale, run analyze' message (:389-439). Registered matchers are PreToolUse Grep|Glob|Bash and PostToolUse Bash (gitnexus/src/cli/setup.ts:576-607; gitnexus-claude-plugin/hooks/hooks.json:3-28). No Edit/Write hook and no diagnostics or type-check feedback."
+      },
+      {
+        "claim": "`analyze` ... registers Claude Code hooks (README.md:58)",
+        "verified": "no",
+        "evidence": "gitnexus/src/cli/analyze.ts has no hook registration (its only 'registerHooks' hit is an unrelated Node API comment, :1140). `analyze` writes AGENTS.md/CLAUDE.md sections and .claude/skills/gitnexus-* (gitnexus/src/cli/ai-context.ts:605-690). Claude Code hooks are written to ~/.claude/settings.json by `gitnexus setup` (gitnexus/src/cli/setup.ts:501-625) or ship with the plugin (gitnexus-claude-plugin/hooks/hooks.json). The README's own editor table implies the setup path (README.md:231-239). Code over README."
+      },
+      {
+        "claim": "Supported languages: 16-row table; CFG/PDG 'currently TypeScript & JavaScript' (README.md:653-676)",
+        "verified": "partial",
+        "evidence": "gitnexus-shared/src/languages.ts:8-26 enumerates 18 languages (adds Vue and COBOL). gitnexus/README.md:421 lists 15 (no Objective-C), ARCHITECTURE.md:380 says 18, and the README roadmap says '14 Language Support' (README.md:1072). cfgVisitor is registered for Java, Dart, Kotlin, PHP, Vue, C, C++, Rust, C#, Python, Go, TypeScript/JavaScript, Swift and Ruby (e.g. gitnexus/src/core/ingestion/languages/java.ts:218, python.ts:155); COBOL is deliberately excluded (cobol.ts:37). So the README's CFG language limit is stale relative to the code."
+      },
+      {
+        "claim": "Requirement: Node.js >= 22 (gitnexus/README.md:463)",
+        "verified": "partial",
+        "evidence": "gitnexus/package.json:133-135 sets engines `^22.18.0 || >=24.11.0`, which excludes 22.0-22.17 and all 23.x; CONTRIBUTING.md:16 repeats it, and CI import-links the build on exactly Node 22.18.0 (.github/workflows/ci-tests.yml:418-472). The Docker runtime image is node:22-bookworm-slim (Dockerfile.cli:12)."
+      },
+      {
+        "claim": "Docker images are Cosign-signed with provenance and SBOM attestations (README.md:916, 976)",
+        "verified": "yes",
+        "evidence": ".github/workflows/docker.yml:235-250 signs every pushed tag at its digest with cosign keyless; :257-271 runs actions/attest-build-provenance for GHCR and Docker Hub; .github/actions/docker-build-push-retry/action.yml:61-62,86-87 set provenance: mode=max and sbom: true; platforms linux/amd64,linux/arm64 (docker.yml:216); the tag must equal gitnexus/package.json's version (docker.yml:113-135); deploy/kubernetes/cluster-image-policy.yaml exists. Caveat: publish.yml:904-906 says stable Docker builds are deferred/RC-only while docker.yml itself triggers on v* tag pushes (docker.yml:3-6); which images were actually published cannot be checked from the clone."
+      },
+      {
+        "claim": "GITNEXUS_MCP_READ_ONLY=1 removes cypher/rename/group tools; other values fail startup (README.md:358-360)",
+        "verified": "yes",
+        "evidence": "gitnexus/src/mcp/read-only-policy.ts:5-19 allow-list excludes cypher, rename, group_list and group_sync; resolveMcpReadOnlyMode returns true only for '1', false for unset/blank/'0', and throws otherwise (:23-28); group routing and group resources are rejected (:30-75)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Cold `analyze` of GitNexus's own repository (5,350 paths / 2,234 parseable / ~30 MB, 16 workers; graph 51,286 nodes / 163,092 edges)",
+        "metric": "total wall time",
+        "value": "110.3 s before #3194 -> 63.6 s after #3196 (parse 74.0 s -> 36.0 s; dispatch rounds 221 -> 15); measured 2026-09-06/07",
+        "source": "gitnexus/bench/analyze-phase-breakdown.md:3-66",
+        "independent": false
+      },
+      {
+        "what": "Re-analyze after a one-file edit (incremental path) on the same corpus",
+        "metric": "total wall time",
+        "value": "31.7 s (scopeResolution ~13.9 s, FTS rebuild ~7.5 s, graph write ~3.6 s, parse ~2.8 s); a forced full rebuild is 36-39 s",
+        "source": "gitnexus/bench/analyze-phase-breakdown.md:69-95",
+        "independent": false
+      },
+      {
+        "what": "`impact` statement-anchored PDG slice vs call-graph on a curated corpus of 12 synthetic single-file TypeScript fixtures (+1 excluded)",
+        "metric": "precision/recall/F1 (stratified by intra/inter/mixed)",
+        "value": "PDG F1 = 1.000 on the intra and mixed strata; call-graph remains the comparator for inter-procedural symbols; no numeric table in the README",
+        "source": "gitnexus/bench/impact-pdg/README.md:3-19, 98-120",
+        "independent": false
+      },
+      {
+        "what": "Agent task on GitNexus's own repo, cross-module class: `workflow_direct` (gated execution skill) vs plain-agent baseline (Claude Code 2.1.207, unnamed model, n=1 per cell)",
+        "metric": "cost / wall time / turns / resolved",
+        "value": "$9.53 / 15 min / 52 turns vs baseline $18.03 / 34 min / 98 turns; both resolved 1/1; project states -47% cost and -56% wall",
+        "source": "eval/workflow_bench/README.md:468-474, 515-539",
+        "independent": false
+      },
+      {
+        "what": "Same bench, three smaller task classes (n=1 each): full plan->work workflow arm vs baseline",
+        "metric": "cost vs baseline",
+        "value": "workflow arm $9.16-$14.56 vs baseline $2.11-$4.25 (doc: 211%-333% more expensive); all arms resolved 1/1; the project labels these figures 'historical calibration'",
+        "source": "eval/workflow_bench/README.md:468-487",
+        "independent": false
+      },
+      {
+        "what": "Leiden community detection on a synthetic 200k-node / 800k-edge graph",
+        "metric": "wall time",
+        "value": "from exceeding a 60 s timeout to ~15 s (project: 'treat that as a direction, not a guarantee')",
+        "source": "gitnexus/README.md:181",
+        "independent": false
+      },
+      {
+        "what": "Streaming graph emit on a synthetic 400k-node / 1.08M-edge graph",
+        "metric": "peak in-memory graph heap",
+        "value": "819 MB -> 584 MB (~1.4x); project notes 'no end-to-end measurement on a real repository yet'",
+        "source": "gitnexus/README.md:683",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Licensing: PolyForm Noncommercial 1.0.0 (LICENSE:1; gitnexus/package.json:6) is a source-available license limited to non-commercial purposes. The project points commercial users to a separate license and an enterprise SaaS/self-hosted offering (README.md:1030-1045; gitnexus/README.md:897-901), and contributions are licensed under the same terms (CONTRIBUTING.md:5-7).",
+      "Scope vs language-server needs: there is no LSP client anywhere in the repo (the only language-server-tool names, tsserver/clangd/jdtls/pyright, appear in design comments at gitnexus/src/core/ingestion/scope-resolution/passes/receiver-bound-calls.ts:630-632 and languages/go/interface-impls.ts:1105). Definitions and references come from Tree-sitter plus a custom heuristic resolver (ARCHITECTURE.md:249-295). References are symbol-level and capped at 30 rows per direction in `context` (local-backend.ts:4530, 4686), edges carry no call-site position (schema.ts:683-692), and property-dispatch/callable targets are capped at 32, with overflow dropping the whole chain (gitnexus/README.md:805-853). Results flag `epistemic: lower-bound` when callers may be missing (tools.ts:295-306). Source text comes from the index snapshot, not the live file. The only file-editing MCP tool is `rename`, a whole-file regex replace (local-backend.ts:6130-6171). There are no symbol-body edit tools and no post-edit diagnostics; the Claude Code hooks fire only on Grep/Glob/Bash and git commands (gitnexus-hook.cjs:301-439).",
+      "Network, telemetry and supply chain: README.md:1101 says 'No network calls', but the code does an npm update check (update-check.ts:176-209), a default LadybugDB extension INSTALL during analyze (gitnexus/README.md:670-676), HuggingFace/NuGet downloads for embeddings (gitnexus/README.md:647-651) and LLM calls for `wiki` (llm-client.ts:134-142). `@scarf/scarf` is a runtime dependency with an install script, and the project's own CI disables it via SCARF_ANALYTICS=false (gitnexus/package.json:62; .github/workflows/gitnexus-review-agent.yml:499). Plugin and manual MCP configs run the unpinned `npx -y gitnexus@latest mcp` (gitnexus-claude-plugin/.mcp.json:3-7). 42 prebuilt native .node binaries are committed to git and shipped in the npm tarball (gitnexus/vendor/tree-sitter-*/prebuilds/**; package.json `files`).",
+      "Side effects on the repo and user config: `analyze` writes/updates AGENTS.md and CLAUDE.md, installs .claude/skills/gitnexus-* (and .agents/skills if .agents/ exists), and creates .gitnexus/ (gitnexus/src/cli/ai-context.ts:605-690; README.md:208-225) unless --skip-agents-md / --skip-skills / --index-only. `gitnexus setup` edits ~/.claude.json, ~/.claude/settings.json, ~/.claude/skills, ~/.codex/config.toml and hooks.json and other editors' configs (gitnexus/src/cli/setup.ts:319-358, 501-625; editor-targets.ts:156-178). `rename` with dry_run=false rewrites files in place (local-backend.ts:6160-6171).",
+      "Platform and runtime constraints: Node ^22.18.0 || >=24.11.0 (package.json:133-135); Linux needs glibc >= 2.34 (gitnexus/README.md:465-468); local embeddings are unavailable on macOS Intel (runtime-support.ts:53-69); Windows FTS needs the VC++ redistributable and OpenSSL 3 (gitnexus/README.md:469-471). Native addons @ladybugdb/core 0.18.3 and tree-sitter 0.21.1 are mandatory (package.json:60,87), and npm 11 `npx` can crash during install (README.md:63-69). LadybugDB is single-writer, so hook augmentation is skipped while an MCP/serve process holds the DB (gitnexus-hook.cjs:337-350). The full test suite runs only on Ubuntu; macOS and Windows run a ~50-file subset (TESTING.md:85; ci-tests.yml:180-258). WSL2 and musl are not addressed.",
+      "Release velocity and doc drift: v1.6.11 (2026-09-04) and v1.6.12 (2026-09-12) are 8 days apart (gitnexus/CHANGELOG.md:7, 53), and an RC is published to npm `rc` on every non-doc merge to main (publish.yml:8-13, 29-35). Docs lag code: TESTING.md cites a nonexistent ci-scope-parity.yml and `test:parity` (TESTING.md:25,117), language counts differ across docs (16/15/18/14), the roadmap lists incremental indexing as in progress although the changelog ships it (README.md:1063-1065), and the README's wiki default model differs from the code (README.md:857 vs llm-client.ts:29,150). Tests set dangerouslyIgnoreUnhandledErrors for LadybugDB N-API destructor issues, and coverage floors are 23-28% (vitest.config.ts:24-25, 38-43). CODEOWNERS lists three owners (.github/CODEOWNERS:3-5).",
+      "HTTP exposure of indexed source: `serve` defaults to 127.0.0.1:4747 (api.ts:905), but /api/mcp is unauthenticated unless GITNEXUS_MCP_AUTH_TOKEN is set, and a directly reachable serve exposes indexed source (SECURITY.md:62-63). On the Render blueprint the generated token is the only access control, and a token holder can read every indexed repo and index or delete repos (SECURITY.md:56-66; README.md:97-99). /api/grep runs caller-supplied regexes with a worker timeout (SECURITY.md:68-70). GITNEXUS_PUBLIC_ORIGIN 'currently refuses to start' (README.md:621). `gitnexus mcp --http` requires a bearer token only for non-loopback binds (gitnexus/src/cli/index.ts:282).",
+      "Provenance and release-artifact gaps: .claude-plugin/marketplace.json sets metadata.homepage to https://github.com/nicosxt/gitnexus with owner email nico@gitnexus.dev (lines 3-9), while the plugin manifests and package.json point to abhigyanpatwari/GitNexus; the README gives no Claude Code plugin install command (only the Codex plugin, README.md:280). The npm tarball is covered by npm provenance only (publish.yml:785-815), and GitHub Releases carry no assets or checksums (publish.yml:833-860). A comment says stable Docker builds are deferred (publish.yml:904-906) while docker.yml triggers on v* tags (docker.yml:3-6)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "abhigyanpatwari/gitnexus",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "npm global (Linux/macOS/Windows): `npm install -g gitnexus` (also `npm i -g gitnexus`)",
+          "citation": "README.md:114; README.md:71",
+          "holds": true,
+          "note": "README.md:114 is the Install row and reads `npm install -g gitnexus`. README.md:71 reads `npm i -g gitnexus`, and :69 also gives `npm install -g gitnexus@latest`. The package name and the `gitnexus` bin match gitnexus/package.json:2 and :30-32. The cross-platform label fits the repo: grammar prebuilds exist for linux, darwin and win32 (build-tree-sitter-prebuilds.yml:181-188), and Windows requirements are documented (gitnexus/README.md:469-471). Caveat: install runs a postinstall grammar build (package.json:53). README.md:73 documents GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 for machines without a C++ toolchain."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX PolyForm-Noncommercial-1.0.0, file LICENSE",
+          "citation": "LICENSE:1-3; gitnexus/package.json:6",
+          "holds": true,
+          "note": "LICENSE:1 reads 'PolyForm Noncommercial License 1.0.0' and :3 gives the polyformproject.org URL. The full standard text runs through :73. gitnexus/package.json:6 declares exactly 'PolyForm-Noncommercial-1.0.0'. There is no other first-party license file or license field. Only the vendored Tree-sitter grammars carry their upstream MIT or ISC licenses (gitnexus/vendor/*/package.json), which does not change the project license."
+        },
+        {
+          "field": "platforms.linux_x86_64",
+          "statement": "yes: primary CI target with the full suite on ubuntu-latest, a linux-x64 grammar prebuild and a linux/amd64 Docker image; requires glibc >= 2.34 and Node ^22.18.0 || >=24.11.0; musl/Alpine not addressed (unknown)",
+          "citation": ".github/workflows/ci-tests.yml:16-19; .github/workflows/build-tree-sitter-prebuilds.yml:182; .github/workflows/docker.yml:216; gitnexus/README.md:465-468; gitnexus/package.json:133-135",
+          "holds": true,
+          "note": "ci-tests.yml:10 is the comment 'Ubuntu full-suite coverage, sharded', and :16-19 is the `tests` job on runs-on: ubuntu-latest. prebuilds.yml:182 is {platform_arch: 'linux-x64', os: 'ubuntu-24.04'}. docker.yml:216 sets platforms: linux/amd64,linux/arm64. gitnexus/README.md:465-468 states the glibc 2.34 floor. package.json:133-135 sets engines node '^22.18.0 || >=24.11.0'. A search found no user-facing musl/Alpine support statement: only lockfile entries, a bench note and a CHANGELOG line saying the Docker base moved from alpine to debian. So 'unknown' is fair."
+        },
+        {
+          "field": "integrations.mcp",
+          "statement": "`gitnexus mcp` serves stdio by default, or --http (Streamable HTTP/SSE, default 127.0.0.1:3000, bearer token required for a non-loopback bind); `serve` exposes /api/mcp; 17 tools; resources plus prompts detect_impact/generate_map; only rename (and group_sync's contracts.json) writes files; no LSP-backed, edit or diagnostics tool; source text is returned only via context/query with include_content=true, from text stored in the index",
+          "citation": "gitnexus/src/cli/index.ts:267-284; gitnexus/src/cli/mcp.ts:97-192; gitnexus/src/mcp/http-transport.ts:27-30; gitnexus/src/server/mcp-http.ts:32; gitnexus/src/mcp/tools.ts:91-986; README.md:186-206; gitnexus/src/mcp/local/local-backend.ts:4131-4152, 4860-4896",
+          "holds": false,
+          "note": "Everything checks out except the 'only via context/query' clause.\n\nVerified:\n- index.ts:270-283: stdio is the default, plus --http, port '3000' and host '127.0.0.1'. The non-loopback refusal is enforced at http-transport.ts:473-478, and :27-30 imports the Streamable HTTP and SSE transports.\n- /api/mcp is mounted at mcp-http.ts:44, called from api.ts:965. The cited :32 is only its optional bearer-auth guard.\n- tools.ts:91-986 holds exactly the 17 named tools. Only rename (:448) and group_sync (:890) use DESTRUCTIVE annotations.\n- server.ts:258-316 registers both prompts, and README.md:186-206 lists the resources.\n- No LSP client exists in gitnexus/src.\n\nWrong as written: the `cypher` tool runs any read statement unfiltered (local-backend.ts:3790-3792), and its formatter explicitly handles a symbol's `content` cell (:3834-3837). So `RETURN n.content` returns source text. `impact` with mode:'pdg' also returns affectedStatements carrying statement source text (tools.ts:479; pdg-impact.ts:127-133). Both still come from the index, not live files."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "CLI 'everything runs locally ... No network calls' (README.md:1101, 117): verified partial. The code makes an npm-registry update check (also armed in `mcp`), a default LadybugDB FTS/VECTOR extension INSTALL during analyze, a HuggingFace model download for opt-in embeddings, and LLM calls from `wiki`",
+          "citation": "README.md:1101; README.md:117; gitnexus/src/core/update-check.ts:176-209; gitnexus/src/cli/mcp.ts:185,191; gitnexus/README.md:670-676; gitnexus/src/cli/doctor.ts:304-314; gitnexus/src/core/embeddings/embedder.ts:229-238; gitnexus/src/core/wiki/llm-client.ts:134-142",
+          "holds": true,
+          "note": "README.md:1101 says 'No network calls.' and :117 says 'Everything local, no network'.\n- Update check: update-check.ts:176-209 calls fetch() on the registry package URL (default https://registry.npmjs.org/gitnexus/latest; update-cache.ts:9, 86-87). mcp.ts:185 and :191 start it in both HTTP and stdio modes.\n- Extensions: gitnexus/README.md:670-676 and doctor.ts:304-314 document analyze's default ('auto') network install from extension.ladybugdb.com. load-only and never opt out.\n- Embeddings: embedder.ts:229-238 is the download-failure path naming huggingface.co and HF_ENDPOINT.\n- Wiki: llm-client.ts:134-142 resolves MiniMax/OpenRouter base URLs, and :303 posts to /chat/completions.\n\n'Partial' is the correct verdict."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "integrations.mcp: replace 'Source text is returned only via `context`/`query` with include_content=true, from text stored in the index at analyze time (gitnexus/src/mcp/local/local-backend.ts:4131-4152, 4860-4896)' with 'Source text stored in the index at analyze time is returned by `context`/`query` with include_content=true (gitnexus/src/mcp/local/local-backend.ts:4131-4152, 4860-4896), by raw `cypher` queries that return a node's `content` property (local-backend.ts:3790-3792, 3834-3837), and as statement text in `impact` mode:\"pdg\" affectedStatements on --pdg indexes (gitnexus/src/mcp/tools.ts:479; gitnexus/src/mcp/local/pdg-impact.ts:127-133).'"
+      ]
+    }
+  ]
+}

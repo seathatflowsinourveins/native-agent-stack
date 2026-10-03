@@ -1,0 +1,343 @@
+{
+  "contender": "akitaonrails/ai-memory",
+  "revision": {
+    "contender": "akitaonrails/ai-memory",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "akitaonrails/ai-memory",
+        "tag": "v2.5.2",
+        "commit": "7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v2.5.2",
+    "commit": "7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83",
+    "read_at": "2026-10-02T03:01:52+00:00"
+  },
+  "dossier": {
+    "contender": "akitaonrails/ai-memory",
+    "revision": {
+      "tag": "v2.5.2",
+      "commit": "7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83",
+      "read_at": "2026-10-01"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Rust server + CLI giving coding agents shared long-term memory. Lifecycle hooks (Claude Code, Codex, 20+ others) send sanitized observations to a local/LAN server. At session end it writes markdown pages into a git-versioned wiki (source of truth), indexes them in SQLite (FTS5, entities, links, optional local vectors) and opens a single-use handoff for the next agent. Agents search/write/delete via 23 MCP tools (stdio or streamable HTTP). Default path uses no LLM; LLM consolidation, auto-improve and an idle 'dream' pass are opt-in. `ai-memory run` adds cross-harness native-session resume. (README.md:8-11,83-98; docs/ARCHITECTURE.md:7-21)",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Quit Claude Code mid-task, start Codex in the same directory, continue without re-explaining.",
+          "citation": "README.md:8-11"
+        },
+        {
+          "claim": "Twenty-plus harnesses feed one shared memory; handoffs are 'typed, owned, claimed exactly once'.",
+          "citation": "README.md:26-31"
+        },
+        {
+          "claim": "Memory lives in a server you run (laptop/homelab); 'one server per data directory, never two'.",
+          "citation": "README.md:33-36,399-401"
+        },
+        {
+          "claim": "Memory is plain markdown in a git-backed wiki; 'The database is a derived index that can always be rebuilt from the files.'",
+          "citation": "README.md:43-47"
+        },
+        {
+          "claim": "Hooks capture prompts/tool calls/session boundaries, 'sanitized at a typed privacy boundary before anything is stored'; default path uses zero LLM calls.",
+          "citation": "README.md:49-54"
+        },
+        {
+          "claim": "Memory decays on a schedule; 'Nothing is hard-deleted: the original stays in git and the version chain (restore-page brings it back)'; compaction/dedup/per-tier curves off by default.",
+          "citation": "README.md:56-66"
+        },
+        {
+          "claim": "Opt-in LLM 'dream' pass never deletes a source and is off by default.",
+          "citation": "README.md:68-74"
+        },
+        {
+          "claim": "One self-contained binary; purge commands say exactly what 'deleted' means; measured write ceiling (~700/s); audit log of every mutation.",
+          "citation": "README.md:76-79"
+        },
+        {
+          "claim": "Linux, macOS, WSL2 Supported; native Windows Experimental; Claude Code and Codex Supported; rows are first-party integrations 'kept honest by CI'.",
+          "citation": "README.md:102-113"
+        },
+        {
+          "claim": "`ai-memory run` auto-installs a harness's hooks+MCP on first launch (opt out --no-autowire) and adds cross-harness session continuity.",
+          "citation": "README.md:347-364"
+        },
+        {
+          "claim": "`ai-memory uninstall --apply` removes everything ai-memory installed and only that; installers are idempotent and write timestamped backups.",
+          "citation": "README.md:366-370"
+        },
+        {
+          "claim": "Default is loopback-only with no auth; per-repo [capture] rules can exclude paths or invert to allowlist mode.",
+          "citation": "README.md:402-410"
+        },
+        {
+          "claim": "LLM providers are optional; everything works with zero LLM calls.",
+          "citation": "README.md:419-428"
+        },
+        {
+          "claim": "MIT license; code 'built collaboratively with Claude Code (Anthropic Claude Opus 4.7)'.",
+          "citation": "README.md:497,501-503"
+        }
+      ],
+      "install": [
+        {
+          "method": "Docker server + host wrapper (Linux/macOS); wrapper from release asset ai-memory-wrapper, checksum-verified",
+          "command": "docker run -d --name ai-memory --restart unless-stopped -p 127.0.0.1:49374:49374 -v ai-memory-data:/data docker.io/akitaonrails/ai-memory:latest  # then: ai-memory install-mcp --client claude-code --apply; ai-memory install-hooks --agent claude-code --apply (repeat with codex)",
+          "citation": "README.md:269-319"
+        },
+        {
+          "method": "Arch AUR",
+          "command": "yay -S ai-memory-bin   # or: yay -S ai-memory (source build)",
+          "citation": "README.md:192-195"
+        },
+        {
+          "method": "Fedora RPM from latest GitHub release (x86_64/aarch64)",
+          "command": "sudo dnf install ./ai-memory-*.rpm",
+          "citation": "README.md:199-205"
+        },
+        {
+          "method": "mise (prebuilt GitHub release binary)",
+          "command": "mise use -g github:akitaonrails/ai-memory",
+          "citation": "docs/install.md:1629"
+        },
+        {
+          "method": "macOS prebuilt tarball (aarch64; x86_64 asset also published)",
+          "command": "curl -fsSL -O https://github.com/akitaonrails/ai-memory/releases/latest/download/ai-memory-macos-aarch64.tar.gz && tar -xzf ai-memory-macos-aarch64.tar.gz && ./ai-memory init && ./ai-memory serve --transport http --bind 127.0.0.1:49374",
+          "citation": "docs/macos.md:55-70"
+        },
+        {
+          "method": "Source build (any OS; `cargo install ai-memory` is unavailable, docs/install.md:1648-1651; macOS menu-bar app: ./companions/ai-memory-macos/build.sh, README.md:235-239)",
+          "command": "git clone https://github.com/akitaonrails/ai-memory ~/.ai-memory && cd ~/.ai-memory && cargo build --release --workspace && ./target/release/ai-memory init",
+          "citation": "docs/install.md:1658-1665"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - ai-memory-linux-x86_64.tar.gz built on ubuntu-22.04 (.github/workflows/release.yml:70-72), amd64 Docker image (release.yml:315-355), RPM (release.yml:679-680), AUR -bin (README.md:193); Linux is the primary CI platform (docs/support-matrix.md:9).",
+        "wsl2": "yes (documented, no WSL2 CI leg) - README.md:110; docs/windows.md:33-72 'Everything inside WSL2'; ci.yml:41-56 runs ubuntu/macOS runners only.",
+        "macos_arm64": "yes - ai-memory-macos-aarch64.tar.gz built on macos-15 (release.yml:125-127); README.md:109; docs/macos.md:3-5. macOS CI test leg runs only on dispatch/'full-ci' label (ci.yml:46-55); release workflow has no codesign/notarize step (release.yml:117-197; companions/ai-memory-macos/README.md:38).",
+        "gpu": "no - not used or required; local embeddings run on CPU (crates/ai-memory-llm/src/local.rs:163 Device::Cpu; docs/local-embeddings.md:5)."
+      },
+      "integrations": {
+        "cli": "Single `ai-memory` binary, ~60 subcommands (crates/ai-memory-cli/src/lib.rs:86-183): serve, hook, install-hooks/install-mcp/uninstall, run/continue, status/doctor/search/read-page, checkpoints/restore-page, purge-session/purge-project, backup/restore/reindex, forget-sweep, handoffs, finalize-session, user/api-key/project.",
+        "mcp": "MCP server with 23 tools (crates/ai-memory-mcp/src/server.rs; docs/ARCHITECTURE.md:446-479) over stdio or streamable HTTP, default http://127.0.0.1:49374/mcp (crates/ai-memory-cli/src/cli.rs:2839-2853; config.rs:43). `ai-memory mcp-bridge` is a stdio bridge that forwards Claude's session id (docs/ARCHITECTURE.md:518-525).",
+        "sdk_or_api": "HTTP API: /hook, /hook/batch, /handoff (crates/ai-memory-hooks/src/router.rs:609-611), /admin/* incl. /admin/audit-log, /admin/purge-session, /admin/restore-page (crates/ai-memory-mcp/src/admin.rs:635-743), /auth/*, read-only /api/v1 + /web with --enable-web (docs/frontend-api.md). No published language SDK found; crates are not on crates.io (docs/install.md:1648-1651). Companions: companions/ai-memory-relay, ai-memory-importer.",
+        "claude_code_or_codex": "Both documented. Claude Code: install-mcp writes ~/.claude.json (install_mcp.rs:388-405); install-hooks edits ~/.claude/settings.json, 9 events (install_hooks.rs:44-62; render_shared.rs:36-49); optional --session-aware MCP bridge. Codex: install-mcp writes [mcp_servers.ai-memory] in ~/.codex/config.toml with default_tools_approval_mode='approve' (install_mcp.rs:407-422,1027-1087); install-hooks writes ~/.codex/hooks.json, 7 events, Codex must trust the hooks (install_hooks.rs:2071-2183; render_shared.rs:907-915); SessionEnd needs Codex CLI >=0.145.0 else `finalize-session` (docs/install.md:844-855). Both: `ai-memory run claude|codex` (README.md:355-359); known Codex daemon issue #987 (docs/managed-workstreams.md:503-522)."
+      },
+      "telemetry_and_network": "No telemetry/analytics/crash reporting (DATA_HANDLING.md:10-14); no such crates in Cargo.lock; 'telemetry' symbols in crates/ are local auto-improve reports (crates/ai-memory-consolidate/src/auto_improve_telemetry.rs). No account or hosted service required; core is a loopback server (127.0.0.1:49374) on a local data dir; LAN binds are refused without a token (SECURITY.md:36-45). Network egress that exists: (1) DEFAULT first-start download of ~87 MB all-MiniLM-L6-v2 weights from huggingface.co, sha256-pinned, background, skipped with embedding_provider='none' or pre-placed files (crates/ai-memory-llm/src/local.rs:49-113; serve.rs:2436-2477; config.rs:2162-2171; docs/local-embeddings.md:65-83); DATA_HANDLING.md:31-32 says local embeddings need no network call. (2) Opt-in cloud LLM/embedding providers, capture_assistant, AI_MEMORY_RERANKER=llm send page text/assistant excerpts/queries (DATA_HANDLING.md:34-72). The `codex` provider reuses Codex's auth.json and may call `codex app-server --stdio` (docs/install.md:1886-1907); `anthropic-oauth` reuses a Claude subscription token that docs call unofficial and against Anthropic's usage policies (docs/install.md:1786-1798). (3) `ai-memory upgrade`, explicit only, calls GitHub Releases (upgrade.rs:341; lib.rs:175). (4) Docker wrapper checks Docker Hub digests at most daily on a TTY, opt-out AI_MEMORY_NO_VERSION_CHECK=1 (bin/ai-memory:134-184). (5) Admission webhooks (crates/ai-memory-wiki/Cargo.toml:33-34) and OIDC device auth (docs/install.md:399-415) are operator-configured."
+    },
+    "code": {
+      "languages": [
+        "Rust (edition 2024, toolchain 1.95)",
+        "POSIX sh + PowerShell (hooks/, bin/, scripts/)",
+        "Swift 6 (companions/ai-memory-macos)",
+        "Python (tests/e2e only)",
+        "HTML/CSS templates (askama, vendored tailwind.css in crates/ai-memory-web)"
+      ],
+      "entry_points": [
+        {
+          "path": "crates/ai-memory-cli/src/main.rs",
+          "what": "`ai-memory` binary shim; builds tokio runtime and calls ai_memory_cli::run()"
+        },
+        {
+          "path": "crates/ai-memory-cli/src/lib.rs",
+          "what": "argv parse + subcommand dispatch; `hook` fast path skips config/tracing (lines 41-184)"
+        },
+        {
+          "path": "crates/ai-memory-cli/src/commands/serve.rs",
+          "what": "server main: MCP (stdio|HTTP), /hook, /admin, optional /web, maintenance schedulers"
+        },
+        {
+          "path": "crates/ai-memory-cli/src/commands/hook.rs",
+          "what": "native `ai-memory hook --event ...` run by Claude/Codex hooks; spools, drains, injects handoff"
+        },
+        {
+          "path": "crates/ai-memory-mcp/src/server.rs",
+          "what": "MCP tool router (23 tools)"
+        },
+        {
+          "path": "crates/ai-memory-mcp/src/admin.rs",
+          "what": "/admin/* HTTP routes (purge, restore-page, backup, audit-log, users)"
+        },
+        {
+          "path": "bin/ai-memory",
+          "what": "Docker host-wrapper shell script"
+        },
+        {
+          "path": "evals/src/main.rs",
+          "what": "ai-memory-eval LongMemEval harness (not shipped); companions/*/src/main.rs are separate tools"
+        }
+      ],
+      "architecture": "Cargo workspace (Cargo.toml:1-43): ai-memory-core (types, Sanitized<T> boundary: src/sanitize.rs:327-362); ai-memory-store (SQLite via bundled rusqlite; single writer actor src/writer.rs, readers src/reader.rs, SQL src/ops.rs, migrations V01-V70, decay src/decay.rs); ai-memory-wiki (atomic md writes, watcher, git2 versioning src/git.rs, restore_page_from_checkpoint src/wiki.rs:732); ai-memory-hooks (payloads, /hook router src/router.rs, rule-based session pages src/synth.rs, capture_policy.rs); ai-memory-mcp (rmcp server, admin, auth); ai-memory-llm (providers/embedders, local candle MiniLM src/local.rs); ai-memory-consolidate (consolidator, auto_improve, sweep, lint, dream); ai-memory-web (read-only axum+askama browser, /api/v1); ai-memory-workstream (read-only adapters over native Claude/Codex/etc. transcripts + launch plans); ai-memory-cli (binary). One server owns a data dir: wiki/ (git, source of truth), db/memory.sqlite (index, but sole copy of sessions/observations/handoffs/audit/users), raw/, models/, logs/; single-instance lock. Agents reach it via hook commands (local spool, batch POST) and MCP.",
+      "packaging_and_release": "Tag-triggered .github/workflows/release.yml: checks tag == Cargo.toml version (31-60); `cargo build --locked --release` tarballs linux-{x86_64,aarch64}, macos-{aarch64,x86_64}, windows zip, RPMs, each with .sha256 made in the same workflow; also wrapper scripts, ai-memory-install-hooks and hooks tarball with SHA-256; GitHub Release body lists checksums (489-564). Docker Hub multi-arch image (provenance:false, lines 354,414) and AUR publish are gated on repo secrets (288-313,315-478,566-670). No signatures, cosign, SLSA/GitHub attestations or SBOM anywhere in .github (grep); docs concede this (docs/install.md:1636-1638). Actions pinned to commit SHAs; token read-only except release job (release.yml:27-28,493-494). Release does not run tests or depend on CI (release.yml:15-17). bin/release makes an annotated, unsigned-in-script tag (bin/release:196). Dockerfile: debian bookworm-slim, non-root uid 1000 (docker/Dockerfile:34-67). flake.nix is CI-built; no user docs found.",
+      "tests_and_ci": "cargo test in CI; cargo-nextest locally (.config/nextest.toml, .cargo/config.toml); rstest, wiremock. About 120 Rust integration-test files under crates/*/tests/suite plus ~4,277 #[test]/#[tokio::test]/#[rstest] attributes across 274 files in crates/ (grep); evals/tests/smoke.rs; tests/hooks/test_lib.sh; tests/wrapper_upgrade.sh; tests/e2e/external_relay_smoke.py; tests/e2e/handoff_smoke.sh (needs GEMINI_API_KEY, not referenced by any workflow); 4 Swift test files. Workflows: ci.yml (push main/PR/dispatch: rustfmt, clippy -D warnings, tests+doctests on ubuntu, macOS leg only on dispatch/'full-ci' label, Windows cross-build only, companions, release-build, cargo install --path, native packaging, hook-shell tests under gawk/mawk/original-awk/busybox, changelog gates, docker smoke, cargo-deny, cargo-audit with 2 ignored advisories, gitleaks); windows.yml (nightly + PR path/label: cargo test on windows-latest); macos-app.yml (swift test, label/dispatch); nix.yml (weekly/path); secret-scan.yml (weekly full history); release.yml. Real Claude/Codex round-trips are a manual script (docs/managed-workstreams.md:763-772).",
+      "dependencies": "Cargo.lock: 506 packages. Cargo.toml (workspace): 55 third-party [workspace.dependencies] + 10 internal path crates. Per-crate [dependencies] incl. internal: ai-memory-cli 42, -core 9, -store 18, -wiki 22 (+1 windows-only), -mcp 24, -hooks 14, -llm 20 (4 optional ML crates, default feature local-embeddings), -consolidate 16, -web 16 (+2 build), -workstream 9, -test-support 0, evals 17. companions/ai-memory-relay/Cargo.toml 9 and companions/ai-memory-importer/Cargo.toml 11 (own lockfiles); Swift package: 0 external. Bundled SQLite and vendored libgit2 (Cargo.toml:116,165), rustls (no OpenSSL), rmcp 2.2, axum 0.8, candle 0.11; host git CLI only as commit fallback (crates/ai-memory-wiki/src/git.rs:646-693). serde_yaml is 0.9.34+deprecated (Cargo.lock:3641-3642). unsafe_code forbidden (Cargo.toml:190); deny.toml enforces license allow-list, crates.io-only.",
+      "security_policy": "SECURITY.md: private GitHub security advisory, 7-day response, 30-day patch target, only latest release gets fixes (SECURITY.md:3-15,157-160); threat model single-tenant workstation/homelab, no encryption at rest (SECURITY.md:19-34,141-155). Also DATA_HANDLING.md, .gitleaks.toml."
+    },
+    "claim_checks": [
+      {
+        "claim": "Handoffs are 'typed, owned, claimed exactly once' (README.md:30-31)",
+        "verified": "partial",
+        "evidence": "Exactly-once holds: single-transaction compare-and-set UPDATE ... WHERE state='open' with owner filter (crates/ai-memory-store/src/ops.rs:4061-4075). But delivery is first-session-wins: docs/design-handoff-offer-not-claim.md:3-30,61-74 records an unrelated Codex session consuming a Claude handoff, says to_agent is never used, and marks the fix 'not implemented'; no claim_on_session_start/AI_MEMORY_HANDOFF in crates/. Claude/Codex injection is SessionStart additionalContext (hook.rs:518-532)."
+      },
+      {
+        "claim": "The database 'can always be rebuilt from the files' (README.md:46-47)",
+        "verified": "partial",
+        "evidence": "reindex rebuilds only workspaces/projects/pages/links/FTS; sessions, observations, handoffs, users, audit rows, embeddings, decay counters are DB-only and not rebuilt (crates/ai-memory-cli/src/commands/reindex.rs:16-18,47-58; docs/lifecycle-ops.md:921-925,1052-1055; docs/backup.md:193-195). docs/backup.md:38 tells users not to back up db/."
+      },
+      {
+        "claim": "'Nothing is hard-deleted: the original stays in git and the version chain' (README.md:62-63)",
+        "verified": "partial",
+        "evidence": "Compaction/dedup/dream supersede rather than delete (docs/ARCHITECTURE.md:343-381); wiki git history has no gc/prune code (crates/ai-memory-wiki/src/git.rs) and restore-page reads git (wiki.rs:732-781). But default-on daily forget sweep evicts cold episodic pages and hard-deletes tombstone ancestry after 180 days, TTL pages are hard-deleted (config.rs:1285-1294; decay.rs:99-100; DATA_HANDLING.md:103-117), and delete/purge commands delete DB rows (docs/lifecycle-ops.md:49-72)."
+      },
+      {
+        "claim": "Default path uses zero LLM calls (README.md:52-54)",
+        "verified": "yes",
+        "evidence": "LLM jobs are skipped without a provider: auto-improve (crates/ai-memory-cli/src/commands/serve.rs:2050), dream (:2080), 'memory_consolidate disabled' (:2560). Caveat: embeddings default to in-process local MiniLM whose ~87 MB weights are downloaded from huggingface.co on first start (config.rs:2162-2171; local.rs:49-113); not an LLM call."
+      },
+      {
+        "claim": "Capture is 'sanitized at a typed privacy boundary before anything is stored' (README.md:49-51)",
+        "verified": "partial",
+        "evidence": "Real for stored observations: Sanitized<T> has one constructor (crates/ai-memory-core/src/sanitize.rs:327-362), writer accepts only Sanitized<NewObservation> (store/src/writer.rs:1211-1261), router calls it (hooks/src/router.rs:3005). But native hook spool holds events before server-side scrubbing, client only truncates (hook_spool.rs:1-21; docs/install.md:488-496); sanitizer is best-effort (SECURITY.md:150-152); hand-edited wiki files can be unsanitized (SECURITY.md:125-128)."
+      },
+      {
+        "claim": "Per-repo [capture] rules can exclude paths or invert to allowlist mode (README.md:407-409)",
+        "verified": "yes",
+        "evidence": "CaptureConfig.ignore_paths and CaptureMode::{Denylist (default), Allowlist} (crates/ai-memory-hooks/src/capture_policy.rs:24-47); enforced in native hook before spooling, with --check-capture (cli/src/commands/hook.rs:665-711). Script/Docker-wrapper hook bundles do not enforce it (docs/install.md:478-486,532-545)."
+      },
+      {
+        "claim": "`uninstall --apply` removes everything ai-memory installed, and only that (README.md:366-370)",
+        "verified": "yes",
+        "evidence": "Plans removal of only signature-matched hook/MCP/instruction/skill entries and generated files (crates/ai-memory-cli/src/commands/uninstall.rs:1-6,667-744); 43 tests in tests/suite/removal.rs. Data dir stays unless --purge-data (uninstall.rs:673-741,755-759)."
+      },
+      {
+        "claim": "Purge commands 'say exactly what deleted means' (README.md:77)",
+        "verified": "yes",
+        "evidence": "Logical delete by default; bytes persist until --compact; text stays in wiki git history and older backups (docs/lifecycle-ops.md:49-72); dry-run preview without --confirm (crates/ai-memory-cli/src/commands/purge_session.rs:95-162); purge tombstones block spool replay (store/migrations/V52__purged_sessions_tombstones.sql:1-18)."
+      },
+      {
+        "claim": "Claude Code and Codex 'Supported', integrations 'kept honest by CI' (README.md:102-113)",
+        "verified": "partial",
+        "evidence": "Installers exist and write the documented targets (install_hooks.rs:44-62,2071-2183; install_mcp.rs:388-422,1027-1087); CI runs their unit tests (~167 and ~66 test attributes) on Linux. No test asserts the support-matrix rows; macOS/Windows legs are conditional (ci.yml:46-55; windows.yml); real Claude/Codex round-trips are manual (docs/managed-workstreams.md:763-772)."
+      },
+      {
+        "claim": "Multi-user auth, attribution and an audit log are built in (README.md:40-41)",
+        "verified": "yes",
+        "evidence": "Append-only audit_log (store/migrations/V01__init.sql:116) read via GET /admin/audit-log (mcp/src/admin.rs:16,676,1171-1189); users/API keys (V14, V54, V55). Opt-in per-project restricted access with audited grants (docs/users.md:698-752; V68) although SECURITY.md:141-145 says no per-project ACLs."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "LongMemEval-S retrieval, local embeddings (2.4 RC run, 470 scored questions, Ryzen 9 7950X3D)",
+        "metric": "hit@5",
+        "value": "0.815 (hit@1 0.536, hit@10 0.891, recall@10 0.817); cross-run noise about +/-0.005",
+        "source": "docs/benchmarks/retrieval-ab-r2.md:40-62,81-90",
+        "independent": false
+      },
+      {
+        "what": "LongMemEval-S, zero-LLM FTS+entity+graph (embeddings none), same run",
+        "metric": "hit@5",
+        "value": "0.666 (hit@1 0.532, hit@10 0.694, recall@10 0.564)",
+        "source": "docs/benchmarks/retrieval-ab-r2.md:49-62",
+        "independent": false
+      },
+      {
+        "what": "Earlier snapshots (2026-09-01, commit 0ac0dcf): local / FTS / pre-2.0 FTS",
+        "metric": "hit@5",
+        "value": "0.823 / 0.668 / 0.617",
+        "source": "docs/benchmarks/README.md:14-20; docs/benchmarks/longmemeval-s-2026-09-01-local.md:3-13",
+        "independent": false
+      },
+      {
+        "what": "memory_query MCP round-trip latency in the same run",
+        "metric": "p50/p95 ms; context tokens (chars/4)",
+        "value": "FTS 5/40 ms, ~350 tok; local embeddings 94/162 ms, ~416 tok",
+        "source": "docs/benchmarks/retrieval-ab-r2.md:59-62",
+        "independent": false
+      },
+      {
+        "what": "Single-writer store throughput (ignored test stress_writer_throughput.rs, fast local disk)",
+        "metric": "writes/s (mean latency)",
+        "value": "1 writer 42/s (23.9 ms); 8: 295/s; 32: 698/s (1.43 ms); 128: 700/s",
+        "source": "docs/deploy.md:270-308; crates/ai-memory-store/tests/suite/stress_writer_throughput.rs:82-88",
+        "independent": false
+      },
+      {
+        "what": "Native hook latency on macOS aarch64, v1.29.0; docs call it 'one independent evaluation' but evaluator is unnamed/unlinked (unverified)",
+        "metric": "ms per hook invocation",
+        "value": "~145 ms posix-native (~290 ms per tool call); ~172 ms legacy .sh",
+        "source": "docs/install.md:460-476",
+        "independent": false
+      },
+      {
+        "what": "End-to-end QA, illustrative --sample 20 (Gemini 2.5 Flash answers+judges); docs say NOT a baseline",
+        "metric": "QA accuracy (n=20)",
+        "value": "9/20 = 0.450; hit@5 0.800",
+        "source": "docs/benchmarks/retrieval-ab-r2.md:100-124",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Handoff delivery is first-session-wins: any next SessionStart in the same project (any harness, scripted or interactive) claims the single-use baton; to_agent is stored but unused, there is no per-execution opt-out, and the 'offer, don't claim' fix is accepted design 'not implemented' (docs/design-handoff-offer-not-claim.md:3-30,61-74; absent from crates/). Manual handoffs are project-wide and outrank automatic ones (docs/usage.md:19-27).",
+      "Codex-specific: install-mcp sets default_tools_approval_mode='approve' for the whole ai-memory server, so memory_delete_page/memory_forget_sweep/memory_write_page run without a Codex prompt (install_mcp.rs:1066-1078); hooks need manual Codex trust (install_hooks.rs:2171-2181); Codex MCP is not session-aware, so unscoped calls use a last-active-project pointer and static clients must pass workspace+project (docs/usage.md:52-55,212-220; docs/auto-scope.md:35-41); `ai-memory run codex` can lose continuity via Codex's shared daemon (#987, workaround --no-daemon) (docs/managed-workstreams.md:503-522); hook formats are verified against specific Codex versions (docs/install.md:827-828).",
+      "Default retention: maintenance is on; rule-based session pages are Tier::Episodic and are evicted when retention <0.20 (~80 days unused), tombstone ancestry is hard-deleted after 180 days, TTL pages are hard-deleted (config.rs:1285-1294; synth.rs:65; decay.rs:99-100; config.default.toml:74-76). Without an LLM provider no decisions/concepts/gotchas pages are made automatically, only session pages and handoffs; durable pages need memory_write_page (default tier semantic, server.rs:3810) or a provider (docs/install.md:1719; serve.rs:2560). With a provider, the hourly auto-improve scheduler auto-approves LLM-written pages by default (config.default.toml:180-201; docs/ARCHITECTURE.md:98-111).",
+      "Deletion/recovery limits: purge-* are logical deletes (bytes stay in SQLite free pages until --compact; text remains in wiki git history and older backups; 'not forensic erasure') (docs/lifecycle-ops.md:49-72); no encryption at rest (SECURITY.md:146); restore-page recovers only page markdown, while sessions/observations/handoffs/users/audit are DB-only and need backup/restore with the server stopped (docs/lifecycle-ops.md:24,921-925; reindex.rs:16-18).",
+      "Capture scope/privacy: unmarked repos are captured by default (prompts up to 16 KiB, tool excerpts up to 2 KB) for Claude Code and Codex; allowlist mode and --no-capture-prompts (Claude only) are opt-in (docs/install.md:488-551). Native hook events wait in <data_dir>/hook-spool/ before server-side scrubbing (hook_spool.rs:1-21). The default loopback server needs no token and the Docker/systemd defaults pass --enable-web (docs/install.md:2459-2474; docker/Dockerfile:67; packaging/systemd/ai-memory-user.service:8; docs/usage.md:423-424). First SessionStart in an empty project spawns a detached import of existing local transcripts (config.rs:392-400; hook.rs:836-851).",
+      "Release/supply chain: integrity is SHA-256 sidecars from the same workflow (no signatures, attestations, SLSA, SBOM; docs/install.md:1636-1638,2614-2619); release is not gated on CI (release.yml:15-17); no macOS signing/notarization (companions/ai-memory-macos/README.md:38); Docker provenance disabled (release.yml:354,414); Dependabot covers only GitHub Actions (.github/dependabot.yml); cargo audit ignores RUSTSEC-2025-0141 and RUSTSEC-2024-0320 without in-repo rationale (ci.yml:352-355); the Docker CLI wrapper bind-mounts $HOME read-write (bin/ai-memory:888).",
+      "Maintenance/licensing: ~125 changelog releases from 0.1.0 (2026-05-23) to 2.5.2 (2026-10-01), with 2.5.1 and 2.5.2 both dated 2026-10-01 (CHANGELOG.md:10,75,7592); Cargo.toml lists one author (Cargo.toml:43); README says code is built with Claude Code (README.md:501-503); only the latest release gets security fixes (SECURITY.md:157-160); forward-only migrations (V70), older binaries refuse newer data (docs/install.md:2624-2630); 2.5.2 fixed a per-project authz info leak GHSA-gf78-hf8g-vffm (CHANGELOG.md:59-66); serde_yaml is deprecated (Cargo.lock:3641-3642). MIT, but evals/Cargo.toml:6 declares 'MIT OR Apache-2.0'; deny.toml allows MPL-2.0 (deny.toml:37).",
+      "Operations/platform/scope: needs a long-running local server; if down, hook events are dropped after 8 failed drains, 7 days or 10,000 files (hook_spool.rs:33-44); each hook call adds ~145 ms (docs/install.md:460-476); one server per data dir (cli.rs:2866-2872); main.rs notes queued writes are dropped at shutdown (main.rs:20-33); first start fetches a model from huggingface.co (local.rs:49-113). Native Windows is Experimental; macOS/Windows CI legs are conditional; WSL2 has no CI. Also ships an agent launcher (`run`, --yolo/ai-jail, 20+ adapters) beyond memory (docs/managed-workstreams.md:483-493)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "akitaonrails/ai-memory",
+      "checks": [
+        {
+          "field": "readme.install[0] (Docker server + host wrapper)",
+          "statement": "Docker server + host wrapper (Linux/macOS); wrapper from release asset ai-memory-wrapper, checksum-verified: docker run -d --name ai-memory --restart unless-stopped -p 127.0.0.1:49374:49374 -v ai-memory-data:/data docker.io/akitaonrails/ai-memory:latest, then ai-memory install-mcp --client claude-code --apply; ai-memory install-hooks --agent claude-code --apply (repeat with codex)",
+          "citation": "README.md:269-319",
+          "holds": true,
+          "note": "README.md:273-288 downloads ai-memory-wrapper and its .sha256 and refuses to install on a checksum mismatch. Lines 300-308 are the docker run with the same flags and image, 317-318 the two wire commands, 311-312 say to re-run with --agent codex, and 325 says 'On Linux/macOS, that's it.' The dossier leaves out the optional -e LLM/embedding lines (300-308), which README.md:297-299 says to omit for zero-LLM mode. Cross-checks: release.yml:504-515 publishes ai-memory-wrapper and ai-memory-wrapper.sha256. docker/Dockerfile:47,63,67 serves on 0.0.0.0:49374 with AI_MEMORY_DATA_DIR=/data. bin/ai-memory:54 defaults to the ai-memory-data volume. Docker Hub publishing depends on repo secrets (release.yml:288-318), so whether the image is actually on Docker Hub can't be confirmed from source."
+        },
+        {
+          "field": "license",
+          "statement": "spdx MIT, file LICENSE",
+          "citation": "LICENSE:1-21; Cargo.toml:41; README.md:15,497",
+          "holds": true,
+          "note": "LICENSE is the standard MIT text, 'Copyright (c) 2026 Fabio Akita'. Cargo.toml:41 has [workspace.package] license = \"MIT\", and every shipped crate inherits it with license.workspace = true. companions/ai-memory-relay is also MIT. The only exception is the unshipped evals harness: evals/Cargo.toml:6 says 'MIT OR Apache-2.0', which the dossier already notes under risks."
+        },
+        {
+          "field": "platforms.macos_arm64",
+          "statement": "yes - ai-memory-macos-aarch64.tar.gz built on macos-15; README.md:109 Supported; docs/macos.md:3-5; macOS CI test leg runs only on dispatch/'full-ci' label; release workflow has no codesign/notarize step",
+          "citation": ".github/workflows/release.yml:125-127,117-197; README.md:109; docs/macos.md:3-5; .github/workflows/ci.yml:46-55; companions/ai-memory-macos/README.md:38",
+          "holds": true,
+          "note": "release.yml:125-127 is the aarch64 / ai-memory-macos-aarch64 / macos-15 matrix entry, built with cargo build --locked --release and smoke-tested (169-190). README.md:109 says 'macOS | Supported', and docs/macos.md:3-5 says releases publish the aarch64 and x86_64 tarballs. In ci.yml:51-55 macos-latest is only added on workflow_dispatch or the 'full-ci' PR label. A case-insensitive grep of .github for codesign|notar|cosign|attest|sbom|slsa finds nothing. companions/ai-memory-macos/README.md:38 says notarization and Developer ID are out of the first version."
+        },
+        {
+          "field": "integrations.claude_code_or_codex",
+          "statement": "Claude Code: install-mcp writes ~/.claude.json; install-hooks edits ~/.claude/settings.json, 9 events; optional --session-aware bridge. Codex: install-mcp writes [mcp_servers.ai-memory] in ~/.codex/config.toml with default_tools_approval_mode='approve'; install-hooks writes ~/.codex/hooks.json, 7 events, Codex must trust hooks; SessionEnd needs Codex CLI >=0.145.0 else finalize-session; ai-memory run claude|codex; Codex daemon issue #987",
+          "citation": "crates/ai-memory-cli/src/commands/install_mcp.rs:388-405,407-422,1027-1087; install_hooks.rs:44-62,2071-2183; render_shared.rs:36-49,907-915; docs/install.md:844-855; README.md:355-359; docs/managed-workstreams.md:503-522",
+          "holds": true,
+          "note": "install_mcp.rs:398-405 resolves ~/.claude.json, or $CLAUDE_CONFIG_DIR/.claude.json when that is set. install_hooks.rs:46-62 resolves ~/.claude/settings.json. render_shared.rs:36-49 has CLAUDE_CODE_EVENTS with 9 entries. --session-aware is Claude-only (cli.rs:2817-2821; install_mcp.rs:123-124). For Codex, install_mcp.rs:414-422 resolves ~/.codex/config.toml (honoring CODEX_HOME), and codex_upsert_mcp_server sets default_tools_approval_mode = \"approve\" (line 1078) under the default name 'ai-memory' (cli.rs:2798). install_hooks.rs:2071-2183 writes ~/.codex/hooks.json and prints the trust reminder (2174-2181). render_shared.rs:907-915 has CODEX_EVENTS with 7 entries. docs/install.md:844-855 covers SessionEnd on Codex 0.145.0+ with finalize-session as the fallback. README.md:356-357 shows run claude and run codex. docs/managed-workstreams.md:503-522 documents #987 and the --no-daemon workaround."
+        },
+        {
+          "field": "claim_checks[0] (handoffs 'typed, owned, claimed exactly once', verified: partial)",
+          "statement": "Exactly-once holds: single-transaction compare-and-set UPDATE ... WHERE state='open' with owner filter. But delivery is first-session-wins: design doc records an unrelated Codex session consuming a Claude handoff, says to_agent is never used, marks the fix 'not implemented'; no claim_on_session_start/AI_MEMORY_HANDOFF in crates/; Claude/Codex injection is SessionStart additionalContext",
+          "citation": "README.md:30-31; crates/ai-memory-store/src/ops.rs:4061-4075; docs/design-handoff-offer-not-claim.md:3-30,61-74; crates/ai-memory-cli/src/commands/hook.rs:518-532",
+          "holds": true,
+          "note": "README.md:30-31 contains the quoted phrase. ops.rs:4061-4075 shows the comment 'single atomic compare-and-set' and an UPDATE handoffs SET state='accepted' ... WHERE ... AND state='open'{owner_clause}, run through tx.execute. The design doc's line 3 reads 'accepted design ... — not implemented.' Lines 21-30 describe an interactive Codex session consuming a Claude Code handoff and say to_agent is 'stored but never used'. Lines 61-74 call to_agent 'dead weight' and say no per-execution opt-out exists. Grepping the whole repo for claim_on_session_start|AI_MEMORY_HANDOFF finds it only in that design doc. hook.rs:518-532 wraps the handoff in hookSpecificOutput.additionalContext for SessionStart. So the 'partial' verdict is justified."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

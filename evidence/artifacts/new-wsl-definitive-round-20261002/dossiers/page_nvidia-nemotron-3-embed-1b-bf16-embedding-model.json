@@ -1,0 +1,299 @@
+{
+  "contender": "page:nvidia-nemotron-3-embed-1b-bf16-embedding-model",
+  "revision": {
+    "contender": "page:nvidia-nemotron-3-embed-1b-bf16-embedding-model",
+    "kind": "pages",
+    "pages": [
+      "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16"
+    ],
+    "tag": null,
+    "commit": null,
+    "read_at": "2026-10-02T03:02:33+00:00"
+  },
+  "dossier": {
+    "contender": "page:nvidia-nemotron-3-embed-1b-bf16-embedding-model",
+    "revision": {
+      "tag": null,
+      "commit": null,
+      "read_at": "2026-10-02T03:02:33+00:00"
+    },
+    "license": {
+      "spdx": "OpenMDW-1.1",
+      "file": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (License/Terms of Use section; HF metadata license: openmdw-1.1; the linked text https://openmdw.ai/license/1-1/ was not opened and no LICENSE file was available in the working directory; the card also lists 'Apache License, Version 2.0' under ADDITIONAL INFORMATION without stating its scope)"
+    },
+    "purpose": "Pretrained multilingual text-embedding checkpoint from NVIDIA (Nemotron-3-Embed-1B-BF16): about 1.14B parameters, BF16 safetensors, 2048-dimensional output, 32,768-token maximum input, 34 natural languages, asymmetric 'query:' / 'passage:' prefixes. It turns text into dense vectors for retrieval, semantic search and RAG. It is model weights plus a model card only. No index, vector store, chunker, query CLI, MCP server or agent-client (Claude Code / Codex) integration is part of it, so a caller must chunk text, store vectors, persist state and run the search. It can be loaded with Sentence Transformers, Transformers or vLLM (offline, or as an HTTP embedding server). Release Date on the card: 07/16/2026. Only the Hugging Face model-card page was available (no source repository), so every code-level field below comes from the card's snippets and prose. Source: https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Model Overview, Description, Release Date, Usage).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Nemotron-3-Embed-1B-BF16 is 'a versatile text embedding model trained by NVIDIA and optimized for retrieval and semantic similarity tasks'; it generates 'dense vector embeddings from multilingual text inputs, enabling retrieval, semantic search, and (agentic) RAG workflows'.",
+          "citation": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Description)"
+        },
+        {
+          "claim": "'This model is ready for commercial use.'",
+          "citation": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Description)"
+        },
+        {
+          "claim": "Use case: 'Most suitable for users who want to build a multilingual question-and-answer application over a large text corpus, leveraging the latest dense retrieval technologies.' Deployment Geography: Global.",
+          "citation": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Use Case; Deployment Geography)"
+        },
+        {
+          "claim": "Architecture: Transformer encoder with bidirectional attention masking; Network Architecture 'Ministral-3-3B-Instruct-2512 based pruned model'; approximately 1.14B parameters; hidden size 2048; average pooling over token-level representations; dense embedding of dimension 2048.",
+          "citation": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Model Architecture)"
+        },
+        {
+          "claim": "Input limit: 'The model's max sequence length is 32768.' Longer inputs 'should be chunked or truncated'.",
+          "citation": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Input(s); Ethical Considerations > Explainability, Technical Limitations & Mitigation)"
+        },
+        {
+          "claim": "Asymmetric prefixes: 'Add the query: prefix for queries and the passage: prefix for documents.' On vLLM's /v2/embed endpoint raw strings plus input_type ('query' or 'document') apply the saved prompts automatically; the OpenAI-compatible /v1/embeddings endpoint needs strings in `input` prefixed manually with query: or passage:.",
+          "citation": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Usage; Recommended Retrieval Endpoint)"
+        },
+        {
+          "claim": "Embeddings are L2-normalized (dot product equals cosine similarity). 'It also supports dynamic embedding sizes by slicing the vector from the start (for example, keeping the first 1024 or 512 dimensions)', provided the sub-vector is re-normalized (L2) after slicing.",
+          "citation": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Model Overview / Output(s))"
+        },
+        {
+          "claim": "34 languages: English, Arabic, Assamese, Bengali, Bulgarian, Chinese, Danish, Dutch, Finnish, French, German, Hindi, Hinglish, Indonesian, Italian, Japanese, Korean, Malay, Marathi, Nepali, Norwegian, Persian, Portuguese, Romanian, Russian, Spanish, Swahili, Swedish, Tamil, Telugu, Thai, Ukrainian, Urdu, Vietnamese. The list contains natural languages only; no programming languages are listed.",
+          "citation": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Model Overview)"
+        },
+        {
+          "claim": "Training data: '8.5M+' data points across '161 dataset files' (hybrid human / automated / synthetic). The Public Datasets table includes code-related sets (coir_apps, coir_cosqa, coir_stackoverflow_qa, coir_codetrans_dl, coir_codetrans_contest, synthetic_text2sql, SWE-bench). Synthetic queries / QA pairs were generated with Qwen3 family, gemma-4-31B-it, gpt-oss-120b/20b and Nemotron-3 Super/Ultra models.",
+          "citation": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Training Dataset; Public Datasets; Synthetic Datasets)"
+        },
+        {
+          "claim": "Reported results, Avg. NDCG@10 at sequence length 4096: RTEB 72.38; ViDoRe-V3 text 57.74; MMTEB (Retrieval) 71.04.",
+          "citation": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Evaluation Dataset, results table)"
+        },
+        {
+          "claim": "Runtime engines PyTorch and vLLM; supported microarchitectures NVIDIA Ampere, Blackwell, Hopper; supported OS Linux; test hardware A100 80GB and H100 80GB; examples tested in nvcr.io/nvidia/pytorch:26.06-py3.",
+          "citation": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Software Integration; Inference; Local Python Dependencies)"
+        },
+        {
+          "claim": "vLLM: 'For BF16, use vllm==0.25.0 for /v2/embed serving.' NVIDIA also validated `vllm serve \"$MODEL_ID\"` with vllm/vllm-openai:v0.20.0 through v0.24.0. On Hopper and Ada Lovelace GPUs FP8 can be enabled with `--quantization fp8_per_tensor` ('Validated with vLLM 0.25.0 on H100; accuracy matched BF16').",
+          "citation": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (vLLM Dependencies)"
+        },
+        {
+          "claim": "License: 'This model and its associated configuration files are licensed under the OpenMDW License Agreement, version 1.1 (OpenMDW-1.1).' 'ADDITIONAL INFORMATION: Apache License, Version 2.0.' 'This project will download and install additional third-party open source software projects. Review the license terms of these open source projects before use.'",
+          "citation": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (License/Terms of Use)"
+        },
+        {
+          "claim": "Known limitation: 'This model does not always guarantee to retrieve the correct passage(s) for a given query.'",
+          "citation": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Ethical Considerations > Explainability, Potential Known Risks)"
+        }
+      ],
+      "install": [
+        {
+          "method": "pip, local Python (Linux; CUDA-enabled PyTorch required). For non-default CUDA environments the card says to use the PyTorch selector with an extra --index-url.",
+          "command": "pip install --upgrade torch  &&  pip install --upgrade \"transformers>=5.2.0\" \"sentence-transformers>=5.4.1\"",
+          "citation": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Local Python Dependencies)"
+        },
+        {
+          "method": "NVIDIA PyTorch container (the tested environment): do not upgrade Torch inside it, install only the missing packages. The container includes flash-attn; otherwise set attn_implementation to sdpa. The card gives no docker run command.",
+          "command": "nvcr.io/nvidia/pytorch:26.06-py3, then: pip install --upgrade \"transformers>=5.2.0\" \"sentence-transformers>=5.4.1\"",
+          "citation": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Local Python Dependencies)"
+        },
+        {
+          "method": "pip, vLLM (offline or server)",
+          "command": "pip install --upgrade \"vllm==0.25.0\" openai requests numpy",
+          "citation": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (vLLM Dependencies)"
+        },
+        {
+          "method": "vLLM OpenAI image tags that NVIDIA says it validated for BF16 `vllm serve`",
+          "command": "vllm/vllm-openai:v0.20.0 through v0.24.0 (tag range only; the page gives no docker run command)",
+          "citation": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (vLLM Dependencies)"
+        },
+        {
+          "method": "Start an HTTP embedding server with vLLM (weights are fetched by model id; for a local checkpoint path add --served-model-name)",
+          "command": "MODEL_ID=nvidia/Nemotron-3-Embed-1B-BF16; vllm serve \"$MODEL_ID\"   # optional: --host 0.0.0.0 --port 8000; local path: vllm serve \"$MODEL_PATH\" --host 0.0.0.0 --port 8000 --served-model-name nvidia/Nemotron-3-Embed-1B-BF16",
+          "citation": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (vLLM Online Serving)"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - 'Supported Operating System(s): Linux' is the only OS listed; examples were tested in nvcr.io/nvidia/pytorch:26.06-py3 on A100 / H100 80GB. The card never names x86_64 or aarch64, so the CPU architecture is not stated. Source: https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Software Integration; Inference; Local Python Dependencies)",
+        "wsl2": "unknown - Windows and WSL are not mentioned in the fetched card text; only 'Linux' is listed as supported. Source: https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Software Integration)",
+        "macos_arm64": "no - not a documented platform: only Linux is listed, no macOS / Apple / MPS mention was found, and the Transformers snippet raises RuntimeError('CUDA is required for practical BF16 inference.') when CUDA is unavailable. Source: https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Software Integration; Transformers)",
+        "gpu": "yes - NVIDIA Ampere, Blackwell and Hopper are listed; test hardware is A100 80GB and H100 80GB; an FP8 option is documented for Hopper and Ada Lovelace; CUDA-enabled PyTorch is required; flash-attn is optional (fallback attn_implementation=sdpa). CPU-only operation is not documented and no VRAM figure is given; the card only says NVIDIA models are 'designed and/or optimized to run on NVIDIA GPU-accelerated systems'. Source: https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Software Integration; Inference; vLLM Dependencies)"
+      },
+      "integrations": {
+        "cli": "none found for the model itself (no project CLI). The only command line shown is the third-party `vllm serve \"$MODEL_ID\"` launcher. Source: https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (vLLM Online Serving)",
+        "mcp": "none found (no MCP server is mentioned in the fetched card text).",
+        "sdk_or_api": "yes, via third-party runtimes. Python: Sentence Transformers (SentenceTransformer(...).encode_query / encode_document / similarity), Transformers (AutoTokenizer + AutoModel with manual average pooling and L2 normalization), vLLM offline (LLM(model=...).embed). HTTP via a vLLM server: 'Recommended Retrieval Endpoint' POST http://localhost:8000/v2/embed with JSON {model, input_type: 'query'|'document', texts, embedding_types: ['float'], truncate: 'END'} returning embeddings.float; plus the OpenAI-compatible /v1/embeddings (strings in `input`, manual query:/passage: prefixes; described in one sentence, no code sample). Source: https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Sentence Transformers; Transformers; vLLM Offline Python; vLLM Online Serving; Recommended Retrieval Endpoint)",
+        "claude_code_or_codex": "none found (no Claude Code or Codex integration is mentioned in the fetched card text)."
+      },
+      "telemetry_and_network": "No telemetry or phone-home statement was found on the card. Network use implied by the documented commands: weights are pulled by model id from the Hugging Face Hub when running SentenceTransformer(\"nvidia/Nemotron-3-Embed-1B-BF16\"), AutoModel.from_pretrained(...), LLM(model=...) or `vllm serve \"$MODEL_ID\"` (the card does not discuss offline mode or mirrors); pip installs come from PyPI / the PyTorch index; the tested container is on NVIDIA NGC (nvcr.io). No gated-access notice, account or token requirement was found, and no snippet uses trust_remote_code (the snippets do not pass it). The card warns: 'This project will download and install additional third-party open source software projects. Review the license terms of these open source projects before use.' The vLLM example binds '--host 0.0.0.0 --port 8000' and the request sample targets http://localhost:8000/v2/embed; no authentication or TLS guidance is given. Source: https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (License/Terms of Use; Local Python Dependencies; vLLM Online Serving; Recommended Retrieval Endpoint)"
+    },
+    "code": {
+      "languages": [
+        "Python (usage snippets only)",
+        "Shell (install / serve commands only)"
+      ],
+      "entry_points": [
+        {
+          "path": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Sentence Transformers section)",
+          "what": "SentenceTransformer(MODEL_ID, device='cuda', model_kwargs={'dtype': torch.bfloat16, 'attn_implementation': 'flash_attention_2'}); model.max_seq_length = 32768; encode_query(...) / encode_document(...) (batch_size=8) and model.similarity(...). Query/document prompts are applied by encode_query / encode_document."
+        },
+        {
+          "path": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Transformers section)",
+          "what": "AutoTokenizer.from_pretrained(MODEL_ID, padding_side='left') + AutoModel.from_pretrained(MODEL_ID, dtype=bfloat16, attn_implementation='flash_attention_2').to('cuda'); manual 'query: ' / 'passage: ' prefixes, masked average pooling and F.normalize(p=2); raises RuntimeError without CUDA."
+        },
+        {
+          "path": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (vLLM Offline Python section)",
+          "what": "from vllm import LLM; LLM(model=MODEL_ID).embed(texts, use_tqdm=False) with manual 'query: ' / 'passage: ' prefixes; scores by query_embeddings @ document_embeddings.T."
+        },
+        {
+          "path": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (vLLM Online Serving section)",
+          "what": "`vllm serve \"$MODEL_ID\"` (optional --host 0.0.0.0 --port 8000; --served-model-name for a local checkpoint path) exposes the HTTP embedding API."
+        },
+        {
+          "path": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Recommended Retrieval Endpoint section)",
+          "what": "POST http://localhost:8000/v2/embed with {model, input_type: 'query'|'document', texts, embedding_types: ['float'], truncate: 'END'}; response['embeddings']['float']. The OpenAI-compatible /v1/embeddings is also available but needs manual query:/passage: prefixes."
+        }
+      ],
+      "architecture": "No source repository exists in the material; this is a model checkpoint plus model card. Model: Transformer encoder with bidirectional attention masking, 'Ministral-3-3B-Instruct-2512 based pruned model' (HF metadata base_model mistralai/Ministral-3-3B-Instruct-2512; the model-tree widget root shows mistralai/Ministral-3-3B-Base-2512 and its relationship labels are ambiguous in the fetched rendering), about 1.14B parameters, hidden size 2048, average pooling over token states, 2048-d output, 32,768-token context. Built in two prune-and-distill rounds: the 3B parent embedding model was pruned to 2B with NVIDIA ModelOpt mcore_minitron Neural Architecture Search (50k in-domain calibration corpus), then distilled from the fine-tuned Nemotron-3-Embed-8B-BF16 teacher with cosine-distance + MSE losses on a multilingual in-domain retrieval blend, and the procedure was repeated to reach 1.14B. Only file named: config.json (keeps rope_parameters.apply_yarn_scaling for vLLM compatibility). Source: https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Model Architecture; Pruning and Distillation Procedure; Expected Configuration Warning)",
+      "packaging_and_release": "No release workflow, checksums, signatures or attestations are documented. The artifact is a single Hugging Face Hub checkpoint (model-size widget: 1B params, BF16, Safetensors) loaded by model id. No tag or commit hash is visible on the page. The card gives Release Date 07/16/2026; the sidebar collection 'Nemotron 3 Embed' (3 items) shows 'updated Aug 11'. Sibling checkpoints named: Nemotron-3-Embed-1B-NVFP4 and Nemotron-3-Embed-8B-BF16 (the distillation teacher). Source: https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Release Date; Model Version(s); sidebar widgets)",
+      "tests_and_ci": "None found: no test directories or test files (0), no CI workflows and no evaluation scripts in the material (model card only). Quality evidence is the reported RTEB / ViDoRe-V3 text / MMTEB (Retrieval) table. The card says the snippets were tested in nvcr.io/nvidia/pytorch:26.06-py3, vllm-openai v0.20.0-v0.24.0 was validated for `vllm serve`, and vLLM 0.25.0 was used for the H100 FP8 check; the Explainability table also lists 'Verified to have met prescribed NVIDIA quality standards: Yes'. Source: https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Local Python Dependencies; vLLM Dependencies; Evaluation Dataset; Ethical Considerations)",
+      "dependencies": "No manifest (no repository). Requirements documented in the card: local path = 3 direct (torch with CUDA, transformers>=5.2.0, sentence-transformers>=5.4.1) plus optional flash-attn (bundled in the NVIDIA container, fallback sdpa); vLLM path = 4 direct (vllm==0.25.0, openai, requests, numpy). No Python version is stated. Source: https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Local Python Dependencies; vLLM Dependencies)",
+      "security_policy": "none (no SECURITY.md or policy file in the material). The card's Ethical Considerations text says: 'Please report model quality, risk, security vulnerabilities or NVIDIA AI concerns here', linking https://www.nvidia.com/en-us/support/submit-security-vulnerability/. Source: https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Ethical Considerations / Safety)"
+    },
+    "claim_checks": [
+      {
+        "claim": "Trained on code-retrieval data and usable for code search (card lists CoIR subsets and SWE-bench; the examples pair 'Write a Python function...' queries with Python function documents).",
+        "verified": "partial",
+        "evidence": "The Public Datasets table lists coir_apps, coir_cosqa, coir_stackoverflow_qa, coir_codetrans_dl, coir_codetrans_contest, synthetic_text2sql (CoIR-Retrieval links) and SWE-bench, and every usage snippet embeds two Python-function documents. No training code or data mix, no code-retrieval benchmark and no per-task results are published, so code-search quality cannot be verified. The stated use case is multilingual Q&A over a text corpus, not code search. https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Training Dataset; Usage; Use Case)"
+      },
+      {
+        "claim": "Embeddings can be served over HTTP through vLLM with a /v2/embed endpoint (input_type handled server-side) and an OpenAI-compatible /v1/embeddings endpoint.",
+        "verified": "partial",
+        "evidence": "A runnable requests snippet exists only for /v2/embed (JSON model / input_type / texts / embedding_types / truncate); /v1/embeddings gets one sentence and no sample. The endpoints belong to vLLM, whose code is not in the material, and the card ties /v2/embed serving to vllm==0.25.0. https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Recommended Retrieval Endpoint; vLLM Dependencies)"
+      },
+      {
+        "claim": "Maximum sequence length is 32768 tokens.",
+        "verified": "partial",
+        "evidence": "The number is consistent across Input(s), the Explainability table and the snippets (MAX_LENGTH = 32768 in the Transformers example, model.max_seq_length = 32768 in Sentence Transformers), but every reported benchmark was run at sequence length 4096, so quality at long lengths is not reported. https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Input(s); Evaluation Dataset)"
+      },
+      {
+        "claim": "Embeddings are L2-normalized, so dot product equals cosine similarity.",
+        "verified": "partial",
+        "evidence": "The Transformers snippet normalizes manually with F.normalize(pooled, p=2, dim=-1). The vLLM offline snippet scores with a plain matrix product and the Sentence Transformers snippet uses model.similarity(), both relying on the pipeline or server to normalize, which is not shown on the page. https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Transformers; vLLM Offline Python; Sentence Transformers)"
+      },
+      {
+        "claim": "Sliced embeddings (first 1024 or 512 dimensions, re-normalized) 'remain highly functional'.",
+        "verified": "not_checkable",
+        "evidence": "No snippet slices vectors and no quality numbers for reduced dimensions are published; this is a prose claim only. https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Model Overview / Output(s))"
+      },
+      {
+        "claim": "Supported OS is Linux, supported GPUs are Ampere / Blackwell / Hopper, and a GPU is needed.",
+        "verified": "partial",
+        "evidence": "Consistent with the snippets: the Transformers example raises RuntimeError('CUDA is required for practical BF16 inference.') without CUDA and the Sentence Transformers example hard-codes device='cuda' with flash_attention_2 (sdpa fallback). However, the FP8 sentence also names Ada Lovelace, which is absent from the 'Supported Hardware Microarchitecture Compatibility' list, and no CPU-only or macOS path is documented. https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Software Integration; Sentence Transformers; Transformers; vLLM Dependencies)"
+      },
+      {
+        "claim": "RTEB 72.38, ViDoRe-V3 text 57.74, MMTEB (Retrieval) 71.04 (Avg. NDCG@10, sequence length 4096).",
+        "verified": "not_checkable",
+        "evidence": "Self-reported by NVIDIA in the card; no evaluation scripts, per-task scores or raw outputs are available in the material. https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Evaluation Dataset)"
+      },
+      {
+        "claim": "vllm==0.25.0 is required for /v2/embed serving; vllm-openai v0.20.0-v0.24.0 were validated for `vllm serve`; FP8 matches BF16 accuracy on H100.",
+        "verified": "not_checkable",
+        "evidence": "The statements are prose plus one pin (pip install --upgrade \"vllm==0.25.0\" openai requests numpy); vLLM is third-party and was not inspected, and the FP8 accuracy claim comes with no figures. https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (vLLM Dependencies)"
+      },
+      {
+        "claim": "The model and its configuration files are licensed under OpenMDW-1.1 (Apache-2.0 listed as additional information) and the model 'is ready for commercial use'.",
+        "verified": "partial",
+        "evidence": "The card states OpenMDW-1.1 for the model and configuration files (HF metadata: openmdw-1.1) and repeats 'Licensed under OpenMDW-1.1 and Apache License 2.0' in the Explainability and Safety tables, without saying what Apache-2.0 covers. The OpenMDW-1.1 text (https://openmdw.ai/license/1-1/) was not opened and no LICENSE file was available. https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (License/Terms of Use; Ethical Considerations)"
+      },
+      {
+        "claim": "The Transformers warning \"Unrecognized keys in `rope_parameters` for 'rope_type'='yarn': {'apply_yarn_scaling'}\" is expected and harmless; the field stays in config.json for vLLM compatibility.",
+        "verified": "not_checkable",
+        "evidence": "config.json is not available in the material. The card says 'This warning is expected and does not prevent model loading or inference', 'Do not remove it from config.json', and cites vLLM issue #48621 (not opened). https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Expected Configuration Warning)"
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "RTEB (Retrieval Embedding Benchmark), 16 public tasks, chunk retrieval, Nemotron-3-Embed-1B-BF16. The card's table also lists NVIDIA's llama-nemotron-embed-vl-1b-v2 at 61.98 in the same column.",
+        "metric": "Avg. NDCG@10, sequence length 4096",
+        "value": "72.38",
+        "source": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Evaluation Dataset, results table)",
+        "independent": false
+      },
+      {
+        "what": "ViDoRe-V3 text (eight OCR-extracted text datasets), chunk retrieval, Nemotron-3-Embed-1B-BF16. The card's table lists llama-nemotron-embed-vl-1b-v2 at 52.54 in the same column.",
+        "metric": "Avg. NDCG@10, sequence length 4096",
+        "value": "57.74",
+        "source": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Evaluation Dataset, results table)",
+        "independent": false
+      },
+      {
+        "what": "MMTEB (Retrieval) benchmark datasets (arXiv 2502.13595), Nemotron-3-Embed-1B-BF16. The card's table lists llama-nemotron-embed-vl-1b-v2 at 59.71 in the same column.",
+        "metric": "Avg. NDCG@10, sequence length 4096",
+        "value": "71.04",
+        "source": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Evaluation Dataset, results table)",
+        "independent": false
+      },
+      {
+        "what": "FP8 (vLLM --quantization fp8_per_tensor) versus BF16 on an H100 with vLLM 0.25.0",
+        "metric": "accuracy (metric not named)",
+        "value": "'accuracy matched BF16' - no numeric values published",
+        "source": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (vLLM Dependencies)",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope: the artifact is model weights only. No index, vector store, chunker, query CLI, MCP server or Claude Code / Codex integration is provided or documented, so chunking, vector storage, scoping and recoverable index state must be built by the caller. The stated use case is multilingual Q&A over a text corpus, not code search. Source: https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Usage; Use Case; Software Integration)",
+      "Platform: documented only for Linux with NVIDIA Ampere / Blackwell / Hopper GPUs (tested on A100 / H100 80GB) and CUDA-enabled PyTorch. macOS, Windows / WSL and CPU-only are not documented, the Sentence Transformers and Transformers snippets hard-require CUDA (FlashAttention-2 with an sdpa fallback), and no VRAM requirement is stated (my arithmetic only: 1.14B params x 2 bytes BF16 is about 2.3 GB for weights alone). Source: https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Software Integration; Sentence Transformers; Transformers)",
+      "Version pinning and compatibility: needs recent libraries (transformers>=5.2.0, sentence-transformers>=5.4.1) and vllm==0.25.0 for /v2/embed; only vllm-openai v0.20.0-v0.24.0 are stated as validated for `vllm serve`. Loading prints an 'expected' rope_parameters warning because apply_yarn_scaling is kept in config.json for vLLM (upstream work tracked in vLLM issue #48621). Source: https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Local Python Dependencies; vLLM Dependencies; Expected Configuration Warning)",
+      "Licensing: OpenMDW-1.1 governs the model and configuration files; Apache-2.0 appears as 'ADDITIONAL INFORMATION' with no stated scope; the network is derived from Mistral's Ministral-3-3B; training used synthetic data from third-party models (Qwen, gemma-4-31B-it, gpt-oss, Nemotron) plus public sets including SWE-bench and CoIR subsets, each with its own terms; the card also warns that setup downloads third-party software under its own licenses. The license text was not opened. Source: https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (License/Terms of Use; Model Architecture; Training Dataset)",
+      "Evidence of quality: all published numbers are NVIDIA-reported averages (RTEB, ViDoRe-V3 text, MMTEB retrieval) at sequence length 4096. No code-retrieval benchmark, per-task breakdown, latency / throughput, long-context result or sliced-dimension result is published, the 34-language list contains no programming languages, and the card itself says retrieval 'does not always guarantee' the correct passage. Source: https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Evaluation Dataset; Model Overview; Explainability)",
+      "Security: the card's explicit-bind example runs `vllm serve ... --host 0.0.0.0 --port 8000` and its request sample uses plain http, with no authentication or TLS guidance. Vulnerability reporting goes through an NVIDIA web form; there is no SECURITY.md. For balance: the weights are Safetensors and no snippet passes trust_remote_code. Source: https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (vLLM Online Serving; Recommended Retrieval Endpoint; Safety)",
+      "Maintenance and provenance: no source repository, tag, commit hash, changelog, release workflow, checksums or signatures are shown, so the revision is unpinned and a consumer must pin one itself. The card gives Release Date 07/16/2026 while the collection widget shows 'updated Aug 11'. Source: https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Release Date; sidebar widgets)",
+      "Reliability of this dossier: only the listed model-card page was read, through WebFetch (a summarizing fetcher) rather than the raw README. Verbatim blocks were requested but may be imperfect, and 'not found' answers were not fully reliable (one search reported 'OpenAI' absent although the card describes the OpenAI-compatible /v1/embeddings endpoint), so 'none found' means not found in the fetched text. The model-tree and sidebar details were not verified against page HTML. Source: https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16"
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "page:nvidia-nemotron-3-embed-1b-bf16-embedding-model",
+      "checks": [
+        {
+          "field": "readme.install[0] (pip, local Python)",
+          "statement": "pip install --upgrade torch  &&  pip install --upgrade \"transformers>=5.2.0\" \"sentence-transformers>=5.4.1\"; CUDA-enabled PyTorch required; for non-default CUDA use the PyTorch selector with an extra --index-url.",
+          "citation": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Local Python Dependencies)",
+          "holds": true,
+          "note": "Card: 'The BF16 checkpoints support Transformers 5.2.0 and above. The examples also require a CUDA-enabled PyTorch installation that matches your driver and CUDA environment.' It gives `pip install --upgrade torch`, says the PyTorch selector 'can include an additional --index-url argument', then 'Then install Transformers and Sentence Transformers: pip install --upgrade \"transformers>=5.2.0\" \"sentence-transformers>=5.4.1\"'. The card shows two separate commands; joining them with && is equivalent. The 'Linux' label comes from Software Integration, not this section, but it is accurate."
+        },
+        {
+          "field": "license",
+          "statement": "spdx OpenMDW-1.1; HF metadata license openmdw-1.1; linked text https://openmdw.ai/license/1-1/ (not opened); card also lists 'Apache License, Version 2.0' under ADDITIONAL INFORMATION without stating its scope.",
+          "citation": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (License/Terms of Use)",
+          "holds": true,
+          "note": "Card: 'This model and its associated configuration files are licensed under the OpenMDW License Agreement, version 1.1 (OpenMDW-1.1).' 'ADDITIONAL INFORMATION: Apache License, Version 2.0.' The page license tag is openmdw-1.1. The OpenMDW text links to https://openmdw.ai/license/1-1/ and the Apache text links to https://www.apache.org/licenses/LICENSE-2.0. No sentence says what Apache-2.0 covers; the next sentence ('This project will download and install additional third-party open source software projects...') sits next to it but does not state a scope. The identifier OpenMDW-1.1 is the card's own; I did not check whether SPDX lists it, because that would mean opening an uncited page."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - 'Supported Operating System(s): Linux' is the only OS listed; examples were tested in nvcr.io/nvidia/pytorch:26.06-py3 on A100 / H100 80GB; the card never names x86_64 or aarch64, so the CPU architecture is not stated.",
+          "citation": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Software Integration; Inference; Local Python Dependencies)",
+          "holds": true,
+          "note": "Software Integration lists 'Supported Operating System(s): Linux' as the only entry. The card says 'NVIDIA tested the examples in nvcr.io/nvidia/pytorch:26.06-py3 with the container-provided Torch and CUDA stack.' The Inference block gives 'Test Hardware: NVIDIA Ampere - A100 80GB, NVIDIA Hopper - H100 80GB'. The page never mentions x86_64, amd64, aarch64, arm64 or Grace, and never mentions Windows, WSL or macOS. Minor point: the container statement and the test-hardware list are separate statements on the card. The 'yes' is a Linux-level answer, and the dossier already says the architecture is not stated."
+        },
+        {
+          "field": "readme.integrations.sdk_or_api",
+          "statement": "Python via Sentence Transformers (encode_query / encode_document / similarity), Transformers (AutoTokenizer + AutoModel, manual average pooling + L2 normalization) and vLLM offline (LLM(model=...).embed); HTTP via a vLLM server: POST http://localhost:8000/v2/embed {model, input_type 'query'|'document', texts, embedding_types ['float'], truncate 'END'} returning embeddings.float, plus OpenAI-compatible /v1/embeddings with manual prefixes and no code sample.",
+          "citation": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Sentence Transformers; Transformers; vLLM Offline Python; vLLM Online Serving; Recommended Retrieval Endpoint)",
+          "holds": true,
+          "note": "Each part is confirmed by the card's code. Sentence Transformers: SentenceTransformer(MODEL_ID, device='cuda', model_kwargs={dtype: torch.bfloat16, attn_implementation: 'flash_attention_2'}), then encode_query / encode_document (batch_size=8) and model.similarity. Transformers: AutoTokenizer(padding_side='left'), then average_pool (a masked mean over last_hidden_state), then F.normalize(pooled, p=2, dim=-1). vLLM offline: LLM(model=MODEL_ID).embed(texts, use_tqdm=False). HTTP: requests.post to http://localhost:8000/v2/embed with exactly those JSON keys, read via response.json()['embeddings']['float'] and called as embed('query', QUERIES) / embed('document', DOCUMENTS). /v1/embeddings: 'You can also use the OpenAI-compatible /v1/embeddings endpoint. For those requests, pass strings in input and manually prefix them with query: or passage:.' No sample calls /v1/embeddings. Trivial nit: that text is two sentences, not one."
+        },
+        {
+          "field": "claim_checks[0] (code retrieval / code search, verified: partial)",
+          "statement": "Public Datasets lists coir_apps, coir_cosqa, coir_stackoverflow_qa, coir_codetrans_dl, coir_codetrans_contest, synthetic_text2sql (CoIR-Retrieval links) and SWE-bench; every usage snippet embeds two Python-function documents; no training code/data mix, no code-retrieval benchmark and no per-task results are published; the stated use case is multilingual Q&A over a text corpus, not code search.",
+          "citation": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16 (Training Dataset; Usage; Use Case)",
+          "holds": true,
+          "note": "All seven rows are present. The coir_* and synthetic_text2sql rows link to huggingface.co/datasets/CoIR-Retrieval/... (e.g. /apps, /cosqa, /synthetic-text2sql); SWE-bench links to princeton-nlp/SWE-bench. Each sample redefines QUERIES / DOCUMENTS: two code queries ('Write a Python function that counts...' and 'Write a function that orders a dictionary...') matched with `def frequency_lists` and `def sort_dict_item`, plus two health Q/A pairs. The training data is given only as 'Total Size: 8.5M+ data points; Total Number of Datasets: 161 dataset files', with no per-dataset mix. The results table has only averages for RTEB, ViDoRe-V3 text and MMTEB (Retrieval); there is no code benchmark. The Use Case quote matches. Omission: the sidebar 'Nemotron 3 Embed' collection description says 'Open embedding models for enterprise RAG, agentic retrieval, code search, and agent memory.' That is collection text, not the card body, so 'partial' is still the right rating."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "Optional (verdict unaffected): in claim_checks[8].evidence, replace the quoted phrase 'Licensed under OpenMDW-1.1 and Apache License 2.0' with the wording the page actually uses in the Explainability 'Licensing' row and the Safety 'Use Case Restrictions' row: 'This model and its associated configuration files are licensed under the OpenMDW License Agreement, version 1.1 (OpenMDW-1.1). ADDITIONAL INFORMATION: Apache License, Version 2.0.'",
+        "Optional (verdict unaffected): in claim_checks[0].evidence, add that the page's sidebar 'Nemotron 3 Embed' collection description says 'Open embedding models for enterprise RAG, agentic retrieval, code search, and agent memory.' This is collection text, not the card's Use Case section."
+      ]
+    }
+  ]
+}

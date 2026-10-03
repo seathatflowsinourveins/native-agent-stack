@@ -1,0 +1,322 @@
+{
+  "contender": "memtensor/memos",
+  "revision": {
+    "contender": "memtensor/memos",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "MemTensor/MemOS",
+        "tag": "v2.0.34",
+        "commit": "41bf5c7fa89ee08ebedf3c662638b06fc29aca8d",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v2.0.34",
+    "commit": "41bf5c7fa89ee08ebedf3c662638b06fc29aca8d",
+    "read_at": "2026-10-02T03:02:29+00:00"
+  },
+  "dossier": {
+    "contender": "memtensor/memos",
+    "revision": {
+      "tag": "v2.0.34",
+      "commit": "41bf5c7fa89ee08ebedf3c662638b06fc29aca8d",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "MemOS (MemTensor) is an open-source 'Memory Operating System' for LLM agents. The repo bundles (1) the `MemoryOS` Python library plus a FastAPI REST server and a FastMCP server over graph/vector-backed memory 'cubes' (Neo4j/Qdrant, scheduler, feedback, optional Dream consolidation) (src/memos/, README.md:43-51); (2) a hosted MemOS Cloud API and Python client (README.md:113-148; src/memos/api/client.py:33-60); (3) agent plugins: a local-first TypeScript/SQLite plugin (L1 traces, L2 policies, L3 world models, skills) with adapters for OpenClaw, Hermes Agent and DeepSeek Harness (apps/memos-local-plugin/README.md:3-45), plus cloud plugins for OpenClaw and DSH (README.md:223-271). No Claude Code or Codex adapter was found. Nothing was executed for this dossier (no shell was available); everything below comes from reading files.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Tagline: give your agent persistent memory and the ability to grow; MemOS is a Memory Operating System that unifies store/retrieve/manage for long-term memory.",
+          "citation": "README.md:19, 43"
+        },
+        {
+          "claim": "Unified Memory API: one API to add, retrieve, edit and delete memory, structured as a graph that is inspectable and editable, not a black-box embedding store.",
+          "citation": "README.md:47"
+        },
+        {
+          "claim": "Multi-cube knowledge-base management: isolation, controlled sharing and dynamic composition across users, projects and agents.",
+          "citation": "README.md:49"
+        },
+        {
+          "claim": "Asynchronous ingestion via MemScheduler with millisecond-level latency.",
+          "citation": "README.md:50"
+        },
+        {
+          "claim": "Memory feedback and correction in natural language (correct, supplement or replace existing memories).",
+          "citation": "README.md:51"
+        },
+        {
+          "claim": "Benchmarks via OmniMemEval: LoCoMo 88.83, LongMemEval 89.20 and others; OpenClaw average task completion 36.63% to 50.87%; 'leads' 14 commercial memory products.",
+          "citation": "README.md:59-60, 73-90"
+        },
+        {
+          "claim": "Four entry points: Cloud API (hosted, data on MemOS Cloud), Self-Host (docker compose, needs Neo4j + Qdrant), MemOS Cloud Plugin (OpenClaw), Local Plugin (DeepSeek Harness/Hermes/OpenClaw, local SQLite, data on your machine).",
+          "citation": "README.md:103-111"
+        },
+        {
+          "claim": "Self-host: `docker compose up` starts MemOS API + Neo4j + Qdrant, API at http://localhost:8000; alternative is uvicorn memos.api.server_api:app with Neo4j and Qdrant already running.",
+          "citation": "README.md:155-176"
+        },
+        {
+          "claim": "Local plugin gives 100% on-device memory for DeepSeek Harness, Hermes or OpenClaw: 'nothing leaves your machine'; requires Node.js and an already-installed host agent.",
+          "citation": "README.md:275, 301"
+        },
+        {
+          "claim": "Local plugin features: hybrid retrieval (FTS5 + vector), smart dedup, tiered skill evolution (L1 traces / L2 policies / L3 world model), multi-agent collaboration, local-first SQLite storage.",
+          "citation": "README.md:303"
+        },
+        {
+          "claim": "Plugin runtime data lives apart from code: config.yaml (includes API keys; chmod 600), data/memos.db SQLite, skills/, logs/ (incl. audit.log) under ~/.openclaw/memos-plugin, ~/.hermes/memos-plugin or $DSH_HOME/memos-plugin.",
+          "citation": "apps/memos-local-plugin/README.md:47-69"
+        },
+        {
+          "claim": "Uninstalling the plugin does not delete data/, skills/, logs/ or config.yaml; startup after an upgrade may migrate the SQLite schema, so back up the runtime directory before upgrading.",
+          "citation": "apps/memos-local-plugin/README.md:78-80"
+        },
+        {
+          "claim": "DSH viewer listens on 127.0.0.1:18801 by default and accepts only loopback bind addresses; viewerEnabled: false disables the listener.",
+          "citation": "apps/memos-local-plugin/README.md:71-74, 219-223"
+        },
+        {
+          "claim": "License: Apache 2.0.",
+          "citation": "README.md:344"
+        }
+      ],
+      "install": [
+        {
+          "method": "pip (PyPI, library plus REST/MCP server code; documented in docs, not in the root README)",
+          "command": "conda create -n memos python=3.11 && conda activate memos && pip install -U \"MemoryOS[all]\"",
+          "citation": "docs/en/open_source/getting_started/installation.md:484-492"
+        },
+        {
+          "method": "Docker Compose self-host (API + Neo4j + Qdrant; builds the local Dockerfile)",
+          "command": "git clone https://github.com/MemTensor/MemOS.git && cd MemOS && cp docker/.env.example .env && cd docker && docker compose up",
+          "citation": "README.md:157-163"
+        },
+        {
+          "method": "uvicorn from source (Neo4j and Qdrant must already be running)",
+          "command": "cd src && uvicorn memos.api.server_api:app --host 0.0.0.0 --port 8000 --workers 1",
+          "citation": "README.md:169-176"
+        },
+        {
+          "method": "Local plugin installer for OpenClaw or Hermes (macOS/Linux; pipes the main branch to bash)",
+          "command": "curl -fsSL https://raw.githubusercontent.com/MemTensor/MemOS/main/apps/memos-local-plugin/install.sh | bash",
+          "citation": "README.md:292"
+        },
+        {
+          "method": "Local plugin installer for DeepSeek Harness (macOS/Linux)",
+          "command": "curl -fsSL https://raw.githubusercontent.com/MemTensor/MemOS/main/apps/memos-local-plugin/install.sh | bash -s -- --agent dsh --profile web",
+          "citation": "README.md:286"
+        },
+        {
+          "method": "MemOS Cloud plugin for OpenClaw (hosted memory; needs a MemOS Cloud API key)",
+          "command": "openclaw plugins install @memtensor/memos-cloud-openclaw-plugin@latest && openclaw gateway restart",
+          "citation": "README.md:235-236"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes. Python CI runs ubuntu-latest on Python 3.10-3.13 (.github/workflows/python-tests.yml:31, 36-40); the plugin release builds a linux-x64 better-sqlite3 prebuild (.github/workflows/memos-local-plugin-publish.yml:350-351); install.sh accepts Linux and needs Node >= 20 (apps/memos-local-plugin/install.sh:91, 156-160). No linux-arm64 prebuild is built (memos-local-plugin-publish.yml:344-353).",
+        "wsl2": "unknown. WSL is never mentioned in code or docs (word-boundary search over non-evaluation files found nothing). install.sh only checks that `uname -s` is Darwin or Linux (install.sh:156-160), which WSL2 reports as Linux, but nothing documents or tests it.",
+        "macos_arm64": "yes. Python CI covers macos-14 and macos-15 (python-tests.yml:33-34); the plugin release labels macos-14 as darwin-arm64 (memos-local-plugin-publish.yml:346-347); install.sh needs Homebrew only when Node is missing (install.sh:179-186).",
+        "gpu": "unknown. No README/docs GPU statement. The optional local Hugging Face LLM backend uses MPS if available, else device_map='auto' (src/memos/llms/hf.py:45-51); docker/docker-compose.yml reserves no GPU; the plugin installer denies onnxruntime's optional Linux CUDA download for DSH installs (install.sh:1410-1414); plugin default embeddings run locally via @huggingface/transformers (apps/memos-local-plugin/core/embedding/providers/local.ts:4)."
+      },
+      "integrations": {
+        "cli": "A `memos` console script exists (pyproject.toml:63-64; src/memos/cli.py:77-116) but has only `download_examples` (fetches the GitHub main-branch zip, cli.py:37-74) and `export_openapi`; no memory-management commands. The local plugin ships installers (install.sh/install.ps1) and a web viewer, and its README says not to `npm install -g` it (apps/memos-local-plugin/README.md:84-95).",
+        "mcp": "Python library only. src/memos/api/mcp_serve.py defines a FastMCP server 'MOS Memory System' with 16 tools (chat, create_user, create_cube, register_cube, unregister_cube, search_memories, add_memory, get_memory, update_memory, delete_memory, delete_all_memories, clear_chat_history, dump_cube, share_cube, get_user_info, control_memory_scheduler; mcp_serve.py:142-567), transports stdio (default), http, sse (mcp_serve.py:570-611; docs/en/open_source/modules/mos/memos_mcp.md:27-61). It needs an OpenAI-style key and, for tree_text, Neo4j (mcp_serve.py:18-28, 107-121; memos_mcp.md:11-25). The only client config example targets Cursor / desktop_config.json (memos_mcp.md:87-110). tests/api/test_mcp_serve.py exists. The local plugin has no MCP server (only hit is a test comment, apps/memos-local-plugin/tests/unit/adapters/openclaw-bridge.test.ts:1871).",
+        "sdk_or_api": "Self-host REST: FastAPI app (src/memos/api/server_api.py:39-72) exposing /product/{add,search,get_memory,delete_memory,feedback,create_cube,...} (src/memos/api/routers/server_router.py:68-512); no auth dependency on those routes and AUTH_ENABLED defaults false (src/memos/api/middleware/auth.py:26, 172-179). Hosted Cloud REST with an `mpg-` token (README.md:117-143). Python SDK: `from memos import MOS, GeneralMemCube, MOSConfig` (src/memos/__init__.py:1-20) and `MemOSClient` for the cloud API (src/memos/api/client.py:33-60). Local plugin: loopback HTTP + SSE under /api/v1/* (apps/memos-local-plugin/server/routes/*.ts; server/http.ts:64) with optional apiKey (server/middleware/auth.ts:1-29), a TypeScript MemoryCore interface (agent-contract/memory-core.ts:169) and a JSON-RPC bridge (ARCHITECTURE.md:162-166).",
+        "claude_code_or_codex": "none found. A case-insensitive search for 'codex' hits only AGENTS.md:3,36 (instructions for contributors' coding agents), model-name strings in apps/openwork-memos-integration, and a comment about Hermes's own provider stack (apps/memos-local-plugin/adapters/hermes/memos_provider/__init__.py:1857). CLAUDE.md:1-23, .claude/agents/ and .codex/agents/ are sub-agent definitions for working on this repo (CLAUDE.md:7-19; AGENTS.md:36), not memory integrations. No hook, skill, plugin or MCP setup for Claude Code or Codex is documented."
+      },
+      "telemetry_and_network": "Local plugin (apps/memos-local-plugin): anonymous usage telemetry is ON by default; the config template writes telemetry.enabled: true (templates/config.openclaw.yaml:43-44; core/config/defaults.ts:340; core/telemetry/sender.ts:1-12, 100). When active it POSTs batched events (plugin_started, memos_search with latency/hit_count, memory_ingested, feedback_submitted, viewer_opened, plugin_error, daily_active) plus OS, OS version, arch, Node version, plugin version, a persistent random anonymous ID and a session ID to an Aliyun ARMS RUM endpoint (sender.ts:197-265, 269-348). It only activates if an endpoint exists: env MEMOS_ARMS_ENDPOINT, or a telemetry.credentials.json that the npm release workflow generates from repository secrets and ships in the tarball (sender.ts:31-54, 111-119; .github/workflows/memos-local-plugin-publish.yml:506-512; package.json:23); no such file is in the source tree. The root README never mentions telemetry and says nothing leaves the machine (README.md:275). core/telemetry/README.md:44 promises GET /api/v1/telemetry/preview, which does not exist (server/routes/telemetry.ts:35 has only POST viewer-opened). The documented npm update-check (core/update-check/README.md:5-15) has no implementation (directory holds only README.md and .gitkeep). Other network use: configured LLM/embedding providers receive memory text for summaries and reflection (ARCHITECTURE.md:119-121); the default local embedder downloads a ~23 MB model on first run (core/embedding/providers/local.ts:4); LAN Hub is off by default (templates/config.openclaw.yaml:38-41); server/viewer bind 127.0.0.1 by default with an optional apiKey (core/config/defaults.ts:27-28; server/http.ts:64, 238-239); install.sh fetches the package with `npm pack` (install.sh:369) and, if Node is missing on Linux, downloads and runs NodeSource's setup script with sudo (install.sh:188-209). Python library/server: a keyword search finds no analytics/telemetry code in src/memos, BUT src/memos/log.py:318-322 launches an undocumented bundled executable (src/memos/_stage0.py:10-25) whose network behavior was not analyzed (see risks). Self-host needs Neo4j + Qdrant (docker/docker-compose.yml) and, by default, third-party LLM/embedding API keys (Alibaba Bailian/DashScope endpoints, docker/.env.example:5-39), and pulls models via hf-mirror.com (docker-compose.yml:18). Hosted Cloud API / MemOSClient need a MemOS account API key and send content to memos.memtensor.cn (src/memos/api/client.py:33-60; README.md:117-143). The Cloud OpenClaw plugin sends conversations to MemOS Cloud by design (README.md:239) and ships an ARMS RUM reporter not mentioned in its README (apps/MemOS-Cloud-OpenClaw-Plugin/lib/arms-reporter.js:1-36). Legacy apps/memos-local-openclaw has telemetry on by default (src/telemetry.ts:5, 76) and depends on posthog-node (package.json:55)."
+    },
+    "code": {
+      "languages": [
+        "Python",
+        "TypeScript",
+        "JavaScript",
+        "Shell",
+        "PowerShell"
+      ],
+      "entry_points": [
+        {
+          "path": "src/memos/cli.py",
+          "what": "`memos` console script (pyproject.toml:63-64): only `download_examples` and `export_openapi` subcommands (cli.py:77-116)."
+        },
+        {
+          "path": "src/memos/api/server_api.py",
+          "what": "FastAPI app `memos.api.server_api:app` (README.md:175; Makefile:39) serving /product/* and /health. AGENTS.md:16,64 names `memos.api.start_api:app`, which does not exist."
+        },
+        {
+          "path": "src/memos/api/mcp_serve.py",
+          "what": "MCP server 'MOS Memory System' (FastMCP): 16 tools, stdio/http/sse (mcp_serve.py:125-611)."
+        },
+        {
+          "path": "src/memos/api/server_api_ext.py",
+          "what": "Alternate 'Krolik' app: adds rate limiting, CORS defaults naming third-party domains, and an API-key admin router (server_api_ext.py:1-135)."
+        },
+        {
+          "path": "apps/memos-local-plugin/install.sh",
+          "what": "macOS/Linux installer for OpenClaw, Hermes and DeepSeek Harness (install.sh:1-33, 156-160); Windows uses install.ps1."
+        },
+        {
+          "path": "apps/memos-local-plugin/bridge.cts",
+          "what": "JSON-RPC bridge daemon (stdio/TCP) used by the Hermes Python adapter (documented at ARCHITECTURE.md:162-166)."
+        },
+        {
+          "path": "apps/memos-local-plugin/adapters/",
+          "what": "Host adapters: openclaw/index.ts and deepseek-harness/index.ts (in-process), hermes/memos_provider/__init__.py (Python, via the bridge). No other hosts."
+        },
+        {
+          "path": "apps/memos-local-plugin/server/index.ts",
+          "what": "HTTP/SSE server for the viewer and /api/v1/* routes (server/routes/*.ts), loopback by default (server/http.ts:64)."
+        }
+      ],
+      "architecture": "Monorepo of loosely coupled products. (A) Python library src/memos/ (dist MemoryOS, import memos): MOS/MOSCore (mem_os/), containers (mem_cube/, multi_mem_cube/), memory types (memories/textual/ incl. tree_text on graph DB + vector DB, preference, activation/, parametric/), ingestion (mem_reader/, chunkers/, parsers/), async scheduling (mem_scheduler/, optional Redis/RabbitMQ), feedback (mem_feedback/), provider factories (llms/, embedders/, vec_dbs/ qdrant|milvus, graph_dbs/ neo4j|neo4j_community|nebular|polardb|postgres, reranker/), FastAPI service + MCP (api/ handlers, routers, middleware, mcp_serve.py), and a plugin framework (plugins/) hosting the built-in Dream consolidation plugin (dream/, disabled unless MEMOS_ENABLED_PLUGINS=dream; src/memos/dream/README.md:10-26). Export/restore for tree memory is dump/load (memories/textual/tree.py:439-460; mem_os/core.py:1089-1109). (B) apps/memos-local-plugin/ (TypeScript, local-first): agent-contract/ (MemoryCore interface), core/ (capture, memory/l1-l3, reward, retrieval, skill, feedback, storage = SQLite WAL + FTS5 + vectors, embedding, llm, hub, telemetry, logger, config), server/ (HTTP/SSE /api/v1/*), bridge.cts JSON-RPC daemon, adapters/{openclaw,hermes,deepseek-harness}, viewer/ (Vite/Preact). Scope = agent kind + profile + workspace with private/public/hub share scope (agent-contract/dto.ts:10-27); one SQLite DB per host agent with no cross-agent memory by default (install.sh:25-28), optional Hub sharing (core/hub). (C) Other: apps/MemOS-Cloud-OpenClaw-Plugin (plain JS cloud plugin), apps/memos-local-openclaw (older v1 local plugin), packages/memos-core (TS sources without manifests), apps/openwork-memos-integration (vendored third-party desktop app), deploy/helm, docker/, evaluation/, docs/. (D) Six prebuilt native executables in src/memos/.sckit/ with no source in the repo (see risks).",
+      "packaging_and_release": "Python: dist `MemoryOS` 2.0.34 (pyproject.toml:6-7). python-release.yml runs `poetry build` and uploads with pypa/gh-action-pypi-publish pinned by SHA, using the PYPI_API_TOKEN secret, when a GitHub release with a v* tag is published (.github/workflows/python-release.yml:3-33). Permissions are contents: read only (no id-token, so no trusted publishing or attestations); no checksum/signature/provenance steps exist anywhere in .github (search for provenance|attest|cosign|sigstore found none). pyproject.toml:153-155 replaces the standard backend with the in-tree sckit_poetry_build.py (wraps poetry-core), and pyproject.toml:169 puts src/memos/.sckit/** (six prebuilt executables) into the wheel and sdist (see risks). Plugin npm: @memtensor/memos-local-plugin 2.0.16-beta.1 (apps/memos-local-plugin/package.json:2-3), published by memos-local-plugin-publish.yml (manual/reusable, tied to the weekly whole-repo release path, :207): builds better-sqlite3 prebuilds for darwin-arm64, darwin-x64, linux-x64, win32-x64 (:344-353), runs `npm run release:validate` (tsc --noEmit + vitest) (:531, package.json:63), injects telemetry credentials from secrets (:506-512), computes a sha256 for the tarball (:578) but deliberately does not publish the tarball (:734), and publishes with NPM_TOKEN (:795); no npm provenance flags found. package.json:74 runs a postinstall script. Release orchestration also in memos-release-prepare.yml, memos-release-publish-main.yml, memos-release-publish-paired-local-plugin.yml. Docker: docker/Dockerfile (python:3.11-slim, no USER, CMD uvicorn --reload, :2, :35); compose builds locally and no published image is documented.",
+      "tests_and_ci": "Frameworks: pytest + pytest-asyncio + pytest-cov + ruff (pyproject.toml:176-188, 216-226); vitest for the plugin (apps/memos-local-plugin/package.json:68-72); node:test for release scripts. Approximate test-file counts: ~121 Python files (tests/**/test_*.py, mirroring src/memos), ~186 vitest files in apps/memos-local-plugin/tests (unit/integration/e2e), ~56 in apps/memos-local-openclaw/tests, 11 .github/scripts/*.test.mjs, 5 in apps/MemOS-Cloud-OpenClaw-Plugin/test. Workflows: python-tests.yml (push/PR on main, dev, dev*, feat/*, test; matrix ubuntu-latest, windows-latest, macos-14, macos-15 x Python 3.10-3.13; poetry install, scripts/check_dependencies.py, build and pip-install sdist and wheel, ruff check/format, pytest with --cov-fail-under=28; python-tests.yml:9-112); python-release.yml (PyPI upload on release); memos-release-pre-merge-dry-run.yml (PR, path-filtered) and memos-release-post-merge-dry-run.yml (push to main, path-filtered) run `node --test .github/scripts/*.test.mjs` plus an offline release inspection; memos-release-prepare.yml, memos-release-publish-main.yml, memos-release-publish-paired-local-plugin.yml (release orchestration); memos-local-plugin-publish.yml (manual/reusable; runs the plugin vitest suite only here); memos-local-plugin-post-merge-dry-run.yml (disabled stub); openclaw-plugin-publish.yml (dispatch); stale.yml; yunxiao-github-sync.yml (mirrors issues/PRs to Yunxiao). No push/PR workflow runs the plugin's vitest suite.",
+      "dependencies": "pyproject.toml (+ poetry.lock): 13 core runtime deps (openai, ollama, transformers, tenacity, fastapi[all], sqlalchemy, pymysql, scikit-learn, fastmcp, python-dateutil, prometheus-client, concurrent-log-handler, cachetools; lines 38-52); 7 optional extras (tree-mem 2, mem-scheduler 2, mem-user 1, mem-reader 3, pref-mem 2, skill-mem 1, tavily 1) and an `all` extra with 20 entries incl. torch, sentence-transformers, qdrant-client (lines 69-145); Poetry groups dev 1, test 5, eval 9 (lines 173-205); a supplemental Poetry source pointing at the Tsinghua PyPI mirror (lines 210-213). docker/requirements.txt (~127 pinned lines) and docker/requirements-full.txt (~185). apps/memos-local-plugin/package.json: 8 runtime deps (@huggingface/transformers 4.2.0, better-sqlite3, preact, @preact/signals, @sinclair/typebox, tsx, uuid, yaml), 8 optional DSH peer deps, 15 devDependencies; package-lock.json and pnpm-lock.yaml present. apps/memos-local-openclaw/package.json: 7 deps (incl. posthog-node, puppeteer), 7 dev. apps/MemOS-Cloud-OpenClaw-Plugin/package.json: no dependencies key found. apps/openwork-memos-integration/package.json: root devDependencies only (vendored app). packages/ has no manifests.",
+      "security_policy": "none at the repo root (no SECURITY.md in the root or .github/). The only policy file is apps/openwork-memos-integration/SECURITY.md for the vendored third-party OpenWork/Accomplish app (supported 0.1.x; report by email via GitHub profile, lines 3-16)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Unified Memory API: one API to add, retrieve, edit and delete memory, inspectable and editable by design (README.md:47).",
+        "verified": "partial",
+        "evidence": "Add/search/get/delete/feedback routes exist (src/memos/api/routers/server_router.py:112-135, 341-401, 409-416) but no edit route; TreeTextMemory.update raises NotImplementedError (src/memos/memories/textual/tree.py:350-351) and the MCP update_memory tool warns tree_text may not support updates (src/memos/api/mcp_serve.py:372). Correction goes through the feedback endpoint."
+      },
+      {
+        "claim": "Multi-cube KB management with isolation and controlled sharing across users/projects/agents (README.md:49).",
+        "verified": "partial",
+        "evidence": "Cubes are keyed by user_name/cube id and handlers take readable/writable cube ids from the request body (src/memos/api/handlers/add_handler.py:122-126; search_handler.py:1031-1035), but no auth dependency is attached to any /product route (server_router.py:112-512). API-key auth is wired only to the admin router (admin_router.py:77-190) and AUTH_ENABLED defaults false, granting scope 'all' (src/memos/api/middleware/auth.py:26, 172-179). Isolation is not server-enforced in the README-documented server_api:app."
+      },
+      {
+        "claim": "Asynchronous ingestion via MemScheduler with millisecond-level latency (README.md:50).",
+        "verified": "not_checkable",
+        "evidence": "Scheduler and async code exist (src/memos/mem_scheduler/; async_mode in the README example, README.md:199; scheduler routes server_router.py:194-268) but no latency measurement, benchmark or test asserting millisecond latency was found."
+      },
+      {
+        "claim": "Memory feedback and correction in natural language (README.md:51).",
+        "verified": "yes",
+        "evidence": "POST /product/feedback routes to FeedbackHandler (server_router.py:409-416; src/memos/api/handlers/feedback_handler.py); module src/memos/mem_feedback/ and tests/mem_feedback/ exist. Effectiveness was not measured here."
+      },
+      {
+        "claim": "Local plugin is 100% on-device; nothing leaves your machine (README.md:275).",
+        "verified": "partial",
+        "evidence": "Storage is local SQLite (apps/memos-local-plugin/core/storage/connection.ts:46-50) but telemetry defaults on (templates/config.openclaw.yaml:43-44; core/telemetry/sender.ts:100) and published tarballs embed an endpoint (package.json:23; memos-local-plugin-publish.yml:506-512). Optional LLM/embedding providers receive memory text (ARCHITECTURE.md:119-121); the default local embedder downloads a model on first run (core/embedding/providers/local.ts:4). The root README never mentions telemetry."
+      },
+      {
+        "claim": "Self-host: `docker compose up` starts MemOS API + Neo4j + Qdrant, API at localhost:8000 (README.md:157-165).",
+        "verified": "partial",
+        "evidence": "docker/docker-compose.yml:3-62 defines memos (8000), neo4j (7474/7687, password 12345678 at :42) and qdrant (6333/6334) and bind-mounts ../src (:23). It also needs a .env with external LLM and embedder credentials (docker/.env.example:5-39, defaults to Alibaba Bailian endpoints), the image runs as root with --reload (docker/Dockerfile:35), and the API has no auth by default."
+      },
+      {
+        "claim": "Hybrid retrieval (FTS5 + vector) in the local plugin (README.md:303).",
+        "verified": "yes",
+        "evidence": "FTS5 virtual tables for traces, policies, skills and world models in apps/memos-local-plugin/core/storage/migrations/001-initial.sql:349-455; vector store at core/storage/vector.ts; RRF + MMR ranking is described at ARCHITECTURE.md:137 (ranker file not opened)."
+      },
+      {
+        "claim": "config.yaml (includes API keys) is chmod 600 when written (apps/memos-local-plugin/README.md:64).",
+        "verified": "yes",
+        "evidence": "core/config/writer.ts:91 and :102 and core/config/paths.ts:130 write with mode 0o600 and re-apply chmod."
+      },
+      {
+        "claim": "Plugin docs: telemetry payloads can be previewed via GET /api/v1/telemetry/preview and are 24h aggregate counts; update-check polls npm every 24h (core/telemetry/README.md:6-14, 44; core/update-check/README.md:5-15).",
+        "verified": "no",
+        "evidence": "server/routes/telemetry.ts:35 registers only POST /api/v1/telemetry/viewer-opened and no preview route exists anywhere in apps/memos-local-plugin. sender.ts:197-265 batches per-event records (not 24h aggregates) with os/arch/node version. core/update-check/ holds only README.md and .gitkeep, the config schema has no updateCheck key, and no code references registry.npmjs.org."
+      },
+      {
+        "claim": "Uninstalling the plugin does not delete data/, skills/, logs/ or config.yaml; back up the runtime dir before upgrading (apps/memos-local-plugin/README.md:78-80).",
+        "verified": "partial",
+        "evidence": "Runtime home is separate from the code dir (core/config/paths.ts) and install.sh has no uninstall/purge mode (no 'uninstall' match). core/storage has no automatic DB backup or snapshot (search for backup|snapshot|VACUUM INTO found none; only config-file backups at core/config/migrations.ts:39), consistent with the warning. End-to-end uninstall behavior was not executed."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "User-memory benchmark scores in the root README (via the OmniMemEval harness); README also says MemOS 'leads' 14 commercial memory products across ten datasets, without per-product numbers",
+        "metric": "Score (unit not stated)",
+        "value": "LoCoMo 88.83; LongMemEval 89.20; PersonaMem v2 40.58; HaluMem 80.91; BEAM-10M 56.75",
+        "source": "README.md:60, 76-90 (harness github.com/MemTensor/OmniMemEval, not opened)",
+        "independent": false
+      },
+      {
+        "what": "Agent-task scores in the root README (same harness)",
+        "metric": "Score (unit not stated)",
+        "value": "GDPVal 62.07; LiveCodeBench 64.96; OmniMath 61.00; SWE-Bench 38.46; BrowseComp-Plus 23.85",
+        "source": "README.md:76-90",
+        "independent": false
+      },
+      {
+        "what": "OpenClaw average task completion across five agent tasks, without vs with MemOS",
+        "metric": "average task completion",
+        "value": "36.63% -> 50.87%",
+        "source": "README.md:60",
+        "independent": false
+      },
+      {
+        "what": "Cloud OpenClaw plugin token usage vs baseline OpenClaw",
+        "metric": "token usage reduction",
+        "value": "72% lower (docs say 'up to 72%')",
+        "source": "README.md:69; docs/en/openclaw/plugin_compare.md:10",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "SECURITY (runtime, undocumented): using the Python package launches a bundled native executable in the background. src/memos/log.py:318-322 calls memos._stage0.trigger() when logging is first configured per process, and get_logger() (log.py:325-335) does that; it is called at import time by most modules (e.g. src/memos/api/client.py:28, server_router.py:66; 154 files reference memos.log). src/memos/_stage0.py:10-25 starts the matching binary under src/memos/.sckit/{darwin,linux,windows}-{amd64,arm64}/ detached, stdio discarded, passing it an embedded base64 config blob. pyproject.toml:169 packages src/memos/.sckit/** into wheel and sdist; docker/Dockerfile:26 copies src/ into the image. The six binaries have no source in the repo (no *.go or go.mod) and README/docs never mention them. They were located but not executed, decoded or analyzed here; their behavior is unknown.",
+      "SECURITY (build/publish chain, undocumented): pyproject.toml:153-155 replaces the standard build backend with in-tree sckit_poetry_build.py, which (lines 8-29) appends BASH_ENV=src/memos/_pypi_bridge.sh to $GITHUB_ENV when run under GitHub Actions. src/memos/_pypi_bridge.sh:1-14 is gated to the PyPI publish action's entrypoint (/app/twine-upload.sh), references its INPUT_PASSWORD/PYPI_API_TOKEN, and runs src/memos/_initial_ci_delivery.py, a helper that contacts a hard-coded non-MemTensor HTTPS host and executes a downloaded binary (_initial_ci_delivery.py:7, 95-105). No workflow in .github references these files (search found none). The session's git status shows the HEAD commit subject 'chore: allow native PyPI upload [skip ci]' (session context, not a file citation). Not run or analyzed here; any artifact built through this pipeline is unreviewed.",
+      "SECURITY (self-host defaults): the README-documented server has no authentication and is network-exposed. README.md:175 binds 0.0.0.0; docker/docker-compose.yml publishes 8000, Neo4j 7474/7687 (password 12345678 at :42, also docker/.env.example:51) and Qdrant 6333/6334; no auth dependency is attached to any /product route (src/memos/api/routers/server_router.py:112-512). API-key auth exists only on the admin router of the alternate server_api_ext.py app (admin_router.py:77-190; server_api_ext.py:108-109) and AUTH_ENABLED defaults false (src/memos/api/middleware/auth.py:26, 172-179). Scoping relies on caller-supplied ids (add_handler.py:122-126; search_handler.py:1031-1035), and delete-by-memory_ids is documented as standalone, not cube-scoped (src/memos/graph_dbs/neo4j.py:1904-1908, 1957-1961). docker/Dockerfile runs as root with uvicorn --reload (:35).",
+      "SCOPE (deletion and recovery are thin): Python server per-item deletes remove nodes (src/memos/memories/textual/tree.py:412-437; graph_dbs/neo4j.py:412-429); the only soft-delete/recover path is a cube-wide route marked '(inner)' keyed by delete_record_id (server_router.py:465-501), implemented for neo4j, neo4j_community and polardb only (neo4j.py:2112-2243; neo4j_community.py:1286, 1384; polardb.py:5110, 5202; absent from postgres.py). MCP delete_memory/delete_all_memories are documented as permanent and dump_cube exports but no restore tool exists (mcp_serve.py:219-248, 398-484). Local plugin: deleteTrace/deletePolicy/deleteWorldModel/deleteSkill are hard deletes and only skills and world models can be archived (agent-contract/memory-core.ts:261-267, 324-341, 389-392, 490-497); export/import bundles drop embeddings (server/routes/import-export.ts:22-25); POST /api/v1/admin/clear-data unlinks the SQLite files with no backup step (server/routes/admin.ts:4-9, 112-114); there is no automatic DB backup in core/storage and the README says to back up before upgrading (apps/memos-local-plugin/README.md:78-80).",
+      "SCOPE (host fit): no Claude Code or Codex adapter, hook, skill or documented MCP setup exists. Plugin adapters cover only OpenClaw, Hermes Agent and DeepSeek Harness (apps/memos-local-plugin/ARCHITECTURE.md:29-31), each host gets its own SQLite DB with no cross-agent memory by default (install.sh:25-28; docs/en/openclaw/plugin_compare.md:28), though AgentKind is an open string (agent-contract/dto.ts:10). The only generic hook is the Python MCP server, which needs an OpenAI-style LLM key and, for tree_text, Neo4j (src/memos/api/mcp_serve.py:18-28, 107-121; docs/en/open_source/modules/mos/memos_mcp.md:11-25) and offers only agent-initiated tool calls, with no passive capture. No first-class 'handoff' feature was found ('handoff' in the plugin refers to process restarts, server/routes/admin.ts).",
+      "PRIVACY / doc accuracy: local-plugin telemetry is on by default and published tarballs embed an endpoint (core/telemetry/sender.ts:100; core/config/defaults.ts:340; package.json:23; memos-local-plugin-publish.yml:506-512), while README.md:275 says nothing leaves the machine and never mentions telemetry. Plugin docs describe a telemetry preview route and an npm update-check that are not implemented (core/telemetry/README.md:44; core/update-check/ has only README.md and .gitkeep). Optional LLM/embedding providers receive memory text (ARCHITECTURE.md:119-121).",
+      "LICENSING: root LICENSE and pyproject are Apache-2.0 (LICENSE:1-3; pyproject.toml:9) but sub-package manifests declare MIT (apps/memos-local-plugin/package.json:87; apps/memos-local-openclaw/package.json:47; apps/MemOS-Cloud-OpenClaw-Plugin/package.json:40). The cloud plugin's LICENSE file is Apache-2.0 text (apps/MemOS-Cloud-OpenClaw-Plugin/LICENSE:1-3) and the local plugin has no LICENSE file of its own; apps/openwork-memos-integration is a vendored MIT app by a different owner (its LICENSE:1-3). The README states only Apache-2.0 (README.md:344).",
+      "MAINTENANCE / hygiene: (a) the plugin's ~186 vitest files run only inside the release workflow (memos-local-plugin-publish.yml:531), not on push/PR, and Python CI enforces only a 28% coverage floor (python-tests.yml:112). (b) Releases use long-lived tokens (PYPI_API_TOKEN, python-release.yml:33; NPM_TOKEN, memos-local-plugin-publish.yml:795) with no provenance, signatures or attestations; the plugin tarball sha256 is computed but the tarball is not published (memos-local-plugin-publish.yml:578, 734). (c) The documented install pipes the mutable main branch into bash (README.md:286, 292); install.sh has no checksum/signature verification and runs NodeSource's setup script via sudo when Node is missing (install.sh:188-209). (d) Overlapping lineages and drift: apps/memos-local-openclaw, manifest-less packages/memos-core, apps/memos-local-plugin; AGENTS.md cites memos.api.start_api:app and extensions/, which do not exist; server_api.py reports version 1.0.1 (:42) vs package 2.0.34 (pyproject.toml:7); plugin 2.0.16 is 'unreleased' in its changelog (CHANGELOG.md:8). (e) Benchmarks are self-reported on a harness in the project's own org; no result artifacts are committed (evaluation/ has none; apps/memos-local-openclaw/tests/bench/README.md is a test plan with target thresholds)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "memtensor/memos",
+      "checks": [
+        {
+          "field": "readme.install[0] (pip)",
+          "statement": "pip (PyPI, library plus REST/MCP server code; documented in docs, not in the root README): conda create -n memos python=3.11 && conda activate memos && pip install -U \"MemoryOS[all]\"",
+          "citation": "docs/en/open_source/getting_started/installation.md:484-492",
+          "holds": true,
+          "note": "Lines 484-485 give the conda create/activate commands and line 492 gives pip install -U \"MemoryOS[all]\". They are separate code blocks, not chained with &&, but the steps are the same. The 'all' extra exists (pyproject.toml:118-145), and the package includes src/memos (pyproject.toml:168), so api/server_api.py and api/mcp_serve.py ship with it. README.md has no 'pip install' or 'MemoryOS[' line. This statement does not mention that pyproject.toml:169 also puts src/memos/.sckit/** (six prebuilt executables) into the wheel; that is covered in the dossier's risks."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX Apache-2.0, file LICENSE",
+          "citation": "LICENSE:1-3; pyproject.toml:9; README.md:344",
+          "holds": true,
+          "note": "LICENSE contains the Apache License 2.0 text. pyproject.toml:9 declares Apache-2.0 and :26 adds the OSI Apache classifier. README.md:344 says Apache 2.0. Sub-packages that declare MIT (e.g. apps/memos-local-plugin/package.json:87) are already listed under the dossier's LICENSING risk."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes: Python CI runs ubuntu-latest on Python 3.10-3.13; the plugin release builds a linux-x64 better-sqlite3 prebuild; install.sh accepts Linux and needs Node >= 20; no linux-arm64 prebuild is built",
+          "citation": ".github/workflows/python-tests.yml:31, 36-40; .github/workflows/memos-local-plugin-publish.yml:344-353; apps/memos-local-plugin/install.sh:91, 156-160",
+          "holds": true,
+          "note": "python-tests.yml:31 lists ubuntu-latest and :36-40 list Python 3.10-3.13. In memos-local-plugin-publish.yml the build-prebuilds matrix (:344-353) has ubuntu-latest/linux-x64 at :350-351 and no linux-arm64 entry, and :398-404 copies node_modules/better-sqlite3/.../better_sqlite3.node. install.sh:91 sets REQUIRED_NODE_MAJOR=20, and :156-160 accepts only Darwin|Linux."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "Python library only: FastMCP server 'MOS Memory System' with 16 named tools; transports stdio (default), http, sse; needs an OpenAI-style key and Neo4j for tree_text; the only client config example targets Cursor/desktop_config.json; tests/api/test_mcp_serve.py exists; the local plugin has no MCP server (only hit is a test comment)",
+          "citation": "src/memos/api/mcp_serve.py:18-28, 107-121, 142-567, 570-611; docs/en/open_source/modules/mos/memos_mcp.md:11-25, 27-61, 87-110; apps/memos-local-plugin/tests/unit/adapters/openclaw-bridge.test.ts:1871",
+          "holds": true,
+          "note": "FastMCP(\"MOS Memory System\") is at :129, and I counted 16 @self.mcp.tool() functions whose names match the list exactly (:142-567). _run_mcp handles stdio, http and sse, and argparse defaults to stdio (:570-611). text_mem_type defaults to tree_text (:110), and get_default takes openai_api_key as a required parameter (default_config.py:274-275). memos_mcp.md:21 says Neo4j is required for tree_text. The only mcpServers example in the repo is the Cursor one at memos_mcp.md:87-110, plus its cn translation. tests/api/test_mcp_serve.py exists. A case-insensitive 'mcp' grep over apps/memos-local-plugin returns only the comment at openclaw-bridge.test.ts:1871."
+        },
+        {
+          "field": "claim_checks[4]",
+          "statement": "'Local plugin is 100% on-device; nothing leaves your machine' (README.md:275), rated partial: storage is local SQLite, but telemetry defaults on, published tarballs embed an endpoint, optional LLM/embedding providers receive memory text, the default embedder downloads a model on first run, and the root README never mentions telemetry",
+          "citation": "README.md:275; apps/memos-local-plugin/core/storage/connection.ts:46-50; apps/memos-local-plugin/templates/config.openclaw.yaml:43-44; apps/memos-local-plugin/core/telemetry/sender.ts:100; apps/memos-local-plugin/package.json:23; .github/workflows/memos-local-plugin-publish.yml:506-512; apps/memos-local-plugin/ARCHITECTURE.md:119-121; apps/memos-local-plugin/core/embedding/providers/local.ts:4",
+          "holds": true,
+          "note": "Every part is confirmed, and 'partial' is the right rating. README.md:275 says 'nothing leaves your machine', and a grep finds no telemetry, analytics or ARMS mention anywhere in README.md. config.openclaw.yaml:43-44 sets telemetry.enabled: true, and sender.ts:100 turns telemetry on unless enabled === false. package.json:23 includes telemetry.credentials.json in the published files. On real publishes, publish.yml:506-512 runs generate-telemetry-credentials.cjs with the ARMS secrets, and that script writes the file to the package root (:29-30). No such file exists in the tree. ARCHITECTURE.md:120-121 lists the cloud embedding and LLM providers, so 'they receive memory text' is a fair inference, though the doc does not say it in those words. local.ts:4 says the model is '~23 MB on first run'. One small citation note: connection.ts:46-50 are the SQLite pragmas; the database file is opened at :37-40."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

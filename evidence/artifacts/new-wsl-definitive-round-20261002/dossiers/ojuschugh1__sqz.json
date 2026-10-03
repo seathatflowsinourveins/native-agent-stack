@@ -1,0 +1,351 @@
+{
+  "contender": "ojuschugh1/sqz",
+  "revision": {
+    "contender": "ojuschugh1/sqz",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "ojuschugh1/sqz",
+        "tag": "v1.9.0",
+        "commit": "726e77bd7e9d6ae7529e2750da69d86e622ca699",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v1.9.0",
+    "commit": "726e77bd7e9d6ae7529e2750da69d86e622ca699",
+    "read_at": "2026-10-02T03:02:28+00:00"
+  },
+  "dossier": {
+    "contender": "ojuschugh1/sqz",
+    "revision": {
+      "tag": "v1.9.0",
+      "commit": "726e77bd7e9d6ae7529e2750da69d86e622ca699",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "Elastic-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "sqz (Cargo workspace: sqz-cli, sqz-engine, sqz-mcp, sqz-wasm; v1.9.0) is a deterministic, no-LLM Rust tool that shrinks tool output before it enters an AI coding agent's context. It has three surfaces: (1) a `sqz` CLI plus agent hooks that rewrite simple Bash commands to pipe through `sqz compress` (per-command formatters, SHA-256 dedup refs, ranged-slice refs, near-duplicate deltas); (2) an MCP server `sqz-mcp` (compress, passthrough, expand, sqz_recall, sqz_read_file, sqz_grep, sqz_list_dir); (3) an MCP proxy that wraps other stdio MCP servers. A local SQLite file (~/.sqz/sessions.db) stores dedup entries, raw originals (recoverable via `sqz expand`, MCP expand, `sqz recall`), compression stats and regret signals. For the stated needs: sqz measures artifact (tool-output) token reductions with its own counters (bytes/4 on hook/dedup paths, tiktoken cl100k/o200k on pipeline paths) and models billed cost with a parametric calculator. Answer to the single-tool question (provider usage from Claude Code/Codex local logs: input, output, cache-creation, cache-read tokens): NONE. Nothing in the repo reads provider usage fields or Codex logs; the only transcript reader, `sqz discover --replay`, parses Claude Code/Kiro JSONL for tool_result text and prints counterfactual estimates (sqz/src/replay.rs:1-35,96-141,245-257).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Positioning: pre-injection context compression and session deduplication for AI coding agents; compresses tool output before it enters the context window, and anything the model already has comes back as a short reference.",
+          "citation": "README.md:13,55-57"
+        },
+        {
+          "claim": "Source code, stack traces and secrets pass through untouched (0% by construction); stack traces, error messages and secrets are routed to safe mode (described as detected by entropy analysis).",
+          "citation": "README.md:57,91,295-297,536"
+        },
+        {
+          "claim": "Single Rust binary, deterministic, no LLM calls, works offline; every compressed result can be recovered byte-exact with `sqz expand`.",
+          "citation": "README.md:81"
+        },
+        {
+          "claim": "Headline stats: 24.7% average reduction across 3,003 real compressions (178,442 tokens saved; 721,840 in / 543,398 out), 13-token refs for repeats, 100% of agent-critical facts kept in the quality benchmark.",
+          "citation": "README.md:18-24,86-91,433-450"
+        },
+        {
+          "claim": "Per-command compression measured via `cargo test -p sqz-engine benchmarks`: repeated logs 58%, large JSON array 45%, JSON API 17%, git diff 12%, prose 2%, stack trace (safe mode) 0%.",
+          "citation": "README.md:111-122"
+        },
+        {
+          "claim": "Session-level dedup measured with the release binary against a throwaway DB: unchanged git status 155->13 tokens (92%), lines 41-80 of a 200-line file 305->16 (95%), same cargo test output 303->13 (96%).",
+          "citation": "README.md:124-132"
+        },
+        {
+          "claim": "A third party counted 92 of their own Claude Code sessions: identical whole-file re-reads in 1 of 542 reads, line-range re-reads in 8.4%; sqz therefore leads with unchanged command output, ranged refs and post-edit deltas rather than whole-file repeats.",
+          "citation": "README.md:134"
+        },
+        {
+          "claim": "`sqz discover --replay` replays Claude Code and Kiro transcripts already on disk (~/.claude/projects, ~/.kiro/sessions/cli) through the sqz engine for a counterfactual, local-only estimate; each session replays against a throwaway cache.",
+          "citation": "README.md:192-221"
+        },
+        {
+          "claim": "Honest accounting: token reduction is not billed-cost reduction; `sqz stats --cost` estimates dollars under a prompt-cached billing model (cache write x1.25 once, cache read x0.10 per later turn) with every assumption printed and overridable; `sqz stats` also reports regret signals (quick re-runs, ref expands).",
+          "citation": "README.md:471-489"
+        },
+        {
+          "claim": "Design avoids invalidating provider prompt caches: deterministic and query-agnostic, only new tool output is touched (history never rewritten), piped or redirected commands are never intercepted, a 16-token net-win gate skips compressions that would not pay for their markers.",
+          "citation": "README.md:491-495"
+        },
+        {
+          "claim": "Claude Code integration is a transparent PreToolUse hook via `sqz init`; Codex CLI integration is AGENTS.md guidance plus an MCP server; `sqz init` wires hooks, MCP server and agent guidance for every client it finds.",
+          "citation": "README.md:61,299-312"
+        },
+        {
+          "claim": "`sqz-mcp proxy` wraps any stdio MCP server, compresses its tool results (dedup refs on repeats, safe mode, error results untouched), compacts tools/list descriptions (`--lazy-tools`), and injects `sqz_expand` / `sqz_tool_help` so originals stay recoverable.",
+          "citation": "README.md:320-349"
+        },
+        {
+          "claim": "Refs are served only while the original is still in context (30-minute window, tunable via SQZ_REF_TTL_SECS, reset on compaction); escape hatches are `sqz expand`, `--no-cache` / SQZ_NO_DEDUP=1, and the MCP passthrough tool.",
+          "citation": "README.md:386-409,534"
+        },
+        {
+          "claim": "Everything that flows through sqz is indexed locally (SQLite FTS5) for `sqz recall` / `sqz_recall`; stats live in ~/.sqz/sessions.db; zero telemetry, no data transmitted, no crash reports, fully offline.",
+          "citation": "README.md:411-424,509,576-580"
+        }
+      ],
+      "install": [
+        {
+          "method": "Prebuilt binaries (macOS/Linux)",
+          "command": "curl -fsSL https://raw.githubusercontent.com/ojuschugh1/sqz/main/install.sh | sh",
+          "citation": "README.md:141-142"
+        },
+        {
+          "method": "npm (postinstall downloads the release binary)",
+          "command": "npm install -g sqz-cli",
+          "citation": "README.md:147-148"
+        },
+        {
+          "method": "Homebrew tap (macOS/Linux)",
+          "command": "brew tap ojuschugh1/sqz; brew install sqz   (one-liner shown elsewhere: brew install ojuschugh1/sqz/sqz)",
+          "citation": "README.md:60,150-152"
+        },
+        {
+          "method": "Cargo build from source (needs a C toolchain; provides sqz and sqz-mcp)",
+          "command": "cargo install sqz-cli sqz-mcp",
+          "citation": "README.md:157-167"
+        },
+        {
+          "method": "pipx (PyPI launcher; in this repo it pins binary v0.1.0, see claim_checks)",
+          "command": "pipx install sqz",
+          "citation": "README.md:60"
+        },
+        {
+          "method": "Post-install wiring step (not an installer): writes hooks/MCP/guidance, globally or per project",
+          "command": "sqz init --global   (or: sqz init)",
+          "citation": "README.md:171-175"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - release.yml builds x86_64-unknown-linux-musl (.github/workflows/release.yml:46-49); install.sh maps Linux x86_64 to it (install.sh:33); CI test matrix includes ubuntu-latest (.github/workflows/benchmarks.yml:17).",
+        "wsl2": "unknown - no README/docs/code mention of WSL (grep for WSL/wsl2 found nothing); a Linux binary exists but WSL2 support is neither documented nor tested.",
+        "macos_arm64": "yes - release.yml builds aarch64-apple-darwin (release.yml:61-64); install.sh maps arm64 Darwin to it (install.sh:44-45); CI includes macos-latest (benchmarks.yml:17).",
+        "gpu": "no - no GPU use or requirement; CPU-only Rust with BPE tokenizer, TF-IDF/Jaccard tool selection and SQLite; no ML runtime in any manifest (sqz_engine/Cargo.toml:14-34; sqz_engine/src/tool_selector.rs:34-67)."
+      },
+      "integrations": {
+        "cli": "yes - `sqz` binary (clap): init, doctor, compress, expand, recall, stats [--cost --json --breakdown --share], gain, discover [--replay], resume, hook <tool>, compact, reset, pin, tee, dashboard, vizit, proxy, export/import, status, cost, analyze, uninstall (README.md:351-384; sqz/src/main.rs:41-434).",
+        "mcp": "yes - `sqz-mcp` over stdio (default) or SSE; tools compress, passthrough, expand, sqz_recall, sqz_read_file, sqz_grep, sqz_list_dir (sqz-mcp/src/lib.rs:13-23,1066-1371); handles only initialize, tools/list, tools/call; protocolVersion 2024-11-05 (lib.rs:958-1043). `sqz-mcp proxy -- <cmd>` wraps other stdio MCP servers and injects sqz_expand / sqz_tool_help (sqz-mcp/src/proxy.rs:1-22,31-32; README.md:320-349).",
+        "sdk_or_api": "No hosted API or accounts. Rust library crate `sqz-engine` (SqzEngine facade, sqz_engine/src/engine.rs; docs.rs/rustdoc built in docs.yml), `sqz-wasm` cdylib for the browser extensions (sqz-wasm/Cargo.toml:16-17), and loopback-only local servers: `sqz dashboard` HTTP/SSE on 127.0.0.1:3001 (main.rs:243; dashboard.rs:426), SSE MCP on 127.0.0.1:3000 (sqz-mcp/src/main.rs:55; lib.rs:885), `sqz proxy` on 127.0.0.1:8080 which returns the compressed body instead of forwarding (main.rs:251,1684,1791-1795). Python launcher (python/sqz/__main__.py) and npm wrapper only download/exec the binary.",
+        "claude_code_or_codex": "Claude Code: `sqz init [--global]` merges three hook entries - PreToolUse matcher `Bash|PowerShell` -> `sqz hook claude`, PreCompact -> `sqz hook precompact` (marks cached refs stale), SessionStart/compact -> `sqz resume` - into .claude/settings.local.json or ~/.claude/settings.json (sqz_engine/src/tool_hooks.rs:1497-1523), plus a CLAUDE.md guidance block and sqz-mcp registration in ~/.claude.json (tool_hooks.rs:1296-1371; sqz_engine/src/claude_md_integration.rs:1-72). Built-in Read/Grep/Glob are not intercepted (tool_hooks.rs:160-167). Codex: no hook; `sqz init --only codex` appends a fenced AGENTS.md block and merges [mcp_servers.sqz] into ~/.codex/config.toml (docs/integrations/level2/codex.md:3-29). Usage measurement: neither integration reads provider usage; the only log reader is `sqz discover --replay` (Claude Code + Kiro JSONL tool results only, no Codex logs) (sqz/src/replay.rs:245-257)."
+      },
+      "telemetry_and_network": "README and docs claim zero telemetry and fully offline operation (README.md:576-580; docs/mcp-context-compression.md:99; CONTRIBUTING.md:110). Code agrees: no HTTP-client crate in any Rust manifest (sqz/Cargo.toml:18-27; sqz_engine/Cargo.toml:14-34; sqz-mcp/Cargo.toml:21-31); no telemetry/analytics/crash-report code found by grep over *.rs; the only listeners bind 127.0.0.1 (dashboard.rs:426; sqz-mcp/src/lib.rs:885; main.rs:1684); the URL indexer's ContentFetcher trait has only a test mock (sqz_engine/src/url_indexer.rs:13-14,407-425). No account, API key or license key is required. Network is used only (a) at install time - install.sh, npm postinstall and the Python launcher download release archives from github.com without checksum verification (install.sh:93-102; npm/install.js:166-194,228-236; python/sqz/__main__.py:55-61); (b) by the opt-in `sqz init --ci` Copilot-cloud hook, which runs `curl -fsSL .../main/install.sh | sh` at session start (tool_hooks.rs:875-898); (c) by `sqz-mcp proxy`, which spawns the user-chosen upstream MCP server whose own network use is out of scope (proxy.rs:382-388). Local persistent data: ~/.sqz/sessions.db holds raw tool outputs, FTS index and stats; ~/.sqz is chmod 0700 on Unix and the code comment notes cached content may include sensitive output (sqz_engine/src/engine.rs:69-87); SQZ_DB_PATH relocates it per project (engine.rs:61-72)."
+    },
+    "code": {
+      "languages": [
+        "Rust (workspace of 4 crates; primary)",
+        "TypeScript (vscode-extension)",
+        "JavaScript (browser extensions, npm installer)",
+        "Kotlin (jetbrains-plugin)",
+        "Python (PyPI launcher only)",
+        "Shell/PowerShell (install.sh, install.ps1)"
+      ],
+      "entry_points": [
+        {
+          "path": "sqz/src/main.rs",
+          "what": "`sqz` CLI binary (crate sqz-cli, bin at sqz/Cargo.toml:14-16); clap Command enum at main.rs:41-434, main() at main.rs:480; no subcommand = stdin proxy loop (cli_proxy.rs:632)."
+        },
+        {
+          "path": "sqz-mcp/src/main.rs",
+          "what": "`sqz-mcp` binary: MCP server over stdio or SSE (--transport, --port, --preset-dir) and `proxy [--no-desc --no-cache --lazy-tools] -- <upstream>` subcommand."
+        },
+        {
+          "path": "sqz_engine/src/lib.rs",
+          "what": "`sqz-engine` library crate; SqzEngine facade in engine.rs (with_preset_and_store, compress, compress_with_cache[_lossless])."
+        },
+        {
+          "path": "sqz_engine/src/tool_hooks.rs",
+          "what": "process_hook / process_hook_{cursor,gemini,windsurf,kiro,copilot} (invoked by `sqz hook <tool>`) and install_tool_hooks_scoped_filtered (invoked by `sqz init`)."
+        },
+        {
+          "path": "sqz/src/cli_proxy.rs",
+          "what": "CliProxy::intercept_output_with_options: the `sqz compress` stdin/hook path (dedup -> slice ref -> per-command formatter -> generic pipeline, 16-token net-win gate)."
+        },
+        {
+          "path": "sqz-wasm/src/lib.rs",
+          "what": "wasm-bindgen cdylib used by extension/ and extension-firefox/ (browser extensions)."
+        },
+        {
+          "path": "npm/install.js",
+          "what": "npm postinstall: downloads sqz and sqz-mcp release archives for the platform from GitHub Releases."
+        },
+        {
+          "path": "python/sqz/__main__.py",
+          "what": "PyPI launcher: downloads a release binary on first run and execs it (VERSION hard-coded to 0.1.0 at line 17)."
+        }
+      ],
+      "architecture": "Cargo workspace (Cargo.toml:1-8). sqz_engine/ (~100 source files): engine.rs facade; pipeline.rs + stages.rs compression stages; cmd_formatters/ per-command formatters (dispatch table at mod.rs:44-101, ~50 command names incl. aliases); confidence_router.rs (Safe/Default/Aggressive routing via substring risk patterns and entropy); verifier.rs; cache_manager.rs (SHA-256 dedup, ranged-slice refs, MinHash-LSH near-duplicate deltas, expand_ref, compaction-aware ref freshness, 30-minute TTL); session_store.rs (SQLite WAL + FTS5: sessions, cache_entries with raw `original` BLOB, compression_log, regret_log, recall_index); token_counter.rs (tiktoken-rs); cost_calculator.rs (parametric $ model); tool_hooks.rs, claude_md_integration.rs, codex_integration.rs, kiro_integration.rs, zed_integration.rs, opencode_plugin.rs (config writers and hook JSON rewriters); api_proxy.rs (request-body compressor); dashboard.rs (loopback HTTP/SSE). Library modules with no caller in the shipped binaries: tee_mode.rs (CLI only lists/gets), sandbox_executor.rs, url_indexer.rs, plugin_api.rs (native load is a stub). sqz/ (bin): main.rs, cli_proxy.rs, shell_hook.rs (rc-file helper functions), doctor.rs, replay.rs, vizit.rs. sqz-mcp/: lib.rs JSON-RPC server, proxy.rs stdio wrapper. sqz-wasm/: browser build. Companion clients that shell out to `sqz`: vscode-extension/ (v0.6.0), jetbrains-plugin/, extension/ and extension-firefox/ (WASM). Also npm/, python/, docs/ (mdBook, whitepaper, arXiv source).",
+      "packaging_and_release": "release.yml triggers on v*.*.* tags: matrix builds `sqz` and `sqz-mcp` for x86_64/aarch64 linux-musl, x86_64/aarch64 apple-darwin and x86_64 windows-msvc (Linux via `cross` installed from git HEAD, release.yml:82-84), packages one flat tar.gz/zip per binary named sqz[-mcp]-<tag>-<target>, uploads with softprops/action-gh-release@v2 (release.yml:164-185), publishes npm `sqz-cli` (release.yml:188-219) and dispatches to the homebrew-sqz tap repo (release.yml:233-278). publish.yml (on release published or manual) publishes npm (skips if version exists) and PyPI via twine (publish.yml:14-72), so npm can be published by two workflows. No crates.io publish step in any workflow (grep found no `cargo publish`). No checksums, signatures, SBOM or provenance attestations anywhere in .github (grep for sha256/checksum/cosign/attest/provenance: no matches). Cargo.lock is gitignored (.gitignore:4); release profile strip + LTO + codegen-units=1 (Cargo.toml:12-16); static-CRT flags in .cargo/config.toml. Docker: Dockerfile and distribution/docker/Dockerfile exist, not in the README install list; distribution/README.md:61-62 says the image is unverified. Docs site built by docs.yml (mdBook + cargo doc) to GitHub Pages.",
+      "tests_and_ci": "Rust tests are mostly inline #[cfg(test)]: grep counts 1,471 `#[test]` functions across 106 .rs files plus 75 `proptest!` blocks in 46 files; proptest-regressions are checked in. Dedicated test files: sqz/tests/integration.rs (31 tests, runs the built binary), sqz/tests/quality_bench.rs (1 test over 13 fixtures with regression gates), sqz/src/tests.rs (19); there is no sqz_engine/tests/ directory. Non-Rust: extension/tests/content.test.js, vscode-extension/src/test/ (mocha via @vscode/test-electron), jetbrains-plugin/src/test/kotlin/com/sqz/SqzBridgeTest.kt (none of these run in CI). Workflows: benchmarks.yml (push/PR to main; ubuntu/macos/windows x Rust stable and 1.85; runs `cargo test -p sqz-engine benchmarks` then `cargo test --workspace --exclude sqz-wasm`, so sqz-wasm tests are excluded); docs.yml (mdBook + cargo doc deploy on push to main); release.yml; publish.yml. No clippy, rustfmt, cargo-audit or cargo-deny step in any workflow.",
+      "dependencies": "Rust manifests (direct deps): sqz/Cargo.toml 9 (+2 dev: proptest, tempfile) - sqz-engine, serde, serde_json, thiserror, clap 4, chrono, libc, rusqlite 0.31 (bundled), dirs-next; sqz_engine/Cargo.toml 17 (+1 dev) - serde, serde_json, thiserror, rusqlite (bundled, vtab, array), toml, toml_edit, sha2, chrono, tree-sitter 0.22 + rust/python/javascript/bash grammars, notify 6, tempfile, tiktoken-rs 0.6, dirs-next; sqz-mcp/Cargo.toml 6 (+2 dev) - sqz-engine, serde, serde_json, thiserror, notify, regex; sqz-wasm/Cargo.toml 3 (+1 dev) - wasm-bindgen, serde, serde_json; root Cargo.toml [workspace.dependencies] 8 entries. No committed Cargo.lock (gitignored). bundled SQLite and tree-sitter need a C compiler (README.md:163-167). Non-Rust: npm/package.json 0 dependencies (postinstall script); pyproject.toml 0 runtime dependencies; vscode-extension/package.json 0 runtime + 9 devDependencies; jetbrains-plugin/build.gradle.kts not inspected.",
+      "security_policy": "none - no SECURITY.md or equivalent (glob for SECURITY* found nothing; grep for security/vulnerab/disclos in README.md, CONTRIBUTING.md, CLA.md, docs/README.md returned no matches)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Every compressed result can be recovered byte-exact with `sqz expand` (README.md:81).",
+        "verified": "partial",
+        "evidence": "Hook/stdin path stores raw bytes for every non-Safe output (sqz/src/cli_proxy.rs:285-318; sqz_engine/src/cache_manager.rs:424-426,447-448) and CLI `expand` writes them raw (sqz/src/main.rs:1363-1373; cache_manager.rs:657-677); round trip is tested for the dedup path (sqz/tests/quality_bench.rs:116-128). Gaps: entries predating the original-capture migration return only the compressed form (cache_manager.rs:670-676); MCP `expand` and proxy `sqz_expand` convert bytes with from_utf8_lossy (sqz-mcp/src/lib.rs:443-451; sqz-mcp/src/proxy.rs:328-331), so only UTF-8 content is exact there; formatter-compressed output carries no hash for the agent (cli_proxy.rs:281-296; a hash is appended only on truncation spill, cli_proxy.rs:365-368), so recovery then needs `sqz recall`; Safe-routed content is never cached (cli_proxy.rs:285-292)."
+      },
+      {
+        "claim": "Source code, stack traces and secrets pass through untouched; safe mode is 0% compression and detects secrets by entropy analysis (README.md:57,91,536).",
+        "verified": "partial",
+        "evidence": "Source-code detection skips line-dropping stages (sqz_engine/src/pipeline.rs:155; cli_proxy.rs:339). Safe mode still runs ANSI strip plus `condense`, folding repeated lines to max 3 (sqz_engine/src/engine.rs:339-361). Risk routing is a substring list evaluated only for content of 100+ bytes; entropy only selects Aggressive (sqz_engine/src/confidence_router.rs:55-81,89-148), so the README's entropy wording differs from the code. On the hook path a per-command formatter can answer before any Safe handling (cli_proxy.rs:281-296). The MCP server's compress/read tools never call the router (engine.rs:260-288; no routing call in sqz-mcp/src/lib.rs) while the MCP proxy does (proxy.rs:251). Docs say secrets are never written to the cache (docs/mcp-context-compression.md:98): true for the hook path and proxy, not for MCP server tools (cache_manager.rs:447-448)."
+      },
+      {
+        "claim": "Zero telemetry, fully offline, no LLM calls (README.md:81,576-580).",
+        "verified": "yes",
+        "evidence": "No HTTP-client crate in any Rust manifest (sqz/Cargo.toml:18-27; sqz_engine/Cargo.toml:14-34; sqz-mcp/Cargo.toml:21-31); no telemetry/analytics/crash-report code (grep over *.rs); listeners bind 127.0.0.1 only (dashboard.rs:426; sqz-mcp/src/lib.rs:885; sqz/src/main.rs:1684); ContentFetcher has only a test mock (url_indexer.rs:13-14,407-425). Network use is install-time downloads and the opt-in `--ci` hook (tool_hooks.rs:875-898)."
+      },
+      {
+        "claim": "24.7% average reduction and 178,442 tokens saved across 3,003 real compressions (README.md:86-109).",
+        "verified": "not_checkable",
+        "evidence": "One developer's local database; not reproducible from the repo. Figures are internally consistent (721,840 - 543,398 = 178,442; 24.7%). Counting is mixed: bytes/4 on formatter and dedup/slice paths (sqz/src/cli_proxy.rs:282-283,447-449,461-471) and tiktoken on pipeline paths (sqz_engine/src/token_counter.rs:32-38; docs/whitepaper.md:182 admits mixed exact and approximate counts); dedup rows assume a fixed 13-token ref (cache_manager.rs:380; cli_proxy.rs:449). The `sqz gain` 'Total' line is all-time (sqz/src/main.rs:2864-2868,2955-2965), so the sample's daily bars (sum 180,043) need not equal the printed 178,442."
+      },
+      {
+        "claim": "sqz keeps token reduction separate from billed cost: `sqz stats --cost` models dollars under prompt caching with printed, overridable assumptions (README.md:471-489).",
+        "verified": "yes",
+        "evidence": "sqz_engine/src/cost_calculator.rs:229-286 (defaults $3.00/MTok, cache write x1.25, cache read x0.10, 10 re-read turns) and sqz/src/main.rs:286-310,2690-2713; it is a model over sqz's own saved-token count. No code reads provider usage: no references to input_tokens, output_tokens, cache_creation_input_tokens, cache_read_input_tokens, a `usage` JSON field, or Codex rollout/token_count logs anywhere in the repo (grep over rs/ts/js/kt/py/md/toml/json); `TokenUsage` (cost_calculator.rs:65-74) is constructed only in tests and SessionState.tool_usage is always empty in production (engine.rs:579). Answer to the single-tool question: none."
+      },
+      {
+        "claim": "`sqz discover --replay` replays Claude Code and Kiro transcripts for a local counterfactual estimate (README.md:192-221).",
+        "verified": "yes",
+        "evidence": "sqz/src/replay.rs:1-35,96-141,245-257,289-352: scans ~/.claude/projects/**/*.jsonl and ~/.kiro/sessions/cli, extracts only tool_use labels and tool_result text, re-compresses against a fresh temp DB, and prints sqz-counted tokens labelled 'estimates, not measurements' (replay.rs:404-411). It does not parse usage fields, does not read Codex logs, and does not measure provider usage."
+      },
+      {
+        "claim": "Claude Code gets a transparent PreToolUse hook, Codex gets AGENTS.md + MCP, and `sqz init` configures every client it finds (README.md:61,303,310).",
+        "verified": "partial",
+        "evidence": "Claude Code hook entries: tool_hooks.rs:1497-1523; plus CLAUDE.md block and ~/.claude.json MCP registration (tool_hooks.rs:1296-1371). The rewrite is skipped for commands containing & | ; < > $( or backticks and for interactive commands (tool_hooks.rs:1868-1897), and built-in Read/Grep/Glob are not intercepted (tool_hooks.rs:160-167). Codex: no hook, AGENTS.md block + [mcp_servers.sqz] (docs/integrations/level2/codex.md:3-29; tool_hooks.rs:324-327). `sqz init` writes configs for all supported tools unless --only/--skip is used - only Copilot CLI is gated on presence - rather than 'every client it finds' (sqz/src/main.rs:75-78,646-651,778-794); it also appends a shell-hook block to the rc file (shell_hook.rs:10-43; main.rs:1033-1045). docs/integrations/level2/claude-code.md:41-44 lists 'real-time token budget tracking', but the budget tracker has no non-test writer (sqz_engine/src/budget_tracker.rs:190; `sqz status` always reports 0 consumed, main.rs:1438-1468)."
+      },
+      {
+        "claim": "`sqz proxy --port 8080` is an API proxy that compresses full request payloads before forwarding (README.md:383; docs/integrations/level3/api-proxy.md:3-13).",
+        "verified": "no",
+        "evidence": "cmd_proxy compresses the body and returns it inside a JSON response; it never forwards upstream (sqz/src/main.rs:1791-1795). The subcommand help says '[Coming soon]' (main.rs:247) and accepts only --port (main.rs:249-253). `--upstream`, `--dry-run` and ~/.config/sqz/proxy.toml named in the docs have no code (grep). The code is authoritative; the docs' 'Implemented since v0.5.0' status is not borne out."
+      },
+      {
+        "claim": "Configuration is via ~/.sqz/presets/default.toml (README.md:540-558).",
+        "verified": "no",
+        "evidence": "The `sqz` CLI never loads it: SqzEngine::new() uses Preset::default() (sqz_engine/src/engine.rs:55-59). `sqz init` writes a file in a different schema ([meta], window_size) than the parser expects ([preset], default_window_size) (sqz/src/main.rs:3676-3699 vs sqz_engine/src/preset.rs:14-39). Only sqz-mcp reloads .toml files from --preset-dir (default '.') on file-change events (sqz-mcp/src/main.rs:44,70-75; lib.rs:810-852); `sqz init` registers sqz-mcp without --preset-dir."
+      },
+      {
+        "claim": "`pipx install sqz` installs the tool (README.md:60).",
+        "verified": "partial",
+        "evidence": "The PyPI package is built from this tree (publish.yml:45-69) but its launcher downloads `sqz-v0.1.0-<target>.tar.gz` regardless of package version (python/sqz/__main__.py:17,55-61) and publish.yml only rewrites pyproject.toml's version (publish.yml:59-63). The launcher extracts a root-level `sqz` member, which npm/install.js:85-87 and install.sh:129-137 describe as absent in <=v0.9.0 archives. Contents actually on PyPI were not inspected."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Real-usage totals from one developer's week (self-reported `sqz gain`/`sqz stats` output)",
+        "metric": "compressions; tokens in/out/saved; average reduction",
+        "value": "3,003 compressions; 721,840 in -> 543,398 out; 178,442 saved; 24.7% average; 92% peak on dedup hits",
+        "source": "README.md:86-109,433-450; docs/whitepaper.md:133-142",
+        "independent": false
+      },
+      {
+        "what": "Per-command fixture compression via `cargo test -p sqz-engine benchmarks`",
+        "metric": "tokens before -> after (chars/4)",
+        "value": "repeated logs 148->62 (58%); large JSON array 259->142 (45%); JSON API 64->53 (17%); git diff 61->54 (12%); prose 124->121 (2%); stack trace 82->82 (0%)",
+        "source": "README.md:111-122",
+        "independent": false
+      },
+      {
+        "what": "Session-level dedup repeats measured with the release binary against a throwaway DB",
+        "metric": "tokens without -> with sqz",
+        "value": "unchanged git status 155->13 (92%); lines 41-80 of a 200-line file 305->16 (95%); same cargo test output 303->13 (96%)",
+        "source": "README.md:124-132",
+        "independent": false
+      },
+      {
+        "what": "Quality benchmark: 13 realistic command-output fixtures through the real binary (sqz 1.7.0), scoring token reduction, critical-fact recall, verbatim preservation and byte-exact recovery; gated as a regression test",
+        "metric": "aggregate tokens in -> out (bytes/4, header counted) and facts kept",
+        "value": "3,115 -> 1,387 tokens (55.5% reduction); 76/76 facts kept; 0.0% on git diff, source read, traceback and dotenv fixtures",
+        "source": "docs/quality-benchmark.md:29-48; sqz/tests/quality_bench.rs",
+        "independent": false
+      },
+      {
+        "what": "Formatter fixture benchmark (document stamped sqz 1.2.0, May 2026, so stale vs 1.9.0)",
+        "metric": "tokens in -> out (chars/4); aggregate under chars/4 vs real cl100k BPE",
+        "value": "npm install 1,186->13 (99%); cargo test 171->8 (95%); cargo build 233->23 (90%); grep 1,373->238 (83%); terraform plan 121->25 (79%); cargo clippy 163->70 (57%); git status 102->56 (45%); aggregate 87.2% (chars/4) vs 88.9% (cl100k)",
+        "source": "BENCHMARKS.md:7-15,147-155",
+        "independent": false
+      },
+      {
+        "what": "Scripted 30-minute session scenarios (file reads, test cycles, git, JSON API, build errors, misc); scenario inputs are fixed round-number token counts in sqz_engine/src/benchmarks.rs",
+        "metric": "raw tokens -> sqz tokens",
+        "value": "41,900 -> 6,469 (85% saved); file reads 7,500->948; test cycles 10,000->875; git 2,400->433; JSON API 8,000->1,213; build errors 9,000->1,950",
+        "source": "docs/benchmark.md:95-104,152",
+        "independent": false
+      },
+      {
+        "what": "Third-party measurement cited by the project: a user's count of 92 Claude Code sessions (14 days, 11,149 tool results over 200 chars); the published gist script was not opened for this dossier",
+        "metric": "share of repeated tool results",
+        "value": "81 of 11,149 results byte-identical (about 0.3% of result characters); 1 in 542 file reads an identical repeat; 8.4% of file reads a line range of an earlier full read (CHANGELOG says 8.5%)",
+        "source": "README.md:134; docs/stop-rereading-files.md:11; CHANGELOG.md:63-69",
+        "independent": true
+      },
+      {
+        "what": "Whitepaper latency and prompt-cache statements (no method or data in the repo)",
+        "metric": "p99 latency; prompt-cache hit rate",
+        "value": "p99 < 5 ms for outputs up to 100 KB, ~0.1 ms SQLite dedup lookup; prompt-cache hit rates 'remain at baseline (90%+)' with sqz",
+        "source": "docs/whitepaper.md:156-162",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Measurement scope: sqz has no provider-usage ingestion (no input/output/cache-creation/cache-read token parsing, no Codex log reader). Its savings are self-computed estimates - bytes/4 on formatter and dedup paths (sqz/src/cli_proxy.rs:282-283,447-449), cl100k as a ~5% approximation for Claude (sqz_engine/src/token_counter.rs:7-9), mixed counts admitted in docs/whitepaper.md:182 - and `sqz stats --cost` is a parametric model (cost_calculator.rs:229-286). The budget tracker behind `sqz status` has no non-test writer, so it reports 0 consumed (sqz_engine/src/budget_tracker.rs:190; sqz/src/main.rs:1438-1468). Earlier token-accounting mismatches were fixed in 1.8.0 (CHANGELOG.md:86-89; docs/quality-benchmark.md:54). No agent task-success evaluation exists (docs/quality-benchmark.md:71; docs/whitepaper.md:187).",
+      "Coverage limits: interception covers only Bash/PowerShell tool calls whose command has no & | ; < > $( or backtick (sqz_engine/src/tool_hooks.rs:1497-1523,1868-1881); Claude Code's built-in Read/Grep/Glob bypass the hook and rely on CLAUDE.md guidance to steer the agent to sqz_read_file (tool_hooks.rs:160-167; docs/stop-rereading-files.md:59-70); Codex has no hook at all, only AGENTS.md guidance whose effect depends on model adherence (docs/integrations/level2/codex.md:3-6,46-48). Dedup refs are only valid while the original is still in context, enforced by a 30-minute TTL heuristic plus a PreCompact marker (sqz_engine/src/cache_manager.rs:284-315).",
+      "Stored data and secrets: raw tool outputs are persisted unencrypted in ~/.sqz/sessions.db (directory 0700 only) and full-text indexed up to 256 KiB each (sqz_engine/src/session_store.rs:81-97,511-535; engine.rs:69-87). Secret/stack-trace gating is a short substring list applied only to content of 100+ bytes (confidence_router.rs:55,89-148), not entropy analysis as README.md:536 states; the hook path skips caching only for Safe-routed content (cli_proxy.rs:285-318) and the MCP server tools cache without any Safe check (cache_manager.rs:447-448; no routing call in sqz-mcp/src/lib.rs), contradicting docs/mcp-context-compression.md:98. CacheManager::evict_lru has only test callers, so the 512 MiB cap (engine.rs:182) is not enforced; `sqz reset` is the only clearing path (sqz/src/main.rs:3228-3302).",
+      "Recoverable originals can be lost: SessionStore::open_or_create deletes and recreates the DB file on any open/schema error, printing 'Prior session data has been lost' (sqz_engine/src/session_store.rs:252-269); each engine instance opens the file three times (engine.rs:171-173) and every hook call is a fresh process; the repo sets no explicit SQLite busy timeout (grep). The raw originals needed by `expand`/`recall` live only in this file.",
+      "MCP server exposure: sqz_read_file, sqz_grep and sqz_list_dir accept any path with no restriction although the docstring describes a traversal guard (sqz-mcp/src/lib.rs:527-531 vs 563-572, 648-668, 701-749); the optional SSE transport binds 127.0.0.1 with no authentication and sends `Access-Control-Allow-Origin: *` on every response (lib.rs:885-933). The default transport is stdio; browser-origin reachability of the SSE port was not tested.",
+      "Distribution and supply chain: release assets ship with no checksums, signatures or provenance (no such steps in .github/workflows/release.yml); install.sh (fetched from the main branch) and the npm postinstall download and install binaries without verification (install.sh:93-102,165-172; npm/install.js:166-194), and install.sh's documented `--version X` form is not parsed (install.sh:8,22); Cargo.lock is gitignored (.gitignore:4) and Linux builds install `cross` from git HEAD (release.yml:82-84); `sqz init --ci` writes a hook that pipes install.sh from main into sh in Copilot cloud sessions (tool_hooks.rs:875-898). The PyPI launcher pins VERSION 0.1.0 (python/sqz/__main__.py:17) although README.md:60 advertises `pipx install sqz`; the root Dockerfile uses rust:1.82 and copies the gitignored Cargo.lock while CI notes MSRV 1.85 (Dockerfile:9,17; benchmarks.yml:18).",
+      "Docs/code drift and project maturity: `sqz proxy` does not forward upstream and is labelled '[Coming soon]' (sqz/src/main.rs:247,1791-1795) while docs/integrations/level3/api-proxy.md:3 calls it implemented with flags that do not exist; the documented preset file is not read by the CLI (engine.rs:55-59); README lists `vitest` among formatters but cmd_formatters has no vitest/jest entry (sqz_engine/src/cmd_formatters/mod.rs:44-101); SQZ tee mode has no producer (sqz/src/main.rs:1546-1581). First release 2026-04-11, 28 changelog entries through 2026-09-23 including three in two days (CHANGELOG.md:8,59,98,870); the VS Code extension is at 0.6.0 versus workspace 1.9.0 (vscode-extension/package.json:5). The checkout is a single-commit shallow clone, so history and contributor breadth were not assessed.",
+      "Licensing and process: Elastic License 2.0 is source-available and not OSI-approved (distribution/README.md:79-81) and bars offering the software as a hosted or managed service (LICENSE:16-20); the CLA grants maintainers a right to relicense or dual-license contributions (CLA.md:35-40); package metadata is inconsistent (npm 'ELv2' at npm/package.json:25; PyPI 'Other/Proprietary' classifier at pyproject.toml:19; Cargo uses license-file). There is no security policy or disclosure process, and CI runs no clippy, fmt or audit steps (.github/workflows/benchmarks.yml)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "ojuschugh1/sqz",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Prebuilt binaries (macOS/Linux): curl -fsSL https://raw.githubusercontent.com/ojuschugh1/sqz/main/install.sh | sh",
+          "citation": "README.md:141-142",
+          "holds": true,
+          "note": "README.md:141 reads '# macOS / Linux' and :142 is the exact command, under 'Prebuilt binaries' (README.md:138). Cross-check: install.sh:92-93 downloads <bin>-<tag>-<target>.tar.gz from GitHub Releases, which matches the flat archives release.yml:109-113 packages (same naming, binary at archive root). sqz-mcp is optional and a failed download only warns (install.sh:186)."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX Elastic-2.0, file LICENSE",
+          "citation": "LICENSE:1-95",
+          "holds": true,
+          "note": "LICENSE:1 reads 'Elastic License 2.0 (ELv2)' and the body is the standard ELv2 text, including the hosted/managed-service limitation at LICENSE:18-20. Elastic-2.0 is the correct SPDX id."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - release.yml builds x86_64-unknown-linux-musl; install.sh maps Linux x86_64 to it; CI test matrix includes ubuntu-latest",
+          "citation": ".github/workflows/release.yml:46-49; install.sh:33; .github/workflows/benchmarks.yml:17",
+          "holds": true,
+          "note": "release.yml:47-49 adds target x86_64-unknown-linux-musl on ubuntu-latest with cross. install.sh:33 maps Linux x86_64 to that target. benchmarks.yml:17 matrix includes ubuntu-latest, and :45 runs `cargo test --workspace --exclude sqz-wasm` there. The macos_arm64 claim also checks out (release.yml:61-64; install.sh:45; benchmarks.yml:17)."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Claude Code: sqz init [--global] merges three hooks (PreToolUse Bash|PowerShell -> sqz hook claude; PreCompact -> sqz hook precompact; SessionStart/compact -> sqz resume) into .claude/settings.local.json or ~/.claude/settings.json, plus a CLAUDE.md block and sqz-mcp registration in ~/.claude.json; built-in Read/Grep/Glob not intercepted. Codex: no hook; sqz init --only codex appends an AGENTS.md block and merges [mcp_servers.sqz] into ~/.codex/config.toml. Neither reads provider usage; the only log reader is sqz discover --replay (Claude Code + Kiro JSONL tool results, no Codex logs).",
+          "citation": "sqz_engine/src/tool_hooks.rs:1497-1523,1296-1371,160-167; sqz_engine/src/claude_md_integration.rs:1-72; docs/integrations/level2/codex.md:3-29; sqz/src/replay.rs:245-257",
+          "holds": true,
+          "note": "tool_hooks.rs:1497-1523 defines exactly the three entries. Precompact calls notify_compaction, which marks cached refs stale (sqz/src/main.rs:3558-3562). Target files are ~/.claude/settings.json or .claude/settings.local.json (tool_hooks.rs:1525-1527,452), and a fresh project file gets the same three hooks (tool_hooks.rs:450-459). tool_hooks.rs:1300-1371 installs the CLAUDE.md guidance and the MCP registration, and claude_md_integration.rs:57-72 resolves ~/.claude.json. tool_hooks.rs:160-171 intercepts shell tool names only. The code agrees with codex.md:3-29: no Codex hook (tool_hooks.rs:324-327), AGENTS.md plus install_codex_mcp_config (tool_hooks.rs:1171-1181), [mcp_servers.sqz] in $CODEX_HOME or ~/.codex/config.toml (codex_integration.rs:39-53,333-412), and --only codex is a real flag (sqz/src/main.rs:65-80). replay.rs:245-257 scans only ~/.claude/projects and ~/.kiro/sessions/cli, and the extractors keep only tool_use labels and tool_result text (replay.rs:96-197). No other rs/ts/js/kt/py file reads jsonl transcripts; the only other match is the --replay help text (main.rs:336-345)."
+        },
+        {
+          "field": "claim_checks[4]",
+          "statement": "sqz keeps token reduction separate from billed cost: `sqz stats --cost` models dollars under prompt caching with printed, overridable assumptions; no code reads provider usage (verified: yes)",
+          "citation": "README.md:471-489; sqz_engine/src/cost_calculator.rs:229-286,65-74; sqz/src/main.rs:286-310,2690-2713; sqz_engine/src/engine.rs:579",
+          "holds": true,
+          "note": "README.md:479-484 matches. Defaults are $3.00/MTok, x1.25, x0.10 and 10 turns (cost_calculator.rs:248-257), with the formula at :277-286. main.rs:286-310 has the --cost, --price-in, --cache-write-mult, --cache-read-mult and --reread-turns flags. main.rs:2690-2713 prints the estimate from cs.tokens_saved() along with the assumptions. Grepping rs/ts/js/kt/py/toml/json/md finds no input_tokens, output_tokens, cache_creation_input_tokens or cache_read_input_tokens, and no 'usage' field reads. Every TokenUsage construction is after the #[cfg(test)] at cost_calculator.rs:292. Weak citation (does not change the result): engine.rs:579 is inside engine.rs's test module (starts at :556). The point still holds: every `tool_usage: vec![]` site is test code, and nothing pushes to tool_usage (it is only read at cost_calculator.rs:178 and session_continuity.rs:215)."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

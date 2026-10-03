@@ -1,0 +1,308 @@
+{
+  "contender": "mlflow/mlflow",
+  "revision": {
+    "contender": "mlflow/mlflow",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "mlflow/mlflow",
+        "tag": "v3.16.1",
+        "commit": "32792afe5b0183fce10532d3a023f5cfa8612d09",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v3.16.1",
+    "commit": "32792afe5b0183fce10532d3a023f5cfa8612d09",
+    "read_at": "2026-10-02T03:02:44+00:00"
+  },
+  "dossier": {
+    "contender": "mlflow/mlflow",
+    "revision": {
+      "tag": "v3.16.1",
+      "commit": "32792afe5b0183fce10532d3a023f5cfa8612d09",
+      "read_at": "2026-10-02T03:02:44+00:00"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE.txt"
+    },
+    "purpose": "MLflow is an Apache-2.0 open-source platform (package maintainer of record: Databricks, pyproject.toml:74-76). At v3.16.1 it combines classic experiment tracking/model registry/serving, OpenTelemetry-based LLM and agent tracing, GenAI evaluation (mlflow.genai.evaluate with built-in, custom, LLM-judge and third-party scorers, evaluation datasets, judge alignment), a prompt registry with prompt optimization, an AI Gateway, an in-app Assistant that drives the Claude Code and Codex CLIs, and tracing/skill-install integrations for Claude Code, Codex, OpenCode and others. Shipped as Python packages mlflow, mlflow-skinny, mlflow-tracing plus TypeScript, Java and R clients. Facts for the three need-questions: (1) per-sample multi-scorer labeled-case evaluation = mlflow.genai.evaluate (mlflow/genai/evaluation/base.py:56); result_df keeps <scorer>/value|rationale|error_message per row (mlflow/genai/utils/trace_utils.py:990-1012). (2) Containerized verifier-graded end-to-end suites for the real Claude Code/Codex CLIs: none found; the only containerized CLI execution is the in-app Assistant sandbox (mlflow/server/sandbox/container.py:1-20; mlflow/assistant/providers/codex.py:360-372); searches for verifier/trial/harbor/terminal-bench/inspect-ai/swe-bench found nothing relevant. (3) Declarative CI regression gate: none found; the gate is programmatic (@mlflow.test + opt-in pytest plugin + assert result.passed: mlflow/pytest/plugin.py:1-18; docs/docs/genai/eval-monitor/regression-testing.mdx:181-206). Method note: static reading only; no shell was available so no tests or CLIs were run. The mlflow/assistant/skills git submodule is not checked out, so the skill text that 'mlflow agent setup' installs was not reviewed.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Described as 'The Open Source AI Engineering Platform for Agents, LLMs & Models' that lets teams debug, evaluate, monitor and optimize production AI applications.",
+          "citation": "README.md:6-9"
+        },
+        {
+          "claim": "Agent/LLM feature set: observability, evaluation, prompt management, prompt optimization and an AI Gateway.",
+          "citation": "README.md:13-14"
+        },
+        {
+          "claim": "Fastest start: 'uvx mlflow@latest agent setup' - 'installs the MLflow skills and launches your coding agent of choice to add tracing to your app.'",
+          "citation": "README.md:48-54"
+        },
+        {
+          "claim": "Three steps: 'uvx mlflow server'; mlflow.set_tracking_uri(...) + mlflow.openai.autolog(); run code; then 'Explore traces and metrics in the MLflow UI at http://localhost:5000'.",
+          "citation": "README.md:56-83"
+        },
+        {
+          "claim": "'Supports Python, TypeScript/JavaScript, Java and any other programming language. MLflow also natively integrates with OpenTelemetry and MCP.'",
+          "citation": "README.md:87"
+        },
+        {
+          "claim": "Observability is 'Built on OpenTelemetry, supporting any LLM provider and agent framework'; 'one-line automatic tracing for more than 60 frameworks'.",
+          "citation": "README.md:97, README.md:159"
+        },
+        {
+          "claim": "Evaluation: 'Run systematic evaluations, track quality metrics over time, and catch regressions before they reach production. Choose from 50+ built-in metrics and LLM judges, or define your own.'",
+          "citation": "README.md:110"
+        },
+        {
+          "claim": "Prompts & Optimization: 'Version, test, and deploy prompts with full lineage tracking'; automatic prompt optimization with 'state-of-the-art algorithms'.",
+          "citation": "README.md:125"
+        },
+        {
+          "claim": "AI Gateway: unified OpenAI-compatible API with rate limits, fallbacks, credential management, guardrails and traffic splitting.",
+          "citation": "README.md:138"
+        },
+        {
+          "claim": "Model Training section lists experiment tracking, 'Model Evaluation - Automated evaluation tools integrated with experiment tracking', model registry and deployment (Docker, Kubernetes, Azure ML, SageMaker).",
+          "citation": "README.md:148-153"
+        },
+        {
+          "claim": "'Tools & No-Code' integration tiles include Claude Code, Opencode and Goose (no Codex tile).",
+          "citation": "README.md:273-287"
+        },
+        {
+          "claim": "MLflow is 'vendor-neutral' and can be hosted locally, on-prem, on cloud platforms or managed services.",
+          "citation": "README.md:291"
+        },
+        {
+          "claim": "License badge points to LICENSE.txt.",
+          "citation": "README.md:21"
+        }
+      ],
+      "install": [
+        {
+          "method": "uvx (run tracking server from PyPI via uv)",
+          "command": "uvx mlflow server",
+          "citation": "README.md:59 (also docs/src/content/setup_server.mdx:15)"
+        },
+        {
+          "method": "uvx (coding-agent setup, labelled experimental in code)",
+          "command": "uvx mlflow@latest agent setup",
+          "citation": "README.md:51"
+        },
+        {
+          "method": "pip (Python 3.10+)",
+          "command": "pip install --upgrade mlflow   # then: mlflow server",
+          "citation": "docs/src/content/setup_server.mdx:26-33"
+        },
+        {
+          "method": "Docker Compose (PostgreSQL + MinIO) from a sparse clone",
+          "command": "git clone --depth 1 --filter=blob:none --sparse https://github.com/mlflow/mlflow.git && cd mlflow && git sparse-checkout set docker-compose && cd docker-compose && cp .env.dev.example .env && docker compose up -d",
+          "citation": "docs/src/content/setup_server.mdx:43-52"
+        },
+        {
+          "method": "Claude Code tracing plugin (requires the claude CLI)",
+          "command": "claude plugin marketplace add mlflow/mlflow --sparse .claude-plugin   &&   claude plugin install mlflow-tracing@mlflow-plugins",
+          "citation": "docs/docs/genai/tracing/integrations/listing/claude_code.mdx:50,64"
+        },
+        {
+          "method": "Codex CLI tracing (npm, Node 18+)",
+          "command": "npm install -g @mlflow/codex   # then: mlflow-codex setup",
+          "citation": "docs/docs/genai/tracing/integrations/listing/codex.mdx:29-42"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - default CI runs on ubuntu-latest (.github/workflows/master.yml:54,73; runner CPU architecture is not stated in the workflow); GHCR images are built for linux/amd64 and linux/arm64 (.github/workflows/push-images.yml:89,100). The README itself states no platform support.",
+        "wsl2": "unknown - no mention found (grep for WSL/wsl2 over the repo, excluding CHANGELOG.md, the UI bundle and docs/static, returned nothing). Native Windows is exercised only by the slow-tests workflow (.github/workflows/slow-tests.yml:94); waitress is the Windows server dependency (pyproject.toml:48,72).",
+        "macos_arm64": "unknown - no macOS job runs the test suites; macos-latest appears only in the Lint workflow (.github/workflows/lint.yml:36-42); dev/dev-env-setup.sh:15 says that dev-setup script 'will not work on Windows or MacOS M1 arm64 chipsets'; package metadata says 'OS Independent' (pyproject.toml:25).",
+        "gpu": "unknown - no GPU requirement or GPU CI found; CI installs CPU-only torch (.github/workflows/master.yml:39; pyproject.toml:265-266). The GenAI evaluation path uses remote LLM judges by default (mlflow/genai/judges/utils/__init__.py:35-41), so no local GPU is implied there."
+      },
+      "integrations": {
+        "cli": "yes - console script 'mlflow' = mlflow.cli:cli (pyproject.toml:132-133; python -m mlflow: mlflow/__main__.py:1-3). Groups registered in mlflow/cli/__init__.py:1350-1448: server/ui, run, experiments, runs, artifacts, db, deployments, models, gateway, traces (incl. 'mlflow traces evaluate --trace-ids ... --scorers ...', mlflow/cli/traces.py:811-881; it only prints results and has no pass/fail exit logic, mlflow/cli/eval.py:92-128), scorers, datasets, skills, ai-commands, mcp, 'autolog claude', assistant, agent ('agent setup'), crypto, doctor, demo. npm CLIs: mlflow-codex (libs/typescript/integrations/codex/package.json:36-38), mlflow-claude-code (libs/typescript/integrations/claude-code/package.json:34-36).",
+        "mcp": "yes, experimental - 'mlflow mcp run' (mlflow/mcp/cli.py:24-33) starts a FastMCP server (mlflow/mcp/server.py:211-255; mcp.run is called without a transport argument) exposing only CLI commands tagged @mlflow_mcp. Default MLFLOW_MCP_TOOLS=genai = traces (11 incl. evaluate_traces and delete_traces), scorers (2), experiments (7), runs (6) (mlflow/mcp/server.py:24-29; mlflow/cli/traces.py:169-812; mlflow/cli/scorers.py:107,211), plus AI-command prompts (server.py:161-181). Needs the mcp extra: pip install 'mlflow[mcp]>=3.5.1' (pyproject.toml:117; docs/docs/genai/mcp/index.mdx:40). Docs mark it experimental (index.mdx:11-14) and list tool names that differ from the code (index.mdx:124-135 vs mlflow/cli/traces.py:512,612,703,721,795). Separately the server hosts an MCP-server registry (mlflow/server/mcp_server_api.py; mlflow/genai/__init__.py:29-54).",
+        "sdk_or_api": "Python SDK (import mlflow; evaluation mlflow.genai.evaluate at mlflow/genai/evaluation/base.py:56; scorers mlflow/genai/scorers/base.py:303,1359; datasets mlflow/genai/datasets/__init__.py:173). HTTP: Flask REST handlers under /api/2.0/mlflow/... (mlflow/server/handlers.py; REST reference docs/api_reference/source/rest-api.rst) mounted under a FastAPI app with native routers for OTLP ingest /v1/traces (mlflow/server/otel_api.py:94; mlflow/tracing/utils/otlp.py:20), AI Gateway /gateway/{endpoint}/mlflow/invocations, jobs, assistant, artifacts (mlflow/server/fastapi_app.py:277-297); OpenAPI/Swagger pages are disabled (fastapi_app.py:263-266). Other clients: TypeScript tracing SDK @mlflow/core 0.4.0 plus integrations (libs/typescript; tracing only), Java client (mlflow/java/client/pom.xml:14), R package (mlflow/R/mlflow/DESCRIPTION).",
+        "claude_code_or_codex": "Claude Code: (a) tracing - 'mlflow autolog claude' runs 'claude plugin marketplace add mlflow/mlflow --scope local --sparse ...' then 'claude plugin install mlflow-tracing@mlflow-plugins' and writes MLFLOW_* env vars into .claude/settings.json (mlflow/claude_code/plugin.py:22-55; mlflow/claude_code/config.py:139-160); the plugin registers a Stop hook running 'node bundle/stop.cjs' (libs/typescript/integrations/claude-code/hooks/hooks.json:2-14) and its marketplace entry sources npm @mlflow/claude-code (.claude-plugin/marketplace.json:7-13); (b) 'mlflow agent setup --agent claude' installs skills into .claude/skills and launches 'claude <prompt>' (mlflow/agent/agents.py:30-36; mlflow/agent/setup/cli.py:278-292,307,363); (c) the in-app Assistant runs 'claude -p ... --output-format stream-json', optionally with --permission-mode bypassPermissions, on the host or in Docker (mlflow/assistant/providers/claude_code.py:530-548,710-757); (d) MCP and AI-Gateway routing docs (docs/docs/genai/mcp/index.mdx:88-93; docs/docs/genai/governance/ai-gateway/coding-agents/index.mdx:49-53); (e) on import mlflow under a detected coding agent, MLflow logs a pointer to the bundled tracing skill unless MLFLOW_DISABLE_AGENT_HINT=1 (mlflow/agent/hint.py:9,104-126). Codex: tracing through the separate npm package @mlflow/codex 0.4.0 ('mlflow-codex setup' writes a notify hook into .codex/config.toml: docs/docs/genai/tracing/integrations/listing/codex.mdx:35-65; libs/typescript/integrations/codex/package.json:3,36-38); 'mlflow agent setup --agent codex' (mlflow/agent/agents.py:37-42); Assistant provider running 'codex exec --json --sandbox danger-full-access' (mlflow/assistant/providers/codex.py:206-213,410-417). None of these is an evaluation or task-suite runner; unit tests mock the CLIs (tests/claude_code/test_plugin.py:34-35)."
+      },
+      "telemetry_and_network": "Telemetry is ON by default for open-source installs since 3.2.0 (docs/docs/community/usage-tracking.mdx:5,15); the README does not mention it. Code: import mlflow calls set_telemetry_client() (mlflow/__init__.py:450). It is disabled by MLFLOW_DISABLE_TELEMETRY or DO_NOT_TRACK=true, by CI/test env vars (CI, GITHUB_ACTIONS, PYTEST_CURRENT_TEST, ...), and for dev versions (mlflow/telemetry/utils.py:30-58,144-161). When active it GETs https://config.mlflow-telemetry.io/<version>.json with a 1 s timeout (mlflow/telemetry/constant.py:9; mlflow/telemetry/client.py:184-218); if that config is missing or disallows, the client stops (client.py:164-175; docs say blocking the domain disables telemetry, usage-tracking.mdx:432). Otherwise events are batched (500 records or 10 s, constant.py:4-5) and POSTed to the ingestion_url from that config (client.py:274-308); with a Databricks tracking URI they go to the workspace endpoint /api/2.0/mlflow/client-telemetry/ingest instead (client.py:279-282,312-342). Each event carries a session ID, a persistent installation ID stored in ~/.config/mlflow/telemetry.json (mlflow/telemetry/installation_id.py:33-41,64-70), SDK name/version, Python version, OS string, tracking-URI scheme and a coding_agent value auto-detected from env vars such as Claude Code or Codex (mlflow/telemetry/schemas.py:58-68,104-121; utils.py:94-135); params are enumerated/boolean (for example genai_evaluate records scorer class names, mlflow/telemetry/events.py:146-175) and MLFLOW_EXPERIMENT_ID is attached when set (mlflow/telemetry/track.py:66-67). coding_agent is not in the documented data table (usage-tracking.mdx:46-129). UI telemetry config comes from CloudFront URLs (constant.py:10-11; utils.py:188-207; mlflow/server/__init__.py:177-184). Other network/accounts: a local server needs no account (default store sqlite:///mlflow.db, 127.0.0.1:5000: mlflow/cli/__init__.py:372-381; mlflow/utils/cli_args.py:162-181). LLM-judge scorers default to openai:/gpt-4.1-mini (a Databricks model when the tracking URI is Databricks), so an external model API key and network are needed unless model= or MLFLOW_GENAI_JUDGE_DEFAULT_MODEL says otherwise (mlflow/genai/judges/utils/__init__.py:35-41); unsupported providers fall back to LiteLLM (mlflow/genai/judges/utils/invocation_utils.py:242-256). 'mlflow autolog claude' needs the claude CLI plus GitHub and npm access (mlflow/claude_code/plugin.py:22-55). The Assistant uses the user's Claude/Codex login and optionally Docker (mlflow/assistant/providers/base.py:17-32). mlflow/agent/setup/setup.sh downloads the Databricks CLI from GitHub for the Databricks backend (setup.sh:903-919)."
+    },
+    "code": {
+      "languages": [
+        "Python (mlflow/, tests/, dev/)",
+        "TypeScript/JavaScript (React UI in mlflow/server/js; tracing SDK in libs/typescript)",
+        "Java (mlflow/java)",
+        "R (mlflow/R/mlflow)",
+        "Protocol Buffers (mlflow/protos)",
+        "Shell (mlflow/agent/setup/setup.sh, dev/*.sh)",
+        "MDX/Markdown docs (docs/)",
+        "Rego (.github/policy.rego)",
+        "Helm chart (charts/)"
+      ],
+      "entry_points": [
+        {
+          "path": "pyproject.toml:132-133 -> mlflow/cli/__init__.py:94-106",
+          "what": "'mlflow' console script (mlflow.cli:cli, click group); 'python -m mlflow' via mlflow/__main__.py:1-3"
+        },
+        {
+          "path": "mlflow/cli/__init__.py:369 -> mlflow/server/__init__.py:342 (_run_server); mlflow/server/fastapi_app.py:307",
+          "what": "Tracking-server main ('mlflow server' / 'mlflow ui'): uvicorn serving a FastAPI app that wraps the Flask app (Flask app at server/__init__.py:71); gunicorn/waitress alternatives"
+        },
+        {
+          "path": "mlflow/genai/evaluation/base.py:56",
+          "what": "mlflow.genai.evaluate(data, scorers, predict_fn, model_id) -> harness.run (mlflow/genai/evaluation/harness.py:663) -> EvaluationResult (mlflow/genai/evaluation/entities.py:255)"
+        },
+        {
+          "path": "mlflow/pytest/plugin.py; mlflow/pytest/decorator.py:53",
+          "what": "Opt-in pytest plugin (-p mlflow.pytest.plugin) and @mlflow.test marker; one MLflow run per pytest session"
+        },
+        {
+          "path": "mlflow/mcp/cli.py:24-33",
+          "what": "'mlflow mcp run' MCP server (FastMCP)"
+        },
+        {
+          "path": "mlflow/agent/setup/cli.py:313-364",
+          "what": "'mlflow agent setup' (experimental): installs skills and launches claude/codex/opencode"
+        },
+        {
+          "path": "mlflow/claude_code/cli.py:57-200",
+          "what": "'mlflow autolog claude' Claude Code tracing setup"
+        },
+        {
+          "path": "libs/typescript/integrations/codex/package.json:36-38; libs/typescript/integrations/claude-code/package.json:34-36; libs/typescript/core/package.json:29-31",
+          "what": "npm bins mlflow-codex, mlflow-claude-code and mlflow-trace-daemon"
+        }
+      ],
+      "architecture": "Python package mlflow/ plus separate clients. Core: mlflow/tracking (fluent API + MlflowClient), mlflow/store (file/SQLAlchemy/REST tracking and registry stores, artifact repos, alembic migrations, workspace store), mlflow/entities, mlflow/protos. Server: mlflow/server - Flask app and REST handlers (__init__.py:71, handlers.py) mounted under a FastAPI app (fastapi_app.py:247-307) with native routers for OTLP trace ingest (otel_api.py), AI Gateway (gateway_api.py; providers in mlflow/gateway), jobs (job_api.py), Assistant (server/assistant), artifacts and an MCP-server registry; optional auth (server/auth), Docker sandbox (server/sandbox), React UI (server/js). Tracing: mlflow/tracing (OpenTelemetry-based) plus dozens of autolog integration packages (mlflow/openai, anthropic, langchain, dspy, ...). GenAI: mlflow/genai - evaluation/ (base.py entry -> harness.py predict-then-score thread-pool pipeline -> entities.py results), scorers/ (Scorer/@scorer in base.py, 24 built-ins in builtin_scorers.py, aggregation.py, adapters for DeepEval/RAGAS/TruLens/Phoenix/Guardrails/Google ADK), judges/ (make_judge, adapters, MemAlign/GEPA/SIMBA optimizers), datasets/, optimize/ (prompt optimization), simulators/, discovery/, labeling/, prompts, agent_tester.py. Classic ML: mlflow/models, pyfunc, 20+ flavor packages, deployments, sagemaker, projects. Coding-agent surfaces: mlflow/agent (setup, hints), mlflow/assistant (providers claude_code, codex, openai_compatible, ollama, mlflow_gateway; skill_installer.py over the assistant/skills submodule), mlflow/claude_code, mlflow/mcp, mlflow/ai_commands, mlflow/pytest. Usage tracking: mlflow/telemetry. Other: libs/typescript (core + integrations), mlflow/java, mlflow/R, libs/skinny, libs/tracing (packaging), docker/, docker-compose/, charts/, dev/ (build, lint, clint, flavors tooling).",
+      "packaging_and_release": "Python: three PyPI distributions built with setuptools - mlflow (pyproject.toml), mlflow-skinny (libs/skinny/pyproject.toml), mlflow-tracing (libs/tracing/pyproject.toml). dev/build.py builds types dev/skinny/tracing/release, initializes the skills submodule (dev/build.py:92-93), swaps in pyproject.release.toml for 'release' (dev/build.py:116-117; that file pins mlflow-skinny/mlflow-tracing==3.16.1, pyproject.release.toml:34-35) and checks UI assets are present or absent per package (dev/build.py:65-86). .github/workflows/build-wheel.yml builds dev/skinny/tracing wheels and sdists on push/PR (matrix excludes 'release', line 50), runs 'twine check --strict', test-installs from sdist/wheel/GitHub (lines 41-171) and uploads a wheel artifact only on manual dispatch with 7-day retention (lines 180-189). No workflow under .github/ publishes to PyPI, npm or Maven or produces checksums, signatures, SBOMs or attestations (searched for twine upload, pypi-publish, npm publish, attest, sigstore, cosign, provenance, sha256sum; only 'twine check' matched). Release tags come from dev/create_release_tag.py; TypeScript packages (@mlflow/core, @mlflow/codex, @mlflow/claude-code, all 0.4.0) are published manually with npm publish (libs/typescript/README.md:189-192). Docker: push-images.yml pushes ghcr.io/mlflow/mlflow (VERSION, -full, latest) and ghcr.io/mlflow/model-server on GitHub release publish, linux/amd64+arm64, no signing step (.github/workflows/push-images.yml:3-9,67-102,104-129). Java: parent pom configures Sonatype central publishing and a do-sign GPG profile (mlflow/java/pom.xml:175-187,263-291). Docs offer only user-side verification (pip hash-checking, upload-time filtering: docs/docs/self-hosting/security/secure-installs.md).",
+      "tests_and_ci": "Frameworks: pytest 9.1.1 with asyncio/benchmark/repeat/cov/timeout plugins (pyproject.toml:201-208); pytest-xdist and pytest-split flags in CI (.github/workflows/master.yml:111-127); strict markers, warnings-as-errors filters, 1200 s timeout (pyproject.toml:549-581). Jest for the UI (craco: mlflow/server/js/package.json:8-10) and TS SDK (libs/typescript/core/package.json:34); Maven+TestNG for Java (mlflow/java/client/pom.xml:53-57); testthat for R (mlflow/R/mlflow/tests/testthat). Approximate test files: 800 Python tests/**/test_*.py (121 under tests/genai, 11 of them in tests/genai/evaluate; tests/pytest/test_plugin.py; 5 in tests/claude_code, 13 in tests/assistant, 6 in tests/agent, 8 in tests/cli), about 728 UI *.test.ts(x) under mlflow/server/js/src, 57 TS-SDK *.test.ts, 14 Java test files, 17 R test files, plus 7 under .claude/skills/tests. CI: 65 workflow YAMLs in .github/workflows. master.yml 'MLflow tests' runs python-skinny, python (4 splits), database (PostgreSQL/MySQL/MSSQL via docker compose), java, flavors, models (3 splits), evaluate (tests/evaluate), genai (tests/genai in an OSS pass and a databricks-agents overlay; tests/genai/scorers/guardrails is ignored, lines 359-360, 372-376) and pyfunc (4 splits). lint.yml runs pre-commit (ruff, mypy, clint, typos, check-actions, conftest policy) on ubuntu and macOS plus dev/clint, dev/pypi and .claude/skills tests (lines 36-42,110-120). Also build-wheel, cross-version-tests (ML-library version matrix; scheduled runs gated to repo mlflow/dev, line 64), slow-tests (docker/assistant/Windows), typescript.yml (Node 22/24, build, lint, tests, min-version check), js, r, tracing, docs, examples, helm, protos, gateway-benchmark (daily; thresholds sqlite P50<=300 ms/P99<=800 ms, postgres <=400/<=1000, described as conservative starting points, lines 4-6,55-63) and tracing-benchmark (per-commit trend, fail-on-alert false, line 83). Integration tests for Claude Code/Codex mock the CLIs (tests/claude_code/test_plugin.py:34-35); sandbox runtime is 'validated against a live Docker daemon rather than in unit tests' (mlflow/assistant/providers/codex.py:373-376).",
+      "dependencies": "Python: pyproject.toml - 39 direct runtime deps (lines 33-73; e.g. Flask, Flask-CORS, FastAPI, uvicorn, starlette, SQLAlchemy, alembic, pandas, numpy, scipy, scikit-learn, pyarrow, matplotlib, pydantic, opentelemetry-api/sdk/proto, databricks-sdk, docker, gunicorn on non-Windows, waitress on Windows) plus 13 optional-extra groups (lines 81-124: extras, db, databricks, gateway, genai, mcp, azure, sqlserver, aliyun-oss, jfrog, kubernetes, langchain, auth) and dev groups lint/test/build/docs (174-246). pyproject.release.toml - 20 direct deps incl. mlflow-skinny==3.16.1 and mlflow-tracing==3.16.1 (33-54). libs/skinny/pyproject.toml - 21 (31-53). libs/tracing/pyproject.toml - 8 (31-40). requirements/*.yaml|txt feed or pin these; uv.lock at repo root; uv exclude-newer P7D (pyproject.toml:249). TypeScript: libs/typescript/core/package.json - 9 deps + 1 optional (40-53); each integration depends on @mlflow/core ^0.4.0 (e.g. codex/package.json:49-51); package-lock.json. UI: mlflow/server/js/package.json - 88 deps + 77 devDeps (25-193); yarn.lock. Java: mlflow/java/client/pom.xml - 7 runtime + 3 test deps (20-68), shaded. R: mlflow/R/mlflow/DESCRIPTION - 17 Imports, 10 Suggests (34-62). Third-party scorer libraries (deepeval, ragas, trulens, arize-phoenix-evals, guardrails-ai, google-adk) and litellm/dspy are not in the main extras; CI installs them ad hoc (master.yml:350-352) and docs install dspy separately (docs/docs/genai/eval-monitor/scorers/llm-judge/memalign.mdx:58).",
+      "security_policy": "SECURITY.md: GitHub private vulnerability reporting; only the latest version has continued support with backports at maintainers' discretion (SECURITY.md:8-11); reports via bounty platforms such as Huntr are auto-closed (SECURITY.md:13-17); public issues titled 'security vulnerability' are auto-closed by .github/workflows/close-security-issues.yml:27-36. Repo hygiene: top-level permissions {} enforced via .github/policy.rego:15-29 (conftest pre-commit hook), actions pinned by SHA, Dependabot with 7-day cooldown (.github/dependabot.yml:11-19)."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:110 - 'Run systematic evaluations, track quality metrics over time' (labeled cases, several scorers, per-sample values).",
+        "verified": "yes",
+        "evidence": "mlflow.genai.evaluate (mlflow/genai/evaluation/base.py:56-299) runs predict_fn then every scorer per row in thread pools (harness.py:974-987), logs each scorer Feedback and each labeled expectation as per-trace assessments (harness.py:1025-1049; entities.py:90-91,188-204), returns result_df with <scorer>/value|rationale|error_message per row (mlflow/genai/utils/trace_utils.py:990-1012) and logs run-level aggregates, default mean (mlflow/genai/scorers/aggregation.py:26-74; harness.py:766-768). A raising scorer becomes a per-row error, not a run abort (harness.py:944-955). Tests assert per-row <name>/value columns (tests/genai/evaluate/test_evaluation.py:182-202). Static reading; not executed."
+      },
+      {
+        "claim": "README.md:110 - '...catch regressions before they reach production' (CI gating).",
+        "verified": "partial",
+        "evidence": "Gating is programmatic: EvaluationResult.passed/.reason (mlflow/genai/evaluation/entities.py:280-305) plus the opt-in pytest plugin and @mlflow.test (mlflow/pytest/plugin.py:1-18; decorator.py:53-71); docs say a failing assert fails the pytest job (docs/docs/genai/eval-monitor/regression-testing.mdx:206). No declarative config: 'mlflow traces evaluate' only prints (mlflow/cli/eval.py:92-128); mlflow.validate_evaluation_results thresholds apply to legacy mlflow.evaluate results (mlflow/models/evaluation/validation.py:234-259). Silent-pass paths: passed is True when result_df is None (entities.py:307-309; tests/genai/evaluate/test_entities.py:96-98); construct_eval_result_df returns None on any exception logged at debug (trace_utils.py:962-963,986-987) and drops rows without a trace (trace_utils.py:967-977); cells a scorer did not produce are skipped (entities.py:322-324); a predict_fn exception is stored only in EvalItem.error_message (harness.py:834-837), which nothing reads except to_dict -> to_pd_series (entities.py:214,231), and to_pd_series has no call site in mlflow/ or tests/genai."
+      },
+      {
+        "claim": "README.md:110 - 'Choose from 50+ built-in metrics and LLM judges'.",
+        "verified": "partial",
+        "evidence": "MLflow-native built-in scorers number 24 (mlflow/genai/scorers/__init__.py:30-56; classes in mlflow/genai/scorers/builtin_scorers.py). Reaching 50+ requires counting third-party adapters: DeepEval registry 30 entries (mlflow/genai/scorers/deepeval/registry.py:7-44), RAGAS 30 (mlflow/genai/scorers/ragas/registry.py:18-100), plus TruLens/Phoenix/Guardrails/Google ADK adapters; these need those packages, which are not declared in pyproject.toml:33-124, and the Guardrails tests are skipped in CI (.github/workflows/master.yml:359-360)."
+      },
+      {
+        "claim": "README.md:48-54 - 'uvx mlflow@latest agent setup' installs the MLflow skills and launches your coding agent.",
+        "verified": "partial",
+        "evidence": "The command exists and is labelled '[Experimental] ... may change without notice' (mlflow/agent/setup/cli.py:336-341; mlflow/agent/cli.py:17). It supports claude, codex and opencode (mlflow/agent/agents.py:13,30-50), copies skills via install_skills (setup/cli.py:278-292; mlflow/assistant/skill_installer.py:62-91) and launches the agent binary with subprocess.run (setup/cli.py:307,363). The skills are a git submodule of https://github.com/mlflow/skills (.gitmodules:1-3), absent from this checkout, so their content is unverified; in such a checkout the 'agent' group is silently omitted because the import fails (mlflow/cli/__init__.py:1414-1420; mlflow/agent/setup/prompt.py:7)."
+      },
+      {
+        "claim": "README.md:87 - 'natively integrates with OpenTelemetry and MCP'.",
+        "verified": "yes",
+        "evidence": "OTLP ingest route /v1/traces (mlflow/server/otel_api.py:94; mlflow/tracing/utils/otlp.py:20-21) and an MCP server via 'mlflow mcp run' (mlflow/mcp/cli.py:24-33; mlflow/mcp/server.py:211-255). Caveats: the MCP server needs the mcp extra (pyproject.toml:117), is documented as experimental (docs/docs/genai/mcp/index.mdx:11-14), and the documented tool names do not match the code (index.mdx:124-135 vs mlflow/cli/traces.py:512,612,703,721,795)."
+      },
+      {
+        "claim": "README.md:87 - 'Supports Python, TypeScript/JavaScript, Java and any other programming language'.",
+        "verified": "partial",
+        "evidence": "Evaluation (mlflow.genai.evaluate, scorers, datasets) is Python-only. The TypeScript SDK is a tracing SDK (libs/typescript/package.json:4); a search for scorer/evaluate(/genai in libs/typescript sources matched only a comment in integrations/gemini/src/index.ts:2. The Java client is the Tracking API (mlflow/java/client/pom.xml:14). 'Any other language' rests on OTLP ingest and REST (mlflow/server/otel_api.py:94)."
+      },
+      {
+        "claim": "mlflow/claude_code/README.md:44-57 - 'mlflow autolog claude' configures Claude Code hooks (PostToolUse, Stop) in .claude/settings.json (repeated for the Python SDK tab in docs/docs/genai/tracing/integrations/listing/claude_code.mdx:131).",
+        "verified": "no",
+        "evidence": "Code differs: the Python hook runtime is retired (mlflow/claude_code/hooks.py:1-16; cli.py:95-98,349-352). 'mlflow autolog claude' installs a Claude Code marketplace plugin via 'claude plugin marketplace add mlflow/mlflow --scope local --sparse ...' and 'claude plugin install mlflow-tracing@mlflow-plugins' (mlflow/claude_code/plugin.py:22-55) and only writes MLFLOW_* env vars into settings (mlflow/claude_code/config.py:139-160). The plugin's Stop hook is node bundle/stop.cjs (libs/typescript/integrations/claude-code/hooks/hooks.json:2-14)."
+      },
+      {
+        "claim": "docs regression-testing.mdx:17 - 'Every test in the session is recorded under a single MLflow run' (the @mlflow.test CI-gate path).",
+        "verified": "partial",
+        "evidence": "One run is opened per pytest process (mlflow/pytest/session.py:83-110); with pytest-xdist each worker opens its own unless a conftest hook is added, as the docs note (regression-testing.mdx:148-177). Run status is FAILED only when a marked test raises (session.py:113-143; mlflow/pytest/plugin.py:56-78). The plugin is opt-in and the decorator raises if it is not enabled (plugin.py:3-10; decorator.py:39-50). @mlflow.test is @experimental(version='3.14.0') (decorator.py:53)."
+      },
+      {
+        "claim": "docs try-assistant.mdx:158-194 - 'Currently, Claude Code is fully supported'; OpenAI Codex is listed as upcoming; only local servers are supported.",
+        "verified": "no",
+        "evidence": "Code has a Codex provider (mlflow/assistant/providers/codex.py:64-91) and 'mlflow agent setup' maps codex to an Assistant provider (mlflow/agent/setup/cli.py:113-116); CHANGELOG.md:58 lists Claude Code, Codex and OpenAI-compatible providers; a remote-assistant mode with optional Docker sandbox exists (mlflow/assistant/providers/base.py:17-32; mlflow/environment_variables.py:126). The docs page is stale."
+      },
+      {
+        "claim": "docs usage-tracking.mdx:5,31,62-67 - anonymized, non-identifying usage data; installation ID 'created for each installation - defined as each time MLflow is imported'.",
+        "verified": "partial",
+        "evidence": "Opt-out and CI auto-disable are implemented as documented (mlflow/telemetry/utils.py:30-58,144-161; client.py:164-175). The installation ID is persisted at ~/.config/mlflow/telemetry.json, not regenerated per import (mlflow/telemetry/installation_id.py:33-41,64-70). Events also carry platform.platform() and an auto-detected coding_agent (Claude Code, Codex, ...) (mlflow/telemetry/schemas.py:58-68,104-121; utils.py:94-135); coding_agent is absent from the documented data table (usage-tracking.mdx:46-129), though the page points to the source for exact data (usage-tracking.mdx:42,135)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "AI issue detection on traces: cost and yield sweep across five chat models",
+        "metric": "USD cost and issues found per run, by number of traces analyzed",
+        "value": "50 traces: $0.08-$0.42, 5-9 issues; 100 traces: $0.11-$0.53, 8-13 issues; 250 traces: $0.16-$0.93, 10-22 issues (gpt-5.4, o3, claude-opus-4-6, claude-sonnet-4-6, gemini-3.1-pro; 402-trace pool, seed 42; run 2026-04-16; the page calls the numbers 'indicative only')",
+        "source": "docs/docs/genai/eval-monitor/ai-insights/detect-issues.mdx:260-292",
+        "independent": false
+      },
+      {
+        "what": "MemAlign judge-alignment optimizer compared with SIMBA",
+        "metric": "speed of alignment cycles",
+        "value": "'Up to 100x faster' than traditional prompt optimizers like SIMBA; the page gives no methodology or measured numbers",
+        "source": "docs/docs/genai/eval-monitor/scorers/llm-judge/memalign.mdx:16",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope: two of the three need-questions have no matching component. No containerized, verifier-graded end-to-end suite runner for the real Claude Code/Codex CLIs: searches for verifier/trial/harbor/terminal-bench/inspect-ai/swe-bench over docs/docs and mlflow/assistant found nothing; the only containerized CLI use is the in-app Assistant chat sandbox (mlflow/server/sandbox/container.py:1-20; mlflow/assistant/providers/codex.py:360-372). No declarative CI gate: gating is 'assert result.passed' inside pytest (docs/docs/genai/eval-monitor/regression-testing.mdx:17,181-206) and 'mlflow traces evaluate' has no threshold or exit-code logic (mlflow/cli/eval.py:92-128).",
+      "Evidence quality of mlflow.genai.evaluate: passed can be vacuously True or miss failures - result_df None counts as passed (mlflow/genai/evaluation/entities.py:307-309; tests/genai/evaluate/test_entities.py:96-98), construct_eval_result_df swallows exceptions at debug level and drops trace-less rows (mlflow/genai/utils/trace_utils.py:967-977,986-987), and predict_fn exceptions are recorded only in EvalItem.error_message (harness.py:834-837) that no code surfaces. evaluate also makes one extra probe call of predict_fn with the first row unless MLFLOW_GENAI_EVAL_SKIP_TRACE_VALIDATION=true (mlflow/genai/utils/data_validation.py:11-34; mlflow/environment_variables.py:979-985), is documented as not thread-safe (mlflow/genai/evaluation/base.py:293-296), and the docs acknowledge LLM-judge non-determinism (regression-testing.mdx:214-217).",
+      "Experimental surfaces and docs/code drift: @mlflow.test (mlflow/pytest/decorator.py:53), 'mlflow agent setup' ('may change without notice', mlflow/agent/setup/cli.py:336-341), mlflow.genai.test_agent (mlflow/genai/agent_tester.py:54,327), the MCP server (docs/docs/genai/mcp/index.mdx:11-14) and the Assistant ('beta', docs/docs/genai/getting-started/try-assistant.mdx:150-154). Drift: mlflow/claude_code/README.md:44-57 vs the plugin runtime (mlflow/claude_code/hooks.py:1-16); MCP tool names in docs (index.mdx:124-135) vs code (mlflow/cli/traces.py:512,612,703,721,795); Assistant provider support (try-assistant.mdx:188-194 vs mlflow/assistant/providers/codex.py); docker/README.md:35 uses 'mlflow:latest-full' while images are pushed as ghcr.io/mlflow/mlflow (.github/workflows/push-images.yml:67-69).",
+      "Telemetry is default-on for open-source installs (docs/docs/community/usage-tracking.mdx:5) and sends a persistent installation ID, OS string and an auto-detected coding_agent (Claude Code, Codex, ...) (mlflow/telemetry/schemas.py:104-121; mlflow/telemetry/utils.py:94-135; installation_id.py:64-70). It is switched off only by env opt-out, CI env vars, dev versions or an unreachable config host (utils.py:144-161; client.py:164-175). The README does not mention it.",
+      "Supply chain: no release provenance in-repo - no PyPI/npm/Maven publish workflow, checksums, signatures or attestations (build-wheel.yml only runs twine check, lines 127-131); npm packages are published manually (libs/typescript/README.md:189-192); GHCR images are unsigned (push-images.yml). Setup flows fetch unpinned third-party content: 'mlflow autolog claude' adds GitHub repo mlflow/mlflow with no ref as a Claude Code marketplace whose plugin comes from npm @mlflow/claude-code (mlflow/claude_code/plugin.py:22-55; .claude-plugin/marketplace.json:7-13), so plugin code is not tied to the installed MLflow version; setup.sh downloads the latest Databricks CLI zip without a checksum (mlflow/agent/setup/setup.sh:903-919); the skills MLflow installs into agents live in a separate repo used as a git submodule (.gitmodules:1-3, fetched by dev/build.py:92-93) and were not reviewed.",
+      "Agent execution and exposure: the Assistant launches coding agents with broad permissions - Codex always gets --sandbox danger-full-access (mlflow/assistant/providers/codex.py:206-213,410-417) and Claude Code gets --permission-mode bypassPermissions in full-access mode (mlflow/assistant/providers/claude_code.py:546-548). The Docker sandbox has unrestricted outbound network ('not a hard egress boundary', mlflow/server/sandbox/container.py:11-19) and, although described as off by default, is auto-enabled for remote-assistant servers when docker is on PATH (mlflow/assistant/providers/base.py:17-32). The default MCP tool set includes destructive tools (delete_traces, delete_run, delete_experiment) with no read-only mode in the code (mlflow/mcp/server.py:24-29; mlflow/cli/traces.py:431; mlflow/runs.py:61; mlflow/experiments.py:353). The repo ships project-scoped Claude Code hooks and a statusLine command that apply to any session started inside a clone (.claude/settings.json:3-25).",
+      "Security defaults and history: the default 'mlflow server' has no authentication; basic-auth is opt-in via --app-name basic-auth (mlflow/cli/__init__.py:480-489; docs/docs/self-hosting/security/basic-http-auth.mdx:50-53). CHANGELOG.md:9 records, as a 3.16.1 breaking change, removal of a previously shipped default basic-auth admin password (GHSA-gq3w-7jj3-x7gr). SECURITY.md:10-11 supports only the latest version, with backports at discretion.",
+      "Platform and footprint: default CI uses Python 3.10 (.python-version:1; .github/actions/setup-python/action.yml:29-41, which accepts only 3.10-3.12) and classifiers list only 3.10 (pyproject.toml:26); macOS is lint-only and Windows runs only in the slow-test workflow (.github/workflows/lint.yml:36-42; slow-tests.yml:94); scheduled cross-version and slow runs are gated to repository mlflow/dev (cross-version-tests.yml:64; slow-tests.yml:59,93); WSL2 and GPU support are unstated. 39 direct runtime dependencies in the dev pyproject (pyproject.toml:33-73), including databricks-sdk, pandas, scikit-learn, scipy and pyarrow; third-party scorer adapters need extra packages and the Phoenix adapter is pinned to arize-phoenix-evals<3 in CI (.github/workflows/master.yml:334,352)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "mlflow/mlflow",
+      "checks": [
+        {
+          "field": "readme.install (pip)",
+          "statement": "pip (Python 3.10+): `pip install --upgrade mlflow   # then: mlflow server`",
+          "citation": "docs/src/content/setup_server.mdx:26-33",
+          "holds": true,
+          "note": "Line 26 reads '**Python Environment**: Python 3.10+'. Lines 30-33 are a shell block with `pip install --upgrade mlflow` and `mlflow server`. This matches pyproject.toml:28 (requires-python = \">=3.10\") and the console script `mlflow = \"mlflow.cli:cli\"` at pyproject.toml:132-133. The nearby uvx method (`uvx mlflow server`, setup_server.mdx:15 and README.md:59) also matches. Working tree HEAD is 32792afe5b0183fce10532d3a023f5cfa8612d09, the dossier's commit."
+        },
+        {
+          "field": "license",
+          "statement": "spdx: Apache-2.0; file: LICENSE.txt",
+          "citation": "LICENSE.txt",
+          "holds": true,
+          "note": "LICENSE.txt is the only LICENSE* file at the repo root. It starts with 'Copyright 2018 Databricks, Inc.  All rights reserved.' followed by the unmodified Apache License, Version 2.0 text and appendix (lines 3-202). Supporting evidence: pyproject.toml:24 has the classifier 'License :: OSI Approved :: Apache Software License', pyproject.toml:78-79 sets license file = \"LICENSE.txt\", and the README badge at README.md:21 links to LICENSE.txt."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - default CI runs on ubuntu-latest (master.yml:54,73; runner CPU architecture not stated in the workflow); GHCR images are built for linux/amd64 and linux/arm64 (push-images.yml:89,100). The README itself states no platform support.",
+          "citation": ".github/workflows/master.yml:54,73; .github/workflows/push-images.yml:89,100",
+          "holds": true,
+          "note": "master.yml:54 (python-skinny job) and :73 (python job) are `runs-on: ubuntu-latest`, and no architecture is given. push-images.yml:89 (base image) and :100 (full image) are `platforms: linux/amd64,linux/arm64`. Searching README.md for linux, windows, macos, x86, arm64, amd64 and platform turns up no OS or architecture support statement. The closest is line 291 ('local environment, on-premises clusters, cloud platforms, and managed services')."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Claude Code: (a) 'mlflow autolog claude' runs 'claude plugin marketplace add mlflow/mlflow --scope local --sparse ...' and then 'claude plugin install mlflow-tracing@mlflow-plugins', and writes MLFLOW_* env vars into .claude/settings.json. The plugin's Stop hook runs 'node bundle/stop.cjs' and its marketplace entry points to npm @mlflow/claude-code. (b) 'mlflow agent setup --agent claude' installs skills into .claude/skills and launches 'claude <prompt>'. (c) The Assistant runs 'claude -p ... --output-format stream-json', optionally with bypassPermissions, on the host or in Docker. (d) There are MCP and AI Gateway docs for Claude Code. (e) A skill hint is logged on import unless MLFLOW_DISABLE_AGENT_HINT=1. Codex: @mlflow/codex 0.4.0 provides 'mlflow-codex setup', which writes a notify hook into .codex/config.toml; 'agent setup --agent codex' is supported; the Assistant runs 'codex exec --json --sandbox danger-full-access'. The unit tests mock the CLIs.",
+          "citation": "mlflow/claude_code/plugin.py:22-55; mlflow/claude_code/config.py:139-160; libs/typescript/integrations/claude-code/hooks/hooks.json:2-14; .claude-plugin/marketplace.json:7-13; mlflow/agent/agents.py:30-42; mlflow/agent/setup/cli.py:278-292,307,363; mlflow/assistant/providers/claude_code.py:530-548,710-757; docs/docs/genai/mcp/index.mdx:88-93; docs/docs/genai/governance/ai-gateway/coding-agents/index.mdx:49-53; mlflow/agent/hint.py:9,104-126; docs/docs/genai/tracing/integrations/listing/codex.mdx:35-65; libs/typescript/integrations/codex/package.json:3,36-38; mlflow/assistant/providers/codex.py:206-213,410-417; tests/claude_code/test_plugin.py:34-35",
+          "holds": true,
+          "note": "Every sub-claim matches the code. (a) plugin.py:37-55 runs `claude plugin marketplace add mlflow/mlflow --scope local --sparse .claude-plugin libs/typescript/integrations/claude-code` and then `claude plugin install mlflow-tracing@mlflow-plugins --scope local`. hooks.json has a Stop hook `node \"${CLAUDE_PLUGIN_ROOT}/bundle/stop.cjs\"`. marketplace.json:10-13 gives the source as npm @mlflow/claude-code. (b) agents.py:30-42 maps claude to .claude/skills and codex to .agents/skills. setup/cli.py:285 installs skills after the user agrees, and :307/:363 build and run [binary, prompt]. (c) claude_code.py:530-538 builds `-p --input-format text --output-format stream-json --verbose`, and :546-548 adds bypassPermissions only when full_access is set. The Docker path at :710-757 does the same. Codex: codex.py:206-213 and :410-417 build `codex exec --json --sandbox danger-full-access --skip-git-repo-check`. (d) The docs lines show `claude mcp add mlflow-mcp ...` and the AI Gateway 'Claude Code' tile. codex.mdx:35-65 shows `npm install -g @mlflow/codex` and `mlflow-codex setup` creating .codex/config.toml with a notify hook. package.json:3 is version 0.4.0, and :36-38 is the mlflow-codex bin. (e) mlflow/__init__.py:454-458 calls maybe_hint_tracing_skill on import, and hint.py:120 checks MLFLOW_DISABLE_AGENT_HINT. test_plugin.py:34-35 patches shutil.which and subprocess.run. One citation is incomplete: config.py:139-160 shows only MLFLOW_CLAUDE_TRACING_ENABLED being written. MLFLOW_TRACKING_URI, MLFLOW_EXPERIMENT_ID and MLFLOW_EXPERIMENT_NAME are written at config.py:184-192. The target file is .claude/settings.json by default, or settings.local.json with --local (claude_code/cli.py:157,171-172)."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "README.md:110 'Run systematic evaluations, track quality metrics over time' (labeled cases, several scorers, per-sample values) - verified yes. mlflow.genai.evaluate runs predict_fn and then every scorer per row in thread pools. It logs scorer feedback and labeled expectations as per-trace assessments and returns result_df with <scorer>/value|rationale|error_message per row. It logs run-level aggregates (mean by default), and a scorer that raises becomes a per-row error instead of aborting the run. Tests assert the per-row <name>/value columns.",
+          "citation": "README.md:110; mlflow/genai/evaluation/base.py:56-299; mlflow/genai/evaluation/harness.py:974-987,1025-1049,766-768,944-955; mlflow/genai/evaluation/entities.py:90-91,188-204; mlflow/genai/utils/trace_utils.py:990-1012; mlflow/genai/scorers/aggregation.py:26-74; tests/genai/evaluate/test_evaluation.py:182-202",
+          "holds": true,
+          "note": "README.md:110 contains the quoted text. base.py:56-299 defines evaluate(data, scorers, predict_fn, model_id), which calls _run_harness. The harness runs predict and score in row-level thread pools (harness.py:276, 424, dispatching _run_predict and _run_score), and each row's scorers run in their own pool (:977-987). _run_score adds expectation assessments (:886), and _log_assessments calls mlflow.log_assessment for each one (:1033-1049). A scorer exception becomes a Feedback with AssessmentError SCORER_ERROR (:944-955). entities.py:188-204 turns expectations into Expectation objects. trace_utils.py:999-1010 always emits <name>/value and adds /rationale and /error_message only when present. aggregation.py:55,67 default to ['mean'], and harness.py:767-768 logs the aggregates. test_evaluation.py:194-199 asserts per-row <name>/value columns. This was static reading only, which matches the dossier's own caveat."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

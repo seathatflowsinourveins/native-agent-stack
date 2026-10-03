@@ -1,0 +1,332 @@
+{
+  "contender": "rtk-ai/rtk",
+  "revision": {
+    "contender": "rtk-ai/rtk",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "rtk-ai/rtk",
+        "tag": "v0.50.0",
+        "commit": "1d87b8e719ce0a50c223cd93ca64dd16921f9aec",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.50.0",
+    "commit": "1d87b8e719ce0a50c223cd93ca64dd16921f9aec",
+    "read_at": "2026-10-02T03:02:44+00:00"
+  },
+  "dossier": {
+    "contender": "rtk-ai/rtk",
+    "revision": {
+      "tag": "v0.50.0",
+      "commit": "1d87b8e719ce0a50c223cd93ca64dd16921f9aec",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "rtk (Rust Token Killer) is a single-binary Rust CLI proxy (Cargo.toml:1-10; README.md:43). Agent hooks or plugins rewrite shell commands such as `git status` to `rtk git status`; rtk runs the real command, compresses its output with built-in Rust filters, TOML filters and a never-worse guard (src/core/guard.rs:16-23), and prints the compact result (README.md:151). It logs raw-vs-filtered size per command in a local SQLite DB (`rtk gain`), keeps unfiltered output for failures and truncations in a content-addressed recall store (`rtk recall <hash>`), and reaches provider spend only by shelling out to the external `ccusage` CLI for Claude Code (`rtk cc-economics`). Answer to the provider-usage question: within this project no single tool measures provider usage from both Claude Code and Codex logs. rtk's own savings numbers are bytes/4 estimates of bash output; the only input/output/cache-creation/cache-read token figures come from the external ccusage tool, wired for Claude Code only (src/analytics/ccusage.rs:1-30; src/main.rs:507); rtk's own transcript reader parses only Claude Code Bash commands (src/discover/provider.rs:167-281); no Codex log reader exists in src/ or scripts/ (grep).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Tagline: 'High-performance CLI proxy that cuts up to 90% of the bash output your agent reads'.",
+          "citation": "README.md:6"
+        },
+        {
+          "claim": "'Single Rust binary, 100+ supported commands, <10ms overhead'; rtk filters and compresses command outputs before they reach the LLM context.",
+          "citation": "README.md:43"
+        },
+        {
+          "claim": "The 90% is bash-output reduction, 'not the same as cutting your bill by 90%': bash output is one contributor to input tokens and input tokens are only part of the bill, so the reduction dilutes at every step.",
+          "citation": "README.md:68-70"
+        },
+        {
+          "claim": "Reported token counts are estimated as bytes / 4; RTK ships no tokenizer, so percentages are reliable but absolute token numbers are approximate.",
+          "citation": "README.md:72"
+        },
+        {
+          "claim": "Hook-based agents rewrite Bash commands (git status -> rtk git status); the hook only runs on Bash tool calls, so Claude Code built-in Read/Grep/Glob are not rewritten.",
+          "citation": "README.md:151-153"
+        },
+        {
+          "claim": "'Does RTK break Claude's prompt cache? No.' Output is filtered once and stored in history; smaller outputs mean cheaper cache writes and reads.",
+          "citation": "README.md:173"
+        },
+        {
+          "claim": "The auto-rewrite hook gives '100% rtk adoption across all conversations and subagents, with no per-command context overhead' (Bash tool calls only).",
+          "citation": "README.md:364-368"
+        },
+        {
+          "claim": "Analytics commands listed: `rtk gain` (summary, graph, history, daily, JSON/CSV export), `rtk discover` (missed savings), `rtk session` (adoption). The README never mentions `rtk cc-economics` or ccusage.",
+          "citation": "README.md:312-324"
+        },
+        {
+          "claim": "When a command fails RTK saves the full unfiltered output so the LLM can recall it without re-executing ([full output: rtk recall <hash>]); [retriever] mode = sqlite (default) | tee | disabled; the sqlite store stays failure/truncation-driven.",
+          "citation": "README.md:460-471"
+        },
+        {
+          "claim": "RTK supports 18 AI coding tools; Claude Code via `rtk init -g` (PreToolUse hook, native binary) and Codex via `rtk init -g --codex` (PreToolUse hook with updatedInput + AGENTS.md).",
+          "citation": "README.md:424-433"
+        },
+        {
+          "claim": "Telemetry is disabled by default and needs explicit opt-in consent; `rtk telemetry status|enable|disable|forget`; `RTK_TELEMETRY_DISABLED=1` blocks it regardless of consent; `forget` deletes 'all local data' and requests server-side erasure.",
+          "citation": "README.md:493, 514-525"
+        },
+        {
+          "claim": "Linux and macOS are supported through the install script, Homebrew, cargo and pre-built tarballs; WSL 'behaves exactly like Linux'.",
+          "citation": "README.md:78-116, 405-420"
+        },
+        {
+          "claim": "Name-collision warning: another project named rtk (Rust Type Kit) exists on crates.io; use `cargo install --git`.",
+          "citation": "README.md:125"
+        }
+      ],
+      "install": [
+        {
+          "method": "Homebrew (macOS/Linux)",
+          "command": "brew install rtk",
+          "citation": "README.md:78-82 (docs/guide/getting-started/installation.md:34-38 documents `brew install rtk-ai/tap/rtk`)"
+        },
+        {
+          "method": "Quick install script (Linux/macOS)",
+          "command": "curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh",
+          "citation": "README.md:92-96 (installs to ~/.local/bin, install.sh:9)"
+        },
+        {
+          "method": "Cargo from git",
+          "command": "cargo install --git https://github.com/rtk-ai/rtk",
+          "citation": "README.md:103-107"
+        },
+        {
+          "method": "Pre-built binaries from GitHub Releases",
+          "command": "download rtk-x86_64-unknown-linux-musl.tar.gz, rtk-aarch64-unknown-linux-gnu.tar.gz, rtk-x86_64-apple-darwin.tar.gz or rtk-aarch64-apple-darwin.tar.gz from https://github.com/rtk-ai/rtk/releases and put rtk on PATH",
+          "citation": "README.md:109-114"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - README.md:113 lists rtk-x86_64-unknown-linux-musl.tar.gz; install.sh:76 selects that target; .github/workflows/release.yml:47-50 builds it; ci.yml:60 runs cargo test on ubuntu-latest.",
+        "wsl2": "yes (documented only, not CI-tested) - README.md:405-420 says WSL behaves exactly like Linux and shows the Linux install.sh run inside WSL; the ci.yml:60 matrix has no WSL job.",
+        "macos_arm64": "yes - README.md:112 lists rtk-aarch64-apple-darwin.tar.gz; release.yml:43-45 builds aarch64-apple-darwin on macos-latest; install.sh:43,80-82 maps arm64 to it; ci.yml:60 tests on macos-latest. Config/data dirs differ on macOS (README.md:453; src/core/tracking.rs:77-79).",
+        "gpu": "no - not used or required; it is a text-filtering CLI, and `rtk smart` is heuristic only and ignores its model/force-download flags (src/cmds/system/local_llm.rs:1,10-11)."
+      },
+      "integrations": {
+        "cli": "yes - the `rtk` binary with dozens of clap subcommands (src/main.rs:92-972): per-tool filters (git, cargo, pytest, docker, kubectl, aws, ...), analytics (`gain`, `discover`, `session`, `learn`, `cc-economics`), recovery (`recall`), hook plumbing (`init`, `hook <agent>`, `rewrite`), `pipe` (stdin filter), `proxy`/`run` (raw), `telemetry`, `config`, `trust`, `verify`. Unknown commands fall back to a TOML filter or raw passthrough (src/main.rs:1545-1604). Exports: `rtk gain --format json|csv` (src/analytics/gain.rs:640-705) and `rtk cc-economics --format json|csv` (src/main.rs:521-523).",
+        "mcp": "none found - no MCP server or subcommand; a repo-wide grep for MCP hits only a test string (src/hooks/init.rs:11683) and a filter fixture (src/filters/liquibase.toml:51).",
+        "sdk_or_api": "none found - Cargo.toml defines no [lib] target and the code has no HTTP/socket server (ureq is only a client for telemetry; .semgrep.yml:29-46 forbids sockets and reqwest). Programmatic surfaces are the CLI JSON/CSV exports and the stdin/stdout JSON hook protocols (`rtk hook <agent>`, `rtk rewrite`; hooks/README.md:73-272).",
+        "claude_code_or_codex": "Claude Code: `rtk init -g` writes ~/.claude/RTK.md, adds an @RTK.md line to ~/.claude/CLAUDE.md, and patches ~/.claude/settings.json (with .bak backup) with a PreToolUse hook, matcher 'Bash', running the native `rtk hook claude` (src/hooks/init.rs:1632-1659,1707-1756; src/hooks/constants.rs:12; README.md:372-380); only Bash tool calls are rewritten (README.md:153). The default awareness file is 8 lines (hooks/rtk-awareness.md:1-8); `--hook-only` skips it (README.md:376). Permission model is Deny > Ask > explicit Allow > default ask (src/hooks/README.md:69-84; src/hooks/decision.rs:38-97). Codex: `rtk init -g --codex` registers `rtk hook codex` as a PreToolUse hook in $CODEX_HOME/hooks.json (or .codex/hooks.json) and writes RTK.md plus an AGENTS.md reference (hooks/codex/README.md:7-16; src/hooks/constants.rs:17; src/hooks/init.rs:3053-3061); direct Codex rewriting is new in v0.50.0 (CHANGELOG.md:19-20) and Codex's safety classifier does not unwrap `rtk` (hooks/codex/README.md:14). Log-reading features (`discover`, `session`, `learn`, the RTK_DISABLED check in `gain`) read only Claude Code transcripts under ~/.claude/projects (src/discover/provider.rs:46-52,103-110; src/analytics/gain.rs:787-831); nothing reads Codex session logs."
+      },
+      "telemetry_and_network": "Telemetry is compile-time gated and opt-in. TELEMETRY_URL comes from option_env!('RTK_TELEMETRY_URL'); with no URL built in, the ping code never runs (src/core/telemetry.rs:16-37). maybe_ping also requires RTK_TELEMETRY_DISABLED != 1, consent_given == Some(true), telemetry.enabled, and a 23-hour marker (telemetry.rs:33-78). Config defaults are enabled=false, consent=None (src/core/config.rs:209-216), and the consent prompt appears only on a TTY (src/hooks/init.rs:903-961; src/core/telemetry_cmd.rs:151-189). Official release builds inject the URL and token from CI vars/secrets (.github/workflows/release.yml:85-86,124-125,151-152), so release binaries can ping an RTK AI Labs endpoint after consent; `cargo install --git` builds have no endpoint unless built with the env var. Payload (telemetry.rs:117-156; docs/TELEMETRY.md:31-109): salted SHA-256 device hash, version/OS/arch/install method, command counts, top tool names (two-word labels), savings %, tokens saved, hook type, recall counters; no arguments or paths. The only ureq calls are that ping and the erasure POST of `rtk telemetry forget` (telemetry.rs:158-166; telemetry_cmd.rs:249-270). No account, API key or server is needed to run. Other network: install.sh downloads from github.com (install.sh:53-105); `rtk cc-economics` falls back to `npx --yes ccusage`, which fetches from the npm registry (src/analytics/ccusage.rs:104-119); wrapped tools (gh, curl, wget, aws, ...) do their own networking; the CI doc-review job calls api.anthropic.com with a CI secret (ci.yml:284-310; CI only). Docs conflict with code: DISCLAIMER.md:25 says metrics are collected 'by default', and docs/guide/getting-started/configuration.md:53-54,192-207 reads as opt-out; the code is opt-in. `telemetry forget` removes the salt, marker and history.db only, not recall.db (telemetry_cmd.rs:200-229), although README.md:519 says 'all local data'."
+    },
+    "code": {
+      "languages": [
+        "Rust (primary: 131 .rs files in src/, 23 in tests/, build.rs)",
+        "TOML (63 built-in filter definitions in src/filters/*.toml)",
+        "TypeScript (hooks/opencode/rtk.ts, hooks/pi/rtk.ts, openclaw/index.ts, scripts/benchmark/*.ts)",
+        "Python (hooks/hermes/rtk-rewrite/__init__.py, scripts/benchmark-sessions/lib/runner.py)",
+        "Shell (install.sh, scripts/*.sh, hooks/*/*.sh)"
+      ],
+      "entry_points": [
+        {
+          "path": "src/main.rs",
+          "what": "Binary `rtk` (Cargo.toml:2). fn main (:1859) -> run_cli (:1931): clap Cli/Commands enum (:92-972), telemetry ping, hook-outdated warning, integrity check, routing; run_fallback (:1545) handles unknown commands (TOML filter or raw passthrough)."
+        },
+        {
+          "path": "src/hooks/hook_cmd.rs",
+          "what": "`rtk hook <claude|codex|cursor|gemini|copilot|trae|droid|vibe|check>` PreToolUse processors: JSON on stdin, JSON on stdout (src/main.rs:974-1001)."
+        },
+        {
+          "path": "src/hooks/rewrite_cmd.rs",
+          "what": "`rtk rewrite '<cmd>'` used by the TypeScript/Python/shell plugin delegates; rules live in src/discover/registry.rs and src/discover/rules.rs (96 rules)."
+        },
+        {
+          "path": "src/hooks/init.rs",
+          "what": "`rtk init` installers and uninstallers for the 18 agent integrations (settings.json / hooks.json patching, RTK.md, plugins)."
+        },
+        {
+          "path": "src/analytics/cc_economics.rs",
+          "what": "`rtk cc-economics` (src/main.rs:507-524): joins RTK tracking data with ccusage output via src/analytics/ccusage.rs."
+        },
+        {
+          "path": "src/core/retriever.rs",
+          "what": "`rtk recall` (src/main.rs:715-734): content-addressed recall store reader/writer."
+        },
+        {
+          "path": "install.sh",
+          "what": "Linux/macOS installer: detects OS/arch, downloads release tarball and checksums.txt, verifies SHA-256, installs to ~/.local/bin."
+        },
+        {
+          "path": "hooks/opencode/rtk.ts",
+          "what": "Agent plugins that shell out to `rtk rewrite`: also hooks/pi/rtk.ts, hooks/hermes/rtk-rewrite/__init__.py, openclaw/index.ts."
+        }
+      ],
+      "architecture": "Single Rust crate and binary (no [lib]; modules declared at src/main.rs:1-7). src/cmds/<ecosystem>/*_cmd.rs: per-tool Rust filters (git, cargo, js, python, go, jvm, php, ruby, dotnet, scala, cloud, system). src/filters/*.toml: 63 declarative filters merged and validated by build.rs into builtin_filters.toml, applied in run_fallback via src/core/toml_filter.rs; project/user filters need `rtk trust`. src/core/: runner.rs (shared exec skeleton, emit_guarded), stream.rs (child capture, RAW_CAP 10 MiB at :423), guard.rs (never_worse), tracking.rs (SQLite history.db with commands, parse_failures, hook_decisions; tokens = ceil(bytes/4); fixed 90-day cleanup), retriever.rs + tee.rs + tee_file.rs (recall.db content-addressed store, gzip, 12-hex SHA-256 id; legacy tee files), config.rs, telemetry.rs and telemetry_cmd.rs. src/hooks/: init.rs (installers), hook_cmd.rs (`rtk hook <agent>`), decision.rs + permissions.rs (Deny > Ask > explicit Allow > default ask), rewrite_cmd.rs, integrity.rs, trust.rs. src/discover/: lexer.rs, registry.rs + rules.rs (rewrite registry), provider.rs (ClaudeProvider reads ~/.claude/projects/**/*.jsonl for Bash tool_use/tool_result: command, output length, error flag; no usage fields), report.rs; src/learn/ mines the same transcripts. src/analytics/: gain.rs (savings dashboard/export), session_cmd.rs, cc_economics.rs, ccusage.rs (subprocess to external `ccusage daily|weekly|monthly --json --since 20250101` or `npx --yes ccusage`; parses inputTokens, outputTokens, cacheCreationTokens, cacheReadTokens, totalTokens, totalCost). Measurement separation: `rtk gain` reports only estimated bash-output reduction; `rtk cc-economics` joins that with ccusage periods and derives dollar savings from hard-coded price ratios (output 5x, cache write 1.25x, cache read 0.1x; cc_economics.rs:17-21,113-137). Nothing in the repo parses `usage` blocks from Claude Code or Codex logs itself.",
+      "packaging_and_release": "release-please (release-type rust) runs on master pushes and creates tags and changelog (.github/workflows/cd.yml:100-120; release-please-config.json). release.yml (reusable) builds `cargo build --release` for x86_64-apple-darwin, aarch64-apple-darwin, x86_64-unknown-linux-musl, aarch64-unknown-linux-gnu (cross-linked) and x86_64-pc-windows-msvc, packaging tar.gz/zip (release.yml:35-106), plus a DEB via cargo-deb and an RPM via cargo-generate-rpm (:108-161), copies rtk_amd64.deb and rtk.x86_64.rpm (:200-208), writes `checksums.txt` with `sha256sum *` (:210-213) and uploads via softprops/action-gh-release (:215-221). No signatures, SBOM or provenance attestations: a grep of .github for attest/cosign/sigstore/gpg/slsa finds nothing. Builds use floating `dtolnay/rust-toolchain@stable` (:64-67) with the telemetry URL/token injected (:85-86). Homebrew formula is pushed to rtk-ai/homebrew-tap (:355-370); winget manifest via winget-releaser, continue-on-error (:372-404); pushes to develop produce `dev-<ver>-rc.<run>` pre-releases (cd.yml:21-94). There is no `cargo publish` step (crates.io not automated). In-repo Formula/rtk.rb is a placeholder (version 0.1.0, PLACEHOLDER sha256; Formula/rtk.rb:9-32). install.sh verifies SHA-256 against the same release's checksums.txt, rejects archives with absolute or .. paths, supports RTK_VERSION pinning, and can skip verification with RTK_SKIP_CHECKSUM=1 (install.sh:93-145). Most actions are pinned by tag, a few by SHA (next-release.yml:15, pr-target-check.yml:16,24, stale.yml:21, release.yml:398). Cargo.toml:71-85 holds the deb/rpm metadata.",
+      "tests_and_ci": "Rust built-in test harness (`cargo test --all`); `temp-env` is the only test-specific dev-dependency (Cargo.toml:57-61). 106 of 131 src/*.rs files contain inline #[cfg(test)] modules (about 3,750 #[test] attributes); 23 integration test files in tests/*.rs (187 #[test]) with about 190 fixture files in tests/fixtures. The 63 built-in TOML filters carry 154 inline [[tests.*]] cases; a cargo test requires every built-in filter to have inline tests (src/core/toml_filter.rs:2166-2190) and `rtk verify` runs them (src/main.rs:760-768); no CI step invokes `rtk verify`. Hook-adapter tests (hooks/claude/test-rtk-rewrite.sh, hooks/copilot/test-rtk-rewrite.sh, hooks/hermes/tests/test_rtk_rewrite_plugin.py) and scripts/test-all.sh are not run by any workflow (grep of .github). Unit tests assert savings thresholds with a whitespace-word count (src/core/utils.rs:374-376), unlike the runtime bytes/4 estimate. CI (.github/workflows/ci.yml) runs only on pull_request to develop/master: test-presence gate (scripts/check-test-presence.sh), `cargo fmt --check`, `cargo clippy --all-targets`, `cargo test --all` on ubuntu/windows/macos (:53-67), a security job (cargo audit that only warns, critical-file/dangerous-pattern/new-dependency greps, clippy unwrap/panic lints; :69-188), semgrep with .semgrep.yml and --baseline-commit (:190-200), `scripts/benchmark.sh` (fails if a filter emits more tokens than raw or empty output; only warns below 60% 'good'; scripts/benchmark.sh:866-882), and an AI doc-review job on develop PRs that calls the Anthropic API (:235-391). Other workflows: cd.yml, release.yml (builds without running tests), next-release.yml, pr-target-check.yml, stale.yml; Dependabot weekly for cargo and github-actions (.github/dependabot.yml). .github/workflows/CICD.md:25 describes the benchmark gate as '>=80% savings', which the script does not enforce.",
+      "dependencies": "Cargo.toml: 23 direct [dependencies] (clap, anyhow, encoding_rs, codepage, oem_cp, ignore, walkdir, regex, serde, serde_json, colored, dirs, rusqlite[bundled], toml, toml_edit, chrono, tempfile, sha2, ureq, getrandom, flate2, quick-xml, which) plus 1 unix-only (libc), 1 windows-only (windows-sys), 1 build (toml) and 1 dev (temp-env) = 27 direct entries; Cargo.lock lists 213 packages including rtk itself. rust-version 1.91, edition 2024; rusqlite 'bundled' compiles SQLite from C source. ureq is the only HTTP client (telemetry only). openclaw/package.json declares no dependencies; there are no other Node or Python manifests. Optional runtime tools: ccusage (npm), rg, and whatever CLIs are wrapped.",
+      "security_policy": "SECURITY.md at repo root: report privately to security@rtk-ai.app or via a GitHub private advisory, 48-hour acknowledgement target, 90-day embargo (SECURITY.md:3-9). It is partly stale: it cites .github/workflows/security-check.yml, src/runner.rs, src/summary.rs, src/tracking.rs, src/pnpm_cmd.rs, src/container.rs, hooks/rtk-rewrite.sh and scripts/detect-dangerous-patterns.sh, none of which exist at this tag (SECURITY.md:30,51-59,92), and says 'Last updated: 2026-03-05' (:217). Actual checks run in ci.yml (security job, semgrep) and .semgrep.yml. Cargo.toml sets `unsafe_code = deny` and `warnings = deny` (:87-89), with 10 localized #[allow(unsafe_code)] sites (src/main.rs:1865,3055; src/core/stream.rs:286-399; src/core/utils.rs:873; src/core/tee_file.rs:324)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Token counts are bytes/4 estimates, percentages are reliable and absolute numbers approximate (README.md:72).",
+        "verified": "yes",
+        "evidence": "estimate_tokens_from_len is ceil(len/4) (src/core/tracking.rs:1788-1797), applied identically to raw and filtered text in TimedExecution::track (:1866-1879); record stores signed saved/pct (:602-643); `rtk gain --format json` exports only these estimates (src/analytics/gain.rs:651-660); Cargo.toml has no tokenizer dependency."
+      },
+      {
+        "claim": "README reports only bash-output reduction, 'not the same as cutting your bill' (README.md:68-74); it documents no provider-usage measurement, and the provider-usage path is `rtk cc-economics`.",
+        "verified": "yes",
+        "evidence": "`gain` never reads provider usage (src/analytics/gain.rs; src/core/tracking.rs). Provider token breakdown appears only in `rtk cc-economics` (src/analytics/cc_economics.rs:427-467), which shells out to external ccusage (src/analytics/ccusage.rs:93-170) and is labelled Claude Code economics (src/main.rs:507); fields parsed are inputTokens, outputTokens, cacheCreationTokens, cacheReadTokens (both default 0), totalTokens, totalCost (ccusage.rs:16-30). docs/guide/resources/troubleshooting.md:176-182 points to cc-economics for cache volumes; the README never mentions it. No Codex usage reader: Codex appears in src/ only in hook/installer code, src/hooks/constants.rs:35 and telemetry hook detection (src/core/telemetry.rs:478). RTK's own JSONL reader keeps only Bash commands, output length and error flag (src/discover/provider.rs:167-281). What logs ccusage itself reads is not shown in this repo."
+      },
+      {
+        "claim": "On failure RTK saves the full unfiltered output so the LLM can recall it without re-executing (README.md:464-471).",
+        "verified": "partial",
+        "evidence": "Holds for non-zero exits with at least 500 bytes of raw output (src/core/tee.rs:52-67; src/core/retriever.rs:18) and for filters that call force_tee_hint/force_tee_tail_hint (81 occurrences across 28 files under src/). Sqlite mode never stores ordinary successful runs (tee.rs:53-55; test at :130-143). Defaults: 200 entries, 30 days, 10 MiB per entry, gzip (retriever.rs:15-17); over the cap only the hidden tail is kept (retriever.rs:499-512). Disabled by RTK_RECALL=0 or RTK_TEE=0 (retriever.rs:424-427). So recoverability is conditional, not universal."
+      },
+      {
+        "claim": "'Does RTK break Claude's prompt cache? No' (README.md:173).",
+        "verified": "not_checkable",
+        "evidence": "Provider-side caching behaviour cannot be checked from this repo. The code only shows the rewrite happens before execution and output is produced once (hooks/README.md:24-37). `rtk cc-economics` can show cache write/read volumes (cc_economics.rs:459-466; docs/guide/resources/troubleshooting.md:167-182). The project's own paired run shows cache read 281,580 (OFF) vs 275,317 (ON) with unchanged cost (FIX_PERF.md:14-19); no cache-specific test was found."
+      },
+      {
+        "claim": "Auto-rewrite hook gives '100% rtk adoption across all conversations and subagents' (README.md:364-368).",
+        "verified": "partial",
+        "evidence": "The README itself limits scope to Bash tool calls (README.md:153,368). Only the final stage of a pipeline is rewritten (hooks/README.md:289-298; src/discover/registry.rs:665-669); substitutions and heredocs defer (src/hooks/decision.rs:86-88). The project's own 2026-07-20 benchmark measured 57% hook coverage vs ~100% expected (FIX_PERF.md:22), before pipeline fixes in 0.44.0 and 0.49.0 (CHANGELOG.md:475-476,90,128); no post-fix coverage number is stored in the repo."
+      },
+      {
+        "claim": "Telemetry is disabled by default and requires explicit opt-in consent (README.md:493).",
+        "verified": "yes",
+        "evidence": "Code is opt-in: TelemetryConfig derives Default, so enabled=false and consent=None (src/core/config.rs:209-216); maybe_ping returns unless consent_given == Some(true) and enabled (src/core/telemetry.rs:50-59); the prompt only runs on a TTY (src/hooks/init.rs:903-925). Caveats: release builds embed the endpoint (release.yml:85-86); DISCLAIMER.md:25 says 'by default' and docs/guide/getting-started/configuration.md:53-54,192-207 reads as opt-out (docs are wrong, code wins); `forget` does not delete recall.db (src/core/telemetry_cmd.rs:200-229)."
+      },
+      {
+        "claim": "'<10ms overhead' (README.md:43).",
+        "verified": "partial",
+        "evidence": "CONTRIBUTING.md:59-63 sets <10ms as a goal; CI has no latency measurement (scripts/benchmark.sh counts tokens only). docs/contributing/ARCHITECTURE.md:34,1014 say ~5-15ms and its tables show +8 to +20ms (:537-546), with the runtime table labelled estimates (:992). Every wrapped command also opens SQLite and writes a row (src/core/tracking.rs:323-325,1866-1879)."
+      },
+      {
+        "claim": "'100+ supported commands' (README.md:43).",
+        "verified": "yes",
+        "evidence": "96 rewrite rules in src/discover/rules.rs, 63 built-in TOML filters in src/filters/ (build.rs:17-67), plus the Rust filter modules under src/cmds/ and the Commands enum (src/main.rs:92-972)."
+      },
+      {
+        "claim": "Claude Code uses a PreToolUse hook (native binary) and Codex a PreToolUse hook with updatedInput + AGENTS.md (README.md:428,433).",
+        "verified": "yes",
+        "evidence": "Code wins over stale docs. constants define `rtk hook claude` and `rtk hook codex` (src/hooks/constants.rs:12,17); init writes the Claude entry with matcher Bash (src/hooks/init.rs:1632-1659,1754-1756) and patches Codex hooks.json (init.rs:3061,3141); HookCommands::Codex exists (src/main.rs:980-981). Stale statements: hooks/claude/README.md:7 (shell hook requiring jq) and docs/guide/getting-started/configuration.md:84 (lists Codex among hook-less agents, while init.rs:3056 honours the configured awareness level). Codex rewriting is new in v0.50.0 (CHANGELOG.md:19-20)."
+      },
+      {
+        "claim": "(Docs, not README) `[tracking] enabled` and `history_days` are configurable (docs/guide/getting-started/configuration.md:25-28; docs/TELEMETRY.md:141).",
+        "verified": "no",
+        "evidence": "Both fields are defined and defaulted (src/core/config.rs:153-168) but never read anywhere in src/. Retention uses the constant DEFAULT_HISTORY_DAYS = 90 (src/core/constants.rs:7; src/core/tracking.rs:645-660) and TimedExecution::track records unconditionally (tracking.rs:1866-1879)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Project's own paired ON/OFF VM benchmark (10 pairs, task rust-bottom-global-audit, model written as claude-opus-4-8, rtk build pr:2781), dated 2026-07-20",
+        "metric": "Cost USD per session, OFF vs ON; new input (input+cache_creation); cache read; API turns",
+        "value": "Cost 0.4604 vs 0.4614 (-0.2%, no saving); new input 22,098 vs 21,322 (+3.5% saving); cache read 281,580 vs 275,317 (+2.2%); API turns 9.8 vs 9.9 (-1%)",
+        "source": "FIX_PERF.md:9-24 (evidence path benchmarking/benchmark-sessions/results/20260713-133110 is not in the repo)",
+        "independent": false
+      },
+      {
+        "what": "Same paired benchmark, behaviour metrics",
+        "metric": "Bash commands per session; errors across 10 VMs; hook coverage",
+        "value": "Commands 17.4 OFF vs 20.8 ON (-19.5%, more commands with rtk); errors 0 vs 5; hook coverage 57% (expected ~100%); `rtk find | xargs wc -l` failed on 10/10 ON runs",
+        "source": "FIX_PERF.md:20-22,48-72 (predates pipeline fixes in CHANGELOG.md:475-476,90,128)",
+        "independent": false
+      },
+      {
+        "what": "An unnamed 'external evaluation' that replayed agent transcripts, as summarized inside FIX_PERF.md",
+        "metric": "Input-token saving ceiling",
+        "value": "~3% (also reported: turn penalty at low reasoning effort, null at high effort); evaluator not identified, not verifiable from this repo",
+        "source": "FIX_PERF.md:29-30,294-295",
+        "independent": false
+      },
+      {
+        "what": "Python/Go module overhead table",
+        "metric": "Added latency and output savings per command",
+        "value": "ruff check +12ms/83%; pytest +10ms/92%; pip list +8ms/78%; go test +20ms/88%; go build (errors) +11ms/80%; golangci-lint +20ms/85% (no methodology given)",
+        "source": "docs/contributing/ARCHITECTURE.md:537-546",
+        "independent": false
+      },
+      {
+        "what": "Performance metrics block for the stripped release build",
+        "metric": "Binary size, cold start, memory, per-command overhead",
+        "value": "~4.1 MB; ~5-10ms cold start; ~2-5 MB; rtk git status +8ms, rtk grep +12ms, rtk read +5ms, rtk lint +15ms (labelled estimates)",
+        "source": "docs/contributing/ARCHITECTURE.md:977-993",
+        "independent": false
+      },
+      {
+        "what": "Illustrative `rtk gain --daily` output from one machine (docs say 'not typical results')",
+        "metric": "Estimated tokens raw -> filtered over 196 commands (bytes/4)",
+        "value": "1.3M -> 59.2K, 95.6% saved",
+        "source": "docs/guide/analytics/gain.md:44-56",
+        "independent": false
+      },
+      {
+        "what": "Per-command bash-output reduction ranges published in docs (bytes, not billed tokens)",
+        "metric": "Reduction in bash output bytes",
+        "value": "Typical 60-99%; e.g. jest/vitest 94-99%, git status 75-93%, cargo test 90%, pytest 80-90%",
+        "source": "docs/guide/resources/what-rtk-covers.md:12-72",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Provider-usage measurement is not self-contained and is Claude-only: it needs the external ccusage npm CLI on PATH or via `npx --yes ccusage`, which downloads from npm at runtime (src/analytics/ccusage.rs:93-122); no Codex usage reader exists in src/ or scripts/. The ccusage window is hard-coded `--since 20250101` while comments say 'last 90 days' (ccusage.rs:124,144-147), and cc-economics compares RTK savings (history.db keeps at most 90 days, tracking.rs:645-660) against ccusage cost since 2025 (cc_economics.rs:312-396,479-484); price ratios are hard-coded 'verified Feb 2026' (cc_economics.rs:17-21).",
+      "Savings figures are estimates and counterfactual (bytes/4, no tokenizer; tracking.rs:1788-1797). The project's own FIX_PERF.md reports no cost saving in a paired run (0.4604 vs 0.4614 USD; 17.4 -> 20.8 commands; 0 vs 5 errors) and says `rtk gain` credits full raw bytes even where the harness would truncate anyway (FIX_PERF.md:14-24,262-264). The harness it cites is not in this checkout (scripts/benchmark-sessions contains only lib/runner.py), so results cannot be re-run here, and no independent or post-fix benchmark is stored in the repo.",
+      "Originals are recoverable only conditionally: sqlite mode stores only non-zero-exit outputs of at least 500 bytes or filter-specific truncations (src/core/tee.rs:52-67; retriever.rs:18); defaults are 200 entries, 30 days, 10 MiB per entry, and over-cap entries keep only the hidden tail (retriever.rs:15-17,499-512). The store holds raw failing output (possible secrets) on disk, and `rtk telemetry forget` removes history.db but not recall.db (telemetry_cmd.rs:200-229).",
+      "Rewrite-correctness and coverage risk: the project documents that format-changing filters can break downstream consumers (`rtk find | xargs wc -l` failed 10/10; `cargo clippy | tee | grep` silently counted 0 warnings; FIX_PERF.md:48-122). v0.50.0 rewrites only a safe final pipeline stage (hooks/README.md:289-298) following fixes in 0.44.0/0.49.0 (CHANGELOG.md:475-476,90,128), but this was not re-benchmarked. `rtk pipe` bails and discards stdin over 10 MiB (src/cmds/system/pipe_cmd.rs:268-269; stream.rs:423); Claude built-in Read/Grep/Glob bypass the hook (README.md:153); Codex hook support is new in v0.50.0 and its classifier does not unwrap `rtk` (CHANGELOG.md:19-20; hooks/codex/README.md:14); sandboxed Codex may block history writes (hooks/codex/README.md:26-38).",
+      "Telemetry: official release binaries are built with the endpoint and token injected (release.yml:85-86,124-125,151-152). The code is opt-in (src/core/config.rs:209-216; telemetry.rs:50-59), but DISCLAIMER.md:25 says metrics are collected 'by default' and the configuration guide shows `enabled = true` with opt-out wording (docs/guide/getting-started/configuration.md:53-54,192-207), so project documents contradict each other.",
+      "Supply chain and packaging: release assets carry only a same-release checksums.txt (release.yml:210-213), with no signatures, SBOM or attestations; install.sh can skip verification with RTK_SKIP_CHECKSUM=1 (install.sh:105-110); builds use floating stable Rust. crates.io `rtk` is a different project (README.md:125) and no `cargo publish` exists; in-repo Formula/rtk.rb is a placeholder (Formula/rtk.rb:9-32) and brew instructions differ (README.md:80-82 vs docs/guide/getting-started/installation.md:37). `cargo audit` in CI only warns (ci.yml:85-99); `warnings = deny` (Cargo.toml:87-89) can fail source builds on newer toolchains.",
+      "Documentation drift: SECURITY.md cites 8 non-existent paths and was last updated 2026-03-05 (SECURITY.md:30,51-59,92,217); the README CI badge targets a 'Security Check' workflow that does not exist (README.md:10; workflow names are CI, CD, Release, ...); README says `rtk --version` shows 0.28.2 (README.md:121) vs 0.50.0 (Cargo.toml:3); docs name the tracking DB tracking.db (tracking.rs:9,77) but the code uses history.db (constants.rs:2); hooks/claude/README.md:7 describes a jq shell hook while the code installs native `rtk hook claude`; `tracking.history_days` and `tracking.enabled` are inert (config.rs:153-168).",
+      "Maintenance and scope: pre-1.0 with five minor releases between 2026-08-26 and 2026-09-24 (CHANGELOG.md:8,78,145,190,284); large surface (131 src files, 96 rewrite rules, 63 TOML filters, 18 agent integrations); a SQLite open+write on every wrapped command (tracking.rs:323-325,1866-1879); `unsafe` is lint-denied yet allowed in 10 places (src/main.rs, src/core/stream.rs, src/core/utils.rs, src/core/tee_file.rs)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "rtk-ai/rtk",
+      "checks": [
+        {
+          "field": "readme.install[1] (Quick install script, Linux/macOS)",
+          "statement": "Quick install: `curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh`, installing to ~/.local/bin.",
+          "citation": "README.md:92-96 (installs to ~/.local/bin, install.sh:9)",
+          "holds": true,
+          "note": "README.md:92-96 shows exactly this command and README.md:98 says 'Installs to ~/.local/bin'. install.sh:9 sets INSTALL_DIR=${RTK_INSTALL_DIR:-$HOME/.local/bin}. The script maps Linux/Darwin and x86_64/arm64 to a release tarball (install.sh:30-84) and checks its SHA-256 against checksums.txt (install.sh:104-129). That file is made by `sha256sum *` inside release/ (release.yml:210-213), so its entries are bare asset names and the grep at install.sh:113 matches. Caveat: the script installs the latest release, not v0.50.0, unless RTK_VERSION is set (install.sh:172-177)."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX Apache-2.0, file LICENSE.",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE is the unmodified Apache License 2.0 text: 'END OF TERMS AND CONDITIONS' (:176), 'Copyright 2024 rtk-ai and rtk-ai Labs' (:178) and the standard notice (:180-190), with no added clauses. It is the only LICENSE/COPYING/NOTICE file in the tree. Cargo.toml:8, openclaw/package.json:6 and openclaw/openclaw.plugin.json:7 all say Apache-2.0."
+        },
+        {
+          "field": "platforms.macos_arm64",
+          "statement": "yes - README.md:112 lists rtk-aarch64-apple-darwin.tar.gz; release.yml:43-45 builds aarch64-apple-darwin on macos-latest; install.sh:43,80-82 maps arm64 to it; ci.yml:60 tests on macos-latest. Config/data dirs differ on macOS (README.md:453; src/core/tracking.rs:77-79).",
+          "citation": "README.md:112,453; .github/workflows/release.yml:43-45; install.sh:43,80-82; .github/workflows/ci.yml:60; src/core/tracking.rs:77-79",
+          "holds": true,
+          "note": "Every citation matches. install.sh:43 maps arm64|aarch64 to aarch64 and :80-82 builds ${ARCH}-apple-darwin; the ci.yml:60 matrix includes macos-latest; README.md:453 gives ~/Library/Application Support/rtk/config.toml. tracking.rs:77-79 is a doc comment that still names the old tracking.db file, but the directory claim holds in code: dirs::data_local_dir (tracking.rs:1645) and dirs::config_dir (config.rs:496). I also checked linux_x86_64 (README.md:113, install.sh:76, release.yml:47-50, ci.yml:60) and it holds."
+        },
+        {
+          "field": "integrations.claude_code_or_codex",
+          "statement": "Claude Code: `rtk init -g` writes ~/.claude/RTK.md, adds @RTK.md to CLAUDE.md, and patches settings.json (with .bak) with a PreToolUse hook, matcher 'Bash', running `rtk hook claude`. The default awareness file is 8 lines. Permissions run Deny > Ask > explicit Allow > default ask. Codex: `rtk init -g --codex` registers `rtk hook codex` as a PreToolUse hook in $CODEX_HOME/hooks.json and writes RTK.md plus an AGENTS.md reference; this is new in v0.50.0, and Codex's classifier does not unwrap rtk. discover/session/learn/gain read only Claude Code transcripts under ~/.claude/projects, and nothing reads Codex session logs.",
+          "citation": "src/hooks/init.rs:1632-1659,1707-1756,3053-3061; src/hooks/constants.rs:12,17; README.md:153,372-380; hooks/rtk-awareness.md:1-8; src/hooks/README.md:69-84; src/hooks/decision.rs:38-97; hooks/codex/README.md:7-16; CHANGELOG.md:19-20; src/discover/provider.rs:46-52,103-110; src/analytics/gain.rs:787-831",
+          "holds": true,
+          "note": "Claude: insert_hook_entry adds {matcher:'Bash', command} under hooks.PreToolUse (init.rs:1647-1659). run_default_mode writes RTK.md, patches CLAUDE.md and calls patch_settings_json_command(CLAUDE_HOOK_COMMAND='rtk hook claude') (init.rs:1707-1756; constants.rs:12). The settings.json.bak copy is at init.rs:1571-1579, outside the cited ranges. The default AwarenessLevel (config.rs:42-44) loads hooks/rtk-awareness.md (init.rs:115,200-206), which is 8 lines. decide_with_params goes Deny, then Defer on unattestable commands, then AllowRewrite only on an explicit Allow, else AskRewrite (decision.rs:82-96); src/hooks/README.md:69-84 agrees. Codex: patch_codex_hooks_json calls insert_hook_entry(CODEX_HOOK_COMMAND) (init.rs:3141-3151), and the directory is $CODEX_HOME, falling back to ~/.codex (init.rs:3667-3684). RTK.md and the AGENTS.md reference are at init.rs:3053-3060. CHANGELOG.md:19-20 is under the 0.50.0 heading (:8), and hooks/codex/README.md:14 has the classifier caveat. ClaudeProvider (~/.claude/projects/**/*.jsonl) is the only SessionProvider implementation; it is used by discover/mod.rs:266, session_cmd.rs:63, learn/mod.rs:20 and gain.rs:791. A repo-wide grep finds no rollout or .codex/sessions reader."
+        },
+        {
+          "field": "claim_checks[1]",
+          "statement": "README reports only bash-output reduction, 'not the same as cutting your bill' (README.md:68-74); it documents no provider-usage measurement, and the provider-usage path is `rtk cc-economics` (verified: yes).",
+          "citation": "README.md:68-74; src/main.rs:507; src/analytics/ccusage.rs:16-30,93-170; src/analytics/cc_economics.rs:427-467; docs/guide/resources/troubleshooting.md:176-182; src/hooks/constants.rs:35; src/core/telemetry.rs:478; src/discover/provider.rs:167-281",
+          "holds": true,
+          "note": "README.md:68 is quoted exactly, and grepping README.md for cc-economics/ccusage finds nothing (the only 'Economics' is the telemetry row at :508). main.rs:507 labels the command 'Claude Code economics: spending (ccusage) vs savings (rtk) analysis'. ccusage.rs:16-30 parses inputTokens, outputTokens, cacheCreationTokens and cacheReadTokens (only the two cache fields have serde default), totalTokens and totalCost. ccusage.rs:93-170 runs ccusage, or falls back to `npx --yes ccusage`, with `--json --since 20250101`. cc_economics.rs:427-467 prints the input/output/cache-write/cache-read breakdown, and troubleshooting.md:176-182 points to it. In gain.rs, input_tokens is RTK's own output estimate (tracking.rs:589), not provider usage. Codex appears in src/ only in hook/installer code, the main.rs CLI flags, telemetry hook detection (telemetry.rs:478) and a 'hook codex' test string (lexer.rs:1301). Wording slip: provider.rs:167-281 also keeps up to 1,000 characters of output plus the session and tool_use IDs, not 'only' command, length and error flag. It still reads no usage or token fields, so the conclusion stands."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "Optional, non-blocking. claim_checks[1].evidence: replace 'RTK's own JSONL reader keeps only Bash commands, output length and error flag (src/discover/provider.rs:167-281)' with 'RTK's own JSONL reader keeps Bash commands, output length, up to 1,000 characters of output, session and tool_use IDs and the error flag, and no usage or token fields (src/discover/provider.rs:12-30,167-281)'.",
+        "Optional, non-blocking. integrations.claude_code_or_codex: add src/hooks/init.rs:1571-1579 as the citation for the settings.json.bak backup, since the cited ranges 1632-1659 and 1707-1756 do not show it."
+      ]
+    }
+  ]
+}

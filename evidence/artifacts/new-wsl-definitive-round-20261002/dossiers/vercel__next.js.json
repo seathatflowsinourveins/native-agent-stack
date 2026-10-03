@@ -1,0 +1,339 @@
+{
+  "contender": "vercel/next.js",
+  "revision": {
+    "contender": "vercel/next.js",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "vercel/next.js",
+        "tag": "v16.3.8",
+        "commit": "b0fad0d45eb4c4430fda5eeeb442e8a5af08a5f6",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v16.3.8",
+    "commit": "b0fad0d45eb4c4430fda5eeeb442e8a5af08a5f6",
+    "read_at": "2026-10-02T03:03:08+00:00"
+  },
+  "dossier": {
+    "contender": "vercel/next.js",
+    "revision": {
+      "tag": "v16.3.8",
+      "commit": "b0fad0d45eb4c4430fda5eeeb442e8a5af08a5f6",
+      "read_at": "2026-10-03"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "license.md"
+    },
+    "purpose": "Next.js (npm package `next`, 16.3.8, MIT) is a React web-application framework: the `next` CLI (dev/build/start), a Node.js HTTP server runtime (App Router and Pages Router, RSC rendering, ISR/caching, image optimizer) and a Rust toolchain (Turbopack + SWC, shipped as a native N-API addon with a wasm fallback), kept in one monorepo with docs (456 .mdx files) and about 224 example apps. It is an application framework, not container tooling: this repo contains no tool that defines or runs a multi-service application (app plus services, volumes, networks) on a container engine. Its docs name 'Docker container' as a deployment target, and four examples (examples/with-docker, with-docker-compose, with-docker-multi-env, with-docker-export-output) supply Dockerfiles and Compose files that are run with the external `docker compose` CLI (examples/with-docker-compose/README.md:44-52,68-74; examples/with-docker/README.md:21-43). The only container-aware product code is Docker detection via the vendored is-docker module.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "[README] 'Next.js enables you to create full-stack web applications by extending the latest React features, and integrating powerful Rust-based JavaScript tooling for the fastest builds.'",
+          "citation": "README.md:19"
+        },
+        {
+          "claim": "[README] The README has no install command, no container/Docker/Compose/deployment/hosting statement, no platform list and no telemetry statement. It only links to nextjs.org/docs, Learn, Showcase, Discussions, Discord and contributing.md.",
+          "citation": "README.md:17-42"
+        },
+        {
+          "claim": "[README] Security: 'we encourage you to responsibly disclose this and NOT open a public issue'; bug-bounty reports go by email to responsible.disclosure@vercel.com.",
+          "citation": "README.md:45-49"
+        },
+        {
+          "claim": "[README] License badge links to license.md; the file is the MIT License, Copyright (c) 2025 Vercel, Inc.",
+          "citation": "README.md:12; license.md:1-3"
+        },
+        {
+          "claim": "[docs] 'Next.js can be deployed as a Node.js server, Docker container, static export, or adapted to run on different platforms.' Feature support: Node.js server All, Docker container All, static export Limited, adapters Varies.",
+          "citation": "docs/01-app/01-getting-started/17-deploying.mdx:6-13"
+        },
+        {
+          "claim": "[docs] 'Docker deployments support all Next.js features'; Next.js 'can be deployed to any provider that supports Docker containers ... container orchestrators like Kubernetes'; per-feature tables also list 'Docker container: Yes'.",
+          "citation": "docs/01-app/01-getting-started/17-deploying.mdx:42-44; docs/01-app/03-api-reference/04-functions/after.mdx:241; docs/01-app/02-guides/streaming.mdx:788"
+        },
+        {
+          "claim": "[docs] Prefer local development (npm run dev) over Docker on Mac/Windows during development: host-to-VM file sharing can delay Fast Refresh by seconds to minutes; reserve Docker for production and production-build testing.",
+          "citation": "docs/01-app/01-getting-started/17-deploying.mdx:46; docs/01-app/02-guides/local-development.mdx:53-69"
+        },
+        {
+          "claim": "[docs] By default the cache lives in memory (50 MB) and on the local disk of each instance; under Kubernetes 'each pod will have a copy of the cache'; use cacheHandler/cacheHandlers to share it.",
+          "citation": "docs/01-app/02-guides/self-hosting.mdx:89,93,109-113"
+        },
+        {
+          "claim": "[docs] Multi-instance deployments must share NEXT_SERVER_ACTIONS_ENCRYPTION_KEY (base64 AES key); the same build should boot multiple containers (use generateBuildId); set deploymentId for version-skew protection.",
+          "citation": "docs/01-app/02-guides/self-hosting.mdx:172-207"
+        },
+        {
+          "claim": "[docs] 'This allows you to use a singular Docker image that can be promoted through multiple environments with different values' (server-side env read at request time; NEXT_PUBLIC_* values are inlined at build time).",
+          "citation": "docs/01-app/02-guides/self-hosting.mdx:39,79"
+        },
+        {
+          "claim": "[docs] A reverse proxy such as nginx is recommended in front of the Next.js server; the only platform requirement is 'a Node.js server' (plus the sharp package for Image Optimization).",
+          "citation": "docs/01-app/02-guides/self-hosting.mdx:15; docs/01-app/02-guides/deploying-to-platforms.mdx:18-20"
+        },
+        {
+          "claim": "[example README] with-docker-compose: 'Run multiple Next.js apps, databases, and other microservices in a single deployment'; multistage + output standalone gives ~110 MB vs ~1 GB; develop locally without Node.js or TypeScript installed.",
+          "citation": "examples/with-docker-compose/README.md:7-10,63,77"
+        },
+        {
+          "claim": "[example README] with-docker: compose.yml offers a Node.js and a Bun service ('Run one service at a time to avoid port conflicts'); non-root user, BuildKit cache mounts, standalone output; deployable to Cloud Run, ECS/Fargate, Azure Container Instances, DigitalOcean App Platform or any Kubernetes cluster.",
+          "citation": "examples/with-docker/README.md:5-12,21-37,159-167"
+        }
+      ],
+      "install": [
+        {
+          "method": "create-next-app via npx (docs; requires Node.js >=20.9; OS-agnostic incl. Linux/macOS/WSL)",
+          "command": "npx create-next-app@latest my-app --yes",
+          "citation": "docs/01-app/01-getting-started/01-installation.mdx:25 (system requirements :50-51)"
+        },
+        {
+          "method": "create-next-app via pnpm",
+          "command": "pnpm create next-app@latest my-app --yes",
+          "citation": "docs/01-app/01-getting-started/01-installation.mdx:19"
+        },
+        {
+          "method": "create-next-app via yarn",
+          "command": "yarn create next-app@latest my-app --yes",
+          "citation": "docs/01-app/01-getting-started/01-installation.mdx:31"
+        },
+        {
+          "method": "create-next-app via bun",
+          "command": "bun create next-app@latest my-app --yes",
+          "citation": "docs/01-app/01-getting-started/01-installation.mdx:37"
+        },
+        {
+          "method": "Manual install into an existing project (npm)",
+          "command": "npm i next@latest react@latest react-dom@latest",
+          "citation": "docs/01-app/01-getting-started/01-installation.mdx:119"
+        },
+        {
+          "method": "Scaffold and run the Docker Compose example (requires Docker with Compose; this installs an example app, not Next.js itself)",
+          "command": "npx create-next-app --example with-docker-compose with-docker-compose-app; docker network create my_network; docker compose -f compose.prod.yaml build; docker compose -f compose.prod.yaml up -d",
+          "citation": "examples/with-docker-compose/README.md:18,35-37,66-74"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - docs list Linux as a supported OS (docs/01-app/01-getting-started/01-installation.mdx:51); native N-API binaries are built for x86_64-unknown-linux-gnu and -musl (.github/workflows/build_and_deploy.yml:231-240) and published as @next/swc-linux-x64-gnu / -musl (crates/next-napi-bindings/npm/linux-x64-gnu/package.json:9-17). Cargo unit tests run on x86-64 Linux (.github/workflows/build_and_test.yml:288-296); most JS e2e jobs run on ARM Linux runners (build_and_test.yml:443).",
+        "wsl2": "yes (documented; no dedicated CI job found) - docs: 'Operating systems: macOS, Windows (including WSL), and Linux' (docs/01-app/01-getting-started/01-installation.mdx:51); WSL 2 is recommended with the project inside the VM filesystem, not /mnt/c (docs/01-app/02-guides/local-development.mdx:71-77). Code only detects WSL for telemetry (packages/next/src/telemetry/anonymous-meta.ts:3,47); CI has Windows jobs (build_and_test.yml:940-1021) but no WSL job.",
+        "macos_arm64": "yes - docs list macOS (installation.mdx:51); aarch64-apple-darwin native binary is built on macos-15 (build_and_deploy.yml:219-222) and published as @next/swc-darwin-arm64 (crates/next-napi-bindings/npm/darwin-arm64/package.json:9-14); the CLI warns when x64 Node runs under Rosetta on Apple Silicon (packages/next/src/bin/next.ts:115-125). No macOS test job found: 'macos' appears in workflows only at build_and_deploy.yml:37,219 and build_reusable.yml:308-309.",
+        "gpu": "no - not applicable; grep for cuda/gpu/nvidia in packages/next/src (excluding compiled) and in docs/ returned zero matches."
+      },
+      "integrations": {
+        "cli": "yes - `next` bin (packages/next/package.json:80-82; packages/next/src/bin/next.ts): build, dev (default), start, info, telemetry, typegen, upgrade, experimental-analyze, experimental-test, experimental-request-insights and internal {trace, query-trace, post-build, upload-trace, static-routes-info} (bin/next.ts:178-799). Also `create-next-app` (packages/create-next-app/package.json:17-19). No container or compose subcommand exists.",
+        "mcp": "Built-in MCP server (Streamable HTTP) at /_next/mcp, mounted only in the dev server and enabled by default (experimental.mcpServer: true - packages/next/src/server/config-shared.ts:2250; mounted at server/dev/hot-reloader-turbopack.ts:1171-1173 and hot-reloader-webpack.ts:1686-1701; route check server/mcp/get-mcp-middleware.ts:18; no auth check in :11-46). Code registers 9 tools (get_project_metadata, get_errors, get_page_metadata, get_logs, get_server_action_by_id, get_routes, get_request_insights, get_compilation_issues and compile_route - the last two Turbopack-only) at server/mcp/get-or-create-mcp-server.ts:44-75; docs list 8 and omit get_request_insights (docs/01-app/02-guides/mcp.mdx:81-88). The separate npm package `next-devtools-mcp` (not in this repo) is the documented client bridge (mcp.mdx:9,15-30). No MCP endpoint on the production server path found.",
+        "sdk_or_api": "Library API of npm package `next`: programmatic server `import next from 'next'; next({dev}).getRequestHandler()` (docs/01-app/02-guides/custom-server.mdx:18-38; packages/next/src/server/next.ts); Deployment Adapter API `NextAdapter` with modifyConfig/onBuildComplete (docs/01-app/03-api-reference/07-adapters/02-creating-an-adapter.mdx:38-68; adapterPath hook packages/next/src/build/index.ts:4461-4481; NEXT_ADAPTER_PATH at server/config-shared.ts:2157); custom cache handlers cacheHandler/cacheHandlers (docs self-hosting.mdx:111-125). No hosted vendor HTTP API; the HTTP surface is the served app plus built-in /_next/image (server/next-server.ts:942) and dev-only /_next/mcp.",
+        "claude_code_or_codex": "Claude Code plugin marketplace manifest .claude-plugin/marketplace.json (plugin 'nextjs', source ./skills) and plugin manifest skills/.claude-plugin/plugin.json; 4 skills in skills/ (next-dev-loop, next-cache-components-adoption, next-cache-components-optimizer, next-partial-prefetching-adoption); documented skill install `npx skills add vercel/next.js --skill next-dev-loop` (docs/01-app/02-guides/ai-agents.mdx:172). create-next-app generates AGENTS.md and CLAUDE.md (ai-agents.mdx:37), and `next dev` writes or updates them when it detects an AI coding agent unless `agentRules: false` (packages/next/src/server/lib/start-server.ts:511-534; server/lib/generate-agent-files.ts:90-123). Docs say Claude Code, Codex, Cursor and GitHub Copilot read AGENTS.md (ai-agents.mdx:33); version-matched docs ship inside the package at dist/docs (packages/next/taskfile.js:36-45). No Codex-specific plugin found."
+      },
+      "telemetry_and_network": "README is silent on telemetry. Docs: 'completely anonymous' telemetry, opt-out with `next telemetry disable` (docs/01-app/03-api-reference/06-cli/next.mdx:161-173). Code: on by default; disabled when env NEXT_TELEMETRY_DISABLED is any non-empty string (including '0') or via the conf flag (packages/next/src/telemetry/storage.ts:135-154). Events are POSTed to https://telemetry.nextjs.org/api/v1/record (telemetry/post-telemetry-payload.ts:25; 5 s timeout, 1 retry, errors swallowed). Payload: random anonymousId and salt kept in a `conf` store, sessionId, projectId = SHA-256(salt + `git config --local --get remote.origin.url` | REPOSITORY_URL | cwd) (storage.ts:156-172; project-id.ts:43-47), plus platform, OS release, arch, CPU count/model/speed, memory, isDocker, isWsl, isCI/ciName, nextVersion and detected AI-agent name (anonymous-meta.ts:8-23). In CI/Docker the conf is stored under <distDir>/cache (storage.ts:41-49). Telemetry objects are created on next build, next dev, export/analyze (build/index.ts:1208; cli/next-dev.ts:150; server/lib/router-server.ts:159-166 gated on opts.dev); no construction on the production-server path was found. NEXT_TELEMETRY_DEBUG prints events to stderr instead of sending (storage.ts:292-310). Example Dockerfiles leave `NEXT_TELEMETRY_DISABLED=1` commented out (examples/with-docker/Dockerfile:49-52,84-87). Other network use: `next dev` fetches https://registry.npmjs.org/-/package/next/dist-tags for a staleness notice (server/dev/hot-reloader-shared-utils.ts:17; errors ignored); if the platform SWC package is missing, it downloads @next/swc-* from the configured npm registry and may fall back to wasm (build/swc/index.ts:262-293,308-383; lib/download-swc.ts:37-41; opt out of wasm fallback with NEXT_DISABLE_SWC_WASM, index.ts:235); next/font/google fetches CSS from fonts.googleapis.com and font files at build/dev, honours http(s)_proxy, and can be mocked via NEXT_FONT_GOOGLE_MOCKED_RESPONSES (packages/font/src/google/get-google-fonts-url.ts:50; fetch-resource.ts:10-57; get-proxy-agent.ts:10-20; fetch-css-from-google-fonts.ts:17-18); create-next-app runs an update check at startup with no opt-out found (packages/create-next-app/index.ts:778-780) and downloads examples from api.github.com/codeload.github.com when --example is used (create-next-app/helpers/examples.ts:41-139). Opt-in only: `--experimental-upload-trace <url>` (bin/next.ts:217-219,373-375) and `next internal upload-trace` to https://nextjs.org/api/upload-trace (cli/internal/upload-trace.ts:4). Accounts: none needed to build, run or self-host; Vercel credentials are used only by the repo's own deploy tests and benchmarks (contributing/core/testing.md:139-150; bench/vercel/README.md:5-11)."
+    },
+    "code": {
+      "languages": [
+        "TypeScript/TSX - packages/next/src (CLI, build, server, client; 575 .ts/.tsx files under server/ alone) and packages/*",
+        "Rust - crates/ (221 .rs files) and turbopack/ (785 .rs files); nightly toolchain pinned (rust-toolchain.toml:4)",
+        "JavaScript - build/release scripts (scripts/, run-tests.js, taskfiles) and most of ~224 examples/",
+        "MDX - docs/ (456 files)",
+        "YAML - .github/workflows (36 files); Dockerfile + Compose YAML only in examples/with-docker*, .devcontainer and scripts/native-builder.Dockerfile"
+      ],
+      "entry_points": [
+        {
+          "path": "packages/next/src/bin/next.ts",
+          "what": "`next` CLI (commander): build, dev (default), start, info, telemetry, typegen, upgrade, experimental-*, internal; published as bin ./dist/bin/next (packages/next/package.json:80-82)"
+        },
+        {
+          "path": "packages/next/src/cli/next-start.ts",
+          "what": "`next start` production server; calls startServer (next-start.ts:12,84)"
+        },
+        {
+          "path": "packages/next/src/server/lib/start-server.ts",
+          "what": "HTTP server main shared by next dev, next start and standalone server.js; handles SIGINT/SIGTERM graceful shutdown (:399-480)"
+        },
+        {
+          "path": "packages/next/src/build/utils.ts",
+          "what": "Lines 1418-1467 generate .next/standalone/server.js (reads PORT default 3000, HOSTNAME default 0.0.0.0, KEEP_ALIVE_TIMEOUT; calls startServer)"
+        },
+        {
+          "path": "packages/next/src/server/next.ts",
+          "what": "Programmatic API next({dev}) used by custom servers"
+        },
+        {
+          "path": "packages/create-next-app/index.ts",
+          "what": "`create-next-app` binary (package.json:17-19); templates under packages/create-next-app/templates"
+        },
+        {
+          "path": "packages/next/src/server/mcp/get-mcp-middleware.ts",
+          "what": "Dev-only /_next/mcp endpoint (Streamable HTTP MCP)"
+        },
+        {
+          "path": "crates/next-napi-bindings",
+          "what": "Rust N-API addon (next-swc.*.node) loaded by packages/next/src/build/swc/index.ts; wasm fallback built from crates/wasm"
+        }
+      ],
+      "architecture": "Monorepo (pnpm workspaces + Turborepo + Lerna; 19 package.json under packages/). packages/next/src: bin/ + cli/ (commander CLI); build/ (build orchestration index.ts, webpack-config.ts, turbopack-build/, swc/ loader of native or wasm bindings, adapter/ hook, utils.ts standalone tracing); server/ (next.ts public API, next-server.ts, base-server.ts, lib/router-server.ts, lib/start-server.ts, app-render/ RSC rendering, dev/ HMR dev server, lib/incremental-cache/ file-system + custom cache handlers, use-cache/, image-optimizer.ts, mcp/); client/ and shared/ (browser runtime and router); telemetry/ and trace/; compiled/ (vendored, ncc-precompiled dependencies with 153 LICENSE files in the tree). Rust: crates/next-napi-bindings (N-API addon), next-api, next-core, next-custom-transforms (SWC transforms), wasm; turbopack/crates/* (~53 crates: turbo-tasks, turbopack-core, -ecmascript, -css, -node, ...). Other packages: create-next-app, eslint-config-next, eslint-plugin-next, font, next-codemod, next-env (.env loading: .env.<mode>.local, .env.local, .env.<mode>, .env), next-mdx, next-routing, next-swc, third-parties, next-rspack. Also docs/ (bundled into the package as dist/docs), examples/, test/, bench/, evals/, skills/ (Claude Code plugin), scripts/. Container material is limited to examples/with-docker*, .devcontainer/devcontainer.json (single contributor image plus features), scripts/native-builder.Dockerfile (release builder) and a Playwright container in test_examples.yml; none define a multi-service app.",
+      "packaging_and_release": "Artifacts are npm packages: `pnpm publish --recursive` of ./packages/** (next, create-next-app, @next/* ...) plus eight per-platform native packages @next/swc-{darwin-arm64,darwin-x64,linux-arm64-gnu,linux-arm64-musl,linux-x64-gnu,linux-x64-musl,win32-arm64-msvc,win32-x64-msvc} (crates/next-napi-bindings/npm/*; scripts/publish-release.js:105-151) and wasm packages @next/swc-wasm-web/-nodejs (publish-release.js:153-187; built at .github/workflows/build_and_deploy.yml:496-556). At publish time `next` gains the native packages as optionalDependencies and devDependencies/scripts are stripped (publish-release.js:208-229); `next` has no install lifecycle scripts (packages/next/package.json:83-93). Flow: trigger_release.yml (daily cron + manual dispatch) -> scripts/start-release.js -> push of tag v* -> build_and_deploy.yml builds binaries on macos-15, Windows and Ubuntu (docker builder image scripts/native-builder.Dockerfile, build_and_deploy.yml:197-241,383-421) -> publishRelease job in a per-channel GitHub Environment with id-token: write (:619-686) runs publish-release.js. The workflow uploads only workflow artifacts (:483-487); GitHub releases are un-drafted for prereleases (publish-release.js:251-313). Integrity: root .npmrc:4 sets `provenance = true` and actions are SHA-pinned (build_and_deploy.yml:55), but publish-release.js passes no --provenance flag (the only explicit --provenance is release-next-rspack.yml:123,130) and no checksum, cosign/sigstore or GPG signing steps exist for the .node binaries (grep of .github/workflows and scripts). Whether published tarballs carry attestations cannot be verified from source. No Docker image is built or published by this repo for Next.js apps.",
+      "tests_and_ci": "Frameworks: Jest 29.7 + Playwright 1.61 driven by `node run-tests.js` / scripts/run-jest.sh (package.json:54-58,224,250); e2e/development/production suites create isolated installs in a temp dir and start a server on a random port (contributing/core/testing.md:36-42); Rust via cargo nextest (.config/nextest.toml; packages/next-swc/package.json:22) plus doc tests; lint via ESLint 9, Prettier, tsc 6.0.2, ast-grep rules (.config/ast-grep/rules) and alex. Approx. test files (*.test.{js,jsx,ts,tsx}): 1,903 under test/ (e2e 1,136; production 358; development 298; unit 110) and 194 under packages/; Rust sources are in 221 (crates/) + 785 (turbopack/) .rs files, not separately counted. CI: 36 workflow files. build_and_test.yml (PR + push to next-16-3) runs build-native/build-next, lint (pnpm lint-no-typescript, check-examples, validate-externals-doc), types-and-precompiled, cargo unit tests (x86-64) / rust-check / rustdoc, unit tests on Node 20 and 22 (Linux and Windows), webpack dev/prod e2e sharded 10 ways x React default and 18.3.1 on Linux ARM runners, Turbopack dev/prod (7 shards), Rspack (label-gated), cache-components suites, wasm SWC test, Firefox/WebKit, new-test flake detection, deploy tests against Vercel preview builds; merge is gated by the aggregate `tests-pass` job (build_and_test.yml:1182-1225). test_examples.yml runs `run-tests.js --type examples` every 4 h in a Playwright Docker container (:11-12,56). Nothing builds or runs the examples/with-docker* images or Compose files (grep for 'with-docker' outside examples/ and docs/ found 0 hits); standalone output is tested without a container engine (e.g. test/e2e/app-dir/app/standalone.test.ts; 26 test files contain output: 'standalone') and graceful shutdown by test/production/graceful-shutdown/index.test.ts. No macOS or WSL test job.",
+      "dependencies": "Manifests and direct counts: package.json (root, private workspace) 0 dependencies, 193 devDependencies, 12 pnpm patchedDependencies; packages/next/package.json 6 dependencies (@next/env, @swc/helpers, baseline-browser-mapping, caniuse-lite, postcss, styled-jsx), 6 peerDependencies (react, react-dom, @opentelemetry/api, @playwright/test, babel-plugin-react-compiler, sass; the last four optional), 1 optionalDependency (sharp ^0.35.4; platform @next/swc-* added at publish), 225 devDependencies (vendored into dist/compiled via ncc); packages/create-next-app/package.json 0 dependencies, 18 devDependencies (ncc-bundled); packages/next-swc/package.json 3 devDependencies; 19 package.json under packages/*; ~224 examples each with its own package.json. Cargo.toml (workspace): 166 [workspace.dependencies] entries (50 in-repo path crates + 116 external), 4 [patch.crates-io] git patches (bincode, virtue, mdxjs, include_dir) and a git dependency on triomphe (Cargo.toml:157-377). Lockfiles: pnpm-lock.yaml, Cargo.lock. pnpm-workspace.yaml:37-38 sets blockExoticSubdeps and minimumReleaseAge 2880 min (48 h). Engines: Node >=20.9.0 (packages/next/package.json:374-376), pnpm 10.33.0 (package.json:308), Rust nightly-2026-07-29 (rust-toolchain.toml:4; source builds only).",
+      "security_policy": "none - no SECURITY.md anywhere in the tree (glob **/SECURITY.md and .github/SECURITY* empty). The only policy text is README.md:45-49: report privately by email to responsible.disclosure@vercel.com (bug-bounty programme); no SLA, supported-versions table or in-repo advisory process."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:19 - Rust-based JavaScript tooling 'for the fastest builds'",
+        "verified": "partial",
+        "evidence": "Rust tooling is real: Cargo workspace (Cargo.toml:4-18) with crates/next-napi-bindings, next-core, next-api and ~53 turbopack/crates, loaded as a native N-API addon by packages/next/src/build/swc/index.ts:202-306; Turbopack is the default bundler (docs/01-app/01-getting-started/01-installation.mdx:151-156). 'Fastest' is a superlative with no comparative measurement in the repo; the only numbers are project-reported compiler claims (docs/03-architecture/nextjs-compiler.mdx:8,19,245)."
+      },
+      {
+        "claim": "docs 17-deploying.mdx:6 - deployable as Node.js server, Docker container, static export, or via adapters",
+        "verified": "partial",
+        "evidence": "Node server: `next start` -> startServer (packages/next/src/cli/next-start.ts:12,84). 'Docker' means standalone output: output:'standalone' emits .next/standalone with a generated server.js (packages/next/src/build/utils.ts:1418-1467; docs .../output.mdx:22-48), exercised without any container engine (26 test files contain output: 'standalone', e.g. test/e2e/app-dir/app/standalone.test.ts). Static export: output 'export' (server/config-shared.ts:1870-1878). Adapters: adapterPath hook (build/index.ts:4461-4481). No Docker-specific code besides is-docker detection (cli/next-info.ts:286-291; server/cache-dir.ts:2-10; telemetry/storage.ts:41-49), and no workflow or test builds the examples/with-docker* images."
+      },
+      {
+        "claim": "docs 17-deploying.mdx:44 - 'Docker deployments support all Next.js features'",
+        "verified": "partial",
+        "evidence": "The standalone server.js and `next start` both call the same startServer (build/utils.ts:1446-1467; cli/next-start.ts:84), so feature parity is by construction, but nothing in the repo runs the suite inside a container image. The docs qualify multi-instance use themselves: per-instance cache (self-hosting.mdx:89,109), per-build encryption key (:193-203), revalidateTag not propagated across instances (:273-275) - all needing cacheHandler/cacheHandlers or env configuration."
+      },
+      {
+        "claim": "examples/with-docker-compose/README.md:9 - Compose lets you 'Run multiple Next.js apps, databases, and other microservices in a single deployment'",
+        "verified": "partial",
+        "evidence": "True of Docker Compose generally, but the shipped compose files define exactly one service (next-app) with only a comment placeholder '# Add more containers below (nginx, postgres, etc.)' (compose.dev.yaml:1-31, compose.prod.yaml:1-22), no named volumes (dev only bind-mounts src/ and public/, compose.dev.yaml:16-18) and an external pre-created network (compose.dev.yaml:29-31). with-docker, with-docker-multi-env and with-docker-export-output likewise define Next.js services only (examples/with-docker/compose.yml:1-28; docker/production/compose.yaml:1-8; with-docker-export-output/compose.yml:1-27)."
+      },
+      {
+        "claim": "docs output.mdx:54 - standalone server.js honours PORT and HOSTNAME env vars",
+        "verified": "yes",
+        "evidence": "packages/next/src/build/utils.ts:1437-1440 emits `parseInt(process.env.PORT, 10) || 3000`, `process.env.HOSTNAME || '0.0.0.0'` and KEEP_ALIVE_TIMEOUT (the last is not mentioned in output.mdx). Only some example Dockerfiles set HOSTNAME=0.0.0.0 (examples/with-docker/Dockerfile:82; with-docker-multi-env/docker/production/Dockerfile:54); the compose example's prod.Dockerfile:75 does not."
+      },
+      {
+        "claim": "docs self-hosting.mdx:299 - SIGINT/SIGTERM trigger graceful shutdown that finishes in-flight requests and pending after() callbacks",
+        "verified": "yes",
+        "evidence": "packages/next/src/server/lib/start-server.ts:399-480: server.close() waits for pending requests, then nextServer.close() and cleanup run, exiting 130 (SIGINT) / 143 (SIGTERM); the handlers are skipped when NEXT_MANUAL_SIG_HANDLE is set (:477-480); comment at :475 cites Docker. Covered by test/production/graceful-shutdown/index.test.ts. No drain timeout is implemented in this function (platform must provide one, as the docs say)."
+      },
+      {
+        "claim": "docs self-hosting.mdx:89,109 - default cache is in-memory (50 MB) plus local disk, per instance",
+        "verified": "yes",
+        "evidence": "cacheMaxMemorySize default 50 * 1024 * 1024 (packages/next/src/server/config-shared.ts:2072); FileSystemCache uses an in-memory LRU when maxMemoryCacheSize is set and persists to the dist dir (packages/next/src/server/lib/incremental-cache/file-system-cache.ts:50-69); custom handler hook in server/lib/incremental-cache/index.ts:154,271."
+      },
+      {
+        "claim": "docs self-hosting.mdx:193-203 - NEXT_SERVER_ACTIONS_ENCRYPTION_KEY must be shared across instances; key is a base64 AES key embedded in build output",
+        "verified": "yes",
+        "evidence": "Runtime reads process.env.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY first, else the manifest key, and imports it as AES-GCM after atob() (packages/next/src/server/app-render/encryption-utils.ts:74-88); when unset a 256-bit AES-GCM key is generated per build (encryption-utils-server.ts:97-129). Extra detail: when is-docker detects a container, no key cache is written between builds (encryption-utils-server.ts:44-50; server/cache-dir.ts:4-10)."
+      },
+      {
+        "claim": "docs next.mdx:163 / CLI - telemetry is 'completely anonymous' and optional",
+        "verified": "partial",
+        "evidence": "Opt-out exists (`next telemetry disable`, NEXT_TELEMETRY_DISABLED; packages/next/src/telemetry/storage.ts:135-154, cli/next-telemetry.ts:14-31) and no events are sent when disabled (storage.ts:312-315). 'Anonymous' is pseudonymous in practice: a persistent random anonymousId, a salted SHA-256 of the git remote URL (or cwd), CPU model, memory, OS release and Docker/WSL/CI/AI-agent flags are sent (anonymous-meta.ts:8-23; project-id.ts:43-47; post-telemetry-payload.ts:25). Any non-empty NEXT_TELEMETRY_DISABLED value, including '0', disables it."
+      },
+      {
+        "claim": "docs ai-agents.mdx:63 / mcp.mdx:79-88,172 - `next dev` auto-generates AGENTS.md/CLAUDE.md when an AI agent is detected; Next.js 16+ has a built-in /_next/mcp endpoint with 8 listed tools",
+        "verified": "partial",
+        "evidence": "Auto-generation confirmed: ensureAgentRulesForDev (packages/next/src/server/lib/app-info-log.ts:129-136), writeAgentFiles (generate-agent-files.ts:90-123), gated on agentRules !== false (start-server.ts:511-534), test test/development/app-dir/agent-rules-auto-generate/. MCP endpoint confirmed (server/mcp/get-mcp-middleware.ts:18; default on, config-shared.ts:2250). Docs tool list is out of date: code also registers get_request_insights (server/mcp/get-or-create-mcp-server.ts:67), and get_compilation_issues/compile_route are Turbopack-only (hot-reloader-webpack.ts:1698)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Docker image size, with-docker-compose example (multistage build + output: standalone vs. no multistage)",
+        "metric": "final image size",
+        "value": "~110 MB vs ~1 GB ('up to 85% smaller')",
+        "source": "examples/with-docker-compose/README.md:10,63,77",
+        "independent": false
+      },
+      {
+        "what": "Node base image used by the with-docker example (slim vs alpine)",
+        "metric": "base image size",
+        "value": "slim ~226 MB; alpine ~110 MB (~100 MB smaller)",
+        "source": "examples/with-docker/README.md:145,149",
+        "independent": false
+      },
+      {
+        "what": "Static-export Docker images (with-docker-export-output)",
+        "metric": "image size",
+        "value": "Nginx-based ~50 MB (README:30,137,203) or ~80 MB (README:119); serve-based ~350 MB (README:119) or ~300 MB (README:203) - the README is internally inconsistent",
+        "source": "examples/with-docker-export-output/README.md:30,119,137,203",
+        "independent": false
+      },
+      {
+        "what": "Next.js Compiler (SWC) vs Babel",
+        "metric": "compile speed",
+        "value": "17x faster than Babel",
+        "source": "docs/03-architecture/nextjs-compiler.mdx:8",
+        "independent": false
+      },
+      {
+        "what": "Switching Next.js to SWC",
+        "metric": "Fast Refresh and build speed",
+        "value": "~3x faster Fast Refresh, ~5x faster builds",
+        "source": "docs/03-architecture/nextjs-compiler.mdx:19",
+        "independent": false
+      },
+      {
+        "what": "SWC minifier vs Terser",
+        "metric": "minification speed",
+        "value": "7x faster than Terser",
+        "source": "docs/03-architecture/nextjs-compiler.mdx:245",
+        "independent": false
+      },
+      {
+        "what": "next/image AVIF vs WebP",
+        "metric": "encode time and compressed size",
+        "value": "AVIF ~50% longer to encode, ~20% smaller than WebP",
+        "source": "docs/01-app/03-api-reference/02-components/image.mdx:770",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope: nothing in this repo defines or runs multi-service container applications. Container material is docs plus four examples (with-docker, with-docker-compose, with-docker-multi-env, with-docker-export-output) that rely on the external Docker/Compose CLIs; product code only detects Docker (packages/next/src/cli/next-info.ts:286-291; server/cache-dir.ts:2-10; telemetry/storage.ts:41-49). The compose files define a single Next.js service each, with a placeholder comment for 'nginx, postgres, etc.' and no named volumes (examples/with-docker-compose/compose.dev.yaml:1-31, compose.prod.yaml:16); both with-docker services bind host port 3000 (examples/with-docker/compose.yml:12-13,26-27). No CI job or test builds or runs these examples (grep for 'with-docker' outside examples/ and docs/: 0 hits).",
+      "Example reproducibility: next is pinned to 'latest' (examples/with-docker/package.json:9; examples/with-docker-compose/next-app/package.json:9) with caret ranges for react/typescript, and the compose README warns build errors are more likely without a lockfile (examples/with-docker-compose/README.md:31-33); the compose example needs a manually created external network (compose.dev.yaml:29-31; README:44-46) and a fixed container_name (compose.dev.yaml:3); base images are tag-pinned only (node:20-alpine in prod.Dockerfile:3; node:24.13.0-slim in with-docker/Dockerfile:8) and READMEs ask users to bump them by hand (examples/with-docker/README.md:156-157); only some Dockerfiles set HOSTNAME=0.0.0.0 although the standalone server reads process.env.HOSTNAME (build/utils.ts:1438 vs compose example prod.Dockerfile:75).",
+      "Dev server in a container: docs advise against Docker for development on Mac/Windows because host-to-VM file sharing delays Fast Refresh (docs/01-app/02-guides/local-development.mdx:53-69). `next dev` binds all interfaces unless -H is given (bin/next.ts:342-345; server/lib/start-server.ts:309,554), moves to another port when the port is the default (cli/next-dev.ts:272; start-server.ts:300-309), blocks cross-origin dev-resource requests unless allowedDevOrigins lists them (server/lib/router-utils/block-cross-site-dev.ts:115-174), and serves an unauthenticated MCP endpoint at /_next/mcp that is on by default (config-shared.ts:2250; server/mcp/get-mcp-middleware.ts:11-46); requests without an Origin header are not blocked (block-cross-site-dev.ts:168-173).",
+      "Network and telemetry: telemetry is on by default and sends machine metadata plus a salted hash of the git remote to telemetry.nextjs.org from next build/dev (storage.ts:135-154; anonymous-meta.ts:8-23; post-telemetry-payload.ts:25); example Dockerfiles leave the disable line commented out (examples/with-docker/Dockerfile:49-52,84-87), so container builds report unless NEXT_TELEMETRY_DISABLED is set. next/font/google needs fonts.googleapis.com at build time (packages/font/src/google/get-google-fonts-url.ts:50); a lockfile lacking the platform binary triggers a runtime download from the npm registry or a wasm fallback (build/swc/index.ts:262-293,308-383; lib/download-swc.ts:37-41); `next dev` queries registry.npmjs.org (hot-reloader-shared-utils.ts:17); create-next-app update-check has no opt-out found (create-next-app/index.ts:778-780).",
+      "State is container-local by default: cache is per-instance memory (50 MB, config-shared.ts:2072) plus disk (incremental-cache/file-system-cache.ts:50-69); revalidateTag does not propagate across instances without a custom handler (docs self-hosting.mdx:273-275); the Server Actions encryption key differs per build unless NEXT_SERVER_ACTIONS_ENCRYPTION_KEY is set, and inside Docker it is not cached between builds (encryption-utils-server.ts:44-50; cache-dir.ts:4-10); `.next` must be writable by the runtime user for prerender cache and optimized images (examples/with-docker/Dockerfile:92-94; README:134); NEXT_PUBLIC_* values are inlined at build time (self-hosting.mdx:39), so images are per-environment unless values are read at request time.",
+      "Workspace side effects: `next dev` creates or rewrites AGENTS.md and CLAUDE.md in the project root when it detects an AI coding agent, unless `agentRules: false` (packages/next/src/server/lib/start-server.ts:511-534; generate-agent-files.ts:90-123; docs ai-agents.mdx:63,85); create-next-app also generates them by default (docs installation.mdx:42). Agent detection uses env-var and filesystem probes (telemetry/agent-name.ts:5-25).",
+      "Artifact integrity is not verifiable from source: root .npmrc:4 sets provenance=true and the publish job has id-token: write (build_and_deploy.yml:629-631), but scripts/publish-release.js passes no --provenance flag and the workflow produces no checksums, signatures or release assets for the native .node binaries (build_and_deploy.yml:483-487 uploads workflow artifacts only). Installing `next` pulls optional per-platform native packages plus optional sharp (publish-release.js:208-217; packages/next/package.json:132-134), and CI installs wasm-pack through unpinned `curl ... | sh` (build_and_deploy.yml:535).",
+      "Platform, maintenance and policy: requires Node >=20.9.0 (packages/next/package.json:374-376); tests run on Linux ARM runners and Windows with no macOS or WSL test job (build_and_test.yml:443,940-1021; 'macos' only at build_and_deploy.yml:37,219 and build_reusable.yml:308-309); docs note glibc Linux Image Optimization may need allocator configuration (self-hosting.mdx:25); source builds need a pinned Rust nightly (rust-toolchain.toml:4) and git-patched crates (Cargo.toml:371-377); no SECURITY.md, only the README email (README.md:45-49)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "vercel/next.js",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "create-next-app via npx (docs; requires Node.js >=20.9; OS-agnostic incl. Linux/macOS/WSL): `npx create-next-app@latest my-app --yes`",
+          "citation": "docs/01-app/01-getting-started/01-installation.mdx:25 (system requirements :50-51)",
+          "holds": true,
+          "note": "Line 25 is exactly `npx create-next-app@latest my-app --yes`, inside the npm block (:24-28). :50 says minimum Node.js 20.9 and :51 says 'macOS, Windows (including WSL), and Linux.' In code, `--yes` is a real option (packages/create-next-app/index.ts:89), and the engines field is node >=20.9.0 in both packages/create-next-app/package.json:50 and packages/next/package.json:374-376. Nit: 'OS-agnostic' is the dossier's own wording; the docs name three OS families."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, file license.md; README license badge links to license.md; the file is the MIT License, Copyright (c) 2025 Vercel, Inc.",
+          "citation": "license.md:1-3; README.md:12",
+          "holds": true,
+          "note": "license.md:1 says 'The MIT License (MIT)' and :3 says 'Copyright (c) 2025 Vercel, Inc.', followed by the standard MIT text. The README.md:12 badge links to github.com/vercel/next.js/blob/canary/license.md, i.e. the canary branch, not the tag. The licence is consistent across the repo: packages/next/package.json:6 is \"MIT\", packages/next/license.md has the same header, and every packages/*/package.json and every crates/* and turbopack/crates/* Cargo.toml that declares a licence says MIT. There is no other top-level licence file."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - docs list Linux; native N-API binaries built for x86_64-unknown-linux-gnu and -musl and published as @next/swc-linux-x64-gnu / -musl; Cargo unit tests run on x86-64 Linux; most JS e2e jobs run on ARM Linux runners.",
+          "citation": "docs/01-app/01-getting-started/01-installation.mdx:51; .github/workflows/build_and_deploy.yml:231-240; crates/next-napi-bindings/npm/linux-x64-gnu/package.json:9-17; .github/workflows/build_and_test.yml:288-296,443",
+          "holds": true,
+          "note": "installation.mdx:51 lists Linux. build_and_deploy.yml:231-240 is the linux matrix with gnu and musl, each arch [x86_64, aarch64]; :215 builds the target as arch-vendor-sys-abi, so x86_64-unknown-linux-gnu and -musl are produced. linux-x64-gnu/package.json:9-17 sets os linux, cpu x64, libc glibc; the name @next/swc-linux-x64-gnu is at :2, outside the cited range. linux-x64-musl/package.json is the same with libc musl. scripts/publish-release.js:105-151 publishes every package under crates/next-napi-bindings/npm. build_and_test.yml:288-296: test-cargo-unit runs on ubuntu-latest-16-core-oss, with the comment 'Run on x86-64 instead of arm64'. :443 is ubuntu-latest-16-core-arm-oss, and the reusable workflow's default runner is also ARM (build_reusable.yml:65), so 'most' holds; the rest run on Windows. Worth knowing: no JS e2e job in build_and_test.yml runs on x86-64 Linux."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "yes - `next` bin: build, dev (default), start, info, telemetry, typegen, upgrade, experimental-analyze, experimental-test, experimental-request-insights and internal {trace, query-trace, post-build, upload-trace, static-routes-info}; also `create-next-app`; no container or compose subcommand exists.",
+          "citation": "packages/next/package.json:80-82; packages/next/src/bin/next.ts:178-799; packages/create-next-app/package.json:17-19",
+          "holds": true,
+          "note": "package.json:80-82 is bin next -> ./dist/bin/next. next.ts registers build :179, experimental-analyze :275, dev {isDefault:true} :314, info :422, start :436, telemetry :495, typegen :516, upgrade :551, experimental-test :580, experimental-request-insights :613, and internal :642 with trace (alias turbo-trace-server) :648, query-trace :674, post-build :722, upload-trace :742 and static-routes-info :760; the file ends with program.parse at :801. The create-next-app bin is at :17-19. Searching for docker|compose|container finds nothing in src/bin; in src/cli the only hit is is-docker detection (next-info.ts:286-291). Minor omission: the hidden `export` command (next.ts:416-419, {hidden:true}) is not in the list."
+        },
+        {
+          "field": "claim_checks[3]",
+          "statement": "examples/with-docker-compose/README.md:9 'Run multiple Next.js apps, databases, and other microservices in a single deployment' - verified partial: shipped compose files define one next-app service with only a placeholder comment, no named volumes, an external pre-created network; the other with-docker* examples define Next.js services only.",
+          "citation": "examples/with-docker-compose/README.md:9; compose.dev.yaml:1-31; compose.prod.yaml:1-22; examples/with-docker/compose.yml:1-28; examples/with-docker-multi-env/docker/production/compose.yaml:1-8; examples/with-docker-export-output/compose.yml:1-27",
+          "holds": true,
+          "note": "README:9 matches the quote word for word. compose.dev.yaml has one service, next-app (:2), and the placeholder '# Add more containers below (nginx, postgres, etc.)' at :25. Its only volumes are bind mounts of ./next-app/src and ./next-app/public (:16-18), with no top-level volumes key, and :29-31 declares my_network as external: true. compose.prod.yaml is 22 lines with one next-app service and the placeholder at :16. with-docker/compose.yml has 2 services, Node and Bun, both standalone Next.js. multi-env production has one service. export-output has 2 services, and both are the Next.js static export: the nginx one copies /app/out (Dockerfile:72,86) and the other uses serve. The uncited compose.prod-without-multistage.yaml and the multi-env development/staging compose files are also single-service. The 'partial' rating is fair."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

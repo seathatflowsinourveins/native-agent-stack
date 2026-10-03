@@ -1,0 +1,303 @@
+{
+  "contender": "systemd/systemd",
+  "revision": {
+    "contender": "systemd/systemd",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "systemd/systemd",
+        "tag": "v262",
+        "commit": "8cc40e0c5e9234bf45084751ac53b1fbfe70b492",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v262",
+    "commit": "8cc40e0c5e9234bf45084751ac53b1fbfe70b492",
+    "read_at": "2026-10-02T03:02:53+00:00"
+  },
+  "dossier": {
+    "contender": "systemd/systemd",
+    "revision": {
+      "tag": "v262",
+      "commit": "8cc40e0c5e9234bf45084751ac53b1fbfe70b492",
+      "read_at": "2026-10-03"
+    },
+    "license": {
+      "spdx": "LGPL-2.1-or-later",
+      "file": "LICENSE.LGPL2.1"
+    },
+    "purpose": "systemd is the Linux system and service manager (PID 1 in system mode, one instance per user session in user mode; README.md:3, docs/ARCHITECTURE.md:169-172) plus a suite of daemons and tools (journald, udev, logind, networkd, resolved, nspawn, ...). The README makes no workflow-engine claims; the facts relevant to a scheduling/supervision need come from the man pages and code. (1) Scheduling: .timer units with OnCalendar= and monotonic On*Sec= triggers, Persistent= catch-up via on-disk stamp files, RandomizedDelaySec=, DeferReactivation= (man/systemd.timer.xml:107-441); a timer enqueues a start job on its service (src/core/timer.c:668); systemd-run can create transient timer+service pairs for arbitrary commands (man/systemd-run.xml:64-89,453-506); transient units are kept under /run/systemd/transient (man/systemd.unit.xml:403-404). Shipped timers: systemd-tmpfiles-clean.timer and the sysupdate timers (units/*.timer). (2) DAG: the unit dependency graph (Requires=/Wants=/BindsTo=, After=/Before=, OnSuccess=/OnFailure=) is resolved into an in-memory job transaction when a unit is started; ordering cycles are broken by deleting jobs (src/core/transaction.c:425-511); no persisted per-run DAG instance was found. (3) Retries: Restart= with RestartSec=/RestartSteps=/RestartMaxDelaySec=/RestartRandomizedDelaySec= (new in v262), limited by StartLimitIntervalSec=/StartLimitBurst= (default 5 starts per 10 s, src/basic/constants.h:20-21); Restart=always/on-success are rejected for Type=oneshot (src/core/service.c:1059-1060). (4) Process-tree bounds: every unit gets a cgroup; KillMode=control-group is the default (src/core/kill.h:8); stop sends SIGTERM then SIGKILL after TimeoutStopSec= (man/systemd.kill.xml:63-101); TasksMax= (default 15% of pid limits, man/systemd-system.conf.xml:225-234), MemoryMax=, slice ConcurrencySoftMax=/ConcurrencyHardMax=/ActivatingConcurrencyMax=; RuntimeMaxSec= is ignored for Type=oneshot (src/core/service.c:1077-1078). (5) History: journald entries carry a per-run INVOCATION_ID (man/systemd.exec.xml:4245-4251; journalctl -I/--invocation, man/journalctl.xml:354-376) and job results are logged with JOB_ID/JOB_RESULT (src/core/job.c:802-831); successfully finished units are unloaded immediately while failed ones stay in memory until reset-failed unless --collect/CollectMode=inactive-or-failed is used (man/systemd-run.xml:545-553); systemctl list-timers shows only the last trigger (man/systemctl.xml:197-200). (6) UI: CLI only (systemctl, systemd-run, journalctl, systemd-analyze); the only web page in the repo is the journal viewer at /browse of systemd-journal-gatewayd (man/systemd-journal-gatewayd.service.xml:165-168). (7) Cancellation: systemctl stop/kill act on running units; systemctl cancel/CancelJob only remove queued jobs (man/systemctl.xml:1377-1382; man/org.freedesktop.systemd1.xml:1498-1501). No rollback or compensation mechanism for side effects was found; ExecStopPost= is the documented cleanup hook (man/systemd.service.xml:594-598).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Project self-description: 'System and Service Manager'; most documentation is on systemd.io; a Code Map (docs/ARCHITECTURE.md) and a hacking guide are linked.",
+          "citation": "README.md:3,19,27-29"
+        },
+        {
+          "claim": "Build requirements are kept in the plain-text README file and release changes in NEWS.",
+          "citation": "README.md:23-25"
+        },
+        {
+          "claim": "Stable branches with backported patches are available in the separate systemd-stable repository.",
+          "citation": "README.md:37"
+        },
+        {
+          "claim": "A security bug bounty program (sponsored by the Sovereign Tech Fund, hosted on YesWeHack) exists; this is an external program and not verifiable from the repository.",
+          "citation": "README.md:39"
+        },
+        {
+          "claim": "Distribution packages built from git main, and from the latest stable release, are available as OBS repositories.",
+          "citation": "README.md:41-42"
+        },
+        {
+          "claim": "Badges advertise Semaphore CI, Coverity, OSS-Fuzz, CIFuzz, CII Best Practices, Coveralls coverage and OpenSSF Scorecard.",
+          "citation": "README.md:5-15"
+        },
+        {
+          "claim": "License: 'LGPL-2.1-or-later for all code, exceptions noted in LICENSES/README.md'.",
+          "citation": "README:28-29"
+        },
+        {
+          "claim": "Kernels below 5.10 ('minimum baseline') are 'not supported at all'; below 5.14 ('recommended baseline') have significant gaps and get taint flag 'old-kernel'; newer kernel APIs fall back gracefully when unavailable.",
+          "citation": "README:58-68,90-91"
+        },
+        {
+          "claim": "The build prefix must be /usr/; split-usr and unmerged-usr systems are no longer supported.",
+          "citation": "README:311-316"
+        },
+        {
+          "claim": "Policy: main and latest releases should compile on current popular distributions; regularly tested on amd64, i386, arm64, ppc64el and s390x.",
+          "citation": "README:320-337"
+        },
+        {
+          "claim": "Default shared linking is recommended; mixing versions of components that are normally built together is not tested upstream and is not supported.",
+          "citation": "README:383-388"
+        },
+        {
+          "claim": "A fully static 'systemd' binary usable as PID 1 in a container can be built with --default-library=static --prefer-static -Dbuild-static=true -Dsystemd-multicall-binary=true; it does not use dlopen() or NSS.",
+          "citation": "README:390-399"
+        },
+        {
+          "claim": "Toolchain/runtime requirements: glibc >= 2.34 or musl >= 1.2.6, python >= 3.9, meson >= 0.62.0, ninja, gcc >= 8.4; dbus >= 1.4.0 is 'strictly speaking optional, but recommended'.",
+          "citation": "README:213-214,255,260-262,275"
+        },
+        {
+          "claim": "Taint flags: the manager warns on missing cgroup support ('cgroups-missing'), the old cgroup hierarchy ('cgroupsv1'), a local-time hardware clock, a bad /var/run, UID/GID range problems; readable via busctl get-property ... Tainted.",
+          "citation": "README:457-476"
+        }
+      ],
+      "install": [
+        {
+          "method": "Build from source with Meson/Ninja, then install",
+          "command": "meson setup build/ && ninja -C build/ ; sudo meson install -C build/ --no-rebuild   (or: DESTDIR=... meson install -C build/)",
+          "citation": "README:282-296"
+        },
+        {
+          "method": "Distribution packages from SUSE OBS repositories (project system:systemd for git main, system:systemd:stable for the latest release)",
+          "command": "Follow the per-distribution repository instructions at https://software.opensuse.org//download.html?project=system%3Asystemd&package=systemd (linked page not opened; no package-manager command is given in the repo). For Secure Boot, docs/HACKING.md also shows: wget https://build.opensuse.org/projects/system:systemd/signing_keys/download?kind=ssl -O- | openssl x509 -inform pem -outform der -out obs.der ; run0 mokutil --import obs.der",
+          "citation": "README.md:41-42; docs/HACKING.md:154-167"
+        },
+        {
+          "method": "Build distribution packages with mkosi, then upgrade the host with the distro package manager",
+          "command": "mkosi -d <distribution> -r <release> -t none -f ; run0 dnf upgrade build/mkosi.builddir/<distribution>~<release>~<architecture>/*.rpm   (Debian/Ubuntu: run0 apt-get install .../*.deb; Arch: run0 pacman --upgrade --needed --noconfirm .../*.pkg.tar; openSUSE: run0 zypper --non-interactive install --allow-unsigned-rpm .../*.rpm)",
+          "citation": "docs/HACKING.md:119-144"
+        },
+        {
+          "method": "Build and boot a throwaway OS image containing the built systemd (nspawn or qemu) instead of installing on the host",
+          "command": "mkosi -f genkey ; mkosi -f box -- meson setup -Dbpf-framework=disabled build ; mkosi -f box -- meson compile -C build ; mkosi -f box -- meson compile -C build mkosi ; mkosi boot   (or: mkosi vm)",
+          "citation": "docs/HACKING.md:43-59"
+        },
+        {
+          "method": "Create a source tarball from a git tag (documented example uses v250)",
+          "command": "v=250 && git archive --prefix=systemd-$v/ v$v | zstd >systemd-$v.tar.zstd",
+          "citation": "README:298-299"
+        },
+        {
+          "method": "Static PID 1 build for containers",
+          "command": "meson setup build/ --default-library=static --prefer-static -Dbuild-static=true -Dsystemd-multicall-binary=true && ninja -C build/",
+          "citation": "README:390-399; NEWS:167-172"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - amd64 is listed as a regularly tested architecture (README:333-336) and unit tests run on x86_64 ubuntu-24.04 runners (.github/workflows/unit-tests.yml:24-27). Requires Linux >= 5.10 (>= 5.14 recommended; README:58-68), cgroup v2 (src/core/main.c:3807-3822), glibc >= 2.34 or musl >= 1.2.6 (README:213-214) and a merged /usr (README:311-316).",
+        "wsl2": "unknown - no WSL install or support statement in README.md, README, docs/*.md or .github/; upstream only detects WSL as a container-like virtualization type (src/basic/virt.c:659-665; man/systemd-detect-virt.xml:192-193,214-219; ConditionVirtualization=wsl at man/systemd.unit.xml:1451).",
+        "macos_arm64": "no - 'systemd is not portable to non-Linux systems' and portability patches are not accepted (docs/PORTABILITY_AND_STABILITY.md:111-113); no macOS install method is documented. (Linux arm64 is a different target: arm64 is a regularly tested architecture, README:333-336, .github/workflows/unit-tests.yml:29-32.)",
+        "gpu": "no - nothing in README.md, README or docs requires or uses a GPU; the only GPU-adjacent mention is the udev 'render' and 'video' group names (README:406-407)."
+      },
+      "integrations": {
+        "cli": "yes - systemctl (src/systemctl/meson.build:43-56; verbs list-timers, list-jobs, cancel, kill, clean, freeze at src/systemctl/systemctl.c:922,957-963,1022-1024), systemd-run and its run0 symlink (src/run/meson.build:3-13; transient timers via --on-calendar/--on-active etc., man/systemd-run.xml:453-506; --wait propagates the unit result as exit status, src/run/run.c:2491-2502), journalctl (src/journal/journalctl.c:1139; -I/--invocation, man/journalctl.xml:354-376), systemd-analyze (calendar, verify, dot, plot; src/analyze/analyze.c:216-273), loginctl enable-linger (man/loginctl.xml:186-195). The CLI is declared stable but its human-readable output generally is not (docs/PORTABILITY_AND_STABILITY.md:42-49).",
+        "mcp": "none found - searches for 'MCP' / 'Model Context Protocol' across src/, man/, docs/, tools/, mkosi/, .github/, README*, NEWS and AGENTS.md returned no matches.",
+        "sdk_or_api": "yes - D-Bus API org.freedesktop.systemd1 (man/org.freedesktop.systemd1.xml; e.g. CancelJob at src/core/dbus-manager.c:3310); Varlink API io.systemd.Manager / io.systemd.Unit / io.systemd.Job incl. StartTransient (src/core/varlink.c:430-444; socket /run/systemd/io.systemd.Manager at line 554; NEWS:191-196); C libraries libsystemd (sd-bus, sd-event, sd-journal, sd-varlink, ...; README:340-346; docs/ARCHITECTURE.md:31-32); the sd_notify socket protocol. D-Bus, Varlink, libsystemd's public interface and the unit-file format are declared stable (docs/PORTABILITY_AND_STABILITY.md:30-56). No HTTP/REST API for the manager; HTTP exists only in systemd-journal-gatewayd for journal data (man/systemd-journal-gatewayd.service.xml:38-42).",
+        "claude_code_or_codex": "none found as a user-facing integration. Repo-internal only: .github/workflows/claude-review.yml (CI job that gives maintainers a Claude Code PR review via '@claude'; header lines 1-4; installs a pinned, SHA-256-checked Claude Code binary at lines 276-291 and authenticates to AWS Bedrock via OIDC at lines 293-297), AGENTS.md (guidance file for AI coding agents contributing to this repository), and the LLM/AI contribution policy in docs/CONTRIBUTING.md:53-69."
+      },
+      "telemetry_and_network": "No telemetry found: case-insensitive searches of src/, man/, docs/, NEWS and README* for 'telemetry', 'phone home' and 'usage statistics' returned no matches. No account or registration concept found; PID 1 inputs are local (unit files, credentials, kernel command line, D-Bus; docs/ARCHITECTURE.md:169-170); some daemons need local OS users/groups (README:401-426). Network use is confined to optional components that act only when built, enabled or invoked: systemd-timesyncd (NTP; NTP= empty by default with a compiled-in fallback list, man/timesyncd.conf.xml:55-74; build default time1-4.google.com, meson_options.txt:395-397), systemd-resolved (compiled-in default DNS server list 1.1.1.1 / 8.8.8.8 / 9.9.9.9 etc., meson_options.txt:392-394), systemd-networkd, systemd-journal-remote/upload/gatewayd (gatewayd listens on port 19531, plain HTTP unless --cert/--key, man/systemd-journal-gatewayd.service.xml:38-42), importctl/importd and systemd-sysupdate (download images/updates; man/importctl.xml:24, man/systemd-sysupdate.xml:31), systemd-imds (cloud IMDS at 169.254.169.254, src/imds/imdsd.c:68) and the experimental 'systemd-report upload' (HTTP(S) POST only when run with --url or when a socket exists under /run/systemd/report.upload/; plain http is unencrypted and --trust=all disables certificate checks; man/systemd-report.xml:36-37,85-97,134-143,170-174). The shipped systemd-report@.service runs systemd-report with no verb (units/systemd-report@.service.in:18) and no shipped timer calls it; the shipped timers are systemd-tmpfiles-clean.timer (system and user) and the two sysupdate timers (units/*.timer, units/user/systemd-tmpfiles-clean.timer). The upstream preset file enables systemd-networkd, systemd-resolved and systemd-timesyncd and disables journal-gatewayd/remote/upload (presets/90-systemd.preset:32-48,68-70); whether a distribution applies it was not checked."
+    },
+    "code": {
+      "languages": [
+        "C (~1,849 .c files under src/; primary language)",
+        "Python (~66 .py files: build tooling, ukify, test harnesses)",
+        "Shell (~314 integration-test scripts test/units/TEST-*.sh)",
+        "Meson build files (meson.build, meson_options.txt)",
+        "DocBook XML (486 man/*.xml pages)",
+        "Jinja2 and gperf templates (*.in)",
+        "eBPF C programs (src/bpf/)"
+      ],
+      "entry_points": [
+        {
+          "path": "src/core/main.c:4028",
+          "what": "main() of the 'systemd' service manager (PID 1 system instance and --user instance); /sbin/init is a symlink to it (src/core/meson.build:337-340)"
+        },
+        {
+          "path": "src/core/executor.c:121",
+          "what": "systemd-executor: deserializes the unit's exec context, applies sandboxing/cgroup/namespaces, then execve()s the command; spawned by PID 1 via posix_spawn (src/core/execute.c:580-588)"
+        },
+        {
+          "path": "src/systemctl/systemctl-main.c:21",
+          "what": "systemctl CLI (start/stop/kill/cancel/list-jobs/list-timers/clean/freeze/...); halt/poweroff/reboot/shutdown symlinks (src/systemctl/meson.build:66-70)"
+        },
+        {
+          "path": "src/run/run.c:2957",
+          "what": "systemd-run (and run0 symlink): transient service/scope/timer/path/socket units for arbitrary commands; --wait returns the unit result as exit status (run.c:2491-2502)"
+        },
+        {
+          "path": "src/journal/journald.c:23",
+          "what": "systemd-journald daemon (structured logs incl. invocation-ID tagging)"
+        },
+        {
+          "path": "src/journal/journalctl.c:1001",
+          "what": "journalctl CLI (-u, -I/--invocation, time filters, JSON output)"
+        },
+        {
+          "path": "src/analyze/analyze.c:636",
+          "what": "systemd-analyze (calendar, verify, dot, plot, critical-chain, security, ...)"
+        },
+        {
+          "path": "src/core/timer.c:372",
+          "what": "Timer unit type (not an executable): timer_enter_waiting (372) computes next elapse; timer_enter_running (643) enqueues the start job"
+        }
+      ],
+      "architecture": "C code base built with Meson. Layering per docs/ARCHITECTURE.md:19-70: src/fundamental -> src/basic -> src/libsystemd (public libsystemd.so: sd-bus, sd-event, sd-journal, sd-varlink, sd-future fibers, ...) -> src/shared (private libsystemd-shared-<nnn>.so); every other src/ subdirectory is one component. Service manager = src/core: main.c (PID 1 / --user), manager.c, unit.c, unit types service.c, timer.c, path.c, socket.c, slice.c, scope.c, target.c, mount.c, device.c, swap.c, automount.c; job.c + transaction.c (job queue, merging, ordering-cycle breaking); cgroup.c + kill.c (and unit_kill_context in unit.c:5081-5179) bound and kill process trees; execute.c + executor.c/exec-invoke.c start each command through the separate systemd-executor binary via posix_spawn into the unit's cgroup (execute.c:525-608); dbus-*.c and varlink-*.c expose the D-Bus and Varlink APIs (varlink.c:430-444). Timers: timer.c computes the next elapse (calendar expressions parsed by src/shared/calendarspec.c, timer.c:451), enqueues JOB_START with JOB_REPLACE (timer.c:668) and stores the last trigger time in stamp files under /var/lib/systemd/timers or ~/.local/share/systemd/timers (timer.c:131-169,679-680). Logging/history: src/journal (journald, journalctl), src/libsystemd/sd-journal, src/journal-remote (gatewayd, remote, upload). Clients: src/systemctl, src/run (systemd-run/run0), src/analyze, src/cgls, src/cgtop, src/tmpfiles. Other daemons: src/udev, src/login, src/network, src/resolve, src/nspawn, src/home, src/machine, src/oom, ... Docs: man/*.xml (DocBook) and docs/*.md; tests in src/test, per-component test-*.c, src/fuzz and test/.",
+      "packaging_and_release": "No project-built binary artifacts. Upstream releases are GPG-signed git tags (docs/RELEASE.md:21,43) plus a GitHub release that .github/workflows/make-release.yml creates as a draft on 'v*' tags using softprops/action-gh-release, with no files attached and the prerelease flag set for -rc tags (lines 5-9,22-26). No checksum, signature, SBOM or provenance/attestation step was found in any workflow (searching .github for gpg/cosign/attest/provenance/sha256sum/sigstore only hit apt LLVM key setup in build-test.sh:132-134 and a hash check of the downloaded Claude Code CLI in claude-review.yml:276-291). Source tarballs are documented via 'git archive' (README:298-299); meson.build has no dist script. Binary packages come from SUSE OBS (project system:systemd for main, system:systemd:stable for releases: .obs/workflows.yml:1-10; docs/RELEASE.md:16,29,34; README.md:41-42; systemd-boot there is signed with a self-signed OBS key, docs/HACKING.md:161-167), Fedora Copr/Packit (.packit.yml:29-48) and Debian/Ubuntu packaging on salsa.debian.org (docs/RELEASE.md:31-33). Version lives in meson.version (262; docs/RELEASE.md:17). Stable branches v<N>-stable live in this repo since v256, older ones in systemd/systemd-stable (docs/RELEASE.md:41). OpenSSF Scorecard runs weekly (.github/workflows/scorecards.yml:8-9,36-41).",
+      "tests_and_ci": "Frameworks: Meson test runner (default suite excludes clang-tidy, coccinelle, unused-symbols and integration-tests: meson.build:16-21); C unit tests in 406 test-*.c files under src/ (264 in src/test/); 54 fuzz-*.c files (2 are helpers) replayed on corpora under test/fuzz/ (-Dfuzz-tests defaults true: meson_options.txt:539-540) and fuzzed continuously via OSS-Fuzz/CIFuzz/ClusterFuzzLite; 73 integration-test groups test/integration-tests/TEST-*/ with ~314 shell scripts test/units/TEST-*.sh run in mkosi-built nspawn/QEMU images (test/integration-tests/README.md:1-60; docs/ARCHITECTURE.md:127-134); ~66 Python files include harnesses (test/test-network, src/ukify/test, ...). Approximate total: ~770 test/fuzz source files. Scheduling/supervision-relevant tests: TEST-53-TIMER (RandomizedDelaySec-persistent/-reload, clock-change, restart-trigger), TEST-07-PID1 (DeferReactivation, concurrency, start-limit, subgroup-kill, transient), TEST-03-JOBS, TEST-16-EXTEND-TIMEOUT, TEST-18-FAILUREACTION, TEST-19-CGROUP, TEST-30-ONCLOCKCHANGE, TEST-38-FREEZER, TEST-04-JOURNAL.invocation, plus src/test/test-calendarspec.c and src/libsystemd/sd-event/test-event.c. CI workflows (.github/workflows): unit-tests.yml (PRs to main/stable; GCC, GCC+ASan/UBSan, Clang, Clang release, Clang+ASan/UBSan on x86_64, arm64, armhf cross, ppc64le, s390x, plus a musl/postmarketOS job; meson test with -Dtests=unsafe -Dslow-tests=true -Dfuzz-tests=true), build-test.yml (gcc 11/13, clang 14/16/18, riscv64/armhf cross, Python 3.9), mkosi.yml (build and boot images for arch, debian, ubuntu, fedora, opensuse, centos, postmarketos), linter.yml (super-linter/actionlint, mypy, ruff, clang-tidy, coccinelle, man-rules), cifuzz.yml (OSS-Fuzz CIFuzz, ASan/UBSan/MSan x86_64 and ASan i386, 600 s), cflite-pr.yml, coverage.yml (daily), coverity.yml (daily), scorecards.yml (weekly), differential-shellcheck.yml, claude-review.yml, labeler/issue-labeler/gather-pr-metadata/development-freeze. Outside GitHub: .semaphore/semaphore.yml (Debian autopkgtest in LXC), .packit.yml (Fedora Copr builds plus tests), .obs/workflows.yml (OBS CI builds).",
+      "dependencies": "Root meson.build: 45 pkg-config dependency() lookups (libbpf, libmount, libseccomp, libselinux, libapparmor, libacl, audit, blkid, libkmod, pam, libcryptsetup, libcurl, libmicrohttpd, openssl, gnutls, tss2-*, libfido2, p11-kit, libdw/libelf, zlib, bzip2, liblzma, liblz4, libzstd, libarchive, xkbcommon, libpcre2-8, glib-2.0/gobject-2.0/gio-2.0, dbus-1, libcrypt, libidn2, libqrencode, libgcrypt, pwquality/passwdqc, xencontrol, fdisk, polkit-gobject-1, libucontext on musl only) plus find_library for m, pam and bz2 (meson.build:1026,1209,1370) and FuzzingEngine for fuzzer builds (meson.build:373); nearly all are gated by feature options (meson_options.txt). No dependency() calls exist in sub-directory meson.build files. Required build tooling per README:251-266: pkg-config, gperf, python >= 3.9 + jinja2, meson >= 0.62.0 (meson.build:13), ninja, gcc >= 8.4 or clang, binutils >= 2.35; required libs: glibc >= 2.34 or musl >= 1.2.6, libmount >= 2.30 (README:213-217; meson.build:1076-1078). .github/workflows/requirements.txt: 2 hash-pinned pip packages (meson==1.11.2, ninja==1.13.0). mkosi/**/mkosi.conf* (29 files) list distro packages for CI images. No Cargo.toml, go.mod, package.json or pyproject.toml found.",
+      "security_policy": "docs/SECURITY.md (no root-level SECURITY.md): private disclosure via a GitHub Security Advisory (preferred) or systemd-security@redhat.com (docs/SECURITY.md:10-13); valid reports must reproduce on main with a real-world end-to-end reproducer that demonstrably violates a security boundary, and maintainers (mostly volunteers) give no fixed timeline (docs/SECURITY.md:22-29); a bug bounty is hosted on YesWeHack with Sovereign Tech Fund sponsorship (README.md:39)."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:3 / docs/ARCHITECTURE.md:169-172 - systemd is the 'System and Service Manager': PID 1 in system mode and one instance per user session in user mode.",
+        "verified": "yes",
+        "evidence": "src/core/main.c:4028 main(); the runtime-scope switch handles the system boot path and the user manager (src/core/main.c:2617-2635); installed as the init symlink to lib/systemd/systemd (src/core/meson.build:337-340)."
+      },
+      {
+        "claim": "docs/ARCHITECTURE.md:172-174 (linked from README.md:27) - each service process is started by posix_spawn()ing a separate systemd-executor binary with the serialized config passed via memfd.",
+        "verified": "yes",
+        "evidence": "src/core/execute.c:525-608 serializes the exec context to a memfd-backed file, posix_spawn_wrapper() runs 'systemd-executor --deserialize', the child is placed into the unit cgroup (CLONE_INTO_CGROUP or cg_attach, lines 600-605); src/core/meson.build:20-23,261-289 builds systemd-executor (or a multicall symlink)."
+      },
+      {
+        "claim": "man/systemd.timer.xml:50-52 (documented behaviour, not README) - if the unit to activate is already active when a timer elapses it is not restarted and no new instance is spawned.",
+        "verified": "yes",
+        "evidence": "src/core/timer.c:668 queues JOB_START with JOB_REPLACE; src/core/unit.c:1957-1962 returns -EALREADY for active units and src/core/job.c:970-971 turns that into JOB_DONE; src/core/service.c:6388-6389 treats services still in condition/start-pre/start/start-post as not startable (no second run, no start-limit increment)."
+      },
+      {
+        "claim": "README:58-59,65-68 - kernels below 5.10 are 'not supported at all'; below 5.14 is the 'recommended baseline' and sets taint 'old-kernel'.",
+        "verified": "partial",
+        "evidence": "Code differs: only a 5.14 constant exists (src/basic/constants.h:74-75, commented 'Recommended baseline'); older kernels just get a warning 'Your mileage may vary' and the 'old-kernel' taint (src/core/main.c:2619-2623; src/core/taint.c:62-65). A grep for \"5.10\" in src/ finds no check or refusal, so the 5.10 floor is documentation-only. By contrast cgroup v1 is refused outright (src/core/main.c:3807-3822)."
+      },
+      {
+        "claim": "README:457-469 - the manager sets taint flags 'cgroups-missing' and 'cgroupsv1' (among others).",
+        "verified": "no",
+        "evidence": "Code preferred over README: src/core/taint.c:35-83 sets only unmerged-usr, unmerged-bin, var-run-bad, local-hwclock, support-ended, old-kernel, overflowuid-not-65534, overflowgid-not-65534, short-uid-range, short-gid-range. 'cgroups-missing' appears only in README:463; 'cgroupsv1' only in README:464 and man/org.freedesktop.systemd1.xml:1855. PID 1 now refuses to run on cgroup v1 (src/core/main.c:3807-3822) and NEWS:2837-2839 (v258) records the removal."
+      },
+      {
+        "claim": "README:311-316 - the build prefix must be /usr/; split-usr and unmerged-usr systems are no longer supported.",
+        "verified": "partial",
+        "evidence": "meson.build:8 only sets prefix=/usr as a default and errors only when the prefix is not absolute (meson.build:123-126); at runtime unmerged layouts merely add the 'unmerged-usr'/'unmerged-bin' taint (src/core/taint.c:45-51)."
+      },
+      {
+        "claim": "README:333-336 - systemd is regularly tested on amd64, i386, arm64, ppc64el and s390x.",
+        "verified": "partial",
+        "evidence": ".github/workflows/unit-tests.yml:24-46 runs the unit-test matrix on x86_64, arm64, armhf (cross), ppc64le and s390x; i386 appears only as a CIFuzz ASan fuzz build (.github/workflows/cifuzz.yml:35-37) and a Packit Copr build target (.packit.yml:37-38); riscv64/armhf are cross-build checks (.github/workflows/build-test.yml:42-47)."
+      },
+      {
+        "claim": "README.md:37 (repeated at README:486-488) - stable branches with backported patches are available in the systemd-stable repo.",
+        "verified": "partial",
+        "evidence": "Code/docs differ: docs/RELEASE.md:41 says since v256 the stable branches live in systemd/systemd and only older ones are in systemd-stable; CI here triggers on v[0-9]+-stable branches (.github/workflows/unit-tests.yml:8-10) and make-release.yml:15 handles both repositories."
+      },
+      {
+        "claim": "docs/OPTIMIZATIONS.md:64-65 (not README) - 'Timer units currently have no support for calendar times'.",
+        "verified": "no",
+        "evidence": "OnCalendar= is documented (man/systemd.timer.xml:190-225) and implemented (src/core/timer.c:394-451, calendar_spec_next_usec in src/shared/calendarspec.c); shipped timers use it (units/systemd-sysupdate-update.timer:25, units/systemd-sysupdate-reboot.timer:16)."
+      },
+      {
+        "claim": "NEWS:3168-3176 (v258; not README) - slice ConcurrencySoftMax=/ConcurrencyHardMax= 'introduces a powerful job execution mechanism ... with support for hierarchial job pools'.",
+        "verified": "partial",
+        "evidence": "Limits exist and are hierarchical: soft limit keeps start jobs queued (src/core/unit.c:2035-2036), hard limit fails them with JOB_CONCURRENCY (src/core/unit.c:2030-2031; src/core/job.c:988-989), parent slices are consulted (src/core/slice.c:433-471); v262 adds ActivatingConcurrencyMax= (man/systemd.slice.xml:144-181). Scope is limited to unit activation: jobs live in memory (serialized to a sealed memfd only for re-exec, src/shared/serialize.c:586-614), and no persisted run table or UI was found."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Userspace boot time, project self-reported 'if configured properly'; the linked example bootchart is dated 2012-05-12 by its file name (linked SVG not opened); no method or hardware details; unrelated to timers or supervision. No scheduling, timer or supervision measurements are published in the repository.",
+        "metric": "userspace boot time",
+        "value": "< 1 s for the Core OS (userspace only); < 2 s for a complete up-to-date desktop on simpler modern SSD laptops",
+        "source": "docs/OPTIMIZATIONS.md:12",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope: the repository contains no workflow/DAG-run engine, run-history store or scheduler UI. Job and unit state is in memory (serialized to a sealed memfd only for re-exec: src/shared/serialize.c:586-614, src/core/main.c:1334-1346); list-jobs shows only jobs in progress (man/systemctl.xml:1362-1366); systemd-analyze plot covers only the most recent per-unit timing data (man/systemd-analyze.xml:412-417); history is whatever journald retains (Storage= default is fixed at build time via -Djournal-storage-default, meson_options.txt:149-150, man/journald.conf.xml:75-95; size/age limits and vacuuming delete archived files, man/journald.conf.xml:283-318,343-348).",
+      "Cancellation/timeout semantics need care: 'systemctl cancel'/CancelJob has no effect on jobs already executing (man/org.freedesktop.systemd1.xml:1498-1501,12801-12804); JobTimeoutSec= cancels the job but leaves the unit running (man/systemd.unit.xml:1173-1190; src/core/job.c:1130-1139); RuntimeMaxSec= has no effect on Type=oneshot (src/core/service.c:1077-1078) and the oneshot start timeout is infinity by default (src/core/service.c:1225-1227), so bounding a hung oneshot command needs an explicit TimeoutStartSec=; Restart=always/on-success are refused for oneshot (src/core/service.c:1059-1060).",
+      "Trigger/ordering semantics: a timer firing while its unit is active or still starting is a no-op, no second instance is spawned (man/systemd.timer.xml:50-52; src/core/service.c:6388-6389), and RemainAfterExit=yes services are unsuitable for repeating timers (man/systemd.timer.xml:50-56); start-rate limiting also applies to manual and timer starts (man/systemd.unit.xml:1232-1245) and can fail a unit with start-limit-hit (src/core/service.c:6392-6395); ordering cycles are resolved by deleting a non-anchor job (logged) instead of rejecting the transaction, and only fail with 'Transaction order is cyclic' if no job can be deleted (src/core/transaction.c:487-521); no rollback/compensation feature for side effects was found, only user-written ExecStopPost= cleanup (man/systemd.service.xml:594-598); transient timers created by systemd-run live under /run/systemd/transient (man/systemd.unit.xml:403-404).",
+      "Platform: Linux only, non-Linux ports are not accepted (docs/PORTABILITY_AND_STABILITY.md:111-113); PID 1 refuses to run on a cgroup v1 hierarchy (src/core/main.c:3807-3822); kernel >= 5.10 required and >= 5.14 recommended (README:58-68); /usr prefix and merged-/usr expected (README:311-316; src/core/taint.c:45-51); mixing systemd component versions is untested and unsupported upstream (README:383-388); jobs for non-root users that must run while logged out need a lingering user manager (man/loginctl.xml:186-195).",
+      "Compatibility churn and experimental parts: v262 changed StartLimitIntervalSec= and other manager rate-limit timers to CLOCK_BOOTTIME (NEWS:121-127), changed UnsetEnvironment= expansion order (NEWS:104-110) and made notify-reload stricter (NEWS:45-50); experimental components may change (systemd-report, man/systemd-report.xml:36-37; systemd-sysupdate marked experimental again, NEWS:135-138; sysupdated D-Bus API removal planned for v263, NEWS:20-24). The set of unit states and internal sockets are declared unstable (docs/PORTABILITY_AND_STABILITY.md:86-98) while the unit-file format, CLI, D-Bus and Varlink interfaces are declared stable (same file:30-49). Feature PRs are held back around -rc tags (.github/development-freeze.yml:7-13).",
+      "Documentation drift (code preferred over docs): README:457-469 lists taint flags cgroups-missing/cgroupsv1 that src/core/taint.c no longer sets; README.md:37 and README:486-488 point to systemd-stable although docs/RELEASE.md:41 says stable branches live in this repo since v256; docs/OPTIMIZATIONS.md:64-65 says timers lack calendar support (contradicted by man/systemd.timer.xml:190-225); docs/ARCHITECTURE.md:76 cites src/core/bpf/, which has no files in this tree (BPF sources are under src/bpf/).",
+      "Release/supply chain: releases are signed git tags (docs/RELEASE.md:21,43) and a draft GitHub release without attached artifacts, checksums or attestations (.github/workflows/make-release.yml:22-26); no release signing, SBOM or provenance step was found in .github/; binary packages come from OBS and distributions (README.md:41-42). CI pins most actions by commit SHA, but cifuzz.yml uses google/oss-fuzz/...@master (lines 44,55) and cflite-pr.yml uses google/clusterfuzzlite@v1 (line 28).",
+      "Licensing and security process: licenses are mixed - LGPL-2.1-or-later for most code, but udev programs are effectively GPL-2.0-or-later, kernel UAPI headers are GPL-2.0 WITH Linux-syscall-note, and some files are MIT/CC0/public domain (LICENSES/README.md:15-82), so README:29 'LGPL-2.1-or-later for all code' is a simplification. Security reports need a real-world end-to-end reproducer on main and maintainers (mostly volunteers) give no fix timeline (docs/SECURITY.md:22-29). Optional network-facing pieces use weaker transport by default when enabled: journal-gatewayd serves plain HTTP unless --cert/--key is given (man/systemd-journal-gatewayd.service.xml:38-42; preset-disabled at presets/90-systemd.preset:68-70) and experimental 'systemd-report upload' accepts http:// and --trust=all (man/systemd-report.xml:134-143,170-174)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "systemd/systemd",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Build from source with Meson/Ninja, then install: meson setup build/ && ninja -C build/ ; sudo meson install -C build/ --no-rebuild (or: DESTDIR=... meson install -C build/)",
+          "citation": "README:282-296",
+          "holds": true,
+          "note": "README:282-283 'To build in directory build/: meson setup build/ && ninja -C build/'; README:292-296 'Useful commands' include 'sudo meson install -C build/ --no-rebuild' and 'DESTDIR=... meson install -C build/'. Commands match verbatim. Checked at commit 8cc40e0 (meson.version = 262)."
+        },
+        {
+          "field": "license",
+          "statement": "spdx: LGPL-2.1-or-later; file: LICENSE.LGPL2.1",
+          "citation": "LICENSE.LGPL2.1; README:28-29; LICENSES/README.md:15-17",
+          "holds": true,
+          "note": "LICENSE.LGPL2.1:1-2 is the GNU Lesser General Public License v2.1 text; README:29 'LGPL-2.1-or-later for all code, exceptions noted in LICENSES/README.md'; LICENSES/README.md:15-17 names LGPL-2.1-or-later as the main license. Exceptions are real but disclosed in the dossier's risks: udev programs effectively GPL-2.0-or-later (LICENSES/README.md:22-23,32-34; LICENSE.GPL2 also present), kernel uapi headers GPL-2.0 WITH Linux-syscall-note, a few MIT/MIT-0/CC0/BSD/public-domain files (lines 37-81). About 168 of the files under src/ carry non-LGPL-2.1-or-later SPDX headers, all in those exception groups."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - amd64 regularly tested (README:333-336); unit tests on x86_64 ubuntu-24.04 runners (.github/workflows/unit-tests.yml:24-27); requires Linux >= 5.10 (>= 5.14 recommended; README:58-68), cgroup v2 (src/core/main.c:3807-3822), glibc >= 2.34 or musl >= 1.2.6 (README:213-214), merged /usr (README:311-316)",
+          "citation": "README:333-336; .github/workflows/unit-tests.yml:24-27; README:58-68; src/core/main.c:3807-3822; README:213-214; README:311-316",
+          "holds": true,
+          "note": "README:334 lists 'amd64, i386, arm64, ppc64el, and s390x'. unit-tests.yml:24 sets 'runner: [ ubuntu-24.04 ]' for all six run phases. The file never says x86_64; that is inferred from GitHub's plain ubuntu-24.04 label, while the other arches use the -arm/-ppc64le/-s390x labels at lines 29-36. README:58 says kernels below 5.10 are 'not supported at all'; README:65-67 calls 5.14 the 'recommended baseline' and mentions the 'old-kernel' taint. main.c:3807-3822 refuses to run on a cgroup v1 hierarchy. README:213-214 gives glibc >= 2.34 and musl >= 1.2.6. README:311-314 says the prefix must be /usr/ and split-usr/unmerged-usr systems are no longer supported. The 5.10 floor is stated in README only and not enforced in code, as the dossier's own claim_checks already says."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "yes - systemctl (list-timers, list-jobs, cancel, kill, clean, freeze), systemd-run and its run0 symlink (transient timers via --on-calendar/--on-active; --wait propagates the unit result as exit status), journalctl (-I/--invocation), systemd-analyze (calendar, verify, dot, plot), loginctl enable-linger; CLI declared stable but its human-readable output generally not",
+          "citation": "src/systemctl/meson.build:43-56; src/systemctl/systemctl.c:922,957-963,1022-1024; src/run/meson.build:3-13; man/systemd-run.xml:453-506; src/run/run.c:2491-2502; src/journal/journalctl.c:1139; man/journalctl.xml:354-376; src/analyze/analyze.c:216-273; man/loginctl.xml:186-195; docs/PORTABILITY_AND_STABILITY.md:42-49",
+          "holds": true,
+          "note": "All ten citations match. systemctl.c: list-timers at 922, kill 957, clean 959, freeze 961, list-jobs 1022, cancel 1024. run/meson.build:3-13 builds systemd-run and install_symlink('run0'). systemd-run.xml:453-506 documents --on-active/--on-boot/--on-startup/--on-unit-*/--on-calendar/--on-clock-change/--timer-property. run.c:2491-2502 maps the result (success/exit-code/signal) to the exit status, inside the 'if (arg_wait || arg_stdio != ARG_STDIO_NONE)' branch opened at 2449. journalctl.c:1139 is DEFINE_MAIN_FUNCTION(run); journalctl.xml:354-376 documents -I/--invocation. analyze.c has plot at 220, dot 222, calendar 262, verify 270. loginctl.xml:186-195 documents enable-linger. PORTABILITY_AND_STABILITY.md:42-49 declares the CLI stable but its output generally not stable."
+        },
+        {
+          "field": "claim_checks[2]",
+          "statement": "man/systemd.timer.xml:50-52 - if the unit to activate is already active when a timer elapses it is not restarted and no new instance is spawned (verified: yes)",
+          "citation": "man/systemd.timer.xml:50-52; src/core/timer.c:668; src/core/unit.c:1957-1962; src/core/job.c:970-971; src/core/service.c:6388-6389",
+          "holds": true,
+          "note": "systemd.timer.xml:50-51: 'already active at the time the timer elapses it is not restarted, but simply left running. There is no concept of spawning new service instances'. timer.c:668 calls manager_add_job(..., JOB_START, trigger, JOB_REPLACE, ...). unit.c:1960-1962 returns -EALREADY for active/reloading units, and job.c:970-971 finishes that job as JOB_DONE. service.c:6388-6389 returns false for SERVICE_CONDITION/START_PRE/START/START_POST before unit_test_start_limit() is reached; unit.c:2012-2015 then returns without calling ->start. So there is no second run and no start-limit increment, as the evidence says."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

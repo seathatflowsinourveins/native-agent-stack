@@ -1,0 +1,320 @@
+{
+  "contender": "grafana/grafana",
+  "revision": {
+    "contender": "grafana/grafana",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "grafana/grafana",
+        "tag": "v13.2.3",
+        "commit": "6193dc03311b631b9727b560d24369e683dc396e",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v13.2.3",
+    "commit": "6193dc03311b631b9727b560d24369e683dc396e",
+    "read_at": "2026-10-02T03:02:17+00:00"
+  },
+  "dossier": {
+    "contender": "grafana/grafana",
+    "revision": {
+      "tag": "v13.2.3",
+      "commit": "6193dc03311b631b9727b560d24369e683dc396e",
+      "read_at": "2026-10-02T03:02:17+00:00"
+    },
+    "license": {
+      "spdx": "AGPL-3.0-only",
+      "file": "LICENSE"
+    },
+    "purpose": "Grafana is a Go backend plus TypeScript/React web application that queries external data sources and renders dashboards and Explore views. It also evaluates alert rules and sends notifications (README.md:4,8; AGENTS.md:16). It keeps only its own state (users, dashboards, data-source config) in SQLite by default, with MySQL and PostgreSQL supported (docs/sources/setup-grafana/installation/_index.md:138-146). The metric, log and trace stores it queries are separate software with their own sizing (installation/_index.md:55). Facts per stated need, for v13.2.3: (1) Local OTLP ingestion point and privacy filter for Claude Code/Codex telemetry: none. No OTLP receiver or telemetry-redaction pipeline exists in pkg/, apps/, conf/, public/app or docs/sources. OTLP code is exporter-only for Grafana's own traces (pkg/infra/tracing/tracing.go:176-196; tracing_file.go:29-37). (2) Store for native usage metrics received over OTLP: none; Grafana queries external stores (docs/sources/datasources/_index.md:103). (3) Store for events/logs received over OTLP: none. The Faro-style /log-grafana-javascript-agent endpoint only writes to the Grafana server log and is off by default (pkg/api/frontend_logging.go:33-93; pkg/setting/setting_grafana_javascript_agent.go:26). (4) Local dashboards and exploration over metrics/log stores: yes (public/app/features/dashboard-scene, public/app/features/explore). The Prometheus, Loki, Tempo etc. data-source plugins are not in this source tree; they are catalog plugins downloaded from grafana.com and bundled or preinstalled (scripts/catalog-plugins-defaults:3-15; pkg/setting/setting_plugins.go:35-55). (5) Store for traces, datasets and experiments to replay a fixed workload against model routes: none found. Grep for gen_ai / AI observability / prompt replay / eval dataset hits only nav entries for external apps grafana-sigil-app and grafana-agento11y-app (pkg/services/navtree/navtreeimpl/applinks.go:594-595). (6) Local model server on a GPU host: none. There is no ollama/vllm/llama.cpp code or config. The only model-related code is optional cloud embedding providers vertex/bedrock/azure (pkg/storage/unified/search/embed/embedder/provider/provider.go:42-53). Grafana Assistant on-prem needs a Grafana Cloud stack (docs/sources/administration/assistant/_index.md:16-36).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Tagline: 'The open-source platform for monitoring and observability'.",
+          "citation": "README.md:4"
+        },
+        {
+          "claim": "'Grafana allows you to query, visualize, alert on and understand your metrics no matter where they are stored.' It describes querying stores, not ingesting or storing telemetry.",
+          "citation": "README.md:8"
+        },
+        {
+          "claim": "Visualizations: fast client-side graphs; panel plugins visualize metrics and logs.",
+          "citation": "README.md:10"
+        },
+        {
+          "claim": "Dynamic dashboards: reusable dashboards with template variables shown as dropdowns.",
+          "citation": "README.md:11"
+        },
+        {
+          "claim": "Explore Metrics: ad-hoc queries, dynamic drilldown, split view to compare time ranges, queries and data sources.",
+          "citation": "README.md:12"
+        },
+        {
+          "claim": "Explore Logs: switch from metrics to logs with preserved label filters; search or live-stream logs.",
+          "citation": "README.md:13"
+        },
+        {
+          "claim": "Alerting: visually defined alert rules, continuously evaluated, with notifications to Slack, PagerDuty, VictorOps, OpsGenie.",
+          "citation": "README.md:14"
+        },
+        {
+          "claim": "Mixed data sources: choose a data source per query in the same graph, including custom data sources.",
+          "citation": "README.md:15"
+        },
+        {
+          "claim": "Install: the README gives no commands, only links to https://grafana.com/get and the installation guides.",
+          "citation": "README.md:19-20"
+        },
+        {
+          "claim": "A hosted demo exists at play.grafana.org; documentation lives at grafana.com/docs.",
+          "citation": "README.md:22,26"
+        },
+        {
+          "claim": "License: AGPL-3.0-only, with Apache-2.0 exceptions listed in LICENSING.md.",
+          "citation": "README.md:50"
+        },
+        {
+          "claim": "Silence: the 51-line README says nothing about OTLP ingestion, telemetry/phone-home, MCP, Claude Code/Codex, local model serving, GPU use or platform support.",
+          "citation": "README.md:1-51"
+        }
+      ],
+      "install": [
+        {
+          "method": "APT repository (Debian/Ubuntu, Linux); OSS package is 'grafana', Enterprise package is 'grafana-enterprise'",
+          "command": "sudo apt-get install -y apt-transport-https wget gnupg; sudo mkdir -p /etc/apt/keyrings; sudo wget -O /etc/apt/keyrings/grafana.asc https://apt.grafana.com/gpg-full.key; sudo chmod 644 /etc/apt/keyrings/grafana.asc; echo \"deb [signed-by=/etc/apt/keyrings/grafana.asc] https://apt.grafana.com stable main\" | sudo tee -a /etc/apt/sources.list.d/grafana.list; sudo apt-get update; sudo apt-get install grafana",
+          "citation": "docs/sources/setup-grafana/installation/debian/index.md:46-91"
+        },
+        {
+          "method": "RPM repository (RHEL/Fedora, Linux)",
+          "command": "wget -q -O gpg.key https://rpm.grafana.com/gpg.key; sudo rpm --import gpg.key; (create /etc/yum.repos.d/grafana.repo with [grafana] baseurl=https://rpm.grafana.com repo_gpgcheck=1 gpgcheck=1 gpgkey=https://rpm.grafana.com/gpg.key); sudo dnf install grafana",
+          "citation": "docs/sources/setup-grafana/installation/redhat-rhel-fedora/index.md:45-75"
+        },
+        {
+          "method": "Docker image (Linux/macOS). The documented command uses grafana/grafana-enterprise; the OSS image is grafana/grafana, and grafana/grafana-oss is no longer updated from 12.4.0.",
+          "command": "docker run -d -p 3000:3000 --name=grafana grafana/grafana-enterprise",
+          "citation": "docs/sources/setup-grafana/installation/docker/index.md:14-17,27-28,43"
+        },
+        {
+          "method": "Homebrew (macOS, Intel or Apple Silicon)",
+          "command": "brew update; brew install grafana; brew services start grafana",
+          "citation": "docs/sources/setup-grafana/installation/mac/index.md:30-45"
+        },
+        {
+          "method": "Standalone tar.gz binary (Linux/macOS). The download snippet lives on https://grafana.com/grafana/download, not in this repo; after untarring, start the server:",
+          "command": "./bin/grafana server   (Linux systemd example: /usr/local/grafana/bin/grafana server --homepath /usr/local/grafana)",
+          "citation": "docs/sources/setup-grafana/installation/mac/index.md:63-81; docs/sources/setup-grafana/installation/debian/index.md:109-167"
+        },
+        {
+          "method": "Build from source (developer guide; Linux/macOS)",
+          "command": "git clone https://github.com/grafana/grafana.git; corepack enable; corepack install; yarn install --immutable; yarn start (frontend, watch); make run (backend on http://localhost:3000, login admin/admin)",
+          "citation": "contribute/developer-guide.md:32,44-45,92,100,146-161"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes: linux-amd64 is in the release build matrix for tar.gz, deb, rpm and Docker (.github/workflows/release-build.yml:219-221,287-289,381-384,491-506). Debian/Ubuntu, RHEL/Fedora and SUSE are the documented Linux installs (docs/sources/setup-grafana/installation/_index.md:32-38).",
+        "wsl2": "unknown: no install doc targets WSL2, and the docs call other operating systems 'not recommended or supported' (docs/sources/setup-grafana/installation/_index.md:40-42). WSL is mentioned only for developing on Windows 10 (contribute/developer-guide.md:26) and for running migration snippets (docs/sources/administration/migration-guide/manually-migrate-to-grafana-cloud.md:50). A WSL2 distro would use the Linux packages, but that is not documented.",
+        "macos_arm64": "yes: the macOS guide covers Homebrew on Apple Silicon (/opt/homebrew) and standalone macOS binaries (docs/sources/setup-grafana/installation/mac/index.md:38-39,63-81). The release workflow builds and publishes a darwin-arm64 tar.gz (.github/workflows/release-build.yml:250-252,318-320,682).",
+        "gpu": "no: Grafana does not use a GPU. The only GPU mention in docs/sources is the image renderer's default '--disable-gpu' Chromium flag (docs/sources/setup-grafana/configure-grafana/_index.md:3005); a grep for GPU/CUDA/nvidia over docs/sources found nothing else."
+      },
+      "integrations": {
+        "cli": "yes: one 'grafana' binary with 'server' and 'cli' subcommands (pkg/cmd/grafana/main.go:59-72). 'grafana cli plugins' has install, list-remote, list-versions, update, update-all, ls and uninstall. 'grafana cli admin' has reset-admin-password, data-migration, secrets-migration, secrets-consolidation, flush-rbac-seed-assignment, db-migrate and resource-db-migrate (pkg/cmd/grafana-cli/commands/commands.go:91-259). The deb package also installs grafana-server and grafana-cli wrappers in /usr/sbin (scripts/build-deb.sh:75-82). Homebrew CLI usage is documented (docs/sources/setup-grafana/installation/mac/index.md:47-61).",
+        "mcp": "none found in this repo: a grep for MCP / model context protocol across code and docs hits only the Grafana Assistant docs. Those mention 'MCP server integrations' for the separate grafana-assistant-app plugin, whose backend runs in a Grafana Cloud stack (docs/sources/administration/assistant/_index.md:16,24-36,47; docs/sources/administration/roles-and-permissions/access-control/plugin-role-definitions/index.md:204).",
+        "sdk_or_api": "HTTP API: every instance exposes one, documented with OpenAPI v2/v3 specs (public/api-merged.json, public/openapi3.json) and a Swagger UI served by the server. Auth is basic auth or a service-account token (docs/sources/developer-resources/api-reference/http-api/_index.md:26,41-52). A newer Kubernetes-style /apis API is being introduced while legacy /api is deprecated (http-api/_index.md:30-37; pkg/registry/apis/*/register.go). SDKs: Go github.com/grafana/grafana-plugin-sdk-go and grafana-app-sdk (go.mod:105,112); npm @grafana/data, ui, runtime and schema, which are Apache-2.0 (LICENSING.md:12-15; .github/workflows/release-npm.yml:44-62).",
+        "claude_code_or_codex": "none found as a product integration: a grep for Claude Code / Codex / Anthropic API found only a CODEOWNERS comment (.github/CODEOWNERS:835). Contributor-facing agent files exist: AGENTS.md:5 ('guidance to AI agents when working with code in the Grafana repository'), CLAUDE.md:1 (imports @AGENTS.md), .claude/skills/add-e2e-selectors/SKILL.md and .claude/skills/panel-testing-strategy/SKILL.md."
+      },
+      "telemetry_and_network": "Phones home by default; each item can be disabled in config.\n(1) Anonymous usage report. POST to https://stats.grafana.org/grafana-usage-report every 24 h with version, OS, arch, edition, packaging, a random anonymous UUID and aggregate counters. On unless [analytics] reporting_enabled=false (pkg/infra/usagestats/service/usage_stats.go:29,41-48,130-184,186-211; pkg/infra/usagestats/service/service.go:70; pkg/setting/setting.go:1680; conf/defaults.ini:383-388; docs/sources/setup-grafana/configure-grafana/_index.md:609-616).\n(2) Version check. GET https://grafana.com/api/grafana/versions/stable at startup and every 24 h, on unless [analytics] check_for_updates=false (pkg/services/updatemanager/grafana.go:23,60-76,95; pkg/setting/setting.go:1661; conf/defaults.ini:393-398). Plugin update check against <grafana_com.api_url>/plugins/versioncheck every 10 min, on unless check_for_plugin_updates=false (pkg/services/updatemanager/plugins.go:71,106; pkg/setting/setting.go:1662).\n(3) Plugin catalog. A background service preinstalls 18 default catalog plugins from grafana.com at startup and auto-updates unpinned ones: Prometheus, Loki, Tempo, Elasticsearch, Jaeger, Zipkin, InfluxDB, MySQL, Postgres, MSSQL, OpenTSDB, Stackdriver, Pyroscope, the four drilldown apps and the advisor app. Enterprise builds add grafana-assistant-app. Async failures are logged and skipped, while preinstall_sync failures halt startup (pkg/setting/setting_plugins.go:35-55,157-171,191,201; pkg/services/pluginsintegration/plugininstaller/service.go:84-147,150-168; conf/defaults.ini:2193-2228). Disable with [plugins] preinstall_disabled=true or preinstall_auto_update=false. Plugin-signature public keys are fetched from <api_url>/plugins/ci/keys unless public_key_retrieval_disabled=true (pkg/services/pluginsintegration/keyretriever/dynamic/dynamic_retriever.go:119; conf/defaults.ini:2206-2210).\n(4) News feed. The browser fetches https://grafana.com/blog/news.xml when [news] news_feed_enabled=true, the default (public/app/plugins/panel/news/constants.ts:1; conf/defaults.ini:1994-1996; pkg/setting/setting.go:1724).\n(5) Default CSP template lists grafana.com in connect-src, but CSP is off by default (conf/defaults.ini:542-547).\nOff by default or optional: Google Analytics, Rudderstack, Application Insights and PostHog (conf/defaults.ini:407-454). The Faro-compatible /log-grafana-javascript-agent endpoint is disabled by default and, when enabled, only writes to the server log (pkg/setting/setting_grafana_javascript_agent.go:26; pkg/api/frontend_logging.go:33-93,101-127). OTLP/gRPC or Jaeger export of Grafana's own traces is off with an empty address, and there is a bounded OTLP/JSON local-file exporter (conf/defaults.ini:2094-2118; pkg/infra/tracing/tracing.go:176-224; pkg/infra/tracing/tracing_file.go:20-37). The feature-flag provider is 'static' (conf/defaults.ini:2365-2368).\nGrafana's own Prometheus metrics at /metrics are enabled by default, with optional basic auth (conf/defaults.ini:2013-2028; docs/sources/setup-grafana/set-up-grafana-monitoring.md:59-82).\nAccounts and services: no account is needed for the OSS server. SQLite is the default DB (conf/defaults.ini:223-228). The default login is admin/admin (conf/defaults.ini:471-474). Data sources need their own backends (docs/sources/setup-grafana/installation/_index.md:55). Grafana Assistant on-prem requires a Grafana Cloud stack that hosts its backend and billing (docs/sources/administration/assistant/_index.md:16,24-36).\nBuild-time network: packaging downloads catalog plugin zips from https://grafana.com/api/plugins (scripts/download-catalog-plugins.sh:6,146-157; Makefile:391-411)."
+    },
+    "code": {
+      "languages": [
+        "Go 1.26.6 (server, CLI, apps/)",
+        "TypeScript/TSX with React 19 (frontend)",
+        "CUE (kinds/, apps/*/cue.mod)",
+        "SCSS",
+        "Bash",
+        "Jsonnet",
+        "Protobuf"
+      ],
+      "entry_points": [
+        {
+          "path": "pkg/cmd/grafana/main.go",
+          "what": "Unified 'grafana' binary; registers the 'server' and 'cli' subcommands (main.go:59-72). Built by Makefile:40-47 into bin/<os>/<arch>/grafana."
+        },
+        {
+          "path": "pkg/cmd/grafana-server/commands/cli.go",
+          "what": "'grafana server' command (cli.go:13-23) delegating to pkg/server/bootstrap, plus a 'target' subcommand for running individual modules."
+        },
+        {
+          "path": "pkg/cmd/grafana-cli/commands/commands.go",
+          "what": "'grafana cli plugins ...' and 'grafana cli admin ...' command sets (commands.go:91-259)."
+        },
+        {
+          "path": "pkg/server/doc.go",
+          "what": "Documents the server package and Wire DI sets (bootstrap/wire, oss/enterprise build tags); the service graph is built in pkg/server (wire.go, initialize_oss.go)."
+        },
+        {
+          "path": "scripts/build-deb.sh",
+          "what": "Packaging entry for .deb: installs /usr/sbin/grafana plus grafana-server/grafana-cli wrappers (packaging/wrappers/*) and the grafana-server systemd unit (build-deb.sh:75-110)."
+        },
+        {
+          "path": "Dockerfile",
+          "what": "Image build with six variants (alpine, ubuntu, distroless, each full or slim). Alpine/ubuntu use packaging/docker/run.sh (Dockerfile:280-285); distroless runs 'grafana server' directly (Dockerfile:399-400); EXPOSE 3000."
+        },
+        {
+          "path": "package.json",
+          "what": "Frontend entry scripts: 'yarn build' (webpack prod, line 12), 'yarn start' (dev watch, line 61), 'yarn test' (Jest, line 35), 'yarn e2e:playwright' (line 24)."
+        },
+        {
+          "path": "conf/defaults.ini",
+          "what": "Default configuration (overrides in conf/custom.ini or GF_* env vars) (AGENTS.md:144)."
+        }
+      ],
+      "architecture": "Monolithic Go server serving a React single-page app.\nBackend (pkg/): pkg/cmd/* entry points; pkg/server (+bootstrap) builds the service graph with Google Wire DI under oss/enterprise/pro build tags (pkg/server/doc.go:1-25; Makefile:263-275; AGENTS.md:143). pkg/api holds HTTP routes (e.g. api.go:546 for /api/live/push). pkg/services/* holds domain services: ngalert alerting with an Alertmanager fork (go.mod:727), live, updatemanager, pluginsintegration, navtree, featuremgmt and others. pkg/registry/apis, pkg/services/apiserver and apps/* form a Kubernetes-style /apis API built on the Grafana App SDK (dashboard, folder, iam, alerting rules/notifications, provisioning, secret...). pkg/storage/unified is a resource store with search and optional cloud-embedder vector search. pkg/plugins plus pluginsintegration load and install plugins; backend plugins use gRPC/protobuf (AGENTS.md:109). pkg/tsdb holds the only in-tree data-source backends: azuremonitor, cloudwatch, grafana-testdata-datasource, grafanads, graphite. pkg/infra covers log, metrics, tracing (exporter-only), usagestats and db. pkg/setting plus conf/defaults.ini handle configuration.\nFrontend: public/app/core, public/app/features (dashboard-scene, explore, variables, alerting, plugins...), 30 built-in panel plugins (public/app/plugins/panel/*/plugin.json) and 8 in-tree data sources (alertmanager, azuremonitor, cloudwatch, dashboard, grafana, grafana-testdata-datasource, graphite, mixed). Shared npm packages live in packages/* and CUE kinds in kinds/.\nPrometheus, Loki, Tempo, Elasticsearch, Jaeger, Zipkin, InfluxDB, MySQL/Postgres/MSSQL, OpenTSDB, Stackdriver and Pyroscope are external catalog plugins. They are fetched at packaging time into data/plugins-bundled (scripts/catalog-plugins-defaults:3-15; scripts/download-catalog-plugins.sh) and preinstalled at runtime (pkg/setting/setting_plugins.go:35-55).\nGrafana Live (pkg/services/live) is an in-memory pub/sub with optional Redis HA. Its HTTP push accepts InfluxDB line protocol only (pkg/services/live/pushhttp/push.go:48-100; pkg/services/live/convert/convert.go:30-45; docs/sources/setup-grafana/set-up-grafana-live.md:58,238).",
+      "packaging_and_release": "Artifacts (release-build.yml:22-27): tar.gz for linux amd64/arm64/s390x/armv6/armv7, linux riscv64 (allowed to fail, 'not an officially supported architecture'), windows amd64/arm64 and darwin amd64/arm64 (release-build.yml:273-320; Makefile:413-425). .deb for all Linux targets and .rpm for amd64/arm64/s390x/riscv64 (release-build.yml:368-406; Makefile:427-453). Docker images alpine/ubuntu/distroless, each full and slim, for amd64/arm64/s390x/armv7 (build-docker-variants.yml:63-100; release-build.yml:491-558). Windows zip and MSI (release-build.yml:582-663). Docker Hub repos are grafana/grafana (OSS) and grafana/grafana-enterprise; grafana/grafana-oss is no longer updated from 12.4.0 (docs/sources/setup-grafana/installation/docker/index.md:14-17,27-28).\nTriggers: weekday-night schedule, pushes to main and release-*.*.*, manual (release-build.yml:2-17). Jobs run only for grafana/grafana main or the private security mirror's '#patched' branches, and the same workflow is dispatched in the private grafana-enterprise repo (release-build.yml:37-41,91-185).\nChecksums: each artifact gets a bare sha256 '.sha256' sidecar (release-build.yml:334-340,431-437,632-638; build-docker-variants.yml:141-147). Upload goes to the GCS bucket 'grafana-prerelease' via publish-artifact.yml (release-build.yml:665-694; publish-artifact.yml:53-88). The release tag and GitHub release are created by release-comms.yml:133-163. An SPDX SBOM from Socket is attached (sbom-on-release.yml:69-85; release-comms.yml:165-180). deb/rpm from dl.grafana.com are attached after their sha256 is verified against the grafana.com packages API (release-comms.yml:182-252).\nSignatures/attestations: no cosign/sigstore/SLSA/provenance steps anywhere under .github (grep). RPM signing ('rpm --addsign') and signed apt/rpm repo scripts exist (scripts/build/sign_packages.sh:17-25; scripts/build/update_repo/*). Docs say RPMs are signed and give GPG key URLs (docs/sources/setup-grafana/installation/redhat-rhel-fedora/index.md:81; debian/index.md:52-58). The signing itself runs outside the public workflows. npm @grafana/* packages publish through npm Trusted Publishing with OIDC (release-npm.yml:42-62). Reproducibility knobs: -trimpath, SOURCE_DATE_EPOCH and docker rewrite-timestamp (Makefile:24,34,469).",
+      "tests_and_ci": "Frameworks: Go 'go test' with testcontainers (pr-test-integration.yml:34-39); Jest 29.7 + React Testing Library + msw (package.json:116,205,222); Playwright 1.56.1 e2e (package.json:106); Vitest for rspack tests (package.json:44,250); Storybook tests (package.json:40). Approximate test-file counts from globs: 1,853 *_test.go under pkg/, 188 under apps/, 1,962 *.test.ts(x) under public/, 433 under packages/, and 212 Playwright *.spec.ts under e2e-playwright/.\nCI: about 94 workflow YAMLs in .github/workflows plus 15 composite actions in .github/actions.\nWorkflows I read: backend-unit-tests.yml (8 shards of 'go test -vet=off -short -timeout=30m', CGO_ENABLED=0); pr-test-integration.yml (TestIntegration on SQLite in 4 shards and MySQL in 16 shards; later jobs not read); pr-frontend-unit-tests.yml (Jest in 16 shards); pr-e2e-tests.yml (builds backend and frontend, then Playwright); go-lint.yml (gofmt + golangci-lint v2.12.2); frontend-lint.yml (prettier, eslint, typecheck); govulncheck.yml (every Go module); trufflehog.yml (verified secrets); release-verify.yml (boots the built tar.gz and runs the Playwright acceptance suite).\nOthers exist by name only (not opened): pr-test-docker, pr-test-integration-pgvector, proto-breaking-changes, pr-k8s-codegen-check, swagger-gen, i18n-verify, documentation-ci, actionlint, shellcheck.\nCaveat: for pushes to main/release branches and non-fork PRs, unit and lint jobs run against a checkout overlaying the private grafana-enterprise repo. The OSS-only jobs run only for fork PRs (backend-unit-tests.yml:38-42,72-125; frontend-lint.yml:40-47,60-87).",
+      "dependencies": "Go: root go.mod (go 1.26.6) has 260 direct requires (go.mod:6-234 = 227, internal workspace modules 237-268 = 30, single-line requires at 705/707/709 = 3) and 398 '// indirect' (go.mod:307-703, 711-715). Four 'replace' forks: go-mysql-server, vitess, memberlist and prometheus-alertmanager (go.mod:717-728). The tree has 46 go.mod files; 34 modules are in go.work (go.work:6-41).\nJS: root package.json has 159 dependencies (lines 264-424) and 167 devDependencies (lines 95-263). Yarn 4.17.1 workspaces cover packages/*, public/app/plugins/*/* and e2e-playwright/test-plugins/* (package.json:466-476). Node is >=22 <25 and .nvmrc says v24.11.0. There are 30 package.json files in total.\nRelevant direct deps: OpenTelemetry Go SDK and OTLP trace exporter (go.mod:192,194), prometheus/prometheus (163), grafana-plugin-sdk-go (112), grafana-app-sdk (105), grafana/alerting (94), @grafana/faro-* (package.json:283-286), @grafana/llm (290), @grafana/assistant (279), @opentelemetry/api (311).",
+      "security_policy": "none in the repo: no SECURITY.md anywhere (globs for **/SECURITY.md and **/security.md found nothing; .github/ has only PULL_REQUEST_TEMPLATE.md and bot.md). CONTRIBUTING.md:84 and :115 point to a GitHub-hosted policy at https://github.com/grafana/grafana/security/policy, which is not in the working tree and was not fetched."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:8: 'query, visualize, alert on and understand your metrics no matter where they are stored'",
+        "verified": "partial",
+        "evidence": "True as a query/visualize layer: a data source is 'a connection to a storage backend' that Grafana queries (docs/sources/datasources/_index.md:103). Grafana has no metric store of its own. The in-tree data-source backends are only Graphite, CloudWatch, Azure Monitor and TestData (pkg/tsdb/{graphite,cloudwatch,azuremonitor,grafana-testdata-datasource}), plus the Grafana/Mixed/Dashboard/Alertmanager data sources (public/app/plugins/datasource/*/plugin.json). Prometheus, Loki, Tempo, Elasticsearch, Jaeger, Zipkin, InfluxDB, MySQL, Postgres, MSSQL, OpenTSDB, Stackdriver and Pyroscope are external catalog plugins (scripts/catalog-plugins-defaults:3-15), so reach depends on code not in this tree."
+      },
+      {
+        "claim": "README.md:4/8: an observability platform. The README never claims OTLP ingestion or storage; checked whether the code provides an OTLP receiver, telemetry store or privacy filter.",
+        "verified": "no",
+        "evidence": "None found. Greps for otlp, receiver and '/v1/(traces|metrics|logs)' over pkg/, apps/, conf/, public/app and docs/sources show only: exporters for Grafana's own traces (pkg/infra/tracing/tracing.go:176-196; conf/defaults.ini:2100-2118), an OTLP/JSON file exporter (pkg/infra/tracing/tracing_file.go:29-37), a 'download trace as OTLP JSON' inspector helper (public/app/features/inspector/utils/download.ts:110-132), and go.opentelemetry.io/collector/pdata used only as a data-model library (go.mod:186). The only push intake is Grafana Live /api/live/push/:streamId (pkg/api/api.go:546), which converts InfluxDB line protocol into in-memory pub/sub frames (pkg/services/live/pushhttp/push.go:48-100; convert/convert.go:30-45). The Faro-style endpoint only logs and is off by default (pkg/api/frontend_logging.go:33-93; pkg/setting/setting_grafana_javascript_agent.go:26). No redaction pipeline for ingested telemetry exists."
+      },
+      {
+        "claim": "README.md:10-13: visualizations, dynamic dashboards with template variables, Explore Metrics, Explore Logs",
+        "verified": "partial",
+        "evidence": "Dashboards (public/app/features/dashboard-scene/scene/DashboardScene.tsx), Explore (public/app/features/explore/Explore.tsx), template variables (public/app/features/variables/**) and 30 built-in panel plugins (public/app/plugins/panel/*/plugin.json) are in-tree. The Metrics/Logs/Traces/Profiles drilldown apps are separate catalog apps preinstalled at startup and not in this tree (pkg/setting/setting_plugins.go:37-40; pkg/services/navtree/navtreeimpl/applinks.go:602-605)."
+      },
+      {
+        "claim": "README.md:14: alert rules with notifications to Slack, PagerDuty, VictorOps, OpsGenie",
+        "verified": "partial",
+        "evidence": "The alerting engine and notifier plumbing are in-tree (pkg/services/ngalert/ngalert.go; pkg/services/ngalert/notifier/*; Alertmanager fork go.mod:727). Integration implementations come from the external module github.com/grafana/alerting (go.mod:94), and integration_schemas.go contains none of those names. Docs list VictorOps among contact points (docs/sources/alerting/configure-notifications/manage-contact-points/_index.md:188) and have pages for Slack, PagerDuty and Opsgenie (.../integrations/configure-slack.md, pager-duty.md, configure-opsgenie.md)."
+      },
+      {
+        "claim": "README.md:15: mixed data sources, selectable per query",
+        "verified": "yes",
+        "evidence": "public/app/plugins/datasource/mixed/module.ts exists; documented in docs/sources/datasources/_index.md:176-181."
+      },
+      {
+        "claim": "README.md:50: AGPL-3.0-only with Apache-2.0 exceptions in LICENSING.md",
+        "verified": "yes",
+        "evidence": "LICENSE is the AGPL v3 text (LICENSE:1-2); package.json:3 says AGPL-3.0-only; LICENSING.md:5-25 lists the Apache-2.0 directories (grafana-data/ui/runtime/e2e-selectors packages, packaging/, kinds/, grafana-mixin/, some icons and TraceView components)."
+      },
+      {
+        "claim": "conf/defaults.ini:384-388: usage reporting 'sends usage counters to stats.grafana.org every 24 hours'; no IP addresses tracked; enabled by default",
+        "verified": "partial",
+        "evidence": "Code confirms the default-on setting (pkg/setting/setting.go:1680), the URL (pkg/infra/usagestats/service/usage_stats.go:29), the 24 h interval (service.go:70) and the payload fields: version, OS, arch, edition, packaging, anonymous UUID, metrics (usage_stats.go:41-48,186-211). Server-side non-tracking of IPs is not checkable from this repo."
+      },
+      {
+        "claim": "docs/sources/setup-grafana/configure-grafana/_index.md:618-623: check_for_updates checks 'in GitHub' and 'runs every ten minutes'",
+        "verified": "no",
+        "evidence": "The code differs; preferring code. The Grafana version check does GET https://grafana.com/api/grafana/versions/stable at startup and every 24 h (pkg/services/updatemanager/grafana.go:23,60-76,95), and defaults.ini:393-398 also says grafana.com. The 10-minute ticker belongs to the plugin update check (pkg/services/updatemanager/plugins.go:106)."
+      },
+      {
+        "claim": "docs/sources/datasources/_index.md:191-233: Grafana ships built-in core data sources including Prometheus, Loki and Tempo",
+        "verified": "partial",
+        "evidence": "They ship in release artifacts as catalog plugins downloaded at packaging time into data/plugins-bundled (Makefile:391-411; scripts/catalog-plugins-defaults:3-15) and are preinstalled and auto-updated at startup (pkg/setting/setting_plugins.go:35-55,201). Their source is not in this repo. Slim Docker variants omit data/plugins-bundled (Dockerfile:156-160). Elasticsearch docs say it became a standalone plugin in v13.0 (docs/sources/datasources/elasticsearch/_index.md:73). AGENTS.md:133 still lists loki as an in-tree plugin, but the directory does not exist; contribute/developer-guide.md:113-114 lists only azuremonitor and grafana-testdata-datasource."
+      },
+      {
+        "claim": "docs/sources/setup-grafana/installation/_index.md:32-42: supported OSes are Debian/Ubuntu, RHEL/Fedora, SUSE, macOS and Windows; others are 'not recommended or supported'",
+        "verified": "yes",
+        "evidence": "The release matrix additionally builds linux s390x/armv6/armv7/riscv64 and windows-arm64, with riscv64 explicitly 'not an officially supported architecture' and allowed to fail (.github/workflows/release-build.yml:215-252,236). No WSL2 target or doc exists."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Minimum and 'Small' tier resources for the Grafana server process (project-documented guidance, not a measured benchmark; no benchmark runs or third-party reports were present in the working tree)",
+        "metric": "RAM / CPU / disk",
+        "value": "Minimum 512 MB RAM and 1 CPU core; Small tier (<25 concurrent users, <100 alert rules, <5 data sources, <200 dashboards): 2 cores, 2-4 GB RAM, 10-20 GB SSD, 1 instance",
+        "source": "docs/sources/setup-grafana/installation/_index.md:48-49,70-74,84-89",
+        "independent": false
+      },
+      {
+        "what": "Medium and Large tier sizing guidance (project-documented; excludes data-source backends)",
+        "metric": "CPU / RAM per instance",
+        "value": "Medium: 4-8 cores, 8-16 GB, 2 instances. Large: 8-16+ cores, 16-32+ GB per instance, 3+ instances",
+        "source": "docs/sources/setup-grafana/installation/_index.md:99-104,116-122",
+        "independent": false
+      },
+      {
+        "what": "Image renderer worker memory (project-stated estimate)",
+        "metric": "memory per renderer worker",
+        "value": "approximately 1 GB",
+        "source": "docs/sources/setup-grafana/installation/_index.md:108",
+        "independent": false
+      },
+      {
+        "what": "Grafana Live WebSocket connection cost (project-stated estimate)",
+        "metric": "memory per persistent connection; default connection cap",
+        "value": "about 50 KB per connection (about 20k connections per 1 GB RAM); default cap 100 connections per server",
+        "source": "docs/sources/setup-grafana/set-up-grafana-live.md:34,144,158",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope gap against the stated needs: no OTLP receiver/collector, telemetry privacy filter, metrics store, logs/events store, trace/dataset/experiment store or local model server exists in this repo (see claim_checks #2). Nav entries exist only for external apps grafana-sigil-app and grafana-agento11y-app (pkg/services/navtree/navtreeimpl/applinks.go:594-595). Embedders are cloud-only vertex/bedrock/azure (pkg/storage/unified/search/embed/embedder/provider/provider.go:42-53). Assistant on-prem needs a Grafana Cloud stack (docs/sources/administration/assistant/_index.md:16-36). What is in scope is dashboards, Explore and alerting over externally provided stores.",
+      "Core data-source code is external: Prometheus, Loki, Tempo and the other listed data sources are catalog plugins downloaded from grafana.com into data/plugins-bundled at packaging time and preinstalled or auto-updated at startup (scripts/catalog-plugins-defaults:3-15; scripts/download-catalog-plugins.sh:6,146-157; pkg/setting/setting_plugins.go:35-55,201). A source-built binary lacks them until fetched (Makefile:391-411), slim Docker variants omit them (Dockerfile:156-160), and their code cannot be reviewed from this checkout.",
+      "Default-on outbound calls to grafana.com and stats.grafana.org (usage report, version check, 10-minute plugin update check, plugin preinstall and auto-update, plugin key download, news feed; see telemetry_and_network). A privacy-filtered local setup must disable them explicitly. Docs and code disagree on the version check (docs: GitHub, every ten minutes; code: grafana.com, every 24 h) (docs/sources/setup-grafana/configure-grafana/_index.md:620-621 vs pkg/services/updatemanager/grafana.go:23,63).",
+      "Insecure defaults: admin/admin initial credentials, empty http_addr (all interfaces), cookie_secure=false, a placeholder secret_key, and /metrics enabled with only optional basic auth (conf/defaults.ini:50,471-480,510,2015-2028; contribute/developer-guide.md:155-161).",
+      "Licensing: the core is AGPL-3.0-only; only the listed directories are Apache-2.0 (LICENSING.md:5-25; README.md:50). The docs recommend the Enterprise build as the default edition, with license-unlockable features. That build comes from a separate private repo that is not in this clone (docs/sources/setup-grafana/installation/debian/index.md:41; docker/index.md:30; .github/workflows/release-build.yml:91-98).",
+      "Release integrity: public workflows produce only sha256 sidecars and an SPDX SBOM; no sigstore/cosign/SLSA/provenance steps were found under .github. RPM/APT signing is done by scripts and processes outside the public workflows (scripts/build/sign_packages.sh:17-25; release-build.yml:334-340; sbom-on-release.yml:69-85). Release builds run from main or the private security mirror and dispatch an Enterprise build (release-build.yml:37-41,91-185).",
+      "Platform and build: the supported-OS list excludes WSL2 and other distros (installation/_index.md:40-42), riscv64 is explicitly unofficial (release-build.yml:236) and no GPU is used. A source build needs Go 1.26.6, Node >=22 <25 (.nvmrc v24.11.0), Yarn 4.17.1 and an 8 GB Node heap for the frontend, plus CGO/SQLite caveats (go.mod:3; package.json:12,473-476; Dockerfile:27; contribute/developer-guide.md:165-167).",
+      "Maintenance and verification: main/release CI runs against a private Enterprise overlay, and OSS-only unit/lint jobs run only for fork PRs, so main-branch results are not reproducible from this repo alone (backend-unit-tests.yml:38-42,72-125; frontend-lint.yml:40-47,60-87). The dependency surface is very large (260 direct and 398 indirect Go modules; 159 + 167 npm packages), partly mitigated by yarn enableScripts:false, npmMinimalAgeGate 3d, Renovate minimumReleaseAge 7 days, govulncheck and trufflehog (.yarnrc.yml:9,15; .github/renovate.json5:29; govulncheck.yml:40-60; trufflehog.yml:33-36). Contributor docs lag the tree (AGENTS.md:133)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "grafana/grafana",
+      "checks": [
+        {
+          "field": "readme.install[0] (APT repository)",
+          "statement": "APT repository (Debian/Ubuntu, Linux); OSS package 'grafana', Enterprise 'grafana-enterprise'. Command: sudo apt-get install -y apt-transport-https wget gnupg; sudo mkdir -p /etc/apt/keyrings; sudo wget -O /etc/apt/keyrings/grafana.asc https://apt.grafana.com/gpg-full.key; sudo chmod 644 /etc/apt/keyrings/grafana.asc; echo \"deb [signed-by=/etc/apt/keyrings/grafana.asc] https://apt.grafana.com stable main\" | sudo tee -a /etc/apt/sources.list.d/grafana.list; sudo apt-get update; sudo apt-get install grafana",
+          "citation": "docs/sources/setup-grafana/installation/debian/index.md:46-91",
+          "holds": true,
+          "note": "Each step matches the doc word for word: prerequisites (:49), keyring dir, gpg-full.key download and chmod 644 (:55-57), stable repo line (:63), apt-get update (:76) and apt-get install grafana (:83). The package table (:35,37) and the Enterprise install (:90) confirm grafana / grafana-enterprise. The doc calls Enterprise 'the recommended and default edition' (:41)."
+        },
+        {
+          "field": "license",
+          "statement": "spdx: AGPL-3.0-only; file: LICENSE",
+          "citation": "LICENSE:1-2; README.md:50; LICENSING.md:5-25; package.json:3",
+          "holds": true,
+          "note": "LICENSE:1-2 is 'GNU AFFERO GENERAL PUBLIC LICENSE / Version 3, 19 November 2007'. The AGPL text alone doesn't choose between -only and -or-later; README.md:50, LICENSING.md:5 and package.json:3 (\"license\": \"AGPL-3.0-only\") make it -only. The Apache-2.0 directory exceptions are at LICENSING.md:9-25, and public/vendor/ keeps its upstream licenses (:27-31)."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes: linux-amd64 is in the release build matrix for tar.gz, deb, rpm and Docker (.github/workflows/release-build.yml:219-221,287-289,381-384,491-506). Debian/Ubuntu, RHEL/Fedora and SUSE are the documented Linux installs (docs/sources/setup-grafana/installation/_index.md:32-38).",
+          "citation": ".github/workflows/release-build.yml:219-221,287-289,381-384,491-506; docs/sources/setup-grafana/installation/_index.md:32-38",
+          "holds": true,
+          "note": "release-build.yml:219-221 is linux-amd64 in build-backend, :287-289 in build-targz, :381-384 in build-deb-rpm with rpm: true, and :491-506 is the build-docker-linux-amd64 job calling build-docker-variants.yml. The verify-targz job (:561-568) also boots the linux-amd64 tarball. installation/_index.md:32-38 lists Debian/Ubuntu, RHEL/Fedora and SUSE/openSUSE, plus macOS and Windows."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "none found as a product integration: a grep for Claude Code / Codex / Anthropic API found only a CODEOWNERS comment (.github/CODEOWNERS:835). Contributor-facing agent files exist: AGENTS.md:5, CLAUDE.md:1 (imports @AGENTS.md), .claude/skills/add-e2e-selectors/SKILL.md and .claude/skills/panel-testing-strategy/SKILL.md.",
+          "citation": ".github/CODEOWNERS:835; AGENTS.md:5; CLAUDE.md:1; .claude/skills/add-e2e-selectors/SKILL.md; .claude/skills/panel-testing-strategy/SKILL.md",
+          "holds": false,
+          "note": "The conclusion and every citation hold. CODEOWNERS:835 is '# Claude Code skills — owned by the squad that maintains each skill', AGENTS.md:5 matches, CLAUDE.md:1 is '@AGENTS.md', and both SKILL.md files exist. Nothing in pkg/, apps/ or public/app references Claude, and there are no hits for codex. But 'found only a CODEOWNERS comment' is false. A case-insensitive grep for anthropic/claude also hits: CI that loads ANTHROPIC_API_KEY to classify external PRs and detect AI slop (.github/workflows/external-pr-notify-handler.yml:99,141,152); Claude-model PR reviews and weekly digests run through Warp Oz (OZ_MODEL=\"claude-4-8-opus-high\" at external-pr-notify-handler.yml:370, external-issue-weekly-digest.yml:186, external-fr-weekly-digest.yml:186, external-pr-weekly-digest.yml:187); CODEOWNERS:36 (/CLAUDE.md); .gitignore:79-87; CHANGELOG mentions of CLAUDE.md; and an 'anthropic-logo' icon that nothing in the tree uses (packages/grafana-data/src/types/icon.ts:313; public/app/core/icons/cached.json:208)."
+        },
+        {
+          "field": "claim_checks #2 (OTLP receiver / telemetry store / privacy filter, verified: no)",
+          "statement": "No OTLP receiver, telemetry store or redaction pipeline exists. OTLP code only exports Grafana's own traces (tracing.go:176-196; defaults.ini:2100-2118; tracing_file.go:29-37); there is also a download-as-OTLP helper (download.ts:110-132), and collector/pdata is used only as a data-model library (go.mod:186). The only push intake is Live /api/live/push/:streamId, which accepts InfluxDB line protocol into in-memory frames (api.go:546; push.go:48-100; convert.go:30-45). The Faro endpoint only logs and is off by default (frontend_logging.go:33-93; setting_grafana_javascript_agent.go:26).",
+          "citation": "pkg/infra/tracing/tracing.go:176-196; conf/defaults.ini:2100-2118; pkg/infra/tracing/tracing_file.go:29-37; public/app/features/inspector/utils/download.ts:110-132; go.mod:186; pkg/api/api.go:546; pkg/services/live/pushhttp/push.go:48-100; pkg/services/live/convert/convert.go:30-45; pkg/api/frontend_logging.go:33-93; pkg/setting/setting_grafana_javascript_agent.go:26",
+          "holds": true,
+          "note": "Every citation matches. tracing.go:176-196 builds an otlptracegrpc client to cfg.Address. defaults.ini:2103 leaves the OTLP address empty, and :2114-2118 configure the file exporter. tracing_file.go:29-37 describes a client that writes OTLP/JSON to a file. download.ts:115-136 defaults to OTLP. go.mod:186 is collector/pdata v1.60.0, imported only by tracing_file.go and the Faro payload struct (pkg/api/frontendlogging/grafana_javascript_agent_payload.go:15-16). api.go:545-546 is commented 'POST influx line protocol'. push.go:76-97 converts the body and pushes frames to the managed stream. convert.go:30-39 accepts only the telegraf 'wide'/'labels_column' formats. frontend_logging.go:33-88 only writes to frontendLogger, and setting_grafana_javascript_agent.go:26 is enabled=MustBool(false). My own grep of pkg/, apps/, conf/, public/app and docs/sources (otlpreceiver, otlphttp, /v1/(traces|metrics|logs), Export/Register*ServiceServer) found no receiver. Its only hits were sending-side config: the image renderer's rendering_tracing_url (conf/defaults.ini:2304-2305; conf/sample.ini:2105) and a Grafana Cloud API example (otlpHttpUrl). The plugin env passthrough GF_INSTANCE_OTLP_ADDRESS (pluginconfig/envvars.go:281-285) is also sending-side. The dossier's 'show only' list leaves these out, but they don't change the 'no'."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "readme.integrations.claude_code_or_codex: replace 'a grep for Claude Code / Codex / Anthropic API found only a CODEOWNERS comment (.github/CODEOWNERS:835)' with: 'no product integration. Hits for claude/anthropic are contributor and CI tooling plus one unused icon name, including CODEOWNERS entries (.github/CODEOWNERS:36,835-837), .gitignore:79-87, CI that loads ANTHROPIC_API_KEY to classify external PRs and detect AI slop (.github/workflows/external-pr-notify-handler.yml:99,141,152), Claude-model PR reviews and weekly digests via Warp Oz (OZ_MODEL=\"claude-4-8-opus-high\" at external-pr-notify-handler.yml:370; external-issue-weekly-digest.yml:186; external-fr-weekly-digest.yml:186; external-pr-weekly-digest.yml:187), and an \"anthropic-logo\" icon that nothing in the tree uses (packages/grafana-data/src/types/icon.ts:313). No hits for codex.'",
+        "Incidental (outside the five checks), readme.integrations.sdk_or_api: LICENSING.md:12-15 lists grafana-data, grafana-e2e-selectors, grafana-runtime and grafana-ui, not grafana-schema. To support '@grafana/schema … Apache-2.0', add packages/grafana-schema/package.json:3 (\"license\": \"Apache-2.0\") or packages/grafana-schema/LICENSE_APACHE2.",
+        "Incidental (outside the five checks), code.entry_points conf/defaults.ini: AGENTS.md:144 says only 'overrides in conf/custom.ini' and does not mention GF_* env vars. Cite a source for env-var overrides or drop that phrase."
+      ]
+    }
+  ]
+}

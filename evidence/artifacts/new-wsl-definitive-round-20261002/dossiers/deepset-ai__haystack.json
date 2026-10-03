@@ -1,0 +1,287 @@
+{
+  "contender": "deepset-ai/haystack",
+  "revision": {
+    "contender": "deepset-ai/haystack",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "deepset-ai/haystack",
+        "tag": "v3.3.0",
+        "commit": "daa2d1ffacd083dcb1fc9a455adf541360a9e09c",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v3.3.0",
+    "commit": "daa2d1ffacd083dcb1fc9a455adf541360a9e09c",
+    "read_at": "2026-10-02T03:02:05+00:00"
+  },
+  "dossier": {
+    "contender": "deepset-ai/haystack",
+    "revision": {
+      "tag": "v3.3.0",
+      "commit": "daa2d1ffacd083dcb1fc9a455adf541360a9e09c",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Haystack (PyPI package haystack-ai, Apache-2.0) is a Python framework for composing LLM applications from components wired into Pipelines and Agents (README.md:12-14). Semantic search is a pattern assembled from parts in this repo: converters and splitters (including an AST-based PythonCodeSplitter), OpenAI/Azure/mock embedders, DocumentWriter, an InMemoryDocumentStore (BM25 plus brute-force vector similarity, JSON save/load) and in-memory retrievers. It is a library, not a product. This tree has no CLI, server, MCP server, repository crawler/indexer or ready-made code-search pipeline. Persistent and ANN document stores, non-OpenAI embedders, the MCP client and REST/MCP serving live in other repositories (haystack-core-integrations, hayhooks), which were not part of this read.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Haystack is an open-source AI orchestration framework for building production-ready LLM applications in Python.",
+          "citation": "README.md:12"
+        },
+        {
+          "claim": "Design modular pipelines and agent workflows with explicit control over retrieval, routing, memory, and generation; build scalable RAG systems, multimodal applications, semantic search, question answering, and autonomous agents.",
+          "citation": "README.md:14"
+        },
+        {
+          "claim": "Install with `pip install haystack-ai`; nightly pre-releases with `pip install --pre haystack-ai`.",
+          "citation": "README.md:30-39"
+        },
+        {
+          "claim": "'Haystack supports multiple installation methods, including Docker images. For a comprehensive guide, please refer to the documentation.'",
+          "citation": "README.md:41-42"
+        },
+        {
+          "claim": "Built for context engineering: explicit control over how information is retrieved, ranked, filtered, combined, structured, and routed before it reaches the model; retrieval, memory, tools and generation are transparent and traceable.",
+          "citation": "README.md:59-60"
+        },
+        {
+          "claim": "Modular and customizable: use built-in components for retrieval, indexing, tool calling, memory, and evaluation, or create your own; add loops, branches and conditional logic to pipelines.",
+          "citation": "README.md:65-66"
+        },
+        {
+          "claim": "Native Async Support: one Pipeline runs synchronously or asynchronously and streams token by token; Agent can run concurrent tool calls.",
+          "citation": "README.md:62-63"
+        },
+        {
+          "claim": "Model- and vendor-agnostic: integrate with OpenAI, Mistral, Anthropic, Cohere, Hugging Face, Google, Azure OpenAI, AWS Bedrock, local models and many others; swap models or infrastructure components without rewriting your system.",
+          "citation": "README.md:68-69"
+        },
+        {
+          "claim": "Extensible ecosystem: build and share custom components through a consistent interface so the community and third parties can extend Haystack.",
+          "citation": "README.md:71-72"
+        },
+        {
+          "claim": "Hayhooks (a separate project) wraps pipelines and agents and exposes them through HTTP endpoints or MCP, including OpenAI-compatible chat completion endpoints.",
+          "citation": "README.md:74-76"
+        },
+        {
+          "claim": "Agents: lifecycle hooks (before_llm, before_tool, on_exit), step_count / token_usage / tool-call tracking, ready-made agents from Agent Pack, and SkillToolset progressive skill discovery.",
+          "citation": "README.md:56-57"
+        },
+        {
+          "claim": "Haystack Enterprise Starter (support, templates, deployment guides) and Haystack Enterprise Platform (managed cloud or self-hosted build/test/deploy/operate) are separate commercial offerings.",
+          "citation": "README.md:78-86"
+        },
+        {
+          "claim": "Telemetry: Haystack collects anonymous usage statistics of pipeline components; 'We receive an event every time these components are initialized'; opt-out is described in the Haystack docs.",
+          "citation": "README.md:88-92"
+        }
+      ],
+      "install": [
+        {
+          "method": "pip (PyPI)",
+          "command": "pip install haystack-ai",
+          "citation": "README.md:30-34; docs-website/docs/overview/installation.mdx:14-18; docs-website/docs/overview/get-started.mdx:25-29"
+        },
+        {
+          "method": "pip, nightly pre-release",
+          "command": "pip install --pre haystack-ai",
+          "citation": "README.md:36-39"
+        },
+        {
+          "method": "uv (pip interface)",
+          "command": "uv pip install haystack-ai",
+          "citation": "docs-website/docs/overview/installation.mdx:20-24"
+        },
+        {
+          "method": "uv (project dependency)",
+          "command": "uv add haystack-ai",
+          "citation": "docs-website/docs/overview/installation.mdx:26-30"
+        },
+        {
+          "method": "conda (conda-forge)",
+          "command": "conda install conda-forge::haystack-ai",
+          "citation": "docs-website/docs/overview/installation.mdx:32-36"
+        },
+        {
+          "method": "Docker base image (Python environment with Haystack preinstalled, meant to be used as a FROM base; no pull command is documented)",
+          "command": "image reference only: deepset/haystack:base-v<version> (docker/README.md writes haystack:base-<version>)",
+          "citation": "docker/README.md:9-12; docker/docker-bake.hcl:28-40; .github/workflows/release.yml:136; README.md:41-42"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - CI runs the unit and integration tests on ubuntu-latest (.github/workflows/tests.yml:124-131, 218-241); the Docker base image is built for and smoke-tested on linux/amd64 (.github/workflows/docker_release.yml:79-81; docker/docker-bake.hcl:39); the package is pure Python and declares Operating System :: OS Independent (pyproject.toml:34, 169-173).",
+        "wsl2": "unknown - no mention of WSL or Windows Subsystem for Linux in README.md, the non-versioned docs-website/docs pages or .github (searched). A Linux install should apply, but upstream neither documents nor tests WSL2.",
+        "macos_arm64": "yes - CI runs the unit and integration tests on macos-latest (.github/workflows/tests.yml:124-131, 243-275), sets HAYSTACK_MPS_ENABLED for that job (tests.yml:248-249; haystack/utils/device.py:509-513), and docker/README.md:40-44 mentions Apple M1. The repo never states the CPU architecture of the macos-latest runner, so arm64 is inferred, not documented.",
+        "gpu": "no - the embedding path shipped in this repo (OpenAIDocumentEmbedder, OpenAITextEmbedder and the Azure variants) is an HTTP client to a remote or self-hosted service and uses no local GPU (haystack/components/embedders/openai_document_embedder.py:128-152). Local-model backends (sentence-transformers, transformers, Hugging Face) were moved to separate packages in 3.0 (MIGRATION.md:35-73). A device resolver (CUDA > XPU > MPS > CPU, haystack/utils/device.py:496-532) exists and is used only by optional components such as SASEvaluator (haystack/components/evaluators/sas_evaluator.py:14,59,119) and TopPSampler (haystack/components/samplers/top_p.py:14); torch is not a runtime dependency (pyproject.toml:44-64)."
+      },
+      "integrations": {
+        "cli": "none found. pyproject.toml (read in full) defines no [project.scripts] or entry points and haystack/ has no __main__.py; the only console tasks are dev-only hatch scripts (pyproject.toml:80-84, 145-153). A hayhooks CLI (hayhooks run, hayhooks pipeline run) belongs to the separate Hayhooks package and is documented in docs-website/docs/development/hayhooks.mdx:36-52, 122-136; its code is not in this tree.",
+        "mcp": "No MCP server in this repo (the only mcp hits under haystack/ are comments and parameters about OpenAI/MCP tool definitions: haystack/tools/toolset.py:51, 214; haystack/components/generators/chat/openai_responses.py:208-209). Documented MCP items are external: (1) a hosted docs MCP server at https://docs.haystack.deepset.ai/api/mcp with a single tool search_haystack_docs that searches the Haystack documentation (not user repositories), no API key (docs-website/docs/overview/docs-mcp-server.mdx:13-23); (2) Hayhooks: pip install hayhooks[mcp] then hayhooks mcp run lists deployed pipelines and agents as MCP tools over Streamable HTTP or SSE (docs-website/docs/development/hayhooks.mdx:138-149; separate repo, not verified); (3) the MCP client side, MCPTool and MCPToolset in the separate mcp-haystack package (docs-website/docs/overview/migrating-from-langgraphlangchain-to-haystack.mdx:42-44, 490-498).",
+        "sdk_or_api": "Python SDK only. import haystack exposes Pipeline, component, Document, SuperComponent, default_to_dict and default_from_dict (haystack/__init__.py:10-40); the package ships py.typed. Pipelines serialize to YAML via Pipeline.dumps/dump/loads/load (haystack/core/pipeline/base.py:294-361). No HTTP API is defined in this repo; REST and OpenAI-compatible endpoints come from the separate Hayhooks project (README.md:74-76; docs-website/docs/development/hayhooks.mdx:22-26, 151-165). Generated API reference pages are in docs-website/reference/haystack-api/.",
+        "claude_code_or_codex": "No integration that exposes Haystack-built search to either client was found in this repo. Claude Code: the only mention is a docs page for registering the hosted Haystack-docs MCP server (claude mcp add --transport http haystack-docs https://docs.haystack.deepset.ai/api/mcp; docs-website/docs/overview/docs-mcp-server.mdx:28-38; the same page has Cursor and GitHub Copilot tabs) - it searches Haystack documentation only. Codex: none found (searching for codex returns only OpenAI model names such as gpt-5-codex in haystack/components/generators/chat/azure.py:76-101). AGENTS.md:1-132 and CLAUDE.md:1 (which contains only @AGENTS.md) are contributor guidance for AI agents editing the Haystack repo itself (hatch commands, API and style rules), not an integration."
+      },
+      "telemetry_and_network": "TELEMETRY (on by default). haystack/telemetry/_telemetry.py creates a module-level Telemetry() at import time when HAYSTACK_TELEMETRY_ENABLED (default 'true') is 'true' or '1' (L191-193); import haystack reaches it via haystack/__init__.py:16 -> haystack/core/pipeline/pipeline.py:33. It sets a hardcoded PostHog project key and host https://eu.posthog.com (L56-57), reads or creates ~/.haystack/config.yaml holding a random uuid4 user_id (L27, 68-97) and logs an info notice when it first creates it (L81-88). Events: 'Pipeline run (3.x)' is sent from Pipeline.run and the async path (haystack/core/pipeline/pipeline.py:328, 903), at most once per 60 s per pipeline object (L30, 150-156). Payload: id(pipeline), pipeline class, run count, each component's qualified class name plus optional _get_telemetry_data() (embedders send the model name: haystack/components/embedders/openai_document_embedder.py:183-187 and openai_text_embedder.py:158-162; retrievers and writers send the document-store class name: haystack/components/retrievers/in_memory/embedding_retriever.py:98-102 and haystack/components/writers/document_writer.py:46-50) and system specs (haystack and python versions, OS family/version/machine, CPU count, container flag, pytest/ipython/colab presence: haystack/telemetry/_environment.py:71-98). A 'Tutorial' event also exists (L181-188). The docs state events never carry IPs, hostnames, file paths, queries or document contents (docs-website/docs/overview/telemetry.mdx:16-24); the payload fields above contain none of those. Opt-out: set HAYSTACK_TELEMETRY_ENABLED to anything other than true/1 before import (L192; telemetry.mdx:56-76). posthog is a mandatory runtime dependency (pyproject.toml:52). The test suite stubs posthog.capture (haystack/testing/telemetry.py:35-52). README.md:90 and telemetry.mdx:14 say events fire when components are initialized; the code fires per Pipeline run (see claim_checks). OTHER NETWORK USE: (a) embeddings and chat go to the OpenAI API by default, or to api_base_url if set (openai_document_embedder.py:47, 136); an API key is required by default (haystack/utils/auth.py:62-77, 213-214), default timeout 30 s and 5 retries (openai_document_embedder.py:129-132); Azure variants need an Azure endpoint and key. (b) Pipeline.show()/draw() send the encoded pipeline graph to https://mermaid.ink (haystack/core/pipeline/draw.py:249, 299, 315). (c) nltk.download('punkt_tab') runs when sentence splitting needs data that is missing and nltk is installed (haystack/components/preprocessors/sentence_tokenizer.py:60-66). (d) LinkContentFetcher fetches arbitrary URLs with no host filtering, by design (SECURITY.md:36-42). (e) No built-in tracing backend: OpenTelemetry and Datadog tracers moved out and are no longer auto-enabled (MIGRATION.md:84-183); content tracing is off unless HAYSTACK_CONTENT_TRACING_ENABLED=true (haystack/tracing/tracer.py:49-66, 118). (f) The hosted docs MCP server is used only if a user registers it; no key or sign-up (docs-website/docs/overview/docs-mcp-server.mdx:15-21). (g) Snapshots are written to disk only when HAYSTACK_PIPELINE_SNAPSHOT_SAVE_ENABLED is true/1 (haystack/core/pipeline/breakpoint.py:22-40, 188-191), but on a component runtime error the code still creates ~/.haystack/pipeline_snapshot (or a tmp/cwd fallback) (haystack/core/pipeline/pipeline.py:481-486; haystack/utils/misc.py:104-134). No account is needed for the open-source package; Haystack Enterprise products are optional (README.md:78-86)."
+    },
+    "code": {
+      "languages": [
+        "Python (library: 286 .py files under haystack/; requires-python >=3.10, classifiers 3.10-3.14: pyproject.toml:11, 37-41)",
+        "MDX/Markdown and JavaScript (Docusaurus docs site in docs-website/, not part of the wheel: pyproject.toml:169-173)",
+        "YAML (GitHub Actions), shell (.github/utils/*.sh), Dockerfile and HCL (docker/)"
+      ],
+      "entry_points": [
+        {
+          "path": "haystack/__init__.py:10-40",
+          "what": "Library import surface (Pipeline, component, Document, SuperComponent, default_to_dict/default_from_dict). Importing it configures logging and, unless disabled, instantiates Telemetry (creates ~/.haystack/config.yaml)."
+        },
+        {
+          "path": "haystack/core/pipeline/pipeline.py:200",
+          "what": "Pipeline.run(...) (sync; accepts break_point, pipeline_snapshot, snapshot_callback); run_async_generator at :806 and run_async at :1096."
+        },
+        {
+          "path": "haystack/core/pipeline/base.py:294-361",
+          "what": "Pipeline.dumps/dump/loads/load - YAML (de)serialization with an allowed_modules allowlist and an unsafe flag."
+        },
+        {
+          "path": "haystack/components/preprocessors/python_code_splitter.py:32-33",
+          "what": "PythonCodeSplitter - ast-based, Python-only chunker; per-chunk meta start_line, end_line, unit_kinds, include_classes, decorators, docstrings."
+        },
+        {
+          "path": "haystack/components/embedders/openai_document_embedder.py:21-22; haystack/components/embedders/openai_text_embedder.py:16-17",
+          "what": "OpenAIDocumentEmbedder / OpenAITextEmbedder - clients for the OpenAI embeddings endpoint with an api_base_url override; MockDocumentEmbedder / MockTextEmbedder (deterministic, no network) are in the same package."
+        },
+        {
+          "path": "haystack/document_stores/in_memory/document_store.py:98",
+          "what": "InMemoryDocumentStore - write_documents (:511), bm25_retrieval (:784), embedding_retrieval (:853), delete_by_filter (:626), save_to_disk (:445), load_from_disk (:457)."
+        },
+        {
+          "path": "haystack/components/retrievers/in_memory/embedding_retriever.py:12-13; haystack/components/retrievers/text_embedding_retriever.py:14-15",
+          "what": "InMemoryEmbeddingRetriever (query_embedding -> top_k documents, optional filters) and TextEmbeddingRetriever (text query -> text embedder -> embedding retriever)."
+        },
+        {
+          "path": "pyproject.toml (no [project.scripts])",
+          "what": "There is no binary, CLI module, server main or daemon in this repo; hatch scripts (pyproject.toml:80-84, 145-153) are developer tasks only."
+        }
+      ],
+      "architecture": "Pure-Python library (package haystack, 286 .py files). Core: haystack/core/component (@component decorator, sockets, type checks); haystack/core/pipeline (pipeline.py run/run_async, base.py graph building plus YAML dumps/loads, breakpoint.py and haystack/dataclasses/breakpoints.py for PipelineSnapshot, draw.py); haystack/core/serialization.py and serialization_security.py (allowlisted deserialization); haystack/core/super_component (wrap a pipeline as one component). Data model: haystack/dataclasses (Document with a sha256 content-derived id: document.py:103-116; ChatMessage; ByteStream). Components under haystack/components: converters (TextFileToDocument etc.), preprocessors (DocumentSplitter, RecursiveDocumentSplitter, PythonCodeSplitter, ...), embedders (OpenAI, Azure OpenAI, mock only), writers (DocumentWriter), retrievers (InMemoryBM25Retriever, InMemoryEmbeddingRetriever, TextEmbeddingRetriever, multi-query and window retrievers), joiners (DocumentJoiner with reciprocal rank fusion), rankers, generators (OpenAI/Azure chat and Responses API), agents (Agent with hooks), evaluators, fetchers. Storage: haystack/document_stores (DocumentStore protocol; InMemoryDocumentStore with BM25 and numpy brute-force vector similarity, shared process-global storage by default, JSON save/load). Tools and agents: haystack/tools (Tool, ComponentTool, PipelineTool, SkillToolset), haystack/hooks, haystack/skill_stores, haystack/token_counters. Cross-cutting: haystack/telemetry (PostHog), haystack/tracing (interfaces only), haystack/utils (Secret auth, filters, device, HTTP client), haystack/testing (test helpers and DocumentStore test mixins). Vector-database stores, sentence-transformers/Hugging Face/Anthropic/Bedrock components, the MCP client and tracers are in the separate haystack-core-integrations repo (MIGRATION.md:35-82), not in this tree. Protocols allow custom backends: DocumentStore (haystack/document_stores/types/protocol.py:11), TextEmbedder/DocumentEmbedder (haystack/components/embedders/types/protocol.py:10-32), EmbeddingRetriever (haystack/components/retrievers/types/protocol.py:33).",
+      "packaging_and_release": "Artifacts: sdist and pure-Python wheel built by hatchling (hatch build) and published to PyPI as haystack-ai (pyproject.toml:1-3, 169-173; .github/workflows/pypi_release.yml:34-38); the version comes from VERSION.txt (pyproject.toml:162-164; VERSION.txt:1 = 3.3.0). Tag v3.3.0 is an annotated tag peeling to commit daa2d1ff (.git/packed-refs:2-3). Release flow: a maintainer-only workflow_dispatch (.github/workflows/release.yml:20-40) bumps VERSION.txt, pushes a v-tag (L83-102) and waits for three tag-triggered workflows - PyPI (pypi_release.yml:3-8), GitHub Release (github_release.yml; notes generated with reno, no assets attached: L57-103) and Docker (docker_release.yml) - then checks that all three artifacts exist (release.yml:104-145). Nightly dev builds X.Y.Z.devYYYYMMDDHHMMSS are published daily at 00:00 UTC from main to PyPI (.github/workflows/nightly_testpypi_release.yml:3-8, 30-51; despite the file name it sets no TestPyPI URL). Docker: deepset/haystack:base-v<version> (plus stable for stable tags) on Docker Hub, linux/amd64 and linux/arm64, python:3.12-slim pinned by digest, installed from a shallow git clone of the tag (docker/docker-bake.hcl:28-40; docker/Dockerfile.base:4-29; docker_release.yml:53-88). Integrity: PyPI uploads use trusted publishing (environment pypi, id-token: write, pypa/gh-action-pypi-publish pinned by SHA: pypi_release.yml:18-21, 37-38); no workflow configures checksums, signatures (cosign/sigstore), SBOMs or provenance attestations explicitly (searched .github and docker; the only checksum hits are docstring-hash utilities), and GitHub releases carry no downloadable files. Whether the publish action emits PyPI attestations by default is not visible in this repo. Actions are pinned by commit SHA and Dependabot updates actions, pip, npm and docker dependencies daily (.github/dependabot.yml:1-49). CI installs use --uploaded-prior-to=P1D and uv is configured with exclude-newer = 24 hours (pyproject.toml:345-351).",
+      "tests_and_ci": "Frameworks: pytest with pytest-asyncio (asyncio_mode auto), pytest-cov, pytest-bdd, pytest-rerunfailures; markers unit/integration/slow (pyproject.toml:180-193); mypy (python_version 3.12) and ruff (pyproject.toml:195-343); hatch scripts test:unit = pytest --cov=haystack -m 'not integration' test, integration-only-fast, integration-only-slow, e2e, types (pyproject.toml:145-153). Test directories: test/ (220 test_*.py modules, 264 .py files in total, roughly 4,550 test functions by grep for def test_; includes test/document_stores/test_in_memory.py with save_to_disk/load_from_disk tests at :199-228 and test/components/preprocessors/test_python_code_splitter.py), e2e/ (2 pipeline test modules plus conftest), test/fuzz/ (3 atheris harnesses: Pipeline.loads, Document.from_dict, document_matches_filter). CI: 36 workflow files in .github/workflows. tests.yml: ruff format/lint check and hawkeye license-header check (L69-95), import check (L97-115), unit tests on ubuntu/windows/macos at Python 3.10 only (L32, 117-150), coverage comment with thresholds green 90 / orange 60 (L162-169), mypy on Python 3.12 for changed files (L178-216), fast integration tests on all three OSes (L218-303); OPENAI_API_KEY and AZURE_OPENAI_* secrets are exported to the job (L28-31). Other workflows: slow.yml (nightly slow integration tests on three OSes), e2e.yml (nightly, needs OPENAI_API_KEY), docs-website-test-docs-snippets.yml (nightly docs snippet tests on Python 3.11), codeql.yml (Python), scorecard.yml (weekly OpenSSF Scorecard, publishes results), cflite_pr.yml (ClusterFuzzLite, 120 s code-change fuzzing, address sanitizer), license_compliance.yml (daily direct-dependency license check plus FOSSA report), workflows_linting.yml (actionlint), plus release, docs-sync, labeler/stale and PR-guard automation. Local hooks: .pre-commit-config.yaml (ruff, codespell, actionlint, release-note checks).",
+      "dependencies": "pyproject.toml: [build-system] requires hatchling>=1.8.0 (1 build dependency, L1-3); [project].dependencies lists 19 direct runtime dependencies (tqdm, tenacity, lazy-imports, openai>=2.6.0, pydantic, Jinja2, MarkupSafe, posthog, pyyaml, more-itertools, networkx, typing_extensions, httpx, anyio>=4.14.2, numpy, python-dateutil, jsonschema, docstring-parser, filetype; L44-64). There is no [project.optional-dependencies] table; optional libraries (pypdf, nltk, sentence-transformers and so on) are imported lazily with install hints (docs-website/docs/overview/installation.mdx:38-46). Hatch default env: 6 dev dependencies (L66-78). Hatch test env: 35 dependencies (L86-143: pytest and plugins, mypy, pandas, transformers[torch], sentence-transformers, nltk, tiktoken and converter libraries). docs-website/package.json: 18 dependencies + 2 devDependencies (docs site only, not shipped). No lock files are committed (no uv.lock, requirements*.txt or package-lock.json found), so versions resolve at install time. Python >=3.10 (pyproject.toml:11).",
+      "security_policy": "SECURITY.md (present). Report by email to opensource-security@deepset.ai (SECURITY.md:3-15); CONTRIBUTING.md:100 instead points to GitHub private security advisories. Target: preliminary review within 5 business days (SECURITY.md:58-60). Declared out of scope (SECURITY.md:17-50): any issue that needs unsanitized attacker-controlled input to the framework; loading pipeline YAML, deserialize_callable or import_class_by_name from untrusted sources ('unsafe by design'); resuming a PipelineSnapshot without integrity verification; SSRF through LinkContentFetcher and other URL-fetching components; prompt injection via documents or metadata. In scope: code execution that does not rely on an operator loading an untrusted pipeline (SECURITY.md:34). Runtime mitigations: a deserialization allowlist (haystack, haystack_integrations, haystack_experimental, builtins, typing, collections) with denylisted builtins; HAYSTACK_DESERIALIZATION_ALLOWLIST extends it and HAYSTACK_UNSAFE_DESERIALIZATION disables all checks process-wide (haystack/core/serialization_security.py:39-56); a fuzz harness for Pipeline.loads (test/fuzz/fuzz_pipeline_loads.py) plus CodeQL and Scorecard in CI."
+    },
+    "claim_checks": [
+      {
+        "claim": "pip install haystack-ai installs Haystack; pip install --pre haystack-ai gives nightly pre-releases (README.md:30-39).",
+        "verified": "yes",
+        "evidence": "pyproject.toml:6 names the distribution haystack-ai and builds a pure-Python wheel with hatchling (L1-3, 169-173). .github/workflows/nightly_testpypi_release.yml publishes X.Y.Z.devTIMESTAMP builds of main to PyPI daily (L3-8, 30-51), so --pre resolves them. Tagged releases publish to PyPI from .github/workflows/pypi_release.yml:3-38."
+      },
+      {
+        "claim": "Haystack supports multiple installation methods, including Docker images (README.md:41-42).",
+        "verified": "partial",
+        "evidence": "A Docker image exists: docker_release.yml builds and pushes deepset/haystack:base-v<version> for linux/amd64 and linux/arm64 (L18, 61-88; docker/docker-bake.hcl:28-40; release.yml:136). But the installation page the README points to lists only pip, uv and conda (docs-website/docs/overview/installation.mdx:12-36); Docker is described only in docker/README.md:9-12, whose heading says Haystack 2.x and which gives no pull command."
+      },
+      {
+        "claim": "Telemetry: 'We receive an event every time these components are initialized' (README.md:90; repeated in docs-website/docs/overview/telemetry.mdx:14).",
+        "verified": "partial",
+        "evidence": "Code differs from the text (code is authoritative). No component constructor sends anything. The only event emitters are pipeline_running, called at the start of Pipeline.run (haystack/core/pipeline/pipeline.py:328) and in the async path (:903), and tutorial_running (haystack/telemetry/_telemetry.py:139-188). The 'Pipeline run (3.x)' event is rate-limited to one per 60 s per pipeline object (L30, 150-156) and lists every component class plus _get_telemetry_data() (L158-178). Opt-out via HAYSTACK_TELEMETRY_ENABLED works as documented (L191-193). The sample event in telemetry.mdx:26-44 (Haystack 1.0.0, 'tutorial 1 executed', torch/transformers versions) does not match the current payload keys (haystack/telemetry/_environment.py:81-98)."
+      },
+      {
+        "claim": "Build semantic search; use built-in components for retrieval and indexing (README.md:14, 65-66).",
+        "verified": "partial",
+        "evidence": "Building blocks exist and are tested: TextFileToDocument (haystack/components/converters/txt.py:16-101), PythonCodeSplitter (haystack/components/preprocessors/python_code_splitter.py:32-615), OpenAI/Azure/mock embedders (haystack/components/embedders/__init__.py:10-17), DocumentWriter (haystack/components/writers/document_writer.py:11-50), InMemoryDocumentStore (haystack/document_stores/in_memory/document_store.py:98), InMemoryEmbeddingRetriever and TextEmbeddingRetriever. docs-website/docs/pipeline-components/preprocessors/pythoncodesplitter.mdx:160-185 shows a converter -> splitter -> writer indexing pipeline over Path(...).glob('**/*.py'). Not found in haystack/: any repository crawler, file watcher, change detection or incremental re-index logic (searched glob/rglob/os.walk/mtime/incremental; the only directory walk is haystack/skill_stores/file_system/skill_store.py:127,207), a CLI, or a prebuilt code-search pipeline. The only DocumentStore in the repo is in-memory."
+      },
+      {
+        "claim": "Model- and vendor-agnostic: integrate with OpenAI, Mistral, Anthropic, Cohere, Hugging Face, Google, Azure OpenAI, AWS Bedrock, local models; swap models or infrastructure without rewriting (README.md:68-69).",
+        "verified": "partial",
+        "evidence": "In this repo the embedders are OpenAI, Azure OpenAI and mock only (haystack/components/embedders/__init__.py:10-17); chat generators are OpenAI/Azure (chat and Responses). Hugging Face, transformers and sentence-transformers components were moved to separate packages in 3.0 (MIGRATION.md:35-73) and the other vendors live in haystack-core-integrations (not in this tree). Swapping is supported through protocols (DocumentStore: haystack/document_stores/types/protocol.py:11; TextEmbedder/DocumentEmbedder: haystack/components/embedders/types/protocol.py:10-32; EmbeddingRetriever: haystack/components/retrievers/types/protocol.py:33), but InMemoryEmbeddingRetriever only accepts an InMemoryDocumentStore (haystack/components/retrievers/in_memory/embedding_retriever.py:84-85), so a different store needs a different retriever. OpenAI-compatible servers can be targeted with api_base_url (openai_document_embedder.py:47, 78-79, 136), but the embedder docs do not mention it and the unit tests only assert the stored value (test/components/embedders/test_openai_text_embedder.py:40-49, 105-147); the API key is mandatory by default (haystack/utils/auth.py:213-214)."
+      },
+      {
+        "claim": "Native Async Support: one Pipeline runs synchronously or asynchronously; Agent can run concurrent tool calls (README.md:62-63).",
+        "verified": "yes",
+        "evidence": "Pipeline.run at haystack/core/pipeline/pipeline.py:200, run_async_generator at :806, run_async at :1096. Agent has tool_concurrency_limit (default 4): haystack/components/agents/agent.py:393, 427, 788. OpenAIDocumentEmbedder.run_async is at haystack/components/embedders/openai_document_embedder.py:364-398 and OpenAITextEmbedder.run_async at haystack/components/embedders/openai_text_embedder.py:233-253. InMemoryDocumentStore async methods delegate to a single-thread executor (haystack/document_stores/in_memory/document_store.py:171-177, 974-1012)."
+      },
+      {
+        "claim": "Hayhooks wraps pipelines and agents and exposes them through HTTP endpoints or MCP (README.md:74-76).",
+        "verified": "not_checkable",
+        "evidence": "Hayhooks is a separate repository (deepset-ai/hayhooks) and no Hayhooks code is in this working tree. docs-website/docs/development/hayhooks.mdx:138-149 documents pip install hayhooks[mcp] and hayhooks mcp run, with pipelines listed as MCP tools over Streamable HTTP or SSE. This is documentation only; nothing here was executed or code-checked."
+      },
+      {
+        "claim": "Pipelines automatically create a snapshot of the last valid state if a run fails; it can be inspected and resumed (docs-website/docs/concepts/pipelines/pipeline-breakpoints.mdx:112-114; a docs claim, not a README claim).",
+        "verified": "partial",
+        "evidence": "Code confirms the in-memory snapshot: on PipelineRuntimeError or BreakpointException the pipeline builds a PipelineSnapshot (inputs, component visits, outputs) and attaches it to the exception (haystack/core/pipeline/pipeline.py:479-510); resuming uses Pipeline.run(pipeline_snapshot=...) (:297-301, 375-397) and load_pipeline_snapshot (haystack/core/pipeline/breakpoint.py:111-138). Writing the snapshot to a JSON file is off by default and needs HAYSTACK_PIPELINE_SNAPSHOT_SAVE_ENABLED=true/1 (breakpoint.py:22-40, 188-191) or a snapshot_callback (:176-186). The snapshot covers a single Pipeline.run (a resumable run), not a persistent or incremental index; SECURITY.md:32 says snapshots are deserialized without integrity verification."
+      },
+      {
+        "claim": "InMemoryDocumentStore: 'Stores data in-memory. It's ephemeral and cannot be saved to disk.' (class docstring haystack/document_stores/in_memory/document_store.py:99-101, copied into docs-website/reference/haystack-api/document_stores_api.md:22; not a README claim).",
+        "verified": "no",
+        "evidence": "The same class implements save_to_disk (writes the whole store, including embeddings, as one JSON file via a plain open(path, 'w') and json.dump, no atomic rename: document_store.py:445-454) and load_from_disk (re-writes every document with DuplicatePolicy.OVERWRITE: :456-478). Tests cover the round trip, including blob and sparse embedding (test/document_stores/test_in_memory.py:199-228), and the same API page documents both methods (document_stores_api.md:114-140). Code is authoritative; the docstring is stale. docs-website/docs/document-stores/inmemorydocumentstore.mdx:11 also says it is not recommended for production."
+      },
+      {
+        "claim": "A hosted Haystack docs MCP server exposes one tool, search_haystack_docs, needs no API key or sign-up, and works with Claude Code via claude mcp add --transport http haystack-docs https://docs.haystack.deepset.ai/api/mcp (docs-website/docs/overview/docs-mcp-server.mdx:13-38; a docs claim).",
+        "verified": "not_checkable",
+        "evidence": "It is a hosted service operated outside this repo; no server code is in the tree, so the tool name and no-auth behavior cannot be confirmed from code. The page itself says the tool searches the official Haystack documentation (L13-15), i.e. not a user's repositories. The command is documented for Claude Code (L28-38); no Codex setup is documented."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Scope: Haystack is a framework, not a turnkey semantic-code-search system. This tree has no CLI (no [project.scripts] in pyproject.toml, no __main__.py), no MCP or HTTP server, no repository crawler or change detector (no glob/walk/mtime logic under haystack/ except haystack/skill_stores/file_system/skill_store.py:127,207) and no prebuilt code-index pipeline. The only MCP server documented searches Haystack's own docs (docs-website/docs/overview/docs-mcp-server.mdx:13-15); serving pipelines over REST or MCP is delegated to the separate Hayhooks project (README.md:74-76; docs-website/docs/development/hayhooks.mdx:138-149), whose code was not read. No Codex integration of any kind was found.",
+      "State and scale: the only DocumentStore in this repo is InMemoryDocumentStore - process-global shared dicts keyed by index by default (haystack/document_stores/in_memory/document_store.py:90-95, 151-159), exact brute-force scoring over every stored embedding on each query with the embedding matrix rebuilt per call (:901-957), and a docs recommendation against production use (docs-website/docs/document-stores/inmemorydocumentstore.mdx:11; docs-website/docs/concepts/document-store/choosing-a-document-store.mdx:179). Recovery is a whole-store JSON dump written non-atomically (:445-454) and reloaded by re-writing and re-tokenizing every document (:471-476). Its class docstring and API reference wrongly say it cannot be saved to disk (:99-101; docs-website/reference/haystack-api/document_stores_api.md:22). Persistent or ANN stores (Chroma, FAISS, pgvector and others) are separate packages outside this tree (e.g. docs-website/docs/document-stores/faissdocumentstore.mdx:18-29, chromadocumentstore.mdx:24-28) and were not code-checked.",
+      "Embedding service coupling and silent partial indexes: only OpenAI, Azure OpenAI and mock embedders ship here (haystack/components/embedders/__init__.py:10-17); local backends moved out in 3.0 (MIGRATION.md:35-73). The OpenAI embedders use a strict env-var API key by default, so a keyless local server needs a dummy key (haystack/utils/auth.py:62-77, 205-215; openai_document_embedder.py:44, 134), always send encoding_format float (openai_document_embedder.py:255; openai_text_embedder.py:206) and default to model text-embedding-ada-002 (openai_document_embedder.py:45). OpenAIDocumentEmbedder defaults to raise_on_failure=False: a failed batch is logged and those documents are returned without embeddings (openai_document_embedder.py:59, 260-270, 355-360); the in-memory retriever then skips documents lacking embeddings (document_store.py:889-899) and DocumentWriter will still store them. Query and document embeddings must come from the same model; mismatched dimensions raise DocumentStoreError (document_store.py:936-964).",
+      "Code ingestion limits: the only code-aware splitter is the Python-only PythonCodeSplitter; it calls ast.parse per document with no per-document error handling, so one file with invalid syntax raises SyntaxError for the whole batch (haystack/components/preprocessors/python_code_splitter.py:575-579, 595). No tree-sitter or other language parsers were found; other languages fall back to generic splitters (split_by options at haystack/components/preprocessors/document_splitter.py:61). TextFileToDocument keeps only the basename in meta file_path unless store_full_path=True (haystack/components/converters/txt.py:40-53, 96-97) and skips unreadable or undecodable files with a warning (:80-92). Document ids are sha256 of content, meta and embedding (haystack/dataclasses/document.py:103-116), so edited chunks get new ids and removing superseded chunks needs explicit delete_documents/delete_by_filter calls (document_store.py:556-579, 626-645); no built-in sync was found.",
+      "Telemetry and side effects at import: telemetry is on by default, uses a hardcoded PostHog key against https://eu.posthog.com, and import haystack creates ~/.haystack/config.yaml with a random user id (haystack/telemetry/_telemetry.py:56-57, 68-97, 191-193; haystack/__init__.py:16); posthog is a mandatory dependency (pyproject.toml:52). Events carry component class names, embedding model names and document-store class names (openai_document_embedder.py:183-187; embedding_retriever.py:98-102). README.md:90 and docs-website/docs/overview/telemetry.mdx:14 describe the trigger incorrectly (component initialization instead of Pipeline.run). Opting out requires an environment variable set before import.",
+      "Security model: SECURITY.md declares unsafe-by-design and out of scope loading pipeline YAML from untrusted sources, resuming unverified PipelineSnapshots, SSRF through LinkContentFetcher and prompt injection via retrieved documents (SECURITY.md:25-50). HAYSTACK_UNSAFE_DESERIALIZATION=1 disables every deserialization check process-wide (haystack/core/serialization_security.py:15-22, 56, 135-157). Snapshots contain run inputs and outputs, which for an indexing or query pipeline would include document content and embeddings (haystack/dataclasses/breakpoints.py:53-69; haystack/core/pipeline/pipeline.py:491-500); file writing is off by default (haystack/core/pipeline/breakpoint.py:22-40). Pipeline.show()/draw() sends the pipeline graph to mermaid.ink (haystack/core/pipeline/draw.py:249, 315).",
+      "Maintenance and compatibility: 3.x carries breaking changes from 2.x (MIGRATION.md:3-35, including components moved to other packages and Agent API removals) and some docs still hold 2.x-era text (docker/README.md:7 heading; the sample event in telemetry.mdx:26-44). pyproject.toml declares Python 3.10-3.14 (L37-41) but the unit and integration jobs run Python 3.10 only (.github/workflows/tests.yml:32, 117-150, 218-303); mypy runs on 3.12 (tests.yml:35), docs-snippet tests on 3.11, Python 3.13 appears only in check_api_ref.yml:24 and 3.14 in no workflow. No lock file is committed (pyproject.toml:44-64 uses unpinned or lower-bounded ranges) and openai has no upper bound (openai>=2.6.0, L48), while the code already carries openai>=3 compatibility notes (openai_document_embedder.py:146-147).",
+      "Supply chain and licensing: release workflows publish through PyPI trusted publishing but configure no checksums, signatures, SBOMs or provenance; GitHub releases attach no files and Docker pushes configure no signing (.github/workflows/pypi_release.yml:17-38, github_release.yml:99-103, docker_release.yml:61-69). The license-compliance job exempts tqdm (its comment calls it MLP, i.e. MPL) and typing_extensions (PSF) from the copyleft check and keeps the license inventory on FOSSA rather than in-tree (.github/workflows/license_compliance.yml:41-59). Project code is Apache-2.0 (LICENSE; pyproject.toml:10) with per-file SPDX headers; contributions require a CLA (CONTRIBUTING.md:27). Enterprise Starter and Platform are separate commercial products (README.md:78-86)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "deepset-ai/haystack",
+      "checks": [
+        {
+          "field": "readme.install[0] (pip (PyPI))",
+          "statement": "pip install haystack-ai",
+          "citation": "README.md:30-34; docs-website/docs/overview/installation.mdx:14-18; docs-website/docs/overview/get-started.mdx:25-29",
+          "holds": true,
+          "note": "All three cited blocks contain exactly `pip install haystack-ai` (README.md:32-34, installation.mdx:16-18, get-started.mdx:27-29). pyproject.toml:6 names the distribution haystack-ai, so the command matches the package built here."
+        },
+        {
+          "field": "license",
+          "statement": "spdx Apache-2.0, file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE is the Apache License, Version 2.0 text (L2-3; appendix 'Copyright 2021 deepset GmbH' at L190). pyproject.toml:10 declares license = \"Apache-2.0\" and L33 has the OSI Apache classifier. It is the only LICENSE/NOTICE/COPYING file in the tree, and no file under haystack/ carries a non-Apache SPDX header."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - CI runs the unit and integration tests on ubuntu-latest; the Docker base image is built for and smoke-tested on linux/amd64; the package is pure Python and declares Operating System :: OS Independent.",
+          "citation": ".github/workflows/tests.yml:124-131, 218-241; .github/workflows/docker_release.yml:79-81; docker/docker-bake.hcl:39; pyproject.toml:34, 169-173",
+          "holds": true,
+          "note": "tests.yml:127-131 unit matrix includes ubuntu-latest; L218-241 integration-tests-linux runs test:integration-only-fast on ubuntu-latest. docker_release.yml:79-80 runs the image with --platform linux/amd64 and prints haystack.__version__; docker-bake.hcl:39 platforms = [linux/amd64, linux/arm64]. pyproject.toml:34 OS Independent; L169-173 hatchling sdist/wheel of the haystack package; no C/Cython/Rust sources under haystack/. Caveats: a version mismatch in the Docker smoke test (L81) only echoes a message and does not fail the step; CI tests run on Python 3.10 only (tests.yml:32)."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "No MCP server in this repo (only comments/parameters mention MCP); documented MCP items are external: hosted docs MCP server with one tool search_haystack_docs and no API key; Hayhooks `pip install hayhooks[mcp]` + `hayhooks mcp run` over Streamable HTTP or SSE; MCPTool/MCPToolset in the separate mcp-haystack package.",
+          "citation": "haystack/tools/toolset.py:51, 214; haystack/components/generators/chat/openai_responses.py:208-209; docs-website/docs/overview/docs-mcp-server.mdx:13-23; docs-website/docs/development/hayhooks.mdx:138-149; docs-website/docs/overview/migrating-from-langgraphlangchain-to-haystack.mdx:42-44, 490-498",
+          "holds": true,
+          "note": "A case-insensitive grep for mcp under haystack/ finds only comments and docstrings, in four files; there is no MCP server or client code. The dossier lists only 4 of about 20 hits: also toolset.py:171-181 (docstring example of a hypothetical MCPToolset subclass), searchable_toolset.py:117,148,158, openai_responses.py:253,334,413-414,490-491,564 and azure_responses.py:220. Some of these are about loading tools from MCP servers, which is broader than 'OpenAI/MCP tool definitions'. docs-mcp-server.mdx:13-23, hayhooks.mdx:140-147 and the migration page (L42-44; L490-492 `pip install haystack-ai mcp-haystack ...`, `from haystack_integrations.tools.mcp import MCPToolset`) match as stated."
+        },
+        {
+          "field": "claim_checks[3]",
+          "statement": "Build semantic search; use built-in components for retrieval and indexing (README.md:14, 65-66) - verified: partial. The building blocks exist (TextFileToDocument, PythonCodeSplitter, OpenAI/Azure/mock embedders, DocumentWriter, InMemoryDocumentStore, InMemoryEmbeddingRetriever, TextEmbeddingRetriever), but haystack/ has no repository crawler, file watcher, change detection or incremental re-index, no CLI and no prebuilt code-search pipeline, and its only DocumentStore is in-memory.",
+          "citation": "README.md:14, 65-66; haystack/components/converters/txt.py:16-101; haystack/components/preprocessors/python_code_splitter.py:32-615; haystack/components/embedders/__init__.py:10-17; haystack/components/writers/document_writer.py:11-50; haystack/document_stores/in_memory/document_store.py:98; docs-website/docs/pipeline-components/preprocessors/pythoncodesplitter.mdx:160-185; haystack/skill_stores/file_system/skill_store.py:127,207",
+          "holds": true,
+          "note": "README L14 and L65-66 say this. Every cited range matches: TextFileToDocument is txt.py:16-101; PythonCodeSplitter runs from @component at L32 to its final return at L615; the embedder registry lists only Azure OpenAI, mock and OpenAI (L10-17); DocumentWriter is L11-50; InMemoryDocumentStore is at L98 and is the only DocumentStore implementation under haystack/. The retrievers exist at in_memory/embedding_retriever.py:12-13 and text_embedding_retriever.py:14-15. The mdx at L160-185 shows converter -> PythonCodeSplitter -> DocumentWriter over Path(...).glob('**/*.py'). Re-running the negative search (glob/rglob/os.walk/scandir/listdir/iterdir/mtime/watchdog/incremental) finds only skill_store.py:127,207 plus a BM25-statistics comment at document_store.py:537. There is no __main__.py, no [project.scripts] and no code-search template. 'partial' is a fair rating."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

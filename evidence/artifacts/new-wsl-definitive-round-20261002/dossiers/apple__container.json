@@ -1,0 +1,278 @@
+{
+  "contender": "apple/container",
+  "revision": {
+    "contender": "apple/container",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "apple/container",
+        "tag": "1.5.0",
+        "commit": "d265d669ecae041bf338cb3b39c4118316d138f0",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "1.5.0",
+    "commit": "d265d669ecae041bf338cb3b39c4118316d138f0",
+    "read_at": "2026-10-02T03:01:55+00:00"
+  },
+  "dossier": {
+    "contender": "apple/container",
+    "revision": {
+      "tag": "1.5.0",
+      "commit": "d265d669ecae041bf338cb3b39c4118316d138f0",
+      "read_at": "2026-10-02T03:01:55+00:00"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Apple's open-source (Apache-2.0) Swift CLI and launchd-managed helper services for building and running Linux containers from OCI images on Apple-silicon Macs. Each container runs in its own lightweight VM (Apple Virtualization framework, driven through the external `Containerization` package) attached to vmnet networks. It also provides image build (BuildKit in a builder VM), registry login, named volumes, user-defined networks, persistent 'container machines' that mount the host home directory, and an experimental local Kubernetes plugin. Host platform scope is macOS only; Linux appears only as the guest OS inside the VMs.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "`container` creates and runs Linux containers as lightweight virtual machines on a Mac; it is written in Swift and optimized for Apple silicon.",
+          "citation": "README.md:6"
+        },
+        {
+          "claim": "Consumes and produces OCI-compatible images: pull from any standard registry, push built images, and run them in other OCI-compatible applications.",
+          "citation": "README.md:8"
+        },
+        {
+          "claim": "Uses the apple/containerization Swift package for low-level container, image and process management.",
+          "citation": "README.md:10"
+        },
+        {
+          "claim": "You need a Mac with Apple silicon to run `container`.",
+          "citation": "README.md:18"
+        },
+        {
+          "claim": "Supported on macOS 26 (new virtualization and networking features); older macOS versions are not supported and maintainers typically will not address issues that cannot be reproduced on macOS 26.",
+          "citation": "README.md:20"
+        },
+        {
+          "claim": "Install by downloading the latest signed installer package from the GitHub release page, double-clicking it and entering an administrator password so files are placed under /usr/local.",
+          "citation": "README.md:24-26"
+        },
+        {
+          "claim": "Start the system service with `container system start`.",
+          "citation": "README.md:28-32"
+        },
+        {
+          "claim": "`container run --rm alpine echo hello` pulls alpine, runs it in a lightweight Linux VM, prints hello and removes the container on exit.",
+          "citation": "README.md:36-42"
+        },
+        {
+          "claim": "Upgrade, downgrade and uninstall use the signed pkg or the update-container.sh / uninstall-container.sh scripts installed to /usr/local/bin; the service must be stopped first with `container system stop`; `-k` keeps and `-d` removes user data.",
+          "citation": "README.md:46-85"
+        },
+        {
+          "claim": "Under active development; release versions are product versions, not semantic versions.",
+          "citation": "README.md:102"
+        },
+        {
+          "claim": "CLI compatibility is generally preserved within a major release; features marked experimental (for example the `k8s` subcommand) may change and carry no backward-compatibility guarantee.",
+          "citation": "README.md:104"
+        },
+        {
+          "claim": "The `container-apiserver` XPC API keeps forward and backward compatibility within a major version; other non-public XPC helpers carry no CLI or API compatibility guarantee across versions.",
+          "citation": "README.md:106-107"
+        },
+        {
+          "claim": "Application data has forward compatibility only, guaranteed within one major version; upgrading to a newer major version may require a specific upgrade path.",
+          "citation": "README.md:109"
+        }
+      ],
+      "install": [
+        {
+          "method": "macOS signed installer package from GitHub Releases (GUI installer)",
+          "command": "Download the latest signed .pkg from https://github.com/apple/container/releases, double-click it and enter the administrator password (installs under /usr/local); then run: container system start",
+          "citation": "README.md:24-32"
+        },
+        {
+          "method": "Upgrade/downgrade with the bundled update script",
+          "command": "container system stop; /usr/local/bin/update-container.sh   # downgrade: /usr/local/bin/uninstall-container.sh -k && /usr/local/bin/update-container.sh -v 0.3.0; then: container system start",
+          "citation": "README.md:48-71"
+        },
+        {
+          "method": "Build from source and install to /usr/local (Apple silicon Mac, macOS 15+ with 26 recommended, Xcode 26)",
+          "command": "BUILD_CONFIGURATION=release make all test integration && BUILD_CONFIGURATION=release make install",
+          "citation": "BUILDING.md:5-7,27-32"
+        },
+        {
+          "method": "Claude Code skill plugin (teaches the CLI; does not install the tool itself)",
+          "command": "/plugin marketplace add apple/container   then   /plugin install container@apple-container",
+          "citation": "skills/README.md:22-27"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "no. macOS-only: Package.swift:30 declares only `.macOS(\"15\")`; README.md:18 requires a Mac with Apple silicon; docs/command-reference.md:1327 says system commands are only available on macOS hosts; the runtime imports Virtualization and vmnet (Sources/Services/RuntimeLinux/Server/NonisolatedInterfaceStrategy.swift:23-24, Sources/Services/NetworkVmnet/Server/ReservedVmnetNetwork.swift:25-26) and uses launchd (Sources/ContainerPlugin/ServiceManager.swift:21-45). No Linux-host build, install doc or CI job exists; CI runs on [self-hosted, macos, tahoe, ARM64] (.github/workflows/common.yml:27). Linux is only the guest OS.",
+        "wsl2": "no. No WSL or Windows reference anywhere in the repo (case-insensitive grep over md/swift/yml/toml/json). The runtime depends on macOS-only Virtualization.framework, vmnet, XPC, launchd and Keychain (Sources/ContainerXPC/XPCServer.swift:17 is wrapped in `#if os(macOS)`; Sources/Services/ContainerImagesService/Server/ImagesService.swift:426 uses KeychainHelper), none of which exist under WSL2.",
+        "macos_arm64": "yes. README.md:18-20 (Apple silicon, macOS 26 supported). Package.swift:30 sets a macOS 15 minimum with reduced functionality (docs/technical-overview.md:61-75): `container network` is registered only on macOS 26+ (Sources/ContainerCommands/Application.swift:179-192) and non-default networks need macOS 26 (Sources/Services/ContainerAPIService/Client/Utility.swift:300-305). Default kernel and default --arch are arm64 (Sources/ContainerPersistence/ContainerSystemConfig.swift:170; docs/command-reference.md:46); the CLI refuses to run under Rosetta (Application.swift:168-176). Intel Macs are unsupported per README.md:18.",
+        "gpu": "no. No GPU, Metal or graphics-device flag or code in Sources/ or docs/ (case-insensitive grep for GPU|Metal|graphics|VZVirtioGraphics|CUDA found only an SVG DTD string). VM device setup is delegated to the external Containerization package, which was not inspected."
+      },
+      "integrations": {
+        "cli": "yes. `container` binary (Sources/CLI/ContainerCLI.swift:19-24; executable target Package.swift:76-84) with command groups container/image/builder/network/volume/machine/registry/system/k8s (Sources/ContainerCommands/Application.swift:45-98; docs/command-reference.md). Machine-readable output via `--format json|table|yaml|toml` on list/inspect-style commands (docs/command-reference.md:856; docs/container-inspection.md:7-60).",
+        "mcp": "none found. No MCP server, config or mention (case-insensitive grep for mcp / model context protocol over all md/swift/json/yml/toml returned nothing).",
+        "sdk_or_api": "Swift libraries over XPC; no HTTP/REST API found. 24 SwiftPM library products (Package.swift:31-56) including ContainerAPIClient; `ContainerClient` and `NetworkClient` are XPC clients of Mach service `com.apple.container.apiserver` (Sources/Services/ContainerAPIService/Client/ContainerClient.swift:29-37; NetworkClient.swift:41; server Sources/APIServer/APIServer+Start.swift:91-97). XPC callers must share the server's EUID (Sources/ContainerXPC/XPCServer.swift:175-193). API docs: https://apple.github.io/container/documentation/ (README.md:94). The apiserver serves XPC plus loopback DNS on 127.0.0.1:2053 and :1053 (APIServer+Start.swift:38-40).",
+        "claude_code_or_codex": "Claude Code: a skill-only plugin. `.claude-plugin/plugin.json:19-21` (skills: ./skills/container), `.claude-plugin/marketplace.json:7-14`, install via `/plugin marketplace add apple/container` and `/plugin install container@apple-container` (skills/README.md:22-27). The skill teaches the CLI surface and the Docker-to-container mapping and loads on demand (skills/container/SKILL.md:1-47; skills/README.md:3-5,29-30). No hooks, MCP server or command-sandboxing wrapper found. Codex: none found (no AGENTS.md or .codex files)."
+      },
+      "telemetry_and_network": "Telemetry: none found. No analytics or crash-reporting code or SDK (case-insensitive grep for telemetry|analytics|sentry|crashlytics|phone home found nothing relevant; direct dependencies in Package.swift:57-74 include no analytics package; swift-metrics and swift-distributed-tracing appear only as transitive pins, Package.resolved:139-147,193-201). Logs go to the macOS unified log or, with --log-root, local files (docs/command-reference.md:1343-1348; docs/logs.md:48-63). No automatic update check in the CLI; the user-run update script calls api.github.com and downloads the pkg (scripts/update-container.sh:101-110,153-160). README.md:1-110 says nothing about telemetry or network policy.\nAccounts and required network: no account needed; registry login is optional and stored in the macOS Keychain (Sources/Services/ContainerAPIService/Client/Constants.swift:19-20; Sources/ContainerCommands/Registry/RegistryLogin.swift:63-96). First `container system start` pulls ghcr.io/apple/containerization/vminit:<tag> (ContainerSystemConfig.swift:147-153; Sources/ContainerCommands/System/SystemStart.swift:153-155,166-175) and, after a Y/n prompt or --enable-kernel-install, downloads a Kata Containers kernel tarball from github.com (ContainerSystemConfig.swift:168-171; SystemStart.swift:177-201), verified against a pinned SHA-256 (Sources/Services/ContainerAPIService/Server/Kernel/KernelService.swift:125-131,184-196). Images default to registry docker.io (ContainerSystemConfig.swift:241-243; ClientImage.swift:112-113); builds need ghcr.io/apple/container-builder-shim/builder:0.13.1 (ContainerSystemConfig.swift:84-87; Package.swift:25); `k8s` pulls docker.io/kindest/node (Sources/ContainerK8s/K8sHelper.swift:39). Proxy environment variables and CONTAINER_* variables are passed to helper services (Sources/ContainerPlugin/PluginLoader.swift:239-244,311-318).\nHost listeners and changes: XPC Mach service plus DNS on 127.0.0.1:2053/1053; `-p` without a host IP binds 0.0.0.0 (Sources/Services/ContainerAPIService/Client/Parser.swift:659-672; Tests/ContainerAPIClientTests/UtilityTests.swift:128); `sudo container system dns create` writes /etc/resolver and, with --localhost, /etc/pf.conf anchors and restarts mDNSResponder (Sources/ContainerCommands/System/DNS/DNSCreate.swift:56-91; Sources/Services/ContainerAPIService/Client/PacketFilter.swift:23-26,112-147; docs/host-integration.md:54-57). A macOS Local Network Privacy prompt may be triggered (Sources/ContainerOS/LocalNetworkPrivacy.swift:20-33)."
+    },
+    "code": {
+      "languages": [
+        "Swift (swift-tools-version 6.2, Package.swift:1)",
+        "C (Sources/CVersion, Sources/CAuditToken)",
+        "Shell (scripts/, Sources/Plugins/MachineAPIServer/Resources)",
+        "Makefile"
+      ],
+      "entry_points": [
+        {
+          "path": "Sources/CLI/ContainerCLI.swift",
+          "what": "`container` CLI binary; @main calls Application.main()"
+        },
+        {
+          "path": "Sources/ContainerCommands/Application.swift",
+          "what": "Root swift-argument-parser command registering the Container/Image/Machine/Volume/Builder/Network/System groups; unknown subcommands fall through to the plugin loader; `network` group only on macOS 26+"
+        },
+        {
+          "path": "Sources/APIServer/APIServer+Start.swift",
+          "what": "`container-apiserver` launchd agent: XPC Mach service com.apple.container.apiserver plus DNS resolvers on 127.0.0.1:2053 and :1053"
+        },
+        {
+          "path": "Sources/Plugins/RuntimeLinux/RuntimeLinuxHelper.swift",
+          "what": "`container-runtime-linux`: per-container XPC helper that boots the VM (logic in Sources/Services/RuntimeLinux/Server/RuntimeService.swift)"
+        },
+        {
+          "path": "Sources/Plugins/NetworkVmnet/NetworkVmnetHelper.swift",
+          "what": "`container-network-vmnet`: XPC service managing a vmnet network"
+        },
+        {
+          "path": "Sources/Plugins/CoreImages/ImagesHelper.swift",
+          "what": "`container-core-images`: XPC service managing OCI images and the content store"
+        },
+        {
+          "path": "Sources/Plugins/MachineAPIServer/MachineAPIServer.swift",
+          "what": "`machine-apiserver`: container-machine management API server"
+        },
+        {
+          "path": "Sources/Plugins/K8s/K8sMain.swift",
+          "what": "`k8s` plugin entry point (experimental local Kubernetes clusters)"
+        }
+      ],
+      "architecture": "CLI -> client library -> XPC -> launchd-managed helpers. `Sources/CLI/ContainerCLI.swift` runs the command tree in `Sources/ContainerCommands/` (Container/, Image/, Builder/, Network/, Volume/, Machine/, System/, Registry/). Commands parse flags in `Sources/Services/ContainerAPIService/Client` (Parser.swift, Utility.swift, Flags.swift; ContainerClient and NetworkClient XPC clients over `Sources/ContainerXPC`) and call `container-apiserver` (`Sources/APIServer`; services in `Sources/Services/ContainerAPIService/Server`: Containers, Networks, Volumes, Kernel, Plugins, DiskUsage). `container system start` registers the apiserver as a per-user launchd agent (SystemStart.swift:115-130; Sources/ContainerPlugin/ServiceManager.swift:124-136). The apiserver loads helpers through `Sources/ContainerPlugin` (PluginLoader): `container-core-images` (`Sources/Services/ContainerImagesService`), `container-network-vmnet` (`Sources/Services/Network*`, vmnet shared or host mode), `machine-apiserver` (`Sources/Services/MachineAPIService`), the experimental `k8s` plugin (`Sources/ContainerK8s`), and one `container-runtime-linux` per container (docs/technical-overview.md:47). That runtime service builds the VM with `VZVirtualMachineManager` from the external Containerization package (RuntimeService.swift:175-180), attaches virtiofs, ext4 and tmpfs mounts and vmnet interfaces, and applies capabilities and masked/read-only paths. The guest runs vminitd (external), reached over vsock gRPC (docs/logs.md:36-39). Image builds use `Sources/ContainerBuild` (gRPC to a BuildKit builder VM). Support modules: `Sources/DNSServer`, `Sources/SocketForwarder` (published ports), `Sources/ContainerPersistence` (config.toml), `Sources/ContainerResource` (resource models), `Sources/TerminalProgress`.",
+      "packaging_and_release": "Artifacts: `container-installer-unsigned.pkg` (pkgbuild, identifier com.apple.container-installer, install-location /usr/local; Makefile:34,160-173) and `container-dSYM.zip` (Makefile:175-187); the package stages bin/container, bin/container-apiserver, libexec/container/plugins/*, update-container.sh and uninstall-container.sh (Makefile:127-158). Binaries are ad-hoc code-signed (`codesign --force --sign -`, Makefile:37,163-169); only container-runtime-linux and container-network-vmnet carry an entitlement, `com.apple.security.virtualization` (signing/*.entitlements:5-6). The release workflow (.github/workflows/release.yml:7-9,23-57) triggers on tags N.N.N, builds through common.yml, then creates a draft GitHub prerelease named `<tag>-prerelease` with only the .zip and .pkg. No checksums, SBOM, notarization, Sigstore or build-provenance attestations in any workflow or the Makefile (grep for attest|cosign|sigstore|sha256sum|notar|provenance|SBOM found nothing relevant). README.md:24 and scripts/update-container.sh:126-149 refer to a `container-installer-signed.pkg` whose production is not in this repo; the update script falls back to the unsigned pkg after a prompt and does no integrity check beyond HTTPS (update-container.sh:153-160). Libraries are consumable via SwiftPM (Package.swift:31-56); DocC API docs are deployed to GitHub Pages (.github/workflows/docs-release.yml:31-46).",
+      "tests_and_ci": "Framework: Swift Testing (`import Testing`, `@Test`/`@Suite`); 112 files import it and no file uses XCTest. About 117 Swift test files: 67 unit files in 14 targets under `Tests/*Tests` (ContainerAPIClientTests, ContainerBuildTests, ContainerPersistenceTests, ContainerPluginTests, ContainerResourceTests, DNSServerTests, SocketForwarderTests and others; Package.swift:85-594) plus 50 CLI integration files in `Tests/IntegrationTests` (Build, Containers, Images, K8s, Machine, Network, Registry, Run, System, Volumes, Warmup); about 1,170 `@Test` markers. `make test` runs unit tests only (Makefile:189-191); `make integration` starts the real apiserver, installs the kernel and runs warmup, concurrent and serial suites against live VMs (Makefile:281-318). The only `withKnownIssue` in the tree is the host-only network test (Tests/IntegrationTests/Network/TestCLINetwork.swift:126-128). CI workflows in .github/workflows: common.yml (reusable: hawkeye/swift-format check, protobuf drift check, `make container dsym docs`, `make test install-kernel integration` or coverage; runs only when github.repository == 'apple/container' on `[self-hosted, macos, tahoe, ARM64]`, lines 25-27,39-112); pr-build.yml (signed-commit check plus build with coverage); merge-build.yml (push to main and release/*); release.yml (tag to draft prerelease); docs-release.yml (manual GitHub Pages deploy); pr-coverage-comment.yml; pr-label-analysis.yml and pr-label-apply.yml. Dependabot updates github-actions weekly (.github/dependabot.yml:1-12). Most actions are pinned by commit SHA; docs-release.yml:46 uses the tag `actions/deploy-pages@v5`.",
+      "dependencies": "Package.swift declares 16 direct SwiftPM packages (lines 57-74): apple/containerization (`exact: 0.47.0`), swift-argument-parser, swift-collections, swift-configuration, swift-log, swift-nio, swift-protobuf, swift-system, grpc-swift-2, grpc-swift-nio-transport, grpc-swift-protobuf, async-http-client, swift-docc-plugin, mattt/swift-toml, mattt/swift-configuration-toml and jpsim/Yams; all but containerization use `from:` ranges. Package.resolved pins 35 packages (16 direct plus 19 transitive such as swift-crypto, swift-nio-ssl, swift-certificates, facebook/zstd), each by git revision. No other dependency manifests exist. Toolchain: Swift 6.2 tools (Package.swift:1) and Xcode 26 (BUILDING.md:7); CI uses Xcode_swift_6.3 (common.yml:32). At runtime it also fetches a Kata kernel tarball, the vminit and builder-shim OCI images, and the kindest/node image (see telemetry_and_network).",
+      "security_policy": "none. No SECURITY.md in the repo root, .github/ or docs/; no vulnerability-reporting text found (case-insensitive grep for security@|vulnerab|security policy|responsible disclosure returned nothing). CONTRIBUTING.md:3 and MAINTAINERS.txt:3 only link to apple/containerization; the issue-template config offers only GitHub Discussions (.github/ISSUE_TEMPLATE/config.yml:2-5)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Linux containers run as lightweight VMs, one VM per container (README.md:6; docs/technical-overview.md:26-28,47).",
+        "verified": "yes",
+        "evidence": "The apiserver launches a `container-runtime-linux` helper per container (docs/technical-overview.md:47; Package.swift:408-425). RuntimeService.bootstrap builds a `VZVirtualMachineManager` VM with kernel, init filesystem and per-container mounts and networks (Sources/Services/RuntimeLinux/Server/RuntimeService.swift:175-180,188-222). The strength of isolation rests on Apple Virtualization.framework and the external Containerization package (README.md:10), which were not audited."
+      },
+      {
+        "claim": "macOS 26 is the supported OS and older macOS is not supported (README.md:20).",
+        "verified": "partial",
+        "evidence": "Code and other docs still allow macOS 15: Package.swift:30 `.macOS(\"15\")`; BUILDING.md:6 'macOS 15 minimum, macOS 26 recommended'; docs/technical-overview.md:61-75 describes macOS 15 operation with limits. macOS 26 gates: `container network` (Application.swift:179-192), non-default networks (Utility.swift:300-305), reserved vmnet networks (@available(macOS 26) at ReservedVmnetNetwork.swift:29). Code wins: macOS 15 runs with reduced network features."
+      },
+      {
+        "claim": "The release is distributed as a signed installer package (README.md:24).",
+        "verified": "partial",
+        "evidence": "The repo builds `container-installer-unsigned.pkg` with pkgbuild and ad-hoc `codesign --sign -` (Makefile:34,37,163-173); release.yml:44,55-57 uploads the *.pkg and *.zip to a draft prerelease; there is no productsign, notarization or checksum step. scripts/update-container.sh:126-149 looks for `container-installer-signed.pkg` and falls back to unsigned after a prompt, so a signed pkg must be produced outside this repo (not checkable here)."
+      },
+      {
+        "claim": "Each VM mounts only the data you share ('Privacy', docs/technical-overview.md:29, linked from README.md:91).",
+        "verified": "partial",
+        "evidence": "`container run` mounts only what flags request (-v/--mount/--tmpfs/--ssh/--publish-socket; Sources/Services/ContainerAPIService/Client/Utility.swift:163-188,247-251). But `container machine` mounts the user's home read-write by default (docs/command-reference.md:1093; docs/container-machine.md:73), and ContainersService.swift contains no mount allow-list; validateMount only checks the path is absolute and exists (Parser.swift:597-619)."
+      },
+      {
+        "claim": "A separately created network is isolated and `--internal` restricts it to host-only (docs/networking.md:155-176; docs/command-reference.md:805).",
+        "verified": "partial",
+        "evidence": "`--internal` maps to NetworkMode.hostOnly and then vmnet VMNET_HOST_MODE (Sources/ContainerCommands/Network/NetworkCreate.swift:31-32,68; ReservedVmnetNetwork.swift:114). Default and plain networks are NAT with outbound access (Sources/ContainerResource/Network/NetworkMode.swift:19-22; APIServer+Start.swift:325-331). The only integration test of external blocking is marked `withKnownIssue(\"curl error 7 despite retries\", isIntermittent: true)` (Tests/IntegrationTests/Network/TestCLINetwork.swift:126-128,166-174). Enforcement is delegated to Apple vmnet; the repo has no firewall or egress policy."
+      },
+      {
+        "claim": "Containers start with a restricted capability set and OCI-default masked and read-only paths (docs/runtime-configuration.md:8-10,55-63).",
+        "verified": "partial",
+        "evidence": "Capability math is in RuntimeService.swift:1317-1346 and flags are validated in Parser.swift:1049-1079, with tests in Tests/IntegrationTests/Run/TestCLIRunCapabilities.swift. The default set includes CAP_NET_RAW, CAP_DAC_OVERRIDE and CAP_MKNOD (docs/runtime-configuration.md:10). Default masked/read-only path lists come from the external Containerization package (`LinuxContainer.defaultMaskedPaths()`, Parser.swift:1093,1099) and whether each applies depends on the guest kernel (Tests/IntegrationTests/Run/TestCLIRunSecurityPaths.swift:38-43); the path flags are EXPERIMENTAL (Flags.swift:298-302,347-351). No seccomp, AppArmor or Landlock profile and no no-new-privileges setting was found in this repo; the only trace is the guest kernel argument `lsm=lockdown,capability,landlock,yama,apparmor` (RuntimeService.swift:165-174)."
+      },
+      {
+        "claim": "`--publish` forwards traffic from your loopback IP to the container (docs/networking.md:88).",
+        "verified": "partial",
+        "evidence": "Without a host-ip the published port binds 0.0.0.0 (Parser.swift:659-672), asserted in Tests/ContainerAPIClientTests/UtilityTests.swift:128 and ParserTest.swift:80,92, and bound at RuntimeService.swift:1028. Loopback binding happens only when `127.0.0.1:` or `[::1]:` is given explicitly. Code wins."
+      },
+      {
+        "claim": "Features marked experimental (e.g. `k8s`) may change (README.md:104).",
+        "verified": "yes",
+        "evidence": "The `container k8s` abstract says '(EXPERIMENTAL)' (Sources/Plugins/K8s/K8sCommand.swift:24); `--masked-path` and `--read-only-path` are also flagged EXPERIMENTAL (Sources/Services/ContainerAPIService/Client/Flags.swift:298-302,347-351)."
+      },
+      {
+        "claim": "The `container-apiserver` XPC API keeps forward and backward compatibility within a major version (README.md:106-107).",
+        "verified": "not_checkable",
+        "evidence": "No API version field, negotiation or compatibility test was found; the XPC server dispatches on route name and checks only caller EUID (Sources/ContainerXPC/XPCServer.swift:163-205). It is a stated policy only."
+      },
+      {
+        "claim": "Docs state default init/kernel versions (docs/container-system-config.md:44 shows vminit:0.34.0; docs/tutorials/start-here.md:30 shows Kata 3.17.0 .tar.xz).",
+        "verified": "no",
+        "evidence": "Code defaults are Kata 3.32.0 `.tar.zst` with a SHA-256 pin (ContainerSystemConfig.swift:168-171) and a vminit tag derived from scVersion 0.47.0 (ContainerSystemConfig.swift:147-153; Package.swift:26). The kernel entry in container-system-config.md:35 matches the code, but the vminit 0.34.0 example and the tutorial's Kata 3.17.0 are stale. Code wins."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Platform scope: macOS-only. Apple silicon with macOS 26 is the supported target (macOS 15 runs with reduced networking); there is no Linux or WSL2 host path, since the runtime needs Virtualization.framework, vmnet, XPC, launchd and Keychain (README.md:18-20; Package.swift:30; docs/command-reference.md:1327; docs/technical-overview.md:61-75; Sources/Services/NetworkVmnet/Server/ReservedVmnetNetwork.swift:25-26; Sources/ContainerPlugin/ServiceManager.swift:21-45).",
+      "No deny-by-default network or egress policy. The built-in `default` network is NAT with outbound access (Sources/APIServer/APIServer+Start.swift:325-331; Sources/ContainerResource/Network/NetworkMode.swift:19-22). `--network none` exists only in code, not in CLI help, docs or tests (Sources/Services/ContainerAPIService/Client/Flags.swift:314; Utility.swift:200-204; NetworkClient.swift:46-47). `network create --internal` relies on vmnet host mode and its only test is flagged intermittent (ReservedVmnetNetwork.swift:114; Tests/IntegrationTests/Network/TestCLINetwork.swift:126-128). No allow-list or firewall code: pf is used only for `--localhost` redirect rules (Sources/Services/ContainerAPIService/Client/PacketFilter.swift:45-73). `-p` without a host IP binds 0.0.0.0 (Parser.swift:659-672).",
+      "Filesystem boundary is mount/VM-based, not path-rule-based. The container root is writable unless `--read-only` (docs/resource-usage.md:111-112; Flags.swift:344-345; Sources/ContainerResource/Container/Bundle.swift:143-150). Read-only host binds depend on passing `ro` to the VM mount (Sources/ContainerResource/Container/Filesystem.swift:23-28), and no integration test asserts that a write to a read-only host bind mount fails (Tests/IntegrationTests/Run/TestCLIRunCommand.swift:225-246 only reads; the `:ro` tests in Tests/IntegrationTests/Containers/TestCLIClean.swift:123-167 cover named volumes). `container machine` mounts $HOME read-write by default (docs/command-reference.md:1093); `--ssh` and `--publish-socket` expose host sockets (docs/host-integration.md:8-10; RuntimeService.swift:1170-1193).",
+      "Control plane trusts any same-user process. XPC requests are authorized only by matching EUID (Sources/ContainerXPC/XPCServer.swift:175-193) and helpers run in the user's launchd domain (ServiceManager.swift:124-136). No server-side mount or network policy was found (Parser.swift:597-619 validates only existence, client-side), so the apiserver appears to accept whatever mounts a same-user client submits. Some features need sudo and modify host config (/etc/resolver, /etc/pf.conf anchors, mDNSResponder; docs warn the localhost domain disables Private Relay): Sources/ContainerCommands/System/DNS/DNSCreate.swift:56-91; PacketFilter.swift:23-26,112-147; docs/host-integration.md:54-57.",
+      "Supply chain and artifact integrity. The in-repo release workflow publishes an unsigned .pkg and a dSYM zip as a draft prerelease; binaries are ad-hoc signed; there are no checksums, notarization, SBOM or attestations; update-container.sh installs a downloaded pkg with sudo and no integrity check beyond HTTPS (.github/workflows/release.yml:44-57; Makefile:34,37,160-173; scripts/update-container.sh:126-160). Runtime artifacts: the vminit and builder images are referenced by mutable tag (ContainerSystemConfig.swift:84-87,147-153), while the Kata kernel is SHA-256 pinned (ContainerSystemConfig.swift:168-171; KernelService.swift:125-131,184-196); the dev-time `make protos` downloads protoc without a checksum (Protobuf.Makefile:28-35).",
+      "Resource model and overhead: each container is a VM with defaults of 4 CPUs and 1 GiB (Sources/ContainerPersistence/ContainerSystemConfig.swift:116-117); memory freed in the guest is not returned to macOS (docs/technical-overview.md:55-59); CPU and memory may be overcommitted (docs/resource-usage.md:34-49). No boot-time or overhead measurements are published; the boot-time statement is qualitative only (docs/technical-overview.md:30).",
+      "Core isolation behaviour lives in an external, exact-pinned package (apple/containerization 0.47.0): VM boot, vminitd, default masked/read-only paths and capability defaults (Package.swift:26,58; Parser.swift:1093,1099; README.md:10). This dossier did not inspect that package, and masked-path defaults vary with the guest kernel (Tests/IntegrationTests/Run/TestCLIRunSecurityPaths.swift:38-43).",
+      "Maintenance, compatibility and scope: versions are 'product versions, not semantic'; app-data compatibility holds only within one major version and experimental features may break (README.md:102-109); docs drift from code (claim check 10); no SECURITY.md or reporting channel (.github/ISSUE_TEMPLATE/config.yml:2-5); CI and release run only on Apple's self-hosted macOS runners (.github/workflows/common.yml:25-27); the shallow clone (.git/shallow) prevents assessing commit cadence. It is a general container runtime with no agent-command wrapper, hook or MCP, and Docker features such as compose, restart, commit and attach are absent (skills/container/SKILL.md:38-45)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "apple/container",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "macOS signed installer package from GitHub Releases (GUI installer): download the latest signed .pkg from https://github.com/apple/container/releases, double-click it and enter the administrator password (installs under /usr/local); then run: container system start",
+          "citation": "README.md:24-32",
+          "holds": true,
+          "note": "README.md:24 says to download the latest signed installer package from the GitHub release page. :26 says to double-click it and enter the admin password so files go under /usr/local. :28-32 gives `container system start`. Makefile:172 confirms the location (pkgbuild --install-location /usr/local). Caveat, already in the dossier's own claim check: the repo's release workflow publishes only container-installer-unsigned.pkg to a draft prerelease (Makefile:34; .github/workflows/release.yml:46-57), so the signed pkg is built outside this repo. scripts/update-container.sh:126-127 expects a container-installer-signed.pkg release asset. I did not open the releases page because it is outside the working directory."
+        },
+        {
+          "field": "license",
+          "statement": "License is Apache-2.0, file LICENSE.",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-3 reads 'Apache License, Version 2.0, January 2004', and the file is the complete, unmodified standard text through the appendix (lines 1-201). This matches the Apache-2.0 header at Package.swift:5 and .claude-plugin/plugin.json:7 (\"license\": \"Apache-2.0\")."
+        },
+        {
+          "field": "readme.platforms.macos_arm64",
+          "statement": "yes. Apple silicon with macOS 26 is supported; Package.swift sets a macOS 15 minimum with reduced functionality; `container network` is registered only on macOS 26+; non-default networks need macOS 26; default kernel and default --arch are arm64; the CLI refuses to run under Rosetta; Intel Macs are unsupported.",
+          "citation": "README.md:18-20; Package.swift:30; docs/technical-overview.md:61-75; Sources/ContainerCommands/Application.swift:168-176,179-192; Sources/Services/ContainerAPIService/Client/Utility.swift:300-305; Sources/ContainerPersistence/ContainerSystemConfig.swift:170; docs/command-reference.md:46",
+          "holds": true,
+          "note": "Every citation matches. README.md:18 requires a Mac with Apple silicon; :20 supports macOS 26 and not older versions. Package.swift:30 is `.macOS(\"15\")`. technical-overview.md:61-75 lists the macOS 15 limits. Application.swift:179-192 adds NetworkCommand only under `#available(macOS 26, *)`. Utility.swift:300-305 throws 'non-default network configuration requires macOS 26 or newer'. ContainerSystemConfig.swift:170 points at kata-static-3.32.0-arm64.tar.zst. command-reference.md:46 says '(default: arm64)'. Application.swift:168-176 throws a ValidationError under Rosetta. Nuance: in code the --arch default is the host architecture (Sources/Services/ContainerAPIService/Client/Flags.swift:235, Arch.hostArchitecture()), which is arm64 on every supported host."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Claude Code: a skill-only plugin (plugin.json skills: ./skills/container; marketplace.json), installed via `/plugin marketplace add apple/container` and `/plugin install container@apple-container`; the skill teaches the CLI surface and Docker mapping and loads on demand; no hooks, MCP server or command-sandboxing wrapper; Codex: none found (no AGENTS.md or .codex files).",
+          "citation": ".claude-plugin/plugin.json:19-21; .claude-plugin/marketplace.json:7-14; skills/README.md:3-5,22-27,29-30; skills/container/SKILL.md:1-47",
+          "holds": true,
+          "note": "plugin.json:19-21 declares only skills: [\"./skills/container\"], with no hooks or mcpServers keys. marketplace.json:2 names the marketplace apple-container and :7-14 lists the plugin `container`, which matches `container@apple-container`. skills/README.md:24-27 gives both commands, :3-4 describes the command surface and Docker mapping, and :29-30 says the skill loads on demand. SKILL.md:1-47 is the command surface plus the Docker-to-container table. A case-insensitive grep over the whole tree, dot-directories included, for mcpServers|modelcontextprotocol|model context protocol|\\bMCP\\b|\"hooks\"|codex found nothing. No AGENTS.md, CLAUDE.md, .mcp.json, .codex/ or plugin hooks/ directory exists."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "Linux containers run as lightweight VMs, one VM per container (verified: yes).",
+          "citation": "README.md:6; docs/technical-overview.md:26-28,47; Package.swift:408-425; Sources/Services/RuntimeLinux/Server/RuntimeService.swift:175-180,188-222",
+          "holds": true,
+          "note": "README.md:6 and technical-overview.md:26-28 state it; :47 says a container-runtime-linux helper is launched per container; Package.swift:408-425 defines that executable. The code confirms it. ContainersService.swift:1109-1127 registers the runtime plugin with launchd using instanceId: configuration.id, which gives one launchd label and Mach service per container (PluginLoader.swift:253-296; Plugin.swift:51-56). Each helper builds its own VZVirtualMachineManager (RuntimeService.swift:175-180) and LinuxContainer(id, rootfs:, vmm:, vm: vmResources) (RuntimeService.swift:272), and attaches networks at 188-222. Citation nit: mounts are attached at RuntimeService.swift:1153-1166, not within 188-222. The dossier's caveat stands: how strong the isolation is depends on Virtualization.framework and the external Containerization package, which are not in this repo."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

@@ -1,0 +1,335 @@
+{
+  "contender": "docling-project/docling",
+  "revision": {
+    "contender": "docling-project/docling",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "docling-project/docling",
+        "tag": "v2.132.0",
+        "commit": "5c349dd696d81c67fe29c378a4fdff08e28090bd",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v2.132.0",
+    "commit": "5c349dd696d81c67fe29c378a4fdff08e28090bd",
+    "read_at": "2026-10-02T03:02:20+00:00"
+  },
+  "dossier": {
+    "contender": "docling-project/docling",
+    "revision": {
+      "tag": "v2.132.0",
+      "commit": "5c349dd696d81c67fe29c378a4fdff08e28090bd",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Docling is a Python SDK and CLI (MIT) that converts PDFs (born-digital and scanned), images, Office files, HTML, EPUB, Markdown, AsciiDoc, LaTeX, email, ODF, iWork, audio/video and several XML schemas into a unified DoclingDocument. It exports Markdown, lossless JSON, HTML, DocTags, DocLang, plain text, chunk JSONL and more. It is a conversion/chunking library, not a search or retrieval engine: this repo contains no lexical, vector or hybrid index and no collection store or read-back service. The MCP server (docling-mcp) and the REST API server (docling-serve) live in other repositories. This repo holds the SDK, the CLI, an HTTP client for docling-serve, a bundled agent usage skill, docs and tests. The DoclingDocument type, serializers, chunkers and URL fetching come from the separate docling-core dependency.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Docling simplifies document processing by parsing diverse formats — including advanced PDF understanding — and providing seamless integrations with the generative AI ecosystem.",
+          "citation": "README.md:31"
+        },
+        {
+          "claim": "Parsing of multiple document formats including PDF, DOCX, PPTX, XLSX, HTML, EPUB, Apple Pages, WAV, MP3, WebVTT, Box Notes, email formats (EML, MSG), images (PNG, TIFF, JPEG, ...), LaTeX, DocLang, plain text, and more",
+          "citation": "README.md:35"
+        },
+        {
+          "claim": "Advanced PDF understanding incl. page layout, reading order, table structure, code, formulas, image classification, and more",
+          "citation": "README.md:36"
+        },
+        {
+          "claim": "A unified, expressive DoclingDocument representation format; various export formats and options, including Markdown, HTML, WebVTT, DocLang, DocTags and lossless JSON",
+          "citation": "README.md:37-38"
+        },
+        {
+          "claim": "Local execution capabilities for sensitive data and air-gapped environments",
+          "citation": "README.md:40"
+        },
+        {
+          "claim": "Plug-and-play integrations incl. LangChain, LlamaIndex, Crew AI & Haystack for agentic AI",
+          "citation": "README.md:41"
+        },
+        {
+          "claim": "Extensive OCR support for scanned PDFs and images",
+          "citation": "README.md:42"
+        },
+        {
+          "claim": "Support for several Visual Language Models, such as GraniteDocling (CLI: docling --pipeline vlm --vlm-model granite_docling <url>)",
+          "citation": "README.md:43,87-91"
+        },
+        {
+          "claim": "Connect to any agent using the MCP server",
+          "citation": "README.md:45"
+        },
+        {
+          "claim": "Run Docling as a service with the API server (docling-serve)",
+          "citation": "README.md:46"
+        },
+        {
+          "claim": "Simple and convenient CLI",
+          "citation": "README.md:47"
+        },
+        {
+          "claim": "Install with `pip install docling`; Python 3.9 support was dropped in 2.70.0 (use 3.10+); works on macOS, Linux and Windows for both x86_64 and arm64",
+          "citation": "README.md:69-75"
+        },
+        {
+          "claim": "`docling https://arxiv.org/pdf/2206.01062` generates a .md file in the current directory containing structured document content",
+          "citation": "README.md:81-85"
+        },
+        {
+          "claim": "The Docling codebase is under MIT license; for individual model usage, refer to the model licenses found in the original packages",
+          "citation": "README.md:153-154"
+        }
+      ],
+      "install": [
+        {
+          "method": "pip (PyPI meta-package; pulls docling-slim[standard])",
+          "command": "pip install docling",
+          "citation": "README.md:69-71; docs/getting_started/installation.md:2-4; packages/docling/pyproject.toml:53-55"
+        },
+        {
+          "method": "uv",
+          "command": "uv add docling",
+          "citation": "docs/getting_started/installation.md:5-8"
+        },
+        {
+          "method": "pip on Linux with CPU-only PyTorch",
+          "command": "pip install docling --extra-index-url https://download.pytorch.org/whl/cpu",
+          "citation": "docs/getting_started/installation.md:19-25"
+        },
+        {
+          "method": "docling-slim with chosen extras (no OCR extra in this example)",
+          "command": "pip install docling-slim[format-pdf,models-local]",
+          "citation": "packages/docling-slim/README.md:24-37"
+        },
+        {
+          "method": "remote-conversion client only (needs an external docling-serve endpoint)",
+          "command": "pip install docling-client",
+          "citation": "packages/docling-client/README.md:21-29"
+        },
+        {
+          "method": "run the CLI without installing (uvx)",
+          "command": "uvx --from docling docling report.pdf --to md --output /tmp/",
+          "citation": "docling/.agents/skills/docling/SKILL.md:70-76"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes — README.md:75 ('Works on macOS, Linux and Windows … x86_64 and arm64'); Linux classifier pyproject.toml:23; the full CI suites run on ubuntu-latest (.github/workflows/checks.yml:195-226). The Nemotron OCR extra is Linux x86_64 + Python 3.12 only (pyproject.toml:226-228).",
+        "wsl2": "unknown — no WSL2 statement for Docling itself; the only mention is docs/getting_started/rtx.md:177 (WSL2 suggested for running a vLLM server on Windows). Nothing in the repo documents or tests WSL2.",
+        "macos_arm64": "yes — README.md:75; Apple-silicon-specific extras mlx-whisper/mlx-vlm (pyproject.toml:180,272) and ocrmac (pyproject.toml:222-224); MPS device (docling/datamodel/accelerator_options.py:22). TableFormer is forced from MPS to CPU (docling/models/stages/table_structure/table_structure_model.py:83-87). macOS CI is a manual smoke lane only (.github/workflows/checks.yml:408-452; ci.yml:18-21).",
+        "gpu": "yes (optional) — devices auto/cpu/cuda/mps/xpu (docling/datamodel/accelerator_options.py:16-23; docling/utils/accelerator_utils.py:27-31); guides docs/usage/gpu.md and docs/getting_started/rtx.md (RTX 40/50 series, Windows/Linux, rtx.md:16-19). CPU-only works (docs/getting_started/installation.md:19-25); Nemotron OCR needs CUDA 13.x (installation.md:82)."
+      },
+      "integrations": {
+        "cli": "Yes. Console scripts `docling` and `docling-tools` (pyproject.toml:71-73). `docling <source>` routes to `convert` (docling/cli/main.py:334-350,786-1225); default output is Markdown, `<input stem>.md`, in the current directory (main.py:1419-1420,1106-1108,620-626); `-q/--quiet` is provided for agent/script use (main.py:408-418,1128-1137). `docling-tools models download` / `download-hf-repo` (docling/cli/tools.py:33; docling/cli/models.py:82,225). `docling convert-remote` talks to a docling-serve endpoint and is registered only with the service-client extra (docling/cli/remote.py:134; main.py:1821-1832).",
+        "mcp": "Not in this repo. No MCP code under docling/ (grep for mcp/MCP/FastMCP found nothing); docs/usage/mcp.md:8-22 point to the separate docling-project/docling-mcp package, started with `uvx --from=docling-mcp docling-mcp-server`, with Claude Desktop and LM Studio config examples (docs/usage/mcp.md:24-28). Remote mode via DOCLING_CONVERSION_MODE=remote + DOCLING_SERVICE_URL (docs/usage/mcp.md:33-41). The MCP tool list was not examined (external repo).",
+        "sdk_or_api": "Python SDK: DocumentConverter.convert/convert_all/convert_string returning ConversionResult with .document (DoclingDocument; export_to_markdown, save_as_json, ...) — docling/document_converter.py:424-770. Chunkers HybridChunker/HierarchicalChunker are re-exported from docling-core (docling/chunking/__init__.py:9-15). HTTP API: the server (docling-serve) is NOT in this repo; docs summarise it at v1.21.0 (docs/usage/api_server/index.md:1-3; REST endpoints /v1/convert/source, /v1/convert/file, async variants, status/result — docs/usage/api_server/rest_api.md:11-18; run via `pip install \"docling-serve[ui]\"` or the quay.io image — deployment.md:64-96). In-repo client: DoclingServiceClient (convert, convert_all, chunk, submit*, health) and an async variant (docling/service_client/client.py:808-1160,2125).",
+        "claude_code_or_codex": "Yes, via a bundled usage skill: docling/.agents/skills/docling/SKILL.md (+ references/cli.md, python-sdk.md, extraction.md, rag.md, service-client.md, slim-packaging.md) with `allowed-tools: Bash(docling:*) Bash(docling-tools:*) Bash(python3:*) ... Bash(uvx:*)` front-matter (SKILL.md:1-22). Installed into the agent's skills dir with `uvx library-skills` (Codex/Cursor/Copilot → .agents/skills) or `uvx library-skills --claude` (→ .claude/skills) (docs/usage/agent_skills.md:12-31). AGENTS.md says the skill is packaged in the wheel/sdist (AGENTS.md:29-33; not verified by building). The repo also has AGENTS.md and CLAUDE.md (CLAUDE.md:7 imports AGENTS.md) for contributors. No Claude Code- or Codex-specific MCP instructions exist in this repo (docs/usage/mcp.md names Claude Desktop and LM Studio only)."
+      },
+      "telemetry_and_network": "Telemetry: none found in code — grep of docling/ for telemetry|analytics|posthog|sentry|mixpanel|opentelemetry|DO_NOT_TRACK returned no matches. The only analytics is Google Analytics on the docs website (mkdocs.yml:253-255), not in the library. Network used by the software: (1) model weights from Hugging Face Hub via snapshot_download on first use unless artifacts_path or `docling-tools models download` is used (docling/models/utils/hf_model_download.py:24-39; docling/datamodel/pipeline_options.py:1397-1407); default layout repo docling-project/docling-layout-heron @ branch main (docling/datamodel/stage_model_specs.py:1011-1027), TableFormer docling-project/docling-models @ v2.3.0 (table_structure_model.py:103-108); (2) RapidOCR model files via URLs resolved by the third-party rapidocr package (docling/models/stages/ocr/rapid_ocr_model.py:373-395,629-660) and EasyOCR auto-download (pipeline_options.py:578-586); (3) URL input sources are fetched over HTTP when given as source (docling/datamodel/document.py:644; CLI main.py:1380-1390, optional --headers), implemented in docling-core; (4) remote images in HTML/EPUB/Markdown/AsciiDoc are fetched only if enable_remote_fetch / `--html-image-fetch remote|all` (docling/datamodel/backend_options.py:27-33; main.py:848-855), with headers scoped to the source origin (backend_options.py:148-174); (5) remote VLM/OCR/picture-description APIs require enable_remote_services=True, default False (pipeline_options.py:1377-1386; docling/models/inference_engines/vlm/api_openai_compatible_engine.py:66-69); (6) `--to chunks` loads the HF tokenizer sentence-transformers/all-MiniLM-L6-v2, downloading it if not cached (main.py:544-547,814-818); (7) `convert-remote` / DoclingServiceClient send documents to the user-chosen DOCLING_SERVICE_URL with optional DOCLING_SERVICE_API_KEY (docling/cli/remote.py:75-79; docling/service_client/client.py:854-861); the managed 'Docling for IBM watsonx' service is optional (packages/docling-client/README.md:85-94). No account or key is required for local use; the code passes no Hugging Face token (hf_model_download.py:34-39). The FAQ states Docling runs fully offline with pre-fetched artifacts (docs/faq/index.md:113-133). Side effect: the CLI loads a .env from the working directory on every invocation when python-dotenv is installed (docling/cli/remote.py:404-434, app-level callback). Subprocesses used: LibreOffice (docling/backend/docx/drawingml/utils.py:54-117,231-258), Tesseract CLI (docling/models/stages/ocr/tesseract_ocr_cli_model.py:180), ffmpeg (docling/utils/video_frame_sampling.py:175), Tectonic (docling/backend/latex/engines/tectonic.py:325)."
+    },
+    "code": {
+      "languages": [
+        "Python (>=3.10,<4.0; 275 .py files under docling/; no compiled code in this repo — native PDF parsing lives in the docling-parse dependency)",
+        "Shell (.github/scripts/*.sh)",
+        "YAML (GitHub workflows)",
+        "Markdown / Jupyter notebooks (docs, examples)"
+      ],
+      "entry_points": [
+        {
+          "path": "pyproject.toml:71-73",
+          "what": "Console scripts: docling = docling.cli.main:app, docling-tools = docling.cli.tools:app (re-declared in packages/docling/pyproject.toml:67-69)"
+        },
+        {
+          "path": "docling/cli/main.py:334-350,786",
+          "what": "Typer app; bare `docling <source>` is routed to the `convert` command (local conversion); `convert-remote` registered from docling/cli/remote.py:134 at main.py:1821-1832"
+        },
+        {
+          "path": "docling/cli/tools.py:24-38; docling/cli/models.py:82,225",
+          "what": "docling-tools: `models download` (pre-fetch model artifacts) and `download-hf-repo`"
+        },
+        {
+          "path": "docling/document_converter.py:424",
+          "what": "DocumentConverter — SDK entry point (convert, convert_all, convert_string) mapping each InputFormat to a backend + pipeline + options"
+        },
+        {
+          "path": "docling/service_client/client.py:808",
+          "what": "DoclingServiceClient — HTTP/WebSocket client for an external docling-serve (convert, convert_all, chunk, submit*)"
+        },
+        {
+          "path": "pyproject.toml:67-68",
+          "what": "Plugin entry-point group `docling` (docling_defaults = docling.models.plugins.defaults); external plugins are off by default (docling/datamodel/pipeline_options.py:1387-1396)"
+        },
+        {
+          "path": "docling/.agents/skills/docling/SKILL.md",
+          "what": "Agent usage skill shipped inside the package (installed with library-skills; docs/usage/agent_skills.md:12-31)"
+        },
+        {
+          "path": "docs/usage/agent_skills.md:61",
+          "what": "DocumentExtractor (typed field extraction, labelled beta) — referenced in the docs; its source file was listed but not read"
+        }
+      ],
+      "architecture": "Layered Python package; layers declared in tach.toml:11-23 (entrypoints > clients > pipeline > models > core > foundation) and checked by `tach check` in CI. Flow: DocumentConverter (docling/document_converter.py:424) detects the input format (filetype + extension/MIME maps: docling/datamodel/document.py:766, base_models.py:152-286), looks up a (backend, pipeline, options) triple per InputFormat (document_converter.py:376-417), caches pipelines by options hash (810-837) and returns a ConversionResult (status SUCCESS/PARTIAL_SUCCESS/FAILURE/SKIPPED, errors, DoclingDocument). Backends (docling/backend/): PDF = threaded docling-parse by default (docling_parse_backend.py) or pypdfium2 (pypdfium2_backend.py); images = image_backend.py; Office = msword_backend.py / mspowerpoint_backend.py / msexcel_backend.py on python-docx/python-pptx/openpyxl, with legacy DOC/XLS/PPT/RTF first converted by an external LibreOffice (docx/drawingml/utils.py:261-326); HTML = html_backend.py (BeautifulSoup; optional Playwright rendering for page images/bboxes); EPUB = epub_backend.py (zip -> spine XHTML concatenated -> HTML backend, lines 402-491); also md, asciidoc, csv, opendocument, iwork, latex, email, xml/{jats,uspto,xbrl,doclang}, json (Docling JSON re-import), webvtt, and audio/video via NoOp backend + ASR. Pipelines (docling/pipeline/): StandardPdfPipeline (threaded stages preprocess > OCR > layout > layout post-process > table > page assemble > reading order > heading hierarchy > optional enrichment: standard_pdf_pipeline.py:586-693), VlmPipeline (full-page VLMs, e.g. granite_docling), NativePdfPipeline (model-free), SimplePipeline (declarative formats), AsrPipeline, VideoPipeline. Models (docling/models/): default layout = RT-DETR 'Heron' from Hugging Face (datamodel/pipeline_options.py:1657-1686); TableFormer via docling-ibm-models; OCR engines (Auto, RapidOCR, EasyOCR, Tesseract, OcrMac, Nemotron, KServe v2) through factories + pluggy plugins (models/factories/, models/plugins/); VLM inference engines for transformers/MLX/vLLM/OpenAI-compatible/KServe v2 (models/inference_engines/). Options are pydantic models (datamodel/pipeline_options.py, backend_options.py); env settings use prefix DOCLING_ (datamodel/settings.py:61-71). Ingestion controls in the SDK: allowed_formats, max_num_pages, max_file_size, page_range, raises_on_error (document_converter.py:444-481,545-553), document_timeout -> PARTIAL_SUCCESS (pipeline_options.py:1355-1367), archive size limits for EPUB/METS/iWork (backend_options.py:258-272,344-360,365-380). Outside this repo: docling-core (DoclingDocument, Markdown/HTML/DocTags serializers, chunkers, URL fetch), docling-parse, docling-ibm-models, docling-serve, docling-mcp, docling-jobkit.",
+      "packaging_and_release": "Build backend hatchling. Three PyPI distributions built with `uv build` (.github/scripts/build-packages.sh:12-25): docling-slim (root pyproject.toml; all docling/ source incl. the bundled skill), docling (packages/docling/pyproject.toml; dependency-only meta-wheel `docling-slim[standard]==<same version>`) and docling-client (packages/docling-client/pyproject.toml; meta-wheel `docling-slim[service-client]==<version>`). Release flow: manual `cd.yml` (workflow_dispatch) runs full checks on Python 3.10-3.14, then .github/scripts/release.sh uses python-semantic-release (pyproject.toml:523-534) to bump the three pyproject files + uv.lock + CHANGELOG, pushes `chore: bump version to X [skip ci]` to main and creates the tag/release via `gh release create` with notes only, no binary assets (release.sh:16-68). `pypi.yml` (on release published) publishes each package through PyPI trusted publishing (OIDC id-token) with `attestations: true` (PEP 740) via pypa/gh-action-pypi-publish pinned by SHA (pypi.yml:33-106); upload/download-artifact are referenced by tag v4 (pypi.yml:28,43). No checksum files, cosign/sigstore signatures or SBOMs are produced here, and no workflow in this repo builds or pushes container images: the root Dockerfile is a usage example (pip install docling + `docling-tools models download`, Dockerfile:12-19); SECURITY.md:16 mentions Quay.io/GHCR signed releases but those images belong to docling-serve (docs/usage/api_server/deployment.md:89). .actor/ is an Apify Actor wrapper FROM quay.io/ds4sd/docling-serve-cpu:latest with `npm install apify-cli@latest` (.actor/Dockerfile:14-23) — not part of the PyPI artifacts. uv.lock is committed and CI syncs with --frozen. Docs built with zensical and deployed to GitHub Pages (cd-docs.yml).",
+      "tests_and_ci": "pytest ~=9.0.3 with pytest-cov, pytest-xdist, pytest-dependency, pytest-durations; coverage to Codecov (pyproject.toml:341-361; checks.yml:228-234). testpaths=['tests']; markers ml_ocr, ml_pdf_model, ml_vlm, ml_asr, cross_platform, external_service (excluded from CI) (pyproject.toml:419-428). 163 test_*.py files under tests/ (155 top-level + 8 in tests/test_latex/); fake servers in tests/fakes/ (docling_serve, openai_compatible, kserve_v2, image_server, http_service); golden data under tests/data/<format>/{sources,groundtruth}; e2e tests compare conversions with groundtruth (tests/test_e2e_conversion.py:95-135; regenerate with DOCLING_GEN_TEST_DATA=1, AGENTS.md:62-63). Static checks via prek (.pre-commit-config.yaml:1-73): ruff lint+format, ty type check, tach module boundaries, dprint, max 1500 lines/file, license headers, uv-lock. Workflows in .github/workflows (13): ci.yml (PR; path-filtered; Python 3.10 by default, 3.10-3.14 with `tests:full` label or manual run), ci-main.yml (push to main + nightly cron 03:17 UTC + manual), checks.yml (reusable: lint, tach, core tests, ML suites ocr/pdf-model/vlm/asr, light examples, Windows and macOS smoke lanes run only on manual dispatch, pip-install across Python versions with and without Python.h, build and install the wheels), pr-fast-checks.yml (pull_request_target: ruff + ty on the PR merge tree, base-commit checkout), ci-heavy-examples.yml (labels or manual), ci-docs.yml / docs.yml / cd-docs.yml (docs build + Pages deploy), cd.yml (manual release), pypi.yml (publish), dco-advisor.yml, pr-reminders.yml, discord-release.yml. CI installs LibreOffice, Tesseract and ffmpeg on Ubuntu for the tests (.github/actions/setup-ubuntu-ci/action.yml:38-48).",
+      "dependencies": "Manifests: (1) pyproject.toml (docling-slim, root): 9 base dependencies (pydantic, docling-core>=2.98.0,<3, pydantic-settings, filetype, requests, certifi, pluggy, tqdm, langcodes — pyproject.toml:49-59; the comment at :48 says '8 packages'); 37 optional extras (pyproject.toml:75-320) with about 81 requirement lines in total (hand count, includes self-referencing extras) — e.g. models-local = torch, torchvision, docling-ibm-models, accelerate, huggingface_hub, defusedxml (:233-242); standard bundle = format-pdf, models-local, feat-ocr-rapidocr, format-office, format-web, format-latex, format-email, format-iwork, feat-chunking, extract-core, service-client, cli (:309-311); dependency groups typecheck 9, pr-fast-checks 4 (+include), dev 16 (+include), docs 7, examples 7, constraints 4 (:322-395). (2) packages/docling/pyproject.toml: 1 dependency (docling-slim[standard]==2.132.0) + 10 re-exported extras (:53-55,76-86). (3) packages/docling-client/pyproject.toml: 1 dependency (docling-slim[service-client]==2.132.0). (4) uv.lock: 407 [[package]] entries; locks docling-core 2.99.0, docling-ibm-models 4.0.3, docling-parse 7.22.1 (uv.lock:1846,1884,1907). External binaries (not installed by pip): LibreOffice for DOC/XLS/PPT/RTF, ffmpeg for video (docs/usage/supported_formats.md:13-14,27), Tesseract for the tesserocr/CLI engines (docs/getting_started/installation.md:126-156).",
+      "security_policy": ".github/SECURITY.md exists: only the latest versions are supported (lines 5-7); report privately via GitHub Private Vulnerability Reporting (28-41) or email deepsearch-core@zurich.ibm.com (43-47); acknowledgement within 3 working days (49-51); advisories via GitHub Discussions announcements (57-59). It claims 'cryptographically signed releases' on PyPI, Quay.io and GHCR (line 16); in this repo only PyPI attestations are visible (pypi.yml:50,77,104)."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:35 — Parsing of multiple formats incl. PDF, DOCX, PPTX, XLSX, HTML, EPUB, images",
+        "verified": "yes",
+        "evidence": "InputFormat enum lists DOCX, DOC, RTF, PPTX, PPT, HTML, MHTML, IMAGE, PDF, EPUB, XLSX, XLS, ODT/ODS/ODP, MD, ASCIIDOC, LATEX, EMAIL, etc. (docling/datamodel/base_models.py:97-134); extension map (152-188); each format has a default backend + pipeline (docling/document_converter.py:376-417); EPUB concatenates spine XHTML and reuses the HTML backend (docling/backend/epub_backend.py:402-491). Not stated in the README: legacy DOC/XLS/PPT/RTF need an external LibreOffice (docling/backend/docx/drawingml/utils.py:261-326; msword_backend.py:780-781; msexcel_backend.py:355; mspowerpoint_backend.py:209; docs/usage/supported_formats.md:13-14). README.md:51 lists video MKV/WebM, which matches code (base_models.py:178) while docs/usage/supported_formats.md:27 lists only MP4/AVI/MOV."
+      },
+      {
+        "claim": "README.md:36 — Advanced PDF understanding incl. layout, reading order, table structure, code, formulas, image classification",
+        "verified": "partial",
+        "evidence": "Layout (Heron default, docling/datamodel/stage_model_specs.py:1011-1027), OCR, table structure (do_table_structure=True, pipeline_options.py:2063-2071) and reading order run in the default StandardPdfPipeline (docling/pipeline/standard_pdf_pipeline.py:602-657). Code and formula enrichment and picture classification default to off (pipeline_options.py:2082-2099; CLI flags default False, docling/cli/main.py:1041-1055). Heading levels stay flat at level 1 unless heading_hierarchy_options.enabled (pipeline_options.py:1946-1955,2205-2215; docs/usage/heading_levels.md:1-10); the CLI has no flag for it (grep 'heading' in docling/cli finds only chunk metadata, main.py:710)."
+      },
+      {
+        "claim": "README.md:37-38 — unified DoclingDocument; export to Markdown, HTML, WebVTT, DocLang, DocTags and lossless JSON",
+        "verified": "partial",
+        "evidence": "The CLI writes md, json, yaml, html, html_split_page, text, doctags, vtt, doclang, dclx, chunks (JSONL), latex (docling/cli/main.py:497-724; OutputFormat in base_models.py:137-149); default is Markdown (main.py:1419-1420). JSON is lossless, but Markdown flattens table row/col spans (docs/concepts/serialization.md:50-58) and carries no page numbers/bboxes. DoclingDocument, serializers and chunkers are defined in docling-core, not in this repo (docs/concepts/docling_document.md:10; pyproject.toml:51; docling/chunking/__init__.py:9-15)."
+      },
+      {
+        "claim": "README.md:40 — Local execution for sensitive data and air-gapped environments",
+        "verified": "yes",
+        "evidence": "Remote model/API calls are opt-in: enable_remote_services=False by default (docling/datamodel/pipeline_options.py:1377-1386) and enforced by OperationNotAllowed (docling/models/inference_engines/vlm/api_openai_compatible_engine.py:66-69); backend remote/local resource fetching is off by default (docling/datamodel/backend_options.py:27-33; CLI --html-image-fetch none, docling/cli/main.py:848-855). Models can be pre-fetched with `docling-tools models download` and used via artifacts_path (pipeline_options.py:1397-1407; docling/cli/tools.py:33; docling/cli/models.py:82; docs/faq/index.md:113-133). Caveat: without artifacts_path, weights are downloaded from Hugging Face on first use (docling/models/utils/hf_model_download.py:24-39) and `--to chunks` also loads an HF tokenizer (main.py:544-547)."
+      },
+      {
+        "claim": "README.md:42 — Extensive OCR support for scanned PDFs and images",
+        "verified": "yes",
+        "evidence": "OCR option classes: Auto, RapidOCR, Nemotron, EasyOCR, Tesseract CLI, tesserocr, OcrMac, KServe v2 (docling/datamodel/pipeline_options.py:329,357,480,526,605,658,702,755); do_ocr defaults True (2072-2081); images go through ImageFormatOption -> StandardPdfPipeline (docling/document_converter.py:266-268). Caveat: in Auto mode, if no engine is importable the model only logs 'No OCR engine found' and passes pages through un-OCRed (docling/models/stages/ocr/auto_ocr_model.py:217-225); the slim README example install has no OCR extra (packages/docling-slim/README.md:26-27 vs pyproject.toml:198-228)."
+      },
+      {
+        "claim": "README.md:41 — Plug-and-play integrations incl. LangChain, LlamaIndex, Crew AI & Haystack",
+        "verified": "not_checkable",
+        "evidence": "No integration code in this repo: grep for langchain|llama_index|haystack|crewai under docling/ matches only the skill doc docling/.agents/skills/docling/references/rag.md, which names separate packages (langchain-docling, llama-index-readers-docling, docling-haystack — rag.md:12-16). In-repo there are only docs pages (docs/integrations/*.md) and example notebooks (docs/examples/rag_*.ipynb, retrieval_qdrant.ipynb). The chunkers they use come from docling-core (docling/chunking/__init__.py:9-15)."
+      },
+      {
+        "claim": "README.md:45 — Connect to any agent using the MCP server",
+        "verified": "not_checkable",
+        "evidence": "No MCP server code exists in this repo (grep for mcp/MCP/FastMCP under docling/ returns nothing). docs/usage/mcp.md:8-22 point to the separate docling-project/docling-mcp package run via `uvx --from=docling-mcp docling-mcp-server`; its tools and behaviour were not examined."
+      },
+      {
+        "claim": "README.md:46 — Run Docling as a service with the API server (docling-serve)",
+        "verified": "partial",
+        "evidence": "The server is not in this repo (no fastapi/uvicorn/APIRouter under docling/); docs/usage/api_server/*.md are summaries 'synced from docling-serve v1.21.0' (index.md:1-3; rest_api.md:11-18). In-repo: DoclingServiceClient (docling/service_client/client.py:808-861), shared service request/response models (docling/datamodel/service/), and `docling convert-remote` (docling/cli/remote.py:134-401)."
+      },
+      {
+        "claim": "README.md:75 — Works on macOS, Linux and Windows for both x86_64 and arm64",
+        "verified": "partial",
+        "evidence": "OS classifiers cover macOS/Linux/Windows (pyproject.toml:22-24). But macOS Intel needs torch 2.2.2, numpy<2 and Python <=3.12 (docs/getting_started/installation.md:49-66; docs/faq/index.md:54-68); Nemotron OCR is Linux x86_64 + Python 3.12 only (pyproject.toml:227); mlx extras are macOS arm64 only (pyproject.toml:180,272); TableFormer falls back from MPS to CPU (docling/models/stages/table_structure/table_structure_model.py:83-87); Windows/macOS CI runs only as manual smoke lanes (.github/workflows/checks.yml:361-452; ci.yml:13-21; ci-main.yml:37-38)."
+      },
+      {
+        "claim": "README.md:81-85 — `docling <url>` writes a .md file into the current directory",
+        "verified": "yes",
+        "evidence": "Default --to is Markdown (docling/cli/main.py:1419-1420); --output defaults to '.' (main.py:1106-1108); the file is `<input stem>.md` (main.py:556,620-626); URL sources are downloaded to a temp dir with docling-core's resolve_source_to_path (main.py:1380-1390). Caveats: a document whose status is not SUCCESS (PARTIAL_SUCCESS included) is skipped with a warning and the process still exits 0 unless --abort-on-error (main.py:554-556,769-783,1098-1105); inputs with the same stem overwrite each other (main.py:556,622)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Standard PDF pipeline throughput without OCR on a 192-page / 95-table PDF (project-run, GPU vs CPU)",
+        "metric": "pages per second",
+        "value": "g6e.2xlarge (NVIDIA L40S): 3.1; RTX 5090: 7.9 (CPU-only, 16 torch threads: 1.5); RTX 5070: 4.2 (CPU-only: 1.2)",
+        "source": "docs/usage/gpu.md:167-204",
+        "independent": false
+      },
+      {
+        "what": "Standard pipeline with OCR on ViDoRe V3 HR (14 docs, 1110 page images, 258 tables); PDF-document OCR cells are marked 'tba'",
+        "metric": "pages per second",
+        "value": "RTX 5090: 1.6; RTX 5070: 1.1 (no g6e.2xlarge figure)",
+        "source": "docs/usage/gpu.md:169-199",
+        "independent": false
+      },
+      {
+        "what": "VLM pipeline (GraniteDocling) via an inference server",
+        "metric": "pages per second",
+        "value": "g6e.2xlarge: 2.4 (PDF); RTX 5090: 3.8 (PDF), 3.6-4.5 (ViDoRe V3 HR); RTX 5070: 2.0 (PDF), 2.8-3.2 (ViDoRe V3 HR)",
+        "source": "docs/usage/gpu.md:200-204",
+        "independent": false
+      },
+      {
+        "what": "Local VLM inference time for one page (tests/data/pdf/2305.03393v1-pg9.pdf) on a MacBook M3 Max, via examples/compare_vlm_models.py",
+        "metric": "seconds per page",
+        "value": "SmolDocling MLX 6.15; Qwen2.5-VL-3B MLX 23.5; SmolDocling Transformers/MPS 102.2; Granite-Vision-3.2-2B Transformers/MPS 104.75; Pixtral-12B MLX 308.9; Gemma-3-12B MLX 378.5; Phi-4 CPU 1175.7; Pixtral-12B Transformers CPU 1828.2; GraniteDocling rows shown as '-'",
+        "source": "docs/usage/vision_models.md:46-68",
+        "independent": false
+      },
+      {
+        "what": "Project claim: GPU acceleration vs CPU-only processing (no measurement table; the doc has a 'TBA. Performance improvement figure' comment)",
+        "metric": "speed-up factor",
+        "value": "'up to 6x speedup'",
+        "source": "docs/getting_started/rtx.md:10-12",
+        "independent": false
+      },
+      {
+        "what": "Project claim: vLLM vs llama-server for the GraniteDocling VLM on RTX GPUs",
+        "metric": "relative performance",
+        "value": "'approximately 4x better performance'",
+        "source": "docs/getting_started/rtx.md:176-177",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope: not a search or retrieval tool. The repo has no lexical/vector/hybrid index, collection store or read-back service (a grep for bm25|faiss|lancedb|chroma|qdrant|sqlite|fts5|tantivy|elasticsearch|opensearch|vector store under docling/ finds only an unrelated 'sqlite' code-language mapping, docling/utils/code_language.py:43). Retrieval is left to external frameworks/stores via docs/integrations/*.md and docs/examples/rag_*.ipynb / retrieval_qdrant.ipynb. The only in-repo ingestion aids are chunking (re-exported from docling-core, docling/chunking/__init__.py:9-15), `--to chunks` JSONL (docling/cli/main.py:676-724) and Docling-JSON re-import (docling/document_converter.py:404). The MCP server and the API server are separate repos (docs/usage/mcp.md:8; docs/usage/api_server/index.md:7) and were not examined.",
+      "Failure handling is easy to miss: in Auto OCR mode a missing OCR engine only logs a warning and pages pass through un-OCRed, so scans can convert to near-empty Markdown (docling/models/stages/ocr/auto_ocr_model.py:217-225); the local CLI skips any document whose status is not SUCCESS (PARTIAL_SUCCESS included) and still exits 0 unless --abort-on-error (docling/cli/main.py:554-556,769-783,1098-1105), whereas the SDK treats PARTIAL_SUCCESS as success (docling/document_converter.py:672-689) and raises by default (raises_on_error=True, :550). Callers must check output files / ConversionResult.status.",
+      "CLI output and format defaults for ingestion: outputs are written flat as <output>/<input stem>.<ext>, so same-stem inputs from different sub-directories (or report.pdf vs report.docx) overwrite one another (docling/cli/main.py:239-253,556,622); --image-export-mode defaults to embedded, i.e. base64 images inside Markdown/JSON (main.py:841-847); PDF headings are all level 1 unless the SDK-only heading_hierarchy_options is enabled (docling/datamodel/pipeline_options.py:1946-1955; docs/usage/heading_levels.md:1-10).",
+      "Source grounding differs by format: PDF items carry page_no + bbox (tests/data/pdf/groundtruth/multi_page.json:309-317), but DOCX items have empty prov (tests/data/docx/groundtruth/word_sample.docx.json:102; no ProvenanceItem in docling/backend/msword_backend.py), the Markdown backend has none, and HTML gets page/bbox only with the opt-in Playwright render_page (docling/datamodel/backend_options.py:92-98). Markdown export flattens table spans and has no page info (docs/concepts/serialization.md:56). EPUB chapters are merged into one HTML document and internal anchor targets are not preserved (docling/backend/epub_backend.py:43-48,402-445). Keeping JSON/chunk output alongside Markdown is needed to retain provenance.",
+      "Model supply chain and licensing: the default layout weights are fetched from Hugging Face docling-project/docling-layout-heron at the floating branch 'main' on first use (docling/datamodel/stage_model_specs.py:1011-1027; docling/models/utils/hf_model_download.py:24-39), so behaviour can change without a Docling release unless models are pre-downloaded and artifacts_path is used (TableFormer is pinned to tag v2.3.0, table_structure_model.py:103-108). Several opt-in VLM/chart presets set trust_remote_code=True (stage_model_specs.py:1222,1333,1564,1809,1864,1905,1950,1978). Model licenses are separate from the MIT code (README.md:153-154) and were not checked here.",
+      "Release churn and hardening: 28 releases between v2.110.0 (2026-07-04) and v2.132.0 (2026-10-01) (CHANGELOG.md:1,531). v2.132.0 changed the PDF reading-order algorithm (CHANGELOG.md:5), and v2.131-2.132 added untrusted-input fixes — HTML fetch address validation, ffmpeg protocol limits, Tectonic without shell escape, no local image loading from Docling JSON (CHANGELOG.md:16-18,37) — so older versions lack them. LibreOffice is run headless with macros and link updates disabled, but the code notes DDE/OLE/remote-image vectors are not configured (docling/backend/docx/drawingml/utils.py:47-117). Output for the same input can differ across versions (golden files are regenerated on intentional output changes, AGENTS.md:62-63). No accuracy/quality benchmark (layout, table, OCR) is published in the repo docs; only throughput/latency figures exist, so quality on a given corpus must be measured locally.",
+      "Install weight and platform limits: `pip install docling` = docling-slim[standard], which pulls torch, docling-ibm-models, docling-parse, rapidocr etc. (packages/docling/pyproject.toml:53-55; pyproject.toml:233-242,309-311). LibreOffice (DOC/XLS/PPT/RTF) and ffmpeg (video) are external binaries not installed by pip (docs/usage/supported_formats.md:13-14,27). macOS Intel needs torch 2.2.2 / Python <=3.12 / numpy<2 (docs/getting_started/installation.md:49-66); Windows and macOS CI is manual smoke-test only (.github/workflows/checks.yml:361-452). Native PDF parsing is in the docling-parse dependency, not this repo (pyproject.toml:100).",
+      "Documentation drift, including the agent-facing skill: the skill says the default OCR engine is EasyOCR (docling/.agents/skills/docling/references/cli.md:83; python-sdk.md:62,81) but code defaults to 'auto' (docling/datamodel/pipeline_options.py:2119-2127; docling/cli/main.py:978-988) and easyocr is not in the standard bundle (pyproject.toml:310); the skill says chunking is SDK-only (python-sdk.md:259) yet the CLI has `--to chunks` (main.py:801-818) and the service client has chunk() (service_client/client.py:1019); it says Docling 'blocks outbound HTTP' unless enable_remote_services (python-sdk.md:251-252), but that flag only gates remote model/API calls, not URL sources or model downloads (pipeline_options.py:1377-1386; datamodel/document.py:644). docs/getting_started/installation.md:62,177 use extras not defined on the docling package (docling[mac_intel], docling[feat-ocr-nemotron]; packages/docling/pyproject.toml:76-86). docs/reference/cli.md:55 lists --vlm-write-native-output but the code has --debug-vlm-native-output (docling/cli/main.py:877)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "docling-project/docling",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "pip (PyPI meta-package; pulls docling-slim[standard]): `pip install docling`",
+          "citation": "README.md:69-71; docs/getting_started/installation.md:2-4; packages/docling/pyproject.toml:53-55",
+          "holds": true,
+          "note": "README.md:69-71 and installation.md:2-4 show `pip install docling` verbatim. packages/docling/pyproject.toml (name = \"docling\") has the single dependency 'docling-slim[standard]==2.132.0' at :53-55 and ships no modules (bypass-selection, :92-93). The standard bundle includes the cli extra (root pyproject.toml:309-311). Requires Python >=3.10 (README.md:73; pyproject.toml:46)."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-21 is the standard MIT text (Copyright The Docling Contributors). Both distributions declare license = \"MIT\" (pyproject.toml:9; packages/docling/pyproject.toml:9), and README.md:153-154 agrees, noting that model weights carry their own licenses. The only other license file is an Apache-2.0 contributor skill (.agents/skills/dignified-python/LICENSE). It is outside the wheel (packages = [\"docling\"], pyproject.toml:414) and the sdist (only-include, :417)."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes — README.md:75 (macOS/Linux/Windows, x86_64 and arm64); Linux classifier pyproject.toml:23; full CI suites run on ubuntu-latest (checks.yml:195-226); Nemotron OCR extra is Linux x86_64 + Python 3.12 only (pyproject.toml:226-228)",
+          "citation": "README.md:75; pyproject.toml:23; .github/workflows/checks.yml:195-226; pyproject.toml:226-228",
+          "holds": true,
+          "note": "README.md:75 has the sentence verbatim. pyproject.toml:23 is 'Operating System :: POSIX :: Linux'. checks.yml:195-226 is run-tests-core with runs-on: ubuntu-latest over the python_versions matrix; the ML suites (236-284) and light examples (286+) are also ubuntu-latest. pyproject.toml:227 marks nemotron-ocr with python_version == \"3.12\" and sys_platform == \"linux\" and platform_machine == \"x86_64\". That ubuntu-latest means x86_64 is GitHub's runner convention; the repo itself doesn't say so."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "Console scripts docling/docling-tools; bare `docling <source>` routes to convert; default output is Markdown <stem>.md in the current directory; -q/--quiet for agent/script use; docling-tools models download / download-hf-repo; convert-remote registered only with the service-client extra",
+          "citation": "pyproject.toml:71-73; docling/cli/main.py:334-350,786-1225,1419-1420,1106-1108,620-626,408-418,1128-1137,1821-1832; docling/cli/tools.py:33; docling/cli/models.py:82,225; docling/cli/remote.py:134",
+          "holds": true,
+          "note": "Every cited line matches. Scripts are at pyproject.toml:72-73. _DefaultCommandGroup.parse_args prepends 'convert' (main.py:345-350), and convert spans 786-1225. to_formats defaults to [OutputFormat.MARKDOWN] (1419-1420) and output to Path('.') (1106-1108); the file is output_dir / f'{stem}.md' (556, 622). The app help names -q/--quiet as 'useful when calling docling from an AI agent or script' (412-414); the option is at 1128-1137. tools.py:33 mounts models_app as 'models'; models.py:82 is 'download' and :225 is 'download-hf-repo'; remote.py:134 defines convert_remote. main.py:1825-1832 registers convert-remote inside try/except ImportError. docling.service_client imports httpx/websockets at module level; these come only from the service-client extra (pyproject.toml:287-295), which is in standard (:310)."
+        },
+        {
+          "field": "claim_checks[9] (README.md:81-85)",
+          "statement": "`docling https://arxiv.org/pdf/2206.01062` writes a .md file into the current directory — verified: yes (with caveats: non-SUCCESS documents skipped with a warning, exit 0 unless --abort-on-error; same-stem inputs overwrite)",
+          "citation": "README.md:81-85; docling/cli/main.py:1419-1420,1106-1108,556,620-626,1380-1390,554-556,769-783,1098-1105",
+          "holds": true,
+          "note": "README.md:81-85 is quoted correctly, and the code confirms it. Markdown is the default, and export_md is MARKDOWN in to_formats (export_utils.py:48). Output defaults to '.' and the file is <stem>.md. URL sources go through resolve_source_to_path into a tempfile.TemporaryDirectory (main.py:1361,1386-1390). The caveats hold: non-SUCCESS results are skipped with a warning (554, 769-777), and convert has no non-zero exit path after export (1801-1818). One small imprecision: --abort-on-error maps to raises_on_error (1795), but the SDK exempts PARTIAL_SUCCESS from raising (document_converter.py:672-675). A PARTIAL_SUCCESS document is still skipped with exit 0 even with the flag, so 'unless --abort-on-error' applies only to outright failures. This does not change the 'yes' verdict."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

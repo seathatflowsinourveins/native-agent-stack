@@ -1,0 +1,329 @@
+{
+  "contender": "promptfoo/promptfoo",
+  "revision": {
+    "contender": "promptfoo/promptfoo",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "promptfoo/promptfoo",
+        "tag": "0.123.1",
+        "commit": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "0.123.1",
+    "commit": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+    "read_at": "2026-10-02T03:02:46+00:00"
+  },
+  "dossier": {
+    "contender": "promptfoo/promptfoo",
+    "revision": {
+      "tag": "0.123.1",
+      "commit": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "read_at": "2026-10-02T03:02:46+00:00"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Promptfoo (npm package `promptfoo` 0.123.1, MIT) is a TypeScript/Node CLI, Node library, local web viewer/server, MCP server and red-team toolkit that evaluates LLM apps from declarative configs (promptfooconfig.yaml/JSON/JS/TS). An eval is a matrix of prompts x providers x test cases (inline, CSV/XLSX with __expected columns, JSON/JSONL, script generators, Hugging Face datasets, Google Sheets). Each result row is graded by a list of assertions (66 base types in src/types/index.ts:605-672, plus not- variants, assert-set, select-best, max-score; deterministic checks, JS/Python/Ruby scripts, webhook, model-graded, trace/trajectory/skill checks). Rows are stored in local SQLite and exportable as json, jsonl, csv, html, xml, yaml and junit.xml.\n\nFacts mapped to the three stated needs (presence/absence only, no judgment):\n(1) Several scorers per labeled case with per-sample values kept: present. Each row stores score, success, failureReason, error, namedScores (keyed by assertion `metric`) and gradingResult.componentResults[] (one entry per assertion, each with its own pass/score/reason/assertion) in the eval_results table and in exported JSON (src/database/tables.ts:107-110; src/assertions/assertionsResult.ts:214-411; src/models/evalResult.ts:966-1026).\n(2) Containerized end-to-end task-suite runner for the real Claude Code and Codex CLIs with a verifier per trial: no such built-in runner found (searched src/, examples/, site/docs for docker/container/verifier/harbor/terminal-bench/swe-bench). Promptfoo has providers that drive agent SDKs/CLIs on the host (anthropic:claude-agent-sdk, openai:codex-sdk, openai:codex-app-server which spawns `codex app-server`); each test row is graded by assertions; --repeat reruns rows. Container isolation is left to the user (docs suggest launcher wrappers; the Claude provider has a programmatic-only spawn hook; the OpenAI Agents provider accepts an Agents-SDK Docker sandbox client; a docs example wraps the separate Inspect harness for OSWorld). The `verifier` code in the repo is red-team security grading for coding agents, not a task-trial verifier.\n(3) Declarative CI regression gate: `promptfoo eval` sets exit code 100 when pass rate is below a threshold (default 100%; env PROMPTFOO_PASS_RATE_THRESHOLD / PROMPTFOO_FAILED_TEST_EXIT_CODE), with JSON/JUnit outputs, a `validate config` command, a generated config JSON schema and docs for many CI systems. The packaged GitHub Action is a separate repository (promptfoo/promptfoo-action, not inspected). Skills and agents can be asserted with skill-used/not-skill-used and trajectory assertions. Gaps and pitfalls are listed under risks.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "promptfoo is a CLI and library for evaluating and red-teaming LLM apps.",
+          "citation": "README.md:12"
+        },
+        {
+          "claim": "Promptfoo is now part of OpenAI. Promptfoo remains open source and MIT licensed.",
+          "citation": "README.md:23"
+        },
+        {
+          "claim": "Requires Node.js >=22.22.0 for npm and npx usage; Node.js 24 LTS is recommended.",
+          "citation": "README.md:27-28"
+        },
+        {
+          "claim": "Also available via `brew install promptfoo` and `pip install promptfoo`; `npx promptfoo@latest` runs any command without installing.",
+          "citation": "README.md:35"
+        },
+        {
+          "claim": "Test your prompts and models with automated evaluations.",
+          "citation": "README.md:55"
+        },
+        {
+          "claim": "Secure your LLM apps with red teaming and vulnerability scanning.",
+          "citation": "README.md:56"
+        },
+        {
+          "claim": "Automate checks in CI/CD.",
+          "citation": "README.md:58"
+        },
+        {
+          "claim": "Review pull requests for LLM-related security and compliance issues with code scanning.",
+          "citation": "README.md:59"
+        },
+        {
+          "claim": "Developer-first: Fast, with features like live reload and caching.",
+          "citation": "README.md:76"
+        },
+        {
+          "claim": "Private: LLM evals run 100% locally - your prompts never leave your machine.",
+          "citation": "README.md:77"
+        },
+        {
+          "claim": "Flexible: Works with any LLM API or programming language.",
+          "citation": "README.md:78"
+        },
+        {
+          "claim": "Battle-tested: Powers LLM apps serving 10M+ users in production.",
+          "citation": "README.md:79"
+        },
+        {
+          "claim": "Data-driven: Make decisions based on metrics, not gut feel.",
+          "citation": "README.md:80"
+        }
+      ],
+      "install": [
+        {
+          "method": "npm (global; needs Node >=22.22.0)",
+          "command": "npm install -g promptfoo",
+          "citation": "README.md:27,31; site/docs/installation.md:19,35"
+        },
+        {
+          "method": "npx (no install)",
+          "command": "npx promptfoo@latest",
+          "citation": "README.md:35; site/docs/installation.md:24"
+        },
+        {
+          "method": "Homebrew (docs say Mac, Linux)",
+          "command": "brew install promptfoo",
+          "citation": "README.md:35; site/docs/installation.md:14,29"
+        },
+        {
+          "method": "pip (README only; not repeated in installation docs; no Python package manifest in this repo)",
+          "command": "pip install promptfoo",
+          "citation": "README.md:35"
+        },
+        {
+          "method": "Docker image (self-hosted server; promptfoo and pf are also linked inside the image)",
+          "command": "docker pull ghcr.io/promptfoo/promptfoo:latest",
+          "citation": "site/docs/usage/self-hosting.md:58; Dockerfile:63-64,81"
+        },
+        {
+          "method": "Claude Code plugin marketplace (installs agent skills only, not the CLI)",
+          "command": "/plugin marketplace add promptfoo/promptfoo  then  /plugin install promptfoo@promptfoo",
+          "citation": "site/docs/integrations/agent-skill.md:36-39"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - CI test lanes run ubuntu-latest on Node 22.22.0, 24.x and 26.x (.github/workflows/main.yml:33-41,88-95); Docker image is built for linux/amd64 (.github/workflows/docker.yml:264-269); lockfile carries @libsql linux-x64-gnu/musl bindings (package-lock.json:11560,11573).",
+        "wsl2": "unknown - no WSL mention anywhere in the repo outside the changelog and blog; Linux and native Windows (windows-2025-vs2026, Node 22.22/24/26 in 3 shards) are CI-tested (main.yml:37-39,53-58) but there is no WSL lane.",
+        "macos_arm64": "yes - CI includes macOS-latest (Node 22.22 on PRs, plus 24.x on main: main.yml:46,51-52); lockfile has @libsql/darwin-arm64 (package-lock.json:11462) and package.json lists @swc/core-darwin-arm64 (package.json:305). The workflow does not state the runner CPU architecture, so arm64 is inferred.",
+        "gpu": "no - not required or used by the core eval path; the only GPU-related code is an optional device setting (cpu/gpu/cuda/webgpu/coreml/...) for the local Transformers.js provider (src/providers/transformers.ts:14-26, optional dependency @huggingface/transformers at package.json:292). Local LLM runtimes are external servers (e.g. Ollama, Docker Model Runner)."
+      },
+      "integrations": {
+        "cli": "Binaries `promptfoo` and `pf` -> dist/src/entrypoint.js (package.json:51-54) -> src/main.ts Commander program with eval, init, view, mcp, redteam (init/eval/discover/generate/run/report/setup/plugins), share, auth, cache, code-scans, config, debug, delete, export, import, list, logs, model scan, optimize, retry, validate, show, generate (src/main.ts:88-135). README quick start uses `promptfoo init --example getting-started`, `promptfoo eval`, `promptfoo view` (README.md:30-49). Option list for eval: src/commands/eval.ts:36-180; documented in site/docs/usage/command-line.md:102-146.",
+        "mcp": "`promptfoo mcp --transport stdio|http [-p 3100]` (src/commands/mcp/index.ts:10-13); tools registered in src/commands/mcp/server.ts:93-112 (list/get evaluations, validate config, test provider, run assertion, run evaluation, share, generate dataset/test cases, compare providers, red-team run/generate, logs); documented in site/docs/integrations/mcp-server.md:35-41,95-119. Needs the optional package @modelcontextprotocol/sdk (package.json:295). The README does not mention MCP. HTTP transport has no auth middleware (src/commands/mcp/server.ts:124-174).",
+        "sdk_or_api": "Node library: `import { evaluate, assertions, cache, guardrails, loadApiProvider, loadApiProviders, redteam } from 'promptfoo'` (src/index.ts:63-73; package.json:12-28 exports `.` ESM+CJS and `./contracts`); README links the Node.js package docs (README.md:89). HTTP API: Express server started by `promptfoo view` or `node dist/src/server/index.js`, default port 15500 (src/constants.ts:27-29), routes in src/server/routes/*.ts (eval, configs, providers, redteam, traces, blobs, media, modelAudit, user, version); OpenAPI generation script (package.json:69-70). SECURITY.md:15-27 calls the local server and MCP single-user development interfaces, not a security boundary. No Python or other-language SDK exists in this repo.",
+        "claude_code_or_codex": "The README does not mention Claude Code or Codex; these appear in docs/code. (1) Agent-skill bundle plugins/promptfoo (promptfoo-evals, promptfoo-provider-setup, promptfoo-redteam-setup, promptfoo-redteam-run) published for Claude Code via .claude-plugin/marketplace.json and for Codex via .agents/plugins/marketplace.json (site/docs/integrations/agent-skill.md:12,34-62; plugins/promptfoo/.claude-plugin/plugin.json; plugins/promptfoo/.codex-plugin/plugin.json; CI runs the built skill examples: main.yml:136-141,228-231). (2) Providers that drive the agent runtimes on the host: anthropic:claude-agent-sdk (alias anthropic:claude-code; src/providers/registry.ts:278-285), openai:codex-sdk (alias openai:codex; registry.ts:1020-1022), openai:codex-app-server (alias openai:codex-desktop; registry.ts:999-1001; spawns `codex app-server --listen stdio://` at src/providers/openai/codex-app-server.ts:844,1684,1749), plus opencode:sdk and openinterpreter; the agent SDKs are optionalDependencies loaded lazily (package.json:278,297). Docs: site/docs/guides/evaluate-coding-agents.md, site/docs/guides/test-agent-skills.md, site/docs/providers/claude-agent-sdk.md, site/docs/providers/openai-codex-sdk.md. (3) skill-used/not-skill-used and trajectory:* assertions (src/assertions/skill.ts:195-205; src/types/index.ts:660-665); skill calls are first-class for Claude/OpenCode but inferred from SKILL.md reads for Codex (src/providers/openai/codexSkillMetadata.ts:111-131; docs/agents/coding-agent-provider-taxonomy.md:199,209). (4) The repo's own .claude/settings.json defines hooks that run `npm run l && npm run f` after Edit/Write and a block-no-verify guard on Bash (.claude/settings.json:1-30)."
+      },
+      "telemetry_and_network": "Local eval path: no account required; state is a local SQLite DB (src/database/tables.ts) and a disk response cache that is on by default with a 14-day TTL (src/cache.ts:38-51). Calls go to whichever LLM providers the config names; the default grader is chosen from whichever provider credentials are present (src/providers/defaults.ts:92-151,165-261). Telemetry is ON by default: each event goes to PostHog (https://a.promptfoo.app, only when the build embeds a key, injected at publish time from PROMPTFOO_POSTHOG_KEY: src/version.ts:34-35, package.json:93) and to https://r.promptfoo.app/ (src/telemetry.ts:126-175; src/constants.ts:43-46). Payload: event name and properties, package version, CI flag, Node version/platform/arch, a random user UUID kept in the global config, plus email, cloud-login status and auth method when present (src/telemetry.ts:44-51,76-82; site/docs/configuration/telemetry.md:22-31, which says prompts, outputs, test cases, API keys and full configs are excluded). PROMPTFOO_DISABLE_TELEMETRY=1 stops PostHog and normal events, but one 'telemetry disabled' acknowledgement event is still sent to r.promptfoo.app (src/telemetry.ts:110-124,158-174; site/docs/faq.md:60; SECURITY.md:78). Browser UI: posthog-js (click autocapture, masked session recording) initializes when the bundle was built with a key, and its disable switch is a build-time define (src/app/src/components/PostHogProvider.tsx:37-67; src/app/vite.config.ts:171-181); the server serves static files without runtime templating (src/server/server.ts:363-367), so by code reading the runtime env var is not consulted by the browser bundle (not executed or verified). Update check: GET https://api.promptfoo.dev/api/latestVersion on every CLI start unless PROMPTFOO_DISABLE_UPDATE, auto-disabled when CI is set (src/updates.ts:14-33; src/main.ts:58-63). Conditional/hosted features: sharing via --share, or automatically once logged into Promptfoo Cloud (src/util/sharing.ts:59-64; share host api.promptfoo.app: src/constants.ts:11-25); red-team scans require an email (interactive prompt, placeholder in CI) checked against api.promptfoo.app plus a consent POST to api.promptfoo.dev/consent unless remote generation is disabled (src/node/doEval.ts:718-732; src/globalConfig/accounts.ts:161-257,259-312; src/telemetry.ts:198-221); red-team generation falls back to https://api.promptfoo.app/api/v1/task when no OPENAI_API_KEY is set or when logged into Cloud, and PROMPTFOO_DISABLE_REMOTE_GENERATION turns it off (src/redteam/remoteGeneration.ts:30-43,73-80,164-189); regular llm-rubric/similar graders only use remote grading when the config has a redteam section (src/matchers/llmGrading.ts:200-237; src/matchers/similarity.ts:187-204); code scanning runs on Promptfoo Cloud by default (src/codeScan/scanner/index.ts:169; site/docs/code-scanning/index.md:80). Offline recipe and its stated limits (not a network firewall): site/docs/faq.md:112-126. Which data each hosted path sends is enumerated in SECURITY.md:58-81."
+    },
+    "code": {
+      "languages": [
+        "TypeScript (CLI, library, server, tests)",
+        "TSX/React 19 + Vite (web UI in src/app)",
+        "Python (runtime wrappers src/python/*.py)",
+        "Ruby (src/ruby/wrapper.rb)",
+        "Go (src/golang/wrapper.go)",
+        "SQL (drizzle/*.sql, 26 migrations)",
+        "YAML/JSON configs; Markdown/MDX docs (site/)"
+      ],
+      "entry_points": [
+        {
+          "path": "src/entrypoint.ts (built to dist/src/entrypoint.js)",
+          "what": "Binary for `promptfoo` and `pf` (package.json:51-54); zero-dependency Node-version gate, then imports ./main.js (src/entrypoint.ts:143-174)."
+        },
+        {
+          "path": "src/main.ts",
+          "what": "Commander program that registers all subcommands and runs migrations, update check and default-config loading (src/main.ts:53-148)."
+        },
+        {
+          "path": "src/index.ts",
+          "what": "Library facade (package main/exports): evaluate, assertions, cache, guardrails, loadApiProvider(s), redteam (src/index.ts:63-73; package.json:12-17)."
+        },
+        {
+          "path": "src/contracts.ts",
+          "what": "Leaf-safe `promptfoo/contracts` export (package.json:18-27)."
+        },
+        {
+          "path": "src/server/index.ts",
+          "what": "Server main (web UI + API); Docker CMD is `node dist/src/server/index.js` (Dockerfile:81); port from API_PORT, default 15500 (src/constants.ts:27-29)."
+        },
+        {
+          "path": "src/commands/mcp/index.ts and src/commands/mcp/server.ts",
+          "what": "`promptfoo mcp` MCP server over stdio or HTTP (default port 3100)."
+        },
+        {
+          "path": "src/localEntrypoint.ts",
+          "what": "Development entry used by `npm run local` (package.json:89)."
+        },
+        {
+          "path": "code-scan-action/src/main.ts",
+          "what": "GitHub Action bundle for `promptfoo code-scans` (code-scan-action/package.json:8-10)."
+        }
+      ],
+      "architecture": "Single published npm package plus private workspaces src/app and site, with enforced layers (architecture/layers.json; docs/architecture/packages.md; `npm run architecture:check`). Flow: src/entrypoint.ts -> src/main.ts (Commander; commands in src/commands/) -> src/commands/eval.ts options -> src/node/doEval.ts (config resolution, test filters, run, summary, outputs, sharing, exit codes) -> src/evaluator.ts (expands prompts x providers x tests x repeats, calls providers under src/scheduler concurrency/rate limits, runs assertions, persists through the EvaluationStore port in src/evaluator/runtime.ts; default adapter src/node/evaluationStore.ts -> src/models/eval.ts and evalResult.ts -> src/database (Drizzle ORM over libsql/SQLite, drizzle/ migrations)). Grading: src/assertions/ (handlers; index.ts runAssertions; assertionsResult.ts weighted aggregation, named scores, thresholds) and src/matchers/ (model-graded helpers). Providers: src/providers/ (registry.ts maps ids; HTTP/WebSocket/browser/script/Python/Ruby/Go providers; agent providers claude-agent-sdk.ts, openai/codex-sdk.ts, openai/codex-app-server.ts, opencode-sdk.ts, openinterpreter; shared agentic-utils.ts for caching and working-dir fingerprints). Others: src/redteam/ (plugins, strategies, graders; src/redteam/plugins/codingAgent/graders.ts and verifiers.ts are security checks for coding agents, including a reader for externally produced verifier sidecar reports at verifiers.ts:3181-3336), src/tracing/ (OTLP receiver + trace store), src/server/ (Express API, CSRF middleware, static UI), src/app/ (React UI), src/commands/mcp/, src/codeScan/ + code-scan-action/ (PR scanner client; backend is Promptfoo Cloud), src/cache.ts, src/telemetry.ts, src/updates.ts, src/globalConfig/, plugins/promptfoo/ (agent-skill bundle), site/ (Docusaurus docs), examples/. Container-related code: nothing orchestrates containers for Claude Code/Codex; Docker appears in src/providers/docker.ts (Docker Model Runner, an OpenAI-compatible HTTP provider), src/providers/openai/agents-loader.ts:12,531-554 (Agents SDK DockerSandboxClient/UnixLocalSandboxClient), update-command helpers, and user-supplied examples (examples/integration-inspect-osworld/provider.py wraps the Inspect CLI, which owns the Docker sandbox, agent loop and scorer; examples/integration-docker/code-generation-sandbox uses a Python assertion with epicbox).",
+      "packaging_and_release": "Artifacts: (1) npm package `promptfoo` (files: dist only; bins promptfoo and pf; ESM + CJS library entry and ./contracts: package.json:12-54) built by tsc + tsdown + Vite (package.json:63; tsdown.config.ts:54-80) and checked by scripts/testPackageArtifact.ts (required packaged paths at lines 45-72; run in CI at .github/workflows/main.yml:223-226); `prepublishOnly` refuses to publish unless PROMPTFOO_POSTHOG_KEY is set (package.json:93). (2) Docker image ghcr.io/promptfoo/promptfoo, multi-arch linux/amd64 + linux/arm64, non-root user, base node:24.21.0-alpine, CMD runs the server (Dockerfile:2,7,74,81; docker.yml:261-346). (3) code-scan-action bundle mirrored to promptfoo/code-scan-action by PR (release-please.yml:180-390). (4) plugins/promptfoo agent-skill bundle consumed straight from the git repo via .claude-plugin/marketplace.json and .agents/plugins/marketplace.json. Release flow: release-please opens a release PR from conventional commits (release-please.yml:23-54; release-please-config.json; tags have no v prefix: config lines 3-5; pre-major bump flags at lines 16-17); `npm test` gates publishing (release-please.yml:56-83); `npm publish --provenance --access public` using OIDC trusted publishing with an empty token (release-please.yml:85-114); then the Docker workflow runs (release-please.yml:162-178). Verification material: GitHub build-provenance attestations for the Docker image (docker.yml:414-437; documented command `gh attestation verify oci://ghcr.io/promptfoo/promptfoo:latest --owner promptfoo` at site/docs/usage/self-hosting.md:63-64) and for code-scan-action dist/ and action.yml (release-please.yml:392-423). No checksum files, cosign/Sigstore signatures or SBOMs are generated by any workflow (searched .github/workflows). The Homebrew formula and any PyPI package named in the README are not built from this repo.",
+      "tests_and_ci": "Frameworks: Vitest ^5 for backend, web UI and site (package.json:254,273); Python unittest for src/python (*_test.py, 2 files); Go test for src/golang (wrapper_test.go); a Ruby wrapper smoke step in CI. Approximate test files: test/**/*.test.ts = 899 (backend; includes 259 under test/providers, 147 under test/redteam, assertion tests under test/assertions, 16 smoke files in test/smoke/*.test.ts and 6 *.integration.test.ts that the default run excludes); src/app **/*.test.{ts,tsx} = 272 (web UI; browser config src/app/vitest.browser.config.ts); site tests = 16; total about 1,190. `npm test` = `vitest run` over test/**/*.test.ts(x) excluding integration and smoke files, random order, forks pool, 30 s test timeout, bail on first failure when CI is set (package.json:104; vitest.config.ts:15-17,28-35,44-52). Other commands: `npm run test:smoke` (built CLI end to end; vitest.smoke.config.ts), `npm run test:integration` (vitest.integration.config.ts), `npm run test:package-artifact`, coverage ratchets (scripts/checkCoverageRatchets.ts), `npm run architecture:check`, `npm run knip`, `npm run lint:ci` (Biome), `npm run tsc`. Project guidance for behavior changes is to run the real CLI (`npm run local -- eval -c <config> --no-cache -o output.json`) and inspect success/score/error in the JSON (AGENTS.md:122-174). CI: .github/workflows/main.yml on PRs, pushes to main and manual dispatch, jobs: ci-config + test matrix (Linux Node 22.22.0/24/26; Windows 22.22 in 3 shards on PRs and Node 24/26 shards on main; macOS 22.22 on PRs and 24 on main: lines 33-160), build on Node 22.22/24/26 (PostHog key presence check, package artifact test, built skill examples: 162-231), style-check (Biome, Prettier, dependency-version consistency, madge circular check, architecture boundaries, knip, lockfile-lint: 233-292), shell-format, assets (regenerated JSON schemas must produce no diff: 306-352), python (ruff + unittest on 3.9 and 3.14: 354-382), docs build, code-scan-action build, site tests, webui tests with coverage ratchets, integration tests, smoke tests (also sets up Node 20.20.0 and 22.22.0 binaries: 600-655), share-test against a local server, redteam against production and staging APIs (757-825), actionlint, ruby, golang. Other workflows: release-please.yml (release + publish), docker.yml (build, health check, publish), deploy-launcher.yml (Cloudflare Pages), promptfoo-code-scan.yml (project scans its own PRs), release-please-format.yml, release-please-sha-drift.yml, validate-pr-title.yml, validate-renovate-config.yml, image-actions.yml, two tusk-test-runner-*.yml.",
+      "dependencies": "package.json (root; workspaces src/app and site): 80 dependencies, 52 devDependencies, 45 optionalDependencies (package.json:324-405, 223-276, 277-323); an overrides block pins transitive security fixes (package.json:113-222); lockfile package-lock.json v3. src/app/package.json: 19 dependencies, 57 devDependencies. site/package.json: 11 dependencies, 39 devDependencies, 1 optional. code-scan-action/package.json: 4 dependencies, 4 devDependencies. src/golang/go.mod: no external requirements. scripts/modelaudit_schema_requirements.txt: 6 pinned Python requirements (CI schema generation only). Provider SDKs and agent runtimes (@anthropic-ai/claude-agent-sdk 0.3.263, @openai/codex-sdk ^0.153.2, @openai/agents, @opencode-ai/sdk, @modelcontextprotocol/sdk, playwright, sharp, AWS/Azure/Google SDKs) are optionalDependencies loaded lazily; @anthropic-ai/sdk, openai, ai, posthog-node, @libsql/client, drizzle-orm, express, socket.io, nunjucks, zod are direct dependencies.",
+      "security_policy": "SECURITY.md at repo root: trust model says configs and code-executing fields (custom assertions/providers/transforms/hooks) run unsandboxed with user permissions, and the local web UI and MCP server are single-user dev interfaces (lines 5-27); hardening recommendations (101-115); supported versions are the latest published release only, no backports (117-125); report privately via GitHub Security Advisories (preferred) or security@promptfoo.dev, acknowledgment within 1 business day, fix targets Critical 14 days / High 30 / Medium 60, CVSS v4.0 (127-140,166-182); CVE and safe-harbor policies (193-256); in/out-of-scope lists (258-318)."
+    },
+    "claim_checks": [
+      {
+        "claim": "CLI and library for evaluating and red-teaming LLM apps (README.md:12).",
+        "verified": "yes",
+        "evidence": "Bins promptfoo/pf -> dist/src/entrypoint.js (package.json:51-54); Commander CLI with eval and redteam subcommands (src/main.ts:88-135); library exports evaluate, assertions, cache, guardrails, loadApiProvider(s), redteam (src/index.ts:63-73; package.json:12-28)."
+      },
+      {
+        "claim": "Test your prompts and models with automated evaluations (README.md:55); includes several scorers per labeled case with per-sample values kept.",
+        "verified": "yes",
+        "evidence": "Test cases take an assert list (src/types/index.ts:719-752); CSV __expected/__expected1..N columns become assertions (src/csv.ts:277-280); runAssertions runs every assertion and aggregates weighted score, namedScores by metric and componentResults per assertion (src/assertions/index.ts:754-884; src/assertions/assertionsResult.ts:253-411); each row persists success, score, gradingResult and namedScores (src/database/tables.ts:107-110) and exports them (src/models/evalResult.ts:966-1026; src/models/eval.ts:1431-1463). Caveats: PROMPTFOO_STRIP_GRADING_RESULT can null gradingResult in exports (evalResult.ts:534-542,1006); assertions sharing a metric name are merged into one weighted-average namedScore (assertionsResult.ts:275-290,351-355) though componentResults stay separate; no pass@k aggregation exists (--repeat only reruns rows: src/evaluator.ts:2668-2674)."
+      },
+      {
+        "claim": "Automate checks in CI/CD (README.md:58).",
+        "verified": "partial",
+        "evidence": "Code prevails over docs. Code: eval sets exit code 100 when pass rate (successes / (successes+failures+errors)) is below PROMPTFOO_PASS_RATE_THRESHOLD (default 100); exit code overridable by PROMPTFOO_FAILED_TEST_EXIT_CODE (src/node/doEval.ts:1040-1041,1290-1306; documented at site/docs/usage/command-line.md:169; unit test test/commands/eval.test.ts:2080-2112); output formats csv/html/json/jsonl/txt/xml/yaml/junit.xml (src/util/outputFormats.ts:5-17); `validate config` command (src/commands/validate.ts:569-587). Mismatch: site/docs/integrations/ci-cd.md:115 and six other pages tell users to run `eval --fail-on-error`, but no such option is defined anywhere under src/ (src/commands/eval.ts:36-180; absent from command-line.md:102-146); I did not execute the CLI. The GitHub Action is a separate repository (site/docs/integrations/github-action.md:8) and was not inspected."
+      },
+      {
+        "claim": "Private: LLM evals run 100% locally - your prompts never leave your machine (README.md:77).",
+        "verified": "partial",
+        "evidence": "Orchestration, SQLite store and cache are local (src/database/tables.ts; src/cache.ts:38-51), but prompts and outputs are sent to every configured provider and grader by design (SECURITY.md:62-64); the default grader depends on available credentials (src/providers/defaults.ts:92-151); telemetry goes to Promptfoo endpoints by default (src/telemetry.ts:126-175; docs say it excludes prompts and outputs: site/docs/configuration/telemetry.md:31); sharing, red-team remote generation, email verification and code scanning contact Promptfoo-operated hosts (see telemetry_and_network). The FAQ itself says inputs/outputs may leave the machine for hosted features (site/docs/faq.md:54-56)."
+      },
+      {
+        "claim": "Flexible: Works with any LLM API or programming language (README.md:78).",
+        "verified": "partial",
+        "evidence": "Generic HTTP, WebSocket, browser, shell-script, Python, Ruby, Go and JavaScript provider mechanisms exist (src/providers/http.ts, websocket.ts, browser.ts, scriptCompletion.ts, pythonCompletion.ts, rubyCompletion.ts, golangCompletion.ts; wrappers in src/python, src/ruby, src/golang). 'Any' is bounded by those mechanisms and cannot be verified exhaustively."
+      },
+      {
+        "claim": "Requires Node.js >=22.22.0 (README.md:27-28).",
+        "verified": "yes",
+        "evidence": "package.json:48-50 engines; .npmrc:1 engine-strict=true; runtime gate in src/entrypoint.ts:30-153; a CI lane installs exactly 22.22.0 (.github/workflows/main.yml:88-95)."
+      },
+      {
+        "claim": "Also available via `brew install promptfoo` and `pip install promptfoo` (README.md:35).",
+        "verified": "not_checkable",
+        "evidence": "Homebrew is repeated at site/docs/installation.md:14,29 but the formula lives outside this repo. `pip install promptfoo` appears only at README.md:35 (searched the whole repo) and there is no pyproject.toml/setup.py for such a package here; src/python/*.py are runtime wrappers shipped inside the npm package (scripts/testPackageArtifact.ts:59-60)."
+      },
+      {
+        "claim": "Review pull requests for LLM-related security and compliance issues with code scanning (README.md:59).",
+        "verified": "partial",
+        "evidence": "Client code exists (src/codeScan/, code-scan-action/src/main.ts) but scans go to a Promptfoo-hosted backend by default (src/codeScan/scanner/index.ts:169; site/docs/code-scanning/index.md:80), authenticated by API key, GitHub OIDC or fork-PR context (src/codeScan/util/auth.ts:5-36). Self-hosting is listed as Enterprise On-Prem, not part of this tree."
+      },
+      {
+        "claim": "Promptfoo remains open source and MIT licensed (README.md:23).",
+        "verified": "yes",
+        "evidence": "LICENSE:1-19 is MIT (Copyright (c) Promptfoo 2025); package.json:6 and the workspace manifests say MIT. Other license files are MIT notices for PyRIT-derived crescendo code (src/redteam/providers/crescendo/LICENSE:1-7) and vendored js-yaml (plugins/promptfoo/skills/promptfoo-provider-setup/scripts/vendor/LICENSE:1-3). Enterprise/On-Prem products are mentioned in docs but are not in this tree."
+      },
+      {
+        "claim": "Docs linked from README: promptfoo can evaluate coding agents (Codex, Claude, OpenCode, Open Interpreter) including sandboxing, tracing and assertions (site/docs/guides/evaluate-coding-agents.md:3-11).",
+        "verified": "partial",
+        "evidence": "Providers exist (src/providers/registry.ts:227-285,999-1022) and trace/trajectory/skill assertions exist (src/types/index.ts:660-665; src/assertions/skill.ts:195-205). 'Sandboxing' is pass-through of each agent's own settings (claude-agent-sdk.ts:790-850,1686; codex-sdk.ts:311) plus advice to use ephemeral containers (evaluate-coding-agents.md:344-368); no code launches containers for Claude Code or Codex, the container-based guide uses a user-written epicbox Python assertion (site/docs/guides/sandboxed-code-evals.md:94-147), and Codex skill detection is heuristic (docs/agents/coding-agent-provider-taxonomy.md:199,209)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "OSWorld-small (21 samples) run through the Promptfoo -> Inspect wrapper example with GPT-5.5, concurrency 6, tracing on",
+        "metric": "samples passed / mean OSWorld score / wall time / total tokens",
+        "value": "13/21 passed, 8 scored failures, 0 provider errors after one rerun; mean score 0.665; 20m 9s; 3,806,976 tokens (docs call it a smoke test, not a stable leaderboard number)",
+        "source": "site/docs/guides/evaluate-osworld-with-inspect.md:387-421",
+        "independent": false
+      },
+      {
+        "what": "OSWorld full Inspect-supported corpus (246 samples) through the same wrapper with GPT-5.5, concurrency 3, run dated April 30, 2026",
+        "metric": "pass rate over scored rows / mean score / wall time / tokens",
+        "value": "139 passed, 103 scored failures, 4 repeated provider errors (242 scored rows); pass rate 57.4%; mean score 0.594; main run 5h27m5s and 54,421,072 tokens; targeted reruns 1,917,890 tokens",
+        "source": "site/docs/guides/evaluate-osworld-with-inspect.md:448-481",
+        "independent": false
+      },
+      {
+        "what": "OSWorld libreoffice_calc slice (3 samples), sequential, GPT-5.5, one local verification on April 29, 2026",
+        "metric": "wall time / total tokens",
+        "value": "12m31s; 533,101 tokens (docs: 'scale guidance, not a fixed benchmark')",
+        "source": "site/docs/guides/evaluate-osworld-with-inspect.md:138-141",
+        "independent": false
+      },
+      {
+        "what": "Project estimate for a Codex SDK security-audit eval of a small codebase (no method given)",
+        "metric": "token usage",
+        "value": "about 1M tokens, because Codex loads its system context regardless of codebase size",
+        "source": "site/docs/guides/evaluate-coding-agents.md:125",
+        "independent": false
+      },
+      {
+        "what": "Project estimate for a coding-agent security-audit task (wording: 'might cost'; no method given)",
+        "metric": "cost and latency",
+        "value": "0.10-0.30 USD and 30-120 seconds",
+        "source": "site/docs/guides/evaluate-coding-agents.md:304",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope: no Promptfoo component orchestrates containers or per-trial verifier loops for the real Claude Code/Codex CLIs. Agent providers run the SDK/CLI on the host (src/providers/claude-agent-sdk.ts:1830-1835,1908; src/providers/openai/codex-app-server.ts:844,1684); isolation is delegated to the agent's own sandbox settings (claude-agent-sdk.ts:790-850; codex-sdk.ts:311), a programmatic-only spawn hook (claude-agent-sdk.ts:968-986; site/docs/providers/claude-agent-sdk.md:905) or user-built launchers (site/docs/red-team/coding-agents.md:119-146). The project's own roadmap lists a side-effect harness and a real-eval QA matrix as future work (docs/agents/coding-agent-provider-taxonomy.md:452-472,520-537). Docker-backed examples wrap other harnesses (Inspect/OSWorld: examples/integration-inspect-osworld/provider.py:1-5) or run user scripts (site/docs/guides/sandboxed-code-evals.md:94-147). The code named `verifier` is red-team security grading (src/redteam/plugins/codingAgent/verifiers.ts:3477-3517).",
+      "CI-gate pitfalls (code prevails over docs): several CI pages recommend `eval --fail-on-error` (site/docs/integrations/ci-cd.md:115; n8n.md:70; aws-codecommit.md:52; travis-ci.md:76; azure-pipelines.md:92; bitbucket-pipelines.md:57,91) but no such option is defined (src/commands/eval.ts:36-180; not executed here). The built-in gate is an absolute pass-rate threshold (default 100%, errors counted as non-passing) giving exit 100 (src/node/doEval.ts:1040-1041,1290-1306); no baseline-vs-candidate diff gate was found in src/commands (searched). By code reading, a run that produces zero graded rows gives passRate NaN so the failure exit code is not set (doEval.ts:710-715,1041,1295); tests with no `assert` pass with score 1 (src/assertions/index.ts:773-775; assertionsResult.ts:215-222); `weight: 0` assertions are forced to pass (src/assertions/index.ts:671-677). The project's own skill guidance adds an explicit nonzero-coverage gate and tests it (plugins/promptfoo/skills/promptfoo-evals/references/eval-patterns.md:229-242; test/smoke/agent-skill-examples.test.ts:368-393).",
+      "Cached results can mask regressions: the response cache is on by default with a 14-day disk TTL (src/cache.ts:38-51); the Claude and Codex agent providers read it too (src/providers/claude-agent-sdk.ts:1756-1788; src/providers/openai/codex-sdk.ts:2277) with a working-dir fingerprint based on file mtimes, not content (src/providers/agentic-utils.ts:94-153); CI docs restore the promptfoo cache across runs (site/docs/integrations/ci-cd.md:151-168) while the project's gate snippet uses --no-cache (eval-patterns.md:237). An unset grader falls back to whichever provider credentials exist (src/providers/defaults.ts:92-151), so grading can differ between environments.",
+      "Security model: configs and custom assertions/providers/transforms/hooks execute unsandboxed with user permissions (SECURITY.md:9-13). The MCP HTTP server has no auth or CSRF middleware and both it and the web server call listen(port) with no host argument while logging localhost (src/commands/mcp/server.ts:154-174; src/server/server.ts:552-558); no code in src/ reads the HOST variable the Dockerfile sets (Dockerfile:68); SECURITY.md:113-114 tells operators to bind to loopback themselves and treats same-network access and the best-effort CSRF checks as out of scope (SECURITY.md:21-27; src/server/middleware/csrfProtection.ts:53-115). Self-hosting docs state no built-in auth and not recommended for production (site/docs/usage/self-hosting.md:36-46).",
+      "Telemetry and hosted dependencies: telemetry is on by default and can include a user UUID plus email/login status; the opt-out still sends one acknowledgement event (src/telemetry.ts:110-124,158-174); the browser UI's analytics switch is a build-time define (src/app/vite.config.ts:171-181); red-team scans need an email verified against api.promptfoo.app (src/node/doEval.ts:718-732); code scanning runs on Promptfoo Cloud by default and self-hosting is Enterprise On-Prem (site/docs/code-scanning/index.md:80); logging in to Cloud turns on automatic result sharing (src/util/sharing.ts:59-64); the README claim that prompts never leave the machine holds only for orchestration and storage (README.md:77).",
+      "Maintenance and versioning: pre-1.0 (0.123.1) with release-please pre-major bump flags (release-please-config.json:16-17) and releases dated 2026-08-04, 08-26, 08-28, 09-10 and 09-18 (CHANGELOG.md:275,199,192,82,7); the project is now part of OpenAI (README.md:23). Agent-runtime SDKs are optional pre-1.0 dependencies (package.json:278,297) and the docs warn an older Codex SDK or binary may silently ignore settings (site/docs/providers/openai-codex-sdk.md:638). Recent changelog entries fix grader failures that could be inverted into passes and failure rows lost when scoring fails (CHANGELOG.md:27,52,77), so grader-error semantics have recently changed.",
+      "Release integrity: npm publish uses --provenance via OIDC, and the GHCR image and code-scan-action bundle get GitHub build-provenance attestations (release-please.yml:111,392-423; docker.yml:414-437), but the workflows generate no checksum files, cosign/Sigstore signatures or SBOMs, and the Homebrew formula/PyPI package named in the README are not produced here. CI downloads actionlint from its main branch (main.yml:837-840). Published builds embed an analytics key at publish time (package.json:93).",
+      "Upstream check tolerance and evidence base: CI sets PROMPTFOO_IGNORE_UNHANDLED_TEST_ERRORS=true so vitest worker crashes/unhandled errors after passing tests do not fail the job (.github/workflows/main.yml:128-134; vitest.config.ts:54-75); the 'Redteam (Staging API)' job is continue-on-error (main.yml:822-825) and the production-API redteam job needs live network (main.yml:757-782); smoke, integration and unit suites are separate commands (package.json:98-104). All benchmark-style numbers in the repo are project-authored docs runs; no third-party measurement of the tool itself was found."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "promptfoo/promptfoo",
+      "checks": [
+        {
+          "field": "readme.install[0] (npm)",
+          "statement": "npm (global; needs Node >=22.22.0): `npm install -g promptfoo`",
+          "citation": "README.md:27,31; site/docs/installation.md:19,35",
+          "holds": true,
+          "note": "README.md:27 says `>=22.22.0` for npm and npx usage; README.md:31 is `npm install -g promptfoo`; installation.md:19 is the same command in the npm tab and installation.md:35 says npm and npx require Node.js `>=22.22.0`. package.json:48-50 engines `>=22.22.0` agrees."
+        },
+        {
+          "field": "license",
+          "statement": "spdx MIT, file LICENSE",
+          "citation": "LICENSE:1-19; package.json:6",
+          "holds": true,
+          "note": "LICENSE is the verbatim MIT permission notice and warranty disclaimer, headed 'Copyright (c) Promptfoo 2025' (it has no 'MIT License' title line); package.json:6 is \"license\": \"MIT\". The only other LICENSE files are the two MIT notices the dossier names (src/redteam/providers/crescendo/LICENSE and the vendored js-yaml one under plugins/promptfoo)."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - CI test lanes run ubuntu-latest on Node 22.22.0, 24.x and 26.x; Docker image is built for linux/amd64; lockfile carries @libsql linux-x64-gnu/musl bindings",
+          "citation": ".github/workflows/main.yml:33-41,88-95; .github/workflows/docker.yml:264-269; package-lock.json:11560,11573",
+          "holds": true,
+          "note": "main.yml:34-36 has ubuntu-latest entries for 22.22, 24.x and 26.x. main.yml:93 installs exactly 22.22.0 for the 22.22 label. docker.yml:267 pairs ubuntu-latest with linux/amd64; line 268 uses ubuntu-24.04-arm for arm64, and the job runs on non-PR events only (line 262). package-lock.json:11560 is @libsql/linux-x64-gnu and :11573 is @libsql/linux-x64-musl, both cpu x64 and os linux."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "README does not mention Claude Code or Codex. The agent-skill bundle plugins/promptfoo (four skills) is published for Claude Code via .claude-plugin/marketplace.json and for Codex via .agents/plugins/marketplace.json. Providers: anthropic:claude-agent-sdk (alias anthropic:claude-code); openai:codex-sdk (alias openai:codex); openai:codex-app-server (alias openai:codex-desktop), which spawns `codex app-server --listen stdio://`; plus opencode:sdk and openinterpreter. Agent SDKs are optionalDependencies loaded lazily. skill-used and trajectory:* assertions exist; Codex skill calls are inferred from SKILL.md reads. The repo's .claude/settings.json defines lint/format and block-no-verify hooks.",
+          "citation": "site/docs/integrations/agent-skill.md:12,34-62; src/providers/registry.ts:278-285,999-1001,1020-1022; src/providers/openai/codex-app-server.ts:844,1684,1749; package.json:278,297; src/assertions/skill.ts:195-205; src/types/index.ts:660-665; src/providers/openai/codexSkillMetadata.ts:111-131; docs/agents/coding-agent-provider-taxonomy.md:199,209; .claude/settings.json:1-30; .github/workflows/main.yml:136-141,228-231",
+          "holds": true,
+          "note": "In README.md, 'claude' appears only in an image filename (line 64), and neither Codex nor MCP appears. agent-skill.md:12 names the four skills and both marketplaces; both marketplace.json files point to ./plugins/promptfoo, and both plugin.json files exist. registry.ts:278-279, 1000 and 1021 match the IDs and aliases. codex-app-server.ts:844 calls spawn, 1684 builds the ['app-server','--listen','stdio://'] args, and 1749 defaults the command to 'codex'. package.json:278 is @anthropic-ai/claude-agent-sdk and :297 is @openai/codex-sdk, both optional. The SDK import in claude-agent-sdk.ts:37-55 is type-only, and the runtime load uses importModule (claude-agent-sdk.ts:344-366; codex-sdk.ts:638-658). types/index.ts:660-665 lists skill-used plus five trajectory types, and skill.ts:195-205 is handleSkillUsed. Taxonomy doc lines 199 and 209 state the SKILL.md heuristic. .claude/settings.json matches. Minor: the SKILL.md path matching itself is at codexSkillMetadata.ts:72,88; the cited 111-131 is the aggregation step."
+        },
+        {
+          "field": "claim_checks[2] (Automate checks in CI/CD, README.md:58)",
+          "statement": "verified: partial. eval sets exit code 100 when the pass rate is below PROMPTFOO_PASS_RATE_THRESHOLD (default 100), overridable by PROMPTFOO_FAILED_TEST_EXIT_CODE; output formats csv/html/json/jsonl/txt/xml/yaml/junit.xml; a `validate config` command exists. Mismatch: site/docs/integrations/ci-cd.md:115 and six other pages tell users to run `eval --fail-on-error`, but no such option is defined under src/. The GitHub Action is a separate repository.",
+          "citation": "src/node/doEval.ts:1040-1041,1290-1306; site/docs/usage/command-line.md:102-146,169; test/commands/eval.test.ts:2080-2112; src/util/outputFormats.ts:5-17; src/commands/validate.ts:569-587; src/commands/eval.ts:36-180; site/docs/integrations/ci-cd.md:115; site/docs/integrations/github-action.md:8",
+          "holds": false,
+          "note": "The substance holds. doEval.ts:1040-1041 computes passRate over successes+failures+errors; 1290-1306 applies the threshold and exit code. eval.ts:36-180 has no --fail-on-error, and nothing in src/ matches it. The command-line.md:102-146 option table lacks it, and :169 documents exit code 100. The formats come from types/index.ts:1544-1553 plus junit.xml (outputFormats.ts:9). validate.ts:569-582 defines `validate config`. eval.test.ts:2080-2112 tests a custom exit code. github-action.md:8 links promptfoo/promptfoo-action. The error is a count: a case-insensitive search of the whole repo finds `fail-on-error` in exactly six files, ci-cd.md plus five others (n8n.md, aws-codecommit.md, travis-ci.md, azure-pipelines.md, bitbucket-pipelines.md). That is five other pages, not 'six other pages', and matches the six pages listed in the dossier's own risks entry."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "claim_checks[2].evidence: replace 'site/docs/integrations/ci-cd.md:115 and six other pages tell users to run `eval --fail-on-error`' with 'site/docs/integrations/ci-cd.md:115 and five other pages (n8n.md:70, aws-codecommit.md:52, travis-ci.md:76, azure-pipelines.md:92, bitbucket-pipelines.md:57,91) tell users to run `eval --fail-on-error`'."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,306 @@
+{
+  "contender": "react/react",
+  "revision": {
+    "contender": "react/react",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "react/react",
+        "tag": "v19.3.0",
+        "commit": "1d34f91dfde6bba84d08b683aaba164c7194dacb",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v19.3.0",
+    "commit": "1d34f91dfde6bba84d08b683aaba164c7194dacb",
+    "read_at": "2026-10-02T03:02:44+00:00"
+  },
+  "dossier": {
+    "contender": "react/react",
+    "revision": {
+      "tag": "v19.3.0",
+      "commit": "1d34f91dfde6bba84d08b683aaba164c7194dacb",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "React (https://github.com/react/react) is a Yarn-classic monorepo for a JavaScript UI library. It publishes the core `react` package, the DOM and server renderers (`react-dom`: client roots plus Fizz streaming SSR), the reconciler and scheduler, React Server Components bindings (`react-server-dom-webpack|turbopack|parcel`), an ESLint plugin and other tooling. It also holds React DevTools (browser extensions, an Electron CLI, a WebSocket core), a separate `compiler/` workspace (TypeScript Babel plugin plus an in-progress Rust port) and two experimental AI-tool packages (`react-devtools-cdt-mcp`, `react-mcp-server`). It is a UI library and its tooling. No Dockerfile, Compose file or other container-engine artifact exists in the repo. Revision check: .git/packed-refs:2 maps refs/tags/v19.3.0 to 1d34f91dfde6bba84d08b683aaba164c7194dacb and .git/HEAD:1 is the same commit; the clone is shallow (.git/shallow).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "'React is a JavaScript library for building user interfaces.'",
+          "citation": "README.md:3"
+        },
+        {
+          "claim": "Declarative and component-based; 'Learn Once, Write Anywhere: We don't make assumptions about the rest of your technology stack... React can also render on the server using Node and power mobile apps using React Native.'",
+          "citation": "README.md:5-7"
+        },
+        {
+          "claim": "Gradual adoption: 'you can use as little or as much React as you need'. The Installation section is three links to react.dev (Quick Start, Add React to an Existing Project, Create a New React App); the README itself contains no install command.",
+          "citation": "README.md:13-17"
+        },
+        {
+          "claim": "Documentation is on the website (react.dev); docs improvements go to the separate repo reactjs/react.dev.",
+          "citation": "README.md:21"
+        },
+        {
+          "claim": "Docs repo pointer: 'You can improve it by sending pull requests to this repository (https://github.com/reactjs/react.dev)'.",
+          "citation": "README.md:39"
+        },
+        {
+          "claim": "Example: createRoot from 'react-dom/client' renders a HelloMessage component into a page container.",
+          "citation": "README.md:45-56"
+        },
+        {
+          "claim": "JSX is not required to use React.",
+          "citation": "README.md:58"
+        },
+        {
+          "claim": "'Development of React happens in the open on GitHub'; contributing guide, code of conduct and good-first-issues are external links.",
+          "citation": "README.md:62-74"
+        },
+        {
+          "claim": "'React is MIT licensed (./LICENSE).'",
+          "citation": "README.md:78"
+        },
+        {
+          "claim": "CI badges reference the workflows '(Runtime) Build and Test' and '(Compiler) TypeScript'; npm version badge for `react`.",
+          "citation": "README.md:1"
+        },
+        {
+          "claim": "Absence: the README (79 lines, read in full) says nothing about Docker/containers/Compose, multi-service orchestration, deployment, supported platforms, telemetry, TypeScript types or security.",
+          "citation": "README.md:1-79"
+        }
+      ],
+      "install": [
+        {
+          "method": "npm (runtime packages)",
+          "command": "npm install react react-dom",
+          "citation": "packages/react-dom/README.md:7-9"
+        },
+        {
+          "method": "npm global / npx (DevTools standalone CLI)",
+          "command": "npm install -g react-devtools  (alternatives: yarn global add react-devtools; npx react-devtools)",
+          "citation": "packages/react-devtools/README.md:9-25"
+        },
+        {
+          "method": "npm devDependency (ESLint plugin)",
+          "command": "npm install eslint-plugin-react-hooks --save-dev",
+          "citation": "packages/eslint-plugin-react-hooks/README.md:9-15"
+        },
+        {
+          "method": "npm (experimental chrome-devtools-mcp tool registration library)",
+          "command": "npm install react-devtools-cdt-mcp",
+          "citation": "packages/react-devtools-cdt-mcp/README.md:18-20"
+        },
+        {
+          "method": "from source (monorepo prerequisites for DevTools, run from repo root)",
+          "command": "yarn install && yarn build-for-devtools",
+          "citation": "packages/react-devtools-extensions/README.md:18-28"
+        },
+        {
+          "method": "from source, dev-only (experimental react-mcp-server; run from compiler/ after adding the documented Claude Desktop config)",
+          "command": "yarn workspace react-mcp-server watch",
+          "citation": "compiler/packages/react-mcp-server/README.md:7-22"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - all CI jobs run on ubuntu-latest (.github/workflows/runtime_build_and_test.yml:39,220,305; Playwright Linux deps at :762); workflows do not state the CPU architecture and the README states no platform support (README.md:1-79).",
+        "wsl2": "unknown - no WSL mention in README, docs or workflows (only an unrelated fixture lockfile matched a search); no Windows runner in any workflow; build helpers are bash scripts (scripts/react-compiler/link-compiler.sh:1).",
+        "macos_arm64": "unknown - not stated in README and no macOS runner in any workflow. Code has darwin branches only in Rust-port dev tooling (compiler/packages/snap/src/runner-watch.ts:212-217); compiler/Cargo.toml:28 reports a size measurement taken on arm64 macOS; the Rust-port design doc lists darwin-arm64 among planned platform packages (compiler/docs/rust-port/rust-port-0005-babel-plugin.md:611-615). The npm runtime packages are plain JavaScript.",
+        "gpu": "no - not applicable: no GPU/CUDA/WebGPU code or docs found outside fixtures/tests; the README makes no GPU claim."
+      },
+      "integrations": {
+        "cli": "react-devtools (packages/react-devtools/package.json:11-13 -> bin.js), react-compiler-healthcheck (compiler/packages/react-compiler-healthcheck/package.json:5-7) and react-mcp-server (compiler/packages/react-mcp-server/package.json:5-7); maintainer yarn scripts for build/test/lint/flow/release (package.json:124-158). The `react` and `react-dom` packages ship no CLI.",
+        "mcp": "Two experimental pieces. (1) compiler/packages/react-mcp-server: stdio MCP server (src/index.ts:8-9,488-492) with tools query-react-dev-docs, compile, review-react-runtime, parse-react-component-tree and prompt review-react-code (src/index.ts:37,80,293,370,409); version 0.0.0 with 'no tests' (package.json:3,10); documented only as a dev setup with a Claude Desktop config (README.md:7-22); not in the compiler publish list (compiler/scripts/release/shared/packages.js:8-12). (2) packages/react-devtools-cdt-mcp: the README says it is 'not an MCP server'; it is a browser library that registers 12 React inspection/profiling tools for chrome-devtools-mcp 1.3.0+ with --categoryExperimentalThirdParty=true (README.md:3-14,42-57; src/DevToolsCdtMcp.js:67-293).",
+        "sdk_or_api": "The npm JavaScript libraries are the API surface: react (packages/react/package.json:24-43), react-dom with /client, /server, /static, /profiling, /test-utils subpaths (packages/react-dom/package.json:51-121), react-reconciler for custom renderers (packages/react-reconciler/package.json:3), react-server-dom-* RSC bindings 'intended to be integrated into meta-frameworks' (packages/react-server-dom-webpack/package.json:3). No HTTP API or hosted service in the repo; the DevTools standalone server is a local HTTP/WebSocket endpoint (packages/react-devtools-core/src/standalone.js:383-410). No TypeScript declarations for react/react-dom in this repo (no `types` field, no .d.ts: packages/react/package.json:11-52).",
+        "claude_code_or_codex": "Contributor-facing Claude Code project config only: .claude/settings.json (SessionStart hook, Skill and yarn allow-list, npm/npx/pnpm/bun deny-list, lines 1-44), .claude/instructions.md, 7 skills in .claude/skills/*/SKILL.md, compiler/.claude/ (agents, rules, skills, settings.json), CLAUDE.md, compiler/CLAUDE.md, and `scripts/worktree.sh --claude` to launch Claude Code in a new git worktree (scripts/worktree.sh:17-26). No Codex files (AGENTS.md, .codex) and no .mcp.json found; no documented end-user Claude Code or Codex integration."
+      },
+      "telemetry_and_network": "No telemetry or phone-home code found in the core runtime (react, react-dom, scheduler, react-reconciler, react-server, react-client, react-server-dom-*): searches for fetch/XMLHttpRequest/WebSocket/sendBeacon and Node http/https/net imports hit only comments, caller-supplied streams (optional WebSocket debug channel typing, packages/react-server-dom-webpack/src/server/ReactFlightDOMServerNode.js:152) or DevTools code. Production error messages only contain a https://react.dev/errors/<code> URL string (packages/shared/formatProdErrorMessage.js:14). DevTools: the event logger is compiled out of OSS builds (enableLogger = false in packages/react-devtools-shared/src/config/DevToolsFeatureFlags.default.js:17, DevToolsFeatureFlags.extension-oss.js:17, DevToolsFeatureFlags.core-oss.js:17; true only in the -fb variants) and also needs a build-time LOGGING_URL (packages/react-devtools-core/webpack.standalone.js:28; packages/react-devtools-shared/src/registerDevToolsEventLogger.js:66-89). The `react-devtools` CLI runs update-notifier on a 7-day interval (packages/react-devtools/bin.js:16-30). The DevTools error boundary queries https://api.github.com/search/issues with the error message (packages/react-devtools-shared/src/devtools/views/ErrorBoundary/githubAPI.js:15-53; cache.js:91). The standalone server is HTTP + WebSocket on localhost:8097 by default with no auth step in the connection handler (packages/react-devtools-core/src/standalone.js:328-364,383-410; packages/react-devtools/README.md:90-102). The experimental react-mcp-server calls Algolia and fetches react.dev pages (compiler/packages/react-mcp-server/src/utils/algolia.ts:12-16,101-105), launches Chrome via Puppeteer with scripts loaded from unpkg (src/tools/runtimePerf.ts:95,208-210) and attaches to Chrome at 127.0.0.1:9222 (src/tools/componentTree.ts:5-8). The compiler playground build downloads fonts from conf.reactjs.org (compiler/apps/playground/scripts/downloadFonts.js:12-20) and is deployed on Vercel (compiler/apps/playground/README.md:36-42). Accounts: none needed to use the npm libraries; maintainer-side accounts are npm (OIDC in a protected `npm` environment for runtime releases; NPM_TOKEN secret for compiler prereleases), crates.io (OIDC), a Discord webhook secret, and a GitHub token for `yarn download-build` (scripts/release/shared-commands/download-build-artifacts.js:10-22)."
+    },
+    "code": {
+      "languages": [
+        "JavaScript (Flow-typed, @flow headers)",
+        "TypeScript (compiler, eslint-plugin-react-hooks, parts of DevTools)",
+        "Rust (compiler/crates, 119 .rs files, in-progress compiler port)",
+        "Shell (build/CI helpers)",
+        "CoffeeScript (one test file)"
+      ],
+      "entry_points": [
+        {
+          "path": "packages/react/index.js",
+          "what": "`react` package main (hooks, elements, JSX runtimes); exports map has a `react-server` condition (packages/react/package.json:24-43)"
+        },
+        {
+          "path": "packages/react-dom/package.json",
+          "what": "exports map -> client.js (createRoot/hydrateRoot), server.{node,edge,browser,bun}.js (Fizz SSR, e.g. renderToPipeableStream), static.*.js, profiling.js, test-utils.js (lines 51-121)"
+        },
+        {
+          "path": "packages/react-server-dom-webpack/package.json",
+          "what": "RSC bindings exports: client.*, server.*, static.*, node-register, plugin; -turbopack and -parcel siblings are also in the publish list (ReactVersions.js:41-43)"
+        },
+        {
+          "path": "packages/react-devtools/bin.js",
+          "what": "`react-devtools` CLI: spawns an Electron app (app.js, preload.js) that starts the DevTools HTTP/WebSocket server (default localhost:8097; core in packages/react-devtools-core/src/standalone.js)"
+        },
+        {
+          "path": "compiler/packages/react-mcp-server/src/index.ts",
+          "what": "experimental stdio MCP server (bin `react-mcp-server`): 4 tools and 1 prompt; not published"
+        },
+        {
+          "path": "packages/react-devtools-cdt-mcp/src/register.js",
+          "what": "side-effect import that installs the DevTools facade and registers 12 React tools via the `devtoolstooldiscovery` window event for chrome-devtools-mcp (not an MCP server)"
+        },
+        {
+          "path": "scripts/rollup/build.js",
+          "what": "build driver behind `yarn build` (scripts/rollup/build-all-release-channels.js, package.json:126); related CLIs: scripts/jest/jest-cli.js (`yarn test`) and scripts/release/publish.js (npm publish)"
+        },
+        {
+          "path": "compiler/packages/babel-plugin-react-compiler/src/index.ts",
+          "what": "React Compiler Babel plugin entry (pipeline in src/Entrypoint/Pipeline.ts); Rust port in compiler/crates exposed through napi at compiler/packages/babel-plugin-react-compiler-rust/native"
+        }
+      ],
+      "architecture": "Renderer-agnostic core plus pluggable host configs, bundled per environment. packages/react (index.js, src/ReactHooks.js) defines components, hooks and JSX runtimes. packages/react-reconciler (ReactFiberWorkLoop.js, ReactFiberHooks.js, ReactFiberBeginWork.js, ReactFiberCommitWork.js; host interface ReactFiberConfig.js) with packages/scheduler (src/forks/Scheduler.js) powers the client renderers: packages/react-dom + react-dom-bindings (createRoot in react-dom/src/client/ReactDOMRoot.js; DOM host config react-dom-bindings/src/client/ReactFiberConfigDOM.js), react-native-renderer (Fabric), react-art, react-test-renderer, react-noop-renderer. Server side: packages/react-server implements Fizz streaming SSR (ReactFizzServer.js) and Flight/RSC (ReactFlightServer.js, ReactFlightReplyServer.js for server-function request decoding) with per-runtime stream configs (ReactServerStreamConfig{Node,Edge,Browser,Bun}.js); packages/react-client holds the Flight client (ReactFlightClient.js); packages/react-server-dom-{webpack,turbopack,parcel,esm,unbundled,fb} are bundler-specific RSC bindings. react-server, react-client, react-dom-bindings, react-native-renderer and shared are private workspace packages (private:true) bundled into published artifacts. scripts/shared/inlinedHostConfigs.js lists 24 host-config targets (dom-browser/node/edge/bun, fabric, art, test, noop, custom, ...); scripts/rollup/{build.js,bundles.js} emit dev/prod/profiling/ESM bundles per channel (stable, experimental, www, RN). Tooling packages: react-devtools-* (shared UI/backend, Chrome/Firefox/Edge extensions, Electron CLI, core WebSocket server/backend, inline/fusebox embeds, facade + cdt-mcp), eslint-plugin-react-hooks (TypeScript, embeds React Compiler analysis), react-refresh. compiler/ is a separate Yarn + Cargo workspace: packages/babel-plugin-react-compiler (TypeScript HIR pipeline), crates/* (Rust port, documented as active work in compiler/CLAUDE.md:239-252), react-compiler-runtime, react-compiler-healthcheck, react-forgive (VS Code LSP), react-mcp-server, snap (fixture runner) and apps/playground (Next.js).",
+      "packaging_and_release": "Artifacts: npm packages built by Rollup (plus Closure Compiler for non-ESM production bundles) per release channel - oss-stable (canary versions), oss-stable-semver (@latest), oss-experimental, facebook-www, facebook-react-native (scripts/rollup/build-all-release-channels.js:179-329; scripts/rollup/build.js:375-379,462-475). The publish allow-list is ReactVersions.js:3-6,35-56 (react, react-dom, scheduler, react-reconciler, react-is, react-refresh, react-art, react-test-renderer, use-subscription, use-sync-external-store, jest-react, eslint-plugin-react-hooks, react-server-dom-webpack/turbopack/parcel; react-markup experimental only). CI uploads `artifacts_combined` (build.tgz, build2.tgz) and attests it with actions/attest-build-provenance@v2 on pushes to main/releases/** and same-repo PRs (.github/workflows/runtime_build_and_test.yml:563-593). Release workflow runtime_release_from_ci.yml: weekday cron (16:10) nightly canary+experimental, or manual stable-latest / stable-backport / experimental_only; the publish job sits behind the protected `npm` environment, uses OIDC (id-token: write), Node 24 and accepts no user-supplied ref (lines 42-45,108-198). scripts/release/prepare-release-from-ci.js downloads the CI artifact and runs `gh attestation verify` unless --noVerify (scripts/release/shared-commands/download-build-artifacts.js:99-111; the guard `executableIsAvailable('gh')` at :103 is async and not awaited, so it is always truthy). scripts/release/publish-commands/publish-to-npm.js runs `npm publish --tag <tag>` per package (:34-41, no explicit --provenance flag). No checksum or signature files (GPG/cosign), GitHub Releases or container images are produced by any workflow or script found; the 'checksum' in scripts/release/utils.js:89-96 is a 7-char hash of packages/ written into build-info.json. Separate pipelines: compiler npm packages (babel-plugin-react-compiler, react-compiler-healthcheck, react-compiler-runtime) published with an NPM_TOKEN secret (.github/workflows/compiler_prereleases.yml:25-35,62-68; compiler/scripts/release/shared/packages.js:8-12); Rust crates to crates.io via OIDC (compiler_rust_publish.yml:26-42); react-devtools-cdt-mcp via OIDC (devtools_cdt_mcp_publish.yml:1-4,51-86); DevTools npm packages published manually with an npm OTP prompt and extension-store uploads by hand (scripts/devtools/publish-release.js:36-112). Build output is also committed to builds/facebook-www and builds/facebook-fbsource branches (runtime_commit_artifacts.yml:209-310).",
+      "tests_and_ci": "Frameworks: Jest 30 with jest-circus (package.json:87,139-143; scripts/jest/config.base.js:27,46) driven by scripts/jest/jest-cli.js (release channels stable/experimental/www-classic/www-modern/xplat, dev/prod env, variants, persistent mode, --build for built bundles, devtools project: lines 36-60); Flow per renderer config (package.json:145-146); ESLint and Prettier; Playwright (fixtures/flight, DevTools extension e2e, react-devtools-cdt-mcp e2e, compiler playground); compiler snapshot runner `snap` plus Jest and Cargo. Test dirs: packages/*/src/__tests__ and packages/*/__tests__ (testRegex matches files directly inside any __tests__ dir, config.base.js:26-27), scripts/*/__tests__, compiler/packages/*/src/__tests__ (plus 1,813 compiler snapshot fixture inputs under babel-plugin-react-compiler/src/__tests__/fixtures), compiler/crates/*/tests/*.rs, compiler/apps/playground/__tests__, fixtures/* apps. Approximate count: ~361 files directly in packages/**/__tests__ (about 310 *-test.js/ts plus about 48 *-test.internal.js, a few helpers), 5 under scripts/, 6 compiler *-test.ts unit tests, 4 Rust integration-test files. CI: 26 workflow files in .github/workflows, every job runs on ubuntu-latest, most set `permissions: {}` by default. (Runtime) Build and Test (push to main/releases/**, PRs not touching compiler/**, manual; runtime_build_and_test.yml:7-20): Flow per host config, generated-Fizz-runtime check, feature-flag check, `yarn test` (18 parameter sets x 5 shards), eslint-plugin-react-hooks tests, 25-worker x 2-channel `yarn build` + lint-build, `yarn test --build` (4 sets x 10 shards), DevTools build tests, provenance attestation, error-code and release-dependency checks, DOM and Flight fixture tests, DevTools extension builds (chrome/firefox/edge) + e2e, cdt-mcp e2e, sizebot. Other workflows: shared_lint (prettier, eslint, PATENTS/license check, print-warnings), runtime_eslint_plugin_e2e (ESLint 6-10 fixtures), runtime_fuzz_tests (hourly cron + main), devtools_regression_tests (daily), compiler_typescript (lint, Jest, per-workspace tests), compiler_rust (cargo check/build, Rust-port tests, snap --rust), compiler_playground (Playwright), plus release/publish, artifact-commit, Discord-notify and cache/stale housekeeping. Benchmark harnesses exist (scripts/bench, fixtures/flight-ssr-bench) but no results are checked in.",
+      "dependencies": "Root package.json: private workspace root (workspaces packages/*, 40 packages), 0 dependencies / 113 devDependencies, yarn 1.22.22 (package.json:2-6,119,163), yarn.lock. compiler/package.json: 2 deps / 17 devDeps (+ compiler/yarn.lock; 9 top-level packages + apps/playground). compiler/Cargo.toml: workspace of 11 internal crates plus the napi crate (compiler/packages/babel-plugin-react-compiler-rust/native/Cargo.toml: napi, napi-derive, serde, serde_json + napi-build); react_compiler crate has 10 internal + 4 external deps (indexmap, rustc-hash, serde, serde_json); react_compiler_ast adds serde-transcode (compiler/crates/react_compiler/Cargo.toml:10-24; react_compiler_ast/Cargo.toml:10-20); compiler/Cargo.lock. Per-package manifests read: react 0 deps; scheduler 0; react-dom 1 dep (scheduler) + 1 peer; react-reconciler 1 dep + 1 peer; react-server-dom-webpack 3 deps (acorn-loose, neo-async, webpack-sources) + 3 peers; eslint-plugin-react-hooks 5 deps + 1 peer + 18 devDeps; react-devtools 6 deps (cross-spawn, electron ^23.1.2, internal-ip, minimist, react-devtools-core, update-notifier); react-devtools-core 2 deps (shell-quote, ws) + 5 devDeps; react-devtools-shared (private) 15 deps; react-devtools-cdt-mcp 0 deps + 5 devDeps (chrome-devtools-mcp 1.8.0); compiler react-mcp-server 12 deps (incl. @modelcontextprotocol/sdk, puppeteer, algoliasearch, cheerio) + 4 devDeps; babel-plugin-react-compiler 1 dep + 31 devDeps; react-compiler-healthcheck 8 deps; scripts/release/package.json 15 deps (own yarn.lock). Other lockfiles: scripts/devtools, scripts/bench, per-fixture lockfiles.",
+      "security_policy": "SECURITY.md (7 lines) asks reporters to follow Meta's responsible-disclosure page https://www.facebook.com/whitehat (SECURITY.md:1-7); no in-repo contact address, SLA, supported-versions table or advisory process. Code of conduct contact is opensource-conduct@fb.com (CODE_OF_CONDUCT.md:62)."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:3 - 'React is a JavaScript library for building user interfaces.' (scope relevant to a multi-service container-engine need)",
+        "verified": "yes",
+        "evidence": "packages/react/package.json:3 repeats the description; the repo is a monorepo of UI, renderer and tooling packages (package.json:2-5). Repo-wide searches found no Dockerfile, docker-compose/compose.yaml, Containerfile, .dockerignore or .devcontainer; the only 'docker' string is the CircleCI executor image circleci/node:10.12.0 in packages/react-devtools-extensions/.circleci/config.yml:8-10 (its `yarn prettier:ci` / `yarn lint:ci` steps at :44-50 have no matching scripts in package.json:124-158). No workflow or script builds or pushes container images (no docker/buildx/ghcr hits under .github or scripts)."
+      },
+      {
+        "claim": "README.md:7 - 'We don't make assumptions about the rest of your technology stack'",
+        "verified": "yes",
+        "evidence": "packages/react/package.json has no dependencies or peerDependencies (lines 1-52); react-dom depends only on scheduler (packages/react-dom/package.json:19-24); renderers are chosen via host configs (scripts/shared/inlinedHostConfigs.js:9-753: dom-browser/node/edge/bun, fabric, art, test, noop, custom)."
+      },
+      {
+        "claim": "README.md:7 - 'React can also render on the server using Node'",
+        "verified": "yes",
+        "evidence": "A react-dom/server Node entry exists (packages/react-dom/package.json:60-70,83-86; packages/react-dom/server.node.js:27-28; packages/react-dom/src/server/ReactDOMFizzServerNode.js:135 renderToPipeableStream). It is a rendering API only: the package example leaves the HTTP handler to the user (packages/react-dom/README.md:35-46), and the core runtime packages import no http/https/net modules (only react-devtools-core creates an HTTP(S) server, packages/react-devtools-core/src/standalone.js:340-341)."
+      },
+      {
+        "claim": "README.md:7 - React can 'power mobile apps using React Native'",
+        "verified": "partial",
+        "evidence": "Renderer source exists (packages/react-native-renderer is a private package, package.json:4; 'fabric' host config at scripts/shared/inlinedHostConfigs.js:688-697) but it is not in the npm publish list (ReactVersions.js:35-51). RN artifacts are committed to the builds/facebook-fbsource branch and the OSS renderers are 'sync'd to RN separately' (.github/workflows/runtime_commit_artifacts.yml:152-169,300-310)."
+      },
+      {
+        "claim": "README.md:15-17,21,39 - install and docs live on react.dev (Quick Start, Add React to an Existing Project, Create a New React App); docs repo is reactjs/react.dev",
+        "verified": "not_checkable",
+        "evidence": "All targets are external URLs and were not fetched. The README has no install command and no TypeScript statement (README.md:1-79); the in-repo install command is `npm install react react-dom` (packages/react-dom/README.md:7-9). There is no docs/ directory at the repo root; in-repo docs are package READMEs, compiler/docs and scripts/release/README.md."
+      },
+      {
+        "claim": "README.md:78 - 'React is MIT licensed (./LICENSE)'",
+        "verified": "yes",
+        "evidence": "LICENSE:1-21 is the MIT text, 'Copyright (c) Meta Platforms, Inc. and affiliates'. Every package.json license field found is MIT (e.g. packages/react/package.json:10). The nested license file is MIT-form text for ESLint-derived code (packages/eslint-plugin-react-hooks/src/code-path-analysis/LICENSE:1-19); CI only guards against PATENTS references (scripts/ci/check_license.sh:5-13)."
+      },
+      {
+        "claim": "README.md:1 - CI badges for '(Runtime) Build and Test' and '(Compiler) TypeScript'",
+        "verified": "yes",
+        "evidence": "Workflows with those names exist (.github/workflows/runtime_build_and_test.yml:5; .github/workflows/compiler_typescript.yml:1). The runtime workflow runs Flow, Jest (18 parameter sets x 5 shards), 25-worker x 2-channel builds, build tests, fixtures and DevTools e2e (runtime_build_and_test.yml:134-992), all on ubuntu-latest."
+      },
+      {
+        "claim": "CHANGELOG.md:23 (19.2.4) - 'Add more DoS mitigations to Server Actions, and harden Server Components'",
+        "verified": "partial",
+        "evidence": "Code has hard-coded limits: a cyclic-thenable guard of 1000 iterations (packages/react-server/src/ReactFlightReplyServer.js:149-160), array-size limit default 1,000,000 (:1913,1928), BigInt at most 300 digits (:1919), at most 1000 bound args (:1921). Completeness of the mitigation cannot be judged from source. CHANGELOG.md:1 is 19.2.7 and there is no 19.3.0 entry although ReactVersions.js:21 and packages/react/package.json:7 say 19.3.0."
+      },
+      {
+        "claim": "README.md:1 and README.md:39 link to facebook/react and reactjs/react.dev, while code and manifests name react/react (README vs code naming)",
+        "verified": "partial",
+        "evidence": "Manifests point to react/react (packages/react/package.json:9,46) and workflows reference react/react (.github/workflows/compiler_prereleases_nightly.yml:16; runtime_commit_artifacts.yml:295), while scripts still default to facebook/react (scripts/release/shared-commands/download-build-artifacts.js:17) and the DevTools issue search filters repo:facebook/react (packages/react-devtools-shared/src/devtools/views/ErrorBoundary/githubAPI.js:27). Code treated as authoritative; redirect behavior is not verifiable offline."
+      },
+      {
+        "claim": "packages/react-devtools-cdt-mcp/README.md:9 - 'This is not an MCP server'",
+        "verified": "yes",
+        "evidence": "The package is a browser library: register() installs the DevTools facade and adds a `devtoolstooldiscovery` window listener (src/DevToolsCdtMcp.js:361-396); it has no MCP SDK dependency (package.json:31-37) and defines 12 tools (DevToolsCdtMcp.js:67-293). The only MCP server in the repo is the separate experimental compiler/packages/react-mcp-server (stdio, src/index.ts:488-492)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Rust compiler port: end-to-end compile time over the fixture corpus after the static base registries change (2026-03-29 log entry)",
+        "metric": "total wall time over 1717 fixtures",
+        "value": "1263 ms -> 1031 ms (~18% speedup)",
+        "source": "compiler/docs/rust-port/rust-port-orchestrator-log.md:126-134",
+        "independent": false
+      },
+      {
+        "what": "Rust napi binary (index.node) size, measured on arm64 macOS",
+        "metric": "binary size",
+        "value": "11.2 MB default release -> 7.2 MB with fat LTO + 1 codegen unit + stripped symbols",
+        "source": "compiler/Cargo.toml:28-34",
+        "independent": false
+      },
+      {
+        "what": "Rust port parity with the TypeScript compiler on the fixture corpus (status header of the orchestrator log)",
+        "metric": "fixtures passing",
+        "value": "1724/1724 overall (code comparison 1724/1724); snap end-to-end 1725/1725; HIR stage 1651/1653",
+        "source": "compiler/docs/rust-port/rust-port-orchestrator-log.md:3-9",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope: the repo defines no container or Compose tooling - no Dockerfile, compose file, Containerfile or devcontainer; the only 'docker' string is a CircleCI image in packages/react-devtools-extensions/.circleci/config.yml:8-10. Local multi-process fixtures are started with yarn + concurrently (fixtures/flight/package.json:75-80), and the only documented deployment is the Vercel-hosted compiler playground (compiler/apps/playground/README.md:36-42). Nothing here defines or runs a multi-service application on a container engine.",
+      "Typed usage: library source is Flow-typed (isFlowTyped in scripts/shared/inlinedHostConfigs.js) and no TypeScript declarations ship for react, react-dom, scheduler, react-reconciler or react-server-dom-* (no `types` field: packages/react/package.json:11-52). Only eslint-plugin-react-hooks, react-compiler-runtime and babel-plugin-react-compiler-rust declare types (packages/eslint-plugin-react-hooks/package.json:33; compiler/packages/react-compiler-runtime/package.json:7; compiler/packages/babel-plugin-react-compiler-rust/package.json:6). The playground consumes separate @types/react packages (compiler/apps/playground/package.json:49-50).",
+      "Server-side surface: CHANGELOG.md:1-42 lists seven consecutive patch releases (19.2.1 Dec 2025 to 19.2.7 Jun 2026) containing only React Server Components / Server Actions fixes, several described as DoS mitigation, cycle or loop protection; request-decoding limits are hard-coded constants (packages/react-server/src/ReactFlightReplyServer.js:149-160,1913-1921). The react-server and react-server-dom-webpack READMEs say 'Use it at your own risk' (packages/react-server/README.md:3-7; packages/react-server-dom-webpack/README.md:3-5) while react-server-dom-webpack/turbopack/parcel are in the stable publish list (ReactVersions.js:41-43).",
+      "Release hygiene and maturity at this revision: CHANGELOG.md has no 19.3.0 entry (top entry 19.2.7, CHANGELOG.md:1) though ReactVersions.js:21 and packages/react/package.json:7 say 19.3.0. Source package.json versions differ from ReactVersions.js for eslint-plugin-react-hooks (7.0.0 vs 7.1.1: packages/eslint-plugin-react-hooks/package.json:4, ReactVersions.js:36) and jest-react (0.17.0 vs 0.18.0: packages/jest-react/package.json:3, ReactVersions.js:37); the build rewrites versions (scripts/rollup/build-all-release-channels.js:194-221,264-276). Rust compiler crates are versioned 0.0.1-oidc.0 and documented as active work (compiler/Cargo.toml:9; compiler/CLAUDE.md:239-252). The stale bot closes issues and PRs after 90+7 days of inactivity unless exempt labels apply (.github/workflows/shared_stale.yml:25-27,42,55).",
+      "Experimental AI-tool surfaces: compiler/packages/react-mcp-server is version 0.0.0 with 'no tests' (package.json:3,10) and not in the compiler publish list (compiler/scripts/release/shared/packages.js:8-12); it runs MCP-client-supplied code in a Puppeteer-launched Chrome that loads react@18, react-dom@18 and web-vitals from unpkg (src/tools/runtimePerf.ts:95,208-210), attaches to Chrome on 127.0.0.1:9222 (src/tools/componentTree.ts:5-8) and embeds an Algolia app ID/API key copied from react.dev's site config (src/utils/algolia.ts:11-16). react-devtools-cdt-mcp is experimental, needs chrome-devtools-mcp 1.3.0+ with an experimental flag, and 'can expose component props and hook values to the MCP client' (packages/react-devtools-cdt-mcp/README.md:3-14,64-66).",
+      "DevTools network and permission surface: the standalone server serves its backend script over HTTP and accepts WebSocket connections with no authentication step (packages/react-devtools-core/src/standalone.js:328-364,383-410); default localhost:8097, host/port/TLS settable by env (packages/react-devtools/preload.js:25-45; packages/react-devtools/README.md:90-102). The CLI depends on electron ^23.1.2 and update-notifier (packages/react-devtools/package.json:26,30; bin.js:16-30); the Chrome extension requests <all_urls> host permissions plus scripting/storage/tabs (packages/react-devtools-extensions/chrome/manifest.json:43-53); the error boundary sends error text to api.github.com search (githubAPI.js:15-53). The event logger is off in OSS builds (DevToolsFeatureFlags.*-oss.js:17).",
+      "Supply-chain controls: workflows reference actions by mutable tags (e.g. actions/checkout@v4 at .github/workflows/runtime_release_from_ci.yml:129) with only the Discord action pinned to a SHA (:95); compiler npm prereleases use a long-lived NPM_TOKEN secret (compiler_prereleases.yml:25-35,62-68) while runtime releases use OIDC plus a protected `npm` environment (runtime_release_from_ci.yml:113-121); Dependabot is configured to ignore every dependency with 0 PRs and only for /fixtures/* (.github/dependabot.yml:1-10); build-provenance attestation covers the CI artifact zip only (runtime_build_and_test.yml:583-593), no signatures or checksums for npm tarballs exist in-repo, and the verification guard in scripts/release/shared-commands/download-build-artifacts.js:103 calls an async function without await.",
+      "Platform and reproducibility: CI runs only on ubuntu-latest (no macOS, Windows, WSL or arm64 jobs in any workflow). Building from source needs Node v20.19.0 (.nvmrc:1), Yarn 1.22.22 (package.json:163), Java 11 for the Closure Compiler (runtime_build_and_test.yml:316-324) and a global `yarn link` of the compiler (scripts/react-compiler/link-compiler.sh:13-22). `yarn install` covers the react-devtools workspace that depends on electron (packages/react-devtools/package.json:26); the fuzz workflow skips the Electron binary download (runtime_fuzz_tests.yml:27-28). Rust compiler CI uses the unpinned dtolnay/rust-toolchain@stable (compiler_rust.yml:33) against rust-version 1.85 (compiler/Cargo.toml:11)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "react/react",
+      "checks": [
+        {
+          "field": "readme.install[0] (npm, runtime packages)",
+          "statement": "Install the runtime packages with `npm install react react-dom`.",
+          "citation": "packages/react-dom/README.md:7-9",
+          "holds": true,
+          "note": "Lines 7-9 are a sh code block containing exactly `npm install react react-dom`, under the '## Installation' heading at line 5."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, license file LICENSE.",
+          "citation": "LICENSE:1-21; README.md:78; packages/react/package.json:10",
+          "holds": true,
+          "note": "LICENSE is the standard MIT License text, 'Copyright (c) Meta Platforms, Inc. and affiliates.'. README.md:78 says 'React is [MIT licensed](./LICENSE).' and packages/react/package.json:10 has \"license\": \"MIT\"."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - all CI jobs run on ubuntu-latest (runtime_build_and_test.yml:39,220,305; Playwright Linux deps at :762); workflows do not state the CPU architecture and the README states no platform support.",
+          "citation": ".github/workflows/runtime_build_and_test.yml:39,220,305,762; README.md:1-79",
+          "holds": true,
+          "note": "All 66 runs-on lines across .github/workflows are literally `ubuntu-latest`, including :39, :220 and :305. Line 762 is `npx playwright install --with-deps chromium`. No workflow contains arm64/aarch64/x64/amd64/macos/windows/self-hosted. README.md (79 lines) makes no OS or CPU support statement. The x86_64 part rests on GitHub's ubuntu-latest runner type, and the dossier says so."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "Two experimental pieces: (1) compiler/packages/react-mcp-server, a stdio MCP server with tools query-react-dev-docs, compile, review-react-runtime, parse-react-component-tree and prompt review-react-code, version 0.0.0 with 'no tests', documented only as a dev setup with a Claude Desktop config, not in the compiler publish list; (2) packages/react-devtools-cdt-mcp, 'not an MCP server', a browser library registering 12 React tools for chrome-devtools-mcp 1.3.0+ with --categoryExperimentalThirdParty=true.",
+          "citation": "compiler/packages/react-mcp-server/src/index.ts:8-9,37,80,293,370,409,488-492; compiler/packages/react-mcp-server/package.json:3,10; compiler/packages/react-mcp-server/README.md:7-22; compiler/scripts/release/shared/packages.js:8-12; packages/react-devtools-cdt-mcp/README.md:3-14,42-57; packages/react-devtools-cdt-mcp/src/DevToolsCdtMcp.js:67-293",
+          "holds": true,
+          "note": "index.ts:8-9 imports McpServer and StdioServerTransport, and :489-490 connects a StdioServerTransport. server.tool is called at :37 (query-react-dev-docs), :80 (compile), :293 (review-react-runtime) and :370 (parse-react-component-tree), and server.prompt at :409 (review-react-code). There are no other registrations. package.json:3 is \"0.0.0\" and :10 is \"echo 'no tests'\". The README contains only a Development section with a Claude Desktop config. PUBLISHABLE_PACKAGES lists only babel-plugin-react-compiler, react-compiler-healthcheck and react-compiler-runtime. cdt-mcp README:9 reads 'This is **not** an MCP server', and :13-14 requires chrome-devtools-mcp 1.3.0+ and the flag. The config at :42-57 passes --categoryExperimentalThirdParty=true. DevToolsCdtMcp.js defines 12 react_* tools at :69-272."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "README.md:3 'React is a JavaScript library for building user interfaces.' (scope vs a multi-service container-engine need), verified yes: no Dockerfile/compose/Containerfile/.dockerignore/.devcontainer; 'the only docker string is the CircleCI executor image circleci/node:10.12.0 in packages/react-devtools-extensions/.circleci/config.yml:8-10'; its prettier:ci/lint:ci steps have no matching scripts in package.json:124-158; no docker/buildx/ghcr hits under .github or scripts.",
+          "citation": "README.md:3; packages/react/package.json:3; package.json:2-5,124-158; packages/react-devtools-extensions/.circleci/config.yml:8-10,44-50",
+          "holds": false,
+          "note": "The conclusion holds. README.md:3 and packages/react/package.json:3 contain the sentence verbatim, and package.json:2-5 is a private workspace root. No container files exist anywhere, and nothing under .github or scripts mentions docker, buildx, ghcr or podman. config.yml:8-10 is the circleci/node:10.12.0 executor, and its prettier:ci and lint:ci steps (:46, :50) match no script in any package.json. One sentence is false as written: the CircleCI image is not 'the only docker string'. `is-docker` npm package entries also appear in yarn.lock:10894-10906 and in the yarn.lock files of fixtures/flight, fixtures/owner-stacks, fixtures/view-transition and packages/react-devtools-cdt-mcp/fixtures/app. These are dependency names, not container files, so 'verified: yes' still stands."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "Non-blocking. claim_checks[0].evidence: replace \"the only 'docker' string is the CircleCI executor image circleci/node:10.12.0 in packages/react-devtools-extensions/.circleci/config.yml:8-10\" with \"apart from `is-docker` npm package entries in lockfiles (yarn.lock:10894-10906; fixtures/flight, fixtures/owner-stacks, fixtures/view-transition and packages/react-devtools-cdt-mcp/fixtures/app yarn.lock), the only 'docker' string is the CircleCI executor image circleci/node:10.12.0 in packages/react-devtools-extensions/.circleci/config.yml:8-10\".",
+        "Non-blocking. risks[0]: qualify \"the only 'docker' string is a CircleCI image in packages/react-devtools-extensions/.circleci/config.yml:8-10\" the same way, adding \"apart from `is-docker` dependency entries in yarn.lock and four fixture lockfiles\"."
+      ]
+    }
+  ]
+}

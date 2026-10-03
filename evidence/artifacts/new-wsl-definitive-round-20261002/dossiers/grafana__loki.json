@@ -1,0 +1,313 @@
+{
+  "contender": "grafana/loki",
+  "revision": {
+    "contender": "grafana/loki",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "grafana/loki",
+        "tag": "v3.7.8",
+        "commit": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v3.7.8",
+    "commit": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+    "read_at": "2026-10-02T03:02:26+00:00"
+  },
+  "dossier": {
+    "contender": "grafana/loki",
+    "revision": {
+      "tag": "v3.7.8",
+      "commit": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+      "read_at": "2026-10-02T03:02:26+00:00"
+    },
+    "license": {
+      "spdx": "AGPL-3.0-only",
+      "file": "LICENSE"
+    },
+    "purpose": "Loki is Grafana Labs' multi-tenant log-aggregation server written in Go: one binary whose roles are chosen with `-target` (default `all` = single-binary mode). It indexes only per-stream label sets, stores compressed log chunks plus 'structured metadata' on the local filesystem or object storage, ingests logs through its push API (`/loki/api/v1/push`) and an OTLP/HTTP logs endpoint (`/otlp/v1/logs`), and answers LogQL queries over an HTTP API and `logcli`. Facts that bear on the stated needs: (1) Loki is not a collector or privacy filter - the README names Grafana Alloy (a separate repo) as the agent; Loki's own OTLP path can only drop attributes or map them to index labels / structured metadata, and it stores the log body verbatim; (2) there is no OTLP metrics receiver and no metrics store (OTLP logs only; recording rules can remote-write to a Prometheus-compatible backend); (3) OTLP log records are stored as logs and are queryable locally with LogQL; (4) Loki has no log-exploration or dashboard UI of its own (docs defer to Grafana, a separate project; the in-repo 'Loki UI' is an experimental, off-by-default deployment-operations UI); (5) there is no trace store, dataset/experiment store or LLM-evaluation tooling; (6) there is no model-serving/inference code and no GPU use.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Loki is 'a horizontally-scalable, highly-available, multi-tenant log aggregation system inspired by Prometheus', designed to be 'very cost effective and easy to operate'.",
+          "citation": "README.md:10-11"
+        },
+        {
+          "claim": "It 'does not index the contents of the logs, but rather a set of labels for each log stream' (no full-text indexing; compressed, unstructured logs plus a metadata index).",
+          "citation": "README.md:12,16"
+        },
+        {
+          "claim": "Loki 'has native support in Grafana (needs Grafana v6.0)'; a Loki-based stack is Alloy (agent that gathers logs and sends them to Loki) + Loki (stores logs, processes queries) + Grafana (querying and displaying the logs).",
+          "citation": "README.md:19,21-25"
+        },
+        {
+          "claim": "'Alloy replaced Promtail in the stack, because Promtail is considered to be feature complete'; future log-collection development is in Grafana Alloy.",
+          "citation": "README.md:27"
+        },
+        {
+          "claim": "Loki wants 'a single-binary, easy to operate system with no dependencies' and differs from Prometheus 'by focusing on logs instead of metrics, and delivering logs via push, instead of pull'.",
+          "citation": "README.md:29-30"
+        },
+        {
+          "claim": "Helm chart migration: effective March 16, 2026 the Loki Helm chart is forked to grafana-community/helm-charts; the chart in the Loki repo stays maintained for GEL users only.",
+          "citation": "README.md:38-39"
+        },
+        {
+          "claim": "Doc entry points: API docs 'for getting logs into Loki'; LogCLI 'provides a command-line interface for querying logs'; Loki Canary 'monitors your Loki installation for missing logs'; Docker driver client sends container logs to Loki.",
+          "citation": "README.md:52,55-57"
+        },
+        {
+          "claim": "Build from source: `go build ./cmd/loki` then `./loki -config.file=./cmd/loki/loki-local-config.yaml` ('single host, no-dependencies mode'); on Unix `make loki` builds ./cmd/loki/loki.",
+          "citation": "README.md:98-122"
+        },
+        {
+          "claim": "Multi-tenant local run: set auth_enabled true and use `-config.file=./cmd/loki/loki-local-multi-tenant-config.yaml -runtime-config.file=./cmd/loki/loki-overrides.yaml`.",
+          "citation": "README.md:124-131"
+        },
+        {
+          "claim": "License: 'Grafana Loki is distributed under AGPL-3.0-only (LICENSE). For Apache-2.0 exceptions, see LICENSING.md.'",
+          "citation": "README.md:140"
+        },
+        {
+          "claim": "A fuzzing-status badge (OSS-Fuzz project loki) and a CI badge for the `check` workflow are shown.",
+          "citation": "README.md:3,6"
+        }
+      ],
+      "install": [
+        {
+          "method": "APT package (Debian/Ubuntu) from the Grafana APT repository (repo must be added first per the linked Grafana instructions)",
+          "command": "apt-get update && apt-get install loki",
+          "citation": "docs/sources/setup/install/local.md:23-39 (package contents: tools/packaging/nfpm.jsonnet:14-34 - /usr/bin/loki, systemd unit, /etc/loki/config.yml)"
+        },
+        {
+          "method": "RPM package via dnf from the Grafana RPM repository",
+          "command": "dnf update && dnf install loki",
+          "citation": "docs/sources/setup/install/local.md:23-32"
+        },
+        {
+          "method": "Pre-built release binary (zip) from GitHub Releases, Linux amd64 (release-note template variable ${DRONE_TAG} replaced by this tag; docs say to fetch the config from the Git ref matching the Loki version)",
+          "command": "curl -O -L https://github.com/grafana/loki/releases/download/v3.7.8/loki-linux-amd64.zip && unzip loki-linux-amd64.zip && chmod a+x loki-linux-amd64 && wget https://raw.githubusercontent.com/grafana/loki/main/cmd/loki/loki-local-config.yaml && ./loki-linux-amd64 -config.file=loki-local-config.yaml",
+          "citation": "tools/release-note.md:23-29; docs/sources/setup/install/local.md:41-75"
+        },
+        {
+          "method": "Docker (Linux); docs pin 3.7.0 and say to adjust the version; config first downloaded with: wget https://raw.githubusercontent.com/grafana/loki/v3.7.0/cmd/loki/loki-local-config.yaml -O loki-config.yaml",
+          "command": "docker run --name loki -d -v $(pwd):/mnt/config -p 3100:3100 grafana/loki:3.7.0 -config.file=/mnt/config/loki-config.yaml",
+          "citation": "docs/sources/setup/install/docker.md:30-40"
+        },
+        {
+          "method": "Docker Compose (Loki + Alloy + Grafana getting-started example; files fetched from examples/getting-started at v3.7.0)",
+          "command": "docker-compose -f docker-compose.yaml up",
+          "citation": "docs/sources/setup/install/docker.md:89-112"
+        },
+        {
+          "method": "Build from source (Go and make; Docker only needed to regenerate protobuf/yacc)",
+          "command": "git clone https://github.com/grafana/loki && cd loki && go build ./cmd/loki && ./loki -config.file=./cmd/loki/loki-local-config.yaml   (alternative: make loki -> ./cmd/loki/loki)",
+          "citation": "README.md:102-122; docs/sources/setup/install/install-from-source.md:18-39"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - `make dist` builds loki, logcli, loki-canary and lokitool for linux/amd64 (Makefile:328-331) and the release jobs run it with SKIP_ARM=false in golang:1.26.6 (.github/workflows/patch-release-pr.yml:118-139); docs show `./loki-linux-amd64 -config.file=loki-local-config.yaml` (docs/sources/setup/install/local.md:71-75); deb/rpm and OCI images are also built (tools/packaging/nfpm.sh:7-13; .github/release-workflows.jsonnet:18-35); PR CI test-builds linux/amd64 (.github/workflows/build-loki-binary.yml:21-22).",
+        "wsl2": "yes (indirect, WSL not WSL2-specific) - no Loki doc names WSL2; the Docker-Compose quickstart says it 'assumes you are running Linux or MacOS. Windows users can follow the same steps using Windows Subsystem for Linux' (docs/sources/get-started/quick-start/tutorial.md:54). The Linux binary is built static with CGO_ENABLED=0 (Makefile:54,216). No WSL-specific notes or tests found and CI has no Windows runner.",
+        "macos_arm64": "yes (build only) - darwin/arm64 binaries for loki, logcli, loki-canary and lokitool are part of `make dist` (Makefile:328-331) with SKIP_ARM=false in the release job (.github/workflows/patch-release-pr.yml:122; .github/release-workflows.jsonnet:59). Docs: quickstart 'assumes you are running Linux or MacOS' (tutorial.md:54); LogCLI 'Builds are available for Linux, Mac, and Windows' (docs/sources/query/logcli/getting-started.md:31); source build works on Unix (README.md:114-122). Caveats: the loki install page lists only Windows and Linux run commands (docs/sources/setup/install/local.md:63-75) and no macOS runner exists in CI (searched .github for macos/windows runners: none).",
+        "gpu": "no - CPU-only Go service; no CUDA/GPU/ML-inference/LLM code or docs in the non-vendor tree (case-insensitive search for cuda|nvidia|gpu|inference|llm|ollama|vllm|openai|anthropic matched only unrelated text and the two Claude CI workflows)."
+      },
+      "integrations": {
+        "cli": "`loki` server binary (cmd/loki/main.go:44-151: -config.file, -target, -verify-config, -list-targets, -version, -health/-health.url via cmd/loki/health.go:11-52); `logcli` (cmd/logcli/main.go:35-348,577-591: query, instant-query, labels, series, stats, volume, volume_range, detected-fields, fmt, delete; --addr/LOKI_ADDR, --org-id, --stdin to query a local file; docs/sources/query/logcli/getting-started.md:22-47,65-69); `lokitool` (cmd/lokitool/main.go:19-27: rules, audit, version); also loki-canary, querytee, migrate, chunks-inspect, dataobj-inspect, logql-analyzer under cmd/.",
+        "mcp": "none found - case-insensitive search of the non-vendor tree for 'mcp' / 'model context protocol' found no server or client. AGENTS.md:39 only mentions an editor tool named `mcp__acp__Write` as a contributor sandbox note.",
+        "sdk_or_api": "HTTP API (docs/sources/reference/loki-http-api.md): push `POST /loki/api/v1/push` (snappy+protobuf or JSON, :211-258) and `POST /otlp/v1/logs` (OTLP/HTTP logs, :270-283); query endpoints query, query_range, labels, label/<name>/values, series, index/stats, index/volume, patterns, tail (:41-52); status /ready, /metrics, /config (:54-63). Note: 'authorization is not part of the Loki API' (:15-18). gRPC `logproto.Pusher` is registered by the distributor in microservices mode (pkg/loki/modules.go:399-403). Go module github.com/grafana/loki/pkg/push (pkg/push/go.mod:1, Apache-2.0 per LICENSING.md:18). No first-party Python/JS SDK in the repo; third-party clients are listed in docs/sources/send-data/_index.md:37-68.",
+        "claude_code_or_codex": "none found for telemetry - no Claude Code/Codex configuration, OTLP recipe or doc in the repo (search for 'claude' / 'codex' outside vendor/ matches only .gitignore:77 `**/.claude/settings.local.json` and two CI workflows). The repo itself runs anthropics/claude-code-action on its own issues/PRs (.github/workflows/claude.yml:45-47; .github/workflows/claude-code-review.yml:43-47) and ships contributor-agent files AGENTS.md and .cursor/skills/go/SKILL.md. Generic path documented for any OTLP/HTTP sender: OpenTelemetry Collector otlphttp exporter with endpoint http://<loki-addr>/otlp (docs/sources/shared/otel.md:40-57)."
+      },
+      "telemetry_and_network": "Usage reporting ('analytics') is ON by default: Loki POSTs a JSON report to https://stats.grafana.org/loki-usage-report every 4h (pkg/analytics/stats.go:26,75-99; pkg/analytics/reporter.go:44-45,61-62). The report carries a random persistent cluster UID (seed file loki_cluster_seed.json written to the configured object store; reporter.go:36,136-139,285-291), version, OS/arch, target, edition 'oss', Go memstats, CPU/goroutine counts and aggregate counters/strings registered via analytics.New* (ingested bytes/lines, store/index/schema types, compactor retention settings, query throughput; e.g. pkg/loghttp/push/push.go:73-75, pkg/storage/store.go:51-53, pkg/compactor/compactor.go:78-79, pkg/analytics/stats.go:61-72,102-169). Docs say it excludes log payloads, label values, tenant identifiers and query strings (docs/sources/configure/usage-statistics.md:21); no log content is registered in the stats I found. Opt-out: `analytics.reporting_enabled: false` or `-reporting.enabled=false` (usage-statistics.md:25-36); knobs -reporting.proxy-url and -reporting.tls-config.* (reporter.go:62-64). The shipped configs only comment out the opt-out (cmd/loki/loki-local-config.yaml:54-65), and that same file is packaged as /etc/loki/config.yml in deb/rpm (tools/packaging/nfpm.jsonnet:25-29). When the UI ring is enabled, GET /analytics returns the report that would be sent (pkg/analytics/handler.go:21-32; pkg/loki/modules.go:2303). Own tracing: tracing.enabled defaults true (pkg/tracing/config.go:12) but spans are exported only if JAEGER_* / OTEL_TRACES_EXPORTER / OTEL_EXPORTER_OTLP_(TRACES_)ENDPOINT env vars are set (vendor/github.com/grafana/dskit/tracing/otel_jaeger.go:55-69). Loki serves Prometheus metrics for pull at /metrics (docs/sources/reference/loki-http-api.md:60). golang.org/x/telemetry appears only as an indirect dependency of vendored x/tools goimports (go.mod:332; no Loki code imports it). Only hard-coded external endpoint in non-test pkg code is the usage-stats URL. No account, license key or SaaS service is required: the single binary runs with filesystem storage and an in-memory ring (cmd/loki/loki-local-config.yaml:9-19); object storage, Alertmanager (ruler.alertmanager_url, :47-48), memcached and Kafka are optional. Network exposure: HTTP listen address defaults to all interfaces (vendor/github.com/grafana/dskit/server/server.go:193), Loki sets port 3100 (pkg/loki/loki.go:259-260), gRPC 9095 (server.go:209; local config uses 9096); no built-in authentication (docs/sources/setup/install/local.md:20); auth.enabled defaults true and then requires X-Scope-OrgID (pkg/loki/loki.go:159-162). README.md (read in full) does not mention usage reporting, OTLP, MCP or GPUs."
+    },
+    "code": {
+      "languages": [
+        "Go (go 1.26.5 per go.mod:3; build image golang:1.26.6, Makefile:29; ~2,400 .go files under pkg/cmd/clients/tools/integration/production incl. generated and test files)",
+        "Protocol Buffers (~39 .proto files under pkg/ and clients/)",
+        "yacc/ragel grammars for LogQL (pkg/logql/**/*.y, *.rl)",
+        "Jsonnet/libsonnet (production/loki-mixin, production/ksonnet, .github release-workflow generators, tools/packaging/nfpm.jsonnet)",
+        "YAML / Helm templates (production/helm/loki)",
+        "Ruby (clients/cmd/fluentd and clients/cmd/logstash output plugins)",
+        "Python (only tools/bigtable-backup/bigtable-backup.py)",
+        "Shell and Nix (flake.nix, nix/)"
+      ],
+      "entry_points": [
+        {
+          "path": "cmd/loki/main.go",
+          "what": "Loki server; roles via -target (default all); also -version, -verify-config, -list-targets, -health; wires pkg/loki"
+        },
+        {
+          "path": "cmd/logcli/main.go",
+          "what": "LogCLI (kingpin): query, instant-query, labels, series, stats, volume, volume_range, detected-fields, fmt, delete; --addr/LOKI_ADDR, --org-id, --stdin"
+        },
+        {
+          "path": "cmd/lokitool/main.go",
+          "what": "lokitool: rules and audit commands plus version"
+        },
+        {
+          "path": "cmd/loki-canary/main.go",
+          "what": "Loki Canary: writes synthetic log lines and checks they can be read back (flags such as -addr, -push, -interval, -size, -wait)"
+        },
+        {
+          "path": "cmd/querytee/main.go",
+          "what": "loki-query-tee proxy (pkg/querytee with a response comparator) that fans queries out to multiple backends"
+        },
+        {
+          "path": "cmd/migrate/main.go",
+          "what": "Chunk/index migration between two Loki stores; its README warns the tool is not well tested (cmd/migrate/README.md:3)"
+        },
+        {
+          "path": "cmd/dataobj-inspect/main.go",
+          "what": "kingpin CLI to inspect data objects (dump, stats, list-streams, print-streams)"
+        },
+        {
+          "path": "clients/cmd/docker-driver/main.go",
+          "what": "Docker logging-driver plugin shipping container logs to Loki (Apache-2.0 client code); cmd/chunks-inspect and cmd/logql-analyzer are further small tools"
+        }
+      ],
+      "architecture": "One Go module (github.com/grafana/loki/v3, go.mod:1) produces a `loki` binary whose roles are chosen with `-target` (default `all`; aliases read/write/backend and individual services; module/dependency table at pkg/loki/loki.go:149-158,810-866; route registration and init in pkg/loki/modules.go) on grafana/dskit services, rings and memberlist. Write path: pkg/distributor/http.go handlers parse push and OTLP requests through pkg/loghttp/push (push.go, otlp.go, otlp_config.go) -> pkg/distributor -> pkg/ingester (WAL + pkg/chunkenc chunks) -> chunk store on filesystem/object storage via pkg/storage with a TSDB label index (pkg/storage/stores/shipper/indexshipper/tsdb; index.go:407 AddSeries stores label sets + chunk metadata, not line contents). Read path: pkg/lokifrontend + pkg/scheduler + pkg/querier evaluate LogQL (pkg/logql; grammar pkg/logql/syntax/syntax.y). Background services: pkg/compactor (compaction, retention, delete API), pkg/ruler (alert/recording rules; recording rules remote-write to Prometheus-compatible backends, docs/sources/operations/recording-rules.md:9,17), pkg/pattern (pattern ingester + metric aggregation pushed back to a Loki address, pkg/pattern/aggregation/config.go:13). Experimental subsystems (category experimental in pkg/loki/loki.go:95,105-106,117-122): pkg/engine (v2 query engine), pkg/dataobj (columnar data objects), pkg/bloombuild + pkg/bloomgateway, pkg/kafka ingestion, pkg/limits. Cross-cutting: pkg/validation (per-tenant limits incl. otlp_config), pkg/analytics (usage reporting), pkg/ui (experimental deployment UI, off by default), pkg/tracing. Apache-2.0 subtrees (LICENSING.md:9-22): clients/ (Docker driver, Fluent Bit plugin, a Promtail library without a main package, Ruby fluentd/logstash plugins), pkg/push, pkg/loghttp, pkg/logproto, pkg/util, production/ (Helm chart, ksonnet, mixins), tools/.",
+      "packaging_and_release": "Artifacts: `make dist` cross-builds loki, logcli, loki-canary and lokitool with CGO_ENABLED=0 for linux/amd64, linux/arm64, linux/arm, darwin/amd64, darwin/arm64, windows/amd64 and freebsd/amd64 (SKIP_ARM=false in release jobs), zips each as <bin>-<os>-<arch>.zip and writes dist/SHA256SUMS (Makefile:317-334; .github/workflows/patch-release-pr.yml:118-139). `make packages` adds .deb/.rpm for loki, loki-canary and logcli on amd64/arm64/arm (tools/packaging/nfpm.sh:7-13); the loki package ships /usr/bin/loki, a systemd unit and /etc/loki/config.yml, and its post-install script enables and restarts the service (tools/packaging/nfpm.jsonnet:14-34; tools/packaging/loki-postinstall.sh:26-33). OCI images (distroless static:nonroot, UID 10001; cmd/loki/Dockerfile:20-32): loki, logcli, loki-canary(+boringcrypto) and helm-test for linux/amd64,arm64,arm; querytee and the Docker driver for amd64,arm64; fluentd/fluent-bit/logstash plugin images for amd64 (.github/release-workflows.jsonnet:18-35). Flow: release-please PR workflows (.github/workflows/minor-release-pr.yml, patch-release-pr.yml) build into Google Artifact Registry; .github/workflows/release.yml (push to main, release-X.Y.x, kN: release.yml:397-402) creates a DRAFT GitHub release via release-please, uploads dist/* (release.yml:96-120), publishes images to a GAR mirror (us-docker.pkg.dev/grafanalabs-global/dockerhub-loki-prod-mirror; release.yml:7-8,287-327) and then un-drafts it (release.yml:356-358). Integrity: SHA256SUMS only; no cosign/sigstore/GPG/SLSA-attestation step found in .github or tools; weekly image builds set `provenance: true` (.github/vendor/github.com/grafana/loki-release/workflows/build.libsonnet:144; .github/workflows/images.yml:85) and .github/workflows/syft-sbom-ci.yml creates an SPDX SBOM when a release is created (:22-25); release notes template has no verification instructions (tools/release-note.md). Reusable check/release logic lives in grafana/loki-release pinned at 6cba58c3... (release.yml:10; check.yml:3), outside this tree, so what it signs is not checkable here. At tag v3.7.8, .release-please-manifest.json:2 and CHANGELOG.md:3 still read 3.7.7. Docs also list Helm ('recommended') and Tanka for Kubernetes (docs/sources/setup/install/_index.md:12-18), but the Helm chart is no longer released from this repo (production/helm/loki/Chart.yaml:5-6 = chart 6.55.0 / appVersion 3.6.7; README.md:38-39). A Nix flake builds loki/logcli/loki-canary for developers (nix/README.md:13-24; .github/workflows/nix-ci.yaml:42-44).",
+      "tests_and_ci": "Go `testing` + testify (go.mod:94), goleak (go.mod:99), gotestsum in CI. 835 `*_test.go` files outside vendor/ (pkg 734 incl. pkg/push, clients 82, integration 11, tools 5, production 2, cmd 1) plus 3 Ruby spec files under clients/cmd. `make test` runs `go test ./...` with coverage (Makefile:378-379); the integration suite is behind `//go:build integration` and runs via `make test-integration` (integration/*.go; Makefile:382-383), including an OTLP ingest+query test (integration/loki_micro_services_test.go:659; helper integration/client/client.go:180-226). Fuzzing: `make test-fuzz` (Makefile:717-720) and an OSS-Fuzz badge (README.md:6). LogQL benchmark/correctness harness in pkg/logql/bench (pkg/logql/bench/README.md:3,42). CI (.github/workflows): check.yml calls the reusable grafana/loki-release check workflow (check.yml:3) which, per the vendored source (.github/vendor/github.com/grafana/loki-release/workflows/validate.libsonnet:36-243), runs golangci-lint (v2.10.1 per .github/release-workflows.jsonnet:9), faillint, `make check-generated-files / check-mod / check-doc / validate-example-configs`, lint-scripts, check-format, per-package `gotestsum -tags=assert`, the pkg/push module tests, the integration tests and a docs-site build; build-loki-binary.yml cross-builds linux/amd64,arm64,arm on PRs; helm-ci.yml and helm-diff-ci.yml (Helm chart), lint-jsonnet.yml, nix-ci.yaml, logql-correctness.yml (schedule/PR), logql-bench.yml (manual), conventional-commits.yml, verify-release-workflow.yaml, secret-scanning.yml (TruffleHog), snyk.yml (Snyk monitor), relyance.yml (daily), images.yml and querytee-images.yml (image publish), plus the release workflows. All runners are Linux (ubuntu-x64/ubuntu-arm64; no macOS or Windows runner found).",
+      "dependencies": "Root go.mod (module github.com/grafana/loki/v3, go 1.26.5): 170 direct requires (no '// indirect'), 312 '// indirect', 482 total; everything is vendored under vendor/ (vendor/modules.txt lists 482 modules). OTLP parsing uses go.opentelemetry.io/collector/pdata v1.59.0 (go.mod:161); other notable direct deps: grafana/dskit, prometheus/prometheus, prometheus/alertmanager, prometheus/otlptranslator, cloud/storage SDKs (aws-sdk-go-v2, GCP, Azure, Alibaba, Baidu, IBM, Swift), franz-go (Kafka), arrow-go + parquet-go, zombiezen sqlite, hashicorp consul. 8 replace directives (forks of azure-storage-blob-go, gocql, memberlist, regexp, objstore, go-syslog; local ./pkg/push) and 1 exclude (go.mod:502-523); `ignore ./tools/dev` (go.mod:5). Submodule pkg/push/go.mod: 3 direct (gogo/protobuf, testify, grpc), 8 indirect. Frozen Helm chart production/helm/loki/Chart.yaml:13-28: 3 chart dependencies (minio 5.4.0, grafana-agent-operator 0.5.2, rollout-operator 0.43.0). 8 jsonnetfile.json manifests (.github, production/ksonnet/*, production/*-mixin, tools/dev/k3d). No package.json or Python requirements file found.",
+      "security_policy": "none - no SECURITY.md at the repo root or in .github/ (only vendored third-party copies under vendor/), and README.md / CONTRIBUTING.md contain no vulnerability-reporting instructions; an org-level GitHub policy, if any, is not checkable here. Related: internal maintainer runbook docs/sources/community/maintaining/release/patch-vulnerabilities.md; Renovate with vulnerability/OSV alerts (.github/renovate.json5:280-289); Snyk monitor (.github/workflows/snyk.yml); TruffleHog (.github/workflows/secret-scanning.yml); zizmor config (.github/zizmor.yml)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Loki focuses on logs and takes data by push (README.md:29-30). The README never mentions OTLP; docs add 'Loki natively supports ingesting OpenTelemetry logs over HTTP' (docs/sources/shared/otel.md:20).",
+        "verified": "yes",
+        "evidence": "pkg/loki/modules.go:420-422 registers POST /api/prom/push, /loki/api/v1/push and /otlp/v1/logs behind tenant + ingestion-policy middleware (:405-412; paths in pkg/util/constants/api_paths.go:33,44). The OTLP parser handles only the logs signal (plogotlp.NewExportRequest, pkg/loghttp/push/otlp.go:118), content types application/x-protobuf or application/json by exact header match (:120-138; the native push path strips media-type parameters via mime.ParseMediaType at pkg/loghttp/push/push.go:363, the OTLP path does not) and Content-Encoding gzip/zstd/lz4/none (:69-101). A search of non-vendor Go code found no pmetricotlp/ptraceotlp/otlpreceiver or OTLP collector gRPC stubs, so there is no OTLP metrics, traces or gRPC ingestion. OTLP/structured metadata also requires schema v13 + TSDB index or startup validation fails (pkg/loki/validation.go:39-52). With the default auth.enabled=true a request without X-Scope-OrgID gets 401 (pkg/loki/loki.go:159-162; docs/sources/operations/multi-tenancy.md:25); the shipped local config sets auth_enabled: false, tenant 'fake' (cmd/loki/loki-local-config.yaml:1). OTLP ingest+query is exercised by integration/loki_micro_services_test.go:659."
+      },
+      {
+        "claim": "'a single-binary, easy to operate system with no dependencies'; run `go build ./cmd/loki` with loki-local-config.yaml (README.md:29,98-112).",
+        "verified": "yes",
+        "evidence": "cmd/loki/main.go is the server main and the default target is `all` (pkg/loki/loki.go:149-150); the config uses filesystem chunks/rules, in-memory ring KV, tsdb/v13 schema and no external service (cmd/loki/loki-local-config.yaml:9-19,32-40). Caveats found in the same file: usage reporting to stats.grafana.org stays enabled (:54-65), an optional Alertmanager URL is listed (:47-48), the pattern ingester with metric aggregation pushes to localhost:3100 (:42-45; pkg/pattern/aggregation/config.go:13), data goes under /tmp/loki (:9-15) and log_level is debug (:6)."
+      },
+      {
+        "claim": "Loki 'does not index the contents of the logs, but rather a set of labels for each log stream' (README.md:12,16).",
+        "verified": "yes",
+        "evidence": "The TSDB index writer stores a label set + fingerprint with chunk metadata (min/max time, checksum), not line text (pkg/storage/stores/shipper/indexshipper/tsdb/index/index.go:407-420,511-517); lines and structured metadata live in chunks (pkg/chunkenc/memchunk.go); the shipped schema is tsdb/v13 (cmd/loki/loki-local-config.yaml:32-40). Exception: experimental bloom-filter build/gateway components accelerate content filters (pkg/loki/loki.go:105-106 category experimental; docs/sources/release-notes/v3-0.md:21)."
+      },
+      {
+        "claim": "'Alloy replaced Promtail in the stack, because Promtail is considered to be feature complete' (README.md:27).",
+        "verified": "partial",
+        "evidence": "Docs and code differ from the README: docs say 'Promtail is end of life (EOL) as of March 2, 2026. Commercial support has ended. No future support or updates will be provided' (docs/sources/send-data/promtail/_index.md:12). There is no clients/cmd/promtail entry point in the tree (clients/cmd holds only docker-driver, fluent-bit, fluentd, logstash) and the Makefile has no promtail build target (Makefile:125-138,180-281), although the Apache-licensed library code clients/pkg/promtail remains. The part about Alloy being the agent is consistent with docs/sources/send-data/_index.md:21."
+      },
+      {
+        "claim": "Loki 'has native support in Grafana (needs Grafana v6.0)' (README.md:19).",
+        "verified": "not_checkable",
+        "evidence": "Grafana is a separate repository. Docs differ from the README on the version: 'Grafana versions after 6.3 have built-in support' and 'Grafana Loki does not have its own user interface' (docs/sources/visualize/grafana.md:17). In-repo integration tests exercise Loki APIs used by exploration UIs (integration/explore_logs_test.go:31-60), not Grafana itself."
+      },
+      {
+        "claim": "Docs: 'When running Loki as a docker container, the UI service is enabled by default. No additional configuration is required.' (docs/sources/operations/loki-ui/_index.md:31)",
+        "verified": "no",
+        "evidence": "Code wins: -ui.enabled defaults to false (pkg/ui/config.go:55; docs/sources/shared/configuration.md:115), initUIRing/initUI return nil unless enabled (pkg/loki/modules.go:2272-2274,2323-2326), the Docker image CMD only sets -config.file (cmd/loki/Dockerfile:32) and cmd/loki/loki-docker-config.yaml has no ui block; only the Helm chart turns it on via values (production/helm/loki/values.yaml:340-341). The page itself is draft: true (:5) and describes an experimental deployment-ops UI (nodes, rings, analyze labels, deletes: :12-15,58-69), not a log explorer."
+      },
+      {
+        "claim": "Docs: OTLP data maps to Loki so that 'Everything under LogRecord except LogRecord.Body, LogRecord.TimeUnixNano and sometimes LogRecord.ObservedTimestamp' becomes structured metadata, and 17 default resource attributes become index labels (docs/sources/shared/otel.md:87-104,118-121; docs/sources/send-data/otel/_index.md:33).",
+        "verified": "partial",
+        "evidence": "Code stores the body verbatim as the line (pkg/loghttp/push/otlp.go:577), log attributes per otlp_config actions (:489-514), severity number/text, observed_timestamp, dropped_attributes_count, flags, trace_id, span_id (:519-573) and scope name/version/dropped count + scope attributes (:322-339). But LogRecord.EventName (present in vendored pdata: vendor/go.opentelemetry.io/collector/pdata/plog/generated_logrecord.go:150) is never read - no EventName reference exists under pkg/, cmd/, integration/ or docs/. The default index-label list in code has 18 attributes, including `deployment.environment` (pkg/loghttp/push/otlp_config.go:56-75), versus 17 in the docs. Attribute rules support drop / structured_metadata (index_label for resource attributes only) by name or regex, first match wins (otlp_config.go:12-22,91-104,118-126; docs/sources/send-data/otel/_index.md:55-81,116); no body redaction exists."
+      },
+      {
+        "claim": "Docs: usage statistics are anonymous, enabled by default, and 'Loki does not report log payloads, label values, tenant identifiers, or query strings' (docs/sources/configure/usage-statistics.md:8,21); config comment says 'anonymous, but uniquely-identifiable' (cmd/loki/loki-local-config.yaml:54-56).",
+        "verified": "yes",
+        "evidence": "-reporting.enabled defaults true (pkg/analytics/reporter.go:61), URL https://stats.grafana.org/loki-usage-report (pkg/analytics/stats.go:26), 4h interval (reporter.go:45), persistent random cluster UID (reporter.go:136-139), report fields are version/OS/arch/target/edition plus memstats and registered aggregate stats (stats.go:61-72,102-169); registered stats are counters/strings such as bytes/lines received, store/index/schema types, retention settings (pkg/loghttp/push/push.go:73-75; pkg/storage/store.go:51-53; pkg/compactor/compactor.go:78-79; pkg/ingester/ingester.go:85-88); none carry log content, labels, tenants or queries. Minor drift: cmd/loki/loki-docker-config.yaml:37 points at a nonexistent pkg/usagestats/stats.go (real file pkg/analytics/stats.go, as cited in loki-local-config.yaml:60)."
+      },
+      {
+        "claim": "License: 'AGPL-3.0-only (LICENSE). For Apache-2.0 exceptions, see LICENSING.md' (README.md:140).",
+        "verified": "yes",
+        "evidence": "LICENSE is the GNU AGPL v3 text (LICENSE:1-2); LICENSING.md:5,9-22 lists Apache-2.0 subtrees; LICENSE_APACHE2 files exist in clients/, pkg/ingester/wal, pkg/loghttp, pkg/logproto, pkg/logqlmodel, pkg/util, production/ and tools/, and pkg/push/LICENSE is Apache-2.0. Gap: pkg/framedstdcopy/ is listed as Apache-2.0 but has no license file. The OTLP parser (pkg/loghttp/push) is Apache-2.0 while pkg/loki, pkg/distributor and cmd/ are AGPL. deb/rpm metadata says 'AGPL-3.0' (tools/packaging/nfpm.jsonnet:50). FAQ: relicensed from Apache 2.0 in 2021; network use of a modified version triggers source-offer duties (docs/sources/community/faqs.md:17-19)."
+      },
+      {
+        "claim": "Helm chart migration: the Loki Helm chart is forked to grafana-community/helm-charts and the in-repo chart stays for GEL users only (README.md:38-39).",
+        "verified": "yes",
+        "evidence": "production/helm/loki/Chart.yaml:5-6 is frozen at chart 6.55.0 / appVersion 3.6.7, matching docs/sources/setup/upgrade/upgrade-to-community/_index.md:14 ('6.55.0 (appVersion 3.6.7) was the last release from the Loki repository') and :19 (GEL support removed from the community chart). Docs install page still lists Helm as 'recommended' (docs/sources/setup/install/_index.md:14)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Loki sizing guide - microservices-mode resource requests for the <100 TB/month (3 TB/day) tier",
+        "metric": "CPU/memory requests per component x replicas, stated to be based on p90 resource utilisation",
+        "value": "Ingester 6 x (2 CPU, 4 GiB); Distributor 4 x (2 CPU, 0.5 GiB); Index gateway 4 x (0.5 CPU, 2 GiB); Querier 10 x (1 CPU, 1 GiB); Query-frontend 2 x (1 CPU, 2 GiB); Query-scheduler 2 x (1 CPU, 0.5 GiB); Compactor 1 x (2 CPU, 10 GiB); table columns sum to 38 CPU / 59 GiB (summed by the dossier author)",
+        "source": "docs/sources/setup/size/_index.md:19,31-41",
+        "independent": false
+      },
+      {
+        "what": "Ingester WAL disk footprint",
+        "metric": "steady WAL-only disk utilisation ('based on tests in real world')",
+        "value": "~10-15 GB for an ingester with 5000 series ingesting ~5 MB/s and a 5-minute checkpoint period",
+        "source": "docs/sources/operations/storage/wal.md:67-71",
+        "independent": false
+      },
+      {
+        "what": "Monolithic (-target=all) deployment capacity guidance",
+        "metric": "approximate read/write volume per day (guidance; no method given)",
+        "value": "up to approximately 20 GB per day",
+        "source": "docs/sources/get-started/deployment-modes.md:19-23",
+        "independent": false
+      },
+      {
+        "what": "LogQL pattern match filter versus regex",
+        "metric": "relative speed claim in the 3.0 release notes (no data or method given)",
+        "value": "'10x faster than using regex'",
+        "source": "docs/sources/release-notes/v3-0.md:27",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope: the only OTLP path is POST /otlp/v1/logs over HTTP (pkg/loki/modules.go:422; parser pkg/loghttp/push/otlp.go:118). No OTLP metrics, traces or gRPC receiver exists in non-vendor code, and the project has no metrics store, trace store, dataset/experiment store or model serving (README.md:29-30; docs/sources/get-started/overview.md:13). The OTLP Content-Type must match exactly application/x-protobuf or application/json (otlp.go:120-138), and OTLP/structured metadata needs schema v13 + TSDB or startup validation errors (pkg/loki/validation.go:39-52). LogRecord.EventName is not stored although docs say all LogRecord fields are kept (docs/sources/shared/otel.md:121).",
+      "Privacy: no ingest-time redaction - the OTLP log body is stored verbatim (`Line: log.Body().AsString()`, pkg/loghttp/push/otlp.go:577); only attribute-level drop / structured_metadata / index_label rules exist (pkg/loghttp/push/otlp_config.go:12-22; docs/sources/send-data/otel/_index.md:55-81) and the docs delegate body transforms to the collector (otel/_index.md:94-112). The delete API is registered only when compactor retention is enabled, which defaults to false (pkg/compactor/config.go:55; docs/sources/operations/storage/logs-deletion.md:43); default retention_period 0s means no automatic expiry (pkg/validation/limits.go:426) and the filesystem store never deletes on disk pressure (docs/sources/configure/storage.md:228).",
+      "Outbound telemetry is default-on: usage reports go to https://stats.grafana.org/loki-usage-report every 4h with a persistent cluster UID stored in the object store (pkg/analytics/stats.go:26; pkg/analytics/reporter.go:36,45,61,136-139). The README quick-start config and the deb/rpm /etc/loki/config.yml only comment out the opt-out (cmd/loki/loki-local-config.yaml:54-65; tools/packaging/nfpm.jsonnet:25-29); opt-out is `analytics.reporting_enabled: false` or `-reporting.enabled=false` (docs/sources/configure/usage-statistics.md:25-36).",
+      "Exposure defaults: no built-in authentication or authorization (docs/sources/setup/install/local.md:20; docs/sources/reference/loki-http-api.md:15-18); HTTP binds to all interfaces by default on port 3100 (vendor/github.com/grafana/dskit/server/server.go:193; pkg/loki/loki.go:259-260); the README quick-start config sets auth_enabled: false (single tenant 'fake', cmd/loki/loki-local-config.yaml:1; docs/sources/operations/multi-tenancy.md:22-23) while the code default is auth.enabled=true requiring X-Scope-OrgID (pkg/loki/loki.go:159-162); admin endpoints (/config, /flush, /log_level, ingester shutdown) share the listener (loki-http-api.md:54-63,74-80); the experimental UI has no authentication (docs/sources/operations/loki-ui/_index.md:24).",
+      "Packaged defaults: the deb/rpm install cmd/loki/loki-local-config.yaml as /etc/loki/config.yml and auto-enable/restart a systemd unit (tools/packaging/nfpm.jsonnet:25-29; tools/packaging/loki-postinstall.sh:26-33). That config sets log_level: debug, keeps chunks/rules/index under /tmp/loki (cmd/loki/loki-local-config.yaml:6,9-15) and enables the pattern ingester with metric aggregation pushing to localhost:3100 (:42-45), so durability, verbosity and disk growth depend on the operator editing it.",
+      "Ingestion defaults can reject or drop events: per-tenant 4 MB/s (burst 6 MB), 256 KB max line, 15 label names, structured metadata 64 KB / 128 entries, reject_old_samples=true with 7d max age and 10m creation grace (pkg/validation/limits.go:317-327,351-354,491-494); oversized attributes get HTTP 400 and the entry is discarded (docs/sources/send-data/otel/_index.md:85-90).",
+      "Licensing: core is AGPL-3.0-only (README.md:140; LICENSE) with Apache-2.0 only for the subtrees in LICENSING.md:9-22; modified versions offered over a network must be made available under the same license (docs/sources/community/faqs.md:19); pkg/framedstdcopy/ is listed as Apache-2.0 but ships no license file; the project relicensed from Apache-2.0 in 2021 (faqs.md:17).",
+      "Maintenance and drift at this tag: README says Promtail is 'feature complete' while docs say EOL since March 2, 2026 (README.md:27 vs docs/sources/send-data/promtail/_index.md:12); the Loki UI doc claims Docker enables it by default but code defaults to off (pkg/ui/config.go:55); in-repo Helm chart is frozen at 6.55.0 / appVersion 3.6.7 (production/helm/loki/Chart.yaml:5-6); Simple Scalable mode is deprecated for removal in 4.0 (docs/sources/get-started/overview.md:37); .release-please-manifest.json:2 and CHANGELOG.md:3 still say 3.7.7 at tag v3.7.8; query_engine, dataobj, kafka, bloom and ingest-limits are marked experimental (pkg/loki/loki.go:95,105-106,117-122). Release assets carry SHA256SUMS only, no signatures or attestations found in this repo's workflows, and the reusable release/check workflows are pinned in an external repo (Makefile:334; .github/workflows/release.yml:10). One named default maintainer plus @grafana/loki-team (MAINTAINERS.md:1; CODEOWNERS:2); release branches 3.7.x/3.6.x get security-only dependency updates (.github/renovate.json5:22-35); no SECURITY.md."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "grafana/loki",
+      "checks": [
+        {
+          "field": "readme.install[2] - pre-built release binary (Linux amd64)",
+          "statement": "Download loki-linux-amd64.zip from the v3.7.8 GitHub release, unzip, chmod a+x, wget loki-local-config.yaml (command uses the main-branch URL; method text notes the docs want the version-matching Git ref), then run ./loki-linux-amd64 -config.file=loki-local-config.yaml.",
+          "citation": "tools/release-note.md:23-29; docs/sources/setup/install/local.md:41-75",
+          "holds": true,
+          "note": "release-note.md:24-28 has the curl/unzip/chmod steps with ${DRONE_TAG}; .git/packed-refs maps v3.7.8 -> 09e6ce2f. Asset name confirmed: gox writes dist/{{.Dir}}-{{.OS}}-{{.Arch}} and zips each file with -j (Makefile:317,328,333), and release.yml:119 uploads dist/* to the GitHub release. local.md:60 is the literal main-branch wget and local.md:73-74 the Linux run command. Caveat: local.md:56-57 says to use the Git ref matching the downloaded version, so for this pin the config URL should be https://raw.githubusercontent.com/grafana/loki/v3.7.8/cmd/loki/loki-local-config.yaml. The dossier states that rule but its command keeps the docs' literal main URL. Recommended non-blocking fix: replace main with v3.7.8. Whether the published release carries the asset can't be checked from the tree."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX AGPL-3.0-only; license file LICENSE.",
+          "citation": "LICENSE:1-2; LICENSING.md:5,9-22; README.md:140",
+          "holds": true,
+          "note": "LICENSE is the GNU Affero GPL v3 text (header :1-2, END OF TERMS AND CONDITIONS :619). LICENSING.md:5: 'The default license for this project is AGPL-3.0-only'; README.md:140 matches. As the dossier notes elsewhere, LICENSING.md:9-22 carves out Apache-2.0 subtrees (clients/, pkg/push, pkg/loghttp, pkg/logproto, pkg/util, production/, tools/, ...) and vendor/ keeps upstream licenses (:24-28)."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - make dist builds loki, logcli, loki-canary and lokitool for linux/amd64; release jobs run it with SKIP_ARM=false in golang:1.26.6; docs show ./loki-linux-amd64; deb/rpm and OCI images also built; PR CI test-builds linux/amd64.",
+          "citation": "Makefile:328-331; .github/workflows/patch-release-pr.yml:118-139; docs/sources/setup/install/local.md:71-75; tools/packaging/nfpm.sh:7-13; .github/release-workflows.jsonnet:18-35; .github/workflows/build-loki-binary.yml:21-22",
+          "holds": true,
+          "note": "Every citation matches. Makefile:328-331: linux/amd64 is in the osarch list for all four binaries (SKIP_ARM ?= false at :320). patch-release-pr.yml:122 SKIP_ARM: false, :134 golang:1.26.6 (= Makefile:29 GO_VERSION), :139 'make dist packages'. local.md:73-74 has the Linux run command. nfpm.sh:7-13 builds rpm+deb for loki/loki-canary/logcli on amd64/arm64/arm. release-workflows.jsonnet:18-35 includes linux/amd64 for the loki/logcli/canary images. build-loki-binary.yml:21-22 has goos [linux], goarch [amd64, arm64, arm], with CGO_ENABLED=0 (:42)."
+        },
+        {
+          "field": "readme.integrations.sdk_or_api",
+          "statement": "HTTP API: POST /loki/api/v1/push (snappy+protobuf or JSON) and POST /otlp/v1/logs; query and status endpoints; 'authorization is not part of the Loki API'; gRPC logproto.Pusher registered by the distributor in microservices mode; Go module github.com/grafana/loki/pkg/push (Apache-2.0); no first-party Python/JS SDK; third-party clients listed in docs.",
+          "citation": "docs/sources/reference/loki-http-api.md:15-18,41-52,54-63,211-258,270-283; pkg/loki/modules.go:399-403; pkg/push/go.mod:1; LICENSING.md:18; docs/sources/send-data/_index.md:37-68",
+          "holds": true,
+          "note": "All cited lines match. API doc :16 has the authorization note; :214-225 snappy protobuf (application/x-protobuf) or JSON; :273-282 /otlp/v1/logs, with collector endpoint http://<LOKI_ADDR>/otlp. Query list :43-52 also has index/volume_range, which the dossier omits (harmless). Status list :58-63. modules.go:401-402 registers the gRPC Pusher only when the target is not all/write/ingester, so it is absent in the default single-binary mode, as stated. Routes are registered in code at modules.go:420-422. pkg/push/go.mod:1 module path confirmed; LICENSING.md:18 lists pkg/push. Outside vendor/ there is no package.json, pyproject.toml or setup.py; the only manifest is tools/bigtable-backup/requirements.txt, a backup tool and not an SDK. That file contradicts the dossier's separate dependencies remark 'No ... Python requirements file found'."
+        },
+        {
+          "field": "claim_checks[0] (logs-only OTLP/push ingestion; verified: yes)",
+          "statement": "/otlp/v1/logs is registered next to /loki/api/v1/push and /api/prom/push behind auth + ingestion-policy middleware. The OTLP parser is logs-only, with exact Content-Type match (x-protobuf/json) and gzip/zstd/lz4/none encoding. No OTLP metrics, traces or gRPC ingestion. Schema v13 + TSDB is required. Requests without X-Scope-OrgID get 401 when auth is enabled (the default). Covered by an integration test.",
+          "citation": "README.md:29-30; docs/sources/shared/otel.md:20; pkg/loki/modules.go:405-412,420-422; pkg/util/constants/api_paths.go:33,44; pkg/loghttp/push/otlp.go:69-101,118-138; pkg/loghttp/push/push.go:363; pkg/loki/validation.go:39-52; pkg/loki/loki.go:159-162; docs/sources/operations/multi-tenancy.md:25; cmd/loki/loki-local-config.yaml:1; integration/loki_micro_services_test.go:659",
+          "holds": true,
+          "note": "Verdict 'yes' is correct; every citation matches. otlp.go:118 uses plogotlp.NewExportRequest. :120-137 switches on the raw Content-Type header against 'application/x-protobuf' (otlp.go:36) and 'application/json' (push.go:79), so a parameterised type is rejected, while the native path strips parameters via mime.ParseMediaType (push.go:363). Grep of non-vendor Go for pmetricotlp|ptraceotlp|otlpreceiver|RegisterGRPCServer|/v1/metrics|/v1/traces: 0 hits. validation.go:46-52 errors when structured metadata is allowed without schema v13 + tsdb. loki.go:159-162: auth.enabled defaults true, otherwise OrgID 'fake'. multi-tenancy.md:25 documents the 401. TestOTLPLogsIngestQuery is at :659. Minor: loki-local-config.yaml:1 only sets auth_enabled: false; the 'fake' tenant name comes from loki.go:161 / multi-tenancy.md:23."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

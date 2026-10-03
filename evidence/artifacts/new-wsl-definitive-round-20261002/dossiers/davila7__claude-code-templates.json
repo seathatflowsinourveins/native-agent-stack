@@ -1,0 +1,301 @@
+{
+  "contender": "davila7/claude-code-templates",
+  "revision": {
+    "contender": "davila7/claude-code-templates",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "davila7/claude-code-templates",
+        "tag": "v1.29.6",
+        "commit": "c02f0e3e5e128aa52ba43bcde4cccd377d35ec46",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v1.29.6",
+    "commit": "c02f0e3e5e128aa52ba43bcde4cccd377d35ec46",
+    "read_at": "2026-10-02T03:02:04+00:00"
+  },
+  "dossier": {
+    "contender": "davila7/claude-code-templates",
+    "revision": {
+      "tag": "v1.29.6",
+      "commit": "c02f0e3e5e128aa52ba43bcde4cccd377d35ec46",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Node.js CLI (npm package claude-code-templates, alias cct) plus a component catalog, website/API and local dashboards. The CLI downloads individual Claude Code components (agents, commands, MCP configs, settings, hooks, skills, loops, mods, project templates) from this repo's main branch into a project's .claude/ directory. The catalog (cli-tool/components/) aggregates first-party and many third-party components: 900 SKILL.md files on disk, 877 skills per the generated counts. It is not a single upstream skills collection; the README attribution lists more than ten upstream sources. A separate Rust cct preview (v0.1.0) ports the install path. Sources: README.md:61,146-167; CLAUDE.md:5-7; dashboard/public/counts.json:1; cli-rust/README.md:3-9.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Ready-to-use configurations for Anthropic's Claude Code: a collection of AI agents, custom commands, settings, hooks, external integrations (MCPs) and project templates.",
+          "citation": "README.md:61"
+        },
+        {
+          "claim": "Interactive web interface (aitmpl.com) to explore and install '100+ agents, commands, settings, hooks, and MCPs'.",
+          "citation": "README.md:65"
+        },
+        {
+          "claim": "Install components with npx claude-code-templates@latest --agent|--command|--setting|--hook|--mcp <category/name> --yes, or run it interactively.",
+          "citation": "README.md:72-85"
+        },
+        {
+          "claim": "Skills are 'Reusable capabilities with progressive disclosure' (examples: PDF processing, Excel automation, custom workflows).",
+          "citation": "README.md:96"
+        },
+        {
+          "claim": "Skills can be installed from the CLI. The sponsor block (Bright Data, sponsored placement) gives: npx claude-code-templates@latest --skill web-data/search,web-data/scrape,web-data/data-feeds,web-data/bright-data-mcp,web-data/bright-data-best-practices,development/brightdata-local-search --mcp web-data/brightdata --yes",
+          "citation": "README.md:34-55"
+        },
+        {
+          "claim": "Extra tools: --analytics dashboard, --chats (with --tunnel: 'Secure remote access via Cloudflare Tunnel'), --health-check, and --plugins dashboard ('view marketplaces, installed plugins, and manage permissions').",
+          "citation": "README.md:100-132"
+        },
+        {
+          "claim": "docs.aitmpl.com holds 'Complete guides, examples, and API reference for all components and tools' (external site, not in the repo).",
+          "citation": "README.md:136"
+        },
+        {
+          "claim": "Contributing guidelines cover adding 'agents, commands, MCPs, settings, or hooks' (skills are not named).",
+          "citation": "README.md:140"
+        },
+        {
+          "claim": "The collection includes components from many sources: K-Dense-AI/claude-scientific-skills (139 scientific skills), anthropics/skills (21), anthropics/claude-code (10), obra/superpowers (14), alirezarezvani/claude-skills (36), wshobson/agents (48), NerdyChefsAI, awesome-claude-code (21 commands), awesome-claude-skills, others.",
+          "citation": "README.md:146-165"
+        },
+        {
+          "claim": "'Each of these resources retains its original license and attribution'.",
+          "citation": "README.md:167"
+        },
+        {
+          "claim": "'This project is licensed under the MIT License'.",
+          "citation": "README.md:170-172"
+        },
+        {
+          "claim": "Not stated anywhere in the README: telemetry or data collection, network requirements, Codex support, Linux/macOS/WSL support, per-task skill selection, release verification.",
+          "citation": "README.md:1-190"
+        }
+      ],
+      "install": [
+        {
+          "method": "npx, interactive (needs Node.js)",
+          "command": "npx claude-code-templates@latest",
+          "citation": "README.md:77"
+        },
+        {
+          "method": "npx, component flags, non-interactive (skills + MCP example)",
+          "command": "npx claude-code-templates@latest --skill web-data/search,web-data/scrape,web-data/data-feeds,web-data/bright-data-mcp,web-data/bright-data-best-practices,development/brightdata-local-search --mcp web-data/brightdata --yes",
+          "citation": "README.md:54"
+        },
+        {
+          "method": "Rust preview, install script (cli-rust/dist/install.sh is not present in the tree at this revision)",
+          "command": "curl -fsSL https://raw.githubusercontent.com/davila7/claude-code-templates/main/cli-rust/dist/install.sh | sh",
+          "citation": "cli-rust/README.md:21"
+        },
+        {
+          "method": "Rust preview, cargo-binstall",
+          "command": "cargo binstall --git https://github.com/davila7/claude-code-templates claude-code-templates",
+          "citation": "cli-rust/README.md:22"
+        },
+        {
+          "method": "Rust preview, from source",
+          "command": "cargo install --path cli-rust",
+          "citation": "cli-rust/README.md:23"
+        },
+        {
+          "method": "npm global from GitHub Packages (printed only in a CI summary; scope @davila7)",
+          "command": "npm install -g @davila7/claude-code-templates --registry=https://npm.pkg.github.com",
+          "citation": ".github/workflows/publish-package.yml:77"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes (code/CI evidence, not executed). README has no platform matrix. Node CLI is plain JS (cli-tool/package.json:86-88 engines node>=14; global fetch in cli-tool/src/index.js:1568 and health-check.js:324-332 effectively need Node 18+). CI runs on ubuntu-latest (.github/workflows/publish-package.yml:19). Rust preview builds x86_64-unknown-linux-gnu (.github/workflows/build-rust-cli.yml:35).",
+        "wsl2": "unknown. No WSL2 statement in README or docs. The only code reference is a WSL_DISTRO_NAME check when choosing the enterprise managed-settings path (cli-tool/src/index.js:849-850, 1212).",
+        "macos_arm64": "yes (not stated in README; code/CI evidence). Rust preview builds aarch64-apple-darwin (.github/workflows/build-rust-cli.yml:33); Node CLI has darwin branches (cli-tool/src/index.js:845-848) and osascript use (cli-tool/src/claude-api-proxy.js:438).",
+        "gpu": "no. The CLI does not use a GPU; no GPU or CUDA references in cli-tool/src, cli-tool/bin or cli-rust/src (searched). Some catalog skills under skills/ai-research are instruction text for GPU workloads, not a GPU feature of the tool."
+      },
+      "integrations": {
+        "cli": "Yes. npm bins claude-code-templates and cct (package.json:6-9; cli-tool/package.json:6-15 lists 8 aliases). Commander flags in cli-tool/bin/create-claude-config.js:11-54 include --agent --command --mcp --setting --hook --skill --loop --mod --directory --yes --dry-run --health-check --analytics --chats --plugins --skills-manager --teams --sandbox --studio. --skill category/name[,..] downloads the whole skill directory to <dir>/.claude/skills/<name>/ (cli-tool/src/index.js:1549-1676). Rust cct preview handles install flags natively and delegates everything else to npx -y claude-code-templates@latest (cli-rust/src/main.rs:30-41; cli-rust/src/commands/delegate.rs:36-53).",
+        "mcp": "No MCP server is shipped. --mcp category/name installs MCP server configs from the catalog (103 configs per dashboard/public/counts.json:1) into <dir>/.mcp.json (cli-tool/src/index.js:661-667). The website registers read-only WebMCP browser tools for the catalog, build-flag gated (dashboard/src/lib/webmcp.ts:1-20). The repo-root .mcp.json (Linear, Neon) is the maintainers' own config (.mcp.json:1-15).",
+        "sdk_or_api": "No documented SDK. package.json main points at cli-tool/src/index.js, which exports createClaudeConfig and showMainMenu (cli-tool/src/index.js:3727) but this is undocumented. HTTP: Astro API routes on the website (dashboard/src/pages/api/*.ts: track-*, collections, github/token, discord/interactions, health-check, claude-code-check) and static JSON catalogs (dashboard/public/components.json, counts.json, search-index.json, components/{type}.json, component-content/**). README.md:136 mentions an 'API reference' at docs.aitmpl.com (external, not read).",
+        "claude_code_or_codex": "Claude Code: yes, the only target. Writes .claude/{agents,commands,skills,hooks,scripts,loops}, .claude/settings*.json (project/local/user/enterprise paths, cli-tool/src/index.js:836-865) and .mcp.json; --prompt launches claude (index.js:2746-2750); --mod installs early-access Claude Mods as plugin dirs under .claude/skills/ (needs CLAUDE_CODE_ENABLE_FUNCTION_HOOKS=1 and Claude Code >=2.1.259; index.js:1727-1830); the skills dashboard reads ~/.claude/skills, .claude/skills and ~/.claude/plugins (cli-tool/src/skill-dashboard.js:15-17,34,106). Codex: none found. Zero 'codex' matches in README.md, CLAUDE.md, CONTRIBUTING.md, cli-tool/src, cli-tool/bin, cli-rust, .github; no .codex or .agents install target. Codex appears only as catalog content: skills development/codex and development/codex-review, agent data-ai/blueprint-mode-codex, and 20 SKILL.md files with author: openai (e.g. cli-tool/components/skills/security/security-best-practices/SKILL.md:4)."
+      },
+      "telemetry_and_network": "Default-on telemetry in the Node CLI; README.md does not mention it. Fire-and-forget POSTs to www.aitmpl.com with a 5 s timeout: /api/track-download-supabase after each successful install (type, name, path = relative target dir or component name, category, cliVersion; cli-tool/src/tracking-service.js:112-140; skill call at cli-tool/src/index.js:1661-1667), /api/track-installation-outcome (component type/name, success or failure, error type and message, duration, CLI and Node versions, platform, arch, batchId; tracking-service.js:296-346) and /api/track-command-usage for dashboard, health, stats and sandbox commands (tracking-service.js:223-270). Server side stores IP address, user-agent and country for downloads in Supabase (dashboard/src/pages/api/track-download-supabase.ts:45-67) and outcomes/command usage in Neon (track-installation-outcome.ts:55-75; track-command-usage.ts:57-77). Opt-out: CCT_NO_TRACKING=true, CCT_NO_ANALYTICS=true or CI=true (literal 'true' only; tracking-service.js:15-25); Rust cct also honours '1' (cli-rust/src/tracking.rs:12-18). Opt-out is documented only outside the README (.github/WORKFLOWS_REFERENCE.md:82-83; cli-rust/README.md:52-53; CLAUDE.md:390-396). Opt-in Sentry crash reports (CCT_ERROR_REPORTING=true) go to a hardcoded public DSN (cli-tool/src/error-reporting.js:18-44). Required network: api.github.com and raw.githubusercontent.com on every component install, with no offline mode and no ref pinning (index.js:1559-1613); no account or API key is needed for installs. Other network use: --health-check GETs api.anthropic.com (health-check.js:362-386); --sandbox and --studio need E2B/Anthropic keys (index.js:2954-2999); --tunnel needs a separately installed cloudflared (analytics.js:1344-1354); --clone-session downloads from an arbitrary URL (session-sharing.js:266-267); session-upload code for x0.at exists (session-sharing.js:209-257) but no call site was found in cli-tool/src. Maintainer-run services (Supabase, Neon, Clerk, Discord, Telegram, Resend, Sentry; CLAUDE.md:246-405) are not needed to install components."
+    },
+    "code": {
+      "languages": [
+        "JavaScript (Node.js CommonJS CLI)",
+        "TypeScript, Astro and React (dashboard, analytics-ui, mods)",
+        "Python (catalog and CI scripts, hook and skill scripts)",
+        "Rust (cli-rust)",
+        "Shell",
+        "Markdown, JSON and YAML (components)"
+      ],
+      "entry_points": [
+        {
+          "path": "cli-tool/bin/create-claude-config.js",
+          "what": "Node CLI binary (bins claude-code-templates and cct; 8 aliases in cli-tool/package.json); commander options including --skill"
+        },
+        {
+          "path": "cli-tool/src/index.js",
+          "what": "createClaudeConfig dispatcher and installIndividual{Agent,Command,MCP,Setting,Hook,Skill,Loop,Mod}; package main (module.exports at line 3727)"
+        },
+        {
+          "path": "cli-rust/src/main.rs",
+          "what": "Rust cct preview binary: native install of agents, commands, mcps, settings, hooks, skills; delegates the rest to the Node CLI via npx"
+        },
+        {
+          "path": "cli-tool/src/security-audit.js",
+          "what": "Component validator CLI (npm run security-audit*), five validators under cli-tool/src/validation/"
+        },
+        {
+          "path": "scripts/skillspector_scan.py",
+          "what": "CI orchestrator that runs NVIDIA SkillSpector over skill directories and emits Markdown, SARIF and Action outputs"
+        },
+        {
+          "path": "scripts/generate_components_json.py",
+          "what": "Catalog generator: docs/components.json and dashboard/public/** artifacts"
+        },
+        {
+          "path": "dashboard/src/pages/api/*.ts",
+          "what": "HTTP API routes of the website on Cloudflare Pages (tracking, collections, Discord, health)"
+        },
+        {
+          "path": "cli-tool/src/sandbox-server.js",
+          "what": "Claude Code Studio local server (--studio); binds 127.0.0.1 since 1.29.4"
+        }
+      ],
+      "architecture": "Node CommonJS CLI: cli-tool/bin/create-claude-config.js (commander) calls cli-tool/src/index.js (3,727-line dispatcher). Component installers fetch files live from davila7/claude-code-templates@main (cli-tool/components/{agents,commands,mcps,settings,hooks,skills,loops,mods,sandbox}) through raw.githubusercontent.com and the GitHub contents API. Skills are downloaded recursively, kept in a category/name tree in the repo, and written under <dir>/.claude/skills/<last path segment>/. Project templates use cli-tool/src/templates.js and file-operations.js (download cli-tool/templates/*/CLAUDE.md etc. with backup/merge prompts). Local dashboards (Express + ws): analytics.js with analytics/**, chats-mobile.js, plugin-dashboard.js, skill-dashboard.js (read-only skill viewer), teams-dashboard.js, sandbox-server.js. Telemetry: tracking-service.js and error-reporting.js. Validation: cli-tool/src/validation/* plus security-audit.js (CI and catalog generation only, not run at install). Catalog pipeline: scripts/generate_components_json.py to docs/components.json and dashboard/public/**. Website/API: dashboard/ (Astro 5 + React on Cloudflare Pages) and cloudflare-workers/* cron and report workers. Rust preview: cli-rust/ (clap, reqwest) mirrors the install path and delegates other flags to npx -y claude-code-templates@latest. Repo-local .claude/ agents and commands are maintainer tooling.",
+      "packaging_and_release": "npm package claude-code-templates is published manually from the root package.json (v1.29.6). Its files whitelist is cli-tool/bin, cli-tool/src, cli-tool/components/sandbox, cli-tool/package.json and README.md, so the tarball contains no skills, agents or commands (package.json:46-52; manual npm publish with a granular token per CLAUDE.md:210-244). .npmrc sets ignore-scripts=true (.npmrc:1). The only publish workflow (.github/workflows/publish-package.yml:3-6,34-41,62-66) pushes @davila7/claude-code-templates to GitHub Packages from cli-tool/package.json (v1.29.4 at this revision) on release or manual dispatch, after npm test. Rust: build-rust-cli.yml on tags cli-rust-v* builds macOS arm64/x64, Linux x64/arm64 (gnu) and Windows x64 and attaches cct-<target>.tgz to a GitHub Release (lines 11-16, 33-37, 78-82). No checksums, signatures, SBOM, npm provenance or attestations in any workflow (searched .github for provenance, attest, cosign, sigstore, sha256, checksum: none). No GitHub Action is pinned by SHA. CHANGELOG.md newest section is 1.29.4 (2026-07-13), behind the 1.29.6 tag.",
+      "tests_and_ci": "Tests were not executed by me. Jest 30 (cli-tool/jest.config.js, coverage thresholds 70-80%): 13 test files plus setup.js in cli-tool/tests (7 unit, 1 integration, 5 validation; about 264 test/it calls). DataService.test.js:11 and StateService.test.js:11 read cli-tool/src/analytics-web/services/*.js, which do not exist at this revision. Root npm test is only echo 'No tests specified' (package.json:12); the Jest suite runs in CI only inside publish-package.yml:50-52. Also 9 TypeScript mod tests under cli-tool/components/mods/games/** (no workflow runs them), 1 Python test (scripts/test_generate_plugins_json.py), and Rust: 27 #[test] functions across 7 files, including tests/integration.rs with 2 network tests marked #[ignore]. 17 workflows in .github/workflows: rust-ci.yml (cli-rust PRs: fmt, clippy -D warnings, cargo test, informational network tests); mods-typecheck.yml (tsc over mods plus plugin-structure check); skill-security-scan.yml (PRs: SkillSpector --no-llm on changed skills, fails above risk 50, installed from NVIDIA main); skill-security-scan-all.yml (weekly, report-only); component-security-validation.yml (security-audit over agents/commands/mcps/settings/hooks .md, continue-on-error); generated-files-guard.yml and component-pr-welcome.yml (pull_request_target PR bots); build-rust-cli.yml; publish-package.yml; deploy.yml (dashboard to Cloudflare Pages); update-json-data.yml (daily catalog regeneration commit); star-history.yml; four daily-*-discord.yml and discord-release-notification.yml. CLAUDE.md:87-170 requires a component-reviewer subagent check for component changes; this is a maintainer convention, not a CI job.",
+      "dependencies": "Root package.json (the published npm manifest): 18 runtime deps, 0 dev (@clack/prompts, @supabase/supabase-js, axios, boxen, chalk, chokidar, commander, dotenv, express, fs-extra, gradient-string, inquirer, js-yaml, open, ora, qrcode, uuid, ws); cli-tool/src does not import axios, @supabase/supabase-js or dotenv. cli-tool/package.json: 15 runtime plus 2 dev (jest, jest-watch-typeahead), engines node>=14. cli-rust/Cargo.toml: 15 deps plus 1 dev (tempfile), Cargo.lock committed. dashboard/package.json (private): 16 deps. cli-tool/analytics-ui/package.json: 2 deps plus 9 dev. cloudflare-workers/{pulse,newsletter,docs-monitor,daily-health-report}/package.json: 1 dev dep each (wrangler). Sandbox packages shipped in the tarball: cli-tool/components/sandbox/docker/package.json (1 dep, @anthropic-ai/claude-agent-sdk) and sandbox/cloudflare/package.json (3 deps plus 9 dev). Lockfiles: package-lock.json at root, cli-tool, dashboard, analytics-ui and two workers. Dependabot (.github/dependabot.yml:1-25) covers /cli-tool, /dashboard and GitHub Actions weekly, but not the root manifest or cargo.",
+      "security_policy": "SECURITY.md: report by email (dan.avila7@gmail.com) or GitHub Security Advisories, safe-harbour wording, user and contributor practices; no supported-versions table or response-time commitment. .github/CODEOWNERS:1-6 assigns a single owner to .github/, scripts/, .npmrc, CLAUDE.md and dashboard/src/pages/api/ only (not cli-tool/src or the components)."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:54 Bright Data command installs six skills plus one MCP.",
+        "verified": "yes",
+        "evidence": "All referenced paths exist: cli-tool/components/skills/web-data/{search,scrape,data-feeds,bright-data-mcp,bright-data-best-practices}/SKILL.md, cli-tool/components/skills/development/brightdata-local-search/SKILL.md and cli-tool/components/mcps/web-data/brightdata.json. The --skill, --mcp and --yes flags exist (cli-tool/bin/create-claude-config.js:19,37,40) and skills resolve via contents/cli-tool/components/skills/<name> (cli-tool/src/index.js:1559). Not executed (needs network)."
+      },
+      {
+        "claim": "README.md:74-84 quick-install examples work as written.",
+        "verified": "partial",
+        "evidence": "4 of 8 distinct component paths do not resolve at this revision. development/github-integration is really cli-tool/components/mcps/integration/github-integration.json; performance/optimize-bundle is really optimize-bundle-size.md; performance/mcp-timeouts is really cli-tool/components/settings/mcp/mcp-timeouts.json (no settings/performance dir); git/pre-commit-validation does not exist (hooks/git has conventional-commits, prevent-direct-push, validate-branch-name). Resolving: development-team/frontend-developer, testing/generate-tests, development-tools/code-reviewer, database/postgresql-integration. CONTRIBUTING.md:134 also lists the MCP category as integration/."
+      },
+      {
+        "claim": "cli-tool/README.md:105-110 installs skills by bare name (--skill algorithmic-art, mcp-builder, pdf-processing-pro, pdf-anthropic,docx,xlsx,pptx).",
+        "verified": "no",
+        "evidence": "Code requests contents/cli-tool/components/skills/${skillName} (cli-tool/src/index.js:1559) and prints a tip to use 'category/skill-name' on 404 (index.js:1576-1580). Skills live in category dirs, e.g. skills/creative-design/algorithmic-art, skills/development/mcp-builder, skills/document-processing/pdf-processing-pro; no top-level skills/algorithmic-art exists. Derived from code and tree, not executed."
+      },
+      {
+        "claim": "README.md:96 (and cli-tool/README.md:138-144): Skills use progressive disclosure.",
+        "verified": "partial",
+        "evidence": "The installer copies the full skill directory recursively (SKILL.md plus references and scripts; cli-tool/src/index.js:1566-1613), which supports the layout. Loading behaviour is Claude Code runtime, not implemented here; skills-dashboard docs only visualise it (cli-tool/SKILLS_DASHBOARD.md:9-30). Skill size varies: the 47 security SKILL.md files total 17,223 lines (22 to 907 lines each)."
+      },
+      {
+        "claim": "README.md:65: 100+ agents, commands, settings, hooks and MCPs.",
+        "verified": "yes",
+        "evidence": "dashboard/public/counts.json:1 reports agents 422, commands 287, mcps 103, settings 72, hooks 62, skills 877, loops 18, mods 24, templates 14. CLAUDE.md:59 says 600+ agents, which disagrees with the generated 422."
+      },
+      {
+        "claim": "README.md:116: --chats --tunnel gives 'Secure remote access via Cloudflare Tunnel'.",
+        "verified": "partial",
+        "evidence": "--tunnel spawns cloudflared tunnel --url http://localhost:<port> (cli-tool/src/chats-mobile.js:1086-1089; analytics.js:1383), which needs cloudflared installed separately (analytics.js:1344-1354). No authentication layer found in chats-mobile.js; servers call listen(port) without a host and analytics sets Access-Control-Allow-Origin * (analytics.js:622,1274; chats-mobile.js:1049)."
+      },
+      {
+        "claim": "README.md:170-172 and 167: MIT licence; every vendored resource keeps its original licence.",
+        "verified": "partial",
+        "evidence": "Root LICENSE is MIT. Vendored items carry other terms, including Anthropic's proprietary all-rights-reserved text on docx/pdf/pptx/xlsx skills that forbids copying, distribution and derivatives (cli-tool/components/skills/document-processing/docx/LICENSE.txt:13-24); ANTHROPIC_ATTRIBUTION.md:27-34 calls them 'NOT open source'. The CLI will download them on request. Other skills carry Apache-2.0 or CC-BY-4.0 per file; no consolidated licence inventory."
+      },
+      {
+        "claim": ".github/WORKFLOWS_REFERENCE.md:40: download tracking is 'Completely anonymous, no personal data collected'.",
+        "verified": "no",
+        "evidence": "The endpoint stores ip_address, user_agent and country alongside component, path and CLI version (dashboard/src/pages/api/track-download-supabase.ts:45-67). Code differs from this doc; the README says nothing about telemetry."
+      },
+      {
+        "claim": "cli-rust/README.md:52-53: opt out of telemetry with CCT_NO_TRACKING=1 (also off when CI=true).",
+        "verified": "partial",
+        "evidence": "Rust cct accepts true or 1 (cli-rust/src/tracking.rs:12-18). The Node CLI accepts only the literal 'true' for CCT_NO_TRACKING or CCT_NO_ANALYTICS (cli-tool/src/tracking-service.js:15-25), so =1 does not disable it there. CI=true disables both."
+      },
+      {
+        "claim": "cli-rust/README.md:21: curl install script at cli-rust/dist/install.sh (also README:3-4 'byte-for-byte parity').",
+        "verified": "no",
+        "evidence": "No install.sh anywhere in the tree (glob **/install.sh returned nothing; cli-rust/.gitignore ignores only /dist/cct and /dist/*.tgz). Parity is shown only by a manual diff recipe (cli-rust/README.md:98-106); the integration tests do not compare outputs (cli-rust/tests/integration.rs:17-100). The Rust CLI declares no --loop or --mod (cli-rust/src/cli.rs:29-45)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Project's own component security validator (5 validators), illustrative example run over 372 components",
+        "metric": "components passed / failed / warnings",
+        "value": "123 passed / 249 failed / 938 warnings (undated example output; the catalog is larger now)",
+        "source": "cli-tool/src/validation/README.md:62-68",
+        "independent": false
+      },
+      {
+        "what": "Same validator, runtime claim",
+        "metric": "wall time for 372 components",
+        "value": "about 20 seconds",
+        "source": "cli-tool/src/validation/README.md:32,501",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Unpinned, unverified content: every component, skills included, is fetched at install time from this repo's main branch via the GitHub contents API or raw URLs. There is no tag or commit pin, checksum or signature check, and no flag or env var to choose a ref (cli-tool/src/index.js:1559-1626; cli-rust/src/constants.rs:7-21; flags at cli-tool/bin/create-claude-config.js:15-54). The npm tarball ships no skills (package.json:46-52), so installs need network and make unauthenticated GitHub API calls (no token support found; index.js:1568-1573; cli-rust/src/github.rs:81-84).",
+      "Claude Code only, project-scoped. Skills are written to <dir>/.claude/skills/<last path segment>/ (cli-tool/src/index.js:1556,1598,1637-1649; cli-rust/src/github.rs:113-115). No Codex or .agents install target, no user-level skill scope (only -d <dir>), no Codex mention in README or CLI source. Keying by last segment makes duplicate names collide and overwrite same-named files with no prompt or backup (webapp-testing in development/ and security/; skill-creator and writing-skills in development/ and productivity/; dispatching-parallel-agents in ai-research/ and development/).",
+      "Heterogeneous, weakly traced catalog: 900 SKILL.md from many authors with inconsistent provenance. Frontmatter shows source: community/personal/self, 29 files with author: zebbern (offensive-security and pentest skills), 20 with author: openai, vibeship-spawner-skills, google/skills; some (development/systematic-debugging, development/code-review-checklist) carry no author or licence; no upstream commit pin. Some skills are workflow bundles that name other skills (security/security-audit/SKILL.md:28-40) and --loop auto-installs every component a loop references (index.js:1683-1704). Skills ship 861 .py and 69 .sh files (many are benchmark artefacts under ai-research/loki-mode/benchmarks/results/) and the installer chmods all .py/.sh to 755 (index.js:1596,1646-1648).",
+      "Licensing mix: repo is MIT but vendors components under other terms, including Anthropic's proprietary all-rights-reserved LICENSE.txt on docx/pdf/pptx/xlsx skills that forbids copying, distribution and derivatives (cli-tool/components/skills/document-processing/docx/LICENSE.txt:13-24); ANTHROPIC_ATTRIBUTION.md:27-34 calls them not open source and lines 40-42 mention GPL-3.0 FFmpeg. Other skills are Apache-2.0, CC-BY-4.0 or MIT per file.",
+      "Telemetry is on by default (opt-out only) and absent from README.md. The server stores IP, user-agent and country (dashboard/src/pages/api/track-download-supabase.ts:45-67) while a repo doc calls it completely anonymous (.github/WORKFLOWS_REFERENCE.md:40). CCT_NO_TRACKING=1 does not disable the Node CLI, only 'true' (tracking-service.js:15-25). Error messages are uploaded with install outcomes (track-installation-outcome.ts:55-75).",
+      "Security posture: GHSA-79wm-x847-7cvg (unauthenticated RCE in --studio, CVSS 8.8) was fixed only in 1.29.4 (CHANGELOG.md:8-26). Other local servers still call listen(port) with no host, analytics sets Access-Control-Allow-Origin * and there is no auth (cli-tool/src/analytics.js:622,1274; skill-dashboard.js:468; chats-mobile.js:1049); --tunnel publishes them via cloudflared; --prompt spawns claude with shell: true (index.js:2746-2750). CI gaps: component audit is non-blocking and skips skills (security-audit.js:21; component-security-validation.yml:42-47); SkillSpector gate covers only changed skills and is installed from NVIDIA main unpinned (skill-security-scan.yml:35-48); weekly full scan never blocks (skill-security-scan-all.yml:3-5); no Actions pinned by SHA; CODEOWNERS excludes cli-tool/ (.github/CODEOWNERS:1-6).",
+      "Maintenance and doc consistency: version drift (root 1.29.6, cli-tool 1.29.4, CHANGELOG top entry 1.29.4); root npm test is a no-op (package.json:12) though CLAUDE.md:14,217 tell maintainers to run it; two Jest tests read nonexistent files (DataService.test.js:11, StateService.test.js:11) and Jest runs in CI only in the GitHub Packages publish workflow (publish-package.yml:50-52); stale docs (.github/WORKFLOWS_REFERENCE.md:5-21 names deploy-docusaurus.yml and Vercel, dated 2025-08-19 at line 87; docs/CLAUDE.md:30-33; CLAUDE.md:59 claims 600+ agents vs 422 in counts.json); README quick-install paths and cli-tool/README.md skill names do not resolve; Rust CLI is a v0.1.0 preview whose documented install.sh is missing; no release checksums, signatures or provenance.",
+      "Scope and ownership: one repo bundles the installer, five local dashboards, a Cloudflare Pages website and API with Supabase, Neon, Clerk, Discord, Telegram, Resend and Sentry backends, Workers, and a Rust port (CLAUDE.md:246-405); skill install is one function inside a 3,727-line index.js. The catalog site, download stats and docs.aitmpl.com are maintainer-hosted and were not read. The README leads with a sponsor's (Bright Data) install command (README.md:34-55). Maintenance is attributed to one named person (SECURITY.md:7; CODEOWNERS single owner)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "davila7/claude-code-templates",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "npx, interactive (needs Node.js): npx claude-code-templates@latest",
+          "citation": "README.md:77",
+          "holds": true,
+          "note": "README.md:77 is exactly `npx claude-code-templates@latest`, under the comment 'Browse and install interactively'. Package name and bins match (package.json:2,6-9). With no flags, createClaudeConfig reaches showMainMenu() (cli-tool/src/index.js:336-337), a @clack/prompts select menu (index.js:63-73). Node is required: npx, and engines node>=14.0.0 (cli-tool/package.json:86-88). Checked by reading the code, not executed."
+        },
+        {
+          "field": "license",
+          "statement": "spdx MIT, file LICENSE",
+          "citation": "LICENSE:1-21 (also README.md:170-172, package.json:45)",
+          "holds": true,
+          "note": "LICENSE is the standard MIT text, 'Copyright (c) 2025 Daniel (San) Ávila'. package.json:45 and cli-tool/package.json:68 declare \"MIT\", and README.md:172 says the project is under the MIT License. This covers the repo's own code. The dossier's separate licence claim check, about vendored components under other terms, was not one of my five and I did not open it."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes (code/CI evidence, not executed). README has no platform matrix; engines node>=14; global fetch / health check effectively need Node 18+; CI runs on ubuntu-latest; Rust preview builds x86_64-unknown-linux-gnu.",
+          "citation": "cli-tool/package.json:86-88; cli-tool/src/index.js:1568; cli-tool/src/health-check.js:324-332; .github/workflows/publish-package.yml:19; .github/workflows/build-rust-cli.yml:35",
+          "holds": true,
+          "note": "All five citations match. engines is node >=14.0.0. index.js:1568 calls the global fetch(); no node-fetch, undici, cross-fetch or axios is required anywhere in cli-tool/src. health-check.js:324-332 fails below Node 18 ('requires Node.js 18+'). The publish job runs-on ubuntu-latest with node-version '18' (line 30). The Rust build matrix has ubuntu-latest / x86_64-unknown-linux-gnu. README.md, read in full, has no platform matrix. Extra support not cited: health-check.js:299-303 lists linux as a supported OS."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Claude Code: yes, the only target (writes .claude/{agents,commands,skills,hooks,scripts,loops}, settings paths, .mcp.json; --prompt launches claude; --mod under .claude/skills/ needing CLAUDE_CODE_ENABLE_FUNCTION_HOOKS=1 and Claude Code >=2.1.259; skills dashboard reads ~/.claude/skills, .claude/skills, ~/.claude/plugins). Codex: none found; zero 'codex' matches in README.md, CLAUDE.md, CONTRIBUTING.md, cli-tool/src, cli-tool/bin, cli-rust, .github; no .codex/.agents target; Codex only as catalog content incl. 20 SKILL.md with author: openai.",
+          "citation": "cli-tool/src/index.js:836-865, 1727-1830, 2746-2750; cli-tool/src/skill-dashboard.js:15-17,34,106; cli-tool/components/skills/security/security-best-practices/SKILL.md:4",
+          "holds": true,
+          "note": "Write targets confirmed: .claude/agents (index.js:513), commands (582), skills (1637), hooks (1117,1135), scripts (765,951), loops (1853), and .mcp.json (662). Settings: user, project, local and enterprise branches (833-866). spawn('claude', [prompt], {shell:true}) is at 2746-2750. The --mod warning names the env flag and Claude Code >= 2.1.259 (1729); mods are written to .claude/skills/<name> (1791). The dashboard reads ~/.claude/skills (15-17), cwd/.claude/skills (34) and ~/.claude/plugins/marketplaces (106). A case-insensitive 'codex' search finds 0 hits in root README.md, CLAUDE.md, CONTRIBUTING.md, cli-tool/src, cli-tool/bin, cli-rust and .github. No .codex or .agents path in cli-tool/src or cli-rust. development/codex, development/codex-review and agents/data-ai/blueprint-mode-codex.md exist. Exactly 20 SKILL.md files have author: openai; security-best-practices/SKILL.md:4 is one. Two small wording issues that don't change the claim: enterprise writes <system dir>/managed-settings.json, not .claude/settings*.json (index.js:845-856), and line 106 reads ~/.claude/plugins/marketplaces."
+        },
+        {
+          "field": "claim_checks[1]",
+          "statement": "README.md:74-84 quick-install examples work as written: partial; 4 of 8 distinct component paths do not resolve (github-integration is under mcps/integration, optimize-bundle is optimize-bundle-size, mcp-timeouts is under settings/mcp with no settings/performance dir, git/pre-commit-validation does not exist); CONTRIBUTING.md:134 lists integration/.",
+          "citation": "README.md:74-84; cli-tool/src/index.js:491,560,630,720,1080; CONTRIBUTING.md:134; tree under cli-tool/components/",
+          "holds": true,
+          "note": "The installers build cli-tool/components/<type>/<name>.{md|json} on main with no fallback; a 404 only prints 'not found'. These exist in the tree: agents/development-team/frontend-developer.md, agents/development-tools/code-reviewer.md, commands/testing/generate-tests.md, mcps/database/postgresql-integration.json. These do not: mcps/development/github-integration.json (only mcps/integration/github-integration.json exists); commands/performance/optimize-bundle.md (only optimize-bundle-size.md); settings/performance/* (mcp-timeouts is only at settings/mcp/mcp-timeouts.json); any pre-commit-validation hook (hooks/git has conventional-commits, prevent-direct-push and validate-branch-name). CONTRIBUTING.md:134 lists 'integration/ - GitHub, GitLab, Jira'. Checked against the tree, not executed."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

@@ -1,0 +1,259 @@
+{
+  "contender": "anthropics/skills",
+  "revision": {
+    "contender": "anthropics/skills",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "anthropics/skills",
+        "tag": null,
+        "commit": "8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": null,
+    "commit": "8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4",
+    "read_at": "2026-10-02T03:01:55+00:00"
+  },
+  "dossier": {
+    "contender": "anthropics/skills",
+    "revision": {
+      "tag": null,
+      "commit": "8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4",
+      "read_at": "2026-10-01"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "skills/webapp-testing/LICENSE.txt"
+    },
+    "purpose": "One skill (skills/webapp-testing) inside Anthropic's anthropics/skills repository. It is a 96-line SKILL.md, one stdlib-only Python helper (scripts/with_server.py) and three Playwright example scripts. It tells an agent to test local web apps by writing its own Python Playwright scripts (headless Chromium). The agent picks one of three paths: static HTML, an already-running server, or starting servers with the helper around a command. The skill is one of 19 in the repo. The Claude Code marketplace lists it only inside the 12-skill `example-skills` bundle (.claude-plugin/marketplace.json:25-42). The repo has no dedicated security-procedure skill, and nothing in it mentions Codex.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Skills are folders of instructions, scripts, and resources that Claude loads dynamically to improve performance on specialized tasks.",
+          "citation": "README.md:6"
+        },
+        {
+          "claim": "The repo's skills range 'from creative applications (art, music, design) to technical tasks (testing web apps, MCP server generation) to enterprise workflows'.",
+          "citation": "README.md:16"
+        },
+        {
+          "claim": "Each skill is self-contained in its own folder with a SKILL.md file containing the instructions and metadata that Claude uses.",
+          "citation": "README.md:18"
+        },
+        {
+          "claim": "Many skills are open source (Apache 2.0); the docx, pdf, pptx and xlsx skills are 'source-available, not open source'.",
+          "citation": "README.md:20"
+        },
+        {
+          "claim": "Skills are 'provided for demonstration and educational purposes only'; behaviour in Claude may differ; 'Always test skills thoroughly in your own environment before relying on them for critical tasks.'",
+          "citation": "README.md:22-24"
+        },
+        {
+          "claim": "Claude Code: register the repo with `/plugin marketplace add anthropics/skills`, then install `document-skills` or `example-skills` (`/plugin install example-skills@anthropic-agent-skills`).",
+          "citation": "README.md:33-49"
+        },
+        {
+          "claim": "After installing the plugin, 'you can use the skill by just mentioning it'.",
+          "citation": "README.md:51"
+        },
+        {
+          "claim": "Claude.ai: the example skills are already available to paid plans. Claude API: pre-built skills can be used and custom skills uploaded.",
+          "citation": "README.md:55, 61"
+        },
+        {
+          "claim": "A skill is a folder with a SKILL.md with YAML frontmatter; only `name` and `description` are required.",
+          "citation": "README.md:65, 86-88"
+        },
+        {
+          "claim": "The Agent Skills standard lives at agentskills.io; ./spec ('The Agent Skills specification') and ./template ('Skill template') are listed as repo contents.",
+          "citation": "README.md:1, 26-29"
+        },
+        {
+          "claim": "SKILL.md: 'Toolkit for interacting with and testing local web applications using Playwright. Supports verifying frontend functionality, debugging UI behavior, capturing browser screenshots, and viewing browser logs.'",
+          "citation": "skills/webapp-testing/SKILL.md:3"
+        },
+        {
+          "claim": "SKILL.md: test local web apps by writing native Python Playwright scripts. scripts/with_server.py manages server lifecycle for multiple servers. Run scripts with --help first and use them as black boxes.",
+          "citation": "skills/webapp-testing/SKILL.md:9-14, 85"
+        },
+        {
+          "claim": "SKILL.md decision tree: static HTML means read the file for selectors. A dynamic app with no server running means use with_server.py. A server already running means reconnaissance-then-action after waiting for networkidle. Always launch chromium headless.",
+          "citation": "skills/webapp-testing/SKILL.md:16-33, 57, 60"
+        }
+      ],
+      "install": [
+        {
+          "method": "Claude Code: register the marketplace. This is the only documented install route that applies to Linux/macOS, and the README gives no OS-specific steps.",
+          "command": "/plugin marketplace add anthropics/skills",
+          "citation": "README.md:34-37"
+        },
+        {
+          "method": "Claude Code: install the plugin bundle that contains webapp-testing. The bundle holds 12 skills (.claude-plugin/marketplace.json:30-41); there is no standalone webapp-testing plugin. The README also describes an equivalent interactive 'Browse and install plugins' path (README.md:39-43).",
+          "command": "/plugin install example-skills@anthropic-agent-skills",
+          "citation": "README.md:45-49; .claude-plugin/marketplace.json:25-42"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "unknown. README.md and SKILL.md document no OS or architecture support. The skill is Markdown plus stdlib-only Python (skills/webapp-testing/scripts/with_server.py:17-21) that calls Playwright, which is not bundled. The examples use POSIX-style paths such as /tmp and /mnt/user-data/outputs (examples/element_discovery.py:37, examples/console_logging.py:31).",
+        "wsl2": "unknown. A case-insensitive grep for wsl|windows|linux|macos|darwin|arm64|x86 over README.md and skills/webapp-testing returned no matches.",
+        "macos_arm64": "unknown. The same grep returned no matches. The code has nothing OS-specific beyond shell=True (with_server.py:68-74).",
+        "gpu": "no. GPU is not used or needed. A grep for gpu|cuda|metal|nvidia in skills/webapp-testing found nothing, and all examples launch headless Chromium (SKILL.md:57; examples/*.py)."
+      },
+      "integrations": {
+        "cli": "scripts/with_server.py is an argparse CLI (skills/webapp-testing/scripts/with_server.py:36-40; usage at SKILL.md:41, 46-49). It is run as `python scripts/with_server.py --server CMD --port N [...] [--timeout S] -- COMMAND`. No installed binary or entry-point packaging exists.",
+        "mcp": "none found. skills/webapp-testing contains no MCP server or client. The repo's separate mcp-builder skill (skills/mcp-builder/SKILL.md:3) is for building MCP servers and is not part of this skill.",
+        "sdk_or_api": "none of its own. The scripts use Playwright's Python sync API (SKILL.md:54; examples/*.py:1), an external dependency that is not bundled or pinned. The README mentions Claude API skill upload (README.md:59-61; the linked quickstart was not opened).",
+        "claude_code_or_codex": "Claude Code: yes, via the plugin marketplace (README.md:31-51; .claude-plugin/marketplace.json:24-42, plugin `example-skills`). Codex: none found. A case-insensitive grep for 'codex' over the whole repo returned no matches. README.md:1 only points to the external Agent Skills standard (agentskills.io, not opened)."
+      },
+      "telemetry_and_network": "No telemetry or phone-home code in skills/webapp-testing. Its only network code is a TCP readiness poll to localhost (with_server.py:28). Every URL in the skill is the placeholder http://localhost:5173 (SKILL.md:59; examples/element_discovery.py:10; examples/console_logging.py:5). A grep for requests/urllib/http.client/api-key/environ/getenv found only `socket` (with_server.py:18, 28, 30). The skill needs no account or API key. A repo-wide grep for telemetry/analytics vendor terms matched only licence text, an XSD and API documentation, not skill code. Outside the code: the documented install uses Claude Code's marketplace add with the GitHub-style shorthand `anthropics/skills` (README.md:34-37). Playwright/Chromium installation is not documented anywhere in the repo (no 'playwright install' or 'pip install playwright' matches), so its network use is undocumented here. README.md:3 embeds a remote skills.sh badge image, which affects README rendering only."
+    },
+    "code": {
+      "languages": [
+        "Python",
+        "Markdown (YAML frontmatter)",
+        "JSON"
+      ],
+      "entry_points": [
+        {
+          "path": "skills/webapp-testing/SKILL.md",
+          "what": "Skill entry document (96 lines). Frontmatter has name, description (line 3) and license (line 4). The body holds the decision tree, the with_server.py usage and the reconnaissance-then-action pattern."
+        },
+        {
+          "path": "skills/webapp-testing/scripts/with_server.py",
+          "what": "Only executable helper (106 lines, stdlib only). main() is at line 35 and the __main__ guard at line 105. CLI: --server/--port pairs (repeatable), --timeout (default 30), then `-- COMMAND`."
+        },
+        {
+          "path": "skills/webapp-testing/examples/element_discovery.py",
+          "what": "Playwright template: lists buttons, links and inputs on http://localhost:5173 and saves a full-page screenshot to /tmp."
+        },
+        {
+          "path": "skills/webapp-testing/examples/static_html_automation.py",
+          "what": "Playwright template: drives a local HTML file via a file:// URL and writes screenshots to /mnt/user-data/outputs/."
+        },
+        {
+          "path": "skills/webapp-testing/examples/console_logging.py",
+          "what": "Playwright template: captures page console messages through page.on('console') and writes them to /mnt/user-data/outputs/console.log."
+        },
+        {
+          "path": ".claude-plugin/marketplace.json",
+          "what": "Claude Code marketplace manifest `anthropic-agent-skills` with 5 plugins. webapp-testing is listed only in plugin `example-skills` (line 41)."
+        }
+      ],
+      "architecture": "Repo layout: .claude-plugin/marketplace.json (5 plugin bundles that point at skills/ paths: document-skills 4 skills, example-skills 12, claude-api 1, academy-guide 1, discernment-nudge 1); skills/<name>/ (19 folders, each with SKILL.md); spec/agent-skills-spec.md (3-line pointer to agentskills.io); template/SKILL.md; THIRD_PARTY_NOTICES.md. Other skills also hold JavaScript, HTML, Bash and XSD files. skills/webapp-testing/ has 6 files: SKILL.md (decision tree, patterns, best practices); scripts/with_server.py (argparse CLI that starts each --server command with subprocess.Popen(shell=True), polls localhost:<port> with socket.create_connection until it answers (30 s default per server), runs the user command with subprocess.run, then terminate()/kill() on every server in a finally block); examples/ (3 Playwright sync-API scripts, headless Chromium); LICENSE.txt. There is no library or package: the agent is expected to write its own Playwright scripts. Per-task loading is described only in skills/skill-creator/SKILL.md:86-91: name+description always in context, SKILL.md body when the skill triggers, bundled resources as needed. The loader itself is not in this repo.",
+      "packaging_and_release": "None found. Distribution is by git through the Claude Code marketplace manifest (.claude-plugin/marketplace.json: name `anthropic-agent-skills`, a single static metadata.version `1.0.0` at line 9, no per-plugin versions). The tree has no .github directory and so no release workflow. There are no checksums, signatures or attestations. The shallow clone has no tags (.git/packed-refs:2 lists only refs/remotes/origin/main), and remote releases cannot be checked from the working tree. The README documents no way to pin a version or commit.",
+      "tests_and_ci": "None. There are 0 test files: a glob for *test* and for test_*.py, *_test.py, *.spec.*, conftest.py and tests/ matched nothing anywhere in the repo. There is no CI config: apart from .git, the only dot-entries are .claude-plugin/ and .gitignore (.github/ is absent). The repo ships skill-evaluation tooling in skills/skill-creator/scripts (run_eval.py, aggregate_benchmark.py), but no evals or results for webapp-testing are in the tree. The examples are placeholder templates, e.g. 'path/to/your/file.html' and 'text=Click Me'.",
+      "dependencies": "skills/webapp-testing has no manifest, so 0 declared direct dependencies. Implicit: the `playwright` Python package plus a Chromium browser (SKILL.md:54, 57; examples/*.py:1), with no install instructions or version pins anywhere in the repo. with_server.py is stdlib only (subprocess, socket, time, sys, argparse; lines 17-21). The only requirements files in the repo belong to other skills: skills/mcp-builder/scripts/requirements.txt (2 deps: anthropic>=0.39.0, mcp>=1.1.0) and skills/slack-gif-creator/requirements.txt (4 deps: pillow, imageio, imageio-ffmpeg, numpy). No package.json, pyproject.toml or lockfiles exist.",
+      "security_policy": "none. There is no SECURITY.md (not in the root or in .github), no CODEOWNERS and no dependabot/renovate config. The only security-flavoured text is authoring guidance: skills/skill-creator/SKILL.md:113 says skills must not contain malware or exploit code. It is not a vulnerability-reporting policy."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:6 says Claude loads skills 'dynamically'.",
+        "verified": "partial",
+        "evidence": "The loader is not in this repo. The only in-repo description is skills/skill-creator/SKILL.md:86-91: name+description always in context, SKILL.md body when the skill triggers, bundled resources as needed. skills/skill-creator/SKILL.md:67 says the description is the trigger text. Per that text, the metadata of every installed skill stays in context while bodies load on trigger. webapp-testing's trigger text is skills/webapp-testing/SKILL.md:3."
+      },
+      {
+        "claim": "README.md:18 says each skill is self-contained in its own folder.",
+        "verified": "partial",
+        "evidence": "skills/webapp-testing/ holds SKILL.md, LICENSE.txt, scripts/with_server.py and 3 examples (6 files), so the files are self-contained. But the scripts import Playwright (SKILL.md:54; examples/*.py:1) and no manifest or install step exists for it. The repo's only requirements.txt files belong to mcp-builder and slack-gif-creator, and greps for 'playwright install' and 'pip install playwright' found nothing."
+      },
+      {
+        "claim": "README.md:20 says many skills are Apache 2.0 while docx/pdf/pptx/xlsx are source-available, not open source.",
+        "verified": "yes",
+        "evidence": "skills/webapp-testing/LICENSE.txt is the Apache License 2.0 text with 'Copyright 2026 Anthropic, PBC.' (lines 2-3, 190). skills/docx/LICENSE.txt:1-30 is an 'All rights reserved' Anthropic licence that bars copying and derivative works outside the Services; line 1 of the pdf, pptx and xlsx LICENSE.txt is the same notice. There is no root LICENSE file, and skills/doc-coauthoring has no LICENSE.txt."
+      },
+      {
+        "claim": "README.md:34-49 says to run `/plugin marketplace add anthropics/skills`, then install `document-skills` or `example-skills`.",
+        "verified": "yes",
+        "evidence": ".claude-plugin/marketplace.json defines marketplace `anthropic-agent-skills` (line 2) with plugins document-skills (line 13) and example-skills (line 25). example-skills lists ./skills/webapp-testing at line 41 among 12 skills (lines 30-41). Code differs from README: the manifest also defines claude-api (line 46), academy-guide (line 55) and discernment-nudge (line 64), which README never names. No standalone webapp-testing plugin exists, so the documented route installs the whole 12-skill bundle."
+      },
+      {
+        "claim": "README.md:51 says you use an installed skill 'by just mentioning it'.",
+        "verified": "not_checkable",
+        "evidence": "Activation is Claude Code behaviour outside this repo. The only in-repo trigger text is the SKILL.md description (skills/webapp-testing/SKILL.md:3), which has no explicit 'use when…' phrasing, although skills/skill-creator/SKILL.md:67 says such context belongs in the description."
+      },
+      {
+        "claim": "README.md:16 says the skills range from 'art, music, design' to 'testing web apps, MCP server generation'.",
+        "verified": "partial",
+        "evidence": "Code differs from README. webapp-testing and mcp-builder exist (skills/webapp-testing/SKILL.md, skills/mcp-builder/SKILL.md). None of the 19 SKILL.md files is a music skill; 'music' appears only in metaphors at skills/canvas-design/SKILL.md:96 and skills/algorithmic-art/SKILL.md:97. The README summary is not fully current."
+      },
+      {
+        "claim": "README.md:26-29 lists ./spec as 'The Agent Skills specification' and ./template as 'Skill template'.",
+        "verified": "partial",
+        "evidence": "Code differs from README. spec/agent-skills-spec.md:3 only says 'The spec is now located at https://agentskills.io/specification', so the spec is not in the repo, and I did not fetch that page. template/SKILL.md exists (6 lines, template/SKILL.md:1-6)."
+      },
+      {
+        "claim": "SKILL.md:3 says the skill supports verifying frontend functionality, debugging UI, capturing screenshots and viewing browser logs.",
+        "verified": "partial",
+        "evidence": "Screenshots (examples/element_discovery.py:37; examples/static_html_automation.py:17, 29), console-log capture (examples/console_logging.py:14-18) and DOM/element discovery (examples/element_discovery.py:14-34) are demonstrated. The skill has no assertions, test runner or reporting: a grep for assert/expect/pytest/unittest in skills/webapp-testing found nothing. 'Verifying' therefore depends on checks the model writes itself."
+      },
+      {
+        "claim": "SKILL.md:11-12 and 41-49 say scripts/with_server.py manages server lifecycle for one or more servers.",
+        "verified": "yes",
+        "evidence": "with_server.py takes repeatable --server/--port pairs (lines 37-38) and rejects mismatched counts (53-55). It starts each server with Popen(shell=True) and waits for a localhost TCP connect up to --timeout, default 30 s (23-32, 65-82). It runs the command after `--` and exits with its return code (44-46, 88-89), then terminates or kills the servers in finally (91-102). The documented command lines match the argparse definitions. Caveats from reading the code, not executing it: server stdout/stderr are piped but never read (69-74); readiness ignores whether the process exited (23-32); only the shell PID is terminated, with no process-group handling (94-101)."
+      },
+      {
+        "claim": "SKILL.md:14 says to run scripts with --help first and not read the source because 'these scripts can be very large'.",
+        "verified": "partial",
+        "evidence": "argparse provides --help (with_server.py:36-40), but the help text is a one-line description and does not include the usage examples in the module docstring (lines 2-15). The skill ships one script of 106 lines, so the 'very large' rationale does not match the shipped file."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Scope: README.md:22-24 says the skills are 'for demonstration and educational purposes only'. webapp-testing is guidance for local Playwright automation. The collection has no dedicated security-procedure skill. The 19 SKILL.md frontmatters cover documents, design, API, MCP, testing and comms. Security text is incidental: skills/mcp-builder/reference/mcp_best_practices.md:152-179 (for MCP servers) and skills/skill-creator/SKILL.md:113 (an authoring rule).",
+      "No assurance infrastructure: 0 test files, no .github/CI, no release workflow, no SECURITY policy, and no tags in the clone (.git/packed-refs:2). The marketplace manifest has one static version, 1.0.0 (.claude-plugin/marketplace.json:9). README.md documents no way to pin a version or commit.",
+      "Granularity and agent coverage: webapp-testing is listed in the marketplace only inside the 12-skill `example-skills` bundle (.claude-plugin/marketplace.json:25-42), and the README documents only bundle-level install (README.md:39-49). Only Claude surfaces are documented (README.md:31-61). The string 'codex' appears nowhere in the repo, so Codex use depends on the external Agent Skills standard (README.md:1, not opened).",
+      "Undeclared dependencies: the skill needs the Playwright Python package and a Chromium browser (SKILL.md:54, 57; examples/*.py:1) but ships no requirements file, install command or version pin. Documented commands use `python` (SKILL.md:25, 41, 46-49) while with_server.py's shebang is python3 (with_server.py:1).",
+      "Arbitrary command execution: with_server.py runs each --server string through the shell (shell=True, with_server.py:68-74) and then an arbitrary command (line 88). The SKILL.md frontmatter declares no allowed-tools (SKILL.md:1-5), so execution is governed by the host's permission settings. SKILL.md:14 and 85 tell the agent to treat scripts as black boxes and not read the source unless needed.",
+      "Helper robustness (from code reading, not executed): server stdout/stderr are piped but never drained (with_server.py:69-74), so logs are hidden and a chatty server may block once the pipe buffer fills. Readiness is only a localhost TCP connect (line 28) and does not detect an exited process, so a failed start waits the full timeout and a stale listener on the port passes (23-32, 79-80). Cleanup terminates only the shell process (94-101), so children of compound commands such as 'cd backend && python server.py' may be left running.",
+      "Examples are not portable as written: examples/console_logging.py:31 and examples/static_html_automation.py:17, 29 write to /mnt/user-data/outputs/, a path nothing in the repo creates or explains. console_logging.py's open() would raise FileNotFoundError where that directory is absent. examples/element_discovery.py:37 and SKILL.md:69 use /tmp. URLs and selectors are placeholders (localhost:5173, 'path/to/your/file.html', 'text=Click Me').",
+      "Licensing and provenance at collection level: there is no root LICENSE, and licences are per skill. webapp-testing is Apache-2.0, but docx/pdf/pptx/xlsx are proprietary 'all rights reserved' (skills/docx/LICENSE.txt:1-30). doc-coauthoring, which is in example-skills, has no LICENSE.txt or license frontmatter (skills/doc-coauthoring/SKILL.md:2-3). THIRD_PARTY_NOTICES.md lists GPL-3.0 FFmpeg 7.0.2, imageio, Pillow and OFL fonts for other skills (THIRD_PARTY_NOTICES.md:7-33, 287-291, 303-359). None of these are in webapp-testing."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "anthropics/skills",
+      "checks": [
+        {
+          "field": "readme.install[1]",
+          "statement": "Claude Code: install the plugin bundle that contains webapp-testing with `/plugin install example-skills@anthropic-agent-skills`. The bundle holds 12 skills (.claude-plugin/marketplace.json:30-41); there is no standalone webapp-testing plugin. The README also describes an equivalent interactive 'Browse and install plugins' path (README.md:39-43).",
+          "citation": "README.md:45-49; .claude-plugin/marketplace.json:25-42",
+          "holds": true,
+          "note": "README.md:48 is exactly `/plugin install example-skills@anthropic-agent-skills`, and README.md:39-43 gives the interactive Browse and install plugins → anthropic-agent-skills → example-skills path. marketplace.json:2 names the marketplace `anthropic-agent-skills`, which matches the @ suffix. Lines 30-41 list exactly 12 skills, with ./skills/webapp-testing at line 41. The manifest's 5 plugins are document-skills, example-skills, claude-api, academy-guide and discernment-nudge, so none is a standalone webapp-testing plugin. A repo grep for 'webapp-testing' matches only marketplace.json:41 and SKILL.md:2. The command assumes the marketplace was already added (README.md:34-37; 'Then', line 39)."
+        },
+        {
+          "field": "license",
+          "statement": "spdx: Apache-2.0; file: skills/webapp-testing/LICENSE.txt",
+          "citation": "skills/webapp-testing/LICENSE.txt:2-3, 177, 190-202; skills/webapp-testing/SKILL.md:4",
+          "holds": true,
+          "note": "LICENSE.txt is the full Apache License 2.0 text: the header at lines 2-3 reads 'Apache License / Version 2.0, January 2004', sections 1-9 end at 'END OF TERMS AND CONDITIONS' (line 177), and the appendix notice at lines 190-202 reads 'Copyright 2026 Anthropic, PBC.' The SKILL.md:4 frontmatter binds the skill to it ('license: Complete terms in LICENSE.txt'). The repo root has no LICENSE file, and THIRD_PARTY_NOTICES.md has no webapp or Playwright entries, so no other licence overrides this one for the skill. The licence is per skill, not repo-wide, as the dossier already notes elsewhere."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "unknown. README.md and SKILL.md document no OS or architecture support. The skill is Markdown plus stdlib-only Python (with_server.py:17-21) that calls Playwright, which is not bundled. The examples use POSIX-style paths such as /tmp and /mnt/user-data/outputs (examples/element_discovery.py:37, examples/console_logging.py:31).",
+          "citation": "skills/webapp-testing/scripts/with_server.py:17-21; skills/webapp-testing/examples/element_discovery.py:37; skills/webapp-testing/examples/console_logging.py:31",
+          "holds": true,
+          "note": "I read README.md and SKILL.md in full and found no OS or architecture statements. A case-insensitive grep for wsl|windows|linux|macos|darwin|arm64|x86 over README.md and skills/webapp-testing returned 0 matches. with_server.py:17-21 imports only subprocess, socket, time, sys and argparse. The skill folder has 6 files and no Playwright package or install step. element_discovery.py:37 writes /tmp/page_discovery.png, and console_logging.py:31 opens /mnt/user-data/outputs/console.log. Wording nit, not a factual error: with_server.py does not call Playwright itself, since it just runs the command after `--`. The three examples import playwright (examples/*.py:1) and are not stdlib-only. The 'unknown' verdict is unaffected."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Claude Code: yes, via the plugin marketplace (README.md:31-51; .claude-plugin/marketplace.json:24-42, plugin `example-skills`). Codex: none found. A case-insensitive grep for 'codex' over the whole repo returned no matches. README.md:1 only points to the external Agent Skills standard (agentskills.io, not opened).",
+          "citation": "README.md:1, 31-51; .claude-plugin/marketplace.json:24-42",
+          "holds": true,
+          "note": "README.md:31-51 is the Claude Code section: marketplace add at 36, the interactive install at 39-43, direct install at 47-48 and 'use the skill by just mentioning it' at 51. marketplace.json:24-43 is the example-skills plugin object, which contains webapp-testing at line 41. A case-insensitive grep for 'codex' over the whole working tree returned 0 matches. That grep covers the hidden .claude-plugin/ directory, which I also searched explicitly, and .gitignore hides only .DS_Store, __pycache__/, .idea/ and .vscode/. README.md:1 is only a note linking to agentskills.io."
+        },
+        {
+          "field": "claim_checks[8]",
+          "statement": "SKILL.md:11-12 and 41-49 say scripts/with_server.py manages server lifecycle for one or more servers. Recorded as verified: yes, with these caveats: the documented command lines match argparse; stdout/stderr are piped but never read (69-74); readiness ignores whether the process exited (23-32); only the shell PID is terminated, with no process-group handling (94-101).",
+          "citation": "skills/webapp-testing/SKILL.md:11-12, 41-49; skills/webapp-testing/scripts/with_server.py:23-32, 37-39, 44-46, 53-55, 65-82, 88-89, 91-102",
+          "holds": true,
+          "note": "Every line reference matches. Repeatable --server/--port options with action='append' are at 37-38. The count-mismatch exit is at 53-55. is_server_ready (23-32) only polls socket.create_connection(('localhost', port)) and never checks process.poll(). Popen(shell=True, stdout=PIPE, stderr=PIPE) is at 69-74, and the pipes are never read. The --timeout default of 30 is at line 39, and the RuntimeError on timeout is at 79-80. The '--' strip is at 44-46, and subprocess.run plus sys.exit(returncode) are at 88-89. The finally block (91-102) calls terminate(), then wait(5), then kill(), with no start_new_session or killpg, so only the shell process is signalled. The SKILL.md:41 and 46-49 command lines parse against argparse lines 37-40. This was static reading only; I did not execute the script."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

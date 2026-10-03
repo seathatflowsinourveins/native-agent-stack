@@ -1,0 +1,353 @@
+{
+  "contender": "facebookincubator/glean",
+  "revision": {
+    "contender": "facebookincubator/glean",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "facebookincubator/Glean",
+        "tag": null,
+        "commit": "e36f1dcdd6ab",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": null,
+    "commit": "e36f1dcdd6ab",
+    "read_at": "2026-10-02T03:02:10+00:00"
+  },
+  "dossier": {
+    "contender": "facebookincubator/glean",
+    "revision": {
+      "tag": null,
+      "commit": "e36f1dcdd6ab",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "BSD-3-Clause",
+      "file": "LICENSE"
+    },
+    "purpose": "Glean is an open-source system (originated at Meta) for collecting, storing and querying typed facts about source code: symbol definitions, cross-references, hierarchies. Per-language indexers write facts into on-disk databases (RocksDB by default, experimental LMDB). The facts are queried with the Angle language through a CLI/shell, a Thrift server (HTTP transport by default per the cabal flag), a Haskell client library, the 'Glass' language-agnostic symbol server, and a generic read-only LSP server (glean-lsp) offering definition, references, hover, outline and symbol search. It indexes in batch and serves a static snapshot; the tree contains no MCP server, no Claude Code/Codex integration, and no editing or diagnostics features (evidence in the fields below).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Glean is a system for working with facts about source code: per-symbol information (location, type, relationships), cross-references such as function/method calls, and call hierarchies, type hierarchies, etc.",
+          "citation": "README.md:8-11"
+        },
+        {
+          "claim": "It is used for collecting and storing detailed information about code structure at scale, and for querying it (Angle query language) to power tools 'from online IDE features to offline code analysis'.",
+          "citation": "README.md:13-20"
+        },
+        {
+          "claim": "'There is currently full support for' C++ and C, Hack, Haskell, JavaScript/Flow and Python.",
+          "citation": "README.md:22-30"
+        },
+        {
+          "claim": "Also supports the SCIP or LSIF indexing formats, for Rust (via rust-analyzer), Go, TypeScript, Java, Python and Dotnet.",
+          "citation": "README.md:32-39"
+        },
+        {
+          "claim": "Custom indexers for Python, Java, Kotlin, Erlang, Thrift, Buck and Bazel, C# and Swift exist but 'aren't in the open source release yet'.",
+          "citation": "README.md:41-51"
+        },
+        {
+          "claim": "Glean is licensed under a BSD LICENSE.",
+          "citation": "README.md:53-55"
+        },
+        {
+          "claim": "Contributions via GitHub pull requests require signing the Contributor License Agreement; Haskell style is checked with hlint (80 columns, -Wall clean); C++ must compile with Clang or GCC; feedback via GitHub issues and a Discord server.",
+          "citation": "README.md:57-75"
+        },
+        {
+          "claim": "Building is documented in the 'Building Glean' page; that page states Linux only ('only tested on Linux so far'), built on x86_64 and arm64v8, using GHC and Cabal.",
+          "citation": "README.md:77-79; glean/website/docs/building.md:19-26"
+        },
+        {
+          "claim": "Docker demo: `docker run -ti -p8888:8888 ghcr.io/facebookincubator/glean/demo` (React codebase with hyperlinks); a variant mounts your own code (needs a .flowconfig) at /glean_demo/code; a `shell` argument drops into a shell with the glean binaries.",
+          "citation": "README.md:81-90"
+        },
+        {
+          "claim": "glean-lsp is 'a generic LSP server that provides a minimal set of LSP features using Glean data', works 'for any language supported by Glean and Glass', and provides Go to Definition, Go to References, Type on Hover, Outline and Symbol Search.",
+          "citation": "glean/lsp/README.md:3-18"
+        },
+        {
+          "claim": "The LSP server is 'purely static': it will not re-index source files when they are edited; the indexer must be re-run manually (no restart of VS Code or the server needed).",
+          "citation": "glean/lsp/README.md:20-23"
+        },
+        {
+          "claim": "Using glean-lsp from VS Code requires a generic LSP client such as 'Generic LSP Client (v2)' plus workspace settings naming the Glean DB; only VS Code is documented.",
+          "citation": "glean/lsp/README.md:49-76"
+        },
+        {
+          "claim": "Website landing page: 'Agent- and tool-friendly: Query via CLI, language-specific APIs or Thrift - ideal for IDEs, code review bots, refactoring tools, LLM coding agents'; 'Coding agents, IDEs, and developer tools query Glean instead of relying on grep'.",
+          "citation": "glean/website/src/pages/index.js:56-64, 156-160"
+        },
+        {
+          "claim": "Query docs (open-source build): 'There is currently only a Haskell API; APIs in other languages are coming soon'; the Thrift API's querying methods are userQuery and userQueryFacts.",
+          "citation": "glean/website/docs/query/intro.md:56-61, 74-85"
+        }
+      ],
+      "install": [
+        {
+          "method": "cabal from Hackage (glean, glean-server, glass-server); Linux; needs ghcup (GHC 9.6.7 + cabal) and ~35 apt packages first",
+          "command": "cabal install glean",
+          "citation": "glean/website/docs/building.md:28-32, 45-86, 137-149"
+        },
+        {
+          "method": "cabal from Hackage (generic LSP server; installs glean-lsp, e.g. ~/.cabal/bin/glean-lsp)",
+          "command": "cabal install glean-lsp",
+          "citation": "glean/website/docs/building.md:163-168; glean/lsp/README.md:25-27, 69"
+        },
+        {
+          "method": "cabal from Hackage (C++ indexer; needs clang-15 dev packages). Conflicts with glean/website/docs/indexer/cxx.md:41, which says the clang indexer is not on Hackage and must be built with `make glean-clang`",
+          "command": "cabal install glean-clang",
+          "citation": "glean/website/docs/building.md:88-92, 170-174"
+        },
+        {
+          "method": "Build from the repository (Linux): clone, install hsthrift/folly/rocksdb deps, build, test",
+          "command": "git clone https://github.com/facebookincubator/Glean.git && cd Glean && ./install_deps.sh && cabal update && make && make test",
+          "citation": "glean/website/docs/building.md:176-224"
+        },
+        {
+          "method": "Docker demo image (docs elsewhere say the image is 'currently not working')",
+          "command": "docker run -ti -p8888:8888 ghcr.io/facebookincubator/glean/demo",
+          "citation": "README.md:81-84; glean/website/docs/docker.md:11-16"
+        },
+        {
+          "method": "scip-to-glean converter (required by every SCIP-based indexer; needs a Rust toolchain)",
+          "command": "cargo install --git https://github.com/facebookincubator/Glean --path glean/lang/scip/indexer/scip_to_glean/cli",
+          "citation": "glean/website/docs/indexer/python-scip.md:46-57"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - primary platform. building.md:19-20 ('We build on x86_64 and arm64v8'); Ubuntu is 'the most well-tested platform' (glean/website/docs/building.md:36-43); CI builds and tests on an ubuntu:24.04 container with GHC 9.2.8/9.4.7/9.6.7 (.github/workflows/ci.yml:12-20). Linux aarch64 is also built, without a test step, in .github/workflows/ci-aarch64.yml:12-17,102-115.",
+        "wsl2": "unknown - no mention of WSL/WSL2 in docs, CI or code (the only grep hits are unrelated yarn.lock entries); upstream CI uses only native Linux runners.",
+        "macos_arm64": "no - glean/website/docs/building.md:19-20: 'The build is only tested on Linux so far; we hope to add support for other OSs in the future'. No macOS CI job or install steps (.github/workflows/ci.yml:17-19; ci-aarch64.yml:17). A few macOS-conditional lines exist in source (glean/rts/serialize.h:26-35; glean/lang/clang/Setup.hs:88-91) but nothing is documented or tested.",
+        "gpu": "no - not applicable; no GPU/CUDA code path. The only 'cuda' hits are a '.cu' file-extension to C++ mapping (glean/glass/Glean/Glass/Repos.hs:242) and a SCIP protobuf language enum (glean/lang/scip/indexer/scip_to_glean/cli/proto/scip.proto:830)."
+      },
+      "integrations": {
+        "cli": "Yes. `glean` CLI (index/create/write/derive/query/backup/restore/etc.: glean/website/docs/cli.md:15-223; executable at glean.cabal.in:1315-1354), `glean shell` (glean/website/docs/shell.md:7-43; a QUERY argument runs once and exits, shell.md:56-59), `glean-server` (glean/website/docs/server.md:9-26), `glass-server` and `glass-democlient` with list/describe/references/location/search commands (glean/glass/tools/Glean/Glass/Test/DemoClient.hs:46-95; default 127.0.0.1:26073 at lines 43-44), and the demo `glean-hyperlink` web server (glean/website/docs/trying.md:101-125). The `glass` CLI described in glean/glass/ARCHITECTURE.md:262-281 lives under glean/glass/facebook/, which is not in this tree (no files found).",
+        "mcp": "none found - a case-insensitive search of the whole tree for 'MCP' / 'model context protocol' returns no matches. README.md (91 lines, README.md:1-91) mentions none of LSP, Glass, MCP, Claude Code or Codex.",
+        "sdk_or_api": "Thrift services: GleanService (glean/if/glean.thrift:1119-1334: userQuery/userQueryFacts plus write, derive and DB-management RPCs) and GlassService (glean/glass/if/glass.thrift:953-1040: documentSymbolListX, documentSymbolIndex, findReferenceRanges(+V2), describeSymbol, symbolLocation, resolveSymbols, searchSymbol, searchRelated, searchRelatedNeighborhood, fileIncludeLocations, clangUSRToDefinition, usrToDefinition; all read-only). Default transport is Thrift-over-HTTP (cabal flag fbthrift defaults False: glean.cabal.in:136-138; glean/server/Glean/Server.hs:26-31). Client libraries: Haskell only in the open-source docs (glean/website/docs/query/intro.md:56-61; glean/client/hs). A Python Glass client file exists but imports Meta-internal modules libfb and servicerouter (glean/glass/client/py3/__init__.py:10,33-35,39). LSP: glean-lsp (glean/lsp/Glean/LSP.hs) serves hover, definition, references, document symbols and workspace symbol; no rename, code-action, completion or diagnostics handlers (LSP.hs:267-291).",
+        "claude_code_or_codex": "none found - searching the tree for claude/anthropic/codex/openai hits only website marketing text mentioning 'LLM coding agents' (glean/website/src/pages/index.js:61,199), unrelated 'Codex-style' symbol-id comments (glean/glass/Glean/Glass/SymbolId.hs:111; glean/glass/Glean/Glass/SymbolId/Class.hs:44) and an internal-wiki link (glean/website/docs/write.md:36). No CLAUDE.md, AGENTS.md, .mcp.json, .claude/, .codex/, plugin manifest or skill files exist. glean-lsp is documented only for VS Code via the Generic LSP Client (glean/lsp/README.md:49-76)."
+      },
+      "telemetry_and_network": "No telemetry or phone-home found in the open-source build. Logging and stats hooks are compiled-in no-op stubs (glean/github/Logger/IO.hs:13-16; glean/github/Logger/GleanGlass.hs:15-24; glean/github/ServiceData/GlobalStats.hs:16-35); the docs say `--enable-logging` has 'no logging backend implemented for the open-source build' (glean/website/docs/running.md:165-172); outbound auth headers are an identity function (glean/github/Glean/Auth.hs:9-26); Scribe writes throw 'not supported' (glean/github/Glean/Datasource/Scribe/Write.hs:21-22); Glass `--trace-to-vlog` only logs locally (glean/glass/Glean/Glass/Options.hs:92-96). No accounts or API keys are required. Network use: (a) glean-server and glass-server listen on a port (Glass default 26073: glean/glass/Glean/Glass/Config.hs:24-25; glean-server --port: glean/server/Glean/Server/Config.hs:31), speaking Thrift over HTTP by default with a /health endpoint (glean/github/Facebook/Service/HttpFb303.hs:19-34). The HTTP server, TLS and bind-address code live in the external hsthrift repo (not in this tree), so bind address and TLS are unknown. The open-source build has no inbound authentication (auth code is compiled only under GLEAN_FACEBOOK: glean/server/Glean/Server.hs:223-253; glean/glass/Glean/Glass/Main.hs:158-173) while the service RPCs include writes, deletes and restores (glean/if/glean.thrift:1146-1287); the only documented mitigation is `--db-read-only` (glean/website/docs/running.md:154-156). (b) An optional S3 DB backup/restore backend (cabal flag s3-support defaults True: glean.cabal.in:96-98) registers an 's3' backend that uses AWS credential discovery, with usage via s3: locators (glean/db/backup/s3/Glean/Database/Backup/S3.hs:10-22,69-72). (c) glean-lsp runs Glass in-process and reads local DBs or a --service HOST:PORT server (glean/lsp/Glean/LSP.hs:35-43,317-322; glean/lsp/README.md:91-108). (d) Build time: install_deps.sh clones https://github.com/facebookincubator/hsthrift.git unpinned and builds folly/rocksdb (install_deps.sh:18,33-43); cabal needs the Hackage index (index-state pinned at cabal.project:25). Indexers shell out to external tools (flow, hh_server, scip-*, elp) whose own network behaviour is outside this repo."
+    },
+    "code": {
+      "languages": [
+        "Haskell (core: DB, query, server, CLI, Glass, LSP)",
+        "C++20 (RTS, storage backends, clang indexer)",
+        "Angle (schema/query DSL; about 95 .angle files in glean/schema/source)",
+        "Thrift IDL",
+        "Rust (scip-to-glean converter)",
+        "Python, JavaScript, Shell (tests, tooling, Docusaurus site, Angle VS Code extension)",
+        "Alex/Happy (Angle lexer/parser)",
+        "m4 (glean.cabal.in template)"
+      ],
+      "entry_points": [
+        {
+          "path": "glean/tools/gleancli/GleanCLI.hs",
+          "what": "`glean` CLI executable (index/create/write/derive/query/backup/...; interactive shell in glean/shell) - glean.cabal.in:1315-1354"
+        },
+        {
+          "path": "glean/server/Glean/Server.hs",
+          "what": "`glean-server`: Thrift-over-HTTP server that manages local databases (glean.cabal.in:1192-1220; options in glean/server/Glean/Server/Config.hs:19-50)"
+        },
+        {
+          "path": "glean/glass/server/Server.hs",
+          "what": "`glass-server`: calls Glean.Glass.Main.mainWith (glean/glass/Glean/Glass/Main.hs:96-99); API defined in glean/glass/if/glass.thrift (glean.cabal.in:1583-1590)"
+        },
+        {
+          "path": "glean/lsp/Glean/LSP.hs",
+          "what": "`glean-lsp`: generic LSP server (main at LSP.hs:317-322) embedding Glass as a library; separate package glean/lsp/glean-lsp.cabal:65-70"
+        },
+        {
+          "path": "glean/demo/Hyperlink.hs",
+          "what": "`glean-hyperlink`: demo web server serving hyperlinked source from a Glean DB (glean.cabal.in:1356-1369; glean/website/docs/trying.md:101-125)"
+        },
+        {
+          "path": "glean/lang/haskell/HieIndexer/Main.hs",
+          "what": "`hie-indexer`: Haskell indexer that consumes GHC .hie files (needs GHC >= 9.2: glean.cabal.in:78-82,1409-1427)"
+        },
+        {
+          "path": "glean/lang/clang/index.cpp",
+          "what": "`clang-index`: C++/C indexer linked against libclang/LLVM, package glean-clang (glean/lang/clang/glean-clang.cabal:122-146)"
+        },
+        {
+          "path": "glean/lang/scip/indexer/scip_to_glean/cli/src/main.rs",
+          "what": "`scip-to-glean`: Rust converter from SCIP protobuf to Glean facts JSON, needed by SCIP-based indexers (cli/Cargo.toml:12-14; Makefile:152-157)"
+        }
+      ],
+      "architecture": "Index-then-query pipeline. (1) Indexers (glean/lang/*, registry in glean/index/list/Glean/Indexer/List.hs:49-74) mostly wrap external tools - clang-index (glean/lang/clang), hh_server, flow, hie-indexer (glean/lang/haskell), scip-*/lsif tools plus the Rust scip-to-glean converter (glean/lang/scip/indexer/scip_to_glean) - and emit JSON/binary facts typed by Angle schemas (glean/schema/source/*.angle; generated Haskell/Thrift/C++ via the gen-schema target, Makefile:282-292). (2) Facts are stored in immutable, de-duplicated databases by the C++ runtime glean/rts (fact store, bytecode evaluator, ownership, queries) on RocksDB (glean/rocksdb) or experimental LMDB (glean/lmdb, glean/lmdb-clib); Haskell glean/db manages DB lifecycle, schema, Angle typechecking/compilation (glean/db/Glean/Query/*) and backups (glean/db/backup/s3); glean/angle holds the Angle lexer/parser (Lexer.x, Parser.y). (3) glean/server serves GleanService (glean/if/glean.thrift); glean/client/hs plus glean/backend-api and glean/backend-local give local-or-remote Haskell access; the `glean` CLI and shell (glean/tools/gleancli, glean/shell) work on local DBs or a server. (4) Glass (glean/glass) is a language-agnostic symbol service built on the codemarkup.* schemas, exposing GlassService (glean/glass/if/glass.thrift; glean/glass/ARCHITECTURE.md:3-5). (5) glean-lsp (glean/lsp; 3 Haskell modules) embeds Glass in-process (LSP.hs:35-43) and maps documentSymbolIndex, findReferenceRanges and searchSymbol onto LSP (LSP.hs:437,505,571). Build glue: glean.cabal.in (m4-generated glean.cabal), cabal.project, Makefile + mk/*.mk (C++ libs), install_deps.sh (clones hsthrift). Docs/site: glean/website (Docusaurus); glean/vscode (Angle syntax highlighting only). Source layout overview: glean/ROADMAP.md:57-146.",
+      "packaging_and_release": "No release workflow, checksums, signatures, SBOM or provenance attestations exist in .github (searched for attest/cosign/sigstore/sha256/checksum/provenance/gpg/slsa/cabal upload/gh release: no matches). Hackage packages are uploaded manually (glean 0.2.0.0 per glean/website/blog/2026-02-06-glean-0-2.md:13-16; HEAD is glean 0.2.0.1 at glean.cabal.in:6, not yet in CHANGELOG.md:3; glean-lsp 0.1.0.0: glean/lsp/glean-lsp.cabal:3; glean-clang 0.1.0.0: glean/lang/clang/glean-clang.cabal:6). glean.cabal is generated from glean.cabal.in by m4 and is gitignored (Makefile:126-131; .gitignore:7). Makefile `install` is a stub (Makefile:371-374). The demo Docker image is rebuilt manually or every Monday and pushed to ghcr.io/facebookincubator/glean/demo as :latest and a date tag (.github/workflows/glean-docker.yml:4-10,35-43). The VS Code extension .vsix is uploaded as a CI artifact (ci.yml:212-228). The docs site is deployed to GitHub Pages on push (.github/workflows/gh_pages.yml:20-36). No git tags are visible in this shallow clone.",
+      "tests_and_ci": "Frameworks: Haskell tasty/HUnit/QuickCheck test-suites (65 `test-suite` stanzas in glean.cabal.in; run by `make test` = `cabal test glean:tests`, Makefile:166-168); C++ GoogleTest (e.g. glean.cabal.in:2149-2157; mk/cxx-make.mk:74-76); snapshot/golden 'regression' framework (glean/test/regression, per-indexer .query/.out cases under glean/lang/*/tests; glean/test/README.md:3-4); Glass unit and regression modules (glean/glass/test: 5 unit + ~31 regression modules); a shell test (glean/bytecode/gen/tests/bytecode_gen_cpp_test.sh). Approximate counts: 48 Haskell *Test.hs files (glean/test/tests has about 45 incl. Angle/ and Schema/), 22 C++ *Test.cpp files (glean/rts/tests has 9), plus a few Python tests. glean-lsp has no tests (glean/lsp/glean-lsp.cabal has no test-suite) and CI only builds it (ci.yml:209-210). CI workflows: ci.yml (push + PR; matrix GHC 9.2.8/9.4.7/9.6.7 on an ubuntu:24.04 container, 32-core runner; installs scip-python, flow-bin, scip-typescript@0.3.15, scip-dotnet, scip-go, lsif-java and a nightly rust-analyzer; runs `make`, `make glass`, `make glean-clang`, `make glean-hie`, `make test`, `make glean-lsp`; hack tests disabled via -f-hack-tests at lines 178-179; separate job that builds the VS Code .vsix), ci-aarch64.yml (push + PR; ARM runner, ghc 8.10.7 + clang-15; build only, no test step; its last step runs `make glean-hiedb`, a target not defined in the Makefile, which has only glean-hie: Makefile:353-354), codeql.yml (push/PR to main + weekly; languages actions, python, javascript-typescript only - Haskell and C/C++ excluded: codeql.yml:25-29), glean-docker.yml (demo image), gh_pages.yml (docs). go-tests and java-lsif-tests default to False (glean.cabal.in:120-122,128-130).",
+      "dependencies": "Haskell/cabal: glean.cabal.in (generated to glean.cabal; 50 libraries, 17 executables, 65 test-suites). The shared `deps` stanza lists 51 direct packages (glean.cabal.in:150-202) and about 45 more distinct external packages appear in individual stanzas (e.g. amazonka, amazonka-s3, conduit, unliftio, microlens, http-client for S3; wai, warp, http-types; haskeline; criterion; QuickCheck; yaml; ghc, hiedb, hie-compat), roughly 96 distinct external Haskell packages (manual tally). base is bounded <4.19, i.e. GHC <= 9.6 (glean.cabal.in:173). Core packages fb-util, thrift-lib, thrift-http, thrift-server, thrift-haxl, mangle and folly-clib come from the separate hsthrift repository, cloned at HEAD by install_deps.sh (cabal.project:3-18; install_deps.sh:18,33-43). No cabal freeze file; only index-state 2025-04-14 (cabal.project:25). glean/lsp/glean-lsp.cabal: 20 build-depends (17 external incl. lsp >=2.7 <2.8, plus glean:glass-lib, glean:if-glass-hs, glean:util). glean/lang/clang/glean-clang.cabal: 18 in the shared deps stanza (lines 49-68) plus clang-derive extras, links clang-cpp, LLVM, glog, fmt, gflags, re2. glean/lmdb-clib/lmdb-clib.cabal: C library wrapper (no Haskell deps). Rust: glean/lang/scip/indexer/scip_to_glean (3-crate workspace; cli has 10 dependencies incl. 1 path dep, plus 1 build-dep and 1 dev-dep; scip_symbol 2; scip_symbol_parse 4; Cargo.lock present). Node: glean/website/package.json (9 dependencies, 11 devDependencies, yarn.lock), glean/vscode/package.json (0 dependencies, 1 devDependency). System packages: about 35 apt packages (glean/website/docs/building.md:45-86) incl. boost, folly, rocksdb, libsodium; C++20 (glean.cabal.in:59); clang-15 dev libs for the C++ indexer (building.md:88-92).",
+      "security_policy": "none - no SECURITY.md anywhere in the tree (glob found none). CONTRIBUTING.md:25-27 only says Facebook has a bounty program for the safe disclosure of security bugs and asks reporters not to file public issues. No dependabot config or CODEOWNERS found."
+    },
+    "claim_checks": [
+      {
+        "claim": "glean-lsp provides Go to Definition, Go to References, Type on Hover, Outline and Symbol Search (glean/lsp/README.md:12-16).",
+        "verified": "yes",
+        "evidence": "Handlers are registered in glean/lsp/Glean/LSP.hs:267-291: hover (272), definition (273), references (276), workspace symbol (284), document symbols (288), plus open/close/cancel/config. Definition = cross-reference targets from Glass documentSymbolIndex (LSP.hs:412-420, 587-591); hover returns only the 'symbolSignature' attribute as plain text (LSP.hs:473-487). Commented out / absent: type definition, implementation, rename, prepareRename, didChange, didSave, codeAction, completion (LSP.hs:274-275, 277-278, 281-282, 286-289). It needs --db-root or --service, otherwise 'No default Glean service' (glean/client/hs/local/Glean/LocalOrRemote.hs:136-143)."
+      },
+      {
+        "claim": "The LSP server is 'purely static' and does not re-index edited files (glean/lsp/README.md:20-23).",
+        "verified": "yes",
+        "evidence": "didChange/didSave handlers are commented out (glean/lsp/Glean/LSP.hs:281-282); the in-file TODO lists 'update index after edits' and 'can we show errors somehow?' as not done (LSP.hs:48-63); the symbol cache is dropped only on config change or didClose (LSP.hs:257-259, 351-357). No publishDiagnostics, WorkspaceEdit, TextEdit or CodeAction exists in glean/lsp or glean/glass (searched; only commented-out handler names), and the Glass API is read-only (glean/glass/if/glass.thrift:953-1040)."
+      },
+      {
+        "claim": "glean-lsp 'works for any language supported by Glean and Glass' (glean/lsp/README.md:9-10).",
+        "verified": "partial",
+        "evidence": "Support per language depends on Glass/codemarkup and on having an indexed DB; the README itself says 'Some languages might be missing certain features' (glean/lsp/README.md:172-175). Glass maps file extensions to 17 languages (glean/glass/Glean/Glass/Repos.hs:237-296; the Language enum has 29 values: glean/glass/if/glass.thrift:644-674). In the OSS build the Glass repo name is simply the Glean DB name (AutoRepoMapping: glean/glass/Glean/Glass/RepoMapping.hs:32-36; Repos.hs:216-217). The LSP default repo is 'stackage' unless the client supplies config section 'glean-lsp' (LSP.hs:88-100, 260); a workspace root is mandatory (LSP.hs:227-233); DB paths must be workspace-relative (LSP.hs:442-444, 593-598)."
+      },
+      {
+        "claim": "README: 'full support' for C++ and C, Hack, Haskell, JavaScript/Flow and Python (README.md:24-30).",
+        "verified": "partial",
+        "evidence": "The OSS `glean index` registry has wrappers for cpp, hack, flow, haskell-hie and python-scip (glean/index/list/Glean/Indexer/List.hs:49-74), but each relies on a tool outside the repo: hh_server (glean/lang/hack/Glean/Indexer/Hack.hs:25-28), flow (glean/lang/flow/Glean/Indexer/Flow.hs:26-29), scip-python (glean/lang/python-scip/Glean/Indexer/PythonScip.hs:26-29), clang/LLVM libs (glean/lang/clang/glean-clang.cabal:136-144), GHC >= 9.2 for hie (glean.cabal.in:78-82). The Meta-internal Python indexers (Glean.Indexer.Python, PythonPyrefly) are behind GLEAN_FACEBOOK (List.hs:28-34, 57-63) and not exposed, so 'Python' in OSS means Sourcegraph scip-python; the README link /docs/indexer/python has no matching doc source (glean/website/sidebars.js:82-94 lists indexer/scip-python). CI disables Hack tests (.github/workflows/ci.yml:178-179)."
+      },
+      {
+        "claim": "README: SCIP/LSIF-based support for Rust, Go, TypeScript, Java, Python and Dotnet (README.md:32-39).",
+        "verified": "yes",
+        "evidence": "Indexers registered for rust-scip, go, java-lsif, typescript, python-scip, dotnet-scip plus generic lsif/scip (glean/index/list/Glean/Indexer/List.hs:65-73). Each needs external tools (CI installs rust-analyzer, scip-go, lsif-java, scip-typescript, scip-python, scip-dotnet: ci.yml:51-108) and the Rust scip-to-glean converter (glean/website/docs/indexer/python-scip.md:46-57). Docs vs code: the --scip-to-glean help text claims a fallback 'to the Haskell converter if not found' (PythonScip.hs:32-34), but glean/lang/scip/Glean/SCIP/Driver.hs:82-92 simply errors 'scip-to-glean not found'; the code matches the docs and the help text is stale. Go and Java-LSIF tests are off by default (glean.cabal.in:120-122, 128-130)."
+      },
+      {
+        "claim": "README: custom indexers for Python, Java, Kotlin, Erlang, Thrift, Buck/Bazel, C# and Swift 'aren't in the open source release yet' (README.md:41-51).",
+        "verified": "partial",
+        "evidence": "Erlang and Swift wrappers ARE registered in the open-source list (List.hs:53, 70): Erlang shells out to `elp` (glean/lang/erlang/Glean/Indexer/Erlang.hs:51-106) and Swift to `scip-gen` (glean/lang/swift/Glean/Indexer/Swift.hs:56-83), but those binaries are not in the repo. Buck, Fbthrift, Python, PythonPyrefly and Yaml indexers are gated behind GLEAN_FACEBOOK (List.hs:28-34, 57-63). glean/lang/java-alpha/Glean/Indexer/Java.hs exists but is not registered in List.hs."
+      },
+      {
+        "claim": "README: Glean handles cross-references, call hierarchies and type hierarchies (README.md:8-11).",
+        "verified": "partial",
+        "evidence": "Glass searchRelated supports RelationType Extends/Contains/Calls/Require*/Generates (glean/glass/if/glass.thrift:756-764) with call handling in glean/glass/Glean/Glass/Handler/Symbols.hs:726-728, 841-902 (C++-specific branch at 850). glean-lsp implements none of call hierarchy or type/implementation navigation (call hierarchy only in the TODO at glean/lsp/Glean/LSP.hs:48-51; type definition/implementation handlers commented out at 274-275)."
+      },
+      {
+        "claim": "Website: Glean is 'Agent- and tool-friendly - Query via CLI, language-specific APIs or Thrift' for 'LLM coding agents' (glean/website/src/pages/index.js:56-64).",
+        "verified": "partial",
+        "evidence": "CLI (glean/website/docs/cli.md:15-223), Thrift (glean/if/glean.thrift:1119-1334; glean/glass/if/glass.thrift:953-1040) and a Haskell client exist. Open-source docs state only a Haskell API exists (glean/website/docs/query/intro.md:56-61); the Python Glass client imports Meta-internal libfb/servicerouter (glean/glass/client/py3/__init__.py:10,33-35,39). No MCP server, agent skill, Claude Code or Codex integration found anywhere in the tree (searches for MCP, claude, anthropic, codex, openai)."
+      },
+      {
+        "claim": "README: Docker demo works via `docker run -ti -p8888:8888 ghcr.io/facebookincubator/glean/demo` and a variant mounting code at /glean_demo/code (README.md:81-90).",
+        "verified": "no",
+        "evidence": "glean/website/docs/docker.md:11-16 and trying.md:11-17 warn 'The Docker image is currently not working'. Dockerfile:17 does `ADD ./Setup.hs` but no Setup.hs exists at the repo root (only glean/lang/clang/Setup.hs). The README mount target /glean_demo/code (README.md:87) differs from the entrypoint's check for '/glean-demo/code' (docker_entrypoint.sh:15; Dockerfile:68), so the 'your own code' command would not trigger indexing. The weekly workflow still builds and pushes the image (.github/workflows/glean-docker.yml:7-10,35-43); the published image's behaviour could not be checked."
+      },
+      {
+        "claim": "Linux-only, x86_64 and arm64v8, GHC with Cabal (glean/website/docs/building.md:19-26; README.md:77-79).",
+        "verified": "yes",
+        "evidence": "CI runs only Linux: ubuntu:24.04 container on a 32-core runner (.github/workflows/ci.yml:17-20) and an Ubuntu ARM runner (ci-aarch64.yml:17); no macOS/Windows jobs. The base <4.19 bound (glean.cabal.in:173) limits builds to GHC <= 9.6, consistent with the CI matrix 9.2.8/9.4.7/9.6.7 (ci.yml:14) and the docs' 9.6.7 (building.md:31). Caveats: ci-aarch64.yml uses ghc 8.10.7 (line 14), has no test step, and ends with `make glean-hiedb` (line 115), a target absent from the Makefile (Makefile:353-354 defines glean-hie)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "LMDB vs RocksDB storage backend (LMDB is experimental)",
+        "metric": "relative performance on the project's own benchmarks",
+        "value": "'around 30-40% better' in most benchmarks (blog); 'at least for some benchmarks performs 30-40% faster' (CHANGELOG); the project also reports unresolved performance issues with very large indexing jobs; benchmark data and method are not in the tree",
+        "source": "glean/website/blog/2026-02-06-glean-0-2.md:48-54; CHANGELOG.md:8-10",
+        "independent": false
+      },
+      {
+        "what": "Incremental (stacked) DBs: cost of computing fact ownership at indexing time",
+        "metric": "indexing-time overhead",
+        "value": "2-3% for Python; 'in the noise' for Hack",
+        "source": "glean/website/blog/2022-12-01-incremental.md:130-133",
+        "independent": false
+      },
+      {
+        "what": "Incremental (stacked) DBs: query overhead after caching optimisations",
+        "metric": "query-time overhead vs non-incremental DB",
+        "value": "less than 10% for 'typical' Glass-style queries; around 3x for search-heavy queries",
+        "source": "glean/website/blog/2022-12-01-incremental.md:134-135",
+        "independent": false
+      },
+      {
+        "what": "Incremental DBs: ownership bookkeeping",
+        "metric": "DB size increase",
+        "value": "about 7%",
+        "source": "glean/website/blog/2022-12-01-incremental.md:107",
+        "independent": false
+      },
+      {
+        "what": "Indexing LLVM + Clang with the C++ indexer (cpp-cmake, -j12)",
+        "metric": "memory estimate",
+        "value": "'should need no more than 16GB or so with 12 indexer processes running in parallel'; building LLVM itself 'tends to OOM' a 32GB laptop at -j12",
+        "source": "glean/website/blog/2026-02-06-glean-0-2.md:99-101, 118-121",
+        "independent": false
+      },
+      {
+        "what": "Illustrative glean shell timings on a Stackage 21.21 Haskell DB (21,735,709 facts, 1.06 GiB); single runs, not a benchmark",
+        "metric": "query time reported by the shell",
+        "value": "1.18 ms to 26.40 ms for example queries (e.g. 267 results in 26.40 ms); a `src.File _` query limited to 5 results took 151.82 ms in the glean-lsp README",
+        "source": "glean/website/blog/2026-02-06-glean-0-2.md:231, 254, 277, 306, 323; glean/lsp/README.md:162",
+        "independent": false
+      },
+      {
+        "what": "C++ indexer speed",
+        "metric": "qualitative statement",
+        "value": "'similar to running the clang frontend' (no number given)",
+        "source": "glean/website/docs/indexer/cxx.md:19-20",
+        "independent": false
+      },
+      {
+        "what": "Scale claim on the website",
+        "metric": "marketing claim, no measurement",
+        "value": "'designed to index monorepos with billions of facts'",
+        "source": "glean/website/src/pages/index.js:38-46",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Read-only, batch-indexed navigation: glean-lsp serves a static index and ignores didChange/didSave (glean/lsp/Glean/LSP.hs:281-282); re-indexing is manual (glean/lsp/README.md:20-23); post-edit re-index and error display are listed as unimplemented TODOs (LSP.hs:48-63). No diagnostics, rename, code-action or any edit capability exists (LSP.hs:277-278, 286-287; Glass API is read-only: glean/glass/if/glass.thrift:953-1040). glean-lsp has no test-suite (glean/lsp/glean-lsp.cabal) and CI only builds it (.github/workflows/ci.yml:209-210).",
+      "Integration gap for agent clients: no MCP server and no Claude Code/Codex plugin, skill or config in the tree. glean-lsp is documented only for VS Code + Generic LSP Client (glean/lsp/README.md:49-76). It requires a workspace root from the client (LSP.hs:227-233), reads the DB name from client config section 'glean-lsp' with default 'stackage' (LSP.hs:88-100, 260), and needs DB file paths relative to the workspace root, the most common failure per the docs (glean/lsp/README.md:141-146; blog 2026-02-06-glean-0-2.md:122-126).",
+      "Heavy, Linux-only build: no macOS support (glean/website/docs/building.md:19-20); GHC <= 9.6 (base <4.19, glean.cabal.in:173); about 35 system packages (building.md:45-86); folly and rocksdb are built through the separate hsthrift repo cloned unpinned at HEAD (install_deps.sh:18,33-43); builds are slow because cabal cannot build C++ in parallel (blog 2026-02-06-glean-0-2.md:30-34); 16 GB RAM suggested for faster builds (building.md:231). Useful indexing also needs per-language toolchains (hh_server, flow, scip-*, clang/LLVM libs) plus the Rust scip-to-glean converter (glean/website/docs/indexer/python-scip.md:46-57).",
+      "Security posture: the OSS server has no inbound authentication; auth hooks are no-ops (glean/github/Glean/Auth.hs:24-26) and the real auth code compiles only under GLEAN_FACEBOOK (glean/server/Glean/Server.hs:223-253; glean/glass/Glean/Glass/Main.hs:158-173), yet GleanService exposes writes, deletes and restores (glean/if/glean.thrift:1146-1287); the only documented mitigation is --db-read-only (glean/website/docs/running.md:154-156). Bind address/TLS are implemented in the external hsthrift package (unknown here). External indexers run through a shell command string (glean/index/Glean/Indexer/External.hs:139-145). No SECURITY.md (CONTRIBUTING.md:25-27 defers to Meta's bounty program); CodeQL covers only actions/python/javascript-typescript, not Haskell or C/C++ (.github/workflows/codeql.yml:25-29).",
+      "Docs and CI drift: the README advertises a Docker demo that the docs call 'currently not working' (README.md:81-90 vs glean/website/docs/docker.md:11-16); Dockerfile:17 references a missing Setup.hs and the image stage uses ubuntu:20.04, ghc-8.10.2 and libssl1.1 (Dockerfile:5,43,58); the README mount path differs from the entrypoint's (README.md:87 vs docker_entrypoint.sh:15). ci-aarch64.yml:115 runs a nonexistent `make glean-hiedb`. glean/website/docs/indexer/cxx.md:22-27,41 says the clang indexer is not on Hackage and was tested with clang 11/12, but building.md:88-92,170-174 and ci.yml:197 use `cabal install glean-clang` and clang-15. The glean-lsp README settings snippet is not valid JSON (glean/lsp/README.md:54-65).",
+      "Internal-mirror and maintenance caveats: the source is mirrored from Meta's internal tree. 54 GLEAN_FACEBOOK-conditional lines across 21 files (searched); internal directories such as glean/glass/facebook are referenced by glean/glass/ARCHITECTURE.md:164,266 but absent; logging, auth, Scribe, source-control and repo-mapping are OSS stubs (glean/github/**; glean/glass/Glean/Glass/RepoMapping.hs:32-60), so the documented `glass` CLI is not available. HEAD version 0.2.0.1 (glean.cabal.in:6) is not in CHANGELOG.md:3; the maintainer contact is a Meta alias (glean.cabal.in:14).",
+      "Release and supply-chain posture: no release workflow, checksums, signatures, SBOM or attestations in .github; Hackage uploads are manual (blog 2026-02-06-glean-0-2.md:13-16); glean.cabal is generated by m4 and gitignored (Makefile:126-131; .gitignore:7); no Haskell freeze file, only an index-state pin (cabal.project:25); Makefile `install` is a stub (Makefile:371-374); core Haskell dependencies (fb-util, thrift-*, folly-clib) live in the separate hsthrift repo (cabal.project:3-18); the demo image is republished weekly as :latest (.github/workflows/glean-docker.yml:7-10,35-43).",
+      "Licensing details: root license is BSD-3-Clause (LICENSE; glean.cabal.in:11), but glean/lsp/LICENSE also embeds MIT (static-ls) and Apache-2.0 (ghcide) notices with a split/garbled tail (glean/lsp/LICENSE:32-70), and glean/lmdb-clib ships the OpenLDAP Public License 2.8 (glean/lmdb-clib/LICENSE:1-3) while its cabal file declares BSD-3-Clause (glean/lmdb-clib/lmdb-clib.cabal:9). Contributions require a Facebook CLA (README.md:59-63)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "facebookincubator/glean",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "cabal from Hackage (glean, glean-server, glass-server); Linux; needs ghcup (GHC 9.6.7 + cabal) and ~35 apt packages first \u2014 `cabal install glean`",
+          "citation": "glean/website/docs/building.md:28-32, 45-86, 137-149",
+          "holds": true,
+          "note": "building.md:137-141 gives `cabal install glean` as the way to install the 'latest stable version'. Lines 143-146 say it installs glean, glean-server and glass-server into ~/.cabal/bin. Lines 49-85 list 37 apt packages, which fits '~35'. Lines 19-20 say Linux only. Wording nit: line 28 *recommends* ghcup ('We recommend installing GHC and Cabal using ghcup'), so strictly what is needed is GHC + Cabal. 9.6.7 is the version the ghcup step installs (line 31), and CI tests 9.2.8/9.4.7/9.6.7 (ci.yml:14)."
+        },
+        {
+          "field": "license",
+          "statement": "spdx BSD-3-Clause, file LICENSE",
+          "citation": "LICENSE:1-30; glean.cabal.in:11-12",
+          "holds": true,
+          "note": "LICENSE is the standard three-clause BSD text: keep the notice in source, reproduce it in binaries, and no endorsement using the Facebook name. glean.cabal.in:11 declares `license: BSD-3-Clause` and line 12 `license-file: LICENSE`."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - primary platform; 'We build on x86_64 and arm64v8'; Ubuntu 'the most well-tested platform'; CI builds and tests on an ubuntu:24.04 container with GHC 9.2.8/9.4.7/9.6.7; Linux aarch64 built without a test step",
+          "citation": "glean/website/docs/building.md:19-20, 36-43; .github/workflows/ci.yml:12-20; .github/workflows/ci-aarch64.yml:12-17,102-115",
+          "holds": true,
+          "note": "building.md:19-20 says 'only tested on Linux so far ... We build on x86_64 and arm64v8', and line 38 says 'the most well-tested platform'. In ci.yml, line 14 has the matrix ghc [9.2.8, 9.4.7, 9.6.7], line 17 runs-on 32-core-ubuntu, and line 19 the image ubuntu:24.04. The x86_64-linux-ghcup download at line 117 confirms x86_64, and `make test` runs at lines 206-207. In ci-aarch64.yml, lines 14-17 set ghc 8.10.7 with clang on 4-core-ubuntu-arm. Steps 102-115 are make, make glass, make glean-clang and make glean-hiedb, with no test step."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "none found - a case-insensitive search of the whole tree for 'MCP' / 'model context protocol' returns no matches; README.md mentions none of LSP, Glass, MCP, Claude Code or Codex",
+          "citation": "README.md:1-91; whole-tree search",
+          "holds": true,
+          "note": "Case-insensitive whole-word searches (`\\bmcp\\b`, `model.?context.?protocol`, `mcp[_-]?server|.mcp.json|mcpServers`) return no matches. The search covers hidden directories, and no files exist under .gitignore'd paths. There are no *mcp* files, .mcp.json, CLAUDE.md, AGENTS.md, .claude or .codex. A raw substring search for 'mcp' does hit `memcpy` and base64 hashes (e.g. glean/rts/binary.h:287, glean/website/yarn.lock:4017), so 'no matches' is true only as a word search. The README contains none of lsp/glass/mcp/claude/codex (case-insensitive), but it is 90 lines, not 91."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "glean-lsp provides Go to Definition, Go to References, Type on Hover, Outline and Symbol Search (verified: yes)",
+          "citation": "glean/lsp/README.md:12-16; glean/lsp/Glean/LSP.hs:267-291, 412-420, 473-487, 587-591; glean/client/hs/local/Glean/LocalOrRemote.hs:136-143",
+          "holds": true,
+          "note": "The README lists exactly these five features. LSP.hs registers handlers for hover (272), definition (273), references (276), workspace symbol (284) and document symbols (288). Commented out: type definition, implementation, rename, prepareRename, didChange, didSave, codeAction, resolveCodeAction, completion and completion-resolve (274-275, 277-278, 281-282, 286-287, 289-290). Definition returns symbolX_target from Glass documentSymbolIndex (418-420, 437, 587-591). Hover returns the symbolSignature attribute as PlainText (480-485). The 'No default Glean service' error is at LocalOrRemote.hs:139-143, reached through Glass Main.hs:123 (withBackendWithDefaultOptions). Citation nits: the range 286-289 also includes the active handleDocumentSymbols at 288, and completion-resolve is at 290. The 'plus open/close/cancel/config' list leaves out initialized (270) and setTrace (285)."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

@@ -1,0 +1,291 @@
+{
+  "contender": "ccusage/ccusage",
+  "revision": {
+    "contender": "ccusage/ccusage",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "ccusage/ccusage",
+        "tag": "v20.0.26",
+        "commit": "d9821088b98aa536c7a385aa1a4579d6fa02269b",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v20.0.26",
+    "commit": "d9821088b98aa536c7a385aa1a4579d6fa02269b",
+    "read_at": "2026-10-02T03:01:59+00:00"
+  },
+  "dossier": {
+    "contender": "ccusage/ccusage",
+    "revision": {
+      "tag": "v20.0.26",
+      "commit": "d9821088b98aa536c7a385aa1a4579d6fa02269b",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "ccusage is a local CLI that parses the usage records coding-agent CLIs write to disk and reports tokens and estimated API-equivalent cost by day, week, month, session and Claude 5-hour block (README.md:24,62; docs/guide/index.md:20-35). It does not modify agent logs, but it does write small caches. The production CLI is a Rust binary shipped through npm platform packages and a Nix flake (AGENTS.md:28-31). For the Claude Code + Codex usage question: one binary reads Claude Code transcripts (~/.claude/projects, ~/.config/claude/projects, or CLAUDE_CONFIG_DIR) and Codex session logs (~/.codex/sessions plus archived_sessions, or CODEX_HOME). It reports input, output, cache-creation and cache-read tokens per agent or merged; for Codex, cache-creation is populated only when the record carries it (rust/adapters/claude/src/paths.rs:23-55; rust/adapters/codex/src/paths.rs:31-64,226-238; rust/crates/ccusage-core/src/types.rs:28-96; rust/adapters/codex/src/types.rs:282-328). It reads 16 other agents too. It has no feature for supplying task context, keeping recoverable originals, or measuring artifact/context reductions; it reports only provider-recorded usage.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Tagline: 'Analyze coding (agent) CLI token usage and costs from local data.'",
+          "citation": "README.md:24"
+        },
+        {
+          "claim": "'ccusage reads local usage data from coding agent CLIs and turns it into daily, weekly, monthly, and session reports.' The supported-sources table lists 18 sources, including Claude Code (`ccusage claude daily`) and Codex (`ccusage codex daily`).",
+          "citation": "README.md:62-83"
+        },
+        {
+          "claim": "'Use `ccusage daily`, `ccusage weekly`, `ccusage monthly`, or `ccusage session` to include every detected source in one report.'",
+          "citation": "README.md:85"
+        },
+        {
+          "claim": "'Cache Token Support: Tracks and displays cache creation and cache read tokens separately'",
+          "citation": "README.md:188"
+        },
+        {
+          "claim": "'JSON Output: Export data in structured JSON format with `--json`'; 'Cost Tracking: Shows costs in USD for each day/month/session'; 'Cost Hiding: Remove cost columns and JSON cost fields with `--no-cost`'",
+          "citation": "README.md:185-187"
+        },
+        {
+          "claim": "'Offline Mode: Use pre-cached pricing data without network connectivity with `--offline`'",
+          "citation": "README.md:189"
+        },
+        {
+          "claim": "'Custom Pricing Overrides: Override token pricing per raw model name in `ccusage.json` without rebuilding'",
+          "citation": "README.md:190"
+        },
+        {
+          "claim": "Claude Code-specific commands: `blocks` = 'Claude Code 5-hour billing windows'; `statusline` = 'Claude Code status line for hooks (Beta)'; feature list: 'Statusline Integration: Compact usage display for Claude Code status bar hooks (Beta)'",
+          "citation": "README.md:120-121,175"
+        },
+        {
+          "claim": "Quick start is `npx ccusage@latest`; package runners (`bunx`, `pnpm dlx`, `pnpx`, `nix run github:ccusage/ccusage -- daily`) run it without a global install; PR preview builds come from pkg.pr.new",
+          "citation": "README.md:57-58,89-107"
+        },
+        {
+          "claim": "'Nix builds embed the LiteLLM pricing file from the locked `litellm` flake input, so sandboxed builds do not fetch pricing at build time.' 'Non-Nix Cargo builds read the same locked LiteLLM revision from `flake.lock` and fetch the pricing file from that revision at build time.'",
+          "citation": "README.md:237-239"
+        },
+        {
+          "claim": "'The scheduled `update pricing` workflow runs the same update and validation, then opens a PR when the pricing snapshot changes.'",
+          "citation": "README.md:245"
+        },
+        {
+          "claim": "Sponsor blurb: 'Lineman.io — a Team & Enterprise solution for Claude Code: 40% lower token usage, full teams spend visibility, and unauthorized-spend alerts.' (advertisement for a different product, not a ccusage statement)",
+          "citation": "README.md:37"
+        },
+        {
+          "claim": "Contributor setup uses the Nix flake dev shell with nix-direnv and `just` recipes (`just fmt`, `just test`, `just check`); the dev shell provides the pinned pnpm, Rust toolchain, git hooks and project utilities",
+          "citation": "README.md:206-225"
+        },
+        {
+          "claim": "Documentation lives at ccusage.com; the license is MIT (c) @ryoppippi",
+          "citation": "README.md:197,269"
+        }
+      ],
+      "install": [
+        {
+          "method": "npx (npm package runner; needs Node)",
+          "command": "npx ccusage@latest",
+          "citation": "README.md:57-58,95"
+        },
+        {
+          "method": "bunx (Bun package runner)",
+          "command": "bunx ccusage",
+          "citation": "README.md:101; docs/guide/installation.md:19-21"
+        },
+        {
+          "method": "pnpm dlx (pnpm package runner)",
+          "command": "pnpm dlx ccusage",
+          "citation": "README.md:102; docs/guide/installation.md:23-25"
+        },
+        {
+          "method": "Nix flake run (README also documents `nix build github:ccusage/ccusage`)",
+          "command": "nix run github:ccusage/ccusage -- daily",
+          "citation": "README.md:98,232-234"
+        },
+        {
+          "method": "npm global install (docs also list `yarn global add ccusage` and `pnpm add -g ccusage`)",
+          "command": "npm install -g ccusage",
+          "citation": "docs/guide/installation.md:57-59,65-71"
+        },
+        {
+          "method": "bun global install",
+          "command": "bun install -g ccusage",
+          "citation": "docs/guide/installation.md:61-63"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - npm optional package @ccusage/ccusage-linux-x64 ('Static native ccusage binary for Linux x64', os=linux, cpu=x64: packages/ccusage-linux-x64/package.json:2-4,14-19); the launcher maps linux/x64 to it (apps/ccusage/src/cli.js:38-45); the release matrix builds it with the musl-static Nix target and CI checks the binary is static (.github/workflows/release.yaml:64-68; .github/actions/build-linux-native-package/action.yaml:26-56); CI E2E runs on ubuntu x64 (.github/workflows/ci.yaml:330-332).",
+        "wsl2": "unknown - no WSL/WSL2 mention in README or docs (a repo-wide search matched only unrelated bun.lock entries) and no CI job runs under WSL (.github/workflows/ci.yaml:330-337). Inference only, not documented: WSL2 reports Node platform 'linux', so the launcher would pick the Linux package (apps/ccusage/src/cli.js:38-45).",
+        "macos_arm64": "yes - npm optional package @ccusage/ccusage-darwin-arm64 (os=darwin, cpu=arm64: packages/ccusage-darwin-arm64/package.json:2,14-19); the release matrix builds it natively with Nix on a macOS runner (.github/workflows/release.yaml:69-73; .github/actions/build-macos-nix-native-package/action.yaml:34-35); CI E2E runs on a macOS runner (.github/workflows/ci.yaml:333-335); flake systems include aarch64-darwin (flake.nix:43-48). macOS x64 is also built, cross-compiled on the arm64 runner (build-macos-nix-native-package/action.yaml:28-33).",
+        "gpu": "no - CPU-only log analyzer; no GPU/CUDA/Metal code or docs found (a search for cuda/gpu/metal/nvidia matched only an unrelated comment in nix/tools/models-dev-gen/compact.ts:33 and a catalog name in rust/crates/ccusage-core/src/models-dev-catalog-rules.json:25)."
+      },
+      "integrations": {
+        "cli": "yes - `ccusage` bin (apps/ccusage/package.json:17-19) -> src/cli.js spawns the native binary with inherited stdio and forwards signals (apps/ccusage/src/cli.js:162-258). Subcommands: daily, monthly, weekly, session, blocks, statusline and per-agent namespaces such as `claude` and `codex` (rust/crates/ccusage/src/main.rs:25-67); with no subcommand it runs the unified daily report (main.rs:53-65). Output is a table or `--json`; `--jq <filter>` pipes the JSON through an external `jq` process (rust/crates/ccusage-cli-parser/src/parser.rs:771; rust/crates/ccusage-core/src/output.rs:158-168). Filters: --since/--until/--last, --timezone, --mode auto|calculate|display, --offline, --breakdown, --instances/--project, --sections, --by-agent (docs/guide/cli-options.md:9-257).",
+        "mcp": "none found - no MCP server in code or docs. The only 'mcp' hits are contributor tooling: .mcp.json:2-10 (remote context7 and grep.app servers for repo-local agents) and a permission entry `mcp__sentry__*` in .claude/settings.json:4.",
+        "sdk_or_api": "none found - no library/SDK or HTTP server. The npm package ships only the bin launcher and config-schema.json (apps/ccusage/package.json:17-23); apps/ccusage/AGENTS.md:7-9 states the public surface is the `ccusage` command, its subcommands and stable `--json` output, 'not library-style TypeScript exports'; the Rust crates are `publish = false` (rust/Cargo.toml:14). The only network code is the pricing client (rust/crates/ccusage/src/http.rs). Programmatic use is subprocess + `--json` (docs/guide/json-output.md:578-681); a JSON Schema for the config file is shipped (apps/ccusage/config-schema.json).",
+        "claude_code_or_codex": "Claude Code: yes. (1) Reads Claude Code JSONL transcripts (rust/adapters/claude/README.md:14-16; rust/adapters/claude/src/paths.rs:23-55). (2) `ccusage statusline` is built to be Claude Code's `statusLine` command: it reads the hook JSON (session_id, transcript_path, model, cost, context_window, effort) from stdin (rust/crates/ccusage/src/commands/mod.rs:310-327,921-951); settings.json snippet at docs/guide/statusline.md:17-31; offline by default (rust/crates/ccusage-cli/src/types.rs:220-224); it keeps an output cache in the OS temp dir (commands/mod.rs:860-877). (3) `ccusage blocks` reports Claude 5-hour windows (commands/mod.rs:262-308; rust/crates/ccusage-core/src/lib.rs:55). Codex: data source only - reads ${CODEX_HOME:-~/.codex}/sessions and archived_sessions (rust/adapters/codex/src/paths.rs:31-64,226-238; rust/adapters/codex/src/README.md:3-11) with `--speed auto|standard|fast` pricing (docs/guide/codex/index.md:40,66-83); docs label Codex support experimental (docs/guide/codex/index.md:5). No end-user plugin, hook or skill for either tool; the repo's .claude/, .codex/ and .agents/skills/ are contributor dev-environment config (.claude/AGENTS.md:1-5; .codex/environments/environment.toml:1-17)."
+      },
+      "telemetry_and_network": "No telemetry, analytics or crash-reporting code found (a repo-wide search for telemetry/analytics/sentry/posthog/tracking matched only docs about Copilot CLI's own OpenTelemetry files that ccusage reads, docs/guide/copilot/index.md:3-5,27). Docs claim '100% Local', 'No Data Transmission', 'Read-Only' (docs/guide/index.md:141-146). Runtime network use is limited to pricing refresh: unless `--offline` or `--mode display`, the binary GETs LiteLLM's model_prices_and_context_window.json from raw.githubusercontent.com and, lazily for models still unpriced, https://models.dev/api.json (rust/crates/ccusage-core/src/pricing.rs:54-56,977-1013,1452-1467; the Claude loader skips pricing in display mode: rust/adapters/claude/src/lib.rs:144-152). The client is ureq+rustls with a 10 s timeout, a 64 MiB cap and only an If-None-Match request header (rust/crates/ccusage/src/http.rs:11-12,75-86); ETag-validated bodies are cached under $XDG_CACHE_HOME/ccusage/http-cache or ~/.cache/ccusage/http-cache (http.rs:22-24,36-52,199-229). Failures fall back silently to the pricing snapshot embedded in the binary (warnings only at LOG_LEVEL>=4: pricing.rs:996-1002,2690-2692). `statusline` defaults to offline (rust/crates/ccusage-cli/src/types.rs:220-224) and writes a per-session file under the OS temp dir ccusage-semaphore/<session>.lock (commands/mod.rs:860-877). No account, API key or login is required or read by the code (no auth header: http.rs:79-82). `--jq` spawns a local jq (output.rs:162-168). Package runners (npx, bunx, pnpm dlx) also contact the npm registry to fetch the package and its platform binary (README.md:57,101-102; apps/ccusage/package.json:32-39). Build time: the `fetch-litellm-pricing` feature downloads the LiteLLM snapshot (rust/crates/ccusage-core/build.rs:83-104; used by Windows release builds: .github/actions/build-windows-native-package/action.yaml:17-21); Nix builds read it from the pinned flake input (README.md:237)."
+    },
+    "code": {
+      "languages": [
+        "Rust (production CLI, 27-crate workspace)",
+        "JavaScript (npm launcher apps/ccusage/src/cli.js)",
+        "TypeScript (tests, fixture generator, Nix-built tooling, docs config)",
+        "Nushell (packaging, release and contribution-gate scripts)",
+        "Clojure/Babashka (PR performance harness)",
+        "Nix (flake, builds, checks)",
+        "Markdown/VitePress (docs site)"
+      ],
+      "entry_points": [
+        {
+          "path": "apps/ccusage/src/cli.js",
+          "what": "npm `bin` launcher: maps platform/arch to @ccusage/ccusage-<platform>-<arch>, chmods and spawns bin/ccusage with inherited stdio, forwards signals, exits 1 with a message if the native package is missing (cli.js:27-109,233-262)."
+        },
+        {
+          "path": "rust/crates/ccusage/src/main.rs",
+          "what": "Native `ccusage` binary main (bin target: rust/crates/ccusage/Cargo.toml:8-10); installs the HTTP pricing fetcher and dispatches subcommands; no subcommand = unified daily report (main.rs:25-67)."
+        },
+        {
+          "path": "rust/crates/ccusage/src/commands/mod.rs",
+          "what": "Claude-namespaced daily/monthly/weekly/session/blocks reports and the `statusline` hook command (reads Claude Code hook JSON on stdin)."
+        },
+        {
+          "path": "rust/crates/ccusage-adapter-all/src/lib.rs",
+          "what": "Unified multi-agent `run` (all detected sources, --sections, --by-agent); loads the Claude and Codex adapters among 18 (loader.rs:120-127)."
+        },
+        {
+          "path": "rust/adapters/claude/src/lib.rs",
+          "what": "Claude Code loader: load_entries / load_daily_summaries, dedupe of copied and sidechain-replayed records (paths.rs, daily.rs alongside)."
+        },
+        {
+          "path": "rust/adapters/codex/src/lib.rs",
+          "what": "Codex adapter run/report_json; parser.rs reads token_count events, replay.rs handles forked/subagent replay, speed.rs resolves service tier."
+        },
+        {
+          "path": "rust/crates/ccusage-config/src/bin/generate_config_schema.rs",
+          "what": "Generates apps/ccusage/config-schema.json; drift is a flake check (nix/checks.nix:86-117)."
+        }
+      ],
+      "architecture": "Rust-first Cargo workspace (rust/Cargo.toml:7; 27 member crates: 19 under adapters/, 8 under crates/; edition 2024; publish=false; pinned toolchain 1.97.1, rust-toolchain.toml:2). apps/ccusage is only the npm shell: launcher, config-schema.json, packaging and benchmark scripts (AGENTS.md:28-31; apps/ccusage/AGENTS.md:3-9). Key modules: rust/crates/ccusage (binary: main.rs dispatch, commands/mod.rs, blocks.rs, http.rs pricing fetcher, adapter/ aliases); rust/crates/ccusage-cli (option types) and ccusage-cli-parser (hand-written parser; help data in cli-help.json/cli-commands.json via build.rs and help_codegen.rs); ccusage-config (config files and JSON-schema generator); ccusage-core (pricing.rs = embedded LiteLLM + models.dev snapshots with optional live refresh, cost.rs, summary.rs, output.rs JSON/table shaping, build.rs embeds deflated snapshots); ccusage-terminal (table rendering); ccusage-adapter-all (unified report); 18 per-agent crates under rust/adapters/<agent> (claude, codex, opencode, amp, droid, codebuff, hermes, pi, goose, openclaw, kilo, kimi, qwen, copilot, gemini, antigravity, grok, zcode; names in ccusage-core/src/lib.rs:59-78) plus rust/adapters/common (recursive *.jsonl discovery, size-balanced chunking, parallel ordered reads: common/src/lib.rs:14-31). Claude adapter: lib.rs (loader, dedupe), daily.rs (narrower daily parser), paths.rs (discovery, --since mtime pruning). Codex adapter: parser.rs, loader.rs, aggregate.rs, replay.rs, speed.rs, report.rs. Flow: discover JSONL/SQLite files -> parse and dedupe -> price (embedded snapshot, optional refresh) -> aggregate -> table or JSON. Release profile: opt-level z, fat LTO, panic=abort, stripped (rust/Cargo.toml:70-78); mimalloc on linux-musl (rust/crates/ccusage/Cargo.toml:54-57); SQLite is bundled (rust/Cargo.toml:65) for adapters that read SQLite stores (not Claude or Codex).",
+      "packaging_and_release": "Artifacts: npm package `ccusage` (launcher + config-schema.json only: apps/ccusage/package.json:20-23) and six platform packages @ccusage/ccusage-{darwin,linux,win32}-{arm64,x64}, each shipping one native binary (packages/*/package.json; apps/ccusage/package.json:32-39). The Nix flake exposes `ccusage` as default package/app (nix/packages.nix:50-70; README.md:229-235). Release flow (.github/workflows/release.yaml, workflow name 'tagpr'): tagpr opens and tags release PRs (lines 19-42; .tagpr); a 6-target build matrix (lines 49-112: linux arm64/x64 via musl-static Nix build verified static in CI, macOS arm64 native and x64 cross-built, Windows x64/arm64 via cargo with --features fetch-litellm-pricing); then `pnpm ... publish --provenance --no-git-checks --access public` with `id-token: write` (lines 114-151), i.e. npm provenance attestation; then changelogithub creates the GitHub release notes (lines 153-172). Binaries move between jobs as workflow artifacts (.github/actions/build-*-native-package/action.yaml); no checksum/SHA256SUMS or detached signature files were found and no workflow step uploads binaries to the GitHub release. PRs publish preview packages via pkg.pr.new for 5 of the 6 targets (ci.yaml:285). Third-party actions are pinned by commit SHA.",
+      "tests_and_ci": "Frameworks: Rust built-in harness (`cargo test --workspace`, rust/justfile:11-13; run in CI as `nix build .#ccusage-tests`, nix/tests.nix) with `insta` snapshots (rust/Cargo.toml:47; 45 .snap files); Node's built-in test runner for `node --test apps/ccusage/src/cli.test.ts nix/tools/models-dev-gen/compact.test.ts` (justfile:50-52); Nushell test .github/scripts/contribution-gate.test.nu; Babashka test apps/ccusage/scripts/compare-pr-performance_test.clj. Approximate counts: 944 `#[test]` attributes in 101 Rust files (inline #[cfg(test)] modules, 2 dedicated tests.rs in ccusage-adapter-all and ccusage-cli-parser, 4 binary-level integration files in rust/crates/ccusage/tests/: claude_cli.rs, codex_cli.rs, copilot_cli.rs, zcode_cli.rs) plus 2 TypeScript, 1 Nushell and 1 Clojure test files (~105 test-bearing files). Fixtures: apps/ccusage/test/fixtures/{claude,codex}, apps/ccusage/test/statusline-test*.json. Workflows in .github/workflows: ci.yaml (change filter; tirith security scan with SARIF upload; gitleaks + treefmt preflight where treefmt runs actionlint and zizmor per ci.yaml:131-139; test job = `nix flake check` [clippy --all-targets -D warnings, rustfmt, cargo-hawk, config-schema drift, oxlint, gitleaks, publint, bun-nix drift: nix/checks.nix:162-233] + Rust tests + JS tests + Nushell + Babashka tests; native builds for 5 targets; pkg.pr.new preview publish; npm/pnpm E2E with --offline and online runs on ubuntu x64/arm64, macOS arm64/x64 and Windows; PR performance-comparison comments against base; ci-gate), release.yaml (tagpr release), update-pricing.yaml (hourly LiteLLM/models.dev lock update + checks + push to main), check-links.yaml (weekly lychee), check-pr-title.yaml, issue-gate.yaml / pr-gate.yaml / gate-close-pr.yaml / approve-contributor.yaml (contribution gate), pullfrog.yml (agent runner), renovate-bun-nix.yaml (manual dispatch).",
+      "dependencies": "Rust: rust/Cargo.toml workspace (27 members; rust/Cargo.lock has 152 packages, 27 of them workspace crates). [workspace.dependencies] declares 17 external crates (rust/Cargo.toml:45-68): assert_fs, compact_str, insta, jiff, memchr, miniz_oxide, mimalloc, minreq, rustc-hash, schemars, serde, serde_json, smallvec, sqlite (bundled), terminal_size, unicode-width, ureq (rustls). Binary crate rust/crates/ccusage/Cargo.toml: 27 direct runtime dependencies (24 workspace crates + serde, serde_json, ureq), 1 build-dependency (serde_json), 3 dev-dependencies, mimalloc only on linux-musl. ccusage-core: 9 direct dependencies plus optional build-dependency minreq (feature fetch-litellm-pricing). Adapter crates: 3-8 direct runtime dependencies each (claude 8: ccusage-adapter-common, ccusage-core, jiff, memchr, rustc-hash, serde, serde_json, smallvec; codex 8). npm side: root package.json 0 dependencies (pnpm@12.5.1, workspaces apps/*, docs, packages/*); apps/ccusage/package.json 0 runtime dependencies, 1 devDependency (@types/node), 6 optionalDependencies (platform packages); 6 packages/ccusage-*/package.json with 0 dependencies; private docs/package.json 6 devDependencies; Nix-built tooling manifests nix/tools/{changelogithub,publint,models-dev-gen}/package.json (1, 1 and 2+1 dependencies).",
+      "security_policy": "none - no SECURITY.md or other vulnerability-reporting policy found (checked SECURITY*, .github/, docs/ and a text search for vulnerability/disclosure wording; the only hit is .github/renovate.json:33 `vulnerabilityAlerts` labels). Related controls found: gitleaks (.gitleaks.toml; nix/checks.nix:173-175), tirith scan in CI (.github/workflows/ci.yaml:30-100), pnpm supply-chain settings minimumReleaseAge/strictDepBuilds/blockExoticSubdeps/trustPolicy (pnpm-workspace.yaml:20-31), Renovate minimumReleaseAge 3 days (.github/renovate.json:16), SHA-pinned actions, npm provenance (.github/workflows/release.yaml:151)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Reads Claude Code and Codex local logs and tracks input, output, cache-creation and cache-read tokens separately (README.md:24,62,66-67,188)",
+        "verified": "yes",
+        "evidence": "Claude: claude_paths finds CLAUDE_CONFIG_DIR or ~/.config/claude + ~/.claude with a projects/ dir (rust/adapters/claude/src/paths.rs:23-55); every *.jsonl is scanned recursively (rust/adapters/common/src/lib.rs:14-31); fields input_tokens, output_tokens, cache_creation_input_tokens, cache_read_input_tokens (rust/crates/ccusage-core/src/types.rs:28-39); cache creation uses the 5m+1h `cache_creation` breakdown when present (types.rs:41-50); separate counters (types.rs:67-96; adapters/claude/src/daily.rs:634-637); advisor iterations are counted under their own model (rust/adapters/claude/src/README.md:52-61); duplicate and sidechain-replayed records are deduplicated (README.md:19-42; adapters/claude/src/lib.rs:198-260). Codex: CODEX_HOME or ~/.codex with sessions/ and archived_sessions/ (rust/adapters/codex/src/paths.rs:31-64,226-238); event_msg/token_count uses last_token_usage or deltas of cumulative total_token_usage (parser.rs:318-332; src/README.md:13-19); maps input, cached_input (cache read), output (reasoning is a subset) and total, and fills cache-creation only if the record has cache_write_input_tokens or cache_creation_input_tokens (types.rs:282-328). Codex report `inputTokens` is non-cached input while `totalTokens` is the recorded total (report.rs:64-90,123-129). Table output shows cache columns only on wide terminals (docs/guide/getting-started.md:87-92,153-154); JSON always includes them (docs/guide/json-output.md:297-310)."
+      },
+      {
+        "claim": "Default/unified reports cover every detected source, so Claude Code and Codex appear together (README.md:85)",
+        "verified": "yes",
+        "evidence": "No subcommand builds a Daily AgentCommandArgs and runs adapter::all::run (rust/crates/ccusage/src/main.rs:53-65); the unified loader runs the Claude and Codex adapters among 18 (rust/crates/ccusage-adapter-all/src/loader.rs:120-127; rust/crates/ccusage-core/src/lib.rs:59-78); --by-agent adds a per-agent split in JSON (ccusage-adapter-all/src/lib.rs:38-70; docs/guide/json-output.md:71). Note: the `claude`-namespaced reports use a separate Claude-only implementation titled 'Claude Code Token Usage Report' (rust/crates/ccusage/src/commands/mod.rs:33-70,146-181)."
+      },
+      {
+        "claim": "Offline Mode uses 'pre-cached pricing data' (README.md:189; docs/guide/index.md:69)",
+        "verified": "partial",
+        "evidence": "Code: --offline skips the network and uses the pricing snapshot compiled into the binary (built from the pinned LiteLLM snapshot, built-in tables and an embedded models.dev snapshot), not a runtime cache (rust/crates/ccusage-core/src/pricing.rs:964-975,977-1013). The on-disk HTTP cache is only used after a server 304 (rust/crates/ccusage/src/http.rs:22-24). The embedded LiteLLM part is filtered to claude-/anthropic/gpt-/openai/azure/zai/openrouter-openai ids (rust/crates/ccusage-core/build.rs:200-214), so freshness equals the release date."
+      },
+      {
+        "claim": "'100% Local', 'No Data Transmission - Your usage data never leaves your computer', 'Read-Only - ccusage only reads files, never modifies them' (docs/guide/index.md:143-146)",
+        "verified": "partial",
+        "evidence": "No code path uploads usage data: the only outbound requests are GETs to two fixed pricing URLs with just an If-None-Match header (rust/crates/ccusage/src/http.rs:75-86; pricing.rs:54-56). But by default (not --offline, not display mode) it does contact raw.githubusercontent.com and models.dev (pricing.rs:977-1013; adapters/claude/src/lib.rs:144-152), and it writes caches: HTTP cache (http.rs:199-229) and statusline cache in the OS temp dir (rust/crates/ccusage/src/commands/mod.rs:860-877). Agent log files are only read."
+      },
+      {
+        "claim": "`CCUSAGE_OFFLINE=1` forces offline mode (docs/guide/environment-variables.md:124-131,205-213)",
+        "verified": "no",
+        "evidence": "The string CCUSAGE_OFFLINE appears only in that doc; no code reads it (repo-wide search). Offline is set by `--offline`/`-O` (rust/crates/ccusage-cli-parser/src/parser.rs:225,766), config-file `offline` (rust/crates/ccusage-config/src/config.rs:595-599) or the statusline default (rust/crates/ccusage-cli/src/types.rs:223). The runtime env vars the code does read include CCUSAGE_MODEL_ALIASES (rust/crates/ccusage-core/src/model_aliases.rs:8), which the docs do not mention. Code wins."
+      },
+      {
+        "claim": "JSON output has a 'Stable schema' and the documented shapes are accurate (README.md:185; docs/guide/json-output.md:285-473,690)",
+        "verified": "partial",
+        "evidence": "The daily example (`daily` + `totals`, json-output.md:297-320) matches code (rust/crates/ccusage/src/commands/mod.rs:52-55). The monthly, session and blocks examples use `type`/`data`/`summary` and `costUSD` (json-output.md:385-473) but the code emits `monthly`/`weekly` + `totals` (commands/mod.rs:94-97), `sessions` + `totals` (164-167) and a bare `blocks` array (291-293). docs/guide/cli-options.md:266,269 and json-output.md:618-621 use `.data[]` / data['data'] that the code does not produce. Per-agent shapes also differ: focused Codex rows use `costUSD` (rust/adapters/codex/src/report.rs:88,179) while Claude/unified rows use `totalCost` (rust/crates/ccusage-core/src/output.rs:34,66,110). Code wins."
+      },
+      {
+        "claim": "`blocks` = Claude Code 5-hour windows and `statusline` works as a Claude Code status-bar hook (README.md:120-121,175)",
+        "verified": "yes",
+        "evidence": "run_blocks builds session blocks with a 5.0 hour default (rust/crates/ccusage/src/commands/mod.rs:262-308; rust/crates/ccusage-core/src/lib.rs:55). run_statusline reads Claude Code hook JSON from stdin and prints one line (commands/mod.rs:310-376; hook fields 921-951); docs give the settings.json `statusLine` command (docs/guide/statusline.md:17-31); default is offline (rust/crates/ccusage-cli/src/types.rs:220-224)."
+      },
+      {
+        "claim": "Non-Nix Cargo builds fetch the locked LiteLLM pricing at build time (README.md:237-239)",
+        "verified": "partial",
+        "evidence": "Only with `--features fetch-litellm-pricing`; a plain `cargo build` panics unless CCUSAGE_PRICING_JSON_PATH points at a snapshot (rust/crates/ccusage-core/build.rs:17-28,74-86; rust/crates/ccusage-core/Cargo.toml:9-12). Windows release builds pass the feature (.github/actions/build-windows-native-package/action.yaml:17-21); apps/ccusage/scripts/ensure-native-binary.nu:27 runs plain `cargo build`, relying on the dev shell's env var (rust/crates/ccusage-core/README.md:27-31)."
+      },
+      {
+        "claim": "The scheduled `update pricing` workflow 'opens a PR when the pricing snapshot changes' (README.md:245)",
+        "verified": "no",
+        "evidence": "The workflow runs hourly and commits and pushes directly to main (.github/workflows/update-pricing.yaml:5,74-80; .github/actions/commit-and-push-main/action.yaml:30-38) after running checks; no PR is opened. Code/workflow wins."
+      },
+      {
+        "claim": "Sponsor line: Lineman.io '40% lower token usage' (README.md:37)",
+        "verified": "not_checkable",
+        "evidence": "A sponsor advertisement for a different product; no measurement or code in this repo corresponds to it. ccusage itself has no token-reduction feature (a search for savings/reduction/compress in rust/ and docs/ finds only the pricing-snapshot deflate in rust/crates/ccusage-core/build.rs:60 and pricing.rs:34)."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Scope: ccusage measures only provider-recorded usage and API-equivalent cost estimates; nothing in the code or docs supplies task context, keeps recoverable originals, or measures artifact/context reductions (search for savings/reduction/compress finds only pricing-snapshot deflate: rust/crates/ccusage-core/build.rs:60, pricing.rs:34). It will not estimate tokens from text (docs/guide/source-support-qa.md:3-5) and excludes tool/Web Search API calls (docs/guide/index.md:152-154). The README sponsor line about '40% lower token usage' (README.md:37) advertises another product, not a ccusage feature.",
+      "Input data is vendor-owned and unversioned: Codex support is self-described experimental (docs/guide/codex/index.md:5) and its parser carries many compatibility shims for changing record shapes (rust/adapters/codex/src/types.rs:250-328; rust/adapters/codex/src/README.md:21-36); Claude Code may keep logs only 30 days by default (docs/guide/claude/index.md:33-34); totals depend on dedupe/replay heuristics for sidechain and copied records (rust/adapters/claude/src/README.md:19-42; rust/adapters/codex/src/README.md:30-36).",
+      "Cost figures are estimates: models with no known price count as $0 (docs/guide/json-output.md:34); Codex rows using the gpt-5 or codex-auto-review fallbacks are flagged isFallback (rust/adapters/codex/src/README.md:46-48); --offline prices from the snapshot compiled into the binary, whose LiteLLM part covers only claude-/anthropic/gpt-/openai/azure/zai/openrouter-openai ids (rust/crates/ccusage-core/build.rs:200-214), so its freshness is the release date; docs say costs 'may not reflect actual billing' (docs/guide/index.md:154).",
+      "Network contact by default despite the 'No Data Transmission' wording: unless --offline or --mode display, runs fetch pricing from raw.githubusercontent.com and, lazily, models.dev (rust/crates/ccusage-core/src/pricing.rs:54-56,977-1013,1452-1467; docs/guide/index.md:141-146); the documented CCUSAGE_OFFLINE variable is not read by any code (docs/guide/environment-variables.md:124-131).",
+      "JSON contract is not uniform and docs disagree with code: focused Codex rows use `costUSD` (rust/adapters/codex/src/report.rs:88,179) while Claude/unified rows use `totalCost` (rust/crates/ccusage-core/src/output.rs:34,66,110); docs show `type`/`data`/`summary` shapes and `.data[]` jq examples (docs/guide/json-output.md:385-473,618-621; docs/guide/cli-options.md:266) that the code does not emit (rust/crates/ccusage/src/commands/mod.rs:94-97,164-167,291-293). Consumers should validate against actual output.",
+      "Supply chain and verification: the documented quick start runs whatever is latest on npm each time (README.md:57; docs/guide/installation.md:149-151); the native binary arrives through per-platform optionalDependencies and the launcher exits 1 if it is missing (apps/ccusage/src/cli.js:93-109); the only release attestation found is npm provenance (.github/workflows/release.yaml:123,151); no checksum or signature files and no SECURITY policy file were found.",
+      "Build from source: plain `cargo build` panics unless CCUSAGE_PRICING_JSON_PATH is set or the `fetch-litellm-pricing` feature is enabled (rust/crates/ccusage-core/build.rs:74-86); the contributor workflow assumes Nix + direnv + just (README.md:206-225); Windows release builds download pricing at build time (.github/actions/build-windows-native-package/action.yaml:17-21); toolchain pinned to Rust 1.97.1 (rust-toolchain.toml:2).",
+      "Maintenance and licensing: fast-moving surface (version 20.0.26; live monitor removed in v18, docs/guide/live-monitoring.md:5-7; standalone wrapper packages removed, AGENTS.md:41-43); an hourly bot commits pricing locks straight to main, contrary to README.md:245 (.github/workflows/update-pricing.yaml:5,74-80); new-contributor issues/PRs pass an automated gate run with Pullfrog agents (CONTRIBUTING.md:13-19,77-79); copyright and package author name a single individual (LICENSE:3; apps/ccusage/package.json:10); statically linked binaries bundle about 125 third-party crates (rust/Cargo.lock: 152 packages incl. 27 workspace crates) and no NOTICE/third-party license file was found."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "ccusage/ccusage",
+      "checks": [
+        {
+          "field": "install[0] (npx)",
+          "statement": "npx (npm package runner; needs Node): `npx ccusage@latest`",
+          "citation": "README.md:57-58,95",
+          "holds": true,
+          "note": "README.md:57 and :95 both read `npx ccusage@latest`. The npm package is named `ccusage` with bin `ccusage` -> ./src/cli.js (apps/ccusage/package.json:2,17-19). The launcher is a `#!/usr/bin/env node` script (apps/ccusage/src/cli.js:1), so Node is required. It resolves the native binary from six optionalDependencies (package.json:32-39). CI E2E runs `npx --yes <preview-url>` on every OS runner (.github/workflows/ci.yaml:412)."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-3 is the standard MIT text, 'Copyright (c) 2025 ryoppippi'. apps/ccusage/LICENSE (shipped inside the npm package) is identical. \"license\": \"MIT\" appears in apps/ccusage/package.json:9 and packages/ccusage-linux-x64/package.json:5. README.md:269 agrees. No other LICENSE/COPYING/NOTICE files exist."
+        },
+        {
+          "field": "platforms.linux_x86_64",
+          "statement": "yes - npm optional package @ccusage/ccusage-linux-x64 (os=linux, cpu=x64); launcher maps linux/x64 to it; release matrix builds it with the musl-static Nix target and CI checks the binary is static; CI E2E runs on ubuntu x64",
+          "citation": "packages/ccusage-linux-x64/package.json:2-4,14-19; apps/ccusage/src/cli.js:38-45; .github/workflows/release.yaml:64-68; .github/actions/build-linux-native-package/action.yaml:26-56; .github/workflows/ci.yaml:330-332",
+          "holds": true,
+          "note": "Every sub-claim checks out. (1) package.json:2-4 gives the name and the description 'Static native ccusage binary for Linux x64'; :14-19 gives os [linux], cpu [x64]. (2) cli.js:42-43 returns '@ccusage/ccusage-linux-x64' for linux/x64. (3) release.yaml:64-68 is the build-linux-x64 matrix entry. (4) action.yaml:32,34 runs `nix build .#ccusage-static`, which nix/static-package.nix:38-46 maps to x86_64-unknown-linux-musl. action.yaml:44-56 fails unless ldd/file reports a static binary. (5) ci.yaml:331 runs E2E on blacksmith-32vcpu-ubuntu-2404; it is x64 because it lacks the -arm suffix and is the same label release.yaml:65 uses for the x64 build. The preview publish includes ./packages/ccusage-linux-x64 (ci.yaml:285)."
+        },
+        {
+          "field": "integrations.claude_code_or_codex",
+          "statement": "Claude Code: yes - reads JSONL transcripts; `ccusage statusline` is a Claude Code statusLine command reading hook JSON from stdin, offline by default, with a temp-dir output cache; `ccusage blocks` reports 5-hour windows. Codex: data source only (CODEX_HOME or ~/.codex sessions + archived_sessions, --speed auto|standard|fast, labelled experimental). No end-user plugin/hook/skill; .claude/.codex/.agents are contributor config.",
+          "citation": "rust/adapters/claude/README.md:14-16; rust/adapters/claude/src/paths.rs:23-55; rust/crates/ccusage/src/commands/mod.rs:262-308,310-327,860-877,921-951; docs/guide/statusline.md:17-31; rust/crates/ccusage-cli/src/types.rs:220-224; rust/crates/ccusage-core/src/lib.rs:55; rust/adapters/codex/src/paths.rs:31-64,226-238; rust/adapters/codex/src/README.md:3-11; docs/guide/codex/index.md:5,40,66-83; .claude/AGENTS.md:1-5; .codex/environments/environment.toml:1-17",
+          "holds": true,
+          "note": "Each part checks out. (1) Claude paths: paths.rs:23-55 uses CLAUDE_CONFIG_DIR, else $XDG_CONFIG_HOME/claude (default ~/.config/claude) plus ~/.claude, each requiring projects/. (2) Statusline: mod.rs:318-325 parses stdin into StatuslineHook{session_id, transcript_path, model, cost, context_window, effort} (921-951). The docs snippet is a settings.json `statusLine` command (statusline.md:17-31). StatuslineArgs::default sets offline: true (types.rs:223), and the parser uses it (ccusage-cli-parser/src/parser.rs:220). The cache lives at temp_dir()/ccusage-semaphore/<session>.lock (mod.rs:860-877). (3) Blocks: main.rs:34 dispatches to run_blocks, which uses the Claude loader (main.rs:7); DEFAULT_SESSION_DURATION_HOURS = 5.0. (4) Codex: discovers sessions/ and archived_sessions/ under CODEX_HOME or ~/.codex; index.md:5 says 'experimental'; :40 lists --speed auto|standard|fast. (5) No plugin: .claude/AGENTS.md and environment.toml are dev-shell config, and .agents/skills/* are contributor skills (commit, create-pr, fix-ci, ...). No .claude-plugin or marketplace manifest exists, and the npm package ships only src/cli.js and config-schema.json."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "Reads Claude Code and Codex local logs and tracks input, output, cache-creation and cache-read tokens separately - verified: yes (Codex cache-creation only when the record carries it; Codex inputTokens is non-cached input)",
+          "citation": "README.md:24,62,66-67,188; rust/adapters/common/src/lib.rs:14-31; rust/crates/ccusage-core/src/types.rs:28-96; rust/adapters/claude/src/daily.rs:634-637; rust/adapters/claude/src/README.md:19-42,52-61; rust/adapters/claude/src/lib.rs:198-260; rust/adapters/codex/src/parser.rs:318-332; rust/adapters/codex/src/types.rs:282-328; rust/adapters/codex/src/report.rs:64-90,123-129; docs/guide/getting-started.md:87-92,153-154; docs/guide/json-output.md:297-310",
+          "holds": true,
+          "note": "The 'yes' verdict matches the code. (1) Claude: recursive *.jsonl walk (common lib.rs:14-31). TokenUsageRaw has input/output/cache_creation_input/cache_read_input (types.rs:28-39). Cache creation is the 5m+1h breakdown when present (types.rs:41-50). TokenCounts keeps separate counters (types.rs:67-96), as do per-model breakdowns (daily.rs:634-637). Sidechain/copy dedupe is at lib.rs:198-260; advisor iterations at src/README.md:52-61. (2) Codex: token_count events use last_token_usage, else the delta of cumulative totals (parser.rs:318-332). cached_input comes from cached_input_tokens/cache_read_input_tokens/cached_tokens; cache_creation comes only from cache_write_input_tokens/cache_creation_input_tokens; reasoning is a subset of output (types.rs:282-328). inputTokens = non_cached_input_tokens, totalTokens = recorded total (report.rs:64-90,123-129). (3) Docs: cache columns appear on wide (>=100 col) terminals, and the JSON example includes cacheCreationTokens/cacheReadTokens. Minor nit, not an error: the evidence's bare 'README.md:19-42' refers to rust/adapters/claude/src/README.md:19-42 (sidechain dedupe), not the top-level README."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

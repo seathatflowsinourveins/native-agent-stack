@@ -1,0 +1,335 @@
+{
+  "contender": "drona23/claude-token-efficient",
+  "revision": {
+    "contender": "drona23/claude-token-efficient",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "drona23/claude-token-efficient",
+        "tag": null,
+        "commit": "0d30a6db75af983b8ababf585f28faefdfc87895",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": null,
+    "commit": "0d30a6db75af983b8ababf585f28faefdfc87895",
+    "read_at": "2026-10-02T03:02:05+00:00"
+  },
+  "dossier": {
+    "contender": "drona23/claude-token-efficient",
+    "revision": {
+      "tag": null,
+      "commit": "0d30a6db75af983b8ababf585f28faefdfc87895",
+      "read_at": "2026-10-02T03:02:05+00:00"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Prompt-instruction set for Claude Code: a 7-line root CLAUDE.md plus alternative profiles (profiles/) meant to be copied into a project so Claude answers more tersely, and a stdlib-only Python harness (benchmark/run.py, benchmark/eval.py) that runs `claude -p` with and without a CLAUDE.md to compare output tokens, cost and behavior markers. It is not a context-supply, recoverable-originals or log-based usage-measurement tool. Answer to the need question (single tool that measures provider usage from the local logs Claude Code and Codex write): none in this project. Nothing in the tree reads Claude Code or Codex logs and Codex is never mentioned. run.py takes usage from the live `claude -p --output-format json` result (benchmark/run.py:63-83) and stores input, output, cache-creation and cache-read fields per run in raw JSONL (run.py:72-78), but its reports aggregate only output tokens, words and cost (run.py:108-118, 202-249).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "One file, dropped into the project, 'keeps responses terse and can reduce total tokens on output-heavy workflows'.",
+          "citation": "README.md:3"
+        },
+        {
+          "claim": "Instruction files add input tokens on every turn; if the file grows too much it can cost more than it saves. Net is positive only when output volume offsets the persistent input cost; not worth it for short queries, casual use, or many fresh sessions.",
+          "citation": "README.md:4, 63-72"
+        },
+        {
+          "claim": "Benchmarks were run on Claude only; rules are model-agnostic but local models (llama.cpp, Mistral, others) are untested.",
+          "citation": "README.md:5"
+        },
+        {
+          "claim": "A CLAUDE.md in the project root needs 'one file, zero setup, no code changes' and applies automatically on every message; pasting rules in chat is the no-setup alternative and costs more.",
+          "citation": "README.md:29-41, 47-52"
+        },
+        {
+          "claim": "5-prompt benchmark, one run each: 465 words -> 170 words (63% reduction), 'Same information. Zero signal loss.'; self-described as a directional indicator, not a controlled study (no variance controls or repeated runs).",
+          "citation": "README.md:78-90"
+        },
+        {
+          "claim": "Automated harness (benchmark/): output-token reduction with the current minimal CLAUDE.md is ~4% (haiku), ~12% (sonnet), ~7% (opus); the 63% figure is 'achievable with a stricter rules profile' via `python3 benchmark/run.py -n 5 --model opus`.",
+          "citation": "README.md:92-94"
+        },
+        {
+          "claim": "Semantic eval confirms baselines on current models already show 0% preamble, sycophancy, 'as an AI' and smart quotes, so rules targeting those carry input cost without changing output.",
+          "citation": "README.md:96"
+        },
+        {
+          "claim": "An independent third-party benchmark (adam-s/testing-claude-agent) ran 6 configs on 3 coding challenges, all passing, so comparison was cost-to-green; the project's own v8 config beat C-structured $0.935 vs $1.131 (-17.4%).",
+          "citation": "README.md:98-111"
+        },
+        {
+          "claim": "Root CLAUDE.md is kept to a small set of high-impact rules to minimize recurring input overhead.",
+          "citation": "README.md:113"
+        },
+        {
+          "claim": "At scale: ~9,600 tokens/day (~$0.86/month on Sonnet) saved at 100 prompts/day; ~96,000 tokens/day (~$8.64) at 1,000 prompts/day.",
+          "citation": "README.md:115-121"
+        },
+        {
+          "claim": "The root file fixes eight behaviors, including targeted edits, running tests before finishing, simple fixes, and 'user instructions always override'.",
+          "citation": "README.md:150-161, 251-254"
+        },
+        {
+          "claim": "Three versioned sets with tool budgets: J-drona23-v5 50 calls, K-drona23-v6 50 calls, M-drona23-v8 20 calls; the v8 config 'uses 2 files (7 lines total)'.",
+          "citation": "README.md:195-201, 111"
+        },
+        {
+          "claim": "A CLAUDE.md file is 'cached efficiently'; rules pasted in chat cost +41% vs CLAUDE.md v8 ($1.318 vs $0.935 over 3 coding challenges).",
+          "citation": "README.md:210-227"
+        },
+        {
+          "claim": "Third-party browser tools (Token Checkup, Cache Health Checker) analyze token use or cache efficiency from pasted /cost output.",
+          "citation": "README.md:293-294"
+        }
+      ],
+      "install": [
+        {
+          "method": "Download root CLAUDE.md with curl (fetches the unpinned main branch; README names no OS)",
+          "command": "curl -o CLAUDE.md https://raw.githubusercontent.com/drona23/claude-token-efficient/main/CLAUDE.md",
+          "citation": "README.md:235-238"
+        },
+        {
+          "method": "Clone and copy a single-file profile (README names no OS)",
+          "command": "git clone https://github.com/drona23/claude-token-efficient\ncp claude-token-efficient/profiles/CLAUDE.coding.md your-project/CLAUDE.md",
+          "citation": "README.md:240-244"
+        },
+        {
+          "method": "Manual copy of CLAUDE.md contents into the project root",
+          "command": "(no command given: 'Copy the contents of CLAUDE.md from this repo into your project root')",
+          "citation": "README.md:246-247"
+        },
+        {
+          "method": "Paste rules into chat instead of using a file",
+          "command": "Rules: Read files first. Write complete solution. Test once. No over-engineering.",
+          "citation": "README.md:29-34"
+        },
+        {
+          "method": "Run the benchmark harness from a clone (no install step; needs a logged-in `claude` CLI and Python 3, version not documented)",
+          "command": "python3 benchmark/run.py -n 5 --model opus",
+          "citation": "README.md:94; benchmark/CLAUDE.md:3-5, 14-17"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "unknown - README names no OS or CPU architecture. Deliverables are Markdown plus stdlib-only Python 3 with no OS-specific calls found (benchmark/run.py:22-33), but there is no CI or test evidence on any platform and the harness needs the external `claude` CLI.",
+        "wsl2": "unknown - not mentioned anywhere in the repository.",
+        "macos_arm64": "unknown - not documented. The only hint is the macOS-style author path recorded in the raw data ('<private>' in benchmark/raw-opus.jsonl); no architecture is stated.",
+        "gpu": "no - not used or required; there is no model-inference code (README.md:5 says local models are untested)."
+      },
+      "integrations": {
+        "cli": "none found as an installed CLI or package. Two manual stdlib Python scripts run from a clone: benchmark/run.py (usage at lines 15-21, main at 121) and benchmark/eval.py (usage at 15-19, main at 128); both shell out to the external `claude` CLI.",
+        "mcp": "none found (no MCP server, config or tool definitions in the tree).",
+        "sdk_or_api": "none found (no library, HTTP API or SDK client; scripts import stdlib only, benchmark/run.py:22-33, benchmark/eval.py:20-32).",
+        "claude_code_or_codex": "Claude Code: CLAUDE.md memory files to copy into a project (README.md:36-41, 233-247); README notes CLAUDE.md files compose across global, project and subdirectory levels (README.md:170-176). The multi-file sets (profiles/J-drona23-v5, K-drona23-v6, M-drona23-v8) refer to .claude/rules/ and .claude/agents/ (profiles/M-drona23-v8/CLAUDE.md:1, profiles/K-drona23-v6/CLAUDE.md:1) but README gives no install steps for them. The repo's own .claude/settings.json has a PreCompact auto-commit hook (lines 3-12) that README does not mention. Codex: none found (no AGENTS.md; the word 'codex' appears nowhere in the tree)."
+      },
+      "telemetry_and_network": "No telemetry or phone-home code found: the only code is two stdlib-only Python scripts with no network-library imports (benchmark/run.py:22-33, benchmark/eval.py:20-32). Network use happens only (a) when the user downloads files via curl from raw.githubusercontent.com or git clone (README.md:237, 242); (b) when the benchmark scripts spawn the external `claude` CLI, which calls Anthropic using the user's logged-in OAuth session with no API key (benchmark/run.py:5-6, 52-58; benchmark/CLAUDE.md:3-5) and spends the user's quota, including Haiku judge calls from eval.py (eval.py:85-89). README links two third-party web tools where users paste /cost output (README.md:293-294); the repo does not ship them. Using the rules files needs no account beyond Claude Code itself."
+    },
+    "code": {
+      "languages": [
+        "Markdown",
+        "Python 3 (stdlib only)",
+        "JSON / JSONL (settings hook, raw benchmark data)"
+      ],
+      "entry_points": [
+        {
+          "path": "benchmark/run.py",
+          "what": "Token benchmark CLI (argparse; main() at line 121, __main__ guard at 252-253). Runs 5 fixed prompts x conditions x N via `claude -p <prompt> --model <m> --output-format json --setting-sources project` in temp dirs; writes raw-<model>.jsonl and report-<model>.md."
+        },
+        {
+          "path": "benchmark/eval.py",
+          "what": "Semantic eval CLI (main() at line 128). Regex behavior markers plus a Haiku judge (via `claude -p`) over captured raw-*.jsonl; writes benchmark/SEMANTIC.md."
+        },
+        {
+          "path": "CLAUDE.md",
+          "what": "Root 7-line rules file (6 bullets) that README's curl command downloads."
+        },
+        {
+          "path": "profiles/",
+          "what": "Five single-file profiles (CLAUDE.agents/analysis/benchmark/coding/compressed.md) and three multi-file sets (J-drona23-v5, K-drona23-v6, M-drona23-v8)."
+        },
+        {
+          "path": "RULES.md",
+          "what": "Core-rules file with the same sentences as profiles/CLAUDE.compressed.md:8-11 (RULES.md:3-6, 12-15); not referenced from README."
+        },
+        {
+          "path": ".claude/settings.json",
+          "what": "Repo-local Claude Code PreCompact hook: git add -A, then commit with --no-verify when changes are staged (lines 3-12)."
+        }
+      ],
+      "architecture": "No runtime library or service. Content: root CLAUDE.md (6 rule bullets) and RULES.md; profiles/ holds five single-file profiles and three multi-file sets (rules/, agents/, reference/ subfolders, each set's CLAUDE.md being a one-line pointer to .claude/ paths). Measurement: benchmark/run.py builds a condition x prompt x run grid (5 fixed one-shot Q&A prompts, run.py:38-44), runs each in a fresh temp dir via subprocess `claude -p ... --output-format json --setting-sources project` on a ThreadPoolExecutor (default 3 workers), retries with backoff, appends one JSON line per run to raw-<model>.jsonl (output_tokens, words, cost, input and cache tokens, num_turns, duration_ms, session_id, result_text; run.py:70-83), then writes report-<model>.md with per-prompt means (run.py:108-118, 202-249). benchmark/eval.py reads those raw files, applies regex markers (preamble, sycophancy, closing fluff, 'as an AI', em-dash, smart quotes; eval.py:51-79) and a Haiku judge also run through `claude -p` (eval.py:85-121), and writes SEMANTIC.md for the 'baseline' and 'CLAUDE.md' conditions only (eval.py:175). Committed results: benchmark/SUMMARY.md, SEMANTIC.md, report-*.md, raw-*.jsonl. BENCHMARK.md (headed 'Project: PromptOS', 2026-03-30) and examples/before-after.md are narrative/illustrative documents (examples/before-after.md:2).",
+      "packaging_and_release": "None. No package manifest, no release or publish workflow, no checksums, signatures or attestations; no .github directory exists (glob '.github/**' matched nothing). Distribution is curl from raw.githubusercontent.com main or git clone (README.md:237, 242). The revision has no tag (.round-meta.json:7, 13; .git/packed-refs:2 lists only origin/main).",
+      "tests_and_ci": "No test framework, no test directories, 0 test files, no CI workflow files. The only executable checks are the two manual benchmark scripts, which call the live `claude` CLI and spend quota; their outputs are committed. From reading the code (not executed): benchmark/CLAUDE.md:17 documents `--variant lean=../profiles/M-drona23-v8/CLAUDE.md`, but run.py:138 resolves variant paths as `REPO / path`, so the '../' form points outside the repo (the run.py docstring at lines 18-20 uses the correct repo-relative form).",
+      "dependencies": "No manifest files (no requirements.txt, pyproject.toml, package.json or similar): 0 declared direct dependencies. Scripts import stdlib only (benchmark/run.py:22-33; benchmark/eval.py:20-32). Undeclared runtime dependency on a logged-in `claude` CLI (benchmark/run.py:5-6; benchmark/CLAUDE.md:3-5); `jq` appears only in documentation examples (benchmark/CLAUDE.md:39-46). run.py:47 uses `Path | None` in a function signature without `from __future__ import annotations`, implying Python 3.10 or newer; no Python version is documented.",
+      "security_policy": "none (no SECURITY.md or equivalent file in the tree)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Output-token reduction with the current minimal CLAUDE.md is ~4% (haiku), ~12% (sonnet), ~7% (opus). (README.md:94)",
+        "verified": "partial",
+        "evidence": "benchmark/SUMMARY.md:14-16 lists haiku -1% (all 5 prompts) / -2% (excl. T4), sonnet -18% / -11%, opus -5% / -7%. I recomputed the means from benchmark/raw-*.jsonl and they match report-*.md and SUMMARY.md (haiku 2266->2254, sonnet 1856->1524, opus 1888->1799). Only opus (~7%) matches README; sonnet is near only on the excl.-T4 basis (-11%); haiku (~4%) matches neither -1% nor -2%. The README figures appear in no checked-in artifact. Data and SUMMARY.md differ from README, so the data wins."
+      },
+      {
+        "claim": "465 words -> 170 words, 63% reduction, 'Same information. Zero signal loss.' (README.md:80-88; BENCHMARK.md:110-122)",
+        "verified": "no",
+        "evidence": "benchmark/SUMMARY.md:34 itself says 'The published 63% reduction does not reproduce on the current minimal CLAUDE.md'. Word counts in benchmark/report-*.md for the same four prompts (T1-T3, T5) fall only about 11% (haiku 579->516), 5% (sonnet 585->554) and 7% (opus 488->452). The original table is one run with no variance controls (README.md:90). examples/before-after.md is described as material for 'README screenshots, LinkedIn posts' (examples/before-after.md:2), i.e. illustrative."
+      },
+      {
+        "claim": "The 63% figure is achievable with a stricter rules profile - reproduce with `python3 benchmark/run.py -n 5 --model opus`. (README.md:94)",
+        "verified": "partial",
+        "evidence": "Without --variant, run.py compares baseline against the root CLAUDE.md only (run.py:143-144), so the quoted command does not test a stricter profile; profiles/CLAUDE.compressed.md:20 gives the correct `--variant compressed=profiles/CLAUDE.compressed.md` form, and README never names that file (profile table README.md:185-191 omits it). SUMMARY.md:22-28 reports compressed-profile output tokens haiku -22%, sonnet -32%, opus -62% (token basis over 5 prompts, not the 63% word basis), but raw-*.jsonl holds only the 'baseline' and 'CLAUDE.md' conditions (25 + 25 records per model; run.py:149-151 opens the raw file with 'w' and overwrites), so those numbers cannot be re-derived from checked-in data. eval.py tabulates only those two conditions (eval.py:175), so no correctness check exists for the compressed profile, which 'drops fabrication and re-read guards' (SUMMARY.md:30; CLAUDE.compressed.md:17)."
+      },
+      {
+        "claim": "'Zero signal loss' from the rules (README.md:88; BENCHMARK.md:121-122)",
+        "verified": "partial",
+        "evidence": "benchmark/SEMANTIC.md grades the minimal CLAUDE.md with a Haiku judge (eval.py:85-121): accurate and complete are 100% in every cell and key-point is 100% for T1, T2, T3, T5 in both conditions. But T4 (prompt generation) key-point is 0% under CLAUDE.md for all three models (haiku baseline 20%, others 0%), which contradicts BENCHMARK.md:79-89 reporting T4 as returning 3 versions (PASS); SEMANTIC.md:55 says the file has no multi-version rule. No semantic check covers the compressed or versioned profiles."
+      },
+      {
+        "claim": "Instruction files add input tokens every turn, so net savings need high output volume. (README.md:4, 72; also README.md:213 'Cached efficiently')",
+        "verified": "yes",
+        "evidence": "Raw usage in benchmark/raw-*.jsonl shows the CLAUDE.md condition adds about 190-230 (haiku, sonnet) and 266-310 (opus) cache_creation_input_tokens per call versus baseline, while input_tokens and cache_read_input_tokens are constant per model (e.g. sonnet 3 and 11,426). Reported cost per 5-prompt pass moves haiku +1.9%, sonnet -0.6%, opus -7.3% (report-*.md:16-17), consistent with SUMMARY.md:41. The 'cached efficiently' statement is not tested: all 150 raw records have num_turns 1 and each run is a fresh temp-dir session (run.py:49-58)."
+      },
+      {
+        "claim": "Baselines on current models already show 0% preamble, sycophancy, 'as an AI' and smart quotes. (README.md:96)",
+        "verified": "yes",
+        "evidence": "benchmark/SEMANTIC.md:12-51: the pre, syc, ai and sq columns are 0% in every baseline row for haiku, opus and sonnet. Detection is regex pattern matching (eval.py:51-79), not a judge. Not 0%: closing-fluff in the T4 baseline (haiku 40%, sonnet 80%) and em-dash in 80-100% of baseline runs for T1, T3, T4."
+      },
+      {
+        "claim": "The root CLAUDE.md fixes the eight listed behaviors and the file 'never fights you'. (README.md:150-161, 251-254)",
+        "verified": "partial",
+        "evidence": "Root CLAUDE.md has 6 bullets (CLAUDE.md:2-7): read before writing and no re-read, concise output, skip files over 100KB, no sycophantic openers or closing fluff, no emojis or em-dashes, do not guess APIs/versions/SHAs. It has no rule for targeted edits, running tests before finishing, simple solutions, or 'user instructions always override'; those appear in profiles/CLAUDE.benchmark.md:7, 9, 11, 13 and profiles/RULES-IN-PROMPT.md:9-14. So 4 of the 8 listed fixes and the override line are not in the file the curl install downloads."
+      },
+      {
+        "claim": "Versioned sets have tool budgets v5 50, v6 50, v8 20, and v8 'uses 2 files (7 lines total)'. (README.md:195-201, 111)",
+        "verified": "partial",
+        "evidence": "J-v5 profiles/J-drona23-v5/agents/builder.md:6 says 50 (matches); M-v8 profiles/M-drona23-v8/rules/workflow.md:3 says 20 (matches); K-v6 profiles/K-drona23-v6/agents/builder.md:6 says 'Maximum 30 tool calls. Wrap up at 25.' while README.md:200 says 50. v8 is 2 files: CLAUDE.md is 1 line and rules/workflow.md is 10 lines (7 content lines: budget plus 6 rules), so '7 lines' counts the rules only. README gives no install steps for these multi-file sets."
+      },
+      {
+        "claim": "Independent benchmark and cost comparisons: v8 beats C-structured by 17.4%; rules in chat cost +41% vs CLAUDE.md v8. (README.md:98-113, 222-229)",
+        "verified": "not_checkable",
+        "evidence": "The harness repo adam-s/testing-claude-agent and its results are not in this tree and were not opened. The v8 vs C-structured and rules-in-chat tables are the project's own runs ('We ran our own v8 config', README.md:102). Arithmetic is internally consistent (0.244+0.406+0.285=0.935; 0.282+0.376+0.473=1.131; 1.318/0.935 = 1.41) and repeated in profiles/RULES-IN-PROMPT.md:37-40, but no per-run data, logs or scripts for these runs are checked in. v8 rule 6 is WebSocket-specific (profiles/M-drona23-v8/rules/workflow.md:10), i.e. tuned to one of the three measured challenges."
+      },
+      {
+        "claim": "At Scale table: ~9,600 tokens/day and ~$0.86/month saved at 100 prompts/day on Sonnet. (README.md:115-121)",
+        "verified": "not_checkable",
+        "evidence": "No derivation exists in the repo. The numbers imply 96 tokens saved per prompt (9,600/100) priced at $3.00 per million tokens (288,000 tokens/month x $3/M = $0.864), with no stated source for either. The harness means for the minimal profile are lower for all three models: about 66 (sonnet), 18 (opus) and 2 (haiku) output tokens saved per prompt over all 5 prompts (from SUMMARY.md:14-16)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Original 5-prompt word-count comparison, one run, no variance controls (T1-T3 and T5 counted; T4 is a format test)",
+        "metric": "words, baseline vs with CLAUDE.md",
+        "value": "465 -> 170 words (63% reduction); per prompt 180->65, 120->30, 110->55, 55->20",
+        "source": "README.md:78-90; BENCHMARK.md:29-121",
+        "independent": false
+      },
+      {
+        "what": "Automated harness (benchmark/run.py): minimal root CLAUDE.md vs empty-dir baseline, N=5 per cell, 5 one-shot prompts, haiku/sonnet/opus. I re-derived the means from raw-*.jsonl and they match the reports.",
+        "metric": "mean output tokens summed over 5 prompts; total cost (sum of per-prompt mean total_cost_usd)",
+        "value": "haiku 2266->2254 (-1%), $0.0585->$0.0596; sonnet 1856->1524 (-18%), $0.1609->$0.1599; opus 1888->1799 (-5%), $0.3850->$0.3570; excluding T4 the token changes are -2%, -11%, -7%",
+        "source": "benchmark/SUMMARY.md:10-16; benchmark/report-haiku.md:7-17; report-sonnet.md:7-17; report-opus.md:7-17; benchmark/raw-*.jsonl",
+        "independent": false
+      },
+      {
+        "what": "Word-count change for the same T1-T3, T5 prompts, derived by the dossier author from the harness report tables (not stated by the project)",
+        "metric": "mean words, baseline -> CLAUDE.md",
+        "value": "haiku 579->516 (-10.9%), sonnet 585->554 (-5.3%), opus 488->452 (-7.4%)",
+        "source": "benchmark/report-haiku.md:9-13; report-sonnet.md:9-13; report-opus.md:9-13",
+        "independent": false
+      },
+      {
+        "what": "Stricter profiles/CLAUDE.compressed.md in the same harness, N=5, 5 prompts. Raw data is not checked in and eval.py was not run on it.",
+        "metric": "mean output tokens summed over 5 prompts; total cost",
+        "value": "haiku 2212->1726 (-22%), $0.0677->$0.0589; sonnet 1745->1182 (-32%), $0.1646->$0.1605; opus 1936->727 (-62%), $0.3997->$0.3451",
+        "source": "benchmark/SUMMARY.md:20-30; profiles/CLAUDE.compressed.md:3",
+        "independent": false
+      },
+      {
+        "what": "Input-side provider usage recorded per run but never reported: cache-creation tokens, baseline vs CLAUDE.md condition. Derived by the dossier author from the raw JSONL (25 runs per condition per model, all num_turns 1).",
+        "metric": "cache_creation_input_tokens per call (input_tokens and cache_read_input_tokens shown for context)",
+        "value": "haiku about 6,237-6,254 -> 6,445-6,469 (3 early baseline runs at about 6,580); sonnet 6,064-6,083 -> 6,273-6,291; opus 8,405-8,427 -> 8,693-8,715 (2 cold-cache baseline runs at 23,534 with cache_read 0). input_tokens / cache_read constant per model: haiku 10 / 11,616; sonnet 3 / 11,426; opus 6 / 15,122.",
+        "source": "benchmark/raw-haiku.jsonl, raw-sonnet.jsonl, raw-opus.jsonl (fields captured at benchmark/run.py:76-78)",
+        "independent": false
+      },
+      {
+        "what": "Regex behavior markers and Haiku-judge correctness on the captured responses, minimal CLAUDE.md vs baseline, N=5 per cell",
+        "metric": "% of runs with each marker; judge accurate / complete / key-point",
+        "value": "accurate and complete 100% in all cells; key-point 100% for T1, T2, T3, T5 and 0% for T4 under CLAUDE.md in all models (baseline 0-20%); baseline preamble/sycophancy/'as an AI'/smart-quote markers all 0%; em-dash share falls for T1 and T3 in all three models (e.g. haiku T3 100%->20%) but stays 100% for T4 and rises for haiku T2 (0%->40%)",
+        "source": "benchmark/SEMANTIC.md:8-51",
+        "independent": false
+      },
+      {
+        "what": "Project-run comparison on a third-party harness's 3 coding challenges (CSV reporter, SQLite window functions, Hono WebSocket); all passed tests; cost-to-green",
+        "metric": "total cost USD over 3 challenges",
+        "value": "M-drona23-v8 $0.935 vs C-structured $1.131 (-17.4% as stated); rules pasted in chat $1.318 vs CLAUDE.md v8 $0.935 (+41%)",
+        "source": "README.md:98-113, 222-229; profiles/RULES-IN-PROMPT.md:35-42",
+        "independent": false
+      },
+      {
+        "what": "Third-party 'independent benchmark' (adam-s/testing-claude-agent, Issue #1) of 6 configs; only qualitative statements appear in this repo and the external repository and issue were not opened",
+        "metric": "cost-to-green across 3 coding challenges (per README); total tokens in coding tasks (per BENCHMARK.md)",
+        "value": "no figures in this repo; README says all 6 configs passed all tests; BENCHMARK.md says shorter 7-12 line configs outperformed longer rule sets on total tokens",
+        "source": "README.md:98-100; BENCHMARK.md:25",
+        "independent": true
+      }
+    ],
+    "risks": [
+      "Scope gap for the stated need: no log-based usage measurement, no Codex support, no context-supply or recoverable-originals mechanism. Nothing reads Claude Code or Codex local logs (searches for ~/.claude/projects, .codex, codex found only an unrelated ~/.claude/CLAUDE.md mention at README.md:171). The harness takes usage from live `claude -p` output (benchmark/run.py:52-83), stores input and cache fields (run.py:76-78) but reports only output tokens, words and cost (run.py:108-118, 202-249).",
+      "Headline claims are not supported by the repo's own data, and the narrative text is inconsistent: README.md:94 percentages differ from benchmark/SUMMARY.md:14-16; the 63% figure does not reproduce on the current file (SUMMARY.md:34); SUMMARY.md:35 labels -11% as opus although its table shows -11% for sonnet and -7% for opus; SUMMARY.md:37 calls opus 'the chattiest baseline' although haiku has the highest baseline output tokens in its table (2266 vs 1888).",
+      "Weak, hard-to-tie measurement: 5 one-shot Q&A prompts (run.py:38-44), N=5, means only with no variance or significance (run.py:108-118); per-cell ranges overlap (haiku T1 output tokens baseline 614-783 vs CLAUDE.md 595-745 in raw-haiku.jsonl); agentic/coding loops are not measured (SUMMARY.md:46). Raw records store `claude_md` as a maintainer-local path ('<private>'), not a content hash (run.py:169), and SEMANTIC.md:55 / eval.py:210-212 say the file has no em-dash rule while the current CLAUDE.md:6 does, so either the file changed after capture or the text is stale and the data cannot say which.",
+      "Net effect is small or negative for low-output work, and the largest savings come from a profile that removes guards: the minimal file adds about 190-310 cache-creation input tokens per call in the raw data, with cost change haiku +1.9%, sonnet -0.6% (report-*.md:16-17); README.md:4, 72 concede this. profiles/CLAUDE.compressed.md:17 and SUMMARY.md:30 say the stricter profile drops fabrication and re-read guards, with no correctness eval on it. v8 caps work at 20 tool calls (profiles/M-drona23-v8/rules/workflow.md:3).",
+      "Unpinned, unsigned distribution of standing instructions: README.md:237 downloads CLAUDE.md from the main branch with curl; there are no tags, releases, checksums or signatures in the tree. The file is loaded as instructions on every message (README.md:36-41), so any upstream edit changes agent behavior without review.",
+      "Undocumented side-effect hook: .claude/settings.json:3-12 runs `git add -A` and then `git commit --no-verify` on every PreCompact when changes are staged (stderr suppressed, `|| true`), committing the whole working tree. README never mentions the file or hook; it applies if the clone is opened in Claude Code or the .claude directory is copied.",
+      "Profiles are tuned to the benchmark tasks and under-documented: v6 and v8 hard-code WebSocket guidance (Set, setTimeout(0), no pub/sub) and 'read the test file first' (profiles/M-drona23-v8/rules/workflow.md:5, 10; profiles/K-drona23-v6/reference/patterns.md:8, 15); README lists K-v6 at 50 tool calls but the file says 30 (README.md:200 vs profiles/K-drona23-v6/agents/builder.md:6); no install steps for the multi-file sets; README's profile table omits CLAUDE.compressed.md and RULES.md (README.md:185-191); benchmark/CLAUDE.md:17 uses a '../' --variant path that run.py:138 would resolve outside the repo (read, not run).",
+      "Maintenance and verification limits: no tests, CI, releases or security policy (no .github directory, no SECURITY file); single named maintainer (LICENSE:3); the shallow clone holds one commit so history and activity cannot be assessed here; Python 3.10+ is implied but undocumented (run.py:47). Running the harness needs a logged-in `claude` CLI and spends quota (50 benchmark calls per model at N=5 plus one judge call per record, run.py:160-163, eval.py:153-161) and is tuned to 3 workers to avoid rate limits (run.py:130)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "drona23/claude-token-efficient",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Download root CLAUDE.md with curl (fetches the unpinned main branch; README names no OS): curl -o CLAUDE.md https://raw.githubusercontent.com/drona23/claude-token-efficient/main/CLAUDE.md",
+          "citation": "README.md:235-238",
+          "holds": true,
+          "note": "README.md:237 has this exact command under 'Option 1 - Universal (any project)' (line 235). The URL points at the main branch, not a commit or tag, so it is unpinned. Origin is github.com/drona23/claude-token-efficient (.git/config:9), and CLAUDE.md exists at the repo root at 0d30a6d (.git/shallow:1, .git/packed-refs:2). A case-insensitive search of the tree for linux, macos, windows, wsl, x86, arm64, ubuntu, darwin and powershell found only 'SQLite Windows' at README.md:107, which refers to SQL window functions, so README names no OS."
+        },
+        {
+          "field": "license",
+          "statement": "spdx MIT, file LICENSE",
+          "citation": "LICENSE:1-21",
+          "holds": true,
+          "note": "LICENSE:1 reads 'MIT License', line 3 is 'Copyright (c) 2026 drona23', and lines 5-21 are the standard MIT permission and warranty-disclaimer text, unmodified. There is no other license file in the tree. README.md:301-303 also says MIT."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "unknown - README names no OS or CPU architecture. Deliverables are Markdown plus stdlib-only Python 3 with no OS-specific calls found (benchmark/run.py:22-33), but there is no CI or test evidence on any platform and the harness needs the external `claude` CLI.",
+          "citation": "benchmark/run.py:22-33",
+          "holds": true,
+          "note": "run.py:22-33 and eval.py:20-32 import only standard-library modules. Reading both scripts in full found no OS-specific calls: they use tempfile, shutil.copy, pathlib and subprocess.run with list arguments and no shell=True. The tree has no .github directory and no test files, and the OS-name search found no OS or architecture named anywhere. Both scripts spawn the external `claude` CLI (run.py:52-58, eval.py:86-89). 'Unknown' is the correct rating."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Claude Code: CLAUDE.md memory files to copy into a project; CLAUDE.md files compose across global/project/subdirectory levels; the multi-file sets refer to .claude/rules/ and .claude/agents/ but README gives no install steps for them; the repo's .claude/settings.json has a PreCompact auto-commit hook that README does not mention. Codex: none found (no AGENTS.md; 'codex' appears nowhere in the tree).",
+          "citation": "README.md:36-41, 170-176, 233-247; profiles/M-drona23-v8/CLAUDE.md:1; profiles/K-drona23-v6/CLAUDE.md:1; .claude/settings.json:3-12",
+          "holds": true,
+          "note": "Every cited line matches. README.md:36-41 is the 'Drop CLAUDE.md file' option, 170-176 says CLAUDE.md files compose (global ~/.claude/CLAUDE.md, project, subdirectory), and 233-247 gives only curl, the profiles/CLAUDE.coding.md copy and a manual copy, with no steps for the multi-file sets. M-v8 CLAUDE.md:1 says 'Read .claude/rules/'. K-v6 CLAUDE.md:1 says 'Read .claude/agents/ and .claude/rules/' and J-v5 CLAUDE.md:3 refers to '.claude/', but their files actually live in profiles/*/rules and agents. settings.json:3-12 defines a PreCompact command that runs `git add -A` and then commits with --no-verify. Searches for settings.json, PreCompact and auto-save found nothing in README; its only hook mention is the generic one at README.md:66. A case-insensitive search for 'codex' over the whole tree found nothing, and there is no AGENTS.md."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "README.md:94 '~4% (haiku), ~12% (sonnet), ~7% (opus)' is rated partial: SUMMARY.md:14-16 shows -1%/-2%, -18%/-11% and -5%/-7%; means recomputed from raw-*.jsonl match the reports; only opus matches README; README's figures appear in no checked-in artifact.",
+          "citation": "README.md:94; benchmark/SUMMARY.md:14-16; benchmark/report-haiku.md:9-17; benchmark/report-sonnet.md:9-17; benchmark/report-opus.md:9-17; benchmark/raw-*.jsonl",
+          "holds": true,
+          "note": "SUMMARY.md:14-16 shows exactly these numbers. I recomputed all 150 raw records (25 baseline + 25 CLAUDE.md per model): haiku 2265.6->2254.0 (-0.5%; without T4 1742.2->1704.8, -2.1%), sonnet 1856.0->1524.0 (-17.9%; without T4 -11.0%), opus 1888.4->1799.0 (-4.7%; without T4 -7.1%). These match report-*.md cell by cell. SUMMARY's haiku 1706 without T4 is a sum of rounded per-prompt means. '~12%' appears nowhere outside README.md:94, and '-4%' appears only in the per-prompt cells for haiku T2 and opus T3 (report-haiku.md:10, report-opus.md:11), never as a model total. The 'partial' rating holds."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

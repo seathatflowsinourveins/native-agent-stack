@@ -1,0 +1,239 @@
+{
+  "contender": "typesafe-ai/skills",
+  "revision": {
+    "contender": "typesafe-ai/skills",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "typesafe-ai/skills",
+        "tag": null,
+        "commit": "65a39f393687675ce170e6094757de20370365b9",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": null,
+    "commit": "65a39f393687675ce170e6094757de20370365b9",
+    "read_at": "2026-10-02T03:02:54+00:00"
+  },
+  "dossier": {
+    "contender": "typesafe-ai/skills",
+    "revision": {
+      "tag": "v0.5.7",
+      "commit": "65a39f393687675ce170e6094757de20370365b9",
+      "read_at": "2026-10-02T03:02:54+00:00"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Documentation-only repository (no executable code) that ships one Agent Skill, `typesafe-ai` (skills/typesafe-ai/SKILL.md, 149 lines), packaged as Claude Code plugin 'typesafe' in a one-plugin marketplace named 'typesafe-ai' (.claude-plugin/plugin.json, .claude-plugin/marketplace.json). The skill teaches a coding agent to design and compose software around TypeSafe AI's 'System One' models (e.g. Jev), which return typed answers and probabilities through Choice/Noul/Score primitives (SKILL.md:18-24, 99-103), and tells the agent to read live docs at docs.typesafe.ai for API/SDK details (SKILL.md:26-53). Its subject is one vendor's API. The repo contains no general engineering or security procedure set (the only security-related sentence is 'Keep API credentials server-side in web apps', SKILL.md:149), no evaluation framework or scorers, no containerized Claude Code/Codex runner, and no CI regression gate.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Positioned as 'Agent skills for building with TypeSafe: typed decisions and probabilities from System One models.'",
+          "citation": "README.md:3"
+        },
+        {
+          "claim": "Claude Code install is two terminal commands: `claude plugin marketplace add typesafe-ai/skills`, then `claude plugin install typesafe@typesafe-ai`.",
+          "citation": "README.md:9-16"
+        },
+        {
+          "claim": "Other agents install via skills.sh: `npx skills add typesafe-ai/skills --skill typesafe-ai`; 'Select your agent when prompted.' No agent is named.",
+          "citation": "README.md:18-24"
+        },
+        {
+          "claim": "'Installation is project-local by default; add `-g` to install globally.'",
+          "citation": "README.md:24"
+        },
+        {
+          "claim": "An installation guide at docs.typesafe.ai/agent-skill#installation provides 'a prompt to copy to your agent, manual installation, and updates'.",
+          "citation": "README.md:26"
+        },
+        {
+          "claim": "Usage is by natural-language request (example: 'Use TypeSafe to route incoming support tickets by department, with human review for uncertain decisions.'); in Claude Code the skill can be invoked explicitly with `/typesafe:typesafe-ai`.",
+          "citation": "README.md:30-34"
+        },
+        {
+          "claim": "The skills table has a single row: `typesafe-ai` - 'Design TypeSafe workflows, find current docs and cookbooks, and compose typed judgments in code'.",
+          "citation": "README.md:36-38"
+        },
+        {
+          "claim": "SKILL.md can be read on GitHub or fetched as raw Markdown from raw.githubusercontent.com (main branch, skills/typesafe-ai/SKILL.md).",
+          "citation": "README.md:5"
+        },
+        {
+          "claim": "License: MIT (links to LICENSE).",
+          "citation": "README.md:40-42"
+        },
+        {
+          "claim": "Absent from the README (whole 42-line file read): supported OS/architectures, Codex or any named non-Claude agent, MCP, telemetry or network behavior, accounts/pricing for the TypeSafe service, tests/CI, evaluation, benchmarks.",
+          "citation": "README.md:1-42"
+        }
+      ],
+      "install": [
+        {
+          "method": "Claude Code plugin marketplace, step 1: add the marketplace (README gives no OS-specific variants)",
+          "command": "claude plugin marketplace add typesafe-ai/skills",
+          "citation": "README.md:14"
+        },
+        {
+          "method": "Claude Code plugin marketplace, step 2: install plugin 'typesafe' from marketplace 'typesafe-ai'",
+          "command": "claude plugin install typesafe@typesafe-ai",
+          "citation": "README.md:15"
+        },
+        {
+          "method": "skills.sh CLI via npx for other agents (prompts for the agent; project-local by default; README says to add `-g` for a global install)",
+          "command": "npx skills add typesafe-ai/skills --skill typesafe-ai",
+          "citation": "README.md:21,24"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "unknown - README states no supported OS or CPU architecture (README.md:7-26); no OS or architecture names appear in tracked files other than 'bash' code-fence labels. The repo holds only Markdown/JSON/LICENSE files, so nothing in it is architecture-specific; installation depends on the external `claude` CLI or `npx` (README.md:14-15, 21), whose platform support is not documented here.",
+        "wsl2": "unknown - WSL/Windows are not mentioned anywhere in the repo (README.md:7-26 has no OS statement).",
+        "macos_arm64": "unknown - macOS/arm64 is not mentioned (README.md:7-26); content is Markdown/JSON only and installs through the external `claude`/`npx` CLIs.",
+        "gpu": "no - no GPU use or requirement: the repo has no code. Where the System One models execute is not described in the repo (SKILL.md refers only to an HTTP API and SDKs, SKILL.md:52)."
+      },
+      "integrations": {
+        "cli": "None shipped. README relies on the external `claude` CLI (README.md:14-15) and the external `npx skills` CLI from skills.sh (README.md:21); neither is part of this repo.",
+        "mcp": "None found - no MCP server, .mcp.json or mcpServers key (.claude-plugin/plugin.json:1-12 has none; a search for 'mcp' over tracked files returned 0 matches).",
+        "sdk_or_api": "None shipped in this repo. The skill points to TypeSafe's separate HTTP API, Python SDK and JavaScript SDK docs on docs.typesafe.ai (SKILL.md:52); those are external and were not opened.",
+        "claude_code_or_codex": "Claude Code: yes. Documented plugin install (README.md:9-16); manifests: plugin 'typesafe' (.claude-plugin/plugin.json:2) and marketplace 'typesafe-ai' with one plugin entry (.claude-plugin/marketplace.json:2, 8-13); explicit invocation `/typesafe:typesafe-ai` (README.md:34). The plugin holds one skill and no hooks, commands or agents. Codex: none found - 'Codex', AGENTS.md and other agent names appear nowhere in the repo; README says only 'Other agents via skills.sh ... Select your agent when prompted' (README.md:18-24) with no agent list."
+      },
+      "telemetry_and_network": "No telemetry, analytics, tracking or phone-home code or statement in the repo; it has no executable code, and a case-insensitive search for telemetry/analytics/tracking/privacy/collect/opt-out matched nothing. Network touchpoints implied by the docs: (1) install - the commands reference the GitHub repo typesafe-ai/skills (README.md:14, 21; .claude-plugin/plugin.json:10) and the external `npx skills add` CLI (README.md:21), whose own network use and telemetry are not described here and were not inspected; (2) task time - SKILL.md tells the agent to read live docs from docs.typesafe.ai ('source of truth', SKILL.md:28; llms.txt index, SKILL.md:32; '.md' pages, SKILL.md:34-37) and gives an offline fallback (SKILL.md:41-44); (3) the TypeSafe API/SDKs the skill steers toward (SKILL.md:52): SKILL.md mentions API credentials (SKILL.md:149) and token/request cost (SKILL.md:129-130), which implies an account-based, metered service. The repo documents no sign-up, pricing, data handling or terms for it. README names no account requirement for installing the skill."
+    },
+    "code": {
+      "languages": [
+        "Markdown",
+        "JSON",
+        "YAML (SKILL.md front matter only)"
+      ],
+      "entry_points": [
+        {
+          "path": "skills/typesafe-ai/SKILL.md",
+          "what": "The only skill: front matter with name 'typesafe-ai', license MIT and a description that holds the when-to-use text (lines 1-14), then the instruction body (lines 16-149)."
+        },
+        {
+          "path": ".claude-plugin/plugin.json",
+          "what": "Claude Code plugin manifest: name 'typesafe', version 0.5.7, MIT; metadata only, with no skills/hooks/commands/mcpServers keys."
+        },
+        {
+          "path": ".claude-plugin/marketplace.json",
+          "what": "Claude Code marketplace manifest: marketplace 'typesafe-ai' with a single plugin entry 'typesafe' whose source is './' (the repo root)."
+        }
+      ],
+      "architecture": "No binary, CLI module or server main exists. Six tracked files (the working tree also holds an untracked .round-meta.json written by the harness, not upstream): README.md, LICENSE, .claude-plugin/plugin.json, .claude-plugin/marketplace.json, skills/typesafe-ai/SKILL.md, skills/typesafe-ai/LICENSE. Chain: marketplace 'typesafe-ai' -> one plugin 'typesafe' (source './', marketplace.json:8-13) -> one skill 'typesafe-ai'. SKILL.md has front matter with only name, license and description (lines 1-14; the 'use when' trigger text is at lines 8-10; no allowed-tools). Body: intro (16-24); 'Read the live docs' with a task-to-docs table linking 24 distinct docs.typesafe.ai pages (26-53); 'Find the useful shape' patterns (55-93); 'Design the judgments' covering the Choice/Noul/Score primitives (95-121); 'Compose and verify' covering composition, confidence and testing advice (123-149). The repo has no hooks, commands, agents, MCP/LSP config, scripts, references/ or assets/ directories, so the plugin contributes instruction text only; the detailed procedures sit on the external docs site. The skill itself advises 'targeted reads rather than loading the entire site' (SKILL.md:32-33). Its verification content ('citation checks', SKILL.md:83-86) concerns applications built on the TypeSafe API, not evaluation tooling for prompts, skills or agents.",
+      "packaging_and_release": "No release workflow, build step, artifacts, checksums, signatures or attestations (no .github/ directory; the six tracked files are all Markdown/JSON/LICENSE). Distribution is by source: the marketplace entry's source is './' (.claude-plugin/marketplace.json:12), i.e. the repo itself, and the skills.sh install names the GitHub repo (README.md:21). The marketplace entry carries no version, ref or sha pin (marketplace.json:9-13). Version 0.5.7 is declared only in .claude-plugin/plugin.json:3. The local clone has a lightweight tag v0.5.7 (.git/refs/tags/v0.5.7:1) at the same commit 65a39f3 (the task's revision lists tag null), and the session's git-status snapshot gives the latest commit message as 'Release v0.5.7' (not a file I opened). The clone is shallow (.git/shallow:1), so earlier history and the commit date are not available.",
+      "tests_and_ci": "None. 0 test files, no test directory and no CI workflow files (no .github/ directory, no other CI config). There is no linter or validator for SKILL.md or the JSON manifests, and no evaluation framework, scorers, labeled cases, containerized runner or regression gate. The only testing-related content is prose advice for users of the TypeSafe API ('Test representative cases and the resulting application behavior', SKILL.md:145-149).",
+      "dependencies": "No dependency manifests (no package.json, pyproject.toml, requirements.txt, go.mod, Cargo.toml or lockfiles), so 0 direct dependencies. .claude-plugin/plugin.json (12 lines) and .claude-plugin/marketplace.json (15 lines) declare no dependency fields; marketplace.json lists 1 plugin. Runtime reliance exists by instruction only: docs.typesafe.ai pages (SKILL.md:32-103) and the TypeSafe API/SDKs (SKILL.md:52).",
+      "security_policy": "none - no SECURITY.md and no .github/ directory in the repository."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:14-15 - `claude plugin marketplace add typesafe-ai/skills` then `claude plugin install typesafe@typesafe-ai` installs the plugin.",
+        "verified": "yes",
+        "evidence": "Manifest names line up with the commands: marketplace name 'typesafe-ai' (.claude-plugin/marketplace.json:2) lists plugin 'typesafe' with source './' (marketplace.json:8-13); the repo root is a plugin whose manifest name is 'typesafe' (.claude-plugin/plugin.json:2) and whose skill sits at skills/typesafe-ai/SKILL.md. Static consistency only: the commands were not executed, and `claude` CLI behavior is outside the repo."
+      },
+      {
+        "claim": "README.md:34 - in Claude Code the skill can be invoked explicitly as `/typesafe:typesafe-ai`.",
+        "verified": "yes",
+        "evidence": "Plugin name 'typesafe' (.claude-plugin/plugin.json:2) plus skill name 'typesafe-ai' (skills/typesafe-ai/SKILL.md:2) give the plugin:skill pair used in the README. Naming consistency only; not run."
+      },
+      {
+        "claim": "README.md:36-38 - the repo offers one skill, `typesafe-ai`, to design TypeSafe workflows, find current docs and cookbooks, and compose typed judgments in code. README.md:1,3 and plugin.json:4 say 'skills' in the plural.",
+        "verified": "yes",
+        "evidence": "Code matches the single-row table: only skills/typesafe-ai/SKILL.md exists under skills/, and the marketplace lists exactly one plugin (.claude-plugin/marketplace.json:8-13). SKILL.md covers docs discovery (26-53), design patterns (55-93), judgment primitives (95-121) and composition/verification (123-149). The plural wording in README.md:1,3 and .claude-plugin/plugin.json:4 differs from the code, which ships one skill."
+      },
+      {
+        "claim": "README.md:38 - the skill helps 'find current docs and cookbooks'.",
+        "verified": "yes",
+        "evidence": "SKILL.md:28-44 makes the live docs at docs.typesafe.ai 'the source of truth', starts from the https://docs.typesafe.ai/llms.txt index (SKILL.md:32) and links 24 distinct docs.typesafe.ai pages (SKILL.md:32-103), including cookbooks (SKILL.md:68-86). Those procedures live on the external site: the repo has no references/ or scripts directory and no copy of the docs, and the pages were not opened."
+      },
+      {
+        "claim": "README.md:40-42 - MIT license.",
+        "verified": "yes",
+        "evidence": "LICENSE:1-21 is the standard MIT text, 'Copyright (c) 2026 TypeSafe AI'; skills/typesafe-ai/LICENSE:1-21 is an identical second copy; SKILL.md:3 and .claude-plugin/plugin.json:11 also declare MIT."
+      },
+      {
+        "claim": "README.md:3 - System One models give 'typed decisions and probabilities'.",
+        "verified": "not_checkable",
+        "evidence": "The repo contains no model, SDK, API client or code. SKILL.md only describes the models (SKILL.md:18-24) and itself says 'Typed output guarantees the interface, not truth' and to 'validate their performance in the target domain' (SKILL.md:142-143)."
+      },
+      {
+        "claim": "README.md:18-24 - `npx skills add typesafe-ai/skills --skill typesafe-ai` installs the skill for the agent you select, project-local by default, global with `-g`.",
+        "verified": "partial",
+        "evidence": "Checkable part: the `--skill typesafe-ai` argument matches the skill name (skills/typesafe-ai/SKILL.md:2) and directory skills/typesafe-ai/. Not checkable: the behavior of the external skills.sh CLI (agent prompt, project-local default, -g), which has no code or config in this repo. No agent, including Codex, is named anywhere (case-insensitive search for codex/cursor/copilot/gemini/windsurf/opencode/agents.md/openai over tracked files: 0 matches)."
+      },
+      {
+        "claim": "README.md:26 - the installation guide at docs.typesafe.ai/agent-skill#installation covers a copy-to-agent prompt, manual installation and updates.",
+        "verified": "not_checkable",
+        "evidence": "External page: not in the working directory and not fetched (no fetch tool available); nothing in the repo mirrors it."
+      },
+      {
+        "claim": "README.md:5 - SKILL.md is available as raw Markdown at raw.githubusercontent.com/typesafe-ai/skills/main/skills/typesafe-ai/SKILL.md.",
+        "verified": "partial",
+        "evidence": "The path skills/typesafe-ai/SKILL.md exists at commit 65a39f3, which is refs/remotes/origin/main in this clone (.git/packed-refs:2); the URL itself was not fetched."
+      },
+      {
+        "claim": "Absence check for the Quality and evaluation needs: README.md and SKILL.md claim no evaluation scorers, no containerized Claude Code/Codex runner and no CI regression gate.",
+        "verified": "yes",
+        "evidence": "A search for test/eval/benchmark/regress/scorer/container/docker/CI/verifier/harness/labeled across tracked files matches only prose in SKILL.md:79 (labeled outcomes becoming ML features), :132 (thresholds), :145 and :148 (advice to test representative cases and to treat cookbook thresholds as examples). The six tracked files contain no workflow, script, test, Dockerfile or config."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Scope: the repo ships exactly one skill, about building with TypeSafe's API (README.md:36-38; SKILL.md:16-24; six tracked files). It has no general engineering or security procedures (the only security-related sentence is SKILL.md:149), no evaluation framework or scorers, no containerized agent-CLI runner and no CI regression gate (SKILL.md:145-149 is advice only).",
+      "Remote instructions: SKILL.md:28 calls the live docs at docs.typesafe.ai 'the source of truth' and directs the agent to fetch the llms.txt index and '.md' pages (SKILL.md:32-37; 24 distinct page URLs). That content is outside this repo, unpinned and unchecksummed, so agent behavior can change without a commit here; the offline fallback is to state the limitation (SKILL.md:41-44).",
+      "External service coupling: the skill steers designs toward TypeSafe's HTTP API and Python/JavaScript SDKs (SKILL.md:52, 95-117) and mentions API credentials (SKILL.md:149) and token/request cost (SKILL.md:129-130). Sign-up, pricing, data handling and terms are not documented in the repo.",
+      "Platform and agent support is under-documented: no OS, architecture or GPU statement (README.md:7-26); Codex is not named anywhere in the repo; non-Claude installs go through the external `npx skills` CLI (README.md:18-24), whose supported agents, network use and telemetry are not covered here and were not inspected.",
+      "Maintenance and provenance signals: no CI, tests, release workflow, SECURITY policy, changelog, checksums, signatures or attestations (six tracked files); the marketplace entry has no version, ref or sha pin (.claude-plugin/marketplace.json:9-13); the version appears only in .claude-plugin/plugin.json:3 and a lightweight tag v0.5.7. The shallow clone (.git/shallow:1) exposes only the HEAD commit, so history and commit date could not be determined.",
+      "Activation breadth: the skill's description says to use it 'when brainstorming what AI could make possible in an app' or when 'an LLM prompt-and-parse step could become a structured decision' (SKILL.md:8-10), which is not limited to tasks that already involve TypeSafe. Once loaded, the body recommends TypeSafe primitives (SKILL.md:95-117) while also saying to 'Preserve the user's chosen stack and scope' (SKILL.md:59-60).",
+      "Licensing: MIT covers this repo's files (LICENSE:1-21; skills/typesafe-ai/LICENSE; SKILL.md:3; .claude-plugin/plugin.json:11). The licensing and terms of the docs.typesafe.ai content the skill tells agents to read, and of the TypeSafe service and models, are not stated in the repo."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "typesafe-ai/skills",
+      "checks": [
+        {
+          "field": "readme.install[0-1]",
+          "statement": "Claude Code plugin marketplace install in two steps: `claude plugin marketplace add typesafe-ai/skills`, then `claude plugin install typesafe@typesafe-ai` (README gives no OS-specific variants).",
+          "citation": "README.md:14-15",
+          "holds": true,
+          "note": "README.md:14 and :15 match both commands verbatim, in a single bash block with no OS variants (README.md:9-16). The names match the manifests: marketplace 'typesafe-ai' (.claude-plugin/marketplace.json:2) lists plugin 'typesafe' with source './' (marketplace.json:10,12), which matches .claude-plugin/plugin.json:2. Static check only; the commands were not run."
+        },
+        {
+          "field": "license",
+          "statement": "spdx: MIT; file: LICENSE",
+          "citation": "LICENSE:1-21",
+          "holds": true,
+          "note": "LICENSE:1 'MIT License', :3 'Copyright (c) 2026 TypeSafe AI', :5-21 the standard MIT grant and warranty disclaimer, word for word. It agrees with README.md:40-42 ('[MIT](LICENSE)'), .claude-plugin/plugin.json:11 and skills/typesafe-ai/SKILL.md:3, and skills/typesafe-ai/LICENSE is an identical copy."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "unknown - README states no supported OS or CPU architecture; no OS or architecture names appear in tracked files other than 'bash' code-fence labels; the repo is Markdown/JSON/LICENSE only; installation depends on the external `claude` CLI or `npx`.",
+          "citation": "README.md:7-26; README.md:14-15, 21",
+          "holds": true,
+          "note": "README.md:7-26 has no OS, architecture or WSL statement. A case-insensitive search for linux/macos/darwin/windows/wsl/x86/x64/amd64/arm64/aarch64/apple/ubuntu/debian/intel/platform over README.md, LICENSE, skills/ and .claude-plugin/ hit only 'intelligence' (SKILL.md:5,18) and the software sense of 'architecture' (SKILL.md:62). The shell tokens are just the ```bash fences at README.md:13,20. Install runs through the external claude CLI (README.md:14-15) and npx (README.md:21), so 'unknown' is the accurate value."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Claude Code: yes (documented plugin install; plugin 'typesafe'; marketplace 'typesafe-ai' with one plugin entry; `/typesafe:typesafe-ai`; one skill, no hooks/commands/agents). Codex: none found; no agent named; README says only 'Select your agent when prompted'.",
+          "citation": "README.md:9-16, 18-24, 34; .claude-plugin/plugin.json:2; .claude-plugin/marketplace.json:2, 8-13",
+          "holds": true,
+          "note": "All cited lines match: README.md:9-16 is the Claude Code plugin section, plugin.json:2 has name 'typesafe', marketplace.json:2 has 'typesafe-ai' with exactly one plugin object at :8-13, and README.md:34 gives `/typesafe:typesafe-ai`. No hooks/, commands/ or agents/ directory exists (only .git/hooks samples), and plugin.json has no such keys. A search for codex/cursor/copilot/gemini/windsurf/opencode/agents.md/openai/cline/aider/goose/kiro/mcp across README.md, skills/ and .claude-plugin/ returned 0 matches, and README.md:18-24 lists no agents."
+        },
+        {
+          "field": "claim_checks[9]",
+          "statement": "Absence check for Quality and evaluation needs (verified: yes): no evaluation scorers, containerized Claude Code/Codex runner or CI regression gate; a search for test/eval/benchmark/regress/scorer/container/docker/CI/verifier/harness/labeled matches only prose at SKILL.md:79, :132, :145, :148; no workflow, script, test, Dockerfile or config.",
+          "citation": "skills/typesafe-ai/SKILL.md:79, 132, 145, 148; repository file tree",
+          "holds": true,
+          "note": "Re-running that search (case-insensitive, CI as a whole word) over README.md, LICENSE, skills/ and .claude-plugin/ returned exactly SKILL.md:79, 132, 145 and 148, all prose. There is no .github/, tests/, scripts/, Dockerfile, *.yml/*.yaml/*.toml, Makefile or package.json. The only config-like files are the two .claude-plugin JSON manifests, which are not test or CI config. A bare case-insensitive 'ci' substring would also match words like 'decisions', which doesn't change the result."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

@@ -1,0 +1,392 @@
+{
+  "contender": "google/gvisor",
+  "revision": {
+    "contender": "google/gvisor",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "google/gvisor",
+        "tag": "release-20260928.0",
+        "commit": "6485c3fbdfe28172ced5d6aed49554cf494967db",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "release-20260928.0",
+    "commit": "6485c3fbdfe28172ced5d6aed49554cf494967db",
+    "read_at": "2026-10-02T03:02:15+00:00"
+  },
+  "dossier": {
+    "contender": "google/gvisor",
+    "revision": {
+      "tag": "release-20260928.0",
+      "commit": "6485c3fbdfe28172ced5d6aed49554cf494967db",
+      "read_at": "2026-10-02T03:02:15+00:00"
+    },
+    "license": {
+      "spdx": "Apache-2.0 AND BSD-3-Clause AND MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "gVisor is an application kernel written in Go that implements a Linux-like syscall interface in userspace (the 'Sentry'), with a separate file-proxy process (the 'Gofer') and its own TCP/IP stack (netstack). It ships as the OCI runtime `runsc` plus a containerd shim, so Docker/Kubernetes/containerd workloads, or single commands via `runsc do`, the bubblewrap-style `runsc bwrap` CLI, `runsc sandboxexec`, or the experimental Go/Python 'SandboxExec' SDKs, run against the Sentry instead of directly against the host kernel. Filesystem and network restriction is configured by the operator (OCI mounts/overlay and `--network=sandbox|host|none`); the project's own README says it is not a tool to 'limit the scope of access for a service'. Linux hosts only (x86_64/ARM64).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "gVisor provides a strong layer of isolation between running applications and the host OS; it is an application kernel implementing a Linux-like interface, written in a memory-safe language (Go) and running in userspace.",
+          "citation": "README.md:11-14"
+        },
+        {
+          "claim": "Includes an OCI runtime called `runsc` that integrates with Docker and Kubernetes.",
+          "citation": "README.md:16-19"
+        },
+        {
+          "claim": "Not a syscall filter (e.g. seccomp-bpf) nor a wrapper over Linux isolation primitives (e.g. firejail, AppArmor), and not a VM; 'a distinct third approach'.",
+          "citation": "README.md:23-30"
+        },
+        {
+          "claim": "Containers are not a sandbox: with a shared kernel, 'container escape is possible with a single vulnerability'.",
+          "citation": "README.md:34-39"
+        },
+        {
+          "claim": "gVisor limits the host kernel surface accessible to the application and 'implements Linux by way of Linux'.",
+          "citation": "README.md:41-46"
+        },
+        {
+          "claim": "Should not be confused with tools to harden containers against external threats, provide integrity checks, or 'limit the scope of access for a service'; 'One should always be careful about what data is made available to a container.'",
+          "citation": "README.md:48-51"
+        },
+        {
+          "claim": "gVisor builds on x86_64 and ARM64.",
+          "citation": "README.md:60"
+        },
+        {
+          "claim": "Requirements (source build): Linux 5.6+ and Docker 17.09.0 or greater.",
+          "citation": "README.md:69-72"
+        },
+        {
+          "claim": "`make release-tarball DESTINATION=bin/` builds a tarball with `runsc`, `containerd-shim-runsc-v1` and sidecar binaries that `runsc` expects in a `gvisor-bin/` directory next to itself; extract to /usr/local/bin.",
+          "citation": "README.md:76-83"
+        },
+        {
+          "claim": "Direct Bazel use (no Docker wrapper) is possible but 'isn't recommended due to the extra overhead'.",
+          "citation": "README.md:91-105"
+        },
+        {
+          "claim": "macOS: 'Some packages support running tests directly on macOS' (needs bazel 8); no macOS runtime is described.",
+          "citation": "README.md:125-135"
+        },
+        {
+          "claim": "A synthetic `go` branch exists for importing gVisor Go packages (e.g. netstack); 'runsc builds from this branch are not supported'.",
+          "citation": "README.md:137-156"
+        },
+        {
+          "claim": "User docs live at gvisor.dev; security policy is SECURITY.md; governance is GOVERNANCE.md. The README itself contains no license statement (searched README.md for license/Apache/BSD/MIT: 0 matches); licensing is in the root LICENSE file.",
+          "citation": "README.md:53-56,158-171; LICENSE:1-254"
+        }
+      ],
+      "install": [
+        {
+          "method": "apt repository (Debian/Ubuntu; amd64/arm64)",
+          "command": "sudo apt-get update && sudo apt-get install -y apt-transport-https ca-certificates curl gnupg\ncurl -fsSL https://gvisor.dev/archive.key | sudo gpg --dearmor -o /usr/share/keyrings/gvisor-archive-keyring.gpg\necho \"deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/gvisor-archive-keyring.gpg] https://storage.googleapis.com/gvisor/releases release main\" | sudo tee /etc/apt/sources.list.d/gvisor.list > /dev/null\nsudo apt-get update && sudo apt-get install -y runsc",
+          "citation": "g3doc/user_guide/install.md:12-34"
+        },
+        {
+          "method": "Latest release tarball with sha512 check (also needs gvisor-bin/ kept next to runsc)",
+          "command": "(\n  set -e\n  ARCH=$(uname -m)\n  URL=https://storage.googleapis.com/gvisor/releases/release/latest/${ARCH}\n  wget ${URL}/gvisor.tar.zstd ${URL}/gvisor.tar.zstd.sha512\n  sha512sum -c gvisor.tar.zstd.sha512\n  sudo tar --zstd -xf gvisor.tar.zstd -C /usr/local/bin\n  rm -f gvisor.tar.zstd gvisor.tar.zstd.sha512\n)",
+          "citation": "g3doc/user_guide/install.md:47-63"
+        },
+        {
+          "method": "Register as a Docker runtime (edits Docker daemon config)",
+          "command": "sudo /usr/local/bin/runsc install\nsudo systemctl reload docker\ndocker run --rm --runtime=runsc hello-world",
+          "citation": "g3doc/user_guide/install.md:65-71"
+        },
+        {
+          "method": "Build from source (Docker-wrapped Bazel)",
+          "command": "make release-tarball DESTINATION=bin/\nsudo tar -C /usr/local/bin -xf bin/gvisor.tar.bz2",
+          "citation": "README.md:76-83"
+        },
+        {
+          "method": "Python SDK (experimental; runsc must be installed separately and found via RUNSC_PATH or PATH)",
+          "command": "pip install gvisor",
+          "citation": "g3doc/user_guide/sdk/python_quickstart.md:9-22"
+        },
+        {
+          "method": "Go SDK (experimental) via the synthetic `go` branch (doc says to replace the path 'when available')",
+          "command": "go get gvisor.dev/gvisor/sandboxexec/sandbox@go",
+          "citation": "g3doc/user_guide/sdk/quickstart.md:68-73"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - README.md:60 ('builds on x86_64 and ARM64'); g3doc/user_guide/install.md:5; g3doc/user_guide/FAQ.md:9-12; CI runs AMD64 and ARM64 smoke, unit and syscall tests (.buildkite/pipeline.yaml:73-86,358-372,397-412). Default platform is systrap, no virtualization needed (runsc/config/flags.go:102; g3doc/architecture_guide/intro_to_gvisor.md:158-163). Sandbox-network mode needs root (intro_to_gvisor.md:219-226); a rootless path exists with limits (g3doc/user_guide/rootless.md:46-53).",
+        "wsl2": "unknown - no mention of WSL, WSL2 or Windows Subsystem for Linux anywhere in the tree (searched all file types for WSL|WSL2|WSL1|Windows Subsystem for Linux|microsoft-standard: 0 matches) and no WSL2 CI job (.buildkite/pipeline.yaml). Upstream says only 'requires Linux 5.6+' (g3doc/user_guide/install.md:5) and 'Today, gVisor requires Linux' (g3doc/user_guide/FAQ.md:5-7). Whether a WSL2 kernel meets the seccomp/user-namespace/cgroup prerequisites is not documented (runsc/hostsettings/hostsettings.go:254-312 lists the user-namespace sysctls checked).",
+        "macos_arm64": "no - g3doc/user_guide/FAQ.md:5-7 ('Today, gVisor requires Linux'); the project blog says 'gVisor works strictly on Linux systems' and that macOS/Windows use needs a Linux VM such as Docker Desktop (website/blog/2024-09-23-dangerzone.md:83-85,305-314); README.md:125-135 documents macOS only for running some Bazel test targets; CI only cross-builds selected netstack packages for darwin/arm64 (.buildkite/pipeline.yaml:146-156); the Python SDK classifies itself as POSIX :: Linux (sandboxexec/sandbox/python/pyproject.toml:16). No macOS install method is documented.",
+        "gpu": "yes (Linux hosts) - NVIDIA GPUs via the in-sandbox `nvproxy` driver proxy on preselected open-driver versions (g3doc/user_guide/gpu.md:11-17; runsc/config/flags.go:184-190), plus TPU devices (g3doc/user_guide/compatibility.md:61-64); GPU CI jobs at .buildkite/pipeline.yaml:198-260."
+      },
+      "integrations": {
+        "cli": "yes - `runsc` binary (runsc/main.go:18-32; subcommands registered in runsc/cli/maincli/maincli.go:49-103): OCI commands (create/run/exec/kill/delete...), `runsc do` (one-off command; 'to be used for testing only', runsc/cmd/do.go:67-81), `runsc bwrap` bubblewrap-style personality (also selected when the binary is invoked as `bwrap`: runsc/cmd/alias/aliases.go:35-44; g3doc/user_guide/personalities/bwrap.md:5-25; implemented inside runsc via an OCI bundle, runsc/cmd/alias/bwrap/bwrap.go:315-354; its parser recognises 26 flags and anything else fails with 'Unknown option': runsc/cmd/alias/bwrap/cli.go:182-227), `runsc sandboxexec` (runs a command per a SandboxOptions proto from --options or stdin: runsc/cmd/sandboxexec.go:39-111), `runsc install` (Docker runtime registration: runsc/cmd/install.go:53-55), plus metric/debug helpers (maincli.go:78-97).",
+        "mcp": "none found - there is no MCP server for gVisor/runsc. The only MCP code in the tree is images/systemd-user/gnome-mcp/desktop_mcp.py, an MCP server that exposes a GNOME desktop as a computer-use tool and is run inside gVisor as a demo/test image (desktop_mcp.py:16,71-80); it is not a sandbox-control interface.",
+        "sdk_or_api": "Go package gvisor.dev/gvisor/sandboxexec/sandbox (New/Exec/Close/Snapshot: sandboxexec/sandbox/sandbox.go:15-17,469,687,748) and Python package `gvisor` (Sandbox/Mount/MountType/NetworkMode/Error: sandboxexec/sandbox/python/gvisor/__init__.py:17-21; pyproject.toml:6-8). Both generate an OCI bundle and drive `runsc` as a subprocess located via RUNSC_PATH or PATH (sandbox.go:341-356,587-611,701-712; sandbox.py:382-423,444-450). Both are labelled experimental/'not meant for production use' (sandboxexec/README.md:3-4; g3doc/user_guide/sdk/go.md:3-4; python.md:3-4). Go SDK docs do not match the code (see claim_checks). Other interfaces: OCI runtime spec via runsc, containerd shim v2 (shim/main.go:15), Prometheus-style HTTP metrics via the opt-in `runsc metric-server` (g3doc/user_guide/observability.md:13-17), a mutating Kubernetes webhook (webhook/main.go:15). No documented HTTP/RPC control API for end users was found in g3doc.",
+        "claude_code_or_codex": "none found - no documented Claude Code or Codex integration, plugin, hook or settings. Searches for claude|codex|MCP found only (a) contributor-workflow files for developing gVisor itself: .claude/skills/add-syscall/SKILL.md:1-24, .agents/skills/update-gvisor-maintainers/SKILL.md:1-11, AGENTS.md:1-47; and (b) project-blog material showing other agent harnesses (OpenClaw, PicoClaw, Hermes Agent) run under Docker `--runtime=runsc` (website/blog/2026-04-15-magi-multi-agent-gvisor-isolation.md:8-27), which itself says integrating gVisor into existing applications that need sandboxing is a current drawback 'being worked on' (same file:1318-1321)."
+      },
+      "telemetry_and_network": "No telemetry or phone-home code found in the runtime: keyword searches (telemetry, analytics, usage report, phone home) over Go/doc/script sources hit only the website's analytics ID (website/_config.yml:28) and an indirect `golang.org/x/telemetry` module in go.mod:117 that no gVisor Go file imports (repo-wide import search). `runsc` itself does not link net/http (runsc/cmd/install_sidecars.go:57-58). Metrics are opt-in and local: `--metric-server` defaults to empty (runsc/config/flags.go:89; g3doc/user_guide/observability.md:89-92) and the separate `runsc metric-server` sidecar serves Prometheus HTTP on a user-chosen address/UDS (observability.md:13-17,67-70). Network use: apt/tarball install fetches from gvisor.dev and storage.googleapis.com (g3doc/user_guide/install.md:27-28,51-53); `runsc install` can auto-download missing sidecars from storage.googleapis.com via curl/wget (runsc/cmd/install.go:69-73; runsc/cmd/install_sidecars.go:46-70; install.md:84-101; slated for removal end of Sept 2026 but still present at this tag) and rewrites Docker daemon config (install.go:53-55,64). An optional GCS checkpoint gofer (runsc/checkpointgofer/main.go:37-53; runsc/sandbox/sandbox.go:609-630,1799-1811) uses Google Cloud credentials only when a checkpoint image path resolves to a GCS URI. No account or hosted service is required to run sandboxes. Source builds fetch Bazel dependencies over the network (MODULE.bazel:38-121)."
+    },
+    "code": {
+      "languages": [
+        "Go (primary: pkg/, runsc/, shim/, webhook/, sandboxexec/sandbox, tools/; ~845 Go files under pkg/sentry alone)",
+        "Go assembly (amd64/arm64 .s files under pkg/, e.g. pkg/safecopy, pkg/ring0, pkg/sentry/platform/systrap)",
+        "C++ (syscall/perf/packetimpact tests under test/; vDSO in vdso/)",
+        "Python (SDK in sandboxexec/sandbox/python, examples/, tools/)",
+        "Starlark/Bazel (BUILD files, MODULE.bazel, tools/*.bzl)",
+        "Shell and Makefile",
+        "Protocol Buffers (sandboxexec/proto)"
+      ],
+      "entry_points": [
+        {
+          "path": "runsc/main.go",
+          "what": "`runsc` binary: OCI runtime and user CLI; delegates to runsc/cli/maincli (subcommand registry at maincli.go:49-103)."
+        },
+        {
+          "path": "runsc/cmd/sentry/sentry_main.go",
+          "what": "`gvisor_sentry` sidecar binary that runs the Sentry (the gVisor kernel); internal boot/umount/symbolize commands."
+        },
+        {
+          "path": "shim/main.go",
+          "what": "`containerd-shim-runsc-v1` containerd shim (v2 API)."
+        },
+        {
+          "path": "runsc/cmd/alias/bwrap/cli.go",
+          "what": "`runsc bwrap` bubblewrap-style CLI personality (also reached when the binary is named `bwrap`, runsc/cmd/alias/aliases.go:35-44); translation in bwrap.go."
+        },
+        {
+          "path": "runsc/cmd/sandboxexec.go",
+          "what": "`runsc sandboxexec`: starts a sandbox from a SandboxOptions proto (sandboxexec/proto/sandbox_options.proto) and prints PID and control-socket path (lines 185-187)."
+        },
+        {
+          "path": "runsc/cmd/do.go",
+          "what": "`runsc do`: quick one-off command in a sandbox with host fs read-only plus in-memory overlay; documented as testing-only."
+        },
+        {
+          "path": "sandboxexec/sandbox/sandbox.go",
+          "what": "Experimental Go SDK; Python counterpart at sandboxexec/sandbox/python/gvisor/sandbox.py (package `gvisor`)."
+        },
+        {
+          "path": "runsc/checkpointgofer/main.go",
+          "what": "Checkpoint-gofer sidecar for remote (GCS) checkpoint file access; other sidecars listed in tools/release.bzl:35-40."
+        }
+      ],
+      "architecture": "Per sandbox, `runsc` (runsc/main.go -> runsc/cli/maincli; OCI/CLI commands in runsc/cmd; sandbox/gofer process management in runsc/sandbox and runsc/container; flags/config in runsc/config; OCI spec handling in runsc/specutils) starts (1) the Sentry userspace kernel as the `gvisor_sentry` sidecar (runsc/cmd/sentry, boot logic runsc/boot): Linux syscall tables in pkg/sentry/syscalls/linux/linux64.go, task/process model in pkg/sentry/kernel, VFS in pkg/sentry/vfs with filesystems in pkg/sentry/fsimpl, memory in pkg/sentry/mm, sockets in pkg/sentry/socket on the netstack TCP/IP stack in pkg/tcpip (or host sockets with --network=host), Linux ABI definitions in pkg/abi/linux, syscall/fault-interception platforms in pkg/sentry/platform/{systrap (default),kvm,ptrace}, GPU/TPU/RDMA proxies in pkg/sentry/devices/{nvproxy,tpuproxy,rdmaproxy}, audit/trace in pkg/sentry/seccheck; the Sentry's own host-syscall allowlist is built in runsc/boot/filter/config on pkg/seccomp ('all syscalls the sandbox is allowed to make to the host', config.go:15-16, with HostNetwork/HostFilesystem options at :36-50); and (2) the Gofer (runsc/fsgofer, LISAFS protocol in pkg/lisafs) that owns filesystem access, with 'directfs' letting the Sentry operate on donated FDs (g3doc/user_guide/filesystem.md:72-94). Sidecars in gvisor-bin/: checkpointgofer, runsc-metric-server, runsc-fd-parking, gvisor-sentry-prewarmer (tools/release.bzl:21-40). Integration code: containerd shim (shim/), mutating Kubernetes webhook (webhook/), SandboxExec SDKs+proto (sandboxexec/), CLI personalities (runsc/cmd/alias/bwrap, runsc/cmd/sandboxexec.go, runsc/cmd/do.go). Build: Bazel (MODULE.bazel; .bazelversion = 8.3.1) wrapped by the Makefile; tools/ holds build/analysis tooling (nogo, checklocks, checkescape, checkunsafe...); docs in g3doc/ and website/.",
+      "packaging_and_release": "Releases are built by an internal Buildkite pipeline, not GitHub Actions: .buildkite/release.yaml:49-63 stages the tag, builds x86_64 and aarch64 artifacts in opt mode, builds Python wheels, runs `make release`, copies to gs://gvisor/releases/ and then pushes the release tag (.buildkite/scripts/release/tag.sh:17-23). Artifacts per arch: gvisor.tar.bz2 and gvisor.tar.zstd (runsc + containerd-shim-runsc-v1 + gvisor-bin/ sidecars; debian/BUILD:80-120), a `runsc` .deb (debian/BUILD:53-78), and a Python wheel/sdist (tools/make_python_release.sh:96-134). Integrity: a .sha512 file is generated beside each raw artifact (tools/make_release.sh:51-80); the apt repo is GPG-signed with InRelease/Release.gpg using SHA512 digests (tools/make_apt.sh:164-168) and .debs are signed with dpkg-sig (make_apt.sh:121-122); the public key is served from https://gvisor.dev/archive.key (install.md:27). GitHub Releases are a mirror: .github/workflows/release_mirror.yml triggers on tags matching release-YYYYMMDD.N (lines 14-23,50), waits for the GCS artifacts, verifies sha512, renames per architecture, generates SHA256SUMS and SHA512SUMS, and attaches them (lines 113-143,181-215); the workflow states it builds nothing (lines 3-8). No cosign/Sigstore/SLSA/provenance/attestation tooling was found in .github, .buildkite or tools. Python: wheels are staged to Google's 'OSS Exit Gate' Artifact Registry (tools/make_python_release.sh:168-210); docs say `pip install gvisor` and tools/make_release.sh:127-129 says PyPI is canonical, but PyPI publication cannot be verified from this tree. Version scheme is date-based release-YYYYMMDD.N, with nightly and master channels (install.md:120-156,173-207).",
+      "tests_and_ci": "Frameworks: Go `testing` under Bazel go_test; C++ gtest syscall tests run both natively and under runsc via the `syscall_test()` macro (test/syscalls/BUILD; .claude/skills/add-syscall/SKILL.md:156-161); Python unittest for the SDK; packetdrill/packetimpact network tests; Docker/containerd/Podman/Kubernetes e2e; Go/Java/Node/PHP/Python language-runtime suites; a syzkaller smoke test; benchmarks. Approximate test-file counts (from globs): ~570 Go *_test.go (pkg 344, runsc 62, test 139, sandboxexec+shim+tools 23), ~296 C++ .cc files in test/syscalls/linux (432 .cc/.h under test/), 2 Python test files (sandboxexec/sandbox/python/tests/sandbox_test.py, g3doc/user_guide/sdk/python_docs_api_test.py). CI: primary pipeline is Buildkite (.buildkite/pipeline.yaml): smoke and race tests, builds, nogo static analysis, unit/container tests on cgroup v1/v2 and ARM64, syscall tests on KVM/systrap including release-candidate Linux kernels, Docker/containerd 1.7-2.2/Podman/Kubernetes integration, GPU/CUDA tests, bwrap tests (lines 758-774), 'sandbox posture' tests that compare the host-observable security posture of the Sentry process against the configured expectations (lines 569-577; pkg/test/sandboxposture/sandboxposture.go:15-18), lint, dependency license check (lines 336-341), governance check (lines 330-335), and benchmark jobs (lines 29-48,836-917); .buildkite/release.yaml adds release and GPU jobs; .buildkite/pgo.yaml refreshes PGO profiles. GitHub Actions: build.yml (builds runsc), go.yml (generates/pushes the `go` branch and runs `go build ./...`), lint.yml (`make lint`), fileheader.yml (license headers), codeql.yml (daily; go, javascript, python, ruby), release_mirror.yml, issue_reviver.yml, labeler.yml, stale.yml, auto_assign.yml, close_banned_prs.yml; dependabot updates GitHub Actions weekly (.github/dependabot.yml:6-14). macOS/Windows/FreeBSD/OpenBSD/32-bit steps only cross-build selected netstack packages (.buildkite/pipeline.yaml:146-196).",
+      "dependencies": "go.mod (go 1.26.3, line 3): 43 direct requires (go.mod:5-49) and 80 indirect (go.mod:51-132). MODULE.bazel: 18 bazel_dep modules (MODULE.bazel:6-23) plus archive overrides for rules_go/grpc and http_archive pins for llvm and kythe (MODULE.bazel:25-70), with Go modules pulled from go.mod through gazelle; Bazel version in .bazelversion:1 (8.3.1). Python SDK: 0 runtime dependencies (sandboxexec/sandbox/python/pyproject.toml:26). Dependency licenses are recorded in tools/licensecheck/dependencies.yaml. `make license-check` (Makefile:214-216; .buildkite/pipeline.yaml:336-341) verifies that every dependency has an entry there, and TestLicensePolicy (tools/licensecheck/licensecheck_test.go:185-201) checks each entry against the allowed list in governance/licensing.yaml:10-29 (Apache-2.0, 0BSD, BSD-2-Clause, BSD-2-Clause-FreeBSD, BSD-3-Clause, MIT, MIT-0, ISC, OpenSSL, OpenSSL-standalone, PSF-2.0, Python-2.0, Python-2.0.1, PostgreSQL, SSLeay-standalone, UPL-1.0, X11, Zlib, 'Google patent license for Golang'). Three entries are listed exceptions (governance/licensing.yaml:30-55): google_root_pem (NOASSERTION; CA root bundle for test images only, never in released binaries; dependencies.yaml:911-916), grpc (Apache-2.0, BSD-3-Clause, MPL-2.0; Bazel build/test tooling only, released binaries use pure-Go google.golang.org/grpc; dependencies.yaml:949-957) and llvm-raw (Apache-2.0 WITH LLVM-exception, MIT; NVIDIA GPU test toolchain only, not distributed; dependencies.yaml:1008-1015). MPL-2.0 (file-level copyleft) is the only copyleft-family identifier in dependencies.yaml and appears only on that Bazel-side grpc archive; no GPL/LGPL/AGPL identifiers appear in the file. Core Sentry packages avoid external imports by policy (g3doc/architecture_guide/security.md:206-209). The project's own source is not uniformly Apache-2.0 (see the license field and the licensing risk).",
+      "security_policy": "SECURITY.md (repo root): private reports to gvisor-security@googlegroups.com or GitHub security advisories, typical response within 48h (SECURITY.md:3-7); CVEs only for gVisor-specific issues that cross the sandbox boundary where the attacker does not control the sandbox configuration (SECURITY.md:9-17); operator-controlled config (OCI spec, runtime flags such as --network=host) is out of CVE scope (SECURITY.md:144-176,254-261); disclosure/embargo process is in GOVERNANCE.md (SECURITY.md:272-275). The experimental sandboxexec directory is declared 'not yet a valid target for security issues' (sandboxexec/README.md:6-18)."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:11-14,23-26 - application kernel in memory-safe Go; 'not a syscall filter' nor 'a wrapper over Linux isolation primitives'.",
+        "verified": "partial",
+        "evidence": "Consistent on the core point: syscalls are implemented by the Sentry rather than passed through (pkg/sentry/syscalls/linux/linux64.go:15 'syscall tables for amd64 and arm64 Linux'; g3doc/architecture_guide/intro_to_gvisor.md:100-105). But gVisor also layers host seccomp, namespaces and pivot_root under the Sentry as a second layer (runsc/boot/filter/config/config.go:15-16; SECURITY.md:64-67; intro_to_gvisor.md:124-133). 'Memory-safe Go' is qualified: unsafe code is confined to *_unsafe.go files by policy (g3doc/architecture_guide/security.md:202-204), the tree contains Go assembly (e.g. pkg/safecopy/memcpy_amd64.s, pkg/sentry/platform/systrap/stub_amd64.s), a C++ vDSO (vdso/vdso.cc), and optional cgo only in the network-plugin build (pkg/sentry/socket/plugin/cgo/stack_unsafe.go; .bazelrc:33-37 selects pure Go by default)."
+      },
+      {
+        "claim": "README.md:48-51 - gVisor is not a tool to 'limit the scope of access for a service'; be careful what data is made available.",
+        "verified": "yes",
+        "evidence": "Access scope is whatever the OCI spec/mounts and --network mode supply: three network modes (runsc/config/config.go:743-758; flags.go:160) and bind/tmpfs/overlay mounts (g3doc/user_guide/filesystem.md:12-54). No per-path/glob or per-domain policy engine exists in code: sandboxexec/proto/sandbox_options.proto:34-39 declares domain_allowlist/domain_denylist but a repo-wide search finds no other reference. g3doc/architecture_guide/security.md:172-177 says network policy controls should be applied at the container level; SECURITY.md:189-198 treats operator-configured host mounts as intended exposure."
+      },
+      {
+        "claim": "README.md:69-72 and g3doc/user_guide/install.md:5 - requires Linux 5.6+.",
+        "verified": "partial",
+        "evidence": "Documented in two places, but no code gate on 5.6 found. Kernel-version comparisons in non-test code exist only for KVM on arm64 (pkg/sentry/platform/kvm/kvm_arm64_unsafe.go:63); other gating is feature-specific: cgroup v2/clone3 probing (runsc/cgroup/cgroup_v2_unsafe.go:45-56), core tagging needs >=5.14 (runsc/config/flags.go:117), systrap note 'available since Linux 5.0' (pkg/sentry/platform/systrap/subprocess.go:201). README lists 5.6 under 'Installing from source > Requirements' while install.md presents it as a general requirement. Startup host-setting checks (user namespaces) are in runsc/hostsettings/hostsettings.go:254-312."
+      },
+      {
+        "claim": "README.md:76-83 - release tarball contains runsc, containerd-shim-runsc-v1 and sidecars in gvisor-bin/; built with `make release-tarball DESTINATION=bin/`.",
+        "verified": "yes",
+        "evidence": "Makefile:915-919 builds //debian:gvisor-release-tar-bz2 and -zstd; debian/BUILD:80-120 bundles //runsc, //shim:containerd-shim-runsc-v1 and gvisor-bin-tar; sidecars are gvisor_sentry, checkpointgofer, runsc-metric-server, runsc-fd-parking and gvisor-sentry-prewarmer (tools/release.bzl:21-40)."
+      },
+      {
+        "claim": "g3doc/user_guide/install.md:84-101 - `runsc install` sidecar auto-download is dropped at the end of September 2026.",
+        "verified": "partial",
+        "evidence": "Still present at release-20260928.0: --download-sidecars defaults to IF_RELEASE_BUILD with help text 'will go away in a few weeks' (runsc/cmd/install.go:69-73) and the downloader shells out to curl/wget against storage.googleapis.com (runsc/cmd/install_sidecars.go:46-70). The embedded-binary fallback is already off by default (runsc/config/config.go:1496-1503) though its flag help says it 'will stop working after 2026-10' (runsc/config/flags.go:122) and maincli still imports the embed package (runsc/cli/maincli/maincli.go:29-31). Code is ahead of/behind the doc depending on the flag."
+      },
+      {
+        "claim": "g3doc/user_guide/sdk/go.md:45-49,124-132 and quickstart.md:14-15,36-50 - Go SDK offers `WithNetworking(bool)` and `Exec(ctx, cmd, opts ...string) (stdout, stderr string, err error)`; Go 1.16+ suffices.",
+        "verified": "no",
+        "evidence": "Code wins and differs: the option is `WithNetwork(mode NetworkMode)` (sandboxexec/sandbox/sandbox.go:161) and `Exec(ctx, argv []string, opts ...ExecOption) (*ExecResult, error)` (sandbox.go:687); `WithNetworking` appears only in the two doc files (repo-wide search). The code uses `slices` (sandboxexec/sandbox/oci.go:22) and `errors.Join` (sandbox.go:775), which need far newer Go than 1.16 (go.mod:3 declares 1.26.3). Python docs, by contrast, are checked against code for symbol coverage (g3doc/user_guide/sdk/python_docs_api_test.py:15), though python_quickstart.md:14 says Python 3.9+ while pyproject.toml:10 declares >=3.7."
+      },
+      {
+        "claim": "g3doc/user_guide/sdk/python.md:55-56 and examples/sandboxexec/python/README.md:43-45 - SDK network defaults to `none`; `Mount.bind(..., readonly=True)` is read-only.",
+        "verified": "yes",
+        "evidence": "Python default NetworkMode.NONE (sandboxexec/sandbox/python/gvisor/sandbox.py:293) is passed as `--network=none` (sandbox.py:389); Go default is NetworkModeNone (sandboxexec/sandbox/sandbox.go:359-363,413-417); read-only mounts map to the OCI `ro` option (sandbox.py:496-504; oci.go:125-127) and a test asserts a write to a read-only bind mount fails (sandboxexec/sandbox/python/tests/sandbox_test.py:438-458). Caveats: runsc's own default is `--network=sandbox` (runsc/config/flags.go:160); `runsc sandboxexec` leaves that default unless the proto sets networking_options (runsc/cmd/sandboxexec.go:278-285); the SDK test for `none` only asserts the OCI spec lacks a network namespace entry (sandbox_test.py:400-410), not that connections fail; the root fs is an empty bundle dir (oci.go:146-150; sandbox.py:461-466), read-only in Python (sandbox.py:533-537) but writable by default in Go (oci.go:177-180); host /bin,/usr,/lib,/lib64,/etc/alternatives are bound read-only by default (oci.go:34,222-237; sandbox.py:484-494)."
+      },
+      {
+        "claim": "g3doc/user_guide/personalities/bwrap.md:45,92,101-103 and 61-63 - `--unshare-net` -> `--network=none`; without it `--network=host`; `--ro-bind` is read-only; without a root mount a fresh tmpfs root is used.",
+        "verified": "yes",
+        "evidence": "runsc/cmd/alias/bwrap/bwrap.go:254-257 (network defaults to host, none with UnshareNet) feeds sandboxexec/sandbox/sandbox.go:413-420 (`--network=host|none`); root defaults to a tmpfs when no `/` mount is given (bwrap.go:281-285); --ro-bind sets ReadOnly (cli.go:284-294) which becomes OCI `ro` (oci.go:125-127). Limits: open TODO 'Fix support for network args' (bwrap.go:267); `--share-net` and `--userns` return 'not supported' (cli.go:410-414,436-439); unknown flags are rejected (cli.go:225-226). The bwrap integration tests cover env/user/hostname/proc/capabilities/argv0/perms (runsc/cmd/alias/bwrap/bwrap_integration_test.go:40-538), not network or read-only enforcement; unit tests cover argument translation including --unshare-net (bwrap_test.go:95-102,244-249)."
+      },
+      {
+        "claim": "g3doc/architecture_guide/intro_to_gvisor.md:267-269 and runsc/cmd/do.go:73-81 - `runsc do` gives the sandbox read-only access to the host filesystem by default.",
+        "verified": "yes",
+        "evidence": "do.go:148 defaults root to '/', and do.go:153,170-176 default `--force-overlay=true` to `Overlay2 all:memory`: the host stays unmodified and writes land in an in-memory overlay; the flag help warns that disabling it 'gives the command write access to the host'. The command self-describes as 'for testing only' (do.go:69). Network: unless `--network=none`, `runsc do` creates a veth pair with iptables NAT to the host's default device (do.go:309-344; needs root), and under --rootless a sandbox network is downgraded to host with a warning (do.go:254-258). Docs show `runsc --rootless --network=none do ...` for the no-sudo case (intro_to_gvisor.md:226-231)."
+      },
+      {
+        "claim": "g3doc/user_guide/observability.md:89-92 - sandbox metrics are disabled by default.",
+        "verified": "yes",
+        "evidence": "`--metric-server` defaults to the empty string (runsc/config/flags.go:89); the exporter is a separate sidecar (`runsc-metric-server`, tools/release.bzl:37) serving Prometheus HTTP only where the operator points it (g3doc/user_guide/observability.md:13-17,67-70). No telemetry/phone-home code was found (see telemetry_and_network)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Container start-up through Docker, runc vs runsc (project performance guide; 'runsc' = ptrace platform unless stated; GCE n1-standard-4, Debian 9 / 4.19; undated). The guide notes most of the time is Docker overhead.",
+        "metric": "startup_time_ms (empty / node / ruby)",
+        "value": "runc 1193.1 / 2558.0 / 2530.1; runsc 1144.2 / 2441.9 / 2455.7",
+        "source": "website/performance/startup.csv:2-7; g3doc/architecture_guide/performance.md:44-64,172-191",
+        "independent": false
+      },
+      {
+        "what": "Raw system-call latency: native runc vs runsc (ptrace platform) vs runsc-kvm (same project guide and test setup).",
+        "metric": "syscall_time_ns",
+        "value": "runc 1939; runsc 38219; runsc-kvm 763",
+        "source": "website/performance/syscall.csv:2-4; g3doc/architecture_guide/performance.md:58-64,143-149",
+        "independent": false
+      },
+      {
+        "what": "Per-container memory footprint (density test), runc vs runsc (project guide; unit not labelled in the CSV).",
+        "metric": "memory_usage per container (empty / node / ruby / redis with ~1GB data)",
+        "value": "runc 4,092,150 / 76,709,888 / 45,737,001 / 1,055,323,750; runsc 23,695,032 / 124,076,605 / 106,141,778 / 1,076,686,029",
+        "source": "website/performance/density.csv:2-9; g3doc/architecture_guide/performance.md:80-107",
+        "independent": false
+      },
+      {
+        "what": "Disk I/O with fio (sync engine), runc vs runsc (project guide; ptrace platform; bandwidth unit not labelled in the CSV; the guide says the disk quickly becomes the bottleneck).",
+        "metric": "fio bandwidth (read / write / randread / randwrite)",
+        "value": "runc 252,253,184 / 457,767,936 / 5,284,864 / 107,758,592; runsc 252,323,840 / 431,845,376 / 4,403,200 / 69,161,984",
+        "source": "website/performance/fio.csv:2-9; g3doc/architecture_guide/performance.md:234-239",
+        "independent": false
+      },
+      {
+        "what": "Network throughput with iperf (one endpoint native), runc vs runsc (project guide; ptrace platform; unit not labelled in the CSV).",
+        "metric": "iperf bandwidth (download / upload)",
+        "value": "runc 746,386,000 / 709,808,000; runsc 640,303,500 / 482,254,000",
+        "source": "website/performance/iperf.csv:2-5; g3doc/architecture_guide/performance.md:193-208",
+        "independent": false
+      },
+      {
+        "what": "CPU-bound sysbench, runc vs runsc (project guide).",
+        "metric": "cpu_events_per_second",
+        "value": "runc 103.62; runsc 103.21",
+        "source": "website/performance/sysbench-cpu.csv:2-3; g3doc/architecture_guide/performance.md:109-125",
+        "independent": false
+      },
+      {
+        "what": "Project blog on directfs (systrap platform, bind mounts) vs routing every filesystem call through the gofer; charts are images, only these statements are in text.",
+        "metric": "stat(2) latency; absolute runtime of real-world workloads; Ruby load time",
+        "value": "stat(2) 'more than 2x faster'; 12% reduction in absolute time for the real-world workloads; 17% reduction in Ruby load time",
+        "source": "website/blog/2023-06-27-directfs.md:112-127",
+        "independent": false
+      },
+      {
+        "what": "Correctness parity of runsc vs runc over 74,379 side-by-side agentic-RL/SWE test cases (authored by Tencent engineers, a user that also upstreams fixes; hosted on gVisor's own blog; measures correctness, not performance; the post-fix figure includes fixes they upstreamed).",
+        "metric": "overall pass rate",
+        "value": "runc 86.78%; runsc pre-fix 85.18%; runsc post-fix 86.91% (gap about 0.13 percentage points)",
+        "source": "website/blog/2026-04-23-scaling-agentic-rl-sandboxes-to-the-millions-with-gvisor-at-tencent.md:142-170",
+        "independent": true
+      }
+    ],
+    "risks": [
+      "Platform: Linux-only. FAQ says 'Today, gVisor requires Linux' (g3doc/user_guide/FAQ.md:5-7); macOS is documented only for running some Bazel test targets (README.md:125-135) and CI only cross-builds netstack packages for darwin/arm64 (.buildkite/pipeline.yaml:146-156); the project's Dangerzone post says gVisor 'works strictly on Linux systems' and that macOS/Windows use needs a Linux VM (website/blog/2024-09-23-dangerzone.md:83-85,305-314). WSL2 is not mentioned anywhere in the tree (all file types searched) and has no CI job, so support there is undocumented/unknown; startup checks user-namespace sysctls and rootless mode needs unprivileged user namespaces (runsc/hostsettings/hostsettings.go:254-312).",
+      "Network deny-by-default is opt-in per entry point, not a runtime default: runsc's own `--network` default is `sandbox` (runsc/config/flags.go:160) and `runsc do` builds a veth+iptables NAT path to the host unless `--network=none` (runsc/cmd/do.go:252-273,309-344); only `none` yields loopback-only networking (runsc/sandbox/network.go:58-63). The SDKs default to none (sandboxexec/sandbox/sandbox.go:359-363; sandboxexec/sandbox/python/gvisor/sandbox.py:293), but `runsc bwrap` defaults to host networking unless `--unshare-net` (runsc/cmd/alias/bwrap/bwrap.go:254-257), has an open TODO on network args (bwrap.go:267) and rejects `--share-net` (cli.go:436-439), and `runsc sandboxexec` only selects `none` when the proto contains networking_options (runsc/cmd/sandboxexec.go:278-285). No per-domain allow/deny list is implemented although declared in sandboxexec/proto/sandbox_options.proto:34-39 (no other reference in the repo). Sandbox-network mode needs root (sandboxexec/sandbox/sandbox.go:502-504; g3doc/architecture_guide/intro_to_gvisor.md:219-226); rootless supports only none/host networking and no save/restore (g3doc/user_guide/rootless.md:46-53). I found no SDK or bwrap test asserting that outbound connections actually fail under `none`.",
+      "Maturity of the agent-facing surfaces: the SandboxExec Go/Python SDKs and `runsc sandboxexec` are labelled experimental and 'not meant for production use' (sandboxexec/README.md:3-4; g3doc/user_guide/sdk/go.md:3-4), at version 0.1.0 (sandboxexec/sandbox/python/pyproject.toml:7), and the directory is declared not a valid target for security reports, including a line addressed to AI agents/automated scanners (sandboxexec/README.md:6-18). Go SDK docs do not match the code (see claim_checks); sandboxexec/proto/defaults.textproto uses `sandbox_path` keys that the proto does not define (defaults.textproto:75-80 vs sandbox_options.proto:78-84) and nothing references it; the project blog calls integration into existing applications a 'current drawback' that 'is being worked on' (website/blog/2026-04-15-magi-multi-agent-gvisor-isolation.md:1318-1321). No MCP server and no Claude Code/Codex integration exist.",
+      "Scope and filesystem exposure are operator-defined: README says gVisor is not a tool to 'limit the scope of access for a service' (README.md:48-51); the security policy treats operator-configured host mounts as intended behaviour (SECURITY.md:189-198) and assigns CVEs only to gVisor-specific sandbox-boundary escapes where the attacker does not control the sandbox configuration, so misconfiguration or runtime flags such as `--network=host` are out of CVE scope (SECURITY.md:9-17,254-261); the production guide lists running untrusted code as a use case but says the guide itself 'is not appropriate for this use-case' and focuses on running an existing trusted stack (g3doc/user_guide/production.md:25-28). `runsc do` is 'for testing only' and exposes host `/` read-only through an in-memory overlay; `--force-overlay=false` gives write access to the host (runsc/cmd/do.go:69-81,148,153). SDK sandboxes bind host /bin, /usr, /lib, /lib64, /etc/alternatives read-only by default (sandboxexec/sandbox/oci.go:34,222-237; sandbox.py:484-494), and the bwrap personality inherits the full host environment (runsc/cmd/alias/bwrap/cli.go:152-155; g3doc/user_guide/personalities/bwrap.md:172-173).",
+      "Install/layout is mid-transition: `runsc` needs sidecars in `gvisor-bin/` next to it, so copying a bare binary is insufficient (g3doc/user_guide/install.md:59-63,78-82); the default sidecar policy disallows the embedded fallback (runsc/config/config.go:1496-1503), whose flag help says it 'will stop working after 2026-10' (runsc/config/flags.go:122); `runsc install` auto-download (needs network plus curl/wget) is slated for removal at end of Sept 2026 but is still present at this tag (install.md:84-101; runsc/cmd/install.go:69-73); `runsc install` rewrites Docker daemon config, /etc/docker/daemon.json by default (runsc/cmd/install.go:53-55,64).",
+      "Release integrity: GitHub release assets are a mirror of artifacts built by an internal Buildkite pipeline (.github/workflows/release_mirror.yml:3-8; .buildkite/release.yaml:49-63); checksums are sha512 sidecars plus SHA256SUMS/SHA512SUMS generated by the mirror workflow itself (release_mirror.yml:113-143); only the apt repository and .debs are GPG/dpkg-sig signed (tools/make_apt.sh:121-122,164-168); no Sigstore/cosign/SLSA/attestation tooling found in .github, .buildkite or tools. Python wheels are staged to Google's Artifact Registry (tools/make_python_release.sh:168-210); PyPI publication cannot be verified from this repo.",
+      "Compatibility and overhead: gVisor implements a subset of Linux - iptables only partially, block-device filesystems (ext4/fat32) not mountable in-sandbox, io_uring off by default, in-sandbox cgroup limits not enforced (g3doc/user_guide/compatibility.md:45-70). Syscall-, network- and file-I/O-heavy workloads degrade (g3doc/user_guide/production.md:74-80); the project's own microbenchmarks (undated, ptrace platform, Debian 9 VMs) show 38,219 ns per syscall vs 1,939 ns native (website/performance/syscall.csv:2-3; g3doc/architecture_guide/performance.md:44-64). The ptrace platform is documented as no longer supported (g3doc/user_guide/platforms.md:48-54).",
+      "Governance and licensing: all 17 listed active maintainers list Google as their organization, with 13 emeritus entries (MAINTAINERS.md:8-24,36-50); contributions require a Google CLA (CONTRIBUTING.md:5-15). The source is not Apache-2.0 alone: the root LICENSE holds Apache-2.0 (LICENSE:1-202), then an MIT notice (LICENSE:204-224) and a BSD-3-Clause notice (LICENSE:226-254) for files that carry those licenses 'noted at the top of each file'; the README has no license statement. BSD-style headers are on 30 source files: 23 under pkg/sync and 2 under pkg/hostarch (gVisor-authored, e.g. pkg/sync/sync.go:1-5, pkg/hostarch/hostarch.go:1-5), four Go-derived pkg/safecopy assembly files (memcpy_arm64.s, memclr_arm64.s, memclr_amd64.s, atomic_arm64.s) and pkg/sentry/time/arith_arm64.go:1-10, with per-directory Go-Authors BSD LICENSE files in pkg/sync, pkg/safecopy and pkg/sentry/time. The MIT notice (Lucent Technologies / Vita Nuova / Go Authors) is on pkg/safecopy/memcpy_amd64.s:1-21. These packages are linked into the Sentry (pkg/sentry/mm/pma.go imports pkg/safecopy; pkg/sentry/kernel/kernel.go:80 imports pkg/sentry/time; runsc/cli/cli.go:35 imports pkg/sync; runsc/cmd/sentry/sentrycmd/boot.go imports pkg/hostarch); the BSD text requires binary redistributions to reproduce its copyright notice and disclaimer (LICENSE:236-238) and the MIT text requires its notice in all copies or substantial portions (LICENSE:215-216). The gVisor logo files are CC BY-SA 4.0 (g3doc/logo.txt:1); the Python SDK package declares Apache-2.0 (sandboxexec/sandbox/python/pyproject.toml:11). Third-party dependency licenses are summarised under code.dependencies (includes an MPL-2.0 entry limited to Bazel build/test tooling, governance/licensing.yaml:37-46)."
+    ]
+  },
+  "repaired": true,
+  "verification": [
+    {
+      "contender": "google/gvisor",
+      "checks": [
+        {
+          "field": "readme.install[0] (apt repository)",
+          "statement": "Install from the gVisor apt repository (Debian/Ubuntu; amd64/arm64): install apt-transport-https, ca-certificates, curl and gnupg; dearmor https://gvisor.dev/archive.key into /usr/share/keyrings/gvisor-archive-keyring.gpg; add 'deb [arch=$(dpkg --print-architecture) signed-by=...] https://storage.googleapis.com/gvisor/releases release main' to /etc/apt/sources.list.d/gvisor.list; then apt-get install -y runsc.",
+          "citation": "g3doc/user_guide/install.md:12-34 (arch support: install.md:5, 170)",
+          "holds": true,
+          "note": "All four commands match install.md:13-18, 27-28 and 34 verbatim; only the backslash line continuations in 13-18 are collapsed. Line 5 says gVisor supports x86_64 and ARM64, and line 170 shows [arch=amd64,arm64] for the release channel. The doc calls apt the preferred, most future-proof method (41-43, 103-105) and says Docker is configured automatically (37)."
+        },
+        {
+          "field": "license",
+          "statement": "spdx: Apache-2.0; file: LICENSE",
+          "citation": "LICENSE:1-202, 204-224, 226-254; pkg/sync/sync.go:1-5; pkg/hostarch/hostarch.go:1-5; pkg/safecopy/memcpy_amd64.s:1-21; pkg/sync/LICENSE, pkg/safecopy/LICENSE, pkg/sentry/time/LICENSE",
+          "holds": false,
+          "note": "LICENSE opens with the full Apache License 2.0 (1-202), so Apache-2.0 is the primary license. But the same file goes on to say that 'Some files carry the following license' for MIT (204-224) and for the 'BSD' license, which is the Go-style BSD-3-Clause text (226-254). Those files are compiled into runsc. The gVisor-authored core packages pkg/sync (sync.go:1-5) and pkg/hostarch (hostarch.go:1-5) use the BSD-style header pointing to LICENSE. So do the Go-derived pkg/safecopy/*.s files and pkg/sentry/time/arith_arm64.go, and pkg/sync, pkg/safecopy and pkg/sentry/time each have their own BSD LICENSE file. pkg/safecopy/memcpy_amd64.s:1-21 is MIT (Lucent/Vita Nuova/Go). The single identifier 'Apache-2.0' therefore leaves out two licenses that the cited file itself declares. All three are permissive and there is no copyleft, so this is a completeness and attribution error, not a wrong license family."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes: builds and runs on x86_64 (and ARM64); CI runs AMD64 and ARM64 smoke, unit and syscall tests; the default platform is systrap, which needs no virtualization; sandbox-network mode needs root; a rootless path exists with limits.",
+          "citation": "README.md:60; g3doc/user_guide/install.md:5; g3doc/user_guide/FAQ.md:9-12; .buildkite/pipeline.yaml:73-86,358-372,397-412; runsc/config/flags.go:102; g3doc/architecture_guide/intro_to_gvisor.md:158-163,219-226; g3doc/user_guide/rootless.md:46-53",
+          "holds": true,
+          "note": "Every citation matches. README:60 says gVisor builds on x86_64 and ARM64. install.md:5 says it supports x86_64 and ARM64 and requires Linux 5.6+. FAQ:9-12 says x86_64/AMD64 and ARM64. pipeline.yaml has AMD64 and ARM64 smoke tests (73-86), unit tests on amd64 cgroupv2 and on ARM64 (358-372), and syscall tests on AMD64 and ARM64 (397-412; the ARM64 job's agent lines run on to 414). flags.go:102 makes systrap the default. intro_to_gvisor.md:158-163 says Systrap does not require virtualization support. intro_to_gvisor.md:219-226 says sandbox setup needs privileges for the userspace network stack, and only sandboxes without networking can run rootless. rootless.md:46-53 lists the --rootless limits: no create, no save/restore, and no Netstack."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "yes: the runsc binary provides OCI commands; `runsc do` (testing only); the `runsc bwrap` personality (also selected when invoked as bwrap, implemented inside runsc via an OCI bundle, with a parser that recognises 26 flags and rejects anything else with 'Unknown option'); `runsc sandboxexec` (SandboxOptions proto from --options or stdin); `runsc install` (Docker runtime registration); and metric/debug helpers.",
+          "citation": "runsc/main.go:18-32; runsc/cli/maincli/maincli.go:49-103; runsc/cmd/do.go:67-81; runsc/cmd/alias/aliases.go:35-44; g3doc/user_guide/personalities/bwrap.md:5-25; runsc/cmd/alias/bwrap/bwrap.go:315-354; runsc/cmd/alias/bwrap/cli.go:182-227; runsc/cmd/sandboxexec.go:39-111; runsc/cmd/install.go:53-55",
+          "holds": true,
+          "note": "main.go:30-32 calls maincli.Main. maincli.go:49-103 registers the OCI commands (Create, Run, Exec, Kill, Delete and others) plus Do, SandboxExec, Install, the debug commands and the metric commands (78-97), and merges the bwrap alias at 105-108. do.go:69 says \"It's to be used for testing only\". aliases.go:35-44 rewrites argv when the binary is invoked as bwrap. bwrap.md:5-25 documents both `runsc bwrap` and a runsc symlinked as bwrap. bwrap.go:315-354 points RUNSC_PATH at the running runsc and calls sandbox.New, which writes an OCI bundle (sandboxexec/sandbox/sandbox.go:582-584) and passes --bundle to runsc (609). cli.go:182-227 has exactly 26 flag case labels, and the default returns 'bwrap: Unknown option'; --share-net and --userns are among the 26 but return 'not supported'. sandboxexec.go:39-111 reads a textproto or binary SandboxOptions from --options or stdin. install.go:53-55 has the synopsis 'adds a runtime to docker daemon configuration'."
+        },
+        {
+          "field": "claim_checks[8] (runsc do read-only host filesystem)",
+          "statement": "intro_to_gvisor.md:267-269 and do.go:73-81: `runsc do` gives the sandbox read-only access to the host filesystem by default (verified: yes). Evidence given: root defaults to '/'; --force-overlay=true selects Overlay2 all:memory; the command is testing-only; a veth pair with iptables NAT is created unless --network=none; --rootless downgrades a sandbox network to host; the docs show `runsc --rootless --network=none do`.",
+          "citation": "g3doc/architecture_guide/intro_to_gvisor.md:226-231,267-269; runsc/cmd/do.go:69,73-81,148,153,170-176,252-258,309-344",
+          "holds": true,
+          "note": "intro_to_gvisor.md:267-269 says `runsc do` gives read-only access to the host's entire filesystem by default, and the usage text at do.go:76-77 says the host filesystem is mounted read-only with a writable tmpfs overlay. In code, --root defaults to '/' (148), and --force-overlay defaults to true with the help text 'WARNING: disabling gives the command write access to the host' (153). FetchSpec then sets Overlay2 to all:memory, or none when the overlay is disabled (170-176). do.go:69 says testing only. Unless --network=none or --rootless is given, setupNet creates a veth pair, sets ip_forward and adds iptables MASQUERADE/FORWARD rules (309-344). Under --rootless a sandbox network falls back to host with a warning (254-258). intro_to_gvisor.md:229 shows `runsc --rootless --network=none do`. The 'verified: yes' rating stands."
+        }
+      ],
+      "verdict": "fail",
+      "repairs": [
+        "license.spdx: change \"Apache-2.0\" to \"Apache-2.0 AND BSD-3-Clause AND MIT\". Apache-2.0 remains the primary license (LICENSE:1-202), but the same LICENSE file declares MIT (LICENSE:204-224) and BSD-3-Clause (LICENSE:226-254) for some files, and those files ship in runsc. BSD-3-Clause covers the gVisor-authored pkg/sync and pkg/hostarch (e.g. pkg/sync/sync.go:1-5, pkg/hostarch/hostarch.go:1-5), the Go-derived pkg/safecopy/*.s files and pkg/sentry/time/arith_arm64.go, and the per-directory LICENSE files in pkg/sync, pkg/safecopy and pkg/sentry/time. MIT covers pkg/safecopy/memcpy_amd64.s:1-21."
+      ]
+    },
+    {
+      "contender": "google/gvisor",
+      "checks": [
+        {
+          "field": "readme.install[0] (apt repository)",
+          "statement": "apt repository (Debian/Ubuntu; amd64/arm64): apt-get install apt-transport-https ca-certificates curl gnupg; curl https://gvisor.dev/archive.key | gpg --dearmor -o /usr/share/keyrings/gvisor-archive-keyring.gpg; add 'deb [arch=$(dpkg --print-architecture) signed-by=...] https://storage.googleapis.com/gvisor/releases release main' to /etc/apt/sources.list.d/gvisor.list; apt-get update && apt-get install -y runsc",
+          "citation": "g3doc/user_guide/install.md:12-34",
+          "holds": true,
+          "note": "All four commands match install.md:13-18, 27, 28 and 34 verbatim (only the line continuations are joined). The .deb package is named runsc and built for amd64 and arm64 (debian/BUILD:55-58,71). install.md:104 calls apt the preferred, most future-proof method. Nit: install.md never names Ubuntu, so the 'Debian/Ubuntu' label is an inference."
+        },
+        {
+          "field": "license",
+          "statement": "spdx 'Apache-2.0 AND BSD-3-Clause AND MIT', file LICENSE",
+          "citation": "LICENSE:1-254",
+          "holds": true,
+          "note": "LICENSE:1-202 is the Apache-2.0 text. LICENSE:204-224 is the MIT text and LICENSE:226-254 a three-clause BSD text (retain notice / reproduce in binary / no endorsement by 'Google Inc.'), each introduced with 'Some files carry the ... license, noted at the top of each file'. In the tree, 30 files carry 'BSD-style' headers (23 in pkg/sync, 2 in pkg/hostarch, 4 pkg/safecopy *_arm64/amd64 .s files, pkg/sentry/time/arith_arm64.go; e.g. pkg/sync/sync.go:1-5). pkg/safecopy/memcpy_amd64.s:1-21 carries the MIT notice. pkg/sync/LICENSE is the Go Authors' BSD-3-Clause text. The AND expression is accurate."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - builds/supported on x86_64 and ARM64 (Linux 5.6+); CI runs AMD64 and ARM64 smoke, unit and syscall tests; default platform systrap needs no virtualization; sandbox-network mode needs root; rootless path exists with limits",
+          "citation": "README.md:60; g3doc/user_guide/install.md:5; g3doc/user_guide/FAQ.md:9-12; .buildkite/pipeline.yaml:73-86,358-372,397-412; runsc/config/flags.go:102; g3doc/architecture_guide/intro_to_gvisor.md:158-163,219-226; g3doc/user_guide/rootless.md:46-53",
+          "holds": true,
+          "note": "Every citation matches. README:60 says 'gVisor builds on x86_64 and ARM64'. install.md:5 says 'supports x86_64 and ARM64, and requires Linux 5.6+'. FAQ:11-12 lists x86_64/AMD64 and ARM64. The pipeline has Smoke tests AMD64/ARM64 (lines 75,82), Unit tests cgroupv2 amd64 and ARM64 (360,368) and System call tests AMD64/ARM64 (399,409). flags.go:102 sets the platform default to 'systrap'. intro_to_gvisor.md:161-162 says systrap 'does not require virtualization support'. intro_to_gvisor.md:222-226 says setup needs privileges for the network stack, with rootless only for no-network sandboxes. rootless.md:46-53 lists the limits (no create, no save/restore, no Netstack). Nit: the 397-412 range ends 1 line before the ARM64 syscall job's 'arch: arm64' key, though its label (409) is inside the range."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "yes - runsc binary with OCI commands, `runsc do` (testing only), `runsc bwrap` personality (also when invoked as `bwrap`; built on an OCI bundle; parser recognises 26 flags, anything else 'Unknown option'), `runsc sandboxexec` (SandboxOptions proto from --options or stdin), `runsc install` (Docker runtime registration), plus metric/debug helpers",
+          "citation": "runsc/main.go:18-32; runsc/cli/maincli/maincli.go:49-103; runsc/cmd/do.go:67-81; runsc/cmd/alias/aliases.go:35-44; g3doc/user_guide/personalities/bwrap.md:5-25; runsc/cmd/alias/bwrap/bwrap.go:315-354; runsc/cmd/alias/bwrap/cli.go:182-227; runsc/cmd/sandboxexec.go:39-111; runsc/cmd/install.go:53-55",
+          "holds": true,
+          "note": "main.go:31 calls maincli.Main(). maincli.go:52-68 registers Create/Run/Exec/Kill/Delete etc., 71-76 Do and SandboxExec, 79-97 Install, Mitigate, Debug, Metric* etc. do.go:69 reads 'It's to be used for testing only'. aliases.go:37-39 rewrites argv when the binary is invoked as 'bwrap'. bwrap.go:322-348 sets RUNSC_PATH to the running runsc and calls sandbox.New, which writes an OCI bundle (sandbox.go:582; oci.go:254-283), then sb.Exec. The switch at cli.go:182-224 has exactly 26 flag cases (share-net and userns only return 'not supported'), and the default at 225-226 returns 'bwrap: Unknown option'. sandboxexec.go:65 defines --options, and 88-111 read the file or stdin as textproto or binary. install.go:54 reads 'adds a runtime to docker daemon configuration'."
+        },
+        {
+          "field": "claim_checks[6] (SDK network default none; read-only bind)",
+          "statement": "Python/Go SDK network defaults to `none` and `Mount.bind(..., readonly=True)` is read-only (verified: yes); caveats: runsc default is --network=sandbox, runsc sandboxexec keeps it unless networking_options is set, the `none` test only inspects the OCI spec, Go root fs writable by default vs read-only in Python, host /bin,/usr,/lib,/lib64,/etc/alternatives bound read-only",
+          "citation": "g3doc/user_guide/sdk/python.md:55-56; examples/sandboxexec/python/README.md:43-45; sandboxexec/sandbox/python/gvisor/sandbox.py:293,389,461-466,484-504,533-537; sandboxexec/sandbox/sandbox.go:359-363,413-417; sandboxexec/sandbox/oci.go:34,125-127,146-150,177-180,222-237; sandboxexec/sandbox/python/tests/sandbox_test.py:400-410,438-458; runsc/config/flags.go:160; runsc/cmd/sandboxexec.go:278-285",
+          "holds": true,
+          "note": "The docs state the default is none (python.md:55-56; example README:43-45). sandbox.py:293 defaults to NetworkMode.NONE and 389 appends --network=<mode>. sandbox.go:361 sets network NetworkModeNone, and 416-417 emit --network=none. Read-only binds become the 'ro' option (sandbox.py:498; oci.go:126). sandbox_test.py:456-458 expects a write to a read-only bind to fail. flags.go:160 defaults --network to sandbox. sandboxexec.go:278-285 changes it only when networking_options is set. sandbox_test.py:400-410 checks only echo plus a missing network-namespace entry, and no SDK test tries a real connection. The Go root uses cfg.RootReadonly, default false (oci.go:179), while Python sets readonly True (sandbox.py:536). Host dirs are bound rbind,ro (oci.go:34,225; sandbox.py:484-486). Nit: the readonly doc wording is at examples/sandboxexec/python/README.md:35-36, outside the cited 43-45."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}
