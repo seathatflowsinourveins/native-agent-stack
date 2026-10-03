@@ -58,7 +58,8 @@ requirement needs, so the shared templates stay what render_config.py and the bo
              and leaves them out.
              An existing ~/.codex/config.toml is merged, never rewritten: every key and table it has stays as it is, what
              the render has and it lacks is added (a rule list, [[skills.config]], gains the render's rules it lacks after
-             its own, and one written as an inline array is refused), a value that differs stays (shown beside the render's, each value cut to
+             its own, and one written as an inline array, an empty `config = []` included, is refused, with nothing
+             written), a value that differs stays (shown beside the render's, each value cut to
              300 characters with `...` in the display only, and the step ends `merged with conflicts kept`), the file is
              backed up first, read back with tomllib after the write and put back when it is not the merge.
              features.daemon_auto_start goes through Codex's own writer. A running Codex (`pgrep -x`) stops either write of
@@ -1610,7 +1611,10 @@ def plan_merge(existing: dict, rendered: dict) -> MergePlan:
     def walk(path: tuple, have: dict, want: dict) -> None:
         for key, value in want.items():
             here = path + (key,)
-            if here in RULE_LISTS and is_table_array(value) and (key not in have or is_table_array(have[key])):
+            # An existing rule list may be empty (`config = []`, which TOML writes only inline): it still gains the render's
+            # rules, so the text edit refuses it as an inline array instead of the rules being kept out as a conflict.
+            if here in RULE_LISTS and is_table_array(value) and (key not in have or is_table_array(have[key])
+                                                                  or have[key] == []):
                 mine = have.get(key, [])
                 missing = [item for item in value if not any(strict_equal(item, rule) for rule in mine)]
                 if missing:
@@ -1765,9 +1769,11 @@ def merge_toml_text(text: str, plan: MergePlan) -> str:
     arrays = {line.path for _, line in headers if line.kind == "array-header"}
     present = tomllib.loads(text)
     for path, items in plan.appends:
-        if lane.get_path(present, list(path))[0] and path not in arrays:
+        found, value = lane.get_path(present, list(path))
+        if found and path not in arrays:
             raise MergeError(f"cannot add {len(items)} item(s) to {lane.key_path(list(path))}: the file defines it as an "
-                             f"inline array, which text cannot extend; write it as [[{lane.key_path(list(path))}]] items")
+                             f"inline array, which text cannot extend; write it as [[{lane.key_path(list(path))}]] items"
+                             + ("; it is empty, so removing the key is enough" if value == [] else ""))
         for item in items:
             block += array_item_lines(path, item)
     if block:
@@ -1984,8 +1990,10 @@ class Apply:
             except (ConfigError, OSError, ValueError) as error:
                 print(f"apply failed: the account's remote plugins in {cache} could not be read: {error}", file=sys.stderr)
                 return 1
+            # Planned, not done: the codex-config step writes the rules and reads them back, or fails and says so.
             print(f"remote plugins: {len(names)} skill name rule(s) and {sum(len(v) for v in servers.values())} plugin MCP "
-                  f"server(s) turned off, read from {cache} (wave-2 skills ruling, change 5)")
+                  f"server off switch(es) planned, read from {cache} (wave-2 skills ruling, change 5); they are in place "
+                  "once the codex-config step has written and read them back")
         mode = "DRY RUN, nothing is written and no client runs" if self.dry else "applying"
         print(f"home {self.home}; eco root {self.eco}; {mode}")
         declared = render_config.load_host_values(args.host)["HOME"].rstrip("/")

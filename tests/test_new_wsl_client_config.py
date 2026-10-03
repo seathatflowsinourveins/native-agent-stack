@@ -3053,7 +3053,10 @@ class RemotePluginRuleTests(unittest.TestCase):
         self.plugin("openai-developers", "1.3.6", {"name": "openai-developers"}, servers=("local-confirmation",))
         code, out, _ = self.apply()
         self.assertEqual(code, 0, out[-800:])
-        self.assertIn("remote plugins: 1 skill name rule(s) and 1 plugin MCP server(s) turned off", out)
+        # Planned when read, in place only after the codex-config step's write and read-back (finding 2 of the Codex root
+        # lane's read of b6828c7d): the line never says the rules are on before the file holds them.
+        self.assertIn("remote plugins: 1 skill name rule(s) and 1 plugin MCP server off switch(es) planned", out)
+        self.assertNotIn("turned off", out)
         text = self.config.read_text()
         config = tomllib.loads(text)
         installer = {"path": str(self.home / ".codex/skills/.system/skill-installer/SKILL.md"), "enabled": False}
@@ -3101,6 +3104,60 @@ class RemotePluginRuleTests(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn("the file defines it as an inline array, which text cannot extend", out)
         self.assertEqual(self.config.read_text(), inline)
+
+    def test_an_existing_rule_list_gains_the_rules_or_is_refused_and_an_empty_one_is_never_kept_as_a_conflict(self):
+        """Finding 2 of the Codex root lane's read of b6828c7d: an existing, valid `[skills] config = []` was not taken for a
+        rule list, so the render's disable rules became a kept conflict and were lost while the step ended `merged with
+        conflicts kept`. The empty list is a rule list now: the plan appends the render's rules to it, and since TOML writes
+        an empty array only inline (and TOML 1.0 forbids adding [[skills.config]] items to a statically defined array, even
+        an empty one), the text edit refuses it and writes nothing. A non-empty array of tables is extended after its own
+        rules. The plan-level assertions on the empty list are the negative control: the earlier plan_merge kept it as a
+        conflict with no appends."""
+        installer = {"path": "/h/.codex/skills/.system/skill-installer/SKILL.md", "enabled": False}
+        remote = {"name": "superpowers:brainstorming", "enabled": False}
+        own = {"name": "my-skill", "enabled": False}
+        rendered = {"skills": {"config": [installer, remote]}}
+        for name, existing, appended, merged in (
+                ("empty", [], [installer, remote], [installer, remote]),
+                ("non-empty", [own, remote], [installer], [own, remote, installer])):
+            with self.subTest(existing=name):
+                plan = cfg.plan_merge({"skills": {"config": existing}}, rendered)
+                self.assertEqual(plan.conflicts, [])
+                self.assertEqual(plan.appends, [(("skills", "config"), appended)])
+                self.assertEqual(plan.expected, {"skills": {"config": merged}})
+                self.assertEqual(cfg.merge_report(plan), [f"rules added to skills.config: {len(appended)}, after the file's own"])
+        # The writer still writes an empty list as a plain `key = []`, never as nothing.
+        self.assertEqual(tomllib.loads(cfg.emit_toml({"skills": {"config": []}}, "# h")), {"skills": {"config": []}})
+        self.plugin("superpowers", "6.4.2", {"name": "superpowers"}, {"brainstorming": self.SKILL.format(name="brainstorming")})
+        self.codex_home.mkdir(mode=0o700, exist_ok=True)
+        # The empty list, as a file: refused, nothing written, and no conflict reported in place of the rules.
+        empty = '[skills]\nconfig = []\n\n[tui]\nscreen_reader_detection_done = true\n'
+        self.config.write_text(empty, encoding="utf-8")
+        self.config.chmod(0o600)
+        code, out, _ = self.apply()
+        self.assertEqual(code, 1, out[-800:])
+        self.assertIn("cannot add 2 item(s) to skills.config: the file defines it as an inline array, which text cannot "
+                      "extend; write it as [[skills.config]] items; it is empty, so removing the key is enough", out)
+        self.assertNotIn("conflict kept: skills.config", out)
+        self.assertNotIn("merged with conflicts kept", out)
+        self.assertEqual(self.config.read_text(), empty)
+        # The way out the message names: without the key, the next run adds both rules as [[skills.config]] items.
+        self.config.write_text(empty.replace("[skills]\nconfig = []\n\n", ""), encoding="utf-8")
+        code, out, _ = self.apply()
+        self.assertEqual(code, 0, out[-800:])
+        self.assertEqual(tomllib.loads(self.config.read_text())["skills"]["config"],
+                         [{"path": str(self.home / ".codex/skills/.system/skill-installer/SKILL.md"), "enabled": False},
+                          remote])
+        # A non-empty array of tables, as a file: extended after its own rule, every line it had kept.
+        tables = '[[skills.config]]\nname = "my-skill"\nenabled = false\n\n[tui]\nscreen_reader_detection_done = true\n'
+        self.config.write_text(tables, encoding="utf-8")
+        code, out, _ = self.apply()
+        self.assertEqual(code, 0, out[-800:])
+        self.assertIn("rules added to skills.config: 2, after the file's own", out)
+        self.assertEqual(tomllib.loads(self.config.read_text())["skills"]["config"],
+                         [own, {"path": str(self.home / ".codex/skills/.system/skill-installer/SKILL.md"), "enabled": False},
+                          remote])
+        self.assertTrue(keeps_lines(tables, self.config.read_text()))
 
     def test_the_toml_writer_writes_a_list_of_tables_as_an_array_of_tables(self):
         data = {"skills": {"max_context_tokens": 6000, "config": [{"path": "/a", "enabled": False},

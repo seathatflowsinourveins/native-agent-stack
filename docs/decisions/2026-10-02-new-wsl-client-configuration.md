@@ -791,7 +791,11 @@ manifest changed under it.
   `load_plugin`), so a table holding only the server switch would turn on a cached plugin the account no longer
   installs; while the account installs it, the synced entry replaces the local one and keeps only its `mcp_servers`. Codex's rule lists are arrays of tables, so the render writes them as `[[...]]` items
   and the merge adds the render's rules a file lacks after the file's own, instead of keeping the file's list as a
-  conflict; a list a file writes inline is refused with nothing written.
+  conflict; a list a file writes inline is refused with nothing written. An empty `config = []` is such a list: TOML
+  writes an empty array only inline and forbids adding `[[...]]` items to it, so it is refused too, never kept as a
+  conflict that would leave the rules out, and the line `--apply` prints when it reads the cache calls the rules
+  planned, because they hold only after the step's write and read-back (both added after the Codex root lane's source
+  read of `b6828c7d`, finding 2).
 - **The acknowledgement gate** (code-search ruling, change 1). While the layer consensus's wave-2 batch owes an
   acknowledgement (`consensus.json` `wave2.acknowledgements_owed`), a real `--apply` refuses to write a render that wires an
   interim install, and a dry run says so; `install.sh`'s `interim_acknowledged` holds the plan's side (the layer-consensus
