@@ -1,0 +1,359 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-03T22:03:25Z",
+  "classification": "prospective pinned-source carrier proposal; no native provider or workflow execution",
+  "status": "SOURCE_ONLY_HOLD",
+  "current_choice": "native Codex plus gh remains the provisional native baseline",
+  "measured_defaults": 0,
+  "freeze_eligible": false,
+  "comparison_contract_changed": false,
+  "pins": {
+    "codex_action": {
+      "version": "v1.12",
+      "ref": "86365089eb2b84e0a8fb0717b304f8bdcb13b20e"
+    },
+    "gh_aw": {
+      "version": "v0.89.21",
+      "ref": "c35393777e5604a63721d09512263b1383301d4f"
+    },
+    "native_codex": {
+      "version": "0.160.0",
+      "ref": "a956835d020762cb2b570053af06f643a11c0ecc"
+    }
+  },
+  "public_marker": {
+    "literal": "nas_public_route_marker",
+    "secret": false,
+    "purpose": "Public noncredential marker solely for key-shaped input interfaces. It creates no account/key and supplies no provider credential.",
+    "source_grammar": "Codex .160 proxy requires nonempty ASCII letters/numbers/hyphen/underscore; gh-aw validation rejects whitespace-only and exact null/undefined, with no OpenAI-key-prefix requirement in the checked ordinary Codex branch.",
+    "prerequisites": "Owned gateway must independently accept this public marker without a new secret or sign-in prompt. Actual destination reachability and acceptance remain UNKNOWN."
+  },
+  "codex_action": {
+    "source_supported_input_fragment": {
+      "uses": "openai/codex-action@86365089eb2b84e0a8fb0717b304f8bdcb13b20e",
+      "with": {
+        "prompt-file": "<owned frozen fixture prompt path>",
+        "openai-api-key": "nas_public_route_marker",
+        "responses-api-endpoint": "<owned literal full Responses endpoint ending in /v1/responses>",
+        "codex-version": "0.160.0",
+        "codex-home": "<fresh task-owned trusted nonsecret configuration directory>",
+        "model": "cx/gpt-6.1-sol",
+        "effort": "ultra",
+        "safety-strategy": "<existing declared supported strategy on qualified disposable runner>"
+      }
+    },
+    "fresh_empty_key": {
+      "eligible": false,
+      "reason": "action.yml:269 invokes read-server-info whenever a prompt or prompt-file is present even with empty key. readServerInfo.ts:8-25 performs up to100 reads with100ms sleeps on errors, then throws for absent server-info. Proxy start/write steps are conditioned on nonempty key. Existing native sign-in alone does not create this required run-id proxy server-info."
+    },
+    "placeholder_flow": [
+      "Nonempty public marker takes the upstream start-proxy branch.",
+      "responses-api-endpoint is forwarded as the complete upstream endpoint.",
+      "Stock proxy .160 receives the public marker via stdin and emits a Bearer header.",
+      "writeProxyConfig writes the action provider pointing at the local proxy into the task-owned config.",
+      "Codex exec uses the preserved task-owned trusted feature configuration; actual native version/model/catalog/route/effort still require observation."
+    ],
+    "protected_args": {
+      "source": "src/runCodexExec.ts:528-660",
+      "provider_and_gateway_roots_rejected": [
+        "model_provider",
+        "model_providers",
+        "openai_base_url",
+        "chatgpt_base_url"
+      ],
+      "native_v2_extra_flag_rejected": [
+        "--enable multi_agent_v2",
+        "-c features.multi_agent_v2=true"
+      ],
+      "rule": "Protected strategies or any permission profile allow --enable only use_legacy_landlock; features.* config overrides are rejected except features.use_legacy_landlock. Disabling features is rejected.",
+      "named_permission_profile_file_roots_restricted": [
+        "model_catalog_json",
+        "model_instructions_file",
+        "experimental_compact_prompt_file"
+      ],
+      "safe_delivery": "Use the explicit responses-api-endpoint input for routing and trusted task-owned codex-home/config.toml for V2 configuration; never switch to unsafe to bypass validation."
+    },
+    "task_owned_config_fragment": {
+      "toml": "[features]\nmulti_agent_v2 = true\n",
+      "source": "README.md:152 treats codex-home configuration as trusted; writeProxyConfig.ts:14-38 preserves existing text while prepending its provider and appending its provider table.",
+      "constraints": "Do not include an existing model_provider declaration or action-proxy table that the writer duplicates. Do not point this proposal at an active host/Claude configuration directory. This fragment is prospective and was not installed or written to an active client."
+    },
+    "self_hosted": {
+      "supported": true,
+      "source": "README.md:172,180-181; action.yml:78-82",
+      "constraints": "Default drop-sudo irreversibly changes runner account/socket access and requires qualified passwordless sudo/setpriv/user namespaces. Upstream recommends disposable runners. Repeated prompt invocation after sudo removal fails; reused host operation is not qualified by this source packet."
+    },
+    "standalone_local_mode": "No documented standalone Action execution/native-sign-in recipe found in checked README/action.yml. Internal dist/main.js helper subcommands are not promoted into a new runner.",
+    "native_sign_in_claim": "Not established. Public-marker custom-provider execution does not prove a retained Codex sign-in was used. OmniRoute's downstream pooled native sign-ins stay with their owner; no auth files are read or copied."
+  },
+  "gh_aw": {
+    "supported_frontmatter_fragment": {
+      "runs-on": [
+        "self-hosted",
+        "linux",
+        "x64"
+      ],
+      "engine": {
+        "id": "codex",
+        "model": "cx/gpt-6.1-sol",
+        "env": {
+          "CODEX_API_KEY": "nas_public_route_marker",
+          "OPENAI_API_KEY": "nas_public_route_marker"
+        },
+        "args": [
+          "-c",
+          "model_reasoning_effort=\"ultra\"",
+          "-c",
+          "features.multi_agent_v2=true",
+          "-c",
+          "model_provider=\"omniroute\"",
+          "-c",
+          "model_providers.omniroute.name=\"OmniRoute\"",
+          "-c",
+          "model_providers.omniroute.base_url=\"<owned_literal_gateway_base_ending_in_/v1>\"",
+          "-c",
+          "model_providers.omniroute.wire_api=\"responses\"",
+          "-c",
+          "model_providers.omniroute.requires_openai_auth=false",
+          "-c",
+          "model_providers.omniroute.supports_websockets=false"
+        ]
+      },
+      "network": {
+        "allowed": [
+          "<owned gateway hostname using upstream allowed-endpoint syntax>"
+        ]
+      }
+    },
+    "fragment_scope": "Native engine.env/args/runs-on surfaces are source-supported; placeholders are unresolved ownership inputs, not an executable admitted workflow. Exact .160 carrier installation/version input, generated lock/config, task/runner/image and existing security settings must be qualified. Preserve upstream AWF security architecture; no sandbox-disable amendment.",
+    "source_controls": [
+      "codex_engine.go:123-127 lists CODEX_API_KEY/OPENAI_API_KEY as supported engine.env keys; OPENAI_BASE_URL is not in this list.",
+      "engine_helpers.go:268-279 applies engine.env values to validation instead of default secret expressions.",
+      "validate_multi_secret.sh:43-53 rejects whitespace and null/undefined; public marker satisfies this source check.",
+      "codex_engine.go:360-367 forwards engine.args into native command construction.",
+      "codex_engine.go:461 selects a separate CODEX_HOME;478-479 build key env, and509 applies engine/agent env.",
+      "codex_engine.go:493 sets AWF_REFLECT_ENABLED=1 when firewall enabled; custom route/reflection and allowed-endpoint precedence remain unobserved."
+    ],
+    "native_commands_after_separate_installed_identity_qualification": [
+      [
+        "gh",
+        "aw",
+        "compile",
+        "<owned fixture.md>"
+      ],
+      [
+        "gh",
+        "aw",
+        "run",
+        "<owned workflow id>"
+      ]
+    ],
+    "execution_mode": {
+      "self_hosted_supported": true,
+      "source": "self-hosted-runners.md:8,58-67",
+      "native_dispatch": "run_workflow_execution.go:75/360/402 invokes GitHub workflow run; self-hosted means a GitHub runner target, not a standalone local execution bypass.",
+      "local_standalone_scope": "No --local/native-sign-in standalone path found in the checked Codex engine docs, self-hosted docs and RunWorkflowOnGitHub implementation; gh aw itself unavailable on this host."
+    },
+    "native_sign_in_claim": "The ordinary documented Codex route uses CODEX_API_KEY/OPENAI_API_KEY and generated separate CODEX_HOME. No documented retained host-native-sign-in reuse recipe found in checked sources. No auth.json copying/mounting/store extraction proposed.",
+    "custom_harness": "Codex engine documentation says engine.agent and custom engine.harness scripts are unsupported. Keep the maintained stock harness and supported args/environment inputs."
+  },
+  "preserved_execution_gates": [
+    "Existing credential and route identity controls; no auth/credential file read or copy and no new secret/sign-in prompt.",
+    "Actual native .160 carrier and effective V2/mode/model-message hint/catalog identity, effort and transport delivery before freeze.",
+    "Generated workflow/config hashes, AWF/reflection/provider precedence and network qualification.",
+    "Frozen throwaway task/actor/repository/image/quality oracle, lifecycle/cancellation/restoration and authoritative complete raw usage.",
+    "Exclusive owner window, independent consequential read and both-family/final-head reads."
+  ],
+  "source_inventory": [
+    {
+      "repository": "openai/codex",
+      "ref": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "upstream_path": "codex-rs/responses-api-proxy/src/lib.rs",
+      "bytes": 8659,
+      "sha256": "092e92662b9a564f98bd5ee157c09348465288a1656adcd5eb34d555dc551c1f",
+      "git_blob_sha1": "307fa05bb8f0f75c1ba65618115338762317a7da",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/responses-api-proxy/src/lib.rs"
+    },
+    {
+      "repository": "openai/codex",
+      "ref": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "upstream_path": "codex-rs/responses-api-proxy/src/read_api_key.rs",
+      "bytes": 10349,
+      "sha256": "fc338d516d5d00239001dbd1f7ed358993e25d08bc6f34b3dfa4bb3f715b0f71",
+      "git_blob_sha1": "df5e2106c77a489063a08d4ae1b765cc2a51f3a7",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/responses-api-proxy/src/read_api_key.rs"
+    },
+    {
+      "repository": "openai/codex-action",
+      "ref": "86365089eb2b84e0a8fb0717b304f8bdcb13b20e",
+      "upstream_path": "README.md",
+      "bytes": 17554,
+      "sha256": "e28e7b6b247ed3114b0c4525d6aa907a6a972d185ebab949841de8c7027fdbd5",
+      "git_blob_sha1": "f11d0095a108fea1b65d1f66453f8a99a72bcaeb",
+      "url": "https://github.com/openai/codex-action/blob/86365089eb2b84e0a8fb0717b304f8bdcb13b20e/README.md"
+    },
+    {
+      "repository": "openai/codex-action",
+      "ref": "86365089eb2b84e0a8fb0717b304f8bdcb13b20e",
+      "upstream_path": "action.yml",
+      "bytes": 16776,
+      "sha256": "448852e9e59565440bf25174b54bbf661bd66102be295af2e526fa09eaaf3bd7",
+      "git_blob_sha1": "ff7088b97498db5cacab3c72b96c406f03f92fa5",
+      "url": "https://github.com/openai/codex-action/blob/86365089eb2b84e0a8fb0717b304f8bdcb13b20e/action.yml"
+    },
+    {
+      "repository": "openai/codex-action",
+      "ref": "86365089eb2b84e0a8fb0717b304f8bdcb13b20e",
+      "upstream_path": "src/main.ts",
+      "bytes": 14739,
+      "sha256": "cd5ad02d75725b03fcdbf603ed9be7ef55bff81c41ef9ed86ee905643ebcdda2",
+      "git_blob_sha1": "e4374a1e46b4436ae951bb93502a53b91d2e4366",
+      "url": "https://github.com/openai/codex-action/blob/86365089eb2b84e0a8fb0717b304f8bdcb13b20e/src/main.ts"
+    },
+    {
+      "repository": "openai/codex-action",
+      "ref": "86365089eb2b84e0a8fb0717b304f8bdcb13b20e",
+      "upstream_path": "src/readServerInfo.ts",
+      "bytes": 910,
+      "sha256": "8fbdc663ee4fede6ae2ba4ddd24a38fc074c23304311f8ac5ba40023114fe572",
+      "git_blob_sha1": "68ca6b93a76ff6b7e406afb5cc84f866224d8465",
+      "url": "https://github.com/openai/codex-action/blob/86365089eb2b84e0a8fb0717b304f8bdcb13b20e/src/readServerInfo.ts"
+    },
+    {
+      "repository": "openai/codex-action",
+      "ref": "86365089eb2b84e0a8fb0717b304f8bdcb13b20e",
+      "upstream_path": "src/runCodexExec.ts",
+      "bytes": 18807,
+      "sha256": "da92c98454356323ea907fa683f796a0092b1ee3da16e3d800b02f91d94dbaa2",
+      "git_blob_sha1": "689d983fab999d57c2887b1434dbc2f5a08238b3",
+      "url": "https://github.com/openai/codex-action/blob/86365089eb2b84e0a8fb0717b304f8bdcb13b20e/src/runCodexExec.ts"
+    },
+    {
+      "repository": "openai/codex-action",
+      "ref": "86365089eb2b84e0a8fb0717b304f8bdcb13b20e",
+      "upstream_path": "src/writeProxyConfig.ts",
+      "bytes": 1607,
+      "sha256": "82d333794cf937413a034aec557ba6ff7358687ccf531bce9ca2684485182244",
+      "git_blob_sha1": "56cbff4bcd32b6a402bb5882d77b924a872950bd",
+      "url": "https://github.com/openai/codex-action/blob/86365089eb2b84e0a8fb0717b304f8bdcb13b20e/src/writeProxyConfig.ts"
+    },
+    {
+      "repository": "github/gh-aw",
+      "ref": "c35393777e5604a63721d09512263b1383301d4f",
+      "upstream_path": "actions/setup/sh/validate_multi_secret.sh",
+      "bytes": 9923,
+      "sha256": "80b9400d24da841c07248a93e582becdf54f267d719e044f46daee251f0a744a",
+      "git_blob_sha1": "196fe161d28b0dd101dfeb7dda16fa941b40c5f4",
+      "url": "https://github.com/github/gh-aw/blob/c35393777e5604a63721d09512263b1383301d4f/actions/setup/sh/validate_multi_secret.sh"
+    },
+    {
+      "repository": "github/gh-aw",
+      "ref": "c35393777e5604a63721d09512263b1383301d4f",
+      "upstream_path": "docs/src/content/docs/engines/codex.md",
+      "bytes": 4012,
+      "sha256": "32920e34879eb83ba945622e289ad2c70446e9809015459824b69767995a52fb",
+      "git_blob_sha1": "b9fa4577be36b2331e0046cdd61ebb326e665d6d",
+      "url": "https://github.com/github/gh-aw/blob/c35393777e5604a63721d09512263b1383301d4f/docs/src/content/docs/engines/codex.md"
+    },
+    {
+      "repository": "github/gh-aw",
+      "ref": "c35393777e5604a63721d09512263b1383301d4f",
+      "upstream_path": "docs/src/content/docs/reference/self-hosted-runners.md",
+      "bytes": 22718,
+      "sha256": "75e870bab8dab73643f2e7257cc55015538503b0dc6a780cc89edb073031c133",
+      "git_blob_sha1": "3a5dd922380ae60194a3ba045c66692fe92ff7a5",
+      "url": "https://github.com/github/gh-aw/blob/c35393777e5604a63721d09512263b1383301d4f/docs/src/content/docs/reference/self-hosted-runners.md"
+    },
+    {
+      "repository": "github/gh-aw",
+      "ref": "c35393777e5604a63721d09512263b1383301d4f",
+      "upstream_path": "pkg/cli/run.go",
+      "bytes": 3525,
+      "sha256": "4b30f24f39460ae84ba13e7f2af448cd1f6510585d569b2b3e28922bd4f3bb24",
+      "git_blob_sha1": "e0f1d7ea16970dcdc1ec4ed252181eac41e97300",
+      "url": "https://github.com/github/gh-aw/blob/c35393777e5604a63721d09512263b1383301d4f/pkg/cli/run.go"
+    },
+    {
+      "repository": "github/gh-aw",
+      "ref": "c35393777e5604a63721d09512263b1383301d4f",
+      "upstream_path": "pkg/cli/run_workflow_execution.go",
+      "bytes": 25566,
+      "sha256": "a7af6a3905b8e22887933ec4f2cf47cafa846c8c7f62330b8a54005df31d52cf",
+      "git_blob_sha1": "44d0c449b296c0d77c9c24b44d380fa8e612dba3",
+      "url": "https://github.com/github/gh-aw/blob/c35393777e5604a63721d09512263b1383301d4f/pkg/cli/run_workflow_execution.go"
+    },
+    {
+      "repository": "github/gh-aw",
+      "ref": "c35393777e5604a63721d09512263b1383301d4f",
+      "upstream_path": "pkg/workflow/codex_engine.go",
+      "bytes": 30484,
+      "sha256": "24796e7935399880401f1e6fd63243b2a319944570c90161a4126ce7b49429c8",
+      "git_blob_sha1": "2f841d5bbda238406d0e0ffdbf89cba79444c8e9",
+      "url": "https://github.com/github/gh-aw/blob/c35393777e5604a63721d09512263b1383301d4f/pkg/workflow/codex_engine.go"
+    },
+    {
+      "repository": "github/gh-aw",
+      "ref": "c35393777e5604a63721d09512263b1383301d4f",
+      "upstream_path": "pkg/workflow/engine_helpers.go",
+      "bytes": 22441,
+      "sha256": "768f744eca1c27f7ce4c3800ccccd6c946aa0c22e92af243930ee7cc9133016a",
+      "git_blob_sha1": "91fdfb69d1f92848ff26f676b21d457a379f9090",
+      "url": "https://github.com/github/gh-aw/blob/c35393777e5604a63721d09512263b1383301d4f/pkg/workflow/engine_helpers.go"
+    },
+    {
+      "repository": "local native-agent-stack checkout",
+      "ref": "5199e01082c434f9f2babd5d6e482f05c6fdd94f",
+      "upstream_path": "blueprints/runtime-workers/comparisons/github-workflow-draft.json",
+      "bytes": 7302,
+      "sha256": "ba73ab9dd62a0eb52c0b1e5e9c0b3cf058fd6bd25678998ae76cc4fb92ab6bda",
+      "git_blob_sha1": "71d06e69cbc821c0a0573220afbd08b71e18eedd",
+      "url": null
+    }
+  ],
+  "independent_root_read": {
+    "sources": 16,
+    "complete_original_byte_hash_and_git_blob_matches": true,
+    "native_source_exit_codes": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "installed_extension_identity_not_requalified": true
+  },
+  "private_packet_binding": {
+    "bytes": 11825,
+    "sha256": "aa460aa45373764f01bb659d1742b5e6256ca8eec847f8709bc1b83d1402b241",
+    "inventory_bytes": 9532,
+    "inventory_sha256": "e282dc6d73485c8a8c94471c92d9ec8356e2416d41b1c12a9b409b2bae90b552"
+  },
+  "not_run": [
+    "Action",
+    "gh-aw compilation or dispatch",
+    "provider/model trials",
+    "auth store inspection/copying",
+    "active client or gateway configuration changes"
+  ],
+  "selection_policy": "No route or job winner follows from supported input shapes.",
+  "native_effort_amendment": {
+    "parent_v1_bytes": 17854,
+    "parent_v1_sha256": "9fe6a6e1ad7ba7dbf9546390b9de19a66d06d375111085a91667c150ef4887f3",
+    "parent_v1_retained": true,
+    "change": "Only the prospective model inputs lose the -ultra suffix; explicit native Ultra remains separately configured. This avoids the declared carry model-suffix override of native-resolved xhigh. Existing force-rule/catalog/identity/transport gates remain.",
+    "source_proposal": "native-ultra-alias-inputs-source-proposal-20261003.json",
+    "active_configuration_changed": false,
+    "earlier_input_was_live_qualified": false
+  }
+}

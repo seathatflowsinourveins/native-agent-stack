@@ -42698,6 +42698,11 @@
       "bytes": 19187
     },
     {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk48-originals-reconciliation-20261003.json",
+      "sha256": "4feb8133b285b042737041d1785a67c1299b3452ae0b7f4c775ca95135408b82",
+      "bytes": 9256
+    },
+    {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-carrier-native-inputs-source-proposal-20261003.json",
       "sha256": "468dd35adf2c33073751a72a4e34e8ef78ae550b9b979c4225daef9dec1d431f",
       "bytes": 11726
@@ -42828,9 +42833,24 @@
       "bytes": 8222
     },
     {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/gateway-token-native-source-proposal-20261003.json",
+      "sha256": "27a5f10d80ef769a690ab48e30c4adc8d45e8716f27794d2b4d7c1485faea0d0",
+      "bytes": 26834
+    },
+    {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/gateway-wire-owner-read.json",
       "sha256": "a198ff1577bd9e6717f73137b3099a92a37fe180d42f589843133664acafdf61",
       "bytes": 3274
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/github-native-route-source-proposal-20261003.json",
+      "sha256": "9fe6a6e1ad7ba7dbf9546390b9de19a66d06d375111085a91667c150ef4887f3",
+      "bytes": 17854
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/github-native-route-source-proposal-v2-20261003.json",
+      "sha256": "319dffa0c4ba91dd59c0d7ea47cc4db6d26484653c91f4900257424dbf201893",
+      "bytes": 18471
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/gptr-chat-diagnostic-retrieval-failure.json",
@@ -42931,6 +42951,11 @@
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/main-merge-reconciliation-20261003.json",
       "sha256": "a5ca4872ff00f75b5a7155aa7a522929e32c8ff8f1026462fb7ba80b567d064b",
       "bytes": 21190
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/native-ultra-alias-inputs-source-proposal-20261003.json",
+      "sha256": "224ba55da6c4d2d9f0e8822e4eb8020c026557bac38f0289aeba463789ed6119",
+      "bytes": 6740
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/native-ultra-gateway-source-qualification-20261003.json",
@@ -43038,6 +43063,11 @@
       "bytes": 18818
     },
     {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/reviewer-oracle-source-proposal-20261003.json",
+      "sha256": "cce6b3ee132f3ef7536515fceab99e3d77dfd1f8d375bed5ff2f5704f10dc452",
+      "bytes": 8618
+    },
+    {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/root-readiness-followup-20261003.json",
       "sha256": "b290189a077273bb2aa469c0d4f46c86207c79cc17e9486bf50105f16770a5f6",
       "bytes": 40518
@@ -43081,6 +43111,11 @@
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/source-read.json",
       "sha256": "0afac3fbca0f1131353880d7248c497be302fb294269469efe8ef1c4fa277233",
       "bytes": 2704
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/trading-rnd-native-source-proposal-20261003.json",
+      "sha256": "d9f431f730003b538c5b7b4a2a4b1e3c9ba89d070d1fbbf50ddebee71712798a",
+      "bytes": 26367
     },
     {
       "path": "evidence/artifacts/runtime-sdk-20260930/README.md",
