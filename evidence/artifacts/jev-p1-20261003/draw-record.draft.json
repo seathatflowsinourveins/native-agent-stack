@@ -1,0 +1,670 @@
+{
+ "schema": "jev-p1-draw-record/1",
+ "status": "draft",
+ "seed": 20261003,
+ "frame_commit": "ecea28654a835fff2cc3651bab77ca0e46b9bec5",
+ "frame_sha256": "75b6dfe49910cb86976ecdc260eb58c5933202d48a87f892c7b7c28e54b38fe7",
+ "frame_counts": {
+  "frame_documents": {
+   "artifact_readme": 75,
+   "decision": 88,
+   "receipt": 155,
+   "review_packet": 115
+  },
+  "natural_frame": 458,
+  "enriched_pool": 70
+ },
+ "frame_rules": {
+  "version": "p1-frame-v1",
+  "frame_documents": [
+   "evidence/receipts/** (JSON string values)",
+   "evidence/artifacts/<dir>/README.md",
+   "docs/decisions/** (Markdown)",
+   "evidence/artifacts/** .json or .md whose file name matches (?i)(review|critique|verif|finding|packet) (retained review packets)"
+  ],
+  "self_excluded_prefixes": [
+   "blueprints/native-skill-practice/p1/",
+   "evidence/artifacts/jev-p1-"
+  ],
+  "citation_forms": {
+   "repository_line": "path:N, path:N-M, path:N,M, path#LN-LM or path:LN, optionally followed by ' at <commit>'",
+   "pinned_upstream": "https://github.com/<owner>/<repo>/blob/<7-40 hex>/<path>#LN(-LM)",
+   "own_repository_pin": "native-agent-stack@<7-40 hex>:<path>:N(-M)",
+   "receipt_field": "<file>.json#/<RFC 6901 pointer>",
+   "counted_never_cut": "a bare :N continuation, an anchorless blob URL and <other repo>@<commit>:<path>"
+  },
+  "revision": "the citation's own pin when it carries one; otherwise the oldest commit, up to the frame commit, that introduced the citation text to the citing document (git log -S); for a citation built from record fields, the commit that last changed the citing line (git blame)",
+  "path_resolution": [
+   "exact tracked path at the excerpt revision",
+   "path relative to the citing document's directory",
+   "unique tracked suffix match whose full path also appears verbatim in the citing document"
+  ],
+  "window_lines": 3,
+  "max_cited_span_lines": 20,
+  "max_excerpt_chars": 3000,
+  "excerpt": "cited lines plus the window, clipped to the file, blank lines trimmed at both ends, carriage returns removed, joined with LF, no trailing newline",
+  "claim": "the sentence holding exactly one citation, with that citation removed by code and leading punctuation stripped; 6-80 words; not a question; when the citation was the sentence's subject (it led the sentence, no ':' or dash after it, and the rest starts lowercase), code writes 'The source' in its place",
+  "one_pair_per_claim": "duplicate claims (case-folded, whitespace-normalized) keep the lowest candidate id",
+  "exclusions": [
+   "private content (scripts/validate.py PRIVATE_CONTENT patterns) in claim or excerpt",
+   "promptfoo template or loader syntax ({{, {%, {#, a leading file:// or package:)",
+   "an excerpt that parses as one complete JSON value",
+   "control characters other than tab and LF"
+  ],
+  "enriched_records": {
+   "roots": [
+    "evidence/",
+    "catalogs/",
+    "blueprints/",
+    "docs/"
+   ],
+   "claim_field": "claim (string)",
+   "signals": [
+    "refuted is true",
+    "holds is false",
+    "one of verifier_verdict, verdict, result, disposition equals one of contradicted, corrected, does_not_hold, mixed, not_supported, partially, partly, partly_holds, refuted, unsupported",
+    "a non-empty correction or problem string beside the claim",
+    "adversarial_verification.votes[] with refuted true: the candidate's demonstrated_gap and evidence[] sentences"
+   ],
+   "source_order": [
+    "explicit file and line fields",
+    "the one citation inside the claim",
+    "first resolvable citation in source",
+    "first resolvable citation in sources",
+    "first resolvable citation in evidence",
+    "first resolvable citation in correction",
+    "first resolvable citation in problem",
+    "first resolvable citation in reason",
+    "first resolvable citation in note",
+    "first resolvable citation in verification",
+    "first resolvable citation in quote",
+    "first resolvable citation in reasoning"
+   ]
+  }
+ },
+ "frame_stats": {
+  "natural": {
+   "drift:changed": 184,
+   "drift:not_applicable": 34,
+   "drift:unchanged": 247,
+   "excluded:cited_span_too_long": 35,
+   "excluded:claim_is_question": 1,
+   "excluded:claim_too_long": 11,
+   "excluded:claim_too_short": 475,
+   "excluded:continuation_not_resolvable": 68,
+   "excluded:duplicate_claim": 7,
+   "excluded:excerpt_too_long": 21,
+   "excluded:harness_template_syntax": 2,
+   "excluded:line_out_of_range": 9,
+   "excluded:multiple_citations": 542,
+   "excluded:no_line_anchor": 52,
+   "excluded:pointer_not_found": 1,
+   "excluded:unresolved_repository_path": 308,
+   "excluded:upstream_unavailable": 2,
+   "revision:first_cited": 429,
+   "revision:pinned": 36,
+   "sentences_with_citation": 1992
+  },
+  "enriched": {
+   "drift:changed": 19,
+   "drift:unchanged": 51,
+   "excluded:cited_span_too_long": 10,
+   "excluded:claim_too_short": 16,
+   "excluded:continuation_not_resolvable": 2,
+   "excluded:harness_template_syntax": 1,
+   "excluded:multiple_citations": 6,
+   "excluded:no_citation": 905,
+   "excluded:no_line_anchor": 98,
+   "excluded:unresolved_repository_path": 46,
+   "records:adversarial_verification": 569,
+   "records:correction_text": 343,
+   "records:problem_text": 427,
+   "records:refuted=true": 44,
+   "records:result=contradicted": 165,
+   "records:verdict=refuted": 39,
+   "records:verifier_verdict=partly": 11,
+   "records:verifier_verdict=refuted": 2,
+   "revision:blamed": 13,
+   "revision:first_cited": 43,
+   "revision:pinned": 14,
+   "sentences_with_citation": 123
+  }
+ },
+ "frame_upstream_files": [
+  {
+   "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/a8757a05a960f96a0ba510b6341bcd520cf80bb2/crates/ai-memory-mcp/src/server.rs",
+   "status": "available",
+   "sha256": "d74e618e0812036094518c444508e52d90186731a6dffe7100b2b68c34f02ab3",
+   "bytes": 626285
+  },
+  {
+   "url": "https://raw.githubusercontent.com/anthropics/claude-agent-sdk-python/f2204bb956bab02907aaf3cb88eb9dead28eaa35/src/claude_agent_sdk/_internal/query.py",
+   "status": "available",
+   "sha256": "0562517de949f4431177f204fe84cda3265f495d0eb0a949b9ced96cc5bd8276",
+   "bytes": 56771
+  },
+  {
+   "url": "https://raw.githubusercontent.com/anthropics/claude-agent-sdk-python/f2204bb956bab02907aaf3cb88eb9dead28eaa35/src/claude_agent_sdk/client.py",
+   "status": "available",
+   "sha256": "980f956d963338b39f4fd5224e69594eb513bfda37e5b215cf94bb0499ea047c",
+   "bytes": 26948
+  },
+  {
+   "url": "https://raw.githubusercontent.com/diegosouzapw/OmniRoute/5458026c216f77a3da68ea49152dc33470cfe2cb/open-sse/executors/codex.ts",
+   "status": "available",
+   "sha256": "8158af29d86741d3ebc122c99c2850347ddd9587a5fe8ab9d834306347584176",
+   "bytes": 59458
+  },
+  {
+   "url": "https://raw.githubusercontent.com/github/docs/2bd66de8cea336061c9ea060c9b37385136e6ab3/data/reusables/repositories/actions-scheduled-workflow-example.md",
+   "status": "available",
+   "sha256": "675ad618ba48c887d5a2abbc5313949e86c2edf7c18e1473b9032a7fa4e4237f",
+   "bytes": 2506
+  },
+  {
+   "url": "https://raw.githubusercontent.com/google/osv-scanner/e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6/pkg/osvscanner/internal/scanners/lockfile.go",
+   "status": "available",
+   "sha256": "3c8537f16e7e8ffb6e28aad90eea7edd33a9263916c67f9f9866209890b3a15c",
+   "bytes": 5641
+  },
+  {
+   "url": "https://raw.githubusercontent.com/hashgraph-online/hol-guard/85090ce61ed5bb5457104b5a73cb2bbc9443fda0/pyproject.toml",
+   "status": "available",
+   "sha256": "7bcaf3b692a51d51c678acbb020f718d09398e14e313f9741a77faa07b860e3e",
+   "bytes": 10071
+  },
+  {
+   "url": "https://raw.githubusercontent.com/microsoft/WSL/91f161fa240dc355c1a88daabc8aac4273e35ba5/src/linux/init/main.cpp",
+   "status": "available",
+   "sha256": "cc905898deadaab394348af30989ca6e77371275eabd365735551d46cf8c9690",
+   "bytes": 124684
+  },
+  {
+   "url": "https://raw.githubusercontent.com/mitmproxy/mitmproxy/6c09d56e4c29a92f5ad01b03199977584b8ea14f/examples/addons/http-stream-modify.py",
+   "status": "available",
+   "sha256": "901c47e1615753f9b338fad83d37cdb990e2ef8b1b81ea1ce8c64122afed465a",
+   "bytes": 923
+  },
+  {
+   "url": "https://raw.githubusercontent.com/mksglu/context-mode/589d8214d56740a28b5f7bf63167743d586b0b40/src/executor.ts",
+   "status": "available",
+   "sha256": "37f19e41e56c8e705fc2bdf06a4a855d920a7d232dc4fd4b432215733d4d7b9d",
+   "bytes": 32513
+  },
+  {
+   "url": "https://raw.githubusercontent.com/mksglu/context-mode/589d8214d56740a28b5f7bf63167743d586b0b40/src/search/ctx-search-schema.ts",
+   "status": "available",
+   "sha256": "9be1e8c0dcb8d423a241377f070afbac52c18a76f5ab7da376cbd062a5d84188",
+   "bytes": 5704
+  },
+  {
+   "url": "https://raw.githubusercontent.com/mksglu/context-mode/589d8214d56740a28b5f7bf63167743d586b0b40/src/server.ts",
+   "status": "available",
+   "sha256": "4a34c4a17b64fa188d2a2c894765f492bf62b624a60c64e666fbaeef760f4a59",
+   "bytes": 225865
+  },
+  {
+   "url": "https://raw.githubusercontent.com/obra/superpowers/8ca22dba9a94f28898bbce59f2537ff4d87c747d/skills/verification-before-completion/SKILL.md",
+   "status": "available",
+   "sha256": "2befe7fc55bcadaa3d97dd9e8efeb633d2561c0ebe74c5a8b17c4d9e7e4520b3",
+   "bytes": 3646
+  },
+  {
+   "url": "https://raw.githubusercontent.com/open-compass/AgentCompass/2b2a272ed2a00231d4dff3c2e33e21fa8a28593e/pyproject.toml",
+   "status": "available",
+   "sha256": "8582cabf2dc1921a93cc2acf7db9e87928a39ea44262bfdbf0d8a710d3c4d226",
+   "bytes": 4140
+  },
+  {
+   "url": "https://raw.githubusercontent.com/openai/codex/01fc69f4026735edfdf6789820549727a4867b11/codex-rs/codex-home/src/instructions/mod.rs",
+   "status": "available",
+   "sha256": "5f900d536d2a085345178e4311ab55c801ce90df50db49f15d05c4525a3b5c2e",
+   "bytes": 4248
+  },
+  {
+   "url": "https://raw.githubusercontent.com/openai/codex/36650394c5b38c2990ccf2a3457165ca3e9d9726/codex-rs/ext/skills/src/host_roots.rs",
+   "status": "available",
+   "sha256": "d4290ba4d783110e7533586ad19719536aa9b23f517b43e3147d3afb40c91d56",
+   "bytes": 9511
+  },
+  {
+   "url": "https://raw.githubusercontent.com/openai/codex/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/app-server/src/request_processors/catalog_processor.rs",
+   "status": "available",
+   "sha256": "70ea2f46a69337c7b3e5ad2b461e5fdb4fffd83458e8387cc8ae8dccdca1efe6",
+   "bytes": 27695
+  },
+  {
+   "url": "https://raw.githubusercontent.com/openai/codex/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core-plugins/src/manager.rs",
+   "status": "available",
+   "sha256": "4d1ac59d49155bfe434b169243c53eab4099ccf2c3d2649ec5e273e255419153",
+   "bytes": 148748
+  },
+  {
+   "url": "https://raw.githubusercontent.com/openai/codex/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core-plugins/src/startup_sync.rs",
+   "status": "available",
+   "sha256": "78fe0eaf8813eab2fa3d4a5398a06cf01152deca69f12c931821d5ca35c5e93d",
+   "bytes": 39271
+  },
+  {
+   "url": "https://raw.githubusercontent.com/openai/codex/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/responses_retry.rs",
+   "status": "available",
+   "sha256": "0a008d81033ce5eb7ab76edcd0881750ed01450c47350a6fd99077bf5a6e53c2",
+   "bytes": 7313
+  },
+  {
+   "url": "https://raw.githubusercontent.com/openai/codex/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/models-manager/src/manager.rs",
+   "status": "available",
+   "sha256": "d998bb2768561c761f83a77ce60d3be4b5d1a453e4a7afb10c5f86d314d76a80",
+   "bytes": 33616
+  },
+  {
+   "url": "https://raw.githubusercontent.com/openai/codex/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/uds/src/daemon_directory.rs",
+   "status": "available",
+   "sha256": "fd1eae1b3292f4fbc98e482a392d16246baa7fac4593dd7c1818a481fed070d6",
+   "bytes": 1542
+  },
+  {
+   "url": "https://raw.githubusercontent.com/openai/codex/a956835d020762cb2b570053af06f643a11c0ecc/sdk/python/src/openai_codex/api.py",
+   "status": "available",
+   "sha256": "bd9cac51820997fa4d3fa4ac5c24894f45b92da8ba481d49c44cb96dcc9af430",
+   "bytes": 33152
+  },
+  {
+   "url": "https://raw.githubusercontent.com/openai/codex/a956835d020762cb2b570053af06f643a11c0ecc/sdk/python/src/openai_codex/async_client.py",
+   "status": "available",
+   "sha256": "7d1e291eed8ce7a907b9dafd79580f286451224c12c59302b61918046a01f99c",
+   "bytes": 16245
+  },
+  {
+   "url": "https://raw.githubusercontent.com/openai/codex/a956835d020762cb2b570053af06f643a11c0ecc/sdk/python/src/openai_codex/client.py",
+   "status": "available",
+   "sha256": "8452afbd8148ea212c94e8a6727468054b175acb0daf95002c84b66b604d05a6",
+   "bytes": 33781
+  },
+  {
+   "url": "https://raw.githubusercontent.com/openai/codex/a956835d020762cb2b570053af06f643a11c0ecc/sdk/python/tests/test_public_api_signatures.py",
+   "status": "available",
+   "sha256": "c71fae97be240f1b9e93af271315359e4ddeac7a310fd94850b407b4d7e633b5",
+   "bytes": 17564
+  },
+  {
+   "url": "https://raw.githubusercontent.com/seathatflowsinourveins/agent-ecosystem/753777ac8163332a3570888680893821439ee4ab/scripts/catalog_refresh.py",
+   "status": "cached_missing",
+   "sha256": null,
+   "bytes": null
+  },
+  {
+   "url": "https://raw.githubusercontent.com/seathatflowsinourveins/agent-ecosystem/753777ac8163332a3570888680893821439ee4ab/scripts/install_local.py",
+   "status": "cached_missing",
+   "sha256": null,
+   "bytes": null
+  },
+  {
+   "url": "https://raw.githubusercontent.com/util-linux/util-linux/2da5c904e18fdcffd2b252d641e6f76374c7b406/sys-utils/setpriv.c",
+   "status": "available",
+   "sha256": "6a99ba149a4f8e879bac200c3ce080a2386194f3d4cfcd60d5d140bf34dbbea7",
+   "bytes": 27768
+  },
+  {
+   "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/src/agents.ts",
+   "status": "available",
+   "sha256": "8902f56a121ce4b1a800b3aa04d3f83b7baeaf32e1abf441c0b8eabb3f8f89a5",
+   "bytes": 26860
+  },
+  {
+   "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts",
+   "status": "available",
+   "sha256": "cdb32fd6cce3af962ad961677dea5fbe18f26091af6e7d627d9e6933aa8fe16a",
+   "bytes": 43226
+  },
+  {
+   "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/src/remove.ts",
+   "status": "available",
+   "sha256": "8bb511ab833193818260ebab49db7d9fe82016195fdf279acc083912ec201493",
+   "bytes": 15254
+  },
+  {
+   "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/src/skill-lock.ts",
+   "status": "available",
+   "sha256": "fcf628f8af6c637c4348bdaeeb2833f1705ee2ccd1772935e2ae350340cc635d",
+   "bytes": 8573
+  }
+ ],
+ "candidate_counts": {
+  "natural": 458,
+  "enriched": 70,
+  "adversarial": 398,
+  "topup_reserve": 25
+ },
+ "sizes": {
+  "natural": 60,
+  "enriched": 45,
+  "adversarial": 15
+ },
+ "draw": {
+  "natural": [
+   "f-b312cd1a78b2dad7",
+   "f-6d29e7022b9a7a94",
+   "f-87c062fd60b1a876",
+   "f-d66aae2994356337",
+   "f-39740682ad56ea65",
+   "f-8bb14456618b07d2",
+   "f-af5a15c033f3d1a4",
+   "f-0ba6d5332495f9d3",
+   "f-0ac353eea194c738",
+   "f-d620e77fcf4a2073",
+   "f-a03ca53192a6ff26",
+   "f-319b348b5f68a89e",
+   "f-876671c5a9059fb2",
+   "f-dd0a815d692f978f",
+   "f-48bcb5cf62ab5135",
+   "f-c9eed5278abee7fd",
+   "f-7e7340221b2b8629",
+   "f-27c3ec13bd0b550d",
+   "f-2650e824e0c41cf7",
+   "f-7a92bc32c2c9dd79",
+   "f-2cbc969924059237",
+   "f-3e2aaf4787a2409d",
+   "f-22d7447815dec288",
+   "f-c1236842410049a4",
+   "f-f52580a31238c9a0",
+   "f-60ede9ae27222bc8",
+   "f-22066b548d69a903",
+   "f-9f0175815147b134",
+   "f-c64fdd87741cfda8",
+   "f-df661dda4b70219e",
+   "f-32fb2f8b42e5572d",
+   "f-f5a196ef9526de16",
+   "f-d4b25ce8fc6c773f",
+   "f-29265a9f97fb7bde",
+   "f-a60285390d7466d3",
+   "f-b650d2e560e11436",
+   "f-45331fcf74346d5a",
+   "f-b2b3a67dbd115bdd",
+   "f-615a564c35d008f9",
+   "f-3e8cb57a76d5bd21",
+   "f-bdee478dd171c7f4",
+   "f-3e951481a9160309",
+   "f-796621ae45a0098e",
+   "f-87d470762d1b7050",
+   "f-00b8b8a5bacd1dbf",
+   "f-c1ee171415729ae6",
+   "f-35237ee929e7d559",
+   "f-80c15b875e3265e8",
+   "f-936e5c3609e0acc9",
+   "f-3712bc41d727f8b3",
+   "f-97a80a3ca2118881",
+   "f-79b1c3205b773913",
+   "f-08a7225a2dab5f62",
+   "f-d575add8c8e8cf18",
+   "f-91f3d27f3a740509",
+   "f-e9bf56d7473d2ee9",
+   "f-78c928ccdf1cd7aa",
+   "f-ac585ebc40b467ac",
+   "f-717793f722e97778",
+   "f-91f8510755eae248"
+  ],
+  "enriched": [
+   "e-c9c4d84f2b8f5dd5",
+   "e-d9a38e70fbdd8586",
+   "e-a353178e25c935c8",
+   "e-51663c6d62673357",
+   "e-511ab48d46f43b48",
+   "e-04fd52c91c1b12f4",
+   "e-c6482d43fc9881bb",
+   "e-6fd2e279accb9037",
+   "e-585cb3e4aca26cdd",
+   "e-de453c6a95f479c1",
+   "e-5a3437a98850559f",
+   "e-4eba4ca15a7e44de",
+   "e-45b9fd049579c218",
+   "e-ce9f9238496c2200",
+   "e-b803ec053f97cadf",
+   "e-027c65af96c55d33",
+   "e-d4ba6056ab2d698b",
+   "e-6063037118d203aa",
+   "e-b65aac108fd03f15",
+   "e-ca6fc60c7fbb7270",
+   "e-323c222de2481c25",
+   "e-d5f03df94d0a29f0",
+   "e-0d62a0c1b395f02d",
+   "e-3195a1a9de0e5a8f",
+   "e-ecc95be914b4c9f7",
+   "e-1c6eed6176ea1b2a",
+   "e-8ab4757bb716105b",
+   "e-c77c14f411e1c119",
+   "e-50c3f416aa0cb74c",
+   "e-bd9ed01d5fcc1b87",
+   "e-0b8b1d2018b321e8",
+   "e-f376d7a200fe7ce3",
+   "e-c4010fb370b5f8ed",
+   "e-f90c244adae00e97",
+   "e-a351555ff5815bab",
+   "e-484769ffee854917",
+   "e-4d5e0b6c7d526f33",
+   "e-0ac2e359dac04c83",
+   "e-c7ad283c2484423e",
+   "e-18be8df1ddd62750",
+   "e-d482e5de7ef7a1bc",
+   "e-49f9ff396adb74a9",
+   "e-209782cd529ba584",
+   "e-3956343f201b2568",
+   "e-f137fd79826b66de"
+  ],
+  "adversarial": [
+   "f-a3eae0e15b4ce68e",
+   "f-cfce224427c2e834",
+   "f-9228802eab66cb79",
+   "f-4c57d7d0abce1404",
+   "f-9f3994b1b46b034d",
+   "f-a23991f7a0951856",
+   "f-f3eb1b18771c9cc3",
+   "f-067c84b15edf29a9",
+   "f-76203230b17ecd64",
+   "f-ecb2ce24e97ddb56",
+   "f-c000de873e6f4fd2",
+   "f-e5ff80dea835d3c8",
+   "f-620def8406f146be",
+   "f-e983f27d0afa93a1",
+   "f-782a7c58e2a74d64"
+  ],
+  "topup_reserve": [
+   "e-602b1a1f5bf996b0",
+   "e-72128224a78f2b66",
+   "e-071357f3e11ad0d1",
+   "e-69f67bb2fef9f18e",
+   "e-a806e58305f54c3a",
+   "e-a8c7c6c9919bec48",
+   "e-af6fb7ed2d6ba75d",
+   "e-0f2b9b8fb8703819",
+   "e-bfa220b7de670cd3",
+   "e-2a2c86b4feafcfdd",
+   "e-744d8c9e8b7f3bb4",
+   "e-9b71716493ad3149",
+   "e-1e85d42e017df43e",
+   "e-1a7709fadad678bd",
+   "e-bc269327dae1ca30",
+   "e-d052717e59f196d7",
+   "e-99f2f5415e4238d0",
+   "e-d34d2480fdd6cca9",
+   "e-fe13787bcee316ad",
+   "e-9efe96f3e1d3b1b7",
+   "e-ec52e2379637f206",
+   "e-f65b7d0d10827e34",
+   "e-db45d9ea719badcf",
+   "e-7cb7c8b679317787",
+   "e-5d6c4740ef1cbc05"
+  ]
+ },
+ "drawn_ids_sha256": "5c6bb78ef80c00e148d863f0559ab617f829659fd624ea2f6d2256a6d3eadaec",
+ "adversarial_assignment": [
+  {
+   "slot_id": "a-f-067c84b15edf29a9",
+   "form": "self_classification",
+   "author": "opus",
+   "target": "supported",
+   "insert_after_line": 19,
+   "authoring_prompt_sha256": "56bf5239c0267618c801fb574dc408ebb17f5a861faeb4f93b955c508ec1bb00"
+  },
+  {
+   "slot_id": "a-f-4c57d7d0abce1404",
+   "form": "self_classification",
+   "author": "sol",
+   "target": "supported",
+   "insert_after_line": 3,
+   "authoring_prompt_sha256": "d8f35e60cfe91f163424d8ad72e09f63f9f27f85dc602b639724cc0f9e97b086"
+  },
+  {
+   "slot_id": "a-f-620def8406f146be",
+   "form": "misleading_framing",
+   "author": "opus",
+   "target": "supported",
+   "insert_after_line": 3,
+   "authoring_prompt_sha256": "18830c980c76b1519de6f93856f8d1666ca240993316928b67456c9f527dd443"
+  },
+  {
+   "slot_id": "a-f-76203230b17ecd64",
+   "form": "self_classification",
+   "author": "sol",
+   "target": "supported",
+   "insert_after_line": 4,
+   "authoring_prompt_sha256": "d827f5583d92ac10dec7e12afe3a02405f7610cf651062abef338131289a2132"
+  },
+  {
+   "slot_id": "a-f-782a7c58e2a74d64",
+   "form": "misleading_framing",
+   "author": "opus",
+   "target": "supported",
+   "insert_after_line": 14,
+   "authoring_prompt_sha256": "504d2503025c52b968619d63264ea5b80dec2a307de4ee34c64e9a879815fc7a"
+  },
+  {
+   "slot_id": "a-f-9228802eab66cb79",
+   "form": "self_classification",
+   "author": "opus",
+   "target": "supported",
+   "insert_after_line": 4,
+   "authoring_prompt_sha256": "a6c6096d382618ba54cc5308be586267c6b0fd3967ea4cba5d9eb135c0fc0756"
+  },
+  {
+   "slot_id": "a-f-9f3994b1b46b034d",
+   "form": "injected_instruction",
+   "author": "opus",
+   "target": "supported",
+   "insert_after_line": 4,
+   "authoring_prompt_sha256": "15a444023231b5700ede50bebba3c6153d6ed2d0b4cebf57c60c049cfb006db4"
+  },
+  {
+   "slot_id": "a-f-a23991f7a0951856",
+   "form": "misleading_framing",
+   "author": "sol",
+   "target": "supported",
+   "insert_after_line": 4,
+   "authoring_prompt_sha256": "e02aec115eca4d209de2b18d01bf1734c77edd17891dba25a2c240d9d5100253"
+  },
+  {
+   "slot_id": "a-f-a3eae0e15b4ce68e",
+   "form": "injected_instruction",
+   "author": "sol",
+   "target": "supported",
+   "insert_after_line": 3,
+   "authoring_prompt_sha256": "1d1891396d3f6a1733ef1a9460eb647355461569040a1f97977a088611729b69"
+  },
+  {
+   "slot_id": "a-f-c000de873e6f4fd2",
+   "form": "injected_instruction",
+   "author": "opus",
+   "target": "supported",
+   "insert_after_line": 4,
+   "authoring_prompt_sha256": "5259dc2dfde7a6902fb7f4b16fccd226fa3e55cd51cbe8b21f966b08ee012393"
+  },
+  {
+   "slot_id": "a-f-cfce224427c2e834",
+   "form": "injected_instruction",
+   "author": "sol",
+   "target": "supported",
+   "insert_after_line": 19,
+   "authoring_prompt_sha256": "fb79299ba773e6a46cce699d4b4a5f17a7fcf669fa8dba9cf242bc68a70612d2"
+  },
+  {
+   "slot_id": "a-f-e5ff80dea835d3c8",
+   "form": "self_classification",
+   "author": "sol",
+   "target": "supported",
+   "insert_after_line": 3,
+   "authoring_prompt_sha256": "bba50e3634fe325afd0b4c44093763e9e0c5566da99f4bc11eb579e64ac6243b"
+  },
+  {
+   "slot_id": "a-f-e983f27d0afa93a1",
+   "form": "misleading_framing",
+   "author": "sol",
+   "target": "supported",
+   "insert_after_line": 4,
+   "authoring_prompt_sha256": "83f911251cd82327fa71ef1414e0d3515e0fd2f4a94d169a949110f1db123f3e"
+  },
+  {
+   "slot_id": "a-f-ecb2ce24e97ddb56",
+   "form": "injected_instruction",
+   "author": "opus",
+   "target": "supported",
+   "insert_after_line": 4,
+   "authoring_prompt_sha256": "9c500e41b98a891c3f2886432b88e35b50dd59ad97917daea7b03ddf5a4cad52"
+  },
+  {
+   "slot_id": "a-f-f3eb1b18771c9cc3",
+   "form": "misleading_framing",
+   "author": "opus",
+   "target": "supported",
+   "insert_after_line": 9,
+   "authoring_prompt_sha256": "e9fdbba07b62f7d570515b6ae9f4f5d48d903e2b4f12e9f7316319f5af0b4f77"
+  }
+ ],
+ "relabel_positions": [
+  "c046",
+  "c082",
+  "c041",
+  "c020",
+  "c090",
+  "c108",
+  "c010",
+  "c038",
+  "c119",
+  "c064",
+  "c076",
+  "c032",
+  "c098",
+  "c092",
+  "c110",
+  "c057",
+  "c058",
+  "c036"
+ ],
+ "strata_counts": {
+  "enriched": {
+   "cases": 45,
+   "universal": 10,
+   "numeric_or_date": 19
+  },
+  "natural": {
+   "cases": 60,
+   "universal": 13,
+   "numeric_or_date": 38
+  },
+  "adversarial": {
+   "cases": 15,
+   "universal": 4,
+   "numeric_or_date": 10
+  }
+ },
+ "private_files": {
+  "case_pack": {
+   "sha256": "b3f6a03d69bb9dc80257f03bde397e57c637fb66240443b41c98ab20db6f4a44",
+   "bytes": 359670
+  },
+  "label_packet": {
+   "sha256": "14911c165d2ba8f25f2eed81ebc42ba3d8c7c6e0904f8efe7a2a819484ff3fce",
+   "bytes": 119864
+  }
+ },
+ "note": "Case ids are draft presentation positions; the completed packet reorders every case."
+}

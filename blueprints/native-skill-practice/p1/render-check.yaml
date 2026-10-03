@@ -1,0 +1,17 @@
+# P1 render check (promptfoo 0.123.1 echo provider: it returns the rendered prompt and calls
+# nothing). Run before freeze; every rendered prompt must equal the bytes p1_casepack.py rendered
+# for the same case, because promptfoo renders string vars as nunjucks templates and strips one
+# trailing newline (dist/src/evaluatorHelpers-*.js, renderPrompt):
+#   PROMPTFOO_DISABLE_TELEMETRY=1 PROMPTFOO_DISABLE_UPDATE=1 promptfoo eval -c render-check.yaml \
+#     --filter-metadata arm_group=render --no-cache --no-share --no-write --no-table \
+#     --output /private/path/render.json
+description: P1 render check (echo only; no model call)
+prompts:
+  - id: file://prompts/jev-state.txt
+    label: jev-state
+  - id: file://prompts/native-question.txt
+    label: native-question
+providers:
+  - id: echo
+    label: render-check
+tests: file://draft/promptfoo-tests.jsonl
