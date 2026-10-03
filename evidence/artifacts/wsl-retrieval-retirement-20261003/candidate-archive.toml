@@ -1,0 +1,7 @@
+# Prospective isolated control only; no repository or active-input assignment.
+# OSV-Scanner v2.6.0 config applies to every input of an invocation. Caller scope
+# must therefore be separately enforced by exact inventory/hash controls.
+[[IgnoredVulns]]
+id = "GHSA-vfj7-8cjw-p6xm"
+ignoreUntil = 2026-10-31
+reason = "Prospective control for the hash-bound retired historical WSL retrieval lock only (SHA2565c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb), pending actual source-retirement and native-control acceptance; not an active QMD exception or vulnerability fix. Root scoped handoff608#5963764481 and Astra retirement design acceptance require exact inventory, digest, historical preservation, expiry and ordinary active-input controls before adoption. braces3.0.3 remains affected by GHSA-vfj7-8cjw-p6xm/CVE-2026-93687; no patched release in reviewed primary evidence. This scratch config tests native ignore/expiry behavior only."

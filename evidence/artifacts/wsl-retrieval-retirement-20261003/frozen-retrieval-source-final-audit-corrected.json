@@ -1,0 +1,15 @@
+{
+  "executable": "rtk",
+  "argv": [
+    "proxy",
+    "python3",
+    "blueprints/convergence-practice/wsl-retrieval/audit.py"
+  ],
+  "cwd": "<owned-source-worktree>",
+  "started_utc": "2026-10-03T01:32:03.884Z",
+  "finished_utc": "2026-10-03T01:32:03.948Z",
+  "exit_code": 0,
+  "stdout": "{\n  \"evidence_consistent\": true,\n  \"source_checks\": 22,\n  \"qmd_checks\": 70,\n  \"status\": \"incomplete_historical_reference\",\n  \"native_acceptance_established\": false,\n  \"recorded_successful_attempt_commands\": 23,\n  \"retained_failed_commands\": 5,\n  \"whole_task_provider_usage\": null,\n  \"semantic_rag_or_client_integration\": false,\n  \"current_retirement_assessment\": {\n    \"artifacts_consistent\": true,\n    \"status\": \"retired_historical_source\",\n    \"native_npm_guard_acceptance_established\": false,\n    \"active_qmd_advisory_status\": \"unresolved\"\n  }\n}\n",
+  "stderr": "",
+  "publication_policy": "Original worker native command/output record with task-owned paths replaced by role markers. Published digests bind only these published bytes; source tests are authored integration checks, not upstream suites."
+}
