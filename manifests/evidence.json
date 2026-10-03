@@ -5806,8 +5806,8 @@
     },
     {
       "path": "blueprints/convergence-practice/omniroute-routing-20260928/README.md",
-      "sha256": "aeff7a02de32d0fc0436b6ceb3991a2fe204f128674311466c040cda463a0e6c",
-      "bytes": 16574
+      "sha256": "8aa53b06b15d195b023ffa8066c047b3f7ebdef8e1727ee79cf76ca933396ea7",
+      "bytes": 16921
     },
     {
       "path": "blueprints/convergence-practice/omniroute-routing-20260928/experiment.json",
@@ -15711,8 +15711,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
-      "sha256": "58d1b99d97939bafa08e46733ab5eb4cec8bde39465f36953a0e146908eff1b9",
-      "bytes": 33981
+      "sha256": "e94dad18ecfa23323ef8c085297728ad00612468b13263a4e38031f196628eeb",
+      "bytes": 34286
     },
     {
       "path": "docs/decisions/2026-09-28-openhands-resolver-isolation.md",
@@ -15806,8 +15806,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-retire-gateway-ab-r02.md",
-      "sha256": "c3c486a70d61170b29ba35356f01f09a117977aaea0d9ce2333a0d7fac5db78a",
-      "bytes": 20673
+      "sha256": "fc11b6c9b02fb25a38470f476dc49f7cc8decfee7237423902d46dcf125658a4",
+      "bytes": 24036
     },
     {
       "path": "docs/direct-results.md",
