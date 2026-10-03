@@ -9114,8 +9114,8 @@
     },
     {
       "path": "blueprints/native-skill-practice/p1/README.md",
-      "sha256": "3a817b42e91ce84a6b683486a9fe763a111c0f6c14075efa0754b30069b4b7a6",
-      "bytes": 11740
+      "sha256": "0368f718abb262199cf9c0d8d924b59c1a5cacc7fde7fc1466962bea2992f5d5",
+      "bytes": 21045
     },
     {
       "path": "blueprints/native-skill-practice/p1/l_nli_provider.py",
@@ -9124,28 +9124,28 @@
     },
     {
       "path": "blueprints/native-skill-practice/p1/p1_casepack.py",
-      "sha256": "d04270216da791ff25469acdd300a39f2a028d2ac58ef921054f2e654610597e",
-      "bytes": 34807
+      "sha256": "61b31950dd9bb06dfc4c85d98708af24f4c1a77b78b967bd803044043dc287fa",
+      "bytes": 43146
     },
     {
       "path": "blueprints/native-skill-practice/p1/p1_frame.py",
-      "sha256": "8ba942b334b92c34e9a9043934e98d19638ee4f2ea0d8f71ecb86458eda3d803",
-      "bytes": 48222
+      "sha256": "c351eeae046ce0b1310546ae30d1887b257b3cd853d7883bf609d7f76f9ad7b5",
+      "bytes": 48900
     },
     {
       "path": "blueprints/native-skill-practice/p1/p1_freeze.py",
-      "sha256": "461a80a0d0977b57aef200b15e3010f301c8ee328582f2ff8412cc6de187e12b",
-      "bytes": 10263
+      "sha256": "4c882208697260ccc8c9ec62a523cf0a91af33751e66e361e90b1500b3d5231d",
+      "bytes": 12416
     },
     {
       "path": "blueprints/native-skill-practice/p1/p1_scoring.py",
-      "sha256": "4386750e20fe58f5913897661d0aeb345dbdda67debaa07970d5f9fcc9c75524",
-      "bytes": 32667
+      "sha256": "b410a77117d1434c3b89fc5777a24883b5f5a95c4f66edb95a824b4bcf1f6e58",
+      "bytes": 37606
     },
     {
       "path": "blueprints/native-skill-practice/p1/promptfooconfig.yaml",
-      "sha256": "0d6943367b02d1e3c4115855aedf34caf19abe62cc05ef66a28b1ed81c5e9c1c",
-      "bytes": 9079
+      "sha256": "825d6a5a5e3f849bc512c2c2b4190cf975dd434fb29aa52d13013f42919d5085",
+      "bytes": 11198
     },
     {
       "path": "blueprints/native-skill-practice/p1/prompts/jev-state.txt",
@@ -9159,8 +9159,13 @@
     },
     {
       "path": "blueprints/native-skill-practice/p1/render-check.yaml",
-      "sha256": "3ab6652272aad2ab7701b232c20fad15d4aa6b6341a00485855419da39d8fd96",
-      "bytes": 864
+      "sha256": "23d5ab009c53a7ab5fe46442ec50bfb673a8194b66a36c507057e68168ea3c8d",
+      "bytes": 5215
+    },
+    {
+      "path": "blueprints/native-skill-practice/p1/render_echo_server.py",
+      "sha256": "575db5a8df6dec0d73419d4b2af56764a2bb764e7f97d00571fdd9f8c80b2d8e",
+      "bytes": 1676
     },
     {
       "path": "blueprints/native-skill-practice/p1/requirements-scoring.in",
@@ -9171,6 +9176,11 @@
       "path": "blueprints/native-skill-practice/p1/requirements-scoring.lock",
       "sha256": "9d80ef024b33d62ae15a048d67614ef55c498a9fe32988829ea5abbd0fa5ec10",
       "bytes": 15625
+    },
+    {
+      "path": "blueprints/native-skill-practice/p1/response-model.cjs",
+      "sha256": "8c56dd69d5a11627b92c19a9783f38f135ca7531dcb0e4f263faf61977f4be99",
+      "bytes": 971
     },
     {
       "path": "blueprints/native-skill-practice/promptfooconfig.yaml",
@@ -32054,18 +32064,18 @@
     },
     {
       "path": "evidence/artifacts/jev-p1-20261003/README.md",
-      "sha256": "8387fb3bd98bdaf70e2a968d5843bd0dfe9a4c8106354b351e250f685688d325",
-      "bytes": 1577
+      "sha256": "bd0149a7003e7c05a80dd864491fbb565dc4b7aedaae5f03095a2d8236ceb032",
+      "bytes": 1800
     },
     {
       "path": "evidence/artifacts/jev-p1-20261003/draw-record.draft.json",
-      "sha256": "2e7462c09474a38af673a3f6d9ce5b8a4841c1e515fb4a787a967a0fa4a029ce",
-      "bytes": 23038
+      "sha256": "81aa2f561bbc99e4956a866e4f46844aeafd4e135138cee34486bd221a3bb59a",
+      "bytes": 23175
     },
     {
       "path": "evidence/artifacts/jev-p1-20261003/freeze-manifest.draft.json",
-      "sha256": "a7531504ddcdbc59f538fcb4337a81c06742e6b695d2ee49dbb8ff68377c7a8d",
-      "bytes": 4800
+      "sha256": "64c068d59b567e32fef106ea7c9a6cd749310822a357952abff73d976bf518b2",
+      "bytes": 5531
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260923-attempts/child-usage-wf_28d47bbc-1b5.json",
@@ -50739,13 +50749,13 @@
     },
     {
       "path": "tests/test_jev_p1_casepack.py",
-      "sha256": "1d75998d012e48c67a88d8d46a7ec4cf0268b884ebf442c23fe7b0d5b6c7c4d3",
-      "bytes": 22701
+      "sha256": "086ca9f60c893ff6abf3a75bc7fcece2bdf5cd03c7f2ae66248e61d2b2ac8dc5",
+      "bytes": 35069
     },
     {
       "path": "tests/test_jev_p1_scoring.py",
-      "sha256": "3993b5343fbee25d0345b96577beb30c5e97c9b689868c968739b3cd04561306",
-      "bytes": 19461
+      "sha256": "aee62cb9673621d743363726d2eefdb4e7a5c64b4f71967eaea0332ea53ad125",
+      "bytes": 28142
     },
     {
       "path": "tests/test_job_recovery.py",
