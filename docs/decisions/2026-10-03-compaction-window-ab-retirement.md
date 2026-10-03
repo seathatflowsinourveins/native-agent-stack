@@ -82,12 +82,12 @@ provided the exclusive upper edge, with A's 1,000,000 upper edge inclusive.
 These were experiment-validity rules, not upstream guarantees. [452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:88](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L88)
 [452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:935](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L935)
 
-The design had four frozen real-task bundles (builder, web research,
-verification and long review), three repetitions per task and three arms:
+The design had four proposed frozen (unsealed) real-task bundles (builder,
+web research, verification and long review), three repetitions per task and three arms:
 **4 × 3 × 3 = 36 attempts**. Each used a fresh coordinator process, owned
 worktree and task index. All 12 A focal children had to exceed 400,000 prompt
 tokens; an underlength, invalid, stopped or unmeasured run was incomplete.
-[452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:219](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L219) [452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:342](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L342) [452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:527](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L527)
+[452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:221](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L221) [452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:342](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L342) [452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:527](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L527)
 
 | Task | Repetition 1 | Repetition 2 | Repetition 3 |
 | --- | --- | --- | --- |
@@ -103,8 +103,9 @@ coordinator one-hour effects stayed separate. A fresh process did not prove
 a cache miss, and settings did not prove the TTL. The three repetitions
 established position balance and a descriptive range only. Paired variance,
 confirmatory sample size and statistical non-inferiority were unqualified.
-Deleting each whole repetition block in turn was a sensitivity check; an
-unstable ranking could not become adoption evidence. [452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:348](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L348)
+Deleting each whole repetition block in turn was a sensitivity check; a
+changed ranking or lost margin was unstable, and the check could not turn any
+pilot ranking into adoption evidence. [452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:348](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L348)
 [452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:355](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L355) [452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:366](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L366) [452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:383](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L383)
 
 Every arm was to use the same sealed settings packet and project-only
@@ -170,7 +171,7 @@ reserve was
 Each attempt's wall cap was 7,200 seconds; the complete cap had to be at least
 `271800 + 36*D + H` seconds for 36 attempts, 35 washouts, 36 drains and
 readiness/overhead. D, H and the numeric cap remained null; the action was
-**do not launch**. [452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:566](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L566) [452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:590](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L590) [452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:602](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L602) [452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:632](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L632)
+**do not launch**. [452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:566](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L566) [452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:590](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L590) [452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:603](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L603) [452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:632](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L632)
 
 The exact sealing rules are retained at [452f7b14:blueprints/compaction-window-ab/preregistration.json:1078](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/preregistration.json#L1078)–1080:
 
@@ -222,7 +223,7 @@ session or model call; its version inspection returned 2.1.283.
 | F1 host condition | At the user's request, peer a9 removed the window environment key after finding no primary recommendation for 400K or 40%; a backup existed. The coordinator's value-only read around 23:28Z returned `absent`; the settings-file mtime 23:21:57Z was not the unknown removal instant. Its shell still read 400000. Builder corroboration at 23:36:46Z was settings `absent`, shell 400000. Incumbent A replaced the superseded 18:59Z B condition; A's explicit environment removal and all-arm settings isolation stayed necessary. | [452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:929](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L929) |
 | F2 autocompact buffer | Native display observation on installed 2.1.283: `/context` displayed **33k** at unset (1m), 400000, 200000 and 100000. It was not an automatic compaction event or measured threshold. The official default about 967K corroborated 1,000,000 − 33,000; B/C expected triggers were 367000/167000. | [452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:930](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L930) |
 | F3 consequence | Old C band 180000–220000 excluded its nominal ~167000 trigger; a child near the trigger would be invalid, while an overshoot to 190000 would meet the old band. Old B 360000–440000 held 367000 by only 7000. The final wording corrected the overclaim that every C child would be invalid. | [452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:931](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L931) |
-| F4 native events | “Peer a9, value-level, coordinator-relayed”: automatic `compact_boundary` entries, `compactMetadata.preTokens`, all main/subagent transcripts including Workflow children, 18:59:21Z–23:23:33Z. Of 35 events, the 31 under 400000 had min 366,209, median 368,563, max 432,724: 18 main, 13 subagent. Four pre-switch-launched sessions' events spanned 618,371–922,073. Before the switch, every event was 966,908–971,662. The proposed symmetric B band 330300–403700 would exclude 432,724 (+17.9%); partition bands retained overshoot. | [452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:932](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L932) |
+| F4 native events | “Peer a9, value-level, coordinator-relayed”: automatic `compact_boundary` entries, `compactMetadata.preTokens`, all main/subagent transcripts including Workflow children, 18:59:21Z–23:23:33Z. Of 35 events, the 31 from sessions running 400000 spanned 366,209–432,724 (median 368,563; 18 main, 13 subagent). Four pre-switch-launched sessions' events spanned 618,371–922,073. Before the switch, every event was 966,908–971,662. The proposed symmetric B band 330300–403700 would exclude 432,724 (+17.9%); partition bands retained overshoot. | [452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:932](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L932) |
 | F5 implementation reading | Peer a9 reported from the installed 2.1.283 binary: threshold = (window − min(model max output, 20000)) − 13000. This was **“peer-supplied, undocumented implementation reading”**; binary offsets were omitted. No rule relied on it. It disagreed with the docs about capping the output reserve; the protocol instead relied on F2, the documented default and F4. | [452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:933](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L933) |
 
 The four F4 events were classified by the coordinator as **transition
@@ -376,7 +377,7 @@ Each reason has a public source:
    This counts lines, not every repeated occurrence. The destination's
    [read-only native-command observation](https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5964814555)
    reports Claude Code **2.1.288**; it is not full host acceptance.
-   The draft's installed pin is documented at [452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:29](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L29).
+   The draft's installed pin is documented at [452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:30](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L30).
 3. **Its sequencing target moved.** The
    [roadmap's “after Gate A” entry](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-28-ecosystem-roadmap.md#L227)
    sequenced #416 after Gate A. The user's
@@ -389,10 +390,10 @@ Each reason has a public source:
    not the new destination's baseline. [452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:96](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L96)
    [docs/decisions/2026-09-28-community-sweep.md:525](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-28-community-sweep.md#L525)
 5. **The five launch-gate groups were never resolved.** They remain in the
-   pinned unresolved-gates section and are repeated in the
-   [custody notice](https://github.com/seathatflowsinourveins/native-agent-stack/pull/416#issuecomment-5967134584);
-   structural passes do not qualify inheritance, metering, bounds, adapters
-   or sealing. [452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:763](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L763) [452f7b14:blueprints/compaction-window-ab/preregistration.json:1064](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/preregistration.json#L1064)
+   pinned unresolved-gates section, and the
+   [custody notice](https://github.com/seathatflowsinourveins/native-agent-stack/pull/416#issuecomment-5967134584)
+   states that the five launch gates are unresolved; structural passes do not
+   qualify inheritance, metering, bounds, adapters or sealing. [452f7b14:blueprints/compaction-window-ab/PREREGISTRATION.md:763](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/PREREGISTRATION.md#L763) [452f7b14:blueprints/compaction-window-ab/preregistration.json:1064](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/preregistration.json#L1064)
 6. **Re-freezing this pilot would not produce a decision-changing protocol.**
    Its own adoption rule permits only nomination for a separate confirmatory
    cohort, and `pilot_allows_persistent_adoption` is false.
@@ -400,10 +401,12 @@ Each reason has a public source:
 7. **Current A/B/E2E work must use an upstream harness.** The
    [standing harness rule](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-30-rule-text-every-layer.md#L34)
    names Harbor or Inspect for containerized agent tasks and prohibits a
-   self-written runner. The
-   [re-aimed E2E](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-01-definitive-sota-wsl-program.md#L371)
+   self-written runner. The Gate A owner's
+   [recommended path R](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-01-definitive-sota-wsl-program.md#L371)
    and [Amendment 4 plan](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-01-definitive-sota-wsl-program.md#L400)
-   apply that requirement; none launches this retired pilot.
+   follow that rule (the harness choice was
+   [still open at the base](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-01-definitive-sota-wsl-program.md#L366));
+   none launches this retired pilot.
 8. **Claude Code remains the native companion.**
    [docs/decisions/2026-10-02-two-host-north-star-architecture.md:56](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-02-two-host-north-star-architecture.md#L56)
    assigns that role and preserves its native model/effort, authentication
@@ -486,8 +489,9 @@ cites #416 and `452f7b14` at all of these retained locations:
 | --- | --- |
 | [blueprints/gate-b-gpt6-route/PREREGISTRATION.md](https://github.com/seathatflowsinourveins/native-agent-stack/blob/caea04f28d7dcd5d428155cf1a24b28423cba1ce/blueprints/gate-b-gpt6-route/PREREGISTRATION.md#L17) | 17, 532, 560, 707, 709, 729 |
 | [blueprints/gate-b-gpt6-route/preregistration.json](https://github.com/seathatflowsinourveins/native-agent-stack/blob/caea04f28d7dcd5d428155cf1a24b28423cba1ce/blueprints/gate-b-gpt6-route/preregistration.json#L1736) | 1736, 1803, 4105, 4110, 4137 |
+| [tests/test_gate_b_gpt6_route_preregistration.py](https://github.com/seathatflowsinourveins/native-agent-stack/blob/caea04f28d7dcd5d428155cf1a24b28423cba1ce/tests/test_gate_b_gpt6_route_preregistration.py#L4) | 4 |
 
-Their fail-first and amendment-rule citations remain resolvable through
+Their fail-first, amendment-rule and test reference-seam citations remain resolvable through
 `refs/pull/416/head` and the preserved branch, including
 [452f7b14:blueprints/compaction-window-ab/preregistration.json:1078](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/blueprints/compaction-window-ab/preregistration.json#L1078) and
 [452f7b14:tests/test_compaction_window_ab_preregistration.py:1](https://github.com/seathatflowsinourveins/native-agent-stack/blob/452f7b14715ae2a038c1d4a98e292b5de7812c87/tests/test_compaction_window_ab_preregistration.py#L1).
