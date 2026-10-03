@@ -47,10 +47,13 @@ does, and keep each job's name, so the required contexts would not change.
 | macos-15 | G3T | 3 shard steps without `tests.test_secret_path_guard`, then the serial tail |
 
 Three repeats per arm, `fail-fast: false`. Linux holds at most two serial and two sharded jobs at once (four timed
-jobs); macOS at most one of each, so with the control job no more than three of the plan's five macOS slots. The
-serial and sharded arms are separate jobs so that no step inside a `parallel:` group carries an `if:`, which the
-reference does not document there; macOS's limit of two timed jobs at once is therefore one serial plus one sharded
-job (`max-parallel: 1` each), beside the one control job.
+jobs); macOS at most one of each, so with the control job the macOS workflow holds no more than three of the plan's
+five macOS slots. The same opening also starts three macOS jobs of `adoption-bootstrap.yml`, because this pull
+request changes `manifests/evidence.json`, one of that workflow's bootstrap paths: bootstrap-macos,
+bootstrap-macos-brew and validate-macos, so up to six macOS jobs meet five slots (see "Risks"). The serial and
+sharded arms are separate jobs so that no step inside a `parallel:` group carries an `if:`, which the reference does
+not document there; macOS's limit of two timed jobs at once is therefore one serial plus one sharded job
+(`max-parallel: 1` each), beside the one control job.
 
 Shard lists are built at run time, in each workflow's inventory job, from the test files of the checked-out head by
 the frozen `make_shards.py` (longest-processing-time-first over files, from the frozen `weights.json`; a file missing
@@ -59,8 +62,10 @@ unless loading every `tests/test_*.py` by name gives exactly the discovery ids, 
 to import, and every file is in exactly one list or the tail of each arm.
 
 Every shard step is a plain `run:` step with no expression in its script; it runs its list with
-`python3 -m unittest -v`, records the exit status and exits with it, so a failing shard fails its step, the group and
-the job, as production would. Each shard step has a hang guard (`timeout-minutes` 25 on Linux, 40 on macOS).
+`python3 -m unittest -v`, records the exit status and exits with it, so a failing shard is expected to fail its step,
+the group and the job, as production would (the reference's lines 1078-1086; the control job measures it). Each shard
+step has a hang guard (`timeout-minutes` 25 on Linux, 40 on macOS), expected to stop the step; the hang control
+measures that on each OS.
 
 ## The preregistered rule
 
@@ -74,16 +79,32 @@ The full text is `experiment.json`'s `quality_rule`; `README.md` gives the same 
   `python3 -m unittest -v` plus its list, the lists are the inventory's, every log ran exactly its modules' ids, the
   union is the inventory with each id once, the `(kind, key, outcome)` records equal the first eligible S run outside
   the flaky ids, every step ran S's Python version, and the checkout, attempt, head and step-time rules hold.
-- **Controls** per OS: one job runs the arms' shard step body in one `parallel:` group on a passing, a failing, a
-  crashing (`os._exit(3)`) and a hanging control (stopped by a 1-minute step limit). The job must fail, the exit
-  statuses must be 0, 1, 3 and none (stopped), every background step must run the foreground step's Python and see a
+- **Controls** per OS: one job runs the arms' shard step body in one `parallel:` group on a passing control, a
+  hanging control (stopped by a 1-minute step limit, writing a heartbeat), a control that fails one test after 90 s
+  and one that ends its process with `os._exit(3)` after 120 s, so the last two must outlive a sibling's stop and a
+  sibling's failure. Each step has an `id`, and the finish step records each step's own outcome from the steps
+  context. The job must fail; the exit statuses must be 0, none (stopped), a non-zero status with
+  `FAILED (failures=1)`, and 3; the steps' own outcomes success, failure, failure, failure; the steps must start
+  within 30 s of each other; the hang control's process must be alive at least 50 s after its step started and the
+  group must end less than 240 s after that; every background step must run the foreground step's Python and see a
   variable exported through `GITHUB_ENV` by an earlier step. A second job asserts this. Whether background steps
-  start with SIGINT or SIGQUIT ignored is recorded, not judged.
+  start with SIGINT or SIGQUIT ignored, and whether the hang control's process outlives its step, are recorded and
+  reported, not judged.
 - **Decision**, per OS: an arm is eligible with three eligible runs and passed controls; S ineligible gives no
   verdict; no eligible sharded arm gives reject; otherwise take the eligible arm with the smaller median step time
   (a tie goes to G), and adopt only if its median is at most 3/5 of the S median and its slowest run at most 3/4 of the
-  fastest S run, as exact fractions; otherwise reject, with no fall-through. A cancelled or partial run is recorded
-  as incomplete, never as a rule outcome; a failed inventory gate gives no verdict.
+  fastest S run, as exact fractions; otherwise reject, with no fall-through. Checked before any of this and never a
+  rule outcome, the OS is incomplete after any re-run (the compare job's own run attempt, or any run or control
+  directory's, other than 1), a cancelled or skipped job or a missing run, a run whose test phase never started
+  (its clock-start step did not succeed: a setup failure, never ineligibility and never a hand-over to the other
+  arm), a control run whose group never started, or an inventory job that failed before its gate reported; a failed
+  inventory gate gives no verdict.
+- **Which run decides**, per OS: the first workflow run whose compare result (attempt 1) is adopt, reject or no
+  verdict; later runs are reported and cannot overturn it. A repeat, by closing and reopening the pull request when
+  neither trial workflow is running, is allowed only after an incomplete run or one whose compare job wrote no
+  `result.json`. No job is ever re-run, the compare job included. `cancel-in-progress: true`: a reopen during a run
+  cancels it (incomplete) instead of queueing an unattended second run; under the deciding-run rule either setting
+  keeps the outcome valid, so the choice is about macOS slots and attendance.
 
 ## Lessons of the first trial applied
 
@@ -93,15 +114,18 @@ The full text is `experiment.json`'s `quality_rule`; `README.md` gives the same 
    each with its 9,853 parsed records equal to the serial run's. A first attempt differed only because a shell's
    background job started the shards with SIGINT and SIGQUIT ignored, which skipped a SIGQUIT subtest.
 2. **The observed record cannot land on the trial branch.** Each workflow runs only on `opened` and `reopened`, with
-   a paths filter on its own file and no `synchronize`; to repeat the trial, close and reopen the pull request. A job
-   re-run still voids its arm-run (`run_attempt` must be 1). "Re-run failed jobs" would also re-run the control job,
-   which fails by design, and so fail the controls; only the compare job may be re-run on its own.
+   a paths filter on its own file and no `synchronize`; to repeat the trial after an incomplete run, close and reopen
+   the pull request. No job is ever re-run: any run attempt other than 1, the compare job's own included, makes the
+   OS incomplete in `compare.py`, not merely the touched run ineligible, so a re-run can neither reject an OS (as a
+   re-run control job failing its attempt check would have) nor hand the decision to the other arm.
 3. **Two independent workflows**, each with its own ubuntu-24.04 inventory job, arms, controls and compare job, so a
    stalled macOS queue never holds the Linux evidence and either run can be cancelled alone.
 4. **Counts agree everywhere and the limits are stated**: n = 3; the controls are synthetic fixtures executed on the
-   hosted runner; the hosted jobs run no model.
-5. **Self-review for the review bot's classes of finding** before hand-over: arithmetic, retention, coverage gaps
-   and design holes (the concurrency group's queued run is described in both workflows and in `README.md`).
+   hosted runner; the hosted jobs run no model; hosted behaviour that no run has measured is stated as an
+   expectation with the first-run check that settles it (`README.md`, "First-run checklist").
+5. **Self-review and independent review before the first push**: arithmetic, retention, coverage gaps and design
+   holes; an independent evidence review and a security review of this preregistration were resolved before any
+   hosted run (`experiment.json`, `discovery_provenance`).
 
 ## Alternatives considered
 
@@ -139,7 +163,8 @@ Each line relays only what was read at the cited source; the comparison came fro
 - This trial's outcome per OS: **adopt** opens a separately reviewed adoption pull request for that OS (below);
   **reject**, **no verdict** or **incomplete** keeps the serial command and is recorded as a failed or partial attempt.
 - GitHub changes the documented semantics or limits of `parallel:` or background steps (workflow-syntax reference),
-  or the controls show that background steps do not honour `timeout-minutes`, `GITHUB_ENV` or the interpreter.
+  or the controls show that background steps do not honour `timeout-minutes`, `GITHUB_ENV` or the interpreter, that
+  a failing background step does not fail on its own, or that one step's stop or failure stops its siblings.
 - After an adoption, a failure that appears only in sharded runs.
 - A suite change that makes the inventory gate fail (a file loaded only by discovery, an id loaded twice).
 
@@ -151,9 +176,37 @@ Each line relays only what was read at the cited source; the comparison came fro
 - **Environment of background steps.** The reference covers exports made by a background step, not whether earlier
   `GITHUB_ENV` exports and `actions/setup-python`'s `PATH` reach one; if not, the shard holding
   `tests.test_shell_parser_ci` fails its tripwire, or a macOS shard runs another Python, and the run is ineligible.
+- **Step outcomes of background steps.** GitHub's published workflow schema (actions/languageservices
+  `workflow-parser/src/workflow-v1.0.json` at `880ac43b`, lines 2168-2197 and 2255-2270) lets a step inside
+  `parallel:` carry an `id`, and the runner source (actions/runner v2.337.0, `BackgroundStepCoordinator.cs` lines
+  371-392) flushes each waited step's outcome and conclusion at the group's wait; that the hosted service fills
+  `steps.<id>` for them is unmeasured. If it does not, the controls fail and the OS gets reject (fail-closed); the
+  first run reads the controls' recorded outcomes.
+- **Stopping a timed-out step.** The runner source signals only the step's own shell (`ProcessInvoker.cs` lines
+  443-465, 829-853 and 855-869; `ScriptHandler.cs` line 346) and records a timed-out background step as failed
+  (`BackgroundStepCoordinator.cs` lines 244-248), so a stopped shard's Python process is expected to live on until the
+  job ends. Unmeasured; the hang control's heartbeat measures it and reports it without judging it. A stopped shard
+  writes no exit status, so its run is ineligible either way, and every job's own `timeout-minutes` bounds it.
+- **Re-runs.** No re-run is permitted, so the first run cannot show whether a re-run job's upload
+  (`overwrite: false`, which fails if an artifact of that name already exists: actions/upload-artifact `action.yml`
+  at `043fb46d`, lines 37-42) collides with the first attempt's artifact, or whether a job re-run also re-runs the
+  jobs that need it. `compare.py` gives incomplete in each case.
+- **macOS slots.** Up to six macOS jobs (this trial's three and adoption-bootstrap's three, started by the
+  `manifests/evidence.json` change) meet the plan's five slots at the opening, the queueing hazard that kept the first
+  trial's macOS jobs from starting. The coordinator opens the pull request when the macOS queue is not saturated and
+  reads the queue before and after; queue time does not enter `step_seconds`.
+- **Egress audit on macOS.** harden-runner's agent logged a non-fatal installation warning on a previous hosted
+  validate-macos run (`evidence/artifacts/wsl-retrieval-retirement-20261003/ci-correction.md`, line 7). The first run
+  reads one macos-15 job's harden-runner log; if the agent did not start, the outcome record says macOS egress was
+  unaudited. The jobs hold no secret and a read-only token.
 - **zizmor's experimental support for parallel steps** (zizmor 1.30.1 warns, and its `docs/usage.md` at v1.30.1 calls it
-  experimental): audit coverage inside the groups is not established; the shard steps are plain `run:` steps with no
-  expression in their scripts. actionlint 1.17.0 parses the groups and runs shellcheck on their scripts.
+  experimental). Measured on scratch copies of the Linux workflow (offline, `--no-config --no-ignores --persona
+  regular`): template-injection, unpinned-uses and artipacked report constructs planted inside a `parallel:` group
+  exactly as outside it, and github-env too under a `pull_request_target` trigger; other audits were not probed. The
+  trial's group steps carry no expression, action, `if:` or `GITHUB_ENV`/`GITHUB_PATH` write, which
+  `test_compare.py` checks. actionlint 1.17.0 parses the groups, their step ids and their scripts with shellcheck.
+- **Text the pull request controls.** Log tails, loader errors and inventory problems reach the job logs and the step
+  summary; the record is `result.json`, the exit files and the job results, never the rendered summary.
 - **Runner noise.** Shared hosted runners vary (the first trial's serial runs took 1,186 to 1,688 s on one image);
   n = 3 bounds this only loosely.
 - **Shard drift.** The lists change with every new test file; a file missing from the weights takes the mean weight.
@@ -169,7 +222,9 @@ Each line relays only what was read at the cited source; the comparison came fro
 - The preflight ran on another machine (48 cores), another CPython patch release (3.13.16, against 3.12 on the Linux
   runner) and an earlier base (`d2777ee7`); it is local integration evidence, not a hosted run.
 - n = 3 per arm. Hosted macOS has never run this suite in shards, and the first trial never ran on macOS at all.
-- The local oracle dry run used the coordinator's real logs with synthetic metadata and `--skip-list-recompute`.
+- The local oracle dry run used the coordinator's real logs with synthetic metadata, `--min-repeats 1` and
+  `--skip-list-recompute`; it shows the comparison on real logs, not a verdict.
+- Artifact attribution checks names and layout, not authorship: every arm job runs the pull request head.
 - The macOS inventory is built on ubuntu-24.04 with the arms' Python line; a platform-dependent id gives no verdict.
 - Skip reasons are not compared; side effects that leave outcomes unchanged are invisible to the oracle.
 
@@ -177,10 +232,11 @@ Each line relays only what was read at the cited source; the comparison came fro
 
 No usage claim. The hosted jobs run deterministic commands and no model; the model usage of the sessions that built
 this trial is not recorded and stays unknown. Evidence classes so far: local integration (the coordinator's preflight,
-the inventory gate at the base, the oracle's dry run on real logs, the oracle's 62 tests on CPython 3.13.16 and 3.12.3),
-synthetic fixtures (real local runs of a fixture suite and of the controls) and source review (the GitHub
-documentation, CPython and the alternatives at their pins). Nothing here is native execution on a hosted runner or
-upstream acceptance; the controls, once run, are synthetic fixtures executed on the hosted runner.
+the inventory gate at the base, the oracle's dry run on real logs), synthetic fixtures (real local runs of a fixture
+suite and of the controls, on which the oracle's 84 tests pass on CPython 3.13.16 and 3.12.3), a local probe of
+zizmor on planted constructs, and source review (the GitHub documentation, GitHub's workflow schema, the runner
+source, CPython and the alternatives at their pins). Nothing here is native execution on a hosted runner or upstream
+acceptance; the controls, once run, are synthetic fixtures executed on the hosted runner.
 
 ## After the run
 
@@ -188,7 +244,10 @@ The observed record goes to a separate records pull request; the trial branch is
 That pull request carries an outcome record under `docs/decisions/`, a receipt under `evidence/receipts/` and sanitized
 artifacts (the compare artifact's `result.json`, `summary.md` and `checkout-status.json`, a byte copy of this
 preregistration, sanitized log excerpts), because the run's artifacts expire after 30 days and its records under the
-repository's 90-day retention.
+repository's 90-day retention. It names the deciding run per OS, reports every other run and attempt with the reason
+for each repeat, and records the answers of `README.md`'s first-run checklist (the macOS queue before and after the
+opening, every attempt, the controls' step outcomes, spans and heartbeat, the probes, the macOS harden-runner log),
+taking every number from `result.json`, the exit files and the jobs API.
 
 A passing result would lead, for each adopting OS, to an adoption pull request that also builds the shard lists at
 run time inside the production job, updates `tests/test_workflow_hardening.py` for sharded whole-suite jobs (the
@@ -205,7 +264,18 @@ guard test (every test file in exactly one shard). None of that is done here.
   (`needs.<job_id>.result`). GitHub changelog of 2026-06-25:
   https://github.blog/changelog/2026-06-25-actions-steps-can-now-be-run-in-parallel/
 - actions/download-artifact at `3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c`, `src/download-artifact.ts` lines 85-95, 149-163
-  and 176-246 (a pattern that matches nothing downloads nothing; a missing name fails).
+  and 176-246 (a pattern that matches nothing downloads nothing; a missing name fails; lines 186-195: without
+  `merge-multiple` each artifact gets its own directory unless exactly one matches); actions/upload-artifact at
+  `043fb46d1a93c77aae656e7c1c64a875d1fc6a0a`, `action.yml` lines 37-42 (`overwrite`).
+- actions/languageservices at `880ac43bc39b0fd7b735ff7976044289bbea3724`, `workflow-parser/src/workflow-v1.0.json`
+  lines 2168-2197 and 2255-2270 (a step inside `parallel:` may carry an `id`).
+- actions/runner v2.337.0 (`397b032cbf865e9c3ddfab89d533ec19325e1273`): `src/Runner.Worker/BackgroundStepCoordinator.cs`
+  lines 63, 78, 225, 244-248 and 371-392; `src/Runner.Sdk/ProcessInvoker.cs` lines 443-465, 829-853 and 855-869;
+  `src/Runner.Worker/Handlers/ScriptHandler.cs` line 346.
+- github/docs at `a3e0414f748215594e8605810f1c7d82cf781683`,
+  `content/actions/how-tos/manage-workflow-runs/re-run-workflows-and-jobs.md`; at
+  `336b7f546d9443dab4e1fa4f0f470e45448c7abc`, `data/reusables/actions/actions-group-concurrency.md` line 11
+  (`cancel-in-progress: true`).
 - python/cpython at v3.13.16 (`cbc944f4bc59639a444dd971c737788ba2283a91`): `Lib/unittest/main.py` lines 144-153 and
   231-234, `Lib/unittest/loader.py` lines 100-117, `Lib/unittest/async_case.py` line 42, `Python/pytime.c` lines 1164-1170
   and 1202-1203; at v3.12.3 (`f6650f9ad73359051f3e558c2431a109bc016664`): `Lib/unittest/main.py` lines 155-164 and
@@ -216,7 +286,8 @@ guard test (every test file in exactly one shard). None of that is done here.
 - The alternatives at the pins and lines cited above: craigahobbs/unittest-parallel `bda5d77`, pytest 9.1.1,
   pytest-xdist v3.8.0, mtreinish/stestr 4.2.1, nose-devs/nose2 0.16.0, CleanCut/green 4.0.2 (and its PyPI JSON),
   cgoldberg/concurrencytest 0.1.11, GNU findutils 4.10.0 `xargs(1)`.
-- zizmor 1.30.1 (`docs/usage.md` at v1.30.1, "Parallel steps"); kjanat/actionlint 1.17.0 (validate.yml lines 71-96).
+- zizmor 1.30.1 (`docs/usage.md` at v1.30.1, "Parallel steps"; the installed binary for the local probe);
+  kjanat/actionlint 1.17.0 (validate.yml lines 71-96).
 - In-repository: `docs/acceptance-evidence-policy.md` and `docs/lanes.md` (hot-file protocol). Not in this
   repository: plan W1 of 2026-10-03 (a coordinator's approved plan) and the first trial's outcome record
   (`docs/decisions/2026-10-03-suite-parallelism-trial-outcome.md`, on an unmerged branch when this record was written).
