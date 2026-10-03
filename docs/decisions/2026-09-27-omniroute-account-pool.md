@@ -487,7 +487,7 @@ rests on source (OR50 `open-sse/executors/codex.ts` L346-347).
 ## Limitations and residuals
 
 - **Upstream CI is red on the base** (#14866). The build is a recorded canary, not a release.
-  - **Update 2026-10-03.** #14866 closed at 2026-09-27T08:46:47Z ("release-green again at a58000c76"), as retained in
+  - **Update 2026-10-03.** #14866 closed at 2026-09-27T08:46:47Z ("release-green again at `a58000c76`"), as retained in
     [`upstream-issue-14866.json`](../../evidence/artifacts/omniroute-features-20260927/upstream-issue-14866.json) and
     [the feature-resolution record](2026-09-27-omniroute-feature-resolution.md#status-on-2026-10-03-later-builds-and-each-remeasurement-promise).
     Lines 102 and 489 above predate that closure. The build stayed a canary because its head was off the release line;
