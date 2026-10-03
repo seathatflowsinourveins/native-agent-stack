@@ -7788,6 +7788,16 @@
       "bytes": 16076
     },
     {
+      "path": "blueprints/gpt6-lane-compression-ab/PREREGISTRATION.md",
+      "sha256": "a005e3193ba3b16592cfea273294a9210cc1f7ab5af327e2b6f24307ddb9f2fd",
+      "bytes": 52252
+    },
+    {
+      "path": "blueprints/gpt6-lane-compression-ab/preregistration.json",
+      "sha256": "34554a57569d8cbaff2fccf101b488eb743be19e14f6d7e623c90fc9ce582206",
+      "bytes": 272524
+    },
+    {
       "path": "blueprints/memory-lifecycle-probe/README.md",
       "sha256": "c50ba6b05cba66095a357f1185429761b251462b9b91d1d23a51532b317bc042",
       "bytes": 9126
