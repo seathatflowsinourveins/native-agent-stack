@@ -15761,8 +15761,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-two-host-north-star-architecture.md",
-      "sha256": "f3234c014072e6a567a42fcc989c7e8bf716823f52c96a633bbe76e1c8d10e26",
-      "bytes": 16881
+      "sha256": "64d49f2de46d3309d7802678039caac1609027b8f00b561987e464e94432847f",
+      "bytes": 21453
     },
     {
       "path": "docs/direct-results.md",
