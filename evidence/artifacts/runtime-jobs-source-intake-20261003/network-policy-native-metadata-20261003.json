@@ -1,0 +1,294 @@
+{
+  "schema_version": 1,
+  "kind": "native-installed-tool-metadata-and-cleanup",
+  "date": "2026-10-03",
+  "completed_at": "2026-10-03 20:04:24 UTC",
+  "input_packet": {
+    "installed-input-helper-recipe.json": {
+      "bytes": 95278,
+      "sha256": "dabef94c050f10bfea2bcdfe29260f84e547cb6a363350e60c7949a1ee32f9df"
+    },
+    "source-inventory.json": {
+      "bytes": 9546,
+      "sha256": "a24b795531c489b739d68ddb976726f834b57d052e8552499fb43e456da49975"
+    }
+  },
+  "source_method": {
+    "packet": {
+      "installed-input-helper-recipe.json": {
+        "bytes": 95278,
+        "sha256": "dabef94c050f10bfea2bcdfe29260f84e547cb6a363350e60c7949a1ee32f9df"
+      },
+      "source-inventory.json": {
+        "bytes": 9546,
+        "sha256": "a24b795531c489b739d68ddb976726f834b57d052e8552499fb43e456da49975"
+      }
+    },
+    "verdict": "Astra/max ACCEPT exact v2 for one render and eleven bounded metadata helpers; no policy admission",
+    "source": "DockerCLI7fc inspector.go148-155,6094B/SHA80862408df50bc1c1530423c92d79eed9f359b19fb8fc791009eedbdbfabb463",
+    "original_failure": "retained; frozen empty stdout FAILED, actual oneLF",
+    "policy": "HOLD"
+  },
+  "scope": "One native Compose render and eleven stock guest metadata commands in isolated no-network containers. Installation/parser/lifecycle metadata only; not an upstream benchmark/test suite, controlled policy experiment, actual task-runtime run or measured default.",
+  "originals": {
+    "native_commands": 46,
+    "native_exit_counts": {
+      "0": 12,
+      "1": 33,
+      "2": 1
+    },
+    "private_original_record": {
+      "bytes": 137779,
+      "sha256": "f3bb8c76d099c4e29c4a6d2378ca0042b9c44a2bf308beb58ea95516b542317e"
+    },
+    "raw_capture_files": "Separate original stdout/stderr plus fresh native CID files retained in task-owned private metadata-captures-02; earlier failed captures unchanged",
+    "command_contract": "Exact source-admitted argv, accepted isolated client wrapper, unique names/native CIDfiles, --network none, --pull never and native finite timeouts. No host credential/config body or host mount."
+  },
+  "helpers": [
+    {
+      "id": "curl-version",
+      "native_exit": 0,
+      "expected_native_exit": 0,
+      "stdout": {
+        "bytes": 483,
+        "sha256": "92867a0ded55f6f4bef068d44dab888686b69df41ba5ae34aef4ada2858e31ce"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gates": {
+        "expected_native_exit": 0,
+        "exit_matched": true,
+        "content_matched": true,
+        "independent_name_and_id_cleanup": true
+      },
+      "native_child_output": "curl 8.22.0 (x86_64-pc-linux-musl) libcurl/8.22.0 OpenSSL/3.5.8 zlib/1.3.2 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.5 libssh2/1.11.1 nghttp2/1.69.0 mit-krb5/1.22.2\nRelease-Date: 2026-09-02\nProtocols: dict file ftp ftps gopher gophers http https imap imaps ipfs ipns mqtt mqtts pop3 pop3s rtsp scp sftp smtp smtps telnet tftp ws wss\nFeatures: alt-svc AsynchDNS brotli GSS-API HSTS HTTP2 HTTPS-proxy IDN IPv6 Kerberos Largefile libz PSL SPNEGO SSL threadsafe UnixSockets zstd"
+    },
+    {
+      "id": "curl-help",
+      "native_exit": 0,
+      "expected_native_exit": 0,
+      "stdout": {
+        "bytes": 18126,
+        "sha256": "ad1c42cf64f70ca40faf14eeeb8ead983aa274dacb6253f7f525d8d0f4fad876"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gates": {
+        "expected_native_exit": 0,
+        "exit_matched": true,
+        "content_matched": true,
+        "independent_name_and_id_cleanup": true
+      }
+    },
+    {
+      "id": "sleep-help",
+      "native_exit": 0,
+      "expected_native_exit": 0,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 225,
+        "sha256": "a2be6ce58892d3c576ce78cc09dbb13d3d034ce53379faaeaab8ea7490d3a465"
+      },
+      "gates": {
+        "expected_native_exit": 0,
+        "exit_matched": true,
+        "content_matched": true,
+        "independent_name_and_id_cleanup": true
+      }
+    },
+    {
+      "id": "python-version",
+      "native_exit": 0,
+      "expected_native_exit": 0,
+      "stdout": {
+        "bytes": 15,
+        "sha256": "9bdce2f3bc127762fcb79db8faf0385c42e81e916436db64486d7162bc1d04e0"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gates": {
+        "expected_native_exit": 0,
+        "exit_matched": true,
+        "content_matched": true,
+        "independent_name_and_id_cleanup": true
+      },
+      "native_child_output": "Python 3.12.15"
+    },
+    {
+      "id": "python-http-help",
+      "native_exit": 0,
+      "expected_native_exit": 0,
+      "stdout": {
+        "bytes": 585,
+        "sha256": "13c0f8e2725a159a71c41e187a7c340d25b50410b3af8d002f187203e40428d3"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gates": {
+        "expected_native_exit": 0,
+        "exit_matched": true,
+        "content_matched": true,
+        "independent_name_and_id_cleanup": true
+      }
+    },
+    {
+      "id": "policy-help",
+      "native_exit": 2,
+      "expected_native_exit": 2,
+      "stdout": {
+        "bytes": 267,
+        "sha256": "c8cb01e4bb2466e05bad4f4ee57191b22b0f4e8a209580d357fe1887771bf659"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gates": {
+        "expected_native_exit": 2,
+        "exit_matched": true,
+        "content_matched": true,
+        "independent_name_and_id_cleanup": true
+      }
+    },
+    {
+      "id": "policy-source-hash",
+      "native_exit": 0,
+      "expected_native_exit": 0,
+      "stdout": {
+        "bytes": 196,
+        "sha256": "582517f76ba5c39b052aed5644b813334a7f25ca077141c148f7409bc4f4803b"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gates": {
+        "expected_native_exit": 0,
+        "exit_matched": true,
+        "content_matched": true,
+        "independent_name_and_id_cleanup": true
+      },
+      "native_child_output": "ff1cacfb95e17cda3668f389176ae54e5e4139cff12ee54b4d745722ad0ff0b2  /usr/local/bin/network-policy\n2e225ed745eb5976f93afd52d91c844b954b5f6f45373fb70c4c509e36d1e069  /opt/egress-sidecar/entrypoint.sh"
+    },
+    {
+      "id": "gost-version",
+      "native_exit": 0,
+      "expected_native_exit": 0,
+      "stdout": {
+        "bytes": 34,
+        "sha256": "ba3d4c8ea762b7055ef98a83e558c866d90e4c216cdc2471704bc3cf16f24f4e"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gates": {
+        "expected_native_exit": 0,
+        "exit_matched": true,
+        "content_matched": true,
+        "independent_name_and_id_cleanup": true
+      },
+      "native_child_output": "gost 3.3.0 (go1.26.3 linux/amd64)"
+    },
+    {
+      "id": "gost-help",
+      "native_exit": 0,
+      "expected_native_exit": 0,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 316,
+        "sha256": "f23fd12d0afa1aed232fbb14b58c08bc24b5ff5ec1b71032e43b366a6284ee67"
+      },
+      "gates": {
+        "expected_native_exit": 0,
+        "exit_matched": true,
+        "content_matched": true,
+        "independent_name_and_id_cleanup": true
+      }
+    },
+    {
+      "id": "nft-version",
+      "native_exit": 0,
+      "expected_native_exit": 0,
+      "stdout": {
+        "bytes": 41,
+        "sha256": "b8bb93fd315947d767366b9cccf96eabbcb751eeead2022f8dbbbefe3556647a"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gates": {
+        "expected_native_exit": 0,
+        "exit_matched": true,
+        "content_matched": true,
+        "independent_name_and_id_cleanup": true
+      },
+      "native_child_output": "nftables v1.1.5 (Commodore Bullmoose #6)"
+    },
+    {
+      "id": "nft-help",
+      "native_exit": 0,
+      "expected_native_exit": 0,
+      "stdout": {
+        "bytes": 1772,
+        "sha256": "c074d6b09381ed6e8c6516c365a7a14b0512d43135ab268e720ccdcab152cb7a"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "gates": {
+        "expected_native_exit": 0,
+        "exit_matched": true,
+        "content_matched": true,
+        "independent_name_and_id_cleanup": true
+      }
+    }
+  ],
+  "cleanup": {
+    "independent_exact_name_and_native_id_absence_pairs": 11,
+    "native_absence_exit": 1,
+    "stdout_exact_alternatives": [
+      "",
+      "\n"
+    ],
+    "stderr": "Explicit native not-found diagnostic names the exact queried name/actual ID; every original capture retained. Other errors cannot establish absence.",
+    "final_owner_inventory": true,
+    "final_owner_inventory_native_exit": 0,
+    "final_owner_inventory_stdout_bytes": 0,
+    "owned_remove_operations": 0
+  },
+  "source_facts": {
+    "policy_sha256": "ff1cacfb95e17cda3668f389176ae54e5e4139cff12ee54b4d745722ad0ff0b2",
+    "entrypoint_sha256": "2e225ed745eb5976f93afd52d91c844b954b5f6f45373fb70c4c509e36d1e069",
+    "gost_actual_native_version": "3.3.0",
+    "gost_image_tag": "3.2.7-nightly.20260602",
+    "gost_compiled_git_revision": null,
+    "gost_distinction": "The image digest pins the delivered binary; tag text does not establish compiled version/revision.",
+    "docker_inspect_lf_source": "https://github.com/docker/cli/blob/7fc2dff9bceb96b266a3b2c3117c0955a0d9e616/cli/command/inspect/inspector.go#L148"
+  },
+  "prior_failure": "network-policy-native-helper-first-precheck-20261003.json remains FAILED under its original literal-empty predicate; this separately accepted prospective v2 never reclassifies it.",
+  "remaining": {
+    "twenty_two_stage_policy_experiment": "HOLD pending separately refrozen method and acceptance",
+    "actual_swe_task_network_reuse": "HOLD",
+    "actual_gateway_runtime_model_identity": "HOLD",
+    "comparative_attempts": 0,
+    "model_calls": 0,
+    "measured_defaults": 0
+  }
+}
