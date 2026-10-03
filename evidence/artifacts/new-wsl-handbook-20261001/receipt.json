@@ -3,11 +3,11 @@
   "kind": "new-wsl-handbook-profile-integration",
   "source_main": "85543efe5abcddb7b7cddb14e8774e83b6758616",
   "evidence_class": "local_integration",
-  "generator_sha256": "da63be4afa284c0d7e9fd8be8225d1c1cab7e8d3bedf7b82d2e5ba0ff3d3316d",
+  "generator_sha256": "a78239b6a2558c916b30f4cbc852fe948904a849e99ae37cfadc1c810a6df20e",
   "profile_sha256": "1e08ba8e879b0c52fd5c53341ea60bb27ca70ebc64cb9af655d9ba5ae0a21cb0",
   "outputs": {
-    "docs/new-wsl-handbook.json": "9b6f0cbf8f1bbfbfa170b8b3ed5ee78bf63a6e0d40e20b522f3d4c24060a8391",
-    "docs/new-wsl-handbook.md": "cf5e84fed408698c1a6350e62966c0571986edc5178fec7c42b68f1e085c546b"
+    "docs/new-wsl-handbook.json": "51db6bc4ac34d8d6431f1485f1ce47d73cb2de6334b73524e4fd6d1ceffbe836",
+    "docs/new-wsl-handbook.md": "c642b64307cc44b25a5711828a2e6fb3c68971227ab00e84b944d1123cbd80df"
   },
   "inventory": {"layers": 37, "profile_entries": 69, "projected_tools": 73, "canonical_package_ids": 20},
   "validation": [
