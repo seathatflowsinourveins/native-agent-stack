@@ -1,0 +1,72 @@
+{
+ "layer_id": "semantic-rag",
+ "title": "Semantic code retrieval",
+ "requirement": "Answer conceptual code questions using a scoped local index and a compatible embedding service, with recoverable state.",
+ "a_deciding_comparison_would_measure": "Freeze target-project questions and expected source spans; measure retrieval/watcher correctness, latency, memory and restore on the destination hardware.",
+ "candidates": [
+  {
+   "key": "C01",
+   "name": "Qdrant",
+   "repository": "https://github.com/qdrant/qdrant"
+  },
+  {
+   "key": "C02",
+   "name": "LanceDB",
+   "repository": "https://github.com/lancedb/lancedb"
+  },
+  {
+   "key": "C03",
+   "name": "ollama",
+   "repository": "https://github.com/ollama/ollama"
+  },
+  {
+   "key": "C04",
+   "name": "semble",
+   "repository": "https://github.com/minishlab/semble"
+  },
+  {
+   "key": "C05",
+   "name": "pgvector",
+   "repository": "https://github.com/pgvector/pgvector"
+  },
+  {
+   "key": "C06",
+   "name": "vLLM",
+   "repository": "https://github.com/vllm-project/vllm"
+  },
+  {
+   "key": "C07",
+   "name": "next-plaid",
+   "repository": "https://github.com/lightonai/next-plaid"
+  },
+  {
+   "key": "C08",
+   "name": "Haystack",
+   "repository": "https://github.com/deepset-ai/haystack"
+  },
+  {
+   "key": "C09",
+   "name": "nvidia/Nemotron-3-Embed-1B-BF16 (embedding model)",
+   "repository": null
+  },
+  {
+   "key": "C10",
+   "name": "SocratiCode",
+   "repository": "https://github.com/giancarloerra/SocratiCode"
+  },
+  {
+   "key": "C11",
+   "name": "huggingface-hub-native",
+   "repository": "https://github.com/huggingface/huggingface_hub"
+  },
+  {
+   "key": "C12",
+   "name": "code-memory",
+   "repository": "https://github.com/kapillamba4/code-memory"
+  }
+ ],
+ "comparisons_on_record_where_every_named_arm_ran": [
+  "A sealed 35-query code-retrieval set on this project's repository: SocratiCode answered 30 of 35 and a traversal-ordered ripgrep baseline 20 of 35; the run's own record says it does not show general superiority."
+ ],
+ "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host."
+}

@@ -1,0 +1,21 @@
+{
+ "me": 2540863,
+ "scratch_port": 25122,
+ "with_listener_and_client": {
+  "lsof": [
+   2540863
+  ],
+  "findListeningPids": "[2540863]"
+ },
+ "after_server_gone": {
+  "client_socket_state": "CLOSE-WAIT",
+  "lsof": [
+   2540863
+  ],
+  "findListeningPids": "[2540863]"
+ },
+ "after_client_closed": {
+  "lsof": [],
+  "findListeningPids": "[]"
+ }
+}

@@ -1,0 +1,790 @@
+{
+  "schema_version": 1,
+  "kind": "bounded_upstream_command_source_review",
+  "date_utc": "2026-10-01",
+  "evidence_class": "source_review_recommendations",
+  "source_head": "85543efe5abcddb7b7cddb14e8774e83b6758616",
+  "inherited_snapshot": "evidence/artifacts/new-wsl-profile-20261001/astramax-takeover-baseline.json",
+  "inherited_receipt": "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+  "review_route": {
+    "requested": "Astra/Max",
+    "trigger": "Consequential architecture and inherited source evidence conflict: the profile retained the old Codex CLI pin and described merged PR 580 as open.",
+    "acceptance_status": "accepted_source_review_after_scoped_local_checks",
+    "scope": "Primary source command/integrity reconciliation and artifact consistency; no merit selection or new-host execution.",
+    "acceptance_result": "The seven upstream fragments, accepted Codex CLI/Python SDK pins, exact integrity observations and gh command example are source-backed. All retained gaps and UNRUN/new-host boundaries remain explicit; no merit or runtime acceptance is promoted."
+  },
+  "worktree_alignment": {
+    "command": "rtk git merge --ff-only 85543efe5abcddb7b7cddb14e8774e83b6758616",
+    "exit_code": 0,
+    "from": "20ea4ae23a18565676823b9e3a23541c2100bb39",
+    "to": "85543efe5abcddb7b7cddb14e8774e83b6758616",
+    "owned_path_overlap": [],
+    "inherited_edits_preserved": true
+  },
+  "upstream": {
+    "releases": [
+      {
+        "name": "Codex",
+        "command": "rtk gh api repos/openai/codex/releases/tags/rust-v0.159.3",
+        "exit_code": 0,
+        "tag": "rust-v0.159.3",
+        "url": "https://github.com/openai/codex/releases/tag/rust-v0.159.3",
+        "published_at": "2026-09-30T22:57:34Z",
+        "release_notes_sha256": "a4a6cb2e232bdcb92eaf4313e1ffa83e50228d66e0458f5233ac7d9bbbdfd828",
+        "native_artifacts": [
+          {
+            "name": "codex-package-x86_64-unknown-linux-musl.tar.gz",
+            "digest": "sha256:3930f31ac5fca861ea3e444e2683f261190d96b63fba58e0a40a879174369cdf",
+            "browser_download_url": "https://github.com/openai/codex/releases/download/rust-v0.159.3/codex-package-x86_64-unknown-linux-musl.tar.gz"
+          },
+          {
+            "name": "codex-x86_64-unknown-linux-musl.tar.gz",
+            "digest": "sha256:b48ca1b2d6b1bf42b944e02c3d937c898e24651916684cdc35fdedf31b291bcb",
+            "browser_download_url": "https://github.com/openai/codex/releases/download/rust-v0.159.3/codex-x86_64-unknown-linux-musl.tar.gz"
+          }
+        ]
+      },
+      {
+        "name": "Claude Code",
+        "command": "rtk gh api repos/anthropics/claude-code/releases/tags/v2.1.284",
+        "exit_code": 0,
+        "tag": "v2.1.284",
+        "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.284",
+        "published_at": "2026-09-28T18:02:03Z",
+        "release_notes_sha256": "f4ca78c52cb39739d96937cf4dc227dd8b78ffe5dcd228a1cd088632c7746026"
+      },
+      {
+        "name": "QMD",
+        "command": "rtk gh api repos/tobi/qmd/releases/tags/v2.8.3",
+        "exit_code": 0,
+        "tag": "v2.8.3",
+        "url": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+        "published_at": "2026-08-16T22:30:34Z",
+        "release_notes_sha256": "cd504c4f68a12917ab4b6e36b56a0f9c5e594626bec2bd968c4f77cfdbdc0837"
+      },
+      {
+        "name": "RTK",
+        "command": "rtk gh api repos/rtk-ai/rtk/releases/tags/v0.50.0",
+        "exit_code": 0,
+        "tag": "v0.50.0",
+        "url": "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0",
+        "published_at": "2026-09-24T10:02:31Z",
+        "release_notes_sha256": "0537f3a09a7af63fe7382e87dc6e62bffae98795f662bb19317e42b80875a236"
+      },
+      {
+        "name": "ai-memory",
+        "command": "rtk gh api repos/akitaonrails/ai-memory/releases/tags/v2.5.2",
+        "exit_code": 0,
+        "tag": "v2.5.2",
+        "url": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.5.2",
+        "published_at": "2026-10-01T07:40:18Z",
+        "release_notes_sha256": "606faa5f27cb1f5c6719dc5a483e682e06ec15bfd3689d6ee56bc6b128a4926b"
+      },
+      {
+        "name": "Worktrunk",
+        "command": "rtk gh api repos/max-sixty/worktrunk/releases/tags/v0.80.0",
+        "exit_code": 0,
+        "tag": "v0.80.0",
+        "url": "https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0",
+        "published_at": "2026-09-27T21:18:46Z",
+        "release_notes_sha256": "5822949a85d55c1cf44b9f2ea63ac943690b67a0fe084e2299211154945fbb9d",
+        "installer_command": "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/max-sixty/worktrunk/releases/download/v0.80.0/worktrunk-installer.sh | sh && wt config shell install"
+      },
+      {
+        "name": "gh",
+        "command": "rtk gh api repos/cli/cli/releases/tags/v2.101.0",
+        "exit_code": 0,
+        "tag": "v2.101.0",
+        "url": "https://github.com/cli/cli/releases/tag/v2.101.0",
+        "published_at": "2026-09-15T14:24:34Z",
+        "release_notes_sha256": "dc4cf144e903cf319be7f4030a0b92fdc49d30a58fa0bcc4eac6485238f3ab49"
+      }
+    ],
+    "pr_580": {
+      "command": "rtk gh api repos/seathatflowsinourveins/native-agent-stack/pulls/580",
+      "exit_code": 0,
+      "state": "closed",
+      "merged": true,
+      "merged_at": "2026-10-01T21:18:12Z",
+      "merge_commit_sha": "85543efe5abcddb7b7cddb14e8774e83b6758616",
+      "html_url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/580"
+    },
+    "npm_launcher": {
+      "metadata_url": "https://registry.npmjs.org/%40openai%2Fcodex/0.159.3",
+      "artifact_url": "https://registry.npmjs.org/@openai/codex/-/codex-0.159.3.tgz",
+      "artifact_sha256": "31d5e584e93e118dd37dbb8bc89ddbbe9998178fc437dc0b9d0f7cc72ef0cf79",
+      "downloaded_bytes": 4904,
+      "published_integrity": "sha512-hg4nlqCwRb87GocxNnHvz4sadOrdJ71mO0a4CUYWXjAozJe2gtuAdRFldKGSQXw9m7SgR4ydis12KDVVPgzDkQ==",
+      "published_integrity_algorithm": "sha512",
+      "published_integrity_matches": true,
+      "observation": "downloaded_and_rehashed"
+    },
+    "python_wheel": {
+      "metadata_url": "https://pypi.org/pypi/openai-codex/0.159.3/json",
+      "artifact_url": "https://files.pythonhosted.org/packages/6f/24/524be7ef0fb11e587a506514f4e9b70473a1b27ba745b1afc660ced25850/openai_codex-0.159.3-py3-none-any.whl",
+      "artifact_sha256": "5148065fb13cfb3f106c6493f3a5dc26457da98f6350e193e85eda8b65263b8f",
+      "downloaded_bytes": 97108,
+      "published_integrity": "5148065fb13cfb3f106c6493f3a5dc26457da98f6350e193e85eda8b65263b8f",
+      "published_integrity_algorithm": "sha256",
+      "published_integrity_matches": true,
+      "observation": "downloaded_and_rehashed"
+    }
+  },
+  "source_fragment_reads": [
+    {
+      "id": "codex-readme",
+      "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.159.3/README.md",
+      "http_status": 200,
+      "sha256": "ba4e1f69ff48386e72a9c5e1edaf76aad64a475c2d51af79ccba6d1128261ba7",
+      "matching_fragments": [
+        {
+          "line": 42,
+          "text": "npm install -g @openai/codex"
+        }
+      ]
+    },
+    {
+      "id": "python-sdk",
+      "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.159.3/sdk/python/README.md",
+      "http_status": 200,
+      "sha256": "e81cdb5f96e4e00862bb567f6a84864169033423c80fbbe4f19a56aff3597ed5",
+      "matching_fragments": [
+        {
+          "line": 11,
+          "text": "pip install openai-codex"
+        },
+        {
+          "line": 20,
+          "text": "from openai_codex import Codex"
+        },
+        {
+          "line": 23,
+          "text": "    thread = codex.thread_start()"
+        },
+        {
+          "line": 25,
+          "text": "    print(result.final_response)"
+        },
+        {
+          "line": 37,
+          "text": "from openai_codex import Codex"
+        }
+      ]
+    },
+    {
+      "id": "qmd",
+      "url": "https://raw.githubusercontent.com/tobi/qmd/facd35e01359e59d938bc9418e93fb9318addee3/README.md",
+      "http_status": 200,
+      "sha256": "24c049f59408d3d021fbee70d4cd5dd744cdb51f5caea956b417f4dfe7e26880",
+      "matching_fragments": [
+        {
+          "line": 32,
+          "text": "npm install -g @tobilu/qmd"
+        },
+        {
+          "line": 80,
+          "text": "qmd search \"authentication\" --json -n 10"
+        },
+        {
+          "line": 591,
+          "text": "npm install -g @tobilu/qmd"
+        },
+        {
+          "line": 863,
+          "text": "--index <name>     # Use named index"
+        }
+      ]
+    },
+    {
+      "id": "rtk-install",
+      "url": "https://raw.githubusercontent.com/rtk-ai/rtk/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/README.md",
+      "http_status": 200,
+      "sha256": "d51e56234265cc33279a0d98126d80159a74d9ac9f8e6e310ec160e32be0435f",
+      "matching_fragments": [
+        {
+          "line": 106,
+          "text": "cargo install --git https://github.com/rtk-ai/rtk"
+        },
+        {
+          "line": 125,
+          "text": "> **Name collision warning**: Another project named \"rtk\" (Rust Type Kit) exists on crates.io. If `rtk gain` fails, you have the wrong package. Use `cargo install --git` above instead."
+        }
+      ]
+    },
+    {
+      "id": "rtk-test",
+      "url": "https://raw.githubusercontent.com/rtk-ai/rtk/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/CONTRIBUTING.md",
+      "http_status": 200,
+      "sha256": "d860b648b28ba3582c23a7305f247747924c621141622a7088576feae526aff4",
+      "matching_fragments": [
+        {
+          "line": 258,
+          "text": "| **Unit tests** | `#[cfg(test)] mod tests` in each module | `cargo test` |"
+        },
+        {
+          "line": 259,
+          "text": "| **Snapshot tests** | `#[cfg(test)]` create snapshots for filters modules | `cargo test` |"
+        },
+        {
+          "line": 261,
+          "text": "| **Integration tests** | `#[ignore]` tests requiring installed binary | `cargo test --ignored` |"
+        }
+      ]
+    },
+    {
+      "id": "memory-install",
+      "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/install.md",
+      "http_status": 200,
+      "sha256": "b52d0cd39f79af4dee11dbb62970be5c02c2bc182419a2269ad3f3ebf8524349",
+      "matching_fragments": [
+        {
+          "line": 1629,
+          "text": "mise use -g github:akitaonrails/ai-memory"
+        },
+        {
+          "line": 1645,
+          "text": "exact tag with `mise use -g github:akitaonrails/ai-memory@1.30.0` to bypass"
+        }
+      ]
+    },
+    {
+      "id": "memory-test",
+      "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/AGENTS.md",
+      "http_status": 200,
+      "sha256": "47c9b4d22f0c8d135e2b2731c97d5e85c63aac62687ebdac7320eb6d8b71fdc6",
+      "matching_fragments": [
+        {
+          "line": 218,
+          "text": "Rust 1.95, pinned in `rust-toolchain.toml`; rustup selects it automatically."
+        },
+        {
+          "line": 227,
+          "text": "cargo t                        # every shipped crate: 11 test binaries, ~20s warm"
+        },
+        {
+          "line": 228,
+          "text": "cargo t -p ai-memory-store     # one crate: builds only its binary, ~5s"
+        },
+        {
+          "line": 229,
+          "text": "cargo t -E 'test(/purge/)'     # one topic (still builds everything)"
+        },
+        {
+          "line": 239,
+          "text": "`cargo t` and `cargo tf` are aliases in `.cargo/config.toml` for"
+        },
+        {
+          "line": 241,
+          "text": "`.config/nextest.toml`. Run them from the repo root. `cargo t` builds the"
+        }
+      ]
+    },
+    {
+      "id": "memory-alias",
+      "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/.cargo/config.toml",
+      "http_status": 200,
+      "sha256": "128bc5d5280d0c5a9f4f1455c600dd369c58b82708dc5d95239b8026d589499e",
+      "matching_fragments": [
+        {
+          "line": 8,
+          "text": "# add harnesses for the two `test = false` targets. nextest filters still"
+        },
+        {
+          "line": 11,
+          "text": "t = \"nextest run\""
+        },
+        {
+          "line": 12,
+          "text": "tf = \"nextest run --workspace -P full\""
+        }
+      ]
+    },
+    {
+      "id": "worktrunk-test",
+      "url": "https://raw.githubusercontent.com/max-sixty/worktrunk/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md",
+      "http_status": 200,
+      "sha256": "e627eb18fd1f383a0bbdc43531675fc2c93e6c8ab2290bc54c817ae23f4ad0aa",
+      "matching_fragments": [
+        {
+          "line": 116,
+          "text": "Shell integration allows commands to change directories."
+        },
+        {
+          "line": 121,
+          "text": "cargo install worktrunk && wt config shell install"
+        },
+        {
+          "line": 218,
+          "text": "  picker](https://worktrunk.dev/switch/#interactive-picker), [Claude Code integration](https://worktrunk.dev/claude-code/), [CI"
+        },
+        {
+          "line": 237,
+          "text": "cargo test"
+        },
+        {
+          "line": 240,
+          "text": "The shell integration tests need bash, zsh, fish, nushell, and pwsh, plus `jq`:"
+        },
+        {
+          "line": 243,
+          "text": "cargo test --test integration --features shell-integration-tests"
+        }
+      ]
+    },
+    {
+      "id": "gh-api",
+      "url": "https://raw.githubusercontent.com/cli/cli/v2.101.0/pkg/cmd/api/api.go",
+      "http_status": 200,
+      "sha256": "030eda84dcfdb52e3bba2cadfc0243a7b47d3098b64f8c12c665550733d72ca1",
+      "matching_fragments": [
+        {
+          "line": 82,
+          "text": "\t\tShort: \"Make an authenticated GitHub API request\","
+        },
+        {
+          "line": 84,
+          "text": "\t\t\tMakes an authenticated HTTP request to the GitHub API and prints the response."
+        },
+        {
+          "line": 143,
+          "text": "\t\t\t$ gh api repos/{owner}/{repo}/releases"
+        },
+        {
+          "line": 146,
+          "text": "\t\t\t$ gh api repos/{owner}/{repo}/issues/123/comments -f body='Hi from CLI'"
+        },
+        {
+          "line": 155,
+          "text": "\t\t\t$ gh api repos/{owner}/{repo}/rulesets --input file.json"
+        },
+        {
+          "line": 164,
+          "text": "\t\t\t$ gh api repos/{owner}/{repo}/issues --jq '.[].title'"
+        },
+        {
+          "line": 167,
+          "text": "\t\t\t$ gh api repos/{owner}/{repo}/issues --template \\"
+        }
+      ]
+    }
+  ],
+  "official_documentation": [
+    {
+      "url": "https://docs.npmjs.com/cli/v11/commands/npm-install",
+      "observed": "Official Description defines a package as <name>@<version>; the selected upstream README supplies the scoped package name and global-install form."
+    },
+    {
+      "url": "https://pip.pypa.io/en/stable/cli/pip_install/",
+      "observed": "Usage supplies python -m pip install; Examples supplies the == exact-version requirement specifier."
+    },
+    {
+      "url": "https://doc.rust-lang.org/cargo/commands/cargo-install.html",
+      "observed": "--tag selects the Git tag and --locked uses the packaged Cargo.lock; the RTK README supplies its maintained Git install URL."
+    },
+    {
+      "url": "https://mise.jdx.dev/dev-tools/backends/github.html",
+      "observed": "Usage documents -g for global scope and github:OWNER/REPO@VERSION; ai-memory's selected install guide supplies its repository and an explicit-version example."
+    },
+    {
+      "url": "https://code.claude.com/docs/en/setup#install-a-specific-version",
+      "observed": "The native installer accepts a specific version number; the page shows curl -fsSL https://claude.ai/install.sh | bash -s 2.1.89. The selected 2.1.284 operand comes from verified release/manifest metadata."
+    },
+    {
+      "url": "https://code.claude.com/docs/en/quickstart#essential-commands",
+      "observed": "The Essential commands table supplies claude -p \"explain this function\"; actual function context and native authentication remain prerequisites."
+    },
+    {
+      "url": "https://developers.openai.com/codex/noninteractive",
+      "observed": "Basic usage supplies codex exec \"summarize the repository structure and list the top 5 risky areas\"; this example was not run."
+    }
+  ],
+  "installed_client_observations": [
+    {
+      "command": "rtk codex --version",
+      "exit_code": 0,
+      "returned_output": "codex-cli 0.159.3\n",
+      "help_command": "rtk codex exec --help",
+      "help_exit_code": 0,
+      "help_excerpt": "Usage: codex exec [OPTIONS] [PROMPT]"
+    },
+    {
+      "command": "rtk claude --version",
+      "exit_code": 0,
+      "returned_output": "2.1.287 (Claude Code)\n",
+      "help_command": "rtk claude --help",
+      "help_exit_code": 0,
+      "help_excerpt": "Usage: claude [options] [command] [prompt]",
+      "selected_pin": "2.1.284",
+      "selected_pin_qualified": false
+    },
+    {
+      "command": "rtk qmd --version",
+      "exit_code": 0,
+      "returned_output": "qmd 2.8.3 (facd35e)\n",
+      "help_command": "rtk qmd search --help",
+      "help_exit_code": 0,
+      "help_excerpt": "qmd search <query>            - Full-text BM25 keywords (no LLM)"
+    },
+    {
+      "command": "rtk proxy rtk --version",
+      "exit_code": 0,
+      "returned_output": "rtk 0.50.0\n",
+      "help_command": "rtk proxy rtk --help",
+      "help_exit_code": 0
+    },
+    {
+      "command": "rtk ai-memory --version",
+      "exit_code": 0,
+      "returned_output": "ai-memory 2.4.2\n",
+      "help_command": "rtk ai-memory --help",
+      "help_exit_code": 0,
+      "selected_pin": "2.5.2",
+      "selected_pin_qualified": false
+    },
+    {
+      "command": "rtk wt --version",
+      "exit_code": 0,
+      "returned_output": "wt v0.79.0\n",
+      "help_command": "rtk wt config shell install --help",
+      "help_exit_code": 0,
+      "help_excerpt": "Usage: wt config shell install [OPTIONS] [bash|fish|nu|zsh|powershell]",
+      "selected_pin": "0.80.0",
+      "selected_pin_qualified": false
+    },
+    {
+      "command": "rtk gh --version",
+      "exit_code": 0,
+      "returned_output": "gh version 2.101.0 (2026-09-15)\nhttps://github.com/cli/cli/releases/tag/v2.101.0\n",
+      "help_command": "rtk proxy gh api --help",
+      "help_exit_code": 0,
+      "help_excerpt": "Makes an authenticated HTTP request to the GitHub API and prints the response.\n  $ gh api repos/{owner}/{repo}/releases"
+    }
+  ],
+  "gap_change": {
+    "entries": 69,
+    "comparison_arms": 23,
+    "before_rows": 56,
+    "after_rows": 51,
+    "before_items": 138,
+    "after_items": 128,
+    "closed_gaps": {
+      "gh": [
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "Worktrunk": [
+        "The reviewed upstream Cargo quick start floats the package version and installs shell integration. A pinned install command matching the verified 0.80.0 artifact is not yet verified; do not execute this example as the profile installer.",
+        "Pin-matching Cargo or release-installer invocation is unverified; the floating quick start is retained only in source-review leads."
+      ],
+      "Codex TypeScript SDK": [
+        "Proposed SDK 0.159.3 waits on open PR #580. Accepted main Codex CLI 0.159.2 is retained; no silent CLI upgrade."
+      ],
+      "Codex Python SDK": [
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
+        "Proposed SDK 0.159.3 waits on open PR #580. Accepted main Codex CLI 0.159.2 is retained; no silent CLI upgrade."
+      ],
+      "ai-memory": [
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "RTK": [
+        "No complete pin-matching supported install command verified for this owned row.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ]
+    }
+  },
+  "corrections": [
+    {
+      "claim": "The current profile can retain the PR 580 open/unmerged observation as its SDK gate.",
+      "correction": "The earlier observation is preserved historically. Fresh GitHub API state is closed/merged at 85543efe on 2026-10-01T21:18:12Z; selected Codex CLI and Python SDK align to 0.159.3 without claiming new-host acceptance.",
+      "verification": [
+        "https://github.com/seathatflowsinourveins/native-agent-stack/pull/580",
+        "adoption/pins-linux-x86_64.json",
+        "adoption/sdk/accepted-constraints.txt"
+      ]
+    },
+    {
+      "claim": "PR 580 acceptance covers both the Python and TypeScript SDK recommendations.",
+      "correction": "Accepted main constrains openai-codex and openai-codex-cli-bin. TypeScript 0.159.3 remains its independent source-review recommendation; removing its stale PR-open condition is not TypeScript acceptance.",
+      "verification": [
+        "adoption/sdk/accepted-constraints.txt",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/pull/580"
+      ]
+    },
+    {
+      "claim": "A floating upstream quick start cannot be made pin-specific using maintained package-manager version syntax.",
+      "correction": "The named package/repository from the selected upstream source plus official npm/pip/Cargo/mise version syntax supports these exact reviewed operands. Only the specified command gaps are removed; prerequisites and all execution boundaries remain.",
+      "verification": "source_fragment_reads, official_documentation, gap_change.closed_gaps"
+    },
+    {
+      "claim": "gh's selected 2.101.0 row may retain latest-release 2.102.0 metadata.",
+      "correction": "The row now cites v2.101.0 and source commit 0cf1092493af067646fc5f3db9421c6a6ec9c938; the older latest-release lookup remains in the inherited source receipt.",
+      "verification": [
+        "https://github.com/cli/cli/releases/tag/v2.101.0",
+        "https://github.com/cli/cli/blob/v2.101.0/pkg/cmd/api/api.go#L143"
+      ]
+    },
+    {
+      "claim": "rtk gh api --help supplies the installed gh help.",
+      "correction": "That invocation returned RTK's own help. rtk proxy gh api --help returned upstream gh's actual API help, including the documented read-only releases example.",
+      "verification": "Both commands returned exit 0; the proxy returned 'Makes an authenticated HTTP request to the GitHub API and prints the response.'"
+    },
+    {
+      "claim": "A failed direct documentation fetch or literal HTML search proves unsupported syntax.",
+      "correction": "Direct urllib requests returned HTTP 403 for four documentation pages after ctx_fetch_and_index had retrieved them successfully. Joining separated HTML text nodes hid npm's exact syntax; preserving adjacent text nodes recovered <name>@<version>. These were retrieval/processing failures, not capability absences.",
+      "verification": "retrieval_attempts; official_documentation"
+    },
+    {
+      "claim": "A single filesystem existence pass can validate every evidence_refs item.",
+      "correction": "The first local observation treated HTTPS citations as files and falsely listed them as missing. The corrected observation distinguishes HTTPS references from repository paths: all 24 local references exist. No profile gap was removed or added from the erroneous pass.",
+      "verification": "independent_observation.missing_local_evidence_files is empty; install table coverage is also complete."
+    },
+    {
+      "claim": "A no-index check against /dev/null must return zero when it emits no whitespace diagnostic.",
+      "correction": "The final capture observed exit 1 with empty output for every nonempty untracked file. A direct native recovery command returned the same exit 1; tracked git diff --check returned exit 0. The collector's zero-only assumption was rejected. The exact no-index observations are retained without reporting them as zero-exit checks.",
+      "verification": [
+        "rtk proxy git diff --no-index --check -- /dev/null adoption/new-wsl-profile.json: exit 1, empty output",
+        "rtk proxy git diff --check: exit 0, empty output"
+      ]
+    }
+  ],
+  "retrieval_attempts": [
+    {
+      "kind": "ctx_fetch_and_index",
+      "result": "All ten selected tagged source files and six official documentation pages fetched successfully before command review; source fragments and scopes were read from original text."
+    },
+    {
+      "kind": "direct_document_read",
+      "records": [
+        {
+          "id": "npm-pinning",
+          "url": "https://docs.npmjs.com/cli/v11/commands/npm-install",
+          "http_status": 200,
+          "sha256": "1700e0fc0fb1263409bcb543c1e816a6d3e6d19344d2627149e9522098247c72",
+          "matching_fragments": [
+            {
+              "query": "npm install <name>@<version>",
+              "found": false,
+              "text": null
+            }
+          ]
+        },
+        {
+          "id": "pip-pinning",
+          "url": "https://pip.pypa.io/en/stable/cli/pip_install/",
+          "error": "HTTP Error 403: Forbidden"
+        },
+        {
+          "id": "cargo-pinning",
+          "url": "https://doc.rust-lang.org/cargo/commands/cargo-install.html",
+          "http_status": 200,
+          "sha256": "665d17c63b66b65067f37cea8adf895a7d5a82d4d934a3678bac8db86414551e",
+          "matching_fragments": [
+            {
+              "query": "--tag",
+              "found": true,
+              "text": "Branch to use when installing from git. --tag tag Tag to use when installing from git. --rev sha Specific commit to use when installing from git. --path path Filesys"
+            },
+            {
+              "query": "--locked",
+              "found": true,
+              "text": "ed since the\npackage was published. The --locked flag can be used to force Cargo to use\nthe packaged Cargo.lock file if it is available. This may be useful for\nensuring"
+            }
+          ]
+        },
+        {
+          "id": "mise-pinning",
+          "url": "https://mise.jdx.dev/dev-tools/backends/github.html",
+          "error": "HTTP Error 403: Forbidden"
+        },
+        {
+          "id": "claude-install",
+          "url": "https://code.claude.com/docs/en/setup#install-a-specific-version",
+          "error": "HTTP Error 403: Forbidden"
+        },
+        {
+          "id": "claude-example",
+          "url": "https://code.claude.com/docs/en/quickstart#essential-commands",
+          "error": "HTTP Error 403: Forbidden"
+        },
+        {
+          "id": "codex-example",
+          "url": "https://developers.openai.com/codex/noninteractive",
+          "http_status": 200,
+          "sha256": "8af111fa1919d49dcfe1f010b54ff32444514933dbba0407f59c74db5397c968",
+          "matching_fragments": [
+            {
+              "query": "summarize the repository structure and list the top 5 risky areas",
+              "found": true,
+              "text": "rompt as a single argument: codex exec \"summarize the repository structure and list the top 5 risky areas\" While codex exec runs, Codex streams progress to stderr and prints only the final agent message to stdout . This makes"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/npm/cli/v11.21.0/docs/lib/content/commands/npm-install.md",
+      "result": "HTTP 404; speculative source URL rejected, official npm documentation supplied the actual supported syntax."
+    },
+    {
+      "kind": "local_metadata_reader",
+      "result": "Initial pin lookup failed with TypeError: list indices must be integers or slices, not str. Reading tools[] by id corrected the helper; no source field used the failed result."
+    },
+    {
+      "kind": "source_record_parser",
+      "result": "A direct documentation read stopped at HTTP 403 before returning its JSON marker; the collector then rejected its missing output with SyntaxError. Per-document failure handling preserved the failed requests; successful indexed official documents were used."
+    }
+  ],
+  "validation_status": "172_scoped_tests_passed",
+  "installed_or_provisioned": false,
+  "source_test_commands_executed": false,
+  "profile_functional_commands_executed": false,
+  "new_host_acceptance_verified": false,
+  "provider_usage": null,
+  "limitations": [
+    "All profile install and functional/source-test commands are documented examples marked UNRUN. Current-host version/help and public source API requests establish only identity/interface/source observations.",
+    "The npm SHA256 identifies the thin launcher, not its native platform dependency. GitHub complete-package and standalone-executable digests are published metadata only; signature/attestation verification was not performed.",
+    "The Python wheel was downloaded only for hashing. No environment, SDK native binary, authentication, provider request or model result was exercised.",
+    "QMD needs a populated isolated index; its BM25 example says nothing about embeddings or GPU behavior.",
+    "RTK source unit/snapshot tests omit the separately documented ignored integration tests. ai-memory cargo t excludes its full/slow/eval tier and does not establish daemon/backend/MCP/hooks. Worktrunk cargo test omits its feature-enabled shell-integration suite.",
+    "All existing prerequisite, model/backend, hook, new-host, GPU, OS and comparison conditions survive. No source-selected entry is a merit winner.",
+    "The central documented-script inventory needs coordinator staging of the new adapter. This owner performs no staging, commit, central registry edits, installs, credential reads or provider calls."
+  ],
+  "validations": [
+    {
+      "command": "rtk python3 -m unittest tests.test_new_wsl_profile tests.test_adoption_status tests.test_adoption_contract tests.test_adoption_bootstrap.PinsSchemaTests tests.test_adoption_bootstrap.ProfileMappingTests tests.test_adoption_bootstrap.ScriptBehaviorTests tests.test_adoption_docs_consistency.ProfileTableTests.test_every_manifest_profile_is_a_table_row",
+      "exit_code": 0,
+      "started_at_utc": "2026-10-01T22:19:46.207494+00:00",
+      "finished_at_utc": "2026-10-01T22:20:04.106302+00:00",
+      "evidence_class": "local_integration_check",
+      "returned_output": "............................................................................................................................................................................\n----------------------------------------------------------------------\nRan 172 tests in 17.707s\n\nOK\n",
+      "sanitization": "Worktree path replaced by <W-PROF worktree> if present."
+    },
+    {
+      "command": "rtk python3 scripts/new_wsl_profile.py --json",
+      "exit_code": 0,
+      "started_at_utc": "2026-10-01T22:20:04.106329+00:00",
+      "finished_at_utc": "2026-10-01T22:20:04.211503+00:00",
+      "evidence_class": "local_integration_check",
+      "returned_output_sha256": "7c7a26b2876734f1c182ada731ac91c9aeb164d24f5c4ec1e9d2359d1678f77f",
+      "matches_source_bytes": true,
+      "observed": {
+        "entries": 69,
+        "gap_rows": 51,
+        "gap_items": 128,
+        "new_host_acceptance_verified": false
+      }
+    },
+    {
+      "command": "rtk python3 scripts/adoption_status.py --profile new-wsl-clean-foundation --json",
+      "exit_code": 0,
+      "started_at_utc": "2026-10-01T22:20:04.212645+00:00",
+      "finished_at_utc": "2026-10-01T22:20:04.344368+00:00",
+      "evidence_class": "local_integration_check",
+      "returned_output": "{\n  \"schema_version\": 1,\n  \"status\": \"prerequisites_present\",\n  \"platform\": {\n    \"os\": \"linux\",\n    \"architecture\": \"x86_64\",\n    \"python\": \"3.13.15\",\n    \"supported\": true\n  },\n  \"manifest\": {\n    \"status\": \"valid\",\n    \"schema_version\": 1\n  },\n  \"profiles\": [\n    {\n      \"id\": \"new-wsl-clean-foundation\",\n      \"commands\": [\n        {\n          \"name\": \"git\",\n          \"present\": true\n        },\n        {\n          \"name\": \"python3\",\n          \"present\": true\n        },\n        {\n          \"name\": \"node\",\n          \"present\": true\n        },\n        {\n          \"name\": \"npm\",\n          \"present\": true\n        },\n        {\n          \"name\": \"uv\",\n          \"present\": true\n        },\n        {\n          \"name\": \"gh\",\n          \"present\": true\n        },\n        {\n          \"name\": \"codex\",\n          \"present\": true\n        },\n        {\n          \"name\": \"claude\",\n          \"present\": true\n        }\n      ],\n      \"recipes\": [\n        {\n          \"path\": \"adoption/new-wsl-profile.json\",\n          \"present\": true\n        },\n        {\n          \"path\": \"adoption/new-wsl-profile.md\",\n          \"present\": true\n        },\n        {\n          \"path\": \"adoption/bootstrap.md\",\n          \"present\": true\n        },\n        {\n          \"path\": \"recipes/README.md\",\n          \"present\": true\n        }\n      ],\n      \"status\": \"prerequisites_present\",\n      \"source_profile\": {\n        \"path\": \"adoption/new-wsl-profile.json\",\n        \"profile_id\": \"new-wsl-clean-foundation\",\n        \"source_head\": \"85543efe5abcddb7b7cddb14e8774e83b6758616\",\n        \"evidence_class\": \"source_review_recommendations\",\n        \"entries\": 69,\n        \"entries_with_blocking_gaps\": 51,\n        \"status\": \"source_review_incomplete\",\n        \"default_install\": [\n          \"Node 24\",\n          \"uv\",\n          \"gh\",\n          \"CPython 3.13\",\n          \"Codex\",\n          \"Claude Code\"\n        ],\n        \"new_host_acceptance_verified\": false\n      }\n    }\n  ],\n  \"errors\": [],\n  \"runtime_acceptance_verified\": false,\n  \"limitations\": [\n    \"Executable presence does not verify its version, installation integrity, activation, or E2E behavior.\",\n    \"Historical acceptance remains historical; no provider, service, GPU, hook, or broker acceptance runs here.\",\n    \"Git comparison reports source identity only; it does not compare worktree file contents with that commit.\",\n    \"No credentials, client configuration, environment values, network endpoints, or running processes are inspected.\"\n  ],\n  \"git\": {\n    \"baseline_commit\": \"8f1da51757e925d319e2a50f080b02742e7e7168\",\n    \"current_commit\": \"85543efe5abcddb7b7cddb14e8774e83b6758616\",\n    \"comparison\": \"baseline_differs\"\n  }\n}\n",
+      "sanitization": "Worktree path replaced by <W-PROF worktree> if present."
+    },
+    {
+      "command": "rtk git diff --check",
+      "exit_code": 0,
+      "started_at_utc": "2026-10-01T22:20:04.344396+00:00",
+      "finished_at_utc": "2026-10-01T22:20:04.408058+00:00",
+      "evidence_class": "local_integration_check",
+      "returned_output": "",
+      "sanitization": "Worktree path replaced by <W-PROF worktree> if present."
+    },
+    {
+      "command": "rtk git diff --name-only 20ea4ae23a18565676823b9e3a23541c2100bb39 85543efe5abcddb7b7cddb14e8774e83b6758616 -- tools/adoption/install_claude_profile.py tools/adoption/managed_block.py adoption/templates adoption/agents",
+      "exit_code": 0,
+      "started_at_utc": "2026-10-01T22:20:04.408082+00:00",
+      "finished_at_utc": "2026-10-01T22:20:04.433971+00:00",
+      "evidence_class": "local_integration_check",
+      "returned_output": "",
+      "sanitization": "Worktree path replaced by <W-PROF worktree> if present."
+    },
+    {
+      "command": "rtk python3 scripts/new_wsl_profile.py --json",
+      "exit_code": 0,
+      "returned_output_sha256": "d316e29413ee927122fa8cdb55d74427bb9a646421ae401f1c5e26e314b474fa",
+      "matches_source_bytes": true,
+      "reason": "The final citation-only correction changed the source bytes after the prior CLI output hash; no implementation or command semantics changed.",
+      "evidence_class": "local_integration_check"
+    }
+  ],
+  "independent_observation": {
+    "entries": 69,
+    "comparison_arms": 23,
+    "gap_rows": 51,
+    "gap_items": 128,
+    "local_reference_count": 24,
+    "missing_local_evidence_files": [],
+    "install_commands_missing_md_citation": [],
+    "historical_sdk_pr_state": {
+      "command": "rtk gh api repos/seathatflowsinourveins/native-agent-stack/pulls/580",
+      "exit_code": 0,
+      "state": "open",
+      "merged_at": null
+    },
+    "new_host_acceptance_verified": false,
+    "default_install": [
+      "Node 24",
+      "uv",
+      "gh",
+      "CPython 3.13",
+      "Codex",
+      "Claude Code"
+    ],
+    "os_null_commands_preserved": true,
+    "changed_command_statuses": {
+      "Codex": {
+        "install": "UNRUN",
+        "acceptance": "UNRUN"
+      },
+      "Claude Code": {
+        "install": "UNRUN",
+        "acceptance": "UNRUN"
+      },
+      "Worktrunk": {
+        "install": "UNRUN",
+        "acceptance": "UNRUN"
+      },
+      "Codex Python SDK": {
+        "install": "UNRUN",
+        "acceptance": "UNRUN"
+      },
+      "QMD": {
+        "install": "UNRUN",
+        "acceptance": "UNRUN"
+      },
+      "ai-memory": {
+        "install": "UNRUN",
+        "acceptance": "UNRUN"
+      },
+      "RTK": {
+        "install": "UNRUN",
+        "acceptance": "UNRUN"
+      }
+    },
+    "final_profile_cli": {
+      "command": "rtk python3 scripts/new_wsl_profile.py --json",
+      "exit_code": 0,
+      "returned_output_sha256": "d316e29413ee927122fa8cdb55d74427bb9a646421ae401f1c5e26e314b474fa",
+      "matches_source_bytes": true,
+      "reason": "The final citation-only correction changed the source bytes after the prior CLI output hash; no implementation or command semantics changed."
+    }
+  },
+  "reused_dry_run": {
+    "historical_receipt": "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+    "command_redacted": "rtk python3 tools/adoption/install_claude_profile.py --dry-run --only guard --only agents --home <temporary-dry-run-home> --eco-root <temporary-dry-run-prefix>",
+    "historical_exit_code": 0,
+    "historical_independent_observation": {
+      "dry_run_created_home": false,
+      "dry_run_created_prefix": false
+    },
+    "input_reuse": "Accepted-main diff has no changes to the selected installer, managed-block implementation, templates or agent inputs. The existing per-step dry run is reused; it was not re-executed and is not a new-host install."
+  },
+  "pending_owner_gates": {
+    "documented_script_inventory": "Known condition retained: the adapter is untracked until coordinator staging. No workaround, staging or rerun of that known-failing gate was performed.",
+    "central_validation": "scripts/validate.py and shared evidence/registry changes remain coordinator-owned.",
+    "wsl_images": "The image owner reports a frozen dual-image recipe. Both profile OS arms retain symmetric provisional status, null install/acceptance commands and all first-boot/GPU/new-host gaps for root integration."
+  }
+}

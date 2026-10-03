@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "kind": "native_workflow_persistence_and_usage_followup",
+  "recorded_at": "2026-10-01",
+  "source_base": "51cb79babc1309a235ae1bd76f1e5b05fadcc212",
+  "sources": [
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "5cfa2400e3ebb4aefb8419135345c1fa92b05409",
+      "file": "examples/claude-native/workflows/readiness-audit.js",
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/5cfa2400e3ebb4aefb8419135345c1fa92b05409/examples/claude-native/workflows/readiness-audit.js",
+      "executed_copy_sha256": "1d3d816cc219a252760a471a3b68a979057e2c417c429d6c094df4c474e612bb",
+      "executed_copy_bytes": 13135
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "51cb79babc1309a235ae1bd76f1e5b05fadcc212",
+      "files": [
+        "tools/sota-convergence/landscape-sweep/README.md",
+        "tools/sota-convergence/landscape-sweep/usage_record.py",
+        "tools/sota-convergence/landscape-sweep/convert.py",
+        "examples/claude-native/workflows/child-usage.mjs"
+      ],
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/tree/51cb79babc1309a235ae1bd76f1e5b05fadcc212/tools/sota-convergence/landscape-sweep",
+      "child_usage_tool_sha256": "3e5189342734135e88a2295c1c2152275d9e26c0c7731ed5cbc8905bbccd98a4"
+    },
+    {
+      "repository": "anthropics/claude-agent-sdk-python",
+      "pin": "1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7",
+      "file": "src/claude_agent_sdk/_internal/transport/subprocess_cli.py",
+      "url": "https://github.com/anthropics/claude-agent-sdk-python/blob/1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7/src/claude_agent_sdk/_internal/transport/subprocess_cli.py#L740",
+      "scope": "Supported forwarding of CLI flags; not proof of the cause of the previous missing child transcripts."
+    }
+  ],
+  "prior_completed_memory_smoke": {
+    "status": "completed",
+    "scope": "Durable-memory smoke stages; not the full research/critic/followup convergence wave.",
+    "native_run": {"bytes": 162993, "sha256": "e90c620ece78c7c9ff8286dcb94033efa7eab0dcf2490f3bb5c84f38aee7d018"},
+    "agents_done": 5,
+    "duration_ms": 2409022,
+    "native_aggregate_tokens": 800995,
+    "native_aggregate_tokens_scope": "Workflow aggregate; not complete per-request provider usage and never added to child/provider counters.",
+    "native_tool_calls": 159,
+    "caller_exit_code": 0,
+    "parent_concluding_result_observed": true,
+    "codex_jobs": {"model": "gpt-6-astra", "effort": "max", "count": 2, "native_exit_codes": [0, 0], "native_copy_matches": 2, "limit_errors": 0, "retries": 0},
+    "usage_record": {"exit_code": 1, "status": "incomplete", "missing_child_transcripts": 5, "effort_observation": "unobserved", "bytes": 38205, "sha256": "b1f2309c862be2e90a1aeec16ef1ef31251a6e4c84af31320a68c47d2d7b31cb"},
+    "conversion": {"exit_code": 0, "layers": 1, "proposals": 8, "survivors": 5, "lost_outputs": 0, "degraded_outputs": 0, "effort_deviations_or_unobserved": 5, "closure_effect": "durable-memory reopened"},
+    "returns": {"bytes": 109355, "sha256": "1a553f330a4a371f12d8784670eebfbcf8d3e9315ea04a98e0e8ae172e322f48"},
+    "survivors": {"bytes": 485, "sha256": "5c2ad883e35880775e3beaf208a9bfd4be56802c76a70fb81c330edae82a4851"},
+    "source_review_exit_code": 0,
+    "promotion": "No successful convergence result or saturation ledger entry; incomplete usage retained."
+  },
+  "qualified_persistence_probe": {
+    "scope": "Unchanged maintained readiness workflow executing the installed Claude version command, then a verifier. No memory-quality, retrieval-quality or new-host workload acceptance.",
+    "caller": "Native Claude print stream-json input/output, Opus/max, allowedTools Workflow, retained non-TTY stdin pipe; session persistence enabled by omitting --no-session-persistence.",
+    "input_command": "rtk claude --version",
+    "agents_done": 2,
+    "status": "completed",
+    "duration_ms": 245997,
+    "parent_concluding_result_observed": true,
+    "eof_after_parent_conclusion": true,
+    "caller_exit_code": 0,
+    "native_run": {"bytes": 22888, "sha256": "10806dc04c01872429eaf581fe8798a9d275f449b31a680409c73d2a49696575"},
+    "caller_observation_provenance": "The coordinator observed the executed flags, EOF submission after conclusion, and the native process tool's exit0. No separate launcher/invocation artifact or tool-completion copy was retained for this probe; these three observations were not independently verified. The original stream independently establishes application-level success.",
+    "caller_stdout": {"bytes": 345440, "sha256": "d491f13b073f0b9a4c8c925cd4abd0cc004418aa61af6a9b97b592eab4af6faa"},
+    "caller_stderr": {"bytes": 0, "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
+    "usage_record": {
+      "exit_code": 0,
+      "status": "complete",
+      "children": 2,
+      "incomplete": [],
+      "effort_mismatches": [],
+      "bytes": 28634,
+      "sha256": "42f9d6a86b68a6ba03a23feba9a67fc70187037ce22d044415c877e580730d2c",
+      "stdout": {"bytes": 412, "sha256": "04817effdef49d3cfb7e83c8f5234926cbac3ef2b744f00f3739416ef2c5a9ca"},
+      "stderr": {"bytes": 0, "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"}
+    },
+    "children": [
+      {"requested_model": "sonnet", "resolved_models": ["claude-sonnet-5-5"], "observed_efforts": ["max"], "native_requests": 3, "complete": true, "provider_usage": {"input_tokens": 8, "output_tokens": 12216, "cache_read_input_tokens": 32807, "cache_creation_input_tokens": 17229}},
+      {"requested_model": "opus", "resolved_models": ["claude-opus-5-5"], "observed_efforts": ["max"], "native_requests": 7, "complete": true, "provider_usage": {"input_tokens": 16, "output_tokens": 10827, "cache_read_input_tokens": 331873, "cache_creation_input_tokens": 54959}}
+    ],
+    "usage_scope": "Native child requests counted once by message identity; excludes parent, prior smoke and independent review. Cache fields remain separate; no whole-task sum is claimed."
+  },
+  "independent_verification": {
+    "role": "stack-verifier / Astra max",
+    "trigger": "Consequential acceptance of a persistence repair after a bounded Sol diagnosis.",
+    "commands": [
+      {"native_tool": "examples/claude-native/workflows/child-usage.mjs --require-effort max", "input": "Original retained workflow transcripts", "exit_code": 0},
+      {"native_tool": "tools/sota-convergence/landscape-sweep/usage_record.py --raw-output --exit-code 0 --require-effort max", "input": "Original-reader rerun output", "exit_code": 0}
+    ],
+    "raw_child_usage_output_sha256": "a54ffbb287e8023d5872880ea26110cc769d6dad80fb1f392825a559e40d8aad",
+    "raw_output_matches_original_measurement": true,
+    "sanitized_usage_payload_matches": true,
+    "measurement_timestamp_changed": true,
+    "original_hashes_match": true,
+    "script_matches_native_git_blob": true,
+    "native_git_blob_exit_code": 0,
+    "terminal_notification_precedes_successful_parent_result": true,
+    "models_and_per_request_max_effort_verified": true,
+    "limits": ["Caller OS exit and original CLI arguments remain coordinator observations", "No model/provider or workflow rerun", "No memory semantics or C4 closure"]
+  },
+  "corrections": [
+    "A native Workflow completed notification does not establish complete child usage. The earlier five-child smoke remains incomplete despite caller exit0 and matching Codex outputs.",
+    "The repaired persistent caller retained both probe child transcripts and passed the unchanged usage checker. This supports the next execution path, not retrospective recovery of absent transcripts or causal isolation across different workflows.",
+    "Empty observed effort arrays in the earlier smoke mean unobserved effort, not proof that requested max was lowered."
+  ],
+  "closure_effect": {
+    "persistence_and_usage_path": "qualified for this native two-child probe",
+    "full_landscape_wave": "pending complete persisted wave",
+    "durable_memory_semantics": "unresolved",
+    "replacement_wsl_acceptance": "unrun; target distro has not been created",
+    "c4": "unresolved",
+    "saturation": false
+  }
+}

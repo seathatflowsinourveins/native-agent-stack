@@ -1,0 +1,10 @@
+observed_utc=2026-09-30T05:20:00Z
+file=omniroute-3.8.51.tgz bytes=137907369
+sha1=12e56f049e617edca50cc17835ea807dbf8c2042
+sha256=421699fdda34bd85bcf035257e88e359edc033c01b85d54b6a4921c1cda4d2ef
+sha512(base64)=sha512-VwwSt+bP9lJiPJXFJMz0nNGGuoewPZU3nFe1SLuO11ADgdSwTegGCxhg8Ov75+31m/cocPxHiO63zygn1XQ0MQ==
+registry dist.shasum=12e56f049e617edca50cc17835ea807dbf8c2042
+registry dist.integrity=sha512-VwwSt+bP9lJiPJXFJMz0nNGGuoewPZU3nFe1SLuO11ADgdSwTegGCxhg8Ov75+31m/cocPxHiO63zygn1XQ0MQ==
+sha1 equals registry dist.shasum: True
+sha512 equals registry dist.integrity: True
+npm pack size equals bytes: True

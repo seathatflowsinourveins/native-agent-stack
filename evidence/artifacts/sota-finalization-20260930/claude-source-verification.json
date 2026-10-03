@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "kind": "primary-source-check-of-native-review-findings",
+  "recorded_at_utc": "2026-09-30T07:48:32.431569+00:00",
+  "method": "Native Git objects, native GitHub API, exact source reads/hashes and native git merge-file simulations. No repository/configuration edits, no model/test reruns.",
+  "claims": [
+    {
+      "id": "F1-stale-base",
+      "verdict": "verified",
+      "head": "5cfa2400e3ebb4aefb8419135345c1fa92b05409",
+      "origin_main": "cc1f6ce1f983721ecb42c7da27e58f0649c132f5",
+      "github_main": "cc1f6ce1f983721ecb42c7da27e58f0649c132f5",
+      "commits_ahead": 24,
+      "upstream_file_overlap_numstat": "959\t1\ttests/test_codex_worker_lane.py\n241\t4\ttools/adoption/apply_codex_lane.py",
+      "merge_simulations": [
+        {
+          "file": "tools/adoption/apply_codex_lane.py",
+          "exit_code": 1,
+          "input_sha256": {
+            "ours": "73ab2454bcfe54199e7dd0e9910e8d00ac9b370e9f4695d767acc2f5a8cbff0b",
+            "base": "a5605cb436cb5fad97394d7c35634e3901c2321a1f7aa33a8aa293a8e4f159db",
+            "upstream": "f867e186d6c12b3091f5ef9c8885dd565e2aa0203c19091f1b4218bee506b3b0"
+          },
+          "stdout_sha256": "683ea081b645336ae66bdde158f24fc63fcdd83523c4529f88bfd2061bb400b1",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "conflict_markers": 1
+        },
+        {
+          "file": "tests/test_codex_worker_lane.py",
+          "exit_code": 1,
+          "input_sha256": {
+            "ours": "cbe4864af05db0809a5d7eb9e3a171a0e62510688bb6a3d1e64df7164746a75f",
+            "base": "41dc80dcfc66c88b597ecd4fc3591210b86f30e77573afd37fff7d4bdb04096e",
+            "upstream": "d0def42e8b4df1e9bd613847864dcb00382dff56d8aa812abc2d94634c881028"
+          },
+          "stdout_sha256": "67f054e42e5981c9d9088f76f1c160fc533510f1059836c0958411733dc097ca",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "conflict_markers": 1
+        }
+      ],
+      "source_url": "https://github.com/seathatflowsinourveins/native-agent-stack/tree/cc1f6ce1f983721ecb42c7da27e58f0649c132f5"
+    },
+    {
+      "id": "F1-owner-receipt-collision",
+      "verdict": "verified",
+      "owner_branch": "claude/sota-defaults-d4-codex-0159-20260930",
+      "owner_head_at_check": "ec449f8930548d0b5fa309530c985c4c896522f7",
+      "receipt_path": "evidence/receipts/codex-01592-qualification-20260930.json",
+      "root_id": "codex-01592-qualification-20260930",
+      "owner_id": "codex-01592-qualification-20260930",
+      "root_sha256": "0d41e2ea59e68c3d6b8e6ddbb20012fc34264fd9fe3a11163b0fba70c6ab41b0",
+      "owner_sha256": "a1f8dd96692db8646dcce0c3c7d0c417bee0a2320c2ae1f9bdfa0c76009cce7e",
+      "bytes_equal": false,
+      "scope": "Local original Git owner branch objects; same id/path, differing content. Owner branch advanced after native review. No private communications were inspected.",
+      "ownership_source": "docs/decisions/2026-09-30-sol-primary-quality-defaults.md:59",
+      "handoff_url": "https://github.com/seathatflowsinourveins/native-agent-stack/issues/140#issuecomment-5904975633"
+    },
+    {
+      "id": "F2-import-closure",
+      "verdict": "verified",
+      "import_source": "tools/adoption/apply_codex_lane.py:72",
+      "import_statement": "from scripts import adoption_status, codex_quota",
+      "guarded_source_paths": [
+        "tools/adoption/apply_codex_lane.py",
+        "scripts/adoption_status.py",
+        "adoption/templates/codex.config.template.toml",
+        "adoption/templates/codex.stack-worker.config.toml",
+        "adoption/templates/codex.AGENTS.template.md",
+        "adoption/pins-linux-x86_64.json"
+      ],
+      "codex_quota_in_guard": false,
+      "codex_quota_sha256": "fa0e3c9e14f367da6a216eaeedfe5a6bac76274f02198f23e80b6f901a9bd94a",
+      "receipt_source": "evidence/artifacts/sota-finalization-20260930/idle-rollout.json:30"
+    },
+    {
+      "id": "F2-window-W",
+      "verdict": "inference_unknown",
+      "confirmed": "The freeze snapshot implementation includes Codex configuration/profile/AGENTS hashes and the recorded W contract forbids carrier/instruction changes during its run.",
+      "unverified": "No current W seal or live run state was inspected; these source facts alone do not prove an active W window. No owner acknowledgment was independently established.",
+      "sources": [
+        "tools/token-e2e/freeze_snapshot.py:741",
+        "tools/token-e2e/freeze_snapshot.py:1071",
+        "docs/decisions/2026-09-28-delegated-decisions.md:99"
+      ]
+    },
+    {
+      "id": "F2-queue-state-drift",
+      "verdict": "verified_receipt_change_only",
+      "reviewed_snapshot_status": "prepared_not_applied",
+      "current_receipt_status": "disarmed_for_source_reconciliation",
+      "current_receipt_application_state": "No production application observed. Original queue attempts refused while active Codex clients remained. Both owned timers were stopped after the native Claude review found stale upstream integration and an omitted imported dependency in the frozen checksum closure. The historical queue acceptance below is retained; no current armed queue is claimed.",
+      "queue_acceptance": {
+        "creation_exit_codes": [
+          0,
+          0
+        ],
+        "service_main_exit": 2,
+        "service_result": "exit-code",
+        "retry_timer_active": true,
+        "expiry_timer_active": true,
+        "returned_result": "refused: nothing written",
+        "stderr_bytes": 0,
+        "host_hashes_unchanged": true,
+        "source_checksum_precondition_passed": true
+      },
+      "live_timer_state_independently_observed": false,
+      "coordinator_disarm_status": "Coordinator stated it would disarm both owned timers after review; actual completion is outside this verifier scope."
+    },
+    {
+      "id": "F6-argv-wording",
+      "verdict": "verified_unqualified_field",
+      "source": "evidence/artifacts/native-skill-finalization-20260930/results.json:68",
+      "field": "same_remaining_native_argv",
+      "recorded_value": true,
+      "interpretation": "The accepted comparison is equivalence after per-run diagnostic debug-path normalization, not literal argv byte equality."
+    },
+    {
+      "id": "F11-F12-publication",
+      "verdict": "not_rechecked",
+      "reason": "Reviewer flagged missing final receipt/publication checks at its snapshot; coordinator owns final completion and registration."
+    },
+    {
+      "id": "F13-lifecycle-pointer",
+      "verdict": "verified_current_value",
+      "source": "adoption/manifest.json:117",
+      "field": "sources.current_native_skills",
+      "value": "catalogs/landscape/native-practice.json",
+      "scope": "Current pointer names catalog rather than the new lifecycle receipt/decision; whether to change its intended meaning is coordinator-owned."
+    }
+  ],
+  "input_changes_during_review": [
+    {
+      "path": "docs/decisions/2026-09-30-sota-native-finalization.md",
+      "before_sha256": "f24f922b720ec899f4e422a0142c1dec9dee560cbafdf7e0f0f25a39c92cd652",
+      "after_sha256": "3bbcd81a1eb0ccb8136b75b4b75baf46aabe31abb3db71f19b342972affb1287"
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/idle-rollout.json",
+      "before_sha256": "fb73c52c796ef25e7393b21f8a820cae42013de3eb9599d883b261256c8dd420",
+      "after_sha256": "2ba2a6b99861436a7e2c1e1b00ee6b26f7f787f95ee624ad7337208ae5b6e842"
+    }
+  ],
+  "boundaries": [
+    "No repository/global-client edits.",
+    "Only explicitly owned private review output files were created.",
+    "No private credential/auth/SSH stores, private peer communications or live systemd state were read.",
+    "Context-mode execute_file refused the explicitly owned private summary because it is outside its workspace; private capture extraction used the already authorized native review driver scope, without changing context-mode permission settings."
+  ]
+}

@@ -20,12 +20,15 @@ Inputs (repository-relative, overridable):
   catalogs/us-equities/coverage.json
   catalogs/sota-convergence/manifest-20260922.json  - source of the 12-layer taxonomy only
   the source records named in TRADING_PIN_SOURCES (trading pins outside the cards)
+  the source records named in RUNTIME_PIN_SOURCES (GPT runtime pins: the new-WSL
+    install plan, the runtime-worker recipe pin record, the native SDK constraints)
 
 Outputs (written under --out):
   foundation-layers.json  {checked_at, layers:[{layer_id,title,summary,decisions,components}], top_gaps}
   trading-catalog.json    {entries:[fine-grained entries + catalog_file], layer_index:{tag:[entry ids]}}
   trading-by-layer.json   {taxonomy:{layer_id:[tags]}, layers:{layer_id:[entries]}}
   trading-pins.json       {entries:[{id, layer, repository, pin, pin_source, repository_source}]}
+  runtime-pins.json       {entries:[{id, group, kind, repository, pin, pin_source, named_in, error, tags}]}
   star-candidates.json    {star_candidates, beyond_stars, star_count}
   models.json             {entries:[...]}
 
@@ -38,6 +41,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from collections import defaultdict
 from pathlib import Path
 
@@ -285,6 +289,527 @@ def resolve_trading_pins(repo_root: Path, sources=TRADING_PIN_SOURCES, taxonomy=
 
 
 # ---------------------------------------------------------------------------
+# GPT runtime workers, SDKs and agents: pins in runtime records, plus watch-only upstreams
+# ---------------------------------------------------------------------------
+
+# The reviewed new-WSL install plan. tests/test_catalog_freshness_runtime.py checks
+# that it is tools/adoption/new_wsl_client_config.py's PLAN_REL plus
+# "/install-plan.json", so this tracker and the client configuration tool move to
+# a new plan revision together.
+NEW_WSL_INSTALL_PLAN = "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json"
+RUNTIME_GROUPS = ("native-client", "agent-sdk", "model-sdk", "gateway", "runtime-worker",
+                  "evaluation-harness", "coding-agent", "ci-action")
+RUNTIME_PIN_KIND = "pin_source"
+RUNTIME_WATCH_KIND = "watch_only"
+# Exactly one of these names where a pin source's pin comes from (see RUNTIME_PIN_SOURCES).
+RUNTIME_SOURCE_FORMS = ("pin_pointer", "row", "requirement")
+# A declared pin_pointer, repository_pointer or row "array" is an RFC 6901 JSON Pointer
+# (https://www.rfc-editor.org/rfc/rfc6901#section-3): empty, or reference tokens that
+# each start with "/", in which "~" appears only as "~0" or "~1". Checked when the
+# declaration is, so a malformed pointer raises instead of reading as a moved record.
+JSON_POINTER_RE = re.compile(r"(?:/(?:[^/~]|~[01])*)*")
+# A "row" source reads these two fields of the row it selects. A composite row
+# (several upstreams in one slot) joins its parts with RUNTIME_PART_SEPARATOR in
+# both fields, in the same order.
+RUNTIME_ROW_REPOSITORY_FIELD = "repository"
+RUNTIME_ROW_PIN_FIELD = "release"
+RUNTIME_PART_SEPARATOR = ";"
+# A repository literal declared below is exactly https://github.com/<owner>/<repo>.
+GITHUB_REPOSITORY_LITERAL_RE = re.compile(r"https://github\.com/[A-Za-z0-9][A-Za-z0-9-]*/[A-Za-z0-9._-]+")
+# A repository resolved from a record only has to be a GitHub URL the fetch step
+# can turn into a slug: github_freshness.py's GITHUB_URL_RE, kept independent here.
+GITHUB_URL_RE = re.compile(r"^https?://github\.com/([^/\s]+)/([^/\s#?]+)")
+# One "name==version" line of a pip constraints file. Comment and blank lines
+# never match; the captured name is compared PEP 503-normalized.
+REQUIREMENT_LINE_RE = re.compile(r"^\s*([A-Za-z0-9][A-Za-z0-9._-]*)\s*==\s*([^\s;#\\]+)")
+# An optional "tags" declaration on a pin or watch source names the tags that carry
+# the upstream's versions, for an upstream whose newest GitHub release is absent or
+# belongs to another package: {"prefix": <literal>, "pattern": <regex>}.
+# github_freshness.py lists the tags whose names start with "prefix" through GitHub's
+# git/matching-refs endpoint (an empty prefix lists every tag), and build_manifest.py
+# keeps the names that re.fullmatch "pattern" and takes the highest version that its
+# one capture group parses to. "pattern" starts with "^", ends with "$" and has exactly
+# one capture group, a dotted numeric version; "prefix" is a prefix of every name the
+# pattern matches. References: nvchecker's GitHub source (use_max_tag with
+# include_regex, nvchecker_source/github.py at v2.22) and Renovate's github-tags datasource.
+RUNTIME_TAG_KEYS = ("prefix", "pattern")
+# A tag prefix is literal: letters, digits, ".", "-", "_", "=" and "+", never "..".
+RUNTIME_TAG_PREFIX_RE = re.compile(r"[A-Za-z0-9._=+-]*")
+
+# GPT-route runtime workers, agent SDKs, the GPT gateway, evaluation harnesses
+# and the native Codex client, each at the pin a runtime record installs. Some of
+# these upstreams also have a catalog row (openai/codex, OmniRoute, inspect_ai and
+# deer-flow are selected trading cards); that row carries the catalog's pin and
+# stays in the drift or trading table, while the entry here carries the runtime
+# record's pin, which can differ. They are not TRADING_PIN_SOURCES: a trading pin
+# must not repeat a selected card's repository and must sit in a trading taxonomy
+# layer. As there, each pin (and repository) is read from its source record at
+# extraction time, never copied here. Unlike there, a record that moved does not
+# raise: the daily job keeps its foundation and trading report, and the entry is
+# written with "pin": null and an "error" (resolve_runtime_pins). Each source has
+# exactly one RUNTIME_SOURCE_FORMS key:
+#   pin_pointer  an RFC 6901 pointer into a JSON record, with repository_pointer
+#                or a literal repository, as in TRADING_PIN_SOURCES;
+#   row          {"array", "key", "value"[, "part_repository"]}: the one row of the
+#                JSON array at "array" whose "key" equals "value"; its
+#                RUNTIME_ROW_REPOSITORY_FIELD and RUNTIME_ROW_PIN_FIELD give the
+#                repository and pin, and part_repository picks one upstream of a
+#                composite row (the release part at the same position);
+#   requirement  a requirement name whose one "name==version" line in a pip
+#                constraints file gives the pin; the repository is a literal.
+# A pin or watch source may also declare "tags" (see RUNTIME_TAG_KEYS).
+RUNTIME_PIN_SOURCES = (
+    {
+        # Codex CLI, the second native client. Its native installer self-updates,
+        # so the row's release is the reviewed release (the row says
+        # version_pinned false), not a lock.
+        "id": "new-wsl:codex",
+        "group": "native-client",
+        "path": NEW_WSL_INSTALL_PLAN,
+        "row": {"array": "/owners", "key": "slot", "value": "codex"},
+    },
+    {
+        # The Codex SDK; the native codex binary owns codex exec and app-server.
+        "id": "new-wsl:codex-sdk",
+        "group": "agent-sdk",
+        "path": NEW_WSL_INSTALL_PLAN,
+        "row": {"array": "/owners", "key": "slot", "value": "codex-sdk-and-codex-exec-app-server"},
+    },
+    {
+        # The Claude Agent SDK, the Codex SDK's pair in the plan's agent-sdks layer.
+        "id": "new-wsl:claude-agent-sdk",
+        "group": "agent-sdk",
+        "path": NEW_WSL_INSTALL_PLAN,
+        "row": {"array": "/owners", "key": "slot", "value": "claude-agent-sdk"},
+    },
+    {
+        # OmniRoute, the GPT gateway that cross-family lanes run through.
+        "id": "new-wsl:omniroute",
+        "group": "gateway",
+        "path": NEW_WSL_INSTALL_PLAN,
+        "row": {"array": "/owners", "key": "slot", "value": "gpt-gateway"},
+    },
+    {
+        # The OpenHands software-agent SDK, the plan's agent runtime worker.
+        "id": "new-wsl:openhands-sdk",
+        "group": "runtime-worker",
+        "path": NEW_WSL_INSTALL_PLAN,
+        "row": {"array": "/owners", "key": "slot", "value": "agent-runtime-worker"},
+    },
+    {
+        # GPT Researcher, the first upstream of the composite research-harnesses row.
+        "id": "new-wsl:gpt-researcher",
+        "group": "runtime-worker",
+        "path": NEW_WSL_INSTALL_PLAN,
+        "row": {"array": "/owners", "key": "slot", "value": "research-harnesses",
+                "part_repository": "https://github.com/assafelovic/gpt-researcher"},
+    },
+    {
+        # DeerFlow, the second upstream of the composite research-harnesses row.
+        "id": "new-wsl:deer-flow",
+        "group": "runtime-worker",
+        "path": NEW_WSL_INSTALL_PLAN,
+        "row": {"array": "/owners", "key": "slot", "value": "research-harnesses",
+                "part_repository": "https://github.com/bytedance/deer-flow"},
+    },
+    {
+        # Harbor, the containerized agent E2E runner.
+        "id": "new-wsl:harbor",
+        "group": "evaluation-harness",
+        "path": NEW_WSL_INSTALL_PLAN,
+        "row": {"array": "/owners", "key": "slot", "value": "harbor-containerized-agent-e2e-runner"},
+    },
+    {
+        # Inspect AI. Upstream publishes no GitHub release, and its first tag in
+        # name order is release/2025-11-28, so the row reads its version tags
+        # (0.3.276) out of all tags (an empty prefix, so a future 1.x is not missed).
+        "id": "new-wsl:inspect-ai",
+        "group": "evaluation-harness",
+        "path": NEW_WSL_INSTALL_PLAN,
+        "row": {"array": "/owners", "key": "slot", "value": "inspect-ai"},
+        "tags": {"prefix": "", "pattern": r"^(\d+\.\d+\.\d+)$"},
+    },
+    {
+        # The OpenHands SDK tag the runtime-worker recipe pins its wheels, image and
+        # source archive to; it can differ from the plan's agent-runtime-worker row.
+        "id": "recipe:openhands-sdk",
+        "group": "runtime-worker",
+        "path": "blueprints/runtime-workers/openhands/pins.json",
+        "pin_pointer": "/tag",
+        "repository_pointer": "/repository",
+    },
+    {
+        # The openai-codex Python SDK in the native SDK constraints. Its official
+        # source is openai/codex's sdk/python (adoption/sdk/README.md).
+        "id": "sdk-lock:openai-codex",
+        "group": "agent-sdk",
+        "path": "adoption/sdk/accepted-constraints.txt",
+        "requirement": "openai-codex",
+        "repository": "https://github.com/openai/codex",
+    },
+    {
+        # The openai Python SDK in the same constraints file.
+        "id": "sdk-lock:openai",
+        "group": "model-sdk",
+        "path": "adoption/sdk/accepted-constraints.txt",
+        "requirement": "openai",
+        "repository": "https://github.com/openai/openai-python",
+    },
+)
+
+# Watch-only upstreams: named in a file on main ("named_in"), but no install or
+# runtime record on main pins them (a catalog card may record an evaluated
+# version), so their rows report upstream activity and are never compared.
+# pi's trial pin lives on unmerged PR #524; the crawl4ai, DeepAgents and
+# codex-action pins live on unmerged PRs #428, #566 and #550. Promote an entry to
+# RUNTIME_PIN_SOURCES when an install or runtime record on main pins it.
+RUNTIME_WATCH_SOURCES = (
+    {
+        # pi, a coding harness and multi-provider agent toolkit.
+        "id": "watch:pi",
+        "group": "coding-agent",
+        "repository": "https://github.com/earendil-works/pi",
+        "named_in": "catalogs/saturation/ledger.json",
+    },
+    {
+        # oh-my-pi, an extended fork of the pi coding agent.
+        "id": "watch:oh-my-pi",
+        "group": "coding-agent",
+        "repository": "https://github.com/can1357/oh-my-pi",
+        "named_in": "catalogs/landscape/upstream-snapshot.json",
+    },
+    {
+        # The OpenAI Agents SDK for Python. Its alternative trading card
+        # (openai-agents-sdk) records v0.22.3, which no table compares: only
+        # default and conditional cards get a row.
+        "id": "watch:openai-agents-python",
+        "group": "agent-sdk",
+        "repository": "https://github.com/openai/openai-agents-python",
+        "named_in": "catalogs/us-equities/agents-operations.json",
+    },
+    {
+        # The OpenAI Agents SDK for JavaScript/TypeScript.
+        "id": "watch:openai-agents-js",
+        "group": "agent-sdk",
+        "repository": "https://github.com/openai/openai-agents-js",
+        "named_in": "docs/decisions/2026-10-02-gpt-runtime-tracking.md",
+    },
+    {
+        # Crawl4AI, a conditional foundation alternative for bulk Markdown ingestion.
+        "id": "watch:crawl4ai",
+        "group": "runtime-worker",
+        "repository": "https://github.com/unclecode/crawl4ai",
+        "named_in": "catalogs/landscape/foundation.json",
+    },
+    {
+        # Deep Agents, a conditional foundation alternative for an application-owned worker.
+        # A monorepo: its latest release can be another package's (deepagents-cli==...,
+        # deepagents-talon==...), so the row reads the deepagents== tags.
+        "id": "watch:deepagents",
+        "group": "runtime-worker",
+        "repository": "https://github.com/langchain-ai/deepagents",
+        "named_in": "catalogs/landscape/foundation.json",
+        "tags": {"prefix": "deepagents==", "pattern": r"^deepagents==(\d+\.\d+\.\d+)$"},
+    },
+    {
+        # The Codex GitHub Action, for running Codex in CI. It publishes tags only
+        # (v1, v1.12), so the row reads the v tags that carry a minor version.
+        "id": "watch:codex-action",
+        "group": "ci-action",
+        "repository": "https://github.com/openai/codex-action",
+        "named_in": "catalogs/saturation/ledger.json",
+        "tags": {"prefix": "v", "pattern": r"^v(\d+\.\d+(?:\.\d+)?)$"},
+    },
+)
+
+
+class _RuntimeSourceUnresolved(Exception):
+    """One runtime source record moved or changed shape. The message is built only
+    from the declared repository-relative path, the pointer, slot or requirement
+    and a short reason, so it is safe to publish."""
+
+
+def _github_slug(url):
+    """Lower-cased 'owner/repo' for a GitHub URL, or None. Mirrors
+    github_freshness.github_slug (kept independent: this module imports no sibling)."""
+    match = GITHUB_URL_RE.match(url) if isinstance(url, str) else None
+    if not match:
+        return None
+    return f"{match.group(1)}/{match.group(2).removesuffix('.git')}".lower()
+
+
+def _normalize_requirement(name: str) -> str:
+    """PEP 503 name normalization (https://peps.python.org/pep-0503/#normalized-names)."""
+    return re.sub(r"[-_.]+", "-", name).lower()
+
+
+def _check_repository_literal(entry_id, value, field="repository") -> None:
+    if not isinstance(value, str) or not GITHUB_REPOSITORY_LITERAL_RE.fullmatch(value):
+        raise ValueError(f"runtime source {entry_id!r}: {field} {value!r} is not "
+                         "https://github.com/<owner>/<repo>")
+
+
+def _check_json_pointer(entry_id, field, pointer) -> None:
+    """Raise ValueError unless ``pointer`` is a string that JSON_POINTER_RE fully matches."""
+    if not isinstance(pointer, str) or not JSON_POINTER_RE.fullmatch(pointer):
+        raise ValueError(f"runtime source {entry_id!r}: {field} {pointer!r} is not an RFC 6901 JSON pointer "
+                         "(empty, or tokens that each start with '/', with '~' only as '~0' or '~1')")
+
+
+def _ends_with_end_anchor(pattern: str) -> bool:
+    """True when ``pattern`` ends with a "$" that no backslash escapes."""
+    if not pattern.endswith("$"):
+        return False
+    body = pattern[:-1]
+    return (len(body) - len(body.rstrip("\\"))) % 2 == 0
+
+
+def _check_tag_declaration(entry_id, tags) -> None:
+    """Raise ValueError unless ``tags`` is a RUNTIME_TAG_KEYS declaration: exactly a
+    literal prefix (RUNTIME_TAG_PREFIX_RE, no "..") and a pattern that starts with
+    "^", ends with an unescaped "$", compiles and has exactly one capture group."""
+    if not isinstance(tags, dict) or set(tags) != set(RUNTIME_TAG_KEYS):
+        raise ValueError(f"runtime source {entry_id!r}: tags needs exactly the keys "
+                         f"{', '.join(RUNTIME_TAG_KEYS)}")
+    prefix, pattern = tags["prefix"], tags["pattern"]
+    if not isinstance(prefix, str) or not RUNTIME_TAG_PREFIX_RE.fullmatch(prefix) or ".." in prefix:
+        raise ValueError(f"runtime source {entry_id!r}: tags prefix {prefix!r} is not a literal tag prefix "
+                         "(letters, digits, '.', '-', '_', '=' and '+', without '..')")
+    if not isinstance(pattern, str) or not pattern.startswith("^") or not _ends_with_end_anchor(pattern):
+        raise ValueError(f"runtime source {entry_id!r}: tags pattern {pattern!r} must start with '^' "
+                         "and end with '$'")
+    try:
+        groups = re.compile(pattern).groups
+    except re.error:
+        raise ValueError(f"runtime source {entry_id!r}: tags pattern {pattern!r} does not compile") from None
+    if groups != 1:
+        raise ValueError(f"runtime source {entry_id!r}: tags pattern {pattern!r} has {groups} capture "
+                         "groups, expected exactly one")
+
+
+def _check_runtime_declaration(repo_root: Path, source: dict, kind: str, seen: set, reserved: set) -> None:
+    """Raise ValueError for a declaration only a code edit can produce."""
+    required = ("id", "group", "path") if kind == RUNTIME_PIN_KIND else ("id", "group", "repository")
+    missing = [field for field in required if not isinstance(source.get(field), str) or not source[field]]
+    if missing:
+        raise ValueError(f"runtime source {source.get('id')!r} has no {', '.join(missing)}")
+    entry_id = source["id"]
+    if entry_id in seen:
+        raise ValueError(f"runtime source id {entry_id!r} duplicates another runtime source")
+    if entry_id in reserved:
+        raise ValueError(f"runtime source id {entry_id!r} duplicates a foundation component, "
+                         "trading entry or trading pin id")
+    seen.add(entry_id)
+    if source["group"] not in RUNTIME_GROUPS:
+        raise ValueError(f"runtime source {entry_id!r}: group {source['group']!r} is not in RUNTIME_GROUPS")
+    if source.get("repository") is not None:
+        _check_repository_literal(entry_id, source["repository"])
+    if source.get("tags") is not None:
+        _check_tag_declaration(entry_id, source["tags"])
+    if kind == RUNTIME_WATCH_KIND:
+        if source.get("named_in") is not None:
+            _source_file(repo_root, source["named_in"])
+        return
+    _source_file(repo_root, source["path"])
+    forms = [form for form in RUNTIME_SOURCE_FORMS if source.get(form) is not None]
+    if len(forms) != 1:
+        raise ValueError(f"runtime source {entry_id!r} needs exactly one of {', '.join(RUNTIME_SOURCE_FORMS)}, "
+                         f"not {forms}")
+    if forms == ["pin_pointer"]:
+        if not isinstance(source["pin_pointer"], str):
+            raise ValueError(f"runtime source {entry_id!r}: pin_pointer is not a string")
+        _check_json_pointer(entry_id, "pin_pointer", source["pin_pointer"])
+        if source.get("repository_pointer") is not None:
+            _check_json_pointer(entry_id, "repository_pointer", source["repository_pointer"])
+        elif not source.get("repository"):
+            raise ValueError(f"runtime source {entry_id!r}: a pin_pointer source needs repository_pointer "
+                             "or repository")
+    elif forms == ["requirement"]:
+        if not isinstance(source["requirement"], str) or not source["requirement"]:
+            raise ValueError(f"runtime source {entry_id!r}: requirement is not a non-empty string")
+        if not source.get("repository"):
+            raise ValueError(f"runtime source {entry_id!r}: a requirement source needs a literal repository")
+    else:
+        row = source["row"]
+        if not isinstance(row, dict) or any(not isinstance(row.get(field), str) or not row[field]
+                                            for field in ("array", "key", "value")):
+            raise ValueError(f"runtime source {entry_id!r}: row needs string array, key and value")
+        _check_json_pointer(entry_id, "row array", row["array"])
+        if row.get("part_repository") is not None:
+            _check_repository_literal(entry_id, row["part_repository"], field="part_repository")
+
+
+def _runtime_locator(source: dict) -> str:
+    """Where a pin source's pin is read, for an error message: declared values only."""
+    if source.get("pin_pointer") is not None:
+        return f"{source['path']}#{source['pin_pointer']}"
+    if source.get("requirement") is not None:
+        return f"{source['path']} requirement {source['requirement']}"
+    row = source["row"]
+    locator = f"{source['path']}#{row['array']} {row['key']} {row['value']!r}"
+    if row.get("part_repository"):
+        locator += f" part {row['part_repository']}"
+    return locator
+
+
+def _runtime_pin_source(source: dict) -> dict:
+    if source.get("pin_pointer") is not None:
+        return {"path": source["path"], "pointer": source["pin_pointer"]}
+    if source.get("requirement") is not None:
+        return {"path": source["path"], "requirement": source["requirement"]}
+    return {"path": source["path"], "row": dict(source["row"])}
+
+
+def _runtime_tags(source: dict):
+    """A copy of a source's checked ``tags`` declaration, or None."""
+    tags = source.get("tags")
+    return dict(tags) if tags is not None else None
+
+
+def _read_runtime_source(repo_root: Path, source: dict, locator: str, as_json: bool):
+    try:
+        text = _source_file(repo_root, source["path"]).read_text(encoding="utf-8")
+    except (OSError, UnicodeError):
+        # Never str(error): an OSError's text carries the absolute host path.
+        raise _RuntimeSourceUnresolved(f"{locator}: source file is missing or unreadable") from None
+    if not as_json:
+        return text
+    try:
+        return json.loads(text)
+    except ValueError:
+        raise _RuntimeSourceUnresolved(f"{locator}: source file is not valid JSON") from None
+
+
+def _runtime_pointer(doc, pointer: str, locator: str):
+    try:
+        return resolve_json_pointer(doc, pointer)
+    except KeyError:
+        raise _RuntimeSourceUnresolved(f"{locator}: pointer {pointer} does not resolve") from None
+
+
+def _runtime_parts(value) -> list:
+    """Composite rule: split on RUNTIME_PART_SEPARATOR and strip each part; a value
+    without the separator, or one that is not a string, is one part."""
+    if isinstance(value, str):
+        return [part.strip() for part in value.split(RUNTIME_PART_SEPARATOR)]
+    return [value]
+
+
+def _resolve_runtime_row(doc, row: dict, locator: str):
+    rows = _runtime_pointer(doc, row["array"], locator)
+    if not isinstance(rows, list):
+        raise _RuntimeSourceUnresolved(f"{locator}: {row['array']} is not a list")
+    matches = [item for item in rows if isinstance(item, dict) and item.get(row["key"]) == row["value"]]
+    if len(matches) != 1:
+        raise _RuntimeSourceUnresolved(f"{locator}: {len(matches)} rows match, expected exactly one")
+    repository = matches[0].get(RUNTIME_ROW_REPOSITORY_FIELD)
+    pin = matches[0].get(RUNTIME_ROW_PIN_FIELD)
+    part_repository = row.get("part_repository")
+    if not part_repository:
+        if any(isinstance(value, str) and RUNTIME_PART_SEPARATOR in value for value in (repository, pin)):
+            raise _RuntimeSourceUnresolved(f"{locator}: composite row, but the source declares no "
+                                           "part_repository")
+        return repository, pin
+    repositories, pins = _runtime_parts(repository), _runtime_parts(pin)
+    if len(repositories) != len(pins):
+        raise _RuntimeSourceUnresolved(f"{locator}: {len(repositories)} repository part(s) but "
+                                       f"{len(pins)} release part(s)")
+    wanted = _github_slug(part_repository)
+    positions = [index for index, part in enumerate(repositories) if _github_slug(part) == wanted]
+    if len(positions) != 1:
+        raise _RuntimeSourceUnresolved(f"{locator}: {len(positions)} parts match part_repository, "
+                                       "expected exactly one")
+    return repositories[positions[0]], pins[positions[0]]
+
+
+def _resolve_runtime_requirement(text: str, name: str, locator: str) -> str:
+    wanted = _normalize_requirement(name)
+    versions = [match.group(2) for match in map(REQUIREMENT_LINE_RE.match, text.splitlines())
+                if match and _normalize_requirement(match.group(1)) == wanted]
+    if not versions:
+        raise _RuntimeSourceUnresolved(f"{locator}: requirement not found")
+    if len(versions) > 1:
+        raise _RuntimeSourceUnresolved(f"{locator}: requirement found {len(versions)} times, expected once")
+    return versions[0]
+
+
+def _resolve_runtime_source(repo_root: Path, source: dict):
+    """(repository, pin) for one pin source; raises _RuntimeSourceUnresolved."""
+    locator = _runtime_locator(source)
+    if source.get("requirement") is not None:
+        text = _read_runtime_source(repo_root, source, locator, as_json=False)
+        repository, pin = source["repository"], _resolve_runtime_requirement(text, source["requirement"], locator)
+    else:
+        doc = _read_runtime_source(repo_root, source, locator, as_json=True)
+        if source.get("row") is not None:
+            repository, pin = _resolve_runtime_row(doc, source["row"], locator)
+        else:
+            pin = _runtime_pointer(doc, source["pin_pointer"], locator)
+            repository = (_runtime_pointer(doc, source["repository_pointer"], locator)
+                          if isinstance(source.get("repository_pointer"), str) else source.get("repository"))
+    if not isinstance(pin, str) or not pin.strip():
+        raise _RuntimeSourceUnresolved(f"{locator}: pin is not a non-empty string")
+    if RUNTIME_PART_SEPARATOR in pin:
+        raise _RuntimeSourceUnresolved(f"{locator}: pin still contains {RUNTIME_PART_SEPARATOR!r}")
+    if _github_slug(repository) is None:
+        raise _RuntimeSourceUnresolved(f"{locator}: repository is not a GitHub URL")
+    return repository, pin
+
+
+def resolve_runtime_pins(repo_root: Path, pin_sources=RUNTIME_PIN_SOURCES, watch_sources=RUNTIME_WATCH_SOURCES,
+                         reserved_ids=()) -> dict:
+    """Resolve each declared runtime pin against its source record, then add the
+    watch-only upstreams. Entries are sorted by id.
+
+    Raises ValueError for a declaration only a code edit can produce: a missing
+    id/group/path (pin source) or id/group/repository (watch source), a group
+    outside RUNTIME_GROUPS, an id that repeats another runtime id or one of
+    ``reserved_ids``, a pin source without exactly one RUNTIME_SOURCE_FORMS key, a
+    pin_pointer, repository_pointer or row "array" that is not an RFC 6901 JSON
+    pointer (JSON_POINTER_RE: "tag" for "/tag", say, would otherwise read as a moved
+    record), a pointer source with neither repository_pointer nor repository, a requirement
+    source without a literal repository, a repository literal that is not
+    https://github.com/<owner>/<repo>, a path that is absolute or contains "..", or
+    a ``tags`` declaration other than RUNTIME_TAG_KEYS describes (a missing or extra
+    key, a prefix with "/", "..", whitespace or another character outside
+    RUNTIME_TAG_PREFIX_RE, or a pattern that is unanchored, does not compile or has
+    other than one capture group). Each entry carries a copy of its source's
+    ``tags``, or None.
+
+    A record that moved or changed shape does not raise, so the daily job keeps its
+    foundation and trading report: that entry is written with ``"pin": None``, its
+    ``repository`` is the declared literal or None, and its ``"error"`` names only
+    the declared path, the pointer, slot or requirement and a short reason. It
+    never carries an exception's text: an OSError's carries an absolute host path,
+    which build_manifest.assert_no_leak and scripts/validate.py reject."""
+    seen, reserved = set(), set(reserved_ids or ())
+    for source in pin_sources:
+        _check_runtime_declaration(repo_root, source, RUNTIME_PIN_KIND, seen, reserved)
+    for source in watch_sources:
+        _check_runtime_declaration(repo_root, source, RUNTIME_WATCH_KIND, seen, reserved)
+    entries = []
+    for source in pin_sources:
+        try:
+            repository, pin = _resolve_runtime_source(repo_root, source)
+            error = None
+        except _RuntimeSourceUnresolved as unresolved:
+            repository, pin, error = source.get("repository"), None, str(unresolved)
+        entries.append({
+            "id": source["id"], "group": source["group"], "kind": RUNTIME_PIN_KIND,
+            "repository": repository, "pin": pin, "pin_source": _runtime_pin_source(source),
+            "named_in": None, "error": error, "tags": _runtime_tags(source),
+        })
+    for source in watch_sources:
+        entries.append({
+            "id": source["id"], "group": source["group"], "kind": RUNTIME_WATCH_KIND,
+            "repository": source["repository"], "pin": None, "pin_source": None,
+            "named_in": source.get("named_in"), "error": None, "tags": _runtime_tags(source),
+        })
+    entries.sort(key=lambda e: e["id"])
+    return {"entries": entries}
+
+
+# ---------------------------------------------------------------------------
 # Beyond the stars: catalogs/us-equities/{star-audit,coverage}.json
 # ---------------------------------------------------------------------------
 
@@ -346,6 +871,12 @@ def main(argv=None) -> int:
     trading_pins = resolve_trading_pins(
         root, taxonomy=taxonomy, card_ids={entry.get("id") for entry in trading_catalog["entries"]},
     )
+    # A runtime id must not reuse an id a foundation or trading report row already has.
+    reserved_ids = {component["id"] for layer in foundation_layers["layers"] for component in layer["components"]}
+    reserved_ids.update(entry.get("id") for entry in trading_catalog["entries"])
+    reserved_ids.update(entry["id"] for entry in trading_pins["entries"])
+    reserved_ids.discard(None)
+    runtime_pins = resolve_runtime_pins(root, reserved_ids=reserved_ids)
 
     star_audit = load_json(us_equities_dir / "star-audit.json")
     coverage = load_json(us_equities_dir / "coverage.json")
@@ -359,6 +890,7 @@ def main(argv=None) -> int:
     write_json(out / "trading-catalog.json", trading_catalog)
     write_json(out / "trading-by-layer.json", trading_by_layer)
     write_json(out / "trading-pins.json", trading_pins)
+    write_json(out / "runtime-pins.json", runtime_pins)
     write_json(out / "star-candidates.json", star_candidates)
     write_json(out / "models.json", models_out)
 
@@ -371,6 +903,8 @@ def main(argv=None) -> int:
         "star_candidates": len(star_candidates["star_candidates"]),
         "beyond_stars": len(star_candidates["beyond_stars"]),
         "models": len(models_out["entries"]),
+        "runtime_pins": len(runtime_pins["entries"]),
+        "runtime_unresolved": sorted(entry["id"] for entry in runtime_pins["entries"] if entry["error"]),
     }))
     if unmapped:
         print(f"warning: {len(unmapped)} tag(s) have no taxonomy layer: {unmapped}")

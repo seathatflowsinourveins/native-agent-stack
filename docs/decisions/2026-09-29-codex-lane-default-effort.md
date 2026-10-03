@@ -61,3 +61,35 @@ with that measurement.
 **Overturn.** A measured comparison on this repository's layer verdicts showing `max` no better than `high` at higher cost (the M7-style sweep of
 [`2026-09-28-community-sweep.md`](2026-09-28-community-sweep.md)), a Codex release that changes what `max` sends for `gpt-6-astra`, or a user change of
 the standing rule.
+
+## Amendment (2026-09-30)
+
+The user changed the standing rule on 2026-09-30: "yes no limit, for highest quality resolution, gpt6.1sol at ultra
+and astra when tasks truly needed it". A lane may stage ultra; its stager chooses per the current GPT worker
+standard. The landscape-sweep harness default stays max. Blind or isolated review lanes must stay at max,
+because ultra auto-delegates through proactive multi-agent mode (openai/codex `rust-v0.159.2`, `ff6aec96948b`,
+`codex-rs/core/src/session/multi_agents.rs:77-103`). This amendment supersedes the blanket prohibition above;
+the original record and its dated measurements remain unchanged.
+
+Staged ultra does not send an ultra effort on root requests. It resolves to the catalog's
+`multi_agent_reasoning_effort`, else max for an ultra-capable catalog model
+(`codex-rs/protocol/src/openai_models/reasoning_effort.rs:12-35`, `codex-rs/core/src/client.rs:863-872`).
+Astra and Sol 6.1 resolve to xhigh (`codex-rs/models-manager/models.json:22,196`) while retaining proactive
+delegation. The harness records staged `effort` and resolved `request_effort` together. Ultra usage is labeled
+`primary_thread_only`; the retained primary-thread counters do not prove complete delegated usage
+(`codex-rs/exec/src/lib.rs:1636-1638`, `codex-rs/exec/src/event_processor_with_jsonl_output.rs:509-511,533-535`).
+
+An ultra lane defaults to an idle budget of 4200 seconds (3600 plus 600) and a total budget of 14400 seconds only
+when those values are absent from staged settings. Initial staging with an ultra idle budget of 3600 seconds or
+less is refused before state changes: the upstream default multi-agent wait cap is 3600 seconds
+(`codex-rs/core/src/config/mod.rs:257`, `codex-rs/core/src/tools/handlers/multi_agents_v2/wait.rs:53-64`).
+If lane configuration raises that cap, its idle budget must also cover it. The sweep's 8 × 540-second wrapper
+cannot accommodate the ultra default; ad-hoc longer lanes require a matching caller wait. Non-ultra lanes
+default to 4000 seconds, and all automatic attempts share that budget. These harness limits and the 300-second
+retry floor implement bounded lifecycle recovery rather than measuring quality at ultra.
+
+Correction and verification path: the prior draft's 7200-second sweep budget exceeded its 4320-second wrapper;
+its reconnect override removed upstream outage recovery; and its ultra label omitted the resolved xhigh request
+effort. Verified against working-tree source at the pin above: local `sweep.js:92`, upstream
+`codex-rs/core/src/responses_retry.rs:71-96`, and the reasoning resolver/catalog/client locators above.
+The local synthetic harness tests cover these repairs; they are not new upstream or live-model acceptance.

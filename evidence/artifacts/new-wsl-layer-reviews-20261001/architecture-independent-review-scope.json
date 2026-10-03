@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "kind": "frozen_independent_review_scope",
+  "checked_at": "2026-10-01T10:02:05Z",
+  "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "escalation": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "role": "stack-researcher",
+    "trigger": "Consequential 37-row architecture composition and conflicting source/acceptance evidence require independent consistency review under the repository's dispatch contract.",
+    "model_basis": "Explicit fixed-role dispatch; this field is not an independently observed native provider response model ID.",
+    "acceptance_result": "Conditional acceptance of capability mapping and evidence boundaries; all32 layers retain material gaps. Installation readiness and saturation are not accepted."
+  },
+  "immutable_inputs": [
+    {
+      "id": "architecture",
+      "source_pr": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/574",
+      "head": "e4772696971a819e6c51c9203febc02965456789",
+      "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "command": "rtk proxy git show e4772696971a819e6c51c9203febc02965456789:catalogs/foundation/new-wsl-architecture-20261001.json",
+      "exit_code": 0,
+      "returned_bytes": 257255,
+      "sha256": "eb9174297d2973df298e71745a02cb170196796d259bf99babc908e83714d90d"
+    },
+    {
+      "id": "peer-foundation-assessment",
+      "source_pr": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/573",
+      "head": "7e6cd883fd3c4ec423cd03b6fb57e73cab11c964",
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/foundation.json",
+      "command": "rtk proxy git show 7e6cd883fd3c4ec423cd03b6fb57e73cab11c964:evidence/artifacts/layer-closure-assessment-20261001/foundation.json",
+      "exit_code": 0,
+      "returned_bytes": 615461,
+      "sha256": "2aa377dd0ae8bbab78d3821c15c235cf3fca726496566c60446cb611cea00c22"
+    },
+    {
+      "id": "crosswalk",
+      "path": "catalogs/foundation/new-wsl-layer-crosswalk-20261001.json",
+      "returned_bytes": 11875,
+      "sha256": "37636424b34850e43e2655136b6daf90624f6633efa1b60a8b5175f65fc6815c"
+    },
+    {
+      "id": "independent-review-snapshot",
+      "private_snapshot": "architecture-inputs/reviews",
+      "files": 38,
+      "layer_reviews": 26,
+      "identity_method": "SHA256 of compact JSON mapping each sorted basename to its exact file SHA256; sorted keys and separators comma/colon, UTF8.",
+      "canonical_name_hash_map_sha256": "61699462cc33404f268f4f5278120abf9d4ac3a53959946a17b38bfc9412b82a",
+      "scope": "Twenty foundation plus six trading-data reviews and contemporaneous source follow-ups. Six trading-runtime independent reviews are not in this snapshot."
+    }
+  ],
+  "questions": [
+    "Preserve the many-to-many relationship of32 capability layers,10 composition themes and5 cross-layer rows.",
+    "Keep selected pins, candidate currency, source review and native/target acceptance distinct.",
+    "Identify actual no-selection rows and the deciding original sources or comparisons.",
+    "Resolve material contradictions in one memory writer, native queue versus mailbox/PTY submission, SDK/skills installation specification and recoverable target-host lifecycle.",
+    "Recommend decision-changing native comparisons with retained failure conditions."
+  ],
+  "runtime_addendum": {
+    "private_snapshot": "architecture-inputs/runtime-addendum",
+    "files": 7,
+    "added_layer_reviews": 6,
+    "worker_source_commit": "46597727c9075eb4e0bc353dae0bcb6a26b371d0",
+    "canonical_name_hash_map_sha256": "9debdb221711a42c0c16158913c737b8e8297b9386c251ed11a197231631f5b5",
+    "independent_identity_result": "matched"
+  },
+  "fingerprint_clarification": {
+    "issue": "The task wording referred to the folder ambiguously. The reviewer initially compared the complete41 original files against the stated38 review-folder-only hash.",
+    "correction": "The explicitly named architecture-inputs/reviews scope contains38 files and reproduces61699462cc33404f268f4f5278120abf9d4ac3a53959946a17b38bfc9412b82a. Adding the three named main inputs produces a different41-file scope. No original bytes changed.",
+    "original41_basename_map_sha256": "9a6da2864c5ba0b943bee870eab496b92b650ac8bf354545a8bb20f91582dc79",
+    "original41_relative_path_map_sha256": "01475255e157ebc13e07be03fe96eda13a1355f4f194faf6c9cbfbc031459fad",
+    "verification": "Coordinator recomputation and independent Astra recomputation both matched all three defined scopes. The reviewer's earlier unresolved fingerprint finding was explicitly withdrawn as a scope comparison error."
+  },
+  "review_result": {
+    "independent_layer_coverage": 32,
+    "canonical_capability_mapping": "20 foundation plus12 US-equities pairs match the frozen canonical catalogs without duplicates, omissions or extras; architecture adds exactly5 cross-layer rows.",
+    "themes": "Nine themes map capabilities; beyond is explicitly a discovery category without repositories. Valid many-to-many navigation is preserved.",
+    "selection_and_acceptance_boundaries": "Passed: recorded versus production pins remain separate and all seven composition entries retain unknown new-host acceptance.",
+    "material_gaps": [
+      "Selected Ubuntu24.04.5 versus queued26.04.1 target assumptions needed relabeling in scheduling and recovery reviews; root corrected those live review files after the frozen audit.",
+      "Catalog ECC head pin differs from intentional per-skill manifest refs; concrete URLs are recovered, but executable-profile reconciliation and lifecycle acceptance remain open.",
+      "Architecture's Python openai-codex0.154.0 and this packet's TypeScript SDK command are separate packages. Explicit --codex-bin binds the worker's executed CLI; package metadata is not SDK acceptance.",
+      "One capture writer is still an acceptance condition; candidate2.5.2 AI_MEMORY_CAPTURE_OWNER must not be attributed to selected2.4.1.",
+      "Native queue model submission remains separate from mailbox reminders and PTY delivery; cross-client submission remains held.",
+      "Research-factor and security domain component selections need explicit capability and canonical-pin reconciliation. The WSL distro row has a pending selection source rather than an undecided preference."
+    ],
+    "sources": [
+      "https://github.com/seathatflowsinourveins/native-agent-stack/blob/5597f9fae2c6148037a74b4e73d2c55fc11c9ff6/docs/ecosystem/manifest.json",
+      "https://github.com/seathatflowsinourveins/native-agent-stack/blob/344a69ffda931d1a05fa28d1c9c146ce32ad49a0/docs/decisions/2026-10-01-new-wsl-distro-recipe.md#L195",
+      "https://github.com/seathatflowsinourveins/native-agent-stack/blob/5597f9fae2c6148037a74b4e73d2c55fc11c9ff6/adoption/skills/manifest.json#L143",
+      "https://github.com/seathatflowsinourveins/native-agent-stack/blob/5597f9fae2c6148037a74b4e73d2c55fc11c9ff6/adoption/sdk/requirements-linux-x86_64-py313.lock#L571",
+      "https://github.com/seathatflowsinourveins/native-agent-stack/blob/5597f9fae2c6148037a74b4e73d2c55fc11c9ff6/blueprints/us-equities/workers/native_worker.py#L248",
+      "https://github.com/akitaonrails/ai-memory/blob/v2.5.2/hooks/_lib.sh",
+      "https://github.com/openai/codex/blob/rust-v0.159.3/codex-rs/tui/src/session_queue_commands.rs",
+      "https://github.com/Dicklesworthstone/mcp_agent_mail/blob/3fad5ec672869f81d2ca0a4c525dde004ac96f45/scripts/hooks/check_inbox.sh"
+    ]
+  },
+  "status": "independently reviewed32 layers; conditional acceptance with explicit material gaps",
+  "new_host_acceptance": "unknown",
+  "limitations": "This records actual frozen inputs and a review assignment, not completed independent acceptance. Current worktree changes after this snapshot are outside its coverage. The native maintained durable-memory smoke runs separately and is not duplicated by this review."
+}

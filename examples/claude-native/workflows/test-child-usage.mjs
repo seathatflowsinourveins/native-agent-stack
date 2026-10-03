@@ -21,6 +21,68 @@ expect('first request cache read and effort are reported', dup.first_request_cac
 expect('first request prompt size is input plus cache read plus cache creation', dup.first_request_prompt_tokens === 502)
 expect('null result is incomplete', !summarizeChild(started, { ...done, result: null }, { model: 'sonnet' }, [msg('m1', 'claude-sonnet-5', 5)]).complete)
 expect('missing journal result is incomplete', !summarizeChild(started, null, { model: 'sonnet' }, [msg('m1', 'claude-sonnet-5', 5)]).complete)
+// PR-A item 6 (#381 AA-PLAN: "a final text that is a wait notice or empty is not counted as complete"; U2 design section 6). The journal
+// result is the child's return: a string, the E2E schema's { answer, evidence } (its answer is read) or another value (its leaves are read).
+// Controls that must stay complete sit beside the failures, so a rule that flags everything fails too.
+const answered = (value) => summarizeChild(started, { ...done, result: value }, { model: 'sonnet' }, [msg('m1', 'claude-sonnet-5', 5)])
+const quality = (c, issue, value) => !c.complete && c.issues.includes(issue) && c.return_quality === value
+for (const [label, value] of [['an empty answer', { answer: '', evidence: [] }], ['an empty string', ''], ['a blank string', '   '],
+  ['an empty object', {}], ['an object whose leaves are all blank', { findings: [], summary: ' ', notes: [null] }]]) {
+  expect('item 6: ' + label + ' is an empty result', quality(answered(value), 'empty result', 'empty'))
+}
+for (const [label, value] of [['a wait-notice answer', { answer: 'Waiting for monitor', evidence: [] }], ['a wait-notice string', 'Waiting for monitor'],
+  ['a still-waiting sentence', 'Still waiting for the background build to finish.'], ["an I'll-wait sentence", "I'll wait for the monitor notification."],
+  ['a typographic apostrophe', 'I’ll wait for the monitor notification.'], ['two lead words', 'Now I am waiting on CI.'],
+  ['a bold notice', '**Waiting until the job ends**'], ['an object whose only strings are wait notices', { status: 'Waiting for the monitor to report.', count: 0 }]]) {
+  expect('item 6: ' + label + ' is a wait-notice result', quality(answered(value), 'wait-notice result', 'wait_notice'))
+}
+for (const [label, value] of [['a sentence about waiting time', 'Waiting time p90 is 3 s.'],
+  ['a later sentence that waits', { answer: 'The fix is in a.py. Waiting for review is not required.', evidence: ['a.py:3'] }],
+  ['a long answer', 'Waiting for the lock is the root cause: ' + 'x'.repeat(600)], ['a word that only starts with for', 'Waiting fortunes are not a notice'],
+  ['a boolean-only object (no string to be a wait notice)', { ok: true }], ['a number', 0], ['four non-word characters before the notice', '--- Waiting for monitor']]) {
+  const c = answered(value)
+  expect('item 6: ' + label + ' is complete', c.complete && c.return_quality === 'ok' && !c.issues.some((i) => i.endsWith(' result') && i !== 'null result'))
+}
+expect('item 6: a null result keeps its issue and has no return quality', (() => { const c = answered(null); return !c.complete && c.issues.includes('null result') && c.return_quality === null })())
+expect('item 6: waitNotice reads the first sentence of at most 400 characters', typeof kernel.waitNotice === 'function'
+  && kernel.waitNotice('We will wait until the job ends.') && !kernel.waitNotice('The job ended. We will wait until the next one.') && !kernel.waitNotice('w'.repeat(390) + ' Waiting for x')
+  && !kernel.waitNotice('') && !kernel.waitNotice('I shall wait for it') && kernel.waitNotice("let me   wait on it") && !kernel.waitNotice('still now still wait for x'))
+// The transcript side (final_return): a child whose own background task (Bash run_in_background's backgroundTaskId, a Monitor or Workflow taskId,
+// or an async Agent's agentId) has no terminal <task-notification> (a <status> of completed, failed, killed or stopped) and no TaskStop by the
+// final assistant row returned while it still ran; the client stops a foreground subagent's background command at its final response
+// (code.claude.com/docs/en/tools-reference, "Background commands"). A Monitor event notification carries no status and ends nothing.
+const said = (id, blocks, minute) => ({ type: 'assistant', timestamp: '2026-09-26T01:' + String(minute).padStart(2, '0') + ':00Z', effort: 'medium',
+  message: { id, model: 'claude-sonnet-5', usage: { input_tokens: 1, output_tokens: 1, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 }, content: blocks } })
+const ran = (id, name, input, minute) => said('msg-' + id, [{ type: 'tool_use', id, name, input }], minute)
+const returned = (id, content, toolUseResult, minute, isError = false) => ({ type: 'user', timestamp: '2026-09-26T01:' + String(minute).padStart(2, '0') + ':30Z',
+  message: { role: 'user', content: [{ type: 'tool_result', tool_use_id: id, content, is_error: isError }] }, toolUseResult })
+const note = (task, status) => '<task-notification>\n<task-id>' + task + '</task-id>\n<tool-use-id>t</tool-use-id>\n' + (status ? '<status>' + status + '</status>\n' : '<event>a line</event>\n') + '<summary>s</summary>\n</task-notification>'
+const queued = (prompt, minute) => ({ type: 'attachment', timestamp: '2026-09-26T01:' + String(minute).padStart(2, '0') + ':40Z', attachment: { type: 'queued_command', prompt, commandMode: 'task-notification' } })
+const told = (text, minute) => ({ type: 'user', timestamp: '2026-09-26T01:' + String(minute).padStart(2, '0') + ':45Z', message: { role: 'user', content: text } })
+const final = (text, minute) => said('msg-final', [{ type: 'text', text }], minute)
+const bashBg = [ran('b1', 'Bash', { command: 'sleep 60', run_in_background: true }, 1), returned('b1', 'Command running in background with ID: bg1', { backgroundTaskId: 'bg1' }, 1)]
+const monitor = [ran('w1', 'Monitor', { command: 'tail -f log' }, 1), returned('w1', 'Monitor started', { taskId: 'mon1' }, 1)]
+const background = (rows) => summarizeChild(started, done, { model: 'sonnet' }, rows)
+const pendingIssue = (c, n) => !c.complete && c.issues.includes('returned with ' + n + ' background task(s) that had no completion notification')
+const bgCase = background([...bashBg, final('Done.', 3)])
+expect('item 6: a Bash background task with no notification by the final message makes the child incomplete', pendingIssue(bgCase, 1)
+  && bgCase.final_return?.background_started === 1 && bgCase.final_return?.background_pending === 1 && bgCase.final_return?.final === 'text')
+expect('item 6: a completed notification in a queued_command prompt before the final message ends the task', background([...bashBg, queued(note('bg1', 'completed'), 2), final('Done.', 3)]).complete)
+expect('item 6: a failed, killed or stopped notification in a user string ends the task too', ['failed', 'killed', 'stopped'].every((s) => background([...bashBg, told(note('bg1', s), 2), final('Done.', 3)]).complete))
+const events = background([...monitor, told(note('mon1', null), 2), final('Done.', 3)])
+expect('item 6: a Monitor whose only notification is an event (no status) is still pending', pendingIssue(events, 1) && events.final_return?.background_pending_with_events === 1)
+expect('item 6: a Monitor with a completed notification is not pending', background([...monitor, told(note('mon1', null), 2), told(note('mon1', 'completed'), 2), final('Done.', 3)]).complete)
+expect('item 6: a status outside the terminal set ends nothing (fail closed)', pendingIssue(background([...bashBg, told(note('bg1', 'running'), 2), final('Done.', 3)]), 1))
+expect('item 6: a notification after the final assistant row does not count', pendingIssue(background([...bashBg, final('Done.', 3), queued(note('bg1', 'completed'), 4)]), 1))
+expect('item 6: a TaskStop result that names the task ends it; an error TaskStop does not',
+  background([...bashBg, ran('s1', 'TaskStop', { task_id: 'bg1' }, 2), returned('s1', 'stopped', { task_id: 'bg1', task_type: 'local_bash', message: 'm', command: 'c' }, 2), final('Done.', 3)]).complete
+  && pendingIssue(background([...bashBg, ran('s1', 'TaskStop', { task_id: 'bg1' }, 2), returned('s1', '<tool_use_error>No task</tool_use_error>', 'Error: No task', 2, true), final('Done.', 3)]), 1))
+expect('item 6: Workflow taskIds and async Agent ids are background tasks as well', pendingIssue(background([ran('f1', 'Workflow', { script: 'x' }, 1), returned('f1', 'started', { status: 'async_launched', taskId: 'wf1', taskType: 'local_workflow' }, 1),
+  ran('a1', 'Agent', { prompt: 'p', run_in_background: true }, 1), returned('a1', 'launched', { status: 'async_launched', agentId: 'ag1', isAsync: true }, 1), final('Done.', 3)]), 2))
+expect('item 6: a synchronous Agent result names no background task', background([ran('a1', 'Agent', { prompt: 'p' }, 1), returned('a1', 'done', { status: 'completed', agentId: 'ag1' }, 1), final('Done.', 3)]).complete)
+const finals = [[[...bashBg, queued(note('bg1', 'completed'), 2), final('   ', 3)], { final: 'text', empty_text: 1, wait_notice: 0 }], [[final('Waiting for monitor', 3)], { final: 'text', empty_text: 0, wait_notice: 1 }],
+  [[...bashBg, queued(note('bg1', 'completed'), 2), ran('z1', 'StructuredOutput', { answer: 'x' }, 3)], { final: 'tool_use', empty_text: 0, wait_notice: 0 }]]
+expect('item 6: final_return names the final row kind and reads its text', finals.every(([rows, want]) => { const f = background(rows).final_return || {}; return f.status === 'measured' && Object.entries(want).every(([k, v]) => f[k] === v) }))
 const inherited = summarizeChild(started, done, { agentType: 'workflow' }, [msg('m1', 'claude-fable-5-1', 5)])
 expect('an omitted model is flagged as not requested explicitly, without claiming coordinator inheritance', !inherited.complete && inherited.requested_model === null && inherited.issues.some((i) => i.includes('not requested explicitly')) && !inherited.issues.some((i) => i.includes('inherits')))
 const swapped = summarizeChild(started, done, { model: 'haiku' }, [msg('m1', 'claude-haiku-4-5-20251001', 5), msg('m2', 'claude-sonnet-5', 7)])
@@ -109,6 +171,20 @@ try {
   writeFileSync(join(fell, 'agent-a1.meta.json'), JSON.stringify({ model: 'opus', agentType: 'evidence-reviewer' }))
   writeFileSync(join(fell, 'agent-a1.jsonl'), [vmsg('m1', 'claude-opus-5-5', '2.1.281'), vmsg('m2', 'claude-opus-4-8', '2.1.281')].map((e) => JSON.stringify(e)).join('\n') + '\n')
   expect('cli: a run with a fallback child exits 1 and reports the run incomplete', cli(fell, '--require-effort', 'max') === 1 && summarizeRun(fell).status === 'incomplete')
+  // PR-A item 6 at run level: a child that handed on only a wait notice leaves the run incomplete and the CLI exits 1, although every
+  // row ran at the required effort; the same run with a real answer passes (a control that the new rule does not fail every run).
+  const waiting = join(dir, 'waiting'); mkdirSync(waiting)
+  writeFileSync(join(waiting, 'journal.jsonl'), [started, { ...done, result: { answer: 'Waiting for monitor', evidence: [] } }].map((e) => JSON.stringify(e)).join('\n') + '\n')
+  writeFileSync(join(waiting, 'agent-a1.meta.json'), JSON.stringify({ model: 'sonnet', agentType: 'workflow' }))
+  writeFileSync(join(waiting, 'agent-a1.jsonl'), JSON.stringify(msg('m1', 'claude-sonnet-5', 9, 100, 0, 'max')) + '\n')
+  const waitRun = summarizeRun(waiting)
+  expect('item 6: a run whose child returned only a wait notice is incomplete and the cli exits 1', waitRun.status === 'incomplete'
+    && waitRun.children[0].issues.includes('wait-notice result') && cli(waiting, '--require-effort', 'max') === 1)
+  const answeredDir = join(dir, 'answered'); mkdirSync(answeredDir)
+  writeFileSync(join(answeredDir, 'journal.jsonl'), [started, { ...done, result: { answer: 'The fix is in a.py.', evidence: ['a.py:3'] } }].map((e) => JSON.stringify(e)).join('\n') + '\n')
+  writeFileSync(join(answeredDir, 'agent-a1.meta.json'), JSON.stringify({ model: 'sonnet', agentType: 'workflow' }))
+  writeFileSync(join(answeredDir, 'agent-a1.jsonl'), JSON.stringify(msg('m1', 'claude-sonnet-5', 9, 100, 0, 'max')) + '\n')
+  expect('item 6: the same run with a real answer is complete and the cli exits 0', summarizeRun(answeredDir).status === 'complete' && cli(answeredDir, '--require-effort', 'max') === 0)
   // A call the runtime re-ran under the same journal key (a Workflow pauses at a usage limit and re-runs its waiting
   // agents after the reset): the attempt that returned nothing is superseded, not lost, and its usage still counts.
   const limitRow = { type: 'assistant', isApiErrorMessage: true, effort: 'max', message: { id: 'syn1', model: '<synthetic>', usage: { input_tokens: 0, output_tokens: 0, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 } } }
@@ -149,6 +225,23 @@ try {
   expect('rerun: a superseded attempt without a transcript has unknown usage, so the run is incomplete', noLog.status === 'incomplete' && ((noLog.superseded_attempts || [])[0] || {}).usage_issues.some((i) => i.includes('no transcript')))
   const quiet = summarizeRun(rerunWith('rerun-no-request', [{ type: 'user', message: { role: 'user', content: 'go' } }]))
   expect('rerun: a superseded attempt that made no request (zero usage) leaves the run complete', quiet.status === 'complete' && !((quiet.superseded_attempts || [])[0] || {}).usage_issues)
+  // Binding decision B9 and U2 correction 1 in run mode: children[].lanes.measurement.usage, a superseded attempt's too, reads usage.iterations[]
+  // (advisor_iterations with their own model and split; tier fields per message). Control: a child whose usage this reading cannot complete
+  // (a compaction entry) keeps the run complete and the cli at exit 0, because summarizeChild and the exit code do not read measurement.usage.
+  const iter = (type, i, o, cc, extra = {}) => ({ type, input_tokens: i, output_tokens: o, cache_read_input_tokens: 0, cache_creation_input_tokens: cc, cache_creation: { ephemeral_5m_input_tokens: cc, ephemeral_1h_input_tokens: 0 }, ...extra })
+  const advisorRow = { type: 'assistant', effort: 'max', message: { id: 'am1', model: 'claude-sonnet-5-5', content: [{ type: 'server_tool_use', id: 'srv1', name: 'advisor', input: {} }, { type: 'advisor_tool_result', tool_use_id: 'srv1', content: { type: 'advisor_redacted_result', encrypted_content: 'e' } }],
+    usage: { input_tokens: 5, output_tokens: 3, cache_read_input_tokens: 0, cache_creation_input_tokens: 2, cache_creation: { ephemeral_5m_input_tokens: 2, ephemeral_1h_input_tokens: 0 }, speed: 'standard', service_tier: 'standard', inference_geo: 'not_available',
+      iterations: [iter('message', 2, 1, 2), iter('advisor_message', 40, 60, 10, { model: 'claude-opus-5-5' }), iter('message', 3, 2, 0)] } } }
+  const compactionRow = { type: 'assistant', effort: 'max', message: { id: 'am2', model: 'claude-sonnet-5-5', usage: { input_tokens: 3, output_tokens: 1, cache_read_input_tokens: 0, cache_creation_input_tokens: 0, iterations: [iter('compaction', 50, 9, 0), iter('message', 3, 1, 0)] } } }
+  const adv = join(dir, 'advisor'); mkdirSync(adv)
+  writeFileSync(join(adv, 'journal.jsonl'), [started, done].map((e) => JSON.stringify(e)).join('\n') + '\n')
+  writeFileSync(join(adv, 'agent-a1.meta.json'), JSON.stringify({ model: 'sonnet', agentType: 'workflow' }))
+  writeFileSync(join(adv, 'agent-a1.jsonl'), [advisorRow, compactionRow].map((e) => JSON.stringify(e)).join('\n') + '\n')
+  const advRun = summarizeRun(adv), advUsage = advRun.children[0]?.lanes?.measurement?.usage || {}
+  expect('usage: a child whose usage iterations cannot all be read keeps the run complete and the cli at exit 0 (control)', advRun.status === 'complete' && advRun.children[0].complete && cli(adv, '--require-effort', 'max') === 0)
+  expect('usage: run-mode children carry advisor iterations with their own model and split, tier fields per message, and incomplete usage for a compaction entry', advUsage.complete === false && JSON.stringify((advUsage.advisor_iterations || []).map((a) => [a.message_ordinal, a.model, a.usage.output_tokens, a.cache_creation_5m, a.cache_creation_1h])) === JSON.stringify([[1, 'claude-opus-5-5', 60, 10, 0]]) && advUsage.messages[0].speed === 'standard' && advUsage.messages[0].cache_creation_5m === 2 && JSON.stringify(advUsage.iteration_issues?.unread_entries) === '{"compaction":1}')
+  const supAdv = summarizeRun(rerunWith('rerun-advisor', [advisorRow, limitRow]))
+  expect('usage: a superseded attempt carries its advisor iterations too', (((supAdv.superseded_attempts || [])[0] || {}).lanes?.measurement?.usage?.advisor_iterations || []).length === 1)
   const capRun = join(dir, 'cap'); mkdirSync(capRun)
   writeFileSync(join(capRun, 'journal.jsonl'), [started, done, { ...started, agentId: 'a2', label: 'review' }, { type: 'result', agentId: 'a2', result: { ok: true } }].map((e) => JSON.stringify(e)).join('\n') + '\n')
   for (const id of ['a1', 'a2']) writeFileSync(join(capRun, 'agent-' + id + '.meta.json'), JSON.stringify({ model: 'opus', agentType: 'workflow' }))
@@ -228,6 +321,13 @@ const injected = childLanes([ask('plain workflow packet', 0), attach({ type: 'ho
 expect('lanes: SubagentStart hook_additional_context carrying the marker is an injected block', !injected.injected_block.in_first_prompt && injected.injected_block.in_subagent_start_context && injected.subagent_start.additional_context && injected.subagent_start.types.join() === 'workflow-subagent')
 const viaStdout = childLanes([ask('packet', 0), attach({ type: 'hook_success', hookName: 'SubagentStart:general-purpose', hookEvent: 'SubagentStart', toolUseID: 'start', command: 'lanes-hook', stdout: JSON.stringify({ hookSpecificOutput: { hookEventName: 'SubagentStart', additionalContext: 'block ' + DEFAULT_MARKER } }), stderr: '', exitCode: 0 }, 0)])
 expect('lanes: stdout-only context is a claim, never proof of insertion', !viaStdout.injected_block.in_subagent_start_context && !viaStdout.subagent_start.additional_context && viaStdout.measurement.hook_context.claimed === 1)
+// Item 1 (PR-A): the SubagentStart insertion row as 2.1.283/2.1.284 clients write it (a plain hookName, hookEvent SubagentStart, a fresh
+// toolUseID, one content entry). Control, equal at the base: the marker is found in SubagentStart context and a plain name names no agent
+// type. New: the row's block counts per event, and an aggregate counts the actors with an insertion (a claim-only child is not one).
+const plainStart = childLanes([ask('packet', 0), attach({ type: 'hook_additional_context', hookName: 'SubagentStart', hookEvent: 'SubagentStart', toolUseID: 'agent-fresh', content: ['lanes\n' + DEFAULT_MARKER] }, 0)])
+expect('lanes: a plain SubagentStart insertion row carrying the marker is an injected block and names no agent type (control)', plainStart.injected_block.in_subagent_start_context && plainStart.subagent_start.types.length === 0 && plainStart.measurement.hook_context.by_hook.SubagentStart === 1)
+const startAgg = aggregateLanes([{ lanes: plainStart }, { lanes: viaStdout }]).measurement.hook_context
+expect('hook context: an insertion row counts its content entries per event, and the aggregate counts actors with an insertion, not claims', plainStart.measurement.hook_context.inserted_blocks === 1 && JSON.stringify(plainStart.measurement.hook_context.blocks_by_event) === '{"SubagentStart":1}' && startAgg.inserted === 1 && startAgg.claimed === 1 && startAgg.actors_with_insertion === 1)
 const quoted = childLanes([ask('no block here', 0), call('d1', 'Bash', { command: 'grep -c "' + DEFAULT_MARKER + '" hooks.mjs' }, 1), toolResult('d1', 'match ' + DEFAULT_MARKER, 1)])
 expect('lanes: the marker in tool input or output is never an injected block', !quoted.injected_block.in_first_prompt && !quoted.injected_block.in_subagent_start_context)
 expect('lanes: another marker is looked for when given', childLanes([ask('nonce-7f3', 0)], { marker: 'nonce-7f3' }).injected_block.in_first_prompt && !childLanes([ask('nonce-7f3', 0)]).injected_block.in_first_prompt)
@@ -400,20 +500,34 @@ const deepRun = timed(() => { try { return ['"$('.repeat(3000), Array.from({ len
 expect('nesting: 3,000 nested "$( and a 3,000-deep shell heredoc chain are read without exhausting the stack', Array.isArray(deepRun.r) && deepRun.ms < 1000)
 // D8 (GPT-6 #9, Claude review R9): the M4 text scanners read a run of unclosed "((" in linear time. Before the repair each
 // unclosed "((" looked ahead to the end of its line, so n = 8000, 16000 and 32000 took about 315, 1100 and 5000 ms (four times
-// per doubling). Each size is timed as the best of five runs; a run over 1.5 s ends the doubling (it is far past the bound
-// already), and 5 ms of the allowance is timer and GC noise, not growth. The brief's requirement, at most 2.5 times per doubling and
-// under 150 ms at 64,000, applies to that input (about 30 ms here); the other shapes below keep the ratio and take an absolute
-// bound of 1.5 s at 64,000, since each does real work per unit and a CI runner is slower than this host.
+// per doubling). Each size is timed as the best of five runs (the minimum of repeats: CPython's timeit documents that the lowest value
+// bounds what the machine can do and the higher ones come from other processes, Doc/library/timeit.rst at 3.13); a run over 1.5 s
+// ends the doubling (it is far past the bound already).
+// Scaling criterion (2026-09-30; it replaces "each size at most 2.5 times the last plus 5 ms", which the brief asked for per doubling):
+// the growth exponent from 16000 to 64000, ln((t64 + 5 ms) / (t16 + 5 ms)) / ln 4, stays under 1.5 (1 is linear, 2 is quadratic, 1.5 is
+// where they meet on a log scale). The 5 ms is the timer and GC noise the earlier check allowed; the 8000 and 32000 times are measured and
+// printed but carry no weight, because judging every step on its own is what failed validate-macos on #548 (twice) and #552 at steps of
+// 2.56 to 3.0 times on linear scanners (actions runs 36745793168, attempts 1 and 2, and 36751526079, full-suite-macos.log); all 36 samples
+// of those runs have an exponent of 1.19 or less. This is a local check: google/benchmark also judges complexity over a family of sizes,
+// but it fits fixed curves and picks the lowest normalized RMS (docs/user_guide.md "Calculating Asymptotic Complexity (Big O)",
+// src/complexity.cc MinimalLeastSq, v1.9.5) and needs its C++ harness.
+// Detection floor: a pure quadratic scan passes while its time at 16,000 is under 4.4 ms (under 70 ms at 64,000; the old ratio failed it
+// above 13 ms), so for small scans the absolute bounds are the guard: the brief's 150 ms at 64,000 for '((' (about 30 ms here) and 1.5 s
+// for the other shapes, since each does real work per unit and a CI runner is slower than this host. The controls below keep a quadratic
+// scan above that floor failing.
 {
-  const ratio = (ms) => ms.length === 4 && ms.every((t, i) => i === 0 || t <= 2.5 * ms[i - 1] + 5)
-  // Best of five per size; when the ratio fails, up to two more rounds and the elementwise minimum of all rounds, so one pause
+  const SIZES = [8000, 16000, 32000, 64000]
+  // The growth exponent from 16000 to 64000 (a 4 times range): ln((t64 + 5 ms) / (t16 + 5 ms)) / ln 4.
+  const exponent = (ms) => Math.log((ms[3] + 5) / (ms[1] + 5)) / Math.log(SIZES[3] / SIZES[1])
+  const scales = (ms) => ms.length === 4 && exponent(ms) < 1.5
+  // Best of five per size; when the criterion fails, up to two more rounds and the elementwise minimum of all rounds, so one pause
   // (a GC or a busy runner) cannot fail a linear scan, while a quadratic one fails every round.
-  const doubling = (make, run) => {
+  const doubling = (make, run, rounds = 3) => {
     run(make(2000)); run(make(2000)) // warm-up
     let best = []
-    for (let round = 0; round < 3 && !ratio(best); round++) {
+    for (let round = 0; round < rounds && !scales(best); round++) {
       const ms = []
-      for (const n of [8000, 16000, 32000, 64000]) {
+      for (const n of SIZES) {
         const input = make(n)
         let t = Infinity
         for (let i = 0; i < 5; i++) { t = Math.min(t, timed(() => run(input)).ms); if (t > 1500) break }
@@ -424,12 +538,21 @@ expect('nesting: 3,000 nested "$( and a 3,000-deep shell heredoc chain are read 
     }
     return best
   }
-  const linear = (ms) => ratio(ms) && ms[3] < 150 // the brief's bound, for '(('.repeat(n) + 'qmd'
-  const linearWork = (ms) => ratio(ms) && ms[3] < 1500 // every other shape
+  const linear = (ms) => scales(ms) && ms[3] < 150 // the brief's bound, for '(('.repeat(n) + 'qmd'
+  const linearWork = (ms) => scales(ms) && ms[3] < 1500 // every other shape
   const shape = (label, make, reader, run, bound = linearWork) => {
     const ms = doubling(make, run)
-    expect('linear: ' + label + ' (' + reader + ') at n = 8000, 16000, 32000, 64000 takes [' + ms.map((t) => t.toFixed(0)).join(', ') + '] ms', bound(ms))
+    expect('linear: ' + label + ' (' + reader + ') at n = 8000, 16000, 32000, 64000 takes [' + ms.map((t) => t.toFixed(0)).join(', ') + '] ms, exponent ' + (ms.length === 4 ? exponent(ms).toFixed(2) : 'n/a'), bound(ms))
   }
+  // Controls of the criterion. (1) Recorded samples (validate-macos, 2026-09-30): four linear scans that the per-doubling check failed or came
+  // near failing pass, and the scan measured before the repair, continued quadratically, fails. (2) A scan that is quadratic by construction,
+  // timed by the same harness in one round (a harness whose times were all near zero would pass anything): it is refused while its time at
+  // 16,000 is at least 4.4 ms, or when the 1.5 s cap ends its doubling early; from this host's times, a host about 5 times faster would
+  // miss it and one about 16 times slower would end it early.
+  expect('linear: control: recorded macOS samples of linear scans that failed or came near failing the per-doubling check fit an exponent under 1.5', [[9, 16, 48, 104], [7, 17, 47, 84], [55, 103, 203, 519], [3, 6, 18, 48]].every((ms) => scales(ms)))
+  expect('linear: control: the scan measured before the repair (315, 1100, 5000 ms), continued quadratically, fits an exponent over 1.5', !scales([315, 1100, 5000, 20000]))
+  const quadraticMs = doubling((n) => 'x'.repeat(n), (c) => { let s = 0; for (let i = 0; i < c.length; i++) for (let j = 0; j < c.length / 8; j++) s += j; return s }, 1)
+  expect('linear: control: a scan that is quadratic by construction takes [' + quadraticMs.map((t) => t.toFixed(0)).join(', ') + '] ms, exponent ' + (quadraticMs.length === 4 ? exponent(quadraticMs).toFixed(2) : 'n/a') + ', and is refused', !scales(quadraticMs))
   const dparen = (n) => '(('.repeat(n) + 'qmd'
   shape('a run of unclosed ((', dparen, 'executedText', (c) => executedText(c), linear)
   shape('a run of unclosed ((', dparen, 'executedText inlineHttp', (c) => executedText(c, { inlineHttp: true }), linear)
@@ -444,6 +567,12 @@ expect('nesting: 3,000 nested "$( and a 3,000-deep shell heredoc chain are read 
   shape('a run of run strings', (n) => 'bash -c "x" '.repeat(n), 'executedText', (c) => executedText(c))
   shape('a run of words with # inside', (n) => 'a#'.repeat(n), 'executedText', (c) => executedText(c))
   shape('a long script of echo, substitution and pipe lines', (n) => Array.from({ length: Math.ceil(n / 8) }, (_, i) => 'echo "step ' + i + ': $(date +%s)" >> log.txt; qmd search "term ' + i + '" -n 2 | head -5').join('\n'), 'fetchKind', (c) => fetchKind(c))
+  // Binding decision B8's part splitter reads the same frames plus here-document bodies: a script of heredocs, lists and quoted
+  // substitutions, and here-documents left open inside substitutions with newlines in deeper frames (the pending list is bounded).
+  if (typeof kernel.shellParts === 'function') {
+    shape('a script of heredocs, lists and quoted substitutions', (n) => Array.from({ length: Math.ceil(n / 40) }, (_, i) => "cat <<'E' && git log -" + i + ' | head\nx; y "$(z)"\nE').join('\n'), 'shellParts', (c) => kernel.shellParts(c))
+    shape('here-documents left open in substitutions, then newlines in frames', (n) => '$(cat <<A) '.repeat(Math.ceil(n / 22)) + '$(\n'.repeat(Math.ceil(n / 6)), 'shellParts', (c) => kernel.shellParts(c))
+  }
   // D8 for the command-position layer (GPT-6 #9; Claude review R9). The parser reads these texts in linear time, but the walk over a node's
   // children with child(i) and fieldNameForChild(i) cost O(i) per call in web-tree-sitter 0.27.0, so a flat run of unclosed constructs
   // (one wide ERROR node) or of comments (one wide program node) took four times as long for twice the text: '(('.repeat(n) + 'qmd'

@@ -33,7 +33,7 @@ Static checks (no model call):
                 reason it is an exception)
 Live checks (--live; each worker is a model call on the shared allowance, so scripts/codex_quota.py --gate runs
 first and a reached gate refuses them):
-  workers       two concurrent `codex exec -p stack-worker -m gpt-6-astra -c model_reasoning_effort="max"
+  workers       two concurrent `codex exec -p stack-worker -m gpt-6.1-sol -c model_reasoning_effort="max"
                 -c web_search="live" -s read-only --skip-git-repo-check` workers (every live worker carries those
                 pins, since a project config outranks the profile), one started in its directory and one with -C
                 from another, each asked to call ctx_execute with `pwd`: the completed mcp_tool_call item's output

@@ -35,7 +35,7 @@ Each sweep record holds these fields:
 
 Each layer entry holds these fields:
 
-- `catalog` (`foundation` or `us-equities`) and `layer_id`
+- `catalog` (`foundation`, `us-equities` or `skills`, the skills modality keyed by lifecycle task) and `layer_id`
 - `requirement_sha256`: the sha256 of the canonical JSON `{next_action, decision_ref}` from the
   layer's `research-state.json` row
 - `platform_profiles_sha256`: the sha256 of the canonical `adoption/manifest.json#/platform_profiles`

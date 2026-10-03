@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-02",
+  "decision_status": "closed",
+  "deployment_verdict": "retain_existing_native_core",
+  "scope": "Existing Mac deployment and this qualification unit; not other owners or hosts",
+  "canonical_revision": "b9dbe3c5a09cdefca435cd78c7f3dad46ca883a4",
+  "shared_memory": {"component": "ai-memory", "version": "2.5.2", "disposition": "retain"},
+  "local_inference": {"component": "Ollama", "version": "0.34.4", "disposition": "retain", "new_acceptance_established": false},
+  "challenger_disposition": "not_selected_for_this_deployment",
+  "comparative_winner": null,
+  "full_stack_readiness_established": false,
+  "runtime_experiments": {
+    "status": "closed",
+    "scheduled_by_this_unit": 0,
+    "owned_colima_profile": "memory-qualification",
+    "profile_status": "stopped",
+    "profile_status_observed_at": "2026-10-02T14:33:21Z",
+    "profile_status_command_exit": 1,
+    "profile_status_diagnostic": "profile is not running",
+    "volumes": "retained_for_rollback",
+    "holdout": "not_executed",
+    "native_canary": "not_executed",
+    "blind_memory_convergence": "not_executed"
+  },
+  "accepted_evidence": {
+    "regression_tests": 20,
+    "synthetic_inspect_samples": 12,
+    "synthetic_model_events": 0,
+    "scoped_unchanged_upstream_tests": 1,
+    "isolated_restore": "runtime/observed-20261002.json",
+    "separate_sdk_route": {
+      "status": "completed",
+      "protocol_checks_passed": 27,
+      "protocol_checks_total": 27,
+      "acceptance_receipt_sha256": "b6cf7ef09826365e1cdaec4ff5b59de6d0b7f3d719465b1528e68604553ce31a",
+      "public_source_handoff": "https://github.com/seathatflowsinourveins/native-agent-stack/issues/384#issuecomment-5947617075",
+      "does_not_establish": ["blind cross-family memory convergence", "legacy native CLI adapter compatibility", "whole-task usage or net savings"]
+    }
+  },
+  "historical_failures": "preserved",
+  "whole_task_usage": null,
+  "net_savings": null,
+  "reopening": "requires a new explicitly scoped decision unit; no automatic test or promotion"
+}

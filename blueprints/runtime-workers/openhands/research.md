@@ -383,10 +383,10 @@ The resulting uv.lock (SHA256 1816ccfdac2d485b790e29a3c38881273e2335ff0413c07f7a
 --check` and `uv export` exit 0 and `cmp` of the export plus the pins.json wheel entries against the committed lock
 exits 0 (returned outputs, section C); an earlier scratch pair gave the same digests, and its outputs are not retained.
 
-- **Choice, as of 2026-09-30T03:27:54Z.** 2.14.0 is the newest release outside the 7-day window the upstream workspace's
-  `exclude-newer` applies: PyJWT 2.15.0 leaves the window at 2026-09-30T16:56:01Z, oauthlib 4.0.0 at 2026-10-05T06:01:19Z and PyJWT 2.15.1 at 2026-10-05T18:40:43Z (each 7 days after the later of the release's file upload times on PyPI). Its two hashes equal PyPI's. 2.15.0's changelog has one Security item without an
+- **Choice, as of 2026-09-30T04:30:20Z.** 2.14.0 is the newest release outside the 7-day window the upstream workspace's
+  `exclude-newer` applies: PyJWT 2.15.0 leaves the window at 2026-09-30T16:56:01Z, oauthlib 4.0.0 at 2026-10-05T06:01:19Z and PyJWT 2.15.1 at 2026-10-05T18:40:43Z (each 7 days after the later of the release's file upload times on PyPI, fractional seconds rounded up to the next second). Its two hashes equal PyPI's. 2.15.0's changelog has one Security item without an
   advisory id (recursion errors from deeply nested payloads wrapped in `DecodeError`); 2.15.1 fixes Base64URL `=` padding.
-  The reason 2.14.0 stays until the joint relock, recorded now: as of 2026-09-30T03:27:54Z: the recipe venv decodes no attacker-controlled JWT that this record found. The 2026-09-29 search found jwt.encode of client assertions in mcp 1.28.1 only, google-auth's ID-token verify_token (the one code path that decodes a presented token, through PyJWKClient) not called by any other artifact, and the LiteLLM proxy's JWT code not run; 2.15.0's Security item (recursion errors from deeply nested payloads wrapped in DecodeError, no advisory id) is the payload counterpart of GHSA-8wjv-2p76-3863, which 2.14.0 fixed for headers, so 2.14.0 most likely still raises a raw RecursionError on such a payload; that matters only where a decode of untrusted tokens is reachable. A dated decision point at 2026-09-30T16:56:01Z
+  The reason 2.14.0 stays until the joint relock, recorded now: as of 2026-09-30T04:30:20Z: no decode of an attacker-controlled token through PyJWT is reachable in the recipe venv by static search of its 10,746 installed .py files other than PyJWT's own and installer tooling (section K of the returned outputs; import aliases and from-imports included). The venv's PyJWT importers are google-auth (oauth2/id_token.py:146, through `import jwt as jwt_lib`; the module is imported by nothing outside google/auth and google/oauth2, and the :153 `jwt.decode` next to it is google-auth's own jwt module, not PyJWT), LiteLLM (seven proxy server modules, one through `import jwt as _jwt` at mcp_management_endpoints.py:1516; nothing outside litellm references litellm.proxy, and the recipe runs no LiteLLM proxy), oauthlib (common.py:221 verify_signed_token, no reference outside oauthlib), redis 7.2.1 (auth/token.py:89, a decode with verify_signature false of a token that a configured credential provider supplies; nothing outside redis references redis.auth.token or JWToken, and none of the recipe's 12 .py files, searched recursively, imports redis or jwt) and mcp 1.28.1 (jwt.encode of client assertions only). 2.15.0's Security item (recursion errors from deeply nested payloads wrapped in DecodeError, no advisory id) is the payload counterpart of GHSA-8wjv-2p76-3863, which 2.14.0 fixed for headers, so 2.14.0 most likely still raises a raw RecursionError on such a payload; that matters only where a decode of untrusted tokens is reachable, and none was found. A dated decision point at 2026-09-30T16:56:01Z
   (owner: bc, session native-agent-stack-bc) confirms it when 2.15.0 leaves the window.
 - **Checks.** The pinned OSV-Scanner 2.6.0 over the 49 inventory lockfiles exits 0 with no PyJWT ignore left, and the
   previous lock under the same config exits 1 with the ten advisories. The install-container.sh sequence in a scratch
@@ -395,7 +395,7 @@ exits 0 (returned outputs, section C); an earlier scratch pair gave the same dig
   binary (upstream's uv.lock, PyJWT 2.13.0) and the grader venv (OpenHands/benchmarks@405bae7's uv.lock, PyJWT 2.10.1) are
   unchanged and unscanned by the inventory; the 2026-09-28 grype record of the image predates these advisories and has no
   PyJWT entry. An installation that recorded the old lock digest must re-run install (host.py refuses to run it otherwise).
-- **oauthlib stays at 3.3.1.** As of 2026-09-30T03:27:54Z, 4.0.0 (published 2026-09-28T06:01Z) is inside the same window, until
+- **oauthlib stays at 3.3.1.** As of 2026-09-30T04:30:20Z, 4.0.0 (published 2026-09-28T06:01Z) is inside the same window, until
   2026-10-05T06:01:19Z, and its two advisories stay covered by the 2026-09-29 reviews, which the record carries forward at the
   new digest. A pre-check on 2026-09-30 found the same outcome for each test under oauthlib 3.3.1 and 4.0.0 in
   requests-oauthlib 2.0.0's own unit tests (72 passed and the same 2 failed, both timing assertions that also fail under
@@ -405,6 +405,98 @@ exits 0 (returned outputs, section C); an earlier scratch pair gave the same dig
   those checks on the real lock and deletes the lock's `IGNORE_ALLOWED_LOCKS` entry.
 
 Overturn conditions: (a) OSV lists an advisory for PyJWT 2.14.0 that only a later release fixes; (b) an OpenHands run of the recipe fails with 2.14.0; (c) at 2026-09-30T16:56:01Z, when PyJWT 2.15.0 leaves the window, the reason recorded in the receipt's release_choice.decision_point_2_15_0 no longer holds (a decode of attacker-controlled JWTs became reachable in the recipe venv): move to 2.15.0 before the joint relock; (d) oauthlib 4.0.0 clears its window (2026-10-05T06:01:19Z) and passes the compatibility checks; (e) PyJWT 2.15.1 clears its window (2026-10-05T18:40:43Z): the joint relock takes it with oauthlib 4.0.0 unless a recorded reason keeps 2.14.0.
+
+## Runtime lock urllib3 and PyJWT relock (2026-09-30)
+
+requirements.lock moved from urllib3 2.7.0 to 2.8.0 and from PyJWT 2.14.0 to 2.15.0 and nothing else changed (two entries and
+their hashes), SHA256 1d11bae34f09707d1ad353e24c33d25c7b004f25de9821d434e065b10969559c, previously 14e57b8d947e. Four advisories whose OSV records were published on 2026-09-30 affect the
+old lock: GHSA-8988-9cw3-xx77, GHSA-vxq7-64xx-v4gw and GHSA-gh4c-6fx4-qh6g for urllib3 2.7.0 (fixed in 2.8.0, uploaded
+2026-09-15, outside every cooldown) and GHSA-42vr-xj54-vc7v for PyJWT below 2.15.0 (OSV record 15:41Z). They failed the
+required osv-scanner check together with a `next` advisory in the frozen macOS lock (PR #546). The previous section's choice
+(PyJWT stays at 2.14.0 until the joint relock) is superseded at the decision point of 2026-09-30T16:56:01Z, when PyJWT 2.15.0
+left the window: overturn condition (a) of that section was met. Record:
+[osv-urllib3-next-20260930.json](../../../evidence/receipts/osv-urllib3-next-20260930.json); returned outputs:
+[evidence/relock-2026-09-30-urllib3.txt](evidence/relock-2026-09-30-urllib3.txt).
+
+The method is the PyJWT one above with PyJWT moved to 2.15.0 and a sixth version-pinned upgrade, from a fresh extraction of the
+pinned archive with the same one-line `environments` edit (uv 0.12.17, without UV_NO_CONFIG):
+
+    uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 \
+      --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 \
+      --upgrade-package pyjwt==2.15.0 --upgrade-package urllib3==2.8.0
+
+The control (the same command with `pyjwt==2.14.0` and without urllib3) reproduces the previous lock byte for byte, and the new lock
+differs from it in the urllib3 and PyJWT entries only (returned outputs, sections B and D). The recipe's hashed install,
+`uv pip check` and the SDK import check pass on the new lock (section C). The carried-forward oauthlib review holds: oauthlib
+3.3.1 and its wheel hash are unchanged, and the four oauthlib source files the review names hash as recorded in the new venv
+(section J). PyJWT 2.15.0 changes the JWKS client (`JWKSetCache` stores the parsed `PyJWKSet`, `PyJWKClient.fetch_data()` raises
+for a non-object JWKS); the only caller of that client outside PyJWT in the venv is google-auth's `google/oauth2/id_token.py` (lines
+144 and 145, the JWKS branch of `verify_token`, an entry point the advisory names), and nothing outside the
+`google` package imports that module (section J).
+
+- **The joint relock in #518** starts from this lock: it adds `--upgrade-package oauthlib==4.0.0`, replaces
+  `--upgrade-package pyjwt==2.15.0` with `--upgrade-package pyjwt==2.15.1` (no earlier than 2026-10-05T18:40:43Z) and keeps
+  `--upgrade-package urllib3==2.8.0` unless a newer release is outside the 7-day window by then.
+- **Not covered.** The image's server binary (upstream's uv.lock) and the grader venv keep their own urllib3 and PyJWT; the
+  inventory does not scan them.
+
+Overturn condition: OSV lists an advisory for urllib3 2.8.0 or PyJWT 2.15.0 that only a later release fixes.
+
+## Runtime lock litellm relock (2026-09-30)
+
+requirements.lock moved from litellm 1.93.0 to 1.93.2 and nothing else changed (the litellm requirement line; 4 hash lines removed and
+7 added), SHA256 e24df8328149c921f751eb93d682b3f5b66eb4efd09bf4b053ffcfca057181e1, previously 1d11bae34f09. OSV published
+GHSA-3cv6-jpf6-8222 (CVE-2026-84377, "LiteLLM: Authenticated SSRF and provider-credential exfiltration via unvalidated request-body
+routing parameters", CVSS 3.1 6.5) at 2026-09-30T21:11:25Z for litellm 1.93.0 and 1.93.1; 1.93.2 is the first release of the 1.93 line
+without it. The scan workflow then concluded failure in every run that the returned outputs list after that time (pull-request heads and main's
+own push runs; section J), and the one log read shows the required osv-scanner job failing on this finding. Record: [osv-openhands-litellm-relock-20260930.json](../../../evidence/receipts/osv-openhands-litellm-relock-20260930.json);
+returned outputs: [evidence/relock-2026-09-30-litellm.txt](evidence/relock-2026-09-30-litellm.txt).
+
+The method is the urllib3 one above plus a seventh version-pinned upgrade and a two-line edit of the extracted workspace. Upstream's
+pyproject.toml pins `litellm==1.93.0` (line 19) and caps litellm at `exclude-newer-package` 2026-07-20T00:00:00Z (line 8), so
+`--upgrade-package litellm==1.93.2` alone is unsatisfiable there. The edit sets the cap to 2026-08-10T00:00:00Z (about 22 hours after the
+last file of 1.93.2 was uploaded, 2026-08-09T02:17:49Z) and the pin to `litellm==1.93.2`. It lives only in the scratch extraction:
+upstream's own lock, and the image built from it, still pin 1.93.0 (returned outputs, section C).
+
+    sed -i -e 's/litellm = "2026-07-20T00:00:00Z"/litellm = "2026-08-10T00:00:00Z"/' \
+      -e 's/"litellm==1\.93\.0"/"litellm==1.93.2"/' pyproject.toml
+    uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 \
+      --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 \
+      --upgrade-package pyjwt==2.15.0 --upgrade-package urllib3==2.8.0 \
+      --upgrade-package litellm==1.93.2
+
+The control (the same six upgrades on the unedited workspace) reproduces the previous lock byte for byte, and the new lock differs from
+it in the litellm entry only (returned outputs, sections B and E). Each of the seven litellm hashes is the sha256 of a file of litellm
+1.93.2 on PyPI (section I). The recipe's hashed install, `uv pip check` and the SDK import check pass on the new lock (section D), and
+the workflow's ordinary OSV-Scanner 2.6.0 scan exits 1 with this one finding on the old tree, and both scans exit 0 on the new one (section F). The advisory concerns the LiteLLM
+proxy; the recipe runs none and no installed package outside litellm references `litellm.proxy` (section H, a search by syntax tree
+and context only). Upstream changed 34 files between v1.93.0 and v1.93.2, none under the paths the recipe cites or calls: the file R7 above and
+`worker.py` cite (`litellm/llms/openai/responses/transformation.py`) has the same blob id at both tags, so those v1.93.0 citations
+still describe the locked release (section C). The carried-forward oauthlib review holds: oauthlib 3.3.1 and everything that imports it
+are unchanged, and no file of litellm 1.93.2 mentions oauthlib (section I).
+
+Two independent reviews (Opus, and GPT-6.1 Sol at effort max through the packaged Codex lane, in two lenses) read the first head of this
+change; their findings and dispositions are in the receipt's `independent_review` and the review files beside the returned outputs. One
+finding concerned the guard, not the lock: the coverage test accepted a receipt of the previous digest as the evidence of a grant, and no
+test compared `pins.json`'s digests with the lock files. `tests/test_openhands_lock_binding.py` now requires the receipt of every
+grant to record the lock's path and the granted sha256 and `pins.json` to record the digests of both lock files, and section L of the
+returned outputs shows it failing on each single-defect copy.
+
+- **A relock, not an ignore.** A fixed release exists and is outside the 7-day window, and OSV-Scanner 2.6.0 matches an ignore by id in
+  every lock of an invocation, so an ignore would be repo-wide. No newer line (1.94.3, 1.95.1, 1.96.2) was evaluated: 1.93.2 is the
+  smallest change and stays on the line upstream's workspace pins.
+- **The joint relock in #518** starts from this lock and keeps `--upgrade-package litellm==1.93.2` and the two workspace edits. They can
+  go only when `source_archive` and the 1.49.6 wheels are re-pinned to an SDK whose own `uv.lock` carries litellm 1.93.2 or later: the
+  pinned archive's pins 1.93.0 for good (section C), and #518 does not re-pin it.
+- **Open pull requests on the same files** (section K): #535 replaces this lock and `pins.json` with a candidate built from another
+  SDK archive (litellm 1.93.2 at its head) and conflicts with this change in `pins.json`, `requirements.lock`, `manifests/evidence.json`
+  and the coverage test; #551 and #555 conflict only in `manifests/evidence.json`. Each rebases onto this change's merge.
+- **Not covered.** The image's server binary (upstream's uv.lock, litellm 1.93.0; grype cannot see inside its PyInstaller archive) and
+  the grader venv keep their own litellm; the inventory does not scan the grader venv. No OpenHands task ran with the relocked venv.
+
+Overturn conditions: (a) OSV lists an advisory for litellm 1.93.2 that only a later release fixes; (b) an OpenHands run of the recipe
+fails with litellm 1.93.2 and passes with 1.93.0; (c) upstream's workspace publishes a lock with litellm 1.93.2 or later (the next
+relock then follows that lock instead of the two-line edit).
 
 ## Takeover phase 1 corrections (2026-09-28)
 

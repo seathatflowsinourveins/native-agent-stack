@@ -1,0 +1,880 @@
+{
+  "schema_version": 1,
+  "kind": "incentive_monitor_run_receipt",
+  "run": "incentive-monitor-20260929",
+  "status": "completed",
+  "status_note": "One unit start at 03:55:00 ET, no restart. The monitor stopped itself at its 20:00 ET limit (stop record at 20:00:13 ET, stop_file false), and the service manager reports Result=success with the main process exited, status 0.",
+  "acceptance": null,
+  "acceptance_note": "No acceptance clause was frozen for this data-only run, so this receipt reports no pass or fail. It records what the run did. The 2026-09-29 paper series' freeze notes do state what the monitor may do and use; frozen_expectations quotes each statement and records it as met.",
+  "evidence_class": "PAPER",
+  "evidence_level": "metadata_plus_partial_broker_listing",
+  "gate": null,
+  "gate_note": "Not a gate run. No gate receipt and no gate row changes with this record.",
+  "label": "data-only run on a paper key; no order placed; no validated edge",
+  "broker": "alpaca",
+  "endpoint": "paper",
+  "endpoint_note": "The trading host (paper-api.alpaca.markets) served one asset-list read at start-up. Market data came from data.alpaca.markets (SIP snapshots, screener, option chains, daily bars) and stream.data.alpaca.markets (news, OPRA trades, corporate-action events), plus SEC EDGAR, the Nasdaq Trader halts RSS and FINRA.",
+  "feed": "sip",
+  "account": "second Alpaca paper account (credential inventory id alpaca-paper-2), key pair used for data and asset-list reads only. No credential, account id, account number or account fingerprint is recorded.",
+  "credential_route": "the 0600 env file store through the $PAPER_ENV_FILE_2 pointer, passed as --env-file under /bin/bash -ic",
+  "credential_route_note": "The unit starts /bin/bash -ic, whose interactive start-up exports the PAPER_ENV_FILE_2 and SEC_CONTACT_ENV pointers; the launch script refuses to start without PAPER_ENV_FILE_2, SEC_USER_AGENT and ENGINE_SHA. Only variable names are recorded.",
+  "private_paths": {
+    "<private state root>": "the private paper state directory of the two paper accounts; it holds the engine clone (engines/<commit>) and the trials directory with the launch script, the series freeze notes and the series index",
+    "<private incentive-monitor directory>": "the monitor's private output root, a sibling of <private state root> and not inside it; it holds the day directory 20260929/ and the unit's console",
+    "note": "Placeholders stand for host paths, which are not published."
+  },
+  "session": {
+    "date": "2026-09-29",
+    "planned_window_et": "03:55-20:00",
+    "unit": "incentive-monitor-20260929"
+  },
+  "recorded_at_utc": "2026-09-30T14:59:09Z",
+  "started_at": "2026-09-29T07:55:00.309Z",
+  "finished_at": "2026-09-30T00:00:13.849Z",
+  "started_finished_note": "started_at is the unit's start in the systemd user journal, as in the template; the monitor's start record followed at 07:55:00.531Z. finished_at is the monitor's stop record; the unit stopped at 00:00:14.110Z.",
+  "window": {
+    "timer_armed_utc": "2026-09-29T05:43:11Z",
+    "timer_armed_et": "01:43:11",
+    "unit_started_utc": "2026-09-29T07:55:00.309Z",
+    "unit_started_et": "03:55:00",
+    "start_record_utc": "2026-09-29T07:55:00.531Z",
+    "start_record_et": "03:55:00",
+    "first_sweep_utc": "2026-09-29T07:55:01Z",
+    "first_sweep_et": "03:55:01",
+    "last_sweep_utc": "2026-09-30T00:00:10Z",
+    "last_sweep_et": "20:00:10",
+    "stop_record_utc": "2026-09-30T00:00:13.849Z",
+    "stop_record_et": "20:00:13",
+    "stop_file": false,
+    "unit_stopped_utc": "2026-09-30T00:00:14.110Z",
+    "unit_stopped_et": "20:00:14",
+    "start_to_stop_seconds": 57913.318,
+    "until_et": "20:00"
+  },
+  "code": {
+    "engine_commit": "b528bb550463991bd3ca554ddf78e2a180aca301",
+    "engine_commit_date": "2026-09-29T00:53:12-04:00",
+    "engine_commit_on_main": true,
+    "checkout": "the read-only clone of b528bb55 at <private state root>/engines/<commit>; HEAD b528bb55 and an empty git status when read on 2026-09-30",
+    "monitor_py": "blueprints/us-equities/incentive-monitor/monitor.py",
+    "monitor_py_sha256": "88f3423a5426c32e2b22e1b7cb8bb504feb4f5093d356c4e2372de69b61e0551",
+    "monitor_py_bytes": 135534,
+    "monitor_py_clone_mode": "444",
+    "monitor_py_clone_modified_utc": "2026-09-29T05:05:24Z",
+    "monitor_py_sha256_sources": {
+      "clone_file": "sha256 of the clone's monitor.py, read 2026-09-30",
+      "git_show": "git show b528bb55:blueprints/us-equities/incentive-monitor/monitor.py | sha256sum",
+      "frozen_sums": "frozen-b528bb55.SHA256SUMS line 45",
+      "run_time": "board.json and board-v2.json monitor.code_sha256, the process's own hash of the file it loaded (monitor.py:2126)"
+    },
+    "frozen_sums": {
+      "file": "frozen-b528bb55.SHA256SUMS",
+      "entries": 70,
+      "sha256": "36daf1949c4b27ee5c4fd17c5478c4f8f7146308b9649d26ee786b4cf88aa07f",
+      "monitor_py_line": 45
+    },
+    "monitor_py_on_base": "monitor.py has the same sha256 at the base f03f41c7",
+    "runtime": {
+      "python": "3.12.3",
+      "interpreter": "the adaptive-paper-20260921 virtual environment, run with python -B and PYTHONDONTWRITEBYTECODE=1",
+      "runtime_basis": "interpreter path and flags from the launch script; its Python version read on 2026-09-30, not at run time"
+    },
+    "launch_script": {
+      "name": "run-monitor.sh",
+      "bytes": 1225,
+      "sha256": "7a34ebd8c5fae061ed2d8a08e50d723aadedc886086c6093864ae050c5c41cb3",
+      "modified_utc": "2026-09-29T05:09:58Z",
+      "location": "<private state root>/trials/",
+      "pre_run_record": {
+        "file": "SERIES-INDEX.md",
+        "line": 55,
+        "sha256_matches": true
+      },
+      "basis": "private. SERIES-INDEX.md, last modified 2026-09-29T05:20:57Z (before the timer was armed at 05:43:11Z), records this sha256 at line 55, and the file hashes the same on 2026-09-30: hashed before the run and unchanged since. No hash was taken at run time. The 2026-09-30 unit runs the same file."
+    },
+    "forward_v1_frozen_code": {
+      "monitor.py": "4c8029e5f8b96e65aa630923e36fd5ddfa51a1adfa18533113d3e6ce7642eaef",
+      "board_scan.py": "0912f48b108ee680d71258ab7c63f47516fdd5dc658cdb69418f17d25fd1ff03",
+      "source": "monitor.FROZEN_V1 at b528bb55 (the protocol v1 code of 05c28491)",
+      "matches_this_run": false
+    }
+  },
+  "settings": {
+    "mode": "run",
+    "role": "standalone",
+    "follow_v1": null,
+    "until_et": "20:00",
+    "sweep_seconds": 20.0,
+    "board_versions": [
+      1,
+      2
+    ],
+    "sources": [
+      "sip_snapshots",
+      "opra_trades",
+      "news",
+      "edgar",
+      "nasdaq_halts",
+      "corporate_actions_sse",
+      "screener",
+      "option_chains",
+      "finra_short_volume"
+    ],
+    "option_oi": false,
+    "iex_status": false,
+    "settings_basis": "the start and budget records in monitor.jsonl; the launch script passes run --standalone --env-file \"$PAPER_ENV_FILE_2\" --out <private incentive-monitor directory> --until-et 20:00 and leaves --option-oi and --iex-status at their off defaults",
+    "budget_plan": {
+      "symbols": 13499,
+      "sweep_seconds": 20.0,
+      "sweeps_per_min": 3.0,
+      "per_sweep": {
+        "edgar": 7,
+        "finra": 1,
+        "nasdaq_halts": 1,
+        "option_chains": 30,
+        "option_contracts": 0,
+        "screener": 3,
+        "snapshots": 27
+      },
+      "once": {
+        "assets": 5,
+        "sec_files": 5
+      },
+      "per_minute": {
+        "adv_bars": 68
+      },
+      "data_per_min": 180.0,
+      "data_first_min": 248.0,
+      "data_cap_per_min": 500.0,
+      "trading_per_min": 1.0,
+      "trading_cap_per_min": 10.0,
+      "sec_per_min": 21.0,
+      "nasdaq_per_min": 1.0,
+      "finra_per_sweep": 1,
+      "streams": {
+        "corporate_actions": {
+          "connects_per_min": 2,
+          "context_replays_per_start": 1,
+          "endpoint_limit_per_min": 20
+        },
+        "iex_status": {
+          "conflict_wait_s": 900.0,
+          "connections": 0
+        },
+        "news": {
+          "connections": 1
+        },
+        "opra": {
+          "connections": 1
+        }
+      },
+      "refusals": []
+    },
+    "budget_note": "Written by the monitor at start (event budget). data_cap_per_min is 5% of the data API's 10,000 per minute and trading_cap_per_min 5% of the trading API's 200 per minute; the plan broke no rule (refusals empty).",
+    "restored": {
+      "counts": {},
+      "counts_v2": {},
+      "note": "empty: a fresh day directory, nothing restored"
+    }
+  },
+  "unit": {
+    "name": "incentive-monitor-20260929.service",
+    "description": "Incentive monitor 2026-09-29 (data only, paper key 2, until 20:00 ET)",
+    "file_sha256": "007fd5ba486461e3e778984d3ae0039c5822ec0d992563df59a7d1543cafce15",
+    "file_bytes": 748,
+    "file_modified_utc": "2026-09-29T05:10:23Z",
+    "file_pre_run_record": {
+      "file": "SERIES-INDEX.md",
+      "line": 81,
+      "sha256_matches": true
+    },
+    "settings": {
+      "Type": "exec",
+      "UMask": "0077",
+      "Restart": "on-failure",
+      "RestartSec": "120",
+      "TimeoutStopSec": "60",
+      "CPUWeight": "100",
+      "OnFailure": "paper-alert@%n.service",
+      "StartLimitIntervalSec": "1h",
+      "StartLimitBurst": "5",
+      "StandardError": "inherit"
+    },
+    "environment": "ENGINE_SHA=b528bb550463991bd3ca554ddf78e2a180aca301",
+    "exec_start": "/bin/bash -ic that exports the variables in the file SEC_CONTACT_ENV names (set -a), then execs sh on run-monitor.sh in <private state root>/trials/",
+    "standard_output": "append to <private incentive-monitor directory>/monitor-20260929.console",
+    "launch_script_exec": "the pinned interpreter runs the clone's monitor.py: run --standalone --env-file \"$PAPER_ENV_FILE_2\" --out <private incentive-monitor directory> --until-et 20:00",
+    "timer": {
+      "name": "incentive-monitor-20260929.timer",
+      "OnCalendar": "2026-09-29 03:55:00 America/New_York",
+      "AccuracySec": "1s",
+      "Persistent": "false",
+      "file_sha256": "ee549de8b98c592b63183bc216abe3b04ed552d810f46f2ce2288d5d147bebd4",
+      "file_bytes": 236,
+      "file_modified_utc": "2026-09-29T05:10:25Z",
+      "file_pre_run_record": {
+        "file": "SERIES-INDEX.md",
+        "line": 82,
+        "sha256_matches": true
+      }
+    },
+    "starts": 1,
+    "restarts": 0,
+    "service_manager": {
+      "queried_at": "2026-09-30T14:59:10Z",
+      "command": "systemctl --user show incentive-monitor-20260929 -p Result,ExecMainCode,ExecMainStatus,NRestarts,ExecMainStartTimestamp,ExecMainExitTimestamp,ActiveState,SubState",
+      "Result": "success",
+      "ExecMainCode": "1 (CLD_EXITED: the main process exited; not an exit status)",
+      "ExecMainStatus": 0,
+      "NRestarts": 0,
+      "ExecMainStartTimestamp_et": "2026-09-29 03:55:00 EDT",
+      "ExecMainExitTimestamp_et": "2026-09-29 20:00:14 EDT",
+      "ActiveState": "inactive",
+      "SubState": "dead"
+    },
+    "journal": {
+      "queried_at": "2026-09-30T14:59:10Z",
+      "command": "journalctl --user -u incentive-monitor-20260929 --since 2026-09-29 --until 2026-09-30 --no-pager -o json (and -o short-iso)",
+      "journald": "systemd 255 (255.4-1ubuntu8.17)",
+      "records": [
+        {
+          "at_utc": "2026-09-29T07:55:00.308Z",
+          "at_et": "03:55:00",
+          "record": "start job: Starting incentive-monitor-20260929.service"
+        },
+        {
+          "at_utc": "2026-09-29T07:55:00.309Z",
+          "at_et": "03:55:00",
+          "record": "start job done: Started incentive-monitor-20260929.service"
+        },
+        {
+          "at_utc": "2026-09-30T00:00:14.110Z",
+          "at_et": "20:00:14",
+          "record": "resource accounting at stop",
+          "cpu_seconds": 3037.841,
+          "cpu_text": "50min 37.840s",
+          "memory_peak_bytes": 457003008,
+          "memory_peak_text": "435.8M",
+          "swap_peak_text": "2.4M"
+        }
+      ],
+      "exit_records": 0,
+      "note": "No EXIT_STATUS, EXIT_CODE or UNIT_RESULT record, as in the 2026-09-28 receipt. The exit status and result come from the service manager's retained properties above.",
+      "timer_record": "Started incentive-monitor-20260929.timer at 2026-09-29T05:43:11Z (01:43:11 ET)"
+    },
+    "on_failure_unit": {
+      "name": "the paper-alert instance for this unit (OnFailure=paper-alert@%n.service)",
+      "started": false,
+      "basis": "no invocation id, no start timestamp and no journal entry from 2026-09-29 to 2026-09-30; its Result=success is the default of a unit that never ran"
+    }
+  },
+  "sweeps": {
+    "count": 2874,
+    "first_utc": "2026-09-29T07:55:01Z",
+    "last_utc": "2026-09-30T00:00:10Z",
+    "first_et": "03:55:01",
+    "last_et": "20:00:10",
+    "interval_seconds": {
+      "min": 20.0,
+      "median": 20.0,
+      "mean": 20.156,
+      "max": 109.0
+    },
+    "intervals_over_25_seconds": 14,
+    "intervals_over_25_seconds_window_et": "16:20:36-17:34:26",
+    "sweep_seconds": {
+      "min": 1.98,
+      "median": 3.32,
+      "max": 108.28
+    },
+    "sweeps_over_20_seconds": 19,
+    "sweeps_over_20_seconds_window_et": "10:38:22-17:33:21",
+    "sweeps_over_20_seconds_after_et": {
+      "after": "16:00",
+      "count": 16
+    },
+    "longest_sweep": {
+      "at_utc": "2026-09-29T21:29:30Z",
+      "at_et": "17:29:30",
+      "seconds": 108.28
+    },
+    "long_sweep_cause": "not recorded: the monitor writes no per-source timing",
+    "snapshot_rows": {
+      "min": 13186,
+      "max": 13191
+    },
+    "board_rows": {
+      "min": 7,
+      "max": 100
+    },
+    "board_v2_rows": {
+      "min": 8,
+      "max": 100
+    },
+    "early_rows": {
+      "min": 5,
+      "max": 77
+    },
+    "screener_rows": {
+      "min": 199,
+      "max": 249
+    },
+    "edgar_new_total": 696,
+    "halt_polls": 961,
+    "halt_changes_total": 46,
+    "option_chain_sweeps": {
+      "count": 1125,
+      "first_et": "09:45:02",
+      "last_et": "15:59:51"
+    },
+    "finra": [
+      {
+        "at_utc": "2026-09-29T22:05:09Z",
+        "at_et": "18:05:09",
+        "result": "20260929"
+      },
+      {
+        "at_utc": "2026-09-29T22:05:29Z",
+        "at_et": "18:05:29",
+        "result": "unchanged:20260928"
+      },
+      {
+        "at_utc": "2026-09-29T22:05:49Z",
+        "at_et": "18:05:49",
+        "result": "unchanged:20260925"
+      }
+    ],
+    "finra_note": "fetched the 2026-09-29 file and ran the update checks of the 2026-09-28 and 2026-09-25 files (unchanged); the FINRA files live in the monitor's shared finra/ directory, outside the day directory, and are not hashed here",
+    "adv_loaded": true
+  },
+  "streams": {
+    "news": {
+      "connected_utc": "2026-09-29T07:55:01.370Z",
+      "connected_et": "03:55:01",
+      "disconnects": 0,
+      "down_seconds": 0.0,
+      "messages": 916
+    },
+    "opra": {
+      "connected_utc": "2026-09-29T07:55:01.382Z",
+      "connected_et": "03:55:01",
+      "disconnects": 1,
+      "down_at_utc": "2026-09-29T21:31:12.442Z",
+      "down_at_et": "17:31:12",
+      "error": "ConnectionClosedError: no close frame received or sent",
+      "attempt": 1,
+      "reconnected_utc": "2026-09-29T21:31:14.554Z",
+      "reconnected_et": "17:31:14",
+      "down_seconds": 2.1,
+      "trade_messages": 9886534
+    },
+    "corporate_actions": {
+      "context_replay": {
+        "at_utc": "2026-09-29T07:55:07.631Z",
+        "since": "2026-08-30T04:00:00Z",
+        "events": 1298,
+        "actions": 278
+      },
+      "connected_utc": "2026-09-29T07:55:07.701Z",
+      "connected_et": "03:55:07",
+      "resumed_from_archive": true,
+      "connects": 1,
+      "archived": 51822,
+      "duplicates": 1,
+      "surfaced": 1321,
+      "down_seconds": 0.0
+    },
+    "iex_status": {
+      "requested": false,
+      "connections": 0,
+      "tapes_counted": 0
+    },
+    "options_unparsed": 0,
+    "note": "Message counts are the monitor's cumulative stream counters at the last sweep (streams, corporate_actions); down seconds are board.json monitor.stream_down_seconds at the last sweep. The corporate-action stream resumed from the newest archived event id (its resume id is not recorded here)."
+  },
+  "calls": {
+    "cumulative_at_last_sweep": {
+      "alpaca": 114534,
+      "finra": 3,
+      "nasdaq": 961,
+      "sec": 20119
+    },
+    "total": 135617,
+    "in_sweep_by_source": {
+      "adv_bars": 12,
+      "edgar": 20118,
+      "finra": 3,
+      "nasdaq_halts": 961,
+      "option_chains": 28245,
+      "screener": 8622,
+      "snapshots": 77598
+    },
+    "alpaca_calls_outside_sweeps": 57,
+    "sec_calls_outside_sweeps": 1,
+    "outside_sweeps_by_interval": [
+      {
+        "interval": "before sweep 1",
+        "alpaca": 1,
+        "sec": 1,
+        "source": "the start-up loads: the /v2/assets read (the only trading-host call of the run) and the SEC company-tickers file"
+      },
+      {
+        "interval": "between sweeps 1 and 2 (by 07:55:21Z)",
+        "alpaca": 42,
+        "source": "the background daily-bar load"
+      },
+      {
+        "interval": "between sweeps 2 and 3 (by 07:55:41Z)",
+        "alpaca": 14,
+        "source": "the background daily-bar load"
+      }
+    ],
+    "adv_bars_calls": {
+      "in_sweeps": 12,
+      "outside_sweeps": 56,
+      "total": 68,
+      "requests_needed": 68,
+      "requests_needed_rule": "ceil(13,499 / 200): the daily-bar loader asks for 200 symbols a request (monitor.py AdvLoader)"
+    },
+    "outside_sweeps_note": "The files do not label the calls made outside sweep windows by source. The cumulative counters against each sweep's in-sweep calls place them in time, and the request sites in monitor.py name the only sources that can make them: before sweep 1 only the start-up loads run (the daily-bar task cannot call earlier: in run mode no await runs between its creation and sweep 1's call snapshot, monitor.py:2138-2200; the await at 2145 is once-mode only), and between sweeps only the background daily-bar load calls Alpaca. This attribution is derived, not labelled.",
+    "max_per_sweep": {
+      "adv_bars": 6,
+      "edgar": 7,
+      "finra": 1,
+      "nasdaq_halts": 1,
+      "option_chains": 30,
+      "screener": 3,
+      "snapshots": 27
+    },
+    "caps_per_sweep": {
+      "edgar": 7,
+      "finra": 1,
+      "nasdaq_halts": 1,
+      "option_chains": 30,
+      "option_contracts": 0,
+      "screener": 3,
+      "snapshots": 27
+    },
+    "busiest_60s_in_sweep_data_calls": {
+      "calls": 180,
+      "from_utc": "2026-09-29T13:45:02Z",
+      "to_utc": "2026-09-29T13:45:42Z",
+      "cap_per_min": 500.0,
+      "note": "summed by sweep start time over snapshots, screener, option chains and daily bars. The 57 calls outside sweeps carry no time stamp (the counters only place them before sweep 1 and between sweeps 1 and 3), so this is not a full per-minute count."
+    },
+    "budget_refusals": 0,
+    "ratelimit": {
+      "data.alpaca.markets": {
+        "limit": 10000,
+        "lowest_remaining": 9996,
+        "at_utc": "2026-09-29T14:29:22Z"
+      },
+      "paper-api.alpaca.markets": {
+        "limit": 200,
+        "remaining": 199,
+        "identical_readings": 2874,
+        "note": "the reading from the start-up asset-list response; it never changed in any sweep"
+      },
+      "basis": "each sweep's ratelimit field holds the last response's rate-limit headers per host"
+    }
+  },
+  "errors": {
+    "sweep_error_keys": 0,
+    "ratelimit_floor_sweeps": 0,
+    "option_chains": {
+      "sweeps": 1125,
+      "roots_answered": 27996,
+      "http_400": 3,
+      "http_400_sweeps_et": [
+        "11:41:48",
+        "12:03:08",
+        "14:12:31"
+      ],
+      "empty": 107,
+      "unbanded_retry": 120,
+      "retry_deferred": 19,
+      "deadline": 0,
+      "budget_refused": 0,
+      "errors": 0,
+      "note": "http_400: a root answered HTTP 400 is marked as having no options for the day (monitor.py poll_option_chains); empty: nothing listed in the expiry window"
+    },
+    "stream_disconnects": 1,
+    "http_406": 0,
+    "http_406_basis": "A 406 (connection limit) arrives as a stream error message and is written as stream_error, then stream_conflict or stream_down with its code; the run has no stream_error, stream_conflict, stream_stopped or stream_refused record. The IEX stream, the one with a 406 wait, was not requested.",
+    "http_429": 0,
+    "http_429_basis": "None recorded. A failed REST call is written as a <source>_error key in its sweep (snapshots, screener, EDGAR, halts, FINRA, daily bars) or as http_<code> in the option-chain counts; no sweep has either for 429. Two surfaces retry a failed request without writing it: the start-up retry() (monitor.py:1274-1281, up to 5 attempts), which wraps the /v2/assets read (monitor.py:2114) and the SEC company-tickers file (monitor.py:2125), and the daily-bar loader (monitor.py AdvLoader, up to 3 attempts a request). Every attempt goes through Http.get, which counts it before the request (monitor.py:975-981), and the counts leave no room for a retry: 1 Alpaca and 1 SEC call before sweep 1, and 68 daily-bar calls for the 68 requests the universe needs (calls.adv_bars_calls). So neither surface retried, and no 429 was absorbed by a retry.",
+    "silent_retry_surfaces": [
+      "start-up retry() around load_universe and load_cik_tickers: 1 Alpaca and 1 SEC call before sweep 1, so no retry",
+      "daily-bar loader (AdvLoader): 68 calls for 68 requests, so no retry and no second page"
+    ],
+    "console": "two bash job-control notices from the non-terminal interactive shell; the monitor wrote nothing to stdout or stderr"
+  },
+  "orders": {
+    "placed": 0,
+    "basis": [
+      "Code: monitor.py's REST requests all go through Http.get, which builds a urllib Request without a body (a GET), behind the fail-closed per-source budget. Its sources list no order, position or activity endpoint; the stream connections subscribe to news, OPRA trades and corporate-action events. Its docstring: 'Data only: it never places, changes or cancels an order.'",
+      "Recorded calls: the trading host's rate-limit reading stayed at the start-up asset-list response in all 2,874 sweeps, and no budget refusal was recorded. Option contracts, the only other trading-host source, had a cap of 0.",
+      "Broker listing: the coordinator's read-only reconciliation of account 2 lists 18 orders between 11:00Z and 13:45Z, all mvr-pre-20260929-, and 22 between 20:00Z and 00:10Z, 21 mvr-ext-20260929- and 1 rec-ext-20260929-. No listed order lacks a paper-series prefix. No broker read covers 07:55Z-11:00Z or 13:45Z-20:00Z."
+    ]
+  },
+  "broker_listing_account_2": {
+    "source": "the coordinator's read-only reconciliation outputs of 2026-09-30 for the 2026-09-29 paper series (pre, ext and the ext recovery prefix), cited by sha256; they are the same outputs the 2026-09-29 series receipts use",
+    "tool": "reconcile_ext_series.py, sha256 50b9da4c17f16b6a84cd418ed9fbb7afca6b4a9e26fc56a6b6753c15e2a6cbff, byte-identical to blueprints/us-equities/adaptive-paper/trials/ext-20260928/reconcile_ext_series.py on main",
+    "reads": [
+      {
+        "file": "pre-20260929.json",
+        "sha256": "c48683eedd7546180a841877d1bcd6b0bb8dda49411cd4cd753d0d154cbbcb16",
+        "observed_at": "2026-09-30T09:06:11.588746+00:00",
+        "window": {
+          "after": "2026-09-29T11:00:00+00:00",
+          "until": "2026-09-29T13:45:00+00:00"
+        },
+        "prefix": "mvr-pre-20260929-",
+        "orders_listed_in_window": 18,
+        "orders_with_prefix": 18,
+        "orders_without_prefix_in_window": 0
+      },
+      {
+        "file": "ext-20260929.json",
+        "sha256": "e8131c7cc24a3bf69dee1ae35678527ece33ca5510c0aa71823a815273e335ba",
+        "observed_at": "2026-09-30T09:06:12.271019+00:00",
+        "window": {
+          "after": "2026-09-29T20:00:00+00:00",
+          "until": "2026-09-30T00:10:00+00:00"
+        },
+        "prefix": "mvr-ext-20260929-",
+        "orders_listed_in_window": 22,
+        "orders_with_prefix": 21,
+        "orders_without_prefix_in_window": 1
+      },
+      {
+        "file": "rec-ext-20260929.json",
+        "sha256": "1231744eb9d746e7a5211141b48a426666cc93d22a464c83de5ac03844267047",
+        "observed_at": "2026-09-30T09:06:12.939158+00:00",
+        "window": {
+          "after": "2026-09-29T20:00:00+00:00",
+          "until": "2026-09-30T00:10:00+00:00"
+        },
+        "prefix": "rec-ext-20260929-",
+        "orders_listed_in_window": 22,
+        "orders_with_prefix": 1,
+        "orders_without_prefix_in_window": 21
+      }
+    ],
+    "not_covered_utc": [
+      "2026-09-29T07:55Z/2026-09-29T11:00Z",
+      "2026-09-29T13:45Z/2026-09-29T20:00Z"
+    ],
+    "independence": "These reads were made for the paper series, not for the monitor. They list the broker's orders independently of the monitor's code, on the same broker API and account."
+  },
+  "frozen_expectations": {
+    "note": "No 2026-09-29 freeze note has an acceptance clause for the monitor. The three paper series' freeze notes (private; cited by sha256 in private_notes_sha256) state what it may do and use; the lines quoted here carry no fingerprint. They are the plan this receipt checks the run against.",
+    "statements": [
+      {
+        "freeze": "pre-20260929/FREEZE.md",
+        "line": 13,
+        "text": "The incentive monitor on key 2 (from 03:55 ET) is data only and places no orders.",
+        "met": true,
+        "basis": "the unit started at 03:55:00 ET with the $PAPER_ENV_FILE_2 pointer (account 2); orders.placed 0 (orders.basis)"
+      },
+      {
+        "freeze": "ext-20260929/FREEZE.md",
+        "line": 10,
+        "text": "The incentive monitor on key 2 (until 20:00 ET) is data only and places no orders.",
+        "met": true,
+        "basis": "the monitor stopped itself at 20:00:13 ET (--until-et 20:00); orders.placed 0"
+      },
+      {
+        "freeze": "pre-20260929/FREEZE.md",
+        "line": 91,
+        "context": "request budget, account 2, any rolling 60 s",
+        "text": "Incentive monitor start-up (`/v2/assets`, at most 5 per process start; `--option-oi` off) | 5",
+        "met": true,
+        "basis": "1 process start (unit.starts, the single start record); 1 trading-host call in the whole run, the /v2/assets read before sweep 1 (calls.outside_sweeps_by_interval; the trading host's reading stayed at 199 of 200 in all 2,874 sweeps); option_oi false and absent from the start record's sources, option_contracts cap 0"
+      },
+      {
+        "freeze": "ext-20260929/FREEZE.md",
+        "line": 108,
+        "context": "request budget, account 2, any rolling 60 s",
+        "text": "Incentive monitor start-up (`/v2/assets`, at most 5 per process start, retries included; `--option-oi` off) | 5",
+        "met": true,
+        "basis": "as for pre line 91; the one /v2/assets call leaves no room for a retry (errors.silent_retry_surfaces)"
+      },
+      {
+        "freeze": "rth-20260929/FREEZE.md",
+        "line": 107,
+        "context": "request budget, account 1",
+        "text": "Incentive monitor (it runs on key 2) | 0",
+        "met": true,
+        "basis": "the launch script passes --env-file \"$PAPER_ENV_FILE_2\" (account 2), so the monitor made no account 1 call"
+      },
+      {
+        "freeze": "rth-20260929/FREEZE.md",
+        "line": 131,
+        "text": "The series unit runs at CPUWeight 1000, the incentive monitor at 100, and research jobs launched as `systemd-run --user` units at 20.",
+        "met": true,
+        "basis": "unit.settings.CPUWeight 100"
+      }
+    ]
+  },
+  "data_purpose": {
+    "study": "incentive-board-forward-v1-20260924, blueprints/us-equities/incentive-monitor/forward-protocol-v1.json (status frozen_before_first_order, evidence class paper_forward_prospective)",
+    "what_the_data_is": "A point-in-time record, with receive times, of the market-side and non-market-side incentive sources the forward study is built on. The protocol states why a forward study is needed: several board components have no usable history, and halt and news receive times exist only from the monitor's first day.",
+    "account": "forward-protocol-v1.json line 63 designates alpaca-paper-2 as the study's isolated account; this run used that account's key pair for data and asset-list reads only.",
+    "v1_binding": "This run cannot feed a protocol v1 decision. Its board.json carries monitor code sha256 88f3423a5426c32e2b22e1b7cb8bb504feb4f5093d356c4e2372de69b61e0551, while v1 is bound to monitor.py 4c8029e5f8b96e65aa630923e36fd5ddfa51a1adfa18533113d3e6ce7642eaef and board_scan.py 0912f48b108ee680d71258ab7c63f47516fdd5dc658cdb69418f17d25fd1ff03 (monitor.FROZEN_V1). The frozen v1 bridge would refuse this board with monitor_code_mismatch, and this code's bridge refuses v1 decisions with code_not_frozen (board_scan.py). Using boards from this code needs a new protocol version (incentive-monitor README).",
+    "licence": "licensed market data and news, kept private (incentive-monitor README)"
+  },
+  "private_files": {
+    "<private incentive-monitor directory>/20260929/adv20.json": {
+      "bytes": 234299,
+      "sha256": "27369d79323de8209eeb5aaeed9a5c695ba526a3dd7e0dd27120029b0e320c7c"
+    },
+    "<private incentive-monitor directory>/20260929/board-v2.json": {
+      "bytes": 60925,
+      "sha256": "ccc06f725789f34a40cd5d3fb4cab0b42e213f10a187ff7d435c4427e9c5db3a"
+    },
+    "<private incentive-monitor directory>/20260929/board-v2.jsonl": {
+      "bytes": 47574315,
+      "sha256": "2fdf111eeb0303dd768f0bc3b3fef47bc825e77210d3ebb6103ea63c047012ee",
+      "records": 2874
+    },
+    "<private incentive-monitor directory>/20260929/board.json": {
+      "bytes": 27484,
+      "sha256": "f1a525b07edffcb8469ae4f8685f5dfef5f8404d4590f57905ddcf637864e97e"
+    },
+    "<private incentive-monitor directory>/20260929/board.jsonl": {
+      "bytes": 16463362,
+      "sha256": "64d32b5367e278db245275d6304c333a2995740e5cadf251f4c2bbd6cb8c2524",
+      "records": 2874
+    },
+    "<private incentive-monitor directory>/20260929/corporate-actions.jsonl": {
+      "bytes": 23925347,
+      "sha256": "e144107f34e1890d8ab51de01ea335d1cd1da201d68b40055a505a953ad3fc0e",
+      "records": 51822
+    },
+    "<private incentive-monitor directory>/20260929/edgar.jsonl": {
+      "bytes": 240571,
+      "sha256": "c1ac79b06a2cf2384717fba0c0024a5f8c1d182166251bd0a3f2ad000ec4badd",
+      "records": 696
+    },
+    "<private incentive-monitor directory>/20260929/halt-state.json": {
+      "bytes": 5568,
+      "sha256": "504bddab7355835e0198dd32e1283fb8288089c08ba8e9952778d3d2b8d0ce88"
+    },
+    "<private incentive-monitor directory>/20260929/halts.jsonl": {
+      "bytes": 14548,
+      "sha256": "cf7848292215c6eaa5adfe6187237c8a3e16e07c6d899c7f7d1c835a18aaad84",
+      "records": 46
+    },
+    "<private incentive-monitor directory>/20260929/monitor.jsonl": {
+      "bytes": 2417359,
+      "sha256": "1565c1bdffac0f1622aa49f0fc50a994cba7fd3cce7e7b98cca814103451df9e",
+      "records": 2884
+    },
+    "<private incentive-monitor directory>/20260929/news.jsonl": {
+      "bytes": 563824,
+      "sha256": "0a5c754853fbc95d09011e358659c787e93706c012e17aae7caf9683667ce26f",
+      "records": 916
+    },
+    "<private incentive-monitor directory>/20260929/options-iv.jsonl": {
+      "bytes": 34763130,
+      "sha256": "5d4108631c0f2ec07641f0933dbc6b3f74e61db5a0d0634e762ba8fd7d90f5b4",
+      "records": 27996
+    },
+    "<private incentive-monitor directory>/20260929/options-large.jsonl": {
+      "bytes": 5437119,
+      "sha256": "a196f7e32cc453585b0a62fd7717e083e8c1dce95824bfd3fc6059ecc62a1d0a",
+      "records": 26819
+    },
+    "<private incentive-monitor directory>/20260929/options-minute.jsonl": {
+      "bytes": 58750876,
+      "sha256": "23ba2386f9ec578e463a922cd612c3fa60b61a00e9b20984cb9c5162494b8acd",
+      "records": 532713
+    },
+    "<private incentive-monitor directory>/20260929/regime.jsonl": {
+      "bytes": 653938,
+      "sha256": "8ff340ea52b04e33c13fffa7e75b45a296053e3bb379e8155504915a4911b564",
+      "records": 2874
+    },
+    "<private incentive-monitor directory>/20260929/screener.jsonl": {
+      "bytes": 53729381,
+      "sha256": "00f2f0ca6c2e377250ee63cca142e7a7dbe070629ca8b61d43320beca0025f23",
+      "records": 2874
+    }
+  },
+  "private_snapshots": {
+    "directory": "<private incentive-monitor directory>/20260929/snapshots/",
+    "files": 2874,
+    "bytes": 145711996,
+    "first": "035501.json.gz",
+    "last": "200010.json.gz",
+    "manifest_sha256": "a5b73f5fadee8c0a0e8bf5e07b73e6b2092037ea2a00051252b861a8f52d778b",
+    "manifest_rule": "cd snapshots && sha256sum *.json.gz | sha256sum (names are six digits, so the glob order is the same in every locale)",
+    "rows_total": 3555660,
+    "empty_files": 14,
+    "note": "one gzip JSON file per sweep, named by the sweep's ET time, holding the SIP snapshot rows whose last trade changed since the previous sweep"
+  },
+  "private_files_total": {
+    "files": 2890,
+    "top_level_files": 16,
+    "snapshot_files": 2874,
+    "bytes": 390574042,
+    "latest_modification_utc": "2026-09-30T00:00:13.845Z",
+    "note": "The brief's 379 MB is a disk-usage figure; the files hold 390,574,042 bytes. No file under the day directory has a modification time after the unit stopped."
+  },
+  "private_file_time_ranges": {
+    "board-v2.jsonl": {
+      "field": "at",
+      "first_utc": "2026-09-29T07:55:01.000Z",
+      "last_utc": "2026-09-30T00:00:10.000Z"
+    },
+    "board.jsonl": {
+      "field": "at",
+      "first_utc": "2026-09-29T07:55:01.000Z",
+      "last_utc": "2026-09-30T00:00:10.000Z"
+    },
+    "corporate-actions.jsonl": {
+      "field": "received_at",
+      "first_utc": "2026-09-29T07:55:07.704Z",
+      "last_utc": "2026-09-29T23:31:34.200Z"
+    },
+    "edgar.jsonl": {
+      "field": "received_at",
+      "first_utc": "2026-09-29T07:55:01.261Z",
+      "last_utc": "2026-09-29T23:59:10.829Z"
+    },
+    "halts.jsonl": {
+      "field": "received_at",
+      "first_utc": "2026-09-29T12:20:02.458Z",
+      "last_utc": "2026-09-29T23:51:30.414Z"
+    },
+    "monitor.jsonl": {
+      "field": "at",
+      "first_utc": "2026-09-29T07:55:00.531Z",
+      "last_utc": "2026-09-30T00:00:13.849Z"
+    },
+    "news.jsonl": {
+      "field": "received_at",
+      "first_utc": "2026-09-29T07:58:52.189Z",
+      "last_utc": "2026-09-29T23:50:00.713Z"
+    },
+    "options-iv.jsonl": {
+      "field": "received_at",
+      "first_utc": "2026-09-29T13:45:06.309Z",
+      "last_utc": "2026-09-29T19:59:58.690Z"
+    },
+    "options-minute.jsonl": {
+      "field": "drained_at",
+      "first_utc": "2026-09-29T07:55:03.000Z",
+      "last_utc": "2026-09-29T21:00:14.000Z"
+    },
+    "regime.jsonl": {
+      "field": "at",
+      "first_utc": "2026-09-29T07:55:01.000Z",
+      "last_utc": "2026-09-30T00:00:10.000Z"
+    },
+    "screener.jsonl": {
+      "field": "received_at",
+      "first_utc": "2026-09-29T07:55:01.465Z",
+      "last_utc": "2026-09-30T00:00:10.431Z"
+    },
+    "options-large.jsonl": {
+      "field": "trade_ts (the trade's own time; the rows carry no receive time)",
+      "first_utc": "2026-09-29T08:18:16.567Z",
+      "last_utc": "2026-09-29T20:59:46.353Z"
+    }
+  },
+  "committed_copies": {
+    "monitor-20260929.console": {
+      "source": "<private incentive-monitor directory>/monitor-20260929.console",
+      "bytes": 112,
+      "sha256": "e032297e4c2b97481f8b8b3dfccba849062ba923dd837f6bfbe18fa8bcfa2a8c",
+      "sanitization": "none needed; byte-identical"
+    }
+  },
+  "private_notes_sha256": {
+    "pre-20260929/FREEZE.md": "3cd44b7838b321d2292eabf11a004e34641e47126ccb5b7ee09287dc485f5369",
+    "rth-20260929/FREEZE.md": "4e595a8dcde301ac502361a0c3563e287ec64db5abe750044d2a7d9faee6f7f7",
+    "ext-20260929/FREEZE.md": "c72bbfedf5280a4510d96628853cd2c11182ddc4749011fccbc077febb741b0c",
+    "SERIES-INDEX.md": "f53fab8bde06b4e317691c030bce74fba3661dd731ffdcc232947ed913993284"
+  },
+  "private_notes_note": "The series freeze notes and the series index in <private state root>/trials/ name account fingerprints, so they stay private and are cited by sha256 only (read on 2026-09-30); the freeze lines quoted in frozen_expectations carry no fingerprint. The freeze notes are 0444 and were last modified 2026-09-29 between 05:11:26Z and 05:12:32Z. SERIES-INDEX.md was last modified 2026-09-29T05:20:57Z, before the timer was armed at 05:43:11Z, and holds the sha256 of the launch script, the unit file and the timer file at lines 55, 81 and 82; each equals the hash of the file on 2026-09-30.",
+  "field_provenance": {
+    "legend": "asserted: the builder stops unless two or more sources agree. single_source: copied from one source with no cross-source assertion. derived: computed by the builder from the named source. literal: text or a constant written into the builder. Descriptive labels and notes are literal.",
+    "asserted": {
+      "code.monitor_py_sha256": "the clone file, git show b528bb55, frozen-b528bb55.SHA256SUMS line 45, board.json and board-v2.json monitor.code_sha256, and git show f03f41c7",
+      "code.frozen_sums (entries, sha256)": "the SUMS file and the brief",
+      "code.engine_commit, checkout": "the clone's git HEAD and status, the unit's ENGINE_SHA and git merge-base against the base",
+      "status, unit.starts, unit.restarts": "the service manager (Result, ExecMainCode, ExecMainStatus, NRestarts), the journal's single start job, and the monitor's single start and stop records",
+      "window (start, stop, sweeps)": "monitor.jsonl start, stop and sweep records, board.json at, and the journal's start and stop records",
+      "private_files records for news, edgar, halts, options-iv, corporate-actions, board, board-v2, regime, screener": "line counts against the monitor's counters: news:n, sum of edgar_new, sum of halt_changes, sum of option-chain roots, corporate_actions.archived, and the sweep count",
+      "private_snapshots.files and names": "the directory listing against the sweep count and each sweep's ET time; the first file's rows against the first sweep's snapshot count",
+      "calls.in_sweep_by_source snapshots, screener, edgar": "the per-sweep deltas against sweeps times the per-sweep cap (27, 3 and 7)",
+      "calls.cumulative nasdaq, finra": "the cumulative counters against the per-sweep deltas and the number of halt polls",
+      "calls.ratelimit.paper-api identical_readings": "all 2,874 sweep records",
+      "broker_listing_account_2 order counts": "each read's with-prefix and without-prefix counts against its listed total; the ext and rec reads against each other",
+      "broker_listing_account_2.tool": "the reconciliation directory copy and git show origin/main of the committed tool",
+      "code.forward_v1_frozen_code.matches_this_run": "monitor.FROZEN_V1 against the run's monitor.py sha256",
+      "code.launch_script.sha256, unit.file_sha256, unit.timer.file_sha256 and their pre_run_record": "sha256sum of each file on 2026-09-30 against SERIES-INDEX.md lines 55, 81 and 82, written before the run"
+    },
+    "single_source": {
+      "started_at": "the systemd user journal (the unit's Started record), as in the template",
+      "finished_at": "the monitor's stop record in monitor.jsonl",
+      "code.engine_commit_date": "git log -1 --format=%cI b528bb55",
+      "code.monitor_py_bytes, monitor_py_clone_mode, monitor_py_clone_modified_utc": "stat of the clone's monitor.py, 2026-09-30",
+      "code.launch_script.bytes, modified_utc; unit.file_bytes, file_modified_utc; unit.timer.file_bytes, file_modified_utc": "stat of each file, 2026-09-30",
+      "unit.journal.journald": "systemctl --version, 2026-09-30",
+      "window.timer_armed_utc, unit.journal.timer_record": "the systemd user journal (the timer's Started record)",
+      "streams.corporate_actions.context_replay": "the ca_context record in monitor.jsonl",
+      "frozen_expectations line numbers and text": "the private freeze notes, read on 2026-09-30 (sha256 in private_notes_sha256)",
+      "private_notes_sha256, private_notes_note times": "sha256sum and stat of each note, 2026-09-30",
+      "settings (every field), settings.budget_plan": "monitor.jsonl start and budget records",
+      "settings.settings_basis launch arguments, unit.launch_script_exec, code.launch_script.name": "the private launch script run-monitor.sh",
+      "unit.settings, unit.environment, unit.exec_start, unit.standard_output, unit.timer, unit.description": "the unit and timer files (systemctl --user cat)",
+      "unit.service_manager": "systemctl --user show, queried on 2026-09-30",
+      "unit.journal records, cpu and memory": "the systemd user journal",
+      "unit.on_failure_unit": "systemctl --user show and the journal for the paper-alert unit",
+      "streams (connect and down times, errors)": "monitor.jsonl stream records",
+      "streams message counts, corporate_actions counters, options_unparsed": "the last sweep record",
+      "streams down_seconds, sweeps.adv_loaded": "board.json monitor block at the last sweep",
+      "sweeps.finra": "the sweep records' finra field",
+      "code.runtime.python": "the pinned interpreter's --version on 2026-09-30, not observed at run time",
+      "broker_listing_account_2.reads (windows, observed_at, counts)": "the coordinator's reconciliation outputs",
+      "data_purpose facts": "forward-protocol-v1.json, board_scan.py, monitor.py and the incentive-monitor README at b528bb55"
+    },
+    "derived": {
+      "sweeps counts, times, intervals, durations, ranges, totals": "the sweep records in monitor.jsonl",
+      "calls.total, in_sweep_by_source, max_per_sweep, outside-sweep differences, busiest_60s_in_sweep_data_calls": "the sweep records' calls and source_calls",
+      "calls.ratelimit.data lowest_remaining": "the sweep records' ratelimit field",
+      "errors.option_chains": "the sweep records' option_chains counts",
+      "errors counts of *_error keys, floors, refusals, stream records": "monitor.jsonl",
+      "private_files, private_snapshots, private_files_total": "sha256, byte and line counts of each private file",
+      "private_files_total.latest_modification_utc": "the latest modification time (stat) over the day directory's files",
+      "calls.outside_sweeps_by_interval, calls.adv_bars_calls": "each sweep's cumulative calls counter against its source_calls (only sweeps 1 to 3 show calls outside sweeps); the sources from monitor.py's request sites; requests_needed as ceil(13,499 / 200)",
+      "private_file_time_ranges": "each file's receive-time field (options-large: trade_ts)",
+      "window ET renderings": "UTC times converted at UTC-4 (EDT)"
+    },
+    "literal": {
+      "status, acceptance, evidence_class, evidence_level, label": "the builder's classification after the asserts above",
+      "errors.http_406, http_429, their bases and silent_retry_surfaces": "0 written after asserting that no record of either exists, with the recording and retry surfaces read from monitor.py and the retry check against calls.outside_sweeps_by_interval and calls.adv_bars_calls",
+      "frozen_expectations.statements[].met": "the builder's evaluation of each quoted statement against the fields its basis names",
+      "private_paths": "the builder's placeholders for host paths",
+      "orders.placed": "0 written after the code review, the rate-limit and budget asserts and the broker-listing asserts; the basis lists each",
+      "unit.service_manager.ExecMainCode text, unit.journal texts": "the builder's reading of the systemd values"
+    }
+  },
+  "error": null,
+  "limitations": [
+    "Data-only run: it evaluates no strategy and qualifies no gate. The boards are unvalidated detectors fixed without outcome data.",
+    "Code identity rests on hashes read on 2026-09-30 (clone file, git show, the frozen SUMS) and on the process's own code_sha256 in board.json, which it computed at start.",
+    "The launch script, unit file and timer file are private. They were hashed before the run in SERIES-INDEX.md and are unchanged since; no hash was taken at run time. The Python version was read on 2026-09-30.",
+    "The journal holds no exit record. The exit status and result come from the service manager's retained properties, read on 2026-09-30.",
+    "No broker read covers 07:55Z-11:00Z or 13:45Z-20:00Z on account 2. For those hours the no-order statement rests on the code and the recorded calls.",
+    "Two surfaces retry without writing an error, the start-up retry() and the daily-bar loader; only the call counts show that neither retried. The sources of the 57 Alpaca calls and 1 SEC call outside sweep windows are derived from the counters and monitor.py's request sites, not labelled in the files.",
+    "19 sweeps ran longer than 20 s and 14 sweep intervals exceeded 25 s; the monitor records no per-source timing, so the cause is not in the files.",
+    "options-large.jsonl rows carry the trade time (trade_ts) but no receive time, although the incentive-monitor README says every record carries the monitor's receive time.",
+    "The FINRA files this run fetched are in the monitor's shared finra/ directory and are not hashed here.",
+    "The data is licensed market data and news and stays private; only hashes, counts and times are published."
+  ],
+  "evidence_note": "Built from the private monitor outputs (monitor.jsonl, the boards and every data file, read-only), the engine clone and git objects, the unit and timer files, systemctl --user show and the systemd user journal, the coordinator's read-only reconciliation outputs for account 2, and the private series freeze notes and series index (cited by sha256). Figures present in two or more sources were cross-checked by assertion, and a mismatch stops the build. Other fields come from one source; field_provenance names them. No credential, account id, account number, account fingerprint, broker order id, activity id, execution id, pid, invocation id or host path is recorded."
+}

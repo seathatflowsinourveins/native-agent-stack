@@ -1,0 +1,44 @@
+"""Read-only probe of the npm provenance attestations of omniroute@3.8.51: fetch them from the registry, decode each DSSE payload and print
+its statement (subject digests, workflow, source commit, builder) without the signatures and certificates. It does NOT verify any signature;
+`npm audit signatures` does that (run separately). Prints one JSON document whose observed_utc is taken at the start.
+Usage: npm_attestation_probe.py <sha512 of the tarball as hex, from the digest recomputation>"""
+import base64
+import datetime
+import json
+import sys
+import urllib.request
+
+EXPECTED_SHA512_HEX = sys.argv[1].lower()
+out = {"observed_utc": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
+URL = "https://registry.npmjs.org/-/npm/v1/attestations/omniroute@3.8.51"
+doc = json.load(urllib.request.urlopen(URL, timeout=30))
+out["url"] = URL
+out["attestation_count"] = len(doc.get("attestations", []))
+statements = []
+for entry in doc.get("attestations", []):
+    bundle = entry.get("bundle", {})
+    envelope = bundle.get("dsseEnvelope", {})
+    payload = json.loads(base64.b64decode(envelope.get("payload", "")))
+    item = {"predicateType": entry.get("predicateType"), "statement_type": payload.get("_type"),
+            "statement_predicateType": payload.get("predicateType"), "envelope_payloadType": envelope.get("payloadType"),
+            "signature_count_in_envelope": len(envelope.get("signatures", [])),
+            "subject": [{"name": s.get("name"), "digest": s.get("digest")} for s in payload.get("subject", [])]}
+    predicate = payload.get("predicate", {})
+    build = predicate.get("buildDefinition", {})
+    if build:
+        external = build.get("externalParameters", {})
+        item["buildType"] = build.get("buildType")
+        item["workflow"] = external.get("workflow")
+        item["resolvedDependencies"] = [{"uri": d.get("uri"), "digest": d.get("digest")} for d in build.get("resolvedDependencies", [])]
+        details = predicate.get("runDetails", {})
+        item["builder_id"] = details.get("builder", {}).get("id")
+        item["invocationId"] = details.get("metadata", {}).get("invocationId")
+    else:
+        item["predicate_keys"] = sorted(predicate.keys()) if isinstance(predicate, dict) else None
+        item["predicate"] = {k: predicate[k] for k in ("name", "version", "registry") if isinstance(predicate, dict) and k in predicate}
+    statements.append(item)
+out["statements"] = statements
+digests = [s["digest"].get("sha512", "").lower() for item in statements for s in item["subject"] if isinstance(s.get("digest"), dict)]
+out["subject_sha512_equals_expected_tarball_sha512"] = bool(digests) and all(d == EXPECTED_SHA512_HEX for d in digests)
+out["subject_names"] = sorted({s["name"] for item in statements for s in item["subject"]})
+print(json.dumps(out, indent=1))

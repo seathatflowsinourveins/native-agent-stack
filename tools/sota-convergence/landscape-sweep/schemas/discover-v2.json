@@ -1,0 +1,54 @@
+{
+ "type": "object",
+ "additionalProperties": false,
+ "required": ["contract_version", "layer_id", "proposed", "calls", "notes", "skills_used"],
+ "properties": {
+  "contract_version": {"type": "integer", "enum": [2]},
+  "layer_id": {"type": "string", "minLength": 1},
+  "proposed": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["candidate_key", "repository", "evidence_key", "proposed_label", "requirement_fit", "frozen_tasks", "admission_reason", "pending_reason", "evidence", "upstream_now", "source"],
+    "properties": {
+     "candidate_key": {"type": "string", "minLength": 1},
+     "repository": {"type": "string", "minLength": 1},
+     "evidence_key": {"type": "string", "minLength": 1},
+     "proposed_label": {"type": "string", "enum": ["admit", "admit_pending", "not_admitted"]},
+     "requirement_fit": {"type": "string", "minLength": 1},
+     "frozen_tasks": {"type": "array", "items": {"type": "string", "minLength": 1}},
+     "admission_reason": {"type": ["string", "null"], "enum": [null, "archived_or_stale", "target_host_incompatible", "outside_requirement", "paid_service_required", "duplicate_repository"]},
+     "pending_reason": {"type": ["string", "null"]},
+     "evidence": {"type": "array", "items": {"type": "string", "minLength": 1}},
+     "upstream_now": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["latest_release", "released_at", "stars", "pushed_at", "archived", "license"],
+      "properties": {
+       "latest_release": {"type": ["string", "null"]},
+       "released_at": {"type": ["string", "null"]},
+       "stars": {"type": ["integer", "null"]},
+       "pushed_at": {"type": ["string", "null"]},
+       "archived": {"type": ["boolean", "null"]},
+       "license": {"type": ["string", "null"]}
+      }
+     },
+     "source": {"type": "string", "minLength": 1}
+    }
+   }
+  },
+  "calls": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": ["web_search", "web_fetch", "gh_api"],
+   "properties": {
+    "web_search": {"type": "integer", "minimum": 0},
+    "web_fetch": {"type": "integer", "minimum": 0},
+    "gh_api": {"type": "integer", "minimum": 0}
+   }
+  },
+  "notes": {"type": "string"},
+  "skills_used": {"type": "array", "items": {"type": "string"}}
+ }
+}

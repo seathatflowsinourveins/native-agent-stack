@@ -1,0 +1,9 @@
+[2026-09-30T06:05:24Z] shim label=v1; lsof on PATH: <throwaway>/ns-omni-trap-v1-20260930/shim/lsof sha256=b12c64614c54bc86
+[2026-09-30T06:05:24Z] phase 1: health=200 after 3s
+[2026-09-30T06:05:29Z] client (pid 2461136) socket before stop: ESTAB ESTAB ESTAB 
+[2026-09-30T06:05:29Z] server stopped, exit 0
+[2026-09-30T06:05:31Z] client alive after stop: yes; its socket: CLOSE-WAIT  | lsof -ti :20197 by the real tool: 2461136 
+[2026-09-30T06:05:31Z] phase 2 (restart with the dead client connection still held): serve exited early after 1s
+✖ Port 20197 is already in use by PID 2461136.
+[2026-09-30T06:05:32Z] done
+namespace wrapper rc=0

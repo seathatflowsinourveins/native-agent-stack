@@ -1,0 +1,30 @@
+{
+  "codex_exit_code": 124,
+  "turn_status": null,
+  "completed_item_types": {
+    "reasoning": 1,
+    "mcp_tool_call": 1
+  },
+  "non_json_lines": 0,
+  "mcp_tool_calls": [
+    {
+      "server": "time",
+      "tool": "get_current_time",
+      "status": "completed",
+      "arguments": {
+        "timezone": "UTC"
+      },
+      "error": null,
+      "result_datetime": "2026-10-01T23:46:43+00:00"
+    }
+  ],
+  "tool_call_completed": true,
+  "tool_result_datetimes": [
+    "2026-10-01T23:46:43+00:00"
+  ],
+  "final_answer": null,
+  "final_answer_contains_result": false,
+  "run_pass": false,
+  "reason": "timeout",
+  "error_events": []
+}

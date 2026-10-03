@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-10-01",
+  "evidence_class": "inherited_artifact_integrity_snapshot",
+  "source_head": "20ea4ae23a18565676823b9e3a23541c2100bb39",
+  "accepted_main_target": "85543efe5abcddb7b7cddb14e8774e83b6758616",
+  "trigger": "Consequential architecture and inherited source evidence conflict: SDK PR 580 was described as pending although accepted main contains the merged update.",
+  "file_sha256": {
+    "adoption/new-wsl-profile.json": "614166f0524ba95daaeac145ba5ab8a133ac27e79a9c49336fa166881a46c1d9",
+    "adoption/new-wsl-profile.md": "386afb9077b1cf0382e45ff00e56efc872a715dc6d701ab54ce7a4840cde1ee9",
+    "adoption/README.md": "f853e8d2a1effc00a5a0079cb1ace5c61daceadd1b6a85cc46423cc32b208906",
+    "adoption/manifest.json": "7bb179e8440be17b75484c21495e66385ea8eb959a491d43d2488056ddede09a",
+    "scripts/adoption_status.py": "5017a00d36990b5e576fa17a5761e2ea2c6d879ea72252bb068baf7542b0447d",
+    "scripts/new_wsl_profile.py": "dc7f39df2d5d297b2e87c82ebfdbd15bf876d33cc1723da6f5d148c49954df23",
+    "tests/test_new_wsl_profile.py": "50be1ce2853737113cc510848f5ab89a599118aba45363d655dc437c4cdc5969",
+    "evidence/artifacts/new-wsl-profile-20261001/source-review.json": "ba0d2d6bfd43b0d289d2886c8755665c3e621785912fa65d75e953e31a3d118a"
+  },
+  "boundary": "Hashes preserve the inherited state before source corrections; they establish no installation, sign-in, provider execution, new-host acceptance or merit ranking."
+}

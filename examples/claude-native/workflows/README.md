@@ -136,7 +136,11 @@ After a run, `node .claude/workflows/child-usage.mjs <transcript dir printed by
 the Workflow tool>` or `--latest` returns each child's requested and resolved
 model, effort, provider-returned usage and first-prompt size, and exits 1 when a
 child returned null, was substituted, resolved no model or inherited the
-coordinator model. The counters are provider-returned and are not comparable
+coordinator model. Since 2026-09-29 it also exits 1 when a child's return is
+incomplete: an empty result, a result that is only a wait notice, or a
+background task the child left running at its final message (`return_quality`,
+`final_return` and `issues` per child; see
+[U2 measurement fields](#u2-measurement-fields-2026-09-29)). The counters are provider-returned and are not comparable
 to RTK, Context Mode, jCodeMunch or Headroom estimates.
 
 Each child also carries a `lanes` object read from its own transcript
@@ -174,8 +178,169 @@ for comparison with historical receipts; their three-lane fetch share is **not M
 ```sh
 node examples/claude-native/workflows/child-usage.mjs --lanes-sweep \
   --root "${CLAUDE_ROOT}" --since "${SINCE}" --until "${UNTIL}" \
-  --rtk-check --rtk-db "${RTK_DB_PATH}" --exceptions "${PRIVATE_EXCEPTIONS}"
+  --rtk-check --rtk-db "${RTK_DB_PATH}" --exceptions "${PRIVATE_EXCEPTIONS}" \
+  --call-ledger "${PRIVATE_LEDGER}"
 ```
+
+`--call-ledger` writes the private per-call ledger (below) to a new file; stdout
+is the same with or without it and holds no call or session ids.
+
+#### U2 measurement fields (2026-09-29)
+
+PR-A items 1, 4, 5, 6 and 7, protocol M15, binding decisions B5, B8 and B9 and
+the U2 corrections add these fields to every measurement (`actors[].measurement`,
+each group's and `main`'s `measurement`, and run mode's `lanes.measurement`).
+Their host scans, upstream sources (URL, fetch time, sha256 and the sentence each
+rule rests on) and the base-versus-U2 differential are in
+[`evidence/artifacts/pra-u2-differential-20260929`](../../../evidence/artifacts/pra-u2-differential-20260929/README.md).
+The per-rule citations sit beside each rule in `child-usage.mjs`.
+
+**Hook context (item 1).** `hook_context.inserted` counts `hook_additional_context`
+rows and `inserted_blocks` their content entries (one per hook whose context
+Claude Code delivered), per event in `by_event` and `blocks_by_event`. A claim
+is a `hook_success` row whose stdout asks for context and is never an insertion:
+`claimed_by_event` counts JSON stdout with `hookSpecificOutput.additionalContext`
+on any event, and `claimed_plain_stdout` plain stdout on the four events whose
+plain stdout Claude Code adds (`UserPromptSubmit`, `UserPromptExpansion`,
+`SessionStart`, `PostModelSwitch`; [hooks](https://code.claude.com/docs/en/hooks), "Exit code 0").
+Other `hook_*` rows are counted apart in `other_hook_rows`. An MCP hook name
+too long for `(other)` is folded to `<Event>:mcp__<server>` (`hook_names_folded`).
+Aggregates add `actors_with_insertion`. M12 reads `measurement.hook_context`
+(`inserted` 0 on blind actors), not the legacy SubagentStart flag.
+
+**Loaded, never called (item 5).** `loaded` counts the tool references a
+ToolSearch result returned per MCP server, and `loaded_not_called` those of
+servers the actor attempted no call on in the window (references, the #432
+unit). Aggregates add `loaded_actors` and `loaded_not_called_actors`: actors
+per server, the unit of the historical "Loaded, never called" baseline row.
+
+**Large-result shapes and section-1 figures (item 4).** Every sizes object
+(`m3`, `m5`, `by_carrier.*`, `exceptions.*`) counts, among its results over
+5,120 bytes, `large_json` (the trimmed payload opens with `[` or `{` and
+parses), `large_uniform_keys` (an array, or the one value of a one-key object,
+of at least five objects with one key set), `large_uniform_flat` (those whose
+values are all primitive; TOON v4.1.1 README, "All objects have identical fields
+with primitive values"), and `large_shape_unknown` (a non-text block, a result
+without its call, or a wrapper this reading cannot remove), so 0 never stands
+for "not inspected". The payload is the result text, text blocks joined with
+nothing, after its carrier's wrapper: the code echo context-mode puts before
+`ctx_execute` and `ctx_execute_file` output, and the line numbers of a Read.
+Aggregates add the AA §1 per-actor figures: `shell_web_large_results_per_actor`
+(nearest-rank percentiles of Bash, rtk proxy and WebFetch results over the
+limit), `actors_with_mcp_call`, `actors_with_non_ctx_mcp_call` and
+`actors_with_ctx_results`.
+
+**Complete usage (B9, U2 correction 1).** Each `usage.messages[]` row adds
+`cache_creation_5m`, `cache_creation_1h`, `speed`, `service_tier` and
+`inference_geo`, each null when the record lacks it, never 0; the combined cache
+creation counter and the deduplication by message id are unchanged.
+`usage.iterations[]` entries of type `advisor_message` (an advisor
+sub-inference, billed at its own model's rates and outside the top-level
+counters) are `usage.advisor_iterations`, summed in `advisor_totals` and
+`totals_including_advisor`. `usage.complete` is false, with
+`usage.iteration_issues` naming the reason, when a message carries an entry this
+reading cannot read, when its top-level counters differ from the sum of its
+`message` entries, or when an advisor result has no usage or an advisor call no
+result ([beta Messages API](https://platform.claude.com/docs/en/api/beta/messages/create),
+`BetaIterationsUsage`; [advisor tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/advisor-tool), "Usage and billing").
+
+**Call states (item 7, M14).** `call_states` gives every call attempted in the
+window one state in the sealed M14 names, per actor and per MCP server
+(`by_server`):
+
+| Field | Calls |
+| --- | --- |
+| `attempted` | every call; `attempted = executed + rejected + invalid + cancelled_with_result + cancelled_or_unfinished + unknown` |
+| `executed` | `succeeded + failed + interrupted` |
+| `rejected` | never ran by a decision, split in `rejected_by_source`: `config`, `hook`, `user`, `other`, `declined` (the OTel `tool_decision` sources) |
+| `invalid` | a `<tool_use_error>` the client raised before running the call |
+| `cancelled_with_result` | the client's "Cancelled" or "Not run" results, kept apart until a Loki probe shows whether such a call emits `tool_result` |
+| `cancelled_or_unfinished` | no result and no native status: the sealed "(no result)" state |
+| `unknown` | an outcome an adapter could not read |
+| `decided` | null: a transcript cannot observe the `tool_decision` event |
+
+`background` and `sandbox` flag calls within those states. `calls_without_result`
+keeps its published meaning: `cancelled_or_unfinished` plus the no-result calls
+a native status decided. `mcp_states` stays the #432 reading, a legacy view, and
+`cli_lanes.lanes.*.failed` keeps U1's meaning (`is_error` calls, `not_executed`
+a subset), so M14's failed for a lane is `failed - not_executed`.
+
+**The private call ledger.** `--call-ledger <file>` writes one JSON line per
+attempted call: `session_id`, `owner` (the agent id, `main`, or null for a row
+with neither, such as a Codex bridge row), `tool_use_id`, `tool`, `server`,
+`state`, `cause`, `native_status`, `background`, `sandbox`, `code_mode` and
+`m15_class`, plus `actor_ordinal` in a sweep (the published actor's number) and
+`label` and `superseded` in run mode. The join key is (session_id, tool_use_id),
+as the E2E README's M14 row requires. The file is created, never written over
+(an existing file is refused, so its mode never stands for 0600), with mode
+0600, in an existing directory outside every git work tree; a refusal exits 2
+before any output. Run-mode stdout holds agent ids and the transcript directory
+by design, but no tool_use_id or sessionId value.
+
+**M15 infrastructure-error classes.** `m15.by_server[server]` classifies every
+attempted MCP call (`mcpErrorClass`; each template is anchored and read by a
+linear scan; the sources are the kernel comments and `sources.json`):
+
+| Class | Group | Source |
+| --- | --- | --- |
+| `approval` | infrastructure | openai/codex rust-v0.157.1 `core/src/mcp_tool_call.rs:1612` |
+| `boundary`, `binding` | infrastructure | context-mode v1.0.169 `src/server.ts:1196-1201` (`binding` when the Codex adapter flags a root mismatch) |
+| `timeout` | infrastructure | the client's MCP idle timeout ([MCP](https://code.claude.com/docs/en/mcp)); `server.ts:1872, :2152, :3815` |
+| `module` | infrastructure | a ModuleNotFoundError or `Cannot find module` in the exit's stderr |
+| `connection` | infrastructure | "MCP server ... is not connected"; SDK 1.30.1 "Connection closed" |
+| `server_error`, `storage_directory`, `usage_error`, `invalid_arguments`, `unmatched` | new class (our misuse until reproduced) | `server.ts` error texts; `session/db.ts`; MCP -32602 |
+| `outcome_unknown`, `invoked_command_exit_indexed`, `echo_mismatch` | unknown | no result or state; an indexed exit; output without its code echo |
+| `policy_deny`, `remote_fetch`, `search_throttle`, `rejected`, `invalid`, `cancelled_with_result` | unassigned: graded as errors until Amendment 4 assigns them | the deny firewall, fetch failures, search throttling, M14 states |
+| `invoked_command_exit` | excluded (the frozen M15 row: "A non-zero exit from the command the child ran is excluded") | the command's own exit |
+
+Grading reads `rate_upper_bound`, the ceiling: every attempted call that neither
+succeeded nor ended in the invoked command's own exit. The frozen M15 row names
+six infrastructure classes and none of the unassigned ones, so until a dated
+amendment (Amendment 4) assigns them, they count as errors (the U2 design 5.3;
+binding decisions: the harder-to-pass reading). A server whose every call fails
+with the client's "No such tool available" `<tool_use_error>` (an `invalid`
+call) therefore reads 1. The ceiling is a residual, so a class a later template
+adds counts too. `unassigned_errors` is that residual after the named groups, and
+`over_threshold` is the verdict on the ceiling's count
+(`(attempted - succeeded - invoked_command_exit) * 100 > attempted`). Rates are
+rounded to four places, so a grader compares the counts, never the rounded rate.
+`rate` counts infrastructure, new-class and unknown calls (B2: an unknown is not
+a success), which is the rate if Amendment 4 finds the unassigned classes not
+infrastructure. `rate_lower_bound` also counts the unknowns as successes.
+`threshold_sensitive` marks a server whose `rate_lower_bound` and
+`rate_upper_bound` fall on different sides of `m15.threshold` (0.01): its
+verdict depends on the unknowns or on the class assignment.
+`every_error_classified` is the `classify_every_ctx_error` criterion (no
+`unmatched`, no `echo_mismatch`).
+
+**Incomplete returns (item 6).** In run mode each child adds `return_quality`,
+its journal result read as `empty`, `wait_notice` or `ok` (null for no result):
+a string as it is, the E2E `{ answer, evidence }` schema by its `answer`, any
+other value by its leaves (to depth 6 and 10,000 values; `wait_notice` needs at
+least one string and every non-blank string a wait notice). A wait notice has no
+upstream definition: the trimmed text has at most 400 characters and its first
+sentence is, after at most three non-word characters and at most two of `still`,
+`now`, `I'll`, `I will`, `I'm`, `I am`, `let me`, `we'll`, `we will`, "wait" or
+"waiting" and then "for", "on" or "until" (a linear word scanner). Every
+measurement adds `final_return`: `status` (`measured`; `not_applicable` when no
+row carries a provider message id, as with the Codex bridge's rows;
+`unobserved` when a row lies at or after `--until`), the final assistant row's
+kind (`text`, `tool_use` or `other`), `empty_text` and `wait_notice` for a final
+text, and `background_started`, `background_pending` and
+`background_pending_with_events`. A background task starts with a Bash
+`backgroundTaskId`, a Monitor or Workflow `taskId`, or an async Agent's
+`agentId`, and ends with a `<task-notification>` whose `<status>` is
+`completed`, `failed`, `killed` or `stopped`, or with a TaskStop that names it;
+a Monitor event (no status) ends nothing. A foreground subagent's background
+command "stops when that subagent gives its final response"
+([tools reference](https://code.claude.com/docs/en/tools-reference), "Background commands"),
+so a pending task's result never reached the return. The child's `issues` then
+hold `empty result`, `wait-notice result` or `returned with N background
+task(s) that had no completion notification`, which make it and its run
+incomplete (exit 1); a superseded attempt keeps them as ordinary issues.
+Aggregates count actors by status and final kind, sum the counters and add
+`actors_with_background_pending`; an actor that ran past the window end is
+counted in `final_return.unobserved`, never as a zero.
 
 #### CLI lanes by command position (2026-09-28)
 
@@ -608,7 +773,7 @@ blanks before a heredoc operator (`A=$(( 1 + 2 )) bash <<EOF`); a data heredoc w
 paren-free substitutions with its regular expression (`$(curl $(date))` misses the outer `curl`); a newline read as a
 blank in `bash` newline `-c "x"`; and a heredoc that a quote or `"$( )"` carries over lines has its head on an earlier
 line, so its heredoc reads as a possible fetch. The text scanners read in linear time (a run of 64,000 unclosed `((`
-takes under 150 ms and at most 2.5 times longer per doubling: `test-child-usage.mjs`), and so does the reading of the lanes (below, "What the parser costs"). The repeated reading is cheap and
+takes under 150 ms, and its time plus 5 ms at 64,000 stays under 8 times that at 16,000: `test-child-usage.mjs`), and so does the reading of the lanes (below, "What the parser costs"). The repeated reading is cheap and
 is not cached: over this host's 136,361 distinct real commands `measureTranscript` of one Bash call took 44 s in all
 (mean 0.32 ms, p99 1.2 ms, at most 10.9 ms), of which `executedText` is 0.07 ms plain and 0.09 ms with inline HTTP,
 `fetchKind` 0.08 ms and `commandInvocations` 0.13 ms (`evidence/artifacts/pra-u1-differential-20260929/timing.mjs`).
@@ -678,6 +843,25 @@ self-reporting `rtk 0.50.0` that passes the five-exclusion probe**, an isolated
 temporary five-exclusion configuration from
 [the adopted recipe](../../../recipes/README.md#native-context-mode-and-hooks),
 and native `rtk hook check --agent claude` on every simple part and whole call.
+`measureTranscript`'s `rtkAgent` option names the agent instead: `claude` by default,
+or `codex`, which the Codex bridge (`tools/skill-usage/skill_usage.py --lanes`) passes
+since PR-A U3; any other value is refused. The option `unresolvedBash` (a non-negative integer, 0 by default) is how a caller
+that could not resolve some Bash calls to shell text (the Codex bridge, for `pwsh`, `powershell`, `cmd` or a shell the
+rollout does not name) reports them: each is added to `rtk_parts.unknown_calls`, never beyond the Bash calls there are,
+so B8's 5 percent rule, `unknown_call_share` and the D7 status below come from the kernel alone. rtk 0.50.0 maps `codex` to
+`InProcess(Host::Codex)`, which has no RTK-side permission rules, while `claude`
+merges the Bash rules of the project's and the home's `.claude/settings(.local).json`,
+so a Claude replay depends on the working directory and HOME and a Codex one does not
+([decision.rs:196-204](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/hooks/decision.rs#L196-L204),
+[permissions.rs:141-175](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/hooks/permissions.rs#L141-L175)).
+Each agent has its own checker and five-exclusion probe; the `claude` checker is
+unchanged, and Claude output was byte-identical across the change with `--rtk-check`
+([pra-u3-differential-20260929](../../../evidence/artifacts/pra-u3-differential-20260929/README.md)).
+On the claude path rtk 0.50.0 prints a once-a-day "No hook installed" warning on
+stderr when a Claude directory registers no rtk hook
+([hook_check.rs:26-35, :88-135](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/hooks/hook_check.rs#L88-L135)).
+The probe then reads that answer as an error, and the replay is `unavailable` for
+that process.
 No transcript command executes. Sources:
 [native check](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/main.rs#L2940-L2952),
 [lexer](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/discover/lexer.rs#L488-L526),
@@ -690,10 +874,42 @@ The adapter retains every part; upstream's analytics splitter stops at the
 first pipe. Native refusals, exclusions and consumers requiring raw input are
 outside eligibility. Redirection is recognized using the splitter's quote state;
 a quoted `>` is data. The native check decides standalone eligibility, including
-its accepted `2>/dev/null` form. Heredocs/arithmetic
-or unsupported shapes stay unknown. `coverage` and `call_coverage` use observed
+its accepted `2>/dev/null` form. `coverage` and `call_coverage` use observed
 command prefixes/recorded hook rewrites, while `replayed_*` fields describe
 potential routing under the fixed config. Replay never proves execution.
+
+Parts (binding decision B8, 2026-09-29): `shellParts` (exported) reads a command
+unit by unit with the frame machine of the M4 text reading (quotes, escapes,
+comments, `$(( ))` and `(( ))`, `"$( )"`, subshells and backquotes, and the
+redirections `>&`, `<&`, `&>` and `>|`, which are not part boundaries), and a
+here-document body is data: it begins after the first newline no quote holds at
+its operator's frame depth or shallower and ends at its delimiter line (any
+word, quotes removed; `<<-` strips leading tabs) or at the end of the text, as
+GNU bash 5.2.21 and dash read it. A top-level body belongs to no part's text.
+rtk v0.50.0 rewrites no command that holds a here-document or `$((`
+([`rewrite_command_precompiled`](https://github.com/rtk-ai/rtk/blob/v0.50.0/src/discover/registry.rs)),
+so such a call's eligible parts, unknown before B8, now count as observed
+uncovered. A call M-R1 still cannot classify (its text cannot be read, the hook's
+rewrite or the replay has another number of parts, or a check fails) is one
+`unknown_calls`, however many parts it has, and adds nothing to the part
+counters; `unknown_call_share` is `unknown_calls / calls`. `status` is
+`incomplete` (M-R1 not evaluable, never a pass) only when unknown calls exceed 5%
+of the Bash calls, compared on the counts (`unknown_calls * 20 > calls`), and
+`measured` otherwise, when M-R1 is evaluated on the parsed parts; an aggregate
+applies that rule to its summed counts. The explicit-rtk, log/find and proxy
+counters read the command's own parts, so they also count a call whose replay
+cannot be classified, but never one whose text cannot be read: M-R3's zero
+counter covers the parsed calls, and `unknown_calls` says how many it cannot.
+
+M1's rtk-claude lane (binding decision B5): `eligible_call_states` gives the M14
+state (the `call_states.by_server` keys) of every Bash call with at least one
+eligible part, and `observed_covered_succeeded_calls` counts those with an
+eligible part observed covered whose state is `succeeded` (a background run
+included): the per-child-task success signal. A child-task is an opportunity
+when `eligible_calls > 0`; `unavailable` and `not_measured` mean incomplete,
+never zero. A child whose Bash calls are all unknown has no eligible call, so a
+grader that holds unknowns unsuccessful (B2) reads its `unknown_calls` too.
+M6c and M1 need `--rtk-check`.
 `explicit_rtk_on_excluded_or_sensitive` is the deterministic zero counter used
 by M-R3 and M6c: the five exclusions, `cd`/`export`/`source`, adopted by-design
 refusals, file-target redirects and raw-input pipelines. Conditional log/find
@@ -707,6 +923,27 @@ same digest-bound sidecar with a witness and `rtk_log_find: [{"part": 1,
 position among all command segments. M-R3/M6c's deterministic zero is not full
 exception clearance while advisory parts are unresolved or require raw output.
 These semantic adjudications never change the fixed-config eligible denominator.
+
+With `rtkAgent: 'codex'`, `rtk_parts` also carries `d7`, the Codex-only view of
+D7's RTK-eligible class; Claude output has no `d7` and its fields are unchanged.
+
+- `d7` starts from the fixed-config eligible parts and drops each `git log` or `find`
+  part, prefixed or not, whose `rtk_log_find` review says `requires_raw`.
+- A `permitted` part stays. An unreviewed part stays too, but sets `d7.status` to
+  `incomplete`, as an unknown call does.
+- `covered_parts`, `coverage`, `eligible_calls`, `all_covered_calls` and
+  `call_coverage` read the kept parts as the fixed-config fields read theirs.
+- `wrapped_exceptions` is `explicit_rtk_on_excluded_or_sensitive` plus
+  `wrapped_requires_raw_parts`, the prefixed parts a review says required raw
+  output. M6c's zero counter therefore keeps its classes, which are broader than
+  the [deployed exception list](../../../adoption/templates/codex.AGENTS.template.md).
+- `d7.status` keeps the harder reading than `rtk_parts.status`: it is `incomplete` when any call was unknown or any
+  unreviewed `log` or `find` part stays, however few, while `rtk_parts.status` tolerates B8's 5 percent. An
+  amendment may relax that with a dated rationale.
+- `aggregateMeasurements` sums `d7` over the measurements that carry it; its status is `measured` only when every
+  actor's `d7` is, so it does not depend on how calls are split across actors, and `rtk_parts.status` of the same
+  aggregate applies B8 to the summed counts.
+- Which view M6c grades from, the fixed-config fields or `d7`, is the M6c owner's call.
 
 Every `rtk proxy` part is counted in `proxy_parts` and excluded from M-R1/M6c's
 eligible population, including an otherwise eligible `git diff --stat`.
@@ -746,7 +983,9 @@ instead of message IDs. Streamed updates use the largest counter total, followin
 Windowed messages subtract their prior snapshot; absent counters remain null.
 `usage.complete` describes accounting, not successful task completion. Failed
 and interrupted attempts still contribute known usage. These numbers cannot be
-added to byte measurements or tool savings estimates.
+added to byte measurements or tool savings estimates. The cache tier split,
+the service fields and advisor iterations are under
+[U2 measurement fields](#u2-measurement-fields-2026-09-29).
 
 `hook_context` counts every inserted `hook_additional_context` by event/name,
 separately from stdout claims and marker presence. Stdout alone no longer sets
@@ -755,11 +994,18 @@ success, failure and unfinished calls; persisted Codex item status supplies stat
 when result bytes are absent. `sandbox_operations` counts normalized nested
 code-mode operations, whose results return to code. They contribute M4/RTK/MCP
 state observations but no M3/M5 context bytes or missing-context-result counts.
-The outer exec return is measured once as carrier `code_mode`.
+The outer exec return is measured once as carrier `code_mode`, and so is the output
+of a code-mode `wait` call that resumes a running cell. The Codex adapter decides
+which operations are nested: since PR-A U3, an item without a model call id is nested
+when an own `exec` call came earlier in its turn. It also counts
+`measurement.code_mode` and marks legacy-mode spans it cannot observe
+([Codex side](../../../tools/skill-usage/README.md)).
 `loaded_not_called` counts loaded server
 references without an attempted call by that actor. These implement PR-A's
-review controls, but do not supply a rejected/cancelled native-ID reconciliation
-ledger or an E2E acceptance verdict. Synthetic controls run through
+review controls; the per-call reconciliation ledger for rejected, cancelled and
+unfinished calls is `--call-ledger`, with `call_states` as its published counts
+(see [U2 measurement fields](#u2-measurement-fields-2026-09-29)), and none of them
+is an E2E acceptance verdict. Synthetic controls run through
 `python3 -m unittest tests.test_token_measurement tests.test_child_usage_suite`.
 
 `--lanes-sweep --root <dir> [--root <dir> ...] --since <ISO> --until <ISO>` aggregates
@@ -773,7 +1019,10 @@ compare a lane between spawn paths within one agent type) and anonymous session
 ordinal, keeps `blind-*`
 children apart as negative controls, and prints names and counts only: no paths,
 ids, labels or transcript text, and a name that is not name-shaped (a path passed as
-a skill name, say) is counted as `(other)`. There is no default root, and a root that
+a skill name, say) is counted as `(other)`. An actor that ran past the window end
+(`children_ran_past_window_end`) has its final return outside the window:
+`final_return.status` is `unobserved`, and aggregates count it in
+`final_return.unobserved`. There is no default root, and a root that
 is not a readable directory exits 2. The Codex counterpart is `tools/skill-usage/skill_usage.py --lanes`
 in this catalog.
 
@@ -834,7 +1083,7 @@ Applies to the coordinator and every Workflow/Agent child (project agents and `.
 - **Stable policy prefix.** Keep the shared contract text byte-identical across saved workflows (asserted by `test-envelope.mjs`) and vary only the task packet. What the provider was observed to reuse across children is the agent type's system prompt and tool definitions, per model; identical packet text alone has no measured cache effect. Reuse one agent type and model for sibling workers, and preserve deferred tool discovery and compaction. Sibling stages share one prompt-cache prefix only when model, effort, agent type, tools, output schema and working directory all match (official workflows doc, fetched 2026-09-22); keep them identical and leave `CLAUDE_CODE_WORKFLOW_PREFIX_STAGGER_MS` at its 5,000 ms default.
 - **Task-matched models at effort max.** Set model and effort explicitly per stage: Opus for design, research, review, verification, adjudication, synthesis and any build without a written contract's tests, and Sonnet for exact extraction, inventories, running named acceptance commands (`source-scout`) and the bounded fan-out units of [the Sonnet 5.5 section](#sonnet-55-fan-out-units-and-the-default-child-model-2026-09-29) (the user's 2026-09-27 rule put Opus on design, build, research, review, verification and synthesis and Sonnet or Haiku only on pure command wrappers, mechanical extraction and probes; on 2026-09-28 the user permitted Sonnet 5.5 for large Ultracode fan-outs and suitable tasks, which that section bounds; Haiku is not routed, though a trivial probe may use it), and every saved stage and project agent at effort `max` (since 2026-09-23), with the coordinator at `max` in a terminal session started through the ecosystem `claude` launcher and at xhigh, saved per model, where the launcher is not used ([decision record](../../../docs/decisions/2026-09-29-max-default-effort.md), which says the default rests on the user's requirement and not on a measured gain here; on 2.1.281 the coordinator stayed at xhigh because a `max` session turned ultracode's orchestration off, and from 2.1.284 Ultracode stays on at any effort level). A stage with no `effort` of its own runs at its agent's frontmatter effort, else at the effort the session was given explicitly (`--effort`, `/effort` or the model picker), else at its model's saved level or default (on 2.1.281 it inherited the coordinator's xhigh), and a stage's own effort overrides the frontmatter, so every `agent()` call, ad-hoc ones included, passes `effort: 'max'`. Never set `CLAUDE_CODE_EFFORT_LEVEL`: any value overrides every child's frontmatter and stage effort (on 2.1.281 any value other than `xhigh` also turned ultracode's orchestration off; on 2.1.284 the Ultracode reminder stayed present at `max`). These effort rules were probed on Claude Code 2.1.281 on 2026-09-23 and re-probed on 2.1.284 on 2026-09-29 (`docs/decisions/2026-09-23-max-effort-default.md` and its addendum; receipt `claude-model-effort-probes-20260929`). Record requested and resolved child model and effort, and treat nulls, schema retries, stub payloads and substitutions as incomplete results. The routing table below is the default; `test-envelope.mjs` fails a saved workflow or project agent that omits model or effort or binds an effort other than `max`.
 - **Dispatch by role.** Every new or ad-hoc `agent()` stage names the `agentType` of its role in [the role table](#dispatch-by-role-2026-09-26); a stage with `general-purpose` or no `agentType` carries a `// dispatch: <reason>` comment beside the call. The saved scripts keep their reviewed routing, since they are vendored byte-identical (the `readiness-audit` verify stage runs as the default child).
-- **Usage accounting.** Count each client separately: native `/usage`, `claude agents`/`/workflows` journals, `ccusage` offline reports and `ecosystem-token-report refresh`. Never sum RTK, Context Mode, jCodeMunch, Headroom and provider counters, and never state a savings percentage from a fixture. After a Workflow run, `node .claude/workflows/child-usage.mjs <Transcript dir printed by the Workflow tool>` (or `--latest`) returns each child's requested and resolved model, effort, provider-returned usage and first-prompt size, and exits 1 when a child is null, substituted, named no model or ran an older model than its alias documents (the client resolves a family alias to the lead's exact model when the lead belongs to that family, so a `sonnet` child under a lead pinned to an older Sonnet is flagged too; keep the lead on the alias). An attempt that returned nothing and that the runtime re-ran under the same journal key (a Workflow pauses at a usage limit and re-runs its waiting agents after the reset) is listed under `superseded_attempts`, not as a lost child, and its usage still counts in `by_resolved_model`. Usage such an attempt holds that cannot be counted (an assistant message without provider usage or without a resolved model, or no transcript at all) is its `usage_issues`, and it leaves the run incomplete. Advisor usage lies outside these totals (2026-09-28): subagents inherit the configured advisor ([advisor](https://code.claude.com/docs/en/advisor)), the API reports each advisor call as a `usage.iterations[]` entry of type `advisor_message` and keeps top-level usage executor-only ([advisor tool usage](https://platform.claude.com/docs/en/agents-and-tools/tool-use/advisor-tool#usage-and-billing)), and `child-usage.mjs` reads only the top-level counters. A count-only scan of one host found 1,018 advisor iterations in 660 of 2,912 subagent transcripts ([receipt](../../../evidence/receipts/claude-advisor-usage-scan-20260928.json)). Take complete session usage from `/usage`, which includes advisor usage, and hold the advisor state equal across comparison arms with `CLAUDE_CODE_DISABLE_ADVISOR_TOOL=1` or `/advisor off`.
+- **Usage accounting.** Count each client separately: native `/usage`, `claude agents`/`/workflows` journals, `ccusage` offline reports and `ecosystem-token-report refresh`. Never sum RTK, Context Mode, jCodeMunch, Headroom and provider counters, and never state a savings percentage from a fixture. After a Workflow run, `node .claude/workflows/child-usage.mjs <Transcript dir printed by the Workflow tool>` (or `--latest`) returns each child's requested and resolved model, effort, provider-returned usage and first-prompt size, and exits 1 when a child is null, substituted, named no model or ran an older model than its alias documents (the client resolves a family alias to the lead's exact model when the lead belongs to that family, so a `sonnet` child under a lead pinned to an older Sonnet is flagged too; keep the lead on the alias). An attempt that returned nothing and that the runtime re-ran under the same journal key (a Workflow pauses at a usage limit and re-runs its waiting agents after the reset) is listed under `superseded_attempts`, not as a lost child, and its usage still counts in `by_resolved_model`. Usage such an attempt holds that cannot be counted (an assistant message without provider usage or without a resolved model, or no transcript at all) is its `usage_issues`, and it leaves the run incomplete. Advisor usage lies outside these totals (2026-09-28): subagents inherit the configured advisor ([advisor](https://code.claude.com/docs/en/advisor)), the API reports each advisor call as a `usage.iterations[]` entry of type `advisor_message` and keeps top-level usage executor-only ([advisor tool usage](https://platform.claude.com/docs/en/agents-and-tools/tool-use/advisor-tool#usage-and-billing)), and a run-mode child's `usage` and `by_resolved_model` read only the top-level counters (since 2026-09-29 `lanes.measurement.usage` also reports the advisor iterations, as `advisor_iterations` and `totals_including_advisor`). A count-only scan of one host found 1,018 advisor iterations in 660 of 2,912 subagent transcripts ([receipt](../../../evidence/receipts/claude-advisor-usage-scan-20260928.json)). Take complete session usage from `/usage`, which includes advisor usage, and hold the advisor state equal across comparison arms with `CLAUDE_CODE_DISABLE_ADVISOR_TOOL=1` or `/advisor off`.
 - **Cross-family review.** Explicit `/codex:review` or `/codex:adversarial-review --background` at integration points (see `recipes/claude-codex-cooperation-lanes.md`); findings are verified against source, not accepted by agreement.
 - **Opt-in and limits.** The `ultracode` keyword starts a workflow only from a prompt typed in the session; it is inert from `-p`, an unstamped SDK prompt, a scheduled task or a relayed comment, so a headless run invokes a saved workflow by name under a settings source whose permission mode or allow rule (`Workflow` or `Workflow(<name>)`) covers the tool. Scripts take no mid-run user input, no `import()` and no `Date.now()`, `Math.random()` or argless `new Date()` (pass timestamps through `args`; run a stage that needs sign-off as its own workflow); one `parallel()`/`pipeline()` call takes at most 4,096 items and a run at most 1,000 agents.
 - **Failure and replay.** On resume a failed or stopped agent runs again together with every agent started after it, completed ones included, and a run with nothing cached has nothing to resume; native failure, cancel and recovery remain documented but unobserved (open gate in `docs/native-ultracode-20260921.md`).

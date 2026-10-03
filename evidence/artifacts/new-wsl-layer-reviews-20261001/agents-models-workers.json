@@ -1,0 +1,1209 @@
+{
+  "schema_version": 1,
+  "layer_id": "agents-models-workers",
+  "catalog": "us-equities",
+  "review_date": "2026-10-01",
+  "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "reviewer": {
+    "model": "gpt-6.1-sol",
+    "effort": "max",
+    "family": "Codex"
+  },
+  "verdict": "corrected",
+  "c4": {
+    "independent_review_performed": true,
+    "no_unresolved_material_gap": false,
+    "remaining_gaps": [
+      "The inherited landscape row is the foundation-memory/retrieval domain projection; it does not select the trading worker/model runtime.",
+      "Completed tagged memory source review does not establish one-writer native capture, project/provider scope negatives, representative quality or restore; these remain material acceptance gaps.",
+      "Matched client/worker/model quality, cancellation, whole-attempt usage and provider/account recovery remain unqualified. No new model/provider/GPU trial ran.",
+      "Representative as-known filing/research artifact quality, index/capture freshness, isolation and new-host lifecycle acceptance remain unknown."
+    ]
+  },
+  "research_method": {
+    "scope": "One bounded independent trading source wave for six assigned layers; no universal SOTA, saturation or full convergence claim.",
+    "source_order": "Coordinator package metadata where relevant; native gh release/tag checks; exact source files; official docs. Reuse this pass's cited foundation sources when repository/pin/capability inputs match.",
+    "channels": {
+      "github_cli": "gh 2.101.0; native public API access succeeded",
+      "skill_discovery": "Supported openai/skills curated list-skills.py --format json succeeded; research/output skills read, no skill installed",
+      "source_reading": "RTK-prefixed commands; large JSON/tree/source responses processed in context-mode outside model context"
+    },
+    "installed_probe_boundary": "importlib.metadata in the coordinator default Python found none of nautilus_trader, alpaca-py, skfolio, PyPortfolioOpt or ib_async; this is not an all-environments absence claim or a replacement-host observation.",
+    "account_and_models": "Native client accounts/routes and explicit model choices preserved. No broker/provider calls, market-data acquisition, model trials, sign-in, install or trading execution in this source wave.",
+    "usage": "reviewer/provider usage not returned; unknown"
+  },
+  "new_host_acceptance": "unknown; replacement WSL distro not created",
+  "selected_repositories": [
+    {
+      "component_id": "codex",
+      "repository": "https://github.com/openai/codex",
+      "pin_of_record": "0.159.2",
+      "pin_source": "manifests/stack.json:295; adoption/pins-linux-x86_64.json:53",
+      "source_pinned_url": "https://github.com/openai/codex/tree/rust-v0.159.2",
+      "upstream_currency": "Latest/installed 0.159.3; published 2026-09-30. Main remains 0.159.2.",
+      "native_install": {
+        "command": "npm install -g @openai/codex@0.159.2",
+        "source": "README.md at rust-v0.159.2; Linux pin's verified package provenance",
+        "evidence_class": "source-only; not run",
+        "recipe_pin": "0.159.2",
+        "recipe_source_ref": "https://github.com/openai/codex/tree/rust-v0.159.2",
+        "upstream_document_binding": {
+          "url": "https://github.com/openai/codex/blob/rust-v0.159.2/README.md#L42",
+          "document_line": 42,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "just test -p codex-tui",
+        "source": "AGENTS.md:192 at rust-v0.159.2",
+        "evidence_class": "source-only; not run"
+      },
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/native-clients.json",
+      "role": "Account-preserving native bounded research/review client; explicit model/effort retained.",
+      "evidence_class": "This pass's primary-source findings reused for matching inputs; independently assessed trading fit only. Historical native receipts retain their original scope.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created"
+    },
+    {
+      "component_id": "claude-code",
+      "repository": "https://github.com/anthropics/claude-code",
+      "pin_of_record": "2.1.284",
+      "pin_source": "manifests/stack.json:190; adoption/pins-linux-x86_64.json:68 (minimum, native auto-update)",
+      "source_pinned_url": "https://github.com/anthropics/claude-code/tree/v2.1.284",
+      "upstream_currency": "Latest/installed 2.1.286; published 2026-09-30. Main 2.1.284 is a native auto-update floor.",
+      "native_install": {
+        "command": "claude install 2.1.284",
+        "source": "installed claude install --help; https://code.claude.com/docs/en/setup",
+        "evidence_class": "source-only; not run",
+        "recipe_pin": "2.1.284",
+        "recipe_source_ref": "https://github.com/anthropics/claude-code/tree/v2.1.284",
+        "upstream_document_binding": {
+          "url": "https://code.claude.com/docs/en/setup.md",
+          "document_line": 346,
+          "line_basis": "returned official Markdown document",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "Official setup documents installing a specific version through the native installer. The recorded claude install 2.1.284 shape comes from the installed CLI install --help in the reused review, not a verbatim setup command."
+        }
+      },
+      "native_acceptance": {
+        "command": null,
+        "source": "v2.1.284 README.md; v2.1.286 CHANGELOG.md; installed --help",
+        "evidence_class": "CLI test command not found in these sources; version/help probes executed, not functional acceptance"
+      },
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/native-clients.json",
+      "role": "Native research/judgment client with its selected role/model/effort.",
+      "evidence_class": "This pass's primary-source findings reused for matching inputs; independently assessed trading fit only. Historical native receipts retain their original scope.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created"
+    },
+    {
+      "component_id": "worktrunk",
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "pin_of_record": "0.79.0",
+      "pin_source": "manifests/stack.json:1057",
+      "source_pinned_url": "https://github.com/max-sixty/worktrunk/tree/5ba6f148e8505c20794f2d8bc706aa4f26335c95",
+      "upstream_currency": "Latest 0.80.0; installed 0.79.0. New release notes do not qualify ownership.",
+      "native_install": {
+        "command": "cargo install worktrunk --version 0.79.0",
+        "source": "pinned README.md Cargo installation",
+        "evidence_class": "source-only; not run",
+        "recipe_pin": "0.79.0",
+        "recipe_source_ref": "https://github.com/max-sixty/worktrunk/tree/5ba6f148e8505c20794f2d8bc706aa4f26335c95",
+        "upstream_document_binding": {
+          "url": "https://github.com/max-sixty/worktrunk/blob/5ba6f148e8505c20794f2d8bc706aa4f26335c95/README.md#L121",
+          "document_line": 121,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "cargo test",
+        "source": "pinned README.md development instructions",
+        "evidence_class": "source-only; not run"
+      },
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/workers.json",
+      "role": "Bounded worktree ownership; process enforcement and provider cancellation are separate.",
+      "evidence_class": "This pass's primary-source findings reused for matching inputs; independently assessed trading fit only. Historical native receipts retain their original scope.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created"
+    },
+    {
+      "component_id": "ai-memory",
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "pin_of_record": "2.4.1",
+      "source_pin": "433a19f3d54dea287571b1423591db2a89965fa9",
+      "pin_source": "manifests/stack.json:94",
+      "selection_source": "catalogs/foundation/manifest.json:83",
+      "role": "Shared memory of record for bounded research context; new capture ownership and representative evidence quality require matched lifecycle acceptance. It is not a market-data, risk or transaction ledger.",
+      "installed_client_observation": {
+        "command": "rtk ai-memory --version",
+        "exit_code": 0,
+        "returned_output": "ai-memory 2.4.2",
+        "scope": "PATH executable on the existing host; this does not identify the running service or qualify an upgrade"
+      },
+      "upstream_currency": {
+        "candidate": "2.5.1",
+        "source_pin": "695805eb881fd25f6bea67a9d0ff05b9adeaab44",
+        "published_at": "2026-10-01T06:04:28Z",
+        "release_source": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.5.1",
+        "installed_version_release_checked": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.2",
+        "adoption": "conditional; neither installed client currency nor release metadata promotes a candidate",
+        "later_currency_check": {
+          "latest_candidate": "2.5.2",
+          "source_pin": "7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83",
+          "published_at": "2026-10-01T07:40:18Z",
+          "release_source": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.5.2",
+          "changelog_source": "https://github.com/akitaonrails/ai-memory/blob/v2.5.2/CHANGELOG.md",
+          "delta_source": "https://github.com/akitaonrails/ai-memory/compare/v2.5.1...v2.5.2",
+          "delta": "37 commits include message-send admission, scoped related-page reads, session-start briefing keys and checkpoint wiki-index writes. The 2.5.1 capture contract source review remains dated evidence; latest-candidate qualification must include this delta.",
+          "adoption": "conditional; unchanged qualification has not run"
+        }
+      },
+      "native_install": {
+        "command": "cargo build --release --workspace",
+        "source": "https://github.com/akitaonrails/ai-memory/blob/433a19f3d54dea287571b1423591db2a89965fa9/docs/install.md#L1558",
+        "evidence_class": "supported source-build recipe at the retained 2.4.1 checkout; not run. A cargo install --git specialization is not attributed to the original installation document.",
+        "recipe_pin": "2.4.1",
+        "recipe_source_ref": "https://github.com/akitaonrails/ai-memory/tree/433a19f3d54dea287571b1423591db2a89965fa9",
+        "upstream_document_binding": {
+          "url": "https://github.com/akitaonrails/ai-memory/blob/433a19f3d54dea287571b1423591db2a89965fa9/docs/install.md#L1558",
+          "document_line": 1558,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "intermediate_candidate_install_review": {
+        "candidate": "2.5.1",
+        "command": "cargo build --release --workspace",
+        "source": "https://github.com/akitaonrails/ai-memory/blob/695805eb881fd25f6bea67a9d0ff05b9adeaab44/docs/install.md#L1661",
+        "integration_command_shapes_observed": [
+          "ai-memory install-mcp --client codex --apply",
+          "ai-memory install-mcp --client claude-code --apply",
+          "ai-memory install-hooks --agent codex --apply",
+          "ai-memory install-hooks --agent claude-code --apply"
+        ],
+        "integration_basis": "Existing PATH client 2.4.2 help checks; these are command shapes, not executed candidate installation or literal 2.5.1 upstream recipes. The tagged Codex example at docs/install.md:813-824 is a Docker remote-server example.",
+        "status": "Intermediate candidate source review only. Latest candidate 2.5.2 requires its own complete installation and lifecycle qualification."
+      },
+      "native_acceptance": {
+        "commands": [
+          "cargo tf",
+          "cargo t -E 'test(/external_capture/)'",
+          "sh tests/hooks/test_lib.sh"
+        ],
+        "source": "https://github.com/akitaonrails/ai-memory/blob/v2.5.1/.cargo/config.toml",
+        "contract": "cargo tf expands to nextest run --workspace -P full; cargo t expands to nextest run. Resolve the external-capture test inventory and hook-test source before execution.",
+        "status": "planned native source/tests; no new execution is claimed"
+      },
+      "evidence_class": "This pass's primary-source findings reused for matching inputs; independently assessed trading fit only. Historical native receipts retain their original scope.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/durable-memory.json",
+      "source_pinned_url": "https://github.com/akitaonrails/ai-memory/tree/433a19f3d54dea287571b1423591db2a89965fa9",
+      "source_install_correction": "Cargo.toml at the retained SHA declares 2.4.1. The tagged installation guide says cargo install ai-memory from crates.io names an unrelated project; use the upstream release/install route or this exact source checkout. Candidate recipes do not change the selected pin.",
+      "later_existing_host_fixture_rerun": {
+        "repository": "https://github.com/akitaonrails/ai-memory",
+        "commit": "7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83",
+        "command": "sh tests/hooks/test_lib.sh",
+        "returned_output": "137 passed, 0 failed",
+        "stderr": "",
+        "exit_code": 0,
+        "evidence_class": "Unchanged upstream POSIX fixture execution; no provider/native-client lifecycle/semantic-quality acceptance",
+        "source": "https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/tests/hooks/test_lib.sh"
+      },
+      "later_fixture_pin_boundary": "137 unchanged POSIX tests passed at candidate 2.5.2 / 7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83. The selected pin remains 2.4.1; this is not an accepted upgrade, a full Rust suite, representative quality or native-client/provider/restore acceptance."
+    },
+    {
+      "component_id": "qmd",
+      "repository": "https://github.com/tobi/qmd",
+      "pin_of_record": "2.8.3",
+      "pin_source": "manifests/stack.json:758; adoption/pins-linux-x86_64.json:87",
+      "source_pinned_url": "https://github.com/tobi/qmd/blob/v2.8.3/README.md",
+      "upstream_currency": "Latest v2.8.3, confirmed by GitHub releases/latest and npm latest metadata.",
+      "native_install": {
+        "command": "npm install --global @tobilu/qmd@2.8.3",
+        "source": "https://github.com/tobi/qmd/blob/v2.8.3/README.md",
+        "evidence_class": "source_review",
+        "recipe_pin": "2.8.3",
+        "recipe_source_ref": "https://github.com/tobi/qmd/blob/v2.8.3/README.md",
+        "upstream_document_binding": {
+          "url": "https://github.com/tobi/qmd/blob/v2.8.3/README.md#L32",
+          "document_line": 32,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "npm test",
+        "source": "https://github.com/tobi/qmd/blob/v2.8.3/package.json",
+        "evidence_class": "source_review"
+      },
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/document-retrieval.json",
+      "role": "Scoped document retrieval for filing/recipe evidence; exact source/date eligibility and historical completeness must remain attached to the evidence, regardless of retrieval ranking.",
+      "evidence_class": "This pass's primary-source findings reused for matching inputs; independently assessed trading fit only. Historical native receipts retain their original scope.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created"
+    },
+    {
+      "component_id": "serena",
+      "repository": "https://github.com/oraios/serena",
+      "pin_of_record": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "pin_source": "manifests/stack.json:880; adoption/pins-linux-x86_64.json:295,299",
+      "source_pinned_url": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/README.md",
+      "upstream_currency": "Latest published release v1.7.0: https://github.com/oraios/serena/releases/tag/v1.7.0; selected dev commit verified separately, not inferred from release numbering.",
+      "native_install": {
+        "command": "uv tool install --python 3.13 git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+        "source": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/docs/02-usage/010_installation.md",
+        "evidence_class": "source_review",
+        "recipe_pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+        "recipe_source_ref": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/README.md",
+        "upstream_document_binding": {
+          "url": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/docs/02-usage/010_installation.md#L23",
+          "document_line": 23,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "Upstream documents native uv tool installation or npx package execution. The separately retained pinned Git/package install recipe and dependency flags are integration choices from the cited matching foundation review, not a verbatim command from this document."
+        }
+      },
+      "native_acceptance": {
+        "command": "uv sync --extra dev --locked && uv run poe test -q --tb=short",
+        "source": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/.github/workflows/pytest.yml",
+        "evidence_class": "source_review"
+      },
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/code-navigation.json",
+      "role": "Exact symbols/references in deterministic research and execution code; this does not observe dynamic broker state or establish output correctness.",
+      "evidence_class": "This pass's primary-source findings reused for matching inputs; independently assessed trading fit only. Historical native receipts retain their original scope.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created"
+    },
+    {
+      "component_id": "socraticode",
+      "repository": "https://github.com/giancarloerra/SocratiCode",
+      "pin_of_record": "1.15.0 @ f6191f076a42405f0d5508139f3a8b505cfef93a",
+      "pin_source": "manifests/stack.json:962; adoption/pins-linux-x86_64.json:312",
+      "source_pinned_url": "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/README.md",
+      "upstream_currency": "Latest v1.16.0 adds Git refresh/restart/deletion fixes: https://github.com/giancarloerra/SocratiCode/releases/tag/v1.16.0. Unqualified here.",
+      "native_install": {
+        "command": "npm install --global --ignore-scripts --before=2026-09-24T12:00:00Z socraticode@1.15.0",
+        "source": "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/README.md; qualified dependency cutoff: adoption/pins-linux-x86_64.json:319",
+        "evidence_class": "source_review",
+        "recipe_pin": "1.15.0 @ f6191f076a42405f0d5508139f3a8b505cfef93a",
+        "recipe_source_ref": "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/README.md",
+        "upstream_document_binding": {
+          "url": "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/README.md#L96",
+          "document_line": 96,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "Upstream documents native uv tool installation or npx package execution. The separately retained pinned Git/package install recipe and dependency flags are integration choices from the cited matching foundation review, not a verbatim command from this document."
+        }
+      },
+      "native_acceptance": {
+        "command": "npm run test:unit; npm run test:integration; npm run test:e2e",
+        "source": "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/package.json",
+        "evidence_class": "source_review"
+      },
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/semantic-rag.json",
+      "role": "Conceptual code search with matched embedding/index inputs; grounded reference quality, watcher freshness and new-host cost/recovery remain unqualified.",
+      "evidence_class": "This pass's primary-source findings reused for matching inputs; independently assessed trading fit only. Historical native receipts retain their original scope.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created"
+    },
+    {
+      "component_id": "qdrant",
+      "repository": "https://github.com/qdrant/qdrant",
+      "pin_of_record": "1.19.1 @ 6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+      "pin_source": "manifests/stack.json:727; no qdrant ID in frozen Linux tools pins",
+      "source_pinned_url": "https://github.com/qdrant/qdrant/blob/v1.19.1/README.md",
+      "upstream_currency": "Latest v1.19.1: https://github.com/qdrant/qdrant/releases/tag/v1.19.1",
+      "native_install": {
+        "command": "docker run -p 127.0.0.1:6333:6333 qdrant/qdrant:v1.19.1",
+        "source": "https://github.com/qdrant/qdrant/blob/v1.19.1/README.md",
+        "evidence_class": "source_review",
+        "recipe_pin": "1.19.1 @ 6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+        "recipe_source_ref": "https://github.com/qdrant/qdrant/blob/v1.19.1/README.md",
+        "upstream_document_binding": {
+          "url": "https://github.com/qdrant/qdrant/blob/v1.19.1/README.md#L49",
+          "document_line": 49,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "uv --project tests run pytest -n auto --dist=loadfile -v tests/consensus_tests --durations=10",
+        "source": "https://github.com/qdrant/qdrant/blob/v1.19.1/.github/workflows/integration-tests.yml",
+        "evidence_class": "source_review"
+      },
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/semantic-rag.json",
+      "role": "Supporting vector store for the accepted conceptual-code lane; snapshot restore is separate from complete client/index/model recovery and financial-record correctness.",
+      "evidence_class": "This pass's primary-source findings reused for matching inputs; independently assessed trading fit only. Historical native receipts retain their original scope.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created"
+    },
+    {
+      "component_id": "rtk",
+      "repository": "https://github.com/rtk-ai/rtk",
+      "pin_of_record": "0.50.0",
+      "pin_source": "manifests/stack.json:822; adoption/pins-linux-x86_64.json:102",
+      "source_pinned_url": "https://github.com/rtk-ai/rtk/blob/v0.50.0/README.md",
+      "upstream_currency": "Latest v0.50.0 confirmed via releases/latest; installed rtk --version exit 0 matches.",
+      "native_install": {
+        "command": "cargo install --git https://github.com/rtk-ai/rtk --tag v0.50.0 --locked",
+        "source": "https://github.com/rtk-ai/rtk/blob/v0.50.0/README.md",
+        "evidence_class": "source_review",
+        "recipe_pin": "0.50.0",
+        "recipe_source_ref": "https://github.com/rtk-ai/rtk/blob/v0.50.0/README.md",
+        "upstream_document_binding": {
+          "url": "https://github.com/rtk-ai/rtk/blob/v0.50.0/README.md#L106",
+          "document_line": 106,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "cargo test --all",
+        "source": "https://github.com/rtk-ai/rtk/blob/v0.50.0/.github/workflows/ci.yml",
+        "evidence_class": "source_review"
+      },
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/token-efficiency.json",
+      "role": "Supported command-output filtering for selected research observations; preserve documented exclusions and raw recovery paths. Token compression cannot change acceptance semantics.",
+      "evidence_class": "This pass's primary-source findings reused for matching inputs; independently assessed trading fit only. Historical native receipts retain their original scope.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created"
+    }
+  ],
+  "alternatives": [
+    {
+      "name": "Context Mode",
+      "repository": "https://github.com/mksglu/context-mode",
+      "catalog_disposition": "selected",
+      "verdict": "Process large source/output off-context and retrieve focused evidence; retain exact original counters and do not compress or infer numeric/order-state truth.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/token-efficiency.json",
+      "sources": [
+        "https://github.com/mksglu/context-mode",
+        "https://github.com/mksglu/context-mode/blob/v1.0.169/README.md"
+      ],
+      "pin_of_record": "not an adopted layer pin; exact cited review ref below",
+      "review_source_refs": [
+        "https://github.com/mksglu/context-mode/blob/v1.0.169/README.md"
+      ],
+      "upstream_currency": "reuse cited same-pass release/source observation; no duplicate release query",
+      "evidence_class": "same-pass cited primary-source review reused; independent trading-fit assessment only, no new native/model/provider execution",
+      "native_install": {
+        "command": "npm install -g context-mode@1.0.169",
+        "source": "https://github.com/mksglu/context-mode/blob/v1.0.169/README.md",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run",
+        "recipe_pin": "not an adopted layer pin; exact cited review ref below",
+        "recipe_source_ref": [
+          "https://github.com/mksglu/context-mode/blob/v1.0.169/README.md"
+        ],
+        "upstream_document_binding": {
+          "url": "https://github.com/mksglu/context-mode/blob/v1.0.169/README.md#L136",
+          "document_line": 136,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "npm test",
+        "source": "https://github.com/mksglu/context-mode/blob/v1.0.169/package.json",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run"
+      },
+      "native_command_review": "Command-only recovery at the exact cited foundation refs; no duplicate release/currency query or runtime adoption.",
+      "trading_fit_delta": "Independent fit review for agents-models-workers; inherited domain membership is not a runtime selection or authority over deterministic numeric/risk/order state."
+    },
+    {
+      "name": "Mem0",
+      "repository": "https://github.com/mem0ai/mem0",
+      "catalog_disposition": "overlap",
+      "verdict": "Conditional memory alternative with distinct coding-plugin Platform API and OSS contracts; require native capture/provider identity/opt-out and provenance fidelity before substitution.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/durable-memory.json",
+      "sources": [
+        "https://github.com/mem0ai/mem0",
+        "https://github.com/mem0ai/mem0/blob/v2.2.1/integrations/claude-code-plugin/README.md"
+      ],
+      "pin_of_record": "2.2.1 Python; 0.3.3 coding plugin",
+      "review_source_refs": [
+        "https://github.com/mem0ai/mem0/blob/v2.2.1/integrations/claude-code-plugin/README.md"
+      ],
+      "upstream_currency": "reuse cited same-pass release/source observation; no duplicate release query",
+      "evidence_class": "same-pass cited primary-source review reused; independent trading-fit assessment only, no new native/model/provider execution",
+      "native_install": {
+        "command": "pip install mem0ai==2.2.1",
+        "source": "https://github.com/mem0ai/mem0/blob/v2.2.1/README.md",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run",
+        "boundary": "Install command is the OSS Python library. The cited unchanged test entrypoint is a separate native coding-plugin fixture suite; plugin installation and Platform API service/provider contracts remain distinct.",
+        "recipe_pin": "2.2.1 Python; 0.3.3 coding plugin",
+        "recipe_source_ref": [
+          "https://github.com/mem0ai/mem0/blob/v2.2.1/integrations/claude-code-plugin/README.md"
+        ],
+        "upstream_document_binding": {
+          "url": "https://github.com/mem0ai/mem0/blob/v2.2.1/README.md#L112",
+          "document_line": 112,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "python3 -m pytest integrations/claude-code-plugin/tests -q --ignore=integrations/claude-code-plugin/tests/integration",
+        "source": "https://github.com/mem0ai/mem0/blob/v2.2.1/integrations/claude-code-plugin/README.md",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run",
+        "boundary": "Install command is the OSS Python library. The cited unchanged test entrypoint is a separate native coding-plugin fixture suite; plugin installation and Platform API service/provider contracts remain distinct."
+      },
+      "native_command_review": "Command-only recovery at the exact cited foundation refs; no duplicate release/currency query or runtime adoption.",
+      "trading_fit_delta": "Independent fit review for agents-models-workers; inherited domain membership is not a runtime selection or authority over deterministic numeric/risk/order state."
+    },
+    {
+      "name": "Hindsight",
+      "repository": "https://github.com/vectorize-io/hindsight",
+      "catalog_disposition": "conditional",
+      "verdict": "Evaluation composition, separate from ai-memory selection. Historical knowledge-page freshness/cold Git seeding failures and representative native lifecycle comparison remain open.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/durable-memory.json",
+      "sources": [
+        "https://github.com/vectorize-io/hindsight",
+        "https://github.com/vectorize-io/hindsight/blob/integrations/coding-agents/v0.8.0/hindsight-integrations/coding-agents/package.json"
+      ],
+      "pin_of_record": "0.10.2 evaluation target, not the canonical stack memory selection",
+      "review_source_refs": [
+        "https://github.com/vectorize-io/hindsight/blob/integrations/coding-agents/v0.8.0/hindsight-integrations/coding-agents/package.json"
+      ],
+      "upstream_currency": "reuse cited same-pass release/source observation; no duplicate release query",
+      "native_acceptance": {
+        "commands": [
+          "npm ci",
+          "npm test",
+          "npm run test:harness-e2e"
+        ],
+        "source": "https://github.com/vectorize-io/hindsight/blob/integrations/coding-agents/v0.8.0/hindsight-integrations/coding-agents/package.json",
+        "contract": "The ordinary test command excludes the harness E2E suite; E2E requires its native backend/provider prerequisites.",
+        "status": "historical integration is distinct from unchanged upstream tests and new-host acceptance"
+      },
+      "evidence_class": "same-pass cited primary-source review reused; independent trading-fit assessment only, no new native/model/provider execution",
+      "native_install": {
+        "command": "npx @vectorize-io/hindsight-coding-agents@0.8.0 install codex",
+        "source": "https://github.com/vectorize-io/hindsight/blob/integrations/coding-agents/v0.8.0/hindsight-integrations/coding-agents/README.md#L63",
+        "evidence_class": "supported candidate native-client integration command; not run. Canonical memory remains ai-memory; no second writer is activated.",
+        "recipe_pin": "integration package 0.8.0; evaluation-backend pin_of_record is separate",
+        "dependency_install": "npm ci at hindsight-integrations/coding-agents is the separately retained upstream test-dependency setup, not client activation.",
+        "recipe_source_ref": [
+          "https://github.com/vectorize-io/hindsight/blob/integrations/coding-agents/v0.8.0/hindsight-integrations/coding-agents/package.json"
+        ],
+        "upstream_document_binding": {
+          "url": "https://github.com/vectorize-io/hindsight/blob/integrations/coding-agents/v0.8.0/hindsight-integrations/coding-agents/README.md#L63",
+          "document_line": 63,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_command_review": "Command-only recovery at the exact cited foundation refs; no duplicate release/currency query or runtime adoption.",
+      "trading_fit_delta": "Independent fit review for agents-models-workers; inherited domain membership is not a runtime selection or authority over deterministic numeric/risk/order state."
+    },
+    {
+      "name": "OpenViking",
+      "repository": "https://github.com/volcengine/openviking",
+      "catalog_disposition": "conditional",
+      "verdict": "Conditional context/memory candidate with tagged capability and unchanged plugin-suite evidence in the completed foundation follow-up; representative trading provenance, native capture/provider use and restore remain unqualified.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/durable-memory-candidate-followup.json",
+      "sources": [
+        "https://github.com/volcengine/OpenViking",
+        "https://github.com/volcengine/OpenViking/blob/v0.4.22/docs/en/agent-integrations/04-codex.md",
+        "https://github.com/volcengine/OpenViking/blob/v0.4.22/docs/en/guides/15-snapshot.md",
+        "https://github.com/volcengine/OpenViking/blob/v0.4.22/examples/codex-memory-plugin/README.md"
+      ],
+      "pin_of_record": "none adopted for this alternative; reviewed candidate 0.4.22",
+      "review_source_refs": [
+        "https://github.com/volcengine/OpenViking",
+        "https://github.com/volcengine/OpenViking/blob/v0.4.22/docs/en/agent-integrations/04-codex.md",
+        "https://github.com/volcengine/OpenViking/blob/v0.4.22/docs/en/guides/15-snapshot.md",
+        "https://github.com/volcengine/OpenViking/blob/v0.4.22/examples/codex-memory-plugin/README.md"
+      ],
+      "upstream_currency": "reuse cited same-pass release/source observation; no duplicate release query",
+      "evidence_class": "completed same-pass tagged capability follow-up reused; trading source-grounding fit assessed independently; unchanged plugin fixtures remain separate from native-client/provider/restore quality",
+      "reviewed_commit": "e8716760934d95ef73414484a45bfe475b9296e2",
+      "deciding_source_facts": "Both integrations document automatic recall/capture. Codex captures completed turns on Stop and commits on SessionEnd/PreCompact, with orphan-session recovery. Peer identity defaults to normalized Git origin, falling back to repository path, intentionally sharing worktrees/clones. Snapshot restore versions files; historical ACLs/vector indexes are not restored and asynchronous index rebuild may be required.",
+      "native_install": {
+        "command": "Native marketplace plugin openviking-memory@openviking from the pinned checkout",
+        "source": "https://github.com/volcengine/OpenViking/blob/v0.4.22/examples/codex-memory-plugin/README.md",
+        "evidence_class": "source-only; not run in this wave",
+        "recipe_pin": "none adopted for this alternative; reviewed candidate 0.4.22",
+        "recipe_source_ref": [
+          "https://github.com/volcengine/OpenViking",
+          "https://github.com/volcengine/OpenViking/blob/v0.4.22/docs/en/agent-integrations/04-codex.md",
+          "https://github.com/volcengine/OpenViking/blob/v0.4.22/docs/en/guides/15-snapshot.md",
+          "https://github.com/volcengine/OpenViking/blob/v0.4.22/examples/codex-memory-plugin/README.md"
+        ],
+        "upstream_document_binding": {
+          "url": "https://github.com/volcengine/OpenViking/blob/v0.4.22/examples/codex-memory-plugin/README.md#L63",
+          "document_line": 63,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "Native Codex marketplace add and plugin add are documented at lines63 and67. The reviewed plugin pin is 0.4.22; the unversioned remote marketplace command is a shape, not acceptance or proof of installing that pin.",
+          "additional_install_line_url": "https://github.com/volcengine/OpenViking/blob/v0.4.22/examples/codex-memory-plugin/README.md#L67"
+        }
+      },
+      "native_acceptance": {
+        "command": [
+          "node --test scripts/*.test.mjs"
+        ],
+        "source": "https://github.com/volcengine/OpenViking/blob/v0.4.22/examples/codex-memory-plugin/README.md",
+        "evidence_class": "completed tagged source follow-up; no new run in this trading review"
+      },
+      "test_working_directory": "examples/codex-memory-plugin",
+      "remaining_gaps": [
+        "Short-session commit and orphan recovery",
+        "Scope negatives for intentional clone/worktree sharing",
+        "Snapshot/index/ACL boundaries",
+        "Matched representative quality"
+      ],
+      "later_unchanged_upstream_test": "Root ran the declared Node suite at the same pin: exit 0, 167 passed, 0 failed, 0 skipped. Original output and fixture boundaries are retained in openviking-0422-upstream-plugin-tests.json; real native-client/server/provider and restore acceptance remain open.",
+      "trading_fit_delta": "Independent fit review for agents-models-workers; inherited domain membership is not a runtime selection or authority over deterministic numeric/risk/order state."
+    },
+    {
+      "name": "Graphiti",
+      "repository": "https://github.com/getzep/graphiti",
+      "catalog_disposition": "conditional",
+      "verdict": "Conditional temporal graph retrieval. Event-time graph structure cannot certify original publication availability, market identity or trustworthy numeric state.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/durable-memory.json",
+      "sources": [
+        "https://github.com/getzep/graphiti",
+        "https://github.com/getzep/graphiti/tree/v0.30.2"
+      ],
+      "pin_of_record": "0.30.2",
+      "review_source_refs": [
+        "https://github.com/getzep/graphiti/tree/v0.30.2"
+      ],
+      "upstream_currency": "reuse cited same-pass release/source observation; no duplicate release query",
+      "evidence_class": "same-pass cited primary-source review reused; independent trading-fit assessment only, no new native/model/provider execution",
+      "native_install": {
+        "command": "make install",
+        "source": "https://github.com/getzep/graphiti/blob/v0.30.2/Makefile",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run",
+        "recipe_pin": "0.30.2",
+        "recipe_source_ref": [
+          "https://github.com/getzep/graphiti/tree/v0.30.2"
+        ],
+        "upstream_document_binding": {
+          "url": "https://github.com/getzep/graphiti/blob/v0.30.2/Makefile#L14",
+          "document_line": 14,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "make test",
+        "source": "https://github.com/getzep/graphiti/blob/v0.30.2/Makefile",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run"
+      },
+      "native_command_review": "Command-only recovery at the exact cited foundation refs; no duplicate release/currency query or runtime adoption.",
+      "trading_fit_delta": "Independent fit review for agents-models-workers; inherited domain membership is not a runtime selection or authority over deterministic numeric/risk/order state."
+    },
+    {
+      "name": "Haystack",
+      "repository": "https://github.com/deepset-ai/haystack",
+      "catalog_disposition": "conditional",
+      "verdict": "Conditional composable retrieval/evaluation pipeline for research documents; require representative causal source grounding and recovery before adding orchestration.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/semantic-rag.json",
+      "sources": [
+        "https://github.com/deepset-ai/haystack",
+        "https://github.com/deepset-ai/haystack/blob/v3.2.0/README.md"
+      ],
+      "pin_of_record": "not an adopted layer pin; exact cited review ref below",
+      "review_source_refs": [
+        "https://github.com/deepset-ai/haystack/blob/v3.2.0/README.md"
+      ],
+      "upstream_currency": "reuse cited same-pass release/source observation; no duplicate release query",
+      "evidence_class": "same-pass cited primary-source review reused; independent trading-fit assessment only, no new native/model/provider execution",
+      "native_install": {
+        "command": "pip install haystack-ai==3.2.0",
+        "source": "https://github.com/deepset-ai/haystack/blob/v3.2.0/README.md",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run",
+        "recipe_pin": "not an adopted layer pin; exact cited review ref below",
+        "recipe_source_ref": [
+          "https://github.com/deepset-ai/haystack/blob/v3.2.0/README.md"
+        ],
+        "upstream_document_binding": {
+          "url": "https://github.com/deepset-ai/haystack/blob/v3.2.0/README.md#L43",
+          "document_line": 43,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "hatch run test:unit",
+        "source": "https://github.com/deepset-ai/haystack/blob/v3.2.0/CONTRIBUTING.md",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run"
+      },
+      "native_command_review": "Command-only recovery at the exact cited foundation refs; no duplicate release/currency query or runtime adoption.",
+      "trading_fit_delta": "Independent fit review for agents-models-workers; inherited domain membership is not a runtime selection or authority over deterministic numeric/risk/order state."
+    },
+    {
+      "name": "LightRAG",
+      "repository": "https://github.com/hkuds/lightrag",
+      "catalog_disposition": "unqualified",
+      "verdict": "Conditional graph/document retrieval source at v1.5.7. Current source has a dev/offline installation path, but no matched filing/code grounded-answer or new-host acceptance is established.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "sources": [
+        "https://github.com/hkuds/lightrag/blob/v1.5.7/README.md",
+        "https://github.com/hkuds/lightrag/blob/v1.5.7/pyproject.toml",
+        "https://github.com/HKUDS/LightRAG/releases/tag/v1.5.7"
+      ],
+      "pin_of_record": "none adopted; frozen current source v1.5.7",
+      "review_source_refs": [
+        "https://github.com/hkuds/lightrag/blob/v1.5.7/README.md",
+        "https://github.com/hkuds/lightrag/blob/v1.5.7/pyproject.toml"
+      ],
+      "upstream_currency": {
+        "latest_release": "v1.5.7",
+        "published_at": "2026-09-02T07:23:55Z",
+        "source": "https://github.com/HKUDS/LightRAG/releases/tag/v1.5.7",
+        "adoption": "none; recorded route or default preserved"
+      },
+      "evidence_class": "fresh tagged/pinned source and native gh release observation; no install/provider/model call",
+      "native_install": {
+        "command": "uv sync --extra test --extra offline",
+        "source": "https://github.com/hkuds/lightrag/blob/v1.5.7/README.md",
+        "evidence_class": "source-only; not run in this wave",
+        "recipe_pin": "none adopted; frozen current source v1.5.7",
+        "recipe_source_ref": [
+          "https://github.com/hkuds/lightrag/blob/v1.5.7/README.md",
+          "https://github.com/hkuds/lightrag/blob/v1.5.7/pyproject.toml"
+        ],
+        "upstream_document_binding": {
+          "url": "https://github.com/hkuds/lightrag/blob/v1.5.7/README.md#L166",
+          "document_line": 166,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "uv run --no-sync pytest tests/ -m offline -v --tb=short",
+        "source": "https://github.com/hkuds/lightrag/blob/v1.5.7/.github/workflows/tests.yml",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run"
+      },
+      "native_command_review": "Command-only recovery at the exact cited foundation refs; no duplicate release/currency query or runtime adoption.",
+      "trading_fit_delta": "Independent fit review for agents-models-workers; inherited domain membership is not a runtime selection or authority over deterministic numeric/risk/order state."
+    },
+    {
+      "name": "LlamaIndex",
+      "repository": "https://github.com/run-llama/llama_index",
+      "catalog_disposition": "conditional",
+      "verdict": "Conditional document indexing/agent pipeline; compare point-in-time source grounding and index freshness against the retained scoped document lane.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/document-retrieval.json",
+      "sources": [
+        "https://github.com/run-llama/llama_index",
+        "https://github.com/run-llama/llama_index/blob/v0.14.25/README.md"
+      ],
+      "pin_of_record": "not an adopted layer pin; exact cited review ref below",
+      "review_source_refs": [
+        "https://github.com/run-llama/llama_index/blob/v0.14.25/README.md"
+      ],
+      "upstream_currency": "reuse cited same-pass release/source observation; no duplicate release query",
+      "evidence_class": "same-pass cited primary-source review reused; independent trading-fit assessment only, no new native/model/provider execution",
+      "native_install": {
+        "command": "pip install llama-index-core==0.14.25",
+        "source": "https://github.com/run-llama/llama_index/blob/v0.14.25/README.md",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run",
+        "recipe_pin": "not an adopted layer pin; exact cited review ref below",
+        "recipe_source_ref": [
+          "https://github.com/run-llama/llama_index/blob/v0.14.25/README.md"
+        ],
+        "upstream_document_binding": {
+          "url": "https://github.com/run-llama/llama_index/blob/v0.14.25/README.md#L115",
+          "document_line": 115,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "make test-core",
+        "source": "https://github.com/run-llama/llama_index/blob/v0.14.25/Makefile",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run"
+      },
+      "native_command_review": "Command-only recovery at the exact cited foundation refs; no duplicate release/currency query or runtime adoption.",
+      "trading_fit_delta": "Independent fit review for agents-models-workers; inherited domain membership is not a runtime selection or authority over deterministic numeric/risk/order state."
+    },
+    {
+      "name": "Docling",
+      "repository": "https://github.com/docling-project/docling",
+      "catalog_disposition": "conditional",
+      "verdict": "Conditional structured-document ingestion/OCR alternative. Parser output does not recover unknown filing timestamps or source revisions; model downloads and extraction-quality acceptance are separate.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/document-retrieval.json",
+      "sources": [
+        "https://github.com/docling-project/docling",
+        "https://github.com/docling-project/docling/blob/v2.131.0/README.md"
+      ],
+      "pin_of_record": "not an adopted layer pin; exact cited review ref below",
+      "review_source_refs": [
+        "https://github.com/docling-project/docling/blob/v2.131.0/README.md"
+      ],
+      "upstream_currency": "reuse cited same-pass release/source observation; no duplicate release query",
+      "evidence_class": "same-pass cited primary-source review reused; independent trading-fit assessment only, no new native/model/provider execution",
+      "native_install": {
+        "command": "pip install docling==2.131.0",
+        "source": "https://github.com/docling-project/docling/blob/v2.131.0/README.md",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run",
+        "boundary": "The general default target is not representative filing OCR/parser quality or model-download/provider/GPU acceptance.",
+        "recipe_pin": "not an adopted layer pin; exact cited review ref below",
+        "recipe_source_ref": [
+          "https://github.com/docling-project/docling/blob/v2.131.0/README.md"
+        ],
+        "upstream_document_binding": {
+          "url": "https://github.com/docling-project/docling/blob/v2.131.0/README.md#L70",
+          "document_line": 70,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "make test",
+        "source": "https://github.com/docling-project/docling/blob/v2.131.0/Makefile",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run",
+        "boundary": "The general default target is not representative filing OCR/parser quality or model-download/provider/GPU acceptance."
+      },
+      "native_command_review": "Command-only recovery at the exact cited foundation refs; no duplicate release/currency query or runtime adoption.",
+      "trading_fit_delta": "Independent fit review for agents-models-workers; inherited domain membership is not a runtime selection or authority over deterministic numeric/risk/order state."
+    },
+    {
+      "name": "Headroom",
+      "repository": "https://github.com/headroomlabs-ai/headroom",
+      "catalog_disposition": "conditional",
+      "verdict": "Conditional inference/output compression boundary; preserve decimals, causal source dates and complete output contracts. Existing session/cost/recovery acceptance remains open.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/token-efficiency.json",
+      "sources": [
+        "https://github.com/headroomlabs-ai/headroom",
+        "https://github.com/headroomlabs-ai/headroom/blob/v0.37.0/README.md",
+        "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.39.1",
+        "https://github.com/headroomlabs-ai/headroom/blob/v0.37.0/.github/workflows/ci.yml"
+      ],
+      "pin_of_record": "0.37.0",
+      "review_source_refs": [
+        "https://github.com/headroomlabs-ai/headroom/blob/v0.37.0/README.md",
+        "https://github.com/headroomlabs-ai/headroom/blob/v0.37.0/.github/workflows/ci.yml"
+      ],
+      "upstream_currency": "Latest v0.39.1 fixes 0.39.0 TPM refusal: https://github.com/headroomlabs-ai/headroom/releases/tag/v0.39.1. New releases unqualified.",
+      "native_install": {
+        "command": "uv tool install --python 3.13 'headroom-ai[mcp]==0.37.0'",
+        "source": "https://github.com/headroomlabs-ai/headroom/blob/v0.37.0/README.md",
+        "evidence_class": "source_review",
+        "recipe_pin": "0.37.0",
+        "recipe_source_ref": [
+          "https://github.com/headroomlabs-ai/headroom/blob/v0.37.0/README.md",
+          "https://github.com/headroomlabs-ai/headroom/blob/v0.37.0/.github/workflows/ci.yml"
+        ],
+        "upstream_document_binding": {
+          "url": "https://github.com/headroomlabs-ai/headroom/blob/v0.37.0/README.md#L92",
+          "document_line": 92,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "pytest tests scripts/tests",
+        "source": "https://github.com/headroomlabs-ai/headroom/blob/v0.37.0/.github/workflows/ci.yml",
+        "evidence_class": "source_review"
+      },
+      "evidence_class": "same-pass cited primary-source review reused; independent trading-fit assessment only, no new native/model/provider execution",
+      "trading_fit_delta": "Independent fit review for agents-models-workers; inherited domain membership is not a runtime selection or authority over deterministic numeric/risk/order state."
+    },
+    {
+      "name": "Basic Memory",
+      "repository": "https://github.com/basicmachines-co/basic-memory",
+      "catalog_disposition": "conditional",
+      "verdict": "Conditional local memory candidate with a completed tagged capability review; require causal source reconstruction, one-writer capture, scope and recovery quality before replacing the retained research memory.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/durable-memory-candidate-followup.json",
+      "sources": [
+        "https://github.com/basicmachines-co/basic-memory",
+        "https://github.com/basicmachines-co/basic-memory/blob/v0.23.2/plugins/claude-code/README.md",
+        "https://github.com/basicmachines-co/basic-memory/blob/v0.23.2/plugins/codex/hooks/hooks.json",
+        "https://github.com/basicmachines-co/basic-memory/blob/v0.23.2/pyproject.toml",
+        "https://github.com/basicmachines-co/basic-memory/blob/v0.23.2/plugins/codex/hooks/session_start.py",
+        "https://github.com/basicmachines-co/basic-memory/blob/v0.23.2/justfile"
+      ],
+      "pin_of_record": "none adopted for this alternative; reviewed candidate 0.23.2",
+      "review_source_refs": [
+        "https://github.com/basicmachines-co/basic-memory",
+        "https://github.com/basicmachines-co/basic-memory/blob/v0.23.2/plugins/claude-code/README.md",
+        "https://github.com/basicmachines-co/basic-memory/blob/v0.23.2/plugins/codex/hooks/hooks.json",
+        "https://github.com/basicmachines-co/basic-memory/blob/v0.23.2/pyproject.toml",
+        "https://github.com/basicmachines-co/basic-memory/blob/v0.23.2/plugins/codex/hooks/session_start.py",
+        "https://github.com/basicmachines-co/basic-memory/blob/v0.23.2/justfile"
+      ],
+      "upstream_currency": "reuse cited same-pass release/source observation; no duplicate release query",
+      "evidence_class": "completed same-pass tagged capability follow-up reused; trading source-grounding fit assessed independently; unchanged plugin fixtures remain separate from native-client/provider/restore quality",
+      "reviewed_commit": "c0bd87c6d5a4a58034b1d6c8c5018e443b0bd048",
+      "deciding_source_facts": "The inspected shipped manifests register SessionStart and PreCompact, with no Stop entry. Lifecycle envelopes enter a local inbox and do not automatically become graph notes. Graph checkpointing relies on compaction or deliberate skills/opt-in capture. The reviewed tag pins FastMCP 4.0.0b1, including its Codex launcher; earlier main-branch stable-dependency findings have different inputs.",
+      "native_install": {
+        "command": "uv tool install basic-memory==0.23.2; native marketplace/plugin installation from the pinned checkout",
+        "source": "https://github.com/basicmachines-co/basic-memory/blob/v0.23.2/justfile",
+        "evidence_class": "source-only; not run in this wave",
+        "recipe_pin": "none adopted for this alternative; reviewed candidate 0.23.2",
+        "recipe_source_ref": [
+          "https://github.com/basicmachines-co/basic-memory",
+          "https://github.com/basicmachines-co/basic-memory/blob/v0.23.2/plugins/claude-code/README.md",
+          "https://github.com/basicmachines-co/basic-memory/blob/v0.23.2/plugins/codex/hooks/hooks.json",
+          "https://github.com/basicmachines-co/basic-memory/blob/v0.23.2/pyproject.toml",
+          "https://github.com/basicmachines-co/basic-memory/blob/v0.23.2/plugins/codex/hooks/session_start.py",
+          "https://github.com/basicmachines-co/basic-memory/blob/v0.23.2/justfile"
+        ],
+        "upstream_document_binding": {
+          "url": "https://github.com/basicmachines-co/basic-memory/blob/v0.23.2/README.md#L84",
+          "document_line": 84,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": [
+          "just package-check-claude-code",
+          "just package-check-codex"
+        ],
+        "source": "https://github.com/basicmachines-co/basic-memory/blob/v0.23.2/justfile",
+        "evidence_class": "completed tagged source follow-up; no new run in this trading review"
+      },
+      "remaining_gaps": [
+        "Default automatic short-session graph capture",
+        "Native scope negatives and restored-copy behavior",
+        "Matched ranking-path quality"
+      ],
+      "trading_fit_delta": "Independent fit review for agents-models-workers; inherited domain membership is not a runtime selection or authority over deterministic numeric/risk/order state."
+    },
+    {
+      "name": "Claude-mem",
+      "repository": "https://github.com/thedotmack/claude-mem",
+      "catalog_disposition": "conditional",
+      "verdict": "Conditional research memory with explicit provider/opt-out and local/native plan paths; sanitized capture, worktree isolation and source reconstruction still need a matched comparison.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/durable-memory.json",
+      "sources": [
+        "https://github.com/thedotmack/claude-mem",
+        "https://github.com/thedotmack/claude-mem/blob/v13.28.0/README.md#L153-L155",
+        "https://github.com/thedotmack/claude-mem/blob/v13.28.0/docs/public/configuration.mdx#L24"
+      ],
+      "pin_of_record": "13.28.0",
+      "review_source_refs": [
+        "https://github.com/thedotmack/claude-mem/blob/v13.28.0/README.md#L153-L155",
+        "https://github.com/thedotmack/claude-mem/blob/v13.28.0/docs/public/configuration.mdx#L24"
+      ],
+      "upstream_currency": "reuse cited same-pass release/source observation; no duplicate release query",
+      "evidence_class": "same-pass cited primary-source review reused; independent trading-fit assessment only, no new native/model/provider execution",
+      "native_install": {
+        "command": "/plugin marketplace add thedotmack/claude-mem; /plugin install claude-mem",
+        "source": "https://github.com/thedotmack/claude-mem/blob/v13.28.0/README.md",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run",
+        "working_directory": "native Claude Code",
+        "boundary": "Native client slash commands install the plugin. npm install -g claude-mem installs the SDK/library only and does not register capture hooks or the worker.",
+        "recipe_pin": "13.28.0",
+        "recipe_source_ref": [
+          "https://github.com/thedotmack/claude-mem/blob/v13.28.0/README.md#L153-L155",
+          "https://github.com/thedotmack/claude-mem/blob/v13.28.0/docs/public/configuration.mdx#L24"
+        ],
+        "upstream_document_binding": {
+          "url": "https://github.com/thedotmack/claude-mem/blob/v13.28.0/README.md#L172",
+          "document_line": 172,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "bun test tests",
+        "source": "https://github.com/thedotmack/claude-mem/blob/v13.28.0/package.json",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run",
+        "boundary": "Native client slash commands install the plugin. npm install -g claude-mem installs the SDK/library only and does not register capture hooks or the worker."
+      },
+      "native_command_review": "Command-only recovery at the exact cited foundation refs; no duplicate release/currency query or runtime adoption.",
+      "trading_fit_delta": "Independent fit review for agents-models-workers; inherited domain membership is not a runtime selection or authority over deterministic numeric/risk/order state."
+    },
+    {
+      "name": "Letta Code",
+      "repository": "https://github.com/letta-ai/letta-code",
+      "catalog_disposition": "conditional",
+      "verdict": "Conditional memory-aware coding client with a completed tagged capability review. Preserve native account/model choice and require full research-artifact/recovery acceptance.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/durable-memory-candidate-followup.json",
+      "sources": [
+        "https://github.com/letta-ai/letta-code",
+        "https://github.com/letta-ai/letta-code/blob/v0.34.1/README.md",
+        "https://github.com/letta-ai/letta-code/blob/v0.34.1/package.json"
+      ],
+      "pin_of_record": "none adopted for this alternative; reviewed candidate 0.34.1",
+      "review_source_refs": [
+        "https://github.com/letta-ai/letta-code",
+        "https://github.com/letta-ai/letta-code/blob/v0.34.1/README.md",
+        "https://github.com/letta-ai/letta-code/blob/v0.34.1/package.json"
+      ],
+      "upstream_currency": "reuse cited same-pass release/source observation; no duplicate release query",
+      "evidence_class": "completed same-pass tagged capability follow-up reused; trading source-grounding fit assessed independently; unchanged plugin fixtures remain separate from native-client/provider/restore quality",
+      "reviewed_commit": "9ef9a0bee79a1b9e92bdc3f67a75e986d7287ce9",
+      "deciding_source_facts": "Own memory blocks, MemFS and agent lifecycle are a separate runtime. The tagged README removes AgentFile export/import and related flags; memory/transcript export is distinct from those retired recovery assumptions.",
+      "native_install": {
+        "command": "npm install -g @letta-ai/letta-code@0.34.1",
+        "source": "https://github.com/letta-ai/letta-code/blob/v0.34.1/package.json",
+        "evidence_class": "source-only; not run in this wave",
+        "recipe_pin": "none adopted for this alternative; reviewed candidate 0.34.1",
+        "recipe_source_ref": [
+          "https://github.com/letta-ai/letta-code",
+          "https://github.com/letta-ai/letta-code/blob/v0.34.1/README.md",
+          "https://github.com/letta-ai/letta-code/blob/v0.34.1/package.json"
+        ],
+        "upstream_document_binding": {
+          "url": "https://github.com/letta-ai/letta-code/blob/v0.34.1/README.md#L43",
+          "document_line": 43,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": [
+          "bun run test:update-chain:manual"
+        ],
+        "source": "https://github.com/letta-ai/letta-code/blob/v0.34.1/package.json",
+        "evidence_class": "completed tagged source follow-up; no new run in this trading review"
+      },
+      "test_boundary": "The declared updater smoke tests its own lifecycle, not external-client memory capture.",
+      "trading_fit_delta": "Independent fit review for agents-models-workers; inherited domain membership is not a runtime selection or authority over deterministic numeric/risk/order state."
+    },
+    {
+      "name": "Cognee",
+      "repository": "https://github.com/topoteretes/cognee",
+      "catalog_disposition": "conditional",
+      "verdict": "Conditional graph/memory pipeline with completed source review of core and native plugins. Its managed integration core pin differs from the reviewed latest core; no causal-source quality or order-state authority is established.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/durable-memory-candidate-followup.json",
+      "sources": [
+        "https://github.com/topoteretes/cognee",
+        "https://github.com/topoteretes/cognee-integrations",
+        "https://github.com/topoteretes/cognee-integrations/blob/7538e97223770d445dcaacefc0b8737530e82a72/integrations/codex/README.md",
+        "https://github.com/topoteretes/cognee-integrations/blob/7538e97223770d445dcaacefc0b8737530e82a72/integrations/codex/plugins/cognee/scripts/session-start.py#L121",
+        "https://github.com/topoteretes/cognee-integrations/blob/7538e97223770d445dcaacefc0b8737530e82a72/integrations/tests/README.md"
+      ],
+      "pin_of_record": "none adopted for this alternative; reviewed candidate 1.6.2",
+      "review_source_refs": [
+        "https://github.com/topoteretes/cognee",
+        "https://github.com/topoteretes/cognee-integrations",
+        "https://github.com/topoteretes/cognee-integrations/blob/7538e97223770d445dcaacefc0b8737530e82a72/integrations/codex/README.md",
+        "https://github.com/topoteretes/cognee-integrations/blob/7538e97223770d445dcaacefc0b8737530e82a72/integrations/codex/plugins/cognee/scripts/session-start.py#L121",
+        "https://github.com/topoteretes/cognee-integrations/blob/7538e97223770d445dcaacefc0b8737530e82a72/integrations/tests/README.md"
+      ],
+      "upstream_currency": "reuse cited same-pass release/source observation; no duplicate release query",
+      "evidence_class": "completed same-pass tagged capability follow-up reused; trading source-grounding fit assessed independently; unchanged plugin fixtures remain separate from native-client/provider/restore quality",
+      "reviewed_commit": "ba3631f2ed363a6ea50d649c34c56885af6b36fe",
+      "deciding_source_facts": "Both plugins provide recall and automatic capture, including Stop/SessionEnd. Shared identity/datasets support cross-client access. Automatic project node sets use a canonical-path hash. Both inspected plugin bootstraps install core 1.6.1; stock installation does not establish 1.6.2 acceptance.",
+      "native_install": {
+        "command": "Official Claude/Codex marketplace plugins from the pinned cognee-integrations checkout; current managed bootstrap selects core 1.6.1",
+        "source": "https://github.com/topoteretes/cognee-integrations/blob/7538e97223770d445dcaacefc0b8737530e82a72/integrations/tests/README.md",
+        "evidence_class": "source-only; not run in this wave",
+        "recipe_pin": "none adopted for this alternative; reviewed candidate 1.6.2",
+        "recipe_source_ref": [
+          "https://github.com/topoteretes/cognee",
+          "https://github.com/topoteretes/cognee-integrations",
+          "https://github.com/topoteretes/cognee-integrations/blob/7538e97223770d445dcaacefc0b8737530e82a72/integrations/codex/README.md",
+          "https://github.com/topoteretes/cognee-integrations/blob/7538e97223770d445dcaacefc0b8737530e82a72/integrations/codex/plugins/cognee/scripts/session-start.py#L121",
+          "https://github.com/topoteretes/cognee-integrations/blob/7538e97223770d445dcaacefc0b8737530e82a72/integrations/tests/README.md"
+        ],
+        "upstream_document_binding": {
+          "url": "https://github.com/topoteretes/cognee-integrations/blob/7538e97223770d445dcaacefc0b8737530e82a72/README.md#L106",
+          "document_line": 106,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": [
+          "uv sync --dev",
+          "uv run pytest tests/ -v"
+        ],
+        "source": "https://github.com/topoteretes/cognee-integrations/blob/7538e97223770d445dcaacefc0b8737530e82a72/integrations/tests/README.md",
+        "evidence_class": "completed tagged source follow-up; no new run in this trading review"
+      },
+      "test_working_directory": "integrations/tests",
+      "test_boundary": "Default subprocess/mock checks and separately enabled live-provider checks are different evidence classes.",
+      "remaining_gaps": [
+        "Resolve bootstrap/core version mismatch",
+        "Shared-recall node sets and explicit tag scope",
+        "Matched quality and restore"
+      ],
+      "integration_repository": "https://github.com/topoteretes/cognee-integrations",
+      "integration_commit": "7538e97223770d445dcaacefc0b8737530e82a72",
+      "trading_fit_delta": "Independent fit review for agents-models-workers; inherited domain membership is not a runtime selection or authority over deterministic numeric/risk/order state."
+    },
+    {
+      "name": "Supermemory",
+      "repository": "https://github.com/supermemoryai/supermemory",
+      "catalog_disposition": "conditional",
+      "verdict": "Conditional memory alternative with separately reviewed native Claude/Codex and server contracts. Source review does not establish native project/provider isolation, trading provenance or restore acceptance.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/durable-memory-candidate-followup.json",
+      "sources": [
+        "https://github.com/supermemoryai/supermemory",
+        "https://github.com/supermemoryai/codex-supermemory",
+        "https://github.com/supermemoryai/claude-supermemory",
+        "https://github.com/supermemoryai/supermemory/blob/server-v0.0.8/apps/docs/self-hosting/quickstart.mdx",
+        "https://github.com/supermemoryai/codex-supermemory/blob/9c0b043490851bce90787d8a35443a274e7525bd/src/hooks/mcp-proxy.ts"
+      ],
+      "pin_of_record": "none adopted for this alternative; reviewed candidate server-v0.0.8",
+      "review_source_refs": [
+        "https://github.com/supermemoryai/supermemory",
+        "https://github.com/supermemoryai/codex-supermemory",
+        "https://github.com/supermemoryai/claude-supermemory",
+        "https://github.com/supermemoryai/supermemory/blob/server-v0.0.8/apps/docs/self-hosting/quickstart.mdx",
+        "https://github.com/supermemoryai/codex-supermemory/blob/9c0b043490851bce90787d8a35443a274e7525bd/src/hooks/mcp-proxy.ts"
+      ],
+      "upstream_currency": "reuse cited same-pass release/source observation; no duplicate release query",
+      "evidence_class": "completed same-pass tagged capability follow-up reused; trading source-grounding fit assessed independently; unchanged plugin fixtures remain separate from native-client/provider/restore quality",
+      "reviewed_commit": "5d2b5855fe492a3682a1cde4a255e2db0c4db595",
+      "deciding_source_facts": "Official local-server installation and separate native clients exist. The clients document remote-hash project containers and completed-turn capture. The Codex MCP proxy defaults independently to the hosted MCP route; changing only the memory API URL does not make the whole composition local.",
+      "native_install": {
+        "command": [
+          "npx supermemory local",
+          "npx codex-supermemory@1.0.19 install",
+          "Native Claude marketplace plugin supermemory"
+        ],
+        "source": [
+          "https://github.com/supermemoryai/supermemory/blob/server-v0.0.8/apps/docs/self-hosting/quickstart.mdx",
+          "https://github.com/supermemoryai/codex-supermemory/blob/9c0b043490851bce90787d8a35443a274e7525bd/src/hooks/mcp-proxy.ts"
+        ],
+        "evidence_class": "source-only; not run in this wave",
+        "recipe_pin": "none adopted for this alternative; reviewed candidate server-v0.0.8",
+        "recipe_source_ref": [
+          "https://github.com/supermemoryai/supermemory",
+          "https://github.com/supermemoryai/codex-supermemory",
+          "https://github.com/supermemoryai/claude-supermemory",
+          "https://github.com/supermemoryai/supermemory/blob/server-v0.0.8/apps/docs/self-hosting/quickstart.mdx",
+          "https://github.com/supermemoryai/codex-supermemory/blob/9c0b043490851bce90787d8a35443a274e7525bd/src/hooks/mcp-proxy.ts"
+        ],
+        "upstream_document_binding": {
+          "url": "https://github.com/supermemoryai/codex-supermemory/blob/9c0b043490851bce90787d8a35443a274e7525bd/README.md#L39",
+          "document_line": 39,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "Server self-hosting, Codex 1.0.19 and Claude plugin 0.1.8 are separate reviewed contracts. The documented unversioned npx/marketplace route does not by itself install the reviewed server/client commit; freeze each actual artifact/checkout before any adoption.",
+          "separate_documented_routes": [
+            {
+              "url": "https://github.com/supermemoryai/supermemory/blob/server-v0.0.8/apps/docs/self-hosting/quickstart.mdx#L18",
+              "document_line": 18
+            },
+            {
+              "url": "https://github.com/supermemoryai/codex-supermemory/blob/9c0b043490851bce90787d8a35443a274e7525bd/README.md#L39",
+              "document_line": 39
+            },
+            {
+              "url": "https://github.com/supermemoryai/claude-supermemory/blob/915aba1b8056ddb3630fa833973032ba6b788fdb/README.md#L19",
+              "document_line": 19
+            },
+            {
+              "url": "https://github.com/supermemoryai/claude-supermemory/blob/915aba1b8056ddb3630fa833973032ba6b788fdb/README.md#L20",
+              "document_line": 20
+            }
+          ]
+        }
+      },
+      "native_acceptance": {
+        "command": "Both native client repositories declare npm test; no server-native test recipe is inferred from the missing guessed package path.",
+        "source": [
+          "https://github.com/supermemoryai/supermemory/blob/server-v0.0.8/apps/docs/self-hosting/quickstart.mdx",
+          "https://github.com/supermemoryai/codex-supermemory/blob/9c0b043490851bce90787d8a35443a274e7525bd/src/hooks/mcp-proxy.ts"
+        ],
+        "evidence_class": "completed tagged source follow-up; no new run in this trading review"
+      },
+      "remaining_gaps": [
+        "Pin local-server executable separately from source/client pins",
+        "Supported local MCP endpoint/override",
+        "Scope negatives, one-writer ownership, quality and restore"
+      ],
+      "native_clients": [
+        {
+          "repository": "https://github.com/supermemoryai/codex-supermemory",
+          "package": "codex-supermemory",
+          "version": "1.0.19",
+          "commit": "9c0b043490851bce90787d8a35443a274e7525bd"
+        },
+        {
+          "repository": "https://github.com/supermemoryai/claude-supermemory",
+          "package": "supermemory",
+          "version": "0.1.8",
+          "commit": "915aba1b8056ddb3630fa833973032ba6b788fdb"
+        }
+      ],
+      "trading_fit_delta": "Independent fit review for agents-models-workers; inherited domain membership is not a runtime selection or authority over deterministic numeric/risk/order state."
+    }
+  ],
+  "corrections": [
+    {
+      "claim": "The agents-models-workers landscape current_choice selects memory/retrieval tools as the complete trading agent/model architecture.",
+      "correction": "It is an inherited domain projection. Read native client/worker records, the explicit user model/effort contract and runtime-target/north-star separately. Memory and retrieval support source-grounded research; numeric/risk/order state remains deterministic.",
+      "deciding_source": "catalogs/landscape/us-equities.json:3366; docs/decisions/2026-09-30-sol-primary-quality-defaults.md:13; blueprints/us-equities/north-star.md"
+    },
+    {
+      "claim": "A current release or installed client version qualifies the selected model, account, SDK and broker decision path.",
+      "correction": "Native CLI, separately versioned SDK, exact provider/model route and workload acceptance are distinct. Keep explicit choices and native sign-ins; no gateway alias, successful retrieval or source review confers broker authority.",
+      "deciding_source": "https://github.com/openai/codex/blob/rust-v0.159.2/codex-rs/core/src/agent/child_config.rs; evidence/artifacts/new-wsl-layer-reviews-20261001/native-clients.json; evidence/artifacts/new-wsl-layer-reviews-20261001/agent-sdks.json"
+    },
+    {
+      "claim": "The reused durable-memory draft still omits the five inherited memory competitors' tagged capabilities.",
+      "correction": "The completed follow-up covers Basic Memory, Letta Code, Cognee, OpenViking and Supermemory plus four dated candidates with exact pins and native commands. Tagged source coverage is now recovered; representative quality, one-writer capture, project/provider scope and restore remain open.",
+      "deciding_source": "evidence/artifacts/new-wsl-layer-reviews-20261001/durable-memory-candidate-followup.json#/candidates"
+    }
+  ],
+  "evidence_assessment": [
+    "Independent trading fit was assessed over all 21 named domain candidates. This is a capability/selection review, not duplicate foundation benchmarking: exact same-pass repositories, pins and primary references were reused from native-clients, workers, durable-memory, document-retrieval, code-navigation, semantic-rag and token-efficiency.",
+    "The explicit policy is Sol 6.1/Ultra coordination and Sol 6.1/Max primary workers, preserving task overrides and judgment roles. Astra escalation is reserved for the recorded triggers; this source wave changes no architecture selection, model/account or role. Configuration/source review is separate from model acceptance.",
+    "No native-model execution, prompt/raw conversation access, provider call or GPU experiment occurred in this trading wave. The completed foundation follow-up re-ran 137 unchanged ai-memory POSIX fixtures and the OpenViking existing-host receipt passed 167 unchanged Codex plugin tests, zero skips, exit 0. Neither is a Rust whole-suite run, representative filing quality, actual native-client capture/provider use/restore or new-host acceptance.",
+    "LightRAG v1.5.7 source and native gh release were separately inspected because there was no matching current foundation candidate record. Its supported dev/offline dependency setup does not supply a matched causal filing/research-artifact benchmark.",
+    "Official OpenAI documentation describes the Agents SDK as an application-owned agent loop in Python/TypeScript, with deployment, tools, storage and approvals owned by the application. This is separate from native Codex CLI/account acceptance: https://developers.openai.com/api/docs/guides/agents/sdk. Exact tagged SDK commands remain separately sourced."
+  ],
+  "failed_access": [
+    {
+      "source": "context-mode ctx_execute_file for an out-of-project skill path",
+      "result": "Tool rejected its fixed project-root boundary. No access configuration changed; authorized RTK reads/context shell processing recovered the required skill and worktree files. This did not gate source coverage."
+    },
+    {
+      "source": "Misplaced catalogs/us-equities/architecture/decision-index.json",
+      "result": "Not present; canonical catalogs/us-equities/decision-index.json was read. No inference of absent decisions followed."
+    },
+    {
+      "source": "https://api.github.com/repos/vectorize-io/hindsight/git/trees/integrations?recursive=1",
+      "result": "gh exit 1, HTTP 404 after initially truncating the slash-containing tag. Recovered package.json with complete integrations/coding-agents/v0.8.0 ref; ordinary tests exclude E2E."
+    },
+    {
+      "source": "https://api.github.com/repos/akitaonrails/ai-memory/contents/install.sh?ref=433a19f3d54dea287571b1423591db2a89965fa9",
+      "result": "gh exit 1, HTTP 404. README.md, Cargo.toml and docs/install.md at that exact retained SHA recovered the 2.4.1 Rust source-build recipe."
+    }
+  ],
+  "omissions": [
+    "No installation/activation, second memory writer, client account/route/model update, fresh model trial, paid inference, broker tool authorization or representative financial-corpus benchmark.",
+    "The completed nine-candidate memory follow-up is source/test-scope evidence. It does not supply new trading-corpus quality, actual client/provider capture, adversarial scope negatives or restore; historical truncated vote explanations are not reconstructed."
+  ],
+  "next_wave": [
+    "Compare one representative as-known filing/research artifact with native one-writer capture, index freshness, project/provider isolation negatives, restart and restore observations against the completed pinned candidate set.",
+    "Only after a measurable worker/model gap is frozen, compare native clients or one SDK/harness with complete artifact quality, explicit provider/model identity, bounded failure/recovery and whole-attempt accounting."
+  ],
+  "reopen_on": [
+    "Changed explicit user model/role choice, native-client/SDK/account contract, demonstrated retrieval/capture provenance loss, or a measured source-quality/worker recovery gap."
+  ],
+  "named_candidate_accounting": {
+    "source": "catalogs/landscape/us-equities.json:3366",
+    "named_count": 21,
+    "accounted_for": 21,
+    "boundary": "accounting includes explicit source/command omissions; it is not completeness or native qualification"
+  }
+}

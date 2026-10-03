@@ -1,0 +1,921 @@
+{
+ "schema_version": 1,
+ "kind": "new_wsl_clean_install_selection",
+ "date_utc": "2026-10-01",
+ "run": {
+  "workflow_run": "wf_c2377ebb-65c",
+  "preregistered_at": "2026-10-01T17:35:24Z",
+  "launched_at": "2026-10-01T17:35:59Z",
+  "agents": 14,
+  "judges": 11,
+  "critics": 3,
+  "model": "claude-opus-5-5 at effort max (stack-researcher)",
+  "subagent_tokens": 3144333,
+  "tool_uses": 622
+ },
+ "evidence_class": "source_review: model judges read upstream public evidence; all 14 agents were one model family (Claude Opus 5.5); no candidate was installed or measured by this run",
+ "meaning": "Recommendations on repository evidence, not merit winners. Under program decision 5 and the accepted U11 design (revision 4, 89424e36), each layer's preregistered comparison on the new distribution selects its winner; a recommendation is one input to that comparison's arm set. The judges flagged 19 of the 21 layers as close calls.",
+ "scope": "The 20 foundation layers and the WSL base distribution. The 12 us-equities layers run the same method on the GPT lane after 2026-10-03T17:14Z, owned by the trading lane, with the user-pinned NautilusTrader and IBKR destination as a requirement. The cross rows runtime-workers, gpt6-harnesses, credential-practice and convergence-practice were not judged.",
+ "layers": [
+  {
+   "layer_id": "native-clients",
+   "status": "recommended",
+   "critic_verdict": "upheld",
+   "selection": [
+    {
+     "name": "Claude Code",
+     "repository": "https://github.com/anthropics/claude-code",
+     "role": "First-party native client for Anthropic accounts (Pro, Max, Team, Enterprise or Console): interactive and print-mode (-p) coding and bounded research, model choice, resumable sessions (-c, -r) and background agent view.",
+     "install_command": "curl -fsSL https://claude.ai/install.sh | bash",
+     "install_source": "https://code.claude.com/docs/en/setup (setup.md lines 40-43, tab 'macOS, Linux, WSL'; read 2026-10-01)",
+     "judge_confidence": "high",
+     "added_by": "judge"
+    },
+    {
+     "name": "Codex",
+     "repository": "https://github.com/openai/codex",
+     "role": "First-party native client for ChatGPT plans (Plus, Pro, Business, Edu, Enterprise) or an API key: TUI and codex exec with JSONL events, session resume and fork, model and sandbox overrides.",
+     "install_command": "npm install -g @openai/codex",
+     "install_source": "https://github.com/openai/codex/blob/main/README.md line 42 (macOS alternative: brew install --cask codex, line 47); read 2026-10-01",
+     "judge_confidence": "high",
+     "added_by": "judge"
+    }
+   ],
+   "deciding_comparison": "The picks are complementary first-party clients. No packet candidate combines native-account sign-in and resumable sessions with better measured results. To overturn a pick: on the WSL2 host, freeze a Terminal-Bench/Harbor task subset and run it with the same account and model in each arm: Claude Code or Codex against an alternative harness such as opencode or Letta Code. Measure resolution rate, resume after a killed session, and event and tool completeness. Because TB2 confidence intervals already overlap across scaffolds on Claude models, the Claude Code pick should be defended on account and session capability, not on scaffold score.",
+   "failed_fact_checks": [
+    "letta-ai/letta (C03) is stale or archived under the frozen definition (archived, or no default-branch commit in 90 days)"
+   ],
+   "current_use_reasoning_found_by_critic": true,
+   "judge_close_call": false,
+   "fact_corrections": [
+    {
+     "claim": "Letta (letta-ai/letta) was excluded as stale_or_archived.",
+     "correction": "It is not archived; default-branch commit 5bcdd177 on 2026-09-10. The supported basis is outside_requirement: the repository holds the retired V1 server, not a client. It stays excluded on that criterion.",
+     "source": "https://github.com/letta-ai/letta/commit/5bcdd177d70fa2b31a754cfcd801e77b2e1ab16a"
+    }
+   ]
+  },
+  {
+   "layer_id": "agent-sdks",
+   "status": "recommended",
+   "critic_verdict": "upheld",
+   "selection": [
+    {
+     "name": "Claude Agent SDK",
+     "repository": "https://github.com/anthropics/claude-agent-sdk-python",
+     "role": "Programmatic control of a Claude Code worker: streamed messages, custom tools as in-process MCP servers, hooks, permissions, subagents, and sessions that resume or fork, loading .claude skills, commands and memory as Claude Code does.",
+     "install_command": "pip install claude-agent-sdk",
+     "install_source": "https://github.com/anthropics/claude-agent-sdk-python/blob/main/README.md line 8 (Python 3.10+, line 13; Claude Code CLI bundled, line 15); read 2026-10-01",
+     "judge_confidence": "high",
+     "added_by": "judge"
+    },
+    {
+     "name": "Codex SDK and codex exec/app-server",
+     "repository": "https://github.com/openai/codex",
+     "role": "Programmatic control of a Codex worker: TypeScript SDK that spawns the codex CLI and streams structured JSONL events (runStreamed), resumes threads by ID and enforces an output schema; Python SDK over the local app-server JSON-RPC; codex exec --json for scripted runs.",
+     "install_command": "npm install @openai/codex-sdk   # Python: pip install openai-codex",
+     "install_source": "https://github.com/openai/codex/blob/main/sdk/typescript/README.md line 10; https://github.com/openai/codex/blob/main/sdk/python/README.md line 11; https://developers.openai.com/codex/sdk (read 2026-10-01)",
+     "judge_confidence": "high",
+     "added_by": "judge"
+    }
+   ],
+   "deciding_comparison": "The judge's comparison is sound. On the WSL2 host, run the same bounded worker task through the Claude Agent SDK, the Codex TypeScript SDK, the Codex Python SDK and the OpenHands SDK (Docker workspace). Measure structured-event completeness, custom-tool round trip, resume after a killed process and container isolation. Add one check on the Python SDK's app-server dependency: re-run after a Codex upgrade. Promote OpenHands, LangGraph or Temporal only after a remote/container, graph-checkpoint or multi-host-state need is qualified.",
+   "failed_fact_checks": [],
+   "current_use_reasoning_found_by_critic": false,
+   "judge_close_call": false,
+   "fact_corrections": []
+  },
+  {
+   "layer_id": "instructions-skills",
+   "status": "recommended",
+   "critic_verdict": "revised",
+   "selection": [
+    {
+     "name": "Trail of Bits security skills (trailofbits/skills)",
+     "repository": "https://github.com/trailofbits/skills",
+     "role": "Security-audit and engineering procedures for specific tasks. Each of the 44 plugins installs separately, so neither Claude Code nor Codex activates the whole catalog.",
+     "install_command": "Claude Code: /plugin marketplace add trailofbits/skills, then install single plugins from /plugin menu. Codex: codex plugin marketplace add trailofbits/skills && codex plugin add <plugin-name>@trailofbits",
+     "install_source": "https://github.com/trailofbits/skills README 'Installation' at default-branch HEAD 82fe822625 (2026-09-28); no GitHub releases, so pin by commit",
+     "judge_confidence": "high",
+     "added_by": "judge"
+    }
+   ],
+   "deciding_comparison": "Start with trailofbits/skills alone. It leads on criteria 2, 6 and 7 and installs per plugin. Add a second pack only after a paired run on the WSL2 host: pin one skill each from anthropics/skills (webapp-testing), mattpocock/skills (for example tdd or diagnosing-bugs) and vercel-labs/agent-skills (react-best-practices). Run each on its matching task with and without the skill in Claude Code and Codex. Record trigger rate, loaded sections, verified findings or pass rate, conflicts with the baseline, tokens and wall time. Adopt only packs that beat the no-skill baseline.",
+   "failed_fact_checks": [],
+   "current_use_reasoning_found_by_critic": true,
+   "judge_close_call": true,
+   "fact_corrections": []
+  },
+  {
+   "layer_id": "mcp-surfaces",
+   "status": "recommended",
+   "critic_verdict": "upheld",
+   "selection": [
+    {
+     "name": "mcporter",
+     "repository": "https://github.com/openclaw/mcporter",
+     "role": "Bridge and configure. A CLI and TypeScript runtime that lets agents call MCP servers over stdio, Streamable HTTP and SSE from a shell. It imports server definitions from Claude Code and Codex config and persists them only through explicit 'mcporter config add/import'. It also runs a keep-alive daemon, generates standalone CLIs and records and replays sessions.",
+     "install_command": "npm install -g mcporter (requires Node 24+; npm latest 0.14.1, the version on record); try without installing: npx mcporter --version; macOS: brew install steipete/tap/mcporter",
+     "install_source": "https://github.com/openclaw/mcporter README 'Install'; npm mcporter 0.14.1 (registry latest), GitHub release v0.14.1 (2026-09-24)",
+     "judge_confidence": "high",
+     "added_by": "judge"
+    },
+    {
+     "name": "MCP Inspector",
+     "repository": "https://github.com/modelcontextprotocol/inspector",
+     "role": "Inspect a server before adopting it. One package provides a web UI, a scriptable CLI (JSON output, exit-code map) and a TUI. --config opens another client's config file read-only, and --catalog is a writable server catalog.",
+     "install_command": "npx @modelcontextprotocol/inspector --cli (omit --cli for the web UI; --tui for the terminal UI); requires Node >= 22.19.0; npm latest 2.9.0",
+     "install_source": "https://github.com/modelcontextprotocol/inspector README; npm @modelcontextprotocol/inspector 2.9.0 (registry latest), GitHub release 2.9.0 (2026-09-30); the comparison on record ran 2.8.0 (2026-09-23)",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    }
+   ],
+   "deciding_comparison": "The 37-check lifecycle run on record, which both tools passed, is the only measured comparison and it covers both selected tools. What would overturn the Inspector: run MCPJam v3.12.8 and Inspector 2.9.0 through the same 37 checks, plus a review of one stdio server and one Streamable HTTP server with OAuth through each CLI's JSON output. Swap only if MCPJam passes every check and finds a defect the Inspector misses. For mcporter: re-run the lifecycle checks on 0.14.2 once it is published (the ps-listing regression) and test importing a project-root .mcp.json.",
+   "failed_fact_checks": [],
+   "current_use_reasoning_found_by_critic": false,
+   "judge_close_call": true,
+   "fact_corrections": []
+  },
+  {
+   "layer_id": "workers",
+   "status": "recommended",
+   "critic_verdict": "upheld",
+   "selection": [
+    {
+     "name": "claude-code (native subagents, worktree isolation, agent teams)",
+     "repository": "https://github.com/anthropics/claude-code",
+     "role": "Worker mechanism for Claude Code sessions: bounded subagents with depth, concurrency and spend caps; isolation: worktree for owned edits; partial-result marking and resume; an experimental agent-team task list with locked claims and TaskCompleted/TeammateIdle gate hooks before integration",
+     "install_command": "curl -fsSL https://claude.ai/install.sh | bash",
+     "install_source": "https://github.com/anthropics/claude-code/blob/main/README.md",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    },
+    {
+     "name": "Codex native workers (subagents)",
+     "repository": "https://github.com/openai/codex",
+     "role": "Worker mechanism for Codex sessions: parallel subagent threads whose results the parent combines (multi-agent tools on by default), custom agents with their own sandbox overrides, and approval failures in non-interactive runs surfaced to the parent rather than dropped",
+     "install_command": "curl -fsSL https://chatgpt.com/codex/install.sh | sh",
+     "install_source": "https://github.com/openai/codex/blob/main/README.md",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    },
+    {
+     "name": "Worktrunk",
+     "repository": "https://github.com/max-sixty/worktrunk",
+     "role": "Edit ownership for both clients: one git worktree per agent or branch, hooks for checks before merge, and one-command merge and cleanup",
+     "install_command": "brew install worktrunk && wt config shell install  (alternative without Homebrew: cargo install worktrunk && wt config shell install)",
+     "install_source": "https://github.com/max-sixty/worktrunk/blob/main/README.md",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    }
+   ],
+   "deciding_comparison": "The judge's four-arm run on the WSL2 host is the right test: single Claude Code session; Claude Code subagents with isolation: worktree and a review gate; Codex subagents in Worktrunk worktrees; Claude Code delegating to Codex via codex-plugin-cc with /codex:review before merge. Measure independent acceptance, cancellation, writes outside the owned worktree, preservation of partial and failed results, and complete usage. Add two items: run arm (b) with and without ultracode to see whether the concurrency cap binds, and record whether codex-plugin-cc still installs and works on 2026-10-06 or later, when it crosses the stale line.",
+   "failed_fact_checks": [],
+   "current_use_reasoning_found_by_critic": false,
+   "judge_close_call": true,
+   "fact_corrections": []
+  },
+  {
+   "layer_id": "isolation",
+   "status": "compare",
+   "critic_verdict": "undetermined",
+   "selection": [
+    {
+     "name": "sandbox-runtime (srt)",
+     "repository": "https://github.com/anthropics/sandbox-runtime",
+     "role": "Default enforced boundary when a task needs restrictions: OS-level filesystem read/write rules and deny-by-default network through host proxies (bubblewrap with the network namespace removed on Linux and WSL2, Seatbelt on macOS). It uses the same primitives as Claude Code's sandboxed Bash and can wrap any command, including Codex and MCP servers. It has no CPU or memory limits.",
+     "install_command": "sudo apt-get install -y bubblewrap socat ripgrep && npm install -g @anthropic-ai/sandbox-runtime",
+     "install_source": "https://github.com/anthropics/sandbox-runtime/blob/main/README.md",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    },
+    {
+     "name": "Worktrunk",
+     "repository": "https://github.com/max-sixty/worktrunk",
+     "role": "Edit separation: one git worktree per agent or branch with create, merge and remove plus hooks. It enforces no filesystem or network boundary; pair it with sandbox-runtime when a task needs restrictions.",
+     "install_command": "brew install worktrunk && wt config shell install  (alternative without Homebrew: cargo install worktrunk && wt config shell install)",
+     "install_source": "https://github.com/max-sixty/worktrunk/blob/main/README.md",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    },
+    {
+     "name": "Podman (rootless)",
+     "repository": "https://github.com/podman-container-tools/podman",
+     "role": "OCI arm for untrusted workloads that need a container boundary and resource limits: daemonless containers that are rootless by default, so there is no root daemon socket, with pasta/Netavark networking and a unified seccomp policy. gVisor runsc is the alternative runtime to test against it.",
+     "install_command": "sudo apt-get update && sudo apt-get -y install podman",
+     "install_source": "https://podman.io/docs/installation",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    }
+   ],
+   "deciding_comparison": "sandbox-runtime and Worktrunk stand. The OCI/VM slot needs a head-to-head on the WSL2 host using one frozen untrusted workload: escape and out-of-tree write attempts, allowed and denied egress, and memory, CPU and fork bombs. Arms: srt; rootless Podman from the Ubuntu archive; Docker Engine in rootless mode from Docker's own repository; Podman or Docker with gVisor runsc; boxlite with /dev/kvm. Measure filesystem, network and resource enforcement; cleanup after kill or stop (no leaked VMs, containers, mounts or cgroups); WSL2 compatibility (cgroup v2 delegation under systemd, /dev/kvm, AppArmor userns); the version each documented install command actually delivers; and whether Claude Code and Codex run unchanged inside each arm. Choose the OCI/VM arm from the result.",
+   "failed_fact_checks": [],
+   "current_use_reasoning_found_by_critic": false,
+   "comparison_arms": [
+    "sandbox-runtime (recommended)",
+    "a rootless container on the hosting-services engine winner",
+    "gVisor runsc on that engine",
+    "boxlite with /dev/kvm"
+   ],
+   "comparison_arms_source": "the critic's deciding_comparison for this layer, listed out",
+   "judge_close_call": true,
+   "fact_corrections": [],
+   "comparison_uses": [
+    "Worktrunk (git-github-automation)",
+    "the container engine (hosting-services)"
+   ]
+  },
+  {
+   "layer_id": "code-navigation",
+   "status": "recommended",
+   "critic_verdict": "revised",
+   "selection": [
+    {
+     "name": "Serena",
+     "repository": "https://github.com/oraios/serena",
+     "role": "C02. Exact symbol source and references from language servers (find_symbol, find_referencing_symbols, symbol overview, symbol-level edits) for Codex sessions, and the MCP alternative to Claude Code's native LSP path in Claude Code sessions.",
+     "install_command": "uv tool install -p 3.13 serena-agent && serena init   (then register the MCP launch command for Claude Code or Codex as the client page describes)",
+     "install_source": "https://github.com/oraios/serena README 'Quick Start'; client setup is on https://oraios.github.io/serena/02-usage/030_clients.html (linked from the README, not fetched)",
+     "judge_confidence": "high",
+     "added_by": "judge"
+    },
+    {
+     "name": "claude-plugins-official (code-intelligence LSP plugins)",
+     "repository": "https://github.com/anthropics/claude-plugins-official",
+     "role": "C10. Claude Code's native LSP path through the official code-intelligence plugins: go-to-definition, find references and diagnostics after edits. Terminal sessions only, one plugin per language, and the language-server binary is installed separately. Codex sessions get nothing from it.",
+     "install_command": "Install the language server first (e.g. `npm install -g pyright` or `npm install -g typescript-language-server typescript`), then in Claude Code: `/plugin install pyright-lsp@claude-plugins-official` (likewise typescript-lsp, gopls-lsp, rust-analyzer-lsp, clangd-lsp, ...)",
+     "install_source": "https://code.claude.com/docs/en/plugins/code-intelligence ('Install a code intelligence plugin'); claude-plugins-official README 'Installation'; plugins/pyright-lsp/README.md and plugins/typescript-lsp/README.md",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    }
+   ],
+   "deciding_comparison": "Use the judge's sealed set of 30-50 target-language questions with exact file:line answers, on WSL2 and once on macOS arm64. (a) Within Claude Code, Serena against the native LSP plugins; Codex uses Serena only. (b) For the structural slot, codebase-memory-mcp (installed with --skip-config and invoked explicitly) against CodeGraph and jCodeMunch, each scored against an rg+Read known-source baseline. Score reference precision and recall, correctness, tokens, tool calls, wall time, cold index build, incremental update after an edit and RSS. Confirm from each transcript that the arm's tools were invoked. Adopt a structural index only for the question class where it beats the baseline.",
+   "failed_fact_checks": [],
+   "current_use_reasoning_found_by_critic": false,
+   "judge_close_call": true,
+   "fact_corrections": []
+  },
+  {
+   "layer_id": "semantic-rag",
+   "status": "compare",
+   "critic_verdict": "undetermined",
+   "selection": [
+    {
+     "name": "SocratiCode",
+     "repository": "https://github.com/giancarloerra/SocratiCode",
+     "role": "C10. Primary code-RAG engine. It builds a scoped per-project hybrid index (dense vectors plus BM25, fused with reciprocal rank fusion) in a local Qdrant and gets embeddings from Ollama. Indexing is checkpointed so it resumes after interruption, a file watcher keeps the index current, and it ships plugins for Claude Code and Codex.",
+     "install_command": "Prerequisites: Node.js 18.17+ and Docker. Claude Code: `claude plugin marketplace add giancarloerra/socraticode && claude plugin install --scope user socraticode@socraticode`. Codex: `codex plugin marketplace add giancarloerra/socraticode --ref main && codex plugin add socraticode@socraticode`",
+     "install_source": "https://github.com/giancarloerra/SocratiCode README 'Quick Start', 'Claude Code plugin (recommended for Claude Code users)', 'OpenAI Codex plugin', 'Prerequisites'",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    },
+    {
+     "name": "semble",
+     "repository": "https://github.com/MinishLab/semble",
+     "role": "C04. Co-finalist: CPU-only code search that needs no separate service. It chunks code with tree-sitter and fuses potion-code-16M-v2 static embeddings with BM25 (reciprocal rank fusion), and exposes this to Claude Code and Codex over MCP. Recovery works by rebuilding the cached index from source when files change; there is no checkpoint/resume, and the vendor reports about 0.3 s to index a repo.",
+     "install_command": "uv tool install semble && semble install",
+     "install_source": "https://github.com/MinishLab/semble README 'Quickstart' (manual per-agent setup is in docs/installation.md)",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    },
+    {
+     "name": "ollama",
+     "repository": "https://github.com/ollama/ollama",
+     "role": "C03. Embedding service for SocratiCode, which uses it as its documented default provider (nomic-embed-text, 768 dimensions) and auto-detects it on :11434 with OLLAMA_MODE=auto. A native install is the documented way to use the NVIDIA GPU on the RTX 4090. semble does not need it.",
+     "install_command": "curl -fsSL https://ollama.com/install.sh | sh && ollama pull nomic-embed-text",
+     "install_source": "https://github.com/ollama/ollama README 'Linux'; https://docs.ollama.com/gpu; SocratiCode README 'External Ollama (native install)'",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    }
+   ],
+   "deciding_comparison": "Re-run the sealed 35-query set with expected source spans on the WSL2 host. Arms: SocratiCode (native Ollama on the RTX 4090, default nomic-embed-text), semble (CPU), ColGREP with LateOn-Code-edge and with LateOn-Code, BM25 and ripgrep. Also run semble's public 1,251-query bench under one harness to settle 0.693 vs 0.846. Measure span hits and NDCG@10, watcher correctness after edits and branch switches, p50/p95 latency, RSS and VRAM, cold index time, and restore after kill -9 and after cache deletion. Name the primary engine from the result, and install Ollama only if SocratiCode wins.",
+   "failed_fact_checks": [],
+   "current_use_reasoning_found_by_critic": false,
+   "comparison_arms": [
+    "SocratiCode (embeddings from the local model server; its documented providers are Ollama, LM Studio, LiteLLM, OpenAI and Google)",
+    "semble",
+    "ColGREP with LateOn-Code-edge",
+    "ColGREP with LateOn-Code",
+    "BM25 baseline",
+    "ripgrep baseline"
+   ],
+   "comparison_arms_source": "the critic's deciding_comparison for this layer, listed out",
+   "judge_close_call": true,
+   "fact_corrections": [],
+   "comparison_uses": [
+    "the local model server (observation-inference)"
+   ]
+  },
+  {
+   "layer_id": "document-retrieval",
+   "status": "recommended",
+   "critic_verdict": "upheld",
+   "selection": [
+    {
+     "name": "tobi/qmd",
+     "repository": "https://github.com/tobi/qmd",
+     "role": "[C08] Retrieval and original-body read-back over controlled Markdown collections. It runs local BM25 (SQLite FTS5), vector and hybrid search with LLM reranking. `qmd get` and `multi_get` (by path or docid, with line ranges) read the source document before a hit is relied on. Interfaces: CLI, MCP server (query/get/multi_get/status) and a Claude Code plugin.",
+     "install_command": "npm install -g @tobilu/qmd   # or: bun install -g @tobilu/qmd ; Claude Code: claude plugin marketplace add tobi/qmd && claude plugin install qmd@qmd ; MCP command: qmd mcp",
+     "install_source": "https://github.com/tobi/qmd#installation",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    },
+    {
+     "name": "MinerU",
+     "repository": "https://github.com/opendatalab/mineru",
+     "role": "[C03] Controlled ingestion of difficult-layout documents into Markdown/JSON: PDF, scans/images, DOC/DOCX, PPT/PPTX, XLS/XLSX, ODF, EPUB and HTML. Stateless `mineru-kit parse` is the bounded conversion path. For read-back, the local document library (`mineru server start`; `mineru parse --json`) adds search, page/block continuation and stable citation locators.",
+     "install_command": "pip install uv && uv venv .mineru --python 3.12 && source .mineru/bin/activate && uv pip install -U \"mineru>=4.0,<5\"   # RTX 4090 throughput path: install mineru[full]>=4.0 (e.g. uv tool install --force \"mineru[full]>=4.0,<5\"), which needs a Volta-or-newer NVIDIA GPU with >= 8 GB VRAM",
+     "install_source": "https://github.com/opendatalab/MinerU#install-manually",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    }
+   ],
+   "deciding_comparison": "I endorse the judge's two head-to-heads, with additions. (1) Ingestion: current Docling (Heron layout, then the GraniteDocling VLM pipeline) against MinerU 4.0 standard/advanced with mineru[full], on the RTX 4090 under WSL2, using a sealed difficult-layout corpus. Score with OmniDocBench TextEdit, TableTEDS and reading-order edit, and also record parse-failure count and run time. (2) Retrieval: qmd query against docs-mcp-server hybrid search with local embeddings, on the converted corpus. Use sealed relevance judgments in randomized order, report recall@k and MRR, and check that each hit's original body can be read back by path.",
+   "failed_fact_checks": [],
+   "current_use_reasoning_found_by_critic": false,
+   "judge_close_call": true,
+   "fact_corrections": []
+  },
+  {
+   "layer_id": "web-research",
+   "status": "recommended",
+   "critic_verdict": "upheld",
+   "selection": [
+    {
+     "name": "trafilatura",
+     "repository": "https://github.com/adbar/trafilatura",
+     "role": "[C07] Bounded, attributable retrieval. Its CLI and Python API fetch chosen URLs (plus sitemap/feed discovery) and extract the main text to Markdown, JSON or XML with metadata (title, author, date, site name, categories, tags), so each source keeps its provenance. No browser and no standing service.",
+     "install_command": "pip install trafilatura   # optional extras: pip install trafilatura[all]",
+     "install_source": "https://trafilatura.readthedocs.io/en/latest/installation.html",
+     "judge_confidence": "high",
+     "added_by": "judge"
+    },
+    {
+     "name": "Playwright CLI",
+     "repository": "https://github.com/microsoft/playwright-cli",
+     "role": "[C03] Bounded interaction with chosen pages: JS-rendered content, forms, auth flows, tabs, PDF and screenshot capture. Each step is a shell command that uses element refs from snapshots. Named sessions shut down after an hour idle, and installable agent skills cover Claude Code and Codex-style agents.",
+     "install_command": "npm install -g @playwright/cli@latest && playwright-cli install --skills",
+     "install_source": "https://github.com/microsoft/playwright-cli#installation",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    }
+   ],
+   "deciding_comparison": "I endorse the judge's comparison. Freeze a set of primary-source tasks with required citation fields (URL, title, date): static articles, JS-rendered docs, a login-gated page, a form or pagination flow, and a PDF link. Run it on the WSL2 host for both Claude Code and Codex. Interaction lane: Playwright CLI against agent-browser. Retrieval lane: trafilatura against agent-browser read and against the clients' native fetch. Use randomized order and the same model and prompts. Measure task success, citation correctness, provider-reported tokens, wall time, and browser processes left after the idle timeout. Add a crawler or hosted search only if the native arm misses a frozen requirement.",
+   "failed_fact_checks": [],
+   "current_use_reasoning_found_by_critic": false,
+   "judge_close_call": true,
+   "fact_corrections": []
+  },
+  {
+   "layer_id": "durable-memory",
+   "status": "compare",
+   "critic_verdict": "undetermined",
+   "selection": [
+    {
+     "name": "ai-memory",
+     "repository": "https://github.com/akitaonrails/ai-memory",
+     "role": "Provisional owner candidate: fullest documented fit to the requirement as written (typed Claude Code<->Codex handoffs, workspace/project scope, markdown-in-git capture, documented purge, backup and restore). A finalist for the deciding head-to-head, not a second memory owner to co-install.",
+     "install_command": "mkdir -p ~/.local/bin\nwrapper_tmp=\"$(mktemp -d)\"\nwrapper_base=https://github.com/akitaonrails/ai-memory/releases/latest/download/ai-memory-wrapper\ncurl -fsSL \"$wrapper_base\" -o \"$wrapper_tmp/ai-memory-wrapper\"\ncurl -fsSL \"$wrapper_base.sha256\" -o \"$wrapper_tmp/ai-memory-wrapper.sha256\"\nexpected=\"$(awk 'NR == 1 { print $1 }' \"$wrapper_tmp/ai-memory-wrapper.sha256\")\"\nactual=\"$(sha256sum \"$wrapper_tmp/ai-memory-wrapper\" | awk '{ print $1 }')\"\n[ -n \"$expected\" ] && [ \"$actual\" = \"$expected\" ] || { echo 'wrapper checksum mismatch' >&2; exit 1; }\ninstall -m 0755 \"$wrapper_tmp/ai-memory-wrapper\" ~/.local/bin/ai-memory\ndocker run -d --name ai-memory --restart unless-stopped -p 127.0.0.1:49374:49374 -v ai-memory-data:/data docker.io/akitaonrails/ai-memory:latest   # zero-LLM mode; README shows optional AI_MEMORY_LLM_PROVIDER / AI_MEMORY_EMBEDDING_PROVIDER env lines\nai-memory install-mcp --client claude-code --apply\nai-memory install-hooks --agent claude-code --apply\nai-memory install-mcp --client codex --apply\nai-memory install-hooks --agent codex --apply",
+     "install_source": "https://github.com/akitaonrails/ai-memory/blob/main/README.md Quick start > Docker (lines 255-348; codex variants per lines 345-346). Native alternative without Docker: `mise use -g github:akitaonrails/ai-memory` (docs/install.md lines 1624-1649; checksum-verified release archive, no SLSA attestation). Latest release v2.5.2, published 2026-10-01.",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    },
+    {
+     "name": "Hindsight",
+     "repository": "https://github.com/vectorize-io/hindsight",
+     "role": "Challenger finalist with the strongest published memory-quality evidence and the richest learning layer (retain/recall/reflect, observations, knowledge pages). Its first-party Claude Code and Codex integration shares one bank per repo. Run it in the head-to-head as the sole owner; it needs an LLM for retain, local or hosted.",
+     "install_command": "docker run -it --pull always --name hindsight --restart unless-stopped -p 8888:8888 -p 9999:9999 -e HINDSIGHT_API_LLM_PROVIDER=<provider, e.g. ollama|openai|anthropic|claude-code|openai-codex> -e HINDSIGHT_API_LLM_API_KEY=<key if the provider needs one> -v hindsight-data:/home/example/.pg0 ghcr.io/vectorize-io/hindsight:latest\nnpx @vectorize-io/hindsight-coding-agents install claude-code\nnpx @vectorize-io/hindsight-coding-agents install codex",
+     "install_source": "https://github.com/vectorize-io/hindsight/blob/main/README.md Quick Start > Docker (recommended) lines 68-83 (the provider list includes local ollama/lmstudio/llamacpp) and Coding Agents lines 250-260; hindsight-integrations/coding-agents/README.md lines 24-63 (`--server cloud|self-hosted|daemon` for scripted installs). Bare metal: `pip install hindsight-api`. Latest release v0.10.2, published 2026-09-29.",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    },
+    {
+     "name": "agentmemory (rohitg00)",
+     "repository": "https://github.com/rohitg00/agentmemory",
+     "role": "Challenger finalist with the best measured retrieval among arms that ran on record. It ships Claude Code and Codex plugins with automatic capture, /forget and /handoff skills, and export/import. It is a head-to-head arm, not a co-installed owner.",
+     "install_command": "npx -y @agentmemory/agentmemory@latest   # first run: pick Claude Code and Codex, keyless or LLM provider; starts the server and the pinned iii-engine v0.22.1\n# inside Claude Code: /plugin marketplace add rohitg00/agentmemory  then  /plugin install agentmemory\ncodex plugin marketplace add rohitg00/agentmemory\ncodex plugin add agentmemory@agentmemory",
+     "install_source": "https://github.com/rohitg00/agentmemory/blob/main/README.md Install (line ~90), 'Claude Code (one block, paste it)' (lines 582-586) and 'Codex CLI (Codex plugin platform)' (lines 601-610). Latest release v0.9.29, published 2026-08-16.",
+     "judge_confidence": "low",
+     "added_by": "judge"
+    },
+    {
+     "name": "deja-vu",
+     "repository": "https://github.com/vshulcz/deja-vu",
+     "role": "Comparison arm added by the critic: one Go binary that indexes existing session history for search and wires an MCP server into the clients.",
+     "install_command": "curl -fsSL https://raw.githubusercontent.com/vshulcz/deja-vu/main/install.sh | sh && deja install --auto",
+     "install_source": "https://github.com/vshulcz/deja-vu README lines 75-81 (latest release v0.21.4, 2026-09-29; read 2026-10-01 with gh api); Homebrew, npm and go install are also documented",
+     "judge_confidence": null,
+     "added_by": "critic"
+    }
+   ],
+   "deciding_comparison": "Run the judge's six-measure head-to-head on the new WSL2 host, with four arms. Install each one alone as the sole memory owner. (1) ai-memory, run with its LLM reranker on and off, using a matched embedder. (2) Hindsight, run once with a local model on the RTX 4090 and once with a hosted model. (3) agentmemory, through its Claude Code and Codex hooks path, not REST alone. (4) deja-vu as a full arm, including promote and remember notes. Measure: source-grounded recall and abstention over Claude Code -> Codex -> Claude Code chains in two projects; cross-project leakage; useful-write quality judged against the source transcripts; forget or purge, then confirm absence from both recall and indexes; backup -> fresh data dir -> restore, with recall compared for identity; and complete token, latency and cost usage, including LLM calls made during capture. As a secondary measure, report LongMemEval-S recall_all@5 with a matched embedder. The arm that leads on source-grounded recall while passing deletion and isolated restore becomes the single owner.",
+   "failed_fact_checks": [],
+   "current_use_reasoning_found_by_critic": false,
+   "comparison_arms": [
+    "ai-memory, LLM reranker on and off",
+    "Hindsight, local model and hosted model",
+    "agentmemory through its Claude Code and Codex hooks",
+    "deja-vu"
+   ],
+   "comparison_arms_source": "the critic's deciding_comparison for this layer, listed out",
+   "judge_close_call": true,
+   "fact_corrections": []
+  },
+  {
+   "layer_id": "token-efficiency",
+   "status": "compare",
+   "critic_verdict": "undetermined",
+   "selection": [
+    {
+     "name": "ccusage",
+     "repository": "https://github.com/ccusage/ccusage",
+     "role": "Measures provider usage. It reads the local usage logs that Claude Code and Codex write and reports input, output, cache-creation and cache-read tokens separately (daily, session or JSON). These counts stay apart from any compressor's own artifact estimate.",
+     "install_command": "npx ccusage@latest   # Codex report: npx ccusage@latest codex daily",
+     "install_source": "https://github.com/ccusage/ccusage/blob/main/apps/ccusage/README.md (Quick Start, line 57; Supported Sources, lines 60-85)",
+     "judge_confidence": "high",
+     "added_by": "judge"
+    },
+    {
+     "name": "rtk-ai/rtk",
+     "repository": "https://github.com/rtk-ai/rtk",
+     "role": "Compresses shell output for the context window. A PreToolUse hook rewrites Bash commands for Claude Code and Codex. On failure or truncation RTK saves the full original output, which `rtk recall` retrieves; `rtk proxy` passes output through raw. `rtk gain` reports artifact reductions as bytes/4 estimates and states explicitly that these are not bill savings.",
+     "install_command": "curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh && rtk init -g && rtk init -g --codex",
+     "install_source": "https://github.com/rtk-ai/rtk/blob/develop/README.md (Quick Install lines 92-101, WSL lines 432-447, Supported AI Tools line 460)",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    }
+   ],
+   "deciding_comparison": "Run on the new WSL2 host as paired, randomized trials with k >= 3 per task, separately for Claude Code and for Codex. Arms: (1) a no-layer baseline; (2) RTK v0.50.x; (3) sqz v1.9.x; (4) Headroom v0.39.x. Headroom stays in because the +48.4% and +44% cost results measured v0.27.0 and a July build, not the current version. Context Mode 1.0.169 runs only as a frozen control unless human development resumes. Take complete provider usage per run from ccusage (input, output, cache creation, cache read) and keep it separate from each tool's own artifact estimate (rtk gain, headroom savings, sqz stats). Count recall, expand and retrieve calls, failed attempts and wall time. Decide on cost per solved task at equal success.",
+   "failed_fact_checks": [],
+   "current_use_reasoning_found_by_critic": false,
+   "comparison_arms": [
+    "ccusage (measurement, selected)",
+    "no compression layer (baseline)",
+    "RTK",
+    "sqz",
+    "Headroom",
+    "Context Mode (frozen control)"
+   ],
+   "comparison_arms_source": "the critic's deciding_comparison for this layer, listed out",
+   "judge_close_call": true,
+   "fact_corrections": []
+  },
+  {
+   "layer_id": "observation-inference",
+   "status": "recommended",
+   "critic_verdict": "upheld",
+   "selection": [
+    {
+     "name": "OTel Collector Contrib",
+     "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+     "role": "The single local OTLP ingestion point and privacy filter. It receives Claude Code's native metrics, events and beta traces and Codex's log events and metrics. The redaction processor applies an attribute allowlist, blocked-value masking, HMAC hashing and an audit trail. It then sends metrics to Prometheus, logs to Loki (/otlp) and traces to Phoenix.",
+     "install_command": "wget https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.162.0/otelcol-contrib_0.162.0_linux_amd64.deb && sudo dpkg -i otelcol-contrib_0.162.0_linux_amd64.deb",
+     "install_source": "https://opentelemetry.io/docs/collector/install/binary/linux/ (deb install pattern) and https://github.com/open-telemetry/opentelemetry-collector-releases/releases/tag/v0.162.0 (otelcol-contrib_0.162.0_linux_amd64.deb)",
+     "judge_confidence": "high",
+     "added_by": "judge"
+    },
+    {
+     "name": "Prometheus",
+     "repository": "https://github.com/prometheus/prometheus",
+     "role": "Stores native usage metrics (claude_code.token.usage, claude_code.cost.usage and codex.* counters) through its OTLP receiver. Also scrapes the inference route's /metrics endpoint.",
+     "install_command": "curl -LO https://github.com/prometheus/prometheus/releases/download/v3.15.0/prometheus-3.15.0.linux-amd64.tar.gz && tar xzf prometheus-3.15.0.linux-amd64.tar.gz && ./prometheus-3.15.0.linux-amd64/prometheus --web.enable-otlp-receiver",
+     "install_source": "https://github.com/prometheus/prometheus/releases/tag/v3.15.0 and https://prometheus.io/docs/guides/opentelemetry/",
+     "judge_confidence": "high",
+     "added_by": "judge"
+    },
+    {
+     "name": "Loki",
+     "repository": "https://github.com/grafana/loki",
+     "role": "Stores native events (Claude Code api_request and tool events, Codex codex.* events) through native OTLP log ingestion.",
+     "install_command": "sudo apt-get update && sudo apt-get install loki   # with the apt.grafana.com repository configured as in the Grafana Debian guide",
+     "install_source": "https://grafana.com/docs/loki/latest/setup/install/local/",
+     "judge_confidence": "high",
+     "added_by": "judge"
+    },
+    {
+     "name": "Grafana",
+     "repository": "https://github.com/grafana/grafana",
+     "role": "Local dashboards and exploration over Prometheus metrics and Loki events, with optional alert rules. Provides the view that reconciles one task's native counters against telemetry.",
+     "install_command": "sudo apt-get install grafana   # after adding 'deb [signed-by=/etc/apt/keyrings/grafana.asc] https://apt.grafana.com stable main'",
+     "install_source": "https://grafana.com/docs/grafana/latest/setup-grafana/installation/debian/",
+     "judge_confidence": "high",
+     "added_by": "judge"
+    },
+    {
+     "name": "llama.cpp optional inference",
+     "repository": "https://github.com/ggml-org/llama.cpp",
+     "role": "Optional local inference route. Runs on CUDA on the RTX 4090 and on Metal on macOS arm64, where Apple silicon is first-class, with quantized models and CPU+GPU hybrid inference. llama-server exposes Anthropic /v1/messages and OpenAI /v1/responses for Claude Code and Codex, and exports Prometheus /metrics into the same pipeline.",
+     "install_command": "git clone https://github.com/ggml-org/llama.cpp && cd llama.cpp && cmake -B build -DGGML_CUDA=ON && cmake --build build --config Release",
+     "install_source": "https://github.com/ggml-org/llama.cpp/blob/master/docs/build.md#cuda",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    },
+    {
+     "name": "Phoenix",
+     "repository": "https://github.com/Arize-ai/phoenix",
+     "role": "Qualifies model routes. It is an OTLP trace sink that also stores datasets, runs experiments and scores evals, so a fixed slice of the real workload can be replayed against a candidate route and its outputs graded. Agents can query it through its CLI or MCP server.",
+     "install_command": "pip install arize-phoenix && phoenix serve   # or: uvx arize-phoenix serve",
+     "install_source": "https://github.com/Arize-ai/phoenix/blob/main/README.md#run-locally",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    }
+   ],
+   "deciding_comparison": "I endorse the judge's comparison and add three checks. (a) Reconcile one Codex task's tokens through Loki codex.sse_event records, because Codex metrics carry no token counts, and one Claude Code task through both Prometheus and Loki. (b) Show that the redaction allowlist removes prompt and tool content, including the codex.tool_result output snippet and map bodies, before anything reaches Loki or Phoenix, with Phoenix analytics disabled. (c) Qualify Claude Code through llama-server /v1/messages with --jinja tool use before treating the route as usable. Then compare llama.cpp (CUDA), vLLM and SGLang at matched quantization on the RTX 4090 under WSL2, measuring task outcome, TTFT, tokens/s at real agent concurrency, VRAM headroom and restart recovery.",
+   "failed_fact_checks": [],
+   "current_use_reasoning_found_by_critic": false,
+   "judge_close_call": true,
+   "fact_corrections": []
+  },
+  {
+   "layer_id": "quality-evaluation",
+   "status": "recommended",
+   "critic_verdict": "upheld",
+   "selection": [
+    {
+     "name": "Inspect AI",
+     "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+     "role": "Primary labeled-case evaluator: datasets carrying independent labels, several scorers whose individual values are kept per sample (collect reducer, krippendorff_alpha), eval logs that keep completed samples when a run errors, and eval-retry into a new log. Claude Code and Codex CLI run as external agents through the separate meridianlabs-ai/inspect_swe package (pip install git+https://github.com/meridianlabs-ai/inspect_swe).",
+     "install_command": "pip install inspect-ai",
+     "install_source": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/main/docs/index.qmd (line 38, read at HEAD 0321960a92aa on 2026-10-01)",
+     "judge_confidence": "high",
+     "added_by": "judge"
+    },
+    {
+     "name": "Harbor (containerized agent E2E runner)",
+     "repository": "https://github.com/harbor-framework/harbor",
+     "role": "Containerized end-to-end runner for the real Claude Code and Codex CLIs on task suites. Each trial runs a verifier test (tests/test.sh writing reward.json or reward.txt) and keeps the trajectory (ATIF or native session) and result.json. Trials can be regraded when only the verifier changes.",
+     "install_command": "uv tool install harbor",
+     "install_source": "https://github.com/harbor-framework/harbor/blob/main/docs-mintlify/getting-started/installation.mdx (line 15; line 60 says Docker is the default sandbox runtime and must be installed)",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    },
+    {
+     "name": "Promptfoo",
+     "repository": "https://github.com/promptfoo/promptfoo",
+     "role": "Declarative CI regression gate for prompts, skills and agents. YAML test cases with assertions; exit code 100 on any failure or on a pass rate below the threshold; retry keeps the original ERROR results until a retry succeeds. Includes Claude Agent SDK and OpenAI Codex SDK providers.",
+     "install_command": "npm install -g promptfoo",
+     "install_source": "https://github.com/promptfoo/promptfoo/blob/main/site/docs/installation.md (line 19; npx promptfoo@latest line 24; brew install promptfoo line 29)",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    }
+   ],
+   "deciding_comparison": "I endorse the judge's comparison. Build fresh, independently labeled task cases plus a safe negative control, and do not use the existing eight-case diagnostic. Run them through (a) Inspect AI with inspect_swe's claude_code and codex_cli agents, two independent scorers and the collect reducer, and (b) Promptfoo with the claude-agent-sdk and openai:codex-sdk providers and two rubric assertions. Run the same cases as Harbor tasks with verifier tests. Measure agreement with the labels, whether every errored and disagreeing case survives an induced kill or timeout in the retained artifacts, whether the negative control stays negative, and wall time and token cost. The result picks the primary labeled-case runner.",
+   "failed_fact_checks": [],
+   "current_use_reasoning_found_by_critic": false,
+   "judge_close_call": true,
+   "fact_corrections": []
+  },
+  {
+   "layer_id": "ci-supply-chain",
+   "status": "recommended",
+   "critic_verdict": "upheld",
+   "selection": [
+    {
+     "name": "zizmor",
+     "repository": "https://github.com/zizmorcore/zizmor",
+     "role": "Workflow policy auditor for the permissions and pinning clauses. Audits include excessive-permissions (at workflow and job level, including a broad default GITHUB_TOKEN) and unpinned-uses (with a blanket hash-pin policy by default), plus injection, credential-persistence and impostor-commit checks. It produces SARIF for hosted code scanning through zizmor-action.",
+     "install_command": "uv tool install zizmor",
+     "install_source": "https://github.com/zizmorcore/zizmor/blob/main/docs/installation.md (line 42; pipx install zizmor line 39; brew install zizmor line 18; cargo install --locked zizmor line 61)",
+     "judge_confidence": "high",
+     "added_by": "judge"
+    },
+    {
+     "name": "attest",
+     "repository": "https://github.com/actions/attest",
+     "role": "Attributable hosted output: Sigstore-signed SLSA build-provenance or SBOM attestations. Each records the workflow, repository, commit SHA and triggering event, and consumers can verify it with the GitHub CLI.",
+     "install_command": "Workflow step (no host install): set permissions id-token: write and attestations: write, then uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2 with subject-path (add sbom-path for an SBOM attestation)",
+     "install_source": "https://github.com/actions/attest/blob/main/README.md (lines 53-54 attestation modes; lines 68-69 required permissions; lines 261-273 SBOM example). The tag ref v4.2.2 resolves to commit 1e69f48acb82d1966a394da916b4c1698aa569d6 via https://api.github.com/repos/actions/attest/git/ref/tags/v4.2.2.",
+     "judge_confidence": "high",
+     "added_by": "judge"
+    },
+    {
+     "name": "Syft",
+     "repository": "https://github.com/anchore/syft",
+     "role": "Actual runtime inventory: SBOMs in CycloneDX, SPDX or Syft JSON of container images and filesystems or directories across dozens of packaging ecosystems. Its SPDX output feeds actions/attest SBOM attestations, as in the attest README example.",
+     "install_command": "curl -sSfL https://get.anchore.io/syft | sudo sh -s -- -b /usr/local/bin",
+     "install_source": "https://github.com/anchore/syft/blob/main/README.md (line 36)",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    },
+    {
+     "name": "Dependabot",
+     "repository": "https://github.com/dependabot/dependabot-core",
+     "role": "Keeps pinned dependencies current. Version updates for the github-actions ecosystem keep action references in workflows and reusable workflows up to date through pull requests, alongside the project's package ecosystems. The Dependabot CLI supports standalone dry runs.",
+     "install_command": "Hosted: commit .github/dependabot.yml with package-ecosystem \"github-actions\", directory \"/\" and a schedule.interval. Local standalone: go install github.com/dependabot/cli/cmd/dependabot@latest (or brew install dependabot); the CLI README lists Docker under Requirements.",
+     "install_source": "https://docs.github.com/en/code-security/dependabot/working-with-dependabot/keeping-your-actions-up-to-date-with-dependabot and https://github.com/dependabot/cli (README lines 15-21 install; lines 23-25 Requirements: Docker)",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    },
+    {
+     "name": "codeql-sarif",
+     "repository": "https://github.com/github/codeql-action",
+     "role": "Attributable hosted checks: upload-sarif publishes zizmor and actionlint SARIF as code-scanning alerts tied to commit and tool. Separately, CodeQL's Actions query pack independently flags workflows without permissions and unpinned tags.",
+     "install_command": "Workflow step (no host install): set permissions security-events: write (private repositories also need contents: read), then uses: github/codeql-action/upload-sarif@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2 with sarif_file",
+     "install_source": "https://github.com/github/codeql-action/blob/main/README.md (line 30 upload-sarif; line 41 required permissions; line 66 v4 is latest). The v4.38.2 annotated tag 88585263c0627ee42c0e1c5143a112c8d6f4aa18 dereferences to commit 2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 via the GitHub git refs and tags API.",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    },
+    {
+     "name": "actionlint (kjanat)",
+     "repository": "https://github.com/kjanat/actionlint",
+     "role": "Workflow correctness: syntax, ${{ }} expression type checks, action input/output and reusable-workflow checks, runner labels, and shellcheck/pyflakes on run: scripts. It adds an opt-in require-commit-hash policy that fails action references not pinned to a full commit SHA. It is the maintained continuation of the stale rhysd/actionlint.",
+     "install_command": "go install actionlint.kjanat.dev/cmd/actionlint@latest",
+     "install_source": "https://github.com/kjanat/actionlint/blob/master/README.md (line 134; line 123 also lists npm, Homebrew, AUR, Scoop, mise and release archives)",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    }
+   ],
+   "deciding_comparison": "I endorse the judge's two head-to-heads. (1) Run zizmor (current default policy) and poutine on the repository's workflows, have every finding labeled independently, and report precision and recall separately for the permissions clause and the pinning clause. Raw counts do not settle this. (2) Score Syft and Trivy SBOMs of the same install tree and image against package-manager ground truth (dpkg-query, uv/pip lock, npm ls). Add one overlap check: compare kjanat actionlint require-commit-hash with zizmor unpinned-uses to decide whether the fork's pinning policy is redundant, and keep actionlint for its syntax and runner-compatibility checks.",
+   "failed_fact_checks": [],
+   "current_use_reasoning_found_by_critic": false,
+   "judge_close_call": true,
+   "fact_corrections": []
+  },
+  {
+   "layer_id": "scheduling-supervision",
+   "status": "recommended",
+   "critic_verdict": "upheld",
+   "selection": [
+    {
+     "name": "Dagu",
+     "repository": "https://github.com/dagucloud/dagu",
+     "role": "Local workflow engine. Runs YAML DAGs over existing commands, with a Web UI for run history, `dagu stop`/`retry`/`history` commands and step- and DAG-level retry policies. Each step command starts in its own process group, which is process-group bounding, not cgroup bounding. A built-in MCP server at /mcp lets Claude Code and Codex sessions inspect and control runs.",
+     "install_command": "npm install -g --ignore-scripts=false @dagucloud/dagu && dagu start-all   (non-interactive. The README's other documented methods are `brew install dagu`, the Docker image, and `curl -fsSL https://raw.githubusercontent.com/dagucloud/dagu/main/scripts/installer.sh | bash`, which runs a guided wizard that sets PATH, a background service and an admin account.)",
+     "install_source": "https://github.com/dagucloud/dagu#install (README Quick Start > Install, HEAD read 2026-10-01)",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    },
+    {
+     "name": "systemd",
+     "repository": "https://github.com/systemd/systemd",
+     "role": "Supervision layer. Bounds process trees with cgroups (KillMode=control-group kills every process left in the unit's cgroup on stop). systemd-run wraps any agent or Dagu step command in a transient scope, service or timer unit and reports CPU, memory and IO accounting. It can also run Dagu itself as a service. It covers the setsid/double-fork escape that process groups leave open.",
+     "install_command": "Preinstalled: systemd is the default init for current Ubuntu installed with `wsl --install`. On other distros, add `[boot]` and `systemd=true` to /etc/wsl.conf, run `wsl.exe --shutdown` from Windows, then check with `systemctl list-unit-files --type=service`.",
+     "install_source": "https://learn.microsoft.com/en-us/windows/wsl/systemd",
+     "judge_confidence": "high",
+     "added_by": "judge"
+    }
+   ],
+   "deciding_comparison": "Default pair, on the new WSL2 host: start a Dagu step that spawns a setsid or double-forked child. Run `dagu stop` and a retry twice: once with the step run plainly and once with it under `systemd-run --user --scope` (KillMode=control-group). Count surviving processes each time, and compare DAGU_SIGNAL_PROPAGATION=true against the default false when the server stops. Durable slot, only if jobs must survive host loss or long waits: run the judge's Temporal-against-Restate head-to-head with equal recovery settings. Use one effectful workflow with an idempotency key; kill -9 the server and the worker mid-activity; run `wsl --shutdown` during a durable sleep; cancel during a retry backoff. Measure duplicated effects, recovery time, history visibility, idle RSS/CPU, and the install and upgrade steps.",
+   "failed_fact_checks": [],
+   "current_use_reasoning_found_by_critic": false,
+   "judge_close_call": true,
+   "fact_corrections": []
+  },
+  {
+   "layer_id": "hosting-services",
+   "status": "compare",
+   "critic_verdict": "undetermined",
+   "selection": [
+    {
+     "name": "Docker Compose",
+     "repository": "https://github.com/docker/compose",
+     "role": "Multi-service definition. One Compose-spec file declares the typed app and its supporting services, with explicit volumes and networks. It runs natively on Docker Engine and is the preferred provider behind `podman compose`, so it stays whichever engine wins.",
+     "install_command": "Docker arm: `sudo apt install docker-compose-plugin` from Docker's apt repository (part of the Docker Engine install command). Podman arm: download the release binary from https://github.com/docker/compose/releases, `chmod +x` it, save it as `docker-compose`, and point Podman at it with `compose_providers` in containers.conf or `PODMAN_COMPOSE_PROVIDER`.",
+     "install_source": "https://docs.docker.com/engine/install/ubuntu/ ; https://github.com/docker/compose#linux ; https://docs.podman.io/en/latest/markdown/podman-compose.1.html",
+     "judge_confidence": "high",
+     "added_by": "judge"
+    },
+    {
+     "name": "Podman / Quadlet (engine arm A)",
+     "repository": "https://github.com/podman-container-tools/podman",
+     "role": "Container engine, arm A of the head-to-head: install both arms on the new host and keep one. It is rootless and daemonless. Quadlet .container/.pod/.kube units become systemd services, including per-user units, which keeps accounts and deployment scope explicit. GPU access goes through CDI, and `podman machine` covers macOS arm64.",
+     "install_command": "sudo apt-get update && sudo apt-get -y install podman   (Ubuntu archive package; the version on the target Ubuntu release is unverified). GPU: install the NVIDIA Container Toolkit and use CDI. Rootless Quadlet units go in ~/.config/containers/systemd/.",
+     "install_source": "https://podman.io/docs/installation",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    },
+    {
+     "name": "Docker Engine / Moby (engine arm B)",
+     "repository": "https://github.com/moby/moby",
+     "role": "Container engine, arm B of the head-to-head: install both arms on the new host and keep one. Docker's upstream apt repository ships current releases plus the native Compose plugin, and NVIDIA runtime configuration is documented for both rootful and rootless mode. The default daemon runs as root, so use rootless mode to keep accounts explicit. Moby itself has no macOS runtime.",
+     "install_command": "Add Docker's apt repository (docs steps), then `sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin`. Use rootless mode for explicit accounts. GPU: `sudo nvidia-ctk runtime configure --runtime=docker`, or the documented rootless variant.",
+     "install_source": "https://docs.docker.com/engine/install/ubuntu/",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    }
+   ],
+   "deciding_comparison": "Run the judge's head-to-head on the new WSL2 host, starting with installed-against-upstream version on the chosen distro: rootless Docker from Docker's apt repository (which supports 26.04) against Podman from the Ubuntu archive (version unverified). Record both versions. Then run one Compose file (typed app, Postgres, and a CUDA job on the RTX 4090) under rootless `docker compose` and under `podman compose` with the docker-compose provider, plus a Quadlet version. Measure GPU access (nvidia-ctk runtime against CDI), volume persistence and service restart across `wsl --shutdown`, port reachability from Windows, rollback after an image update, and idle RSS/CPU. Keep the engine that passes at lower cost, and re-check the Podman arm on macOS arm64 through podman machine.",
+   "failed_fact_checks": [],
+   "current_use_reasoning_found_by_critic": false,
+   "comparison_arms": [
+    "Docker Compose (selected)",
+    "Podman with Quadlet",
+    "rootless Docker Engine"
+   ],
+   "comparison_arms_source": "the critic's deciding_comparison for this layer, listed out",
+   "judge_close_call": true,
+   "fact_corrections": []
+  },
+  {
+   "layer_id": "secrets-credentials",
+   "status": "recommended",
+   "critic_verdict": "upheld",
+   "selection": [
+    {
+     "name": "betterleaks",
+     "repository": "https://github.com/betterleaks/betterleaks",
+     "role": "Main local secret check. It scans staged changes before each commit (pre-commit hook) and scans git history, directories, stdin and GitHub/GitLab sources in CI. Live validation is optional (-v). BPE filtering cuts natural-language false positives on generic secrets. It continues Gitleaks under the same original author.",
+     "install_command": "Download betterleaks_1.9.0_linux_x64.tar.gz from the v1.9.0 release and verify it against checksums.txt (a sigstore bundle, checksums.txt.sigstore.json, is published with it). Alternative: go install github.com/betterleaks/betterleaks@v1.9.0 (the v1.x README documents @latest). macOS arm64: betterleaks_1.9.0_darwin_arm64.tar.gz, or brew install --cask betterleaks/tap/betterleaks@1. Pre-commit: repo https://github.com/betterleaks/betterleaks, rev v1.9.0, hook id betterleaks (v1.x entry: betterleaks git --pre-commit --redact --staged --verbose). The v2 line on main has no stable release yet.",
+     "install_source": "https://github.com/betterleaks/betterleaks/releases/tag/v1.9.0 ; README on branch v1.x (install section) ; .pre-commit-hooks.yaml on branch v1.x",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    },
+    {
+     "name": "trufflehog",
+     "repository": "https://github.com/trufflesecurity/trufflehog",
+     "role": "Complement focused on verification. It classifies over 800 secret types, and over 700 detectors actively check credentials against provider APIs. Findings from history, org, S3/GCS and container scans come back labelled verified, unverified or unknown. It can gate PRs and CI (--since-commit <base> --fail) and ships a pre-commit hook and a GitHub Action. A default run makes outbound verification calls.",
+     "install_command": "curl -sSfL https://raw.githubusercontent.com/trufflesecurity/trufflehog/main/scripts/install.sh | sh -s -- -b /usr/local/bin v3.97.9 (or brew install trufflehog). PR/CI gate from the README: trufflehog git file://. --since-commit main --branch <pr-branch> --results=verified,unknown --fail",
+     "install_source": "README (main) Installation section; https://github.com/trufflesecurity/trufflehog/releases/tag/v3.97.9",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    }
+   ],
+   "deciding_comparison": "Run the judge's head-to-head on the new WSL2 host: betterleaks v1.9.0, with and without -v, and trufflehog v3.97.9, with verification on and with --no-verification, on the same inputs. Use CredData plus a git fixture with planted live test credentials in staged changes and in history. Measure recall, precision, verified-label accuracy, pre-commit latency on staged changes, false positives on the host's own repositories, and the recall gained by running both. Also record outbound network calls in each mode, so that the 'no content off the host' property is measured rather than assumed. For the storage half, no comparison is needed until a concrete multi-host or multi-operator sharing need appears; then qualify OpenBao against it.",
+   "failed_fact_checks": [
+    "The judge's ggshield reason: 'The two local scanners need no hosted account and send no content off the host'",
+    "The judge's reading that the post 'classifies secrets that were already captured; it is not a standalone detection test' (only partly true: the filter runs after capture, but the .892 is reported for running Betterleaks against CredData)"
+   ],
+   "current_use_reasoning_found_by_critic": false,
+   "judge_close_call": true,
+   "fact_corrections": [
+    {
+     "claim": "The judge wrote that the two local scanners send no content off the host.",
+     "correction": "TruffleHog verifies credentials through the providers' APIs, so its verification contacts those services; local scanning alone does not establish that nothing leaves the host.",
+     "source": "https://github.com/trufflesecurity/trufflehog/blob/main/README.md"
+    },
+    {
+     "claim": "The judge read Betterleaks' published result as a classification of already captured secrets.",
+     "correction": "Betterleaks' 0.892 figure is an author-run CredData result with a modified configuration.",
+     "source": "https://lookingatcomputer.substack.com/p/rare-not-random"
+    }
+   ]
+  },
+  {
+   "layer_id": "git-github-automation",
+   "status": "recommended",
+   "critic_verdict": "upheld",
+   "selection": [
+    {
+     "name": "git",
+     "repository": "https://github.com/git/git",
+     "role": "Base version control. Native 'git worktree' gives each agent its own working directory, and 'git diff' (including --no-index) gives line diffs. Every other selected tool builds on it.",
+     "install_command": "sudo add-apt-repository ppa:git-core/ppa && sudo apt update && sudo apt install git",
+     "install_source": "https://git-scm.com/install/linux (Latest version: 2.56.0; the PPA provides the latest stable upstream Git for Ubuntu)",
+     "judge_confidence": "high",
+     "added_by": "judge"
+    },
+    {
+     "name": "gh (GitHub CLI)",
+     "repository": "https://github.com/cli/cli",
+     "role": "GitHub automation from the host that the agents call: gh pr create, checkout, checks, comment, diff, merge, review, update-branch and view, plus gh api.",
+     "install_command": "Use the official signed apt repository from docs/install_linux.md. Fetch https://cli.github.com/packages/githubcli-archive-keyring.gpg into /etc/apt/keyrings, add 'deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main' to /etc/apt/sources.list.d/github-cli.list, then run sudo apt update && sudo apt install gh -y",
+     "install_source": "https://github.com/cli/cli/blob/trunk/docs/install_linux.md",
+     "judge_confidence": "high",
+     "added_by": "judge"
+    },
+    {
+     "name": "worktrunk",
+     "repository": "https://github.com/max-sixty/worktrunk",
+     "role": "Manages worktrees for agents working in parallel. Commands cover create/switch, list with CI status and PR links, merge (squash, rebase or fast-forward, then clean up), remove, hooks on create and merge, and PR checkout (wt switch pr:N). Plugins exist for Claude Code (activity tracking, worktree isolation, skills) and Codex (activity tracking, configuration skill).",
+     "install_command": "cargo install worktrunk && wt config shell install (or brew install worktrunk && wt config shell install). Release v0.80.0 also ships worktrunk-installer.sh and an x86_64-unknown-linux-musl tarball with sha256 files and a sigstore packslip. Then run wt config plugins claude install and wt config plugins codex install.",
+     "install_source": "https://github.com/max-sixty/worktrunk README Install section; https://worktrunk.dev/claude-code/ ; https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    },
+    {
+     "name": "difftastic",
+     "repository": "https://github.com/Wilfred/difftastic",
+     "role": "Structural diff for human review. It understands syntax in over 30 languages and falls back to a line diff with word highlighting for unknown files. It works with git as an external diff or difftool when reviewing changed code.",
+     "install_command": "Download the Linux x86_64 pre-built difft from the 0.71.0 GitHub release (the manual's Pre-Built Binaries method), or brew install difftastic. Configure git per https://difftastic.wilfred.me.uk/git.html, as difftool rather than the global diff if sem is also used.",
+     "install_source": "https://difftastic.wilfred.me.uk/installation.html ; https://github.com/Wilfred/difftastic/releases/tag/0.71.0",
+     "judge_confidence": "high",
+     "added_by": "judge"
+    },
+    {
+     "name": "sem (lowest confidence; kept only if the structural-diff comparison shows a gain)",
+     "repository": "https://github.com/Ataraxy-Labs/sem",
+     "role": "Entity-level structural diff for agents. It reports which functions, classes and methods were added, modified or deleted, with impact, blame and a dependency graph, as JSON and through an MCP server (sem mcp) that Claude Code launches. It complements difftastic, whose output is meant for humans.",
+     "install_command": "curl -fsSL https://raw.githubusercontent.com/Ataraxy-Labs/sem/main/install.sh | sh (or brew install sem-cli / cargo install sem-cli), then claude mcp add sem -- sem mcp. Do not run 'sem setup' on the shared host: it replaces global git diff output, installs a pre-commit hook and edits ~/.claude/settings.json.",
+     "install_source": "https://github.com/Ataraxy-Labs/sem README (Install; Use with AI agents (MCP); Use as default Git diff); release v0.25.0",
+     "judge_confidence": "low",
+     "added_by": "judge"
+    },
+    {
+     "name": "claude-code-action",
+     "repository": "https://github.com/anthropics/claude-code-action",
+     "role": "PR review and @claude automation on the GitHub side. It runs Claude Code in GitHub Actions on PR and issue events and complements gh on the host. It runs on GitHub runners; nothing is installed on the WSL host beyond Claude Code.",
+     "install_command": "In Claude Code run /install-github-app (direct Anthropic API users only). Manual setup: install the Claude GitHub app (https://github.com/apps/claude), add ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN as a repository secret (Pro/Max users generate the token with 'claude setup-token'), and copy examples/claude.yml into .github/workflows/.",
+     "install_source": "https://github.com/anthropics/claude-code-action README Quickstart; https://github.com/anthropics/claude-code-action/blob/main/docs/setup.md",
+     "judge_confidence": "low",
+     "added_by": "judge"
+    }
+   ],
+   "deciding_comparison": "Structural-diff slot (the judge's own comparison): on the WSL2 host, give Claude Code and Codex the same questions about changed code across a sample of real PRs, using (a) sem diff JSON through sem mcp, (b) difft output and (c) plain git diff. Score answers against ground truth, and record tokens, wall time, and sem and difft runtime and memory on large diffs. If sem shows no gain over difft plus git diff, it leaves the finalized set. Review slot: compare claude-code-action's PR findings with a host-side Claude Code + gh review of the same PRs. Add the codex-plugin-cc review bridge only after a version newer than v1.0.6 ships and passes the same comparison.",
+   "failed_fact_checks": [
+    "The judge's claim that claude-code-action has no GitHub Release in the last 90 days and that its latest release object is v1 (2025-08-26)",
+    "The judge's statement that worktrunk's latest main-branch 'ci' run was cancelled (2026-07-23), read as current CI state",
+    "sem's default-branch CI runs a Linux test suite (implied by the 'tested' status the selection assumes)"
+   ],
+   "current_use_reasoning_found_by_critic": false,
+   "judge_close_call": true,
+   "fact_corrections": [
+    {
+     "claim": "The judge wrote that claude-code-action has no GitHub release in the last 90 days.",
+     "correction": "claude-code-action published v1.0.239 on 2026-10-01; the floating v1 'Latest' object does not show staleness.",
+     "source": "https://api.github.com/repos/anthropics/claude-code-action/releases?per_page=10"
+    },
+    {
+     "claim": "The judge read a cancelled July CI run as Worktrunk's current CI state.",
+     "correction": "Worktrunk commit ca8d3797 has current Linux, macOS and Windows checks.",
+     "source": "https://api.github.com/repos/max-sixty/worktrunk/commits/ca8d3797b245/check-runs?per_page=100"
+    },
+    {
+     "claim": "The selection assumed sem runs a Linux test suite in CI.",
+     "correction": "sem's workflows at dfcb3de6 build and package for Windows; Linux testing is not established.",
+     "source": "https://github.com/Ataraxy-Labs/sem/blob/dfcb3de6c8bb32eda4005b0b3260b2b437f256db/.github/workflows/test-windows.yml"
+    }
+   ]
+  },
+  {
+   "layer_id": "recovery-portability",
+   "status": "recommended",
+   "critic_verdict": "upheld",
+   "selection": [
+    {
+     "name": "mise",
+     "repository": "https://github.com/jdx/mise",
+     "role": "C03: Tool reproduction. Installs the pinned Python, Node, Rust and CLI tool set on the chosen host (Linux x86_64 under WSL2 and macOS arm64) from a committed mise.toml plus mise.lock. Optional `mise bootstrap` covers OS packages, user services and repos.",
+     "install_command": "curl https://mise.run | sh",
+     "install_source": "jdx/mise README, Quickstart '1. Install mise' (read via gh api repos/jdx/mise/readme on 2026-10-01); package-manager alternatives at https://mise.jdx.dev/installing-mise.html",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    },
+    {
+     "name": "Restic",
+     "repository": "https://github.com/restic/restic",
+     "role": "C06: Application-state backup and restore. Makes encrypted, deduplicated, verifiable snapshots to a local directory, SFTP, REST server, S3-compatible or rclone backend, and restores them onto the chosen host. Authentication-store paths stay out of the backup set.",
+     "install_command": "sudo apt-get install restic   # distro package; or the official linux_amd64 binary from https://github.com/restic/restic/releases/latest checked against SHA256SUMS and its PGP signature SHA256SUMS.asc, then `restic self-update`",
+     "install_source": "https://restic.readthedocs.io/en/stable/020_installation.html (restic 0.19.1 documentation: Packages > Debian; Official binaries > Stable releases)",
+     "judge_confidence": "high",
+     "added_by": "judge"
+    },
+    {
+     "name": "chezmoi",
+     "repository": "https://github.com/twpayne/chezmoi",
+     "role": "C07: Configuration and dotfiles reproduction that keeps credentials out of the transferred state. Templates pull secrets from a password manager at apply time, so authentication stores are set up again natively instead of being copied.",
+     "install_command": "sh -c \"$(curl -fsLS https://get.chezmoi.io)\" -- -b $HOME/.local/bin",
+     "install_source": "https://www.chezmoi.io/install/ (One-line binary install; also `apt-get install chezmoi` or `mise use --global chezmoi@2.73.0`)",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    }
+   ],
+   "deciding_comparison": "Run the judge's comparison. On the destination WSL2 host and on one macOS arm64 laptop, each from a clean user profile, reproduce the same pinned set three ways: `mise install --locked` from mise.lock, a flake.lock under Determinate Nix, and devbox.lock. Record success, wall time, exact resolved versions and checksums, and whether uninstall is clean. Then restore application state from a restic snapshot whose backup set excludes authentication stores. Apply dotfiles with chezmoi (secrets from the password manager), compare that with mise bootstrap's [dotfiles] and [bootstrap.secrets] path, and drop chezmoi if mise bootstrap covers the same need. Finish with fresh native sign-ins and one scoped, useful task per agent client.",
+   "failed_fact_checks": [],
+   "current_use_reasoning_found_by_critic": false,
+   "judge_close_call": true,
+   "fact_corrections": []
+  },
+  {
+   "layer_id": "cross:wsl-distro",
+   "status": "recommended",
+   "critic_verdict": "upheld",
+   "selection": [
+    {
+     "name": "Ubuntu 26.04.1 LTS (Canonical WSL image), primary",
+     "repository": "https://ubuntu.com/download/server",
+     "role": "C02: Fallback base distribution if 26.04.1 fails the first-boot, systemd --user, GPU or toolchain checks on this host.",
+     "install_command": "wsl --install Ubuntu-24.04   (catalog image https://releases.ubuntu.com/24.04.5/ubuntu-24.04.5-wsl-amd64.wsl, SHA256 bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e)",
+     "install_source": "Microsoft WSL docs basic-commands.md (`wsl --install <Distribution Name>`), read via the MicrosoftDocs/WSL GitHub API on 2026-10-01. Name and SHA256 come from microsoft/WSL distributions/DistributionInfo.json.",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    },
+    {
+     "name": "Ubuntu 24.04.5 LTS (Canonical WSL image), fallback",
+     "repository": "https://ubuntu.com/download/server",
+     "role": "C02: Fallback base distribution if 26.04.1 fails the first-boot, systemd --user, GPU or toolchain checks on this host.",
+     "install_command": "wsl --install Ubuntu-24.04   (catalog image https://releases.ubuntu.com/24.04.5/ubuntu-24.04.5-wsl-amd64.wsl, SHA256 bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e)",
+     "install_source": "Microsoft WSL docs basic-commands.md (`wsl --install <Distribution Name>`), read via the MicrosoftDocs/WSL GitHub API on 2026-10-01. Name and SHA256 come from microsoft/WSL distributions/DistributionInfo.json.",
+     "judge_confidence": "medium",
+     "added_by": "judge"
+    }
+   ],
+   "deciding_comparison": "Run the judge's comparison on the same host: clean-install Ubuntu 26.04.1, Ubuntu 24.04.5 and Debian 13 from their catalog images after checking the SHA256 (and SHA256SUMS.gpg for Ubuntu), then run the project bootstrap on each. Test #40593 properly by starting each candidate while the existing distro is running and while a second new instance is running, and check that the `systemctl --user` session starts, on the host's WSL 2.7.13 and again on WSL 3.0.1. Also run /usr/lib/wsl/lib/nvidia-smi, a CUDA sample and a CUDA-enabled PyTorch import on the RTX 4090; `uv python install 3.13`; Node 24; and rustup stable. On 26.04, also run the bootstrap under sudo-rs. 26.04.1 stays primary unless it fails a check that 24.04.5 passes.",
+   "failed_fact_checks": [
+    "Issue #40593 shows that Ubuntu-24.04 instances avoid the systemd user-session failure (the judge's basis for the fallback)"
+   ],
+   "current_use_reasoning_found_by_critic": false,
+   "judge_close_call": true,
+   "fact_corrections": [
+    {
+     "claim": "The judge cited microsoft/WSL#40593 as the reason 24.04.5 is a safe fallback.",
+     "correction": "The issue does not show comparative safety: a 2026-05-19 contributor comment describes shared-cgroup collisions across instances.",
+     "source": "https://github.com/microsoft/WSL/issues/40593#issuecomment-4486165852"
+    }
+   ]
+  }
+ ],
+ "field_coverage": "The packets held every candidate of the landscape catalogs (148), every survivor of the 2026-09-29 sweep (37) and the second-family review's selections. They did not hold 15 of the 25 survivors of the 2026-09-26 sweep, or 266 of the 328 distinct layer and repository pairs that the v1 sweeps refuted (counted by the Gate A owner against the ledger).",
+ "install_note": "Eleven install commands are upstream quick starts piped to a shell and eleven name @latest. They record upstream's documented path; the install profile pins each release and verifies its checksum before stage 2 runs it.",
+ "cross_family": "One model family judged (Claude Opus 5.5). The GPT-6.1 Sol reviews of 2026-10-01 (PR #575) reviewed the source host's record, not these blind packets, so they are not a second blind judgment; a blind GPT-6.1 Sol run on the same packets is requested from the Codex lane. Where both families agree, the recommendation stands as an arm; where they differ, both picks enter the comparison.",
+ "comparison_order": "The code-RAG comparison (semantic-rag) runs before the local-model-server comparison (observation-inference); the server comparison then requires serving the code-RAG winner's embedding provider. The container-engine comparison (hosting-services) runs before isolation's container-boundary comparison."
+}

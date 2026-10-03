@@ -1,0 +1,15 @@
+{
+  "attempts": [
+    {
+      "development_mismatches": [],
+      "diagnosis": "Three booleans are supported by explicit no-receipt or still-pending prose, not literal JSON true/false. The lexical structural checker rejected supported prose; two exact key-specific semantic allowances added. Fixture unchanged.",
+      "exit_code": 1,
+      "failed_check": "prose_support",
+      "model_calls": 0,
+      "observed_at": "2026-10-02T05:53:37.528372+00:00",
+      "returned_error": "AssertionError: prose_support",
+      "scope": "First author structural validation, before commit; no backend execution."
+    }
+  ],
+  "evidence_class": "structural_validation"
+}

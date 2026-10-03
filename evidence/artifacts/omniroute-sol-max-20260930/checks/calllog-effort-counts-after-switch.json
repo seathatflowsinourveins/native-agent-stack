@@ -1,0 +1,43 @@
+{
+ "observed_utc": "2026-09-30T06:34:09Z",
+ "store": "omniroute",
+ "since": "2026-09-30T06:30:03Z",
+ "filter": "gpt-6",
+ "groups": [
+  {
+   "model": "gpt-6.1-sol-max",
+   "requested": "-",
+   "upstream": "max",
+   "reasoning_source": "encrypted",
+   "n": 3
+  },
+  {
+   "model": "gpt-6-astra-max",
+   "requested": "-",
+   "upstream": "max",
+   "reasoning_source": "encrypted",
+   "n": 1
+  },
+  {
+   "model": "gpt-6-sol",
+   "requested": "low",
+   "upstream": "low",
+   "reasoning_source": "encrypted",
+   "n": 1
+  },
+  {
+   "model": "gpt-6.1-sol",
+   "requested": "max",
+   "upstream": "max",
+   "reasoning_source": "encrypted",
+   "n": 1
+  },
+  {
+   "model": "gpt-6.1-sol-xhigh",
+   "requested": "-",
+   "upstream": "xhigh",
+   "reasoning_source": "encrypted",
+   "n": 1
+  }
+ ]
+}

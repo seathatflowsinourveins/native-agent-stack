@@ -1,0 +1,3927 @@
+{
+  "adapter_errors": [],
+  "average_invariant_mismatches": [],
+  "callback_faults": [],
+  "config_sha256": "3a35221a3cea0bd44c501f678cbfc37a60268a2d76319af9b8c2eaec06af2d7d",
+  "error_reason": null,
+  "error_type": null,
+  "events": [
+    {
+      "applied": [],
+      "expired_on_arrival": [],
+      "halted": [],
+      "sha256": "de1d5e7bdcad819a116e3d8193cb67b9455aa6b81f2e42c3d5ee851081037dc1",
+      "status": "seeded",
+      "type": "halt_seed"
+    },
+    {
+      "ask": "3.09",
+      "at": 1790713522.657151,
+      "client_id": "mvr-ext-20260929-4-0000001",
+      "limit_price": "3.10",
+      "qty": 100,
+      "symbol": "BKYI",
+      "type": "mover_entry_submitted"
+    },
+    {
+      "ask": "40.37",
+      "at": 1790713522.657151,
+      "client_id": "mvr-ext-20260929-4-0000002",
+      "limit_price": "40.57",
+      "qty": 24,
+      "symbol": "BEX",
+      "type": "mover_entry_submitted"
+    },
+    {
+      "client_id": "mvr-ext-20260929-4-0000001",
+      "reason": "entry",
+      "side": "buy",
+      "strategy": "MOVER-001-M",
+      "symbol": "BKYI",
+      "type": "intent"
+    },
+    {
+      "client_id": "mvr-ext-20260929-4-0000002",
+      "reason": "entry",
+      "side": "buy",
+      "strategy": "MOVER-001-M",
+      "symbol": "BEX",
+      "type": "intent"
+    },
+    {
+      "ask": "14.46",
+      "at": 1790713548.4923134,
+      "client_id": "mvr-ext-20260929-4-0000003",
+      "limit_price": "14.53",
+      "qty": 68,
+      "symbol": "IOVA",
+      "type": "mover_entry_submitted"
+    },
+    {
+      "client_id": "mvr-ext-20260929-4-0000003",
+      "reason": "entry",
+      "side": "buy",
+      "strategy": "MOVER-001-M",
+      "symbol": "IOVA",
+      "type": "intent"
+    },
+    {
+      "at": 1790713549.7930045,
+      "reason": "spread_exceeds_cap",
+      "symbol": "NCPL",
+      "type": "mover_entry_skipped"
+    },
+    {
+      "at": 1790713549.7930045,
+      "reason": "no_fresh_quote",
+      "symbol": "SSTI",
+      "type": "mover_entry_skipped"
+    },
+    {
+      "at": 1790716119.6048615,
+      "reason": "transport_gap",
+      "type": "mover_force"
+    },
+    {
+      "at": 1790716119.6048615,
+      "reason": "transport_gap",
+      "symbol": "BKYI",
+      "type": "mover_exit_triggered"
+    },
+    {
+      "at": 1790716119.6048615,
+      "reason": "transport_gap",
+      "symbol": "IOVA",
+      "type": "mover_exit_triggered"
+    },
+    {
+      "at": 1790716119.6048615,
+      "reason": "transport_gap",
+      "symbol": "BEX",
+      "type": "mover_exit_triggered"
+    },
+    {
+      "at": 1790716122.865406,
+      "bid": "3.09",
+      "client_id": "mvr-ext-20260929-4-0000004",
+      "limit_price": "3.08",
+      "qty": 100,
+      "reason": "transport_gap",
+      "symbol": "BKYI",
+      "type": "mover_exit_submitted"
+    },
+    {
+      "client_id": "mvr-ext-20260929-4-0000004",
+      "reason": "transport_gap",
+      "side": "sell",
+      "strategy": "MOVER-001-M",
+      "symbol": "BKYI",
+      "type": "intent"
+    },
+    {
+      "at": 1790716152.1248322,
+      "bid": "40.41",
+      "client_id": "mvr-ext-20260929-4-0000005",
+      "limit_price": "40.21",
+      "qty": 24,
+      "reason": "transport_gap",
+      "symbol": "BEX",
+      "type": "mover_exit_submitted"
+    },
+    {
+      "client_id": "mvr-ext-20260929-4-0000005",
+      "reason": "transport_gap",
+      "side": "sell",
+      "strategy": "MOVER-001-M",
+      "symbol": "BEX",
+      "type": "intent"
+    },
+    {
+      "at": 1790716153.4610524,
+      "reason": "no_exit_progress",
+      "type": "mover_handoff_to_recovery"
+    }
+  ],
+  "evidence_class": "PAPER",
+  "execution_stats": {
+    "activity_executions_booked": 0,
+    "activity_fill_reconciliations": 0,
+    "average_invariant_mismatches": 0,
+    "duplicate_executions": 0,
+    "executions_booked": 7,
+    "fill_events_missing_execution_fields": 0,
+    "open_fill_gaps_at_stop": 0,
+    "startup_fill_reports": 0
+  },
+  "exit_parameters": {
+    "rule": "X2",
+    "x1_flatten_at_et": "15:58",
+    "x2_hold_seconds": 3600,
+    "x3_trail_fraction": "0.85",
+    "x4_stop_fraction": "0.85",
+    "x4_target_fraction": "1.50"
+  },
+  "exit_rule": "X2",
+  "flat": false,
+  "force_at": "2026-09-29T21:08:39.604861+00:00",
+  "force_reason": "transport_gap",
+  "foreign_terminal_orders_ignored": 0,
+  "halts": {
+    "halted_now": [],
+    "last_status": {},
+    "seed": {
+      "applied": [],
+      "bytes": 61047,
+      "expired_on_arrival": [],
+      "expiry": {},
+      "fetched_at_ns": 1790713520533468254,
+      "halted": [],
+      "items": 42,
+      "sha256": "de1d5e7bdcad819a116e3d8193cb67b9455aa6b81f2e42c3d5ee851081037dc1",
+      "source": "nasdaq_trade_halts_rss",
+      "status": "seeded",
+      "symbols": [
+        "BEX",
+        "BKYI",
+        "IOVA",
+        "NCPL",
+        "SPY",
+        "SSTI"
+      ],
+      "url": "https://www.nasdaqtrader.com/rss.aspx?feed=tradehalts"
+    },
+    "seeded_only": {},
+    "status_messages": 0
+  },
+  "handoff_to_recovery": {
+    "at": "2026-09-29T21:09:13.461052+00:00",
+    "force_reason": "transport_gap",
+    "reason": "no_exit_progress",
+    "seconds_after_force": 33.856
+  },
+  "inter_trial_cash_changed": false,
+  "kind": "mover_trial_receipt",
+  "ledger_risk": {
+    "drawdown_usd": "23.1900",
+    "halted_reason": "recovery_only",
+    "lifetime_gross_loss_usd": "117.1400",
+    "lifetime_realized_pnl_usd": "-19.1100"
+  },
+  "limitations": [
+    "Alpaca paper fills are simulated by the broker from quotes; they are not exchange executions and do not establish live slippage, queue position or partial-fill behaviour.",
+    "Exits are marketable limit sells re-priced every exit timeout; stops never rest at the broker, and a gap or halt can fill below the protocol's stop level or leave a sell unfilled until the flatten or recovery.",
+    "One paper session is not a strategy evaluation; the historical study, not this receipt, decides the rule and exit."
+  ],
+  "native": {
+    "dropped_quotes": {
+      "by_reason": {
+        "crossed": 34
+      },
+      "by_symbol": {
+        "BKYI": 18,
+        "SPY": 16
+      }
+    },
+    "elapsed_seconds": 2633.338241159101,
+    "engine": "NautilusTrader LiveNode 2.0.0rc5",
+    "native_fill_events": 7,
+    "native_quotes": 4629,
+    "native_rejections": 0,
+    "orders_submitted": 5,
+    "requests": {
+      "read": 336,
+      "submit": 4
+    },
+    "session_policy": {
+      "extended_hours": true,
+      "overnight_holds": false
+    }
+  },
+  "native_assertions": {
+    "fill_events_carry_execution_fields": true,
+    "no_fill_gap_open_at_stop": true,
+    "overturn_signals": []
+  },
+  "preflight": {
+    "account_status": "ACTIVE",
+    "asset_count": 6,
+    "capital_available": true,
+    "clock": {
+      "is_open": false,
+      "next_close_ns": 1790798400000000000,
+      "next_open_ns": 1790775000000000000,
+      "received_at_ns": 1790713518624972835,
+      "timestamp_ns": 1790713518616946425
+    },
+    "config_sha256": "3a35221a3cea0bd44c501f678cbfc37a60268a2d76319af9b8c2eaec06af2d7d",
+    "endpoint": "https://paper-api.alpaca.markets",
+    "feed": "sip",
+    "http": [
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713518"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "1000",
+          "x-ratelimit-remaining": "999",
+          "x-ratelimit-reset": "1790713518"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790713519"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790713519"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790713519"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "195",
+          "x-ratelimit-reset": "1790713520"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "194",
+          "x-ratelimit-reset": "1790713520"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "193",
+          "x-ratelimit-reset": "1790713520"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "192",
+          "x-ratelimit-reset": "1790713521"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "191",
+          "x-ratelimit-reset": "1790713521"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "10000",
+          "x-ratelimit-remaining": "9999",
+          "x-ratelimit-reset": "1790713518"
+        },
+        "kind": "data_read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713522"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790713523"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790713523"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790713523"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "195",
+          "x-ratelimit-reset": "1790713524"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "194",
+          "x-ratelimit-reset": "1790713524"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713548"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713550"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790713551"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790713551"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790713551"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713580"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790713581"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790713581"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790713581"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713611"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790713611"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790713611"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790713612"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713641"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790713641"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790713641"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790713642"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713672"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790713673"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790713673"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790713673"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713703"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790713703"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790713703"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790713703"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713733"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790713733"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790713733"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790713734"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713765"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713766"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713767"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713768"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713798"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790713798"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790713799"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790713799"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713828"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790713828"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790713829"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790713829"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713860"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713862"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713863"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790713863"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713893"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790713893"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790713894"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790713894"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713925"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713925"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713927"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713928"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713958"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790713958"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790713958"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790713959"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713988"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713989"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790713991"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790713991"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714021"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714024"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714025"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790714025"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714067"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714067"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790714068"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790714068"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714099"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714100"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790714100"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714100"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714131"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714132"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790714132"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790714132"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714162"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714162"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790714162"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790714163"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714192"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714192"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790714193"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790714193"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714222"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714222"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790714223"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790714223"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714252"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714253"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790714253"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790714253"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714282"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714283"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790714283"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790714283"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714313"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714313"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790714313"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790714313"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714343"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714344"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714345"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714345"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714375"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714376"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790714376"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790714376"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714406"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714406"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790714406"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790714407"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714436"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714436"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790714436"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790714437"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714466"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714466"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790714467"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790714467"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714496"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714496"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790714497"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790714497"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714527"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714529"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714529"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790714529"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714559"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714559"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790714560"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790714560"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714589"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714589"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790714590"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790714590"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714619"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714620"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790714620"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790714620"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714649"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714650"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790714650"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790714650"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714680"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714680"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790714681"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790714681"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714710"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714711"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790714711"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790714711"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714740"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714741"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790714741"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790714741"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714771"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714771"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790714771"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790714772"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714801"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714801"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790714801"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790714802"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714831"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714831"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790714832"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790714832"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714861"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714861"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790714862"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790714862"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714891"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714892"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790714892"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790714892"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714921"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714922"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790714922"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790714922"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714952"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714952"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790714952"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790714953"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790714982"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790714982"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790714982"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790714983"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715012"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715012"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715013"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715013"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715042"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715042"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715043"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715043"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715072"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715073"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715073"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715073"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715102"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715103"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715103"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715103"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715133"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715133"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715133"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715134"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715163"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715163"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715163"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715164"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715193"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715193"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715194"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715194"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715223"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715223"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715224"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715224"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715253"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715254"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715254"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715254"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715284"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715284"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715284"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715285"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715314"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715314"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715314"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715315"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715344"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715344"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715345"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715345"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715376"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715376"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715377"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715377"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715406"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715406"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715407"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715407"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715436"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715437"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715437"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715437"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715466"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715467"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715467"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715467"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715497"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715497"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715497"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715498"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715527"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715527"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715527"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715528"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715557"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715557"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715558"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715558"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715587"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715587"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715588"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715588"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715617"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715618"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715618"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715618"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715647"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715648"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715648"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715648"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715679"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715679"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715680"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715680"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715709"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715709"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715710"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715710"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715739"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715740"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715740"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715740"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715769"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715770"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715770"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715770"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715800"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715800"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715800"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715801"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715830"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715830"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715830"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715831"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715860"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715860"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715861"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715861"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715890"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715890"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715891"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715891"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715920"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715921"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715921"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715921"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715950"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715951"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715951"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715951"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790715981"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790715981"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790715981"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790715982"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790716011"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790716011"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790716011"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790716012"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790716042"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790716042"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790716042"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790716042"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790716072"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790716072"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790716072"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790716073"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790716123"
+        },
+        "kind": "submit",
+        "status": 200
+      }
+    ],
+    "observed_at": "2026-09-29T20:25:18.850109+00:00",
+    "open_order_count": 0,
+    "orders_submitted": 0,
+    "position_count": 0,
+    "promotion_gate": "not_supplied",
+    "quote_count": 6,
+    "quote_errors": {},
+    "scan_sha256": "ff7408f81f072ddf70c48dce10d8651d987ad863d53eb40fa328b301e232f6bf",
+    "untradable_scan_symbols": []
+  },
+  "protocol": "mover-early-entry-v1-20260924",
+  "reconciliation": {
+    "end": null,
+    "recovery": {
+      "adoption_scope": {
+        "adopted": 24,
+        "skipped_terminal_unsubscribed": 15,
+        "subscribed_symbols": 6
+      },
+      "broker_positions_last_observed": null,
+      "buy_submissions": 0,
+      "cancel_attempt_client_ids": [],
+      "errors": [
+        "TransportError"
+      ],
+      "exit_attempt_client_ids": [],
+      "flat": false,
+      "mode": "official_sdk_recovery",
+      "native_engine_resumed": false,
+      "order_deadline_seconds": 120.0,
+      "positions": [
+        {
+          "qty": "68",
+          "symbol": "IOVA"
+        },
+        {
+          "qty": "24",
+          "symbol": "BEX"
+        }
+      ],
+      "reconciliation": null,
+      "stale_symbols": [],
+      "status": "needs_attention",
+      "unresolved_orders": [],
+      "unsellable_positions": []
+    },
+    "start": {
+      "checked_by": "runner.validate_preflight and the native adapter's startup snapshot",
+      "flat_account_and_no_open_orders": true
+    }
+  },
+  "rule": "10:00|G20|V1000000|any",
+  "scan": {
+    "age_seconds_at_trial_start": 186.687,
+    "regime_inputs": {
+      "spy_prev_close": "765.61",
+      "spy_rv20": "0.006973347",
+      "spy_rv20_median252": "0.008009177",
+      "spy_sma20": "763.9335"
+    },
+    "scan_time": "2026-09-29T20:22:13+00:00",
+    "session_date": "2026-09-29",
+    "symbols": 5
+  },
+  "scan_sha256": "ff7408f81f072ddf70c48dce10d8651d987ad863d53eb40fa328b301e232f6bf",
+  "schema_version": 1,
+  "section": "paper_e2e",
+  "session": {
+    "drawdown_factor": "1",
+    "drawdown_fraction": "0.003829",
+    "equity_peak_usd": "4991.09",
+    "number": 7,
+    "pause_sessions_remaining_after": 0,
+    "paused": false,
+    "reason": null,
+    "rung": "4"
+  },
+  "shared_account_override": false,
+  "sizing": {
+    "appreciation_allowance": "2",
+    "engine_leverage_multiple": "1",
+    "entry_limit_cap_bps": "50",
+    "exit_headroom_factor": "10",
+    "exit_limit_cap_bps": "50",
+    "gross_budget_usd": "4971.98",
+    "gross_guard_usd": "9000.00",
+    "ledger_max_order_notional_usd": "10000",
+    "leverage_L": "4",
+    "max_entry_notional_usd": "1000",
+    "regime_factor": "1",
+    "regime_source": "scan_inputs_recomputed",
+    "sizing_equity_source": "config capital_usd plus the mover ledger's realized P&L",
+    "sizing_equity_usd": "4971.9800"
+  },
+  "status": "needs_attention",
+  "symbols": [
+    {
+      "closed_at": "2026-09-29T21:08:43.369164+00:00",
+      "entry": {
+        "accepted_at": "2026-09-29T20:25:22.693162+00:00",
+        "average_fill_price": "3.090000",
+        "broker_order_ref": "withheld",
+        "cancel_reason": null,
+        "cancel_requested": false,
+        "client_order_id": "mvr-ext-20260929-4-0000001",
+        "detail": null,
+        "filled_qty": "100",
+        "fills": [
+          {
+            "at": "2026-09-29T20:25:23.061525+00:00",
+            "price": "3.0900",
+            "qty": "6"
+          },
+          {
+            "at": "2026-09-29T20:25:23.325922+00:00",
+            "price": "3.0900",
+            "qty": "63"
+          },
+          {
+            "at": "2026-09-29T20:25:23.770743+00:00",
+            "price": "3.0900",
+            "qty": "31"
+          }
+        ],
+        "ledger_filled_qty": "100",
+        "ledger_status": "filled",
+        "limit_price": "3.10",
+        "pre_wire_refusal": false,
+        "qty": "100",
+        "reason": "entry",
+        "reference_price": "3.09",
+        "side": "buy",
+        "status": "filled",
+        "submitted_at": "2026-09-29T20:25:22.657151+00:00"
+      },
+      "exit_blocked": null,
+      "exit_budget_from": 0,
+      "exit_reason": "transport_gap",
+      "exit_triggered_at": "2026-09-29T21:08:39.604861+00:00",
+      "exit_wait_reason": null,
+      "exits": [
+        {
+          "accepted_at": "2026-09-29T21:08:43.285288+00:00",
+          "average_fill_price": "3.090000",
+          "broker_order_ref": "withheld",
+          "cancel_reason": null,
+          "cancel_requested": false,
+          "client_order_id": "mvr-ext-20260929-4-0000004",
+          "detail": null,
+          "filled_qty": "100",
+          "fills": [
+            {
+              "at": "2026-09-29T21:08:43.285288+00:00",
+              "price": "3.0900",
+              "qty": "100"
+            }
+          ],
+          "ledger_filled_qty": "100",
+          "ledger_status": "filled",
+          "limit_price": "3.08",
+          "pre_wire_refusal": false,
+          "qty": "100",
+          "reason": "transport_gap",
+          "reference_price": "3.09",
+          "side": "sell",
+          "status": "filled",
+          "submitted_at": "2026-09-29T21:08:42.865406+00:00"
+        }
+      ],
+      "fills_and_pnl": {
+        "bought_qty": "100",
+        "buy_notional_usd": "309.00",
+        "flat": true,
+        "realized_pnl_usd": "0.0000",
+        "sell_notional_usd": "309.00",
+        "sold_qty": "100"
+      },
+      "first_fill_at": "2026-09-29T20:25:23.061525+00:00",
+      "last_wait_reason": null,
+      "rank": 1,
+      "realized_pnl_usd": "0.0000",
+      "recovery_exits": [],
+      "running_high": "3.18",
+      "scan": {
+        "dollar_volume_at_t": "304188917.485447109",
+        "entry_bar_dollar_volume": null,
+        "gain_pct_at_t": "140.476190476",
+        "news_before_t": null,
+        "price_at_t": "4.04"
+      },
+      "sizing": {
+        "binding": "formula",
+        "caps_usd": {
+          "dollar_volume_1pct": "3041889.17",
+          "entry_bar_10pct": null,
+          "gross_remaining": "4971.98",
+          "max_entry_notional": "1000"
+        },
+        "entry_leverage_i": "1",
+        "entry_notional_usd": "994.39",
+        "entry_order_notional_usd": "310.00",
+        "entry_qty_binding": "max_order_qty",
+        "intended_notional_usd": "994.39",
+        "leverage_i": "1",
+        "price_decimals": 4,
+        "raw_notional_usd": "994.39"
+      },
+      "skip_reason": null,
+      "state": "closed",
+      "symbol": "BKYI"
+    },
+    {
+      "closed_at": null,
+      "entry": {
+        "accepted_at": "2026-09-29T20:25:48.536111+00:00",
+        "average_fill_price": "14.460000",
+        "broker_order_ref": "withheld",
+        "cancel_reason": null,
+        "cancel_requested": false,
+        "client_order_id": "mvr-ext-20260929-4-0000003",
+        "detail": null,
+        "filled_qty": "68",
+        "fills": [
+          {
+            "at": "2026-09-29T20:25:48.621008+00:00",
+            "price": "14.4600",
+            "qty": "68"
+          }
+        ],
+        "ledger_filled_qty": "68",
+        "ledger_status": "filled",
+        "limit_price": "14.53",
+        "pre_wire_refusal": false,
+        "qty": "68",
+        "reason": "entry",
+        "reference_price": "14.46",
+        "side": "buy",
+        "status": "filled",
+        "submitted_at": "2026-09-29T20:25:48.492313+00:00"
+      },
+      "exit_blocked": null,
+      "exit_budget_from": 0,
+      "exit_reason": "transport_gap",
+      "exit_triggered_at": "2026-09-29T21:08:39.604861+00:00",
+      "exit_wait_reason": "no_fresh_quote",
+      "exits": [],
+      "fills_and_pnl": {
+        "bought_qty": "68",
+        "buy_notional_usd": "983.28",
+        "flat": false,
+        "realized_pnl_usd": null,
+        "sell_notional_usd": "0",
+        "sold_qty": "0"
+      },
+      "first_fill_at": "2026-09-29T20:25:48.621008+00:00",
+      "last_wait_reason": null,
+      "rank": 2,
+      "realized_pnl_usd": null,
+      "recovery_exits": [],
+      "running_high": "14.4600",
+      "scan": {
+        "dollar_volume_at_t": "182715618.866034985",
+        "entry_bar_dollar_volume": null,
+        "gain_pct_at_t": "25.022747953",
+        "news_before_t": null,
+        "price_at_t": "13.74"
+      },
+      "sizing": {
+        "binding": "max_entry_notional",
+        "caps_usd": {
+          "dollar_volume_1pct": "1827156.18",
+          "entry_bar_10pct": null,
+          "gross_remaining": "3977.59",
+          "max_entry_notional": "1000"
+        },
+        "entry_leverage_i": "4",
+        "entry_notional_usd": "1000.00",
+        "entry_order_notional_usd": "988.04",
+        "entry_qty_binding": "notional",
+        "intended_notional_usd": "1000.00",
+        "leverage_i": "4",
+        "price_decimals": 4,
+        "raw_notional_usd": "3977.58"
+      },
+      "skip_reason": null,
+      "state": "holding",
+      "symbol": "IOVA"
+    },
+    {
+      "closed_at": null,
+      "entry": {
+        "accepted_at": "2026-09-29T20:25:22.743547+00:00",
+        "average_fill_price": "40.370000",
+        "broker_order_ref": "withheld",
+        "cancel_reason": null,
+        "cancel_requested": false,
+        "client_order_id": "mvr-ext-20260929-4-0000002",
+        "detail": null,
+        "filled_qty": "24",
+        "fills": [
+          {
+            "at": "2026-09-29T20:25:23.177642+00:00",
+            "price": "40.3700",
+            "qty": "18"
+          },
+          {
+            "at": "2026-09-29T20:25:23.448806+00:00",
+            "price": "40.3700",
+            "qty": "6"
+          }
+        ],
+        "ledger_filled_qty": "24",
+        "ledger_status": "filled",
+        "limit_price": "40.57",
+        "pre_wire_refusal": false,
+        "qty": "24",
+        "reason": "entry",
+        "reference_price": "40.37",
+        "side": "buy",
+        "status": "filled",
+        "submitted_at": "2026-09-29T20:25:22.657151+00:00"
+      },
+      "exit_blocked": null,
+      "exit_budget_from": 0,
+      "exit_reason": "transport_gap",
+      "exit_triggered_at": "2026-09-29T21:08:39.604861+00:00",
+      "exit_wait_reason": null,
+      "exits": [
+        {
+          "accepted_at": null,
+          "average_fill_price": null,
+          "broker_order_ref": null,
+          "cancel_reason": null,
+          "cancel_requested": false,
+          "client_order_id": "mvr-ext-20260929-4-0000005",
+          "detail": null,
+          "filled_qty": "0",
+          "fills": [],
+          "ledger_filled_qty": "0",
+          "ledger_status": "not_sent",
+          "limit_price": "40.21",
+          "pre_wire_refusal": false,
+          "qty": "24",
+          "reason": "transport_gap",
+          "reference_price": "40.41",
+          "side": "sell",
+          "status": "submitted",
+          "submitted_at": "2026-09-29T21:09:12.124832+00:00"
+        }
+      ],
+      "fills_and_pnl": {
+        "bought_qty": "24",
+        "buy_notional_usd": "968.88",
+        "flat": false,
+        "realized_pnl_usd": null,
+        "sell_notional_usd": "0",
+        "sold_qty": "0"
+      },
+      "first_fill_at": "2026-09-29T20:25:23.177642+00:00",
+      "last_wait_reason": null,
+      "rank": 3,
+      "realized_pnl_usd": null,
+      "recovery_exits": [],
+      "running_high": "40.52",
+      "scan": {
+        "dollar_volume_at_t": "72661338.76464197",
+        "entry_bar_dollar_volume": null,
+        "gain_pct_at_t": "21.502119927",
+        "news_before_t": null,
+        "price_at_t": "40.12"
+      },
+      "sizing": {
+        "binding": "max_entry_notional",
+        "caps_usd": {
+          "dollar_volume_1pct": "726613.38",
+          "entry_bar_10pct": null,
+          "gross_remaining": "2977.59",
+          "max_entry_notional": "1000"
+        },
+        "entry_leverage_i": "4",
+        "entry_notional_usd": "1000.00",
+        "entry_order_notional_usd": "973.68",
+        "entry_qty_binding": "notional",
+        "intended_notional_usd": "1000.00",
+        "leverage_i": "4",
+        "price_decimals": 4,
+        "raw_notional_usd": "3977.58"
+      },
+      "skip_reason": null,
+      "state": "exiting",
+      "symbol": "BEX"
+    },
+    {
+      "closed_at": null,
+      "entry": null,
+      "exit_blocked": null,
+      "exit_budget_from": 0,
+      "exit_reason": null,
+      "exit_triggered_at": null,
+      "exit_wait_reason": null,
+      "exits": [],
+      "fills_and_pnl": null,
+      "first_fill_at": null,
+      "last_wait_reason": "spread_exceeds_cap",
+      "rank": 4,
+      "realized_pnl_usd": "0",
+      "recovery_exits": [],
+      "running_high": null,
+      "scan": {
+        "dollar_volume_at_t": "41574325.902643003",
+        "entry_bar_dollar_volume": null,
+        "gain_pct_at_t": "27.694444444",
+        "news_before_t": null,
+        "price_at_t": "1.3791"
+      },
+      "sizing": {
+        "binding": "formula",
+        "caps_usd": {
+          "dollar_volume_1pct": "415743.25",
+          "entry_bar_10pct": null,
+          "gross_remaining": "1977.59",
+          "max_entry_notional": "1000"
+        },
+        "entry_leverage_i": null,
+        "entry_notional_usd": null,
+        "entry_order_notional_usd": null,
+        "entry_qty_binding": null,
+        "intended_notional_usd": "994.39",
+        "leverage_i": "1",
+        "price_decimals": 4,
+        "raw_notional_usd": "994.39"
+      },
+      "skip_reason": "spread_exceeds_cap",
+      "state": "skipped",
+      "symbol": "NCPL"
+    },
+    {
+      "closed_at": null,
+      "entry": null,
+      "exit_blocked": null,
+      "exit_budget_from": 0,
+      "exit_reason": null,
+      "exit_triggered_at": null,
+      "exit_wait_reason": null,
+      "exits": [],
+      "fills_and_pnl": null,
+      "first_fill_at": null,
+      "last_wait_reason": "no_fresh_quote",
+      "rank": 5,
+      "realized_pnl_usd": "0",
+      "recovery_exits": [],
+      "running_high": null,
+      "scan": {
+        "dollar_volume_at_t": "22929048.685220994",
+        "entry_bar_dollar_volume": null,
+        "gain_pct_at_t": "51.645338208",
+        "news_before_t": null,
+        "price_at_t": "8.295"
+      },
+      "sizing": {
+        "binding": "gross_remaining",
+        "caps_usd": {
+          "dollar_volume_1pct": "229290.48",
+          "entry_bar_10pct": null,
+          "gross_remaining": "983.20",
+          "max_entry_notional": "1000"
+        },
+        "entry_leverage_i": null,
+        "entry_notional_usd": null,
+        "entry_order_notional_usd": null,
+        "entry_qty_binding": null,
+        "intended_notional_usd": "983.20",
+        "leverage_i": "4",
+        "price_decimals": 4,
+        "raw_notional_usd": "3977.58"
+      },
+      "skip_reason": "no_fresh_quote",
+      "state": "skipped",
+      "symbol": "SSTI"
+    }
+  ],
+  "timing": {
+    "entry_deadline": "2026-09-29T20:25:49.687261+00:00",
+    "entry_timeout_seconds": 60.0,
+    "exit_order_timeout_seconds": 10.0,
+    "hard_flatten_at": "2026-09-29T21:33:19.687261+00:00",
+    "sell_window_end": "2026-09-29T21:35:19.687261+00:00",
+    "trial_start": "2026-09-29T20:25:19.687261+00:00",
+    "x1_flatten_at": null,
+    "x2_hold_seconds": 3600.0
+  },
+  "totals": {
+    "buy_notional_usd": "2261.16",
+    "entries_filled": 3,
+    "entries_submitted": 3,
+    "exit_orders_submitted": 2,
+    "ledger_cash_delta_usd": "-1952.16",
+    "ledger_realized_pnl_delta_usd": "0.0000",
+    "native_fill_events": 7,
+    "native_rejections": 0,
+    "pnl_consistent": false,
+    "realized_pnl_usd": null,
+    "sell_notional_usd": "309.00",
+    "symbols": 5
+  },
+  "trial_id": "ext-20260929-4",
+  "unsellable_positions": []
+}

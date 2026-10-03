@@ -1,0 +1,19 @@
+observed_utc=2026-09-30T19:28:59Z
+== the four compile-input captures the PR lists under 'excluded', and what the pinned scanner reports about each as a requirements file (empty config)
+pyjwt-relock-20260930-constraints.txt: 334 pinned lines, sha256 9be46e2d3628a47e
+   scan exit 1 | pyjwt-relock-20260930-constraints.txt.raw -> {"oauthlib==3.3.1": ["GHSA-hj66-6f7g-4r5v", "GHSA-xpv3-w29h-x7cv"]}
+urllib3-relock-20260930-constraints.txt: 334 pinned lines, sha256 935e34547853b50e
+   scan exit 1 | urllib3-relock-20260930-constraints.txt.raw -> {"oauthlib==3.3.1": ["GHSA-hj66-6f7g-4r5v", "GHSA-xpv3-w29h-x7cv"], "pyjwt==2.14.0": ["GHSA-42vr-xj54-vc7v"]}
+main-reconcile-20260930-constraints.txt: 334 pinned lines, sha256 b4e06f725855214b
+   scan exit 1 | main-reconcile-20260930-constraints.txt.raw -> {"oauthlib==3.3.1": ["GHSA-hj66-6f7g-4r5v", "GHSA-xpv3-w29h-x7cv"], "pyjwt==2.14.0": ["GHSA-42vr-xj54-vc7v"], "urllib3==2.7.0": ["GHSA-8988-9cw3-xx77", "GHSA-gh4c-6fx4-qh6g", "GHSA-vxq7-64xx-v4gw"]}
+wheel-relock-20260930-constraints.txt: 334 pinned lines, sha256 bfdcbb60d2ed1819
+   scan exit 1 | wheel-relock-20260930-constraints.txt.raw -> {"oauthlib==3.3.1": ["GHSA-hj66-6f7g-4r5v", "GHSA-xpv3-w29h-x7cv"], "urllib3==2.7.0": ["GHSA-8988-9cw3-xx77", "GHSA-gh4c-6fx4-qh6g", "GHSA-vxq7-64xx-v4gw"]}
+== references to these files outside evidence directories, receipts, manifests and the inventory (git grep at the head):
+(end of matches)
+== the inventory description's rule for the excluded list:
+An excluded entry is a tracked lockfile deliberately left out of the scan; it needs a reason and an evidence path, and only a deliberately vulnerable test fixture qualifies. A lockfile entry
+== the four entries' reasons (first 330 characters each):
+pyjwt-relock-20260930-constraints.txt | Frozen native compile-input reproducibility fixture for the PyJWT 2.15.0 relock, retaining original bytes, command and target-specific selection in its receipt. It includes unused platform branches and is not an installable runtime closure. No recipe installer consumes it. The selected Linux x86_64/CPython 3.13.15 closure remain
+urllib3-relock-20260930-constraints.txt | Frozen native compile-input reproducibility fixture for the intermediate urllib3 2.8.0 relock, retaining original bytes, command and target-specific selection in its receipt. It includes unused platform branches and is not an installable runtime closure. No recipe installer consumes it. The selected Linux x86_64/CPython 3.13.15 
+main-reconcile-20260930-constraints.txt | Frozen native compile-input reproducibility fixture copied from the reviewed main lock, with original bytes, baseline SHA, command and target-specific selection retained in the reconciliation receipt. It includes unused platform branches and is not an installable runtime closure. No recipe installer consumes this captured eviden
+wheel-relock-20260930-constraints.txt | Frozen native compile-input reproducibility fixture, retained with its original hash and command in the relock receipt. It constrains the qualification resolver and includes unused Windows/macOS branches from the prior multi-platform export; it is not an installable runtime closure. No recipe installer consumes this captured evi

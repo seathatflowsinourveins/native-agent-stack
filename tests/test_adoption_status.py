@@ -23,12 +23,13 @@ import unittest
 from unittest.mock import patch
 
 from scripts import adoption_status
-from scripts.adoption_status import (CLIENT_WIRING_KEYS, CLIENT_WIRING_LIMITATIONS, LOGIN_FILE_STATES,
+from scripts.adoption_status import (CLIENT_WIRING_KEYS, CLIENT_WIRING_LIMITATIONS, LAUNCHER_LOGIN_PATH,
+                                     LAUNCHER_RESOLUTION_KEYS, LAUNCHER_RESOLUTION_LIMITATIONS, LOGIN_FILE_STATES,
                                      LOGIN_SHELL_FILES, LOGIN_SHELL_KEYS, LOGIN_SHELL_LIMITATIONS, NO_CLIENT_STATE,
                                      NO_PINNED_VERSION, PINNED_VERSION_LIMITATIONS, client_wiring,
-                                     fixed_login_shell, git_revision, inspect_adoption, login_file_state,
-                                     login_shell, main, pins_file_path, probe_pinned_version,
-                                     signals_interrupt_probes, version_output_matches)
+                                     fixed_launcher_resolution, fixed_login_shell, git_revision, inspect_adoption,
+                                     launcher_resolution, login_file_state, login_shell, main, pins_file_path,
+                                     probe_pinned_version, signals_interrupt_probes, version_output_matches)
 
 REPO = Path(__file__).resolve().parents[1]
 # Resolved at import, before a test narrows PATH to its own directory or patches the platform.
@@ -618,6 +619,7 @@ class AdoptionStatusTests(unittest.TestCase):
         self.assertEqual(result["manifest"]["status"], "invalid")
         self.assertEqual(set(result["login_shell"]), set(LOGIN_SHELL_KEYS))
         self.assertIs(result["login_shell"]["profile_read"], False)
+        self.assertEqual(result["launcher_resolution"], {"status": "not_run", "flag": "--launcher-resolution"})
         self.assertNotIn(str(self.root), json.dumps(result))
 
     def test_login_shell_composes_with_client_wiring_and_pinned_versions(self):
@@ -866,6 +868,10 @@ class LoginShellTests(unittest.TestCase):
             observed = subprocess.run([bash, "-l", "-c", 'printf %s "$MARK"'], env={"HOME": str(self.home)},
                                       capture_output=True, text=True, timeout=30).stdout
             first = result["first_read"]
+            # first_read is the first startup file that exists and can be opened (not absent, not a dangling link); the exported MARK is empty for 344 of the 512
+            # combinations, so the MARK alone cannot tell a wrong first_read from a right one.
+            truth_first = next((key for key, state in zip(keys, combo) if state not in ("absent", "dangling")), None)
+            self.assertEqual(first, truth_first, combo)
             predicted = first if first is not None and result[first] == "content" else ""
             control_first = next((key for key in keys if result[key] not in ("absent", "empty")), None)
             control = control_first if control_first is not None and result[control_first] == "content" else ""
@@ -879,6 +885,139 @@ class LoginShellTests(unittest.TestCase):
         self.assertEqual(combinations, len(states) ** len(keys))
         self.assertEqual(mismatches, 0)
         self.assertGreater(control_disagreements, 0)
+
+
+@unittest.skipUnless(shutil.which("bash", path=LAUNCHER_LOGIN_PATH), "needs bash in a system directory")
+class LauncherResolutionTests(unittest.TestCase):
+    """--launcher-resolution against a real Bash login shell in a temporary HOME: the managed ~/.profile block of
+    tools/adoption/managed_block.py makes `claude` the ecosystem launcher, and each way a login shell misses it
+    (the 2026-09-29 empty ~/.bash_profile, a profile without the block, a PATH only this process has) is reported as
+    not the launcher. The stand-in launcher records a run, which must never happen."""
+
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.base = Path(temporary.name)
+        self.home = self.base / "home"
+        self.home.mkdir()
+        self.eco = self.base / "eco-root"  # outside HOME, as an ECO_INSTALL_ROOT may be
+        (self.eco / "bin").mkdir(parents=True)
+        self.ran = self.base / "launcher-ran"
+        self.launcher = self.eco / "bin" / "claude"
+        self.launcher.write_text(f"#!/bin/sh\n: > '{self.ran}'\n")
+        self.launcher.chmod(0o755)
+        self.env = {"HOME": str(self.home), "ECO_INSTALL_ROOT": str(self.eco)}
+
+    def write_profile_block(self):
+        sys.path.insert(0, str(REPO / "tools" / "adoption"))
+        self.addCleanup(sys.path.remove, str(REPO / "tools" / "adoption"))
+        import managed_block
+        (self.home / ".profile").write_text(managed_block.merged_profile("umask 022\n", str(self.eco), str(self.home)))
+
+    def check(self, result):
+        self.assertTrue(fixed_launcher_resolution(result), result)
+        self.assertEqual(tuple(result), LAUNCHER_RESOLUTION_KEYS)
+        text = json.dumps(result)
+        for private in (str(self.base), PRIVATE):
+            self.assertNotIn(private, text)
+        self.assertFalse(self.ran.exists(), "claude itself must never run")
+        return result
+
+    def test_the_managed_profile_block_makes_claude_the_ecosystem_launcher(self):
+        self.write_profile_block()
+        result = self.check(launcher_resolution(self.env))
+        self.assertEqual(result, {"resolution": "ecosystem_launcher", "path": "$ECO_ROOT/bin/claude",
+                                  "is_ecosystem_launcher": True,
+                                  "launcher_sha256": hashlib.sha256(self.launcher.read_bytes()).hexdigest()})
+
+    def test_an_empty_bash_profile_hides_the_block(self):
+        self.write_profile_block()
+        (self.home / ".bash_profile").write_bytes(b"")
+        result = self.check(launcher_resolution(self.env))
+        self.assertIs(result["is_ecosystem_launcher"], False)
+        self.assertIn(result["resolution"], ("not_found", "other"))
+
+    def test_this_processs_path_does_not_answer_for_the_login_shell(self):
+        (self.home / ".profile").write_text(f"export {PRIVATE}=1\n")
+        result = self.check(launcher_resolution({**self.env, "PATH": f"{self.eco}/bin:/usr/bin:/bin"}))
+        self.assertIs(result["is_ecosystem_launcher"], False)
+        self.write_profile_block()
+        self.assertIs(self.check(launcher_resolution(self.env))["is_ecosystem_launcher"], True)
+
+    def test_a_path_outside_the_anchors_or_a_function_is_withheld(self):
+        elsewhere = self.base / "elsewhere"
+        elsewhere.mkdir()
+        (elsewhere / "claude").write_text("#!/bin/sh\nexit 0\n")
+        (elsewhere / "claude").chmod(0o755)
+        (self.home / ".profile").write_text(f'PATH="{elsewhere}:$PATH"; export PATH\n')
+        result = self.check(launcher_resolution(self.env))
+        self.assertEqual((result["resolution"], result["path"]), ("other", None))
+        (self.home / ".profile").write_text("claude() { :; }\n")
+        result = self.check(launcher_resolution(self.env))
+        self.assertEqual((result["resolution"], result["path"]), ("other", None))
+
+    def test_a_path_under_home_is_shown_relative_to_it(self):
+        native = self.home / ".local" / "bin"
+        native.mkdir(parents=True)
+        (native / "claude").write_text("#!/bin/sh\nexit 0\n")
+        (native / "claude").chmod(0o755)
+        (self.home / ".profile").write_text('PATH="$HOME/.local/bin:$PATH"; export PATH\n')
+        result = self.check(launcher_resolution(self.env))
+        self.assertEqual((result["resolution"], result["path"]), ("other", "$HOME/.local/bin/claude"))
+
+    def test_a_blocking_startup_file_is_bounded(self):
+        os.mkfifo(self.home / ".bash_profile")
+        started = time.monotonic()
+        result = self.check(launcher_resolution(self.env, seconds=1))
+        self.assertLess(time.monotonic() - started, 15)
+        self.assertEqual(result["resolution"], "unavailable")
+
+    def test_no_launcher_has_no_sha256_and_no_bash_is_unavailable(self):
+        self.launcher.unlink()
+        self.assertIsNone(self.check(launcher_resolution(self.env))["launcher_sha256"])
+        with patch("scripts.adoption_status.shutil.which", return_value=None):
+            self.assertEqual(self.check(launcher_resolution(self.env))["resolution"], "unavailable")
+
+    def test_the_result_shape_is_fixed_and_a_stray_value_is_refused(self):
+        good = {"resolution": "other", "path": "$HOME/.local/bin/claude", "is_ecosystem_launcher": False,
+                "launcher_sha256": None}
+        self.assertTrue(fixed_launcher_resolution(good))
+        for broken in ({**good, "path": "/mnt/c/Users/example/claude"}, {**good, "path": str(self.home)},
+                       {**good, "is_ecosystem_launcher": True}, {**good, "resolution": "maybe"},
+                       {**good, "launcher_sha256": "abc"}, {**good, "extra": 1},
+                       {key: value for key, value in good.items() if key != "path"}, None):
+            with self.subTest(broken=broken):
+                self.assertFalse(fixed_launcher_resolution(broken))
+
+    def test_the_flag_is_opt_in_separate_from_login_shell_and_restates_its_limitation(self):
+        manifest = REPO / "adoption/manifest.json"
+        with patch("scripts.adoption_status.launcher_resolution") as probe, \
+                contextlib.redirect_stdout(io.StringIO()) as output:
+            main(["--manifest", str(manifest), "--json", "--login-shell"])
+        probe.assert_not_called()
+        payload = json.loads(output.getvalue())
+        # --login-shell never executes a login file, so it names the flag that does instead of leaving the key out.
+        self.assertEqual(payload["launcher_resolution"], {"status": "not_run", "flag": "--launcher-resolution"})
+        self.assertEqual(payload["limitations"][-1:], LOGIN_SHELL_LIMITATIONS)
+        with patch("scripts.adoption_status.launcher_resolution") as probe, \
+                contextlib.redirect_stdout(io.StringIO()) as output:
+            main(["--manifest", str(manifest), "--login-shell"])
+        probe.assert_not_called()
+        self.assertIn('Launcher resolution: {"flag": "--launcher-resolution", "status": "not_run"}\n', output.getvalue())
+        with contextlib.redirect_stdout(io.StringIO()) as output:
+            main(["--manifest", str(manifest), "--json"])
+        self.assertNotIn("launcher_resolution", json.loads(output.getvalue()))  # nothing asked, nothing stated
+        self.write_profile_block()
+        with patch.dict("os.environ", self.env), contextlib.redirect_stdout(io.StringIO()) as output:
+            main(["--manifest", str(manifest), "--json", "--login-shell", "--launcher-resolution"])
+        payload = json.loads(output.getvalue())
+        self.assertEqual(payload["launcher_resolution"]["resolution"], "ecosystem_launcher")
+        self.assertEqual(payload["limitations"][-2:], LOGIN_SHELL_LIMITATIONS + LAUNCHER_RESOLUTION_LIMITATIONS)
+        with patch.dict("os.environ", self.env), contextlib.redirect_stdout(io.StringIO()) as output:
+            main(["--manifest", str(manifest), "--launcher-resolution"])
+        self.assertIn('Launcher resolution: {"is_ecosystem_launcher": true, "launcher_sha256": "', output.getvalue())
+        self.assertNotIn(str(self.base), output.getvalue())
+        self.assertFalse(self.ran.exists())
 
 
 class PinnedVersionProbeTests(unittest.TestCase):
@@ -1153,6 +1292,39 @@ class PinnedVersionsCheckTests(unittest.TestCase):
         for item in result["profiles"][0]["pinned_versions"]:
             for key, value in item.items():
                 self.assertTrue(value is None or isinstance(value, (bool, str)), repr((key, value)))
+
+
+def pin_manifest_disagreements(pins: dict, components: list[dict]) -> list[str]:
+    """Linux pins whose version differs from manifests/stack.json's version of the same component. A stack version
+    may carry a source commit after " @ " (serena's "2.0.0.dev0 @ <commit>"); only the part before it is a version."""
+    stack = {component["id"]: component["version"].split(" @ ", 1)[0]
+             for component in components if isinstance(component.get("version"), str)}
+    return [f"{identifier}: pin {entry['version']}, manifests/stack.json {stack[identifier]}"
+            for identifier, entry in sorted(pins.items()) if identifier in stack and entry["version"] != stack[identifier]]
+
+
+class PinManifestAgreementTests(unittest.TestCase):
+    """--pinned-versions compares an installed tool with the Linux pins file, while manifests/stack.json names the
+    version that the component's receipts qualified. A pin moved without its manifest row (or the reverse) makes
+    `matches_pin: true` certify a version the manifest does not claim. Found 2026-09-30 while moving codex from 0.157.1
+    to 0.159.2: nothing tied the two files together. The macOS pins file is left out: its codex pin waits for its own
+    qualification (manifests/stack.json codex freshness)."""
+
+    def test_every_linux_pin_names_the_manifest_version(self):
+        pins = adoption_status.read_pins(pins_file_path(REPO, {"os": "linux", "architecture": "x86_64"}))
+        components = json.loads((REPO / "manifests/stack.json").read_text(encoding="utf-8"))["components"]
+        self.assertIn("codex", pins)
+        self.assertGreaterEqual(len([identifier for identifier in pins
+                                     if identifier in {component["id"] for component in components}]), 10)
+        self.assertEqual(pin_manifest_disagreements(pins, components), [])
+
+    def test_the_check_rejects_a_moved_pin_and_reads_a_commit_suffix(self):
+        pins = {"tool": {"id": "tool", "version": "2.0.0"}, "pinned": {"id": "pinned", "version": "1.0.dev0"},
+                "pin-only": {"id": "pin-only", "version": "9.9.9"}}
+        components = [{"id": "tool", "version": "1.0.0"}, {"id": "pinned", "version": "1.0.dev0 @ " + "a" * 40}]
+        self.assertEqual(pin_manifest_disagreements(pins, components), ["tool: pin 2.0.0, manifests/stack.json 1.0.0"])
+        components[0]["version"] = "2.0.0"
+        self.assertEqual(pin_manifest_disagreements(pins, components), [])
 
 
 @unittest.skipUnless(SLEEP, "needs a sleep executable")
@@ -2093,8 +2265,12 @@ class TokenEfficiencyProfileTests(unittest.TestCase):
               "mcp-surfaces")
     CURRENT_CHOICE = {"RTK": "rtk", "Context Mode": "context-mode", "Repomix": "repomix", "Headroom": "headroom",
                       "TOON": "toon", "ccusage": "ccusage"}
+    # jcodemunch-mcp, ast-grep and codebase-memory-mcp are the code-navigation layer's task-selected tools and the
+    # SubagentStart carrier's task-appended lanes, and they stay optional rows: neither bootstrap can install a profile
+    # member that has no pin, and none of the three has one (docs/decisions/2026-09-30-task-model-routing.md).
     OPTIONAL = {"jcodemunch-mcp", "ast-grep", "codebase-memory-mcp", "context-hub", "agentsview", "claude-hud",
                 "otel-tui", "omniroute"}
+    PIN_FILES = ("adoption/pins-linux-x86_64.json", "adoption/pins-macos-arm64.json")
 
     @staticmethod
     def load(relative: str):
@@ -2140,6 +2316,18 @@ class TokenEfficiencyProfileTests(unittest.TestCase):
                                             "agentsview", "otel-tui"})
         self.assertLessEqual(tools - selected, self.OPTIONAL)
         self.assertEqual(selected - tools, {"codex", "claude-code", "ccusage", "mcporter"})
+
+    def test_every_profile_component_has_a_pin_on_both_platforms(self):
+        # adoption/bootstrap-linux.sh and adoption/bootstrap-macos.sh fail closed on a selected component that their
+        # pin file lacks ("No pin in <file> for selected component(s)", exit 3, before anything is installed), and
+        # adoption/bootstrap-macos.sh no longer exempts any component from a pin by default. So a profile lists only
+        # components that both pin files carry; the bootstrap plan tests (tests/test_adoption_bootstrap_macos.py,
+        # TokenEfficiencyPlanTests) fail otherwise, and they are outside this file's module set.
+        selected = set(self.profile["component_ids"])
+        for pin_file in self.PIN_FILES:
+            with self.subTest(pin_file=pin_file):
+                pinned = {tool["id"] for tool in self.load(pin_file)["tools"]}
+                self.assertEqual(selected - pinned, set(), "a profile component without a pin makes the bootstrap exit 3")
 
 
 class RetainedEvidenceTests(unittest.TestCase):

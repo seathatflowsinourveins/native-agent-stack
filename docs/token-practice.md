@@ -64,6 +64,9 @@ hook acceptance is not authorization to enable capture on every runtime.
 1. Retrieve what the current decision needs: exact code with rg/Serena,
    structural patterns with ast-grep, conceptual code with SocratiCode, selected
    Markdown with scoped QMD, and durable decisions with scoped ai-memory.
+   For maintained decisions, including deployed architecture after compaction or
+   resume, follow the scoped query and exact-path read in
+   [the memory lifecycle guide](native-memory-rag-lifecycle.md#maintained-decision-routing).
 2. Choose one suitable lane per artifact. RTK formats supported command output;
    Context Mode processes or retrieves bounded results; TOON suits some
    structured data only when the measured representation helps; Repomix outlines selected source; the local Headroom guard
@@ -72,8 +75,13 @@ hook acceptance is not authorization to enable capture on every runtime.
    original implementation before correctness decisions. Lossy retrieval and
    compression can omit necessary information.
 4. Preserve native caching, compaction, tool discovery, accounts and model
-   behavior. Shared PATH is not host acceptance. Do not add hooks or schedulers,
-   override providers, or rerun model trials during ordinary startup.
+   behavior. Shared PATH is not host acceptance. Do not add hooks or
+   schedulers, override providers, run audits or network checks, or rerun
+   model trials during ordinary startup. One addition is allowed: a read-only
+   SessionStart hook that prints one line of at most 160 characters, the
+   `summary_line` of the due-file a daily user timer writes, and prints nothing
+   when that file is absent or unreadable (fail-open). The checks run in that
+   timer, never at startup ([session currency notice](decisions/2026-09-30-session-currency-notice.md)).
 5. Count once at the proper boundary. Missing measurements are unknown.
    Never add cumulative snapshots, cache subsets, provider usage and artifact
    differences, or multiply a measured difference by repository count.
@@ -86,6 +94,32 @@ when TOON expands it; full-original tasks bypass compression followed by full
 recovery. A rejected representation remains recorded but is not the default.
 Supporting runtimes, security checks and recovery tools are evaluated for their
 own role, not assigned invented token savings.
+
+### Bounded metadata discovery
+
+For native deferred tool search, use a small supported result limit and accept
+the selected schemas it loads. For broad inventory reads, filter metadata outside
+the model and initially return at most eight matching names, brief descriptions
+and source locators, then load complete schemas only for selected tools. Report
+returned counts, matched/omitted counts when known, and the next filter or
+supported cursor when available; mark unavailable counts explicitly. This is a
+local context budget, not an API limit: widen the selection when
+ambiguity, an absence claim or the task's information contract requires it. Use
+only pagination and projection fields the installed tool supports.
+
+Keep the complete inventory/output recoverable outside the model and preserve
+errors and truncation notices. Do not dump every server's schemas, skill bodies
+or catalog rows into discovery, startup instructions or each worker. Native
+deferred discovery, caching and compaction remain in place; this policy selects
+what to return, without replacing those mechanisms or changing tool grants.
+Project registration metadata to safe names/status before returning it; client
+configuration can contain environment/header credentials. Configuration listings
+establish registration, not a connected tool's schema or successful use.
+
+The [reported Mac rollout](decisions/2026-09-30-bounded-native-decision-routing.md)
+retained an oversized initial discovery and a missed current decision. These
+rules address those observed failure modes; semantic answer quality and complete
+task savings still require their own acceptance and usage evidence.
 
 ## Four accepted native coding trials
 
@@ -377,6 +411,8 @@ the advisor's tokens to the executor's). For a window, pass `--since YYYY-MM-DD`
 and `--since YYYYMMDD --timezone UTC` to ccusage. The
 [decision record](decisions/2026-09-29-token-spend-attribution.md) gives each lever its
 owner and overturn condition.
+
+The model and effort of each task class, and the file or instruction that enforces each today, are one table in the [task-to-model routing record](decisions/2026-09-30-task-model-routing.md).
 
 ## Shared Codex quota (2026-09-26)
 

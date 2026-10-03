@@ -1,0 +1,87 @@
+{
+  "layers": [
+    {
+      "layer_id": "embedding-model",
+      "selection": [],
+      "not_selected": [
+        {
+          "key": "C04",
+          "name": "Nemotron-3-Embed-1B-BF16",
+          "reason": "Finalist: 32,768-token inputs, adjustable dimensions and a documented OpenAI-compatible endpoint fit the requirement well. NVIDIA reports RTEB 72.38 and MMTEB Retrieval 71.04, evaluated at a 4,096-token sequence length, but these results do not establish superiority over the other candidates at equal dimensions or on code retrieval. Selection deferred pending that comparison. [Model card](https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16)."
+        },
+        {
+          "key": "C03",
+          "name": "Jina embeddings through jina-on-prem",
+          "reason": "Finalist: the toolkit directly serves local CPU/GPU embeddings through /v1/embeddings and supports both general text and code models. Its supported v5-text-small offers 32,768-token inputs and reports MTEB English v2 71.7 and MMTEB 67.7; these aggregate scores do not resolve the required retrieval comparison against Nemotron and EmbeddingGemma. A winning single checkpoint remains undetermined. [Toolkit README](https://github.com/jina-ai/jina-on-prem/blob/5128127ddd80/README.md), [text model card](https://huggingface.co/jinaai/jina-embeddings-v5-text-small)."
+        },
+        {
+          "key": "C02",
+          "name": "EmbeddingGemma",
+          "reason": "Finalist: Google publishes both text and code evidence—MTEB English v2 69.67 and MTEB Code v1 68.76 at 768 dimensions—for this 300M-parameter model. Its 2K input limit is a material tradeoff for documents and session histories, while its smaller size could benefit CPU and laptop use. The evidence does not quantify that tradeoff against the longer-context finalists on the target hosts. [Official model card](https://ai.google.dev/gemma/docs/embeddinggemma/model_card)."
+        },
+        {
+          "key": "C01",
+          "name": "BGE-M3",
+          "reason": "Viable alternative: 8,192-token inputs and published multilingual and long-document evaluations support document retrieval. Its dense, sparse and multi-vector capabilities are broader than a conventional embeddings endpoint, but those additional modes do not establish better dense retrieval over the required mixed corpus. The examined evaluations do not separate it from the finalists on code and session text. [Model card and evaluation reproduction links](https://huggingface.co/BAAI/bge-m3)."
+        }
+      ],
+      "excluded": [],
+      "close_call": true,
+      "deciding_comparison": "Decision deferred under the no-forced-pick rule. Run Nemotron-3-Embed-1B-BF16, jina-embeddings-v5-text-small through jina-on-prem, EmbeddingGemma-300M and BGE-M3 on the specified WSL2 RTX 4090 host. Use identical public text-retrieval and MTEB Code v1 tasks, corpus chunks, relevance judgments and search settings. Impose a common ceiling of 1,024 dimensions: Nemotron and Jina at 1,024, BGE-M3 at its native 1,024, and EmbeddingGemma at its native 768; report the dimensional difference explicitly. Also compare the three dimension-adjustable finalists at 512 dimensions. Measure retrieval nDCG@10 and Recall@k, indexing throughput, batch-1 and concurrent-request latency, peak GPU/host memory, endpoint correctness with the documented query/document prompts, and degradation from truncation. Test common short inputs separately from each model's maximum supported length. Repeat CPU measurements on Linux and macOS arm64. The packet contains no comparison where these arms all ran, and the public evidence inspected does not supply this comparison.",
+      "evidence_gaps": [
+        "Judged as of 2026-10-02 UTC; the 90-day cutoff is 2026-07-04. No candidate met the stale exclusion criterion. GitHub metadata marked Gemma, jina-on-prem and FlagEmbedding unarchived, and their latest default-branch commits were respectively 2026-09-30, 2026-09-14 and 2026-08-24. [Gemma commit](https://github.com/google-deepmind/gemma/commit/c490becf42d1), [Jina commit](https://github.com/jina-ai/jina-on-prem/commit/5128127ddd80), [FlagEmbedding commit](https://github.com/FlagOpen/FlagEmbedding/commit/fd1a2bdf6948).",
+        "Release activity differs without establishing a quality winner: FlagEmbedding v1.4.2 was published 2026-08-24; Gemma's latest release, v4.0.1, was published 2026-05-20; jina-on-prem's releases/latest endpoint returned HTTP 404. Issue/PR records showed recent activity for all three repositories. Nemotron's Hugging Face main revision was updated 2026-08-27, and NVIDIA's release article was published 2026-07-16. [FlagEmbedding release](https://github.com/FlagOpen/FlagEmbedding/releases/tag/v1.4.2), [Gemma release](https://github.com/google-deepmind/gemma/releases/tag/v4.0.1), [Nemotron revision history](https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16/commits/main), [NVIDIA release article](https://huggingface.co/blog/nvidia/nemotron-3-embed-wins-rteb).",
+        "The benchmark numbers are not interchangeable: Nemotron reports retrieval-subset metrics, while the cited Jina and Gemma figures include broader MTEB aggregates. Dimensions, sequence limits and evaluation configurations differ. NVIDIA's article also discusses an 8B model and an NVFP4 variant; neither model's results were attributed to the nominated 1B BF16 checkpoint.",
+        "CI interpretation was checked at job level: Gemma's latest default-branch workflow had an overall failure, but its pytest job and core-test step succeeded; publishing failed. FlagEmbedding documents compatibility and inference tests, while the sampled Actions runs were documentation workflows awaiting approval. Jina supplies an offline verification script, while the sampled successful Actions runs were Pages deployments. These signals do not constitute a common model-serving test. [Gemma test job](https://github.com/google-deepmind/gemma/actions/runs/36687639337/job/109797061459), [FlagEmbedding tests](https://github.com/FlagOpen/FlagEmbedding/blob/fd1a2bdf6948/tests/README.md), [Jina offline verification](https://github.com/jina-ai/jina-on-prem/blob/5128127ddd80/verify-offline.sh).",
+        "Nemotron has the clearest verified GPU endpoint launch path among the examined model cards: pip install --upgrade \"vllm==0.25.0\" openai requests numpy, followed by vllm serve nvidia/Nemotron-3-Embed-1B-BF16. Its OpenAI-compatible /v1/embeddings requests require manual query: and passage: prefixes. This is an upstream-documented path, not an installation tested here. [Model-card serving instructions](https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16#usage).",
+        "Other documented Linux paths were verified but not executed: Jina documents bundling, loading and running CPU/GPU Docker images; FlagEmbedding documents pip install -U FlagEmbedding; Gemma documents installing JAX and pip install gemma. The latter two commands install libraries and do not alone establish a complete OpenAI-compatible endpoint deployment. [Jina README](https://github.com/jina-ai/jina-on-prem/blob/5128127ddd80/README.md), [FlagEmbedding README](https://github.com/FlagOpen/FlagEmbedding/blob/fd1a2bdf6948/README.md), [Gemma README](https://github.com/google-deepmind/gemma/blob/c490becf42d1/README.md).",
+        "Platform evidence remains incomplete. vLLM's pinned Linux documentation explicitly permits WSL with a compatible distribution. Nemotron lists A100/H100 test hardware, which does not establish RTX 4090 throughput or maximum-length memory use. Jina explicitly documents native arm64 PyTorch serving on Apple Silicon; its prebuilt Docker images are amd64 and use emulation there. Comparable macOS arm64 endpoint measurements for the other candidates were not established. [vLLM v0.25.0 platform documentation](https://github.com/vllm-project/vllm/blob/v0.25.0/docs/getting_started/installation/gpu.md), [Nemotron model card](https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16), [Jina platform instructions](https://github.com/jina-ai/jina-on-prem/blob/5128127ddd80/README.md).",
+        "License information did not affect ranking or exclusion. GitHub identifies the Gemma library as Apache-2.0 and FlagEmbedding as MIT. Nemotron's model metadata identifies OpenMDW-1.1; the examined Jina text and code model cards identify CC BY-NC 4.0. Jina's deployment key mechanism is optional and fail-open by default, so it was not classified as requiring a paid service. [Nemotron metadata](https://huggingface.co/api/models/nvidia/Nemotron-3-Embed-1B-BF16), [Jina text license](https://huggingface.co/jinaai/jina-embeddings-v5-text-small#license), [Jina code card](https://huggingface.co/jinaai/jina-code-embeddings-1.5b), [Jina licensing behavior](https://github.com/jina-ai/jina-on-prem/blob/5128127ddd80/README.md).",
+        "The documented HTTP endpoints and clients support agent-invoked calls. The inspected evidence does not demonstrate an automatic Claude Code or Codex retrieval integration or session-ingestion pipeline.",
+        "Research used 30 GitHub API calls, 8 page-fetch attempts including one HTTP 401 for the Hugging Face EmbeddingGemma README, and 3 web-search queries that returned no usable results. Hugging Face metadata and commit APIs were also read. Only the supplied packet was read under the working directory.",
+        "Retrieval-method deviation: the environment rejected ctx_fetch_and_index because the tool required approval and the approval policy was never. Primary documentation was instead retrieved through the GitHub API and public URLs, indexed with ctx_index and read with ctx_search. The requested fetch mechanism could not be followed."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/google-deepmind/gemma",
+        "https://api.github.com/repos/google-deepmind/gemma/releases/latest",
+        "https://api.github.com/repos/google-deepmind/gemma/commits?per_page=1",
+        "https://api.github.com/repos/google-deepmind/gemma/readme",
+        "https://api.github.com/repos/google-deepmind/gemma/actions/runs?per_page=3",
+        "https://api.github.com/repos/google-deepmind/gemma/issues?state=all&sort=updated&direction=desc&per_page=3",
+        "https://api.github.com/repos/google-deepmind/gemma/actions/runs?event=push&branch=main&per_page=5",
+        "https://api.github.com/repos/google-deepmind/gemma/actions/runs/36687639337/jobs?per_page=20",
+        "https://ai.google.dev/gemma/docs/embeddinggemma/model_card",
+        "https://api.github.com/repos/jina-ai/jina-on-prem",
+        "https://api.github.com/repos/jina-ai/jina-on-prem/releases/latest",
+        "https://api.github.com/repos/jina-ai/jina-on-prem/commits?per_page=1",
+        "https://api.github.com/repos/jina-ai/jina-on-prem/readme",
+        "https://api.github.com/repos/jina-ai/jina-on-prem/contents/models/catalog.json",
+        "https://api.github.com/repos/jina-ai/jina-on-prem/actions/runs?per_page=3",
+        "https://api.github.com/repos/jina-ai/jina-on-prem/issues?state=all&sort=updated&direction=desc&per_page=3",
+        "https://api.github.com/repos/jina-ai/jina-on-prem/git/trees/5128127ddd80aec11dc18c73f9e5e4b648d0b9fe?recursive=1",
+        "https://api.github.com/repos/jina-ai/jina-on-prem/contents/verify-offline.sh?ref=5128127ddd80aec11dc18c73f9e5e4b648d0b9fe",
+        "https://huggingface.co/jinaai/jina-embeddings-v5-text-small/raw/main/README.md",
+        "https://huggingface.co/jinaai/jina-code-embeddings-1.5b/raw/main/README.md",
+        "https://api.github.com/repos/FlagOpen/FlagEmbedding",
+        "https://api.github.com/repos/FlagOpen/FlagEmbedding/releases/latest",
+        "https://api.github.com/repos/FlagOpen/FlagEmbedding/commits?per_page=1",
+        "https://api.github.com/repos/FlagOpen/FlagEmbedding/readme",
+        "https://api.github.com/repos/FlagOpen/FlagEmbedding/actions/runs?per_page=3",
+        "https://api.github.com/repos/FlagOpen/FlagEmbedding/issues?state=all&sort=updated&direction=desc&per_page=3",
+        "https://api.github.com/repos/FlagOpen/FlagEmbedding/git/trees/fd1a2bdf69488ffebe0327999d4400d8c8058a0b?recursive=1",
+        "https://api.github.com/repos/FlagOpen/FlagEmbedding/contents/tests/README.md?ref=fd1a2bdf69488ffebe0327999d4400d8c8058a0b",
+        "https://huggingface.co/BAAI/bge-m3/raw/main/README.md",
+        "https://huggingface.co/api/models/nvidia/Nemotron-3-Embed-1B-BF16",
+        "https://huggingface.co/api/models/nvidia/Nemotron-3-Embed-1B-BF16/commits/main",
+        "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16/raw/main/README.md",
+        "https://huggingface.co/blog/nvidia/nemotron-3-embed-wins-rteb",
+        "https://api.github.com/repos/vllm-project/vllm",
+        "https://api.github.com/repos/vllm-project/vllm/releases/latest",
+        "https://api.github.com/repos/vllm-project/vllm/commits?per_page=1",
+        "https://api.github.com/repos/vllm-project/vllm/contents/docs/models/supported_models.md?ref=v0.25.0",
+        "https://api.github.com/repos/vllm-project/vllm/contents/docs/getting_started/installation/gpu.md?ref=v0.25.0",
+        "https://docs.vllm.ai/en/stable/models/supported_models/"
+      ]
+    }
+  ]
+}

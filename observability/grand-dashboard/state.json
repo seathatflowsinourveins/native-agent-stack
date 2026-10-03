@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-29T07:38:10Z",
-  "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
+  "recorded_at_utc": "2026-10-02T22:57:25Z",
+  "meaning": "Recorded checkpoint adding one gate for the new WSL distribution: its source selection on main is stated apart from its host qualification, which is open. Every other entry is carried over unchanged from the checkpoint of 2026-10-01T19:18:16Z, whose meaning was: Recorded checkpoint aligning Codex 0.159.3 and its SDK pair; native queue, capture and SDK qualification retain their linked scopes and limits. Existing foundation, paper and simulation records are preserved; the gateway request remains held.",
   "lanes": [
     {
       "kind": "lane",
@@ -14,8 +14,8 @@
       "kind": "lane",
       "id": "paper",
       "title": "Alpaca paper accounts 1 and 2",
-      "state": "acct 1 401 cleared 09-28 (new keys) / HTTP 200 + flat 09-29 / RTH series frozen / acct 2 ext-20260928 2 of 8 passed 10 filled -8.91 USD reconciled flat",
-      "evidence_ref": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/README.md"
+      "state": "09-29 mechanics-only / acct 2 pre 3 of 3 passed -2.05 USD / acct 1 rth 5 of 6 passed -115.94 USD then halted / acct 2 ext 3 of 4 passed IOVA 68 held (PR 559)",
+      "evidence_ref": "blueprints/us-equities/adaptive-paper/trials/ext-20260929/README.md"
     },
     {
       "kind": "lane",
@@ -37,7 +37,7 @@
       "kind": "gate",
       "id": "alpaca-paper-operational",
       "title": "Alpaca bounded paper lifecycle",
-      "state": "smoke passed / 1x broker trial passed 2026-09-23 / native faults re-verified on order-contract engine 2026-09-24 / corporate-action guard merged 2026-09-25",
+      "state": "smoke passed / 1x broker trial passed 2026-09-23 / native faults re-verified on fee-aware engine 2026-10-01 / corporate-action guard merged 2026-09-25",
       "evidence_ref": "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json"
     },
     {
@@ -340,6 +340,34 @@
       "title": "Skills trial window 2026-09-25 to 2026-10-25",
       "state": "listing restored to manifest 2026-09-28 / verification-before-completion removed 2026-09-28 / 28 skills / Mac check issue 472 / review issue 474",
       "evidence_ref": "docs/decisions/2026-09-25-skills-trial-and-usage.md"
+    },
+    {
+      "kind": "gate",
+      "id": "codex-native-daemon-queue-20261001",
+      "title": "Codex native daemon and cross-session queue",
+      "state": "0.159.3 native idle / busy / reconnect delivery passed in owned thread / no shared restart",
+      "evidence_ref": "evidence/receipts/codex-01593-native-queue-20261001.json"
+    },
+    {
+      "kind": "gate",
+      "id": "codex-hindsight-capture-20261001",
+      "title": "Codex automatic Hindsight capture and recollection",
+      "state": "headless and daemon paths passed / captured synthetic facts survived recovery / seed and pages separate",
+      "evidence_ref": "evidence/receipts/codex-01593-hindsight-native-memory-20261001.json"
+    },
+    {
+      "kind": "gate",
+      "id": "sdk-pair-candidate-01593-20261001",
+      "title": "SDK and bundled CLI 0.159.3 pair qualification",
+      "state": "paired protocol and native marker passed / qualified inventory and model guards intact / 209-test run passed (32 skips) / gateway HTTP 429 held - cause unknown",
+      "evidence_ref": "evidence/artifacts/runtime-sdk-20261001/receipt.json"
+    },
+    {
+      "kind": "gate",
+      "id": "new-wsl-distribution-20261002",
+      "title": "New WSL distribution sources (manifest + recipe + install plan + handbook) and host qualification (useful task per client + roles + lifecycle)",
+      "state": "source selection on main / host qualification open / 64-row plan ran once on the destination distribution - record private - public receipt with its acceptance",
+      "evidence_ref": "docs/decisions/2026-10-02-new-wsl-layer-consensus.md"
     }
   ],
   "workers": [

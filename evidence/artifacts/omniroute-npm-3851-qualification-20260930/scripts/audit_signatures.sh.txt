@@ -1,0 +1,27 @@
+#!/bin/bash
+# Published copy of the script as it ran on 2026-09-30. Host paths are replaced by the placeholders named in the assignments below
+# (<work directory>, <bin directory of Node 24.21.0>, <npm cache>, <throwaway directory>); nothing else differs.
+# audit_signatures.sh: npm's own verification of registry signatures and provenance attestations for the omniroute@3.8.51 dependency tree.
+# `npm audit` refuses global installs, so this installs the published package as a dependency of a throwaway project (no lifecycle scripts:
+# signatures are checked on the tree, not on built native binaries), then runs `npm audit signatures`. Clean environment, host network.
+set -u
+OM=<work directory>
+W=$OM/audit
+NODEBIN=<bin directory of Node 24.21.0>
+[ -e "$W" ] && { echo "WORKDIR EXISTS, stopping: $W"; exit 90; }
+mkdir -p "$W/proj" "$W/home" "$W/tmp"
+cd "$W/proj" || exit 91
+run() { /usr/bin/env -i "HOME=$W/home" "TMPDIR=$W/tmp" "PATH=$NODEBIN:/usr/bin:/bin" "npm_config_cache=<npm cache>" "HUSKY=0" "LANG=C.UTF-8" "TERM=dumb" "$@"; }
+stamp() { date -u +%FT%TZ; }
+echo "[$(stamp)] node $(run node --version) npm $(run npm --version)"
+echo "[$(stamp)] npm init -y"
+run npm init -y > "$W/init.log" 2>&1; echo "[$(stamp)] npm init rc=$?"
+echo "[$(stamp)] npm install omniroute@3.8.51 --ignore-scripts --no-audit --no-fund"
+run npm install omniroute@3.8.51 --ignore-scripts --no-audit --no-fund > "$W/install.log" 2>&1; rc=$?
+echo "[$(stamp)] npm install rc=$rc"; [ $rc -eq 0 ] || exit 92
+echo "[$(stamp)] installed omniroute version: $(run node -p "require('./node_modules/omniroute/package.json').version")"
+echo "[$(stamp)] npm audit signatures"
+run npm audit signatures > "$W/audit-signatures.txt" 2>&1; rc=$?
+echo "[$(stamp)] npm audit signatures rc=$rc"
+echo "--- audit output (first 40 lines)"; head -n 40 "$W/audit-signatures.txt" | cut -c1-200
+echo "exit $rc"

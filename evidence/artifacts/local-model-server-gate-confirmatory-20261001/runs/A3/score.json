@@ -1,0 +1,16 @@
+{
+  "codex_exit_code": 0,
+  "turn_status": "turn.completed",
+  "completed_item_types": {
+    "agent_message": 1
+  },
+  "non_json_lines": 0,
+  "mcp_tool_calls": [],
+  "tool_call_completed": false,
+  "tool_result_datetimes": [],
+  "final_answer": "The function `get_current_time` is not available in the provided tools. I cannot fulfill this request.",
+  "final_answer_contains_result": false,
+  "run_pass": false,
+  "reason": "tool_not_called",
+  "error_events": []
+}

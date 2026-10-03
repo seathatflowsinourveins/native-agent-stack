@@ -1,0 +1,1 @@
+PASS 5 profiles: AI clients let titles through and ring audible+taskbar with a quiet sound; static shells stay silent; Claude sets COLORTERM through the profile environment key; Codex kinds and the deployed copy verified; 1 settings.json scanned (AI profiles there follow the same rules)

@@ -1,0 +1,25 @@
+{
+  "candidates": [
+    {
+      "name": "BGE-M3",
+      "repository": "https://github.com/FlagOpen/FlagEmbedding",
+      "why_candidate": "Open-weight multilingual retrieval embedding model documented in the [README](https://github.com/FlagOpen/FlagEmbedding#model-list), serveable through TEI; latest FlagEmbedding library release: [v1.4.2, 2026-08-24](https://github.com/FlagOpen/FlagEmbedding/releases/tag/v1.4.2)."
+    },
+    {
+      "name": "EmbeddingGemma",
+      "repository": "https://github.com/google-deepmind/gemma",
+      "why_candidate": "Google’s [300M-parameter open-weight text embedding model](https://ai.google.dev/gemma/docs/embeddinggemma/model_card), supported by TEI; latest Gemma library release: [v4.0.1, 2026-05-20](https://github.com/google-deepmind/gemma/releases/tag/v4.0.1), with a [default-branch commit on 2026-09-30](https://github.com/google-deepmind/gemma/commit/c490becf42d1)."
+    },
+    {
+      "name": "Jina embeddings through jina-on-prem",
+      "repository": "https://github.com/jina-ai/jina-on-prem",
+      "why_candidate": "Local OpenAI-compatible serving of open-weight Jina embeddings, including v5 text and omni models, on CUDA, CPU and native macOS arm64; no published GitHub release, with the latest [default-branch commit dated 2026-09-14](https://github.com/jina-ai/jina-on-prem/commit/5128127ddd80)."
+    },
+    {
+      "name": "Nemotron-3-Embed-1B-BF16",
+      "repository": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16",
+      "why_candidate": "NVIDIA’s 1.14B-parameter open-weight embedding model for text and code retrieval, with local vLLM serving examples; latest model release: [BF16 weights, 2026-07-16](https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16#model-overview)."
+    }
+  ],
+  "search_notes": "Checked against a 2026-10-01 EDT reference date, with a 90-day cutoff of 2026-07-03. The three included GitHub repositories were verified through gh api repos/OWNER/REPO and releases/latest as public and non-archived; default-branch commits were checked where releases were absent or older. BGE-M3 and EmbeddingGemma qualify through repository activity, rather than newly released weights. Nemotron qualifies through NVIDIA’s public model card and its July release; GitHub archive metadata does not apply to its Hugging Face repository, and macOS serving was not verified. The [TEI README](https://github.com/huggingface/text-embeddings-inference/blob/main/README.md) documents OpenAI compatibility, CPU serving, RTX 4000-series support, Metal support and EmbeddingGemma compatibility. The [Jina README](https://github.com/jina-ai/jina-on-prem/blob/main/README.md) documents local /v1/embeddings serving and native arm64 execution. Excluded seeds: Qwen3-Embedding has no published GitHub release and its latest default-branch commit is [2025-09-30](https://github.com/QwenLM/Qwen3-Embedding/commit/44548aa5f0a0); nomic’s latest release is [v3.9.0, 2025-11-11](https://github.com/nomic-ai/nomic/releases/tag/v3.9.0), with no qualifying newer default-branch commit. The supplied jina-ai/jina-embeddings-v4 URL returned HTTP 404; the maintained jina-on-prem repository was identified separately. Budget used: 6 search attempts, 8 external page-fetch attempts and 30 GitHub API calls. Searches returned empty results and browser page opening failed, so discovery relied on direct upstream fetches and API responses. This is a bounded verified set; an exhaustive list was not established."
+}

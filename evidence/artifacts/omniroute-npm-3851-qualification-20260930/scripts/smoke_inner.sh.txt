@@ -1,0 +1,47 @@
+#!/bin/bash
+# Published copy of the script as it ran on 2026-09-30. Host paths are replaced by the placeholders named in the assignments below
+# (<work directory>, <bin directory of Node 24.21.0>, <npm cache>, <throwaway directory>); nothing else differs.
+# smoke_inner.sh PREFIX OUTDIR RAWDIR  -- runs inside the user+net namespace with the smoke env (fresh DATA_DIR, no lsof shim on PATH).
+# Phase 1: start `omniroute serve`, poll /api/health, record listeners, SIGTERM. Phase 2: start again on the same DATA_DIR, poll,
+# compare the store's migration rows and integrity, SIGTERM, check no orphan. The raw server logs stay in RAWDIR (throwaway).
+set -u
+PREFIX="$1"; OUT="$2"; RAW="$3"
+S="$OUT/summary.txt"
+: > "$S"
+db_rows() { python3 -c 'import sqlite3,sys; c=sqlite3.connect("file:"+sys.argv[1]+"?mode=ro", uri=True); print(c.execute("select count(*) from _omniroute_migrations").fetchone()[0], c.execute("pragma integrity_check").fetchone()[0], len(c.execute("select name from sqlite_master where type=\"table\"").fetchall()))' "$DATA_DIR/storage.sqlite" 2>&1; }
+phase() {
+  local n="$1" t0 code pid
+  t0=$(date +%s)
+  echo "=== phase $n start=$(date -u +%FT%TZ) uid=$(id -u)" >> "$S"
+  echo "lsof on PATH: $(command -v lsof || echo none) | listeners before: $(ss -Hltn | wc -l)" >> "$S"
+  "$PREFIX/bin/omniroute" serve --port 20197 --no-open --no-tray > "$RAW/serve-$n.log" 2>&1 &
+  pid=$!
+  code=000
+  for i in $(seq 1 240); do
+    if ! kill -0 "$pid" 2>/dev/null; then echo "serve exited early after ${i}s" >> "$S"; break; fi
+    code=$(curl -s -m 5 -o "$RAW/health-$n.body" -w '%{http_code}' http://127.0.0.1:20197/api/health || true)
+    if [ "$code" = "200" ]; then echo "health=200 after $(( $(date +%s) - t0 ))s" >> "$S"; break; fi
+    sleep 1
+  done
+  echo "last health code=$code | health body (first 300 bytes): $(head -c 300 "$RAW/health-$n.body" 2>/dev/null | tr '\n' ' ')" >> "$S"
+  sleep 3
+  echo "listeners while running: $(ss -Hltn | awk '{print $4}' | sort | tr '\n' ' ')" >> "$S"
+  echo "store (rows, integrity, tables) while running: $(db_rows)" >> "$S"
+  local pids
+  pids=$( { pstree -p "$pid" | grep -oE '\([0-9]+\)' | tr -d '()'; ss -Hltnp | grep -oE 'pid=[0-9]+' | cut -d= -f2; } | sort -u | tr '\n' ' ')
+  kill -TERM "$pid"; local t1; t1=$(date +%s)
+  wait "$pid"; local rc=$?
+  echo "SIGTERM: serve exit code=$rc after $(( $(date +%s) - t1 ))s" >> "$S"
+  sleep 3
+  echo "listeners after exit: $(ss -Hltn | wc -l)" >> "$S"
+  local alive=""; for p in $pids; do kill -0 "$p" 2>/dev/null && alive="$alive $p"; done
+  echo "tree/listener pids still alive after exit:${alive:- none}" >> "$S"
+  echo "store after stop (rows, integrity, tables): $(db_rows)" >> "$S"
+}
+echo "start=$(date -u +%FT%TZ) cwd=$PWD" >> "$S"
+phase 1
+phase 2
+echo "data dir entries (names and modes only):" >> "$S"
+ls -la "$DATA_DIR" | awk '{print $1, $NF}' >> "$S"
+stat -c 'data dir mode %a' "$DATA_DIR" >> "$S"
+echo "end=$(date -u +%FT%TZ)" >> "$S"

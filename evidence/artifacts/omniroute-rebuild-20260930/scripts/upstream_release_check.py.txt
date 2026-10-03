@@ -1,0 +1,45 @@
+"""Read-only check of upstream OmniRoute's v3.8.51 release against the tree our builds use. No REST call: git protocol against
+github.com, the npm registry, and one GraphQL read (gh pr view). Prints one JSON document, whose observed_utc is taken at the start.
+Usage: upstream_release_check.py <local clone of OmniRoute with the needed objects fetched>"""
+import datetime
+import json
+import subprocess
+import sys
+import urllib.request
+
+CLONE = sys.argv[1]
+BASE = "2f42a9ac19d1a247ec9ce5473b790843724b3061"   # the release branch tip our builds use
+started = datetime.datetime.now(datetime.timezone.utc)
+out = {"observed_utc": started.strftime("%Y-%m-%dT%H:%M:%SZ")}
+
+
+def run(*argv, cwd=None):
+    return subprocess.run(argv, capture_output=True, text=True, cwd=cwd, timeout=120)
+
+
+refs = run("git", "ls-remote", "https://github.com/diegosouzapw/OmniRoute.git", "refs/heads/main", "refs/heads/release/v3.8.51",
+           "refs/heads/release/v3.8.52", "refs/tags/v3.8.51", "refs/tags/v3.8.51^{}").stdout.split("\n")
+out["ls_remote"] = {line.split("\t")[1]: line.split("\t")[0] for line in refs if line}
+run("git", "fetch", "-q", "origin", "refs/tags/v3.8.51:refs/tags/v3.8.51", cwd=CLONE)
+tag_commit = out["ls_remote"]["refs/tags/v3.8.51^{}"]
+tag_body = run("git", "cat-file", "-p", "refs/tags/v3.8.51", cwd=CLONE).stdout.splitlines()
+tagger = next(line for line in tag_body if line.startswith("tagger "))
+epoch = int(tagger.split()[-2])
+out["tag"] = {
+    "object": out["ls_remote"]["refs/tags/v3.8.51"], "commit": tag_commit,
+    "tagger_time_utc": datetime.datetime.fromtimestamp(epoch, datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+    "subject": run("git", "log", "-1", "--format=%s", tag_commit, cwd=CLONE).stdout.strip(),
+    "author_time_utc": run("git", "log", "-1", "--format=%aI", tag_commit, cwd=CLONE).stdout.strip(),
+    "parents": run("git", "log", "-1", "--format=%P", tag_commit, cwd=CLONE).stdout.split(),
+}
+out["trees"] = {"release_v3.8.51_tip": run("git", "rev-parse", BASE + "^{tree}", cwd=CLONE).stdout.strip(),
+                "tag_commit": run("git", "rev-parse", tag_commit + "^{tree}", cwd=CLONE).stdout.strip()}
+out["trees"]["equal"] = out["trees"]["release_v3.8.51_tip"] == out["trees"]["tag_commit"]
+out["release_tip_is_ancestor_of_tag_commit"] = run("git", "merge-base", "--is-ancestor", BASE, tag_commit, cwd=CLONE).returncode == 0
+doc = json.load(urllib.request.urlopen("https://registry.npmjs.org/omniroute", timeout=30))
+out["npm"] = {"dist_tags": doc.get("dist-tags"), "published_3.8.51": doc.get("time", {}).get("3.8.51"), "published_3.8.50": doc.get("time", {}).get("3.8.50"),
+              "has_3.8.52": "3.8.52" in doc.get("versions", {})}
+pr = run("gh", "pr", "view", "13788", "--repo", "diegosouzapw/OmniRoute", "--json", "state,title,updatedAt,headRefOid")
+out["pr_13788"] = json.loads(pr.stdout) if pr.returncode == 0 else {"error": pr.stderr[:200]}
+out["finished_utc"] = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+print(json.dumps(out, indent=1))

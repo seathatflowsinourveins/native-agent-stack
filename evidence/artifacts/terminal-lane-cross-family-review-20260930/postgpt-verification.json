@@ -1,0 +1,148 @@
+{
+ "verdicts": [
+  {
+   "id": "F-sol-P1-1",
+   "unit": "V1",
+   "check": "flush",
+   "verdict": "confirmed",
+   "severity": "medium",
+   "evidence": "flush: child exit 120 (a death by SIGTERM would be -15); stderr: raised BrokenPipeError",
+   "repair": "alert_probe.py and push_notification_probe.py: no flush before the final kill, the signal unblocked, the cleanup's report flushed in `main` with its failure tolerated; flush_case (a closed stdout, a blocked signal); mutants: a flush comes back, the signal is not unblocked"
+  },
+  {
+   "id": "F-sol-P1-2",
+   "unit": "V1",
+   "check": "handoff",
+   "verdict": "confirmed",
+   "severity": "medium",
+   "evidence": "handoff: latched first = SIGINT (-2 would be 'ended by the first signal'); child exit -15 (-15 = died by the SECOND signal); latched 2",
+   "repair": "`with_private_dir(restore=False)` in `main`: the latch stays installed to the end of the process; the sweep driver and the new handoff_case end like `__main__`; mutant: the previous handlers are restored before the process ends"
+  },
+  {
+   "id": "F-sol-P1-3",
+   "unit": "V1",
+   "check": "typing",
+   "verdict": "confirmed",
+   "severity": "low",
+   "evidence": "typing: target line 565 | Enter sent True | latch value at the Enter write 15",
+   "repair": "`type_prompt` checks and writes the Enter with the handled signals blocked, so no Enter is written after the latch is set; typing_case checks five situations; four mutants, one per guard and one for the signal block"
+  },
+  {
+   "id": "F-sol-P1-4",
+   "unit": "V2",
+   "check": "spawn",
+   "verdict": "confirmed",
+   "severity": "medium",
+   "evidence": "spawn: sweep_case on the guard-removed copy -> False | 110 lines swept of the 160 lines with code in main, with_private_dir and measure (0 of them up to the spawn guard), the client was running at 17 of them, 1 problems | the dry run did not reach the spawn guard (`if not stopped():`), so the sweep cannot tell whether a client was started after a stop request",
+   "repair": "the sweep driver counts the client's `subprocess.Popen` calls; the guard carries a `# SPAWN GUARD:` marker; the spawn mutant keeps the marker and must fail with the client-start message"
+  },
+  {
+   "id": "F-sol-P1-5",
+   "unit": "V3",
+   "check": "order",
+   "verdict": "confirmed",
+   "severity": "medium",
+   "evidence": "order (no handler records anything): exit 0 | sent SIGHUP then SIGTERM: the handlers ran in the order [] / sent SIGTERM then SIGINT: the handlers ran in the order [] / the handlers ran in ascending signal number in every case: True",
+   "repair": "signal_order_probe.py compares the recorded order with the exact expected pair; `--selftest` rejects a recorder that records nothing and one that records only the first handler"
+  },
+  {
+   "id": "F-sol-P1-6",
+   "unit": "V2",
+   "check": "skips",
+   "verdict": "confirmed",
+   "severity": "low",
+   "evidence": "skips: pty_probe_mutants.py:98 discards the notes of a mutant run (`_notes`); the baseline's notes end the run (`if notes: ... sys.exit(1)`)",
+   "repair": "the runner ends the run on the notes of a mutant as on those of the baseline"
+  },
+  {
+   "id": "F-sol-P2-1",
+   "unit": "V3",
+   "check": "identity",
+   "verdict": "confirmed",
+   "severity": "medium",
+   "evidence": "identity: another server (socket path = ours + '.old', comm 'tmux: server') accepted as ours: True",
+   "repair": "`server_identity` compares the command name (`tmux: server`) and the socket argument exactly; a fourth shutdown-failure control answers the pid of a prefix server; tmux_identity_mutant.py runs three mutants (comparison removed, substring, cleanup removed)"
+  },
+  {
+   "id": "F-sol-P2-3",
+   "unit": "V3",
+   "check": "cleanup",
+   "verdict": "confirmed",
+   "severity": "low",
+   "evidence": "cleanup: shutdown_control raised an unexpected failure of the measurement on the third control; tmux servers left behind: 1",
+   "repair": "`shutdown_control` stops every server it caused by exact socket path in a `finally`; cleanup_control; mutant: the servers of a failing control are not stopped"
+  },
+  {
+   "id": "F-sol-P2-5",
+   "unit": "V3",
+   "check": "delay",
+   "verdict": "confirmed",
+   "severity": "low",
+   "evidence": "delay: SIGINT 0.5 s after the start, the child installs its handler at 0.8 s -> 0 of 3 runs continued, shell exit -2 (the control expects 3 for its exit-130 arm)",
+   "repair": "the control waits for a readiness file (the child's pid) before it sends SIGINT"
+  },
+  {
+   "id": "F-sol-P2-6",
+   "unit": "V4",
+   "check": "dash",
+   "verdict": "confirmed",
+   "severity": "medium",
+   "evidence": "dash: bash, SIGINT to the process group: exit 130: 3 of 3 runs continued, shell exit 0; dies by SIGINT: 0 of 3 runs continued, shell exit -2 / dash: bash, SIGINT to the child only:     exit 130: 3 of 3 runs continued, shell exit 0; dies by SIGINT: 3 of 3 runs continued, shell exit 0 / dash: dash, SIGINT to the process group: exit 130: 0 of 3 runs continued, shell exit -2; dies by SIGINT: 0 of 3 runs continued, shell exit -2 / dash: dash, SIGINT to the child only:     exit 130: 3 of 3 runs continued, shell exit 0; dies by SIGINT: 3 of 3 runs continued, shell exit 0",
+   "repair": "every statement about shells names bash (and dash where measured) and the condition (the shell must receive the SIGINT too); shell_loop_control.py measures bash and dash, SIGINT to the group and to the child only"
+  },
+  {
+   "id": "F-sol-P3-2",
+   "unit": "V2",
+   "check": "partial",
+   "verdict": "confirmed",
+   "severity": "low",
+   "evidence": "partial: sweep_trial raised JSONDecodeError on a truncated record before it could kill the stand-in",
+   "repair": "`sweep_trial` parses defensively (`unreadable_record`) and kills the stand-in in a `finally`; partial_case; mutant: a truncated sweep record raises"
+  },
+  {
+   "id": "F-sol-P3-6",
+   "unit": "V3",
+   "check": "wrongsignal",
+   "verdict": "confirmed",
+   "severity": "medium",
+   "evidence": "wrongsignal (the 'dies by SIGINT' child kills its PARENT shell with SIGTERM: the loop stops and prints nothing): exit 0 | child exits 130 after its cleanup: bash exit 0, lines ['continued-1', 'continued-2', 'continued-3'] / child ends BY SIGINT after its cleanup: bash exit -15, lines [] / the loop went on after an exit 130: True; the loop stopped after a death by SIGINT: True",
+   "repair": "the shell's exit status is asserted (-SIGINT and no `continued` line) and a rejecting control kills the parent shell with SIGTERM"
+  },
+  {
+   "id": "F-sol-P3-7",
+   "unit": "V4",
+   "check": "dash",
+   "verdict": "confirmed",
+   "severity": "medium",
+   "evidence": "dash: bash, SIGINT to the process group: exit 130: 3 of 3 runs continued, shell exit 0; dies by SIGINT: 0 of 3 runs continued, shell exit -2 / dash: bash, SIGINT to the child only:     exit 130: 3 of 3 runs continued, shell exit 0; dies by SIGINT: 3 of 3 runs continued, shell exit 0 / dash: dash, SIGINT to the process group: exit 130: 0 of 3 runs continued, shell exit -2; dies by SIGINT: 0 of 3 runs continued, shell exit -2 / dash: dash, SIGINT to the child only:     exit 130: 3 of 3 runs continued, shell exit 0; dies by SIGINT: 3 of 3 runs continued, shell exit 0",
+   "repair": "the condition that the shell must receive the SIGINT too is stated and measured (see F-sol-P2-6)"
+  },
+  {
+   "id": "F-sol-P3-8",
+   "unit": "V4",
+   "check": "reading",
+   "verdict": "confirmed",
+   "severity": "low",
+   "evidence": "coordinator: by reading: the README said recorded/ holds the outputs of the F2 and F3 reproductions and holds neither",
+   "repair": "the README says which outputs are recorded; F2 and F3 are covered by the sweep's recorded detail (lines swept of lines with code) and by the runner's spawn mutant, which must fail with the client-start message"
+  },
+  {
+   "id": "F-sol-P3-9",
+   "unit": "V4",
+   "check": "reading",
+   "verdict": "confirmed",
+   "severity": "low",
+   "evidence": "coordinator: by reading: the decision record said all 11 findings were repaired while the record says ten repaired and one documented",
+   "repair": "the wording says ten repaired and one documented"
+  },
+  {
+   "id": "F-ultra-P2-2",
+   "unit": "V3",
+   "check": "symlink",
+   "verdict": "confirmed",
+   "severity": "low",
+   "evidence": "symlink: victim file after the run: 'import signal, sys, time\\nsignal.signal(signal.SIGI'",
+   "repair": "shell_loop_control.py keeps its scripts in a private temporary directory (`tempfile.TemporaryDirectory`, mode 0700), never at a predictable path"
+  }
+ ]
+}
