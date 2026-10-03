@@ -162,9 +162,12 @@ with `no verdict` and the reason `no run directory`.
 Each workflow runs only on `pull_request` `opened` and `reopened`, with a paths filter on its own file. A push to the
 branch (`synchronize`) never re-runs the trial, so the observed record cannot land on the trial branch by accident;
 it goes to a separate records pull request. To repeat the trial, close and reopen the draft pull request. A job
-re-run voids its arm-run (`run_attempt` must be `"1"`), and every upload sets `overwrite: false`. The concurrency
-group (`cancel-in-progress: false`) keeps one run going: a reopen during a run queues one run, which starts unattended
-when the first ends; a further reopen replaces the queued run, which then shows as cancelled.
+re-run voids its arm-run (`run_attempt` must be `"1"`), and every upload sets `overwrite: false`. Never use "Re-run
+failed jobs" or "Re-run all jobs": the control job fails by design, so it would run again with attempt 2 and fail the
+controls. Only the compare job may be re-run on its own (for example after its self-test failed): it touches no
+arm-run, and the arm and control artifacts of the first attempt stay downloadable. The concurrency group
+(`cancel-in-progress: false`) keeps one run going: a reopen during a run queues one run, which starts unattended when
+the first ends; a further reopen replaces the queued run, which then shows as cancelled.
 
 ## Run it
 

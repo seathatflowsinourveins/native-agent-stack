@@ -93,7 +93,8 @@ The full text is `experiment.json`'s `quality_rule`; `README.md` gives the same 
    background job started the shards with SIGINT and SIGQUIT ignored, which skipped a SIGQUIT subtest.
 2. **The observed record cannot land on the trial branch.** Each workflow runs only on `opened` and `reopened`, with
    a paths filter on its own file and no `synchronize`; to repeat the trial, close and reopen the pull request. A job
-   re-run still voids its arm-run (`run_attempt` must be 1).
+   re-run still voids its arm-run (`run_attempt` must be 1). "Re-run failed jobs" would also re-run the control job,
+   which fails by design, and so fail the controls; only the compare job may be re-run on its own.
 3. **Two independent workflows**, each with its own ubuntu-24.04 inventory job, arms, controls and compare job, so a
    stalled macOS queue never holds the Linux evidence and either run can be cancelled alone.
 4. **Counts agree everywhere and the limits are stated**: n = 3; the controls are synthetic fixtures executed on the

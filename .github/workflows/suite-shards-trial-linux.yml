@@ -19,9 +19,11 @@ name: Suite shards trial, ubuntu-24.04 (draft pull request only)
 # Trigger: only `opened` and `reopened` (events-that-trigger-workflows.md at 63859c48, lines 465 and 484-489), with
 # a paths filter on this file, so pushing to the branch (synchronize) never re-runs the trial and the observed
 # record can never land on this branch by accident. To repeat the trial, close and reopen the pull request. A job
-# re-run voids its arm-run (compare.py requires run_attempt 1), and every upload sets overwrite: false. The
-# concurrency group keeps at most one run going: a reopen during a run queues one run, which starts unattended
-# when the first ends; a further reopen replaces the queued run, which then shows as cancelled.
+# re-run voids its arm-run (compare.py requires run_attempt 1), and every upload sets overwrite: false. Never use
+# "Re-run failed jobs" or "Re-run all jobs": the control job fails by design, so it would run again with attempt 2
+# and fail the controls. Only the compare job may be re-run on its own (for example after its self-test failed); it
+# touches no arm-run. The concurrency group keeps at most one run going: a reopen during a run queues one run, which
+# starts unattended when the first ends; a further reopen replaces the queued run, which then shows as cancelled.
 #
 # Jobs: inventory (the fail-closed parity and coverage gate, shard lists built at run time from the head);
 # serial (arm S x 3) and shards (arms G4 and G4T x 3; at most 2 + 2 timed jobs at once); controls (a failing, a
