@@ -31,3 +31,22 @@ The binding October 2 freezes retain all original caps, session limits and accep
 Disposition summaries must distinguish the **two executed pre-market trials**, the **risk-halt refusals** and **account 1 admission failure**. Original `mover-paper.json` files and `paper.log`/`series.console` output establish the first two; all 171 runtime probe JSONs and the independent systemd journals establish HTTP 401 and process exits 3/3/5. The new snapshot output and separate SQLite read corroborate cash and flatness. The four average-invariant observations are retained as observations; the no-halt acceptance failure is independently decisive.
 
 Public sanitization removes account references, host identity, process identifiers, credential pointers and personal paths. Selected JSON values and native log messages otherwise preserve their original values. Source hashes identify retained private bytes; hashes and repository structural validation establish consistency, not successful trading acceptance.
+
+## Follow-up: October 3 readmission and October 5 scheduling
+
+A later retained account 1 paper admission probe returned HTTP **200** at **2026-10-03T04:06:07.156554+00:00**, with native `x-ratelimit-limit: 200`. This is a later observation; the original 171 HTTP 401 probes and the 03:26:45 recheck remain recorded above. The probe timestamp does not timestamp the subsequent SDK snapshot.
+
+The first frozen snapshot invocation failed during import with **`ModuleNotFoundError: No module named 'collect'`**, process exit **1**, and **zero broker requests**. Its failure receipt was retained. A separate correction freeze authorized one invocation with the source directory expected by the unchanged helper. That corrected read-only SIP snapshot exited **0** on **2026-10-03 UTC**: the identity matched original account 1 and differed from account 2; the account was `ACTIVE`, not blocked, with zero positions, zero open orders and `sip_snapshot: 'ok'`. The snapshot printed no exact timestamp. The [receipt follow-up](receipt.json) preserves its native output with only the account reference removed.
+
+The frozen scope contained **four logical SDK calls**, a **120-second process bound**, and at most **16 HTTP attempts under the SDK's default retries**. These are bounds, not measured request or retry counts; actual HTTP attempts and usage remain unknown. The retry reference is the official alpaca-py `v0.44.0` source at `cc4cb3b7ba50ae250e621983c2779047fb16bb28`: [`common/constants.py`](https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/alpaca/common/constants.py) and [`common/rest.py`](https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/alpaca/common/rest.py).
+
+Native RTH timer enable and show commands both exited **0**, returning `UnitFileState=enabled`, `ActiveState=active` and `NextElapseUSecRealtime=Mon 2026-10-05 10:00:05 EDT`. The retained Monday index records the following schedule; the RTH entry is also supported by that native observation.
+
+| Monday, October 5, EDT | Retained scheduled unit | Recorded condition |
+| --- | --- | --- |
+| 06:45:05 | `paper-recover-a2-gate-20261005` | Account 2 old-lineage recovery gate |
+| 07:00:05 | `paper-pre-20261005` | Requires the dated native recovery gate |
+| 10:00:05 | `paper-rth-20261005` | Enabled after account 1 readmission |
+| 16:00:05 | `paper-ext-20261005` | Requires terminal, unhalted successor state |
+
+The Monday index records all four timers as enabled and active. The original account 2 numerical halt remains preserved; scheduled recovery and successor staging do not erase its failed acceptance. **No Monday orders or execution results are recorded here.** Account 1 readmission establishes the observed identity, flatness and SIP admission only. The assembled receipt and returned native output are local integration evidence, and do not constitute unchanged upstream test acceptance or promote paper or strategy qualification.

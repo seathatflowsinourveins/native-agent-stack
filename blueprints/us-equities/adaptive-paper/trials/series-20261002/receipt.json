@@ -592,5 +592,133 @@
     "No unchanged official upstream test suite was run by this evidence task. Repository validation covers structural consistency only.",
     "Broker paper fills are simulated and do not establish exchange execution quality, live slippage, queue position or live trading performance.",
     "Historical and fresh provider/model usage are unmeasured; no provider usage or new model execution is inferred from these artifacts."
-  ]
+  ],
+  "follow_up_2026_10_03_account1_readmission_and_monday_scheduling": {
+    "evidence_class": "local_integration_receipt_with_retained_native_operation_output",
+    "observation_date_utc": "2026-10-03",
+    "historical_receipt_fields_and_source_bindings_preserved": true,
+    "private_followup_sources_sha256": {
+      "account1-readmission-20261003/FREEZE.md": "615e56ee707ae961d00157ac91f6f16bfda5526ec137b239db62e28769f2aa42",
+      "account1-readmission-20261003/FREEZE-CORRECTION-20261003.md": "fa9a02766dcfd4f01f00f4f8c064f2686f380aee2bb4439919cbde5401634409",
+      "account1-readmission-20261003/startup-failed.json": "60a270bdb4c59a48b18b9bc9cedb8446f131df55a969dfb73a03b79d30527175",
+      "account1-readmission-20261003/receipt.json": "f0f0e6d160e64d9d9cbde3f41d45e68020d4367eb82c6417deb7666fae45156b",
+      "rate-limit/paper-20261003T040505Z.json": "1aaad24dc7abf5cc6fc279718835d2404979756420da39f652245585513e6bfe",
+      "SERIES-INDEX-20261005.md": "34d206820c0032ca7cb0c3fd8488c552a2c16c36ffbf4f13b327908c52b535a1"
+    },
+    "later_native_probe_original_json": {
+      "account": "paper",
+      "host": "paper-api.alpaca.markets",
+      "http_status": 200,
+      "interpretation": "200 calls/min: standard tier",
+      "observed_at_utc": "2026-10-03T04:06:07.156554+00:00",
+      "rate_limit_headers": {
+        "x-ratelimit-limit": "200",
+        "x-ratelimit-remaining": "199",
+        "x-ratelimit-reset": "1791000367"
+      },
+      "request": "GET /v2/account"
+    },
+    "original_startup_failure_excerpt": {
+      "kind": "paper_readmission_startup_failure",
+      "observation_date_utc": "2026-10-03",
+      "process_exit": 1,
+      "stage": "import_collect_before_credential_loader_or_broker_client",
+      "exception": "ModuleNotFoundError: No module named 'collect'",
+      "broker_requests": 0,
+      "cause": "Coordinator supplied adaptive-paper source directory; existing helper expects its parent us-equities directory.",
+      "correction": "One newly frozen corrected invocation; no source edit or process retry after broker access."
+    },
+    "corrected_native_read_only_snapshot": {
+      "snapshot_process_exit": 0,
+      "native_snapshot_timestamp": null,
+      "probe_timestamp_not_snapshot_timestamp": true,
+      "source_and_frozen_engine_fingerprints_verified": true,
+      "original_account1_fingerprint_lock_held": true,
+      "identity_matches_original_account1": true,
+      "distinct_from_account2": true,
+      "returned_snapshot": {
+        "status": "AccountStatus.ACTIVE",
+        "equity": "888277",
+        "cash": "888277",
+        "buying_power": "3553108",
+        "multiplier": "4",
+        "pattern_day_trader": null,
+        "daytrade_count": null,
+        "shorting_enabled": true,
+        "trading_blocked": false,
+        "account_blocked": false,
+        "positions": 0,
+        "open_orders": 0,
+        "sip_snapshot": "ok"
+      },
+      "native_stdout": "{'status': 'AccountStatus.ACTIVE', 'equity': '888277', 'cash': '888277', 'buying_power': '3553108', 'multiplier': '4', 'pattern_day_trader': None, 'daytrade_count': None, 'shorting_enabled': True, 'trading_blocked': False, 'account_blocked': False, 'positions': 0, 'open_orders': 0, 'sip_snapshot': 'ok'}",
+      "sanitization": "Only account_ref removed from the native snapshot mapping and stdout; all other native field values preserved.",
+      "orders": 0,
+      "engine_recovery": false,
+      "paper_qualification": false
+    },
+    "frozen_snapshot_bounds": {
+      "explicit_logical_sdk_calls": 4,
+      "default_sdk_retry_attempts_per_call": 3,
+      "max_http_attempts_under_sdk_defaults": 16,
+      "whole_process_timeout_seconds": 120,
+      "actual_http_attempts": null,
+      "actual_request_count": null,
+      "provider_usage": null,
+      "new_model_trial": false,
+      "source_helper_sha256": "4cf84a66439ad3deb427d9f5858a3e3cc16b52b1900adb3f9aae53cb3c42fa61",
+      "frozen_engine_revision": "dca821cca85dce3647fa7b488d5a23fbe5b85d4a",
+      "official_sdk_revision": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+      "official_retry_constants_source": "https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/alpaca/common/constants.py",
+      "official_retry_loop_source": "https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/alpaca/common/rest.py"
+    },
+    "monday_scheduling": {
+      "session_date": "2026-10-05",
+      "timezone": "EDT",
+      "source_label": "SERIES-INDEX-20261005.md",
+      "all_four_timers_enabled_active_in_retained_index": true,
+      "recorded_schedule": [
+        {
+          "unit": "paper-recover-a2-gate-20261005",
+          "time": "06:45:05",
+          "condition": "Account 2 old-lineage recovery gate"
+        },
+        {
+          "unit": "paper-pre-20261005",
+          "time": "07:00:05",
+          "condition": "gated on native old-lineage recovery"
+        },
+        {
+          "unit": "paper-rth-20261005",
+          "time": "10:00:05",
+          "condition": "enabled after native Account 1 readmission"
+        },
+        {
+          "unit": "paper-ext-20261005",
+          "time": "16:00:05",
+          "condition": "gated on the same successor terminal/unhalted state"
+        }
+      ],
+      "rth_timer_activation_authorized_by_frozen_rules": true,
+      "rth_timer_activation_observed": true,
+      "native_enable_exit": 0,
+      "native_show_exit": 0,
+      "original_native_rth_timer_observation": {
+        "UnitFileState": "enabled",
+        "ActiveState": "active",
+        "NextElapseUSecRealtime": "Mon 2026-10-05 10:00:05 EDT"
+      },
+      "original_account2_numeric_halt_preserved": true,
+      "monday_orders_not_yet_observed": true,
+      "monday_execution_acceptance": "not_established"
+    },
+    "limitations": [
+      "The original 22 source bindings, raw passed execution receipts, failed no-halt acceptance and historical HTTP 401 observations remain intact.",
+      "The later probe supplies its own exact timestamp; the SDK snapshot supplies only an observation date.",
+      "Four logical calls and sixteen default-retry HTTP attempts describe frozen scope and bounds, not measured actual request counts or provider usage.",
+      "The first import failure and correction freeze are retained. No snapshot-helper source change is claimed.",
+      "The assembled receipt and returned native output are local integration evidence, not unchanged official upstream test acceptance.",
+      "Readmission establishes observed paper identity, flatness and SIP admission. No paper or strategy qualification is promoted, and no Monday order outcome is recorded."
+    ]
+  }
 }
