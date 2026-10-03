@@ -4045,8 +4045,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "91c2f9a7c532d8a2a63a3754adc9053833294fcafa81e0c315dc78030bba9e83",
-      "bytes": 38354
+      "sha256": "25979151243677d1ed9b0c86e834a106c29ddf5663d8d430199118fc80ad5f1a",
+      "bytes": 38496
     },
     {
       "path": ".gitignore",
@@ -14980,6 +14980,11 @@
       "bytes": 20383
     },
     {
+      "path": "catalogs/foundation/upstream-audit-20261002.json",
+      "sha256": "d9a8a68611397997a9dba7e9daa3c25605f90515edba0c06e26d8c3015804122",
+      "bytes": 123799
+    },
+    {
       "path": "catalogs/landscape/README.md",
       "sha256": "500e375204086fb808fab88afc5c7ec5198218e1e484ece9ec8c1fe90139f784",
       "bytes": 10292
@@ -15803,6 +15808,11 @@
       "path": "docs/decisions/2026-10-02-two-host-north-star-architecture.md",
       "sha256": "64d49f2de46d3309d7802678039caac1609027b8f00b561987e464e94432847f",
       "bytes": 21453
+    },
+    {
+      "path": "docs/decisions/2026-10-02-upstream-audit.md",
+      "sha256": "053280fbd4f80bc9b9020cb08c2edb6cff4fe2d08049c468214f8207057bbfad",
+      "bytes": 18305
     },
     {
       "path": "docs/direct-results.md",
@@ -46260,6 +46270,11 @@
       "bytes": 2803
     },
     {
+      "path": "evidence/artifacts/upstream-audit-20261002/observations.json",
+      "sha256": "9a1cf45da89563977687c5fad0f0d1bd45ec0a25aea68372459b8131020b5772",
+      "bytes": 222176
+    },
+    {
       "path": "evidence/artifacts/usage-report.source.txt",
       "sha256": "e5ba2fc9e397b97888a4929069434321e4ea17ea298a536ae20360638a304d50",
       "bytes": 11763
@@ -50651,8 +50666,8 @@
     },
     {
       "path": "tools/sota-convergence/blind_checkout.py",
-      "sha256": "0b8785d20a0bad420d3b178874241fc728acc81a1bd5675eab4e1d079138dfaf",
-      "bytes": 55711
+      "sha256": "f4f81c03c8ba22da17bbc72d0fae519994ac3d75ce763e232b6b1ca74b070948",
+      "bytes": 56083
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",

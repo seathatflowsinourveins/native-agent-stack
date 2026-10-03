@@ -1,0 +1,4908 @@
+{
+  "schema_version": 2,
+  "kind": "upstream_quality_audit",
+  "meaning": "Upstream maintenance, release currency, provenance, advisories, default-branch checks, license and published Scorecard for the GitHub repositories that the definitive manifest's foundation rows name. Information only: no default, state or slot changes through it.",
+  "observed_at": "2026-10-03T13:27:14+00:00",
+  "thresholds": {
+    "stale_after_days": 90,
+    "old_release_days": 365,
+    "low_scorecard": 5.0,
+    "failing_conclusions": [
+      "failure",
+      "timed_out",
+      "startup_failure"
+    ],
+    "max_attested_assets": 5
+  },
+  "inputs": {
+    "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json": "cfd08b85efca343f428fadd8253a06ce9c08afb944a4f66a2aaae15d3c08fa96",
+    "evidence/artifacts/upstream-audit-20261002/observations.json": "9a1cf45da89563977687c5fad0f0d1bd45ec0a25aea68372459b8131020b5772"
+  },
+  "summary": {
+    "repositories": 59,
+    "flag_counts": {
+      "fetch_error": 0,
+      "archived": 0,
+      "stale": 1,
+      "no_release": 7,
+      "old_release": 1,
+      "no_provenance": 17,
+      "advisories": 24,
+      "ci_failing": 20,
+      "low_scorecard": 1
+    },
+    "archived_or_stale": 1,
+    "incomplete_counts": {
+      "head": 0,
+      "release": 0,
+      "attestations": 0,
+      "advisories": 0,
+      "check_runs": 1,
+      "deps_dev": 0
+    },
+    "provenance": {
+      "attested": 13,
+      "none": 17,
+      "unknown": 0,
+      "no_digest": 0,
+      "no_assets": 22
+    },
+    "scorecard_published": 19,
+    "by_state": {
+      "definitive": {
+        "repositories": 27,
+        "flag_counts": {
+          "fetch_error": 0,
+          "archived": 0,
+          "stale": 0,
+          "no_release": 3,
+          "old_release": 0,
+          "no_provenance": 6,
+          "advisories": 15,
+          "ci_failing": 12,
+          "low_scorecard": 1
+        },
+        "archived_or_stale": 0,
+        "incomplete_counts": {
+          "head": 0,
+          "release": 0,
+          "attestations": 0,
+          "advisories": 0,
+          "check_runs": 1,
+          "deps_dev": 0
+        },
+        "provenance": {
+          "attested": 9,
+          "none": 6,
+          "unknown": 0,
+          "no_digest": 0,
+          "no_assets": 9
+        },
+        "scorecard_published": 9
+      },
+      "resolved": {
+        "repositories": 16,
+        "flag_counts": {
+          "fetch_error": 0,
+          "archived": 0,
+          "stale": 0,
+          "no_release": 2,
+          "old_release": 1,
+          "no_provenance": 3,
+          "advisories": 6,
+          "ci_failing": 4,
+          "low_scorecard": 0
+        },
+        "archived_or_stale": 0,
+        "incomplete_counts": {
+          "head": 0,
+          "release": 0,
+          "attestations": 0,
+          "advisories": 0,
+          "check_runs": 0,
+          "deps_dev": 0
+        },
+        "provenance": {
+          "attested": 3,
+          "none": 3,
+          "unknown": 0,
+          "no_digest": 0,
+          "no_assets": 8
+        },
+        "scorecard_published": 6
+      },
+      "split": {
+        "repositories": 9,
+        "flag_counts": {
+          "fetch_error": 0,
+          "archived": 0,
+          "stale": 1,
+          "no_release": 2,
+          "old_release": 0,
+          "no_provenance": 4,
+          "advisories": 2,
+          "ci_failing": 3,
+          "low_scorecard": 0
+        },
+        "archived_or_stale": 1,
+        "incomplete_counts": {
+          "head": 0,
+          "release": 0,
+          "attestations": 0,
+          "advisories": 0,
+          "check_runs": 0,
+          "deps_dev": 0
+        },
+        "provenance": {
+          "attested": 0,
+          "none": 4,
+          "unknown": 0,
+          "no_digest": 0,
+          "no_assets": 3
+        },
+        "scorecard_published": 4
+      },
+      "measurement": {
+        "repositories": 2,
+        "flag_counts": {
+          "fetch_error": 0,
+          "archived": 0,
+          "stale": 0,
+          "no_release": 0,
+          "old_release": 0,
+          "no_provenance": 2,
+          "advisories": 0,
+          "ci_failing": 0,
+          "low_scorecard": 0
+        },
+        "archived_or_stale": 0,
+        "incomplete_counts": {
+          "head": 0,
+          "release": 0,
+          "attestations": 0,
+          "advisories": 0,
+          "check_runs": 0,
+          "deps_dev": 0
+        },
+        "provenance": {
+          "attested": 0,
+          "none": 2,
+          "unknown": 0,
+          "no_digest": 0,
+          "no_assets": 0
+        },
+        "scorecard_published": 0
+      },
+      "pinned": {
+        "repositories": 5,
+        "flag_counts": {
+          "fetch_error": 0,
+          "archived": 0,
+          "stale": 0,
+          "no_release": 0,
+          "old_release": 0,
+          "no_provenance": 2,
+          "advisories": 1,
+          "ci_failing": 1,
+          "low_scorecard": 0
+        },
+        "archived_or_stale": 0,
+        "incomplete_counts": {
+          "head": 0,
+          "release": 0,
+          "attestations": 0,
+          "advisories": 0,
+          "check_runs": 0,
+          "deps_dev": 0
+        },
+        "provenance": {
+          "attested": 1,
+          "none": 2,
+          "unknown": 0,
+          "no_digest": 0,
+          "no_assets": 2
+        },
+        "scorecard_published": 0
+      }
+    },
+    "installed": {
+      "repositories": 38,
+      "flag_counts": {
+        "fetch_error": 0,
+        "archived": 0,
+        "stale": 0,
+        "no_release": 4,
+        "old_release": 0,
+        "no_provenance": 11,
+        "advisories": 18,
+        "ci_failing": 14,
+        "low_scorecard": 1
+      },
+      "archived_or_stale": 0,
+      "incomplete_counts": {
+        "head": 0,
+        "release": 0,
+        "attestations": 0,
+        "advisories": 0,
+        "check_runs": 1,
+        "deps_dev": 0
+      },
+      "provenance": {
+        "attested": 11,
+        "none": 11,
+        "unknown": 0,
+        "no_digest": 0,
+        "no_assets": 12
+      },
+      "scorecard_published": 11
+    },
+    "not_audited": 5
+  },
+  "not_audited": [
+    {
+      "named_as": "repository",
+      "reason": "not_github",
+      "slot_id": "base-distribution",
+      "state": "definitive",
+      "url": "https://releases.ubuntu.com/26.04.1/"
+    },
+    {
+      "named_as": null,
+      "reason": "finalists_without_repository",
+      "slot_id": "code-search",
+      "state": "split",
+      "url": null
+    },
+    {
+      "named_as": "arm",
+      "reason": "not_github",
+      "slot_id": "embedding-model",
+      "state": "split",
+      "url": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16"
+    },
+    {
+      "named_as": null,
+      "reason": "finalists_without_repository",
+      "slot_id": "memory-owner",
+      "state": "measurement",
+      "url": null
+    },
+    {
+      "named_as": null,
+      "reason": "finalists_without_repository",
+      "slot_id": "research-skill",
+      "state": "measurement",
+      "url": null
+    }
+  ],
+  "rows": [
+    {
+      "repository": "aannoo/hcom",
+      "roles": [
+        {
+          "installs": false,
+          "named_as": [
+            "former_default",
+            "arm"
+          ],
+          "slot_id": "agent-messaging",
+          "state": "split"
+        }
+      ],
+      "flags": [
+        "no_provenance",
+        "advisories"
+      ],
+      "observed_at": "2026-10-03T13:26:15+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T01:48:19Z",
+      "days_since_last_commit": 2,
+      "release": {
+        "tag": "v0.7.27",
+        "published_at": "2026-10-01T02:11:55Z",
+        "days_old": 2,
+        "assets": 23,
+        "assets_with_digest": 23,
+        "queried_assets": [
+          {
+            "attestations": 0,
+            "digest": "sha256:a822c45eb0d14f14a46913280c58c29328be2abe087242b1b6df2049ef48f05d",
+            "name": "dist-manifest.json"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:6b7a999cf39559b0ad58de26ba91037ccd58c85a4e51d51ef5d24b3e8e49c4ec",
+            "name": "hcom-aarch64-apple-darwin.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:3bf4f3b1688808b5b2d50ae63ed18a5fb9da95fa7e44c9d08caeddda78107e2d",
+            "name": "hcom-aarch64-apple-darwin.tar.gz.sha256"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:c5c6e260da07d1a6fdadf0365e364d9473f7c521f315793415b13fc1b849824f",
+            "name": "hcom-aarch64-linux-android.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:b52fcea0d2b87486cf9a355ad23bc396faf574dc754337d624c1ae4a41f4c31d",
+            "name": "hcom-aarch64-linux-android.tar.gz.sha256"
+          }
+        ],
+        "attested_assets": 0,
+        "provenance": "none"
+      },
+      "advisories": {
+        "count": 1,
+        "complete": true,
+        "severities": [
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "observed": 46,
+        "total": 46,
+        "total_counts": [
+          46
+        ],
+        "check_suites": 9,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "actions/attest",
+      "roles": [
+        {
+          "installs": false,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "attest",
+          "state": "definitive"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-03T13:26:15+00:00",
+      "archived": false,
+      "last_commit": "2026-10-03T00:00:05Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v4.2.2",
+        "published_at": "2026-08-04T20:36:29Z",
+        "days_old": 59,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "queried_assets": [],
+        "attested_assets": 0,
+        "provenance": "no_assets"
+      },
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 77,
+        "total": 77,
+        "total_counts": [
+          77
+        ],
+        "check_suites": 79,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "adbar/trafilatura",
+      "roles": [
+        {
+          "installs": false,
+          "named_as": [
+            "former_default"
+          ],
+          "slot_id": "trafilatura",
+          "state": "resolved"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-03T13:26:15+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T16:53:21Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v2.3.0",
+        "published_at": "2026-10-02T16:53:41Z",
+        "days_old": 0,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "queried_assets": [],
+        "attested_assets": 0,
+        "provenance": "no_assets"
+      },
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 13,
+        "total": 13,
+        "total_counts": [
+          13
+        ],
+        "check_suites": 4,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "Apache-2.0",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 5.1
+      },
+      "incomplete": []
+    },
+    {
+      "repository": "anchore/syft",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "syft",
+          "state": "definitive"
+        }
+      ],
+      "flags": [
+        "advisories",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-03T13:26:15+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T13:30:02Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v1.54.0",
+        "published_at": "2026-10-01T20:54:29Z",
+        "days_old": 1,
+        "assets": 30,
+        "assets_with_digest": 30,
+        "queried_assets": [
+          {
+            "attestations": 1,
+            "digest": "sha256:e423344e663d7d14db62e51ddd31e4a5012818ed69e78358391dc487483f839c",
+            "name": "syft_1.54.0_checksums.txt"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:6a0dbf94cb89e2fb157f022bed752b3ceb5827cb557a4a4cfb6af67f98b99811",
+            "name": "syft_1.54.0_checksums.txt.sigstore.json"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:0924a17ab435a936883fe36ebf220a50765810984bcc1b3e13c0f8d628bcedf2",
+            "name": "syft_1.54.0_darwin_amd64.sbom"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:22b71725e388a4c0de385249c4bc1044f78a870f2894f34b43ba957e792145d7",
+            "name": "syft_1.54.0_darwin_amd64.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:ed4455d2db6817d698720bf96acebb71bb0015c16be644c182d7bda88f5cc583",
+            "name": "syft_1.54.0_darwin_arm64.sbom"
+          }
+        ],
+        "attested_assets": 5,
+        "provenance": "attested"
+      },
+      "advisories": {
+        "count": 3,
+        "complete": true,
+        "severities": [
+          "medium",
+          "medium",
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "observed": 14,
+        "total": 14,
+        "total_counts": [
+          14
+        ],
+        "check_suites": 5,
+        "complete": true,
+        "failing": 1
+      },
+      "license": "Apache-2.0",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 8
+      },
+      "incomplete": []
+    },
+    {
+      "repository": "anthropics/claude-agent-sdk-python",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "claude-agent-sdk",
+          "state": "definitive"
+        }
+      ],
+      "flags": [
+        "advisories",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-03T13:26:17+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T20:22:40Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v0.2.163",
+        "published_at": "2026-09-30T19:47:45Z",
+        "days_old": 2,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "queried_assets": [],
+        "attested_assets": 0,
+        "provenance": "no_assets"
+      },
+      "advisories": {
+        "count": 1,
+        "complete": true,
+        "severities": [
+          "critical"
+        ]
+      },
+      "check_runs": {
+        "observed": 20,
+        "total": 20,
+        "total_counts": [
+          20
+        ],
+        "check_suites": 18,
+        "complete": true,
+        "failing": 2
+      },
+      "license": "MIT",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "anthropics/claude-code",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "claude-code",
+          "state": "definitive"
+        }
+      ],
+      "flags": [
+        "advisories",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-03T13:26:18+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T20:19:38Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v2.1.288",
+        "published_at": "2026-10-02T20:19:57Z",
+        "days_old": 0,
+        "assets": 10,
+        "assets_with_digest": 10,
+        "queried_assets": [
+          {
+            "attestations": 1,
+            "digest": "sha256:86616c1bdb2d3581343b41bf1674b936991d74d14b6d5cf205194cd7d2e104fe",
+            "name": "claude-darwin-arm64.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:d5181f0842894b6a495e97bc4f0215556ee224b9a8a27b6e7fc3c340dea9e08e",
+            "name": "claude-darwin-x64.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:31df6461c2f8f9684aeb0e6cd3c4d0411aad21683827e1abd9ad93ec69ed4186",
+            "name": "claude-linux-arm64-musl.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:4d27054191394530666025db88114ea38c31cc5f5564766beb909b079a9652c4",
+            "name": "claude-linux-arm64.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:889979239be18d47047d88f4fcbf3d8a6fead28190512c42c31a34b23e4800fb",
+            "name": "claude-linux-x64-musl.tar.gz"
+          }
+        ],
+        "attested_assets": 5,
+        "provenance": "attested"
+      },
+      "advisories": {
+        "count": 32,
+        "complete": true,
+        "severities": [
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "low",
+          "low",
+          "low",
+          "medium",
+          "medium",
+          "medium",
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "observed": 1000,
+        "total": 1000,
+        "total_counts": [
+          1000
+        ],
+        "check_suites": 1343,
+        "complete": false,
+        "failing": 11
+      },
+      "license": null,
+      "scorecard": "not_covered",
+      "incomplete": [
+        "check_runs"
+      ]
+    },
+    {
+      "repository": "anthropics/claude-code-action",
+      "roles": [
+        {
+          "installs": false,
+          "named_as": [
+            "former_default"
+          ],
+          "slot_id": "claude-code-action",
+          "state": "resolved"
+        }
+      ],
+      "flags": [
+        "old_release",
+        "advisories"
+      ],
+      "observed_at": "2026-10-03T13:26:18+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T20:23:19Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v1",
+        "published_at": "2025-08-26T17:01:10Z",
+        "days_old": 402,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "queried_assets": [],
+        "attested_assets": 0,
+        "provenance": "no_assets"
+      },
+      "advisories": {
+        "count": 1,
+        "complete": true,
+        "severities": [
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "observed": 22,
+        "total": 22,
+        "total_counts": [
+          22
+        ],
+        "check_suites": 11,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "anthropics/claude-plugins-official",
+      "roles": [
+        {
+          "installs": false,
+          "named_as": [
+            "former_default"
+          ],
+          "slot_id": "claude-plugins-official-code-intelligence-lsp-pl",
+          "state": "resolved"
+        }
+      ],
+      "flags": [
+        "no_release",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-03T13:26:18+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T21:26:10Z",
+      "days_since_last_commit": 0,
+      "release": null,
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 8,
+        "total": 8,
+        "total_counts": [
+          8
+        ],
+        "check_suites": 15,
+        "complete": true,
+        "failing": 1
+      },
+      "license": "Apache-2.0",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "anthropics/sandbox-runtime",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "sandbox-runtime-srt",
+          "state": "definitive"
+        }
+      ],
+      "flags": [
+        "advisories"
+      ],
+      "observed_at": "2026-10-03T13:26:19+00:00",
+      "archived": false,
+      "last_commit": "2026-10-03T12:33:01Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v0.0.78",
+        "published_at": "2026-09-30T01:09:22Z",
+        "days_old": 3,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "queried_assets": [],
+        "attested_assets": 0,
+        "provenance": "no_assets"
+      },
+      "advisories": {
+        "count": 1,
+        "complete": true,
+        "severities": [
+          "low"
+        ]
+      },
+      "check_runs": {
+        "observed": 8,
+        "total": 8,
+        "total_counts": [
+          8
+        ],
+        "check_suites": 8,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "Apache-2.0",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "anthropics/skills",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "skill-authoring",
+          "state": "resolved"
+        }
+      ],
+      "flags": [
+        "no_release"
+      ],
+      "observed_at": "2026-10-03T13:26:21+00:00",
+      "archived": false,
+      "last_commit": "2026-09-29T02:20:03Z",
+      "days_since_last_commit": 4,
+      "release": null,
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 0,
+        "total": 0,
+        "total_counts": [
+          0
+        ],
+        "check_suites": 7,
+        "complete": true,
+        "failing": 0
+      },
+      "license": null,
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "arize-ai/phoenix",
+      "roles": [
+        {
+          "installs": false,
+          "named_as": [
+            "former_default"
+          ],
+          "slot_id": "phoenix",
+          "state": "resolved"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-03T13:26:21+00:00",
+      "archived": false,
+      "last_commit": "2026-10-03T00:04:18Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "arize-phoenix-v20.19.0",
+        "published_at": "2026-10-01T22:59:10Z",
+        "days_old": 1,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "queried_assets": [],
+        "attested_assets": 0,
+        "provenance": "no_assets"
+      },
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 61,
+        "total": 61,
+        "total_counts": [
+          61
+        ],
+        "check_suites": 32,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "NOASSERTION",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "assafelovic/gpt-researcher",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "research-harnesses",
+          "state": "pinned"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-03T13:26:21+00:00",
+      "archived": false,
+      "last_commit": "2026-09-26T16:56:07Z",
+      "days_since_last_commit": 6,
+      "release": {
+        "tag": "v3.7.0",
+        "published_at": "2026-09-26T17:46:25Z",
+        "days_old": 6,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "queried_assets": [],
+        "attested_assets": 0,
+        "provenance": "no_assets"
+      },
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 9,
+        "total": 9,
+        "total_counts": [
+          9
+        ],
+        "check_suites": 7,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "Apache-2.0",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "ast-grep/ast-grep",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "structural-search",
+          "state": "resolved"
+        }
+      ],
+      "flags": [
+        "no_provenance"
+      ],
+      "observed_at": "2026-10-03T13:26:23+00:00",
+      "archived": false,
+      "last_commit": "2026-09-28T14:22:46Z",
+      "days_since_last_commit": 4,
+      "release": {
+        "tag": "0.45.3",
+        "published_at": "2026-08-31T01:42:23Z",
+        "days_old": 33,
+        "assets": 7,
+        "assets_with_digest": 7,
+        "queried_assets": [
+          {
+            "attestations": 0,
+            "digest": "sha256:6d2279dea5bea2ad79c66ea93f5fe54ba926e398a8a26de76c56db68fe59eac6",
+            "name": "app-aarch64-apple-darwin.zip"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:5da748848c4cad2a1e7f41e27b58871714dd2c0908632f9874cc2833b92a21ca",
+            "name": "app-aarch64-pc-windows-msvc.zip"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:b39cfbc58da4b869a88b8a4bc57bd5deb0d24541e704cf7c257da7b53ec81c8f",
+            "name": "app-aarch64-unknown-linux-gnu.zip"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:9c056ad0a95bad2834eeab4997c2583d1ba6b1b709cb85d3068ca4595a362147",
+            "name": "app-i686-pc-windows-msvc.zip"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:b2ffd26f42810340326a9e8a084bdc3647a8795c1a3f21fc06bd7bef3c7c5b2c",
+            "name": "app-x86_64-apple-darwin.zip"
+          }
+        ],
+        "attested_assets": 0,
+        "provenance": "none"
+      },
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 156,
+        "total": 156,
+        "total_counts": [
+          156
+        ],
+        "check_suites": 28,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "betterleaks/betterleaks",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "betterleaks",
+          "state": "definitive"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-03T13:26:23+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T18:58:46Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v1.9.0",
+        "published_at": "2026-09-29T20:08:06Z",
+        "days_old": 3,
+        "assets": 8,
+        "assets_with_digest": 8,
+        "queried_assets": [
+          {
+            "attestations": 1,
+            "digest": "sha256:83dd7eaab13d44a1e8e347a17064cdef153a1478db473276d41b38d55613d3f2",
+            "name": "betterleaks_1.9.0_darwin_arm64.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:68dfd83458d9e7f90663daa7a81c7f944083b170dae82e4f5f8d0581ed519ef1",
+            "name": "betterleaks_1.9.0_darwin_x64.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:1d39116e0a58dc94574715e2aa12a2dbd5062f193eee3fec011fef6ba06bd13b",
+            "name": "betterleaks_1.9.0_linux_arm64.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:f8b185a39ffcece2a1ca82bf3a4e7435cd81963ffd16b7a9128daf75f35f6de7",
+            "name": "betterleaks_1.9.0_linux_x64.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:3e5b9b6cdbfe8d486ae2dd2fa137473dc9ab42bf50317f051b73561121861816",
+            "name": "betterleaks_1.9.0_windows_arm64.zip"
+          }
+        ],
+        "attested_assets": 5,
+        "provenance": "attested"
+      },
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 2,
+        "total": 2,
+        "total_counts": [
+          2
+        ],
+        "check_suites": 3,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "bytedance/deer-flow",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "research-harnesses",
+          "state": "pinned"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-03T13:26:23+00:00",
+      "archived": false,
+      "last_commit": "2026-10-03T13:16:01Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v2.1.0",
+        "published_at": "2026-09-24T10:40:44Z",
+        "days_old": 9,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "queried_assets": [],
+        "attested_assets": 0,
+        "provenance": "no_assets"
+      },
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 22,
+        "total": 22,
+        "total_counts": [
+          22
+        ],
+        "check_suites": 14,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "ccusage/ccusage",
+      "roles": [
+        {
+          "installs": false,
+          "named_as": [
+            "former_default"
+          ],
+          "slot_id": "ccusage",
+          "state": "resolved"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-03T13:26:25+00:00",
+      "archived": false,
+      "last_commit": "2026-10-03T10:18:42Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v20.0.26",
+        "published_at": "2026-09-27T16:26:00Z",
+        "days_old": 5,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "queried_assets": [],
+        "attested_assets": 0,
+        "provenance": "no_assets"
+      },
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 5,
+        "total": 5,
+        "total_counts": [
+          5
+        ],
+        "check_suites": 12,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "NOASSERTION",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "cli/cli",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "gh-github-cli",
+          "state": "definitive"
+        }
+      ],
+      "flags": [
+        "advisories"
+      ],
+      "observed_at": "2026-10-03T13:26:26+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T16:05:07Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v2.102.0",
+        "published_at": "2026-09-30T02:40:02Z",
+        "days_old": 3,
+        "assets": 22,
+        "assets_with_digest": 22,
+        "queried_assets": [
+          {
+            "attestations": 1,
+            "digest": "sha256:afe49e9affa232faa8212aed035417166f6ade9b9470acb53d4dbd28c0504e8d",
+            "name": "gh_2.102.0_checksums.txt"
+          },
+          {
+            "attestations": 2,
+            "digest": "sha256:759b31942b78c05434a5d958fdacfc66aaf81446e283b4a8b1444104cf9de850",
+            "name": "gh_2.102.0_linux_386.deb"
+          },
+          {
+            "attestations": 2,
+            "digest": "sha256:9b502088f51d4f7dda65ead3e240a71b76febac1e45f2d823557495f208b8787",
+            "name": "gh_2.102.0_linux_386.rpm"
+          },
+          {
+            "attestations": 2,
+            "digest": "sha256:307972902a54bf5e05e3cdc80a6ac0d30c2dd7c817ba5249a4ecccf9f11754f7",
+            "name": "gh_2.102.0_linux_386.tar.gz"
+          },
+          {
+            "attestations": 2,
+            "digest": "sha256:7e54a307f90afdc59796c325ec0c49fb09e6c18537727207a8ac7513584ea5b0",
+            "name": "gh_2.102.0_linux_amd64.deb"
+          }
+        ],
+        "attested_assets": 5,
+        "provenance": "attested"
+      },
+      "advisories": {
+        "count": 17,
+        "complete": true,
+        "severities": [
+          "high",
+          "high",
+          "low",
+          "low",
+          "low",
+          "low",
+          "low",
+          "low",
+          "low",
+          "low",
+          "low",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "observed": 268,
+        "total": 268,
+        "total_counts": [
+          268
+        ],
+        "check_suites": 63,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 6.8
+      },
+      "incomplete": []
+    },
+    {
+      "repository": "dagucloud/dagu",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "dagu",
+          "state": "definitive"
+        }
+      ],
+      "flags": [
+        "advisories"
+      ],
+      "observed_at": "2026-10-03T13:26:27+00:00",
+      "archived": false,
+      "last_commit": "2026-10-03T11:50:04Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v2.18.1",
+        "published_at": "2026-09-29T15:24:51Z",
+        "days_old": 3,
+        "assets": 15,
+        "assets_with_digest": 15,
+        "queried_assets": [
+          {
+            "attestations": 0,
+            "digest": "sha256:177f151bef2d1a371c87ed4139e7e88b2b9e71114d505e870ba52f8e780bed87",
+            "name": "checksums.txt"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:2daef7db234880d594aa9deacac1b525476d696ef53f7f0345ef019091e9683c",
+            "name": "dagu-2.18.1-setup.exe"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:cfd0cb0294e96f27264dd9be8f391537a0cc9878dc8f1cc70404be298e475c81",
+            "name": "dagu_2.18.1_darwin_amd64.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:7f0765bdfe75835918e1e09fb86299ab109d7b28bc41bfe4f0856f9f6a878661",
+            "name": "dagu_2.18.1_darwin_arm64.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:5f38a76142c5db9652df923eddb019ced55f997f2c09eec2d199ff74fc1e36fd",
+            "name": "dagu_2.18.1_linux_386.tar.gz"
+          }
+        ],
+        "attested_assets": 3,
+        "provenance": "attested"
+      },
+      "advisories": {
+        "count": 6,
+        "complete": true,
+        "severities": [
+          "critical",
+          "high",
+          "high",
+          "low",
+          "low",
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "observed": 24,
+        "total": 24,
+        "total_counts": [
+          24
+        ],
+        "check_suites": 12,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "GPL-3.0",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "dependabot/dependabot-core",
+      "roles": [
+        {
+          "installs": false,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "dependabot",
+          "state": "resolved"
+        }
+      ],
+      "flags": [
+        "advisories"
+      ],
+      "observed_at": "2026-10-03T13:26:27+00:00",
+      "archived": false,
+      "last_commit": "2026-10-03T04:11:02Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v0.398.0",
+        "published_at": "2026-09-28T03:51:27Z",
+        "days_old": 5,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "queried_assets": [],
+        "attested_assets": 0,
+        "provenance": "no_assets"
+      },
+      "advisories": {
+        "count": 1,
+        "complete": true,
+        "severities": [
+          "low"
+        ]
+      },
+      "check_runs": {
+        "observed": 41,
+        "total": 41,
+        "total_counts": [
+          41
+        ],
+        "check_suites": 10,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 8.1
+      },
+      "incomplete": []
+    },
+    {
+      "repository": "diegosouzapw/omniroute",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "gpt-gateway",
+          "state": "pinned"
+        }
+      ],
+      "flags": [
+        "no_provenance",
+        "advisories",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-03T13:26:30+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T14:59:36Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v3.8.51",
+        "published_at": "2026-09-30T01:41:50Z",
+        "days_old": 3,
+        "assets": 17,
+        "assets_with_digest": 17,
+        "queried_assets": [
+          {
+            "attestations": 0,
+            "digest": "sha256:16b084c707f046fbc66afd997ee900ae292e70ed82dedc4c5128233f99fcfc93",
+            "name": "CHANGELOG-v3.8.51.md"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:cea86de3da43315906c753f2f6c0c892d1f89a38b381bdf7a20eab45555586c3",
+            "name": "latest-linux-arm64.yml"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:6a18992f0ec29d352d903abb2fbccc4093c187bbfb8adb25c8038b0450b9f8dc",
+            "name": "latest-linux.yml"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:05c5eff171bc2e7dedca6a486391198396465a22b0b768c77a4871ad0fdb1cfa",
+            "name": "latest-mac.yml"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:d3909bc3009bf830f611d5421b7e0e4c073ec528cdbcd713cf610dfbf78ed696",
+            "name": "latest.yml"
+          }
+        ],
+        "attested_assets": 0,
+        "provenance": "none"
+      },
+      "advisories": {
+        "count": 1,
+        "complete": true,
+        "severities": [
+          "critical"
+        ]
+      },
+      "check_runs": {
+        "observed": 162,
+        "total": 162,
+        "total_counts": [
+          162
+        ],
+        "check_suites": 33,
+        "complete": true,
+        "failing": 20
+      },
+      "license": "MIT",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "docker/compose",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "docker-compose",
+          "state": "definitive"
+        }
+      ],
+      "flags": [
+        "no_provenance",
+        "advisories",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-03T13:26:31+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T15:35:20Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v5.6.0",
+        "published_at": "2026-10-02T16:07:06Z",
+        "days_old": 0,
+        "assets": 56,
+        "assets_with_digest": 56,
+        "queried_assets": [
+          {
+            "attestations": 0,
+            "digest": "sha256:40d09e5c4e2f2e24f99c0520cbd29c02d816b58800b4e11070318cffe03c6fbd",
+            "name": "checksums.txt"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:bd714a42b46e51757fc1121085b3096b9064e3f80d3ca5a991e33f44df4f43c9",
+            "name": "docker-compose-darwin-aarch64"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:53d21d6342a291d85c85ef1159e1a8f0c6850bb9f5d24ca77735df84124dafaf",
+            "name": "docker-compose-darwin-aarch64.provenance.json"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:f7126f20463a335cd3e49b196ec3ecb178c1688d2dfb0f76c2db1a50dc0f9f01",
+            "name": "docker-compose-darwin-aarch64.sbom.json"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:0414592b27ec3707229558796187b0ed5b3ee08aaf9ba3cffd7fb61a4f83bbdc",
+            "name": "docker-compose-darwin-aarch64.sha256"
+          }
+        ],
+        "attested_assets": 0,
+        "provenance": "none"
+      },
+      "advisories": {
+        "count": 1,
+        "complete": true,
+        "severities": [
+          "high"
+        ]
+      },
+      "check_runs": {
+        "observed": 142,
+        "total": 142,
+        "total_counts": [
+          142
+        ],
+        "check_suites": 19,
+        "complete": true,
+        "failing": 7
+      },
+      "license": "Apache-2.0",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 8
+      },
+      "incomplete": []
+    },
+    {
+      "repository": "gethasp/hasp",
+      "roles": [
+        {
+          "installs": false,
+          "named_as": [
+            "arm"
+          ],
+          "slot_id": "credential-custody",
+          "state": "measurement"
+        }
+      ],
+      "flags": [
+        "no_provenance"
+      ],
+      "observed_at": "2026-10-03T13:26:33+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T21:02:00Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v1.0.44",
+        "published_at": "2026-10-02T21:29:01Z",
+        "days_old": 0,
+        "assets": 28,
+        "assets_with_digest": 28,
+        "queried_assets": [
+          {
+            "attestations": 0,
+            "digest": "sha256:1bce3b9e70a2e0c5dc5659ac3b4f1738971f3360be811b7b86514a565f050fed",
+            "name": "hasp-release-public-key.asc"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:80255aa588ada0c6467736286c716ea49480bc123ecacf3a8879f5f1e5f1058c",
+            "name": "hasp-v1.0.44-darwin-amd64.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:d0a94a49d44eee997240d5046803e7f779b3288c51cfbdc05cf4a922309322f7",
+            "name": "hasp-v1.0.44-darwin-amd64.tar.gz.sig"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:80ed01b0c842521f9cc1176fdc4a8581d92281d515bc656ac1ca48f3c1eb2c3e",
+            "name": "hasp-v1.0.44-darwin-arm64.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:6bedbec8877ddfb6e2150f16125e1fede1f31a25b8d5e47fb526402b87603ea1",
+            "name": "hasp-v1.0.44-darwin-arm64.tar.gz.sig"
+          }
+        ],
+        "attested_assets": 0,
+        "provenance": "none"
+      },
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 21,
+        "total": 21,
+        "total_counts": [
+          21
+        ],
+        "check_suites": 2,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "NOASSERTION",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "git/git",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "git",
+          "state": "definitive"
+        }
+      ],
+      "flags": [
+        "no_release",
+        "advisories"
+      ],
+      "observed_at": "2026-10-03T13:26:36+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T18:28:16Z",
+      "days_since_last_commit": 1,
+      "release": null,
+      "advisories": {
+        "count": 32,
+        "complete": true,
+        "severities": [
+          "critical",
+          "critical",
+          "critical",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "low",
+          "low",
+          "low",
+          "low",
+          "low",
+          "low",
+          "low",
+          "low",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "observed": 49,
+        "total": 49,
+        "total_counts": [
+          49
+        ],
+        "check_suites": 6,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "NOASSERTION",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 5.2
+      },
+      "incomplete": []
+    },
+    {
+      "repository": "github/codeql-action",
+      "roles": [
+        {
+          "installs": false,
+          "named_as": [
+            "former_default"
+          ],
+          "slot_id": "codeql-sarif",
+          "state": "resolved"
+        }
+      ],
+      "flags": [
+        "advisories",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-03T13:26:36+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T17:50:29Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "codeql-bundle-v2.27.1",
+        "published_at": "2026-09-22T17:10:11Z",
+        "days_old": 10,
+        "assets": 34,
+        "assets_with_digest": 34,
+        "queried_assets": [
+          {
+            "attestations": 1,
+            "digest": "sha256:a745d79b9d9a4e149ab3a40f45e035aa0e48dc6dc0201b393ccf5c9bb66fad9d",
+            "name": "cli-version-2.27.1.txt"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:71247327cf3afe4115acc546fe3ac77f2865928205d7688d6a0b7153e055603f",
+            "name": "codeql-bundle-actions-linux64.tar.zst"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:d4245a690c4bc2e346c510c1a8a1fcbf4b76ba7f799cf2771bd1983bc63d949c",
+            "name": "codeql-bundle-cpp-linux64.tar.zst"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:f012adbe9ec6e3ce1e662c45592db4a6b9bed177395b1c7bccb93bb348ff9630",
+            "name": "codeql-bundle-csharp-linux64.tar.zst"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:c7fd9efd7bdd93b89a6d8daa6023611156be13608042c39ae6701722a1fef04e",
+            "name": "codeql-bundle-go-linux64.tar.zst"
+          }
+        ],
+        "attested_assets": 5,
+        "provenance": "attested"
+      },
+      "advisories": {
+        "count": 2,
+        "complete": true,
+        "severities": [
+          "high",
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "observed": 774,
+        "total": 774,
+        "total_counts": [
+          774
+        ],
+        "check_suites": 328,
+        "complete": true,
+        "failing": 1
+      },
+      "license": "MIT",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "google-deepmind/gemma",
+      "roles": [
+        {
+          "installs": false,
+          "named_as": [
+            "arm"
+          ],
+          "slot_id": "embedding-model",
+          "state": "split"
+        }
+      ],
+      "flags": [
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-03T13:26:37+00:00",
+      "archived": false,
+      "last_commit": "2026-09-30T08:05:57Z",
+      "days_since_last_commit": 3,
+      "release": {
+        "tag": "v4.0.1",
+        "published_at": "2026-05-20T15:37:55Z",
+        "days_old": 135,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "queried_assets": [],
+        "attested_assets": 0,
+        "provenance": "no_assets"
+      },
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 10,
+        "total": 10,
+        "total_counts": [
+          10
+        ],
+        "check_suites": 8,
+        "complete": true,
+        "failing": 2
+      },
+      "license": "Apache-2.0",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "grafana/grafana",
+      "roles": [
+        {
+          "installs": false,
+          "named_as": [
+            "former_default",
+            "arm"
+          ],
+          "slot_id": "grafana",
+          "state": "split"
+        },
+        {
+          "installs": false,
+          "named_as": [
+            "arm"
+          ],
+          "slot_id": "loki",
+          "state": "split"
+        }
+      ],
+      "flags": [
+        "no_provenance",
+        "advisories",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-03T13:26:37+00:00",
+      "archived": false,
+      "last_commit": "2026-10-03T11:05:43Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v13.2.3",
+        "published_at": "2026-09-29T09:02:18Z",
+        "days_old": 4,
+        "assets": 13,
+        "assets_with_digest": 13,
+        "queried_assets": [
+          {
+            "attestations": 0,
+            "digest": "sha256:2cc5d089f7e615624531ca0f7fb15fa3af27714678bfc7a9c1c9ddc684452994",
+            "name": "grafana-enterprise-rpi_13.2.3_36482603486_linux_arm-6.deb"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:ee07d48e1933f81167a9783e0967492edfaaf7a78a6be0d078b2a11ffbd0c56a",
+            "name": "grafana-enterprise_13.2.3_36482603486_linux_amd64.deb"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:e159494522b4fb240f55d8807a3d7f23bc680f86fcbbdd86bf16111cf1b0745f",
+            "name": "grafana-enterprise_13.2.3_36482603486_linux_amd64.rpm"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:2c2d384a409caa3fdf87b07ac964b1b2fd2bbfb651922c84a80e93ceb099b516",
+            "name": "grafana-enterprise_13.2.3_36482603486_linux_arm-7.deb"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:675a6e0f5ffe5ce6ff4aff73f0bf6e5dd1497377a63947b199bc79e4fd647dd2",
+            "name": "grafana-enterprise_13.2.3_36482603486_linux_arm64.deb"
+          }
+        ],
+        "attested_assets": 0,
+        "provenance": "none"
+      },
+      "advisories": {
+        "count": 28,
+        "complete": true,
+        "severities": [
+          "critical",
+          "critical",
+          "critical",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "observed": 274,
+        "total": 274,
+        "total_counts": [
+          274
+        ],
+        "check_suites": 35,
+        "complete": true,
+        "failing": 1
+      },
+      "license": "AGPL-3.0",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 6.8
+      },
+      "incomplete": []
+    },
+    {
+      "repository": "grafana/loki",
+      "roles": [
+        {
+          "installs": false,
+          "named_as": [
+            "arm"
+          ],
+          "slot_id": "grafana",
+          "state": "split"
+        },
+        {
+          "installs": false,
+          "named_as": [
+            "former_default",
+            "arm"
+          ],
+          "slot_id": "loki",
+          "state": "split"
+        }
+      ],
+      "flags": [
+        "no_provenance"
+      ],
+      "observed_at": "2026-10-03T13:26:38+00:00",
+      "archived": false,
+      "last_commit": "2026-10-03T06:28:00Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v3.7.8",
+        "published_at": "2026-09-17T15:51:10Z",
+        "days_old": 15,
+        "assets": 47,
+        "assets_with_digest": 47,
+        "queried_assets": [
+          {
+            "attestations": 0,
+            "digest": "sha256:503e0dcf68cf32817dd963ce375c7b8b928124fb7dae9598d10a4cc2b196b86a",
+            "name": "logcli-3.7.8-1.aarch64.rpm"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:5675aa1dede23971e3af8ddf4f9d83715968c911ea42b18c0c9adbc6926ea6c5",
+            "name": "logcli-3.7.8-1.arm.rpm"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:e4c3d6df35c2b83f11c7e7538b02edc34e8366ee3718180b9e07386dec1f3de4",
+            "name": "logcli-3.7.8-1.x86_64.rpm"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:9f312919b384d048e9cfcf542bf00bd768644ef18064577af414bf61f4cdbd81",
+            "name": "logcli-darwin-amd64.zip"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:2f4dff99d7acfaacd08f99d8220989977d771bf28a83363b6b5396516db20c02",
+            "name": "logcli-darwin-arm64.zip"
+          }
+        ],
+        "attested_assets": 0,
+        "provenance": "none"
+      },
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 157,
+        "total": 157,
+        "total_counts": [
+          157
+        ],
+        "check_suites": 16,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "AGPL-3.0",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 8.1
+      },
+      "incomplete": []
+    },
+    {
+      "repository": "harbor-framework/harbor",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "harbor-containerized-agent-e2e-runner",
+          "state": "definitive"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-03T13:26:39+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T21:48:55Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v0.23.0",
+        "published_at": "2026-09-12T04:55:17Z",
+        "days_old": 21,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "queried_assets": [],
+        "attested_assets": 0,
+        "provenance": "no_assets"
+      },
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 25,
+        "total": 25,
+        "total_counts": [
+          25
+        ],
+        "check_suites": 22,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "Apache-2.0",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "jdx/mise",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "mise",
+          "state": "definitive"
+        }
+      ],
+      "flags": [
+        "advisories"
+      ],
+      "observed_at": "2026-10-03T13:26:41+00:00",
+      "archived": false,
+      "last_commit": "2026-10-03T13:19:41Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v2026.10.0",
+        "published_at": "2026-10-02T01:42:32Z",
+        "days_old": 1,
+        "assets": 52,
+        "assets_with_digest": 52,
+        "queried_assets": [
+          {
+            "attestations": 1,
+            "digest": "sha256:41743b1036070d01e37a6eab45fab283766029c6ae7da1c394a0b1c593b28be3",
+            "name": "install.sh"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:42cb1411b31ca89ae84b9916db0634f1ffc5ed11d7f0a6ce1d7bf7f596ade315",
+            "name": "install.sh.minisig"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:b037ad0e820d8ec5f751b1f942164566a5432e663aa6a548e91d0974d8607cfa",
+            "name": "install.sh.sig"
+          },
+          {
+            "attestations": 2,
+            "digest": "sha256:4b8cacffac83e8493fc5d1eef25f6365edba73ccbed5a1f3987b7cb3f5079656",
+            "name": "mise-v2026.10.0-linux-arm64"
+          },
+          {
+            "attestations": 2,
+            "digest": "sha256:76f90a8452df83c421c66ee8dc84d241f6e4881af6ba6c74518a416d562c4c81",
+            "name": "mise-v2026.10.0-linux-arm64-musl"
+          }
+        ],
+        "attested_assets": 5,
+        "provenance": "attested"
+      },
+      "advisories": {
+        "count": 12,
+        "complete": true,
+        "severities": [
+          "critical",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "observed": 17,
+        "total": 17,
+        "total_counts": [
+          17
+        ],
+        "check_suites": 20,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "kjanat/actionlint",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "actionlint-kjanat",
+          "state": "definitive"
+        }
+      ],
+      "flags": [
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-03T13:26:43+00:00",
+      "archived": false,
+      "last_commit": "2026-09-25T14:28:28Z",
+      "days_since_last_commit": 7,
+      "release": {
+        "tag": "v1.17.0",
+        "published_at": "2026-09-13T16:07:47Z",
+        "days_old": 19,
+        "assets": 24,
+        "assets_with_digest": 24,
+        "queried_assets": [
+          {
+            "attestations": 2,
+            "digest": "sha256:af95f1518352372a937253f3e6af76cf6d9349b803967678d82b3b42c470b85b",
+            "name": "actionlint-1.17.0.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:762a94f56b4b7afa3296a65fd7ceb93ba013332fe892a670de2e30c66bf6a1f4",
+            "name": "actionlint_1.17.0_checksums.txt"
+          },
+          {
+            "attestations": 2,
+            "digest": "sha256:e5fa505c0236666f2b1f36a2852db5fad6e186e9125babee017538a4049e3afb",
+            "name": "actionlint_1.17.0_darwin_amd64.tar.gz"
+          },
+          {
+            "attestations": 2,
+            "digest": "sha256:ee59be8b147d6eb052ec6e4093be5aa0475e652a8ead97326b0465bbbffd0aeb",
+            "name": "actionlint_1.17.0_darwin_amd64.tar.gz.sbom.json"
+          },
+          {
+            "attestations": 2,
+            "digest": "sha256:f123b7ad57a0fe376dcc85e81b7e04e85eb39219184803fc25f989b255f569b4",
+            "name": "actionlint_1.17.0_darwin_arm64.tar.gz"
+          }
+        ],
+        "attested_assets": 5,
+        "provenance": "attested"
+      },
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 61,
+        "total": 61,
+        "total_counts": [
+          61
+        ],
+        "check_suites": 49,
+        "complete": true,
+        "failing": 2
+      },
+      "license": "MIT",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "mattpocock/skills",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "engineering-process-skills",
+          "state": "resolved"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-03T13:26:43+00:00",
+      "archived": false,
+      "last_commit": "2026-09-29T12:37:40Z",
+      "days_since_last_commit": 4,
+      "release": {
+        "tag": "v1.2.3",
+        "published_at": "2026-08-06T14:05:28Z",
+        "days_old": 57,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "queried_assets": [],
+        "attested_assets": 0,
+        "provenance": "no_assets"
+      },
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 1,
+        "total": 1,
+        "total_counts": [
+          1
+        ],
+        "check_suites": 3,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "max-sixty/worktrunk",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "worktrunk",
+          "state": "definitive"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-03T13:26:45+00:00",
+      "archived": false,
+      "last_commit": "2026-10-03T07:45:29Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v0.80.0",
+        "published_at": "2026-09-27T21:18:46Z",
+        "days_old": 5,
+        "assets": 18,
+        "assets_with_digest": 18,
+        "queried_assets": [
+          {
+            "attestations": 1,
+            "digest": "sha256:83ffd9417360a09b480f7f9c552f16575d9c1cba980c13fb22a7128dcfca3435",
+            "name": "dist-manifest.json"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:384c53f829b5552f359ac49c067765127bcd36724df6068dfe1434659df4e3ed",
+            "name": "packslip.sigstore.json"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:bfd8568d6e92648e4361b4117db1944877922e96382400e28625d8b3fd79ce8c",
+            "name": "sha256.sum"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:915b1453ae51a5d07835e125f10871416aa433fdaca8fef0037990aefa46249e",
+            "name": "source.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:68e8e194322bba763038aed2cc3fc54242f4cdd58084b8c75f446141769afc6c",
+            "name": "source.tar.gz.sha256"
+          }
+        ],
+        "attested_assets": 5,
+        "provenance": "attested"
+      },
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 36,
+        "total": 36,
+        "total_counts": [
+          36
+        ],
+        "check_suites": 25,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "NOASSERTION",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "microsoft/playwright-cli",
+      "roles": [
+        {
+          "installs": false,
+          "named_as": [
+            "former_default",
+            "arm"
+          ],
+          "slot_id": "playwright-cli",
+          "state": "split"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-03T13:26:45+00:00",
+      "archived": false,
+      "last_commit": "2026-09-28T23:22:31Z",
+      "days_since_last_commit": 4,
+      "release": {
+        "tag": "v0.1.22",
+        "published_at": "2026-09-28T23:23:13Z",
+        "days_old": 4,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "queried_assets": [],
+        "attested_assets": 0,
+        "provenance": "no_assets"
+      },
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 8,
+        "total": 8,
+        "total_counts": [
+          8
+        ],
+        "check_suites": 7,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "Apache-2.0",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 6.4
+      },
+      "incomplete": []
+    },
+    {
+      "repository": "moby/moby",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "container-engine",
+          "state": "definitive"
+        }
+      ],
+      "flags": [
+        "advisories",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-03T13:26:46+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T20:29:45Z",
+      "days_since_last_commit": 1,
+      "release": {
+        "tag": "docker-v29.8.2",
+        "published_at": "2026-09-30T20:28:33Z",
+        "days_old": 2,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "queried_assets": [],
+        "attested_assets": 0,
+        "provenance": "no_assets"
+      },
+      "advisories": {
+        "count": 26,
+        "complete": true,
+        "severities": [
+          "critical",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "low",
+          "low",
+          "low",
+          "low",
+          "low",
+          "low",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "observed": 347,
+        "total": 347,
+        "total_counts": [
+          347
+        ],
+        "check_suites": 29,
+        "complete": true,
+        "failing": 2
+      },
+      "license": "Apache-2.0",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 9.1
+      },
+      "incomplete": []
+    },
+    {
+      "repository": "modelcontextprotocol/inspector",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "mcp-inspector",
+          "state": "definitive"
+        }
+      ],
+      "flags": [
+        "advisories",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-03T13:26:47+00:00",
+      "archived": false,
+      "last_commit": "2026-09-30T22:23:03Z",
+      "days_since_last_commit": 2,
+      "release": {
+        "tag": "2.9.0",
+        "published_at": "2026-09-30T22:23:56Z",
+        "days_old": 2,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "queried_assets": [],
+        "attested_assets": 0,
+        "provenance": "no_assets"
+      },
+      "advisories": {
+        "count": 2,
+        "complete": true,
+        "severities": [
+          "critical",
+          "high"
+        ]
+      },
+      "check_runs": {
+        "observed": 30,
+        "total": 30,
+        "total_counts": [
+          30
+        ],
+        "check_suites": 14,
+        "complete": true,
+        "failing": 1
+      },
+      "license": "NOASSERTION",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "ollama/ollama",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "local-model-server",
+          "state": "measurement"
+        }
+      ],
+      "flags": [
+        "no_provenance"
+      ],
+      "observed_at": "2026-10-03T13:26:47+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T18:52:27Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v0.35.1",
+        "published_at": "2026-09-29T20:14:22Z",
+        "days_old": 3,
+        "assets": 17,
+        "assets_with_digest": 17,
+        "queried_assets": [
+          {
+            "attestations": 0,
+            "digest": "sha256:015c97c38bd342225ee83e0a3fd5c630b1ee7c522f18f1ca751ec1c3b811396e",
+            "name": "install.ps1"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:25f64b810b947145095956533e1bdf56eacea2673c55a7e586be4515fc882c9f",
+            "name": "install.sh"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:3137dbf28948ee844e0fb3e584d9b5de6879d73d9f0cb7eff3ad64930601d307",
+            "name": "ollama-darwin.tgz"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:60dba52660dc7cb4e160e914edd76b98271945941f5db40d34a507cef544970e",
+            "name": "Ollama-darwin.zip"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:15ee9a52b60e22d62c3195c70d0a708fbaeb3decb393f2571cbd4e1079608e6b",
+            "name": "ollama-linux-amd64-mlx.tar.zst"
+          }
+        ],
+        "attested_assets": 0,
+        "provenance": "none"
+      },
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 1,
+        "total": 1,
+        "total_counts": [
+          1
+        ],
+        "check_suites": 1,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "open-telemetry/opentelemetry-collector-contrib",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "otel-collector-contrib",
+          "state": "definitive"
+        }
+      ],
+      "flags": [
+        "advisories",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-03T13:26:48+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T19:48:46Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v0.162.0",
+        "published_at": "2026-09-29T10:11:33Z",
+        "days_old": 4,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "queried_assets": [],
+        "attested_assets": 0,
+        "provenance": "no_assets"
+      },
+      "advisories": {
+        "count": 7,
+        "complete": true,
+        "severities": [
+          "high",
+          "high",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "observed": 347,
+        "total": 347,
+        "total_counts": [
+          347
+        ],
+        "check_suites": 83,
+        "complete": true,
+        "failing": 2
+      },
+      "license": "Apache-2.0",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 7.7
+      },
+      "incomplete": []
+    },
+    {
+      "repository": "openai/codex",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "codex",
+          "state": "definitive"
+        },
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "codex-sdk-and-codex-exec-app-server",
+          "state": "definitive"
+        }
+      ],
+      "flags": [
+        "no_provenance",
+        "advisories",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-03T13:26:49+00:00",
+      "archived": false,
+      "last_commit": "2026-10-03T07:45:47Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "rust-v0.160.0",
+        "published_at": "2026-10-01T20:19:13Z",
+        "days_old": 1,
+        "assets": 176,
+        "assets_with_digest": 176,
+        "queried_assets": [
+          {
+            "attestations": 0,
+            "digest": "sha256:7d9e1145581fd0626a2017abb8abd7d23fea2de27483ae31bb2f963e5aa8bdb4",
+            "name": "argument-comment-lint"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:84bb0f1d10688640cc8700c3eec79d130ace7e890a3990590c4194cdbe019631",
+            "name": "argument-comment-lint-aarch64-apple-darwin.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:dcac5fd68ec0edbda1678078109a41a7e60bb77515e39215810b337fe3eda142",
+            "name": "argument-comment-lint-aarch64-unknown-linux-gnu.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:b58ed2352253c11132e53102aacc949adf948b6d67db139e1ecac207cc63353c",
+            "name": "argument-comment-lint-x86_64-pc-windows-msvc.zip"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:71e98beff1fae548a7193096a7378cbd4ce3118e4a183172a7b19d2b99401a00",
+            "name": "argument-comment-lint-x86_64-unknown-linux-gnu.tar.gz"
+          }
+        ],
+        "attested_assets": 0,
+        "provenance": "none"
+      },
+      "advisories": {
+        "count": 1,
+        "complete": true,
+        "severities": [
+          "high"
+        ]
+      },
+      "check_runs": {
+        "observed": 1273,
+        "total": 1273,
+        "total_counts": [
+          1273
+        ],
+        "check_suites": 458,
+        "complete": true,
+        "failing": 47
+      },
+      "license": "Apache-2.0",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 5.9
+      },
+      "incomplete": []
+    },
+    {
+      "repository": "openai/gpt-oss",
+      "roles": [
+        {
+          "installs": false,
+          "named_as": [
+            "arm"
+          ],
+          "slot_id": "local-generation-model",
+          "state": "split"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-03T13:26:51+00:00",
+      "archived": false,
+      "last_commit": "2026-07-24T18:56:00Z",
+      "days_since_last_commit": 70,
+      "release": {
+        "tag": "v0.0.9",
+        "published_at": "2026-01-13T19:03:30Z",
+        "days_old": 262,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "queried_assets": [],
+        "attested_assets": 0,
+        "provenance": "no_assets"
+      },
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 4,
+        "total": 4,
+        "total_counts": [
+          4
+        ],
+        "check_suites": 6,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "Apache-2.0",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 5.8
+      },
+      "incomplete": []
+    },
+    {
+      "repository": "openclaw/mcporter",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "mcporter",
+          "state": "definitive"
+        }
+      ],
+      "flags": [
+        "no_provenance"
+      ],
+      "observed_at": "2026-10-03T13:26:52+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T18:43:09Z",
+      "days_since_last_commit": 1,
+      "release": {
+        "tag": "v0.14.2",
+        "published_at": "2026-10-01T18:24:07Z",
+        "days_old": 1,
+        "assets": 5,
+        "assets_with_digest": 5,
+        "queried_assets": [
+          {
+            "attestations": 0,
+            "digest": "sha256:12238c722e8195f916d20f23d8abd5ffead712ab725dda21e42422be4a014877",
+            "name": "checksums.txt"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:f5baa5a02be64d5d75722c5739975eee79d393eb2761496f70a53474688f8f6b",
+            "name": "mcporter-0.14.2.tgz"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:2d7a8983ce0b091869cda44f963a2e6da7a530f2d575c9d41715703965f5fbc6",
+            "name": "mcporter_0.14.2_darwin_arm64.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:cb63ac4a258d149d182c71adbc98e8cb89f4444c448f569ec6036e7ae60a1a84",
+            "name": "mcporter_0.14.2_darwin_x86_64.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:e45a952fe7ab034b5355293c4808ecc20a1977ed8d86726d6d3d6793778ab503",
+            "name": "provenance.json"
+          }
+        ],
+        "attested_assets": 0,
+        "provenance": "none"
+      },
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 14,
+        "total": 14,
+        "total_counts": [
+          14
+        ],
+        "check_suites": 20,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "opendatalab/mineru",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "mineru",
+          "state": "definitive"
+        }
+      ],
+      "flags": [
+        "no_provenance"
+      ],
+      "observed_at": "2026-10-03T13:26:54+00:00",
+      "archived": false,
+      "last_commit": "2026-09-29T07:16:39Z",
+      "days_since_last_commit": 4,
+      "release": {
+        "tag": "mineru-4.0.10-released",
+        "published_at": "2026-09-29T07:18:10Z",
+        "days_old": 4,
+        "assets": 1,
+        "assets_with_digest": 1,
+        "queried_assets": [
+          {
+            "attestations": 0,
+            "digest": "sha256:9731eb8afb9756bb2e3a8e3e6a69252786434602eeb4ff36f7e7a5f2aa8ac107",
+            "name": "mineru-4.0.10-py3-none-any.whl"
+          }
+        ],
+        "attested_assets": 0,
+        "provenance": "none"
+      },
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 20,
+        "total": 20,
+        "total_counts": [
+          20
+        ],
+        "check_suites": 19,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "NOASSERTION",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "openhands/software-agent-sdk",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "agent-runtime-worker",
+          "state": "pinned"
+        }
+      ],
+      "flags": [
+        "no_provenance"
+      ],
+      "observed_at": "2026-10-03T13:26:54+00:00",
+      "archived": false,
+      "last_commit": "2026-10-03T08:10:20Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v1.51.0",
+        "published_at": "2026-10-03T07:38:03Z",
+        "days_old": 0,
+        "assets": 7,
+        "assets_with_digest": 7,
+        "queried_assets": [
+          {
+            "attestations": 0,
+            "digest": "sha256:cfbee9c92cb17fdd6fd1cffdfe6c037837e9d61cd1ef633e9bbdfe8bd8fa0c4f",
+            "name": "agent-server-1.51.0-linux-arm64"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:29f74e0fe097c39e8d5f44d417c0b06499a4de825e536c2bca9c1a2ec6be93f3",
+            "name": "agent-server-1.51.0-linux-x86_64"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:ccd423310cd69d4bb39fc2fb3a0cdb566249858be417ffa39301bc1bced7e409",
+            "name": "agent-server-1.51.0-macos-arm64"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:da373fd9f85d25629494de551d70d92877da63b2d5115b10d764f6b928b5e3c7",
+            "name": "agent-server-1.51.0-macos-x86_64"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:39e0ddb79de15689c867a501eff6c6d9d57960c3ad063db5d9ca1719e0c8c048",
+            "name": "agent-server-1.51.0-windows-x86_64.exe"
+          }
+        ],
+        "attested_assets": 0,
+        "provenance": "none"
+      },
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 87,
+        "total": 87,
+        "total_counts": [
+          87
+        ],
+        "check_suites": 27,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "oraios/serena",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "serena",
+          "state": "definitive"
+        }
+      ],
+      "flags": [
+        "advisories",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-03T13:26:55+00:00",
+      "archived": false,
+      "last_commit": "2026-09-30T18:53:23Z",
+      "days_since_last_commit": 2,
+      "release": {
+        "tag": "v1.7.0",
+        "published_at": "2026-08-09T18:38:06Z",
+        "days_old": 54,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "queried_assets": [],
+        "attested_assets": 0,
+        "provenance": "no_assets"
+      },
+      "advisories": {
+        "count": 2,
+        "complete": true,
+        "severities": [
+          "critical",
+          "high"
+        ]
+      },
+      "check_runs": {
+        "observed": 28,
+        "total": 28,
+        "total_counts": [
+          28
+        ],
+        "check_suites": 11,
+        "complete": true,
+        "failing": 1
+      },
+      "license": "NOASSERTION",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "prometheus/alertmanager",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "alerting",
+          "state": "resolved"
+        }
+      ],
+      "flags": [
+        "no_provenance",
+        "advisories",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-03T13:26:56+00:00",
+      "archived": false,
+      "last_commit": "2026-09-29T15:45:02Z",
+      "days_since_last_commit": 3,
+      "release": {
+        "tag": "v0.34.1",
+        "published_at": "2026-09-17T08:12:07Z",
+        "days_old": 16,
+        "assets": 40,
+        "assets_with_digest": 40,
+        "queried_assets": [
+          {
+            "attestations": 0,
+            "digest": "sha256:9f3a3806c81a2ef3546fea9bae3dd39abcf2206edd112c9433133a9355875fce",
+            "name": "alertmanager-0.34.1.darwin-amd64.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:a3941879f340ef12a4cc1a479c82bd8520611265ea8d1ee25c88bd5f944d8293",
+            "name": "alertmanager-0.34.1.darwin-arm64.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:d6dcc7f4acfbd306af8ad368848de2f30f0a6b30c00db5313fe0b1d97dab6c51",
+            "name": "alertmanager-0.34.1.dragonfly-amd64.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:7882e78b4d66c9ec9b038120e81f7be321677868ef3d07abf1ce72b01976865c",
+            "name": "alertmanager-0.34.1.freebsd-386.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:4339fa6fcd4f42e92e4d9c184ddde29cee56ffe8d60d7e5249140cc6a3461a80",
+            "name": "alertmanager-0.34.1.freebsd-amd64.tar.gz"
+          }
+        ],
+        "attested_assets": 0,
+        "provenance": "none"
+      },
+      "advisories": {
+        "count": 1,
+        "complete": true,
+        "severities": [
+          "high"
+        ]
+      },
+      "check_runs": {
+        "observed": 56,
+        "total": 56,
+        "total_counts": [
+          56
+        ],
+        "check_suites": 42,
+        "complete": true,
+        "failing": 3
+      },
+      "license": "Apache-2.0",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 6.6
+      },
+      "incomplete": []
+    },
+    {
+      "repository": "prometheus/prometheus",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "prometheus",
+          "state": "resolved"
+        }
+      ],
+      "flags": [
+        "advisories"
+      ],
+      "observed_at": "2026-10-03T13:26:58+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T14:40:10Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v3.15.0",
+        "published_at": "2026-09-25T08:56:22Z",
+        "days_old": 8,
+        "assets": 37,
+        "assets_with_digest": 37,
+        "queried_assets": [
+          {
+            "attestations": 1,
+            "digest": "sha256:0772720b677291281d92be55b25af341793346da76718e6872ea6ac84f30a4f9",
+            "name": "prometheus-3.15.0.aix-ppc64.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:2d79e744c2d7e505db936fbc898e05abc74fcb6e437c25befd26e9c9f00aa58b",
+            "name": "prometheus-3.15.0.darwin-amd64.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:920df4d17e78b3b0175af144eb318b0c74d1cf7b1d1251b326966f0e81977260",
+            "name": "prometheus-3.15.0.darwin-arm64.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:3fc6f2c5c3e9eaa10a61acac7b01e863bd72cd2cb4f8fc8eecd6c4f9e04afb24",
+            "name": "prometheus-3.15.0.dragonfly-amd64.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:24a61fa22ec703aaf7fe62b161c55eb7f0df5e4ec048ecc27ae3ef301476ccf3",
+            "name": "prometheus-3.15.0.freebsd-386.tar.gz"
+          }
+        ],
+        "attested_assets": 5,
+        "provenance": "attested"
+      },
+      "advisories": {
+        "count": 6,
+        "complete": true,
+        "severities": [
+          "high",
+          "high",
+          "high",
+          "medium",
+          "medium",
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "observed": 49,
+        "total": 49,
+        "total_counts": [
+          49
+        ],
+        "check_suites": 19,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "Apache-2.0",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 8.5
+      },
+      "incomplete": []
+    },
+    {
+      "repository": "promptfoo/promptfoo",
+      "roles": [
+        {
+          "installs": false,
+          "named_as": [
+            "former_default"
+          ],
+          "slot_id": "promptfoo",
+          "state": "resolved"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-03T13:26:58+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T23:52:24Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "0.123.1",
+        "published_at": "2026-09-18T01:07:54Z",
+        "days_old": 15,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "queried_assets": [],
+        "attested_assets": 0,
+        "provenance": "no_assets"
+      },
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 87,
+        "total": 87,
+        "total_counts": [
+          87
+        ],
+        "check_suites": 17,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "qwenlm/qwen3-embedding",
+      "roles": [
+        {
+          "installs": false,
+          "named_as": [
+            "former_default",
+            "arm"
+          ],
+          "slot_id": "embedding-model",
+          "state": "split"
+        }
+      ],
+      "flags": [
+        "stale",
+        "no_release"
+      ],
+      "observed_at": "2026-10-03T13:27:00+00:00",
+      "archived": false,
+      "last_commit": "2025-09-30T06:10:27Z",
+      "days_since_last_commit": 368,
+      "release": null,
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 0,
+        "total": 0,
+        "total_counts": [
+          0
+        ],
+        "check_suites": 0,
+        "complete": true,
+        "failing": 0
+      },
+      "license": null,
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "qwenlm/qwen3.8",
+      "roles": [
+        {
+          "installs": false,
+          "named_as": [
+            "former_default",
+            "arm"
+          ],
+          "slot_id": "local-generation-model",
+          "state": "split"
+        }
+      ],
+      "flags": [
+        "no_release"
+      ],
+      "observed_at": "2026-10-03T13:27:00+00:00",
+      "archived": false,
+      "last_commit": "2026-08-17T05:17:40Z",
+      "days_since_last_commit": 47,
+      "release": null,
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 96,
+        "total": 96,
+        "total_counts": [
+          96
+        ],
+        "check_suites": 48,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "Apache-2.0",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "restic/restic",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "restic",
+          "state": "definitive"
+        }
+      ],
+      "flags": [
+        "no_provenance"
+      ],
+      "observed_at": "2026-10-03T13:27:02+00:00",
+      "archived": false,
+      "last_commit": "2026-09-25T20:08:18Z",
+      "days_since_last_commit": 7,
+      "release": {
+        "tag": "v0.19.1",
+        "published_at": "2026-07-05T08:13:33Z",
+        "days_old": 90,
+        "assets": 29,
+        "assets_with_digest": 29,
+        "queried_assets": [
+          {
+            "attestations": 0,
+            "digest": "sha256:bb9b1a19040744d26d8a79be029d4e6b189c45ccc9d8831d7fe367d3c33df725",
+            "name": "restic-0.19.1.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:6e5ad378c9aa9ab25b87e3bbed66e5dbb6eca57d4659f292d97352a69f86c3ff",
+            "name": "restic-0.19.1.tar.gz.asc"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:a8e0fc448966b31c2e5d4e21d75f1f97d9164f43a4bc0a5154554a0ef6a8136c",
+            "name": "restic_0.19.1_aix_ppc64.bz2"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:c38d579622cf602f665234c5a8c315030b6cf70656028fe6dc29a786b60e5f35",
+            "name": "restic_0.19.1_darwin_amd64.bz2"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:7be0a144ccc377880f294204aa271d76e4b79554b42a751151d425ce6ebac143",
+            "name": "restic_0.19.1_darwin_arm64.bz2"
+          }
+        ],
+        "attested_assets": 0,
+        "provenance": "none"
+      },
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 20,
+        "total": 20,
+        "total_counts": [
+          20
+        ],
+        "check_suites": 7,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "BSD-2-Clause",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 7.3
+      },
+      "incomplete": []
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "convergence-validators",
+          "state": "pinned"
+        },
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "credential-guard",
+          "state": "pinned"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-03T13:27:02+00:00",
+      "archived": false,
+      "last_commit": "2026-10-03T10:56:12Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v2026.09.26.2",
+        "published_at": "2026-09-26T16:04:55Z",
+        "days_old": 6,
+        "assets": 2,
+        "assets_with_digest": 2,
+        "queried_assets": [
+          {
+            "attestations": 2,
+            "digest": "sha256:831bf8c371b66a09b05002ca1a37a0098a5b349c3a62a5f1cc7fa7238321ad4e",
+            "name": "native-agent-stack-771f25f824a7851a6cb46ebcfa2922b54cb88d9e.spdx.json"
+          },
+          {
+            "attestations": 2,
+            "digest": "sha256:01938ebb65125d9a94f0461f516e4be125e313a68a1c6914617a5655a1b03e07",
+            "name": "native-agent-stack-771f25f824a7851a6cb46ebcfa2922b54cb88d9e.tar.gz"
+          }
+        ],
+        "attested_assets": 2,
+        "provenance": "attested"
+      },
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 23,
+        "total": 23,
+        "total_counts": [
+          23
+        ],
+        "check_suites": 8,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "tobi/qmd",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "tobi-qmd",
+          "state": "definitive"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-03T13:27:03+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T00:41:53Z",
+      "days_since_last_commit": 1,
+      "release": {
+        "tag": "v2.8.3",
+        "published_at": "2026-08-16T22:30:34Z",
+        "days_old": 47,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "queried_assets": [],
+        "attested_assets": 0,
+        "provenance": "no_assets"
+      },
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 15,
+        "total": 15,
+        "total_counts": [
+          15
+        ],
+        "check_suites": 7,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "trailofbits/skills",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "trail-of-bits-security-skills-trailofbits-skills",
+          "state": "definitive"
+        }
+      ],
+      "flags": [
+        "no_release"
+      ],
+      "observed_at": "2026-10-03T13:27:05+00:00",
+      "archived": false,
+      "last_commit": "2026-09-28T18:06:37Z",
+      "days_since_last_commit": 4,
+      "release": null,
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 11,
+        "total": 11,
+        "total_counts": [
+          11
+        ],
+        "check_suites": 12,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "CC-BY-SA-4.0",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "trufflesecurity/trufflehog",
+      "roles": [
+        {
+          "installs": false,
+          "named_as": [
+            "former_default"
+          ],
+          "slot_id": "trufflehog",
+          "state": "resolved"
+        }
+      ],
+      "flags": [
+        "no_provenance",
+        "advisories",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-03T13:27:05+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T14:15:13Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v3.97.9",
+        "published_at": "2026-09-24T09:11:59Z",
+        "days_old": 9,
+        "assets": 9,
+        "assets_with_digest": 9,
+        "queried_assets": [
+          {
+            "attestations": 0,
+            "digest": "sha256:d8a2807fd8019f3db10308365bdfc818c07ae86f4e7e22839e41f77f9b27f93f",
+            "name": "trufflehog_3.97.9_checksums.txt"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:16c8e54ab6d5f61c29cf9171a130ec36c98ec1f2b71123b2596548934f7e9288",
+            "name": "trufflehog_3.97.9_checksums.txt.pem"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:f31e588b20e9c46d6fe88f1afeab065d526590fb7e6723f59fce258718ae503d",
+            "name": "trufflehog_3.97.9_checksums.txt.sig"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:4451ba8d17106da0d0a2f1952d3b1c2d20a6e5c97c21ccd1f8fc04ecf2ff77d9",
+            "name": "trufflehog_3.97.9_darwin_amd64.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:3d25c178fe1a2563687b22547adcaebcf08cc8a607315c6741fe396c597951f7",
+            "name": "trufflehog_3.97.9_darwin_arm64.tar.gz"
+          }
+        ],
+        "attested_assets": 0,
+        "provenance": "none"
+      },
+      "advisories": {
+        "count": 1,
+        "complete": true,
+        "severities": [
+          "low"
+        ]
+      },
+      "check_runs": {
+        "observed": 6,
+        "total": 6,
+        "total_counts": [
+          6
+        ],
+        "check_suites": 10,
+        "complete": true,
+        "failing": 1
+      },
+      "license": "AGPL-3.0",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 7.4
+      },
+      "incomplete": []
+    },
+    {
+      "repository": "twpayne/chezmoi",
+      "roles": [
+        {
+          "installs": false,
+          "named_as": [
+            "former_default"
+          ],
+          "slot_id": "chezmoi",
+          "state": "resolved"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-03T13:27:05+00:00",
+      "archived": false,
+      "last_commit": "2026-09-28T18:53:18Z",
+      "days_since_last_commit": 4,
+      "release": {
+        "tag": "v2.73.0",
+        "published_at": "2026-09-28T19:52:37Z",
+        "days_old": 4,
+        "assets": 111,
+        "assets_with_digest": 111,
+        "queried_assets": [
+          {
+            "attestations": 1,
+            "digest": "sha256:220a33fa46217455d79a99ca6155404359109968bed992af6c7d13a619a46b76",
+            "name": "chezmoi-2.73.0-aarch64.rpm"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:8608cc76f6aa53a55d2419253ebab0922cd357324f8d90f1050b7270c066be45",
+            "name": "chezmoi-2.73.0-armhfp.rpm"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:1ea1b87fc507da154bf5b14285645d61b01c9b6b4c704b7db27b9ef05382ce6d",
+            "name": "chezmoi-2.73.0-armv5l.rpm"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:7802540cbe01ca888666fcb4fcac3629246599326a454c4c67c7fc3826620dd6",
+            "name": "chezmoi-2.73.0-i686.rpm"
+          },
+          {
+            "attestations": 1,
+            "digest": "sha256:50ce284731f894111e0b3c4ebdcb63ab150b559199dd9181975945398f97a07e",
+            "name": "chezmoi-2.73.0-loong64.rpm"
+          }
+        ],
+        "attested_assets": 5,
+        "provenance": "attested"
+      },
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 144,
+        "total": 144,
+        "total_counts": [
+          144
+        ],
+        "check_suites": 23,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 6.6
+      },
+      "incomplete": []
+    },
+    {
+      "repository": "ukgovernmentbeis/inspect_ai",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "inspect-ai",
+          "state": "definitive"
+        }
+      ],
+      "flags": [
+        "no_release"
+      ],
+      "observed_at": "2026-10-03T13:27:07+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T15:00:09Z",
+      "days_since_last_commit": 0,
+      "release": null,
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 22,
+        "total": 22,
+        "total_counts": [
+          22
+        ],
+        "check_suites": 8,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "vercel-labs/agent-browser",
+      "roles": [
+        {
+          "installs": false,
+          "named_as": [
+            "arm"
+          ],
+          "slot_id": "playwright-cli",
+          "state": "split"
+        }
+      ],
+      "flags": [
+        "no_provenance",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-03T13:27:09+00:00",
+      "archived": false,
+      "last_commit": "2026-10-03T06:28:26Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v0.38.2",
+        "published_at": "2026-10-01T21:44:28Z",
+        "days_old": 1,
+        "assets": 7,
+        "assets_with_digest": 7,
+        "queried_assets": [
+          {
+            "attestations": 0,
+            "digest": "sha256:8168b86ab5d94be8f670992dfe4fe1445016518a864b48bda105e64142e7cbf9",
+            "name": "agent-browser-darwin-arm64"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:787cb40e086a188d0bb13ff29a99a0b2380aff3aa5e8600b8f8131a0b98ca69c",
+            "name": "agent-browser-darwin-x64"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:690c02d952de8497bba4f8cc58b59acbf27dc27b346755869b518f4b411c7f40",
+            "name": "agent-browser-linux-arm64"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:eafeca9ca0fdb2fa2aa60c4554723348c739656b0ddba0d82ff654d4d33311b1",
+            "name": "agent-browser-linux-musl-arm64"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:993d462f4dcfc19860d93a6521a452eba4502bfc449fe0120303c2ccb998e675",
+            "name": "agent-browser-linux-musl-x64"
+          }
+        ],
+        "attested_assets": 0,
+        "provenance": "none"
+      },
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 17,
+        "total": 17,
+        "total_counts": [
+          17
+        ],
+        "check_suites": 18,
+        "complete": true,
+        "failing": 1
+      },
+      "license": "Apache-2.0",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "vercel-labs/skills",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "skill-discovery",
+          "state": "resolved"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-03T13:27:09+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T16:25:54Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v1.7.0",
+        "published_at": "2026-09-17T15:00:30Z",
+        "days_old": 15,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "queried_assets": [],
+        "attested_assets": 0,
+        "provenance": "no_assets"
+      },
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 8,
+        "total": 8,
+        "total_counts": [
+          8
+        ],
+        "check_suites": 17,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "wilfred/difftastic",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "difftastic",
+          "state": "definitive"
+        }
+      ],
+      "flags": [
+        "no_provenance",
+        "ci_failing",
+        "low_scorecard"
+      ],
+      "observed_at": "2026-10-03T13:27:10+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T08:44:40Z",
+      "days_since_last_commit": 1,
+      "release": {
+        "tag": "0.71.0",
+        "published_at": "2026-09-18T22:57:29Z",
+        "days_old": 14,
+        "assets": 7,
+        "assets_with_digest": 7,
+        "queried_assets": [
+          {
+            "attestations": 0,
+            "digest": "sha256:92acf8890543b6d6f436a87a7a5ec64f82a4b8dbe3a7e564c1e5cbfe60823bc7",
+            "name": "difft-0.71.0-aarch64-apple-darwin.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:fbf0497f654271f9c96dfc52f06aad2163ac391ee4050f9dab7b88cba2bd9e77",
+            "name": "difft-0.71.0-aarch64-pc-windows-msvc.zip"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:5f046098b36ff985d0f99fec6f22cf74961db60386ff9d40df39fd99660aae2c",
+            "name": "difft-0.71.0-aarch64-unknown-linux-gnu.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:390b5299b0bc5059b5617f448eb1f3cb42c689933258fc57770c24d257a5d8a8",
+            "name": "difft-0.71.0-x86_64-apple-darwin.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:9a979f9d96d739625a0fe69317f3197cc7bcef663a6d7195197d6c9bf96ed6f5",
+            "name": "difft-0.71.0-x86_64-pc-windows-msvc.zip"
+          }
+        ],
+        "attested_assets": 0,
+        "provenance": "none"
+      },
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 17,
+        "total": 17,
+        "total_counts": [
+          17
+        ],
+        "check_suites": 6,
+        "complete": true,
+        "failing": 1
+      },
+      "license": "MIT",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 3.9
+      },
+      "incomplete": []
+    },
+    {
+      "repository": "zizmorcore/zizmor",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "zizmor",
+          "state": "definitive"
+        }
+      ],
+      "flags": [
+        "advisories",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-03T13:27:10+00:00",
+      "archived": false,
+      "last_commit": "2026-10-03T06:08:17Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v1.30.1",
+        "published_at": "2026-09-09T05:34:10Z",
+        "days_old": 24,
+        "assets": 5,
+        "assets_with_digest": 5,
+        "queried_assets": [
+          {
+            "attestations": 2,
+            "digest": "sha256:e28d22b087f9ebb8d99da6e740d348c930f559961c7c3f12badda54f882195a2",
+            "name": "zizmor-aarch64-apple-darwin.tar.gz"
+          },
+          {
+            "attestations": 2,
+            "digest": "sha256:7ff1dce33bdd18fd2a4affe63bdd47efcccca97b2cec1c1863ec26e9e2647540",
+            "name": "zizmor-aarch64-unknown-linux-gnu.tar.gz"
+          },
+          {
+            "attestations": 2,
+            "digest": "sha256:10e6b18b11ea07e515a16f0f0518c7b07527bc9977c1fd5698181ce7f3554202",
+            "name": "zizmor-x86_64-apple-darwin.tar.gz"
+          },
+          {
+            "attestations": 2,
+            "digest": "sha256:b183b1e996eddfab9659f1e9b46e059f1ef1cf984a1f14e5da09f7876a4b3a1c",
+            "name": "zizmor-x86_64-pc-windows-msvc.zip"
+          },
+          {
+            "attestations": 2,
+            "digest": "sha256:e65324f4430c2717591937edcec90ccbefaf14c174f8ec9415e03ca875b46e1a",
+            "name": "zizmor-x86_64-unknown-linux-gnu.tar.gz"
+          }
+        ],
+        "attested_assets": 5,
+        "provenance": "attested"
+      },
+      "advisories": {
+        "count": 1,
+        "complete": true,
+        "severities": [
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "observed": 24,
+        "total": 24,
+        "total_counts": [
+          24
+        ],
+        "check_suites": 7,
+        "complete": true,
+        "failing": 3
+      },
+      "license": "MIT",
+      "scorecard": "not_covered",
+      "incomplete": []
+    }
+  ],
+  "by_slot": {
+    "actionlint-kjanat": [
+      {
+        "repository": "kjanat/actionlint",
+        "state": "definitive",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "ci_failing"
+        ]
+      }
+    ],
+    "agent-messaging": [
+      {
+        "repository": "aannoo/hcom",
+        "state": "split",
+        "installs": false,
+        "named_as": [
+          "former_default",
+          "arm"
+        ],
+        "flags": [
+          "no_provenance",
+          "advisories"
+        ]
+      }
+    ],
+    "agent-runtime-worker": [
+      {
+        "repository": "openhands/software-agent-sdk",
+        "state": "pinned",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "no_provenance"
+        ]
+      }
+    ],
+    "alerting": [
+      {
+        "repository": "prometheus/alertmanager",
+        "state": "resolved",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "no_provenance",
+          "advisories",
+          "ci_failing"
+        ]
+      }
+    ],
+    "attest": [
+      {
+        "repository": "actions/attest",
+        "state": "definitive",
+        "installs": false,
+        "named_as": [
+          "repository"
+        ],
+        "flags": []
+      }
+    ],
+    "betterleaks": [
+      {
+        "repository": "betterleaks/betterleaks",
+        "state": "definitive",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": []
+      }
+    ],
+    "ccusage": [
+      {
+        "repository": "ccusage/ccusage",
+        "state": "resolved",
+        "installs": false,
+        "named_as": [
+          "former_default"
+        ],
+        "flags": []
+      }
+    ],
+    "chezmoi": [
+      {
+        "repository": "twpayne/chezmoi",
+        "state": "resolved",
+        "installs": false,
+        "named_as": [
+          "former_default"
+        ],
+        "flags": []
+      }
+    ],
+    "claude-agent-sdk": [
+      {
+        "repository": "anthropics/claude-agent-sdk-python",
+        "state": "definitive",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "advisories",
+          "ci_failing"
+        ]
+      }
+    ],
+    "claude-code": [
+      {
+        "repository": "anthropics/claude-code",
+        "state": "definitive",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "advisories",
+          "ci_failing"
+        ]
+      }
+    ],
+    "claude-code-action": [
+      {
+        "repository": "anthropics/claude-code-action",
+        "state": "resolved",
+        "installs": false,
+        "named_as": [
+          "former_default"
+        ],
+        "flags": [
+          "old_release",
+          "advisories"
+        ]
+      }
+    ],
+    "claude-plugins-official-code-intelligence-lsp-pl": [
+      {
+        "repository": "anthropics/claude-plugins-official",
+        "state": "resolved",
+        "installs": false,
+        "named_as": [
+          "former_default"
+        ],
+        "flags": [
+          "no_release",
+          "ci_failing"
+        ]
+      }
+    ],
+    "codeql-sarif": [
+      {
+        "repository": "github/codeql-action",
+        "state": "resolved",
+        "installs": false,
+        "named_as": [
+          "former_default"
+        ],
+        "flags": [
+          "advisories",
+          "ci_failing"
+        ]
+      }
+    ],
+    "codex": [
+      {
+        "repository": "openai/codex",
+        "state": "definitive",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "no_provenance",
+          "advisories",
+          "ci_failing"
+        ]
+      }
+    ],
+    "codex-sdk-and-codex-exec-app-server": [
+      {
+        "repository": "openai/codex",
+        "state": "definitive",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "no_provenance",
+          "advisories",
+          "ci_failing"
+        ]
+      }
+    ],
+    "container-engine": [
+      {
+        "repository": "moby/moby",
+        "state": "definitive",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "advisories",
+          "ci_failing"
+        ]
+      }
+    ],
+    "convergence-validators": [
+      {
+        "repository": "seathatflowsinourveins/native-agent-stack",
+        "state": "pinned",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": []
+      }
+    ],
+    "credential-custody": [
+      {
+        "repository": "gethasp/hasp",
+        "state": "measurement",
+        "installs": false,
+        "named_as": [
+          "arm"
+        ],
+        "flags": [
+          "no_provenance"
+        ]
+      }
+    ],
+    "credential-guard": [
+      {
+        "repository": "seathatflowsinourveins/native-agent-stack",
+        "state": "pinned",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": []
+      }
+    ],
+    "dagu": [
+      {
+        "repository": "dagucloud/dagu",
+        "state": "definitive",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "advisories"
+        ]
+      }
+    ],
+    "dependabot": [
+      {
+        "repository": "dependabot/dependabot-core",
+        "state": "resolved",
+        "installs": false,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "advisories"
+        ]
+      }
+    ],
+    "difftastic": [
+      {
+        "repository": "wilfred/difftastic",
+        "state": "definitive",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "no_provenance",
+          "ci_failing",
+          "low_scorecard"
+        ]
+      }
+    ],
+    "docker-compose": [
+      {
+        "repository": "docker/compose",
+        "state": "definitive",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "no_provenance",
+          "advisories",
+          "ci_failing"
+        ]
+      }
+    ],
+    "embedding-model": [
+      {
+        "repository": "google-deepmind/gemma",
+        "state": "split",
+        "installs": false,
+        "named_as": [
+          "arm"
+        ],
+        "flags": [
+          "ci_failing"
+        ]
+      },
+      {
+        "repository": "qwenlm/qwen3-embedding",
+        "state": "split",
+        "installs": false,
+        "named_as": [
+          "former_default",
+          "arm"
+        ],
+        "flags": [
+          "stale",
+          "no_release"
+        ]
+      }
+    ],
+    "engineering-process-skills": [
+      {
+        "repository": "mattpocock/skills",
+        "state": "resolved",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": []
+      }
+    ],
+    "gh-github-cli": [
+      {
+        "repository": "cli/cli",
+        "state": "definitive",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "advisories"
+        ]
+      }
+    ],
+    "git": [
+      {
+        "repository": "git/git",
+        "state": "definitive",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "no_release",
+          "advisories"
+        ]
+      }
+    ],
+    "gpt-gateway": [
+      {
+        "repository": "diegosouzapw/omniroute",
+        "state": "pinned",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "no_provenance",
+          "advisories",
+          "ci_failing"
+        ]
+      }
+    ],
+    "grafana": [
+      {
+        "repository": "grafana/grafana",
+        "state": "split",
+        "installs": false,
+        "named_as": [
+          "former_default",
+          "arm"
+        ],
+        "flags": [
+          "no_provenance",
+          "advisories",
+          "ci_failing"
+        ]
+      },
+      {
+        "repository": "grafana/loki",
+        "state": "split",
+        "installs": false,
+        "named_as": [
+          "arm"
+        ],
+        "flags": [
+          "no_provenance"
+        ]
+      }
+    ],
+    "harbor-containerized-agent-e2e-runner": [
+      {
+        "repository": "harbor-framework/harbor",
+        "state": "definitive",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": []
+      }
+    ],
+    "inspect-ai": [
+      {
+        "repository": "ukgovernmentbeis/inspect_ai",
+        "state": "definitive",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "no_release"
+        ]
+      }
+    ],
+    "local-generation-model": [
+      {
+        "repository": "openai/gpt-oss",
+        "state": "split",
+        "installs": false,
+        "named_as": [
+          "arm"
+        ],
+        "flags": []
+      },
+      {
+        "repository": "qwenlm/qwen3.8",
+        "state": "split",
+        "installs": false,
+        "named_as": [
+          "former_default",
+          "arm"
+        ],
+        "flags": [
+          "no_release"
+        ]
+      }
+    ],
+    "local-model-server": [
+      {
+        "repository": "ollama/ollama",
+        "state": "measurement",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "no_provenance"
+        ]
+      }
+    ],
+    "loki": [
+      {
+        "repository": "grafana/grafana",
+        "state": "split",
+        "installs": false,
+        "named_as": [
+          "arm"
+        ],
+        "flags": [
+          "no_provenance",
+          "advisories",
+          "ci_failing"
+        ]
+      },
+      {
+        "repository": "grafana/loki",
+        "state": "split",
+        "installs": false,
+        "named_as": [
+          "former_default",
+          "arm"
+        ],
+        "flags": [
+          "no_provenance"
+        ]
+      }
+    ],
+    "mcp-inspector": [
+      {
+        "repository": "modelcontextprotocol/inspector",
+        "state": "definitive",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "advisories",
+          "ci_failing"
+        ]
+      }
+    ],
+    "mcporter": [
+      {
+        "repository": "openclaw/mcporter",
+        "state": "definitive",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "no_provenance"
+        ]
+      }
+    ],
+    "mineru": [
+      {
+        "repository": "opendatalab/mineru",
+        "state": "definitive",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "no_provenance"
+        ]
+      }
+    ],
+    "mise": [
+      {
+        "repository": "jdx/mise",
+        "state": "definitive",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "advisories"
+        ]
+      }
+    ],
+    "otel-collector-contrib": [
+      {
+        "repository": "open-telemetry/opentelemetry-collector-contrib",
+        "state": "definitive",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "advisories",
+          "ci_failing"
+        ]
+      }
+    ],
+    "phoenix": [
+      {
+        "repository": "arize-ai/phoenix",
+        "state": "resolved",
+        "installs": false,
+        "named_as": [
+          "former_default"
+        ],
+        "flags": []
+      }
+    ],
+    "playwright-cli": [
+      {
+        "repository": "microsoft/playwright-cli",
+        "state": "split",
+        "installs": false,
+        "named_as": [
+          "former_default",
+          "arm"
+        ],
+        "flags": []
+      },
+      {
+        "repository": "vercel-labs/agent-browser",
+        "state": "split",
+        "installs": false,
+        "named_as": [
+          "arm"
+        ],
+        "flags": [
+          "no_provenance",
+          "ci_failing"
+        ]
+      }
+    ],
+    "prometheus": [
+      {
+        "repository": "prometheus/prometheus",
+        "state": "resolved",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "advisories"
+        ]
+      }
+    ],
+    "promptfoo": [
+      {
+        "repository": "promptfoo/promptfoo",
+        "state": "resolved",
+        "installs": false,
+        "named_as": [
+          "former_default"
+        ],
+        "flags": []
+      }
+    ],
+    "research-harnesses": [
+      {
+        "repository": "assafelovic/gpt-researcher",
+        "state": "pinned",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": []
+      },
+      {
+        "repository": "bytedance/deer-flow",
+        "state": "pinned",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": []
+      }
+    ],
+    "restic": [
+      {
+        "repository": "restic/restic",
+        "state": "definitive",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "no_provenance"
+        ]
+      }
+    ],
+    "sandbox-runtime-srt": [
+      {
+        "repository": "anthropics/sandbox-runtime",
+        "state": "definitive",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "advisories"
+        ]
+      }
+    ],
+    "serena": [
+      {
+        "repository": "oraios/serena",
+        "state": "definitive",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "advisories",
+          "ci_failing"
+        ]
+      }
+    ],
+    "skill-authoring": [
+      {
+        "repository": "anthropics/skills",
+        "state": "resolved",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "no_release"
+        ]
+      }
+    ],
+    "skill-discovery": [
+      {
+        "repository": "vercel-labs/skills",
+        "state": "resolved",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": []
+      }
+    ],
+    "structural-search": [
+      {
+        "repository": "ast-grep/ast-grep",
+        "state": "resolved",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "no_provenance"
+        ]
+      }
+    ],
+    "syft": [
+      {
+        "repository": "anchore/syft",
+        "state": "definitive",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "advisories",
+          "ci_failing"
+        ]
+      }
+    ],
+    "tobi-qmd": [
+      {
+        "repository": "tobi/qmd",
+        "state": "definitive",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": []
+      }
+    ],
+    "trafilatura": [
+      {
+        "repository": "adbar/trafilatura",
+        "state": "resolved",
+        "installs": false,
+        "named_as": [
+          "former_default"
+        ],
+        "flags": []
+      }
+    ],
+    "trail-of-bits-security-skills-trailofbits-skills": [
+      {
+        "repository": "trailofbits/skills",
+        "state": "definitive",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "no_release"
+        ]
+      }
+    ],
+    "trufflehog": [
+      {
+        "repository": "trufflesecurity/trufflehog",
+        "state": "resolved",
+        "installs": false,
+        "named_as": [
+          "former_default"
+        ],
+        "flags": [
+          "no_provenance",
+          "advisories",
+          "ci_failing"
+        ]
+      }
+    ],
+    "worktrunk": [
+      {
+        "repository": "max-sixty/worktrunk",
+        "state": "definitive",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": []
+      }
+    ],
+    "zizmor": [
+      {
+        "repository": "zizmorcore/zizmor",
+        "state": "definitive",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "advisories",
+          "ci_failing"
+        ]
+      }
+    ]
+  }
+}
