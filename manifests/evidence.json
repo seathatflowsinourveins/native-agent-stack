@@ -15765,6 +15765,11 @@
       "bytes": 16881
     },
     {
+      "path": "docs/decisions/2026-10-03-token-context-study-custody.md",
+      "sha256": "2224a0cd04b60d7ebcc346621cc2c92adfbde33c0d7dc01d277120e63d838b16",
+      "bytes": 16698
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -45268,6 +45273,21 @@
       "path": "evidence/artifacts/token-adoption-e2e-20260926/token-e2e-run.mjs",
       "sha256": "eb7029f9c7f5d6672525b0c8cb59263b78a29b40bc4254cf84a666e99dc47913",
       "bytes": 9122
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/harness-source-read.json",
+      "sha256": "63dcec9a9dd0051e8333d32a1cfe32e8aa783c5639cb6d5c41058444ef97c60b",
+      "bytes": 2739
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/protocol.md",
+      "sha256": "2fa8bc1252a179548ac7e5a5465e1fa8db3d98620d78eb5b861e4e512705d881",
+      "bytes": 14257
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/source-qualification.md",
+      "sha256": "ce94021a191e91257d60699458d85c321c26df1e81e9d30f9cd493e3b1ef375e",
+      "bytes": 7083
     },
     {
       "path": "evidence/artifacts/token-coverage-20260926/README.md",
