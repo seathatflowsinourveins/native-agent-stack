@@ -1,0 +1,196 @@
+{
+  "unit": "76",
+  "north_star": "Keep the token job freeze current while the root qualifies RTK privately.",
+  "evidence_level": "Fresh primary public release/tag source metadata, not installed runtime or model acceptance.",
+  "observed_at": "2026-10-03T22:47:00.215781+00:00",
+  "cutoff": "2026-09-29T00:00:00Z",
+  "native_public_gh_calls": 17,
+  "native_public_gh_calls_closed_zero": 17,
+  "native_client_model_benchmark_index_config_calls": 0,
+  "changes_to_fixed_pins": 0,
+  "choice": "Retain all five fixed stable candidate pins; record RTK prerelease as future source lead only.",
+  "source_scope_limits": [
+    "GitHub latest release excludes prereleases; newest published prerelease is separately bound.",
+    "The tags endpoint first returned tag is not assumed chronological newest tag.",
+    "Release date is published_at, separately retained from created_at.",
+    "No untagged HEAD/package-artifact/installed-byte freshness assertion."
+  ],
+  "corrections": [
+    {
+      "claim": "TOON identity package.json",
+      "correction": "The selected TOON root package has version but no repository field; repository identity is bound to retained stack manifest, with package.json only the version source."
+    }
+  ],
+  "reviewer_scope": "No winner, cost benefit, default adoption, native test replay, or retrieval-layer mutation.",
+  "scope_distinctions": [
+    "W records RTK 0.50.0; the private qualified current candidate is independently fixed at 0.51.0/e001.",
+    "Release/tag identity is distinct from installed source/build equality; QMD installed-versus-pinned equality remains UNKNOWN."
+  ],
+  "repositories": [
+    {
+      "component": "rtk",
+      "repository": "rtk-ai/rtk",
+      "fixed_version": "0.51.0",
+      "fixed_candidate_commit": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+      "latest_stable": {
+        "tag": "v0.51.0",
+        "commit": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+        "release_id": 401846659,
+        "release_name": "v0.51.0",
+        "created_at": "2026-10-02T13:33:07Z",
+        "published_at": "2026-10-02T13:33:54Z",
+        "release_url": "https://github.com/rtk-ai/rtk/releases/tag/v0.51.0",
+        "prerelease": false,
+        "draft": false,
+        "body_bytes": 6019,
+        "body_sha256": "89b628dcd04c477f1fdc344ad1bebb61403fda0933b529aaa5491e5dfe7b8232"
+      },
+      "fixed_candidate_equals_latest_stable_commit": true,
+      "scope": "Official release/tag metadata only; installed-build equivalence and untagged HEAD changes are not established.",
+      "current_work_impact": "Fixed stable 0.51.0/e001 source is unchanged. New prerelease is a separately pinned, diverged prospective source with changed dependency/permission/subprocess-test classes; no upgrade, rerun, acceptance or regrade follows.",
+      "release_window": {
+        "cutoff": "2026-09-29T00:00:00Z",
+        "requested_limit": 30,
+        "returned": 30,
+        "reaches_before_cutoff": true,
+        "published_at_or_after_cutoff_count": 18
+      },
+      "newest_published_prerelease": {
+        "tag": "dev-0.51.1-rc.503",
+        "commit": "c356374fc1c9cff132c02484d2b9195c796b8e8f",
+        "release_id": 402587706,
+        "release_name": "dev-0.51.1-rc.503",
+        "created_at": "2026-10-03T16:03:05Z",
+        "published_at": "2026-10-03T16:10:25Z",
+        "release_url": "https://github.com/rtk-ai/rtk/releases/tag/dev-0.51.1-rc.503",
+        "body_bytes": 0,
+        "body_absence_is_not_source_absence": true,
+        "compare_status": "diverged",
+        "ahead_by": 48,
+        "behind_by": 7,
+        "commits_returned": 48,
+        "total_commits": 48,
+        "compare_url": "https://github.com/rtk-ai/rtk/compare/e001f773f80b22b7dc4c7a79521b30e35aaef026...dev-0.51.1-rc.503",
+        "comparison_is_not_direct_stable_successor": true
+      }
+    },
+    {
+      "component": "context-mode",
+      "repository": "mksglu/context-mode",
+      "fixed_version": "1.0.169",
+      "fixed_candidate_commit": "589d8214d56740a28b5f7bf63167743d586b0b40",
+      "latest_stable": {
+        "tag": "v1.0.169",
+        "commit": "589d8214d56740a28b5f7bf63167743d586b0b40",
+        "release_id": 346435394,
+        "release_name": "v1.0.169",
+        "created_at": "2026-06-29T18:17:55Z",
+        "published_at": "2026-06-29T18:18:53Z",
+        "release_url": "https://github.com/mksglu/context-mode/releases/tag/v1.0.169",
+        "prerelease": false,
+        "draft": false,
+        "body_bytes": 1104,
+        "body_sha256": "11a36ff4c2afeeabe1cf380ed579a3b4d5952922b4c867b02ecb58e9ba2f08db"
+      },
+      "fixed_candidate_equals_latest_stable_commit": true,
+      "scope": "Official release/tag metadata only; installed-build equivalence and untagged HEAD changes are not established.",
+      "current_work_impact": "No newer published release found since cutoff in a bounded window reaching before cutoff; fixed candidate pin unchanged. Existing qualification gaps and STOP/HOLD records remain.",
+      "release_window": {
+        "cutoff": "2026-09-29T00:00:00Z",
+        "requested_limit": 30,
+        "returned": 30,
+        "reaches_before_cutoff": true,
+        "published_at_or_after_cutoff_count": 0
+      }
+    },
+    {
+      "component": "toon",
+      "repository": "toon-format/toon",
+      "fixed_version": "4.1.1",
+      "fixed_candidate_commit": "a9e6d97eca931379824f3b6a1ba8fbfbda7d3c53",
+      "latest_stable": {
+        "tag": "v4.1.1",
+        "commit": "a9e6d97eca931379824f3b6a1ba8fbfbda7d3c53",
+        "release_id": 365489195,
+        "release_name": "v4.1.1",
+        "created_at": "2026-08-05T11:49:14Z",
+        "published_at": "2026-08-05T11:49:55Z",
+        "release_url": "https://github.com/toon-format/toon/releases/tag/v4.1.1",
+        "prerelease": false,
+        "draft": false,
+        "body_bytes": 843,
+        "body_sha256": "2e05b2df78fa71b9c27e47ad6d3a2ce9b849d29fbacf30c242a4672bb70484ff"
+      },
+      "fixed_candidate_equals_latest_stable_commit": true,
+      "scope": "Official release/tag metadata only; installed-build equivalence and untagged HEAD changes are not established.",
+      "current_work_impact": "No newer published release found since cutoff in a bounded window reaching before cutoff; fixed candidate pin unchanged. Existing qualification gaps and STOP/HOLD records remain.",
+      "release_window": {
+        "cutoff": "2026-09-29T00:00:00Z",
+        "requested_limit": 30,
+        "returned": 30,
+        "reaches_before_cutoff": true,
+        "published_at_or_after_cutoff_count": 0
+      }
+    },
+    {
+      "component": "ccusage",
+      "repository": "ccusage/ccusage",
+      "fixed_version": "20.0.26",
+      "fixed_candidate_commit": "d9821088b98aa536c7a385aa1a4579d6fa02269b",
+      "latest_stable": {
+        "tag": "v20.0.26",
+        "commit": "d9821088b98aa536c7a385aa1a4579d6fa02269b",
+        "release_id": 397721757,
+        "release_name": "v20.0.26",
+        "created_at": "2026-09-27T16:18:33Z",
+        "published_at": "2026-09-27T16:26:00Z",
+        "release_url": "https://github.com/ccusage/ccusage/releases/tag/v20.0.26",
+        "prerelease": false,
+        "draft": false,
+        "body_bytes": 1540,
+        "body_sha256": "b6d318d9d396c3304a86c4df007dbf354ca541c200d5e7915b20d5c27459efab"
+      },
+      "fixed_candidate_equals_latest_stable_commit": true,
+      "scope": "Official release/tag metadata only; installed-build equivalence and untagged HEAD changes are not established.",
+      "current_work_impact": "No newer published release found since cutoff in a bounded window reaching before cutoff; fixed candidate pin unchanged. Existing qualification gaps and STOP/HOLD records remain.",
+      "release_window": {
+        "cutoff": "2026-09-29T00:00:00Z",
+        "requested_limit": 30,
+        "returned": 30,
+        "reaches_before_cutoff": true,
+        "published_at_or_after_cutoff_count": 0
+      }
+    },
+    {
+      "component": "qmd",
+      "repository": "tobi/qmd",
+      "fixed_version": "2.8.3",
+      "fixed_candidate_commit": "facd35e01359e59d938bc9418e93fb9318addee3",
+      "latest_stable": {
+        "tag": "v2.8.3",
+        "commit": "facd35e01359e59d938bc9418e93fb9318addee3",
+        "release_id": 371450827,
+        "release_name": "v2.8.3",
+        "created_at": "2026-08-16T22:28:32Z",
+        "published_at": "2026-08-16T22:30:34Z",
+        "release_url": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+        "prerelease": false,
+        "draft": false,
+        "body_bytes": 23766,
+        "body_sha256": "cd504c4f68a12917ab4b6e36b56a0f9c5e594626bec2bd968c4f77cfdbdc0837"
+      },
+      "fixed_candidate_equals_latest_stable_commit": true,
+      "scope": "Official release/tag metadata only; installed-build equivalence and untagged HEAD changes are not established.",
+      "current_work_impact": "No newer published release found since cutoff in a bounded window reaching before cutoff; fixed candidate pin unchanged. Existing qualification gaps and STOP/HOLD records remain.",
+      "release_window": {
+        "cutoff": "2026-09-29T00:00:00Z",
+        "requested_limit": 30,
+        "returned": 14,
+        "reaches_before_cutoff": true,
+        "published_at_or_after_cutoff_count": 0
+      }
+    }
+  ],
+  "private_summary_sha256": "e11309e6cc76fbc0f1967a41f2d80b48a17a266b331014705dc5ee219326b7f8",
+  "completeness_critic": "Release/tag metadata is current only for the selected five tools and bounded windows. Untagged source, installed byte equivalence, new candidate classes and live quality/counter modalities remain separate job-specific sweeps; no freeze or acceptance follows metadata alone."
+}

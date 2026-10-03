@@ -1,0 +1,284 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "unit_id": "rtk-native-full-cargo-preparation-first-clone-stop",
+  "publication_status": "SANITIZED_DATA_FOR_ROOT_INTEGRATION",
+  "status": "STOP_NATIVE_LOCAL_CLONE_EXIT128_BEFORE_CARGO",
+  "north_star_action": "Reliable measured command-output context for cumulative engineering and US-equities R&D.",
+  "source_pin": "rtk-ai/rtk@e001f773f80b22b7dc4c7a79521b30e35aaef026",
+  "evidence_class": "ONE_CLOSED_NATIVE_PREPARATION_ATTEMPT_NOT_TEST_ACCEPTANCE",
+  "actual_operation": {
+    "name": "native local clone",
+    "unchanged_native_flags": [
+      "--no-hardlinks",
+      "--no-checkout"
+    ],
+    "native_exit": 128,
+    "terminal_observed": true,
+    "recorded_native_attempts": 1,
+    "stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "bytes": 505,
+      "sha256": "69084fac12455babdd2b0ccd3c482bac57890f4e6ae663a8c29df2c41b8bce6c"
+    },
+    "failure_class": "Native stderr reports lazy fetching disabled and failure to obtain a promisor history object; upload-pack/index-pack failed.",
+    "not_a_Cargo_test_exit": true,
+    "timeout_seconds": 950,
+    "kill_after_seconds": 10,
+    "literal_returned_argv_matches_first_frozen_plan_command": true
+  },
+  "strict_remaining_stages": [
+    {
+      "stage": "native_detached_checkout",
+      "status": "UNRUN_FINAL"
+    },
+    {
+      "stage": "native_public_archive_copy",
+      "status": "UNRUN_FINAL"
+    },
+    {
+      "stage": "native_public_index_copy",
+      "status": "UNRUN_FINAL"
+    },
+    {
+      "stage": "unchanged_native_full_cargo",
+      "status": "UNRUN_FINAL"
+    }
+  ],
+  "unchanged_Cargo_intent": {
+    "command": "cargo test --all",
+    "status": "UNRUN_FINAL",
+    "declared_adaptations": [
+      "Fresh owned runtime prefix and planned cwd",
+      "Native timeout950s/kill-after10s",
+      "Source-documented CARGO_BUILD_JOBS=2"
+    ],
+    "HOME_assignment": false
+  },
+  "preregistration": {
+    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5973991246",
+    "posted_at": "2026-10-03T22:11:38Z",
+    "native_read_exit": 0,
+    "retained_body_bytes_match": true,
+    "body_sha256": "6f9ca63026de72197ded9143d1d83bde21d91cf067faa033a9ead1066e2e6800",
+    "before_call_order": "Root-observed native reread/preflight then clone, distinguished from independent file custody."
+  },
+  "immutability": {
+    "selected_source60_inputs": 365,
+    "source60_outputs": 7,
+    "after_closed_clone_all_match": true,
+    "scope": "Exact selected byte bindings only; does not establish Git object-graph completeness or a global filesystem census."
+  },
+  "prior_results_preserved": {
+    "original_container": {
+      "passed": 3922,
+      "failed": 2,
+      "ignored": 8,
+      "exit": 101,
+      "later_integration_targets_UNRUN": 18
+    },
+    "separate_host_guard_runs": {
+      "passed": 22,
+      "failed": 0,
+      "scope": "Two disjoint 2+20 native guard operations only; not full Cargo qualification."
+    }
+  },
+  "preserved_projection_correction": "Archive copy operand count is145; earlier146 included the destination. No command, source or result changed.",
+  "source_references": [
+    {
+      "repository": "rust-lang/cargo",
+      "pin": "ea2d97820c16195b0ca3fadb4319fe512c199a43",
+      "path": "src/doc/src/commands/cargo-test.md",
+      "selected_lines": [
+        [
+          12,
+          34
+        ],
+        [
+          56,
+          69
+        ],
+        [
+          81,
+          85
+        ],
+        [
+          118,
+          119
+        ],
+        [
+          424,
+          434
+        ]
+      ],
+      "sha256": "0527d98b3f0f4bd12c1194aabfee9d7ace09e56b3b9b2f06c9f943aa81b4da45",
+      "url": "https://github.com/rust-lang/cargo/blob/ea2d97820c16195b0ca3fadb4319fe512c199a43/src/doc/src/commands/cargo-test.md"
+    },
+    {
+      "repository": "rust-lang/cargo",
+      "pin": "ea2d97820c16195b0ca3fadb4319fe512c199a43",
+      "path": "src/doc/src/reference/environment-variables.md",
+      "selected_lines": [
+        [
+          91,
+          91
+        ]
+      ],
+      "sha256": "a693c71967f8e8e0b85f35cde54372028a85da34538037d7459848124aa744c0",
+      "url": "https://github.com/rust-lang/cargo/blob/ea2d97820c16195b0ca3fadb4319fe512c199a43/src/doc/src/reference/environment-variables.md"
+    },
+    {
+      "repository": "rust-lang/cargo",
+      "pin": "ea2d97820c16195b0ca3fadb4319fe512c199a43",
+      "path": "src/doc/src/guide/cargo-home.md",
+      "selected_lines": [
+        [
+          1,
+          9
+        ],
+        [
+          44,
+          51
+        ],
+        [
+          55,
+          70
+        ]
+      ],
+      "sha256": "53399d7f2251f8f06a7dfab47d3df74cbe3d54854fac4d64272edde1c4f83ec6",
+      "url": "https://github.com/rust-lang/cargo/blob/ea2d97820c16195b0ca3fadb4319fe512c199a43/src/doc/src/guide/cargo-home.md"
+    },
+    {
+      "repository": "rtk-ai/rtk",
+      "pin": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+      "path": "Cargo.toml",
+      "selected_lines": [
+        [
+          1,
+          7
+        ]
+      ],
+      "sha256": "362b34c49755eddcf3f8d48bb80db8db6c2bb26f05a928efa2fd124684d5b29d",
+      "url": "https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/Cargo.toml"
+    },
+    {
+      "repository": "rtk-ai/rtk",
+      "pin": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+      "path": "Cargo.lock",
+      "selected_lines": [],
+      "sha256": "ba33797597230a239167f49b85ffa6c6a4bdc7a33e0e76c3daf41da200c9df44",
+      "url": "https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/Cargo.lock"
+    },
+    {
+      "repository": "rtk-ai/rtk",
+      "pin": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+      "path": ".github/workflows/ci.yml",
+      "selected_lines": [
+        [
+          58,
+          67
+        ]
+      ],
+      "sha256": "e77f934a2345820ba640107524880905b1413b8ae1741ea57e185536859b76a2",
+      "url": "https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/.github/workflows/ci.yml"
+    },
+    {
+      "repository": "rtk-ai/rtk",
+      "pin": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+      "path": "tests/common/mod.rs",
+      "selected_lines": [
+        [
+          11,
+          36
+        ]
+      ],
+      "sha256": "889a37e765ec10f2a4fa90271df8fa2adb6fe3f123b8611e69c2e8112f3e4fd6",
+      "url": "https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/tests/common/mod.rs"
+    },
+    {
+      "repository": "rtk-ai/rtk",
+      "pin": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+      "path": "src/core/test_isolation/scratch.rs",
+      "selected_lines": [
+        [
+          25,
+          72
+        ],
+        [
+          155,
+          188
+        ]
+      ],
+      "sha256": "a4f9d5300f95b4f2b2e47e267fa251a45448ae730a55b15bdb0f10c6b703e4df",
+      "url": "https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/core/test_isolation/scratch.rs"
+    },
+    {
+      "repository": "containers/bubblewrap",
+      "pin": "124c4cdf4321f63ef17a1cb0ce8f9dd45bd7adbe",
+      "path": "bubblewrap.c",
+      "selected_lines": [
+        [
+          313,
+          369
+        ],
+        [
+          1230,
+          1270
+        ],
+        [
+          1876,
+          1894
+        ],
+        [
+          1956,
+          1985
+        ],
+        [
+          2509,
+          2524
+        ],
+        [
+          3026,
+          3033
+        ]
+      ],
+      "sha256": "e81e833751d3d247d72dff1ad1792ca72939fa6956974dde2cb86f9f1b0a2bb3",
+      "url": "https://github.com/containers/bubblewrap/blob/124c4cdf4321f63ef17a1cb0ce8f9dd45bd7adbe/bubblewrap.c"
+    },
+    {
+      "repository": "containers/bubblewrap",
+      "pin": "124c4cdf4321f63ef17a1cb0ce8f9dd45bd7adbe",
+      "path": "README.md",
+      "selected_lines": [
+        [
+          104,
+          173
+        ]
+      ],
+      "sha256": "16fa90d97bde583e83fef0ebbde912b2118eb61f2d7c860a07264755d9a56f79",
+      "url": "https://github.com/containers/bubblewrap/blob/124c4cdf4321f63ef17a1cb0ce8f9dd45bd7adbe/README.md"
+    }
+  ],
+  "private_custody_sha256": {
+    "root_plan": "e1c431dccfc7bb88499280c7f77ef4cc1c897b00ea37a341d63717ed48e30750",
+    "native_clone_tool_return": "7a3d2ae42e9e28d3c81661b9f29a6afdda5a4f0d7fbc57ad33cf9cc8d396daac",
+    "first_failure_postread": "a31bca4f5e6dfad903b71f19f7016210efb85feeeebd22df5b9b34ac358c718f",
+    "native_GitHub_body_read": "105cb694e7a649cb8e4d50dc29061515e9b63b1fdb1cc04a2ca81ebb3b6fba73",
+    "source60_manifest": "44388b4a156a39c94025602c58ce03b5a404299d168e750c3b348a58ef6ad6dc",
+    "unit68_source_bindings": "60b16ea81e292c1905143646e14d40ea29abf4ee4de6873b492ebf0811b6d653",
+    "unit68_frozen_projection": "537059b39fa5a3ce7d38ef3eed6e50aeee43237293b8571037c09aea9d2b1788"
+  },
+  "usage": {
+    "model_or_provider_tokens": null,
+    "cost": null,
+    "status": "NOT_MEASURED_NATIVE_PREPARATION_ONLY"
+  },
+  "limits": [
+    "No retry, rescue, patched source, Cargo compilation/test execution, baseline/winner, installation or measured savings/protection/default acceptance.",
+    "No complete Git-history integrity, sole-error cause, universal repository corruption, whole-host filesystem/process census, physical stream EOF or invoice claim.",
+    "Stopped native clone is operational preparation evidence; old test failures and separate guard PASS remain distinct."
+  ]
+}

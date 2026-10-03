@@ -136,7 +136,12 @@
       "unit43-five-job-gap-map",
       "unit51-rtk-host-libtest-metadata",
       "unit54-rtk-host-two-original-cases",
-      "unit54-rtk-host-remaining20"
+      "unit54-rtk-host-remaining20",
+      "unit64-rtk-local-clone-stop",
+      "unit70-rtk-full-public-cargo-stop",
+      "unit74-astra-minimum-view-source-judgment",
+      "unit75-rtk-cc-view-link-stop",
+      "unit76-token-release-currency"
     ],
     "roles": [
       "command-worker",
@@ -314,7 +319,12 @@
     "independent committed-evidence five-job completeness map and exact25sourcebindings",
     "retained upstream native guard libtest --help and --list on host; metadata only",
     "preregistered selective bubblewrap native guard libtest --exact --test-threads1 two original cases; native closure0",
-    "separately preregistered selective bubblewrap native guard libtest exact skip of two original cases; remaining20 native closure0"
+    "separately preregistered selective bubblewrap native guard libtest exact skip of two original cases; remaining20 native closure0",
+    "native local offline clone exit128 before Cargo; remaining stages UNRUN_FINAL",
+    "fresh full public pinned Git source/cache delivery followed by unchanged cargo test --all exit101",
+    "native codex exec -m gpt-6-astra at max; one complete frozen source packet read; closed0",
+    "separate private compiler-link repair cc version0 then unchanged fresh cargo test --all exit101",
+    "17 closed public native gh release tag compare metadata reads; selected five stable candidate pins unchanged"
   ],
   "observations": [
     {
@@ -3788,6 +3798,161 @@
         "total": null,
         "uncached_input": null
       }
+    },
+    {
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit64-rtk-local-clone-stop.json",
+          "sha256": "ceccc055307edf15223ce2856eee7399d8a3443b7816ba702ff0d7fee72e3ca2"
+        }
+      ],
+      "attempt": 1,
+      "command_index": 104,
+      "condition": "candidate",
+      "evidence_class": "native_cli_execution",
+      "exit_code": 128,
+      "id": "unit64-rtk-local-clone-stop",
+      "quality": {
+        "contract": false,
+        "semantic": false
+      },
+      "role": "coordinator",
+      "scope": "Local clone STOP, one native preparation attempt only; Cargo/tests unrun.",
+      "status": "failed",
+      "task": "unit64-rtk-local-clone-stop",
+      "usage": {
+        "cache_creation": null,
+        "cache_read": null,
+        "native_retries": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "uncached_input": null
+      }
+    },
+    {
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit70-rtk-full-public-cargo-stop.json",
+          "sha256": "485bcd30cd9029cec0b1f73f306e2a93aa68af7b6b0ed822cd27bd2db1c52fe7"
+        }
+      ],
+      "attempt": 1,
+      "command_index": 105,
+      "condition": "candidate",
+      "evidence_class": "native_cli_execution",
+      "exit_code": 101,
+      "id": "unit70-rtk-full-public-cargo-stop",
+      "quality": {
+        "contract": false,
+        "semantic": false
+      },
+      "role": "coordinator",
+      "scope": "Full source/cache metadata pass; selected compiler lookup STOP before tests. No whole-host absence or token comparison.",
+      "status": "failed",
+      "task": "unit70-rtk-full-public-cargo-stop",
+      "usage": {
+        "cache_creation": null,
+        "cache_read": null,
+        "native_retries": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "uncached_input": null
+      }
+    },
+    {
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit74-astra-minimum-view-source-judgment.json",
+          "sha256": "7c2500e64641262075310f180c12ae3efcac076ff6d764cd6b3fb232c4294432"
+        }
+      ],
+      "attempt": 1,
+      "command_index": 106,
+      "condition": "candidate",
+      "evidence_class": "native_cli_execution",
+      "exit_code": 0,
+      "id": "unit74-astra-minimum-view-source-judgment",
+      "quality": {
+        "contract": true,
+        "semantic": true
+      },
+      "role": "coordinator",
+      "scope": "Source judgment only; exact 1/1 whole packet and172words. Native two finalized main groups once; global helper/wire/invoice unknown.",
+      "status": "passed",
+      "task": "unit74-astra-minimum-view-source-judgment",
+      "usage": {
+        "cache_creation": 0,
+        "cache_read": 17920,
+        "native_retries": null,
+        "output": 1716,
+        "reasoning_in_output": 1354,
+        "total": 25874,
+        "uncached_input": 6238
+      }
+    },
+    {
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit75-rtk-cc-view-link-stop.json",
+          "sha256": "0e176c61257bad74060987506a2d6c30fa934ca2535ab5b0a5a2772f8da0ad10"
+        }
+      ],
+      "attempt": 1,
+      "command_index": 107,
+      "condition": "candidate",
+      "evidence_class": "native_cli_execution",
+      "exit_code": 101,
+      "id": "unit75-rtk-cc-view-link-stop",
+      "quality": {
+        "contract": false,
+        "semantic": false
+      },
+      "role": "coordinator",
+      "scope": "Compiler metadata0; linking startup objects/runtime libraries absent in selected view; no tests or sole-cause inference.",
+      "status": "failed",
+      "task": "unit75-rtk-cc-view-link-stop",
+      "usage": {
+        "cache_creation": null,
+        "cache_read": null,
+        "native_retries": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "uncached_input": null
+      }
+    },
+    {
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit76-token-release-currency.json",
+          "sha256": "12a2df8742e8dcab7e9d4e7ff36dba682f05c2e894a7ff0cf2afd3c8477695d1"
+        }
+      ],
+      "attempt": 1,
+      "command_index": 108,
+      "condition": "candidate",
+      "evidence_class": "native_cli_execution",
+      "exit_code": 0,
+      "id": "unit76-token-release-currency",
+      "quality": {
+        "contract": true,
+        "semantic": true
+      },
+      "role": "coordinator",
+      "scope": "Bounded release metadata only, not runtime/model/installed-byte qualification; newer RTK prerelease remains separately pinned diverged lead.",
+      "status": "passed",
+      "task": "unit76-token-release-currency",
+      "usage": {
+        "cache_creation": null,
+        "cache_read": null,
+        "native_retries": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "uncached_input": null
+      }
     }
   ],
   "failures_and_skips": [
@@ -4026,6 +4191,18 @@
     {
       "reason": "Native exit0 and selected rangesPASS12/12 do not satisfy required whole-view coverage:9/11FAIL, two unterminated nonblank tails omitted. Source advice is conditional. Known five finalized groups80857 counted once, helper/invoice/wire completenessUNKNOWN; old STOPs unchanged.",
       "run_id": "unit36-astra-source-judgment"
+    },
+    {
+      "reason": "Local clone STOP, one native preparation attempt only; Cargo/tests unrun. Previous failures, guards and unknown usage preserved; no retries/rescue or default claim.",
+      "run_id": "unit64-rtk-local-clone-stop"
+    },
+    {
+      "reason": "Full source/cache metadata pass; selected compiler lookup STOP before tests. No whole-host absence or token comparison. Previous failures, guards and unknown usage preserved; no retries/rescue or default claim.",
+      "run_id": "unit70-rtk-full-public-cargo-stop"
+    },
+    {
+      "reason": "Compiler metadata0; linking startup objects/runtime libraries absent in selected view; no tests or sole-cause inference. Previous failures, guards and unknown usage preserved; no retries/rescue or default claim.",
+      "run_id": "unit75-rtk-cc-view-link-stop"
     }
   ],
   "limitations": [
@@ -4174,7 +4351,12 @@
       "unit43-five-job-gap-map",
       "unit51-rtk-host-libtest-metadata",
       "unit54-rtk-host-two-original-cases",
-      "unit54-rtk-host-remaining20"
+      "unit54-rtk-host-remaining20",
+      "unit64-rtk-local-clone-stop",
+      "unit70-rtk-full-public-cargo-stop",
+      "unit74-astra-minimum-view-source-judgment",
+      "unit75-rtk-cc-view-link-stop",
+      "unit76-token-release-currency"
     ],
     "coverage_artifact": null
   }

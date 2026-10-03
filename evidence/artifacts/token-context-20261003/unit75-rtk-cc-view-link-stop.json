@@ -1,0 +1,572 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "unit_id": "rtk-private-cc-view-native-link-stop",
+  "publication_status": "SANITIZED_DATA_FOR_ROOT_INTEGRATION",
+  "status": "STOP_NATIVE_CARGO101_LINK_RUNTIME_BEFORE_TESTS",
+  "north_star_action": "Honest native command-output candidate qualification before measured engineering and US-equities R&D token comparison.",
+  "source_pin": "rtk-ai/rtk@e001f773f80b22b7dc4c7a79521b30e35aaef026",
+  "evidence_class": "CLOSED_NATIVE_COMPILER_METADATA_SOURCE_DELIVERY_AND_FAILED_UNCHANGED_CARGO_ATTEMPT",
+  "compiler_metadata": {
+    "native_exit": 0,
+    "version_line": "cc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+    "stdout": {
+      "bytes": 238,
+      "sha256": "f6ab9d76ae8dcab3e133254944fbc77f41e0ba766287e289345c1ab77df09c45"
+    },
+    "stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "status": "LOOKUP_VERSION_PASS_ONLY"
+  },
+  "operations": [
+    {
+      "stage": "native_local_clone",
+      "native_exit": 0,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 41,
+        "sha256": "18b65349f3d650f26d7f6d5df82a3b56dd6886317670bf8cda9039614913a145"
+      }
+    },
+    {
+      "stage": "native_detached_checkout",
+      "native_exit": 0,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 111,
+        "sha256": "2deb953368d930b70fa559e0a72dc7d3a7598ce40205ae59fb2932a97fb1499c"
+      }
+    },
+    {
+      "stage": "native_public_archive_copy",
+      "native_exit": 0,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "stage": "native_public_index_copy",
+      "native_exit": 0,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "stage": "unchanged_native_full_cargo",
+      "native_exit": 101,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 3643,
+        "sha256": "b5807c9173641a2f35406fc3cab3ecae592c929e705c47bd5168ccd2d02d8523"
+      }
+    }
+  ],
+  "source_fidelity": {
+    "HEAD_matches_pin": true,
+    "native_is_shallow": false,
+    "native_tree_index_entries": 607,
+    "mode_blob_path_match_and_capture_bytes_equal70": true,
+    "native_worktree_index_diff_exits": [
+      0,
+      0
+    ],
+    "selected_current_source_bytes_match": true,
+    "scope": "Native tracked snapshots before Cargo; selected current bodies match without a fresh native Git check."
+  },
+  "public_cache_delivery": {
+    "archives": 145,
+    "index_config_files": 198,
+    "native_copy_exits": [
+      0,
+      0
+    ],
+    "current_source_destination_bytes_equal": true
+  },
+  "native_Cargo": {
+    "declared_command": "cargo test --all",
+    "native_exit": 101,
+    "test_phase": "UNRUN_COMPILATION_STOP",
+    "error_class": "Dependency build-script link failure in selected native view",
+    "startup_objects_reported_unavailable": [
+      "Scrt1.o",
+      "crti.o",
+      "crtn.o"
+    ],
+    "libraries_reported_unavailable": [
+      "-lc",
+      "-ldl",
+      "-lm",
+      "-lpthread",
+      "-lrt",
+      "-lutil"
+    ],
+    "failed_build_scripts": [
+      "proc-macro2",
+      "quote"
+    ],
+    "stdout_bytes": 0,
+    "stderr_bytes": 3643,
+    "stderr_sha256": "b5807c9173641a2f35406fc3cab3ecae592c929e705c47bd5168ccd2d02d8523",
+    "timeout_seconds": 950,
+    "kill_after_seconds": 10,
+    "build_jobs": 2
+  },
+  "later_actions": "UNRUN_FINAL",
+  "preregistration": {
+    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5974261301",
+    "published_at": "2026-10-03T22:42:41Z",
+    "actual_native_reread_exit": 0,
+    "body_exact": true,
+    "body_sha256": "e7ef910888913bdacb9ff56a1ad56b82c0f31ab2a3d6a9b7b57f872380ee16ae",
+    "retained_metadata_failure": {
+      "incorrect_comment_read_HTTP": 404,
+      "native_exit": 1,
+      "corrected_before_first_trial_action": "Root-attested and recorded",
+      "classification": "PRELAUNCH_METADATA_REFERENCE_FAILURE_NOT_EXPERIMENT_RETRY"
+    }
+  },
+  "independent_custody": {
+    "source60_inputs_outputs": [
+      365,
+      7
+    ],
+    "source71_inputs_outputs": [
+      18,
+      5
+    ],
+    "all_selected_match": true,
+    "launch_argv_order_scope": "Root-attested; invoked argument objects absent from result export. Plan/source/capture identities independently verified."
+  },
+  "source77_advice": {
+    "status": "SCOPED_SOURCE_READ_PASS_RUNTIME_CANDIDATE_UNQUALIFIED",
+    "scope": "Source-supported minimum private compiler-link projection only; not ABI/test/token approval or default.",
+    "receipt_sha256": "aa4455266e9eebfb12950b678f21f8e642673fc6a66c9e1eb565541c4916da1c",
+    "candidate_sha256": "7c2500e64641262075310f180c12ae3efcac076ff6d764cd6b3fb232c4294432",
+    "not_added_to_compilation_usage": true
+  },
+  "prior_outcomes_preserved": {
+    "unit70": {
+      "native_Cargo_exit": 101,
+      "status": "STOP_LINKER_LOOKUP_BEFORE_TESTS"
+    },
+    "unit64": {
+      "native_clone_exit": 128,
+      "later_stages": "UNRUN_FINAL"
+    },
+    "original_container": {
+      "passed": 3922,
+      "failed": 2,
+      "ignored": 8,
+      "native_exit": 101,
+      "later_integration_targets_UNRUN": 18
+    },
+    "separate_host_guards": {
+      "passed": 22,
+      "scope": "Disjoint 2+20 guards only"
+    }
+  },
+  "source_references": [
+    {
+      "repository": "rust-lang/cargo",
+      "pin": "ea2d97820c16195b0ca3fadb4319fe512c199a43",
+      "path": "src/doc/src/commands/cargo-test.md",
+      "sha256": "0527d98b3f0f4bd12c1194aabfee9d7ace09e56b3b9b2f06c9f943aa81b4da45",
+      "lines": [
+        [
+          12,
+          34
+        ],
+        [
+          56,
+          69
+        ],
+        [
+          81,
+          85
+        ],
+        [
+          118,
+          119
+        ],
+        [
+          424,
+          434
+        ]
+      ],
+      "url": "https://github.com/rust-lang/cargo/blob/ea2d97820c16195b0ca3fadb4319fe512c199a43/src/doc/src/commands/cargo-test.md",
+      "reference_class": "PINNED_UPSTREAM_SOURCE_FILE",
+      "bytes": 29536
+    },
+    {
+      "repository": "rust-lang/cargo",
+      "pin": "ea2d97820c16195b0ca3fadb4319fe512c199a43",
+      "path": "src/doc/src/reference/environment-variables.md",
+      "sha256": "a693c71967f8e8e0b85f35cde54372028a85da34538037d7459848124aa744c0",
+      "lines": [
+        [
+          17,
+          24
+        ],
+        [
+          32,
+          33
+        ],
+        [
+          49,
+          50
+        ],
+        [
+          119,
+          119
+        ]
+      ],
+      "url": "https://github.com/rust-lang/cargo/blob/ea2d97820c16195b0ca3fadb4319fe512c199a43/src/doc/src/reference/environment-variables.md",
+      "reference_class": "PINNED_UPSTREAM_SOURCE_FILE",
+      "bytes": 27754
+    },
+    {
+      "repository": "rust-lang/cargo",
+      "pin": "ea2d97820c16195b0ca3fadb4319fe512c199a43",
+      "path": "src/doc/src/guide/cargo-home.md",
+      "sha256": "53399d7f2251f8f06a7dfab47d3df74cbe3d54854fac4d64272edde1c4f83ec6",
+      "lines": [
+        [
+          1,
+          9
+        ],
+        [
+          44,
+          51
+        ],
+        [
+          55,
+          70
+        ]
+      ],
+      "url": "https://github.com/rust-lang/cargo/blob/ea2d97820c16195b0ca3fadb4319fe512c199a43/src/doc/src/guide/cargo-home.md",
+      "reference_class": "PINNED_UPSTREAM_SOURCE_FILE",
+      "bytes": 4418
+    },
+    {
+      "repository": "rust-lang/rust",
+      "pin": "f8297e351a40c1439a467bbbb6879088047f50b3",
+      "path": "src/tools/cargo",
+      "sha256": "c7008dbf735cbed28ad41af050c83131fcd5f8f1376f7b5a24dd6c7b6012985b",
+      "lines": [],
+      "url": "https://api.github.com/repos/rust-lang/rust/contents/src/tools/cargo?ref=f8297e351a40c1439a467bbbb6879088047f50b3",
+      "reference_class": "OFFICIAL_PINNED_GITLINK_API_METADATA",
+      "resolved_repository": "rust-lang/cargo",
+      "resolved_gitlink_sha": "ea2d97820c16195b0ca3fadb4319fe512c199a43",
+      "resolved_tree_url": "https://github.com/rust-lang/cargo/tree/ea2d97820c16195b0ca3fadb4319fe512c199a43",
+      "sha256_representation": "Retained original API response bytes, not source-file text.",
+      "bytes": 851
+    },
+    {
+      "repository": "rtk-ai/rtk",
+      "pin": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+      "path": "Cargo.toml",
+      "sha256": "362b34c49755eddcf3f8d48bb80db8db6c2bb26f05a928efa2fd124684d5b29d",
+      "lines": [
+        [
+          1,
+          7
+        ]
+      ],
+      "url": "https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/Cargo.toml",
+      "reference_class": "PINNED_UPSTREAM_SOURCE_FILE",
+      "bytes": 2512
+    },
+    {
+      "repository": "rtk-ai/rtk",
+      "pin": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+      "path": "Cargo.lock",
+      "sha256": "ba33797597230a239167f49b85ffa6c6a4bdc7a33e0e76c3daf41da200c9df44",
+      "lines": [],
+      "url": "https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/Cargo.lock",
+      "reference_class": "PINNED_UPSTREAM_SOURCE_FILE",
+      "bytes": 50475
+    },
+    {
+      "repository": "rtk-ai/rtk",
+      "pin": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+      "path": ".github/workflows/ci.yml",
+      "sha256": "e77f934a2345820ba640107524880905b1413b8ae1741ea57e185536859b76a2",
+      "lines": [
+        [
+          58,
+          67
+        ]
+      ],
+      "url": "https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/.github/workflows/ci.yml",
+      "reference_class": "PINNED_UPSTREAM_SOURCE_FILE",
+      "bytes": 15555
+    },
+    {
+      "repository": "rtk-ai/rtk",
+      "pin": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+      "path": "tests/common/mod.rs",
+      "sha256": "889a37e765ec10f2a4fa90271df8fa2adb6fe3f123b8611e69c2e8112f3e4fd6",
+      "lines": [
+        [
+          11,
+          36
+        ]
+      ],
+      "url": "https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/tests/common/mod.rs",
+      "reference_class": "PINNED_UPSTREAM_SOURCE_FILE",
+      "bytes": 1814
+    },
+    {
+      "repository": "rtk-ai/rtk",
+      "pin": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+      "path": "src/core/test_isolation/scratch.rs",
+      "sha256": "a4f9d5300f95b4f2b2e47e267fa251a45448ae730a55b15bdb0f10c6b703e4df",
+      "lines": [
+        [
+          25,
+          72
+        ],
+        [
+          155,
+          188
+        ]
+      ],
+      "url": "https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/core/test_isolation/scratch.rs",
+      "reference_class": "PINNED_UPSTREAM_SOURCE_FILE",
+      "bytes": 9731
+    },
+    {
+      "reference_class": "NATIVE_REVISION_METADATA_SNAPSHOT",
+      "artifact_name": "source-head.txt",
+      "sha256": "2cf586916fd613bdddc76b3259fa603192dde8bfc6f85f628814e72f4cdf8a4f",
+      "bytes": 41,
+      "recorded_origin_label": "rtk-ai/rtk",
+      "recorded_version_or_context": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+      "public_url_status": "NOT_AN_UPSTREAM_SOURCE_PAGE; no URL supplied.",
+      "recorded_native_commit": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+      "meaning": "Native revision observation, not a tracked upstream HEAD file."
+    },
+    {
+      "repository": "containers/bubblewrap",
+      "pin": "124c4cdf4321f63ef17a1cb0ce8f9dd45bd7adbe",
+      "path": "bubblewrap.c",
+      "sha256": "e81e833751d3d247d72dff1ad1792ca72939fa6956974dde2cb86f9f1b0a2bb3",
+      "lines": [
+        [
+          313,
+          369
+        ],
+        [
+          1230,
+          1270
+        ],
+        [
+          1876,
+          1894
+        ],
+        [
+          1956,
+          1985
+        ],
+        [
+          2509,
+          2524
+        ],
+        [
+          3026,
+          3033
+        ]
+      ],
+      "url": "https://github.com/containers/bubblewrap/blob/124c4cdf4321f63ef17a1cb0ce8f9dd45bd7adbe/bubblewrap.c",
+      "reference_class": "PINNED_UPSTREAM_SOURCE_FILE",
+      "bytes": 116430
+    },
+    {
+      "repository": "containers/bubblewrap",
+      "pin": "124c4cdf4321f63ef17a1cb0ce8f9dd45bd7adbe",
+      "path": "README.md",
+      "sha256": "16fa90d97bde583e83fef0ebbde912b2118eb61f2d7c860a07264755d9a56f79",
+      "lines": [
+        [
+          104,
+          173
+        ]
+      ],
+      "url": "https://github.com/containers/bubblewrap/blob/124c4cdf4321f63ef17a1cb0ce8f9dd45bd7adbe/README.md",
+      "reference_class": "PINNED_UPSTREAM_SOURCE_FILE",
+      "bytes": 11153
+    },
+    {
+      "reference_class": "LOCAL_PROSPECTIVE_NAMESPACE_DATA_CUSTODY",
+      "artifact_name": "namespace-argv-data.json",
+      "sha256": "4787ca81c7dc28c88b864e96e8a008c6a31c6cfdca31db7bd064ca6f0b650804",
+      "bytes": 3884,
+      "recorded_origin_label": "native-agent-stack",
+      "recorded_version_or_context": "retained unit49",
+      "public_url_status": "NOT_AN_UPSTREAM_SOURCE_PAGE; no URL supplied."
+    },
+    {
+      "reference_class": "LOCAL_NATIVE_CAPABILITY_BINDING_CUSTODY",
+      "artifact_name": "source-bindings.json",
+      "sha256": "6ab00399bb649b7bc7d68fe41de04f50162a9411525bda326c68673b97b0e8be",
+      "bytes": 8697,
+      "recorded_origin_label": "native-agent-stack",
+      "recorded_version_or_context": "retained unit49",
+      "public_url_status": "NOT_AN_UPSTREAM_SOURCE_PAGE; no URL supplied."
+    },
+    {
+      "reference_class": "INSTALLED_STATIC_MANUAL",
+      "artifact_name": "git-clone.1.gz",
+      "sha256": "feeee7130eba36a696101469d36011dc5b4423a266bd5ddc3f681b0430bc8e64",
+      "bytes": 7909,
+      "recorded_origin_label": "installed native manual",
+      "recorded_version_or_context": "Git2.53.0",
+      "public_url_status": "NOT_AN_UPSTREAM_SOURCE_PAGE; no URL supplied.",
+      "decoded_text_ranges": [
+        [
+          55,
+          93
+        ],
+        [
+          189,
+          193
+        ]
+      ],
+      "sha256_representation": "Compressed installed manual bytes; ranges refer to decoded text."
+    },
+    {
+      "reference_class": "INSTALLED_STATIC_MANUAL",
+      "artifact_name": "git-checkout.1.gz",
+      "sha256": "c3d07490c1b6e1a59d3418554a3ba83bab27d9059e923f37ce60048dc23cbf54",
+      "bytes": 8802,
+      "recorded_origin_label": "installed native manual",
+      "recorded_version_or_context": "Git2.53.0",
+      "public_url_status": "NOT_AN_UPSTREAM_SOURCE_PAGE; no URL supplied.",
+      "decoded_text_ranges": [
+        [
+          354,
+          362
+        ]
+      ],
+      "sha256_representation": "Compressed installed manual bytes; ranges refer to decoded text."
+    },
+    {
+      "reference_class": "INSTALLED_STATIC_MANUAL",
+      "artifact_name": "cp.1.gz",
+      "sha256": "f43999b7b2f267077a66b3cb02fe83e35de6cb01a16336b8fe2ca8a011a3cc39",
+      "bytes": 2778,
+      "recorded_origin_label": "installed native manual",
+      "recorded_version_or_context": "GNUcoreutils9.7",
+      "public_url_status": "NOT_AN_UPSTREAM_SOURCE_PAGE; no URL supplied.",
+      "decoded_text_ranges": [
+        [
+          17,
+          22
+        ],
+        [
+          81,
+          85
+        ]
+      ],
+      "sha256_representation": "Compressed installed manual bytes; ranges refer to decoded text."
+    },
+    {
+      "reference_class": "OWNED_IMAGE_SYSROOT_BINARY_CUSTODY",
+      "artifact_name": "cargo",
+      "sha256": "6aef14418ff380d092bfcd1268781116e3134ac27049a8c08a0a4c9ed9fe5e72",
+      "bytes": 40980664,
+      "recorded_origin_label": "rust-lang/rust",
+      "recorded_version_or_context": "1.91.0 image sha256:307d198027388f780db83929487de35084a73ecbaa31319989438db38103439f",
+      "public_url_status": "NOT_AN_UPSTREAM_SOURCE_PAGE; no URL supplied.",
+      "file_relative_to_public_sysroot": "bin/cargo",
+      "image_digest": "sha256:307d198027388f780db83929487de35084a73ecbaa31319989438db38103439f"
+    },
+    {
+      "reference_class": "OWNED_IMAGE_SYSROOT_BINARY_CUSTODY",
+      "artifact_name": "rustc",
+      "sha256": "1b4a8971db9b9f440d55f64c0c592e4f3cfe0efc085c1b1a0e4972dfffaa238b",
+      "bytes": 656832,
+      "recorded_origin_label": "rust-lang/rust",
+      "recorded_version_or_context": "1.91.0 image sha256:307d198027388f780db83929487de35084a73ecbaa31319989438db38103439f",
+      "public_url_status": "NOT_AN_UPSTREAM_SOURCE_PAGE; no URL supplied.",
+      "file_relative_to_public_sysroot": "bin/rustc",
+      "image_digest": "sha256:307d198027388f780db83929487de35084a73ecbaa31319989438db38103439f"
+    },
+    {
+      "reference_class": "OWNED_IMAGE_SYSROOT_BINARY_CUSTODY",
+      "artifact_name": "rustdoc",
+      "sha256": "19f28d8d1e2889216b85c625ca84a4d376f1d1776f1c368667ea447e637362da",
+      "bytes": 14009944,
+      "recorded_origin_label": "rust-lang/rust",
+      "recorded_version_or_context": "1.91.0 image sha256:307d198027388f780db83929487de35084a73ecbaa31319989438db38103439f",
+      "public_url_status": "NOT_AN_UPSTREAM_SOURCE_PAGE; no URL supplied.",
+      "file_relative_to_public_sysroot": "bin/rustdoc",
+      "image_digest": "sha256:307d198027388f780db83929487de35084a73ecbaa31319989438db38103439f"
+    },
+    {
+      "reference_class": "OWNED_PUBLIC_REGISTRY_INDEX_FILE_CUSTODY",
+      "artifact_name": "config.json",
+      "sha256": "5b943a2c6f7eb743f7308aba07bdbb47d9ae44aafecd832d7f15df186afbafb3",
+      "bytes": 76,
+      "recorded_origin_label": "crates.io public index",
+      "recorded_version_or_context": "owned prior Cargo1.91 cache",
+      "public_url_status": "NOT_AN_UPSTREAM_SOURCE_PAGE; no URL supplied."
+    },
+    {
+      "reference_class": "HISTORICAL_NATIVE_CARGO_RESULT_CUSTODY",
+      "artifact_name": "upstream-test-result.json",
+      "sha256": "11858b22c3c5c1df90b97fe457f77da9f5ad7dc9f7284f619d93879997f2bec1",
+      "bytes": 3826,
+      "recorded_origin_label": "native-agent-stack",
+      "recorded_version_or_context": "historical original RTK qualification",
+      "public_url_status": "NOT_AN_UPSTREAM_SOURCE_PAGE; no URL supplied."
+    },
+    {
+      "reference_class": "HISTORICAL_NATIVE_COMPILER_METADATA_CUSTODY",
+      "artifact_name": ".rustc_info.json",
+      "sha256": "75e3b5dcf681f785f78e71470b3ea8292560fe361a406d6024d946fff34ebc8e",
+      "bytes": 1036,
+      "recorded_origin_label": "rust-lang/rust",
+      "recorded_version_or_context": "f8297e351a40c1439a467bbbb6879088047f50b3",
+      "public_url_status": "NOT_AN_UPSTREAM_SOURCE_PAGE; no URL supplied.",
+      "meaning": "Generated compiler metadata from an older owned Cargo target, not a Rust repository source file."
+    }
+  ],
+  "private_custody_sha256": {
+    "root_plan": "2dcd3c8bd9936d40bbc7daf0aadc98d74d8e629fc97bffdc5f57ddcb7582bad2",
+    "root_returns": "65e4a0b8549200da8e65dbb8408d574bd4e6f6892a1ed7fa9a846aea1d6d82d4",
+    "root_closed_STOP": "1fb8540f4a69b7110d582451c011d9588c9666f1d5bad699f2e2dcbb0f823d24",
+    "root_source_fidelity": "83fbe0fb748f226670657b13d9f9d7e362a2c0f0c48b05c57276d7f12c78bbaf",
+    "root_pre_Cargo": "fcddd0726bd63013ff8df2223322a20ca816f4d4bb17b985d5ba983503c84771",
+    "preregistration_correction": "d106413dc88566815454138022b5300c07be0dfa665ae3f256e17a92de80cd9a",
+    "source_bindings": "5c3e41b5ff87b6c89777d669cf7a495c266db71c40485966ace830ddeb3feac8",
+    "source_copy_projection": "93bf4e75cee3102f501d87b6bcc34d25fa63f82280d0f30b2cd6dc00b26aefbe"
+  },
+  "measurement_scope": "Nonmodel native setup/build evidence; no provider tokens, zero model usage or cost totals claimed.",
+  "limits": [
+    "Compiler lookup/version readiness does not qualify startup/system-library closure, ABI or full unchanged Cargo tests.",
+    "No whole-host object/library absence, sole cause, upstream compressor defect, baseline/winner, installation, default, savings or protection claim.",
+    "No global process/filesystem census or physical EOF claim."
+  ]
+}

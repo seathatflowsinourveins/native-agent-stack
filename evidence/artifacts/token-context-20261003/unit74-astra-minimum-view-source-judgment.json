@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "qualification": "unit77-astra-rtk-native-view-source-judgment",
+  "classification": "native_source_judgment_reconciliation",
+  "status": "SCOPED_SOURCE_READ_PASS_RUNTIME_CANDIDATE_UNQUALIFIED",
+  "native_client": "Codex0.160.0",
+  "requested_and_observed_model": "gpt-6-astra",
+  "requested_and_observed_effort": "max",
+  "native_exit_code": 0,
+  "quality_scope": {
+    "whole_source_views_required": 1,
+    "exact_whole_views_observed": 1,
+    "final_words": 172,
+    "word_cap": 200,
+    "observable_helper_dispatches": 0,
+    "global_helper_scope": "UNKNOWN"
+  },
+  "usage": {
+    "scope": "own main two disjoint finalized response groups only",
+    "unique_groups": 2,
+    "known_total_tokens": 25874,
+    "input_tokens_including_cached": 24158,
+    "cached_input_tokens_subset": 17920,
+    "uncached_input_tokens": 6238,
+    "cache_write_input_tokens": 0,
+    "output_tokens_including_reasoning": 1716,
+    "reasoning_output_tokens_subset": 1354,
+    "cumulative_and_cli_views_match": true,
+    "alternatives_added": false,
+    "wire_invoice_scope": "UNKNOWN"
+  },
+  "advice_scope": "Exact source-supported private compiler-link projection for a separate new attempt; compiler/ABI/full native suite and token acceptance remain unqualified. Advice is not approval/default.",
+  "old_failed_source_coverage": "Unit36 9_OF_11 FAIL retained",
+  "bindings": {
+    "source_packet_sha256": "2cf7304e7f10ece5c966bef2fd1b684e4973a1f871fb1ecfd75035d54ca8cfd4",
+    "final_answer_sha256": "b771851f7785c43e55f20ddeff37999e7c56a6619449bd288e949b5dc5567e83",
+    "original_cli_stdout_sha256": "663750023010ec454f48deeab9d20d2a480701093bdcdf0f087204751ef138b3",
+    "original_cli_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "original_canonical_rollout_sha256": "0ef8d9084d698c4a647cc9a8c2d09f23ca78de39875bbb3c4c3ae368cf5dacf6",
+    "actual_root_native_returns_sha256": "2a847fbed53f1f7cb6d7da37f2fe4df3eec3e047937da3e173eff667701e85c7",
+    "current_launch_bound_freeze_sha256": "0e85f23ef3b3853be2cc0b2872392fc49a2ec7ece70be6f39d75378711133dcc"
+  },
+  "sources": [
+    {
+      "repository": "rtk-ai/rtk",
+      "pin": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+      "paths": [
+        "src/hooks/init/pi.rs:1210\u20131269",
+        ".github/workflows/ci.yml:62\u201367"
+      ]
+    },
+    {
+      "repository": "containers/bubblewrap",
+      "pin": "124c4cdf4321f63ef17a1cb0ce8f9dd45bd7adbe",
+      "paths": [
+        "bubblewrap.c:2284\u20132294",
+        "bubblewrap.c:1554\u20131575"
+      ]
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/model-provider-info/src/lib.rs",
+      "sha256": "941a8ec0e8be4b45080cac3df3d052999a4cb104811575634b1a9ed510690958"
+    }
+  ],
+  "completeness_critic": "Missing acceptance modality is actual unchanged native Cargo/history test execution and owned teardown, followed separately by quality-preserving native counter comparison. No new runner/source/candidate class is required for this exact repair."
+}
