@@ -3900,6 +3900,43 @@
         "The earlier final-native-scan-record.json remains historical output for its bound earlier workflow/config. completion-native-record.json records the strengthened partition, shortened 2026-10-17 expiry, fresh active/expired controls and 161-test run; neither is an unchanged upstream test suite. The first completion validation failed on a stale hash row for an already-empty output and is retained, with the corrected diagnosis in publication-correction.md."
       ],
       "path": "evidence/receipts/wsl-retrieval-retirement-20261003.json"
+    },
+    {
+      "id": "catalog-freshness-20261003",
+      "kind": "upstream_provenance",
+      "component_ids": [
+        "affaan-m/ECC",
+        "agent-browser",
+        "ai-memory",
+        "apple-container",
+        "beads",
+        "claude-code",
+        "claude-hud",
+        "codex",
+        "dagu",
+        "fastapi",
+        "grafana",
+        "huggingface-hub-native",
+        "jcodemunch-mcp",
+        "mcp-inspector",
+        "mcporter",
+        "nextjs",
+        "omniroute",
+        "openresearch",
+        "opentelemetry-collector-contrib",
+        "rtk",
+        "sandbox-runtime",
+        "skfolio",
+        "syft"
+      ],
+      "claim": "Scheduled catalog-freshness run (https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37104350733) rebuilt the SOTA-convergence manifest and found 40 component(s) with pin/upstream drift against the currently published manifest. This receipt, and the branch/PR it is registered from, are report-only: no catalogs/sota-convergence/*, catalogs/landscape/*.json, manifests/stack.json, or layer-verdicts* file was selected, evaluated, or changed by this run. A pin bump requires its own separately qualified receipt under evidence/artifacts/*/, produced by the existing SOTA-convergence lane review, not by this automation.",
+      "limitations": [
+        "This is drift detection only: it reports that a pin or upstream 'latest' value differs from the published manifest; it does not evaluate, select, or adopt any candidate, and it changes no catalog selection file.",
+        "component_ids lists only this run's drifted rows whose id is also a manifests/stack.json component; it is not a claim that every drifted id in the full drift report was reviewed.",
+        "Components with no reliable upstream data this run (an unfinished/bounded fetch, or a releases/tags/commit fetch problem for that repository) have their upstream comparison excluded; a pin change on such a row is still reported as drift (the pin comes from the local catalogs), with its fresh upstream fields empty. A component fetched successfully but with no GitHub release or tag at all is also not counted as drift.",
+        "The rebuilt manifest and drift table are read from this run's own catalog-freshness workflow artifact; this receipt does not independently re-fetch upstream sources."
+      ],
+      "path": "evidence/receipts/catalog-freshness-20261003.json"
     }
   ],
   "files": [
@@ -17023,6 +17060,16 @@
       "path": "evidence/artifacts/catalog-freshness-20260923/manifest-20260923.json",
       "sha256": "ec6f40a94567c8f0a95a3d22688ec7cefc412ef97de94f99a2803676e6954290",
       "bytes": 166445
+    },
+    {
+      "path": "evidence/artifacts/catalog-freshness-20261003/drift.md",
+      "sha256": "87889389cbce7a6c26fa02ec3a85e65c345fd0cb1cfa9c38fb8c957dc20de1e2",
+      "bytes": 26978
+    },
+    {
+      "path": "evidence/artifacts/catalog-freshness-20261003/manifest-20261003.json",
+      "sha256": "1db2e6ea4483d812408136958acd46481889b09a9765770fd26ecb99351fc159",
+      "bytes": 166391
     },
     {
       "path": "evidence/artifacts/catalog-models.full.txt",
@@ -47783,6 +47830,11 @@
       "path": "evidence/receipts/catalog-freshness-20260923.json",
       "sha256": "8598a451bb1b3415528153293c3418e823b40e0d25a4eae160c2d8494494fc50",
       "bytes": 2090
+    },
+    {
+      "path": "evidence/receipts/catalog-freshness-20261003.json",
+      "sha256": "0ed74ec0a3b1e86787dda0a2e4a4119aae7bc94aa745ae22363b33f1446cbc51",
+      "bytes": 2411
     },
     {
       "path": "evidence/receipts/catalog-runtime-review-20260921.json",
