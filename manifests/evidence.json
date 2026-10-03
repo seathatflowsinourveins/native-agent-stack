@@ -4000,8 +4000,8 @@
     },
     {
       "path": ".github/workflows/runtime-worker-skills-freshness.yml",
-      "sha256": "de0ee24dd430afa69d31397ba4510f023f143e7576a9fa03735dab22080c21d9",
-      "bytes": 2020
+      "sha256": "af56deffb177f4692b39d75e6b541f42dae979d0faf25b4209e2c579f65c8695",
+      "bytes": 3651
     },
     {
       "path": ".github/workflows/security-scan.yml",
@@ -9150,6 +9150,36 @@
       "bytes": 2690
     },
     {
+      "path": "blueprints/runtime-workers/PLAN.md",
+      "sha256": "c9a859a555415c3c0c38c8eb62ce0d2377c7112df56f3a931005d61a02423f1e",
+      "bytes": 5116
+    },
+    {
+      "path": "blueprints/runtime-workers/README.md",
+      "sha256": "d239078b9ee53b746809bbc2238475488dd6b94f1bcd0cbed8b32abdee11bd38",
+      "bytes": 6023
+    },
+    {
+      "path": "blueprints/runtime-workers/comparisons/coding-worker-draft.json",
+      "sha256": "3a832886e78557107927009f65fadc8d4c4cf4c120d51c56bad632a5f6a82b37",
+      "bytes": 7036
+    },
+    {
+      "path": "blueprints/runtime-workers/comparisons/gateway-token-draft.json",
+      "sha256": "4b57345b49904a246b4e2913c9a3dbae2f4862f80d63127399e9c23b47c98fda",
+      "bytes": 5125
+    },
+    {
+      "path": "blueprints/runtime-workers/comparisons/research-gatherer-draft.json",
+      "sha256": "30515c51c1a4efadb806cf50383574cf891202db766c64ca25e36497b9ed7f1b",
+      "bytes": 7702
+    },
+    {
+      "path": "blueprints/runtime-workers/comparisons/role-and-lifecycle-draft.md",
+      "sha256": "038123a8d91aae7b500fbea9359bfb083514d6ddeba4f2e92f180dc0d37b1e9d",
+      "bytes": 6064
+    },
+    {
       "path": "blueprints/runtime-workers/openhands/README.md",
       "sha256": "3bef3150f4d6c7e3b3877c69292a4d87b7a00b96fb8fe3ed947714873ee02461",
       "bytes": 72164
@@ -9648,6 +9678,16 @@
       "path": "blueprints/runtime-workers/openhands/worker.py",
       "sha256": "ea5d67a538f87feac8a4d0b8a66cfdcbaef44f86a8ee7cb11efc332272bb1f5c",
       "bytes": 11141
+    },
+    {
+      "path": "blueprints/runtime-workers/org-extensions.md",
+      "sha256": "3f0f51af7505c6ce53102a8d3cf4ebba4ca95e68c5d1921020037e83c4e7d6e4",
+      "bytes": 6262
+    },
+    {
+      "path": "blueprints/runtime-workers/sdk-role-qualification.md",
+      "sha256": "d9e08d338bb62168203a4accc0830819dad21457897870d2829cc3fc28a7b3b3",
+      "bytes": 2882
     },
     {
       "path": "blueprints/runtime-workers/skills/README.md",
@@ -14935,6 +14975,11 @@
       "bytes": 20197
     },
     {
+      "path": "catalogs/foundation/runtime-jobs.json",
+      "sha256": "8c30ff4342af11b097b5884506dbc36117e80910f125c2c48cbf810d9202457a",
+      "bytes": 13611
+    },
+    {
       "path": "catalogs/foundation/surfaces.json",
       "sha256": "be845c04926aa9bd1d7824911839090d8e636e6016d9a641bb683ad1c951aef1",
       "bytes": 20383
@@ -15763,6 +15808,11 @@
       "path": "docs/decisions/2026-10-02-two-host-north-star-architecture.md",
       "sha256": "f3234c014072e6a567a42fcc989c7e8bf716823f52c96a633bbe76e1c8d10e26",
       "bytes": 16881
+    },
+    {
+      "path": "docs/decisions/2026-10-03-runtime-job-qualification.md",
+      "sha256": "4ff1e965dec39a50ed1e189caa15b83c42aba8181a1b0a721eb46e014acfb235",
+      "bytes": 8490
     },
     {
       "path": "docs/direct-results.md",
@@ -41803,6 +41853,21 @@
       "path": "evidence/artifacts/rtk-native-git256-20261002/receipt.json",
       "sha256": "3746287baeda32c343247eb8f87ecc3b79b6605dfe564f31c2a85ca1f714368a",
       "bytes": 29878
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/README.md",
+      "sha256": "2e53ae17d621b077cbd5f859ee50a6d21baad6777f028044a9b38adab6d7794b",
+      "bytes": 1302
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/checks.json",
+      "sha256": "37ed25a31100f053d9592adbf203b4a06007081726bf1b9f878ae80ae9a8d480",
+      "bytes": 5472
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/source-read.json",
+      "sha256": "0afac3fbca0f1131353880d7248c497be302fb294269469efe8ef1c4fa277233",
+      "bytes": 2704
     },
     {
       "path": "evidence/artifacts/runtime-sdk-20260930/README.md",
