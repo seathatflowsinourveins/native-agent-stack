@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "class": "bounded_source_publication_review",
+  "date": "2026-10-03",
+  "reviewed_head": "66d784cfb87405e20765ab176cbf24c01ec32e14",
+  "delta_base": "a87afb753f07d175124384afb649df15976999ca",
+  "sol_read": {
+    "requested_model": "gpt-6.1-sol",
+    "requested_effort": "max",
+    "verdict": "accept_unexecuted_source_packet",
+    "scope": "Owned delta, twelve registered artifact identities, local links and selected pinned source hashes; all five new drafts remain unexecuted and held.",
+    "independent_checks": {
+      "changed_paths": 13,
+      "registered_artifacts_matched": 12,
+      "working_tree_clean": true,
+      "validator_rerun": false,
+      "full_catalog_pin_audit_rerun": false
+    },
+    "tool_calls": 6,
+    "additional_index_recovery_calls": 1,
+    "usage": null,
+    "usage_limit": "No complete native counters returned by this delegated source read."
+  },
+  "astra_read": {
+    "trigger": "Conflicting primary-source lifecycle interpretation after a worker omitted a negated child-interrupt assertion; consequential model/effort parity limits.",
+    "requested_model": "cx/gpt-6-astra-max",
+    "requested_effort": "max",
+    "backend_model_and_effort_observed": false,
+    "process_exit": 0,
+    "verdict": "accept_unexecuted_source_packet",
+    "required_owned_corrections": [],
+    "answer_bytes": 4578,
+    "answer_sha256": "b8ef50bff1fc2ea888711e603375c8c5b1cc8c535ce8fe18bf6f3aa9e11a4bdb",
+    "scope": "Exact-head owned drafts and supplied root-original excerpts. Target-only interrupt, separate candidate gates and conditional gateway parity are represented accurately.",
+    "upstream_originals_independently_verified": false,
+    "retained_failures": [
+      {
+        "kind": "direct_upstream_fetch",
+        "count": 3,
+        "error": "[Errno -3] Temporary failure in name resolution",
+        "processing_wrapper_exit": 0,
+        "interpretation": "Caught fetch failures; wrapper success is not successful retrieval."
+      }
+    ],
+    "connector_attempt": {
+      "isError": false,
+      "body_inspected": false,
+      "command_exit": null,
+      "interpretation": "Success metadata alone does not independently verify original source."
+    },
+    "tool_calls": 6,
+    "native_shell_invocations": 5,
+    "native_shell_exits": [0, 0, 0, 0, 0],
+    "usage": {
+      "input_tokens": 291935,
+      "cached_input_tokens_subset": 234624,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 8508,
+      "reasoning_output_tokens_subset": 4941,
+      "billing": null
+    },
+    "usage_scope": "One terminal turn.completed event. Source-review overhead, separate from study usage; subset counters are not added to totals."
+  },
+  "root_original_verification": {
+    "receipt": "protocol-source-read.json",
+    "scope": "Root fetched and hashed original pinned files before the Astra read. This does not convert the Astra read into an independent upstream retrieval."
+  },
+  "sdk_custody_delta": {
+    "pull_request": 626,
+    "head": "ad9787c313c05e4325416060a8737641d4cd714d",
+    "receipt_status": "compatibility_attempt_with_retained_completed_canaries",
+    "root_observation": "Retained native SDK stdout, gateway SDK stdout and completed CLI events contain their marker outputs. These are historical separate invocations, not new executions or qualified roles.",
+    "additional_original_sources": [
+      {
+        "path": "evidence/artifacts/runtime-sdk-20261003/qualification-facts.json",
+        "bytes": 5321,
+        "sha256": "ac7e7efc086c1c9e40575f26eae4ed9e20bdcc1407ebc182ac1d8606b24aba76",
+        "observation": "Retained facts name native Sol/low and gateway Sol/max requests; backend model and effort remain unobserved."
+      },
+      {
+        "path": "evidence/artifacts/runtime-sdk-20261003/canary-gateway/run.py",
+        "bytes": 1223,
+        "sha256": "61df9cdc175abd76dc751cb2b24366167377c6af0f737a8eb45497d609b7cfc7",
+        "observation": "Retained caller uses thread_start(model='cx/gpt-6.1-sol', model_provider='omniroute', ephemeral=True, config={'model_reasoning_effort':'max'})."
+      }
+    ],
+    "new_model_runs": 0,
+    "unchanged_upstream_checks": [],
+    "remaining_gaps": ["Original SDK outer argv/cwd and start/end timestamps", "Reconstructed native caller", "Useful-role controls", "Delivered model/effort", "Process reclamation and recovery"]
+  },
+  "current_ci_failure": {
+    "reviewed_head": "66d784cfb87405e20765ab176cbf24c01ec32e14",
+    "run_id": 37098138142,
+    "job_id": 111132159518,
+    "native_log_read_exit": 0,
+    "scan_step_exit": 1,
+    "advisory": "GHSA-vfj7-8cjw-p6xm",
+    "package": "braces",
+    "version": "3.0.3",
+    "path": "blueprints/convergence-practice/wsl-retrieval/package-lock.json",
+    "owner": "Root freshness/scanner lane, PR622; runtime lane does not modify that lockfile or its exception gates."
+  },
+  "coordination_probe_corrections": [
+    {
+      "failed_probe": "GraphQL pullRequest fields repeated with different arguments without aliases",
+      "command_exit": 1,
+      "processor_error": "KeyError after rejected response",
+      "repair": "Give each pullRequest field a distinct alias.",
+      "repaired_api_exit": 0
+    },
+    {
+      "failed_assumption": "The last entries on PR608 comments page one were the latest comments.",
+      "command_exit": 0,
+      "repair": "Use native gh api --paginate --slurp and select the final entries across all returned pages.",
+      "repaired_api_exit": 0,
+      "observed_pages": 2,
+      "observed_comments": 123,
+      "observation_time_utc": "2026-10-03T05:10:09Z",
+      "comparison_window_ack_found": false
+    }
+  ],
+  "preserved_owned_edit_failure": {
+    "tool": "apply_patch",
+    "returned_error": "Failed to find expected lines: useful_task_comparison opening field",
+    "cause": "The planned context expected a multiline opening field; the original draft stores that object on one line.",
+    "repair": "Read the exact original line and apply the same bounded readiness-link insertion with matching context.",
+    "command_exit": null
+  },
+  "limits": [
+    "These reads accept source publication at the exact recorded head, not future deltas, frozen comparisons or final defaults.",
+    "No candidate, extension, evaluator, gateway feature or useful role was executed by these reads.",
+    "No Claude-lane exact-head read or agreed comparison-window allocation is inferred.",
+    "All eight measured defaults remain pending."
+  ]
+}

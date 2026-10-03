@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "class": "unchanged_upstream_offline_control_execution",
+  "date": "2026-10-03",
+  "repository": "https://github.com/harbor-framework/harbor",
+  "version": "0.23.0",
+  "pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+  "installation": {
+    "scope": "Isolated checkout and core .venv; adopted host CLI and shared services unchanged.",
+    "clone_tag": "v0.23.0",
+    "release_metadata_read_exit": 0,
+    "clone_exit": 0,
+    "head_verification_exit": 0,
+    "sync_argv": ["rtk", "uv", "sync", "--locked", "--no-dev"],
+    "sync_exit": 0,
+    "native_install_observation": "Resolved336 packages; prepared34 packages; installed91 core packages.",
+    "python_version": "3.13.15",
+    "uv_version": "0.12.17",
+    "version_argv": ["rtk", "uv", "run", "--no-sync", "harbor", "--version"],
+    "version_exit": 0,
+    "version_stdout": "0.23.0\n",
+    "test_overlay": "Native UV --with supplies pytest9.0.2 and pytest-asyncio1.3.0, the versions named in Harbor's original lock. Its six installed overlay packages are separate from the locked core environment; the complete upstream dev group was not installed."
+  },
+  "native_overlay_source": {
+    "repository": "https://github.com/astral-sh/uv",
+    "tag": "0.12.17",
+    "pin": "635500036e1705961315e86447f0fab0a8ddb309",
+    "changelog_read_exit": 0,
+    "source_file": "docs/concepts/projects/run.md",
+    "bytes": 3461,
+    "sha256": "b9c64e077a69916da739204486e6d47505b3919ac5581072a3f41d7e9da24a8e",
+    "contract": "Additional or different dependency versions may be requested per invocation with --with.",
+    "installed_raw_help_exit": 0
+  },
+  "source_identities": [
+    {"path": "pyproject.toml", "bytes": 5829, "sha256": "00290ec17fb5f4f44ebd1a251dd07fe4f1b6dabb9fed61497cd303a4679e104d"},
+    {"path": "uv.lock", "bytes": 1057639, "sha256": "ce2eed59946e8f0d21494c0115939e8169d1362e46d92d5db377861303192b01"},
+    {"path": "tests/conftest.py", "bytes": 2050, "sha256": "cb19553a44f85b35da417882435b91ee8c24ef912dc137cd449e8c4849aed1c7"},
+    {"path": "tests/unit/agents/installed/test_error_patterns.py", "bytes": 29176, "sha256": "35a87ac3ce453e7a90ea8baa725ee12be5e06f3931f1a1d711504707762b4815"},
+    {"path": ".python-version", "bytes": 5, "sha256": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398"}
+  ],
+  "control": {
+    "argv": [
+      "rtk", "uv", "run", "--no-sync", "--with", "pytest==9.0.2", "--with", "pytest-asyncio==1.3.0", "pytest", "--color=no",
+      "tests/unit/agents/installed/test_error_patterns.py::TestErrorClassification::test_successful_command_is_never_classified",
+      "tests/unit/agents/installed/test_error_patterns.py::TestErrorClassification::test_rate_limit_output_raises_api_rate_limit_error",
+      "tests/unit/agents/installed/test_error_patterns.py::TestErrorClassification::test_authentication_output_is_classified"
+    ],
+    "exit": 0,
+    "collected": 14,
+    "passed": 14,
+    "skipped": 0,
+    "native_elapsed_seconds": 0.54,
+    "parameter_counts": {"successful_command": 1, "rate_limit": 6, "authentication": 7},
+    "agent_class_in_fixture": "ClaudeCode",
+    "environment_in_fixture": "AsyncMock; exec returns mocked stdout/stderr/return_code.",
+    "returned_tool_output": "harbor-offline-controls.output.txt",
+    "output_provenance": "Actual returned tool output retained with two host paths replaced by ${SOURCE_CHECKOUT} and ${UV_TEST_OVERLAY}; stdout/stderr separation is not claimed.",
+    "expected_live_model_calls_from_selected_source": 0,
+    "independent_network_trace_captured": false,
+    "provider_usage": null
+  },
+  "post_execution_observation": {
+    "git_status_exit": 0,
+    "working_tree_clean": true,
+    "source_lock_conftest_and_test_file_identities_unchanged": true
+  },
+  "preparation_corrections": [
+    "Original selectors require the TestErrorClassification class prefix, not bare module-level methods.",
+    "The worker's generic source index obscured its full helper/parameter output; root original AST read establishes AsyncMock and7 authentication parameters.",
+    "A narrowed UV help extraction returned no flag lines; tracked raw help plus pinned official documentation established --with and --no-sync without an absence claim.",
+    "git clone -h returned native usage exit129. The supported branch/depth options were used; no exact-revision clone option was assumed."
+  ],
+  "limits": [
+    "Selected unchanged upstream fixtures passed in the declared minimal native-tool overlay, not the complete upstream development environment or full suite.",
+    "Classifier controls cover a mocked ClaudeCode executor, not real Codex transport, useful worker tasks or evaluator superiority.",
+    "No container was launched, no shared GPT comparison occurred, and original process start/end timestamps were not captured.",
+    "Parent observed completion before2026-10-03T05:32:37Z; token saving and returned billing remain unmeasured."
+  ]
+}

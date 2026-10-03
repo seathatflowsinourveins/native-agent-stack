@@ -12,10 +12,10 @@
   ],
   "routing": {"gateway_model": "cx/gpt-6.1-sol-ultra", "native_codex_effort": "ultra", "consequential_judge": "cx/gpt-6-astra-max", "judge_effort": "max", "actual_build_carry_and_request_qualified": false},
   "candidate_conditions": [
-    {"id": "compression-off", "header": {"x-omniroute-compression": "off"}, "role": "paired control"},
+    {"id": "compression-off", "header": {"x-omniroute-compression": "off", "x-omniroute-no-cache": "true"}, "role": "paired proactive-compression control with gateway semantic-response-cache bypass; reactive context-fit and provider prompt caching remain separate"},
     {"id": "upstream-lossless-plan", "status": "plan identity and applicability pending", "required_bindings": ["exact native engine/combo IDs", "master/toggle/combo policy", "request shape", "lossy policy", "native pipeline settings hash without secrets"]},
     {"id": "upstream-lossy-plan", "status": "conditional research arm; cannot become default from mechanical fidelity alone", "required_bindings": ["exact native plan", "explicit request lossy opt-in", "loss indicators", "unchanged task oracle", "negative controls"]},
-    {"id": "upstream-cache", "status": "separate arm pending supported isolation contract", "required_bindings": ["cache type", "hit provenance", "freshness/as-of behavior", "exact cache scope", "cold/warm order", "provider prompt-cache subsets kept separate"]},
+    {"id": "upstream-cache", "status": "Source read/write bypass established; actual enablement, namespace, hit and cold/warm execution remain pending", "control_receipt": "../../../evidence/artifacts/runtime-jobs-source-intake-20261003/gateway-cache-controls.json", "required_bindings": ["cache type", "hit provenance", "freshness/as-of behavior", "exact cache scope", "cold/warm order", "provider prompt-cache subsets kept separate"]},
     {"id": "upstream-combo-routing", "status": "separate arm pending source and route identity", "required_bindings": ["exact combo pin/settings", "all resolved models and efforts", "no hidden lower-effort fallback", "failed attempts retained"]}
   ],
   "evaluator": {"candidate": "promptfoo native Codex SDK/app-server provider", "pin": "34f74d34e140b5e17d23770dfb2340057b1936b8", "local_evaluator_cache": "disabled", "stock_omniroute_eval_limit": "Released eval:compression and compare/verify do not expose the required effort contract; their screening results cannot qualify native Ultra or complete provider usage."},

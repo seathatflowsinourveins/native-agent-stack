@@ -94,8 +94,8 @@
       "default": null,
       "decision_status": "unmeasured",
       "components": [
-        {"id": "harbor", "repository": "https://github.com/harbor-framework/harbor", "version": "v0.23.0", "ref": "1e5c5c6db929a10a140d05e606882c671ae20729", "source_file": "src/harbor/agents/installed/codex.py", "kind": "evaluator", "evidence_class": "source_review"},
-        {"id": "inspect-ai", "repository": "https://github.com/UKGovernmentBEIS/inspect_ai", "version": "0.3.276", "ref": "93f7182cf2ce9be22724b05e499cd1358d7ed41d", "source_file": "src/inspect_ai/model/_providers/openai.py", "kind": "evaluator", "evidence_class": "source_review"},
+        {"id": "harbor", "repository": "https://github.com/harbor-framework/harbor", "version": "v0.23.0", "ref": "1e5c5c6db929a10a140d05e606882c671ae20729", "source_file": "src/harbor/agents/installed/codex.py", "kind": "evaluator", "evidence_class": "source_review", "readiness_evidence": "evidence/artifacts/runtime-jobs-source-intake-20261003/harbor-offline-controls.json", "readiness_scope": "14 original offline classifier cases; minimal native test-tool overlay, mocked ClaudeCode environment; no final default"},
+        {"id": "inspect-ai", "repository": "https://github.com/UKGovernmentBEIS/inspect_ai", "version": "0.3.276", "ref": "93f7182cf2ce9be22724b05e499cd1358d7ed41d", "source_file": "src/inspect_ai/model/_providers/openai.py", "kind": "evaluator", "evidence_class": "source_review", "readiness_evidence": "evidence/artifacts/runtime-jobs-source-intake-20261003/inspect-offline-controls.json", "readiness_scope": "5 original offline controls passed,3 default Trio skips; no provider transport or final default"},
         {"id": "promptfoo", "repository": "https://github.com/promptfoo/promptfoo", "version": "0.123.1", "ref": "34f74d34e140b5e17d23770dfb2340057b1936b8", "source_file": "examples/compare-agentic-sdks/promptfooconfig.yaml", "kind": "evaluator", "evidence_class": "source_review"}
       ]
     },

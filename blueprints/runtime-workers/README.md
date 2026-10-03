@@ -13,9 +13,11 @@ For Codex0.160, record the effective multi-agent version and model-message/confi
 
 ## Measure gateway token features
 
-Use the upstream compression/cache/combo implementation at the recorded gateway pin. Freeze an uncompressed control, exact feature settings, task/source/extension hashes, runtime/model/effort, quality graders, repetition order and cache boundaries before execution. Obtain the Claude read and exclusive throwaway GPT-pool window through the existing architecture handoff, coordinated with session 0c and client-token measurements.
+Use the upstream compression/cache/combo implementation at the recorded gateway pin. Freeze a prompt-compression control, exact feature settings, task/source/extension hashes, runtime/model/effort, quality graders, repetition order and cache boundaries before execution. Obtain the Claude read and exclusive throwaway GPT-pool window through the existing architecture handoff, coordinated with session0c and client-token measurements.
 
 Measure one gateway condition per artifact; keep client context compression outside that condition. Enable a feature only when its frozen quality rule passes and native counters show a benefit. Separate input/output totals, cached/reasoning subsets, compression estimates, cache-hit counters and billed cost. Retain every failed attempt and keep absent counters unknown. Headerless requests and opt-in compression are distinct conditions; an advertised feature establishes no saving. Gateway effort-observation columns may be null even when an effort was sent.
+
+The [pinned cache controls](../../evidence/artifacts/runtime-jobs-source-intake-20261003/gateway-cache-controls.json) support `X-OmniRoute-No-Cache: true` or `Cache-Control: no-cache` for semantic-response-cache read/write bypass. Use that bypass for compression-only controls and unique request/idempotency identifiers per independent attempt. This does not clear upstream prompt caching. `x-omniroute-compression: off` leaves independent reactive context-fit safety available; observe and retain any intervention. Capture only allowlisted gateway metadata. Cache-hit usage belongs to the retained response, and gateway savings/cost headers are estimates rather than new provider consumption or returned billing.
 
 ## Add or replace a default
 

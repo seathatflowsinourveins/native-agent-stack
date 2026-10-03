@@ -25,7 +25,7 @@
       "pydata__xarray-7393", "pydata__xarray-2905", "pydata__xarray-4075", "pydata__xarray-4629",
       "matplotlib__matplotlib-25122", "matplotlib__matplotlib-24627", "matplotlib__matplotlib-24026", "matplotlib__matplotlib-25332"
     ],
-    "source_preflight": "All 24 instruction.md, task.toml and tests/test.sh URLs returned HTTP200 at the dataset pin; all 24 test.sh files declare swebench==4.0.3. Task-tree/image receipts remain required before freeze."
+    "source_preflight": "All24 instruction.md, task.toml and tests/test.sh URLs returned HTTP200 at the dataset pin; all24 test.sh files declare swebench==4.0.3. coding-input-source-map.csv now binds24 native task-tree OIDs and original Dockerfile identities; coding-input-read.json retains registry manifests. Built-image identities and native digest enforcement remain required before freeze."
   },
   "proposed_execution": {
     "repeats_per_task_arm": 2,
