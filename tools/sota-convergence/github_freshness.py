@@ -43,8 +43,8 @@ unreliable and holds catalog-freshness.yml's propose job.
 Resumability: a repository already present in an existing --out file is
 skipped unless --refresh is given, *unless* its record carries a
 "partial_errors" entry (a releases/tags/commit sub-request that failed with
-something other than an ordinary "not found"); such a record is left pending so
-the next run retries exactly the missing metadata. A record that carries
+something other than an ordinary "not found"); such a record is left pending,
+and the next run fetches that repository again. A record that carries
 "matching_tags_errors", or has no "matching_tags" list for a prefix that
 runtime-pins.json now declares for its repository, is pending too; the resume is
 per repository, so the next run fetches that whole repository again. --max-repos

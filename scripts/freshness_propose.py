@@ -87,8 +87,8 @@ RUNTIME_TAG_MARKER = " (tag)"
 # The line after the runtime table that lists the rows whose declared pattern selected no tag.
 RUNTIME_TAG_MISS_SENTENCE = (
     "runtime row(s) whose declared tag pattern selected no tag this run, each with its reason "
-    "(`tag_pattern_unmatched`: no listed tag matched, so the upstream latest stays the release or tag "
-    "listing; `tag_pattern_unfetched`: the tag list could not be read this run)"
+    "(`tag_pattern_unmatched`: no listed tag matched; `tag_pattern_unfetched`: the tag list could not be read "
+    "this run; in both cases the upstream latest stays the release or tag listing)"
 )
 _DRIFT_ROW = re.compile(r"^\|\s*([^|]+?)\s*\|.*\|$")
 _SEPARATOR_ROW = re.compile(r"\A\|[\s:|-]+\|\Z")
@@ -470,8 +470,10 @@ def render_runtime_markdown(document: dict, raw_repositories: dict | None = None
         "belong to other packages. The same upstreams' `manifests/stack.json` pins and selected "
         "(`default`/`conditional`) trading card pins stay in the tables above; an `alternative` card's pin "
         "is compared in no table. Rows here select nothing, are never drift and never change "
-        "`drift-status.txt`. A dormant upstream has no GitHub release and no default-branch commit "
-        f"in the last {threshold} days as of `{document.get('checked_at')}`.", "",
+        "`drift-status.txt`. The last-release and last-commit columns describe the repository's activity "
+        "(its latest GitHub release, which in a monorepo can belong to another package, and its default "
+        "branch), not the tag in the latest column. A dormant upstream has no GitHub release and no "
+        f"default-branch commit in the last {threshold} days as of `{document.get('checked_at')}`.", "",
     ]
     if rows:
         lines += [RUNTIME_TABLE_HEADER, RUNTIME_TABLE_SEPARATOR]

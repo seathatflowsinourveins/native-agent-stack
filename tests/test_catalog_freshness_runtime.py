@@ -1357,9 +1357,10 @@ class RuntimeReportTests(unittest.TestCase):
         self.assertIn(f"2 {fp.RUNTIME_TAG_MISS_SENTENCE}:\n\n" + fp.md_cell("new-wsl:inspect-ai (tag_pattern_unmatched)")
                       + ", " + fp.md_cell("watch:deepagents (tag_pattern_unfetched)") + "\n", text)
         self.assertGreater(text.index(fp.RUNTIME_TAG_MISS_SENTENCE), text.index(fp.RUNTIME_TABLE_HEADER))
-        # The line states what each reason means.
-        for meaning in ("`tag_pattern_unmatched`: no listed tag matched, so the upstream latest stays the release or "
-                        "tag listing", "`tag_pattern_unfetched`: the tag list could not be read this run"):
+        # The line states what each reason means, and that both keep the release or tag listing as latest.
+        for meaning in ("`tag_pattern_unmatched`: no listed tag matched",
+                        "`tag_pattern_unfetched`: the tag list could not be read this run",
+                        "in both cases the upstream latest stays the release or tag listing"):
             self.assertIn(meaning, fp.RUNTIME_TAG_MISS_SENTENCE)
         self.assertEqual(self._cells("new-wsl:inspect-ai")[3:5],
                          [fp.md_cell(None), fp.md_cell("not compared (unversioned)")])

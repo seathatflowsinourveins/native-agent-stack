@@ -217,12 +217,15 @@ independent verifier re-ran each claim, and evidence and security reviewers read
     either pattern; and leave each kind of compile error uncaught.
 - Round 4 replay, offline: `build_runtime_freshness` at the round-4 code on the round-3 run's records gives the same
   counts and the same latest and comparison on all 19 rows; only Inspect AI loses `latest_flag`, and Deep Agents'
-  `released_at` and `prerelease` (2026-09-30 and false, from another package's release) become null. No live run
-  was made at the round-4 code.
+  `released_at` and `prerelease` become null. In that run they were 2026-09-30 and false from Deep Agents' own release
+  of the selected tag `deepagents==0.7.21`, so the nulling removed correct values there; it guards the case where the
+  repository's latest release belongs to another package of the monorepo. An independent live run at the round-4
+  code then fetched 488 repositories with 0 errors and gave the same 19 rows (4 behind), and a run with the Inspect AI
+  tag list forced to fail kept its drift and trading rows reliable and the propose gate at 0 partial errors.
 - Review: no blocking or major finding; the minor findings (leak-gate isolation, a slot test that could not see a
   swap, the watch-only wording) and the nits were fixed and re-reviewed. Round 3's independent evidence and security
   reviews also found no blocking or major defect; round 4 fixes their minor findings (a failed tag list made the
-  repository's other rows unreliable and held the propose job; a matching tag was paired with another package's
+  repository's other rows unreliable and held the propose job; a matching tag could be paired with another package's
   release date) and their nits.
 
 ## Limits and open findings

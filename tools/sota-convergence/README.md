@@ -81,8 +81,9 @@ The model-running landscape-sweep lane of `recipes/saturation-sweep.md` has its 
    declares the prefix says `tag_pattern_unfetched`. A record with
    `"matching_tags_errors"`, or without a list for every prefix declared now,
    stays pending, and the next run fetches that whole repository again.
-   Resumable: a repository already present in `--out` *without* an `"error"`
-   or `"partial_errors"` field is skipped unless `--refresh`. A repository
+   Resumable: a repository already present in `--out` *without* an `"error"`,
+   `"partial_errors"` or `"matching_tags_errors"` field, and with a list for
+   every declared prefix, is skipped unless `--refresh`. A repository
    whose record carries `"error"` (the primary `repos/{slug}` call itself
    timed out or failed) stays pending and is retried on the next run. A
    repository whose primary call succeeded but a releases/tags/commit
