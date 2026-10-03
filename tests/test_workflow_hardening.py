@@ -11,6 +11,7 @@ a full commit SHA.
 
 from datetime import date
 from pathlib import Path
+import ast
 import fnmatch
 import hashlib
 import json
@@ -1232,13 +1233,54 @@ class BetterleaksTrialJobTests(unittest.TestCase):
         self.assertEqual(grep.returncode, 1, f"{marker!r} in tracked files: {grep.stdout.split()} {grep.stderr}")
 
 
-class AdoptionBootstrapMacosRequiredTests(unittest.TestCase):
-    """validate-macos required-check readiness (docs/decisions/2026-09-22-github-automation-closure.md,
-    "validate-macos required (2026-09-25)"): validate-macos must report a status on every
-    pull_request (a required check that never reports blocks the PR forever), while the
-    three real-install bootstrap-* jobs stay path-gated exactly as before."""
+ADOPTION_BOOTSTRAP = WORKFLOWS / "adoption-bootstrap.yml"
+CHANGES_STEP = "Detect which bootstrap- and macOS-relevant paths changed"
+CHANGED_TESTS_STEP = "Run the changed test modules (changed-tests mode)"
+FULL_MODE_IF = "env.VALIDATE_MACOS_MODE == 'full'"
+CHANGED_TESTS_IF = "env.VALIDATE_MACOS_MODE == 'changed-tests'"
+# The changed-tests step's zero-test guard (docs/decisions/2026-10-03-macos-ci-scope.md, section 6.1).
+ZERO_TEST_GUARD = 'if [ "${ran:-0}" -eq 0 ]; then'
 
-    text = (WORKFLOWS / "adoption-bootstrap.yml").read_text(encoding="utf-8")
+
+def run_block(step_text):
+    """A step's literal-block ``run: |`` script, dedented, with a trailing newline."""
+    body = step_text.split("run: |\n", 1)[1].splitlines()
+    indent = min(len(line) - len(line.lstrip(" ")) for line in body if line.strip())
+    return "\n".join(line[indent:] for line in body) + "\n"
+
+
+def shell_array(script, name):
+    """The single-quoted entries of the bash array ``name=( ... )`` in ``script``, one entry per line, or None.
+    The name is anchored at the start of its line, so ``PATTERNS`` never matches ``MACOS_PATTERNS=(``."""
+    match = re.search(rf"(?ms)^[ \t]*{re.escape(name)}=\(\n(.*?)^[ \t]*\)[ \t]*$", script)
+    return None if match is None else re.findall(r"(?m)^[ \t]*'([^']*)'[ \t]*$", match.group(1))
+
+
+def changes_script(text=None):
+    """The ``changes`` job's path-detection script from adoption-bootstrap.yml (or from ``text``)."""
+    text = ADOPTION_BOOTSTRAP.read_text(encoding="utf-8") if text is None else text
+    return run_block(step_block(jobs(text)["changes"], CHANGES_STEP))
+
+
+def validate_macos_mode(outputs):
+    """The mode docs/decisions/2026-10-03-macos-ci-scope.md (section 2) gives validate-macos on a pull_request for
+    the ``changes`` outputs ``outputs``: a ``macos`` other than 'false', an empty one included, is full; otherwise a
+    nonempty ``macos_tests`` is changed-tests; otherwise skipped. The job-level ``if:`` and ``VALIDATE_MACOS_MODE``
+    that implement this table are pinned as text in AdoptionBootstrapMacosRequiredTests."""
+    if outputs.get("macos", "") != "false":
+        return "full"
+    return "changed-tests" if outputs.get("macos_tests", "") else "skip"
+
+
+class AdoptionBootstrapMacosRequiredTests(unittest.TestCase):
+    """validate-macos stays a required check (docs/decisions/2026-09-22-github-automation-closure.md,
+    "validate-macos required (2026-09-25)"), scoped on pull_request by docs/decisions/2026-10-03-macos-ci-scope.md:
+    it runs full, changed-tests or not at all, as the `changes` job decides. It still reports on every pull
+    request: a job skipped by its own `if:` reports success to a required check, while a workflow skipped by a
+    `paths:` filter would leave it pending. The three real-install bootstrap-* jobs stay path-gated, and the two
+    macOS ones run on a pull_request only when validate-macos runs in full (B+, D5)."""
+
+    text = ADOPTION_BOOTSTRAP.read_text(encoding="utf-8")
     job_map = jobs(text)
 
     def test_pull_request_trigger_has_no_path_filter(self):
@@ -1246,15 +1288,36 @@ class AdoptionBootstrapMacosRequiredTests(unittest.TestCase):
         pull_request = trigger.split("\n  pull_request:", 1)[1].split("\n  schedule:", 1)[0]
         self.assertNotIn("paths", pull_request)
 
-    def test_validate_macos_is_reachable_on_every_pull_request(self):
-        # No `needs:` (so it is never withheld pending another job) and no job-level `if:`
-        # (so no expression can skip the job itself for a pull_request): a required check
-        # must be reachable on every PR. Step-level `if: always()` (log upload) is fine and
-        # deliberately not what this checks.
-        job = self.job_map["validate-macos"]
-        header = job.split("\n    steps:\n", 1)[0]
-        self.assertNotIn("needs:", header)
-        self.assertNotRegex(header, r"(?m)^    if:", "a required check must not be skipped on any pull_request")
+    def validate_macos_gate(self):
+        """validate-macos's job header, its job-level ``if:`` value and its ``VALIDATE_MACOS_MODE`` expression."""
+        header = self.job_map["validate-macos"].split("\n    steps:\n", 1)[0]
+        mode = re.search(r"(?m)^    env:\n(?:[ \t]+#[^\n]*\n)*      VALIDATE_MACOS_MODE: ([^\n]+)$", header)
+        return header, block_if(header), None if mode is None else mode.group(1)
+
+    def assert_validate_macos_gate(self, condition, mode):
+        """The gate of docs/decisions/2026-10-03-macos-ci-scope.md, section 6.3 (D9): a status function, so the job
+        is evaluated when `changes` is skipped (every push, schedule and dispatch run) or failed; full on every
+        event but pull_request; on a pull_request full unless `changes` wrote macos=false, and changed-tests only
+        with a nonempty module list; `!= 'false'`, never `== 'true'`, so an empty output (changes failed,
+        cancelled or skipped) runs the full job; and 'full' as the mode's fallback branch."""
+        self.assertIsNotNone(condition, "validate-macos needs its job-level if:")
+        self.assertRegex(condition, r"!cancelled\(\)|always\(\)",
+                         "an implicit success() from `needs: changes` would skip the required check whenever "
+                         "changes is skipped or fails")
+        for term in ("github.event_name != 'pull_request'", "needs.changes.outputs.macos != 'false'",
+                     "needs.changes.outputs.macos_tests != ''"):
+            self.assertIn(term, condition)
+        self.assertNotIn("== 'true'", condition, "an empty output (changes failed or cancelled) must run in full")
+        self.assertIsNotNone(mode, "validate-macos's job-level env defines VALIDATE_MACOS_MODE")
+        self.assertIn("github.event_name == 'pull_request' && needs.changes.outputs.macos == 'false'", mode)
+        self.assertRegex(mode, r"&& 'changed-tests' \|\| 'full' \}\}$", "'full' is the fallback branch")
+
+    def test_validate_macos_gate_fails_safe(self):
+        # Replaces test_validate_macos_is_reachable_on_every_pull_request (2026-09-25), which forbade `needs:` and a
+        # job-level `if:` here; docs/decisions/2026-10-03-macos-ci-scope.md (D9) changes that expectation.
+        header, condition, mode = self.validate_macos_gate()
+        self.assertRegex(header, r"(?m)^    needs: changes$")
+        self.assert_validate_macos_gate(condition, mode)
 
     def test_bootstrap_jobs_stay_path_gated_on_pull_request_and_still_run_off_it(self):
         # Regression for "bootstrap jobs are skipped on push, schedule and dispatch"
@@ -1288,6 +1351,13 @@ class AdoptionBootstrapMacosRequiredTests(unittest.TestCase):
                               f"missing/empty output (changes skipped, failed or cancelled) needs "
                               f"'!= \\'false\\'' to avoid")
             self.assertIn("github.event_name != 'pull_request'", condition, job_id)
+        # B+ (docs/decisions/2026-10-03-macos-ci-scope.md, D5): on a pull_request the two macOS bootstrap jobs run
+        # only when validate-macos runs in full, with the same fail-safe spelling; bootstrap-linux is unchanged.
+        for job_id in ("bootstrap-macos", "bootstrap-macos-brew"):
+            condition = block_if(self.job_map[job_id])
+            self.assertIn("needs.changes.outputs.macos != 'false'", condition, job_id)
+            self.assertNotIn("needs.changes.outputs.macos == 'true'", condition, job_id)
+        self.assertNotIn("outputs.macos", block_if(self.job_map["bootstrap-linux"]))
 
     def test_the_pre_fix_condition_text_fails_this_tests_own_assertions(self):
         # Proof the strengthened assertions above are not vacuous: the exact `if:` text
@@ -1298,6 +1368,23 @@ class AdoptionBootstrapMacosRequiredTests(unittest.TestCase):
             self.assertRegex(pre_fix_condition, r"!cancelled\(\)|always\(\)")
         with self.assertRaises(AssertionError):
             self.assertIn("needs.changes.outputs.bootstrap != 'false'", pre_fix_condition)
+        # 2026-10-03 (docs/decisions/2026-10-03-macos-ci-scope.md, D9): the same proof for validate-macos's gate. The
+        # text `needs.changes.outputs.macos == 'true'`, and each other single weakening, must fail the assertions
+        # that the workflow's own text passes.
+        _, condition, mode = self.validate_macos_gate()
+        controls = {
+            "macos == 'true'": (condition.replace("needs.changes.outputs.macos != 'false'",
+                                                  "needs.changes.outputs.macos == 'true'"), mode),
+            "no status function": (condition.replace("!cancelled() && ", ""), mode),
+            "no changed-tests term": (condition.replace(" || needs.changes.outputs.macos_tests != ''", ""), mode),
+            "changed-tests as the fallback": (condition, mode.replace("&& 'changed-tests' || 'full'",
+                                                                      "&& 'full' || 'changed-tests'")),
+        }
+        for label, (weak_condition, weak_mode) in controls.items():
+            with self.subTest(label):
+                self.assertNotEqual((weak_condition, weak_mode), (condition, mode), "the mutation applies")
+                with self.assertRaises(AssertionError):
+                    self.assert_validate_macos_gate(weak_condition, weak_mode)
 
     def test_changes_job_runs_only_on_pull_request_and_diffs_paths_matching_push(self):
         job = self.job_map["changes"]
@@ -1318,7 +1405,11 @@ class AdoptionBootstrapMacosRequiredTests(unittest.TestCase):
             # gitignore-style globs ('adoption/**'). Both mean "everything under".
             return path.replace("/**", "/*")
 
-        job_patterns = re.findall(r"(?m)^            '([^']+)'$", job)
+        # Scoped to the PATTERNS array (2026-10-03, D9): MACOS_PATTERNS is a second list of 12-space quoted lines in
+        # the same script, and a different one. The anchor keeps `PATTERNS=(` from matching `MACOS_PATTERNS=(`.
+        patterns_block = re.search(r"(?ms)^[ \t]+PATTERNS=\(\n(.*?)^[ \t]+\)$", job)
+        self.assertIsNotNone(patterns_block, "the changes script's PATTERNS array")
+        job_patterns = re.findall(r"(?m)^            '([^']+)'$", patterns_block.group(1))
         self.assertTrue(job_patterns)
         self.assertEqual(sorted(normalize(path) for path in push_paths), sorted(job_patterns))
 
@@ -1326,15 +1417,20 @@ class AdoptionBootstrapMacosRequiredTests(unittest.TestCase):
         # Item 2/3 of the independent review: a missing payload SHA or a failed `git
         # diff` must still write bootstrap=true (never leave the job to fail and skip
         # the three bootstrap-* jobs through `needs:`), and the diff must be NUL-delimited
-        # so a non-ASCII quoted filename still matches a PATTERNS glob.
+        # so a non-ASCII quoted filename still matches a PATTERNS glob. Since 2026-10-03 every
+        # failure path calls fail_safe, which also writes macos=true (full mode for validate-macos).
         job = self.job_map["changes"]
-        script = step_block(job, "Detect whether any bootstrap-relevant path changed")
+        script = step_block(job, CHANGES_STEP)
         (set_flags,) = re.findall(r"(?m)^\s+set (-\S+)(?: |$)", script)
         self.assertNotIn("e", set_flags, "set -e would abort before a failure path's own bootstrap=true write")
         # `shell: bash` runs as `bash -eo pipefail`, so errexit must be turned off explicitly.
         self.assertRegex(script, r"(?m)^\s+set \+e\s*$", "errexit is on under shell: bash unless the script runs set +e")
-        self.assertIn('diff_file="$(mktemp)" || { echo "bootstrap=true" >> "$GITHUB_OUTPUT"; exit 0; }', script)
-        self.assertIn('echo "bootstrap=true" >> "$GITHUB_OUTPUT"', script)
+        self.assertIn('diff_file="$(mktemp)" || { fail_safe; exit 0; }', script)
+        # Since 2026-10-03 the writes are grouped, `{ ...; } >> "$GITHUB_OUTPUT"` (shellcheck SC2129, which the
+        # validate job's actionlint step runs); test_fail_safe_writes_full_mode_and_macos_is_always_written_last
+        # pins what fail_safe writes.
+        self.assertIn('echo "bootstrap=true"', script)
+        self.assertIn('} >> "$GITHUB_OUTPUT"', script)
 
         def if_block(needle):
             # A same-indentation-anchored match (not a naive string split on "fi", which
@@ -1345,13 +1441,528 @@ class AdoptionBootstrapMacosRequiredTests(unittest.TestCase):
             return match.group(0)
 
         missing_sha_block = if_block('-z "${BASE_SHA:-}"')
-        self.assertIn('echo "bootstrap=true"', missing_sha_block)
+        self.assertIn("fail_safe", missing_sha_block)
         self.assertIn("exit 0", missing_sha_block)
         self.assertIn("git diff -z --no-renames --name-only", script)
         diff_failure_block = if_block("git diff -z")
-        self.assertIn('echo "bootstrap=true"', diff_failure_block)
+        self.assertIn("fail_safe", diff_failure_block)
         self.assertIn("exit 0", diff_failure_block)
         self.assertIn("read -r -d ''", script)
+
+    def test_fail_safe_writes_full_mode_and_macos_is_always_written_last(self):
+        # The fail_safe body writes bootstrap=true, macos=true and an empty macos_tests (D9). `macos` is the last
+        # write there and on the normal path, so a script that stops part way leaves it empty, which the
+        # needs-gated jobs read as full mode, never a macos=false with its module list still unwritten.
+        script = changes_script(self.text)
+        body = re.search(r"(?ms)^fail_safe\(\) \{\n(.*?)^\}$", script)
+        self.assertIsNotNone(body, "the changes script defines fail_safe")
+
+        def output_writes(text):
+            """The (key, value) pairs of each grouped `{ echo "key=value"; ...; } >> "$GITHUB_OUTPUT"` write."""
+            groups = re.findall(r'(?ms)^([ \t]*)\{\n(.*?)\n\1\} >> "\$GITHUB_OUTPUT"$', text)
+            return [re.findall(r'(?m)^[ \t]*echo "(\w+)=([^"]*)"$', group) for _, group in groups]
+
+        (writes,) = output_writes(body.group(1))
+        self.assertEqual(dict(writes), {"bootstrap": "true", "macos": "true", "macos_tests": ""})
+        self.assertEqual([key for key, _ in writes][-1], "macos")
+        (normal,) = output_writes(script[body.end():])
+        self.assertEqual([key for key, _ in normal], ["macos_tests", "bootstrap", "macos"])
+        self.assertEqual(len(re.findall(r'>> "\$GITHUB_OUTPUT"', script)), 2, "no other output write")
+
+
+def macos_job_inputs():
+    """The inputs that tests/test_adoption_bootstrap_macos.py's CIWorkflowTriggerPathsTests holds to the push
+    `paths:` list (its `for expected in (...)` loop), read with ast so the two files cannot drift apart unseen."""
+    tree = ast.parse((ROOT / "tests/test_adoption_bootstrap_macos.py").read_text(encoding="utf-8"))
+    for node in ast.walk(tree):
+        if isinstance(node, ast.FunctionDef) and node.name == "test_every_macos_job_input_is_a_push_trigger_path":
+            for loop in ast.walk(node):
+                if isinstance(loop, ast.For) and isinstance(loop.iter, ast.Tuple):
+                    return [element.value for element in loop.iter.elts if isinstance(element, ast.Constant)]
+    raise AssertionError("CIWorkflowTriggerPathsTests.test_every_macos_job_input_is_a_push_trigger_path not found")
+
+
+class MacosPatternsTests(unittest.TestCase):
+    """MACOS_PATTERNS, the `changes` job's list of macOS-relevant paths (docs/decisions/2026-10-03-macos-ci-scope.md,
+    section 6.2): a pull request that changes a listed path runs validate-macos in full. The list holds this
+    workflow and only live patterns, covers every script and gate module validate-macos runs and every input that
+    tests/test_adoption_bootstrap_macos.py lists except the evidence manifest (D8), and a drift guard holds every
+    non-test file with a Darwin branch, macOS path handling or a non-Linux refusal to the list or to a recorded
+    exclusion."""
+
+    patterns = shell_array(changes_script(), "MACOS_PATTERNS")
+    # The record's widened C5 grep: macOS path handling, a non-Linux refusal, or a Darwin branch (a quoted Darwin,
+    # a shell comparison with Darwin, or sys.platform == "darwin"). At the record's verification base (6112d14d4)
+    # it finds the record's 27 files, as `git grep -I -E` with the same expression does.
+    DRIFT = re.compile(r"""/private/(?:tmp|var)"""
+                       r"""|platform\.system\(\)\s*!=\s*['"]Linux['"]"""
+                       r"""|sys\.platform\s*!=\s*['"]linux['"]"""
+                       r"""|['"]Darwin['"]"""
+                       r"""|==?\s*Darwin\b"""
+                       r"""|sys\.platform\s*==\s*['"]darwin['"]""")
+    DRIFT_SKIPPED = (("tests/", "evidence/", "docs/", "catalogs/"), (".md", ".json"))
+    # The record's recorded exclusions (section 6.2), each with its reason.
+    EXCLUDED = {
+        "blueprints/convergence-practice/wsl-memory-maintenance/run.py":
+            "Refuses to run off Linux x86_64: a WSL-host blueprint the Mac never runs.",
+        "blueprints/convergence-practice/wsl-native-tools/install.py": "Refuses to run off Linux x86_64.",
+        "blueprints/convergence-practice/wsl-retrieval/run-initial.py.txt":
+            "An archived run script kept as text: never executed, with a Linux-only guard.",
+        "blueprints/convergence-practice/wsl-retrieval/run-qmd-attempt-2.py.txt":
+            "An archived run script kept as text: never executed, with a Linux-only guard.",
+        "blueprints/convergence-practice/wsl-retrieval/run-recording-aid.py.txt":
+            "An archived run script kept as text: never executed, with a Linux-only guard.",
+        "blueprints/gap-resolution-20260922/worktrunk-0-79-0-requalify/install.py": "Refuses to run off Linux x86_64.",
+        "manifests/evidence.json":
+            "Nearly every main commit touches it; platform-neutral JSON that Linux validate checks with the same "
+            "validators. It stays in the push paths: as the post-merge net (D11).",
+        "blueprints/convergence-practice/wsl-native-tools/pins.json": "WSL tool pins with no macOS consumer.",
+        "adoption/templates/*":
+            "Data the listed render_config.py consumes; listing it would add full-suite PR jobs with no macOS-only "
+            "failure observed, and adoption/** push runs cover it after merge.",
+        "adoption/hosts/*":
+            "Data the listed render_config.py consumes; listing it would add full-suite PR jobs with no macOS-only "
+            "failure observed, and adoption/** push runs cover it after merge.",
+    }
+
+    @classmethod
+    def setUpClass(cls):
+        listed = subprocess.run(["git", "-C", str(ROOT), "ls-files", "-z"], capture_output=True, check=True).stdout
+        cls.tracked = [path for path in listed.decode("utf-8", "surrogateescape").split("\0") if path]
+
+    def covered(self, path):
+        return any(fnmatch.fnmatchcase(path, pattern) for pattern in self.patterns)
+
+    def excluded(self, path):
+        return any(fnmatch.fnmatchcase(path, key) for key in self.EXCLUDED)
+
+    def drift_hits(self, root, paths):
+        """The paths the drift grep flags: tracked files outside the skipped trees and suffixes that are not
+        binary (no NUL in the first 8000 bytes, as `git grep -I` decides) and match DRIFT."""
+        prefixes, suffixes = self.DRIFT_SKIPPED
+        hits = []
+        for path in paths:
+            if path.startswith(prefixes) or path.endswith(suffixes):
+                continue
+            full = root / path
+            if full.is_symlink() or not full.is_file():
+                continue
+            raw = full.read_bytes()
+            if b"\0" not in raw[:8000] and self.DRIFT.search(raw.decode("utf-8", "ignore")):
+                hits.append(path)
+        return hits
+
+    def test_the_list_holds_this_workflow_and_no_dead_or_duplicate_pattern(self):
+        self.assertTrue(self.patterns, "the changes script's MACOS_PATTERNS array")
+        self.assertIn(".github/workflows/adoption-bootstrap.yml", self.patterns)
+        self.assertEqual(len(self.patterns), len(set(self.patterns)), "a duplicate pattern")
+        dead = [pattern for pattern in self.patterns
+                if not any(fnmatch.fnmatchcase(path, pattern) for path in self.tracked)]
+        self.assertEqual(dead, [], "a pattern that matches no tracked path")
+
+    def test_drift_guard_every_flagged_file_is_listed_or_excluded(self):
+        hits = self.drift_hits(ROOT, self.tracked)
+        self.assertTrue(hits, "the drift grep flags nothing, so the guard would be vacuous")
+        uncovered = [path for path in hits if not self.covered(path) and not self.excluded(path)]
+        self.assertEqual(uncovered, [], "add each to MACOS_PATTERNS under a criterion of the record's section 6.2, "
+                                        "or to EXCLUDED here with a reason")
+
+    def test_drift_guard_controls(self):
+        for line in ("if platform.system() != 'Linux' or platform.machine() != 'x86_64':", 'if sys.platform != "linux":',
+                     "tmp = '/private/var/folders/x'", 'if platform.system() != "Darwin":',
+                     'elif [ "$(uname -s)" = Darwin ]; then', '[[ "$(uname -s)" == Darwin ]]',
+                     'peak if sys.platform == "darwin" else peak'):
+            self.assertIsNotNone(self.DRIFT.search(line), line)
+        for line in ("uv-aarch64-apple-darwin.tar.gz", "on Darwin, killpg skips zombies",
+                     "platform_system == 'darwin' and sys_platform == 'linux'", 'PIN_OS_ALIASES = {"darwin": "macos"}'):
+            self.assertIsNone(self.DRIFT.search(line), line)
+        # A new, unlisted, unexcluded file with a Darwin branch is reported by the same check.
+        scratch = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, scratch, ignore_errors=True)
+        probe = "blueprints/new-mac-tool/run.py"
+        (scratch / probe).parent.mkdir(parents=True)
+        (scratch / probe).write_text('import platform\nif platform.system() != "Darwin":\n    raise SystemExit(1)\n')
+        (scratch / "tests").mkdir()
+        (scratch / "tests" / "test_new_mac_tool.py").write_text('if sys.platform == "darwin":\n    pass\n')
+        hits = self.drift_hits(scratch, [probe, "tests/test_new_mac_tool.py"])
+        self.assertEqual([path for path in hits if not self.covered(path) and not self.excluded(path)], [probe])
+
+    def test_every_exclusion_has_a_reason_and_is_not_also_listed(self):
+        for key, reason in self.EXCLUDED.items():
+            with self.subTest(key):
+                self.assertTrue(reason.strip())
+                self.assertNotIn(key, self.patterns)
+                if "*" not in key:
+                    self.assertFalse(self.covered(key), "an excluded path that the list also covers")
+
+    def test_every_script_and_gate_module_validate_macos_runs_is_listed(self):
+        job = jobs(ADOPTION_BOOTSTRAP.read_text(encoding="utf-8"))["validate-macos"]
+        steps = uncommented(job.split("\n    steps:\n", 1)[1])
+        scripts = set(re.findall(r'(?:python3|bash|"\$python_bin")\s+((?:scripts|tools|adoption)/[\w./-]+\.(?:py|sh))\b',
+                                 steps))
+        self.assertLessEqual({"scripts/validate.py", "scripts/host_receipts.py", "adoption/bootstrap-macos.sh",
+                              "tools/sota-convergence/build_verdicts.py", "scripts/release_due.py"}, scripts)
+        modules = re.findall(r"\btests\.(test_\w+)", step_block(job, "Gate on the adoption test modules"))
+        self.assertEqual(len(modules), 7)
+        for path in sorted(scripts) + [f"tests/{module}.py" for module in modules]:
+            with self.subTest(path):
+                self.assertTrue(self.covered(path))
+
+    def test_every_macos_job_input_is_listed_except_the_evidence_manifest(self):
+        # D8: the inputs tests/test_adoption_bootstrap_macos.py lists for the push trigger are the inputs the
+        # macOS jobs consume, so each is in MACOS_PATTERNS too, except manifests/evidence.json, the one recorded
+        # exclusion, which stays in the push paths: as the post-merge net (D11).
+        inputs = macos_job_inputs()
+        self.assertIn("manifests/evidence.json", inputs)
+        for entry in inputs:
+            files = [path for path in self.tracked if fnmatch.fnmatchcase(path, entry.replace("/**", "/*"))]
+            with self.subTest(entry):
+                self.assertTrue(files, "the input names no tracked path")
+                missing = [path for path in files if not self.covered(path)]
+                if entry == "manifests/evidence.json":
+                    self.assertEqual(missing, files, "the recorded exclusion stays out of MACOS_PATTERNS")
+                    self.assertIn(entry, self.EXCLUDED)
+                else:
+                    self.assertEqual(missing, [])
+
+
+class PushNetTests(unittest.TestCase):
+    """The post-merge net (docs/decisions/2026-10-03-macos-ci-scope.md, D11): main's push run re-runs validate-macos
+    in full after a pull request whose run was skipped or scoped. It exists because nearly every merge touches
+    manifests/evidence.json, which the push `paths:` filter lists; the record's overturn 8 re-plans the net before
+    that entry leaves."""
+
+    def assert_push_net(self, text):
+        trigger = "\n" + text.split("\non:\n", 1)[1].split("\n\njobs:", 1)[0]
+        lines = trigger.split("\n  push:\n", 1)[1].split("\n  pull_request:", 1)[0].splitlines()
+        entry = "      - 'manifests/evidence.json'"
+        self.assertIn(entry, lines, "the push paths: keep manifests/evidence.json")
+        comment = []
+        for line in reversed(lines[:lines.index(entry)]):
+            if not line.lstrip().startswith("#"):
+                break
+            comment.insert(0, line.strip())
+        self.assertIn("post-merge net", " ".join(comment), "the comment above the entry names it as the net")
+
+    def test_the_push_paths_keep_the_evidence_manifest_as_the_post_merge_net(self):
+        self.assert_push_net(ADOPTION_BOOTSTRAP.read_text(encoding="utf-8"))
+
+    def test_controls_a_dropped_entry_or_comment_fails(self):
+        text = ADOPTION_BOOTSTRAP.read_text(encoding="utf-8")
+        entry = "      - 'manifests/evidence.json'\n"
+        self.assertEqual(text.count(entry), 1)
+        for label, mutated in (("entry dropped", text.replace(entry, "")),
+                               ("comment dropped", text.replace("post-merge net", "pull-request net"))):
+            with self.subTest(label):
+                self.assertNotEqual(mutated, text)
+                with self.assertRaises(AssertionError):
+                    self.assert_push_net(mutated)
+
+
+class ValidateMacosModeTests(unittest.TestCase):
+    """How validate-macos runs each mode (docs/decisions/2026-10-03-macos-ci-scope.md, sections 6.1 and 6.3): every
+    step after setup-python runs in full mode only, except the changed-tests step and the always() upload; the
+    changed-tests step reads its modules only through env and refuses a selection that runs no test; and the
+    changes script admits only well-formed top-level test modules that still exist."""
+
+    text = ADOPTION_BOOTSTRAP.read_text(encoding="utf-8")
+    job = jobs(text)["validate-macos"]
+
+    def steps(self):
+        body = self.job.split("\n    steps:\n", 1)[1]
+        return [match.group(0) for match in re.finditer(r"(?ms)^      - .*?(?=^      - |\Z)", body)]
+
+    @staticmethod
+    def step_name(step):
+        return re.search(r"(?m)^      - name: (.+)$", step).group(1).strip("'\"")
+
+    def test_every_step_after_setup_python_runs_in_full_mode_only_except_two(self):
+        steps = [(self.step_name(step), block_if(step)) for step in self.steps()]
+        names = [name for name, _ in steps]
+        setup = names.index("Set up the manifest-supported Python line")
+        self.assertEqual([condition for _, condition in steps[:setup + 1]], [None] * (setup + 1),
+                         "harden-runner, checkout and setup-python run in every mode")
+        exceptions = {CHANGED_TESTS_STEP: CHANGED_TESTS_IF, "Upload the full test suite result": "always()"}
+        for name, condition in steps[setup + 1:]:
+            with self.subTest(name):
+                self.assertEqual(condition, exceptions.get(name, FULL_MODE_IF))
+        self.assertEqual(sum(condition == FULL_MODE_IF for _, condition in steps), 15)
+        self.assertLess(names.index("Run the full test suite (gating on macOS)"), names.index(CHANGED_TESTS_STEP))
+        self.assertEqual(names[-1], "Upload the full test suite result")
+
+    def assert_changed_tests_guards(self, script):
+        self.assertIn('read -r -a modules <<< "$MODULES"', script)
+        self.assertIn('if [ "${#modules[@]}" -eq 0 ]; then', script, "an empty selection would run discovery")
+        self.assertIn(ZERO_TEST_GUARD, script, "a selection that runs no test would pass vacuously")
+        self.assertIn('python3 -m unittest -v "${modules[@]}"', script)
+
+    def test_the_changed_tests_step_reads_modules_through_env_and_keeps_its_guards(self):
+        step = step_block(self.job, CHANGED_TESTS_STEP)
+        self.assertEqual(block_if(step), CHANGED_TESTS_IF)
+        self.assertIn("MODULES: ${{ needs.changes.outputs.macos_tests }}", step)
+        script = run_block(step)
+        self.assertNotIn("${{", script, "no expression is interpolated into the shell script")
+        self.assert_changed_tests_guards(script)
+
+    def test_control_the_step_text_without_the_guard_line_fails(self):
+        script = run_block(step_block(self.job, CHANGED_TESTS_STEP))
+        self.assertEqual(script.count(ZERO_TEST_GUARD), 1)
+        with self.assertRaises(AssertionError):
+            self.assert_changed_tests_guards(script.replace(ZERO_TEST_GUARD, "if false; then"))
+
+    def test_the_changes_script_admits_only_existing_well_formed_top_level_modules(self):
+        script = changes_script(self.text)
+        self.assertIn('if [[ "$module" =~ ^tests\\.test_[A-Za-z0-9_]+$ ]]; then', script)
+        self.assertLess(script.index("*/*)"), script.index("test_*.py)"), "a nested path is tested first")
+        self.assertIn('[ -f "$file" ] && test_modules="$test_modules $module"', script)
+        self.assertIn("export LC_ALL=C", script, "ASCII-only ranges in the module-name regex")
+
+
+def write_tree(root, files):
+    for relative, content in files.items():
+        path = root / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(content, encoding="utf-8")
+
+
+@unittest.skipUnless(shutil.which("bash") and shutil.which("git"), "the changes step needs bash and git, as the runner has")
+class ChangesModeComputationTests(unittest.TestCase):
+    """The `changes` script executed as GitHub runs a `shell: bash` step (`bash --noprofile --norc -eo pipefail`)
+    against a scratch repository (docs/decisions/2026-10-03-macos-ci-scope.md, sections 2 and 6.1): a listed
+    path selects full mode; top-level test modules alone select changed-tests mode with exactly those modules;
+    anything else under tests/ selects full mode; a change that touches neither, or only deletes a test module,
+    is skipped; and an error selects full mode. Each control mutates one guard of the script and must turn its
+    scenario's assertion red."""
+
+    BASE = {
+        "README.md": "base\n",
+        "docs/a.md": "a\n",
+        "adoption/bootstrap-macos.sh": "#!/bin/bash\n",
+        "adoption/launchd/agent.plist": "<plist/>\n",
+        "tests/__init__.py": "",
+        "tests/helpers.py": "x = 1\n",
+        "tests/test_unlisted_a.py": "# a\n",
+        "tests/test_unlisted_b.py": "# b\n",
+        "tests/test_workflow_hardening.py": "# a listed test module\n",
+    }
+
+    @classmethod
+    def setUpClass(cls):
+        cls.script = changes_script()
+        cls.repository = Path(tempfile.mkdtemp())
+        cls.addClassCleanup(shutil.rmtree, cls.repository, ignore_errors=True)
+        cls.git("init", "--quiet", "--initial-branch=main")
+        write_tree(cls.repository, cls.BASE)
+        cls.git("add", "-A")
+        cls.git("commit", "--quiet", "-m", "base")
+        cls.base = cls.git("rev-parse", "HEAD")
+
+    @classmethod
+    def git(cls, *args):
+        return subprocess.run(["git", "-C", str(cls.repository), "-c", "user.name=fixture",
+                               "-c", "user.email=fixture@example.invalid", "-c", "commit.gpgsign=false", *args],
+                              check=True, capture_output=True, text=True, env=tests.hermetic_git_environment()
+                              ).stdout.strip()
+
+    def run_changes(self, changes=None, deletions=(), base=None, head=None, script=None):
+        """Commit ``changes`` (path to text) and ``deletions`` on top of the base commit, check the result out,
+        and run the script there with BASE_SHA and HEAD_SHA (``base``/``head`` override them). Returns the
+        outputs as {key: value} (each key at most once) and the step summary."""
+        self.git("checkout", "--quiet", "--force", "--detach", self.base)
+        self.git("clean", "-dfxq")
+        write_tree(self.repository, changes or {})
+        for path in deletions:
+            self.git("rm", "--quiet", path)
+        self.git("add", "-A")
+        self.git("commit", "--quiet", "--allow-empty", "-m", "pull request")
+        head_sha = self.git("rev-parse", "HEAD")
+        scratch = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, scratch, ignore_errors=True)
+        step = scratch / "step.sh"
+        step.write_text(self.script if script is None else script, encoding="utf-8")
+        output, summary = scratch / "output", scratch / "summary.md"
+        environment = tests.hermetic_git_environment()
+        environment.update(BASE_SHA=self.base if base is None else base, HEAD_SHA=head_sha if head is None else head,
+                           GITHUB_OUTPUT=str(output), GITHUB_STEP_SUMMARY=str(summary))
+        proc = subprocess.run(["bash", "--noprofile", "--norc", "-eo", "pipefail", str(step)], cwd=self.repository,
+                              env=environment, capture_output=True, text=True, timeout=120)
+        self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+        pairs = [line.partition("=")[::2] for line in output.read_text(encoding="utf-8").splitlines()]
+        self.assertEqual(sorted(key for key, _ in pairs), ["bootstrap", "macos", "macos_tests"], pairs)
+        return dict(pairs), summary.read_text(encoding="utf-8") if summary.exists() else ""
+
+    def assert_mode(self, outputs, mode, modules="", bootstrap=None):
+        self.assertEqual(validate_macos_mode(outputs), mode, outputs)
+        self.assertEqual(outputs["macos_tests"], modules, outputs)
+        if bootstrap is not None:
+            self.assertEqual(outputs["bootstrap"], bootstrap, outputs)
+
+    def test_a_mac_relevant_path_selects_full_mode(self):
+        outputs, summary = self.run_changes({"adoption/bootstrap-macos.sh": "#!/bin/bash\necho changed\n",
+                                             "tests/test_unlisted_a.py": "# a, changed\n"})
+        self.assert_mode(outputs, "full", bootstrap="true")
+        self.assertIn("- `adoption/bootstrap-macos.sh`", summary)
+
+    def test_a_listed_test_module_selects_full_mode(self):
+        outputs, _ = self.run_changes({"tests/test_workflow_hardening.py": "# changed\n"})
+        self.assert_mode(outputs, "full", bootstrap="false")
+
+    def test_top_level_test_modules_alone_select_changed_tests_mode(self):
+        outputs, summary = self.run_changes({"tests/test_unlisted_a.py": "# a, changed\n",
+                                             "tests/test_unlisted_b.py": "# b, changed\n", "docs/a.md": "a, changed\n"})
+        self.assert_mode(outputs, "changed-tests", modules="tests.test_unlisted_a tests.test_unlisted_b",
+                         bootstrap="false")
+        self.assertIn("changed-tests mode", summary)
+        self.assertIn("not a macOS full-suite pass", summary)
+
+    def test_anything_else_under_tests_selects_full_mode(self):
+        for label, changes in (("nested data", {"tests/fixtures/data.json": "{}\n"}),
+                               ("a helper", {"tests/helpers.py": "x = 2\n"}),
+                               ("a malformed module name", {"tests/test_bad-name.py": "# x\n"}),
+                               ("a non-ASCII module name", {"tests/test_naïve.py": "# x\n"}),
+                               ("a module-shaped nested path", {"tests/test_dir/test_x.py": "# x\n"})):
+            with self.subTest(label):
+                outputs, summary = self.run_changes(changes)
+                self.assert_mode(outputs, "full")
+                self.assertIn("A tests/ path other than a top-level test module changed", summary)
+
+    def test_a_change_touching_neither_is_skipped_as_untested(self):
+        outputs, summary = self.run_changes({"docs/a.md": "a, changed\n", "README.md": "changed\n"})
+        self.assert_mode(outputs, "skip", bootstrap="false")
+        self.assertIn("skipped: no Mac-relevant change; this is not a macOS pass", summary)
+        self.assertIn("untested, not passed", summary)
+
+    def test_a_pull_request_that_only_deletes_a_test_module_is_skipped(self):
+        outputs, _ = self.run_changes(deletions=("tests/test_unlisted_b.py",))
+        self.assert_mode(outputs, "skip")
+
+    def test_an_error_selects_full_mode(self):
+        for label, override in (("missing base sha", {"base": ""}), ("missing head sha", {"head": ""}),
+                                ("git diff fails", {"base": "0" * 40})):
+            with self.subTest(label):
+                outputs, summary = self.run_changes({"docs/a.md": "a, changed\n"}, **override)
+                self.assert_mode(outputs, "full", bootstrap="true")
+                self.assertIn("failed safe", summary)
+
+    def test_a_listed_path_is_shown_in_the_summary_only_in_a_safe_spelling(self):
+        outputs, summary = self.run_changes({"adoption/launchd/we`ird name.plist": "<plist/>\n"})
+        self.assert_mode(outputs, "full")
+        self.assertIn("- `adoption/launchd/we?ird?name.plist`", summary)
+        self.assertNotIn("we`ird", summary)
+
+    def mutated(self, old, new):
+        self.assertEqual(self.script.count(old), 1, old)
+        return self.script.replace(old, new)
+
+    def test_controls_each_guard_holds_its_scenario(self):
+        controls = (
+            ("fail_safe writes macos=false", self.mutated('echo "macos=true"', 'echo "macos=false"'),
+             dict(base=""), "full"),
+            ("a deleted module is kept", self.mutated('[ -f "$file" ] && test_modules=', "test_modules="),
+             dict(deletions=("tests/test_unlisted_b.py",)), "skip"),
+            ("no module-name check", self.mutated('if [[ "$module" =~ ^tests\\.test_[A-Za-z0-9_]+$ ]]; then',
+                                                  "if true; then"),
+             dict(changes={"tests/test_bad-name.py": "# x\n"}), "full"),
+            ("a helper does not force full mode",
+             self.mutated('if [ "$macos" = false ] && [ "$tests_other" = true ]; then macos=true; fi', ":"),
+             dict(changes={"tests/helpers.py": "x = 2\n"}), "full"),
+        )
+        for label, script, scenario, mode in controls:
+            with self.subTest(label):
+                outputs, _ = self.run_changes(**scenario)
+                self.assertEqual(validate_macos_mode(outputs), mode, "the unmutated script holds the scenario")
+                weak, _ = self.run_changes(script=script, **scenario)
+                with self.assertRaises(AssertionError):
+                    self.assert_mode(weak, mode)
+
+
+@unittest.skipUnless(shutil.which("bash"), "the changed-tests step needs bash, as the runner has")
+class ChangedTestsStepRunTests(unittest.TestCase):
+    """The changed-tests step executed as GitHub runs it, in a scratch checkout of probe test modules with `python3`
+    this interpreter: a passing selection passes with a scoped summary; a failing one fails; a selection that
+    runs no test, an empty selection and a malformed name fail. As a discriminating control, a python3 that
+    reports "Ran 0 tests" and exits 0 (unittest before 3.12 did; 3.12 added exit status 5) fails the step only
+    while the zero-test guard is in place."""
+
+    PROBES = {
+        "tests/__init__.py": "",
+        "tests/test_zz_pass.py": "import unittest\n\n\nclass T(unittest.TestCase):\n    def test_ok(self):\n"
+                                 "        self.assertTrue(True)\n",
+        "tests/test_zz_fail.py": "import unittest\n\n\nclass T(unittest.TestCase):\n    def test_no(self):\n"
+                                 "        self.assertTrue(False)\n",
+        "tests/test_zz_skip.py": "import unittest\n\n\nclass T(unittest.TestCase):\n    @unittest.skip('probe')\n"
+                                 "    def test_skipped(self):\n        pass\n",
+        "tests/test_zz_empty.py": "import unittest\n",
+    }
+    OLD_UNITTEST = '#!/bin/sh\nprintf "\\nRan 0 tests in 0.000s\\n\\nOK\\n" >&2\nexit 0\n'
+
+    @classmethod
+    def setUpClass(cls):
+        cls.script = run_block(step_block(jobs(ADOPTION_BOOTSTRAP.read_text(encoding="utf-8"))["validate-macos"],
+                                          CHANGED_TESTS_STEP))
+
+    def run_step(self, modules, script=None, python3=None):
+        scratch = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, scratch, ignore_errors=True)
+        write_tree(scratch, self.PROBES)
+        tools = scratch / "bin"
+        tools.mkdir()
+        stub = tools / "python3"
+        stub.write_text(python3 or f'#!/bin/sh\nexec {shlex.quote(sys.executable)} "$@"\n', encoding="utf-8")
+        stub.chmod(0o755)
+        step = scratch / "step.sh"
+        step.write_text(self.script if script is None else script, encoding="utf-8")
+        summary, log = scratch / "summary.md", scratch / "full-suite-macos.log"
+        environment = {key: value for key, value in os.environ.items()
+                       if not key.startswith("GITHUB_") and key != "PYTHONPATH"}
+        environment.update(PATH=f"{tools}{os.pathsep}{os.environ.get('PATH', '')}", PYTHONDONTWRITEBYTECODE="1",
+                           GITHUB_STEP_SUMMARY=str(summary), MODULES=modules)
+        proc = subprocess.run(["bash", "--noprofile", "--norc", "-eo", "pipefail", str(step)], cwd=scratch,
+                              env=environment, capture_output=True, text=True, timeout=120)
+        return (proc.returncode, proc.stdout + proc.stderr,
+                summary.read_text(encoding="utf-8") if summary.exists() else "",
+                log.read_text(encoding="utf-8") if log.exists() else None)
+
+    def test_a_passing_selection_reports_a_scoped_pass(self):
+        code, output, summary, _ = self.run_step("tests.test_zz_pass")
+        self.assertEqual(code, 0, output)
+        self.assertIn("ran 1 tests from: tests.test_zz_pass", summary)
+        self.assertIn("this is a scoped result, not a macOS full-suite pass", summary)
+
+    def test_a_failing_module_fails_the_step(self):
+        code, output, summary, _ = self.run_step("tests.test_zz_pass tests.test_zz_fail")
+        self.assertNotEqual(code, 0, output)
+        self.assertIn("ran 2 tests from: tests.test_zz_pass tests.test_zz_fail", summary)
+
+    def test_skipped_tests_are_counted_in_the_summary(self):
+        code, output, summary, _ = self.run_step("tests.test_zz_pass tests.test_zz_skip")
+        self.assertEqual(code, 0, output)
+        self.assertIn("ran 2 tests from:", summary)
+        self.assertIn("Skipped: 1.", summary)
+
+    def test_a_selection_that_runs_no_test_fails_as_untested(self):
+        code, output, _, _ = self.run_step("tests.test_zz_empty")
+        self.assertEqual(code, 1, output)
+        self.assertIn("changed-tests mode ran no test: untested, not passed", output)
+
+    def test_an_empty_or_malformed_selection_fails_before_unittest_runs(self):
+        for label, modules, message in (("empty", "", "received no test module"),
+                                        ("a path, not a module", "tests.test_zz_pass tests/test_zz_pass.py",
+                                         "refuses a module name")):
+            with self.subTest(label):
+                code, output, _, log = self.run_step(modules)
+                self.assertEqual(code, 1, output)
+                self.assertIn(message, output)
+                self.assertIsNone(log, "unittest never ran, so discovery could not run the whole suite")
+
+    def test_control_the_zero_test_guard_is_what_fails_a_vacuous_pass(self):
+        code, output, _, _ = self.run_step("tests.test_zz_empty", python3=self.OLD_UNITTEST)
+        self.assertEqual(code, 1, output)
+        self.assertEqual(self.script.count(ZERO_TEST_GUARD), 1)
+        unguarded = self.script.replace(ZERO_TEST_GUARD, "if false; then")
+        code, output, summary, _ = self.run_step("tests.test_zz_empty", script=unguarded, python3=self.OLD_UNITTEST)
+        self.assertEqual(code, 0, "without the guard a selection that ran no test would pass")
+        self.assertIn("ran 0 tests from: tests.test_zz_empty", summary)
 
 
 class NoWorkflowApprovesPullRequestsTests(unittest.TestCase):

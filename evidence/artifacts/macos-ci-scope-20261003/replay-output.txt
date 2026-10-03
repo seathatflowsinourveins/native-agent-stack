@@ -1,0 +1,35 @@
+OK       MACOS_PATTERNS entries in the workflow: measured 89, expected 89
+OK       entries in only one of MACOS_PATTERNS and the record's list (lists_r2.json Bp): measured [], expected []
+OK       MACOS_PATTERNS has no duplicate: measured 89, expected 89
+OK       tracked files at 6112d14d4 that the list matches: measured 151, expected 151
+OK       patterns that match no tracked file at 6112d14d4: measured [], expected []
+OK       completed pull_request validate-macos jobs (SUCCESS or FAILURE): measured 1069, expected 1069
+OK       their slot-hours: measured 348.8, expected 348.8
+OK       head SHAs without a file list (counted as full runs): measured 40, expected 40
+OK       B0: full / skipped / changed-tests PR jobs: measured (416, 653, 0), expected (416, 653, 0)
+OK       B0: PR slot-hours: measured 127.6, expected 127.6
+OK       Bp: full / skipped / changed-tests PR jobs: measured (439, 630, 0), expected (439, 630, 0)
+OK       Bp: PR slot-hours: measured 133.0, expected 133.0
+OK       Amac: full / skipped / changed-tests PR jobs: measured (578, 491, 0), expected (578, 491, 0)
+OK       Amac: PR slot-hours: measured 179.1, expected 179.1
+OK       Aall: full / skipped / changed-tests PR jobs: measured (702, 367, 0), expected (702, 367, 0)
+OK       Aall: PR slot-hours: measured 216.0, expected 216.0
+OK       B2: full / skipped / changed-tests PR jobs: measured (441, 367, 261), expected (441, 367, 261)
+OK       B2: PR slot-hours (with the changed-tests estimate): measured 136.8, expected 136.8
+OK       B2: changed-tests job minutes, median and p90 (estimate): measured (0.67, 1.23), expected (0.67, 1.23)
+OK       deterministic macOS-only PR failures (D1 rows): measured 18, expected 18
+OK       D1 caught/escaped flags that differ from d1_rows.json: measured 0, expected 0
+OK       D1 escapes per candidate: measured {'B0': 5, 'Bp': 5, 'Amac': 1, 'Aall': 0, 'B2': 0}, expected {'B0': 5, 'Bp': 5, 'Amac': 1, 'Aall': 0, 'B2': 0}
+OK       D1 merged escapes per candidate: measured {'B0': 2, 'Bp': 2, 'Amac': 0, 'Aall': 0, 'B2': 0}, expected {'B0': 2, 'Bp': 2, 'Amac': 0, 'Aall': 0, 'B2': 0}
+OK       macOS-only failures in the 30-run table: measured 30, expected 30
+OK       pull_request rows whose B0/Bp/B2 outcome differs from runs30.json: measured [], expected []
+OK       both families' labels over the 25 classified runs: measured (Counter({'test-portability-only': 12, 'flaky-or-infra': 11, 'mac-host-defect': 2}), Counter({'test-portability-only': 10, 'unknown': 8, 'flaky-or-infra': 6, 'mac-host-defect': 1})), expected (Counter({'test-portability-only': 12, 'flaky-or-infra': 11, 'mac-host-defect': 2}), Counter({'test-portability-only': 10, 'unknown': 8, 'flaky-or-infra': 6, 'mac-host-defect': 1}))
+OK       first-parent main commits since 2026-09-25T00:00Z at 6112d14d4: measured 369, expected 369
+OK       B0: main commits skipped / of those touching tests/*.py / run changed-tests: measured (237, 95, 0), expected (237, 95, 0)
+OK       Bp: main commits skipped / of those touching tests/*.py / run changed-tests: measured (232, 90, 0), expected (232, 90, 0)
+OK       Aall: main commits skipped / of those touching tests/*.py / run changed-tests: measured (142, 0, 0), expected (142, 0, 0)
+OK       B2: main commits skipped / of those touching tests/*.py / run changed-tests: measured (142, 0, 90), expected (142, 0, 90)
+OK       pull_request runs with a changes result: measured 1211, expected 1211
+NOTE     the bootstrap gate skipped bootstrap-macos on 51 of them; the record's 52 counts skipped bootstrap-macos check runs across all events, one of them a workflow_dispatch run
+NOTE     sim_r2.json (saved simulation output, not re-run): B2 367.7 slot-h, B2+ 339.9 slot-h, p90 1.7 min; the record states 319.6 slot-h and 1.4 min for (b2) with B+
+PASS: 0 mismatch(es)
