@@ -1,0 +1,1 @@
+The function `get_current_time` is not available in the provided tools. The available MCP-related functions are for listing resources/templates and reading specific resources, but none directly retrieve the current time. Unable to execute the requested action.

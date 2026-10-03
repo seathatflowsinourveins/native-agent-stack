@@ -1,0 +1,35 @@
+{
+ "layer_id": "cross:wsl-distro",
+ "title": "WSL2 base distribution",
+ "requirement": "The base Linux distribution for a new WSL2 instance on this Windows host (WSL 2.7.13, kernel 6.18), installed from a vendor image whose checksum can be verified, with systemd user services, current toolchains for Python 3.13, Node 24 and Rust, NVIDIA GPU access through WSL for an RTX 4090, and long-term security support.",
+ "a_deciding_comparison_would_measure": "A clean install of each candidate image with the project's bootstrap, then its first-boot, systemd, GPU and toolchain checks on the same host.",
+ "candidates": [
+  {
+   "key": "C01",
+   "name": "Ubuntu 26.04.1 LTS (Canonical WSL image)",
+   "repository": "https://ubuntu.com/download/server"
+  },
+  {
+   "key": "C02",
+   "name": "Ubuntu 24.04.5 LTS (Canonical WSL image)",
+   "repository": "https://ubuntu.com/download/server"
+  },
+  {
+   "key": "C03",
+   "name": "Debian 13 (WSL distribution)",
+   "repository": "https://github.com/microsoft/WSL/blob/master/distributions/DistributionInfo.json"
+  },
+  {
+   "key": "C04",
+   "name": "Arch Linux (WSL distribution)",
+   "repository": "https://github.com/microsoft/WSL/blob/master/distributions/DistributionInfo.json"
+  },
+  {
+   "key": "C05",
+   "name": "Fedora (WSL distribution)",
+   "repository": "https://github.com/microsoft/WSL/blob/master/distributions/DistributionInfo.json"
+  }
+ ],
+ "comparisons_on_record_where_every_named_arm_ran": [],
+ "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host."
+}

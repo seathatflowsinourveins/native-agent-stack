@@ -1,0 +1,170 @@
+{
+ "slot_id": "local-model-server",
+ "layer_id": "observation-inference",
+ "title": "Observation and optional inference",
+ "requirement": "Observe real native usage/service outcomes through one privacy-filtered local pipeline and qualify any optional model route on its actual workload.",
+ "slot_question": "Which single local model server does the new host install for the optional local inference route? State also whether it can serve embeddings to a code-search engine that needs an embedding endpoint, so that one server covers both roles.",
+ "a_deciding_comparison_would_measure": "Reconcile one real task across native counters and telemetry; qualify any new model route on actual output, privacy, latency and recovery without duplicate capture.",
+ "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host.",
+ "context": "The code-search slot is decided in the same round among SocratiCode (documented embedding providers: Ollama, OpenAI-compatible, Google, LM Studio, LiteLLM), semble and ColGREP (both embed in-process). The route is optional under the requirement: Claude Code and Codex keep their native model accounts.",
+ "comparisons_on_record_where_every_named_arm_ran": [],
+ "first_round": {
+  "reviewer_notes": [
+   {
+    "about": "llama.cpp [C13]",
+    "first_round_status": "selected",
+    "note": "Optional local inference route. Runs on CUDA on the RTX 4090 and on Metal on macOS arm64, where Apple silicon is first-class, with quantized models and CPU+GPU hybrid inference. llama-server exposes Anthropic /v1/messages and OpenAI /v1/responses for Claude Code and Codex, and exports Prometheus /metrics into the same pipeline.",
+    "cited_facts": [
+     {
+      "url": "https://github.com/ggml-org/llama.cpp/blob/master/README.md",
+      "shows": "Documented: 'Apple silicon is a first-class citizen' (Metal); custom CUDA kernels for NVIDIA GPUs; 1.5- to 8-bit quantization; 'CPU+GPU hybrid inference to partially accelerate models larger than the total VRAM capacity'. Install options: llama.app, Docker, release binaries or the build guide."
+     },
+     {
+      "url": "https://github.com/ggml-org/llama.cpp/blob/master/tools/server/README.md",
+      "shows": "Documented: OpenAI-compatible chat completions, responses and embeddings routes; an Anthropic Messages API at /v1/messages; Prometheus-compatible /metrics with --metrics; parallel slots, continuous batching and a prompt cache."
+     },
+     {
+      "url": "https://api.github.com/graphql",
+      "shows": "Observed 2026-10-01: release v0.5.0 on 2026-09-23 plus nightly b-builds. In 90 days: 1,480 commits, 1,266 issues closed and 1,476 PRs merged. License MIT."
+     }
+    ]
+   },
+   {
+    "about": "SGLang",
+    "first_round_status": "not selected",
+    "note": "Very active serving engine (v0.5.20, 2026-09-18; 4,459 commits in 90 days), optimized for agentic and large-scale workloads, with Apple Silicon support through Metal/MLX. RTX 40-series support is listed as 'select', the documented uv install needs --prerelease=allow, the README does not mention WSL2, and no measured comparison exists on this host. Should run in the engine comparison."
+   },
+   {
+    "about": "vllm",
+    "first_round_status": "not selected",
+    "note": "Leading NVIDIA serving engine (v0.30.0, 2026-09-22) with PagedAttention, continuous batching and prefix caching. It serves the OpenAI API and the Anthropic Messages API, and its docs cover running on Windows through WSL. It is the main alternative for concurrent agent traffic. It was ranked below llama.cpp because it needs a Python/CUDA stack and lists Apple Silicon only as a hardware plugin. No measured comparison on this host's workload separates the two."
+   },
+   {
+    "about": "ollama",
+    "first_round_status": "selected",
+    "note": "C03. Embedding service for SocratiCode, which uses it as its documented default provider (nomic-embed-text, 768 dimensions) and auto-detects it on :11434 with OLLAMA_MODE=auto. A native install is the documented way to use the NVIDIA GPU on the RTX 4090. semble does not need it.",
+    "cited_facts": [
+     {
+      "url": "https://github.com/ollama/ollama",
+      "shows": "documented (README 'Linux' and docs/api.md): installs on Linux with `curl -fsSL https://ollama.com/install.sh | sh`. Embeddings are served at `POST /api/embed`, which supersedes /api/embeddings."
+     },
+     {
+      "url": "https://docs.ollama.com/gpu",
+      "shows": "documented: supports NVIDIA GPUs with compute capability 5.0+ and driver 550 or newer; the RTX 4090 is listed at compute capability 8.9."
+     },
+     {
+      "url": "https://github.com/giancarloerra/SocratiCode",
+      "shows": "documented: SocratiCode's default EMBEDDING_PROVIDER is ollama, and OLLAMA_MODE=auto prefers a native Ollama. The README notes that Docker on macOS and Windows cannot use the GPU. not verified: whether the managed container gets GPU access under WSL2."
+     },
+     {
+      "url": "https://api.github.com/graphql (repository ollama/ollama, queried 2026-10-01)",
+      "shows": "observed now: v0.35.0 (2026-09-28). HEAD 1abe35e6e6 (2026-09-30), with 296 commits since 2026-07-03. The check on HEAD passed. MIT. macOS: the README documents a macOS download; not verified: Metal acceleration (absent from the pages fetched)."
+     }
+    ]
+   },
+   {
+    "about": "vLLM",
+    "first_round_status": "not selected",
+    "note": "A GPU inference server that can serve embedding models. SocratiCode's documented providers are ollama, openai, google, lmstudio and litellm, and semble and ColGREP embed in-process, so vLLM could only enter through an OpenAI-compatible path that none of these projects documents."
+   }
+  ],
+  "critic": {
+   "findings": [
+    "Every observed-now fact holds, including both native-client telemetry claims the pipeline depends on. Both clients have exporters off by default, prompt content redacted by default, and Claude Code's api_request events carry cache_read_tokens and cache_creation_tokens.",
+    "llama.cpp stays in the selection as the optional inference route only. The requirement makes the route optional, and the core pipeline (collector -> Prometheus/Loki -> Grafana) does not depend on it.",
+    "A gap in the reconciliation plan: Codex OTel metrics carry only counts and durations (codex.api_request, codex.tool.call and duration histograms). Codex token counts arrive only on codex.sse_event log events (response.completed). Reconciling one Codex task's tokens therefore has to use Loki events, not Prometheus. The judge's Prometheus role text ('codex.* counters') is accurate but does not spell this out.",
+    "Privacy-filter detail: codex.tool_result carries an output snippet. The redaction processor is alpha for logs and works on attribute allowlists, plus map-typed log bodies (README L224-238). The allowlist must be shown to drop these fields; that test belongs in the deciding comparison.",
+    "llama-server documents its Anthropic /v1/messages endpoint with 'no strong claims of compatibility', and tool use requires --jinja (server README L1599-1603). Claude Code through this route is therefore unqualified until tested. The route is optional under the requirement, and the llama.cpp vs vLLM vs SGLang choice has not been measured on this host. The core pipeline does not depend on that choice.",
+    "Phoenix: by default it collects basic web analytics (README L285-289; opt out with PHOENIX_TELEMETRY_ENABLED=false). That conflicts with 'one privacy-filtered local pipeline' unless the opt-out is set at install. Its experiments overlap the quality-evaluation layer's evaluators. License ELv2 (information only). These are findings, not grounds to reverse the pick: Phoenix is the only packet candidate that is both a trace sink and a dataset/experiment store, and OpenLIT would duplicate capture.",
+    "No reasoning from popularity or current use appears in the judgment."
+   ],
+   "checked_facts": [
+    {
+     "claim": "otelcol-contrib v0.162.0 released 2026-09-29 (contrib repo, and v0.162.0 in opentelemetry-collector-releases at 2026-09-29T12:34Z); 1418 contrib default-branch commits since 2026-07-03",
+     "url": "https://api.github.com/graphql",
+     "holds": true
+    },
+    {
+     "claim": "Redaction processor README: deletes span, log and metric datapoint attributes not on the allowed list (L4); stability alpha for logs and metrics, beta for traces (L11-12); hmac-sha256 and hmac-sha512 hash functions (L173); audit trail (L193); redaction of map-typed log bodies (L224-238)",
+     "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/processor/redactionprocessor/README.md",
+     "holds": true
+    },
+    {
+     "claim": "Claude Code monitoring docs: CLAUDE_CODE_ENABLE_TELEMETRY=1 with OTEL_METRICS_EXPORTER=otlp and OTEL_LOGS_EXPORTER=otlp to localhost:4317; OTEL_LOG_USER_PROMPTS disabled by default; api_request carries cache_read_tokens and cache_creation_tokens; span tracing is beta (CLAUDE_CODE_ENHANCED_TELEMETRY_BETA) and spans redact prompt and tool content by default",
+     "url": "https://code.claude.com/docs/en/monitoring-usage",
+     "holds": true
+    },
+    {
+     "claim": "Codex docs: OTel export disabled by default, opt in via [otel] with exporter otlp-http or otlp-grpc; log_user_prompt = false; events codex.api_request, codex.sse_event (token counts on response.completed) and codex.tool_result (output snippet); metrics are codex.api_request and codex.tool.call counters plus duration histograms",
+     "url": "https://developers.openai.com/codex/config-advanced",
+     "holds": true
+    },
+    {
+     "claim": "Prometheus v3.15.0 released 2026-09-25; 728 commits since 2026-07-03; flag --web.enable-otlp-receiver documented ('Enable API endpoint accepting OTLP write requests', default false)",
+     "url": "https://github.com/prometheus/prometheus/blob/main/docs/command-line/prometheus.md",
+     "holds": true
+    },
+    {
+     "claim": "Loki v3.7.8 released 2026-09-17; 1017 commits since 2026-07-03; AGPL-3.0",
+     "url": "https://api.github.com/graphql",
+     "holds": true
+    },
+    {
+     "claim": "Loki OTLP ingestion: the collector's otlphttp exporter writes to http://<loki-addr>/otlp; allow_structured_metadata must be true (enabled by default in Loki 3.0 and later)",
+     "url": "https://grafana.com/docs/loki/latest/send-data/otel/",
+     "holds": true
+    },
+    {
+     "claim": "Grafana v13.2.3 released 2026-09-29; 3341 commits since 2026-07-03",
+     "url": "https://api.github.com/graphql",
+     "holds": true
+    },
+    {
+     "claim": "Grafana OSS installs on Debian/Ubuntu as package 'grafana' from the APT repository 'https://apt.grafana.com stable main', after importing the GPG key to /etc/apt/keyrings/grafana.asc. The page names Grafana Enterprise as the recommended default edition",
+     "url": "https://grafana.com/docs/grafana/latest/setup-grafana/installation/debian/",
+     "holds": true
+    },
+    {
+     "claim": "llama.cpp: GitHub 'latest' release is v0.5.0 (2026-09-23), with daily b-builds marked prerelease (b11322 on 2026-10-01); 1481 commits since 2026-07-03. README: Apple silicon first-class (L58), custom CUDA kernels (L62), CPU+GPU hybrid inference (L64). Server README: /v1/messages (L1597), /v1/responses (L1461), --metrics and /metrics (L222, L1122)",
+     "url": "https://github.com/ggml-org/llama.cpp/blob/master/tools/server/README.md",
+     "holds": true
+    },
+    {
+     "claim": "Phoenix: arize-phoenix-v20.18.0 and @arizeai/phoenix-mcp@4.3.15 released 2026-09-30; 1209 commits since 2026-07-03. README: web analytics collected by default, opt out with PHOENIX_TELEMETRY_ENABLED=false (L285-289); Elastic License 2.0 (L315); pip install arize-phoenix and phoenix serve (L86-87)",
+     "url": "https://github.com/Arize-ai/phoenix/blob/main/README.md",
+     "holds": true
+    }
+   ],
+   "deciding_comparison": "I endorse the judge's comparison and add three checks. (a) Reconcile one Codex task's tokens through Loki codex.sse_event records, because Codex metrics carry no token counts, and one Claude Code task through both Prometheus and Loki. (b) Show that the redaction allowlist removes prompt and tool content, including the codex.tool_result output snippet and map bodies, before anything reaches Loki or Phoenix, with Phoenix analytics disabled. (c) Qualify Claude Code through llama-server /v1/messages with --jinja tool use before treating the route as usable. Then compare llama.cpp (CUDA), vLLM and SGLang at matched quantization on the RTX 4090 under WSL2, measuring task outcome, TTFT, tokens/s at real agent concurrency, VRAM headroom and restart recovery."
+  },
+  "evidence_gaps": [
+   "No measured comparison of llama.cpp, vLLM and SGLang exists on an RTX 4090 under WSL2 for the actual Claude Code and Codex workload. The third-party benchmark pages that web search returned were not fetched, and their own summary reports inconsistent numbers.",
+   "The redaction processor is alpha for logs and metrics, and beta only for traces.",
+   "Not verified whether Phoenix renders Claude Code's beta traces or Codex spans, which are not OpenInference-format, usefully. Also unknown whether redacted native telemetry carries enough content to qualify routes; a curated replay dataset may be required.",
+   "SGLang's support for WSL2 is not verified. For llama.cpp, prebuilt Linux CUDA binaries are not verified (the v0.5.0 release has one asset); building from source is documented.",
+   "OpenLIT's telemetry defaults were not checked. Phoenix and AgentsView have default telemetry that can be turned off, per their READMEs."
+  ]
+ },
+ "finalists": [
+  {
+   "key": "F2",
+   "name": "ollama",
+   "repository": "https://github.com/ollama/ollama"
+  },
+  {
+   "key": "F3",
+   "name": "SGLang",
+   "repository": "https://github.com/sgl-project/sglang"
+  },
+  {
+   "key": "F4",
+   "name": "vllm",
+   "repository": "https://github.com/vllm-project/vllm"
+  },
+  {
+   "key": "F1",
+   "name": "llama.cpp optional inference",
+   "repository": "https://github.com/ggml-org/llama.cpp"
+  }
+ ]
+}

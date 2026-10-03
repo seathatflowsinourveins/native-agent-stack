@@ -259,8 +259,9 @@ class PinsSchemaTests(unittest.TestCase):
     MAC_PIN_LAGS_LINUX = {
         "ai-memory": ("2.3.2", "2.4.1", "evidence/receipts/ai-memory-241-qualification-20260925.json"),
         "mcporter": ("0.13.13", "0.14.1", "evidence/receipts/mcporter-0141-qualification-20260925.json"),
-        # Linux switched 2026-09-26; the Mac keeps 0.155.1 until its own qualification (the receipt's limitation).
-        "codex": ("0.155.1", "0.157.1", "evidence/receipts/codex-01571-qualification-20260926.json"),
+        # Linux moved to 0.159.3 on 2026-10-01; the Mac keeps 0.155.1 until its own
+        # qualification (the receipts' limitations).
+        "codex": ("0.155.1", "0.159.3", "evidence/receipts/codex-01593-native-queue-20261001.json"),
         # Linux moved 2026-09-27 (cooldown waived by the user); the Mac keeps 1.14.0 until its own qualification.
         "socraticode": ("1.14.0", "1.15.0", "evidence/receipts/socraticode-1150-qualification-20260927.json"),
     }

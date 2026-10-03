@@ -1,0 +1,81 @@
+{
+ "schema": "token-e2e-calibration/1",
+ "template": "T18",
+ "clauses": [
+  "Object/dictionary output keys are sorted; array order is not sorted by this option."
+ ],
+ "sources": [
+  {
+   "label": "documentation facts (frozen captures)",
+   "text": "allow_nan_false_valueerror: True; ensure_ascii_default_true: True; ensure_ascii_escapes_non_ascii: True; jsondecodeerror_invalid_document: True; loads_bytes_bytearray: True; read_text_signature: encoding=None, errors=None, newline=None; sort_keys_sorts_dicts: True"
+  }
+ ],
+ "controls": [
+  {
+   "id": "ref",
+   "kind": "reference",
+   "answer": "According to the documentation: If sort_keys is true (default: False), then the output of dictionaries will be sorted by key.\n\nSource excerpt: allow_nan_false_valueerror: True; ensure_ascii_default_true: True; ensure_ascii_escapes_non_ascii: True; jsondecodeerror_invalid_document: True; loads_bytes_bytearray: True; read_text_signature: encoding=None, errors=None, newline=None; sort_keys_sorts_dicts: True",
+   "evidence": [],
+   "expected": {
+    "c1": true
+   }
+  },
+  {
+   "id": "para",
+   "kind": "paraphrased",
+   "answer": "sort_keys=True orders the keys of every JSON object alphabetically in the output; the order of the items in lists is left exactly as it was given.",
+   "evidence": [],
+   "expected": {
+    "c1": true
+   }
+  },
+  {
+   "id": "wrong-1",
+   "kind": "wrong",
+   "answer": "sort_keys sorts arrays too, so the list elements come out in ascending order.",
+   "evidence": [],
+   "expected": {
+    "c1": false
+   }
+  },
+  {
+   "id": "wrong-2",
+   "kind": "wrong",
+   "answer": "With sort_keys set nothing is reordered: dictionaries keep their insertion order in the output.",
+   "evidence": [],
+   "expected": {
+    "c1": false
+   }
+  }
+ ],
+ "extraction_controls": [
+  {
+   "id": "x-inline",
+   "component": "payload",
+   "answer": "Here is the table as JSON: [{\"id\":1,\"name\":\"a\"},{\"id\":2,\"name\":\"b\"}] which keeps every field.",
+   "evidence": [],
+   "expected": {
+    "values": [
+     "[{\"id\":1,\"name\":\"a\"},{\"id\":2,\"name\":\"b\"}]"
+    ],
+    "answer_quotes": [
+     "[{\"id\":1,\"name\":\"a\"},{\"id\":2,\"name\":\"b\"}]"
+    ]
+   }
+  },
+  {
+   "id": "x-toon",
+   "component": "payload",
+   "answer": "The compact form of the rows is:\n[2]{id,name}:\n  1,a\n  2,b\nThat is all of them.",
+   "evidence": [],
+   "expected": {
+    "values": [
+     "[2]{id,name}:\n  1,a\n  2,b"
+    ],
+    "answer_quotes": [
+     "[2]{id,name}:\n  1,a\n  2,b"
+    ]
+   }
+  }
+ ]
+}

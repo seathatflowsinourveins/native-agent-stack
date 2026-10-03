@@ -1,0 +1,268 @@
+{
+ "excluded": [
+  "broker order ids",
+  "ledger path",
+  "account fingerprint",
+  "cash balances"
+ ],
+ "intents": [
+  {
+   "average_price": "14.94",
+   "client_id": "mvr-mover-mac-20260924c-0000001",
+   "fill_vs_quote_bps": "0.00",
+   "filled_qty": "13",
+   "limit_price": "15.01",
+   "observed": [
+    {
+     "at": "2026-09-24T18:52:09.811+00:00",
+     "average_price": null,
+     "filled_qty": "0",
+     "status": "pending_new"
+    },
+    {
+     "at": "2026-09-24T18:52:09.815+00:00",
+     "average_price": null,
+     "filled_qty": "0",
+     "status": "new"
+    },
+    {
+     "at": "2026-09-24T18:52:10.050+00:00",
+     "average_price": "14.94",
+     "filled_qty": "13",
+     "status": "filled"
+    }
+   ],
+   "priced_on": {
+    "ask": "14.94"
+   },
+   "qty": "13",
+   "reserved_at": "2026-09-24T18:52:09.755+00:00",
+   "side": "buy",
+   "status": "filled",
+   "submit_attempted": true,
+   "symbol": "GRML"
+  },
+  {
+   "average_price": "2.97",
+   "client_id": "mvr-mover-mac-20260924c-0000002",
+   "fill_vs_quote_bps": "0.00",
+   "filled_qty": "67",
+   "limit_price": "2.98",
+   "observed": [
+    {
+     "at": "2026-09-24T18:52:11.129+00:00",
+     "average_price": null,
+     "filled_qty": "0",
+     "status": "pending_new"
+    },
+    {
+     "at": "2026-09-24T18:52:11.152+00:00",
+     "average_price": null,
+     "filled_qty": "0",
+     "status": "new"
+    },
+    {
+     "at": "2026-09-24T18:52:11.534+00:00",
+     "average_price": "2.97",
+     "filled_qty": "67",
+     "status": "filled"
+    }
+   ],
+   "priced_on": {
+    "ask": "2.97"
+   },
+   "qty": "67",
+   "reserved_at": "2026-09-24T18:52:11.064+00:00",
+   "side": "buy",
+   "status": "filled",
+   "submit_attempted": true,
+   "symbol": "PFSA"
+  },
+  {
+   "average_price": "5.29",
+   "client_id": "mvr-mover-mac-20260924c-0000003",
+   "fill_vs_quote_bps": "0.00",
+   "filled_qty": "37",
+   "limit_price": "5.31",
+   "observed": [
+    {
+     "at": "2026-09-24T18:52:24.850+00:00",
+     "average_price": null,
+     "filled_qty": "0",
+     "status": "pending_new"
+    },
+    {
+     "at": "2026-09-24T18:52:24.889+00:00",
+     "average_price": null,
+     "filled_qty": "0",
+     "status": "new"
+    },
+    {
+     "at": "2026-09-24T18:52:26.004+00:00",
+     "average_price": "5.29",
+     "filled_qty": "32",
+     "status": "partially_filled"
+    },
+    {
+     "at": "2026-09-24T18:52:26.764+00:00",
+     "average_price": "5.29",
+     "filled_qty": "33",
+     "status": "partially_filled"
+    },
+    {
+     "at": "2026-09-24T18:52:27.242+00:00",
+     "average_price": "5.29",
+     "filled_qty": "37",
+     "status": "filled"
+    }
+   ],
+   "priced_on": {
+    "ask": "5.29"
+   },
+   "qty": "37",
+   "reserved_at": "2026-09-24T18:52:24.794+00:00",
+   "side": "buy",
+   "status": "filled",
+   "submit_attempted": true,
+   "symbol": "APUS"
+  },
+  {
+   "average_price": "32.25",
+   "client_id": "mvr-mover-mac-20260924c-0000004",
+   "fill_vs_quote_bps": "0.00",
+   "filled_qty": "6",
+   "limit_price": "32.41",
+   "observed": [
+    {
+     "at": "2026-09-24T18:52:28.772+00:00",
+     "average_price": null,
+     "filled_qty": "0",
+     "status": "pending_new"
+    },
+    {
+     "at": "2026-09-24T18:52:28.778+00:00",
+     "average_price": null,
+     "filled_qty": "0",
+     "status": "new"
+    },
+    {
+     "at": "2026-09-24T18:52:29.565+00:00",
+     "average_price": "32.25",
+     "filled_qty": "2",
+     "status": "partially_filled"
+    },
+    {
+     "at": "2026-09-24T18:52:30.057+00:00",
+     "average_price": "32.25",
+     "filled_qty": "4",
+     "status": "partially_filled"
+    },
+    {
+     "at": "2026-09-24T18:52:30.904+00:00",
+     "average_price": "32.25",
+     "filled_qty": "6",
+     "status": "filled"
+    }
+   ],
+   "priced_on": {
+    "ask": "32.25"
+   },
+   "qty": "6",
+   "reserved_at": "2026-09-24T18:52:28.718+00:00",
+   "side": "buy",
+   "status": "filled",
+   "submit_attempted": true,
+   "symbol": "SRZN"
+  },
+  {
+   "average_price": null,
+   "client_id": "mvr-mover-mac-20260924c-0000005",
+   "fill_vs_quote_bps": null,
+   "filled_qty": "0",
+   "limit_price": "14.98",
+   "observed": [],
+   "priced_on": {
+    "bid": "15.05"
+   },
+   "qty": "13",
+   "reserved_at": "2026-09-24T20:01:26.787+00:00",
+   "side": "sell",
+   "status": "reserved",
+   "submit_attempted": true,
+   "symbol": "GRML"
+  }
+ ],
+ "kind": "mover_ledger_readback",
+ "legs": [
+  {
+   "bought_qty": "37",
+   "cost_usd": "195.73",
+   "flat": false,
+   "orders": [
+    "mvr-mover-mac-20260924c-0000003"
+   ],
+   "proceeds_usd": "0",
+   "realized_pnl_usd": null,
+   "sold_qty": "0",
+   "symbol": "APUS"
+  },
+  {
+   "bought_qty": "13",
+   "cost_usd": "194.22",
+   "flat": false,
+   "orders": [
+    "mvr-mover-mac-20260924c-0000001",
+    "mvr-mover-mac-20260924c-0000005"
+   ],
+   "proceeds_usd": "0",
+   "realized_pnl_usd": null,
+   "sold_qty": "0",
+   "symbol": "GRML"
+  },
+  {
+   "bought_qty": "67",
+   "cost_usd": "198.99",
+   "flat": false,
+   "orders": [
+    "mvr-mover-mac-20260924c-0000002"
+   ],
+   "proceeds_usd": "0",
+   "realized_pnl_usd": null,
+   "sold_qty": "0",
+   "symbol": "PFSA"
+  },
+  {
+   "bought_qty": "6",
+   "cost_usd": "193.50",
+   "flat": false,
+   "orders": [
+    "mvr-mover-mac-20260924c-0000004"
+   ],
+   "proceeds_usd": "0",
+   "realized_pnl_usd": null,
+   "sold_qty": "0",
+   "symbol": "SRZN"
+  }
+ ],
+ "requests": {
+  "submit": {
+   "at": [
+    "2026-09-24T18:52:09.760+00:00",
+    "2026-09-24T18:52:11.065+00:00",
+    "2026-09-24T18:52:24.797+00:00",
+    "2026-09-24T18:52:28.720+00:00",
+    "2026-09-24T20:01:26.789+00:00"
+   ],
+   "count": 5
+  }
+ },
+ "schema_version": 1,
+ "totals": {
+  "all_legs_flat": false,
+  "filled_intents": 4,
+  "intents": 5,
+  "realized_pnl_usd": "0"
+ },
+ "trial_id": "mover-mac-20260924c",
+ "trial_started_at": "2026-09-24T18:52:08.244+00:00"
+}

@@ -1,0 +1,1391 @@
+{
+ "jobs": [
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-30T05:45:48Z",
+   "finished": "2026-09-30T06:29:46Z",
+   "usage": {
+    "input_tokens": 3293543,
+    "cached_input_tokens": 3137792,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 48649,
+    "reasoning_output_tokens": 25913
+   },
+   "usage_status": "reported",
+   "limit": false,
+   "model": "cx/gpt-6.1-sol",
+   "effort": "max",
+   "codex_version": "codex-cli 0.159.2",
+   "attempts": [],
+   "lane": "sol",
+   "job": "R1",
+   "stderr_tail": "Reading additional input from stdin...\n",
+   "review": {
+    "verdict": "changes-needed",
+    "summary": "The standard controls, mutants, tmux probes and 237-test suite pass, but additional synthetic inputs expose an unrecoverable settings update during backup, two signal cleanup gaps, and two ineffective probe checks. The new backup-mode control also fails under umask 077, and the review README reports the wrong pool-point count. All executable checks ran in disposable scratch copies with synthetic homes.",
+    "claims_checked": [
+     {
+      "claim": "The checkout is PR head 9e55a1036c61, and 72 files differ from b4056a35.",
+      "result": "confirmed",
+      "source": "rtk git -C CHECKOUT rev-parse HEAD returned 9e55a1036c61d3b7936649d202d664618afa3333; the requested diff --stat reported 72 files."
+     },
+     {
+      "claim": "The runner records contain nine successful jobs at cx/gpt-6.1-sol/max, 46 findings, the stated severity counts and 41 reviewer-tested findings.",
+      "result": "confirmed",
+      "source": "Scratch calculations over results.json: nine done/exit-0 jobs; model/effort cx/gpt-6.1-sol/max; 3 high, 34 medium, 9 low; tested=true for 41 findings. This verifies the recorded counters, not the unobservable outbound provider effort."
+     },
+     {
+      "claim": "Recorded usage totals are 24.47M input tokens, 95.0% cache reads, 0.36M output, approximately 71 minutes and four observed pool points.",
+      "result": "confirmed",
+      "source": "Summing results.json job usage produced input=24470302, cached_input=23242624, output=360897; cache share rounded to 95.0%; timestamp span=71.1167 minutes. Receipt pool counters were 7 and 11."
+     },
+     {
+      "claim": "Verification records contain 23 grades: 17 confirmed, 4 partly and 2 refuted, with 11 duplicates and 12 coordinator checks.",
+      "result": "confirmed",
+      "source": "Scratch calculations over verification.json and findings.json confirmed these counts; dispositions were 39 repaired, 2 refuted, 3 removed and 2 kept."
+     },
+     {
+      "claim": "Identical command hooks run once, and terminal permission notifications are timed by inactivity.",
+      "result": "unverifiable",
+      "source": "The two earlier refutations were not reopened. No fresh check of the installed 2.1.285 implementation or official hooks reference was performed for this lens. Version-matched primary implementation evidence would settle these claims."
+     },
+     {
+      "claim": "tmux 3.4 emits three synchronized-output pairs when xterm*:sync is declared and none without it.",
+      "result": "confirmed",
+      "source": "Fresh scratch execution of tmux_sync_probe.py returned exit 0, declared=(3,3), plain=(0,0); installed tmux -V returned tmux 3.4."
+     },
+     {
+      "claim": "The settings tool passes 24 controls and the declared mutant failure sets.",
+      "result": "confirmed",
+      "source": "Fresh scratch runs returned '24 cases, 0 problems' and '15 runs, 0 problems'. The latter comprises the unmutated baseline plus 14 mutants."
+     },
+     {
+      "claim": "The reader has eight tests and seven mutants with the specified failure sets.",
+      "result": "confirmed",
+      "source": "Fresh scratch scan_reader_mutants.py run reported eight tests for each mutant and '7 mutants, 0 problems'. No installed release binary was read."
+     },
+     {
+      "claim": "Both probe selftests pass normally, and the handler-less end-to-end mutant fails.",
+      "result": "confirmed",
+      "source": "With synthetic HOME/code/native-agent-stack directories, both normal selftests exited 0. Calling signal_case on handler-less copies returned 1 for both probes, with private directory and stand-in client remaining."
+     },
+     {
+      "claim": "The end-to-end SIGTERM check proves that a running stand-in client was terminated.",
+      "result": "contradicted",
+      "source": "Complete selftests of pre-client-crash mutants exited 0 with all 38/33 PASS lines. An unrelated process containing the numeric marker also caused a false failure."
+     },
+     {
+      "claim": "SIGTERM and SIGHUP always remove private payloads and stop the client.",
+      "result": "contradicted",
+      "source": "Signals immediately after Popen left the client running in both probes. SIGTERM at directory-deletion entry left events.log behind in both probes."
+     },
+     {
+      "claim": "The repaired alert probe distinguishes a quiet control, a BEL-emitting control and a missing observation point by exit statuses 0, 1 and 2.",
+      "result": "confirmed",
+      "source": "Fresh stand-in CLI controls returned 0 without BEL and 1 with BEL; the selftest's missing-observation cases returned 2."
+     },
+     {
+      "claim": "The derived push probe also rejects a hooks-disabled control that observes BEL.",
+      "result": "contradicted",
+      "source": "Fresh stand-in push_notification_probe.py ask --control run counted one post-dialog BEL and exited 0."
+     },
+     {
+      "claim": "BelCounter preserves decoder state across split UTF-8 input and handles the tested valid C1, invalid-byte, overlong-sequence and replacement-character cases.",
+      "result": "confirmed",
+      "source": "Each probe passed 50 additional two-way-split checks across eight vectors. The pinned parser says 'we ignore these characters by default.' [Windows Terminal v1.24.11911.0 stateMachine.cpp](https://raw.githubusercontent.com/microsoft/terminal/v1.24.11911.0/src/terminal/parser/stateMachine.cpp). The tagged decoder source uses CP_UTF8 conversion: [u8u16convert.h](https://raw.githubusercontent.com/microsoft/terminal/v1.24.11911.0/src/inc/til/u8u16convert.h). These checks cover the default AcceptC1-off behavior."
+     },
+     {
+      "claim": "The existing after-merge and before-backup injections preserve the other writer's save.",
+      "result": "confirmed",
+      "source": "The original 24-control suite passed both declared concurrent-writer cases. Those cases inject before backup source capture."
+     },
+     {
+      "claim": "An atomic save while backup copying is in progress is refused and retained.",
+      "result": "contradicted",
+      "source": "The added atomic-rename interleaving produced tool exit 0, stale live settings and a stale backup. The scratch variant of the existing during-backup control failed."
+     },
+     {
+      "claim": "The backup necessarily contains an edit made after the second comparison and before replacement.",
+      "result": "contradicted",
+      "source": "A separate scratch interposition immediately before atomic_write saved a new model value; the tool exited 0 and both installed file and backup contained the original model. The acknowledged final race was not reported independently; its recovery claim is false."
+     },
+     {
+      "claim": "The installed file and backup retain mode 0640 independently of shell umask.",
+      "result": "contradicted",
+      "source": "With umask 077, the installed file was 0640 and backup 0600; the new mode control failed."
+     },
+     {
+      "claim": "Existing backup files and backup-name symlinks are not overwritten.",
+      "result": "confirmed",
+      "source": "Synthetic runs preserved a pre-existing backup and a symlink's decoy content, creating another backup name and exiting 0."
+     },
+     {
+      "claim": "An unwritable settings directory and non-object top-level hooks are refused without changing settings.",
+      "result": "confirmed",
+      "source": "Synthetic directory mode 0500 produced exit 1/PermissionError with unchanged settings and no backup. hooks=[] produced exit 1 with 'the Notification hooks are not a list of groups'."
+     },
+     {
+      "claim": "A hard-linked settings target is replaced at its named path while the other link retains the original contents.",
+      "result": "confirmed",
+      "source": "Synthetic hard-link run exited 0; alias bytes remained original and the installed target had a separate inode/link."
+     },
+     {
+      "claim": "Two concurrent runs of the same tool preserve original backups and produce the intended final settings.",
+      "result": "confirmed",
+      "source": "A scratch barrier held both runs immediately before atomic_write. Both exited 0; two backups contained original bytes; the final model and Notification group were correct."
+     },
+     {
+      "claim": "The observed group-ownership change is introduced by this PR.",
+      "result": "contradicted",
+      "source": "Synthetic group-owned 0640 files changed group ownership identically under the base and head tools. This inherited behavior was excluded from findings."
+     },
+     {
+      "claim": "Ownership is preserved when the tool runs against a settings file owned by another UID.",
+      "result": "unverifiable",
+      "source": "The available execution identity could not create a different-UID-owned fixture. A controlled multi-UID scratch test would settle this; no real user's settings were inspected."
+     },
+     {
+      "claim": "The five affected modules pass their 237-test suite.",
+      "result": "confirmed",
+      "source": "Fresh scratch unittest execution returned 'Ran 237 tests ... OK (skipped=2)'. The recorded run says skipped=1; isolating HOME additionally made the installed-Claude-binary case unavailable."
+     },
+     {
+      "claim": "The native colour rerun reproduces the earlier counts with the corrected SGR-only counter.",
+      "result": "unverifiable",
+      "source": "recorded/color_capture.txt was inspected and contains the stated colour counts, but no fresh interactive Claude session was run. An authorized native pty rerun would settle reproducibility."
+     },
+     {
+      "claim": "All new receipt script, record-file and recorded-output SHA-256 values match the checkout.",
+      "result": "confirmed",
+      "source": "Scratch hashlib checks matched 7 script hashes, 4 record-file hashes and 27 recorded-output hashes, with no missing paths or mismatches."
+     },
+     {
+      "claim": "The review README agrees with the receipt's pool-point count.",
+      "result": "contradicted",
+      "source": "README says three; receipt counters [7,11] give four, matching the decision record."
+     },
+     {
+      "claim": "The broader Windows Terminal, sound and login-shell source-review statements are established by this focused review.",
+      "result": "unverifiable",
+      "source": "Their full primary-source audit was outside this behavior lens. No live Windows Terminal, interactive Claude session or live overlay/settings check was performed. The relevant pinned vendor sources and separately authorized native observations would settle the remaining claims."
+     }
+    ],
+    "commands_run": [
+     "rtk git -C CHECKOUT rev-parse HEAD",
+     "rtk git -C CHECKOUT diff --stat b4056a35 HEAD",
+     "rtk git -C CHECKOUT diff b4056a35 HEAD -- ART/notification-types-20260929/replace_bell_group.py",
+     "rtk git -C CHECKOUT diff b4056a35 HEAD -- ART/notification-types-20260929/replace_bell_group_controls.py",
+     "rtk git -C CHECKOUT diff b4056a35 HEAD -- ART/notification-types-20260929/replace_bell_group_mutants.py",
+     "rtk git -C CHECKOUT diff b4056a35 HEAD -- ART/notification-types-20260929/concurrent_writer_harness.py",
+     "rtk git -C CHECKOUT diff b4056a35 HEAD -- ART/notification-types-20260929/tmux_bell_probe.py",
+     "rtk git -C CHECKOUT diff b4056a35 HEAD -- ART/notification-types-20260929/push_notification_probe.py",
+     "rtk git -C CHECKOUT diff b4056a35 HEAD -- ART/terminal-experience-20260928/alert_probe.py",
+     "rtk git -C CHECKOUT diff b4056a35 HEAD -- ART/notification-types-20260929/README.md",
+     "rtk cat, rtk sed, rtk rg and rtk wc reads of AGENTS.md, scoped scripts and READMEs, apply_claude_settings.py, affected tests, the decision record and receipts",
+     "ctx_execute scratch setup and teardown for executable checks: D=$(rtk mktemp -d <scratch>); rtk cp -r CHECKOUT/. \"$D\"/; checks; rtk rm -rf \"$D\"",
+     "rtk python3 -B replace_bell_group_controls.py D",
+     "rtk python3 -B replace_bell_group_mutants.py D",
+     "rtk python3 -B scan_reader_mutants.py D",
+     "rtk python3 -B alert_probe.py --selftest and rtk python3 -B push_notification_probe.py --selftest, with synthetic HOME",
+     "rtk python3 -B tmux_bell_probe.py --selftest",
+     "rtk tmux -V; scratch rtk python3 -B tmux_bell_probe.py; scratch rtk python3 -B tmux_sync_probe.py",
+     "rtk python3 -B - D: synthetic settings cases for late writers, umask 077, existing backups, hard links, unwritable directories and malformed hooks",
+     "rtk python3 -B atomic_writer_during_backup.py replace_bell_group.py D",
+     "rtk python3 -B replace_bell_group_controls.py D with the scratch at-backup harness changed to atomically replace the live file after its backup source opened",
+     "rtk python3 -B replace_bell_group_controls.py D with subprocess umask 077",
+     "rtk python3 -B - D: SIGTERM/SIGHUP line-trace injections after client spawn",
+     "rtk python3 -B runner.py PROBE: SIGTERM injection at private-directory deletion",
+     "rtk python3 -B alert_probe_preclient_crash.py --selftest and rtk python3 -B push_notification_probe_preclient_crash.py --selftest",
+     "rtk python3 -B - D: handler-less signal_case mutants and unrelated-process marker test",
+     "rtk python3 -B alert_probe.py ask --control and rtk python3 -B push_notification_probe.py ask --control, with quiet and BEL-emitting stand-ins",
+     "rtk python3 -B - D: UTF-8 split-vector checks",
+     "rtk python3 -B concurrent_tool.py ROLE replace_bell_group.py D, two concurrent scratch processes",
+     "rtk proxy git -C CHECKOUT show b4056a35:ART/notification-types-20260929/replace_bell_group.py; scratch base/head group-ownership comparison",
+     "rtk python3 -B -m unittest tests.test_adoption_status tests.test_windows_terminal_defaults tests.test_adoption_docs_consistency tests.test_render_config tests.test_apply_claude_settings",
+     "rtk python3 -B - D: runner/verification totals, elapsed-time calculation, receipt hashes and exact line extraction",
+     "ctx_fetch_and_index: web search, Windows Terminal v1.24.11911.0 parser/tree/decoder sources, Python os.open documentation and Microsoft MultiByteToWideChar documentation; unsuccessful guessed decoder paths were corrected using the tagged tree",
+     "ctx_fetch_and_index: public PR #532 metadata, comments and reviews; ctx_search for limitations and residuals",
+     "rtk git -C D config --get remote.origin.url, processed to print only the public GitHub repository path"
+    ],
+    "finding_count": 7
+   }
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-30T05:46:03Z",
+   "finished": "2026-09-30T06:23:58Z",
+   "usage": {
+    "input_tokens": 4165591,
+    "cached_input_tokens": 3968256,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 41354,
+    "reasoning_output_tokens": 20062
+   },
+   "usage_status": "reported",
+   "limit": false,
+   "model": "cx/gpt-6.1-sol",
+   "effort": "max",
+   "codex_version": "codex-cli 0.159.2",
+   "attempts": [],
+   "lane": "sol",
+   "job": "R2",
+   "stderr_tail": "Reading additional input from stdin...\n",
+   "review": {
+    "verdict": "changes-needed",
+    "summary": "Found six medium defects in the repaired readers and controls, plus one low accounting inconsistency. The requested unit suite ran 237 tests successfully with two skips. The shipped selftests, 24 replacement controls, 15 replacement mutant runs, seven reader mutants and native tmux synchronization probe passed. Additional inputs and mutations nevertheless exposed false successful scans, incorrect PATH measurements, SGR misclassification and controls that accept broken implementations. Live settings, interactive client observations and the unavailable practice repository remain unverified.",
+    "claims_checked": [
+     {
+      "claim": "The recorded nine jobs used the stated model and effort and returned 46 findings with the stated usage totals.",
+      "result": "confirmed",
+      "source": "Aggregated results.json and the new receipt: all nine jobs record exit 0, cx/gpt-6.1-sol and max; 3 high, 34 medium, 9 low; 41 tested findings; 24,470,302 input, 23,242,624 cached input and 360,897 output tokens. Cache share is 94.98%; recorded timestamps span 71.12 minutes. This confirms recorded accounting."
+     },
+     {
+      "claim": "The artifact README's pool consumption matches the receipt.",
+      "result": "contradicted",
+      "source": "README lines 17–18 report three points; receipt before/after values are [7,11], a difference of four."
+     },
+     {
+      "claim": "The verification records contain 23 grades, 11 duplicates and 12 coordinator checks.",
+      "result": "confirmed",
+      "source": "Aggregated findings.json and verification.json: 17 confirmed, four partly, two refuted; 11 duplicate rows; 12 coordinator checks; dispositions total 39 repaired, two refuted, three removed and two kept."
+     },
+     {
+      "claim": "The verifier's independence and historical model executions are independently established.",
+      "result": "unverifiable",
+      "source": "The committed records are internally consistent, but the README says private event streams and verifier transcripts were not retained. Sanitized runner provenance and verifier execution records would settle independence and execution provenance."
+     },
+     {
+      "claim": "The terminal permission notification is timed by inactivity, with different Agent SDK timing.",
+      "result": "confirmed",
+      "source": "[Official hooks reference](https://code.claude.com/docs/en/hooks.md), freshly fetched 2026-09-30, says each keystroke defers the terminal timer and documents the SDK's fixed-delay behavior. The earlier refutation was not reopened."
+     },
+     {
+      "claim": "Identical command hooks execute once in the installed client.",
+      "result": "unverifiable",
+      "source": "The refuted disposition remains preserved and was not reopened. No live Claude Code hook session was run. A scoped installed-binary execution-path citation or sanitized native duplicate-hook control would independently settle the behavior."
+     },
+     {
+      "claim": "tmux 3.4 emits three synchronized-output pairs when sync is declared and none otherwise.",
+      "result": "confirmed",
+      "source": "Ran tmux_sync_probe.py in scratch: tmux 3.4, declared (3,3), negative control (0,0), exit 0. Also fetched tty-features.c at tmux tags 3.4 and 3.6."
+     },
+     {
+      "claim": "The replacement tool's 24 controls and 15 mutant runs pass their declared expectations.",
+      "result": "confirmed",
+      "source": "Ran replace_bell_group_controls.py: 24 cases, zero problems. Completed replace_bell_group_mutants.py: 15 runs, zero problems. An initial 12-second mutant attempt timed out and was superseded by the completed run."
+     },
+     {
+      "claim": "The reader's eight tests and seven shipped mutants pass.",
+      "result": "confirmed",
+      "source": "The requested unit suite passed ScanReaderTests. scan_reader_mutants.py ran eight tests per mutant and reported seven mutants, zero problems."
+     },
+     {
+      "claim": "The repaired reader fails closed on scoped or nested catalog constructions.",
+      "result": "contradicted",
+      "source": "Three adversarial synthetic bundles returned exit 0 while omitting or incorrectly resolving catalog data; Node evaluation independently confirmed the scoped fixture contains brand_new_type."
+     },
+     {
+      "claim": "The three installed release binaries resolve to 17 matcher values.",
+      "result": "confirmed",
+      "source": "Scanned installed 2.1.283, 2.1.284 and 2.1.285 binaries: each exited 0, resolved a 15-item base, reported 17 matcher values and no unknown types. Installed --version reported 2.1.285."
+     },
+     {
+      "claim": "The pty selftests exercise SIGTERM cleanup and reject a handler-less implementation.",
+      "result": "confirmed",
+      "source": "Created only a temporary expected working directory and ran both complete selftests with their stand-in clients: exit 0 and end-to-end cleanup PASS. Called each handler-less mutant's isolated signal_case: result 1, private directory retained and stand-in alive. Stand-ins were then terminated. Removing handlers during the entire selftest instead exits 143 in an earlier signal fixture; that was not counted as the end-to-end result."
+     },
+     {
+      "claim": "The recorded corrected color totals match the earlier receipt.",
+      "result": "confirmed",
+      "source": "Compared recorded/color_capture.txt with terminal-experience-20260928.json: 37+4=41 palette counts and 39+6=45 truecolor counts, with the opposite class zero."
+     },
+     {
+      "claim": "The historical native color rerun is independently reproduced.",
+      "result": "unverifiable",
+      "source": "A live interactive Claude Code capture was skipped as requested. Sanitized contemporaneous capture bytes would permit recounting without another interactive session."
+     },
+     {
+      "claim": "The repaired SGR counter correctly distinguishes colors for empty parameters and colon subparameters.",
+      "result": "contradicted",
+      "source": "Direct sgr_counts fixtures misclassified canonical colon truecolor as basic color or no color. Compared behavior with [Windows Terminal v1.24.11911.0 dispatch source](https://raw.githubusercontent.com/microsoft/terminal/v1.24.11911.0/src/terminal/adapter/adaptDispatchGraphics.cpp), fetched 2026-09-30."
+     },
+     {
+      "claim": "The requested five affected unit modules pass.",
+      "result": "confirmed",
+      "source": "Ran the exact requested unittest module list in a private copy with a temporary HOME: Ran 237 tests in 29.026 seconds, OK, skipped=2."
+     },
+     {
+      "claim": "The login controls and strengthened bash oracle pass.",
+      "result": "confirmed",
+      "source": "login_shell_check_controls.py reported nine cases as expected. login_shell_bash_truth.py checked 512 combinations with zero mismatches, observed the FIFO block and three filesystem-error cases, and recorded 26 negative-control disagreements. A healthy .bash_profile beside an unreadable .bash_login also passed."
+     },
+     {
+      "claim": "The repaired PATH measurement remains correct when startup files print before the probe.",
+      "result": "contradicted",
+      "source": "CLI fixtures produced both false measurement errors and unchanged digests for changed final PATH values. Correction to the preliminary comparator: final evidence uses the identical distro-default PATH and USER/LOGNAME/SHELL environment, rather than the preliminary /usr/bin:/bin environment."
+     },
+     {
+      "claim": "The placeholder selftest proves its append and replacement checks detect those operations.",
+      "result": "contradicted",
+      "source": "A mutant omitting .profile and .zshrc passed all ten checks; fresh-state probes confirmed it missed both claimed operations. A dropped-inode mutant also passed."
+     },
+     {
+      "claim": "The landscape comparison is independent of definition order.",
+      "result": "confirmed",
+      "source": "Reversed the order of SYNTHETIC's declaration/implementation blocks; definitions_identical returned True and still extracted all six named parts."
+     },
+     {
+      "claim": "The landscape comparison includes whole declaration attributes.",
+      "result": "contradicted",
+      "source": "Changed a multiline serde rename_all attribute and received True from definitions_identical. A mutant dropping all declaration attributes passed all 11 selftest checks."
+     },
+     {
+      "claim": "The documentation control sees every wrong operative matcher beside a correct historical quote.",
+      "result": "contradicted",
+      "source": "Mutated both operative lists to worker_permission_prompt|push_notification and retained correct historical quotes. All three DocumentationTests passed."
+     },
+     {
+      "claim": "The Codex judge's shipped selftest and unfamiliar-banner rejection work.",
+      "result": "confirmed",
+      "source": "codex_tui_strict_check.py --selftest passed five checks. Direct judge calls accepted its expected banner and classified synthetic translated or differently formatted banners as neither loaded nor refused. Tagged exec source uses workdir/model labels; no actual localized banner was established."
+     },
+     {
+      "claim": "The installed Codex accepts the rendered template and refuses both native configuration controls.",
+      "result": "unverifiable",
+      "source": "The isolated full strict-template check exceeded a 28-second limit. Recorded output claims success, but this review did not complete an independent native rerun. A completed isolated transcript containing the banner and both refusal results would settle it."
+     },
+     {
+      "claim": "Installed Codex 0.159.2 exposes --strict-config.",
+      "result": "confirmed",
+      "source": "With node available on PATH, the isolated package entry returned codex-cli 0.159.2 and --help listed --strict-config. Correction: its earlier exit 127 under /usr/bin:/bin came from the package entry requiring node, not from a missing Codex installation."
+     },
+     {
+      "claim": "Windows Terminal defaults outrank a fragment parent, and the focused-tab bell timer is about two seconds.",
+      "result": "confirmed",
+      "source": "Tagged source review: [v1.24.11911.0 settings serialization](https://raw.githubusercontent.com/microsoft/terminal/v1.24.11911.0/src/cascadia/TerminalSettingsModel/CascadiaSettingsSerialization.cpp) adds generated parents with AddLeastImportantParent and user defaults with AddMostImportantParent; [v1.24.11911.0 Tab.cpp](https://raw.githubusercontent.com/microsoft/terminal/v1.24.11911.0/src/cascadia/TerminalApp/Tab.cpp) documents the focused-tab timer and sets 2000 milliseconds. Fetched 2026-09-30."
+     },
+     {
+      "claim": "The sound receipt supports the rounded 16 dB RMS difference.",
+      "result": "confirmed",
+      "source": "Receipt sound rows record -24.7 dBFS for Windows Notify System Generic and -40.9 dBFS for Windows Ding, a difference of 16.2 dB."
+     },
+     {
+      "claim": "The sound measurements and live Windows Terminal behavior are independently reproduced.",
+      "result": "unverifiable",
+      "source": "No Windows Terminal interaction, real settings access or original sound-file measurement was performed. The original sound assets and sanitized measurement output, plus contemporaneous native terminal observation, would settle these claims."
+     },
+     {
+      "claim": "The practice repository's profile checks and doctor repair pass.",
+      "result": "unverifiable",
+      "source": "The practice repository is unavailable and was explicitly excluded. Its repaired source and independently runnable controls would settle the recorded claims."
+     },
+     {
+      "claim": "Live overlay state, real-home isolation and the authenticated landscape refresh hold.",
+      "result": "unverifiable",
+      "source": "Skipped live overlay_noop_check, real-host login checks, native scrub arms and authenticated landscape_refresh as requested. Synthetic oracle tests ran only against temporary homes. Sanitized actual-state transcripts and a dated authenticated refresh would settle the live claims."
+     }
+    ],
+    "commands_run": [
+     "rtk ls -la (initial working directory)",
+     "rtk git -C CHECKOUT diff --stat b4056a35 HEAD",
+     "rtk git -C CHECKOUT diff b4056a35 HEAD -- notification reader, reader mutants and affected tests",
+     "rtk git -C CHECKOUT diff b4056a35 HEAD -- login-shell artifacts, WSL defaults artifacts, color_capture.py and tmux_sync_probe.py",
+     "rtk git -C CHECKOUT diff b4056a35 HEAD -- terminal decision, notification README and receipt",
+     "rtk rg --files -g AGENTS.md CHECKOUT",
+     "rtk cat CHECKOUT/AGENTS.md",
+     "rtk cat, sed, tail, rg and nl -ba: targeted reads of the lens scripts, tests, artifact READMEs, recorded outputs and receipts",
+     "Each execution batch through ctx_execute: D=$(rtk mktemp -d <scratch>); rtk cp -r CHECKOUT/. \"$D\"/; run Python with -B; rtk rm -rf \"$D\"",
+     "rtk python3 -B -m unittest tests.test_adoption_status tests.test_windows_terminal_defaults tests.test_adoption_docs_consistency tests.test_render_config tests.test_apply_claude_settings (scratch, temporary HOME)",
+     "rtk python3 -B evidence/artifacts/notification-types-20260929/scan_reader_mutants.py <scratch checkout>",
+     "rtk python3 -B evidence/artifacts/notification-types-20260929/notification_types_scan.py <synthetic bundle> <scratch checkout>",
+     "rtk python3 -B evidence/artifacts/notification-types-20260929/notification_types_scan.py <installed release binary> <scratch checkout> (2.1.283, 2.1.284, 2.1.285)",
+     "rtk python3 -B evidence/artifacts/notification-types-20260929/replace_bell_group_controls.py <scratch checkout>",
+     "rtk python3 -B evidence/artifacts/notification-types-20260929/replace_bell_group_mutants.py <scratch checkout> (initial timeout, then completed rerun)",
+     "rtk python3 -B evidence/artifacts/notification-types-20260929/tmux_bell_probe.py --selftest",
+     "rtk python3 -B evidence/artifacts/notification-types-20260929/push_notification_probe.py --selftest",
+     "rtk python3 -B evidence/artifacts/terminal-experience-20260928/alert_probe.py --selftest",
+     "rtk python3 -B evidence/artifacts/terminal-experience-20260928/color_capture.py --selftest",
+     "rtk python3 -B evidence/artifacts/login-shell-contract-20260929/login_shell_check_controls.py",
+     "rtk python3 -B evidence/artifacts/login-shell-contract-20260929/login_path_digest.py --selftest",
+     "rtk python3 -B evidence/artifacts/login-shell-contract-20260929/scrub_placeholder_probe.py --selftest",
+     "rtk python3 -B evidence/artifacts/login-shell-contract-20260929/landscape_refresh.py --selftest",
+     "rtk python3 -B evidence/artifacts/wsl-terminal-defaults-20260929/codex_tui_strict_check.py --selftest",
+     "rtk python3 -B evidence/artifacts/wsl-terminal-defaults-20260929/login_shell_bash_truth.py <scratch checkout>",
+     "rtk python3 -B evidence/artifacts/terminal-lane-cross-family-review-20260930/tmux_sync_probe.py",
+     "rtk python3 -B - \"$D\": inline receipt accounting, scoped/nested bundle fixtures, SGR fixtures, startup-output probes, reordered/multiline definitions and synthetic banner judgments",
+     "rtk python3 -B <scratch mutants> --selftest: omitted placeholder files, dropped inode, constant PATH/digest and omitted landscape attributes",
+     "rtk python3 -B - \"$D\": isolated handler-less signal_case controls with explicit stand-in cleanup",
+     "rtk python3 -B -m unittest tests.test_windows_terminal_defaults.DocumentationTests (mutated scratch documentation)",
+     "rtk node -e <scoped minified catalog fixture>",
+     "rtk proxy python3 -B - \"$D\": recover complete three-release scan summaries",
+     "rtk which codex tmux bash node gh",
+     "rtk cat CODEX_ECOSYSTEM/bin/codex",
+     "<installed Claude binary> --version (isolated HOME)",
+     "<installed Codex package entry> --version and --help (isolated HOME; corrected PATH includes node)",
+     "rtk python3 -B evidence/artifacts/wsl-terminal-defaults-20260929/codex_tui_strict_check.py <scratch checkout> (isolated attempt timed out)",
+     "Web searches for Bash startup rules and xterm SGR documentation returned no content on this route",
+     "ctx_fetch_and_index: official hooks reference; tagged Windows Terminal dispatch, engine, tab and settings sources; tagged Codex config/exec sources; tmux 3.4/3.6 feature sources; xterm control-sequence reference",
+     "ctx_search: targeted sections of fetched primary sources",
+     "rtk git -C CHECKOUT status --short (clean)"
+    ],
+    "finding_count": 7
+   }
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-30T05:46:18Z",
+   "finished": "2026-09-30T06:32:32Z",
+   "usage": {
+    "input_tokens": 5605208,
+    "cached_input_tokens": 5387392,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 49972,
+    "reasoning_output_tokens": 25723
+   },
+   "usage_status": "reported",
+   "limit": false,
+   "model": "cx/gpt-6.1-sol",
+   "effort": "max",
+   "codex_version": "codex-cli 0.159.2",
+   "attempts": [],
+   "lane": "sol",
+   "job": "R3",
+   "stderr_tail": "Reading additional input from stdin...\n",
+   "review": {
+    "verdict": "changes-needed",
+    "summary": "Five medium findings remain: a false-positive login check, an incorrect PATH digest, ineffective isolation controls, a comparison that misses changed attributes, and an unsupported native-rerun claim. Four low findings concern publication hygiene, temporary-file cleanup, and incorrect counts. The existing 237-test run passed with one skip; the replacement controls and reader mutants passed; all 38 hashes in the new receipt and all 71 changed-file manifest entries matched. The checkout remained unchanged.",
+    "claims_checked": [
+     {
+      "claim": "The nine recorded jobs returned 46 findings, with 3 high, 34 medium, 9 low and 41 marked as reviewer-tested; their usage totals match the receipt.",
+      "result": "confirmed",
+      "source": "A python3 -B audit of results.json and the new receipt found no job-field mismatches. Totals were 24,470,302 input tokens, 23,242,624 cached input tokens, 360,897 output tokens and 71.1167 minutes from earliest start to latest finish. Cache share was 94.98299%, consistent with the rounded 95.0%."
+     },
+     {
+      "claim": "The verification and disposition counts are 23 verifier grades, 11 duplicates, 12 coordinator checks; 17 confirmed, 4 partly, 2 refuted; 39 repaired, 2 kept, 2 refuted and 3 removed.",
+      "result": "confirmed",
+      "source": "Computed from verification.json and findings.json. Every recorded verifier_verdict matched its corresponding verification row."
+     },
+     {
+      "claim": "Every finding was checked before repairs, and the verifier runs had the stated independence, model settings and three-wave execution.",
+      "result": "unverifiable",
+      "source": "The published records support the counts but do not retain the private verifier journals or a complete chronology of checks and edits. Sanitized runner and workflow records with timestamps, model settings and isolation details would settle those historical assertions."
+     },
+     {
+      "claim": "The new receipt's script, record and recorded-output hashes match the checkout, and the manifest mirrors the changed files and receipt summaries.",
+      "result": "confirmed",
+      "source": "Recomputed all 38 hashes listed in the new receipt and the hashes and byte sizes of all 71 changed files other than the manifest itself: no mismatches. All five receipt mirrors matched their intended common fields. A whole-object comparison was initially inapplicable because manifest receipt entries intentionally contain fewer fields; the corrected comparison passed."
+     },
+     {
+      "claim": "The prompt hash map matches prompts_sha256.txt.",
+      "result": "confirmed",
+      "source": "Parsed all eleven entries and compared them with data.prompts_sha256: equal."
+     },
+     {
+      "claim": "Those hashes establish the contents of the original submitted prompts.",
+      "result": "unverifiable",
+      "source": "The original private prompts are explicitly not retained. Their sanitized originals plus a documented mapping to the submitted bytes would permit independent verification."
+     },
+     {
+      "claim": "The retained command ledger contains 25 successful commands.",
+      "result": "confirmed",
+      "source": "recorded/exit_codes.txt contains exactly 25 lines, each beginning 'exit 0 <-'. This verifies the retained ledger, not an independent replay of every historical native command."
+     },
+     {
+      "claim": "The affected five test modules run 237 tests successfully.",
+      "result": "confirmed",
+      "source": "Independent scratch-copy run of python3 -B -m unittest tests.test_adoption_status tests.test_windows_terminal_defaults tests.test_adoption_docs_consistency tests.test_render_config tests.test_apply_claude_settings: exit 0, Ran 237 tests, OK (skipped=1)."
+     },
+     {
+      "claim": "The settings replacement has 24 passing controls and its listed mutants fail exactly their expected cases.",
+      "result": "confirmed",
+      "source": "Independent scratch-copy runs of replace_bell_group_controls.py and replace_bell_group_mutants.py both exited 0: 24 cases, 0 problems; 15 total runs, 0 problems. Those runs comprise 14 mutants and one baseline."
+     },
+     {
+      "claim": "There are fifteen defective settings-replacement mutant runs.",
+      "result": "contradicted",
+      "source": "The recorded output and rerun contain fourteen mutants and one unmutated baseline."
+     },
+     {
+      "claim": "The scan reader has eight tests and seven effective mutants.",
+      "result": "confirmed",
+      "source": "Independent scan_reader_mutants.py run exited 0. Each of seven mutants produced its expected failing ScanReaderTests case; the tests reported eight cases."
+     },
+     {
+      "claim": "The recorded three releases contain 17 matcher types, with 12 documented, 8 ringing and no unknown decisions.",
+      "result": "confirmed",
+      "source": "Parsed the three recorded scan JSON files: each has base size 15, catalogs_resolved=true, 17 matcher values, 12 documented types, 8 ring decisions and unknown=[]. Bounded grep -a of the installed 2.1.285 binary independently found its fifteen-entry Ojo array and the catalog's two elicitation additions."
+     },
+     {
+      "claim": "The two pty selftests include effective SIGTERM cleanup checks.",
+      "result": "confirmed",
+      "source": "Both independent --selftest runs exited 0 and their end-to-end SIGTERM cases reported the private directory and stand-in client gone. A handler-less push-probe mutant returned status 1 with the directory and client still present; the harness then terminated only that mutant's stand-in client."
+     },
+     {
+      "claim": "The changed BEL counter handles ignored UTF-8 C1 controls consistently with the pinned output parser.",
+      "result": "confirmed",
+      "source": "Both probe selftests passed the added C1 cases. [Windows Terminal stateMachine.cpp at v1.24.11911.0](https://github.com/microsoft/terminal/blob/v1.24.11911.0/src/terminal/parser/stateMachine.cpp) ignores C1 characters unless AcceptC1 is enabled; the constructor leaves that mode disabled for the output engine."
+     },
+     {
+      "claim": "The repaired color counter passes eight cases, and the retained native counts match the older receipt.",
+      "result": "confirmed",
+      "source": "color_capture.py --selftest exited 0 with eight cases. recorded/color_capture.txt matches the older receipt's foreground/background counts: 37/4 indexed colors versus 39/6 truecolor sequences."
+     },
+     {
+      "claim": "The historical native color rerun occurred exactly as described.",
+      "result": "unverifiable",
+      "source": "The retained aggregate counts match, but I did not start a live Claude Code session under the review restrictions. A sanitized contemporaneous invocation record with the binary pin and returned counters would settle the historical execution."
+     },
+     {
+      "claim": "The nine synthetic login homes and the 512-combination Bash oracle pass after the repairs.",
+      "result": "confirmed",
+      "source": "Independent login_shell_check_controls.py run returned all_cases_as_expected=true. login_shell_bash_truth.py exited 0 with 512 combinations, zero mismatches and 26 disagreements for its empty-file negative control."
+     },
+     {
+      "claim": "The repaired login check proves that each resolved name can be launched by the profile's exec.",
+      "result": "contradicted",
+      "source": "The stale-hash scratch-home reproduction returned pass=true while exec claude failed with exit 127."
+     },
+     {
+      "claim": "The repaired PATH measurement hashes the final login PATH.",
+      "result": "contradicted",
+      "source": "Two different final PATH values produced the same accepted digest when .profile printed an earlier PATH diagnostic. The duplicate parser in scrub_placeholder_probe.py also returned the earlier value."
+     },
+     {
+      "claim": "The scrub probe's new selftest rejects implementations that omit monitored files or inode comparison.",
+      "result": "contradicted",
+      "source": "Both the .profile-omitting and inode-blind mutants passed all ten selftest checks. The isolated replacement reproduction demonstrated the inode-blind implementation's missed change."
+     },
+     {
+      "claim": "The decision record cites a retained native rerun of the revised 19-name real-home comparison.",
+      "result": "contradicted",
+      "source": "The cited new receipt retains only scrub_placeholder_probe.py --selftest and its synthetic output, while the older receipt explicitly attributes its native values to earlier script versions."
+     },
+     {
+      "claim": "The landscape comparison includes whole notification definitions, including their attributes.",
+      "result": "contradicted",
+      "source": "The eleven existing selftest checks passed, but changing a multiline serde rename_all attribute from lowercase to UPPERCASE still returned definitions_identical=true. [Serde container attributes](https://serde.rs/container-attrs.html), fetched 2026-09-30, establishes that the change affects enum configuration names."
+     },
+     {
+      "claim": "The Codex strict checker distinguishes a banner-bearing load from a pre-configuration failure.",
+      "result": "confirmed",
+      "source": "codex_tui_strict_check.py --selftest exited 0 with five cases. Its predicates and recorded native output distinguish loaded banners, configuration refusals and runs that never started. The historical native invocation was inspected through its retained output rather than replayed."
+     },
+     {
+      "claim": "The overlay oracle's repaired fixture tests reject disableAllHooks and conflicting groups while accepting identical hook repeats within one group.",
+      "result": "confirmed",
+      "source": "The independently rerun test_windows_terminal_defaults module passed those synthetic OverlayOracleTests. No live user settings were read."
+     },
+     {
+      "claim": "The user's live settings carry the overlay and the real-host doctor passes.",
+      "result": "unverifiable",
+      "source": "Skipped overlay_noop_check.py and --real-host checks because they depend on prohibited live settings or startup files. A sanitized host-side rerun would settle these claims."
+     },
+     {
+      "claim": "The two earlier refutations are supported: identical command hooks are deduplicated, and terminal permission notifications are inactivity-timed.",
+      "result": "confirmed",
+      "source": "[Claude hooks reference](https://code.claude.com/docs/en/hooks.md), fetched 2026-09-30, distinguishes terminal inactivity timing from the SDK timer and documents handler deduplication. Bounded grep of installed 2.1.285 also found the command-handler Map deduplication and the Date.now()-Math.max(Xm(), promptTime) timing predicate. Neither refuted finding is reopened."
+     },
+     {
+      "claim": "The corrected PushNotification presence and config_off checks apply only to local sessions.",
+      "result": "confirmed",
+      "source": "Bounded grep -a of installed 2.1.285 found r=a.CLAUDE_CODE_REMOTE||Fn(), Fn checking workspace===\"remote\", and both suppression conditions guarded by !r. V4r uses terminalFocus when defined and otherwise the 60000 ms input-time threshold."
+     },
+     {
+      "claim": "A live remote workspace delivers its notification and push as described.",
+      "result": "unverifiable",
+      "source": "The branch was verified from source; no live remote session was run. Sanitized remote-session observations would settle transport and hook-delivery behavior."
+     },
+     {
+      "claim": "Windows Terminal prioritizes own profile values over defaults, and defaults over fragment values; a profile environment replaces the defaults environment.",
+      "result": "confirmed",
+      "source": "[CascadiaSettingsSerialization.cpp at v1.24.11911.0](https://github.com/microsoft/terminal/blob/v1.24.11911.0/src/cascadia/TerminalSettingsModel/CascadiaSettingsSerialization.cpp) makes the defaults layer the most important parent. [Microsoft's profile documentation](https://github.com/MicrosoftDocs/terminal/blob/main/TerminalDocs/customize-settings/profile-advanced.md), fetched 2026-09-30, explicitly documents environment replacement."
+     },
+     {
+      "claim": "The focused-tab bell indicator uses a two-second timer.",
+      "result": "confirmed",
+      "source": "[Tab.cpp at v1.24.11911.0](https://github.com/microsoft/terminal/blob/v1.24.11911.0/src/cascadia/TerminalApp/Tab.cpp) sets ActivateBellIndicatorTimer's interval to 2000 milliseconds and documents its use when the tab already has focus."
+     },
+     {
+      "claim": "The live Windows Terminal title, bell, focus-report and layering behavior was observed by this review.",
+      "result": "unverifiable",
+      "source": "No live Windows Terminal session was used, as instructed. A controlled Windows-side observation would settle runtime behavior; the relevant corrected claims were checked against tagged source."
+     },
+     {
+      "claim": "tmux 3.4 emits three synchronized-output pairs with xterm*:sync and none without; 3.4 and 3.6 define the sync feature.",
+      "result": "confirmed",
+      "source": "Independent tmux_sync_probe.py run exited 0 with (3, 3) and (0, 0). Primary source defines sync in [tmux 3.4 tty-features.c](https://github.com/tmux/tmux/blob/3.4/tty-features.c) and [tmux 3.6 tty-features.c](https://github.com/tmux/tmux/blob/3.6/tty-features.c)."
+     },
+     {
+      "claim": "The tmux bell verdict requires all five arms.",
+      "result": "confirmed",
+      "source": "Its eight-check selftest passed. The initial native run exceeded my 30-second wrapper timeout; a subsequent run with a suitable timeout completed and exited 0 with counts (1, 1, 0, 0, 0)."
+     },
+     {
+      "claim": "The new tmux sync probe writes only inside its private temporary directory.",
+      "result": "contradicted",
+      "source": "The independent socket-placement check found its surviving -L socket outside the probe-created ts directory after exit 0."
+     },
+     {
+      "claim": "The publication hygiene repair removes the private profile identifiers from the new review artifacts.",
+      "result": "contradicted",
+      "source": "Bounded searches found the identifiers in results.json, verification.json and recorded/practice_repository_commits.txt. The 72-file path/UUID scan found no forbidden /home user paths or UUID-shaped identifiers, but that scan does not establish exhaustive absence of sensitive data."
+     },
+     {
+      "claim": "Probe output now prints message lengths and makes screen contents opt-in.",
+      "result": "confirmed",
+      "source": "Read both repaired output sections: message text is replaced by its length and screen-tail printing is guarded by args.show_screen. Inspected the new recorded outputs for screen content; none was found."
+     },
+     {
+      "claim": "At least ten sampled findings have repairs where findings.json says they do.",
+      "result": "confirmed",
+      "source": "Matched and checked F-sol-u484-A-1, A-2, A-4, B-1, B-2, B-4, B-5 and B-7; F-sol-u498-A-4 and B-1; F-sol-u510-A-1, A-2, A-4 and B-3; and F-sol-u519-A1-1, A2-3, A2-5, A2-8, A2-9, B-2 and B-3 against code, tests or primary source. The incomplete checks and publication repair are reported separately."
+     },
+     {
+      "claim": "The repaired documentation consistency test detects removal of permission_prompt from the current operative matcher.",
+      "result": "confirmed",
+      "source": "A scratch mutation removed permission_prompt from the decision record's sole full quoted matcher. DocumentationTests failed with 'the decision record quotes no matcher'. The suspected missed mutation was therefore rejected, and no finding is reported."
+     },
+     {
+      "claim": "The push probe newly promises a nonzero exit for a BEL in its hooks-disabled control.",
+      "result": "contradicted",
+      "source": "A fake-client ask --control run observed one BEL and exited 0, but comparison with b4056a35 and the current README showed that this no-verdict behavior is existing and the README promises only exit 2 for an unobserved tool call. The initial interpretation was corrected; this is not reported as a new defect."
+     },
+     {
+      "claim": "The private practice repository's sound check, 29 controls and doctor implement the described repairs.",
+      "result": "unverifiable",
+      "source": "The retained outputs and commit subjects support the recorded counts, but the actual practice code is outside this checkout and has no published remote. A sanitized, hash-pinned export of its check, controls and doctor would permit verification."
+     },
+     {
+      "claim": "The README's gateway pool figure is consistent with the receipt.",
+      "result": "contradicted",
+      "source": "README says three points; the receipt's cached limits move from 7 to 11, a four-point difference."
+     },
+     {
+      "claim": "The review jobs themselves consumed exactly four gateway pool points.",
+      "result": "unverifiable",
+      "source": "The receipt explicitly acknowledges that other sessions may have used points between the cached observations. Per-job provider accounting would establish attribution."
+     },
+     {
+      "claim": "Sol is newer and lower-cost than astra according to the cited OpenAI release notes.",
+      "result": "unverifiable",
+      "source": "The attempted fetch of https://help.openai.com/en/articles/9624314-model-release-notes returned HTTP 403, and the decision supplies no precise release-note passage or dated pricing comparison. An accessible primary release note and pricing source would settle the statement."
+     }
+    ],
+    "commands_run": [
+     "rtk git -C <checkout> diff --stat b4056a35 HEAD",
+     "rtk git -C <checkout> diff b4056a35 HEAD -- docs/decisions/2026-09-28-terminal-experience.md docs/harness-defaults.md recipes/claude-native-profile.md adoption/platforms/linux-wsl2.md",
+     "rtk git -C <checkout> diff b4056a35 HEAD -- the five artifact READMEs and four corrected receipts",
+     "rtk git -C <checkout> diff b4056a35 HEAD -- tests/test_windows_terminal_defaults.py",
+     "rtk git -C <checkout> diff b4056a35 HEAD -- evidence/artifacts/login-shell-contract-20260929/{scrub_placeholder_probe,landscape_refresh,login_path_digest}.py",
+     "rtk cat and rtk sed -n on the new receipt, findings, repaired scripts and recorded outputs",
+     "rtk git -C <checkout> config --get remote.origin.url",
+     "rtk proxy git -C <checkout> log -1 --format='%H %s'",
+     "ctx_execute scratch setup for each execution: D=$(rtk mktemp -d <scratch>); rtk cp -r <checkout>/. \"$D\"/; cleanup with rtk rm -rf \"$D\"",
+     "ctx_execute: rtk python3 -B - <scratch> — aggregate job usage, severities, tested flags, verification grades and dispositions",
+     "ctx_execute: rtk proxy python3 -B - <scratch> — verify 38 receipt hashes, prompt hash map and changed-file path/UUID hygiene",
+     "ctx_execute: rtk python3 -B -m unittest tests.test_adoption_status tests.test_windows_terminal_defaults tests.test_adoption_docs_consistency tests.test_render_config tests.test_apply_claude_settings",
+     "ctx_execute: python3 -B evidence/artifacts/notification-types-20260929/replace_bell_group_controls.py <scratch>",
+     "ctx_execute: python3 -B evidence/artifacts/notification-types-20260929/replace_bell_group_mutants.py <scratch>",
+     "ctx_execute: python3 -B evidence/artifacts/notification-types-20260929/scan_reader_mutants.py <scratch>",
+     "ctx_execute: python3 -B --selftest runs for push_notification_probe.py, alert_probe.py, color_capture.py, login_path_digest.py, scrub_placeholder_probe.py, landscape_refresh.py, codex_tui_strict_check.py and tmux_bell_probe.py",
+     "ctx_execute: python3 -B evidence/artifacts/login-shell-contract-20260929/login_shell_check_controls.py",
+     "ctx_execute: python3 -B evidence/artifacts/wsl-terminal-defaults-20260929/login_shell_bash_truth.py <scratch>",
+     "ctx_execute: python3 -B evidence/artifacts/terminal-lane-cross-family-review-20260930/tmux_sync_probe.py",
+     "ctx_execute: python3 -B evidence/artifacts/notification-types-20260929/tmux_bell_probe.py — initial 30-second timeout, completed rerun with 50-second timeout",
+     "ctx_execute: rtk python3 -B - <scratch> — inode-blind and .profile-omitting scrub selftest mutants, plus isolated replacement reproduction",
+     "ctx_execute: rtk python3 -B - <scratch> — startup PATH diagnostic reproduction against both PATH parsers",
+     "ctx_execute: rtk python3 -B - <scratch> — multiline serde attribute comparison reproduction",
+     "ctx_execute: rtk python3 -B - <scratch> — stale Bash command-hash reproduction and exec comparison",
+     "ctx_execute: rtk python3 -B - <scratch> — tmux sync socket placement and cleanup verification",
+     "ctx_execute: rtk python3 -B - <scratch> — handler-less push-probe SIGTERM mutant and targeted stand-in cleanup",
+     "ctx_execute: python3 -B -m unittest tests.test_windows_terminal_defaults.DocumentationTests — operative matcher mutation",
+     "ctx_execute: rtk python3 -B - <scratch> — verify all 71 changed manifest entries and five receipt mirrors",
+     "ctx_execute: rtk python3 -B - <scratch> — scan-record counts, mutant/baseline counts and historical color-count comparison",
+     "ctx_execute: python3 -B push_notification_probe.py ask --control — fake client, synthetic HOME, one BEL after dialog detection",
+     "ctx_execute: rtk python3 -B - <scratch> — compare existing push-probe return behavior with git show b4056a35:<path>",
+     "rtk proxy rg -n '<project>|<project>|Polaris' <new-review-artifacts>",
+     "rtk proxy rg -n 'scrub_placeholder_probe|real_home' <new-receipt> <recorded/exit_codes.txt> <recorded/scrub_placeholder_probe_selftest.txt>",
+     "rtk which claude bash tmux",
+     "rtk ls -l /home/<user>/.local/bin/claude",
+     "rtk readlink -f /home/<user>/.local/bin/claude",
+     "rtk bash --noprofile --norc -c 'help type'",
+     "rtk proxy env LC_ALL=C grep -a -o -E <bounded presence, remote-workspace, timing and hook-deduplication patterns> <native-client-2.1.285>",
+     "rtk proxy env LC_ALL=C grep -a -o -E <bounded notification catalog and base-array patterns> <native-client-2.1.285>",
+     "Web search attempts for Windows Terminal v1.24.11911.0, tmux sync and Claude hook semantics",
+     "ctx_fetch_and_index: Windows Terminal Tab.cpp, CascadiaSettings.cpp, CascadiaSettingsSerialization.cpp, Profile.h and stateMachine.cpp at v1.24.11911.0",
+     "ctx_fetch_and_index: tmux tty-features.c at 3.4 and 3.6, and tmux.1 at 3.4",
+     "ctx_fetch_and_index: Claude hooks reference and Microsoft terminal profile-advanced documentation, fetched 2026-09-30",
+     "ctx_fetch_and_index: Codex config types.rs at rust-v0.157.1 and rust-v0.159.0",
+     "ctx_fetch_and_index: Bash maintainer reference manual and Serde container attributes, fetched 2026-09-30",
+     "ctx_fetch_and_index: PR #532 API record and HTML description",
+     "ctx_fetch_and_index: OpenAI model release notes — HTTP 403",
+     "ctx_search: bounded queries scoped to the fetched primary sources",
+     "rtk proxy git -C <checkout> status --short — clean"
+    ],
+    "finding_count": 9
+   }
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-30T05:46:34Z",
+   "finished": "2026-09-30T06:13:19Z",
+   "usage": {
+    "input_tokens": 4408642,
+    "cached_input_tokens": 4272896,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 39819,
+    "reasoning_output_tokens": 20066
+   },
+   "usage_status": "reported",
+   "limit": false,
+   "model": "cx/gpt-6-astra-ultra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.159.2",
+   "attempts": [],
+   "lane": "ultra",
+   "job": "U1",
+   "stderr_tail": "Reading additional input from stdin...\n",
+   "review": {
+    "verdict": "changes-needed",
+    "summary": "Found eight medium and two low defects, including incomplete repairs, controls that still accept wrong implementations, and publication inconsistencies. The recorded review totals and hashes agree, the 237-test suite completed without failures with two skips, and the isolated native Codex and tmux checks reproduced their expected results. Both earlier refutations are supported. Artifact execution and mutations used disposable scratch copies; the checkout remains clean at 9e55a1036c61.",
+    "claims_checked": [
+     {
+      "claim": "The runner records contain nine successful jobs, 46 findings with severity counts 3/34/9, and 41 reviewer-tested findings.",
+      "result": "confirmed",
+      "source": "Recomputed from results.json and compared with the new receipt: nine jobs, all exit 0; 46 findings; 3 high, 34 medium, 9 low; tested=true on 41."
+     },
+     {
+      "claim": "Recorded usage is 24.47M input tokens, 95.0% cache reads, 0.36M output and approximately 71 minutes.",
+      "result": "confirmed",
+      "source": "Runner totals are 24,470,302 input, 23,242,624 cached input and 360,897 output tokens. Cache ratio is 94.98299%; earliest start to latest finish is 71.1167 minutes. Per-job receipt values agree."
+     },
+     {
+      "claim": "Verifier and disposition accounting agrees across the records.",
+      "result": "confirmed",
+      "source": "verification.json and findings.json reproduce 23 graded findings: 17 confirmed, 4 partly, 2 refuted; 11 duplicates and 12 coordinator checks. Dispositions are 39 repaired, 2 refuted, 3 removed and 2 kept."
+     },
+     {
+      "claim": "The two earlier refutations are correct.",
+      "result": "confirmed",
+      "source": "Installed Claude Code 2.1.285 source and the [hooks reference](https://code.claude.com/docs/en/hooks.md), fetched 2026-09-30, support command-hook deduplication and terminal inactivity timing. The reference says \"If you define the same handler in more than one settings file, it runs once\" and \"each keystroke defers it\". No finding reopens either refutation."
+     },
+     {
+      "claim": "The removed second-distro findings have no remaining write path, and the kept host-ID findings are explicit residuals.",
+      "result": "confirmed",
+      "source": "replace_bell_group.py accepts only local; the retired-target control passes and the remote write implementation is absent. findings.json explicitly records the registered host identifier as kept and its duplicate as the same convention."
+     },
+     {
+      "claim": "The supplied settings-swap controls and mutants reproduce their recorded results.",
+      "result": "confirmed",
+      "source": "Scratch execution returned 24 cases, 0 problems and 15 runs, 0 problems. The after-merge and at-backup conflict controls pass. This does not substantiate the separate false assurance about saves after backup."
+     },
+     {
+      "claim": "Backup mode preservation is independent of the caller's umask.",
+      "result": "contradicted",
+      "source": "With umask 077 and a 0640 settings fixture, apply exited 0 with live mode 0640 and backup mode 0600; the expanded controls returned 24 cases, 1 problem. This comes from unchanged tools/adoption/apply_claude_settings.py write_backup behavior and is excluded from findings as outside the patch."
+     },
+     {
+      "claim": "A save after backup creation survives in the backup.",
+      "result": "contradicted",
+      "source": "After-backup writer injection exited 0 while both installed settings and backup retained original-model."
+     },
+     {
+      "claim": "The repaired notification reader reproduces the three installed-release reports and its supplied mutant results.",
+      "result": "confirmed",
+      "source": "Scans of installed 2.1.283, 2.1.284 and 2.1.285 each exited 0 with 17 matcher values, no unknown types and output exactly equal to the corresponding recorded JSON. Eight reader tests and all seven supplied mutants behaved as recorded."
+     },
+     {
+      "claim": "The reader fails closed when the spread identifier has no supported array assignment.",
+      "result": "contradicted",
+      "source": "The property-assignment/function-parameter fixture evaluated to a real catalog containing brand_new_type, but the scanner exited 0 with catalogs_resolved=true and unknown=[]. Additional unsupported numbered-name fixtures also produced false passes."
+     },
+     {
+      "claim": "The repaired login-shell controls reject early exits and functions, and the bash oracle checks first_read.",
+      "result": "confirmed",
+      "source": "Nine control homes passed. The bash sweep checked 512 combinations with zero mismatches; its negative control disagreed in 26 combinations. A separate fixture showed command -v accepts a function, type -P rejects it, and exec fails with 127; a real executable passes."
+     },
+     {
+      "claim": "The repaired PATH digest measures the complete final PATH and distinguishes changed PATHs.",
+      "result": "contradicted",
+      "source": "Two unmodified CLI runs returned the same startup-log digest despite different independently captured final PATHs. Newline-containing PATHs were also truncated. The supplied four selftests passed even with a constant-digest mutant."
+     },
+     {
+      "claim": "The repaired Codex strict-config check accepts a loaded template and rejects failures before configuration loading.",
+      "result": "confirmed",
+      "source": "Five selftests passed, and a pre-configuration-failure shim made the script exit 1. Native codex-cli 0.159.2, with isolated HOME and CODEX_HOME and no authentication, loaded the rendered template and unknown-[tui]-key arm before expected 401 errors, rejected both negative configuration controls, and made the checker exit 0. The first isolated attempt lacked Node and was correctly rejected; adding the installed Node directory to PATH resolved that harness dependency."
+     },
+     {
+      "claim": "The pty probes handle a single SIGTERM and their supplied selftests pass.",
+      "result": "confirmed",
+      "source": "Both baseline selftests passed, including their end-to-end SIGTERM cases. An independent PID-based stand-in harness confirmed that one SIGTERM removes the private directory and terminates the child."
+     },
+     {
+      "claim": "The pty cleanup remains effective through repeated termination signals.",
+      "result": "contradicted",
+      "source": "Two SIGTERMs 100 ms apart left the expected sleep process in sleeping state after each parent exited 143."
+     },
+     {
+      "claim": "The end-to-end SIGTERM control proves that its stand-in started and was terminated.",
+      "result": "contradicted",
+      "source": "Changing the launched executable to /bin/true left both complete selftests passing their end-to-end signal cases."
+     },
+     {
+      "claim": "tmux bell and synchronized-output results reproduce.",
+      "result": "confirmed",
+      "source": "Private tmux 3.4 runs returned bell counts 1,1,0,0,0 and successful verdicts. The synchronized-output probe returned three opening/closing mode-2026 pairs with xterm*:sync and zero without. The bell selftest also passed all eight checks."
+     },
+     {
+      "claim": "The recorded corrected colour counts agree with the older receipt.",
+      "result": "confirmed",
+      "source": "recorded/color_capture.txt agrees with terminal-experience-20260928.json: unset foreground/background truecolor counts 0/0 and indexed counts 37/4; truecolor-enabled counts 39/6 and indexed counts 0/0. All eight supplied counter selftests pass."
+     },
+     {
+      "claim": "The new colour parser correctly handles colon subparameters.",
+      "result": "contradicted",
+      "source": "Valid and invalid colon fixtures disagree with the pinned [Windows Terminal v1.24.11911.0 parser](https://raw.githubusercontent.com/microsoft/terminal/v1.24.11911.0/src/terminal/adapter/adaptDispatchGraphics.cpp). The recorded semicolon-form capture counts are not disputed."
+     },
+     {
+      "claim": "The scrub probe's append and replacement controls independently detect those operations.",
+      "result": "contradicted",
+      "source": "A mutant that never observes .profile or .zshrc still passed all ten selftest results, including append and replacement detection."
+     },
+     {
+      "claim": "The landscape comparison detects the notification behavior changes required by the earlier verifier.",
+      "result": "contradicted",
+      "source": "Changing Notifications' Default from true to false still returned identical=true. Multiline serde-attribute changes and significant whitespace changes inside Display strings also compared equal. All eleven supplied selftests passed. The omitted Default block exists in the tagged upstream source."
+     },
+     {
+      "claim": "The five affected unit-test modules run 237 tests without failures.",
+      "result": "confirmed",
+      "source": "An isolated scratch run completed 237 tests with zero failures, zero errors and two skips. One skip is the intentionally unavailable installed-Claude test in the synthetic HOME; the other is the existing no-differing-profile case. Overlay oracle unit tests use synthetic settings; the live-overlay check was not run."
+     },
+     {
+      "claim": "The repaired profile-precedence and focused-tab timer statements match primary sources.",
+      "result": "confirmed",
+      "source": "Tagged [CascadiaSettingsSerialization.cpp](https://raw.githubusercontent.com/microsoft/terminal/v1.24.11911.0/src/cascadia/TerminalSettingsModel/CascadiaSettingsSerialization.cpp) calls \"profile->AddMostImportantParent(userSettings.baseLayerProfile);\"; [IInheritable.h](https://raw.githubusercontent.com/microsoft/terminal/v1.24.11911.0/src/cascadia/TerminalSettingsModel/IInheritable.h) checks own values before parents. Tagged [Tab.cpp](https://raw.githubusercontent.com/microsoft/terminal/v1.24.11911.0/src/cascadia/TerminalApp/Tab.cpp) sets the focused-tab bell timer to \"std::chrono::milliseconds(2000)\". Sources fetched 2026-09-30."
+     },
+     {
+      "claim": "The revised PushNotification presence rule is qualified to local sessions.",
+      "result": "confirmed",
+      "source": "Installed Claude Code 2.1.285 source guards both agentPushNotifEnabled and presence checks with the non-remote condition. Presence uses focus information when available and otherwise the 60000 ms interaction threshold, matching the revised documents."
+     },
+     {
+      "claim": "Published receipt hashes and manifest metadata match the changed files.",
+      "result": "confirmed",
+      "source": "Verified seven script hashes, four record hashes, 27 recorded-output hashes, eleven internally consistent prompt hashes, and SHA-256/byte-size metadata for all 71 changed files represented in manifests/evidence.json."
+     },
+     {
+      "claim": "The private-label repair and gateway-point figure are consistent across the new publication.",
+      "result": "contradicted",
+      "source": "Private project labels remain in new recorded commit subjects and review JSON. The artifact README says three pool points while the receipt records [7,11] and says four."
+     },
+     {
+      "claim": "The historical native Claude colour-capture execution can be independently reproduced within this review.",
+      "result": "unverifiable",
+      "source": "No real interactive Claude session was run. The recorded numbers were compared, but a permitted isolated native capture or retained raw capture would be needed to establish the historical execution itself."
+     },
+     {
+      "claim": "The user's live overlay, live Windows Terminal sound/focus behavior and remote notification delivery satisfy the documented results.",
+      "result": "unverifiable",
+      "source": "Live settings and interactive terminal/client checks were excluded. Source review and synthetic tests establish narrower properties only. Authorized live-setting observation and terminal/remote-session measurements would settle these claims."
+     },
+     {
+      "claim": "The external practice repository's deployed doctor and profile-check repairs match the recorded results.",
+      "result": "unverifiable",
+      "source": "Its private checkout was not accessed. The copied login-shell function was tested, but validating the deployed doctor and 29-case profile checker requires their pinned source and a permitted fixture run."
+     },
+     {
+      "claim": "Private prompts, verifier transcripts, original provider measurements and review-lane execution provenance can be authenticated from the checkout.",
+      "result": "unverifiable",
+      "source": "The underlying private files are not retained and were not accessed. Published records and hashes are internally consistent; sanitized contemporaneous originals would be needed for independent provenance verification."
+     },
+     {
+      "claim": "The complete live upstream landscape remains unchanged.",
+      "result": "unverifiable",
+      "source": "The signed-in gh landscape workflow was not run. Local comparison logic and selected pinned primary sources were checked; they do not establish the current state of every upstream."
+     }
+    ],
+    "commands_run": [
+     "rtk git -C <checkout> diff --stat b4056a35 HEAD",
+     "rtk git -C <checkout> diff b4056a35 HEAD -- <reviewed changed scripts, tests, documents and receipts>",
+     "rtk cat <checkout>/AGENTS.md",
+     "rtk rg --files -g AGENTS.md <checkout>",
+     "rtk cat, sed, rg and nl -ba over the scoped changed files, review records and recorded outputs",
+     "ctx_execute scratch setup: D=$(rtk mktemp -d <scratch>); rtk cp -r <checkout>/. \"$D\"/; rtk python3 -B - \"$D\"; cleanup in finally",
+     "python3 -B replace_bell_group_controls.py <scratch>",
+     "python3 -B replace_bell_group_mutants.py <scratch>",
+     "python3 -B scan_reader_mutants.py <scratch>",
+     "python3 -B notification_types_scan.py <installed 2.1.283, 2.1.284 or 2.1.285 binary> <scratch>",
+     "python3 -B scratch settings harness: after-backup writer injection, installed/backup comparison, and umask-077 mode controls",
+     "python3 -B scratch reader harness: property-assignment fixture, numbered-name fixtures, and recorded-output comparison",
+     "node <scratch>/reader-fixture.js",
+     "python3 -B login_shell_check_controls.py",
+     "python3 -B login_shell_bash_truth.py <scratch>",
+     "python3 -B scratch login-shell harness: command -v, type -P and exec against function-only and executable fixtures",
+     "python3 -B scratch digest harness: startup-log and newline-PATH fixtures, constant-digest mutant, and independent NUL-framed PATH captures",
+     "python3 -B scrub_placeholder_probe.py --selftest",
+     "python3 -B scrub_placeholder_probe.py --selftest after scratch-only mutation omitting .profile and .zshrc observations",
+     "python3 -B landscape_refresh.py --selftest and scratch comparisons of Default, multiline serde attributes and Display literals",
+     "python3 -B alert_probe.py --selftest",
+     "python3 -B push_notification_probe.py --selftest",
+     "python3 -B scratch PID-based pty harness: one versus two SIGTERMs, child-state verification and private process-group cleanup",
+     "python3 -B each pty probe --selftest after scratch-only claude-to-/bin/true mutation",
+     "python3 -B color_capture.py --selftest and scratch sgr_counts calls for colon and semicolon RGB fixtures",
+     "python3 -B tmux_bell_probe.py --selftest",
+     "python3 -B tmux_bell_probe.py with synthetic HOME and private TMUX_TMPDIR",
+     "python3 -B tmux_sync_probe.py with synthetic HOME and private TMUX_TMPDIR",
+     "python3 -B codex_tui_strict_check.py --selftest",
+     "python3 -B codex_tui_strict_check.py <scratch> with a pre-configuration-failure PATH shim",
+     "rtk which codex; bounded inspection of the returned launcher to locate the installed executable",
+     "<installed codex 0.159.2> --version under an isolated environment",
+     "python3 -B codex_tui_strict_check.py <scratch> with installed Codex, its Node dependency and isolated HOME/CODEX_HOME",
+     "python3 -B scratch unittest loader for test_adoption_status, test_windows_terminal_defaults, test_adoption_docs_consistency, test_render_config and test_apply_claude_settings",
+     "ctx_execute: python3 -B JSON aggregation of jobs, severities, verifier grades, dispositions, usage, timestamps, prompt hashes and recorded colour counts",
+     "ctx_execute: python3 -B receipt and manifest SHA-256/byte-size verification",
+     "rtk rg -n '<project>|<project>' <checkout>/evidence/artifacts/terminal-lane-cross-family-review-20260930",
+     "rtk nl -ba <checkout>/evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/practice_repository_commits.txt",
+     "Read-only bounded source inspection of installed Claude Code 2.1.285 for hook identity, permission timing and PushNotification presence guards",
+     "Web searches followed by ctx_fetch_and_index for PR #532, Claude hooks documentation, Windows Terminal tagged sources and Codex rust-v0.157.1 types.rs",
+     "rtk git -C <checkout> rev-parse HEAD",
+     "rtk git -C <checkout> status --short"
+    ],
+    "finding_count": 10
+   }
+  }
+ ],
+ "findings": [
+  {
+   "id": "F-sol-R1-1",
+   "lane": "sol",
+   "job": "R1",
+   "severity": "high",
+   "file": "evidence/artifacts/notification-types-20260929/replace_bell_group.py",
+   "line": 140,
+   "claim": "The new backup comparison misses an atomic save made during the backup and overwrites that save without retaining a recovery copy.",
+   "evidence": "In ctx_execute, rtk python3 -B atomic_writer_during_backup.py interposed on acs.shutil.copyfileobj after write_backup had opened its source. It saved model='atomic-save-during-backup' using the repository's acs.atomic_write. Output: 'source inode differs from current live: True'; tool exit 0; 'read-back equals the merged copy: True'; 'FINAL LIVE MODEL original'; 'BACKUP MODELS [original]'; 'ANY RECOVERY COPY HAS NEW SAVE False'. Changing only the scratch concurrent_writer_harness.py to inject this interleaving made the existing controls report: 'the other writer’s save was lost ... the backup does not hold the newer content'; '24 cases, 1 problems'.",
+   "failure_scenario": "Another writer atomically replaces settings.json after write_backup opens the original inode but before it copies that inode. The backup still equals original, so the second comparison passes even though the live pathname contains newer settings. This happens before the second comparison, rather than in the acknowledged comparison-to-replace gap. The tool restores its stale model value and its backup also contains the stale value.",
+   "fix": "After making the backup, compare the current live file with original again and refuse if either the live file or backup differs. Add a control that atomically replaces the live pathname after the backup source is opened. Correct line 14's claim that the backup necessarily holds an intervening save, and distinguish the remaining final comparison-to-replace limitation from the protection actually tested.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-R1-2",
+   "lane": "sol",
+   "job": "R1",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+   "line": 256,
+   "claim": "The new signal handler can still leave the client running because the process cleanup guard starts after the client is spawned.",
+   "evidence": "A scratch rtk python3 -B stdin harness used a stand-in claude and a line trace to deliver the signal at os.close(slave), immediately after Popen returned. alert_probe.py: SIGTERM exit 143 and SIGHUP exit 129, both with 'private directory exists False child still running True'. The same experiment at push_notification_probe.py:297 produced the same results. The client process-group cleanup try/finally begins later in measure().",
+   "failure_scenario": "SIGTERM or SIGHUP arrives after the client process is created but before measure enters its observation-loop try/finally. SystemExit reaches with_private_dir and removes the payload directory, but never executes the client process-group cleanup.",
+   "fix": "Establish the resource cleanup guard before creating the pty and client, track which resources have been created, and protect process creation and registration from interruption. Add a signal case at this initialization boundary to both probes.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-R1-3",
+   "lane": "sol",
+   "job": "R1",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+   "line": 263,
+   "claim": "Restoring the original signal handlers before deleting the private directory leaves raw payloads behind when termination arrives during cleanup.",
+   "evidence": "Lines 263–264 restore each previous handler before shutil.rmtree(private). A scratch runner interposed on rmtree and sent SIGTERM at its entry, after work returned normally. Both alert_probe.py and push_notification_probe.py exited 143 with 'private directories left 1 payload retained True'. The corresponding restoration occurs at push_notification_probe.py:256.",
+   "failure_scenario": "A single SIGTERM arrives while the probe is beginning its final directory deletion. The original default handler has already been restored, so the process terminates without removing events.log. A repeated signal can similarly interrupt cleanup already triggered by an earlier signal.",
+   "fix": "Protect resource cleanup from SIGTERM and SIGHUP, for example by blocking or deferring them during cleanup, and restore previous handlers only after cleanup completes. Simply moving restoration below rmtree is insufficient if the raising handler can still interrupt rmtree. Add a cleanup-phase signal test.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-R1-4",
+   "lane": "sol",
+   "job": "R1",
+   "severity": "medium",
+   "file": "evidence/artifacts/notification-types-20260929/push_notification_probe.py",
+   "line": 144,
+   "claim": "The end-to-end SIGTERM check can pass without starting or terminating a stand-in client, and its process scan can mistake an unrelated process for that client.",
+   "evidence": "In scratch copies, measure() was changed to sleep 0.6 seconds and raise RuntimeError before spawning the client. Running the complete --selftest still returned exit 0: alert_probe had 38 PASS lines and push_notification_probe had 33 PASS lines, both ending 'PASS SIGTERM end to end: probe started True, private directory left False, stand-in client still alive False'. Separately, an unrelated Python process with an argument containing the constructed unique string made the unmodified signal_case fail with 'stand-in client still alive True', although its own stand-in had terminated.",
+   "failure_scenario": "The private directory appears, the probe crashes and cleans it up, and send_signal is called after the probe has already exited. Directory existence is treated as proof that the client started, so the check passes vacuously. Conversely, the substring search over every /proc cmdline can fail because of an unrelated process.",
+   "fix": "Have the stand-in publish its PID and a readiness marker. Require both probe and stand-in to be alive immediately before signaling, assert the probe's expected termination status, and check the recorded stand-in PID or process group instead of searching unrelated command lines. Apply the same correction to alert_probe.py.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-R1-5",
+   "lane": "sol",
+   "job": "R1",
+   "severity": "medium",
+   "file": "evidence/artifacts/notification-types-20260929/push_notification_probe.py",
+   "line": 439,
+   "claim": "The derived probe's hooks-disabled control still exits successfully after observing a forbidden BEL.",
+   "evidence": "With a synthetic HOME and stand-in claude that printed 'Enter to select' and emitted one BEL nine seconds after startup, rtk python3 -B push_notification_probe.py ask --control printed 'dialog_opened=True' and 'bare BEL bytes after the dialog opened: 1', then exited 0. The identical input to alert_probe.py exited 1 with 'a hooks-disabled control saw a BEL byte'. Both quiet controls exited 0.",
+   "failure_scenario": "A caller uses the supported ask --control mode of push_notification_probe.py and checks only its exit status. A BEL appears while every hook is disabled, invalidating attribution to the notification hook, but the caller receives success.",
+   "fix": "Apply the repaired alert_probe exit-status logic to the derived probe: return 1 when a hooks-disabled control observes a post-dialog BEL and retain 2 when the observation point is never reached. Add the corresponding exit-status cases and a stand-in CLI test.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-R1-6",
+   "lane": "sol",
+   "job": "R1",
+   "severity": "medium",
+   "file": "evidence/artifacts/notification-types-20260929/replace_bell_group_controls.py",
+   "line": 204,
+   "claim": "The new assertion that a 0640 backup preserves its mode is not valid under a restrictive umask.",
+   "evidence": "Running rtk python3 -B replace_bell_group_controls.py D with subprocess umask 077 returned exit 1: 'WRONG --apply keeps a file mode other than 0600 on the installed file and on its backup ... the backup does not keep the mode'; '24 cases, 1 problems'. A direct synthetic-home run exited 0 with installed mode 0640 and backup mode 0600. write_backup creates the backup with os.open and does not subsequently restore its mode. Python's documentation states: 'When computing mode, the current umask value is first masked out.' [Python os.open documentation](https://docs.python.org/3.11/library/os.html#os.open), fetched 2026-09-30.",
+   "failure_scenario": "A user runs the controls or replacement tool from a shell with umask 077 against a 0640 settings file. The new control fails, and the README's claim that the backup keeps that mode is false.",
+   "fix": "If exact backup-mode preservation is the intended contract, explicitly restore the source mode on the opened backup and add a umask-077 case. Otherwise, change the assertion and documentation to describe the backup's umask-filtered permissions rather than exact preservation.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-R1-7",
+   "lane": "sol",
+   "job": "R1",
+   "severity": "low",
+   "file": "evidence/artifacts/terminal-lane-cross-family-review-20260930/README.md",
+   "line": 17,
+   "claim": "The review README reports three pool points, while the receipt and decision record report four.",
+   "evidence": "README lines 17–18 say '71 minutes of wall clock; three points of the gateway pool’s hundred used.' A scratch receipt calculation printed 'POOL DELTA 4' from gateway_pool_points_used_before_and_after=[7,11]. The receipt claim and decision record also say four.",
+   "failure_scenario": "A reader uses the README to assess the review's recorded pool consumption and obtains a number inconsistent with the underlying record.",
+   "fix": "Replace three with four observed pool points, retaining the receipt's limitation that other sessions may have contributed to the observed delta.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-R2-1",
+   "lane": "sol",
+   "job": "R2",
+   "severity": "medium",
+   "file": "evidence/artifacts/notification-types-20260929/notification_types_scan.py",
+   "line": 65,
+   "claim": "The repaired reader can still select an unrelated scope's array and successfully omit an unknown notification type.",
+   "evidence": "In a scratch copy, `rtk python3 -B notification_types_scan.py <other-scope-nested-assignment> <checkout>` returned exit 0, `catalogs_resolved: true`, `base_candidates: 1`, and `unknown: []`. The fixture has an unrelated function assigning Ojo=[\"permission_prompt\",\"idle_prompt\"] and the catalog's function assigning Ojo=[...Q,\"brand_new_type\"]. `rtk node -e <same fixture>` returned [\"permission_prompt\",\"idle_prompt\",\"brand_new_type\",\"elicitation_complete\",\"elicitation_response\"]. A second fixture containing one recognized catalog and another with values:[...(true?Q:Ojo),\"elicitation_response\"] also returned exit 0 while omitting the second catalog.",
+   "failure_scenario": "A minified update reuses a spread identifier in another scope and constructs the real base through a nested spread. The global literal-assignment search finds only the unrelated assignment, calls the catalog resolved, and approves a bundle containing an unclassified type. An unsupported additional catalog is likewise invisible when another catalog matches the regex.",
+   "fix": "Account for every notification_type catalog marker and fail closed on unsupported catalog expressions. Resolve spread identifiers within their lexical scope, or refuse resolution when another assignment cannot be accounted for. Add the scoped nested-assignment and mixed recognized/unrecognized catalog fixtures; each must either report brand_new_type as UNKNOWN or exit nonzero as unresolved.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-R2-2",
+   "lane": "sol",
+   "job": "R2",
+   "severity": "medium",
+   "file": "evidence/artifacts/login-shell-contract-20260929/login_path_digest.py",
+   "line": 43,
+   "claim": "The new PATH protocol mistakes startup output for the measurement and can report identical digests for different final PATH values.",
+   "evidence": "Ran the CLI against temporary homes whose startup file first executes `printf \"PATH=%s\\n\" \"$PATH\"`, then prepends either $HOME/binA or $HOME/binB. Both runs exited 0 and reported 9 entries with digest f5a00065660f4ba1. An independent final-PATH probe using the identical HOME, USER, LOGNAME, SHELL and distro-default PATH environment observed 10 entries, with different digests 238582c9668d92cc and d01e10b73ff91e94. A startup `echo welcome` instead caused exit 1 with `the login shell ended before the PATH probe completed`, although that probe completed. The same first-line parsing in scrub_placeholder_probe.py returned None for welcome output and 'bogus' for an earlier PATH=bogus line.",
+   "failure_scenario": "A healthy login startup file prints a welcome message or logs PATH before modifying it. Ordinary output produces a false measurement error; an earlier PATH= line produces a successful measurement of the wrong value, hiding an actual PATH change.",
+   "fix": "Separate probe output from startup stdout using a dedicated descriptor or pipe, or read an unambiguous final adjacent PATH/DONE record instead of lines[0]. Apply the repair to scrub_placeholder_probe.py's login_path too. Add controls with startup logging and two different final PATH values, asserting the actual counts and hashes.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-R2-3",
+   "lane": "sol",
+   "job": "R2",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/color_capture.py",
+   "line": 65,
+   "claim": "Flattening semicolon parameters and colon subparameters misclassifies valid truecolor sequences as basic colors.",
+   "evidence": "A scratch Python harness calling sgr_counts('ESC[38:2::31:32:33m') returned fg_truecolor_38;2=0 and basic_16=1; sgr_counts('ESC[38:2::1:2:3m') counted no color. The empty slot is the color-space slot. The pinned Windows Terminal dispatch reads RGB after it, including `const size_t red = options.at(2).value_or(0);`, and applies the color when that slot is empty. Source: [microsoft/terminal v1.24.11911.0 adaptDispatchGraphics.cpp](https://raw.githubusercontent.com/microsoft/terminal/v1.24.11911.0/src/terminal/adapter/adaptDispatchGraphics.cpp), fetched 2026-09-30.",
+   "failure_scenario": "A capture contains the colon-form truecolor sequence ESC[38:2::31:32:33m. The terminal sets RGB(31,32,33), but the measurement reports a basic-color sequence. Similar empty-component inputs cause RGB channel values to be reinterpreted as independent SGR options.",
+   "fix": "Preserve colon subparameter groups when splitting semicolon parameters. Handle the empty color-space slot and component defaults according to the pinned dispatch, and consume the entire extended-color group so RGB channels cannot become basic-color options. Add these cases to the selftest with expectations derived from the upstream parser.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-R2-4",
+   "lane": "sol",
+   "job": "R2",
+   "severity": "medium",
+   "file": "evidence/artifacts/login-shell-contract-20260929/landscape_refresh.py",
+   "line": 67,
+   "claim": "The supposedly whole-definition comparison silently excludes multiline attributes and can report identical notification definitions after their serialized names change.",
+   "evidence": "In a scratch harness, reformatted SYNTHETIC's serde attributes as `#[serde(\\n    rename_all = \"lowercase\"\\n)]`, then changed the first rename_all value to \"UPPERCASE\". definitions_identical(old,new) returned True. The prefix pattern only accepts attributes without a newline. A mutant replacing the entire prefix with an empty regex also passed `rtk python3 -B <mutant> --selftest`: exit 0, 11 checks, no problems.",
+   "failure_scenario": "Upstream formats a serde attribute across multiple lines and later changes its rename_all rule. Although notification setting spellings change, the refresh reports notification_definitions_identical=true because the attribute was omitted from both extracted declarations.",
+   "fix": "Capture complete multiline attribute blocks attached to each declaration, and return unknown when extraction cannot account for them. Add a changed multiline serde attribute control and a mutant that drops declaration attributes; both must be detected.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-R2-5",
+   "lane": "sol",
+   "job": "R2",
+   "severity": "medium",
+   "file": "evidence/artifacts/login-shell-contract-20260929/scrub_placeholder_probe.py",
+   "line": 110,
+   "claim": "The append and replacement selftests can pass without observing either file because they compare against an already-dirty baseline.",
+   "evidence": "Mutated real_home_state to skip .profile and .zshrc after lstat. `rtk python3 -B <mutant> --selftest` still exited 0 with all ten results true, including appending_detected and replacing_a_file_with_a_same_size_copy_detected. A separate fresh-state harness showed the mutant missed both operations: `omission mutant append missed True` and `omission mutant replacement missed True`. Before those selftest checks, .bashrc's mtime has already been moved five seconds away from base.",
+   "failure_scenario": "A regression stops tracking .profile or .zshrc. The claimed controls still pass because the earlier .bashrc modification makes every later whole-state comparison unequal, regardless of whether the current operation was detected.",
+   "fix": "Use a fresh home or a fresh immediately-before snapshot for each operation. Assert that the specific changed entry differs and unrelated entries remain equal. Isolate inode detection by preserving size, mode and mtime during replacement, and require omission and dropped-inode mutants to fail.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-R2-6",
+   "lane": "sol",
+   "job": "R2",
+   "severity": "medium",
+   "file": "tests/test_windows_terminal_defaults.py",
+   "line": 53,
+   "claim": "The repaired documentation control still accepts a wrong operative matcher beside a correct historical quote when the wrong matcher omits permission_prompt.",
+   "evidence": "In a scratch checkout, changed the operative matcher in both the recipe and decision record to `worker_permission_prompt|push_notification`, then appended the correct overlay matcher as a historical backtick quote. `rtk python3 -B -m unittest tests.test_windows_terminal_defaults.DocumentationTests` returned exit 0: Ran 3 tests, OK. quoted_matchers filters out every list that does not contain permission_prompt, so only the correct historical quote reaches the comparison.",
+   "failure_scenario": "An active instruction accidentally drops permission_prompt and other required types while a correct historical quote remains. The tests pass although following the active instruction leaves permission requests silent.",
+   "fix": "Identify the operative matcher from its instruction context, or recognize notification matcher lists using any known notification type rather than requiring permission_prompt. Add controls for a wrong active list missing permission_prompt and a single-type matcher beside a correct historical quote.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-R2-7",
+   "lane": "sol",
+   "job": "R2",
+   "severity": "low",
+   "file": "evidence/artifacts/terminal-lane-cross-family-review-20260930/README.md",
+   "line": 17,
+   "claim": "The README reports three gateway pool points, while the new receipt and decision record report four.",
+   "evidence": "README lines 17–18 say `three points of the gateway pool's hundred used`. A scratch JSON accounting command read data.totals.gateway_pool_points_used_before_and_after=[7,11] and printed `pool arithmetic [7, 11] 4`. The decision record's new evidence table also says four points.",
+   "failure_scenario": "A reader using the artifact README receives a different resource-consumption number from a reader using the accompanying receipt or decision.",
+   "fix": "Change the README to four points, matching the recorded before/after values.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-R3-1",
+   "lane": "sol",
+   "job": "R3",
+   "severity": "medium",
+   "file": "evidence/artifacts/login-shell-contract-20260929/login_shell_check_controls.py",
+   "line": 56,
+   "claim": "The repaired login check still reports success for commands that the profile's exec cannot start: type -P can return a stale hashed pathname.",
+   "evidence": "In a scratch home, .bash_profile populated Bash's command hash with nonexistent paths for claude, codex, nativestack and rtk. A python3 -B harness called login_shell_check(home) and returned {'pass': True, 'missing_in_login_shell': [], 'probe_completed': True, 'exit': 0}. In the same home, type -P claude printed the nonexistent pathname, test -x failed, and exec claude exited 127 with 'No such file or directory'. The [Bash Reference Manual](https://tiswww.case.edu/php/chet/bash/bashref.html#Bash-Builtin-Commands), fetched 2026-09-30, also documents that -p and -P can print hashed values.",
+   "failure_scenario": "A startup file contains hash -p \"$HOME/missing/claude\" claude and equivalent entries for the other required commands. The doctor reports a healthy login environment even though starting the client fails with exit 127.",
+   "fix": "Require the resolved pathname to be a regular executable file, rather than accepting any nonempty type -P output. Add a synthetic home with stale hashed paths and require it to fail. Qualify the recipe and platform statements that type -P finds files only.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-R3-2",
+   "lane": "sol",
+   "job": "R3",
+   "severity": "medium",
+   "file": "evidence/artifacts/login-shell-contract-20260929/login_path_digest.py",
+   "line": 45,
+   "claim": "The new protocol hashes the first PATH= line, which can come from startup output instead of the completed probe.",
+   "evidence": "A scratch-home python3 -B harness used .profile containing printf \"PATH=%s\\n\" \"$PATH\" followed by an export of the final PATH. For final values /first/bin:/usr/bin:/bin and /second/bin:/usr/bin:/bin, independent Bash probes printed those different values, but measure(home) returned the identical accepted result in both arms: login_path_entries=9 and login_path_sha256_prefix=f5a00065660f4ba1, with no measurement_error. The same harness showed scrub_placeholder_probe.login_path(home) returning the earlier startup PATH in both arms.",
+   "failure_scenario": "A startup file prints a PATH diagnostic before changing PATH. Changing the final login PATH leaves the reported digest unchanged, falsely supporting the documented conclusion that the change altered nothing.",
+   "fix": "Parse the PATH record immediately preceding the final DONE marker, or use a separate output channel for the probe protocol. Apply the correction to scrub_placeholder_probe.login_path as well. Add a case with startup PATH diagnostics and assert the exact final value and digest.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-R3-3",
+   "lane": "sol",
+   "job": "R3",
+   "severity": "medium",
+   "file": "evidence/artifacts/login-shell-contract-20260929/scrub_placeholder_probe.py",
+   "line": 110,
+   "claim": "The new append and replacement controls remain green for broken implementations because earlier mutations permanently changed the shared baseline.",
+   "evidence": "In scratch copies, a python3 -B harness removed .profile from REAL_HOME_NAMES and separately removed inode from the recorded metadata tuple. Both mutants' --selftest runs exited 0 with all_detected_as_expected=true, including appending_detected and replacing_a_file_with_a_same_size_copy_detected. An isolated same-size, same-mode, same-mtime replacement changed the inode but compared unchanged under the inode-blind mutant. Lines 107-114 compare subsequent mutations with the original baseline after .bashrc's mtime has already changed.",
+   "failure_scenario": "The isolation checker stops monitoring .profile, or stops detecting inode-only replacements. The receipt's ten-check selftest still reports complete success because an unrelated earlier .bashrc change makes every later whole-home comparison unequal.",
+   "fix": "Give each mutation a fresh home or a fresh baseline taken immediately before that mutation. Assert that the intended file's entry changed. Preserve size, mode and mtime in the replacement case so that removing inode comparison makes that case fail.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-R3-4",
+   "lane": "sol",
+   "job": "R3",
+   "severity": "medium",
+   "file": "evidence/artifacts/login-shell-contract-20260929/landscape_refresh.py",
+   "line": 67,
+   "claim": "The repaired comparison still reports identical notification definitions when a multiline serde attribute changes their configuration semantics.",
+   "evidence": "A scratch-copy python3 -B harness formatted NotificationMethod's attribute as #[serde(\\n    rename_all = \"lowercase\"\\n)] and compared it with the same definition using \"UPPERCASE\". definitions_identical(old, new) returned True; the extracted NotificationMethod contained no rename_all attribute. The equivalent single-line change returned False. [Serde's container-attribute documentation](https://serde.rs/container-attrs.html), fetched 2026-09-30, confirms that rename_all changes serialized and deserialized enum variant names.",
+   "failure_scenario": "Upstream uses a multiline attribute and changes lowercase configuration names to uppercase names. The refresh reports notification_definitions_identical=true despite a behavior-changing definition change, contrary to its claim that whole attributes are included.",
+   "fix": "Include complete preceding multiline attribute blocks in the extracted item, and return unknown when attributes cannot be captured reliably. Add a multiline lowercase-to-UPPERCASE fixture that must return False.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-R3-5",
+   "lane": "sol",
+   "job": "R3",
+   "severity": "medium",
+   "file": "docs/decisions/2026-09-28-terminal-experience.md",
+   "line": 225,
+   "claim": "The decision record presents the strengthened real-home isolation measurement as a recorded native rerun, but the referenced receipt retains only its synthetic selftest.",
+   "evidence": "Line 225 states that 19 real-home names 'were unchanged by lstat mode, size, mtime and inode' and that 'a rerun with the revised script is recorded in the 2026-09-30 receipt'. Inspecting the new receipt and recorded outputs found only scrub_placeholder_probe_selftest.txt; recorded/exit_codes.txt:16 says 'exit 0 <- python3 -B scrub_placeholder_probe.py --selftest'. That output contains synthetic selftest booleans, not a native real_home_names_checked or real_home_compared_by result. The older login-shell receipt explicitly says its recorded values were produced by earlier script versions.",
+   "failure_scenario": "A reader treats the native isolation row as evidence that the revised 19-name metadata comparison observed the real host unchanged. The cited artifacts establish only that synthetic controls ran, while the historical native observation used the weaker earlier comparison.",
+   "fix": "Keep the historical row scoped to its original existence comparison and describe the stronger checker as a synthetic validation. Alternatively, retain the actual revised native-run summary, including its 19-name metadata fields, and register its command and hash in the new receipt.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-R3-6",
+   "lane": "sol",
+   "job": "R3",
+   "severity": "low",
+   "file": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/practice_repository_commits.txt",
+   "line": 4,
+   "claim": "The privacy repair removes private profile names from the older receipt but republishes them in the new evidence bundle.",
+   "evidence": "rtk proxy rg -n '<project>|<project>' against the added artifact directory found the names in results.json, verification.json and recorded/practice_repository_commits.txt. The latter's line 4 reads: '636e7ea README: the second distro (Polaris) was unregistered on 2026-09-29; <project> runs in NativeStack, <project> is archived'. verification.json:68 and :70 also reproduce the two names that finding F-sol-u498-B-4 says should be replaced.",
+   "failure_scenario": "Publishing the sanitized review artifacts discloses the same private profile identifiers that the accepted hygiene repair was intended to remove, including their current or archived status.",
+   "fix": "Replace the two private profile identifiers throughout the added records and recorded commit subjects with neutral placeholders. Extend the sanitizer accordingly and regenerate the affected receipt and manifest hashes. Keep the repository's permitted host_scope identifier.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-R3-7",
+   "lane": "sol",
+   "job": "R3",
+   "severity": "low",
+   "file": "evidence/artifacts/terminal-lane-cross-family-review-20260930/tmux_sync_probe.py",
+   "line": 4,
+   "claim": "The new probe's temporary-directory-only claim is false: -L creates a socket outside its private directory and the socket survives successful cleanup.",
+   "evidence": "A scratch-copy python3 -B harness ran the unchanged probe with TMUX_TMPDIR pointing to a separate scratch socket directory. The probe exited 0 with (3, 3) and (0, 0), but the harness reported 'socket remains outside probe-created ts directory True'. It then removed that specific socket. The [tmux 3.4 manual](https://github.com/tmux/tmux/blob/3.4/tmux.1) places -L sockets under TMUX_TMPDIR/tmux-UID, or /tmp/tmux-UID when unset.",
+   "failure_scenario": "A successful run removes its ts temporary directories and kills its server but leaves a socket in the shared tmux socket directory, despite claiming that all writes occur inside its own temporary directory.",
+   "fix": "Use -S with an explicit socket pathname inside the probe's private work directory, and remove that directory after terminating the client and server.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-R3-8",
+   "lane": "sol",
+   "job": "R3",
+   "severity": "low",
+   "file": "evidence/artifacts/terminal-lane-cross-family-review-20260930/README.md",
+   "line": 17,
+   "claim": "The README reports three gateway pool points, contradicting the receipt and decision record's four-point change.",
+   "evidence": "README lines 17-18 say 'three points of the gateway pool's hundred used'. The new receipt records gateway_pool_points_used_before_and_after=[7, 11], and a python3 -B audit computed the difference as 4. The receipt's claim and the decision record also say four.",
+   "failure_scenario": "Readers obtain different cost figures depending on which summary they consult.",
+   "fix": "Report a four-point difference in the cached pool limits, preserving the receipt's limitation that other sessions may have contributed.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-R3-9",
+   "lane": "sol",
+   "job": "R3",
+   "severity": "low",
+   "file": "evidence/receipts/cross-family-review-terminal-lane-20260930.json",
+   "line": 10,
+   "claim": "The prose counts the successful baseline as a fifteenth mutant run.",
+   "evidence": "The receipt says '24 controls and 15 mutant runs'. A python3 -B audit of recorded/replace_bell_group_mutants.txt counted 14 'ok    mutant,' rows and one unmutated baseline row. I reran the harness successfully: its final '15 runs, 0 problems' includes that baseline. The structured repair_checks field correctly calls them 15 runs.",
+   "failure_scenario": "The receipt, decision record and PR summary overstate mutation coverage by one and imply that every one of the fifteen runs exercises a defective implementation.",
+   "fix": "Describe the coverage consistently as 14 mutants plus one successful baseline, or 15 total runs, and correct the repeated prose in the decision record and PR description.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-U1-1",
+   "lane": "ultra",
+   "job": "U1",
+   "severity": "medium",
+   "file": "evidence/artifacts/notification-types-20260929/replace_bell_group.py",
+   "line": 14,
+   "claim": "The new assurance that the backup preserves a save made between backup and replacement is false.",
+   "evidence": "The changed text says: \"change in the last instant between the backup and the replace is not excluded (the backup then holds it).\" In a scratch HOME, a python3 -B runpy harness wrapped acs.atomic_write to change model to changed-after-backup immediately before the real replacement. The unmodified tool exited 0 and printed \"read-back equals the merged copy: True\"; inspection reported \"installed model original-model\" and \"backup models ['original-model']\".",
+   "failure_scenario": "Another writer saves after backup creation and comparison. Replacement erases that save, and the existing backup also lacks it. The acknowledged race is not being reopened here; the defect is the newly stated recovery assurance.",
+   "fix": "Remove the assertion that the backup contains this intervening save. Explicitly state that it can be absent from both the installed file and backup, and qualify the decision record's statement that the tool installs only over the bytes it read. Add an after-backup injection case to keep the documented residual accurate.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-U1-2",
+   "lane": "ultra",
+   "job": "U1",
+   "severity": "medium",
+   "file": "evidence/artifacts/login-shell-contract-20260929/login_path_digest.py",
+   "line": 45,
+   "claim": "The repaired digest can successfully hash startup logging instead of the final PATH, making different PATHs compare equal.",
+   "evidence": "A scratch .bash_profile printed \"PATH=logged-before-final-path\\n\", then assigned PATH=\"/synthetic/first:$PATH\"; a second run used /synthetic/second. Both unmodified CLI runs exited 0 with login_path_entries=1 and login_path_sha256_prefix=2872b9f4cd092719. Independent NUL-framed captures using the same HOME, USER, LOGNAME, SHELL and distro default PATH measured 10 entries and different digests: 2755fd727acd8653 and 36fd9d2c29da5499. The code validates the final DONE but hashes lines[0].",
+   "failure_scenario": "A startup file logs a PATH= line before finishing its PATH setup. The real probe supplies DONE afterward, allowing the earlier diagnostic line to pass validation. Legitimate newline-containing PATH components are also truncated by splitlines().",
+   "fix": "Use an unambiguous, binary-safe final PATH record and hash its complete payload; reject malformed framing. Add tests asserting exact entry counts and digests for startup output and newline-containing paths, rather than merely checking that a digest exists.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-U1-3",
+   "lane": "ultra",
+   "job": "U1",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+   "line": 256,
+   "claim": "A second termination signal interrupts cleanup and leaves the client running.",
+   "evidence": "A python3 -B scratch harness ran each unmodified probe against a synthetic claude that recorded its PID and exec'd /bin/sleep 300. One SIGTERM produced exit 143 with the child gone. Two SIGTERMs 100 ms apart produced exit 143 with the child remaining. A follow-up check confirmed State: S (sleeping) and the expected sleep command, excluding a zombie-process false positive. This reproduced in alert_probe.py and push_notification_probe.py, whose corresponding handler is at line 249. Both reported their raw payload directory removed. verification.json explicitly required: \"A repeated signal during cleanup should be ignored.\"",
+   "failure_scenario": "The first SIGTERM enters measure's finally block. A second SIGTERM during its cleanup sleeps raises another SystemExit, bypassing process-group termination. The parent exits while its client continues running.",
+   "fix": "Ignore further SIGTERM and SIGHUP signals once shutdown begins, through both child-process and private-directory cleanup. Restore previous handlers only after cleanup completes. Add a two-signal test that verifies the child was running before interruption and is gone afterward.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-U1-4",
+   "lane": "ultra",
+   "job": "U1",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+   "line": 126,
+   "claim": "The new end-to-end SIGTERM control passes even when its stand-in client never starts.",
+   "evidence": "In scratch copies, replacing only subprocess.Popen([\"claude\", \"--model\" with subprocess.Popen([\"/bin/true\", \"--model\" left both complete --selftest runs exiting 0. Each printed: \"PASS SIGTERM end to end: probe started True, private directory left False, stand-in client still alive False\". The started predicate only checks whether an alert-probe-* directory exists. The same defect is at push_notification_probe.py:128.",
+   "failure_scenario": "A broken launcher creates the probe directory but never executes the stand-in. The test interprets directory creation as startup and absence of the never-created child as successful cleanup.",
+   "fix": "Have the stand-in publish a PID/readiness token, require that exact process to be alive before sending SIGTERM, and verify its termination afterward. Add the never-started-client mutant and require the control to reject it.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-U1-5",
+   "lane": "ultra",
+   "job": "U1",
+   "severity": "medium",
+   "file": "evidence/artifacts/notification-types-20260929/notification_types_scan.py",
+   "line": 51,
+   "claim": "The repaired resolver accepts an unrelated property assignment as the catalog's identifier assignment and can silently miss an unknown notification type.",
+   "evidence": "The scratch fixture assigned obj.Ojo=[\"permission_prompt\",\"idle_prompt\"], defined f(Ojo) returning a catalog with values:[...Ojo,\"elicitation_complete\",\"elicitation_response\"], and called f with an additional brand_new_type. Node evaluated the actual catalog as five types including brand_new_type. Running python3 -B notification_types_scan.py against the same file exited 0 with catalogs_resolved=True, unknown=[], and matcher_values=4. The pattern (?<![\\w$]) permits the dot before obj.Ojo, although the catalog spreads a function parameter with no supported array assignment.",
+   "failure_scenario": "A client bundle contains a parameterized catalog and an unrelated property with the same short name. The reader reports successful resolution using the property's array and misses a type in the real catalog, instead of failing closed.",
+   "fix": "Exclude member access from the assignment boundary, for example by changing the negative lookbehind to (?<![\\w$.]). Add this complete fixture expecting zero base candidates, unresolved catalog status and a nonzero CLI exit; add a mutant that removes the dot exclusion.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-U1-6",
+   "lane": "ultra",
+   "job": "U1",
+   "severity": "medium",
+   "file": "evidence/artifacts/login-shell-contract-20260929/landscape_refresh.py",
+   "line": 72,
+   "claim": "The notification-definition comparison still omits Notifications' Default implementation and reports identical definitions when notifications change from enabled to disabled by default.",
+   "evidence": "A scratch python3 -B harness compared SYNTHETIC plus an impl Default for Notifications returning Self::Enabled(true) with the same text returning Self::Enabled(false). Output: \"landscape default true-to-false identical True captured parts 6\". All eleven supplied selftests also passed. The tagged [Codex types.rs](https://raw.githubusercontent.com/openai/codex/rust-v0.157.1/codex-rs/config/src/types.rs), fetched 2026-09-30, contains \"impl Default for Notifications\" returning \"Self::Enabled(true)\". The earlier verifier's F-sol-u498-A-6 repair explicitly required the Default implementation.",
+   "failure_scenario": "An upstream release changes only the Notifications default. The refresh reports notification_definitions_identical=true despite a behavior change that the agreed repair was supposed to detect.",
+   "fix": "Include the complete Notifications Default implementation among the required comparison blocks. Return null when it is missing, and add controls for both a changed implementation and a missing implementation.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-U1-7",
+   "lane": "ultra",
+   "job": "U1",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/color_capture.py",
+   "line": 65,
+   "claim": "Flattening colon subparameters into semicolon parameters misclassifies valid truecolor and makes the new colon selftest assert the wrong result.",
+   "evidence": "Calling sgr_counts on ESC[38:2::31:32:33m returned fg_truecolor_38;2=0 and basic_16=1. ESC[38:2:1:2:3m returned fg_truecolor_38;2=1, and all eight selftests passed. The pinned [Windows Terminal parser](https://raw.githubusercontent.com/microsoft/terminal/v1.24.11911.0/src/terminal/adapter/adaptDispatchGraphics.cpp), fetched 2026-09-30, uses \"const bool hasColorSpaceId = options.at(1).has_value();\" and applies colon RGB only with an empty color-space field. RGB occupies subsequent subparameters. Thus the first tested sequence is valid and the selftest's second sequence is rejected by the pinned terminal.",
+   "failure_scenario": "Valid colon RGB containing the empty color-space field is rejected by the counter, which then counts RGB components such as 31, 32 and 33 as basic colors. Conversely, the new selftest blesses an invalid nonempty color-space identifier.",
+   "fix": "Keep semicolon parameters and colon subparameter groups distinct. Consume each color group as a unit and follow the pinned parser's color-space, component and default rules. Replace the invalid fixture and add a valid colon fixture with RGB values overlapping basic-color codes.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-U1-8",
+   "lane": "ultra",
+   "job": "U1",
+   "severity": "medium",
+   "file": "evidence/artifacts/login-shell-contract-20260929/scrub_placeholder_probe.py",
+   "line": 110,
+   "claim": "The append and replacement controls cannot establish that those changes are detected because an earlier fixture change already makes the comparison unequal.",
+   "evidence": "The selftest changes .bashrc's mtime at line 107 and leaves it different from base before testing .profile appending and .zshrc replacement. In a scratch mutation, real_home_state was changed to skip .profile and .zshrc entirely. Both the original and mutated --selftest exited 0, reporting appending_detected=true, replacing_a_file_with_a_same_size_copy_detected=true and all_detected_as_expected=true.",
+   "failure_scenario": "A regression stops observing the appended or replaced files. These controls still pass because the earlier .bashrc difference satisfies real_home_state(root) != base independently of the operation being tested.",
+   "fix": "Give each mutation an independent fixture or a fresh baseline immediately before that operation. Add mutants omitting the relevant observations and require the corresponding controls to fail.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-U1-9",
+   "lane": "ultra",
+   "job": "U1",
+   "severity": "low",
+   "file": "evidence/artifacts/terminal-lane-cross-family-review-20260930/recorded/practice_repository_commits.txt",
+   "line": 4,
+   "claim": "The privacy repair removes private project labels from the older receipt but republishes them in the new review artifacts.",
+   "evidence": "The numbered file read shows: \"636e7ea README: the second distro (Polaris) was unregistered on 2026-09-29; <project> runs in NativeStack, <project> is archived\". A scoped rg search also finds the private labels in results.json:577,2040,2092 and verification.json:68,70. findings.json marks F-sol-u498-B-4 repaired; only the registered host identifier was explicitly kept.",
+   "failure_scenario": "Publishing the new artifact directory exposes the labels removed by the privacy repair and additionally publishes their operational status.",
+   "fix": "Replace the private labels with generic placeholders throughout the new review JSON and recorded commit subjects. Extend the publishing sanitizers and regenerate affected hashes and manifest entries.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-U1-10",
+   "lane": "ultra",
+   "job": "U1",
+   "severity": "low",
+   "file": "evidence/artifacts/terminal-lane-cross-family-review-20260930/README.md",
+   "line": 17,
+   "claim": "The README reports three gateway-pool points while the receipt and decision record report four.",
+   "evidence": "README.md:17-18 says \"71 minutes of wall clock; three points of the gateway pool's hundred used.\" The receipt records gateway_pool_points_used_before_and_after=[7,11], and its claim and the decision record say four. JSON arithmetic confirms a difference of 4.",
+   "failure_scenario": "Readers get conflicting consumption figures for the same review depending on which new record they consult.",
+   "fix": "Change the README to four points and retain the receipt's qualification that these are cached aggregate before/after figures that may include other sessions.",
+   "tested": true
+  }
+ ]
+}

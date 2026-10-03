@@ -3,18 +3,28 @@
 
 Checks command presence with shutil.which; it never invokes those commands. The
 only subprocess is a bounded native Git revision query. It opens no credential store
-(~/.claude.json, ~/.claude/.credentials.json, ~/.codex/auth.json) and reads no
+(~/.claude.json, ~/.claude/.credentials.json, ~/.codex/auth.json). A profile's optional
+source_profile is read from this checkout and reduced to source-review counts and
+blocking-gap status; none of its install or acceptance commands run. It reads no
 service/process state, network endpoint or model API. Client configuration is read
 only with the opt-in --client-wiring, which parses fixed native client files whole and
 in-process and emits no value from them: fixed booleans and hook-event counts only,
 never a value, command, path or environment value (Codex hook trust is compared as a
-SHA-256 inside this process, as Codex computes it). The opt-in --pinned-versions execs
+SHA-256 inside this process, as Codex computes it; the two Codex role files under the
+Codex home's agents/ are compared byte for byte with this checkout's adoption/agents/codex
+copies and only how many are equal is reported). The opt-in --pinned-versions execs
 a profile's PATH-resolved commands with their platform pin's declared "exec"
 version_probe only (never one declared "npm-metadata" or another method, since that
 method exists exactly because running the tool starts a server or a UI), each in its
 own process group that is killed once the probe exits, times out or is interrupted,
 and emits booleans, counts, component ids and version strings from the checked-in
-manifest and pins file and the output of a probe that exited 0.
+manifest and pins file and the output of a probe that exited 0. The opt-in --login-shell looks at the metadata of the
+three personal startup files a Bash login shell reads (~/.bash_profile, ~/.bash_login, ~/.profile) without opening or
+executing any of them, and emits a fixed state per file, never a value, path or environment value. The opt-in
+--launcher-resolution is the one check that runs them: a bounded Bash login shell from a fixed environment reports
+where `command -v claude` resolves (claude itself never runs), shown only under $ECO_ROOT, $HOME or a system
+directory, with whether it is the ecosystem launcher and that launcher's sha256. Without that flag, --login-shell
+reports launcher_resolution as {"status": "not_run", "flag": "--launcher-resolution"}.
 """
 
 from __future__ import annotations
@@ -30,6 +40,7 @@ import re
 import shlex
 import shutil
 import signal
+import stat
 import subprocess
 import sys
 import tempfile
@@ -50,14 +61,16 @@ NO_PINNED_VERSION = "Executable presence does not verify its version, installati
 LIMITATIONS = [
     NO_PINNED_VERSION,
     "Historical acceptance remains historical; no provider, service, GPU, hook, or broker acceptance runs here.",
-    "Git comparison reports source identity only; changed worktree files are not inspected.",
+    "Git comparison reports source identity only; it does not compare worktree file contents with that commit.",
     NO_CLIENT_STATE,
 ]
 # --client-wiring replaces NO_CLIENT_STATE with these two statements.
 CLIENT_WIRING_LIMITATIONS = [
     "--client-wiring parses the user Claude settings and plugin registry, the Codex config.toml, hooks.json, "
     "AGENTS.override.md, AGENTS.md and RTK.md, and this checkout's .claude/settings.json and .codex/config.toml whole "
-    "and in-process, and emits no value from them: fixed booleans and hook-event counts only. It opens no credential "
+    "and in-process, and emits no value from them: fixed booleans and hook-event counts only. It also compares the two "
+    "Codex role files under the Codex home's agents/ with this checkout's adoption/agents/codex copies byte for byte "
+    "and reports how many are equal, a count and never a name or text. It opens no credential "
     "store (~/.claude.json, ~/.claude/.credentials.json, ~/.codex/auth.json), network endpoint or running process; "
     "environment variables only locate the client homes, and two opt-ins are checked by name.",
     "Configured wiring is not activation: managed, project or local Claude settings, and Codex profiles, project "
@@ -92,6 +105,56 @@ PINNED_VERSION_LIMITATIONS = [
     "platform, or whose declared method is not \"exec\" (for example context-mode's \"npm-metadata\", declared "
     "because any other argument starts its MCP stdio server), is reported unchecked; this never execs a probe "
     "whose declared method is not \"exec\".",
+]
+# --login-shell: the personal files a Bash login shell reads, in bash(1) INVOCATION order. GNU bash 5.3 shell.c
+# execute_profile_file (1116-1127) runs ~/.bash_profile and, only while maybe_execute_file returns 0, ~/.bash_login and
+# then ~/.profile; builtins/evalfile.c evalfile_internal returns 0 only for a missing file (FEVAL_ENOENTOK) and nonzero
+# for an empty file (nr == 0), a directory and every other open error, so the first file that exists ends the search
+# even when it reads as nothing; maybe_execute_file does not set FEVAL_REGFILE, so a device is read as empty and a FIFO
+# blocks the shell. Key -> file name under HOME.
+LOGIN_SHELL_FILES = {"bash_profile": ".bash_profile", "bash_login": ".bash_login", "profile": ".profile"}
+LOGIN_FILE_STATES = ("absent", "empty", "content", "unusable")
+LOGIN_SHELL_KEYS = (*LOGIN_SHELL_FILES, "first_read", "profile_read")
+# --login-shell appends this statement.
+LOGIN_SHELL_LIMITATIONS = [
+    "--login-shell looks at the metadata of ~/.bash_profile, ~/.bash_login and ~/.profile under HOME (existence, regular "
+    "file, read permission, size) and never opens, reads or executes one, so it emits a fixed state per file (absent, "
+    "empty, content or unusable), the file a Bash login shell reads first and whether that shell reaches ~/.profile, "
+    "never a value, path or environment value. It mirrors GNU bash 5.3's login search (shell.c execute_profile_file, "
+    "builtins/evalfile.c evalfile_internal): the first of the three that exists ends the search even when it is empty "
+    "or unusable (a directory, an unreadable file or a special file: a device reads as empty and a FIFO blocks the login "
+    "shell), so an empty ~/.bash_profile hides a real ~/.profile. profile_read is true when the search reaches ~/.profile "
+    "and it is usable, false when an earlier file is empty or unusable, when ~/.profile is itself unusable or when it does "
+    "not exist, and null when an earlier file has content, since whether that file sources ~/.profile is not read. HOME "
+    "is the environment's, else the passwd entry's, else \"/\", the way bash falls back (shell.c). It does not run a login shell, so it proves neither a PATH nor a command; "
+    "/etc/profile, ~/.bashrc, another shell, --noprofile, POSIX mode and an sh-mode login (which read other files or "
+    "none, bash(1) INVOCATION) are outside it.",
+]
+# --launcher-resolution: one Bash login shell, started as a Windows Terminal profile's `bash -lc` starts one
+# (adoption/platforms/linux-wsl2.md, "Windows Terminal profiles and the login shell"), from a fixed environment, so this
+# process's own PATH cannot answer for it (a probe from a shell that already has PATH passes with broken login files).
+# The PATH is the system directories of adoption/hosts/example.json's HOST_PATH.
+LAUNCHER_LOGIN_PATH = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+LAUNCHER_TIMEOUT_SECONDS = 10
+LAUNCHER_MARKER = "native-agent-stack:launcher-resolution:"
+# A resolved path outside $ECO_ROOT and $HOME is shown only under these directories; any other is withheld (on WSL a
+# Windows npm install puts a `claude` script under /mnt/c/Users/<name>/, which names the user).
+LAUNCHER_SYSTEM_PREFIXES = ("/usr/", "/bin/", "/sbin/", "/opt/", "/snap/", "/nix/")
+LAUNCHER_RESOLUTIONS = ("ecosystem_launcher", "other", "not_found", "unavailable")
+LAUNCHER_RESOLUTION_KEYS = ("resolution", "path", "is_ecosystem_launcher", "launcher_sha256")
+# --login-shell without --launcher-resolution: that check executes the login files, which --login-shell never does, so
+# the report says the check was not run and which flag runs it instead of leaving the key out.
+LAUNCHER_NOT_RUN = {"status": "not_run", "flag": "--launcher-resolution"}
+# --launcher-resolution appends this statement.
+LAUNCHER_RESOLUTION_LIMITATIONS = [
+    "--launcher-resolution runs one Bash login shell (`bash -l -c`, stdin from /dev/null, its own process group killed "
+    f"after {LAUNCHER_TIMEOUT_SECONDS}s) from a fixed environment: HOME, USER and LOGNAME from this process and PATH "
+    f"{LAUNCHER_LOGIN_PATH}, as a terminal profile's `bash -lc` starts, so this process's PATH cannot answer for it. That "
+    "shell runs /etc/profile and the first personal startup file bash finds, whatever they do, then `command -v "
+    "claude`; claude itself never runs. It reports where claude resolves only as a path under $ECO_ROOT "
+    "($ECO_INSTALL_ROOT, else ~/.local/share/codex-ecosystem), under $HOME or under a system directory, and withholds "
+    "any other path; whether it is the ecosystem launcher $ECO_ROOT/bin/claude; and that launcher's sha256. WSL's "
+    "appended Windows PATH entries, ~/.bashrc and another login shell are outside it.",
 ]
 # The selected token practice's client wiring (docs/token-efficiency-stack.md, "Coverage check").
 CONTEXT_MODE_PLUGIN = "context-mode@context-mode"
@@ -156,8 +219,13 @@ CLIENT_WIRING_KEYS = {
                "workflow_concurrency_set", "effort_level_env_unset", "agent_teams_opt_in"),
     "project": ("settings_depth_and_concurrency", "codex_mcp_servers_present"),
     "codex": ("rtk_instructions", "context_mode_plugin_enabled", "mcp_servers_present", "hooks_feature_enabled",
-              "ai_memory_hook_events", "ai_memory_hook_events_trusted"),
+              "ai_memory_hook_events", "ai_memory_hook_events_trusted", "stack_roles_matching"),
 }
+# The two Codex role carriers the worker lane installs under <Codex home>/agents (tools/adoption/apply_codex_lane.py) and
+# this checkout ships in adoption/agents/codex, whose SHA256SUMS names exactly these two files.
+STACK_ROLE_FILES = ("stack-researcher.toml", "stack-verifier.toml")
+STACK_ROLES_SOURCE = Path(__file__).resolve().parents[1] / "adoption" / "agents" / "codex"
+ABSENT, NOT_A_FILE = "absent", "not_a_file"
 
 
 class InvalidManifest(ValueError):
@@ -251,6 +319,8 @@ def validate_manifest(data, root: Path) -> dict:
         for reference in references:
             recipe_path(root, reference)
         require(len(references) == len(set(references)), "recipe_paths contains duplicate references")
+        if "source_profile" in profile:
+            recipe_path(root, profile["source_profile"])
     require(isinstance(data.get("default_profile"), str) and data["default_profile"] in ids,
             "default_profile must identify a profile")
     return data
@@ -798,8 +868,64 @@ def codex_ai_memory_hook_counts(events: dict, config, key_root: str) -> tuple[in
                             and states.get(key, {}).get("trusted_hash") == digest})
 
 
-def codex_wiring(codex_dir: Path, key_root: str | None = None) -> dict:
-    """``key_root`` is the Codex home as Codex spells it in hook keys (client_wiring passes it)."""
+def read_regular_bytes(path: Path, limit: int = CLIENT_FILE_LIMIT):
+    """The bytes of a regular file, never read through a link: ABSENT when there is none, NOT_A_FILE for a link, a folder or
+    another kind of file, None when it cannot be read (a folder that cannot be searched, a path through a file, no
+    permission) or is over ``limit``."""
+    try:
+        mode = os.lstat(path).st_mode
+    except FileNotFoundError:
+        return ABSENT
+    except OSError:
+        return None
+    if not stat.S_ISREG(mode):
+        return NOT_A_FILE
+    try:
+        with open(path, "rb") as handle:
+            data = handle.read(limit + 1)
+    except OSError:
+        return None
+    return data if len(data) <= limit else None
+
+
+def stack_roles_matching(codex_dir: Path, roles_source: Path) -> int | None:
+    """How many of the two Codex role carriers under ``codex_dir``/agents are byte for byte the copies in ``roles_source``
+    (this checkout's adoption/agents/codex): a count, never a file's text or name.
+
+    0 when the agents folder is absent. A carrier that is absent, a link, a folder or another kind of file, or that differs,
+    does not count. None when the comparison cannot be made: a source copy is unreadable (also where the folder is absent),
+    the agents path is a link or not a folder (what Codex would load through it is not known here), or the folder or an
+    installed carrier cannot be read. Codex discovers a role from every *.toml below agents/ (codex-rs/agent-roles/src/
+    discovery.rs at rust-v0.157.1), so an extra file is another role: tools/adoption/apply_codex_lane.py and
+    tools/token-e2e/freeze_snapshot.py count those, and this count does not."""
+    sources = []
+    for name in STACK_ROLE_FILES:
+        data = read_regular_bytes(roles_source / name)
+        if not isinstance(data, bytes):
+            return None
+        sources.append(data)
+    agents = codex_dir / "agents"
+    try:
+        mode = os.lstat(agents).st_mode
+    except FileNotFoundError:
+        return 0
+    except OSError:
+        return None
+    if not stat.S_ISDIR(mode):  # lstat does not follow a link, so a linked folder is not a folder here
+        return None
+    matching = 0
+    for name, expected in zip(STACK_ROLE_FILES, sources):
+        found = read_regular_bytes(agents / name)
+        if found is None:
+            return None
+        matching += isinstance(found, bytes) and found == expected
+    return matching
+
+
+def codex_wiring(codex_dir: Path, key_root: str | None = None, *, roles_source: Path | None = None) -> dict:
+    """``key_root`` is the Codex home as Codex spells it in hook keys (client_wiring passes it); ``roles_source`` is the
+    directory holding the two role carriers to compare with (client_wiring passes the checkout's, and a caller that passes
+    none gets this repository's own)."""
     config = read_client_file(codex_dir / "config.toml", "toml")
     engine = codex_hooks_enabled(config)
     hooks_path = codex_dir / "hooks.json"
@@ -826,6 +952,8 @@ def codex_wiring(codex_dir: Path, key_root: str | None = None) -> dict:
         "hooks_feature_enabled": engine,
         "ai_memory_hook_events": configured,
         "ai_memory_hook_events_trusted": trusted,
+        "stack_roles_matching": stack_roles_matching(codex_dir, STACK_ROLES_SOURCE if roles_source is None
+                                                     else roles_source),
     }
 
 
@@ -861,7 +989,9 @@ def leaves(value) -> list:
 def wiring_complete(groups: dict) -> bool:
     """The documented rule (docs/token-efficiency-stack.md, "Coverage check"): every file parsed, every boolean
     true with each Codex server named in the user or the project config.toml, both hook counts above zero, and
-    every Codex event that runs ai-memory trusted, so Codex actually runs its hook."""
+    every Codex event that runs ai-memory trusted, so Codex actually runs its hook. The count of matching role files
+    (stack_roles_matching) is information: a number, 0 included, never blocks completeness, but its None (a file, the folder
+    or a source copy that cannot be read) does, like every other null."""
     if None in leaves(groups):
         return False
     claude, project, codex = groups["claude"], groups["project"], groups["codex"]
@@ -886,10 +1016,132 @@ def client_wiring(root: Path, env=None) -> dict:
     key_root = os.path.realpath(codex_home) if codex_home else os.path.normpath(f"{home}/.codex")
     groups = {"claude": claude_wiring(Path(env.get("CLAUDE_CONFIG_DIR") or f"{home}/.claude"), env),
               "project": project_wiring(root),
-              "codex": codex_wiring(Path(codex_home or f"{home}/.codex"), key_root)}
+              "codex": codex_wiring(Path(codex_home or f"{home}/.codex"), key_root,
+                                    roles_source=root / "adoption" / "agents" / "codex")}
     if not fixed_wiring(groups):
         raise AssertionError("client wiring must be the fixed keys with boolean or count values")
     return {**groups, "complete": wiring_complete(groups)}
+
+
+def login_file_state(path: Path) -> str:
+    """How a Bash login shell finds one startup file, from its metadata alone: absent (ENOENT, a dangling symlink
+    included: the search goes on), empty (read as nothing, yet the search ends), content, or unusable (a directory,
+    a special file, no read permission or any other error: the search ends at that file, whatever bash then does with
+    it: it reports a directory, reads a device such as /dev/null as empty, and blocks on a FIFO). Never opens it."""
+    try:
+        info = path.stat()
+    except FileNotFoundError:
+        return "absent"
+    except OSError:
+        return "unusable"
+    if not stat.S_ISREG(info.st_mode) or not os.access(path, os.R_OK):
+        return "unusable"
+    return "content" if info.st_size else "empty"
+
+
+def fixed_login_shell(result) -> bool:
+    """The exact LOGIN_SHELL_KEYS shape over fixed literals only: no text from a file can pass."""
+    return (isinstance(result, dict) and set(result) == set(LOGIN_SHELL_KEYS)
+            and all(result[key] in LOGIN_FILE_STATES for key in LOGIN_SHELL_FILES)
+            and any(result["first_read"] is value for value in (*LOGIN_SHELL_FILES, None))
+            and any(result["profile_read"] is value for value in (True, False, None)))
+
+
+def login_home(env) -> Path:
+    """HOME as bash finds it: the environment's, else the passwd entry's, else "/" (shell.c sets
+    current_user.home_dir to "/" when getpwuid fails)."""
+    try:
+        return Path(env.get("HOME") or Path.home())
+    except (KeyError, RuntimeError, OSError):
+        return Path("/")
+
+
+def login_shell(env=None) -> dict:
+    """Opt-in static check of the files a Bash login shell reads under HOME (see LOGIN_SHELL_FILES). Fixed keys: a
+    state per file, first_read (the first file that exists, None when none does) and profile_read (True when the
+    search reaches ~/.profile and it is usable, False when an empty or unusable file ends the search first, when
+    ~/.profile is itself unusable or when it does not exist, None when an earlier file has content and may or may not
+    source it). HOME comes from the environment, else from the user's passwd entry, else "/" as bash falls back to it
+    (shell.c sets current_user.home_dir to "/" when getpwuid fails)."""
+    env = os.environ if env is None else env
+    home = login_home(env)
+    states = {key: login_file_state(home / name) for key, name in LOGIN_SHELL_FILES.items()}
+    first = next((key for key, state in states.items() if state != "absent"), None)
+    if first is None:
+        profile_read = False
+    elif first == "profile":
+        profile_read = states["profile"] != "unusable"
+    else:
+        profile_read = None if states[first] == "content" else False
+    result = {**states, "first_read": first, "profile_read": profile_read}
+    if not fixed_login_shell(result):
+        raise AssertionError("login shell state must be the fixed keys with fixed values")
+    return result
+
+
+def shown_path(path: str, eco_root: Path, home: Path) -> str | None:
+    """A resolved path as the report may show it: under the ecosystem root as $ECO_ROOT/..., under HOME as
+    $HOME/..., a system directory's path as it is, and None for anything else."""
+    normal = os.path.normpath(path)
+    for anchor, name in ((eco_root, "$ECO_ROOT"), (home, "$HOME")):
+        base = os.path.normpath(str(anchor))
+        if base != "/" and normal.startswith(base + "/"):
+            return f"{name}/{normal[len(base) + 1:]}"
+    return normal if normal.startswith(LAUNCHER_SYSTEM_PREFIXES) else None
+
+
+def fixed_launcher_resolution(result) -> bool:
+    """The exact LAUNCHER_RESOLUTION_KEYS shape: a resolution from the fixed list, a shown path or None, a boolean that
+    agrees with the resolution, and a sha256 or None."""
+    if not isinstance(result, dict) or tuple(result) != LAUNCHER_RESOLUTION_KEYS:
+        return False
+    path, digest = result["path"], result["launcher_sha256"]
+    return (result["resolution"] in LAUNCHER_RESOLUTIONS
+            and (path is None or (isinstance(path, str) and "\n" not in path
+                                  and path.startswith(("$ECO_ROOT/", "$HOME/", *LAUNCHER_SYSTEM_PREFIXES))))
+            and isinstance(result["is_ecosystem_launcher"], bool)
+            and result["is_ecosystem_launcher"] == (result["resolution"] == "ecosystem_launcher")
+            and (digest is None or (isinstance(digest, str) and re.fullmatch(r"[0-9a-f]{64}", digest) is not None)))
+
+
+def launcher_resolution(env=None, seconds: float = LAUNCHER_TIMEOUT_SECONDS) -> dict:
+    """Opt-in: where `command -v claude` resolves in a Bash login shell started from a fixed environment (see
+    LAUNCHER_RESOLUTION_LIMITATIONS), whether that is the ecosystem launcher ($ECO_INSTALL_ROOT, else
+    ~/.local/share/codex-ecosystem, then bin/claude), and the launcher's sha256. claude is never run. resolution is
+    unavailable when no bash is found, the shell does not finish within ``seconds`` or prints no answer, not_found when
+    no claude resolves, and other for anything but the launcher, whose path is shown only under $ECO_ROOT, $HOME or a
+    system directory (an alias or function is never shown)."""
+    env = os.environ if env is None else env
+    home = login_home(env)
+    eco_root = Path(env.get("ECO_INSTALL_ROOT") or home / ".local/share/codex-ecosystem")
+    launcher = eco_root / "bin" / "claude"
+    try:
+        digest = hashlib.sha256(launcher.read_bytes()).hexdigest() if launcher.is_file() else None
+    except OSError:
+        digest = None
+    result = {"resolution": "unavailable", "path": None, "is_ecosystem_launcher": False, "launcher_sha256": digest}
+    bash = shutil.which("bash", path=LAUNCHER_LOGIN_PATH)
+    if bash is not None:
+        login_env = {"HOME": str(home), "PATH": LAUNCHER_LOGIN_PATH,
+                     **{name: env[name] for name in ("USER", "LOGNAME") if env.get(name)}}
+        script = f'p="$(command -v claude)" || p=; printf "\\n%s%s\\n" "{LAUNCHER_MARKER}" "$p"'
+        probe = run_version_probe([bash, "-l", "-c", script], seconds, env=login_env, cwd="/")
+        answers = [line[len(LAUNCHER_MARKER):] for line in (probe[1] if probe else "").splitlines()
+                   if line.startswith(LAUNCHER_MARKER)]
+        if answers and not answers[-1]:
+            result["resolution"] = "not_found"
+        elif answers:
+            resolved = answers[-1]
+            same = os.path.normpath(resolved) == os.path.normpath(str(launcher))
+            if not same and os.path.isabs(resolved):
+                with contextlib.suppress(OSError):
+                    same = os.path.samefile(resolved, launcher)
+            result["resolution"] = "ecosystem_launcher" if same else "other"
+            result["is_ecosystem_launcher"] = same
+            result["path"] = shown_path(resolved, eco_root, home) if os.path.isabs(resolved) else None
+    if not fixed_launcher_resolution(result):
+        raise AssertionError("launcher resolution must be the fixed keys with fixed values")
+    return result
 
 
 def pins_file_path(root: Path, host: dict) -> Path:
@@ -946,7 +1198,7 @@ def signal_group(group: int, signum: int) -> None:
         pass
 
 
-def run_version_probe(argv: list[str], seconds: float) -> tuple[int, str] | None:
+def run_version_probe(argv: list[str], seconds: float, *, env=None, cwd=None) -> tuple[int, str] | None:
     """adoption/bootstrap-linux.sh run_version_probe: run ``argv`` with stdin from /dev/null in its own process
     group (a new session), its output going to temporary files, so a descendant that keeps them open cannot
     delay the result. When ``seconds`` pass, TERM goes to the whole group and KILL follows
@@ -956,12 +1208,13 @@ def run_version_probe(argv: list[str], seconds: float) -> tuple[int, str] | None
     are held back (held_interrupts) from before the process is created until its group has been killed and
     reaped, except while the probe is waited for (interrupts_released), inside the block whose cleanup kills the
     group. One held back, such as one that arrives between the probe's fork and subprocess.Popen returning it, or
-    during the kill, is raised once the group is gone. Returns the exit status and the stdout and stderr text, or
-    None on timeout."""
+    during the kill, is raised once the group is gone. ``env`` and ``cwd`` (launcher_resolution's fixed login
+    environment) go to the process as given; by default it inherits both. Returns the exit status and the stdout and
+    stderr text, or None on timeout."""
     with tempfile.TemporaryFile() as stdout, tempfile.TemporaryFile() as stderr:
         with held_interrupts():
             process = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=stdout, stderr=stderr,
-                                       start_new_session=True)
+                                       start_new_session=True, env=env, cwd=cwd)
             try:
                 with interrupts_released():
                     try:
@@ -1133,7 +1386,8 @@ def pinned_versions_match(profiles: list[dict]) -> bool | None:
 
 
 def inspect_adoption(manifest: Path, root: Path | None = None, profiles: list[str] | None = None,
-                     *, with_client_wiring: bool = False, with_pinned_versions: bool = False, env=None) -> dict:
+                     *, with_client_wiring: bool = False, with_pinned_versions: bool = False,
+                     with_login_shell: bool = False, with_launcher_resolution: bool = False, env=None) -> dict:
     manifest = manifest.absolute()
     root = (root or manifest.parent.parent).resolve()
     host = {"os": platform.system().lower(), "architecture": platform.machine().lower(),
@@ -1149,6 +1403,14 @@ def inspect_adoption(manifest: Path, root: Path | None = None, profiles: list[st
     if with_pinned_versions:
         result["limitations"] = [item for item in result["limitations"]
                                  if item != NO_PINNED_VERSION] + PINNED_VERSION_LIMITATIONS
+    if with_login_shell:
+        result["login_shell"] = login_shell(env)
+        result["limitations"] = result["limitations"] + LOGIN_SHELL_LIMITATIONS
+    if with_launcher_resolution:
+        result["launcher_resolution"] = launcher_resolution(env)
+        result["limitations"] = result["limitations"] + LAUNCHER_RESOLUTION_LIMITATIONS
+    elif with_login_shell:
+        result["launcher_resolution"] = dict(LAUNCHER_NOT_RUN)
     try:
         require(manifest.resolve().is_relative_to(root), "manifest must be inside the repository root")
         require(manifest.is_file(), "manifest must be a regular file")
@@ -1157,6 +1419,15 @@ def inspect_adoption(manifest: Path, root: Path | None = None, profiles: list[st
         selected = list(dict.fromkeys(profiles or [data["default_profile"]]))
         by_id = {profile["id"]: profile for profile in data["profiles"]}
         require(all(identifier in by_id for identifier in selected), "unknown profile requested")
+        source_profiles = {}
+        for identifier in selected:
+            if "source_profile" in by_id[identifier]:
+                try:
+                    from .new_wsl_profile import load_profile, summarize
+                except ImportError:
+                    from new_wsl_profile import load_profile, summarize
+                source_profiles[identifier] = summarize(load_profile(
+                    root, by_id[identifier]["source_profile"], identifier))
     except (OSError, UnicodeError, json.JSONDecodeError):
         result["errors"].append("manifest is unavailable or not valid UTF-8 JSON")
         return result
@@ -1176,6 +1447,8 @@ def inspect_adoption(manifest: Path, root: Path | None = None, profiles: list[st
         ready = all(item["present"] for item in commands + recipes)
         entry = {"id": identifier, "commands": commands, "recipes": recipes,
                  "status": "prerequisites_present" if ready else "prerequisites_missing"}
+        if identifier in source_profiles:
+            entry["source_profile"] = source_profiles[identifier]
         if with_pinned_versions:
             entry["pinned_versions"] = pinned_versions(profile["component_ids"], pins)
             entry["pinned_versions_summary"] = pinned_versions_summary(entry["pinned_versions"])
@@ -1210,10 +1483,23 @@ def main(argv: list[str] | None = None) -> int:
                              "pinned_versions_match that is false when any checked component differs from its pin "
                              "(booleans, ids and version strings only; never execs a probe whose declared "
                              "method is not \"exec\", and the exit code is unchanged)")
+    parser.add_argument("--login-shell", action="store_true",
+                        help="Also report, from file metadata alone (never a read or an exec), which of "
+                             "~/.bash_profile, ~/.bash_login and ~/.profile a Bash login shell reads first and "
+                             "whether it reaches ~/.profile: a state per file, first_read and profile_read only; "
+                             "without --launcher-resolution, launcher_resolution is "
+                             '{"status": "not_run", "flag": "--launcher-resolution"}; the exit code is unchanged')
+    parser.add_argument("--launcher-resolution", action="store_true",
+                        help="Also run one bounded Bash login shell from a fixed environment and report where "
+                             "`command -v claude` resolves (under $ECO_ROOT, $HOME or a system directory, else "
+                             "withheld), whether it is the ecosystem launcher $ECO_ROOT/bin/claude, and that "
+                             "launcher's sha256; claude is never run, and the exit code is unchanged")
     args = parser.parse_args(argv)
-    with signals_interrupt_probes() if args.pinned_versions else contextlib.nullcontext():
+    probes = args.pinned_versions or args.launcher_resolution
+    with signals_interrupt_probes() if probes else contextlib.nullcontext():
         report = inspect_adoption(args.manifest, args.repo_root, args.profile,
-                                  with_client_wiring=args.client_wiring, with_pinned_versions=args.pinned_versions)
+                                  with_client_wiring=args.client_wiring, with_pinned_versions=args.pinned_versions,
+                                  with_login_shell=args.login_shell, with_launcher_resolution=args.launcher_resolution)
     if args.json:
         print(json.dumps(report, indent=2))
     else:
@@ -1234,6 +1520,10 @@ def main(argv: list[str] | None = None) -> int:
             wiring = dict(report["client_wiring"])
             print(f"Client wiring complete: {json.dumps(wiring.pop('complete', None))}")
             print("Client wiring: " + json.dumps(wiring, sort_keys=True))
+        if "login_shell" in report:
+            print("Login shell: " + json.dumps(report["login_shell"], sort_keys=True))
+        if "launcher_resolution" in report:
+            print("Launcher resolution: " + json.dumps(report["launcher_resolution"], sort_keys=True))
         for error in report["errors"]:
             print(f"Error: {error}")
         for limitation in report["limitations"]:

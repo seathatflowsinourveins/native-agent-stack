@@ -1,0 +1,352 @@
+{
+ "E1": {
+  "coverage_with_asof": null,
+  "gate": {
+   "missing_inputs_sha256": {
+    "audit_results": "7e8b6999f52bfbbf5e45d0bdcbdf681aa119dff5f88d22b9d00e2604c7ce8b82",
+    "candidates_main": "afe2255291e57596e84e1183ef04e11043b329fe3d690d8bd3e2034a7d6917e4",
+    "candidates_premarket": "e8ea2dc37ec83a44cfb054ffe797e6faee8e65793ded3bc0c374abd3bf48066f"
+   },
+   "reason": "inputs_missing",
+   "requests_sent": 0,
+   "status": "refused"
+  },
+  "status": "not_run"
+ },
+ "E2": {
+  "N2": 594,
+  "N2_minus_committed_events": 0,
+  "by_close_to_close_1d_ratio": {
+   "2": {
+    "N2": 261,
+    "candidate_rule_passes": 261,
+    "f2_identity": {
+     "f1_raw_unavailable": 0,
+     "f2_error": 0,
+     "f2_not_fetched": 0,
+     "no_row": 0,
+     "other_issuer": 0,
+     "same_issuer": 261
+    },
+    "touch_passes": 261
+   },
+   "3": {
+    "N2": 97,
+    "candidate_rule_passes": 97,
+    "f2_identity": {
+     "f1_raw_unavailable": 0,
+     "f2_error": 0,
+     "f2_not_fetched": 0,
+     "no_row": 0,
+     "other_issuer": 0,
+     "same_issuer": 97
+    },
+    "touch_passes": 97
+   },
+   "3/2": {
+    "N2": 507,
+    "candidate_rule_passes": 507,
+    "f2_identity": {
+     "f1_raw_unavailable": 0,
+     "f2_error": 0,
+     "f2_not_fetched": 0,
+     "no_row": 0,
+     "other_issuer": 0,
+     "same_issuer": 507
+    },
+    "touch_passes": 507
+   }
+  },
+  "by_tier": {
+   "-0.30": {
+    "N2": 23,
+    "N2_minus_committed_events": 0,
+    "candidate_rule_passes": 23,
+    "committed_events": 23,
+    "committed_missed": 3,
+    "f2_identity": {
+     "f1_raw_unavailable": 0,
+     "f2_error": 0,
+     "f2_not_fetched": 0,
+     "no_row": 0,
+     "other_issuer": 0,
+     "same_issuer": 23
+    },
+    "touch_passes": 23
+   },
+   "0.30-0.50": {
+    "N2": 64,
+    "N2_minus_committed_events": 0,
+    "candidate_rule_passes": 64,
+    "committed_events": 64,
+    "committed_missed": 8,
+    "f2_identity": {
+     "f1_raw_unavailable": 0,
+     "f2_error": 0,
+     "f2_not_fetched": 0,
+     "no_row": 0,
+     "other_issuer": 0,
+     "same_issuer": 64
+    },
+    "touch_passes": 64
+   },
+   "0.50-1.00": {
+    "N2": 246,
+    "N2_minus_committed_events": 0,
+    "candidate_rule_passes": 246,
+    "committed_events": 246,
+    "committed_missed": 31,
+    "f2_identity": {
+     "f1_raw_unavailable": 0,
+     "f2_error": 0,
+     "f2_not_fetched": 0,
+     "no_row": 0,
+     "other_issuer": 0,
+     "same_issuer": 246
+    },
+    "touch_passes": 246
+   },
+   "1.00-3.00": {
+    "N2": 214,
+    "N2_minus_committed_events": 0,
+    "candidate_rule_passes": 214,
+    "committed_events": 214,
+    "committed_missed": 38,
+    "f2_identity": {
+     "f1_raw_unavailable": 0,
+     "f2_error": 0,
+     "f2_not_fetched": 0,
+     "no_row": 0,
+     "other_issuer": 0,
+     "same_issuer": 214
+    },
+    "touch_passes": 214
+   },
+   "10.00-": {
+    "N2": 4,
+    "N2_minus_committed_events": 0,
+    "candidate_rule_passes": 4,
+    "committed_events": 4,
+    "committed_missed": 1,
+    "f2_identity": {
+     "f1_raw_unavailable": 0,
+     "f2_error": 0,
+     "f2_not_fetched": 0,
+     "no_row": 0,
+     "other_issuer": 0,
+     "same_issuer": 4
+    },
+    "touch_passes": 4
+   },
+   "3.00-10.00": {
+    "N2": 43,
+    "N2_minus_committed_events": 0,
+    "candidate_rule_passes": 43,
+    "committed_events": 43,
+    "committed_missed": 15,
+    "f2_identity": {
+     "f1_raw_unavailable": 0,
+     "f2_error": 0,
+     "f2_not_fetched": 0,
+     "no_row": 0,
+     "other_issuer": 0,
+     "same_issuer": 43
+    },
+    "touch_passes": 43
+   }
+  },
+  "candidate_rule_passes_among_N2": 594,
+  "candidate_rule_share_among_N2": 1.0,
+  "classify_code_revision": {
+   "clean": true,
+   "head": "99dfec7cf6bdd2bc49f0099206ed84fc1d88ebb1"
+  },
+  "code_revision": {
+   "clean": true,
+   "head": "291c99099c934c166abfa95a4daa869e5b4344a9"
+  },
+  "committed_reference": {
+   "events": 594,
+   "missed_by_tier": {
+    "-0.30": 3,
+    "0.30-0.50": 8,
+    "0.50-1.00": 31,
+    "1.00-3.00": 38,
+    "10.00-": 1,
+    "3.00-10.00": 15
+   },
+   "present": 498
+  },
+  "control_sent_at_utc": "2026-09-29T02:11:45Z",
+  "exposure": {
+   "price_rows_before_2021_01_04": 979,
+   "price_rows_in_holdout": 0,
+   "price_rows_total": 155642
+  },
+  "f2_identity_among_N2": {
+   "f1_raw_unavailable": 0,
+   "f2_error": 0,
+   "f2_not_fetched": 0,
+   "no_row": 0,
+   "other_issuer": 0,
+   "same_issuer": 594
+  },
+  "f2_identity_outside_N2_post_hoc": {
+   "f1_raw_unavailable": 0,
+   "f2_error": 0,
+   "f2_not_fetched": 0,
+   "no_event_data": 2,
+   "no_row": 0,
+   "other_issuer": 4,
+   "same_issuer": 115
+  },
+  "failure_classes_among_N2": {
+   "below_touch_auction_outside_bar_range": 0,
+   "below_touch_other": 0,
+   "below_touch_split_basis": 0,
+   "derivative_pattern": 0,
+   "fetch_error": 0,
+   "no_asof_event_row": 0,
+   "no_prior_row": 0
+  },
+  "fetched_at_utc": "2026-09-29T02:11:45Z",
+  "finished_at_utc": "2026-09-29T02:16:01Z",
+  "flags_among_N2": {
+   "basis_uncertain": {
+    "false": 580,
+    "true": 14,
+    "unknown": 0
+   },
+   "gap_over_7_days": {
+    "false": 594,
+    "true": 0,
+    "unknown": 0
+   },
+   "leg_error": {
+    "false": 594,
+    "true": 0,
+    "unknown": 0
+   },
+   "not_verified_in_new_vintage": {
+    "false": 594,
+    "true": 0,
+    "unknown": 0
+   },
+   "otc_as_known": {
+    "false": 591,
+    "true": 3,
+    "unknown": 0
+   },
+   "prior_row_not_previous_session": {
+    "false": 594,
+    "true": 0,
+    "unknown": 0
+   }
+  },
+  "package_events_in_window": 715,
+  "positive_control": {
+   "KOD": {
+    "touch": true
+   },
+   "LFCR": {
+    "touch": true
+   },
+   "passed": true
+  },
+  "private_files_sha256": {
+   "control.json": "d7e208414379fb26b03db67b3462e72c6adf717e011deb1ec7f00e8b9605c722",
+   "fetch-status.json": "eaf8e3ad20c9160c68b1e11763e5a39249ebc92f7686cdfa9bdefa7a32c1bddc",
+   "inputs/package/datasets/alias-map.csv": "6a75792c73faa572434346af0f79dbbf87008960d89431cb7fab235f714099da",
+   "inputs/package/datasets/forward-returns-2021-2026.csv": "d4f80668ea33191a955d2b86b125e2d4dfcbe3263421410117920e73fde48ec0",
+   "labels.json": "19e276665707e3ec2ba70aad365afaf6d2277240d4619681627ec87dd8993108",
+   "request-log.json": "efd19b84270287caf91bf86b9bfffda615b63bc1e02ade252868babad72ec8c2",
+   "results.json": "406f582c484b67c3e352c2a31a69a8cd8eb76dfb66ec1fc2c3386a707cb7fb26",
+   "snapshot-f1.json": "6fd9a1bd34dd498d89d271517e58b2d6bda822c766531b7e17747ff86b9121d2",
+   "snapshot-f2.json": "1854394adbdc7f6787b37c034d1e2de5ed8d7558536db9d9ee1f56d91dac8c97",
+   "summary.json": "803fd31f8cd56d9a8cb81abd8c052a0c620acbeb2230007a342fab89fee0da84",
+   "verify.json": "24eb12f47201f16c975d66963bc258f7662715648fa360b190398e30a40516e0"
+  },
+  "requests": {
+   "status_counts": {
+    "200": 3585
+   },
+   "total": 3585
+  },
+  "responses": {
+   "error_codes": {},
+   "legs": {
+    "control_auctions": {
+     "error": 0,
+     "ok_empty": 0,
+     "ok_with_rows": 2
+    },
+    "control_bars_all": {
+     "error": 0,
+     "ok_empty": 0,
+     "ok_with_rows": 2
+    },
+    "control_bars_raw": {
+     "error": 0,
+     "ok_empty": 0,
+     "ok_with_rows": 2
+    },
+    "control_bars_split": {
+     "error": 0,
+     "ok_empty": 0,
+     "ok_with_rows": 2
+    },
+    "f1_auctions": {
+     "error": 0,
+     "ok_empty": 3,
+     "ok_with_rows": 713
+    },
+    "f1_bars_all": {
+     "error": 0,
+     "ok_empty": 1,
+     "ok_with_rows": 715
+    },
+    "f1_bars_raw": {
+     "error": 0,
+     "ok_empty": 1,
+     "ok_with_rows": 715
+    },
+    "f1_bars_split": {
+     "error": 0,
+     "ok_empty": 1,
+     "ok_with_rows": 715
+    },
+    "f2_bars_raw": {
+     "error": 0,
+     "ok_empty": 0,
+     "ok_with_rows": 713
+    }
+   }
+  },
+  "status": "run",
+  "touch_passes_among_N2": 594,
+  "touch_share_among_N2": 1.0,
+  "validity": {
+   "classify_rerun_byte_identical": true,
+   "label": null,
+   "no_holdout_rows": true,
+   "positive_control_passed": true,
+   "stands": true
+  },
+  "verdicts": {
+   "match": 395,
+   "mismatch": 67,
+   "no_prev_close": 6,
+   "no_source_data": 2,
+   "recovered_match": 202,
+   "recovered_mismatch": 43
+  }
+ },
+ "kind": "mover_coverage_asof_summary",
+ "plan": {
+  "bytes": 18173,
+  "path": "blueprints/us-equities/mover-coverage-asof/plan.json",
+  "sha256": "5a5937e16f33c69e08034eb9f9bfb02acad05d2f8a929148e4d1c8bb3f2d9951"
+ },
+ "privacy": "Totals only (plan guards.publication). Event lists, symbols, dates, prices, label values and per-event classes stay in the private trial workspace; each private file is named by sha256.",
+ "schema_version": 1
+}

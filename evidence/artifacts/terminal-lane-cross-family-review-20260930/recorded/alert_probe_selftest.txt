@@ -1,0 +1,53 @@
+PASS plain BEL: expected 1, got 1
+PASS two BELs in one read: expected 2, got 2
+PASS OSC title ended by BEL: expected 0, got 0
+PASS OSC title ended by BEL, split across reads: expected 0, got 0
+PASS ESC split from its bracket: expected 0, got 0
+PASS OSC ended by ST then a bare BEL: expected 1, got 1
+PASS BEL after an OSC and another bare BEL: expected 1, got 1
+PASS CSI colour then BEL: expected 1, got 1
+PASS ESC then BEL: executed in the escape state: expected 1, got 1
+PASS ESC then BEL, split across reads: expected 1, got 1
+PASS OSC text, ESC, then BEL: the BEL executes in the escape state: expected 1, got 1
+PASS OSC text, ESC, then BEL, split across reads: expected 1, got 1
+PASS DCS interrupted by ESC ESC, ST, then BEL: expected 1, got 1
+PASS APC ended by ST, then BEL: expected 1, got 1
+PASS BEL inside a DCS string is not a bell: expected 0, got 0
+PASS BEL inside an APC string is not a bell: expected 0, got 0
+PASS BEL inside a CSI sequence executes: expected 1, got 1
+PASS CAN inside an OSC string returns to ground, then BEL: expected 1, got 1
+PASS SUB inside a DCS string returns to ground, then BEL: expected 1, got 1
+PASS BEL after an escape intermediate sequence: expected 1, got 1
+PASS OSC ended by ST, split between ESC and backslash, then BEL: expected 1, got 1
+PASS NUL, TAB and LF are C0 controls but not bells: expected 0, got 0
+PASS UTF-8 C1 character inside an escape sequence is ignored, so ESC ] still opens an OSC that the BEL ends: expected 0, got 0
+PASS the same split between the two UTF-8 bytes: expected 0, got 0
+PASS the same split before the continuation byte and after the bracket: expected 0, got 0
+PASS a C1 character in ground does not hide a following bell: expected 1, got 1
+PASS a two-byte character above C1 ends the escape state like any printable: expected 1, got 1
+PASS an invalid UTF-8 byte is a printable replacement character: expected 1, got 1
+PASS private directory removed after an interruption
+PASS private directory removed after a failure
+PASS a SIGTERM in the work is latched, the work carries on, the directory is removed and the previous handlers return
+PASS a SIGHUP in the work is latched, the work carries on, the directory is removed and the previous handlers return
+PASS a SIGINT in the work is latched, the work carries on, the directory is removed and the previous handlers return
+PASS a SIGTERM then SIGINT (the first is kept) in the work is latched, the work carries on, the directory is removed and the previous handlers return
+PASS an inherited SIG_IGN stays: the latch is not installed for a signal the parent ignored: an ignored SIGHUP: work result 7, latched None, disposition inside the work [<Handlers.SIG_IGN: 1>], after 1; at the end of the process SIGHUP 1, SIGTERM 0, SIGINT 0
+PASS typing stops at a latched signal and sends no Enter, and never after the latch is set: five typing situations checked
+PASS a truncated sweep record is reported and the stand-in killed: a truncated record: sweep_trial raised None; record reported unreadable True; the stand-in was killed True
+PASS no output is written while the latch is installed: `measure` and `type_prompt` write nothing to stdout or stderr: `measure` collects 8 result lines with `say`; `measure` and `type_prompt` write to stdout or stderr themselves at 0 places
+PASS exit status: an opened dialog and no BEL passes: expected 0, got 0
+PASS exit status: a hooks-disabled control with a dialog and no BEL passes: expected 0, got 0
+PASS exit status: a hooks-disabled control that saw a BEL fails: expected 1, got 1
+PASS exit status: a control whose dialog never opened fails: expected 2, got 2
+PASS exit status: a run whose dialog never opened fails: expected 2, got 2
+PASS end to end, one SIGTERM: stand-in client ran True with signal mask 0000000000000000, probe running when signaled True, probe exit -15 (expected -15), private directory left False, stand-in client still alive False
+PASS end to end, two SIGTERMs 100 ms apart: stand-in client ran True with signal mask 0000000000000000, probe running when signaled True, probe exit -15 (expected -15), private directory left False, stand-in client still alive False
+PASS end to end, two SIGINTs 100 ms apart: stand-in client ran True with signal mask 0000000000000000, probe running when signaled True, probe exit -2 (expected -2), private directory left False, stand-in client still alive False
+PASS end to end, SIGTERM then SIGINT: the first signal is the one that ends the probe: stand-in client ran True with signal mask 0000000000000000, probe running when signaled True, probe exit -15 (expected -15), private directory left False, stand-in client still alive False
+PASS end to end, a SIGTERM at each line a dry run reaches: 122 lines swept of the 184 lines with code in main, with_private_dir, measure, end_by_latched_signal and emit_report (45 of them up to the spawn guard), the client was running at 17 of them, 0 problems
+PASS end to end, the measurement's exit status: 2 when the dialog never opened, 1 for a control that saw a BEL, 0 for a quiet one: the dialog never opened: exit 2 (expected 2); a hooks-disabled control saw a BEL: exit 1 (expected 1); a quiet hooks-disabled control: exit 0 (expected 0)
+PASS end to end, a closed or stuck stdout or a blocked signal does not keep the probe from ending by the signal: closed-stdout: the child ended with -15 (expected -15), payload directories left 0; closed-stdout-exit: the child ended with 0 (expected 0), payload directories left 0; full-pipe: the child ended with -15 (expected -15), payload directories left 0; late-signal: the child ended with -15 (expected -15), payload directories left 0 (blocked in its write when the signal was sent: yes); blocked-signal: the child ended with -15 (expected -15), payload directories left 0
+PASS end to end, a second signal after the cleanups does not replace the first: SIGINT at line 968, SIGTERM at line 840: the probe ended with -2 (expected -2), payload directories left 0, stand-in still alive False
+PASS end to end, negative control: a client that never starts is rejected by a signal case: stand-in client ran False with signal mask None, probe running when signaled True, probe exit -15 (expected -15), private directory left False, stand-in client still alive False
+PASS end to end, negative control: a client that exits at once is rejected by the sweep: 122 lines swept of the 184 lines with code in main, with_private_dir, measure, end_by_latched_signal and emit_report (45 of them up to the spawn guard), the client was running at 0 of them, 1 problems | the client was running when the signal fired at only 0 lines (at least 10 expected): the sweep did not exercise the client's lifetime

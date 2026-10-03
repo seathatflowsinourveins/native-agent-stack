@@ -1,0 +1,6 @@
+dry-run exit: 0 | stderr bytes: 0
+merged equals live: True
+groups holding the overlay's bell command in live: 1 | exactly one: True
+that group's matcher equals the overlay's: True
+overlay in effect (merge is a no-op, one group, same matcher): True
+exit code: 0

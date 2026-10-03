@@ -38,23 +38,76 @@ native scope and refreshes usage on return. That host launcher is a local
 integration, not an upstream Claude executable and not installed by this recipe.
 On another PC, native `claude` is sufficient; retain any accepted local launcher.
 
-For Windows Terminal, add a named profile with paths resolved on that PC:
+For Windows Terminal, add a named profile with the distro, WSL user and project resolved on that PC. The
+[fragment example](../examples/claude-native/windows-terminal.fragment.example.json) carries the Shell, Codex and
+Claude set and one resume profile for each client; its install steps, the login-shell check and the Claude Code notification overlay are in
+[the Linux/WSL2 page](../adoption/platforms/linux-wsl2.md#windows-terminal-profiles-and-the-login-shell). The
+Claude entry, with its settings explained below:
 
 ```json
 {
   "name": "Claude Code (Ubuntu)",
-  "commandline": "wsl.exe -d Ubuntu-24.04 --cd /absolute/project --exec /absolute/native/claude",
-  "hidden": false
+  "commandline": "wsl.exe -d Ubuntu-24.04 -u <wsl-user> --cd /absolute/project --exec /bin/bash -lc \"exec claude\"",
+  "startingDirectory": "%USERPROFILE%",
+  "hidden": false,
+  "environment": { "COLORTERM": "truecolor" },
+  "tabTitle": "Claude Code (Ubuntu)",
+  "bellStyle": ["audible", "taskbar"],
+  "bellSound": "C:\\Windows\\Media\\Windows Ding.wav",
+  "closeOnExit": "graceful"
 }
 ```
 
-Use the actual distro, project and native executable. If the accepted local
-launcher is selected instead, append its `--project /absolute/project` option.
+Use the actual distro, WSL user and project (`startingDirectory` is only the Windows-side working directory of `wsl.exe`; `--cd` sets the Linux one). If the accepted local launcher is selected instead, run it in place of
+`claude` and append its `--project /absolute/project` option. `closeOnExit: graceful` closes the tab on a normal
+exit and keeps a failed start open with its exit code visible (the default `automatic` behaves the same for a process
+Terminal launches itself,
+[profile termination behavior](https://learn.microsoft.com/en-us/windows/terminal/customize-settings/profile-advanced#profile-termination-behavior)).
 Preserve other profiles and the user's terminal default. Windows Terminal
 already supports Shift+Enter; use the official
 [terminal configuration](https://code.claude.com/docs/en/terminal-config) only
 for a demonstrated keyboard/display problem. Shell or tmux customizations are
 not prerequisites.
+
+Tab titles, bell and colour in those profiles (measured on one host; reasons, sources and
+limits in [the 2026-09-28 terminal decision](../docs/decisions/2026-09-28-terminal-experience.md)):
+
+- Do not set `suppressApplicationTitle` on a Claude or Codex profile. It discards every
+  program-sent title, so all tabs read the same. Leave it off, keep `tabTitle` as the
+  initial title and `tabColor` as the static identity, and each session shows its own
+  native title (Claude's AI session title and busy spinner; Codex's `terminal_title`).
+  A settings reload applies the change to open tabs at their next title write. Static
+  shell profiles may keep a fixed title; give them `"bellStyle": ["taskbar"]` so a readline
+  completion bell stays silent.
+- BEL is the only bell or notification signal Windows Terminal acts on (`DECPS` plays notes
+  but raises no bell indicator, and a hook cannot send it): it does not handle
+  plain OSC 9 text, OSC 777 or OSC 99 in 1.24 stable or the 1.25 preview, and `OSC 9;4` only
+  sets tab and taskbar progress state. The default `bellStyle`,
+  `audible`, gives a sound and a tab bell icon: on an unfocused tab it stays until the tab is focused, on the focused tab it clears after about 2 s (`Tab::ActivateBellIndicatorTimer`, 2000 ms, `Tab.cpp` at v1.24.11911.0). Write
+  an explicit array such as `["audible", "taskbar"]`, never `"all"` (on Terminal `main`
+  `"all"` will also raise a toast), and choose a quiet `bellSound`: the Windows Ding sound
+  measured 16 dB quieter (RMS) than Windows Notify System Generic.
+- To be alerted only when a decision is pending, set `preferredNotifChannel` to
+  `notifications_disabled` and add one `Notification` hook whose matcher is the exact list <!-- operative-matcher -->`permission_prompt|elicitation_dialog|elicitation_url_dialog|agent_needs_input|quota_auto_resume_stale|quota_auto_resume_disabled|worker_permission_prompt|push_notification` and whose command is `jq -nc --arg s "$(printf '\a')" '{terminalSequence:$s}'`. The dialog
+  types (permission, elicitation and an agent-team setup question) wait until you have been
+  unresponsive for about 6 s; `agent_needs_input` also fires when a background session starts
+  waiting while agent view is open; the quota types fire when the quota event occurs; `worker_permission_prompt` (a teammate needs permission) and `push_notification` (the model's own PushNotification: without this type its "come back" signal rings nothing, and with it the bell rings once, in a native probe. In a local session the tool sends nothing while the client judges you present (a remote workspace skips this check and the `agentPushNotifEnabled` one). The rule, read from the binary: once the terminal has sent a focus report, its last state decides, and a tab last reported focused counts as present however long you are away, so a push, and its bell, reach you when the tab or window was last reported unfocused, not when you left a focused tab; before any report, 60 s without input counts as away. `CLAUDE_CODE_DISABLE_NOTIFICATION_PRESENCE_CHECK` bypasses the check, so a push is then also sent while you watch. Whether Windows Terminal reports focus for a background tab was not measured. With Remote Control connected (local session) the tool also needs the mobile-push setting `agentPushNotifEnabled`, and it exists only where the server-side flag `tengu_kairos_push_notifications` is on) are not in the hooks reference: they come from the installed binary, which knows 17 notification types, all of them valid matcher values (the other nine stay quiet on purpose, each with its reason in the scan's table; see the decision). The same hook covered a pending `AskUserQuestion` and plan
+  approval in a native probe. In Codex set
+  `[tui] notifications = ["approval-requested", "plan-mode-prompt", "async-question"]`.
+- Agent teams: the default `in-process` display works in any terminal, Windows Terminal included (in-process teammates run inside the lead's terminal per the same page, so the lead's own alerts ring in its tab; an alert a teammate raises, such as `worker_permission_prompt`, was not observed here). Split panes need tmux or iTerm2 and are opt-in through `teammateMode` ([display modes](https://code.claude.com/docs/en/agent-teams#choose-a-display-mode)); the same page's limitations say "Split-pane mode isn't supported in VS Code's integrated terminal, Windows Terminal, or Ghostty" (it may mean native panes, and tmux inside WSL is outside its stated support and unmeasured for teams here), so none is configured. What was measured is narrower: tmux 3.4 forwards a pane's BEL to the outer terminal by default (a pty in the probe; `bell-action any` and `visual-bell off` are its defaults) and `bell-action none` or `visual-bell on` stops it.  The team hooks `TeammateIdle`, `TaskCreated` and `TaskCompleted` (exit 2 gives feedback) are the upstream quality gates and are not configured on this host.
+- Claude Code draws in 256 colours under WSL because `COLORTERM` is unset, although Windows
+  Terminal renders 24-bit. Add `"environment": { "COLORTERM": "truecolor" }` to its profile:
+  Windows Terminal sets the key on the launched process and adds it to `WSLENV`, so the `--exec` command line above stays unchanged. In a profile defined in `settings.json`, its own `environment` replaces `profiles.defaults.environment` instead of merging with it, so copy any variables the defaults set into it; a profile defined only by a fragment ranks below `profiles.defaults` (own value, then defaults, then fragment), so a `defaults` that sets `environment`, `bellStyle`, `bellSound` or `suppressApplicationTitle` overrides the fragment's values (see the platform page, step 5). Codex promotes truecolor itself when
+  `WT_SESSION` is set.
+- If the profile starts a login shell (`bash -lc`), bash reads only the first of `~/.bash_profile`, `~/.bash_login` and
+  `~/.profile` (`bash(1)` INVOCATION), so a file created at one of the first two names hides the PATH and `~/.bashrc` that
+  `~/.profile` provides. `CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1` on Linux with bubblewrap does exactly that: it pre-creates empty
+  placeholder files for missing protected paths, `~/.bash_profile` among them, and leaves them (anthropics/claude-code #76236 and
+  #78072; reproduced on 2.1.284). Keep a real `~/.bash_profile` that hands off to `~/.profile`
+  (`if [ -r "$HOME/.profile" ]; then . "$HOME/.profile"; fi`), never an empty one, and probe the way the profile starts, with a clean
+  environment (`env -i HOME="$HOME" PATH=<distro default> /bin/bash -lc 'type -P claude'`, which finds files, where `command -v` also accepts a shell function that the profile's `exec` cannot start; the printed path must also be an executable regular file, because `type -P` can print a stale hashed or a non-executable one): a probe from a shell that already has
+  PATH passes even when the login files are broken. Do not put a fixed `-n` or `--name` in a shared profile, because every tab would
+  carry the fixed name or a variant of it instead of its own generated title; use `/rename` in a tab.
 
 For the matching Codex entry, add a separate `Codex (Ubuntu)` profile using the
 same distro/project and the installed native `codex` executable. On this host,
@@ -241,6 +294,13 @@ follows the measurement (an unsaved model warns at `SessionStart` and heals at
 `SessionEnd`, `ultracode` or not). The
 [dispatch record](../docs/decisions/2026-09-29-sonnet-5-5-dispatch.md) has the rest.
 
+**2026-09-29, later: the terminal default is `max`, through the ecosystem launcher.** The user asked for `max` as the default. A saved
+`max` is still not accepted, and `CLAUDE_CODE_EFFORT_LEVEL` would override every child's own effort, so the launcher that `install_native`
+writes adds `--effort max` only when nothing chose an effort (a terminal, no `-p`, no `--effort`, no `CLAUDE_CODE_EFFORT_LEVEL`, a client
+at 2.1.284 or newer). `claude --effort xhigh` opts out, and the saved per-model `xhigh` above stays the fallback for launches that skip
+the launcher (IDE, desktop, web). The choice rests on the user's requirement, not on a measured gain here
+([decision record](../docs/decisions/2026-09-29-max-default-effort.md), [receipt](../evidence/receipts/claude-max-default-effort-20260929.json)).
+
 Saved effort defaults apply to fresh sessions. Already-open sessions can retain
 their previous selection; Claude supports `/effort` for the current session.
 Do not interrupt active work to reload a default. [Codex worker settings](https://learn.chatgpt.com/docs/agent-configuration/subagents)
@@ -267,8 +327,8 @@ therefore declare `effort: max` beside their task-matched models (Sonnet for
 `stack-verifier` declare Opus since 2026-09-27, per item 1 of the
 [settings decision](../docs/decisions/2026-09-27-claude-harness-settings.md);
 Haiku is not routed), and workflow stages pass
-`effort: 'max'` explicitly: a stage without its own effort inherits the
-coordinator's `xhigh` unless its agent's frontmatter sets one, and a stage's
+`effort: 'max'` explicitly: a stage without its own effort inherited the
+coordinator's `xhigh` on 2.1.281 unless its agent's frontmatter sets one, and a stage's
 effort overrides the frontmatter (probe Q3). Verify each child's resolved
 effort in its transcript rather than inferring it from a definition. The
 [Ultracode recipe](claude-native-ultracode.md#child-effort-max-under-an-ultracode-coordinator)

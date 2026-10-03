@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "layer_id": "mcp-surfaces",
+  "catalog": "foundation",
+  "review_date": "2026-10-01",
+  "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "reviewer": {"model":"gpt-6.1-sol","effort":"max","family":"Codex"},
+  "verdict": "corrected",
+  "c4": {"independent_review_performed":true,"no_unresolved_material_gap":false,"remaining_gaps":["Bounded stdio/manual recovery does not qualify all transports/OAuth/client scopes or owned cleanup.","No matched bridge/inspector comparison or requirement-driven registry-entry review.","Inspector 2.9.0 changes need scoped review; accepted pin remains 2.8.0."]},
+  "selected_repositories": [
+    {"component_id":"mcporter","repository":"https://github.com/openclaw/mcporter","pin_of_record":"0.14.1","pin_source":"manifests/stack.json:623; adoption/pins-linux-x86_64.json:131","source_pinned_url":"https://github.com/openclaw/mcporter/tree/v0.14.1","upstream_currency":"Latest/installed 0.14.1; Node >=24 required.","native_install":{"command":"npm install -g mcporter@0.14.1","source":"tagged README.md/package.json; Linux pin verified package provenance","evidence_class":"source-only; not run"},"native_acceptance":{"command":"pnpm install --frozen-lockfile && pnpm check && pnpm test","source":"README.md development section at v0.14.1","evidence_class":"source-only; not run"}},
+    {"component_id":"mcp-inspector","repository":"https://github.com/modelcontextprotocol/inspector","pin_of_record":"2.8.0","pin_source":"manifests/stack.json:598; no Inspector row in adoption/pins-linux-x86_64.json","source_pinned_url":"https://github.com/modelcontextprotocol/inspector/tree/2.8.0","upstream_currency":"Latest 2.9.0 (2026-09-30); installed package 2.8.0. No promotion.","native_install":{"command":"npx --yes @modelcontextprotocol/inspector@2.8.0 --cli <server-command> --method tools/list","source":"tagged README.md; official Inspector CLI documentation","evidence_class":"source-only; not run"},"native_acceptance":{"command":"npm run smoke:cli","source":"package.json at 2.8.0 (scripts/smoke-cli.mjs)","evidence_class":"source-only; not run"}}
+  ],
+  "alternatives": [
+    {"name":"Awesome MCP servers registry","repository":"punkpeye/awesome-mcp-servers","verdict":"Head 3c301956 README is a curated list; no specific entry accepted.","sources":["https://github.com/punkpeye/awesome-mcp-servers/blob/3c30195615095be4f22ac120a7cee82f215cf547/README.md"]}
+  ],
+  "corrections": [
+    {"claim":"Pins are mcporter 0.13.13/Inspector 2.7.0; bridge behind 0.14.0.","correction":"Main/installed: 0.14.1/2.8.0. Latest: 0.14.1/2.9.0. Comparison pins historical.","deciding_source":"manifests/stack.json:598,623; adoption/pins-linux-x86_64.json:131; gh api releases/latest"}
+  ],
+  "evidence_assessment": [
+    "Executed installed mcporter/Inspector help and package identity probes only; transport/config controls are surfaces.",
+    "Tagged README/package read: separate web/CLI/TUI validation and smoke scripts; no suite run.",
+    "Historical stdio/manual recovery not rerun; shared-daemon liveness is separate from owned cleanup."
+  ],
+  "failed_access": [
+    {"source":"GitHub punkpeye/awesome-mcp-servers releases/latest","result":"HTTP 404; current head and pinned README accessible; no release version inferred"}
+  ],
+  "omissions": [
+    "No server registration/restart/OAuth/install/registry adoption; specific entry awaits concrete gap."
+  ],
+  "next_wave": [
+    "Inspect 2.8.0-to-2.9.0 protocol/skill diff; choose one native upstream transport/config smoke."
+  ],
+  "reopen_on": [
+    "Protocol mismatch, native surface regression or a required registry entry with bounded acceptance."
+  ],
+  "new_host_acceptance": "unknown; distro not created"
+}

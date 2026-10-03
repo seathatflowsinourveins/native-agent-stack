@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "layer_id": "agent-sdks",
+  "catalog": "foundation",
+  "review_date": "2026-10-01",
+  "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "reviewer": {"model":"gpt-6.1-sol","effort":"max","family":"Codex"},
+  "verdict": "corrected",
+  "c4": {"independent_review_performed":true,"no_unresolved_material_gap":false,"remaining_gaps":["SDK resume/custom tools/cancellation/provider usage and inherited tools/config remain unqualified.","Retained comparison has no winner; recovery/artifact-judge gaps remain.","CLI pin does not pin/qualify published SDK or bundled alternative client."]},
+  "selected_repositories": [
+    {"component_id":"codex","repository":"https://github.com/openai/codex","pin_of_record":"0.159.2","pin_source":"manifests/stack.json:295; adoption/pins-linux-x86_64.json:53 (CLI package)","source_pinned_url":"https://github.com/openai/codex/tree/rust-v0.159.2/sdk/typescript","upstream_currency":"Latest CLI 0.159.3; selected SDK source package is 0.0.0-dev. Published SDK pin not inferred.","native_install":{"command":"npm install @openai/codex-sdk","source":"sdk/typescript/README.md at rust-v0.159.2; https://developers.openai.com/codex/sdk/","evidence_class":"source-only; not run"},"native_acceptance":{"command":"pnpm --filter @openai/codex-sdk test","source":"sdk/typescript/package.json at rust-v0.159.2 (test: jest)","evidence_class":"source-only; not run"}}
+  ],
+  "alternatives": [
+    {"name":"Claude Agent SDK","repository":"anthropics/claude-agent-sdk-python","verdict":"v0.2.163 client/in-process MCP; bundled CLI default and override require parity qualification.","sources":["https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.163/README.md"]},
+    {"name":"OpenHands SDK","repository":"OpenHands/software-agent-sdk","verdict":"v1.50.1 Python/TypeScript/REST/local/ephemeral workspaces; conditional container need.","sources":["https://github.com/OpenHands/software-agent-sdk/blob/v1.50.1/README.md"]},
+    {"name":"Temporal","repository":"temporalio/temporal","verdict":"v1.32.0 durable workflow infrastructure; external-effects requirement separate.","sources":["https://github.com/temporalio/temporal/blob/v1.32.0/README.md"]},
+    {"name":"LangGraph","repository":"langchain-ai/langgraph","verdict":"Stateful orchestration; current latest CLI tag is not core-version acceptance.","sources":["https://github.com/langchain-ai/langgraph/blob/4be610c6bc7c042038f671d6def9f523ca385a69/README.md"]}
+  ],
+  "corrections": [
+    {"claim":"SDK/CLI landscape winner is 0.155.1.","correction":"Main CLI is 0.159.2. Tagged TS SDK wraps JSONL CLI with run/resumeThread; direct app-server RPC is another surface.","deciding_source":"https://github.com/openai/codex/blob/rust-v0.159.2/sdk/typescript/README.md"},
+    {"claim":"Layer selection describes supported start/run/resume.","correction":"API availability does not resolve the published package pin or SDK resume/custom-tool acceptance; preserved queue evidence is CLI integration.","deciding_source":"https://github.com/openai/codex/blob/rust-v0.159.2/codex-rs/app-server/README.md; preserved queue receipt at 3e6617d1ee73da9aef619cc277c624ac74e07326"}
+  ],
+  "evidence_assessment": [
+    "Read installed exec/agents help, tagged SDK README/package scripts, app-server source/docs and candidate releases.",
+    "README supports JSONL events/resumeThread availability, not fresh SDK execution. Prior scope/approval failures and no-receipt cancellation remain boundaries.",
+    "Preserve explicit role/model/effort, native accounts/cache and client parity."
+  ],
+  "failed_access": [
+  ],
+  "omissions": [
+    "No SDK install/API turn/credentials/benchmark; published package provenance and client parity unresolved."
+  ],
+  "next_wave": [
+    "Resolve published SDK pin/provenance; freeze resume/custom-tool/cancellation controls against native CLI."
+  ],
+  "reopen_on": [
+    "Concrete app requirement, client parity change or matched SDK comparison with accepted artifact judge."
+  ],
+  "new_host_acceptance": "unknown; distro not created"
+}

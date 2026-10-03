@@ -434,6 +434,24 @@ reindex is needed, because the index format and profile are unchanged.
 - Search, symbol or impact output diverges from 1.14.0 on the same query.
 - Upstream reports a 1.15.0 regression.
 
+**Update (2026-09-30, socraticode 1.16.0 qualified, not adopted).** v1.16.0 (tag commit `3d3a4a4d`, npm
+2026-09-28T12:23Z) passed upstream's suite at the tag (107 files, 2,517 tests) and again on the tree that the
+recipe resolves with `--before=2026-09-28T12:30:00Z`, its tarball equals the tag's build, and it is installed in an
+unreferenced prefix ([receipt](../../evidence/receipts/socraticode-1160-qualification-20260929.json)). The Linux
+pin stays 1.15.0, because a pin change drives cutover paths: `adoption/update.md` re-runs the bootstrap after one
+(it relinks `bin/socraticode`), and `tools/adoption/render_config.py` and the landscape sweep's scratch Codex homes
+render the pinned prefix, so the pin stays behind the cutover, as 1.14.0 stayed the pin while this record's own
+cutover was deferred. The cutover waits for Gate A's window W to close and for the 7-day cooldown (earliest
+2026-10-05T12:23Z; the user's waiver of 2026-09-27 covered 1.15.0 only).
+
+**Alternatives.** Move the pin now (rejected: an independent review found that any render or bootstrap from a
+checkout carrying it starts a 1.16.0 server in watcher `auto` mode beside the running 1.15.0 servers, inside W and
+inside the cooldown); skip 1.16.0 (gives up upstream's dependency-security follow-up, #192 and #193, without
+evidence against it).
+
+**Overturn when.** The user waives the cooldown or W closes early; a native call errors on 1.16.0; upstream reports
+a 1.16.0 regression. The 26-file branch that moves the pin is kept unmerged for the cutover.
+
 ## Held by the trading lane
 
 ### dagu 2.17.2

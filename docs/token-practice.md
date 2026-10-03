@@ -64,6 +64,9 @@ hook acceptance is not authorization to enable capture on every runtime.
 1. Retrieve what the current decision needs: exact code with rg/Serena,
    structural patterns with ast-grep, conceptual code with SocratiCode, selected
    Markdown with scoped QMD, and durable decisions with scoped ai-memory.
+   For maintained decisions, including deployed architecture after compaction or
+   resume, follow the scoped query and exact-path read in
+   [the memory lifecycle guide](native-memory-rag-lifecycle.md#maintained-decision-routing).
 2. Choose one suitable lane per artifact. RTK formats supported command output;
    Context Mode processes or retrieves bounded results; TOON suits some
    structured data only when the measured representation helps; Repomix outlines selected source; the local Headroom guard
@@ -72,8 +75,13 @@ hook acceptance is not authorization to enable capture on every runtime.
    original implementation before correctness decisions. Lossy retrieval and
    compression can omit necessary information.
 4. Preserve native caching, compaction, tool discovery, accounts and model
-   behavior. Shared PATH is not host acceptance. Do not add hooks or schedulers,
-   override providers, or rerun model trials during ordinary startup.
+   behavior. Shared PATH is not host acceptance. Do not add hooks or
+   schedulers, override providers, run audits or network checks, or rerun
+   model trials during ordinary startup. One addition is allowed: a read-only
+   SessionStart hook that prints one line of at most 160 characters, the
+   `summary_line` of the due-file a daily user timer writes, and prints nothing
+   when that file is absent or unreadable (fail-open). The checks run in that
+   timer, never at startup ([session currency notice](decisions/2026-09-30-session-currency-notice.md)).
 5. Count once at the proper boundary. Missing measurements are unknown.
    Never add cumulative snapshots, cache subsets, provider usage and artifact
    differences, or multiply a measured difference by repository count.
@@ -86,6 +94,32 @@ when TOON expands it; full-original tasks bypass compression followed by full
 recovery. A rejected representation remains recorded but is not the default.
 Supporting runtimes, security checks and recovery tools are evaluated for their
 own role, not assigned invented token savings.
+
+### Bounded metadata discovery
+
+For native deferred tool search, use a small supported result limit and accept
+the selected schemas it loads. For broad inventory reads, filter metadata outside
+the model and initially return at most eight matching names, brief descriptions
+and source locators, then load complete schemas only for selected tools. Report
+returned counts, matched/omitted counts when known, and the next filter or
+supported cursor when available; mark unavailable counts explicitly. This is a
+local context budget, not an API limit: widen the selection when
+ambiguity, an absence claim or the task's information contract requires it. Use
+only pagination and projection fields the installed tool supports.
+
+Keep the complete inventory/output recoverable outside the model and preserve
+errors and truncation notices. Do not dump every server's schemas, skill bodies
+or catalog rows into discovery, startup instructions or each worker. Native
+deferred discovery, caching and compaction remain in place; this policy selects
+what to return, without replacing those mechanisms or changing tool grants.
+Project registration metadata to safe names/status before returning it; client
+configuration can contain environment/header credentials. Configuration listings
+establish registration, not a connected tool's schema or successful use.
+
+The [reported Mac rollout](decisions/2026-09-30-bounded-native-decision-routing.md)
+retained an oversized initial discovery and a missed current decision. These
+rules address those observed failure modes; semantic answer quality and complete
+task savings still require their own acceptance and usage evidence.
 
 ## Four accepted native coding trials
 
@@ -270,12 +304,17 @@ E1 and E2 subagent receipts.
   to more tokens than the original. Include recall or original reads and the response
   envelope when comparing workflow cost; the clean-prefix Headroom figures below show
   the same growth.
-- **Measurement infrastructure saves nothing itself.** gpt-tokenizer 3.4.0
-  (`o200k_base`) is the counter behind the exact comparisons, not a reducer. Its
-  counting contract covers ordinary UTF-8 text under the default special-token
-  policy, which disallows every special token and throws on an input that contains
-  one ([3.4.0 README](https://github.com/niieani/gpt-tokenizer/blob/3.4.0/README.md#special-tokens));
-  allowed-special modes are not qualified here, and neither is 4.0.0. ccusage totals
+- **Measurement infrastructure saves nothing itself.** gpt-tokenizer 4.0.0
+  (`o200k_base`) is the pinned counter behind the exact comparisons, not a reducer;
+  the [ten dated comparisons](#ten-exact-retained-artifact-comparisons) were counted
+  with 3.4.0. Its counting contract covers ordinary UTF-8 text under the default
+  special-token policy, which disallows every special token and throws on an input
+  that contains one ([4.0.0 README](https://github.com/niieani/gpt-tokenizer/blob/4.0.0/README.md#special-tokens)).
+  The [4.0.0 qualification](../evidence/receipts/gpt-tokenizer-400-qualification-20260929.json)
+  covers only default `encode` of `encoding/o200k_base` on UTF-8 text under Node
+  v24.21.0, where 3.4.0 and 4.0.0 counted all 47 artifacts retained in the host's
+  token-report ledger identically; allowed-special modes and other entry points are
+  not qualified. ccusage totals
   are consumption, reported token-only while any model is unpriced
   ([recipe row](../recipes/README.md#component-catalog-install-and-check)). An
   agentsview answer observes retained history, and MCPorter is transport.
@@ -302,6 +341,78 @@ E1 and E2 subagent receipts.
   `tool_reference` blocks and keeps the 1M window, and reports cache creation and
   reads per arm; otherwise compression is confounded with lost tool search and a
   changed cache lifetime.
+
+## Run shape and accounting (2026-09-29)
+
+The [spend attribution receipt](../evidence/receipts/claude-spend-attribution-20260929.json)
+counts this host's Claude Code transcripts for 2026-09-24 to 2026-09-29 (UTC dates; the files that record a version
+were written by Claude Code 2.1.280 to 2.1.284) and matches ccusage 20.0.26 on input, output, cache-read and cache-creation
+(5m plus 1h split) totals within 0.001%. At API list prices (a proxy for the plan meter,
+which weights tokens differently), spend concentrates in how runs are shaped:
+
+- **Children.** Agent-tool and workflow children are 81.3% of dollars, workflow
+  stages alone 66.1%, and 4 of 710 session trees cover half. A child of more than
+  60 calls is 23.8% of children and 53.2% of dollars (median 25 calls,
+  p90 100, maximum 1,489). ccusage lists each workflow run as a session: the 303 runs
+  are 68.1% of its dollars, the median run $22 and the largest $448.
+- **Default-typed children.** A child with no role definition (`workflow-subagent`,
+  `general-purpose`, `claude`, `Explore`) is 63.4% of children and 41.1% of dollars,
+  with a median first call of 39.5K tokens; among the named role types in the receipt the
+  median first call runs from 8.2K (`source-scout`) to 47.9K (`landscape-sweep-worker`).
+- **Effort and thinking.** Effort `max` covers 82.2% of calls, and thinking is 61.0%
+  of output tokens. Earlier thinking blocks stay in context by default on Opus 4.5+
+  and Sonnet 4.6+ (the `keep` default of `clear_thinking_20251015` in
+  [context editing](https://platform.claude.com/docs/en/build-with-claude/context-editing)),
+  so output is paid twice, once as output and again as carried context; no Claude
+  Code setting that clears them was found in the settings reference or changelog
+  on 2026-09-29. The docs say `max` "may show diminishing returns and is prone to
+  overthinking, so test before adopting it broadly"
+  ([model configuration](https://code.claude.com/docs/en/model-config)); the M7 arms
+  in the [max-default decision](decisions/2026-09-29-max-default-effort.md) are that
+  test and have no result yet.
+- **Advisor.** 1,872 iterations are 14.0% of dollars (750 on `claude-fable-5-1`,
+  all but 17 before 2026-09-28; 1,122 on `claude-opus-5-5`). Each call reads the
+  transcript uncached, and top-level `usage` leaves it out
+  ([advisor tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/advisor-tool#usage-and-billing)).
+  ccusage counts it since v20.0.17; `child-usage.mjs` does not (see
+  [claude-advisor-usage-scan-20260928](../evidence/receipts/claude-advisor-usage-scan-20260928.json)).
+- **Long contexts.** Calls above 400K tokens of context are 13.4% of calls, 23.3% of
+  dollars and 35.5% of cache-read tokens; above 200K they are 42.8% of calls and
+  59.9% of dollars. Claude Code's guidance is to `/clear` when switching to
+  unrelated work, since stale context "wastes tokens on every subsequent message"
+  ([costs](https://code.claude.com/docs/en/costs)). At a task boundary, record the
+  progress and git state in a file or commit, then start a fresh context; an
+  incomplete handoff costs re-reads, so compare session spans and peak context
+  before and after.
+- **Cache.** Children wrote 844.6M tokens to the 5-minute class (their unsplit remainder priced
+  as 5-minute) and show none in the 1-hour split field; main sessions show 142.7M there. Misses after
+  5-minute to 1-hour gaps rewrote 168.2M of the children's tokens in 789 events, 19.9% of
+  their writes (the gap includes the next call's response time, so the bin is approximate). At the
+  generic price ratios (write 1.25x, 1-hour write 2x, read 0.1x the input price), a 1-hour class
+  would price every remaining write at 2x (+507.3M input-equivalents) and turn the rewrites into
+  reads (-193.4M), a net +313.9M; it pays only when rewrites exceed 0.39 of the 5-minute writes
+  (`data.derived` in the receipt). The 5-minute default stays
+  ([prompt caching](https://code.claude.com/docs/en/prompt-caching)).
+- **Tools.** MCP calls are 15.1% of 210,900 tool calls and 98.6% of them are Context
+  Mode. ToolSearch loads exceed later calls for serena (694 loads, 28 calls), QMD
+  (519, 58), ai-memory (238, 137), SocratiCode (132, 68), Headroom (119, 26) and
+  jCodeMunch (102, 81). These are attempt counts with separate denominators, not
+  success rates.
+
+The receipt does not size the always-loaded files, and it carries no quality
+comparison: a saving from fewer or shorter children, a lower effort or a
+different advisor policy needs its own paired result. To repeat the measurement, copy the
+transcript tree (`cp -a ~/.claude/projects <copy>/projects`) so both tools read the same bytes, run
+`CLAUDE_CONFIG_DIR=<copy> ccusage claude daily --json --offline` and the scan
+(`cp evidence/artifacts/claude-spend-scan.py.txt claude_spend_scan.py`,
+`python3 claude_spend_scan.py --root <copy>/projects`, then `--control`) without a date filter, and compare
+`totals_comparable_to_ccusage` in the scan's output with ccusage's totals (the scan adds
+the advisor's tokens to the executor's). For a window, pass `--since YYYY-MM-DD` to the scan
+and `--since YYYYMMDD --timezone UTC` to ccusage. The
+[decision record](decisions/2026-09-29-token-spend-attribution.md) gives each lever its
+owner and overturn condition.
+
+The model and effort of each task class, and the file or instruction that enforces each today, are one table in the [task-to-model routing record](decisions/2026-09-30-task-model-routing.md).
 
 ## Shared Codex quota (2026-09-26)
 

@@ -1,0 +1,20 @@
+# Isolated operational probe only. Quality-arm settings must be tuned and frozen separately.
+server_url = "http://127.0.0.1:49374"
+embedding_provider = "none"
+capture_assistant = false
+backfill_on_start = false
+run_autowire = false
+consolidate_on_session_end = false
+reranker = ""
+llm_fallbacks = []
+[auto_improve]
+require_approval = true
+on_session_end = false
+[auto_improve.scheduler]
+enabled = false
+[auto_improve.eval]
+enabled = false
+[maintenance]
+enabled = false
+[dream]
+enabled = false

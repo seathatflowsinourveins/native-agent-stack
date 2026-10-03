@@ -71,11 +71,13 @@ Version **0.29.0 failed real startup with "UVA is not available"** on this
 WSL GPU path (unified virtual addressing unsupported by the WSL GPU driver
 surface at that release).
 [`adoption/lifecycle.md`](../lifecycle.md) records this exactly: "The working
-WSL vLLM pin remains 0.25.0. Version 0.29.0 failed real startup with
-unavailable UVA support. Preserve the accepted environment and model/vector
-data; repeating installation until the version number is newer would not
-resolve that compatibility failure." Do not bump this pin on a new WSL host
-without first re-testing 0.29.0 (or any newer release) startup on that host's
+WSL vLLM pin is 0.30.0 since 2026-09-25, qualified against 0.25.0 on the same
+host before the switch; 0.25.0 stays installed for rollback. Version 0.29.0
+failed real startup with unavailable UVA support. Preserve the accepted
+environment and model/vector data; repeating installation until the version
+number is newer would not resolve such a compatibility failure, so a new
+version is qualified on an owned instance first." Do not bump this pin on a new
+WSL host without first re-testing any newer release's startup on that host's
 actual GPU/driver combination; a newer upstream version number is not by
 itself evidence the WSL UVA gap closed.
 
@@ -104,7 +106,7 @@ itself evidence the WSL UVA gap closed.
    The script and its rtk and markitdown pins changed after `v2026.09.25.2` (#291): at that tag rtk was pinned at 0.49.0 and the script printed no such reminder at all; after that tag the pin became 0.50.0 and, after installing rtk, the script started printing a reminder unless `~/.config/rtk/config.toml` already has the Claude-hook `exclude_commands` key. It changed after `v2026.09.26`, which already pins rtk 0.50.0 but still checks only for the original two-entry key and does not detect a duplicate `exclude_commands` line; here the reminder fires unless the key appears exactly once with all five entries from [the RTK hook recipe](../../recipes/README.md#native-context-mode-and-hooks) are present, exactly once, and, since #314, unless the installed `rtk hook check` also leaves the recipe's probes unrewritten (rtk can ignore a TOML-valid file, for example one with a `[tracking]` table that lacks `history_days`). The script never writes that file. Its pins file's rtk `install_note` also changed after `v2026.09.26` (`pins-linux-x86_64.json`, text only).
    The script's socraticode and headroom installs changed after `v2026.09.26` too (as did headroom's `install_note`): it now passes `--ignore-scripts` for socraticode's `ignore_scripts: true` pin, a field the tag's script ignores, so there npm runs every install script in socraticode's dependency tree, and it now downloads headroom's pinned wheel, verifies its `sha256` and installs that file, where the tag's script resolves `headroom-ai[mcp]==0.37.0` from the index without reading the wheel or its hash (step 2 of [`adoption/bootstrap.md`](../bootstrap.md)).
    Its pins file also changed after `v2026.09.25.2` in a second way:
-   `pins-linux-x86_64.json` changed after `v2026.09.26.2` in its `codex` entry (0.155.1 to 0.157.1; a host at that tag installs 0.155.1, and 0.157.1 needs the Codex template's `daemon_auto_start = false` before its first interactive launch) and in its `claude-code` entry (2.1.281 to 2.1.284, described earlier in this step).
+   `pins-linux-x86_64.json` changed after `v2026.09.26.2` in its `codex` entry (0.155.1 to 0.157.1 on 2026-09-26, then to 0.159.2 on 2026-09-30; a host at that tag installs 0.155.1, and 0.157.1 needs the Codex template's `daemon_auto_start = false` before its first interactive launch, which the template keeps for 0.159.2, where the feature is still listed as stable and on) and in its `claude-code` entry (2.1.281 to 2.1.284, described earlier in this step).
    `pins-linux-x86_64.json` now pins `repomix`, `toon`,
    `headroom`, `ccusage`, `serena` and `socraticode` too, completing the
    `token-efficiency` profile's Linux coverage (step 2 of
@@ -116,7 +118,8 @@ itself evidence the WSL UVA gap closed.
    [`adoption/receipt.json`](../receipt.json).
 3. Render configs with [`tools/adoption/render_config.py`](../../tools/adoption/render_config.py)
    (`adoption/bootstrap.md` step 4) using this host's own
-   `adoption/hosts/<host>.json`.
+   `adoption/hosts/<host>.json`. For tab titles, alerts and the login shell of Windows Terminal profiles, see
+   [Windows Terminal profiles and the login shell](#windows-terminal-profiles-and-the-login-shell) (added after `v2026.09.26.2`).
 4. Start selected `systemd --user` units per
    [`adoption/lifecycle.md`](../lifecycle.md#native-client-integration-and-process-lifecycle);
    never stop the shared MCPorter daemon to clean up another component.
@@ -163,6 +166,61 @@ upstream behavior behind each.
   `/dev/stdin` could not be reopened by path across the interop boundary
   either. Pipe the script to `bash -s` instead:
   `wsl.exe -d <distro> -- bash -s < script.sh`.
+
+## A new distro from the official Ubuntu WSL image
+
+Added after `v2026.09.26.2`. [A new distro from the official Ubuntu WSL image](linux-wsl2-new-distro.md) creates a
+second WSL 2 distribution on this Windows host from Canonical's `ubuntu-24.04.5-wsl-amd64.wsl`, after checking the file
+against both published sha256 values. cloud-init gives it a passwordless default user before its first launch, and the page
+proves systemd, linger and the user bus before the bootstrap runs there. It changes nothing for the other distributions:
+no `.wslconfig` edit, no `wsl --update`, never `wsl --shutdown`, and the default distribution stays as it is. The
+decisions, their alternatives, the command table and the open questions are in
+[the 2026-10-01 record](../../docs/decisions/2026-10-01-new-wsl-distro-recipe.md).
+
+## Windows Terminal profiles and the login shell
+
+Added after `v2026.09.26.2`: `adoption/templates/claude.settings.linux-wsl2.overlay.json`, the profile example
+[`examples/claude-native/windows-terminal.fragment.example.json`](../../examples/claude-native/windows-terminal.fragment.example.json)
+and `scripts/adoption_status.py --login-shell`. `adoption/templates/codex.config.template.toml` changed after
+`v2026.09.26.2` too: it adds a `[tui] notifications` list. A host pinned to that release has none of them until a release
+carries them ([moving a host to a new release](../update.md#moving-a-host-to-a-new-release)). The decision, its evidence and
+its limits are in [the 2026-09-28 terminal decision](../../docs/decisions/2026-09-28-terminal-experience.md).
+
+A Windows Terminal profile that starts a client with `bash -lc "exec claude"` gets its PATH from the Bash login shell, and a
+login shell reads only the first of `~/.bash_profile`, `~/.bash_login` and `~/.profile`
+([Bash startup files](https://www.gnu.org/software/bash/manual/bash.html#Bash-Startup-Files); bash 5.3 `shell.c`
+`execute_profile_file`). A file at one of the first two names, even an empty one, therefore hides `~/.profile` and every PATH
+entry it adds, and the tab ends with `exec: claude: not found` (exit 127). With `CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1` on Linux
+with bubblewrap, Claude Code creates such an empty `~/.bash_profile` and leaves it
+([anthropics/claude-code#76236](https://github.com/anthropics/claude-code/issues/76236)).
+
+1. Keep no empty `~/.bash_profile` or `~/.bash_login`. On a host that sets that variable, make `~/.bash_profile` a real file that
+   hands off:
+   `if [ -r "$HOME/.profile" ]; then . "$HOME/.profile"; fi`. Bootstrap writes no shell startup file; this stays the
+   operator's edit.
+2. Check without running anything:
+   `uv run --no-project --python 3.13 python scripts/adoption_status.py --profile <id> --login-shell --json`. It stats the three
+   files and reports a state each, the file a login shell reads first and `profile_read` (`false` when an empty or unusable earlier file hides `~/.profile` or `~/.profile` is itself unusable; `null` when an earlier file has content, because whether it hands off is not read). It proves
+   no PATH. Prove that with the profile's own launch shape, from Windows or through WSL interop:
+   `wsl.exe -d <DISTRO> -u <WSL_USER> --exec /bin/bash -lc 'type -P claude codex'` must print both paths (`type -P` finds files, where `command -v` also accepts a shell function, which the profile's `exec` cannot start; `type -P` can still print a stale hashed or a non-executable path, so the doctor's check also requires the printed path to be an executable regular file). A probe from a shell
+   that already has PATH passes even when the login files are broken.
+3. Merge the Claude Code overlay (added after `v2026.09.26.2`) into the live settings: `python3 tools/adoption/apply_claude_settings.py --template
+   adoption/templates/claude.settings.linux-wsl2.overlay.json --dry-run`, then the same without `--dry-run` (it backs the file up
+   first). It sets `preferredNotifChannel` to `notifications_disabled` and adds one `Notification` hook that rings the
+   terminal bell only when Claude Code needs the person (a permission or elicitation dialog, an agent waiting for input, a quota event, or the model's own push notification, which a local session sends only when the client judges you away (a remote workspace skips that check): once the terminal has sent a focus report its last state decides, so a tab last reported focused counts as present however long you are gone, and before any report 60 s without input counts as away; `CLAUDE_CODE_DISABLE_NOTIFICATION_PRESENCE_CHECK` bypasses the check); the hook runs `jq`, which the bootstrap already requires. Windows Terminal 1.24 acts on no notification sequence but BEL. The merge de-duplicates hooks by command anywhere in the event, so it never changes the matcher of a `Notification` hook that already runs the same command: if the overlay's matcher changes later, edit or remove that group first and merge again (`evidence/artifacts/notification-types-20260929/replace_bell_group.py <checkout> local [--apply]` does that on a private copy, after a backup, and refuses a group it cannot replace without losing something). `evidence/artifacts/wsl-terminal-defaults-20260929/overlay_noop_check.py` prints whether exactly one group holds the command and whether its matcher equals the overlay's.
+4. Render the Codex template as usual (`tools/adoption/render_config.py`; step 3 above): its `[tui] notifications` list asks for a notification on an approval, a plan-mode prompt or a question (`request_user_input` questions notify as `plan-mode-prompt`; `async-question` covers the asynchronous questions added after 0.155.1), and not when a turn finishes. Codex loads a misspelled kind
+   without an error and never notifies for it; the comment above the list names the source file that defines the kinds.
+5. Copy the profile example, replace `<DISTRO>`, `<WSL_USER>` and `<PROJECT>`, and save it as UTF-8 to
+   `%LOCALAPPDATA%\Microsoft\Windows Terminal\Fragments\native-agent-stack\<name>.json`
+   ([JSON fragment extensions](https://learn.microsoft.com/en-us/windows/terminal/json-fragment-extensions)). The page says a GUID is "optional, but strongly encouraged"; the example declares none because this repository's publication scan treats any UUID as a session identifier. Windows Terminal then derives a stable one from the folder name and the profile name (the page's UUIDv5 recipe gives the same value if you must reference a profile by it), so keep the folder name and the profile names fixed once installed: renaming either gives the profile a new identity, and a `settings.json` override or a `defaultProfile` keyed to the old GUID stops applying. Windows Terminal merges fragments on every settings load
+   and watches only `settings.json`, so touch that file after adding or editing one. The example sets no `suppressApplicationTitle` on the Claude and Codex profiles, so each tab shows the title its
+   client sends; gives them an explicit `bellStyle` array (never `"all"`) and a quiet `bellSound`; and sets `COLORTERM` through the profile's `environment` key. **Precedence** (microsoft/terminal v1.24.11911.0, `SettingsLoader::FinalizeLayering`, source read, not run here): a profile's own value, then `profiles.defaults`, then the fragment's profile. A profile that only a fragment defines therefore loses to `profiles.defaults` for every key `defaults` sets: if your `defaults` set `suppressApplicationTitle`, `bellStyle`, `bellSound` or `environment`, the example's values for those keys do not apply, and so the titles, the quiet bell or `COLORTERM` are not what the example advertises. Remove those keys from `defaults`, or put the values in the `settings.json` entry for the profile's own (derived) GUID, which does beat `defaults`. A profile's own `environment` also completely replaces `profiles.defaults.environment` instead of merging with it ([profile-advanced](https://github.com/MicrosoftDocs/terminal/blob/main/TerminalDocs/customize-settings/profile-advanced.md), "Environment variables"), so in such an entry copy the variables the defaults set. The practice repository's host check refuses a `defaults` that suppresses titles or rings `all`; it does not compare `defaults.environment`.
+
+Measured on one workstation (Windows Terminal 1.24, Claude Code 2.1.284, Codex 0.157.1, before the Linux pin moved to 0.159.2). A new host collects its own evidence.
+
+The example also carries two resume profiles, `WSL - Codex - resume` and `WSL - Claude - resume`, each right after the profile of its client. They run `exec codex resume` and `exec claude --resume`, which open the client's own session picker, and nothing resumes until you choose a row. Each picker starts with the sessions of the profile's `--cd` directory (Codex: the launch directory; Claude Code: the current worktree) and can be widened from inside it ([Codex `resume_picker.rs` at `rust-v0.159.3`](https://github.com/openai/codex/blob/rust-v0.159.3/codex-rs/tui/src/resume_picker.rs#L674-L687); [Claude Code sessions](https://code.claude.com/docs/en/sessions)), and the default profiles are unchanged and still start a new session.
+
+Windows Terminal re-saves `settings.json` in its own layout, written from its settings model with four-space indentation, and writes a single `bellSound` string back as a one-element array (`microsoft/terminal` `v1.24.11911.0`: `CascadiaSettingsSerialization.cpp` L1602 writes the file, and `JsonUtils.h` L359-L389 reads a lone string as a list of one while L549-L551 always writes an array), so a check that reads that file must accept both forms.
 
 ## Listeners and ports
 

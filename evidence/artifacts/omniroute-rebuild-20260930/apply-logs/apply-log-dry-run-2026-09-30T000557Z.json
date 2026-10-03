@@ -1,0 +1,407 @@
+{
+ "finished": "2026-09-30T00:05:57Z",
+ "mode": "dry-run",
+ "started": "2026-09-30T00:05:57Z",
+ "steps": {
+  "T01": {
+   "gateway": "20129",
+   "precondition": [
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "len_equals",
+     "path": "overrides",
+     "route": "/api/model-capability-overrides"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "contains",
+     "path": "overrides.0.target",
+     "route": "/api/model-capability-overrides"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "contains",
+     "path": "overrides.1.target",
+     "route": "/api/model-capability-overrides"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "contains",
+     "path": "overrides.2.target",
+     "route": "/api/model-capability-overrides"
+    }
+   ],
+   "result": "dry-run-ok",
+   "started": "2026-09-30T00:05:57Z",
+   "title": "20129: context_length 872000 override for sharedgw/gpt-6-astra-max (GC9, C-CTX)"
+  },
+  "T02": {
+   "gateway": "20129",
+   "precondition": [
+    {
+     "actual": "<match>",
+     "http": 404,
+     "ok": true,
+     "op": "absent",
+     "path": "id",
+     "route": "/api/context/combos/gpt6-agent-safe"
+    }
+   ],
+   "result": "dry-run-ok",
+   "started": "2026-09-30T00:05:57Z",
+   "title": "20129: context combo gpt6-agent-safe (per-request opt-in via x-omniroute-compression: gpt6-agent-safe)"
+  },
+  "T03": {
+   "gateway": "20129",
+   "precondition": [
+    {
+     "actual": "<match>",
+     "http": 404,
+     "ok": true,
+     "op": "absent",
+     "path": "id",
+     "route": "/api/context/combos/gpt6-memory-safe"
+    }
+   ],
+   "result": "dry-run-ok",
+   "started": "2026-09-30T00:05:57Z",
+   "title": "20129: context combo gpt6-memory-safe (per-request opt-in via x-omniroute-compression: gpt6-memory-safe)"
+  },
+  "T04": {
+   "gateway": "20129",
+   "precondition": [
+    {
+     "actual": "<match>",
+     "http": 404,
+     "ok": true,
+     "op": "absent",
+     "path": "id",
+     "route": "/api/context/combos/gpt6-safe-lossy"
+    }
+   ],
+   "result": "dry-run-ok",
+   "started": "2026-09-30T00:05:57Z",
+   "title": "20129: context combo gpt6-safe-lossy (per-request opt-in via x-omniroute-compression: gpt6-safe-lossy)"
+  },
+  "T05": {
+   "gateway": "20128",
+   "precondition": [
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "flags.46.key",
+     "route": "/api/settings/feature-flags"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "flags.46.source",
+     "route": "/api/settings/feature-flags"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "flags.46.effectiveValue",
+     "route": "/api/settings/feature-flags"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "flags.46.requiresRestart",
+     "route": "/api/settings/feature-flags"
+    }
+   ],
+   "result": "dry-run-ok",
+   "started": "2026-09-30T00:05:57Z",
+   "title": "20128: feature flag OMNIROUTE_CODEX_APP_SERVER_ENABLED=false (GC8)"
+  },
+  "T06": {
+   "gateway": "20129",
+   "precondition": [
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "len_equals",
+     "path": "",
+     "route": "/api/providers/openai-compatible-responses-3393b3bd…/interception-rules"
+    }
+   ],
+   "result": "dry-run-ok",
+   "started": "2026-09-30T00:05:57Z",
+   "title": "20129: interception rule on the sharedgw node, search and fetch native passthrough (GC5)"
+  },
+  "T07": {
+   "gateway": "20129",
+   "precondition": [
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "connection.id",
+     "route": "/api/providers/3eea0518…"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "connection.provider",
+     "route": "/api/providers/3eea0518…"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "absent",
+     "path": "connection.providerSpecificData.timeoutMs",
+     "route": "/api/providers/3eea0518…"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "absent",
+     "path": "connection.providerSpecificData.cache",
+     "route": "/api/providers/3eea0518…"
+    }
+   ],
+   "result": "dry-run-ok",
+   "started": "2026-09-30T00:05:57Z",
+   "title": "20129: sharedgw connection prompt-cache declaration (K06) and 1200 s hop header timeout (GC12)"
+  },
+  "T08": {
+   "gateway": "20129",
+   "precondition": [
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "connection.id",
+     "route": "/api/providers/3eea0518…"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "connection.provider",
+     "route": "/api/providers/3eea0518…"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "absent",
+     "path": "connection.providerSpecificData.customHeaders",
+     "route": "/api/providers/3eea0518…"
+    }
+   ],
+   "result": "dry-run-ok",
+   "started": "2026-09-30T00:05:57Z",
+   "title": "20129: fixed hop headers on the sharedgw connection: no memory, no bridges, no exact cache at 20128 (GC13)"
+  },
+  "T09": {
+   "gateway": "20129",
+   "precondition": [
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "enabled",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "defaultMode",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "autoTriggerTokens",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "contextBudget.mode",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "activeComboId",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "compressionComboId",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "len_equals",
+     "path": "comboOverrides",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "len_equals",
+     "path": "exclusions",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "lite",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "stackedPipeline",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "preserveSystemPrompt",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "preserveSystemPromptMode",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "cavemanOutputMode.enabled",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "ultraEngine",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "ultraSlmPrewarm",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "cacheMinutes",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "mcpDescriptionCompressionEnabled",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "enginesExplicit",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "engines",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "len_equals",
+     "path": "outputStyles",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "equals",
+     "path": "liveZone.enabled",
+     "route": "/api/settings/compression"
+    },
+    {
+     "actual": "<match>",
+     "http": 200,
+     "ok": true,
+     "op": "absent",
+     "path": "lite.maxToolLength",
+     "route": "/api/settings/compression"
+    }
+   ],
+   "result": "dry-run-ok",
+   "started": "2026-09-30T00:05:57Z",
+   "title": "20129: compression settings: CCR headerless, terse-prose:lite, safest globals, per-request engines"
+  }
+ }
+}

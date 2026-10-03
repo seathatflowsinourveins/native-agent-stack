@@ -1,0 +1,18 @@
+[2026-09-30T05:38:48Z] setup start base=ae5539a5623457a2e8bb7f5dddd3d0736a2ddeb7 pr=f5d8e150b79e0901fa18241c7f29bff889b87c14 cpus=40-47
+[2026-09-30T05:38:52Z] cherry-picked head=cf6748d04c1e0dd033fb6b6effa9bbaf5ed5466b stable-patch-id=14ec6648f50fc499d430f28d2af7840cd2d46055 upstream=14ec6648f50fc499d430f28d2af7840cd2d46055
+[2026-09-30T05:40:13Z] B3 ready head=cf6748d04 commits-over-tip=4
+[2026-09-30T05:40:13Z] effort probe B3 start
+[2026-09-30T05:40:16Z] effort probe B3 end rc=0
+[2026-09-30T05:40:16Z] build B3 start
+[2026-09-30T05:50:33Z] build B3 end rc=0
+[2026-09-30T05:50:33Z] B3 install start
+[2026-09-30T05:53:24Z] B3 install end rc=0
+[2026-09-30T05:53:24Z] B3 smoke start
+[2026-09-30T05:53:34Z] B3 smoke end rc=0
+[2026-09-30T05:53:34Z] B3 pack-boot start
+[2026-09-30T05:58:02Z] B3 pack-boot end rc=0
+[2026-09-30T05:58:02Z] B3 targeted tests start (14 files)
+[2026-09-30T05:58:10Z] B3 targeted tests end rc=0
+[2026-09-30T05:58:10Z] B2 baseline tests start
+[2026-09-30T05:58:14Z] B2 baseline tests end rc=0
+[2026-09-30T05:58:14Z] DONE

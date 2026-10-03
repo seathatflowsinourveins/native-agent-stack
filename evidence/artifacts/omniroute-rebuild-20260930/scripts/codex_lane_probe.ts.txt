@@ -1,0 +1,71 @@
+// Offline probe (no network, no gateway, no model): what would the headerless lane do to a Codex-style Responses body?
+// Usage: run.sh codex_lane_probe.ts <live-settings.json> <out.json>
+// Settings = the live 20129 compression config with the exclusions emptied (the 20128 candidate); ctx = native Codex passthrough.
+import fs from "node:fs";
+import { runGateway, type Combo, type GatewayCtx } from "./gatewayPath.ts";
+
+const [livePath, outPath] = process.argv.slice(2);
+const live = JSON.parse(fs.readFileSync(livePath, "utf8"));
+const settings = { ...live.ports["20129"].compression.config, exclusions: [] };
+const combos: Combo[] = live.ports["20129"].combos.combos;
+const ctx: GatewayCtx = {
+  provider: "codex", model: "gpt-6-astra-max", sourceFormat: "openai-responses", targetFormat: "openai-responses", contextLimit: 400000,
+};
+
+// A source file the way `cat` prints it: two blank lines between top-level definitions, trailing spaces, a tab, a padded line.
+const FILE = [
+  "import os", "", "", "def alpha():", "    return 1   ", "", "", "def beta(x):", "    y  = x   +  1", "    return y", "", "", "",
+  "class Gamma:", "\tpass   ", "",
+].join("\n") + "\n";
+const PATCH = [
+  "*** Begin Patch", "*** Update File: src/app.py", "@@", " def alpha():", "-    return 1   ", "+    return 2", " ", " ", " def beta(x):",
+  "*** End Patch",
+].join("\n");
+const LOG = Array.from({ length: 40 }, (_, i) => `2026-09-30T00:00:${String(i).padStart(2, "0")}Z INFO worker ${i % 3} ok   `).join("\n") + "\n";
+
+function turn(callId: string, name: string, command: string, output: string): any[] {
+  return [
+    { type: "function_call", name, arguments: JSON.stringify({ command: ["bash", "-lc", command] }), call_id: callId },
+    { type: "function_call_output", call_id: callId, output },
+  ];
+}
+const items: any[] = [
+  { type: "message", role: "user", content: [{ type: "input_text", text: "Fix beta() in src/app.py and keep the formatting.\n\n\nThanks   " }] },
+  ...turn("call_1", "shell", "cat src/app.py", FILE),
+  { type: "message", role: "assistant", content: [{ type: "output_text", text: "Reading the file again to be sure.\n\n\nOK   " }] },
+  ...turn("call_2", "shell", "cat src/app.py", FILE),
+  ...turn("call_3", "shell_command", "tail -n 40 app.log", LOG),
+  { type: "custom_tool_call", name: "apply_patch", input: PATCH, call_id: "call_4" },
+  { type: "custom_tool_call_output", call_id: "call_4", output: "Done!" },
+  { type: "message", role: "user", content: [{ type: "input_text", text: "Now run the tests." }] },
+];
+const body = { model: "cx/gpt-6-astra-max", instructions: "You are a coding agent.", input: items, stream: true };
+
+function summarize(a: any, b: any): any {
+  if (JSON.stringify(a) === JSON.stringify(b)) return null;
+  const sa = JSON.stringify(a), sb = JSON.stringify(b);
+  return { before_chars: sa.length, after_chars: sb.length };
+}
+
+const run = await runGateway(settings, null, combos, body as any, ctx, {});
+const out: any = {
+  plan: { mode: run.plan.mode, source: (run.plan as any).source ?? null, pipeline: run.plan.stackedPipeline?.map((s: any) => s.engine) ?? null, meta: run.meta },
+  ran: run.ran, compressed: run.compressed, stats: run.statsSummary, items: [],
+};
+const after: any[] = (run.bodyOut as any).input ?? [];
+for (let i = 0; i < items.length; i++) {
+  const changed = summarize(items[i], after[i]);
+  const rec: any = { i, type: items[i].type, name: items[i].name ?? null, call_id: items[i].call_id ?? null, changed: changed !== null, ...(changed ?? {}) };
+  const field = items[i].output !== undefined ? "output" : items[i].input !== undefined ? "input" : null;
+  if (changed && field && typeof items[i][field] === "string" && typeof after[i]?.[field] === "string") {
+    const b = items[i][field] as string, a = after[i][field] as string;
+    rec.blank_lines_before_after = [b.split("\n").filter((l) => l === "").length, a.split("\n").filter((l) => l === "").length];
+    rec.trailing_ws_lines_before_after = [b.split("\n").filter((l) => /[ \t]+$/.test(l)).length, a.split("\n").filter((l) => /[ \t]+$/.test(l)).length];
+    rec.after_preview = a.length > 300 ? a.slice(0, 300) + "..." : a;
+  }
+  out.items.push(rec);
+}
+out.instructions_changed = (run.bodyOut as any).instructions !== body.instructions;
+out.extra_top_level_keys = Object.keys(run.bodyOut).filter((k) => !(k in body));
+fs.writeFileSync(outPath, JSON.stringify(out, null, 1));
+console.log(JSON.stringify({ plan: out.plan, ran: out.ran, compressed: out.compressed, changed_items: out.items.filter((r: any) => r.changed).map((r: any) => r.i) }));

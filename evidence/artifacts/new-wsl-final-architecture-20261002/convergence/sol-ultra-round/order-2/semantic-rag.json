@@ -1,0 +1,209 @@
+{
+  "layers": [
+    {
+      "layer_id": "semantic-rag",
+      "selection": [
+        {
+          "name": "SocratiCode",
+          "repository": "https://github.com/giancarloerra/SocratiCode",
+          "role": "C10: project-scoped code retrieval and MCP integration for Claude Code and Codex; coordinates persistent indexing and embedding services.",
+          "install_command": "git clone https://github.com/giancarloerra/socraticode.git socraticode\ncd socraticode\ngit checkout --detach 155ba9325f43a65c78a09930735b378f91651cf5\nnpm ci\nnpm run build\nclaude mcp add --scope user socraticode -- node \"$PWD/dist/index.js\"\ncodex mcp add socraticode -- node \"$PWD/dist/index.js\"",
+          "install_source": "Upstream source-install instructions and CI, adapted with an explicit commit pin. Requires Node.js 18.17+ and running Docker. This pin includes the September 30 transport fix that postdates release v1.16.0.",
+          "basis": [
+            {
+              "url": "https://github.com/giancarloerra/SocratiCode/blob/155ba9325f43a65c78a09930735b378f91651cf5/README.md",
+              "shows": "Scoped dense/BM25 retrieval, ignore rules, path/language filters, agent integrations, interchangeable embedding providers, persistent Docker volumes, and checkpointed indexing recovery."
+            },
+            {
+              "url": "https://github.com/giancarloerra/SocratiCode/blob/155ba9325f43a65c78a09930735b378f91651cf5/CONTRIBUTING.md",
+              "shows": "Supported clone/build installation; README documents registering the built dist/index.js MCP entry."
+            },
+            {
+              "url": "https://github.com/giancarloerra/SocratiCode/blob/155ba9325f43a65c78a09930735b378f91651cf5/.github/workflows/ci.yml",
+              "shows": "Linux unit tests across Node versions, Windows Git-refresh tests, and integration testing with Qdrant and Ollama."
+            },
+            {
+              "url": "https://github.com/giancarloerra/SocratiCode/actions/runs/36751131570",
+              "shows": "Successful CI at the selected September 30 default-branch commit."
+            },
+            {
+              "url": "https://github.com/giancarloerra/SocratiCode/blob/155ba9325f43a65c78a09930735b378f91651cf5/README.md#real-world-benchmark-vs-code-245m-lines-of-code-with-claude-opus-46",
+              "shows": "Publisher-reported five-question VS Code comparison: 61.5% fewer context bytes and 31 versus five tool steps. It measures workflow efficiency, not retrieval accuracy."
+            },
+            {
+              "url": "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.16.0",
+              "shows": "September 28 release; repository is unarchived and its default branch committed September 30."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "Qdrant",
+          "repository": "https://github.com/qdrant/qdrant",
+          "role": "C01: persistent retrieval backend. SocratiCode provisions its documented v1.17.0 image and named volume automatically; latest standalone release is v1.19.1.",
+          "install_command": "docker run -p 6333:6333 qdrant/qdrant:v1.19.1",
+          "install_source": "Upstream README Docker quick start with an explicit release-pin substitution. The selected stack obtains persistent storage through SocratiCode's managed installation.",
+          "basis": [
+            {
+              "url": "https://github.com/qdrant/qdrant/blob/6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de/README.md",
+              "shows": "Payload filtering supports repository/path scoping; REST/gRPC interfaces and write-ahead logging provide a suitable persistent vector-search substrate."
+            },
+            {
+              "url": "https://github.com/qdrant/qdrant/releases/tag/v1.19.1",
+              "shows": "September 4 release with Linux x86_64 and macOS arm64 assets, including maintained data-consistency and unsafe-shutdown fixes."
+            },
+            {
+              "url": "https://github.com/qdrant/qdrant/actions/runs/36940648531",
+              "shows": "Successful integration-test run; all five sampled recent workflows succeeded."
+            },
+            {
+              "url": "https://api.github.com/repos/qdrant/qdrant/commits?per_page=1",
+              "shows": "Unarchived repository; latest default-branch commit September 3. Push timestamps on other branches were not substituted for default-branch activity."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "ollama",
+          "repository": "https://github.com/ollama/ollama",
+          "role": "C03: compatible local embedding service; native installation also supports the selected indexer's documented macOS acceleration path.",
+          "install_command": "curl -fsSL https://ollama.com/install.sh | sh\nollama pull nomic-embed-text",
+          "install_source": "Ollama README's Linux installer; SocratiCode README documents nomic-embed-text predownload and native Ollama integration. Installer and model digest are unpinned.",
+          "basis": [
+            {
+              "url": "https://github.com/ollama/ollama/blob/b0c1ca4f7549d7acdfa52a7dcffc934bc63a43ce/README.md",
+              "shows": "Documented Linux and macOS install paths."
+            },
+            {
+              "url": "https://github.com/ollama/ollama/blob/b0c1ca4f7549d7acdfa52a7dcffc934bc63a43ce/docs/api.md#generate-embeddings",
+              "shows": "POST /api/embed supports individual and batched inputs, model selection, dimensions, and residency controls."
+            },
+            {
+              "url": "https://github.com/ollama/ollama/releases/tag/v0.35.0",
+              "shows": "September 28 release with Linux amd64 and macOS distribution assets."
+            },
+            {
+              "url": "https://api.github.com/repos/ollama/ollama/commits?per_page=1",
+              "shows": "Unarchived repository with an October 2 UTC default-branch commit."
+            },
+            {
+              "url": "https://api.github.com/repos/ollama/ollama/actions/runs?per_page=5",
+              "shows": "Five sampled PR test runs contained three successes and two failures; this sample does not establish release-wide test status."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C02",
+          "name": "LanceDB",
+          "reason": "Maintained embedded retrieval database; completing this layer requires code-specific indexing, refresh logic, and agent integration beyond its documented database interface. [README](https://github.com/lancedb/lancedb/blob/857e455361df77a0eb35e23764282e3d87dc1e44/README.md)"
+        },
+        {
+          "key": "C04",
+          "name": "semble",
+          "reason": "Strong CPU challenger with scoped cached indexes, incremental refresh, both agent integrations, and a public approximately 1,250-query evaluation. Its inspected documentation leaves external embedding-service compatibility and crash restore unverified. [README](https://github.com/minishlab/semble/blob/aa634b14dc81ba6925a130cb999081f3240e2a3c/README.md)"
+        },
+        {
+          "key": "C05",
+          "name": "pgvector",
+          "reason": "Maintained PostgreSQL vector extension; requires assembling the code indexer, embedding service, and agent-facing retrieval interface. [README](https://github.com/pgvector/pgvector/blob/f37c13f68b57d2c3472b2214fbcff699d6d34876/README.md)"
+        },
+        {
+          "key": "C06",
+          "name": "vLLM",
+          "reason": "Maintained inference-serving component; a separate scoped code index and recovery workflow remain necessary. Reviewed evidence provides no target-host comparison supporting replacement of the selected embedding service. [README](https://github.com/vllm-project/vllm/blob/8486f1ebfe6e39a5513a8636e7f07ed9746f8be5/README.md)"
+        },
+        {
+          "key": "C07",
+          "name": "next-plaid",
+          "reason": "Strong challenger: publisher-reported ColGREP NDCG@10 is 0.859 for LateOn-Code and 0.846 for the default edge model, versus Semble's 0.853. ColBERT/ONNX integration differs from the selected stack; Codex integration is explicitly basic and interrupted restore remains unverified. [README](https://github.com/lightonai/next-plaid/blob/00e26aae0006b322727db277672211d9a0e3ccec/README.md)"
+        },
+        {
+          "key": "C08",
+          "name": "Haystack",
+          "reason": "Maintained RAG framework with broad provider flexibility; this requirement needs configuration of code-specific indexing, scoped storage, refresh, and agent integration. The selected application documents those together. [README](https://github.com/deepset-ai/haystack/blob/9f31fb4b0ef318c51a6fa8ad30321336d99e2cb8/README.md)"
+        },
+        {
+          "key": "C11",
+          "name": "huggingface-hub-native",
+          "reason": "Maintained Hub SDK/CLI and useful model-distribution dependency; its documented purpose does not supply the complete local code-retrieval workflow. [README](https://github.com/huggingface/huggingface_hub/blob/1a76ad25c8f10fcd4ffa696d8289a3a1488dfa34/README.md)"
+        }
+      ],
+      "excluded": [
+        {
+          "key": "C09",
+          "name": "nvidia/Nemotron-3-Embed-1B-BF16 (embedding model)",
+          "criterion": "outside_requirement",
+          "fact": "The packet identifies an embedding-model artifact and supplies no repository. The model alone is neither an embedding service nor a scoped, recoverable code index."
+        },
+        {
+          "key": "C12",
+          "name": "code-memory",
+          "criterion": "stale_or_archived",
+          "fact": "Latest default-branch commit and latest release are May 20, outside the 90-day window starting July 4, 2026. [Commit](https://github.com/kapillamba4/code-memory/commit/5a8db166ca11a90c093ba4a9a54d266cde756f54), [release](https://github.com/kapillamba4/code-memory/releases/tag/v1.0.33)."
+        }
+      ],
+      "close_call": true,
+      "deciding_comparison": "The selection reflects the strongest documented complete-stack fit, without claiming measured retrieval superiority. Freeze one target-project commit, conceptual questions, and expected source spans. Compare SocratiCode/Qdrant/Ollama, Semble, and ColGREP with both documented models on WSL2/RTX 4090 and macOS arm64. Measure recall and NDCG, answer/source correctness with the same agent model, scope isolation, edit/delete/branch refresh correctness, cold/warm latency, indexing time, RAM/VRAM, interrupted-index recovery, and restored-state correctness and duration.",
+      "evidence_gaps": [
+        "Judged as of October 2, 2026; the 90-day window starts July 4. All repository candidates except code-memory have verified default-branch commits within that window; none is archived.",
+        "No public common-arm evaluation separates SocratiCode from Semble and ColGREP. SocratiCode's public efficiency comparison and the packet's sealed 35-query comparison do not establish general retrieval superiority.",
+        "Persistence and indexing resume are documented. A complete backup/disaster-restore procedure and measured restore correctness were not verified; a stable index snapshot is not proof of backup restoration.",
+        "Linux installation paths and macOS distribution paths are documented. WSL2/RTX 4090 operation, GPU prerequisites, and macOS arm64 performance were not tested. SocratiCode's broad Windows Docker GPU statement was not generalized to WSL2.",
+        "Latest releases were checked for SocratiCode, Qdrant, Ollama, next-plaid, and code-memory. Other candidates' release histories and recent issue/PR activity were not sampled. Semble and next-plaid CI execution results were not sampled.",
+        "The recommended SocratiCode source pin includes an unreleased transport fix and matches successful upstream CI. Ollama binary/model digest pins remain unresolved. No installation or tests were executed locally.",
+        "Research used 30 GitHub API calls and two web searches. Five requested page fetches retrieved no pages. ctx_fetch_and_index was rejected with 'MCP tool call requires approval, but approval policy is never'; upstream documents were instead obtained through the allowed GitHub GraphQL API, indexed, and read using ctx_search. Only the packet was read under the local project directory."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/giancarloerra/SocratiCode",
+        "https://api.github.com/repos/lancedb/lancedb",
+        "https://api.github.com/repos/minishlab/semble",
+        "https://api.github.com/repos/deepset-ai/haystack",
+        "https://api.github.com/repos/qdrant/qdrant",
+        "https://api.github.com/repos/kapillamba4/code-memory",
+        "https://api.github.com/repos/vllm-project/vllm",
+        "https://api.github.com/repos/pgvector/pgvector",
+        "https://api.github.com/repos/ollama/ollama",
+        "https://api.github.com/repos/huggingface/huggingface_hub",
+        "https://api.github.com/repos/lightonai/next-plaid",
+        "https://api.github.com/repos/giancarloerra/SocratiCode/commits?per_page=1",
+        "https://api.github.com/repos/lancedb/lancedb/commits?per_page=1",
+        "https://api.github.com/repos/minishlab/semble/commits?per_page=1",
+        "https://api.github.com/repos/deepset-ai/haystack/commits?per_page=1",
+        "https://api.github.com/repos/qdrant/qdrant/commits?per_page=1",
+        "https://api.github.com/repos/kapillamba4/code-memory/commits?per_page=1",
+        "https://api.github.com/repos/vllm-project/vllm/commits?per_page=1",
+        "https://api.github.com/repos/pgvector/pgvector/commits?per_page=1",
+        "https://api.github.com/repos/ollama/ollama/commits?per_page=1",
+        "https://api.github.com/repos/lightonai/next-plaid/commits?per_page=1",
+        "https://api.github.com/repos/giancarloerra/SocratiCode/releases/latest",
+        "https://api.github.com/repos/qdrant/qdrant/releases/latest",
+        "https://api.github.com/repos/ollama/ollama/releases/latest",
+        "https://api.github.com/repos/kapillamba4/code-memory/releases/latest",
+        "https://api.github.com/repos/lightonai/next-plaid/releases/latest",
+        "https://api.github.com/repos/giancarloerra/SocratiCode/actions/runs?per_page=5",
+        "https://api.github.com/repos/qdrant/qdrant/actions/runs?per_page=5",
+        "https://api.github.com/repos/ollama/ollama/actions/runs?per_page=5",
+        "https://api.github.com/graphql",
+        "https://github.com/giancarloerra/SocratiCode/blob/155ba9325f43a65c78a09930735b378f91651cf5/README.md",
+        "https://github.com/giancarloerra/SocratiCode/blob/155ba9325f43a65c78a09930735b378f91651cf5/CONTRIBUTING.md",
+        "https://github.com/giancarloerra/SocratiCode/blob/155ba9325f43a65c78a09930735b378f91651cf5/package.json",
+        "https://github.com/giancarloerra/SocratiCode/blob/155ba9325f43a65c78a09930735b378f91651cf5/.github/workflows/ci.yml",
+        "https://github.com/minishlab/semble/blob/aa634b14dc81ba6925a130cb999081f3240e2a3c/README.md",
+        "https://github.com/minishlab/semble/blob/aa634b14dc81ba6925a130cb999081f3240e2a3c/pyproject.toml",
+        "https://github.com/lightonai/next-plaid/blob/00e26aae0006b322727db277672211d9a0e3ccec/README.md",
+        "https://github.com/lightonai/next-plaid/blob/00e26aae0006b322727db277672211d9a0e3ccec/.github/workflows/ci.yml",
+        "https://github.com/qdrant/qdrant/blob/6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de/README.md",
+        "https://github.com/ollama/ollama/blob/b0c1ca4f7549d7acdfa52a7dcffc934bc63a43ce/README.md",
+        "https://github.com/ollama/ollama/blob/b0c1ca4f7549d7acdfa52a7dcffc934bc63a43ce/docs/api.md",
+        "https://github.com/lancedb/lancedb/blob/857e455361df77a0eb35e23764282e3d87dc1e44/README.md",
+        "https://github.com/deepset-ai/haystack/blob/9f31fb4b0ef318c51a6fa8ad30321336d99e2cb8/README.md",
+        "https://github.com/vllm-project/vllm/blob/8486f1ebfe6e39a5513a8636e7f07ed9746f8be5/README.md",
+        "https://github.com/pgvector/pgvector/blob/f37c13f68b57d2c3472b2214fbcff699d6d34876/README.md",
+        "https://github.com/huggingface/huggingface_hub/blob/1a76ad25c8f10fcd4ffa696d8289a3a1488dfa34/README.md"
+      ]
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 """Local integration tests for tools/adoption/render_config.py (fixture host, no live host claims)."""
 
+import importlib.util
 import json
 import os
 import re
@@ -39,6 +40,8 @@ FIXTURE_VALUES = {
     "SOCRATICODE_VERSION": next(
         tool["version"] for tool in json.loads((ROOT / "adoption" / "pins-linux-x86_64.json").read_text(
             encoding="utf-8"))["tools"] if tool["id"] == "socraticode"),
+    # Derived from the platform's Codex pin (CodexModelTests), spelled out as the Linux pin's (0.159.2) model.
+    "CODEX_MODEL": "gpt-6.1-sol",
 }
 
 
@@ -125,9 +128,11 @@ class RenderConfigTests(unittest.TestCase):
         # PR-F and H4 of the 2026-09-27 settings synthesis (codex rows 8, 10, 20 and 21), each read at openai/codex
         # rust-v0.157.1: live search in every sandbox (core/src/config/mod.rs), no startup update check on a pinned
         # client (config/src/config_toml.rs L520-523), no shell snapshot of exported variables
-        # (shell-command/src/shell_snapshot_exports.rs), children at max unless the spawn call picks an effort
-        # (core/src/agent/child_config.rs), and no trust for dated directories that no longer exist. The interactive
-        # effort stays `ultra`: moving it is a user decision. The gateway route lives only in the omniroute profile.
+        # (shell-command/src/shell_snapshot_exports.rs), and no trust for dated directories that no longer exist.
+        # The user's 2026-09-30 defaults are Sol/Ultra coordination and Sol/Max generic children, supported by
+        # rust-v0.159.2 models-manager/models.json and core/src/agent/child_config.rs L204-249. Selected role
+        # configs still apply afterwards (L62-73). The gateway route lives only in the omniroute profile. Both
+        # models are the one CODEX_MODEL placeholder, which CodexModelTests renders from each platform's Codex pin.
         import tomllib  # Python 3.11+, as above
 
         text = (TEMPLATES / "codex.config.template.toml").read_text(encoding="utf-8")
@@ -135,8 +140,11 @@ class RenderConfigTests(unittest.TestCase):
         self.assertEqual(user["web_search"], "live")
         self.assertIs(user["check_for_update_on_startup"], False)
         self.assertIs(user["features"]["shell_snapshot"], False)  # exported secrets never land in a snapshot file
+        self.assertIs(user["agents"]["enabled"], True)
+        self.assertEqual(user["agents"]["max_concurrent_threads_per_session"], 3)
         self.assertEqual(user["agents"]["default_subagent_reasoning_effort"], "max")
-        self.assertNotIn("default_subagent_model", user["agents"])  # alone it would give the catalog's `low`
+        self.assertEqual(user["agents"]["default_subagent_model"], FIXTURE_VALUES["CODEX_MODEL"])
+        self.assertEqual(user["model"], FIXTURE_VALUES["CODEX_MODEL"])
         self.assertEqual(user["model_reasoning_effort"], "ultra")
         self.assertEqual(sorted(user["projects"]), [FIXTURE_VALUES["PROJECT_ROOT"],
                                                     FIXTURE_VALUES["HOME"] + "/code/native-agent-stack-publication"])
@@ -529,6 +537,121 @@ class SocratiCodeVersionTests(unittest.TestCase):
         given = run("--host", self.host, "--platform", "linux-aarch64", "--set", "AI_MEMORY_BIN=/opt/running/ai-memory",
                     "--set", "SOCRATICODE_VERSION=1.15.0", "--out", str(out_dir))
         self.assertEqual(given.returncode, 0, given.stderr)
+
+
+class CodexModelTests(unittest.TestCase):
+    """PR #542 cross-family review (2026-09-30): the Codex user template set model = "gpt-6.1-sol" on every
+    platform, while adoption/pins-macos-arm64.json keeps Codex 0.155.1, whose bundled catalog has no GPT-6.1 entry
+    (evidence/receipts/codex-01592-qualification-20260930.json, data.checks_after_the_constant_move
+    .bundled_catalogs_offline; openai/codex rust-v0.159.1 release notes: "Added GPT-6.1 Sol as the default model in
+    the bundled catalog"). render_config.py now renders ${CODEX_MODEL} from the selected platform's Codex pin unless
+    a host supplies it, like ${SOCRATICODE_VERSION} (SocratiCodeVersionTests)."""
+
+    CODEX = TEMPLATES / "codex.config.template.toml"
+    # Today's two pins sit on either side of the rule: Linux 0.159.3, macOS 0.155.1.
+    EXPECTED = {"linux-x86_64": "gpt-6.1-sol", "macos-arm64": "gpt-6-astra"}
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.hosts_dir = ROOT / "adoption" / "hosts"
+        # A host value file without any derived value, as adoption/hosts/example.json is.
+        self.host = "test-fixture-no-codex-model"
+        values = {key: value for key, value in FIXTURE_VALUES.items()
+                  if key not in ("AI_MEMORY_BIN", "SOCRATICODE_VERSION", "CODEX_MODEL")}
+        (self.hosts_dir / f"{self.host}.json").write_text(json.dumps(values, indent=2))
+        self.addCleanup((self.hosts_dir / f"{self.host}.json").unlink, missing_ok=True)
+
+    @staticmethod
+    def pinned(platform_id: str) -> str:
+        tools = json.loads((ROOT / "adoption" / f"pins-{platform_id}.json").read_text(encoding="utf-8"))["tools"]
+        return next(tool["version"] for tool in tools if tool["id"] == "codex")
+
+    @staticmethod
+    def renderer():
+        spec = importlib.util.spec_from_file_location("render_config_under_test", SCRIPT)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
+
+    def models(self, out_dir: Path) -> tuple[str, str]:
+        import tomllib  # Python 3.11+, as the Codex wiring check already requires
+
+        config = tomllib.loads((out_dir / "codex.config.toml").read_text(encoding="utf-8"))
+        return config["model"], config["agents"]["default_subagent_model"]
+
+    def test_the_template_names_its_models_only_through_the_placeholder(self):
+        text = self.CODEX.read_text(encoding="utf-8")
+        self.assertEqual(re.findall(r'^(model|default_subagent_model) = "([^"]*)"$', text, flags=re.M),
+                         [("model", "${CODEX_MODEL}"), ("default_subagent_model", "${CODEX_MODEL}")])
+
+    def test_each_platform_renders_the_model_its_pinned_codex_lists(self):
+        self.assertEqual((self.pinned("linux-x86_64"), self.pinned("macos-arm64")), ("0.159.3", "0.155.1"))
+        for platform_id, model in self.EXPECTED.items():
+            with self.subTest(platform=platform_id):
+                out_dir = Path(self.tmp.name) / platform_id
+                result = run("--host", self.host, "--platform", platform_id, "--out", str(out_dir))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(self.models(out_dir), (model, model))
+
+    def test_gpt_6_1_sol_starts_at_codex_0_159_1(self):
+        # openai/codex codex-rs/models-manager/models.json has no "gpt-6.1-sol" slug at rust-v0.159.0 (687a119f) and
+        # one at rust-v0.159.1 (8e68a98e, line 178), the release whose notes add it.
+        renderer = self.renderer()
+        for version, model in (("0.155.1", "gpt-6-astra"), ("0.157.1", "gpt-6-astra"), ("0.159.0", "gpt-6-astra"),
+                               ("0.159.1", "gpt-6.1-sol"), ("0.159.2", "gpt-6.1-sol"), ("0.160.0", "gpt-6.1-sol"),
+                               ("1.0.0", "gpt-6.1-sol")):
+            with self.subTest(version=version):
+                self.assertEqual(renderer.codex_model_for(version), model)
+        # Anything but a plain release version is refused rather than guessed.
+        for version in ("0.159", "0.159.1-alpha.1", "v0.159.1", ""):
+            with self.subTest(version=version):
+                with self.assertRaises(renderer.RenderError) as refused:
+                    renderer.codex_model_for(version)
+                self.assertIn("--set CODEX_MODEL=", str(refused.exception))
+
+    def test_a_host_supplied_model_wins_over_the_pin(self):
+        out_dir = Path(self.tmp.name) / "override"
+        result = run("--host", self.host, "--platform", "macos-arm64", "--set", "CODEX_MODEL=gpt-6-sol",
+                     "--out", str(out_dir))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(self.models(out_dir), ("gpt-6-sol", "gpt-6-sol"))
+        self.assertNotIn("CODEX_MODEL", result.stdout)  # nothing was derived, so nothing is explained
+
+    def test_a_platform_without_a_pins_file_fails_closed_unless_the_model_is_given(self):
+        out_dir = Path(self.tmp.name) / "unknown"
+        others = ("--set", "AI_MEMORY_BIN=/opt/running/ai-memory", "--set", "SOCRATICODE_VERSION=1.15.0")
+        result = run("--host", self.host, "--platform", "linux-aarch64", *others, "--out", str(out_dir))
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("no pins file for platform 'linux-aarch64'", result.stderr)
+        self.assertIn("--set CODEX_MODEL=", result.stderr)
+        self.assertFalse((out_dir / "codex.config.toml").exists())
+        given = run("--host", self.host, "--platform", "linux-aarch64", *others, "--set", "CODEX_MODEL=gpt-6-astra",
+                    "--out", str(out_dir))
+        self.assertEqual(given.returncode, 0, given.stderr)
+        self.assertEqual(self.models(out_dir), ("gpt-6-astra", "gpt-6-astra"))
+
+    def test_out_and_check_name_the_derived_model_its_pin_and_the_rules_sources(self):
+        for platform_id, model in self.EXPECTED.items():
+            with self.subTest(platform=platform_id):
+                out_dir = Path(self.tmp.name) / f"check-{platform_id}"
+                written = run("--host", self.host, "--platform", platform_id, "--out", str(out_dir))
+                self.assertEqual(written.returncode, 0, written.stderr)
+                checked = run("--host", self.host, "--platform", platform_id, "--check",
+                              "--live-settings", str(out_dir / "settings.json"),
+                              "--live-codex-user", str(out_dir / "codex.config.toml"),
+                              "--live-codex-project", str(out_dir / "project.codex.config.toml"))
+                self.assertEqual(checked.returncode, 0, checked.stdout + checked.stderr)
+                self.assertIn("codex.config.toml: byte-identical", checked.stdout)
+                for result in (written, checked):
+                    notes = [line for line in result.stdout.splitlines() if line.startswith("derived CODEX_MODEL: ")]
+                    self.assertEqual(len(notes), 1, result.stdout)
+                    note = notes[0]
+                    self.assertTrue(note.startswith(f"derived CODEX_MODEL: {model} "), note)
+                    self.assertIn(f"adoption/pins-{platform_id}.json pins codex {self.pinned(platform_id)}", note)
+                    self.assertIn("0.159.1", note)
+                    self.assertIn("rust-v0.159.1", note)
+                    self.assertIn("evidence/receipts/codex-01592-qualification-20260930.json", note)
 
 
 class VerifyStdinTests(unittest.TestCase):

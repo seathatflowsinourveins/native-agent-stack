@@ -1,0 +1,62 @@
+# push_notification_probe.py outputs recorded 2026-09-29 (Claude Code 2.1.285, Haiku, native pty; the probe path is left out; 'screen tail' lines dropped; raw hook payloads were removed by the probe).
+# The first attempts of arms A and B ended without a tool call while the host was heavily loaded (a peer's build); they are kept below the reruns, which ran after the load fell.
+
+== arm A: push --no-user-settings
+kind=push control=False state=observing dialog_opened=True probe_process_group=gone
+focus reporting enabled by the client: True | focus-out report sent: True (0.0 s after Enter) | prompt sleep: 45 s | seconds from Enter to the tool call: 52.6
+events: ['permission mode footer at prompt time: bypassPermissions', 'prompt sent', 'PreToolUse observed (the tool is being called); no keys sent for 16 s']
+Notification events: 1
+  +0.0s after open | type=push_notification | message=readiness probe
+bare BEL bytes after the dialog opened: 0  (seconds after open, bytes per read: [])
+raw payload directory removed: True
+
+== arm B: push --no-user-settings --bell-hook
+kind=push control=False state=observing dialog_opened=True probe_process_group=gone
+focus reporting enabled by the client: True | focus-out report sent: True (0.0 s after Enter) | prompt sleep: 45 s | seconds from Enter to the tool call: 54.3
+events: ['permission mode footer at prompt time: bypassPermissions', 'prompt sent', 'PreToolUse observed (the tool is being called); no keys sent for 16 s']
+Notification events: 1
+  +0.1s after open | type=push_notification | message=readiness probe
+bare BEL bytes after the dialog opened: 1  (seconds after open, bytes per read: [(0.2, 1)])
+raw payload directory removed: True
+
+== arm C: push
+kind=push control=False state=observing dialog_opened=True probe_process_group=gone
+focus reporting enabled by the client: True | focus-out report sent: True (0.0 s after Enter) | prompt sleep: 45 s | seconds from Enter to the tool call: 53.7
+events: ['permission mode footer at prompt time: bypassPermissions', 'prompt sent', 'PreToolUse observed (the tool is being called); no keys sent for 16 s']
+Notification events: 1
+  +0.0s after open | type=push_notification | message=readiness probe
+bare BEL bytes after the dialog opened: 1  (seconds after open, bytes per read: [(0.0, 1)])
+raw payload directory removed: True
+
+== arm D: push --no-user-settings --no-focus-report --sleep 75
+kind=push control=False state=observing dialog_opened=True probe_process_group=gone
+focus reporting enabled by the client: True | focus-out report sent: False | prompt sleep: 75 s | seconds from Enter to the tool call: 81.1
+events: ['permission mode footer at prompt time: bypassPermissions', 'prompt sent', 'PreToolUse observed (the tool is being called); no keys sent for 16 s']
+Notification events: 2
+  +-17.4s after open | type=idle_prompt | message=Claude is waiting for your input
+  +0.0s after open | type=push_notification | message=readiness probe
+bare BEL bytes after the dialog opened: 0  (seconds after open, bytes per read: [])
+raw payload directory removed: True
+
+== arm E: push --no-user-settings --no-focus-report --sleep 15
+kind=push control=False state=observing dialog_opened=True probe_process_group=gone
+focus reporting enabled by the client: True | focus-out report sent: False | prompt sleep: 15 s | seconds from Enter to the tool call: 20.1
+events: ['permission mode footer at prompt time: bypassPermissions', 'prompt sent', 'PreToolUse observed (the tool is being called); no keys sent for 16 s']
+Notification events: 0
+bare BEL bytes after the dialog opened: 0  (seconds after open, bytes per read: [])
+raw payload directory removed: True
+
+== arm A, first attempt (no tool call; kept): push --no-user-settings
+kind=push control=False state=waiting_tool dialog_opened=False probe_process_group=gone
+focus reporting enabled by the client: True | focus-out report sent: True (4.9 s after Enter) | prompt sleep: 45 s | seconds from Enter to the tool call: None
+events: ['permission mode footer at prompt time: default (no mode footer)', 'prompt sent']
+Notification events: 0
+raw payload directory removed: True
+
+== arm B, first attempt (no tool call; kept): push --no-user-settings --bell-hook
+kind=push control=False state=waiting_tool dialog_opened=False probe_process_group=gone
+focus reporting enabled by the client: True | focus-out report sent: True (0.0 s after Enter) | prompt sleep: 45 s | seconds from Enter to the tool call: None
+events: ['permission mode footer at prompt time: default (no mode footer)', 'prompt sent']
+Notification events: 1
+  +Nones after open | type=idle_prompt | message=Claude is waiting for your input
+raw payload directory removed: True

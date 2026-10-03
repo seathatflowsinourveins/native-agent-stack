@@ -1,0 +1,136 @@
+{
+  "layers": [
+    {
+      "layer_id": "observation-inference",
+      "selection": [],
+      "not_selected": [
+        {
+          "key": "C02",
+          "name": "OTel Collector Contrib",
+          "reason": "Leading privacy-gate candidate; upstream redaction search excerpts describe masking and allowlisting, but the install command, pinned behavior and CI results could not be verified. [Redaction documentation](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/processor/redactionprocessor/README.md)"
+        },
+        {
+          "key": "C07",
+          "name": "OpenLIT",
+          "reason": "Leading integrated candidate: upstream search excerpts describe Claude Code/Codex hooks, privacy controls and evaluations; full documentation, default-branch commit and latest release were not verified. [README](https://github.com/openlit/openlit/blob/main/README.md)"
+        },
+        {
+          "key": "C08",
+          "name": "Phoenix",
+          "reason": "Strong provisional evaluator with documented OTLP, experiments and local serving; native-session reconciliation and the filtered pipeline remain unverified. Its release and default-branch commit are recent. [Upstream](https://github.com/Arize-ai/phoenix), [release](https://github.com/Arize-ai/phoenix/releases/tag/arize-phoenix-v20.19.0), [commit](https://github.com/Arize-ai/phoenix/commit/7ea5dc10be15a283f8a25b87b24516e0b66c7b7f)"
+        },
+        {
+          "key": "C09",
+          "name": "Prometheus",
+          "reason": "Strong complementary metric store with a documented Linux Docker install and recent release/commit; metrics alone do not establish the complete required pipeline. [Installation](https://prometheus.io/docs/prometheus/latest/installation/), [release](https://github.com/prometheus/prometheus/releases/tag/v3.15.0), [commit](https://github.com/prometheus/prometheus/commit/7c741e2879db6b58b8d152f566a8112f0d642bb1)"
+        },
+        {
+          "key": "C12",
+          "name": "Loki",
+          "reason": "Recent log-storage candidate, but its contribution beyond the integrated alternatives was not established on this workload. [Local installation](https://grafana.com/docs/loki/latest/setup/install/local/), [release](https://github.com/grafana/loki/releases/tag/v3.7.8), [commit](https://github.com/grafana/loki/commit/ee133fabe75ea5898ebf9e8b15a104146443ebce)"
+        },
+        {
+          "key": "C05",
+          "name": "Grafana",
+          "reason": "Recent dashboard candidate for Prometheus/Loki; adding its separate presentation layer was not justified against OpenLIT or a terminal viewer by measured evidence. [Data sources](https://grafana.com/docs/grafana/latest/datasources/), [release](https://github.com/grafana/grafana/releases/tag/v13.2.3), [commit](https://github.com/grafana/grafana/commit/f89103a8dac3e24563d0ce43f83fd085676a92d6)"
+        },
+        {
+          "key": "C14",
+          "name": "otel-tui",
+          "reason": "Recent, lightweight OTLP viewer with an upstream Go install command; native-agent capture, retention and route evaluation were not established in the inspected excerpts. [Upstream](https://github.com/ymtdzzz/otel-tui), [release](https://github.com/ymtdzzz/otel-tui/releases/tag/v0.7.5), [commit](https://github.com/ymtdzzz/otel-tui/commit/253c5e35ab39d1472955eaeb0304c3cf501dbf7c)"
+        },
+        {
+          "key": "C10",
+          "name": "AgentsView",
+          "reason": "Recent native-session analytics candidate, but direct transcript ingestion creates a separate capture path whose privacy filtering and duplication were not reconciled with OTLP. [Upstream](https://github.com/kenn-io/agentsview), [release](https://github.com/kenn-io/agentsview/releases/tag/v0.44.0), [commit](https://github.com/kenn-io/agentsview/commit/d37642206051dababc436635024676c17dddac45)"
+        },
+        {
+          "key": "C06",
+          "name": "Claude HUD",
+          "reason": "Its verified repository description covers Claude Code context, tools, agents and progress; that narrower client display does not establish the shared local pipeline or workload evaluation. [Repository metadata](https://api.github.com/repos/jarrodwatts/claude-hud)"
+        },
+        {
+          "key": "C03",
+          "name": "Alertmanager",
+          "reason": "Alert handling is supplementary; no alert-delivery requirement or evidence justifying another service was established for this packet. [Repository metadata](https://api.github.com/repos/prometheus/alertmanager)"
+        },
+        {
+          "key": "C04",
+          "name": "ntfy",
+          "reason": "Its verified capability is push notification delivery; the packet does not establish a notification need that would justify adding it to the observation pipeline. [Repository metadata](https://api.github.com/repos/binwiederhier/ntfy)"
+        },
+        {
+          "key": "C13",
+          "name": "llama.cpp optional inference",
+          "reason": "Recent candidate for an optional trial, but the published 4090 comparison used an older Qwen workload and different precisions; current installation, platform fit and actual-task quality were not verified. [Comparison](https://github.com/ggml-org/llama.cpp/discussions/15180), [release](https://github.com/ggml-org/llama.cpp/releases/tag/v0.5.0), [commit](https://github.com/ggml-org/llama.cpp/commit/5fc4f3c8c7103ffd0b7ff5ee4855bcc78a3ed5cd)"
+        },
+        {
+          "key": "C11",
+          "name": "vllm",
+          "reason": "Plausible optional serving candidate, but metadata and the older comparison do not qualify its current release, installation or actual workload within 24 GB. [Repository metadata](https://api.github.com/repos/vllm-project/vllm), [Comparison](https://github.com/ggml-org/llama.cpp/discussions/15180)"
+        },
+        {
+          "key": "C01",
+          "name": "SGLang",
+          "reason": "Plausible optional serving candidate, but only repository metadata was verified; no comparison covering its actual workload, current install or target-platform fit was established. [Repository metadata](https://api.github.com/repos/sgl-project/sglang)"
+        }
+      ],
+      "excluded": [],
+      "close_call": true,
+      "deciding_comparison": "No finalized clean-install selection; this is unresolved evidence, not a demonstrated performance tie. Compare OpenLIT behind one Collector privacy gate against Collector + Prometheus + Loki + Grafana + Phoenix on the WSL2 host. Run the same real Claude Code and Codex task, reconcile native counters with telemetry, check duplicate capture and synthetic-secret leakage, and measure outcome coverage, overhead and restart recovery. If local inference is needed, compare llama.cpp, vLLM and SGLang using the actual task, matched model/precision/context/concurrency, output acceptance criteria, latency, memory fit and failure recovery.",
+      "evidence_gaps": [
+        "The mandated ctx_fetch_and_index tool was rejected because it requires approval while this session's policy is never. No full page was fetched or read through ctx_search; documentation findings are primary-source search excerpts.",
+        "Budget correction: 30 GitHub API calls were used. Nine search queries across four calls exceeded the six-query limit. Further requests stopped; zero page fetches succeeded.",
+        "No upstream CI result, completed test-suite result or current benchmark separated complete observation stacks. Promtool documentation describes testing facilities, not a verified passing run.",
+        "All 14 repository metadata responses reported unarchived. Default-branch commits and latest releases were verified for eight candidates; pushed_at alone was not treated as default-branch freshness for the remaining six.",
+        "The eight fully checked candidates had recent commits and releases within the 90-day window ending October 1, 2026 in America/New_York. Open issue counts include pull requests and do not establish issue-response activity.",
+        "Linux x86_64 under WSL2, macOS arm64 support, release-pinned installation commands and end-to-end client integration were not comprehensively verified.",
+        "No optional model route is qualified. The available llama.cpp/vLLM comparison does not match the actual workload and omits SGLang."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/binwiederhier/ntfy",
+        "https://api.github.com/repos/jarrodwatts/claude-hud",
+        "https://api.github.com/repos/prometheus/alertmanager",
+        "https://api.github.com/repos/openlit/openlit",
+        "https://api.github.com/repos/open-telemetry/opentelemetry-collector-contrib",
+        "https://api.github.com/repos/open-telemetry/opentelemetry-collector-contrib/releases/latest",
+        "https://api.github.com/repos/open-telemetry/opentelemetry-collector-contrib/commits?per_page=1",
+        "https://api.github.com/repos/prometheus/prometheus",
+        "https://api.github.com/repos/prometheus/prometheus/releases/latest",
+        "https://api.github.com/repos/prometheus/prometheus/commits?per_page=1",
+        "https://api.github.com/repos/grafana/grafana",
+        "https://api.github.com/repos/grafana/grafana/releases/latest",
+        "https://api.github.com/repos/grafana/grafana/commits?per_page=1",
+        "https://api.github.com/repos/grafana/loki",
+        "https://api.github.com/repos/grafana/loki/releases/latest",
+        "https://api.github.com/repos/grafana/loki/commits?per_page=1",
+        "https://api.github.com/repos/Arize-ai/phoenix",
+        "https://api.github.com/repos/Arize-ai/phoenix/releases/latest",
+        "https://api.github.com/repos/Arize-ai/phoenix/commits?per_page=1",
+        "https://api.github.com/repos/kenn-io/agentsview",
+        "https://api.github.com/repos/kenn-io/agentsview/releases/latest",
+        "https://api.github.com/repos/kenn-io/agentsview/commits?per_page=1",
+        "https://api.github.com/repos/ymtdzzz/otel-tui",
+        "https://api.github.com/repos/ymtdzzz/otel-tui/releases/latest",
+        "https://api.github.com/repos/ymtdzzz/otel-tui/commits?per_page=1",
+        "https://api.github.com/repos/ggml-org/llama.cpp",
+        "https://api.github.com/repos/ggml-org/llama.cpp/releases/latest",
+        "https://api.github.com/repos/ggml-org/llama.cpp/commits?per_page=1",
+        "https://api.github.com/repos/sgl-project/sglang",
+        "https://api.github.com/repos/vllm-project/vllm",
+        "Search excerpts only: https://github.com/openlit/openlit/blob/main/README.md",
+        "Search excerpts only: https://github.com/openlit/openlit/blob/main/docs/latest/overview.mdx",
+        "Search excerpts only: https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/processor/redactionprocessor/README.md",
+        "Search excerpts only: https://prometheus.io/docs/prometheus/latest/installation/",
+        "Search excerpts only: https://prometheus.io/docs/prometheus/latest/configuration/promtool/",
+        "Search excerpts only: https://grafana.com/docs/grafana/latest/datasources/",
+        "Search excerpts only: https://grafana.com/docs/loki/latest/setup/install/local/",
+        "Search excerpts only: https://github.com/Arize-ai/phoenix",
+        "Search excerpts only: https://github.com/Arize-ai/phoenix/blob/main/docs/phoenix/skill.md",
+        "Search excerpts only: https://github.com/kenn-io/agentsview",
+        "Search excerpts only: https://github.com/ymtdzzz/otel-tui",
+        "Search excerpts only: https://github.com/ggml-org/llama.cpp/discussions/15180"
+      ]
+    }
+  ]
+}

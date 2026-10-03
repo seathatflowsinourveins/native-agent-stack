@@ -1,0 +1,70 @@
+{
+ "layer_id": "ci-supply-chain",
+ "title": "CI and supply chain",
+ "requirement": "Publish reproducible changes with scoped workflow permissions, pinned dependencies, actual runtime inventory and attributable hosted checks.",
+ "a_deciding_comparison_would_measure": "Use a CI-repair skill when a real Actions check fails; qualify log recovery and repair. Add vulnerability tooling only for a defined artifact/database gap.",
+ "candidates": [
+  {
+   "key": "C01",
+   "name": "attest",
+   "repository": "https://github.com/actions/attest"
+  },
+  {
+   "key": "C02",
+   "name": "poutine",
+   "repository": "https://github.com/boostsecurityio/poutine"
+  },
+  {
+   "key": "C03",
+   "name": "zizmor",
+   "repository": "https://github.com/zizmorcore/zizmor"
+  },
+  {
+   "key": "C04",
+   "name": "gitleaks",
+   "repository": "https://github.com/gitleaks/gitleaks"
+  },
+  {
+   "key": "C05",
+   "name": "Trivy",
+   "repository": "https://github.com/aquasecurity/trivy"
+  },
+  {
+   "key": "C06",
+   "name": "actionlint (kjanat)",
+   "repository": "https://github.com/kjanat/actionlint"
+  },
+  {
+   "key": "C07",
+   "name": "Syft",
+   "repository": "https://github.com/anchore/syft"
+  },
+  {
+   "key": "C08",
+   "name": "Grype",
+   "repository": "https://github.com/anchore/grype"
+  },
+  {
+   "key": "C09",
+   "name": "Dependabot",
+   "repository": "https://github.com/dependabot/dependabot-core"
+  },
+  {
+   "key": "C10",
+   "name": "codeql-sarif",
+   "repository": "https://github.com/github/codeql-action"
+  },
+  {
+   "key": "C11",
+   "name": "actionlint (rhysd)",
+   "repository": "https://github.com/rhysd/actionlint"
+  },
+  {
+   "key": "C12",
+   "name": "osv-scanner",
+   "repository": "https://github.com/google/osv-scanner"
+  }
+ ],
+ "comparisons_on_record_where_every_named_arm_ran": [],
+ "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host."
+}

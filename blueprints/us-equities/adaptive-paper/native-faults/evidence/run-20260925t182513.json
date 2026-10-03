@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "native_fault_run_record",
   "subject_gate": "native-fault-behaviour",
-  "subject_receipt": "blueprints/us-equities/adaptive-paper/native-faults/receipt.json",
+  "subject_receipt": "blueprints/us-equities/adaptive-paper/native-faults/receipt-20260925t182513.json",
   "receipt_sha256": "31c112e3f1ff4471543b5ca034ef879561467a85e6d456000971f075d605e90d",
   "client_order_id_prefix": "nf-20260925t182513-9a1b9a-",
   "purpose": "Re-run of the frozen native-faults plan (C01, C02, C05, C04) on the released adaptive-paper engine, which the gate's 2026-09-24 binding amendment requires before the gate is cited for that engine.",

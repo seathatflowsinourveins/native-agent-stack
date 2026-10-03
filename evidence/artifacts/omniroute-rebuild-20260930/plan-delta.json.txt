@@ -1,0 +1,1147 @@
+{
+ "version": 1,
+ "gateways": {
+  "20128": "http://127.0.0.1:20128",
+  "20129": "http://127.0.0.1:20129"
+ },
+ "digest_routes": [
+  "/api/settings/compression",
+  "/api/context/combos",
+  "/api/model-capability-overrides",
+  "/api/resilience"
+ ],
+ "steps": [
+  {
+   "id": "T10",
+   "gateway": "20129",
+   "title": "20129: compression settings to upstream defaults (user direction: upstream as source of truth): headerless plan [session-dedup, ccr, lite], no output style, liveZone off, cacheMinutes 5",
+   "features": [
+    "engines map ON: session-dedup, ccr, lite, rtk minimal, codex-responses, relevance, caveman lite, aggressive, llmlingua, ultra; OFF: headroom (upstream number-rounding defect), omniglyph (inert on GPT-6)",
+    "headerless plan [session-dedup, ccr, lite] = upstream's documented default lane (COMPRESSION_GUIDE.md:233-239, seeded Standard Savings); lossy engines still run only with a header/combo opt-in (lossyRequestPolicy.ts)",
+    "outputStyles [] (upstream ships none; removes the +74 input tokens), liveZone off, cacheMinutes 5, languageConfig, rtkConfig, codexResponsesConfig, cavemanConfig, aggressive, ultra, headroom.minRows, stackedPipeline at upstream defaults",
+    "two deliberate exceptions kept as defect mitigations: sessionDedup.minBlockChars 512 (upstream 80; key-collision defect) and lite.compressToolResults false (already live; Responses tool-loop truncation)"
+   ],
+   "risk": "medium",
+   "source": "delta file from the pi-practice session's upstream comparison at 2f42a9ac1 (main c1e30b76 identical tree): src/app/api/settings/compression/route.ts (PUT replaces each top-level key), lossyRequestPolicy.ts:49-60, engineCatalog.ts:200-206, planResolution.ts:56-57",
+   "precondition": [
+    {
+     "type": "get",
+     "route": "/api/settings/compression",
+     "asserts": [
+      {
+       "path": "engines",
+       "op": "equals",
+       "value": {
+        "session-dedup": {
+         "enabled": false
+        },
+        "ccr": {
+         "enabled": true
+        },
+        "lite": {
+         "enabled": false
+        },
+        "rtk": {
+         "enabled": true,
+         "level": "minimal"
+        },
+        "codex-responses": {
+         "enabled": true
+        },
+        "headroom": {
+         "enabled": false
+        },
+        "relevance": {
+         "enabled": false
+        },
+        "caveman": {
+         "enabled": true,
+         "level": "lite"
+        },
+        "aggressive": {
+         "enabled": false
+        },
+        "llmlingua": {
+         "enabled": false
+        },
+        "ultra": {
+         "enabled": false
+        },
+        "omniglyph": {
+         "enabled": false
+        }
+       }
+      },
+      {
+       "path": "outputStyles",
+       "op": "equals",
+       "value": [
+        {
+         "id": "terse-prose",
+         "level": "lite"
+        }
+       ]
+      },
+      {
+       "path": "liveZone",
+       "op": "equals",
+       "value": {
+        "enabled": true
+       }
+      },
+      {
+       "path": "languageConfig",
+       "op": "equals",
+       "value": {
+        "enabled": true,
+        "defaultLanguage": "en",
+        "autoDetect": false,
+        "enabledPacks": [
+         "en"
+        ]
+       }
+      },
+      {
+       "path": "rtkConfig",
+       "op": "equals",
+       "value": {
+        "applyToAssistantMessages": false,
+        "applyToCodeBlocks": false,
+        "applyToToolResults": true,
+        "customFiltersEnabled": false,
+        "deduplicateThreshold": 5,
+        "disabledFilters": [
+         "aws",
+         "biome",
+         "build-eslint",
+         "build-typescript",
+         "build-vite",
+         "build-webpack",
+         "bundle-install",
+         "composer",
+         "curl",
+         "df",
+         "docker-build",
+         "docker-logs",
+         "docker-ps",
+         "dotnet",
+         "du",
+         "error-stacktrace",
+         "gcloud",
+         "generic-output",
+         "gh",
+         "git-branch",
+         "git-diff",
+         "git-log",
+         "git-status",
+         "golangci-lint",
+         "gradle",
+         "json-output",
+         "kubectl",
+         "make",
+         "mypy",
+         "npm-audit",
+         "npm-install",
+         "nx",
+         "pip",
+         "playwright",
+         "poetry-install",
+         "prettier",
+         "ps",
+         "rsync",
+         "rubocop",
+         "ruff",
+         "shell-find",
+         "shell-grep",
+         "shell-ls",
+         "ssh",
+         "systemctl-status",
+         "terraform-plan",
+         "test-cargo",
+         "test-go",
+         "test-jest",
+         "test-pytest",
+         "test-vitest",
+         "tofu-plan",
+         "turbo",
+         "uv-sync",
+         "wget"
+        ],
+        "enableGrouping": false,
+        "enableRenderers": false,
+        "enabled": false,
+        "enabledFilters": [],
+        "groupingThreshold": 3,
+        "intensity": "minimal",
+        "maxCharsPerResult": 40000,
+        "maxLinesPerResult": 400,
+        "preserveDocstrings": true,
+        "rawOutputMaxAgeDays": 30,
+        "rawOutputMaxBytes": 1048576,
+        "rawOutputMaxFiles": 100000,
+        "rawOutputRetention": "never",
+        "stripCodeComments": false,
+        "trustProjectFilters": false
+       }
+      },
+      {
+       "path": "codexResponsesConfig",
+       "op": "equals",
+       "value": {
+        "enabled": false,
+        "minBytes": 4096,
+        "maxOutputBytes": 2097152,
+        "maxCandidateBytes": 524288,
+        "maxLines": 160,
+        "minSearchMatches": 10000,
+        "minLogLines": 10000,
+        "preserveToolNames": [
+         "Read",
+         "Glob",
+         "Grep",
+         "Write",
+         "Edit",
+         "WebSearch",
+         "WebFetch",
+         "read",
+         "glob",
+         "grep",
+         "write",
+         "edit",
+         "web_search",
+         "web_fetch",
+         "str_replace_editor",
+         "file_editor",
+         "edit_file",
+         "terminal",
+         "execute_bash",
+         "bash",
+         "shell"
+        ]
+       }
+      },
+      {
+       "path": "cavemanConfig",
+       "op": "equals",
+       "value": {
+        "enabled": true,
+        "intensity": "lite",
+        "compressRoles": [
+         "assistant"
+        ],
+        "minMessageLength": 200,
+        "skipRules": [],
+        "preservePatterns": [
+         "```[\\s\\S]*?```",
+         "`[^`\\n]+`",
+         "\\b(https?://\\S+)",
+         "(?:^|\\s)(\\.{0,2}/[\\w./\\-]+)",
+         "^\\s*(Error|TypeError|RangeError|SyntaxError|ReferenceError):",
+         "^\\s+at\\s"
+        ]
+       }
+      },
+      {
+       "path": "sessionDedup",
+       "op": "equals",
+       "value": {
+        "minBlockChars": 512,
+        "fuzzy": false
+       }
+      },
+      {
+       "path": "headroom",
+       "op": "equals",
+       "value": {
+        "minRows": 16
+       }
+      },
+      {
+       "path": "aggressive",
+       "op": "equals",
+       "value": {
+        "thresholds": {
+         "fullSummary": 100,
+         "moderate": 100,
+         "light": 100,
+         "verbatim": 100
+        },
+        "toolStrategies": {
+         "fileContent": false,
+         "grepSearch": false,
+         "shellOutput": false,
+         "json": false,
+         "errorMessage": false
+        },
+        "summarizerEnabled": false,
+        "maxTokensPerMessage": 32768,
+        "minSavingsThreshold": 0
+       }
+      },
+      {
+       "path": "ultra",
+       "op": "equals",
+       "value": {
+        "enabled": false,
+        "compressionRate": 0.9,
+        "minScoreThreshold": 0.1,
+        "slmFallbackToAggressive": false,
+        "maxTokensPerMessage": 8192
+       }
+      },
+      {
+       "path": "enabled",
+       "op": "equals",
+       "value": true
+      },
+      {
+       "path": "defaultMode",
+       "op": "equals",
+       "value": "off"
+      },
+      {
+       "path": "autoTriggerTokens",
+       "op": "equals",
+       "value": 0
+      },
+      {
+       "path": "contextBudget.mode",
+       "op": "equals",
+       "value": "off"
+      },
+      {
+       "path": "activeComboId",
+       "op": "equals",
+       "value": null
+      },
+      {
+       "path": "compressionComboId",
+       "op": "equals",
+       "value": null
+      },
+      {
+       "path": "comboOverrides",
+       "op": "len_equals",
+       "value": 0
+      },
+      {
+       "path": "exclusions",
+       "op": "len_equals",
+       "value": 0
+      },
+      {
+       "path": "lite",
+       "op": "equals",
+       "value": {
+        "compressToolResults": false
+       }
+      },
+      {
+       "path": "preserveSystemPrompt",
+       "op": "equals",
+       "value": true
+      },
+      {
+       "path": "preserveSystemPromptMode",
+       "op": "equals",
+       "value": "always"
+      },
+      {
+       "path": "cavemanOutputMode.enabled",
+       "op": "equals",
+       "value": false
+      },
+      {
+       "path": "ultraEngine",
+       "op": "equals",
+       "value": "heuristic"
+      },
+      {
+       "path": "ultraSlmPrewarm",
+       "op": "equals",
+       "value": false
+      },
+      {
+       "path": "mcpDescriptionCompressionEnabled",
+       "op": "equals",
+       "value": true
+      },
+      {
+       "path": "enginesExplicit",
+       "op": "equals",
+       "value": true
+      },
+      {
+       "path": "stackedPipeline",
+       "op": "equals",
+       "value": [
+        {
+         "engine": "ccr",
+         "config": {
+          "enabled": false
+         }
+        }
+       ]
+      },
+      {
+       "path": "cacheMinutes",
+       "op": "equals",
+       "value": 60
+      }
+     ]
+    }
+   ],
+   "captures": [
+    {
+     "name": "T10_compression",
+     "type": "get",
+     "route": "/api/settings/compression",
+     "keep": [
+      "engines",
+      "outputStyles",
+      "liveZone",
+      "languageConfig",
+      "rtkConfig",
+      "codexResponsesConfig",
+      "cavemanConfig",
+      "sessionDedup",
+      "headroom",
+      "aggressive",
+      "ultra",
+      "enabled",
+      "defaultMode",
+      "autoTriggerMode",
+      "autoTriggerTokens",
+      "contextBudget",
+      "activeComboId",
+      "compressionComboId",
+      "comboOverrides",
+      "exclusions",
+      "lite",
+      "stackedPipeline",
+      "preserveSystemPrompt",
+      "preserveSystemPromptMode",
+      "cavemanOutputMode",
+      "ultraEngine",
+      "ultraSlmPrewarm",
+      "cacheMinutes",
+      "mcpDescriptionCompressionEnabled",
+      "enginesExplicit",
+      "ccr"
+     ]
+    }
+   ],
+   "write": {
+    "method": "PUT",
+    "route": "/api/settings/compression",
+    "body": {
+     "engines": {
+      "session-dedup": {
+       "enabled": true
+      },
+      "ccr": {
+       "enabled": true
+      },
+      "lite": {
+       "enabled": true
+      },
+      "rtk": {
+       "enabled": true,
+       "level": "minimal"
+      },
+      "codex-responses": {
+       "enabled": true
+      },
+      "headroom": {
+       "enabled": false
+      },
+      "relevance": {
+       "enabled": true
+      },
+      "caveman": {
+       "enabled": true,
+       "level": "lite"
+      },
+      "aggressive": {
+       "enabled": true
+      },
+      "llmlingua": {
+       "enabled": true
+      },
+      "ultra": {
+       "enabled": true
+      },
+      "omniglyph": {
+       "enabled": false
+      }
+     },
+     "outputStyles": [],
+     "liveZone": {
+      "enabled": false
+     },
+     "cacheMinutes": 5,
+     "languageConfig": {
+      "enabled": false,
+      "defaultLanguage": "en",
+      "autoDetect": true,
+      "enabledPacks": [
+       "en"
+      ]
+     },
+     "rtkConfig": {
+      "disabledFilters": [],
+      "maxLinesPerResult": 120,
+      "maxCharsPerResult": 12000,
+      "deduplicateThreshold": 3,
+      "customFiltersEnabled": true
+     },
+     "codexResponsesConfig": {
+      "minBytes": 512,
+      "minSearchMatches": 8,
+      "minLogLines": 24,
+      "preserveToolNames": [
+       "Read",
+       "Glob",
+       "Grep",
+       "Write",
+       "Edit",
+       "WebSearch",
+       "WebFetch",
+       "read",
+       "glob",
+       "grep",
+       "write",
+       "edit",
+       "web_search",
+       "web_fetch"
+      ]
+     },
+     "cavemanConfig": {
+      "enabled": true,
+      "compressRoles": [
+       "user"
+      ],
+      "minMessageLength": 50
+     },
+     "aggressive": {
+      "thresholds": {
+       "fullSummary": 5,
+       "moderate": 3,
+       "light": 2,
+       "verbatim": 2
+      },
+      "toolStrategies": {
+       "fileContent": true,
+       "grepSearch": true,
+       "shellOutput": true,
+       "json": true,
+       "errorMessage": true
+      },
+      "summarizerEnabled": true,
+      "maxTokensPerMessage": 2048,
+      "minSavingsThreshold": 0.05
+     },
+     "ultra": {
+      "enabled": false,
+      "compressionRate": 0.5,
+      "minScoreThreshold": 0.3,
+      "slmFallbackToAggressive": true,
+      "maxTokensPerMessage": 0
+     },
+     "headroom": {
+      "minRows": 8
+     },
+     "sessionDedup": {
+      "minBlockChars": 512,
+      "fuzzy": false
+     },
+     "stackedPipeline": [
+      {
+       "engine": "rtk",
+       "intensity": "standard"
+      },
+      {
+       "engine": "caveman",
+       "intensity": "full"
+      }
+     ]
+    }
+   },
+   "readback": [
+    {
+     "type": "get",
+     "route": "/api/settings/compression",
+     "asserts": [
+      {
+       "path": "engines",
+       "op": "equals",
+       "value": {
+        "session-dedup": {
+         "enabled": true
+        },
+        "ccr": {
+         "enabled": true
+        },
+        "lite": {
+         "enabled": true
+        },
+        "rtk": {
+         "enabled": true,
+         "level": "minimal"
+        },
+        "codex-responses": {
+         "enabled": true
+        },
+        "headroom": {
+         "enabled": false
+        },
+        "relevance": {
+         "enabled": true
+        },
+        "caveman": {
+         "enabled": true,
+         "level": "lite"
+        },
+        "aggressive": {
+         "enabled": true
+        },
+        "llmlingua": {
+         "enabled": true
+        },
+        "ultra": {
+         "enabled": true
+        },
+        "omniglyph": {
+         "enabled": false
+        }
+       }
+      },
+      {
+       "path": "outputStyles",
+       "op": "len_equals",
+       "value": 0
+      },
+      {
+       "path": "liveZone",
+       "op": "equals",
+       "value": {
+        "enabled": false
+       }
+      },
+      {
+       "path": "cacheMinutes",
+       "op": "equals",
+       "value": 5
+      },
+      {
+       "path": "languageConfig.enabled",
+       "op": "equals",
+       "value": false
+      },
+      {
+       "path": "languageConfig.defaultLanguage",
+       "op": "equals",
+       "value": "en"
+      },
+      {
+       "path": "languageConfig.autoDetect",
+       "op": "equals",
+       "value": true
+      },
+      {
+       "path": "languageConfig.enabledPacks",
+       "op": "equals",
+       "value": [
+        "en"
+       ]
+      },
+      {
+       "path": "rtkConfig.disabledFilters",
+       "op": "equals",
+       "value": []
+      },
+      {
+       "path": "rtkConfig.maxLinesPerResult",
+       "op": "equals",
+       "value": 120
+      },
+      {
+       "path": "rtkConfig.maxCharsPerResult",
+       "op": "equals",
+       "value": 12000
+      },
+      {
+       "path": "rtkConfig.deduplicateThreshold",
+       "op": "equals",
+       "value": 3
+      },
+      {
+       "path": "rtkConfig.customFiltersEnabled",
+       "op": "equals",
+       "value": true
+      },
+      {
+       "path": "codexResponsesConfig.minBytes",
+       "op": "equals",
+       "value": 512
+      },
+      {
+       "path": "codexResponsesConfig.minSearchMatches",
+       "op": "equals",
+       "value": 8
+      },
+      {
+       "path": "codexResponsesConfig.minLogLines",
+       "op": "equals",
+       "value": 24
+      },
+      {
+       "path": "codexResponsesConfig.preserveToolNames",
+       "op": "equals",
+       "value": [
+        "Read",
+        "Glob",
+        "Grep",
+        "Write",
+        "Edit",
+        "WebSearch",
+        "WebFetch",
+        "read",
+        "glob",
+        "grep",
+        "write",
+        "edit",
+        "web_search",
+        "web_fetch"
+       ]
+      },
+      {
+       "path": "cavemanConfig.enabled",
+       "op": "equals",
+       "value": true
+      },
+      {
+       "path": "cavemanConfig.compressRoles",
+       "op": "equals",
+       "value": [
+        "user"
+       ]
+      },
+      {
+       "path": "cavemanConfig.minMessageLength",
+       "op": "equals",
+       "value": 50
+      },
+      {
+       "path": "aggressive.thresholds",
+       "op": "equals",
+       "value": {
+        "fullSummary": 5,
+        "moderate": 3,
+        "light": 2,
+        "verbatim": 2
+       }
+      },
+      {
+       "path": "aggressive.toolStrategies",
+       "op": "equals",
+       "value": {
+        "fileContent": true,
+        "grepSearch": true,
+        "shellOutput": true,
+        "json": true,
+        "errorMessage": true
+       }
+      },
+      {
+       "path": "aggressive.summarizerEnabled",
+       "op": "equals",
+       "value": true
+      },
+      {
+       "path": "aggressive.maxTokensPerMessage",
+       "op": "equals",
+       "value": 2048
+      },
+      {
+       "path": "aggressive.minSavingsThreshold",
+       "op": "equals",
+       "value": 0.05
+      },
+      {
+       "path": "ultra.enabled",
+       "op": "equals",
+       "value": false
+      },
+      {
+       "path": "ultra.compressionRate",
+       "op": "equals",
+       "value": 0.5
+      },
+      {
+       "path": "ultra.minScoreThreshold",
+       "op": "equals",
+       "value": 0.3
+      },
+      {
+       "path": "ultra.slmFallbackToAggressive",
+       "op": "equals",
+       "value": true
+      },
+      {
+       "path": "ultra.maxTokensPerMessage",
+       "op": "equals",
+       "value": 0
+      },
+      {
+       "path": "headroom.minRows",
+       "op": "equals",
+       "value": 8
+      },
+      {
+       "path": "sessionDedup.minBlockChars",
+       "op": "equals",
+       "value": 512
+      },
+      {
+       "path": "sessionDedup.fuzzy",
+       "op": "equals",
+       "value": false
+      },
+      {
+       "path": "stackedPipeline",
+       "op": "len_equals",
+       "value": 2
+      },
+      {
+       "path": "stackedPipeline.0.engine",
+       "op": "equals",
+       "value": "rtk"
+      },
+      {
+       "path": "stackedPipeline.0.intensity",
+       "op": "equals",
+       "value": "standard"
+      },
+      {
+       "path": "stackedPipeline.1.engine",
+       "op": "equals",
+       "value": "caveman"
+      },
+      {
+       "path": "stackedPipeline.1.intensity",
+       "op": "equals",
+       "value": "full"
+      },
+      {
+       "path": "enabled",
+       "op": "equals",
+       "value": true
+      },
+      {
+       "path": "defaultMode",
+       "op": "equals",
+       "value": "off"
+      },
+      {
+       "path": "autoTriggerTokens",
+       "op": "equals",
+       "value": 0
+      },
+      {
+       "path": "contextBudget.mode",
+       "op": "equals",
+       "value": "off"
+      },
+      {
+       "path": "activeComboId",
+       "op": "equals",
+       "value": null
+      },
+      {
+       "path": "compressionComboId",
+       "op": "equals",
+       "value": null
+      },
+      {
+       "path": "comboOverrides",
+       "op": "len_equals",
+       "value": 0
+      },
+      {
+       "path": "exclusions",
+       "op": "len_equals",
+       "value": 0
+      },
+      {
+       "path": "lite",
+       "op": "equals",
+       "value": {
+        "compressToolResults": false
+       }
+      },
+      {
+       "path": "preserveSystemPrompt",
+       "op": "equals",
+       "value": true
+      },
+      {
+       "path": "preserveSystemPromptMode",
+       "op": "equals",
+       "value": "always"
+      },
+      {
+       "path": "cavemanOutputMode.enabled",
+       "op": "equals",
+       "value": false
+      },
+      {
+       "path": "ultraEngine",
+       "op": "equals",
+       "value": "heuristic"
+      },
+      {
+       "path": "ultraSlmPrewarm",
+       "op": "equals",
+       "value": false
+      },
+      {
+       "path": "mcpDescriptionCompressionEnabled",
+       "op": "equals",
+       "value": true
+      },
+      {
+       "path": "enginesExplicit",
+       "op": "equals",
+       "value": true
+      },
+      {
+       "path": "lite.maxToolLength",
+       "op": "absent"
+      }
+     ]
+    }
+   ],
+   "rollback": {
+    "method": "PUT",
+    "route": "/api/settings/compression",
+    "body_from_capture": {
+     "capture": "T10_compression",
+     "paths": [
+      "engines",
+      "outputStyles",
+      "liveZone",
+      "cacheMinutes",
+      "languageConfig",
+      "rtkConfig",
+      "codexResponsesConfig",
+      "cavemanConfig",
+      "aggressive",
+      "ultra",
+      "headroom",
+      "sessionDedup",
+      "stackedPipeline"
+     ]
+    }
+   },
+   "rollback_verify": [
+    {
+     "type": "get",
+     "route": "/api/settings/compression",
+     "asserts": [
+      {
+       "path": "engines",
+       "op": "equals",
+       "value": {
+        "$capture": "T10_compression",
+        "path": "engines"
+       }
+      },
+      {
+       "path": "outputStyles",
+       "op": "equals",
+       "value": {
+        "$capture": "T10_compression",
+        "path": "outputStyles"
+       }
+      },
+      {
+       "path": "liveZone",
+       "op": "equals",
+       "value": {
+        "$capture": "T10_compression",
+        "path": "liveZone"
+       }
+      },
+      {
+       "path": "cacheMinutes",
+       "op": "equals",
+       "value": {
+        "$capture": "T10_compression",
+        "path": "cacheMinutes"
+       }
+      },
+      {
+       "path": "languageConfig",
+       "op": "equals",
+       "value": {
+        "$capture": "T10_compression",
+        "path": "languageConfig"
+       }
+      },
+      {
+       "path": "rtkConfig",
+       "op": "equals",
+       "value": {
+        "$capture": "T10_compression",
+        "path": "rtkConfig"
+       }
+      },
+      {
+       "path": "codexResponsesConfig",
+       "op": "equals",
+       "value": {
+        "$capture": "T10_compression",
+        "path": "codexResponsesConfig"
+       }
+      },
+      {
+       "path": "cavemanConfig",
+       "op": "equals",
+       "value": {
+        "$capture": "T10_compression",
+        "path": "cavemanConfig"
+       }
+      },
+      {
+       "path": "aggressive",
+       "op": "equals",
+       "value": {
+        "$capture": "T10_compression",
+        "path": "aggressive"
+       }
+      },
+      {
+       "path": "ultra",
+       "op": "equals",
+       "value": {
+        "$capture": "T10_compression",
+        "path": "ultra"
+       }
+      },
+      {
+       "path": "headroom",
+       "op": "equals",
+       "value": {
+        "$capture": "T10_compression",
+        "path": "headroom"
+       }
+      },
+      {
+       "path": "sessionDedup",
+       "op": "equals",
+       "value": {
+        "$capture": "T10_compression",
+        "path": "sessionDedup"
+       }
+      },
+      {
+       "path": "stackedPipeline",
+       "op": "equals",
+       "value": {
+        "$capture": "T10_compression",
+        "path": "stackedPipeline"
+       }
+      },
+      {
+       "path": "enabled",
+       "op": "equals",
+       "value": true
+      },
+      {
+       "path": "defaultMode",
+       "op": "equals",
+       "value": "off"
+      },
+      {
+       "path": "autoTriggerTokens",
+       "op": "equals",
+       "value": 0
+      },
+      {
+       "path": "contextBudget.mode",
+       "op": "equals",
+       "value": "off"
+      },
+      {
+       "path": "activeComboId",
+       "op": "equals",
+       "value": null
+      },
+      {
+       "path": "compressionComboId",
+       "op": "equals",
+       "value": null
+      },
+      {
+       "path": "comboOverrides",
+       "op": "len_equals",
+       "value": 0
+      },
+      {
+       "path": "exclusions",
+       "op": "len_equals",
+       "value": 0
+      },
+      {
+       "path": "lite",
+       "op": "equals",
+       "value": {
+        "compressToolResults": false
+       }
+      },
+      {
+       "path": "preserveSystemPrompt",
+       "op": "equals",
+       "value": true
+      },
+      {
+       "path": "preserveSystemPromptMode",
+       "op": "equals",
+       "value": "always"
+      },
+      {
+       "path": "cavemanOutputMode.enabled",
+       "op": "equals",
+       "value": false
+      },
+      {
+       "path": "ultraEngine",
+       "op": "equals",
+       "value": "heuristic"
+      },
+      {
+       "path": "ultraSlmPrewarm",
+       "op": "equals",
+       "value": false
+      },
+      {
+       "path": "mcpDescriptionCompressionEnabled",
+       "op": "equals",
+       "value": true
+      },
+      {
+       "path": "enginesExplicit",
+       "op": "equals",
+       "value": true
+      },
+      {
+       "path": "lite.maxToolLength",
+       "op": "absent"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

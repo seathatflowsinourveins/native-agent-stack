@@ -1,0 +1,4 @@
+tmux: tmux 3.4
+ESC[?2026h / ESC[?2026l written to the outer terminal, with terminal-features xterm*:sync: (3, 3)
+the same without it (negative control): (0, 0)
+synchronized output is emitted only when declared: True

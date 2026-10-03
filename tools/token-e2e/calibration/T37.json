@@ -1,0 +1,56 @@
+{
+ "schema": "token-e2e-calibration/1",
+ "template": "T37",
+ "clauses": [
+  "Names greeting and the added exclamation mark; confirm against both original files."
+ ],
+ "sources": [
+  {
+   "label": "fixtures/before.py",
+   "text": "def greeting(name):\n    return \"Hello, \" + name"
+  },
+  {
+   "label": "fixtures/after.py",
+   "text": "def greeting(name):\n    return \"Hello, \" + name + \"!\""
+  }
+ ],
+ "controls": [
+  {
+   "id": "ref",
+   "kind": "reference",
+   "answer": "Both files define greeting(name). before.py returns \"Hello, \" + name and after.py returns \"Hello, \" + name + \"!\", so the exact change is the added exclamation mark.\n\nSource excerpt: def greeting(name):\n    return \"Hello, \" + name",
+   "evidence": [],
+   "expected": {
+    "c1": true
+   }
+  },
+  {
+   "id": "para",
+   "kind": "paraphrased",
+   "answer": "The public interface is the single function greeting that takes a name; the newer version ends its greeting with an exclamation mark, which the older one did not.",
+   "evidence": [],
+   "expected": {
+    "c1": true
+   }
+  },
+  {
+   "id": "wrong-1",
+   "kind": "wrong",
+   "answer": "The pair defines a class Greeter; the change renames the method to hello and adds a comma.",
+   "evidence": [],
+   "expected": {
+    "c1": false
+   }
+  },
+  {
+   "id": "wrong-2",
+   "kind": "wrong",
+   "answer": "greeting takes two arguments and the change makes it upper-case the name; nothing else differs.",
+   "evidence": [],
+   "expected": {
+    "c1": false
+   }
+  }
+ ],
+ "extraction_controls": []
+}

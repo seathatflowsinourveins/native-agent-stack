@@ -701,3 +701,147 @@ live provider execution, Context Hub network runs and token measurements: none.*
 The `codex exec` login-shell environment path was not separately qualified.
 F4 duplication in a spawned role when user AGENTS already contains F4 remains
 unverified; one block per role file does not establish one block per child rollout.
+
+## 2026-09-29 addendum: Codex stack role carriers
+
+**Scope.** Two Codex custom agents, `stack-researcher` and `stack-verifier`, for the
+[token-adoption E2E](../../evidence/artifacts/token-adoption-e2e-20260926/README.md).
+The worker profile and the three earlier custom agents keep their dated states above.
+This addendum supersedes one sentence of the 2026-09-27 addendum above, for these two
+agents only: "No additional custom agent, orchestration layer or installation mechanism
+is required." Two agents are added, and putting them under `$CODEX_HOME/agents/` is an
+installation step of its own. No orchestration layer is added.
+
+**Why.** The frozen preregistration launches four Codex sub-agent tasks, `seed-binding-1`,
+`-2`, `-3` and `-5`, with `agent_type` `stack-researcher`, and an unknown `agent_type` fails
+the spawn ([`role.rs:51-60`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agent/role.rs#L51-L60)).
+No role of that name existed in the repository. The arm-B table of the E2E README counts 5
+binding and 6 rtk-codex opportunities
+([`README.md:206,214`](../../evidence/artifacts/token-adoption-e2e-20260926/README.md)); counted
+from `preregistration.json`, 4 of each need that role, so without it only 1 and 2 could launch
+and the E2E could not be complete. `stack-verifier` has no frozen spawn. The E2E text names both
+as the only Codex custom carriers
+([`README.md:281-285`](../../evidence/artifacts/token-adoption-e2e-20260926/README.md),
+[`RUNBOOK.md:421-425`](../../evidence/artifacts/token-adoption-e2e-20260926/RUNBOOK.md)), and the
+verifier is qualified as capability evidence only.
+
+**Decision.**
+- **Carriers.** `adoption/agents/codex/stack-{researcher,verifier}.toml`, with byte-identical
+  mirrors under `examples/codex-native/agents/`. Each file carries exactly `name`, `description`,
+  `model = "gpt-6-astra"`, `model_reasoning_effort = "max"` and `developer_instructions`: an adapted
+  role text, then the F4 block verbatim. The two digests are also
+  `adoption/agents/codex/SHA256SUMS`, and the rules the tests and the installer share are
+  `tools/adoption/codex_roles.py`. The pins equal the route of every Codex task in the
+  preregistration (26 tasks, all `gpt-6-astra` at `max`). The descriptions name no tool, because the
+  `spawn_agent` tool text shows every role's description to every parent
+  ([`role.rs:294-334`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agent/role.rs#L294-L334)).
+- **Placement.** User-wide, by discovery, under `$CODEX_HOME/agents/`, with no `[agents.<name>]`
+  table, so `config.toml` and the `stack-worker` profile do not change. The E2E's arm A repeats
+  `seed-binding-1` "with its existing researcher role"
+  ([`README.md:155-158`](../../evidence/artifacts/token-adoption-e2e-20260926/README.md)), which is
+  the user-wide reading. Detail and the digest rows: the
+  [examples README](../../examples/codex-native/README.md#2026-09-29-stack-role-carriers).
+  `tools/adoption/apply_codex_lane.py` is that installation step: it checks each source against its
+  pinned digest, creates the files create-only (mode 0600, in a 0700 folder it makes), reads them back,
+  journals the run so that rollback removes only what it created, and its dry run reads a scratch copy
+  back through `codex doctor --json`. `tools/adoption/prove_codex_lane.py` has a static `roles` row.
+  Both report other role files, role tables and doctor warnings as counts, never as a name, path or text.
+  A link to a folder below `agents/` makes those counts unknown, never smaller: Codex follows links
+  (`LocalFileSystem::read_directory` classifies a link by its target,
+  [`codex-rs/exec-server/src/local_file_system.rs`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/exec-server/src/local_file_system.rs#L710-L735)
+  at `rust-v0.157.1`) and loads what it finds behind one as roles, which a walk that skipped the link
+  would miss. Checked against `codex-cli 0.157.1` through `codex doctor --json` in a scratch home with
+  the network off, by `CodexIntegrationTests.test_codex_follows_links_below_agents_and_the_role_count_never_undercounts_it`
+  in `tests/test_codex_worker_lane.py` (local integration, `NAS_CODEX_INTEGRATION=1`): a malformed role
+  behind a linked folder, or behind a link named `x.toml` to a file, is one role warning; behind a
+  dangling link, or a link whose own name is not `*.toml`, none; and the count is never below what
+  Codex collected. If a later pin stops following links, that test fails and the rule can be revisited.
+- **Role text.** Adapted sentence by sentence from the Claude carriers (17 sentences of the researcher
+  and 16 of the verifier are kept byte for byte and pinned by a test), with a one-agent rule, a
+  working-directory rule and `jq` output among the exact command shapes added. The working-directory
+  rule says a task's own instruction wins and `cwd` goes to context-mode only for a directory other
+  than the launch directory, which the server is already bound to; the frozen M13 leg reads sentinel
+  files with no explicit `cwd`
+  ([`README.md:370`](../../evidence/artifacts/token-adoption-e2e-20260926/README.md)).
+- **Status and freeze rows.** `scripts/adoption_status.py --client-wiring` gains `stack_roles_matching`, how
+  many of the two carriers the Codex home holds byte for byte (a count; `null` when it cannot be
+  compared, which makes `complete` false as every `null` does). `tools/token-e2e/freeze_snapshot.py`
+  gains twelve frozen `codex.*` rows that the E2E's role item takes its values from: the two carriers'
+  digests, the set of `*.toml` files below the Codex home's `agents/` and the number of
+  `[agents.<name>]` tables in `config.toml` and the profile (0 expected), the same two counts for the
+  system layer (`/etc/codex`, always loaded, N included) and the checkout's project layer, the digests
+  of the `codex` on `PATH` and of the file its launcher executes, and the server names and enabled flags of
+  `codex mcp list --json` with and without `-p stack-worker`, read in an empty directory so that a
+  project layer adds none: the parent's effective tool set, which a role child is compared with because
+  a role cannot bind tools at this pin. The binary row follows the identity launcher one hop
+  (its last line, `exec '<absolute path>' "$@"`): the design's "file the entry resolves to" would be
+  the launcher itself, since the entry on the reference host is a script and not a link. The file
+  that line names is a link to the npm package's Node entry (`@openai/codex` `bin/codex.js`), which
+  resolves and starts the native executable, so the row pins the install's entry point and
+  `codex.version` names the release; the native executable is not hashed, and following the entry
+  on to it would need a rule of its own for the platform package. No row
+  publishes a path, a file name a host chose, or a transport, environment value, argument or URL.
+  The rows are captured through `CODEX_HOME` as `adoption_status.py` reads it; the older `codex.*`
+  rows of the snapshot still read `~/.codex` whatever the variable says.
+- **Order of use** (binding decision U13-D5). After this change merges and before the E2E's seal
+  announcement, in an announced quiet window with no `codex` process running, from a checkout at
+  origin/main that holds it: (1) run R4a if a live `scripts/codex_quota.py --json` reading shows no reached
+  limit, because it needs a Codex home without any role file; (2) make a private 0600 backup of
+  `$CODEX_HOME/stack-worker.config.toml`; (3) assert that the live file still has the hash recorded for
+  the drifted profile and only then remove that literal path; (4) run the installer's dry run and expect
+  the profile and both roles to be `create` and "rehearsal passed"; (5) run the printed `--apply` command
+  with its two `--expect-*` hashes; (6) read back the profile hash against the template, `sha256sum
+  --check --strict SHA256SUMS`, `stack_roles_matching` 2, and the `roles` row of `prove_codex_lane.py`;
+  then run the probes R6, R1, R2, R3, R4b and R5 of the
+  [examples README](../../examples/codex-native/README.md#carrier-probes-r1-to-r6-procedures-none-has-been-run)
+  as unscored rehearsals, and only then write Amendment 4 citing them. When no live capacity exists the
+  roles and the profile are still installed and verified, and the probes move to the capability phase with
+  both outcomes for N described in advance. Undo is `--rollback <run>` and then restoring the private
+  backup by hand.
+
+**Alternatives considered.** Source read at openai/codex `rust-v0.157.1`; none was run in a session.
+
+| Alternative | Evidence | Not chosen because |
+| --- | --- | --- |
+| Per-launch `-c agents.<role>.config_file=<absolute path>` on the sub-agent launches | [`loader.rs:35-73,192-206`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/agent-roles/src/loader.rs#L35-L206): tables from every enabled layer, session flags included, and the path must be absolute; that layer has no config folder ([`state.rs:227`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/config/src/state.rs#L218-L231)) | Those launches would differ from the RUNBOOK's launch command, and the roles would exist only for the proof, not as installed practice |
+| A project `.codex/agents/` copy | A project layer's folder is its `.codex` (`state.rs:226`) | A copy would load in every trusted session of that checkout, not only in the E2E's |
+| Role tables only in the `stack-worker` profile | – | Arm A runs without that profile and repeats `seed-binding-1` with the researcher role |
+| `multi_agent_v2.subagent_developer_instructions` | [`child_config.rs:145-153`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agent/child_config.rs#L145-L153) applies it to every V2 child | It would also reach `seed-binding-4`'s child, which the preregistration launches with no role |
+| A SubagentStart-style hook | – | Hooks in Codex children are unverified (E2E README, "Merge-before-run dependencies and unverified boundaries") |
+
+**Evidence and limits.** Structural validation only: `tests/test_codex_agents.py` checks the stem set,
+byte-identical mirrors and their SHA-256 rows, the closed key set, the pins against the frozen Codex
+tasks, description lane-neutrality against the preregistration's no-tool-names denylist, the F4 block,
+the kept sentences and the Claude-only names, with a mutation control per rule. No Codex session has
+spawned either role, and nothing here measures a token saving.
+- A role file cannot set the sandbox, an MCP allowlist, tools or web search
+  ([`role.rs:36-48`](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agent/role.rs#L36-L48),
+  as in the 2026-09-27 erratum above): read-only access and the verifier's no-web rule are prompt rules,
+  and the parent's `-s` is the enforcement.
+- A child sees the F4 block twice, once through the inherited user AGENTS.md and once in its role text,
+  which is 2,180 bytes more context per child. The count in a real child rollout is unverified, as the
+  previous addendum says of F4 duplication.
+- Discovery under `--ignore-user-config` is a source-read prediction (`loader/mod.rs:503-519` keeps the
+  ignored user layer's file, so its folder stays `$CODEX_HOME`); it has not been run.
+- The Codex `cwd` sentence of `docs/token-session-handbook.md` ("Context Mode executor and session
+  store") said to pass `cwd` every time, which contradicted the role texts' working-directory rule. The same
+  change now says to pass `cwd` for any directory other than the session's launch directory, which the
+  server is already bound to; no other sentence of that document changed.
+- **Not in this change** (a follow-up unit, U13b, by a coordinator decision of 2026-09-29, recorded in
+  the history of this branch). The capability-gate blocks for role children (the sealed M13 structure
+  with disabled-server and wrong-root negatives per role and tool pair, and a spawned-children leg), the
+  offline grader of a child rollout (`role_child_state`, whose rules are stated in the
+  [examples README](../../examples/codex-native/README.md#carrier-probes-r1-to-r6-procedures-none-has-been-run)
+  and which the E2E's organic M11 grader must agree with), the tool that runs the probes, the gate's
+  refusal when the captured freeze rows differ from the pinned carriers, and the review's residuals for
+  the gate (a Serena wrong-root negative, and a web-search fixture that a wrong search cannot pass). The
+  probes R1 to R6 exist as procedures only. `prove_codex_lane.py` has a static `roles` row and no live
+  role check: `exec` forces `--ephemeral`, so no rollout persists, and the exec JSONL item for a spawned
+  agent carries no role or developer text (`codex-rs/exec/src/exec_events.rs:250-259` at
+  `rust-v0.157.1`), so a check through it could not show that a role applied.
+
+**Overturn conditions.** A Codex release whose role files can set a sandbox or an MCP allowlist would let
+these restrictions be enforced instead of instructed. A run in which a spawned role does not receive its
+developer text exactly once, or does not run at the pinned model and effort, would reopen the carriers.
+A later change to either file's bytes needs a new dated section and new digest rows in `SHA256SUMS`, the
+test and the examples README.

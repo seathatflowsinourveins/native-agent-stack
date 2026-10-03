@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "layer_id": "native-clients",
+  "catalog": "foundation",
+  "review_date": "2026-10-01",
+  "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "reviewer": {"model":"gpt-6.1-sol","effort":"max","family":"Codex"},
+  "verdict": "corrected",
+  "c4": {"independent_review_performed":true,"no_unresolved_material_gap":false,"remaining_gaps":["No matched client quality/cost comparison.","Host failure, remote cancellation/billing cessation and cross-account recovery unqualified.","Preserved production queue acceptance does not update main or qualify a new host."]},
+  "selected_repositories": [
+    {"component_id":"claude-code","repository":"https://github.com/anthropics/claude-code","pin_of_record":"2.1.284","pin_source":"manifests/stack.json:190; adoption/pins-linux-x86_64.json:68 (minimum, native auto-update)","source_pinned_url":"https://github.com/anthropics/claude-code/tree/v2.1.284","upstream_currency":"Latest/installed 2.1.286; published 2026-09-30. Main 2.1.284 is a native auto-update floor.","native_install":{"command":"claude install 2.1.284","source":"installed claude install --help; https://code.claude.com/docs/en/setup","evidence_class":"source-only; not run"},"native_acceptance":{"command":null,"source":"v2.1.284 README.md; v2.1.286 CHANGELOG.md; installed --help","evidence_class":"CLI test command not found in these sources; version/help probes executed, not functional acceptance"}},
+    {"component_id":"codex","repository":"https://github.com/openai/codex","pin_of_record":"0.159.2","pin_source":"manifests/stack.json:295; adoption/pins-linux-x86_64.json:53","source_pinned_url":"https://github.com/openai/codex/tree/rust-v0.159.2","upstream_currency":"Latest/installed 0.159.3; published 2026-09-30. Main remains 0.159.2.","native_install":{"command":"npm install -g @openai/codex@0.159.2","source":"README.md at rust-v0.159.2; Linux pin's verified package provenance","evidence_class":"source-only; not run"},"native_acceptance":{"command":"just test -p codex-tui","source":"AGENTS.md:192 at rust-v0.159.2","evidence_class":"source-only; not run"}}
+  ],
+  "alternatives": [
+    {"name":"MCPorter native bridge","repository":"openclaw/mcporter","verdict":"CLI bridge; retain in MCP layer.","sources":["https://github.com/openclaw/mcporter/blob/v0.14.1/README.md"]},
+    {"name":"Claude Agent SDK","repository":"anthropics/claude-agent-sdk-python","verdict":"Conditional SDK; default bundled CLI needs explicit parity qualification.","sources":["https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.163/README.md#L15"]},
+    {"name":"OpenAI Agents SDK","repository":"openai/openai-agents-python","verdict":"v0.22.3 application framework; native-client equivalence unqualified.","sources":["https://github.com/openai/openai-agents-python/blob/v0.22.3/README.md"]},
+    {"name":"Letta Code","repository":"letta-ai/letta-code","verdict":"v0.34.1 stateful harness; memory-specific comparison remains open.","sources":["https://github.com/letta-ai/letta-code/blob/v0.34.1/README.md"]},
+    {"name":"Letta V1 legacy server","repository":"letta-ai/letta","verdict":"Current 0.16.8 memory/API platform; historical V1 label is not a current capability verdict.","sources":["https://github.com/letta-ai/letta/blob/0.16.8/README.md"]}
+  ],
+  "corrections": [
+    {"claim":"Landscape pins Claude 2.1.278/Codex 0.155.1.","correction":"Main records 2.1.284 floor/0.159.2; comparison-era pins remain historical.","deciding_source":"manifests/stack.json:190,295 and adoption/pins-linux-x86_64.json:53,68"},
+    {"claim":"Codex recovery is only the older macOS fixture.","correction":"Preserved 0.159.3 adds existing-host idle/busy/reconnect queue delivery; excludes daemon restart/cross-family transport.","deciding_source":"evidence/receipts/codex-01593-native-queue-20261001.json at 3e6617d1ee73da9aef619cc277c624ac74e07326"}
+  ],
+  "evidence_assessment": [
+    "Executed installed version/help probes: Codex agents exposes shared-daemon sessions; exec exposes resume/fork/JSONL. Probes are surface evidence.",
+    "Read production queue commands/timestamps/lsof observation at 3e6617d: four submissions exit 0, busy input becomes a following turn, reconnect needs no restart. Retained local integration, not a fresh run.",
+    "Tagged/official sources read; preserve explicit model/effort. CLI, SDK, quality, usage and recovery remain separate."
+  ],
+  "failed_access": [
+    {"source":"https://raw.githubusercontent.com/openai/codex/rust-v0.159.2/CONTRIBUTING.md","result":"HTTP 404; recovered with docs/contributing.md and AGENTS.md"}
+  ],
+  "omissions": [
+    "No installs/model runs/private histories/authentication stores; public Claude implementation/suite not inferred."
+  ],
+  "next_wave": [
+    "Freeze matched client quality and recovery conditions using maintained upstream harnesses."
+  ],
+  "reopen_on": [
+    "Changed native account/model/tool semantics, a reproducible failure, or a matched challenger win."
+  ],
+  "new_host_acceptance": "unknown; distro not created"
+}

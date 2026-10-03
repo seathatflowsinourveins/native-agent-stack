@@ -1,0 +1,21 @@
+#!/bin/bash
+# trap_smoke.sh PREFIX SHIM LABEL: does `omniroute serve` restart while a client still holds a dead connection to its port?
+# Fresh user+network namespace (own loopback; the host's listeners are unreachable), clean environment, throwaway HOME/DATA_DIR/cwd,
+# the given lsof shim first on PATH as `lsof`, sidecar listeners moved to 20198/20199, server on loopback port 20197.
+# Phase 1: start serve, wait for health. A client then connects to the port and keeps its end open. The server is stopped with SIGTERM;
+# the client's socket is now CLOSE-WAIT. Phase 2: start serve again on the same port; it must reach health.
+set -u
+PREFIX="$1"; SHIM="$2"; LABEL="$3"
+OM=<OMNI>
+H=$OM/ns/sol61-harness
+T=<throwaway>/ns-omni-trap-$LABEL-20260930
+NODEBIN=<TOOLS>/node-24.21.0/bin
+[ -e "$T" ] && { echo "throwaway dir already exists: $T"; exit 95; }
+mkdir -p "$T/home" "$T/data" "$T/cwd" "$T/raw" "$T/shim"
+cp "$SHIM" "$T/shim/lsof" && chmod 755 "$T/shim/lsof"
+cd "$T/cwd" || exit 97
+/usr/bin/unshare -rn /bin/sh -c '/usr/sbin/ip link set lo up || exit 98; exec /usr/bin/unshare --user --map-user=1000 --map-group=1000 "$@"' sh \
+  /usr/bin/env -i "HOME=$T/home" "DATA_DIR=$T/data" "PATH=$T/shim:$NODEBIN:/usr/local/bin:/usr/bin:/bin" "PORT=20197" \
+    "OMNIROUTE_SERVER_HOST=127.0.0.1" "LIVE_WS_PORT=20199" "EMBED_WS_PROXY_PORT=20198" "REQUIRE_API_KEY=true" "LANG=C.UTF-8" \
+    /bin/bash "$H/trap_smoke_inner.sh" "$PREFIX" "$T/raw" "$LABEL"
+echo "namespace wrapper rc=$?"

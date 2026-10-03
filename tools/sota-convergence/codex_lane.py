@@ -136,7 +136,7 @@ def write_strict_schema(schema_path: Path, codex_dir: Path) -> Path:
     strict_path.write_text(json.dumps(strict, indent=1, sort_keys=True) + "\n", encoding="utf-8")
     return strict_path
 DEFAULT_TIMEOUT = 900.0
-DEFAULT_EFFORT = "high"
+DEFAULT_EFFORT = "max"
 LANE = "codex"
 
 # Recognized directly on an event dict or anywhere nested under it (e.g. a
@@ -1092,7 +1092,8 @@ def parse_args(argv=None):
     parser.add_argument("--repo", required=True, type=Path)
     parser.add_argument("--layers", default=None,
                          help="Comma-separated layer ids to run (matched across every catalog); default: all.")
-    parser.add_argument("--effort", default=DEFAULT_EFFORT, help="model_reasoning_effort passed via -c.")
+    parser.add_argument("--effort", default=DEFAULT_EFFORT,
+                        help="model_reasoning_effort passed via -c (default max, the standing GPT-6 lane setting; a return made at another effort is not reused).")
     parser.add_argument("--model", default=None,
                         help="Model passed to codex exec -m and recorded as the return's model.name "
                              "(default: Codex's configured model, recorded from the event stream).")

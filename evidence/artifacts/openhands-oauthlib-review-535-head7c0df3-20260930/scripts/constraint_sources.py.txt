@@ -1,0 +1,23 @@
+"""Which installed distributions constrain click, pypdf and soupsieve, and how (Requires-Dist lines), plus a check for dynamic-import shapes naming oauthlib
+inside requests_oauthlib and google_auth_oauthlib. Run with the reproduced venv's python."""
+import importlib.metadata as md
+import re
+import sys
+from pathlib import Path
+
+for target in ("click", "pypdf", "soupsieve"):
+    print(f"== who requires {target}:")
+    for dist in md.distributions():
+        for req in dist.requires or []:
+            if re.match(rf"\s*{target}\b", req, re.I):
+                print(f"   {dist.metadata['Name']} {dist.version}: {req}")
+site = Path(sys.argv[1])
+print("== dynamic-import shapes naming oauthlib in requests_oauthlib and google_auth_oauthlib:")
+count = 0
+for package in ("requests_oauthlib", "google_auth_oauthlib"):
+    for path in sorted((site / package).rglob("*.py")):
+        for number, line in enumerate(path.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
+            if re.search(r"importlib|__import__|import_module|entry_points|getattr\(", line):
+                count += 1
+                print(f"   {path.relative_to(site)}:{number}: {line.strip()[:120]}")
+print(f"   ({count} lines)")

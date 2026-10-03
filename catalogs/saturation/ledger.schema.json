@@ -76,7 +76,7 @@
    "additionalProperties": false,
    "required": ["catalog", "layer_id", "requirement_sha256", "platform_profiles_sha256", "votes", "proposed", "known", "new", "survived", "refuted", "reopen"],
    "properties": {
-    "catalog": {"enum": ["foundation", "us-equities"]},
+    "catalog": {"enum": ["foundation", "us-equities", "skills"]},
     "layer_id": {"type": "string", "minLength": 1},
     "requirement_sha256": {"$ref": "#/$defs/sha256", "description": "sha256 of canonical {next_action, decision_ref} of the layer's research-state row at append time."},
     "platform_profiles_sha256": {"$ref": "#/$defs/sha256", "description": "sha256 of canonical adoption/manifest.json#/platform_profiles at append time."},

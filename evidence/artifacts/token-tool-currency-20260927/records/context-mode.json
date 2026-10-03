@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "tool": "context-mode",
+  "evidence_class": "upstream-source-review",
+  "retrieved_at": "2026-09-27T12:40:10.076Z",
+  "upstream_repository": "https://github.com/mksglu/context-mode/",
+  "pin": {
+    "version": "1.0.169",
+    "source_pin": null,
+    "metadata_revision": "1c32ad22d76479fdc0385f2bbbada15b3f9f6a5f",
+    "metadata_sources": [
+      "manifests/stack.json:401",
+      "adoption/pins-linux-x86_64.json:162"
+    ],
+    "verified_against_worktree_on": "2026-09-27"
+  },
+  "scratch_record": {
+    "reviewed_on": "2026-09-26",
+    "input_sources": [
+      "full-save/synth/currency-records.json",
+      "full-save/cur/context-mode/gpt6.md"
+    ],
+    "latest_release": {
+      "version": "1.0.169",
+      "tag": "v1.0.169",
+      "published_at": "2026-06-29T18:18:53Z"
+    },
+    "behind_by": {
+      "stable_releases": 0,
+      "reviewed_source_revision": "6f0cc6841c687e754059f36714a11233fda1a02b",
+      "main_commits_ahead": 10,
+      "main_head": "6c8dbf229a1c63588c0d5fca143498ca49fd219f",
+      "changed_files": [
+        "stats.json"
+      ]
+    }
+  },
+  "latest_release": {
+    "tag_name": "v1.0.169",
+    "published_at": "2026-06-29T18:18:53Z",
+    "html_url": "https://github.com/mksglu/context-mode/releases/tag/v1.0.169",
+    "prerelease": false,
+    "draft": false,
+    "source_url": "https://api.github.com/repos/mksglu/context-mode/releases/latest"
+  },
+  "behind_by": {
+    "count": 0,
+    "unit": "stable releases",
+    "basis": "GitHub latest release and npm latest both equal the package pin.",
+    "source_url": "https://api.github.com/repos/mksglu/context-mode/releases/latest"
+  },
+  "changes_since_scratch": [
+    {
+      "field": "main_commits_ahead_of_reviewed_revision",
+      "previous": 10,
+      "current": 12,
+      "detail": "The changed-file set remains stats.json only.",
+      "source_url": "https://api.github.com/repos/mksglu/context-mode/compare/6f0cc6841c687e754059f36714a11233fda1a02b...5d13dc4556a5a5d30eb5ea4653b10a2f9142c8a1"
+    },
+    {
+      "field": "latest_stable",
+      "status": "unchanged"
+    }
+  ],
+  "key_new_findings": [
+    {
+      "finding": "The release tag to the scratch-reviewed source revision spans 133 commits but changes only cli.bundle.mjs, server.bundle.mjs and stats.json. This establishes generated-bundle differences; it does not prove npm bundle identity.",
+      "source_urls": [
+        "https://github.com/mksglu/context-mode/compare/v1.0.169...6f0cc6841c687e754059f36714a11233fda1a02b"
+      ],
+      "revision": "6f0cc6841c687e754059f36714a11233fda1a02b",
+      "channel": "source comparison",
+      "verification": "primary source retrieved on 2026-09-27; no executable or provider acceptance claimed",
+      "evidence_class": "upstream-source-review"
+    },
+    {
+      "finding": "All file changes between the reviewed revision and current main are confined to stats.json; no new package release was observed in the separately queried GitHub/npm channels.",
+      "source_urls": [
+        "https://github.com/mksglu/context-mode/compare/6f0cc6841c687e754059f36714a11233fda1a02b...5d13dc4556a5a5d30eb5ea4653b10a2f9142c8a1"
+      ],
+      "revision": "5d13dc4556a5a5d30eb5ea4653b10a2f9142c8a1",
+      "channel": "source comparison",
+      "verification": "primary source retrieved on 2026-09-27; no executable or provider acceptance claimed",
+      "evidence_class": "upstream-source-review"
+    }
+  ],
+  "package_channels": [
+    {
+      "package": "context-mode",
+      "latest": "1.0.169",
+      "published_at": "2026-06-29T18:18:27.670Z",
+      "source_url": "https://registry.npmjs.org/context-mode",
+      "channel": "npm dist-tags.latest",
+      "retrieved_on": "2026-09-27"
+    }
+  ],
+  "limitations": [
+    "Source/documentation review only; this record does not establish installed behavior, native tests, model execution, savings or upgrade acceptance.",
+    "Scratch host measurements and executable probes were not rerun or promoted into this evidence class."
+  ]
+}

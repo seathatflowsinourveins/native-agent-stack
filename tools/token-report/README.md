@@ -144,6 +144,11 @@ covers this reporter's own internal tokenizer-count invocation used while
 comparing `toon` output; it does not change what `"toon"`'s own `env node`
 shebang above resolves at run time.
 
+`systemctl --user show-environment` (above) is for your own terminal: the
+agent command guard refuses it, because it prints every value the manager
+holds. From an agent session, check what a user unit's `PATH` resolves with
+`systemd-run --user --pipe --wait --quiet /bin/sh -c 'command -v node && node --version'`.
+
 The timer's four fixed local times a day (03:15, 10:15, 16:15, 22:15) never
 land inside the Sat/Sun 05:00-09:00 quiet window on any on-schedule fire
 (checked with `systemd-analyze calendar`), and `systemd-analyze --user verify`
@@ -198,12 +203,109 @@ paths. An `rtk_database` path also enables RTK's client-visible view (see below)
 `inspect_hook_history` additionally inspects the configured Context Mode roots'
 hook metadata. Both default to false and are unnecessary for counters.
 
+## Optional upstream reports
+
+A tool with no savings counter can still report its own usage, cache or index state.
+Select each report explicitly with `report_sources`. The reporter runs its command at
+refresh, retains the complete output like any other capture, and records the parsed
+report beside the tool's coverage row. **A report never carries a savings value**,
+even when upstream names a field "saved": its `saved` is always null, so nothing is
+added to a counter. `kind` is one of `usage report` (tokens consumed), `status report`
+(index or store state), `cache report` (cache hits and cached tokens) or
+`savings report` (an upstream estimate retained as evidence, not counted).
+
+```json
+"report_sources": [
+  {"name": "ccusage claude daily", "tool": "ccusage", "kind": "usage report",
+   "argv": ["/abs/ccusage", "claude", "daily", "--offline", "--no-cost", "--json"],
+   "boundary": "Claude Code sessions only; consumption, not avoided tokens"},
+  {"name": "ccusage codex daily", "tool": "ccusage", "kind": "usage report",
+   "argv": ["/abs/ccusage", "codex", "daily", "--offline", "--no-cost", "--json"],
+   "boundary": "Codex sessions only; consumption, not avoided tokens"},
+  {"name": "ai-memory status", "tool": "ai-memory", "kind": "status report",
+   "argv": ["/abs/ai-memory", "status", "--json"], "boundary": "Store and index state; no token counter"},
+  {"name": "qmd catalog status", "tool": "qmd", "kind": "status report", "format": "text",
+   "argv": ["/abs/qmd", "--index", "native-agent-stack-catalog", "status"],
+   "boundary": "Named index state; the default index is a different store"},
+  {"name": "agentsview usage daily", "tool": "agentsview", "kind": "usage report",
+   "argv": ["/abs/agentsview", "usage", "daily", "--no-sync", "--offline", "--json"],
+   "boundary": "Archived sessions only; --no-sync reads without syncing new history"},
+  {"name": "OmniRoute prompt cache", "tool": "omniroute", "kind": "cache report",
+   "argv": ["/usr/bin/curl", "-sS", "--fail-with-body", "--max-time", "20", "http://127.0.0.1:20128/api/cache"],
+   "boundary": "Cached input tokens over the gateway's retained usage history (30 days by upstream default); the response also carries upstream savings estimates, retained as evidence and never counted"},
+  {"name": "OmniRoute compression", "tool": "omniroute", "kind": "savings report",
+   "argv": ["/usr/bin/curl", "-sS", "--fail-with-body", "--max-time", "20", "http://127.0.0.1:20128/api/analytics/compression?since=all"],
+   "boundary": "Upstream compression estimate with skip reasons; since=all spans the gateway's retained analytics (30 days by upstream default), not its lifetime; retained, never counted"}
+]
+```
+
+Each ccusage entry selects one source, as upstream's `ccusage claude daily` and
+`ccusage codex daily` do; the bare `ccusage daily` covers every detected source and
+mixes agents in one report. The OmniRoute entries give curl as `/usr/bin/curl`;
+adjust that absolute path per host.
+
+`tool` must be the component id in `manifests/stack.json` (for example
+`jcodemunch-mcp`), so the report lands on that component's row. Its command and
+boundary also replace the row's generic "no counter" text. A report is stored under
+the scope `Report / <name>`, which never equals a counter's scope, so it cannot
+replace a counter's last good value. Names must stay unique after punctuation is
+folded into `-`, because each name becomes a capture folder. `format` defaults to
+`json`; a JSON report that fails to parse, or a nonzero exit, is a failed report,
+and the last good report stays separate. Give `curl` `--fail-with-body`, so an HTTP
+error exits nonzero while its body is still retained. `timeout` defaults to 60
+seconds (1–600). Select only aggregate routes: OmniRoute's `/api/usage/analytics`
+and call-log routes carry per-account rows with account emails.
+
+`argv` is stored literally: in each capture's `receipt.json`, in the ledger
+snapshots and in `manifest.json` and `manifest.html`. Keep credentials out of it; a
+command that needs one should read it from the environment, which the reporter
+passes to every command unchanged. Give `argv[0]` as an absolute path: commands run
+in the configured `project` directory, so a relative path resolves against it (a
+bare name such as `curl` is searched on `PATH`). A command runs with the reporter's
+standard input until it exits or its `timeout` expires. Its whole output is held in
+memory, and a successful JSON report is stored twice in its snapshot, as
+`stdout_text` and as the parsed `raw`, so use bounded queries for full-history
+reports.
+
+The OmniRoute entries send no credential. OmniRoute (the 3.8.50 pin in
+`manifests/stack.json`) answers both routes without one only while its login is
+off (`requireLogin` false; the upstream default is true) or during first-run setup
+from loopback (`src/shared/utils/apiAuth.ts`). Otherwise they require management
+credentials, such as a dashboard session or a manage-scope API key in an
+`Authorization: Bearer` header, never in the URL. A host that keeps the dashboard
+login therefore gets 401: `curl --fail-with-body` exits 22, and the refresh records
+a failed report and an issue and exits nonzero. Do not add the key to `argv`, which
+is retained verbatim (see above). Use curl's header-file form instead,
+`-H @/absolute/path/omniroute.header`, which `curl --manual` describes as adding "a
+header for each line in the input file" (added in curl 7.55.0). The file holds the
+one line `Authorization: Bearer <key>`, with mode `0600`, outside every worktree like
+the [secret store](../../docs/secret-storage.md#storage-rules); only its path is
+retained.
+
+Loading the configuration rejects a report entry whose `argv` element contains a NUL
+character, whose name, `tool`, `boundary` or `argv` element cannot be encoded as
+UTF-8 (a lone surrogate such as `\ud800` in the JSON), or whose name folds to a
+capture folder label over 100 characters (`report-` plus the folded name, so the
+folded name keeps at most 93). It also rejects a `counter_scopes` value or
+`context_roots` name that starts with `Report / `, the prefix reserved for reports.
+A report whose `tool` is not a component id is still
+captured and recorded, but it adds an issue, so every refresh exits nonzero until
+the id is corrected; a stack manifest that is missing, unreadable or lists no
+component skips this check.
+
+The [scheduled unit](../../adoption/templates/systemd/token-report-refresh.service)
+is a oneshot with `TimeoutStartSec=900`, and a refresh runs its captures one after
+another. The sum of the report `timeout`s and the counter captures' own 60-second
+limits must therefore stay within those 900 seconds, or systemd marks the run
+failed and stops it. A steady-state refresh with a 106,000-row RTK history took about 35
+seconds (measured once on one host, 2026-09-29 UTC).
+
 ## Exact artifact comparisons
 
 Install the pinned tokenizer only if you need retained-text comparisons:
 
 ```sh
-npm install --prefix "$REPORT_TOOLS/tokenizer" gpt-tokenizer@3.4.0
+npm install --prefix "$REPORT_TOOLS/tokenizer" --ignore-scripts --no-audit --no-fund gpt-tokenizer@4.0.0
 ```
 
 Set `tokenizer_module` in the private configuration to the absolute path of

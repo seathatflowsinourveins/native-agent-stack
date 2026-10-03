@@ -1,0 +1,51 @@
+"""References to litellm.proxy outside the litellm package in the installed .py files of a venv (static, by syntax tree): an import of litellm.proxy or one of its submodules, a from-import of
+litellm.proxy or of the name proxy from litellm (also in a parenthesized, multi-line form), an attribute access litellm.proxy, and a string constant that names litellm.proxy (a dynamic import by
+name). Files that fail to parse are counted and listed. The litellm package itself is skipped. A name assembled at run time would not match. usage: proxy_refs.py <site-packages>"""
+import ast
+import sys
+from pathlib import Path
+
+root = Path(sys.argv[1])
+parsed = unparsed = users = 0
+hits = []
+errors = []
+for path in sorted(root.rglob("*.py")):
+    rel = path.relative_to(root)
+    if rel.parts[0] == "litellm":
+        continue
+    try:
+        tree = ast.parse(path.read_bytes(), filename=str(rel))
+    except (SyntaxError, ValueError, RecursionError) as error:
+        unparsed += 1
+        errors.append(f"{rel}: {type(error).__name__}")
+        continue
+    parsed += 1
+    imports_litellm = False
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                if alias.name == "litellm" or alias.name.startswith("litellm."):
+                    imports_litellm = True
+                if alias.name == "litellm.proxy" or alias.name.startswith("litellm.proxy."):
+                    hits.append((str(rel), node.lineno, f"import {alias.name}"))
+        elif isinstance(node, ast.ImportFrom):
+            module = node.module or ""
+            if node.level == 0 and (module == "litellm" or module.startswith("litellm.")):
+                imports_litellm = True
+                if module == "litellm.proxy" or module.startswith("litellm.proxy."):
+                    hits.append((str(rel), node.lineno, f"from {module} import ..."))
+                elif module == "litellm" and any(alias.name == "proxy" for alias in node.names):
+                    hits.append((str(rel), node.lineno, "from litellm import proxy"))
+        elif isinstance(node, ast.Attribute):
+            if node.attr == "proxy" and isinstance(node.value, ast.Name) and node.value.id == "litellm":
+                hits.append((str(rel), node.lineno, "attribute litellm.proxy"))
+        elif isinstance(node, ast.Constant) and isinstance(node.value, str):
+            if node.value == "litellm.proxy" or node.value.startswith("litellm.proxy."):
+                hits.append((str(rel), node.lineno, f"string {node.value[:60]!r}"))
+    users += imports_litellm
+print(f"python files parsed outside the litellm package: {parsed}; not parsed: {unparsed}; files that import litellm or one of its submodules: {users}")
+print(f"references to litellm.proxy outside the litellm package: {len(hits)}")
+for rel, line, kind in hits[:30]:
+    print(f"  {rel}:{line}: {kind}")
+for line in errors[:10]:
+    print(f"  not parsed: {line}")

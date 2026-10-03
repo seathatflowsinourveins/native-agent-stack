@@ -607,8 +607,14 @@ class MoverPaperCommandWiring(unittest.TestCase):
             port.fill_sells = self.sell_blocked_ports <= 0     # the next N ports leave every sell resting
             self.sell_blocked_ports -= 1
             self.ports.append(port)
+            self.port_kwargs.append((list(symbols), kwargs.get("required_quote_symbols")))
             self.broker = port
             return port
+
+        def fake_checkpoint(key, secret, *, after, before_request, **kwargs):
+            for _ in range(3):
+                before_request("read")
+            return {"account": self.observation([])["account"], "fees": []}
 
         args = [command, "--env-file", str(Path(root) / "unused.env"), "--output", str(out),
                 "--state-root", str(Path(root) / "state")]
@@ -620,6 +626,7 @@ class MoverPaperCommandWiring(unittest.TestCase):
         try:
             with patch.object(mover_runner, "credentials", return_value=("key", "secret")), \
                  patch.object(transport, "preflight", lambda key, secret, symbols, **kw: self.observation(symbols)), \
+                 patch.object(transport, "fee_checkpoint", fake_checkpoint), \
                  patch.object(transport, "AlpacaPaperTransport", fake_transport), \
                  patch.object(mover_runner, "load_scan",
                               lambda raw, settings, *, now: real_load_scan(raw, settings, now=SCAN_TIME + 20)), \
@@ -637,6 +644,7 @@ class MoverPaperCommandWiring(unittest.TestCase):
         self.broker = None
         self.sell_blocked_ports = 0
         self.ports = []
+        self.port_kwargs = []
         self.path_points = None
 
     def fast_config(self, root):
@@ -713,6 +721,24 @@ class MoverPaperCommandWiring(unittest.TestCase):
             self.assertEqual(self.trial_json(root)["phase"], "finished")
             code, receipt = self.run_paper(root, "lane-3", config=config)
             self.assertEqual((code, receipt["status"], receipt["session"]["number"]), (0, "passed", 3))
+
+    def test_recovery_ports_require_only_the_benchmark_quotes(self):
+        # #215: the forced recovery's port and the recover command's port wait on the
+        # benchmark quotes only, as a trial's port does; recovery.recover gates each held
+        # symbol's exit on that symbol's own fresh quote.
+        with tempfile.TemporaryDirectory() as root:
+            config, scan = self.fast_config(root), Path(root) / "scan.json"
+            scan.write_bytes(scan_raw([row("AAA", 1, "10.00")]))
+            self.assertEqual(self.run_paper(root, "lane-1", config=config)[0], 0)
+            scan.write_bytes(scan_raw([row("BBB", 1, "10.00")]))
+            self.sell_blocked_ports = 2                               # the trial's port and the forced recovery's
+            code, receipt = self.run_paper(root, "lane-2", config=config)
+            self.assertEqual((code, receipt["flat"]), (3, False))
+            code, result = self.run_recover(root, config=config)
+            self.assertEqual((code, result["flat"]), (0, True))
+        self.assertEqual(len(self.port_kwargs), 4)                    # lane-1, lane-2, forced recovery, recover
+        self.assertTrue(all("BBB" in symbols for symbols, _ in self.port_kwargs[1:]))
+        self.assertEqual([required for _, required in self.port_kwargs], [["SPY"]] * 4)
 
     def test_recover_flattens_a_residual_that_the_forced_recovery_left(self):
         with tempfile.TemporaryDirectory() as root:

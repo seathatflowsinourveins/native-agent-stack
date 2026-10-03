@@ -12,7 +12,8 @@ sweep's return) or the bare return. The lane defaults to the return's `sweep`. W
                  {lost: true}); failures/<layer> (the layer's retained failures); skills_usage; gpt6_usage
   lanes.json     {lanes: [{lane, result: {layers, calls, limits}, proposals}], critic, lost} for build_manifest.py
   layers.json    ledger layer entries whose refs start with @RETURNS@ (make_result.py puts in the returns path)
-  survivors.json [{layer_id, repository}] for source_reviews.py
+  survivors.json [{layer_id, repository}] for source_reviews.py; a skills survivor adds its proposal's pin and
+                 skill_md_sha256, the commit and SKILL.md the refuters judged
 Survival: the facts refuter AND the Claude fit refuter AND the GPT-6 fit refuter did not refute (the fit vote is
 two-family: refuted when either family refutes). A vote refutes unless it says refuted: false, so a missing or
 malformed vote counts as refuted and is noted. When a later round proposes a repository again, that round's proposal
@@ -41,6 +42,12 @@ Integrity: with --work-dir, every GPT-6 output is compared with the file Codex w
 when the workflow used an output that differs from that file (mismatch), that Codex never wrote (no_file) or that
 Codex wrote as non-JSON (file_unparseable), or when a job that finished with exit 0 wrote an output that never
 reached the workflow (file_only). Each is also a retained failure of its layer.
+
+The descriptions above apply to V1. An explicit integer contract_version: 2 uses the source-only U11V4 consumer:
+every frozen/discovered identity is retained, votes remain credible/not_credible/pending, and each screen requires
+independent replicated family majorities. It retains declared judgment metadata and raw returns; it does not prove
+native execution, provider sampling controls, or V2 runner copy/usage acceptance. Newly discovered identities need
+a screen bound to a later frozen field before resolution. V1 dispatch and artifacts remain unchanged.
 """
 
 from __future__ import annotations
@@ -53,7 +60,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from sweep_common import (REPO_ROOT, canon, deviation_rounds, host_replacements, load_json,  # noqa: E402
+from sweep_common import (REPO_ROOT, canon, deviation_rounds, host_replacements, ledger_module, load_json,  # noqa: E402
                           pointer_token, private_content, private_findings, sanitize, slug, write_json)
 
 # The Claude judgment roles all run on Opus (sweep.js WORKER, adoption/agents/claude/landscape-sweep-worker.md): the
@@ -69,14 +76,23 @@ SYNTHETIC_MODEL = "<synthetic>"  # child-usage.mjs: the model of client-written 
 # Copy checks that mean the workflow's GPT-6 input is not exactly what Codex wrote (exit 4, and a retained failure).
 COPY_FAILURES = ("mismatch", "no_file", "file_unparseable", "file_only")
 VOTE_ROLES = (("facts", "facts"), ("fit_claude", "Claude fit"), ("fit_gpt6", "GPT-6 fit"))
+SKILLS_CATALOG = "skills"  # build_inputs.SKILLS: the catalog of a skills-* layer, whose proposals are skill refs
 
 
-def method_limits(models: dict, gpt6_model: str = GPT6_DEFAULT["model"]) -> list[str]:
+def method_limits(models: dict, gpt6_model: str = GPT6_DEFAULT["model"], skills: bool = False) -> list[str]:
+    """The lane's method limits; `skills` for a skills run (every layer's catalog is skills), whose unit is a skill
+    (owner/repo@name) merged by its skill_ref."""
+    unit, key = ("skills (owner/repo@name)", "skill_ref") if skills else ("repositories", "canonical repository")
+    last = ("SKILL.md source review and GitHub metadata only: no skill was installed, invoked, benchmarked "
+            "(skill-creator or promptfoo) or compared with an installed skill; survival means the proposal withstood "
+            "fact and fit checks, not that it beats an installed skill." if skills else
+            "Source review and GitHub metadata only: no candidate was installed, run, benchmarked or compared with a "
+            "winner; survival means the proposal withstood fact and fit checks, not that it beats a winner.")
     return [
         f"Discovery per layer: a Claude researcher ({models['discover']}, effort max) and a GPT-6 researcher "
         f"({gpt6_model} through the Codex CLI, effort max, web search, read-only sandbox, user config "
-        "ignored), each proposing at most 6 repositories within 12 web searches, 8 page fetches and 40 GitHub API "
-        f"calls; the two returns are merged by canonical repository and capped at {MERGE_CAP} per layer (two-family "
+        f"ignored), each proposing at most 6 {unit} within 12 web searches, 8 page fetches and 40 GitHub API "
+        f"calls; the two returns are merged by {key} and capped at {MERGE_CAP} per layer (two-family "
         "proposals first; dropped proposals are logged and kept under raw).",
         f"Adversarial verification per layer: a facts/identity refuter ({models['refute-facts']}, effort max) and "
         f"two fit/standing refuters ({models['refute-fit']} and {gpt6_model}, effort max), each defaulting "
@@ -84,8 +100,7 @@ def method_limits(models: dict, gpt6_model: str = GPT6_DEFAULT["model"]) -> list
         "no refuter refutes it, and a missing vote counts as refuted.",
         f"One completeness critic ({models['critic']}, effort max) and one bounded follow-up round over at most "
         f"{FOLLOWUP_CAP} critic-flagged layers, with the same roles.",
-        "Source review and GitHub metadata only: no candidate was installed, run, benchmarked or compared with a "
-        "winner; survival means the proposal withstood fact and fit checks, not that it beats a winner.",
+        last,
     ]
 
 
@@ -280,8 +295,86 @@ def sweep_rounds(res: dict) -> list:
     return first + followups
 
 
+def convert_v2(res: dict, scope: dict, lane: str, work: Path | None, limits, workflow_run) -> dict:
+    """Explicit U11V4 neutral contract; V1's binary projections remain unchanged below.
+
+    A lost/unavailable screen retains the complete frozen field, including V1 refutations.
+    Unsupported and malformed raw proposals remain pending with pointer failures; other layers continue.
+    Sources: decision A/B and revision 5 item 6 at 49a4260029244e3e20d8b2dd3ada00af7983a3c9;
+    retained-field/malformed-proposal reproductions of PR #590 comment 5942837180.
+    """
+    if work is None:
+        raise ValueError("V2 conversion needs --work-dir with frozen inputs/<layer>.json")
+    led = ledger_module(REPO_ROOT)
+    returns = {"contract_version": 2, "sweep_id": lane, "discovery": {}, "votes": {},
+               "raw": {}, "failures": {}}
+    if workflow_run:
+        returns["workflow_run"] = workflow_run
+    grouped = {}
+    for entry in sweep_rounds(res):
+        grouped.setdefault(entry["layer_id"], []).append(entry)
+    layers = []
+    for layer_id, rounds in grouped.items():
+        catalog = rounds[0]["catalog"]
+        frozen = load_json(work / "inputs" / f"{layer_id}.json")
+        if (frozen.get("contract_version"), frozen.get("catalog"), frozen.get("layer_id")) != (2, catalog, layer_id):
+            raise ValueError(f"{layer_id}: V2 frozen field identity/contract mismatch")
+        if (frozen.get("requirement_sha256") != scope["requirement_sha256"][f"{catalog}/{layer_id}"]
+                or frozen.get("platform_profiles_sha256") != scope["platform_profiles_sha256"]):
+            raise ValueError(f"{layer_id}: V2 field does not match the frozen requirement/platform scope")
+        if frozen.get("field_sha256") != led.v2_field_sha256(frozen):
+            raise ValueError(f"{layer_id}: V2 frozen field_sha256 mismatch")
+        members = led.v2_expand_field(frozen, rounds)
+        proposed = [row["repository"] for row in members]
+        source_hash = frozen["field_sha256"]
+        discovery = {key: frozen[key] for key in (
+            "contract_version", "catalog", "layer_id", "requirement_sha256", "platform_profiles_sha256")}
+        discovery.update(proposed=proposed, source_field_sha256=source_hash, field_sha256=source_hash,
+                         eligible_field=members, source_field=frozen)
+        discovery["field_sha256"] = led.v2_field_sha256(discovery)
+        returns["discovery"][layer_id] = discovery
+        returns["votes"][layer_id] = []
+        returns["raw"][layer_id] = rounds
+        returns["failures"][layer_id] = led.v2_round_failures(rounds)
+        documents = led.v2_screen_documents(rounds)
+        discovery["screen_judgments"] = documents
+        conflict = led.v2_provenance_conflict(documents)
+        outcomes = {"pending": [], "credible": [], "not_credible": []}
+        for index, member in enumerate(members):
+            objects = {role: {"contract_version": 2, "role": role, "candidate_key": member["candidate_key"],
+                             "repository": member["repository"], "evidence_key": member["evidence_key"],
+                             "judgments": docs, **led.v2_screen(role, docs, member, frozen, conflict)}
+                       for role, docs in documents.items()}
+            member.update(led.v2_member_outcome(member, objects))
+            returns["votes"][layer_id].append(objects)
+            outcome = {**member, "repo": member["repository"],
+                       **{role: {"vote": objects[role]["status"],
+                                 "ref": f"@RETURNS@#/votes/{pointer_token(layer_id)}/{index}/{role}"}
+                          for role in ("facts", "fit")}}
+            outcomes[member["status"]].append(outcome)
+        layers.append({"contract_version": 2, "catalog": catalog, "layer_id": layer_id,
+                       "votes": "retained", "discovery_ref": f"@RETURNS@#/discovery/{pointer_token(layer_id)}",
+                       "field_sha256": discovery["field_sha256"], "source_field_sha256": source_hash,
+                       "eligible_field": members, "calls": None, "proposed": proposed,
+                       "survived": outcomes["credible"], "refuted": outcomes["not_credible"],
+                       "pending": outcomes["pending"],
+                       "reopen": ([{"trigger": "retained_failure", "ref": f"@RETURNS@#/failures/{pointer_token(layer_id)}"}]
+                                  if returns["failures"][layer_id] else [])})
+    return {"returns": returns, "lanes": {"contract_version": 2, "lanes": [{"lane": lane,
+            "result": {"contract_version": 2, "layers": layers, "limits": list(limits)}}]},
+            "layers": layers, "survivors": [{"layer_id": layer["layer_id"], "repository": row["repo"],
+                                             "candidate_key": row["candidate_key"], "evidence_key": row["evidence_key"]}
+                                            for layer in layers for row in layer["survived"]],
+            "summary": {"contract_version": 2, "lane": lane, "layers": len(layers),
+                        "pending": sum(len(layer["pending"]) for layer in layers), "gpt6_copy_check": {}}}
+
+
 def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None = None, limits=(),
             workflow_run: str | None = None, usage: dict | None = None) -> dict:
+    if "contract_version" in res and (type(res["contract_version"]) is not int or res["contract_version"] not in (1, 2)):
+        raise ValueError("contract_version must be the integer 1 or 2; V2 never falls back to binary V1")
+    if res.get("contract_version") == 2:
+        return convert_v2(res, scope, lane, work, limits, workflow_run)
     returns = {"sweep_id": lane, "discovery": {}, "votes": {}, "raw": {}, "failures": {}}
     if workflow_run:
         returns["workflow_run"] = workflow_run
@@ -473,7 +566,10 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
             if not survives and not ((facts_refuted and fv) or (claude_refuted and cv) or (gpt6_refuted and gv)):
                 absent.append((repo_slug, [role for role, _ in VOTE_ROLES if not row[role]]))
             if survives:
-                survivors.append({"layer_id": layer_id, "repository": repository})
+                survivor = {"layer_id": layer_id, "repository": repository}
+                if catalog == SKILLS_CATALOG:  # the commit and SKILL.md the refuters judged, which source_reviews.py checks
+                    survivor.update(pin=p.get("pin"), skill_md_sha256=p.get("skill_md_sha256"))
+                survivors.append(survivor)
             new_candidates.append({"repository": repository, "source": f"{lane}: {p.get('source', '')}"[:600],
                                    "demonstrated_gap": p.get("demonstrated_gap"), "proposed_label": p.get("proposed_label"),
                                    "comparison_that_would_overturn": p.get("comparison_that_would_overturn"),
@@ -513,8 +609,12 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
     returns["skills_usage"] = skills_usage
     returns["gpt6_usage"] = gpt6_usage
     gpt6_model_text = "+".join(sorted(gpt6_models)) or GPT6_DEFAULT["model"]
+    # A skills run's layers all come from the skills catalog (build_inputs.py --modality skills; one modality a run).
+    skills_run = bool(rounds_by_layer) and all(rounds[0]["catalog"] == SKILLS_CATALOG
+                                               for rounds in rounds_by_layer.values())
     lanes = {"lanes": [{"lane": lane, "result": {"layers": lane_layers, "calls": calls_total,
-                                                 "limits": [*method_limits(models, gpt6_model_text), *limits]},
+                                                 "limits": [*method_limits(models, gpt6_model_text, skills_run),
+                                                            *limits]},
                         "proposals": proposals}],
              "critic": res.get("critic"), "lost": lost}
     failures_summary = {layer_id: [f"{f['round']}:{f['cause']}" for f in items]

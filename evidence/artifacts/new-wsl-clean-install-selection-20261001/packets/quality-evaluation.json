@@ -1,0 +1,60 @@
+{
+ "layer_id": "quality-evaluation",
+ "title": "Quality and evaluation",
+ "requirement": "Verify the changed behavior using relevant upstream/project checks, independent observations and explicit failure-preserving evidence.",
+ "a_deciding_comparison_would_measure": "Evaluate semantic advice on fresh independently labeled task cases, retain uncertain disagreements and a safe negative control; do not tune on the existing eight-case diagnostic.",
+ "candidates": [
+  {
+   "key": "C01",
+   "name": "Official OpenAI CI and security skills",
+   "repository": "https://github.com/openai/skills"
+  },
+  {
+   "key": "C02",
+   "name": "Difftastic",
+   "repository": "https://github.com/Wilfred/difftastic"
+  },
+  {
+   "key": "C03",
+   "name": "ShellCheck",
+   "repository": "https://github.com/koalaman/shellcheck"
+  },
+  {
+   "key": "C04",
+   "name": "Harbor (containerized agent E2E runner)",
+   "repository": "https://github.com/harbor-framework/harbor"
+  },
+  {
+   "key": "C05",
+   "name": "Playwright",
+   "repository": "https://github.com/microsoft/playwright"
+  },
+  {
+   "key": "C06",
+   "name": "Promptfoo",
+   "repository": "https://github.com/promptfoo/promptfoo"
+  },
+  {
+   "key": "C07",
+   "name": "TypeSafe semantic skill",
+   "repository": "https://github.com/typesafe-ai/skills"
+  },
+  {
+   "key": "C08",
+   "name": "Inspect AI",
+   "repository": "https://github.com/UKGovernmentBEIS/inspect_ai"
+  },
+  {
+   "key": "C09",
+   "name": "MCP Inspector",
+   "repository": "https://github.com/modelcontextprotocol/inspector"
+  },
+  {
+   "key": "C10",
+   "name": "MLflow",
+   "repository": "https://github.com/mlflow/mlflow"
+  }
+ ],
+ "comparisons_on_record_where_every_named_arm_ran": [],
+ "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host."
+}

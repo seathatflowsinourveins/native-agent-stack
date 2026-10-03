@@ -359,7 +359,7 @@ At `v2026.09.26` macOS has no rtk pin, and that script prints no reminder.
 `socraticode` is installed with `--ignore-scripts` (the pin's own
 `ignore_scripts: true` field, read by the script's `install_npm`), the same
 convention [`recipes/README.md`](../../recipes/README.md#paths-pins-and-installation-conventions)
-documents for the Linux recipe. `adoption/pins-linux-x86_64.json` changed after `v2026.09.26.2` in its `codex` entry (0.157.1 on Linux; the macOS pin stays 0.155.1) and in its `claude-code` entry (2.1.284, as on macOS). It changed after `v2026.09.25.2`,
+documents for the Linux recipe. `adoption/pins-linux-x86_64.json` changed after `v2026.09.26.2` in its `codex` entry (0.157.1 on Linux from 2026-09-26, 0.159.2 from 2026-09-30; the macOS pin stays 0.155.1) and in its `claude-code` entry (2.1.284, as on macOS). Since 2026-09-30 the shared Codex template defaults to `gpt-6.1-sol`, which entered Codex's bundled model catalog in `rust-v0.159.1` and is absent from the Linux 0.155.1 build's catalog (`codex debug models --bundled`, offline): macOS needs its own 0.159.x qualification before the template default applies there, and until then `tools/adoption/render_config.py --platform macos-arm64` renders the template's `CODEX_MODEL` placeholder as `gpt-6-astra` from this 0.155.1 pin. It changed after `v2026.09.25.2`,
 adding the identical entry there too (same version,
 url, sha256 and `--ignore-scripts`), completing the token-efficiency profile's Linux pin
 coverage alongside new `repomix`, `toon`, `headroom`, `ccusage` and `serena`
@@ -459,6 +459,13 @@ no `build/bin` path in this asset), so the bootstrap installs the whole
 directory into `tools/llama-cpp-b11057` and places a wrapper script at
 `bin/llama-server` that exports `DYLD_LIBRARY_PATH` before exec'ing the real
 binary, instead of a bare symlink.
+
+### Codex notifications on macOS
+
+Changed after `v2026.09.26.2` (drafted, not run on a Mac): the shared `codex.config.template.toml` sets `[tui] notifications` to the needed-action kinds, so a
+rendered macOS config asks Codex for a notification on an approval, a plan-mode prompt or a question and not when a turn finishes. Codex keeps its own per-terminal channel, so a Mac keeps native notifications in Ghostty, iTerm2 and Kitty for those kinds and stops receiving the turn-complete one. At this platform's pin (0.155.1) a `request_user_input` question already notifies as `plan-mode-prompt`; the `async-question` kind covers the asynchronous questions added after that release, so it is inert there and no notification 0.155.1 emits is lost. To keep the turn-complete notification, add
+`"agent-turn-complete"` to the list in the rendered `config.toml`. The decision is in
+[the 2026-09-28 terminal decision](../../docs/decisions/2026-09-28-terminal-experience.md#repository-carried-defaults-and-the-second-distros-profiles-2026-09-29).
 
 ### ai-memory hook paths on macOS
 
@@ -745,6 +752,24 @@ hosted run proves" above) `launchd-agents.sh` bootstrapped and booted out the
 `qdrant` and `llama-embed` agents; `ai-memory` has not run, and none of the
 three has run on a Mac workstation.
 
+**Credential boot receipt (added after `v2026.09.26.2`; documented, not
+run).** On Linux/WSL2 the `credential-boot-receipt.service` oneshot runs
+`python3 -I scripts/credential_boot_receipt.py record` at every start of the
+user's service manager
+([Restart check](../../docs/secret-storage.md#restart-check-2026-09-29)). On a
+Mac the same tool would run from a `RunAtLoad` LaunchAgent, which launchd
+starts only after the user's FileVault login, so a receipt there follows a
+login rather than the boot itself. No plist template exists for it, and it has
+not run on any Mac. macOS has no `/proc`, so a receipt there records
+`boot_id`, `uptime_seconds` and the kernel keyring names as null, and
+`compare` reports the boot change as `unknown`.
+
+**Canary proof (Linux only).** `tools/credentials/canary_proof.py` refuses
+prepare, arm and scan with `unsupported_platform` on macOS. Its systemd/cgroup-v2
+and setpriv parent-death guarantees have no Mac fallback; pure logic tests still
+run. See [Canary proof](../../docs/secret-storage.md#canary-proof). Boot-receipt
+restart comparison is separate, and no synthetic canary survives a restart.
+
 **2026-09-23 decision: brew-services semantics, no backup or reconcile.**
 
 - **Chosen:** stateless, path-verified ownership with no backup, no
@@ -807,6 +832,40 @@ or otherwise, has produced a `launchctl bootout` whose corresponding
 afterward. A real Mac run should specifically try to reproduce that window
 (e.g. a service with a slow `KeepAlive` shutdown path) rather than assume
 the bounded poll alone is proof it behaves correctly there.
+
+### Keys under launchd (drafted 2026-09-29, not run on a Mac)
+
+A LaunchAgent whose program needs a provider key may start it through the
+key runner, as a systemd unit may; the runner is available and not yet the
+default path
+([Using a key](../../docs/secret-storage.md#using-a-key-available-2026-09-29)). Its
+`ProgramArguments` are the Homebrew `python3`, `-I`,
+`<repository>/tools/credentials/credential_run.py`, the inventory id, `--`
+and the program with its arguments, and its `EnvironmentVariables` hold
+`PATH` only. No value goes into a plist or `launchctl setenv`. The runner
+and the two modules it imports are standard-library Python that parses in
+the 3.9 grammar (a test checks the runner), so the Command Line Tools
+`python3` should run it too. A uv-managed CPython 3.9.25 on Linux passed the
+runner's 60 tests once on 2026-09-29 (no committed receipt); no Mac has run
+it. macOS sets
+no `XDG_*` variable, so the store is
+`~/.config/native-agent-stack`, created by `set_credential.py` at the first
+key. `scripts/kernel_keyring.py` refuses macOS, so Tavily is a stored file
+here as on Linux: type it once with
+`bash tools/credentials/open_credential_terminal.sh tavily`. The design's
+boot receipt is to run as a `RunAtLoad` LaunchAgent rendered by
+`adoption/launchd/launchd-agents.sh`; it lands in a later change. Before
+any Mac acceptance, the guard hook must also count a capital `E` in a `ps`
+option (`ps -E`, `ps auxE`) as an environment dump, because macOS ps(1)
+shows the environment with `-E`, and its `-e` means `-A` outside legacy
+mode (apple-oss-distributions/adv_cmds `ps/ps.1`). The runner's refusal of a
+core pattern that pipes crash dumps to a collector reads
+`/proc/sys/kernel/core_pattern`, which macOS lacks, so that check is skipped
+there; what a Mac's crash reporter keeps of a crashed command's environment
+has not been checked. Key acceptance on a Mac is
+the runner, guard and status test suites on the macOS CI job, then a new Mac
+host receipt that separates the steps run from those not run. WSL receipts
+do not certify the Mac.
 
 ## Qdrant collections
 

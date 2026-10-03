@@ -1,0 +1,210 @@
+[
+ {
+  "slot": "local-generation-model",
+  "candidates": 6,
+  "order-1": [
+   "ibm-granite/granite-4.2-language-models",
+   "openai/gpt-oss"
+  ],
+  "order-2": [
+   "ibm-granite/granite-4.2-language-models",
+   "openai/gpt-oss"
+  ],
+  "agreed": [
+   "ibm-granite/granite-4.2-language-models",
+   "openai/gpt-oss"
+  ],
+  "differ": []
+ },
+ {
+  "slot": "embedding-model",
+  "candidates": 4,
+  "order-1": [],
+  "order-2": [
+   "google-deepmind/gemma",
+   "hf:nvidia/nemotron-3-embed-1b-bf16",
+   "jina-ai/jina-on-prem"
+  ],
+  "agreed": [],
+  "differ": [
+   "google-deepmind/gemma",
+   "hf:nvidia/nemotron-3-embed-1b-bf16",
+   "jina-ai/jina-on-prem"
+  ]
+ },
+ {
+  "slot": "reranker-model",
+  "candidates": 8,
+  "order-1": [
+   "flagopen/flagembedding",
+   "nvidia/nemo-retriever"
+  ],
+  "order-2": [
+   "flagopen/flagembedding",
+   "nvidia/nemo-retriever"
+  ],
+  "agreed": [
+   "flagopen/flagembedding",
+   "nvidia/nemo-retriever"
+  ],
+  "differ": []
+ },
+ {
+  "slot": "alerting-notification",
+  "candidates": 11,
+  "order-1": [
+   "binwiederhier/ntfy",
+   "prometheus/alertmanager"
+  ],
+  "order-2": [
+   "binwiederhier/ntfy",
+   "prometheus/alertmanager"
+  ],
+  "agreed": [
+   "binwiederhier/ntfy",
+   "prometheus/alertmanager"
+  ],
+  "differ": []
+ },
+ {
+  "slot": "agents-in-ci",
+  "candidates": 10,
+  "order-1": [
+   "github/gh-aw"
+  ],
+  "order-2": [
+   "github/gh-aw"
+  ],
+  "agreed": [
+   "github/gh-aw"
+  ],
+  "differ": []
+ },
+ {
+  "slot": "session-analytics",
+  "candidates": 10,
+  "order-1": [
+   "kenn-io/agentsview",
+   "thevibeworks/ccx"
+  ],
+  "order-2": [
+   "cesarandreslopez/sidekick-agent-hub",
+   "kenn-io/agentsview"
+  ],
+  "agreed": [
+   "kenn-io/agentsview"
+  ],
+  "differ": [
+   "cesarandreslopez/sidekick-agent-hub",
+   "thevibeworks/ccx"
+  ]
+ },
+ {
+  "slot": "gpu-container-runtime",
+  "candidates": 12,
+  "order-1": [
+   "apptainer/apptainer",
+   "nvidia/nvidia-container-toolkit"
+  ],
+  "order-2": [
+   "containerd/nerdctl",
+   "nvidia/nvidia-container-toolkit",
+   "podman-container-tools/podman"
+  ],
+  "agreed": [
+   "nvidia/nvidia-container-toolkit"
+  ],
+  "differ": [
+   "apptainer/apptainer",
+   "containerd/nerdctl",
+   "podman-container-tools/podman"
+  ]
+ },
+ {
+  "slot": "web-search-provider",
+  "candidates": 9,
+  "order-1": [
+   "ihor-sokoliuk/mcp-searxng",
+   "searxng/searxng",
+   "sweetcornna/free-search-mcp"
+  ],
+  "order-2": [
+   "ihor-sokoliuk/mcp-searxng",
+   "searxng/searxng",
+   "sweetcornna/free-search-mcp"
+  ],
+  "agreed": [
+   "ihor-sokoliuk/mcp-searxng",
+   "searxng/searxng",
+   "sweetcornna/free-search-mcp"
+  ],
+  "differ": []
+ },
+ {
+  "slot": "structural-code-search",
+  "candidates": 9,
+  "order-1": [
+   "ast-grep/ast-grep",
+   "semgrep/semgrep"
+  ],
+  "order-2": [
+   "ast-grep/ast-grep",
+   "semgrep/semgrep"
+  ],
+  "agreed": [
+   "ast-grep/ast-grep",
+   "semgrep/semgrep"
+  ],
+  "differ": []
+ },
+ {
+  "slot": "agent-messaging",
+  "candidates": 10,
+  "order-1": [
+   "aannoo/hcom",
+   "get-concord-ai/concord-mcp"
+  ],
+  "order-2": [
+   "aannoo/hcom",
+   "agentworkforce/relay",
+   "avivsinai/agent-message-queue"
+  ],
+  "agreed": [
+   "aannoo/hcom"
+  ],
+  "differ": [
+   "agentworkforce/relay",
+   "avivsinai/agent-message-queue",
+   "get-concord-ai/concord-mcp"
+  ]
+ },
+ {
+  "slot": "secret-scanning",
+  "candidates": 9,
+  "order-1": [
+   "mongodb/kingfisher"
+  ],
+  "order-2": [
+   "mongodb/kingfisher"
+  ],
+  "agreed": [
+   "mongodb/kingfisher"
+  ],
+  "differ": []
+ },
+ {
+  "slot": "llm-tracing",
+  "candidates": 10,
+  "order-1": [
+   "openlit/openlit"
+  ],
+  "order-2": [
+   "langwatch/langwatch"
+  ],
+  "agreed": [],
+  "differ": [
+   "langwatch/langwatch",
+   "openlit/openlit"
+  ]
+ }
+]

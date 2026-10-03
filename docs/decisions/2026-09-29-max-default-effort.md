@@ -54,7 +54,7 @@ warning is advisory and this branch leaves the guard alone; the host's user sett
    F5 measured it from the user settings), so the 2026-09-23 rule against `--effort max` beside Ultracode no longer applies.
    No Actions run was executed for this record.
 
-Applied to this host on 2026-09-29: first at 01:49Z (a 911-byte version), then replaced at about 02:22Z by the repaired version
+Applied to this host on 2026-09-29: first as a 911-byte version, then replaced at about 02:22Z (the receipt's `recorded_at_utc`) by the repaired version
 after the cross-family review below. The launcher went from 165 to 1,810 bytes (sha256 `22c2d518…0f45d26` to `f48eb134…0a2cd5`, mode
 0755); the original and the first version stay beside it as `claude.bak-20260929-max-default` and `…-v1`. The native binary it execs is
 `~/.local/bin/claude`, 2.1.284. `~/.claude/settings.json` was not touched (its sha256 was the same before and after every probe).
@@ -110,8 +110,9 @@ repaired version was then installed and the four cases rerun, and those rows are
 `bash -lc "exec claude"` (its settings live on the Windows side and were not read here); a login shell on this host resolves
 `claude` to the ecosystem launcher first. The repository tests pass: a 27-case table on real
 pseudo-terminals (both bootstrap scripts; it includes the short-flag clusters `-pc` and `-cp`, `--`, empty and multi-line
-arguments and clients from 2.1.281 to 3.0.1), nine broken launchers that the table must reject, and the bootstrap and adoption
-suites (288 tests, 33 skipped, exit 0).
+arguments and clients from 2.1.281 to 3.0.1), nine broken launchers that the table must reject, and the two bootstrap modules
+(the receipt records 241 tests, 32 skipped, exit 0 on the first head; the merged head's suites ran 290 tests with 33 skipped locally
+and green in CI, which the receipt does not record).
 
 **What the vendor and third-party measurements say about `max`** (sources read 2026-09-29 by a research workflow, then every claim
 re-fetched by an independent verifier: 30 of 40 confirmed, 10 corrected as written here, none unsupported). The default rests on the

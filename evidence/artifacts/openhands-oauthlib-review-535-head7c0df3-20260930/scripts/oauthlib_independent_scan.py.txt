@@ -1,0 +1,66 @@
+"""Independent OAuthlib sweep of an installed wheel closure (a different method from the candidate's AST scan, so that the two can disagree):
+1. reverse dependencies from installed metadata (Requires-Dist naming oauthlib);
+2. a raw-text sweep of EVERY file under site-packages outside oauthlib itself (any extension, binary included) for the string 'oauthlib', grouped by
+   top-level package, with the import-shaped lines and the dynamic-import shapes (importlib, __import__, entry points) shown;
+3. the names of oauthlib's server-side classes and of the two advisories' code paths wherever they occur outside oauthlib;
+4. sha256 of the two advisory source files and the pinned versions.
+Usage: python oauthlib_independent_scan.py <site-packages>"""
+import collections
+import hashlib
+import importlib.metadata as md
+import re
+import sys
+from pathlib import Path
+
+SITE = Path(sys.argv[1])
+print("== versions:", {n: md.version(n) for n in ("oauthlib", "PyJWT", "requests-oauthlib", "google-auth-oauthlib", "authlib", "openhands-sdk", "openhands-tools")})
+print("== reverse dependencies (Requires-Dist names oauthlib):")
+for dist in md.distributions():
+    for req in dist.requires or []:
+        if re.match(r"\s*oauthlib\b", req, re.I):
+            print("  ", dist.metadata["Name"], dist.version, "<-", req)
+SERVER = re.compile(r"RevocationEndpoint|AuthorizationCodeGrant|WebApplicationServer|LegacyApplicationServer|BackendApplicationServer|MobileApplicationServer|"
+                    r"oauthlib\.oauth2\.Server|oauthlib\.openid|enable_jsonp|code_challenge_method_s256|validate_code_challenge|pre_configured|RequestValidator")
+files_with = collections.defaultdict(list)
+scanned = 0
+for path in SITE.rglob("*"):
+    if not path.is_file() or path.is_symlink():
+        continue
+    rel = path.relative_to(SITE)
+    top = rel.parts[0]
+    if top in ("oauthlib",) or top.startswith("oauthlib-"):
+        continue
+    scanned += 1
+    try:
+        data = path.read_bytes()
+    except OSError:
+        continue
+    if b"oauthlib" not in data:
+        continue
+    files_with[top].append((rel.as_posix(), data))
+print(f"== raw-text sweep: {scanned} files outside oauthlib; files mentioning 'oauthlib': {sum(len(v) for v in files_with.values())} in {len(files_with)} top-level entries")
+for top, entries in sorted(files_with.items()):
+    kinds = collections.Counter(Path(rel).suffix or "(none)" for rel, _ in entries)
+    print(f"  {top}: {len(entries)} files {dict(kinds)}")
+print("== import-shaped and dynamic lines (text files), outside requests_oauthlib's plain client imports:")
+for top, entries in sorted(files_with.items()):
+    for rel, data in entries:
+        if not rel.endswith((".py", ".pyi", ".txt", ".cfg", ".toml", ".json", ".pth", ".md", ".rst")):
+            print(f"  [binary or other] {rel}")
+            continue
+        for number, line in enumerate(data.decode("utf-8", "replace").splitlines(), 1):
+            if "oauthlib" in line and re.search(r"\bimport\b|importlib|__import__|entry_points|find_spec|Requires-Dist|import_module", line) and top != "requests_oauthlib":
+                print(f"  {rel}:{number}: {line.strip()[:150]}")
+print("== server-side or advisory names in files that mention oauthlib (outside oauthlib):")
+hits = 0
+for top, entries in sorted(files_with.items()):
+    for rel, data in entries:
+        for number, line in enumerate(data.decode("utf-8", "replace").splitlines(), 1):
+            if SERVER.search(line):
+                hits += 1
+                print(f"  {rel}:{number}: {line.strip()[:150]}")
+print(f"   ({hits} lines)")
+print("== advisory source files:")
+for rel in ("oauthlib/oauth2/rfc6749/endpoints/revocation.py", "oauthlib/oauth2/rfc6749/grant_types/authorization_code.py",
+            "oauthlib/oauth2/rfc6749/endpoints/pre_configured.py", "oauthlib/openid/connect/core/endpoints/pre_configured.py"):
+    print("  ", rel, hashlib.sha256((SITE / rel).read_bytes()).hexdigest())

@@ -50,7 +50,8 @@ documents the body but not the HTTP status. 422 was inferred from the code prefi
 the POST /v2/orders 422 entry. It was first observed on the paper endpoint in the
 2026-09-24 14:39Z native-fault run (`native-faults/receipt-20260924t143905.json`,
 C04), and again in the 18:58Z run that day (`native-faults/receipt-20260924t185811.json`)
-and the 2026-09-25 18:25Z run (`native-faults/receipt.json`). The message, not the
+and the 2026-09-25 18:25Z run (`native-faults/receipt-20260925t182513.json`; the current
+`native-faults/receipt.json` is the 2026-10-01 14:38Z run on engine dca821cc). The message, not the
 code, is the discriminator. The transport
 raises `RejectedSubmission(422, "sub_penny_minimum_price_variance")` and compares
 the body with those constants only, never retaining or raising it. The engine's
@@ -78,10 +79,27 @@ cumulative state never moves back. `fill_activities(order_id)` returns one order
 executions from `GET /v2/account/activities/FILL` filtered by the documented
 `order_id` parameter (ascending, 100 per page, the last activity id as `page_token`),
 each with its own `qty` and `price` and the order's `cum_qty` after it, and requires
-them to tile the filled quantity from zero. It is the only activities read the
-guarded session allows: another activity type, filter, page size or method is refused
-before any request. An activity id is `<timestamp>::<uuid>`; its 36-character UUID is
-the native trade id.
+them to tile the filled quantity from zero. The guarded session allows exactly one
+other activities read (2026-09-30): `GET /v2/account/activities/FEE` with `after` (a
+UTC `YYYY-MM-DDTHH:MM:SSZ` instant) and `direction` `asc`, plus an optional
+`page_size` 1-100 and activity-id `page_token`. Another activity type, filter, page
+size or method is refused before any request. `snapshot()` lists `"fees"`, the FEE
+activities created after the transport's `fee_history_start` (default
+`history_start`; new callers reuse their saved lineage checkpoint window), normalized by
+`normalize_fee_activity` to `{id, date, net_amount, sub_type}` without the
+`description` field, read after the account, bounded by `max_snapshot_pages`; a
+fee-read failure makes the snapshot incomplete. `fee_activities(...)` is the same
+read on a fresh read-only client. `fee_checkpoint(...)` uses one fresh read-only
+client for F1/account/F2 with the same `after`, and refuses changed id-to-normalized-row
+maps as `fee_activity_posted_during_checkpoint`. Each GET is admitted synchronously
+as a durable `read` before sending. Assuming fee visibility exactly coincides with
+its inclusion in cash, callers book F2 before calculating baseline as checkpoint
+cash minus ledger cash delta, and reuse that formatted cutoff on later reads.
+Whole-second formatting can include earlier same-second fees; booking before baseline
+and deduplicating by id keeps cash consistent. A refused checkpoint leaves a start
+unentered for retry. Legacy mover recovery uses `current_trial_started_at`; legacy
+adaptive metadata uses `started_at` (see README-safety.md, "Broker FEE activities"). An
+activity id is `<timestamp>::<uuid>`; its 36-character UUID is the native trade id.
 
 ## Pre-submission order-contract boundary
 

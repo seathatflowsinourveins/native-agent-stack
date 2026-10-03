@@ -1,9 +1,12 @@
 """Keep portable adoption references and accepted SDK dependency artifacts aligned."""
+import hashlib
 import json
 import re
 import subprocess
+import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -94,7 +97,8 @@ class AdoptionContractTests(unittest.TestCase):
         normal = lambda value: re.sub(r'[-_.]+', '-', value).lower()
         inventory = json.loads((ROOT / 'blueprints/us-equities/supply-chain/receipt.json').read_text())
         expected = {normal(item['name']): item['version'] for item in inventory['packages']}
-        text = (ROOT / self.adoption['toolchain']['sdk_lock']).read_text()
+        lock = ROOT / self.adoption['toolchain']['sdk_lock']
+        text = lock.read_text()
         blocks = re.split(r'(?=^[A-Za-z0-9_.-]+==)', text, flags=re.M)
         pins = {}
         for block in blocks:
@@ -103,15 +107,74 @@ class AdoptionContractTests(unittest.TestCase):
                 self.assertRegex(block, r'--hash=sha256:[0-9a-f]{64}')
                 self.assertNotIn(normal(match[1]), pins)
                 pins[normal(match[1])] = match[2]
-        self.assertEqual(pins, expected)
+        # The supply-chain receipt retains its historical SDK installation.
+        # The current SDK pair follows the client pin and its separately scoped
+        # qualification; every other distribution stays bound to that inventory.
+        # Sources: uv pip/compile/#adding-constraints; published openai-codex
+        # 0.159.2 requires openai-codex-cli-bin==0.159.2 (PyPI metadata).
+        sdk_names = {'openai-codex', 'openai-codex-cli-bin'}
+        self.assertEqual(set(pins), set(expected))
+        self.assertEqual(
+            {name: version for name, version in pins.items() if name not in sdk_names},
+            {name: version for name, version in expected.items() if name not in sdk_names},
+            'historical non-SDK inventory must remain unchanged')
+        client = next(row for row in self.stack['components'] if row['id'] == 'codex')
+        self.assertEqual(
+            {name: pins[name] for name in sdk_names},
+            {name: client['version'] for name in sdk_names},
+            'SDK runtime pins must follow the current Codex client')
         for reference in ['sdk_direct_requirements', 'sdk_accepted_constraints']:
             records = (ROOT / self.adoption['toolchain'][reference]).read_text()
-            required = dict((normal(name), version) for name, version in re.findall(
-                r'^([A-Za-z0-9_.-]+)==([^\s]+)$', records, re.M))
+            entries = [(normal(name), version) for name, version in re.findall(
+                r'^([A-Za-z0-9_.-]+)==([^\s]+)$', records, re.M)]
+            required = dict(entries)
+            self.assertEqual(len(entries), len(required), reference)
             self.assertTrue(required)
             self.assertTrue(required.items() <= pins.items())
             if reference == 'sdk_accepted_constraints':
-                self.assertEqual(required, expected)
+                self.assertEqual(required, pins)
+
+        qualification = json.loads((ROOT / 'evidence/artifacts/runtime-sdk-20261001/receipt.json').read_text())
+        installation = qualification['installation']
+        self.assertEqual(installation['lock'], self.adoption['toolchain']['sdk_lock'])
+        self.assertEqual(installation['lock_sha256'], hashlib.sha256(lock.read_bytes()).hexdigest())
+        self.assertEqual(installation['distribution_count'], len(pins))
+        for field in ['sdk', 'bundled_cli', 'selected_native_cli']:
+            self.assertEqual(installation[field], client['version'], field)
+        self.assertTrue(any(source.get('repository') == 'openai/codex'
+                            and source.get('ref') == 'rust-v' + client['version']
+                            for source in qualification['sources']))
+
+    def test_sdk_upgrade_keeps_independent_inventory_and_client_guards(self):
+        paths = ['blueprints/us-equities/supply-chain/receipt.json',
+                 'evidence/artifacts/runtime-sdk-20261001/receipt.json']
+        paths.extend(self.adoption['toolchain'][key] for key in
+                     ['sdk_lock', 'sdk_direct_requirements', 'sdk_accepted_constraints'])
+        cases = [('duckdb', '0.0.0', 'historical non-SDK inventory'),
+                 ('openai-codex-cli-bin', '0.0.0', 'current Codex client')]
+        for name, version, guard in cases:
+            with self.subTest(package=name), tempfile.TemporaryDirectory() as directory:
+                candidate = Path(directory)
+                for relative in paths:
+                    target = candidate / relative
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    target.write_bytes((ROOT / relative).read_bytes())
+                for key in ['sdk_lock', 'sdk_accepted_constraints']:
+                    target = candidate / self.adoption['toolchain'][key]
+                    text, count = re.subn(r'^' + re.escape(name) + r'==[^\s\\]+',
+                                         name + '==' + version, target.read_text(), flags=re.M)
+                    self.assertEqual(count, 1)
+                    target.write_text(text)
+                # Keep the generated lock, constraints and receipt hash consistent
+                # so the independent inventory/client guards must reject the drift.
+                qualification_path = candidate / paths[1]
+                qualification = json.loads(qualification_path.read_text())
+                lock = candidate / self.adoption['toolchain']['sdk_lock']
+                qualification['installation']['lock_sha256'] = hashlib.sha256(lock.read_bytes()).hexdigest()
+                qualification_path.write_text(json.dumps(qualification))
+                with patch(__name__ + '.ROOT', candidate):
+                    with self.assertRaisesRegex(AssertionError, guard):
+                        self.test_lock_matches_accepted_inventory_and_all_pins_have_hashes()
 
     def test_platform_profiles_stay_linux_accepted_and_macos_drafted(self):
         profiles = {row['id']: row for row in self.adoption['platform_profiles']}

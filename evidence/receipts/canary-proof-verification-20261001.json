@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "id": "canary-proof-verification-20261001",
+  "kind": "artifact_measurement",
+  "component_ids": [
+    "claude-code",
+    "codex",
+    "systemd"
+  ],
+  "claim": "The canary proof tool (tools/credentials/canary_proof.py, 1,834 lines, with the contained scan worker tools/credentials/canary_scan_worker.py, 2,114 lines) passed its synthetic acceptance on the workstation on 2026-10-01 on main with the K4 guard: its unit suite ran 143 tests, OK, with none skipped (including 12 cases that start transient systemd user scopes); its mutation runner killed 138 of 138 mutants by failures of their named permanent tests after 90 passing unmutated runs; and the credential, guard, Codex worker-lane and pre-commit suites ran 531 tests with one failure by design (the installed host copy of the guard). The tool plants a unique synthetic canary, lets named consumers use it through the key runner, and searches the named sinks with ripgrep in a worker that runs in a finite systemd user scope; its classifier refuses unless every required check has a fresh, complete result bound to the run. Reviews: a read-only GPT-6 verification found seven paths to a false clean verdict and four high findings, and an Opus build review found one blocking gap in the contract's acceptance cases; one repair round by a GPT-6 runtime worker fixed them, each with a permanent test and a mutant; an Opus re-check confirmed 37 of 42 dispositions and found one more false-clean path (a Git object store with no HEAD, refs or .git name, reached directly) and a record-validation defect, which one bounded fix round closed with tests and mutants. No end-to-end proof has run: it is the new distribution's acceptance after its guard install.",
+  "limitations": [
+    "Synthetic acceptance only: every sink, canary, Git store, SQLite database and journal in these runs is a fixture the tests build under a temporary directory; no real consumer, transcript, log, journal or credential was used, and no proof claim is made before the end-to-end run.",
+    "Containment evidence is workstation scope enforcement: the real-scope classes start transient systemd user scopes on this host (12 cases, all passing); hosted CI runners skip them where no user scope exists.",
+    "Scanner: ripgrep 14.1.0 is the executed version; the runtime also accepts 15.2.0 on a source-reviewed output grammar that no run has executed.",
+    "Size: the implementation (3,948 coordinator and worker lines) and the permanent test file (3,632 lines) exceed the contract's ceilings (1,800 and 2,800); the coordinator accepted the deviation for the required coverage and containment logic, and the reviews' dead-code findings were removed.",
+    "Residuals from the Opus re-check, recorded in the decision record: a completed but too-early or stale final is labelled requested_incomplete; the WAL/SHM-without-valid-main guard, Walk.covered's exclusion, time, special-file and symlinked-parent branches, and several O12 changes have no test of their own; three mutants are missing (END count/aux, --text, a count-based Git reconcile); bind_scope's refusal paths and the real scope_populated parser are untested; the scan's exit code still comes from events it does not validate.",
+    "Evidence classes differ: the unit, mutation and suite runs were made by the coordinator on the final head outside any sandbox; the reviews are read-only cross-family reads, not proofs."
+  ],
+  "evidence_class": "local integration (the tool's unit suite, mutation runner and the credential and guard suites on this host, run by the coordinator, including transient systemd user scopes) plus read-only cross-family reviews: a GPT-6 (gpt-6-astra, effort max) verification, an Opus build review and an Opus re-check",
+  "recorded_at_utc": "2026-10-01T11:50:00Z",
+  "host_scope": {
+    "host": "nativestack-5975wx-20260925",
+    "platform": "NativeStack workstation, WSL2 Linux x86_64",
+    "identity": "one workstation; the repository checkout at the canary head before this receipt's commit"
+  },
+  "data": {
+    "verified_head": "68d406907eaac28e391a6f0f9a815a2aae27be72",
+    "guard_sha256": "33a11fc01ee35dc4b157b04eee4a8524460bb3fe74375ee32485bc3b2530782f",
+    "scanner": "ripgrep 14.1.0 (executed); 15.2.0 accepted on a source-reviewed grammar, not executed",
+    "line_counts": {
+      "tools/credentials/canary_proof.py": 1834,
+      "tools/credentials/canary_scan_worker.py": 2114,
+      "tests/test_canary_proof.py": 3632,
+      "tests/canary_mutants.py": 782
+    },
+    "gates": {
+      "unit": "python3 -I tests/test_canary_proof.py -v: Ran 143 tests in 988.374s, OK",
+      "mutation_check": "all 138 mutants apply exactly once and compile",
+      "mutation_runner": "canary_mutants: 138/138 killed; pristine runs passed 90/90; repository inputs unchanged",
+      "credential_and_guard_suites": "Ran 531 tests in 294.321s; FAILED (failures=1, skipped=17): test_host_profile_copy_is_verbatim, by design",
+      "real_scope_containment_at_repair_commit": "python3 -I tests/test_canary_proof.py -v ContainmentRealScopeTests: Ran 12 tests in 79.171s, OK (repair commit, outside the sandbox)",
+      "validate": "{\"components\": 69, \"hashed_files\": 8827, \"profiles\": 4, \"receipts\": 183, \"status\": \"passed\"} with this receipt registered"
+    },
+    "reviews": [
+      {
+        "round": "verification",
+        "reviewer": "GPT-6 gpt-6-astra, effort max, read-only",
+        "result": "7 blocking false-clean paths (Git indirection files and damaged Git directories, a WAL whose main database was any entry, an incomplete END frame read as complete, symlink coverage by root prefix, a dropped journal cursor binding, an unterminated final journal entry, virtual-table shadows matched by prefix), 4 high (cleanup order, the header sentinel, FIFO fixtures that never reached a FIFO, parent-death coverage), mediums and lows"
+      },
+      {
+        "round": "build review",
+        "reviewer": "Opus, read-only",
+        "result": "1 blocking (contract acceptance cases missing), 1 high (the second configured store), mediums and lows"
+      },
+      {
+        "round": "one repair round",
+        "reviewer": "GPT-6 runtime worker gpt-6-astra, effort max",
+        "result": "every blocking and high finding fixed with a permanent test and a mutant; 135 of 135 mutants killed"
+      },
+      {
+        "round": "re-check",
+        "reviewer": "Opus, read-only",
+        "result": "37 of 42 dispositions confirmed, 5 partial; 1 high (objects-only Git store reached directly), 1 medium (request-level inventory_unreconciled rejected), lows and notes"
+      },
+      {
+        "round": "bounded fix round",
+        "reviewer": "Opus builder, reviewed by the coordinator",
+        "result": "the high and the medium fixed with tests and mutants, an unsigned M2 count fixed, documents corrected; 138 of 138 mutants killed"
+      }
+    ],
+    "verified_head_note": "the gates ran on this head (main 2979742f plus the canary commits); the branch was then rebased onto main 000aae77 with an identical canary patch, and main's changes in between touch none of the tested files"
+  },
+  "provenance": {
+    "commands": [
+      "python3 -I tests/test_canary_proof.py -v",
+      "python3 -I tests/canary_mutants.py --check --json",
+      "python3 -I tests/canary_mutants.py --json --keep <scratch>",
+      "python3 -B -m unittest tests.test_secret_path_guard tests.test_credential_status tests.test_credential_tools tests.test_credential_run tests.test_credential_boot_receipt tests.test_install_claude_profile tests.test_adoption_docs_consistency tests.test_gitleaks_config tests.test_codex_worker_lane tests.test_pre_commit_gate",
+      "python3 scripts/validate.py",
+      "codex exec -p stack-worker -s read-only -m gpt-6-astra -c model_reasoning_effort=max -o final.md - < prompt.txt"
+    ],
+    "withheld": "the review files, the workers' handoffs and the retained mutation artifacts live in the key-management lane's private state directory; the published values are copied from their outputs",
+    "decision_record": "docs/decisions/2026-09-29-key-management.md (Part 5 and its re-check round) and the Canary proof section of docs/secret-storage.md"
+  }
+}

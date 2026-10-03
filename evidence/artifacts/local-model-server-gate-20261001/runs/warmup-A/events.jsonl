@@ -1,0 +1,8 @@
+{"type":"thread.started","thread_id":"<uuid>"}
+{"type":"turn.started"}
+{"type":"item.started","item":{"id":"item_0","type":"mcp_tool_call","server":"time","tool":"read_mcp_resource","arguments":{"server":"time","uri":"get_current_time"},"result":null,"error":null,"status":"in_progress"}}
+{"type":"item.completed","item":{"id":"item_0","type":"mcp_tool_call","server":"time","tool":"read_mcp_resource","arguments":{"server":"time","uri":"get_current_time"},"result":null,"error":{"message":"resources/read failed: resources/read failed for `time` (get_current_time): Mcp error: -32602: Invalid request parameters(\"\")"},"status":"failed"}}
+{"type":"item.started","item":{"id":"item_1","type":"mcp_tool_call","server":"time","tool":"list_mcp_resources","arguments":{"server":"time"},"result":null,"error":null,"status":"in_progress"}}
+{"type":"item.completed","item":{"id":"item_1","type":"mcp_tool_call","server":"time","tool":"list_mcp_resources","arguments":{"server":"time"},"result":null,"error":{"message":"resources/list failed: resources/list failed for `time`: Mcp error: -32601: Method not found"},"status":"failed"}}
+{"type":"item.completed","item":{"id":"item_2","type":"agent_message","text":"The MCP server \"time\" is not accessible or improperly configured. The error \"Method not found\" indicates the server name or resource might be invalid. Please verify the MCP server configuration and ensure the \"time\" server is correctly set up to provide the `get_current_time` resource. This task cannot proceed without a valid MCP server connection."}}
+{"type":"turn.completed","usage":{"input_tokens":10936,"cached_input_tokens":7828,"cache_write_input_tokens":0,"output_tokens":1366,"reasoning_output_tokens":0}}

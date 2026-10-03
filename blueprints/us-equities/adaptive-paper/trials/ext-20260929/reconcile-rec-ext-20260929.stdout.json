@@ -1,0 +1,71 @@
+{
+ "method": "alpaca-py TradingClient.get_orders(status=all, after, until, limit=500, asc); GET /v2/account/activities?activity_types=FILL (after, until, asc, page_size=100, page_token); get_all_positions; get_orders(status=open); joined in memory to the engine mover ledger (sqlite mode=ro) on client order id and (cum_qty, qty, price)",
+ "alpaca_py_version": "0.44.0",
+ "python": "3.12.3",
+ "observed_at": "2026-09-30T09:06:12.939158+00:00",
+ "endpoint": "paper",
+ "prefix": "rec-ext-20260929-",
+ "window": {
+  "after": "2026-09-29T20:00:00+00:00",
+  "until": "2026-09-30T00:10:00+00:00"
+ },
+ "orders_listed_in_window": 22,
+ "orders_with_prefix": 1,
+ "orders_without_prefix_in_window": 21,
+ "fill_activity_pages": 1,
+ "fill_activities_in_window": 35,
+ "fill_activities_without_prefix_order": 33,
+ "ledger_intents_with_prefix": 2,
+ "ledger_executions_with_prefix": 2,
+ "ledger_intents_not_listed_by_broker": [
+  "4-0000002"
+ ],
+ "ledger_broker_ids_not_in_listing": 0,
+ "executions_matched_on_cum_qty_qty_price": 2,
+ "executions_matched_on_execution_id_too": 2,
+ "max_ledger_vs_activity_time_skew_seconds": 0.002,
+ "unconfirmed_executions": [],
+ "orders": [
+  {
+   "order": "4-0000001",
+   "symbol": "BEX",
+   "side": "sell",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": true,
+   "qty": "24",
+   "limit_price": "40.42",
+   "broker_status": "filled",
+   "filled_qty": "24",
+   "filled_avg_price": "40.44",
+   "submitted_at": "2026-09-29T21:10:09.055226+00:00",
+   "filled_at": "2026-09-29T21:10:09.601400+00:00",
+   "broker_fill_activities": 2,
+   "broker_activity_qty_sum": "24",
+   "activity_types": {
+    "partial_fill": 1,
+    "fill": 1
+   },
+   "ledger_status": "filled",
+   "ledger_executions": 2,
+   "ledger_executions_matched": 2,
+   "ledger_broker_id_equals_order": true,
+   "agree": true
+  }
+ ],
+ "status_counts": {
+  "filled": 1
+ },
+ "broker_recomputed_realized_pnl_usd_by_trial": {
+  "4": "970.56"
+ },
+ "broker_recomputed_realized_pnl_usd_total": "970.56",
+ "positions_now": 1,
+ "position_symbols_now": [
+  "IOVA"
+ ],
+ "open_orders_now": 0,
+ "ledger_positions_nonzero": [
+  "IOVA"
+ ]
+}

@@ -1,0 +1,931 @@
+{
+  "schema_version": 1,
+  "layer_id": "backtesting-engine",
+  "catalog": "us-equities",
+  "review_date": "2026-10-01",
+  "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "reviewer": {
+    "model": "gpt-6.1-sol",
+    "effort": "max",
+    "family": "Codex"
+  },
+  "verdict": "corrected",
+  "c4": {
+    "independent_review_performed": true,
+    "no_unresolved_material_gap": false,
+    "remaining_gaps": [
+      "Replacement WSL host does not exist; installation, unchanged upstream suites and host lifecycle acceptance are unknown.",
+      "ib_async and Backtrader package-to-Git provenance remain unresolved; HftBacktest supported suite command retrieval remains incomplete.",
+      "Selected rc5 callback-loss behavior remains a retained failure; the upstream fix is a later commit, not acceptance of the recorded wheel.",
+      "One SPY one_zero parity case and synthetic EUR/USD quickstarts do not qualify finite liquidity/queue/impact, realistic closing-auction execution, or a complete as-known equity universe."
+    ]
+  },
+  "research_method": {
+    "scope": "One bounded independent trading source wave for six assigned layers; no universal SOTA, saturation or full convergence claim.",
+    "source_order": "Coordinator package metadata where relevant; native gh release/tag checks; exact source files; official docs. Reuse this pass's cited foundation sources when repository/pin/capability inputs match.",
+    "channels": {
+      "github_cli": "gh 2.101.0; native public API access succeeded",
+      "skill_discovery": "Supported openai/skills curated list-skills.py --format json succeeded; research/output skills read, no skill installed",
+      "source_reading": "RTK-prefixed commands; large JSON/tree/source responses processed in context-mode outside model context"
+    },
+    "installed_probe_boundary": "importlib.metadata in the coordinator default Python found none of nautilus_trader, alpaca-py, skfolio, PyPortfolioOpt or ib_async; this is not an all-environments absence claim or a replacement-host observation.",
+    "account_and_models": "Native client accounts/routes and explicit model choices preserved. No broker/provider calls, market-data acquisition, model trials, sign-in, install or trading execution in this source wave.",
+    "usage": "reviewer/provider usage not returned; unknown"
+  },
+  "new_host_acceptance": "unknown; replacement WSL distro not created",
+  "selected_repositories": [
+    {
+      "component_id": "nautilus-trader",
+      "repository": "https://github.com/nautechsystems/nautilus_trader",
+      "pin_of_record": "2.0.0rc5 / 1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "pin_source": "manifests/stack.json:1938",
+      "source_pinned_url": "https://github.com/nautechsystems/nautilus_trader/tree/1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "upstream_currency": {
+        "latest_github_stable_release": "v1.231.0",
+        "published_at": "2026-08-02T18:53:49Z",
+        "latest_release_source": "https://github.com/nautechsystems/nautilus_trader/releases/tag/v1.231.0",
+        "observed_head": "a2db48153a5235a8d78f393d3452b8b74a2c736f",
+        "head_date": "2026-10-01T07:54:41Z",
+        "metadata_source": "https://api.github.com/repos/nautechsystems/nautilus_trader",
+        "adoption": "currency/source observation only; pin of record retained",
+        "latest_prerelease": "v2.0.0rc5",
+        "prerelease_published_at": "2026-09-15T06:17:23Z",
+        "prerelease_source": "https://github.com/nautechsystems/nautilus_trader/releases/tag/v2.0.0rc5",
+        "latest_endpoint_limit": "releases/latest returns stable v1.231.0; release-list/tag checks retain the selected prerelease"
+      },
+      "role": "User-selected Rust v2 backtest/execution destination; native IBKR remains separately unqualified.",
+      "native_install": {
+        "command": "pip install --pre nautilus_trader==2.0.0rc5",
+        "source": "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/README.md",
+        "evidence_class": "source-only; not run in this wave",
+        "recipe_pin": "2.0.0rc5 / 1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+        "recipe_source_ref": "https://github.com/nautechsystems/nautilus_trader/tree/1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+        "upstream_document_binding": {
+          "url": "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/README.md#L273",
+          "document_line": 273,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "make cargo-test NEXTEST_PROFILE=ci; make pytest",
+        "source": "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/.github/workflows/test.yml",
+        "evidence_class": "source-only; not run in this wave",
+        "additional_source": "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/Makefile",
+        "class_boundary": "Supported unchanged upstream suites are unexecuted here; historical unchanged quickstart is an upstream example using synthetic EUR/USD."
+      },
+      "evidence_class": "new primary-source review; historical native evidence, if linked, retains its original scope",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "retained_evidence": [
+        "evidence/receipts/native-nautilus-v2-20260920.json",
+        "evidence/receipts/native-nautilus-ci-20260920.json",
+        "blueprints/us-equities/engine-nautilus/spy-parity/verdict-v2.json"
+      ],
+      "selected_ibkr_source": "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/docs/integrations/interactive_brokers.md",
+      "tag_resolution": {
+        "tag_object": "34de0d6f886a9fe8359f9d6590f43f53c86b1d32",
+        "commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+        "source": "https://api.github.com/repos/nautechsystems/nautilus_trader/git/tags/34de0d6f886a9fe8359f9d6590f43f53c86b1d32",
+        "returned_exit_code": 0
+      }
+    },
+    {
+      "component_id": "lean",
+      "repository": "https://github.com/quantconnect/lean",
+      "pin_of_record": "985ef30 with documented dependency remediation",
+      "pin_source": "manifests/stack.json:1367",
+      "source_pinned_url": "https://github.com/quantconnect/lean/tree/985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+      "upstream_currency": {
+        "latest_github_stable_release": "v2.4.0.1",
+        "published_at": "2017-08-08T20:57:57Z",
+        "latest_release_source": "https://github.com/QuantConnect/Lean/releases/tag/v2.4.0.1",
+        "observed_head": "41c6e603e5671ca7b5d3de0cbe13b3c4b109bba4",
+        "head_date": "2026-09-30T16:10:07Z",
+        "metadata_source": "https://api.github.com/repos/quantconnect/lean",
+        "adoption": "currency/source observation only; pin of record retained"
+      },
+      "role": "Retained historical comparison/oracle, with documented dependency remediation; destination unchanged.",
+      "native_install": {
+        "command": "dotnet build QuantConnect.Lean.sln",
+        "source": "https://github.com/quantconnect/lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/readme.md",
+        "evidence_class": "source-only; not run in this wave",
+        "recipe_pin": "985ef30 with documented dependency remediation",
+        "recipe_source_ref": "https://github.com/quantconnect/lean/tree/985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+        "upstream_document_binding": {
+          "url": "https://github.com/quantconnect/lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/readme.md#L165",
+          "document_line": 165,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "dotnet test ./Tests/bin/Release/QuantConnect.Tests.dll --blame-hang-timeout 300seconds --blame-crash --filter \"TestCategory!=TravisExclude&TestCategory!=ResearchRegressionTests\"",
+        "source": "https://github.com/quantconnect/lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/.github/workflows/gh-actions.yml",
+        "evidence_class": "source-only; not run in this wave",
+        "qualification": "Original workflow command prefix; CI appends its runner-specific test parameters. Not run here."
+      },
+      "evidence_class": "new primary-source review; historical native evidence, if linked, retains its original scope",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "retained_evidence": [
+        "blueprints/us-equities/engine/receipt.json",
+        "blueprints/us-equities/engine/resolution-receipt.json"
+      ]
+    },
+    {
+      "component_id": "alpaca-py",
+      "repository": "https://github.com/alpacahq/alpaca-py",
+      "pin_of_record": "0.44.0",
+      "pin_source": "manifests/stack.json:1418",
+      "source_pinned_url": "https://github.com/alpacahq/alpaca-py/tree/v0.44.0",
+      "upstream_currency": {
+        "latest_github_stable_release": "v0.44.0",
+        "published_at": "2026-08-11T10:11:55Z",
+        "latest_release_source": "https://github.com/alpacahq/alpaca-py/releases/tag/v0.44.0",
+        "observed_head": "c85707ba0a381239b593fd1ce208839accc01fec",
+        "head_date": "2026-09-28T15:37:46Z",
+        "metadata_source": "https://api.github.com/repos/alpacahq/alpaca-py",
+        "adoption": "currency/source observation only; pin of record retained"
+      },
+      "role": "Separate official ingestion and deterministic paper-lifecycle SDK; not a Nautilus v2 adapter.",
+      "native_install": {
+        "command": "pip install alpaca-py==0.44.0",
+        "source": "https://github.com/alpacahq/alpaca-py/blob/v0.44.0/README.md",
+        "evidence_class": "source-only; not run in this wave",
+        "recipe_pin": "0.44.0",
+        "recipe_source_ref": "https://github.com/alpacahq/alpaca-py/tree/v0.44.0",
+        "upstream_document_binding": {
+          "url": "https://github.com/alpacahq/alpaca-py/blob/v0.44.0/README.md#L51",
+          "document_line": 51,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "poetry install; poetry run pytest",
+        "source": "https://github.com/alpacahq/alpaca-py/blob/v0.44.0/Makefile",
+        "evidence_class": "source-only; not run in this wave"
+      },
+      "evidence_class": "new primary-source review; historical native evidence, if linked, retains its original scope",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "retained_evidence": [
+        "blueprints/us-equities/authenticated-data/native-receipt.json",
+        "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json"
+      ]
+    }
+  ],
+  "alternatives": [
+    {
+      "component_id": "skfolio",
+      "repository": "https://github.com/skfolio/skfolio",
+      "pin_of_record": "1.2.9",
+      "pin_source": "manifests/stack.json:1492",
+      "source_pinned_url": "https://github.com/skfolio/skfolio/tree/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+      "upstream_currency": {
+        "latest_github_stable_release": "v1.4.10",
+        "published_at": "2026-09-30T22:15:00Z",
+        "latest_release_source": "https://github.com/skfolio/skfolio/releases/tag/v1.4.10",
+        "observed_head": "4a222c261030b6f83d9d186226eea46b76ce2b06",
+        "head_date": "2026-09-30T22:14:57Z",
+        "metadata_source": "https://api.github.com/repos/skfolio/skfolio",
+        "adoption": "currency/source observation only; pin of record retained"
+      },
+      "role": "Bounded causal research evaluation/optimizer candidate; not broker risk enforcement or an accepted profitable strategy.",
+      "native_install": {
+        "command": "pip install skfolio==1.2.9",
+        "source": "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/README.rst",
+        "evidence_class": "source-only; not run in this wave",
+        "recipe_pin": "1.2.9",
+        "recipe_source_ref": "https://github.com/skfolio/skfolio/tree/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+        "upstream_document_binding": {
+          "url": "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/README.rst#L97",
+          "document_line": 97,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "uv sync; uv run --no-sync pytest -q tests",
+        "source": "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/.github/workflows/ci.yml",
+        "evidence_class": "source-only; not run in this wave"
+      },
+      "evidence_class": "new primary-source review; historical native evidence, if linked, retains its original scope",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "retained_evidence": [
+        "blueprints/us-equities/research-evaluation/receipt.json"
+      ],
+      "name": "skfolio",
+      "verdict": "Bounded causal research evaluation/optimizer candidate; not broker risk enforcement or an accepted profitable strategy.",
+      "sources": [
+        "https://github.com/skfolio/skfolio/tree/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee"
+      ],
+      "catalog_disposition": "conditional; research optimizer only"
+    },
+    {
+      "component_id": "lean-alpaca",
+      "repository": "https://github.com/quantconnect/lean.brokerages.alpaca",
+      "pin_of_record": "1973f6165bee212acf656ed2f9cb0af86d4f2a18",
+      "pin_source": "catalogs/us-equities/engines-strategies.json:61",
+      "source_pinned_url": "https://github.com/quantconnect/lean.brokerages.alpaca/tree/1973f6165bee212acf656ed2f9cb0af86d4f2a18",
+      "upstream_currency": {
+        "latest_github_stable_release": null,
+        "published_at": null,
+        "latest_release_source": "https://api.github.com/repos/quantconnect/lean.brokerages.alpaca/releases/latest",
+        "observed_head": "e69f39b0d8869329cf084d08dfce7a3b5985b4d0",
+        "head_date": "2026-09-28T13:44:48Z",
+        "metadata_source": "https://api.github.com/repos/quantconnect/lean.brokerages.alpaca",
+        "adoption": "currency/source observation only; pin of record retained"
+      },
+      "role": "conditional/reference candidate; not newly adopted",
+      "native_install": {
+        "command": "dotnet build --configuration Release",
+        "source": "https://github.com/quantconnect/lean.brokerages.alpaca/blob/1973f6165bee212acf656ed2f9cb0af86d4f2a18/README.md",
+        "evidence_class": "source-only; not run in this wave",
+        "recipe_pin": "1973f6165bee212acf656ed2f9cb0af86d4f2a18",
+        "recipe_source_ref": "https://github.com/quantconnect/lean.brokerages.alpaca/tree/1973f6165bee212acf656ed2f9cb0af86d4f2a18",
+        "upstream_document_binding": {
+          "url": "https://github.com/quantconnect/lean.brokerages.alpaca/blob/1973f6165bee212acf656ed2f9cb0af86d4f2a18/.github/workflows/gh-actions.yml#L59",
+          "document_line": 59,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "dotnet test ./QuantConnect.AlpacaBrokerage.Tests/bin/Release/QuantConnect.Brokerages.Alpaca.Tests.dll",
+        "source": "https://github.com/quantconnect/lean.brokerages.alpaca/blob/1973f6165bee212acf656ed2f9cb0af86d4f2a18/.github/workflows/gh-actions.yml",
+        "evidence_class": "source-only; not run in this wave"
+      },
+      "evidence_class": "pinned source review and currency metadata only; native commands unexecuted",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "name": "LEAN Alpaca brokerage",
+      "verdict": "Retain conditional LEAN plugin reference. A plugin test or historical LEAN replay does not qualify the separate selected alpaca-py paper path.",
+      "sources": [
+        "https://github.com/quantconnect/lean.brokerages.alpaca/blob/1973f6165bee212acf656ed2f9cb0af86d4f2a18/README.md",
+        "https://github.com/quantconnect/lean.brokerages.alpaca/blob/1973f6165bee212acf656ed2f9cb0af86d4f2a18/.github/workflows/gh-actions.yml"
+      ],
+      "trading_fit_delta": "Assessed for backtesting-engine; no claim of destination replacement, profitable strategy, broker/provider/GPU run or new-host acceptance."
+    },
+    {
+      "component_id": "lumibot",
+      "repository": "https://github.com/lumiwealth/lumibot",
+      "pin_of_record": "4.5.91",
+      "pin_source": "catalogs/us-equities/engines-strategies.json:205",
+      "source_pinned_url": "https://github.com/lumiwealth/lumibot/tree/f987da3e2c81a5ae2cb6edf35457d2aa54aacf8b",
+      "upstream_currency": {
+        "latest_github_stable_release": "v4.6.2",
+        "published_at": "2026-09-27T20:19:48Z",
+        "latest_release_source": "https://github.com/Lumiwealth/lumibot/releases/tag/v4.6.2",
+        "observed_head": "b068e8055dc52db93b6d22e0b230b1cf797a3e3f",
+        "head_date": "2026-09-27T19:35:02Z",
+        "metadata_source": "https://api.github.com/repos/lumiwealth/lumibot",
+        "adoption": "currency/source observation only; pin of record retained"
+      },
+      "role": "conditional/reference candidate; not newly adopted",
+      "native_install": {
+        "command": "pip install -r requirements_dev.txt; pip install -e .",
+        "source": "https://github.com/lumiwealth/lumibot/blob/f987da3e2c81a5ae2cb6edf35457d2aa54aacf8b/README.md",
+        "evidence_class": "source-only; not run in this wave",
+        "recipe_pin": "4.5.91",
+        "recipe_source_ref": "https://github.com/lumiwealth/lumibot/tree/f987da3e2c81a5ae2cb6edf35457d2aa54aacf8b",
+        "upstream_document_binding": {
+          "url": "https://github.com/lumiwealth/lumibot/blob/f987da3e2c81a5ae2cb6edf35457d2aa54aacf8b/README.md#L546",
+          "document_line": 546,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "pytest",
+        "source": "https://github.com/lumiwealth/lumibot/blob/f987da3e2c81a5ae2cb6edf35457d2aa54aacf8b/README.md",
+        "evidence_class": "source-only; not run in this wave"
+      },
+      "evidence_class": "pinned source review and currency metadata only; native commands unexecuted",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "name": "Lumibot",
+      "verdict": "Python broker/backtest challenger. Native execution comparison and unresolved GPL-3.0 LICENSE versus MIT metadata/badge conflict remain conditions; current v4.6.2 IBKR paging/lookahead fixes reopen a bounded source comparison.",
+      "sources": [
+        "https://github.com/lumiwealth/lumibot/blob/f987da3e2c81a5ae2cb6edf35457d2aa54aacf8b/README.md",
+        "https://github.com/lumiwealth/lumibot/blob/f987da3e2c81a5ae2cb6edf35457d2aa54aacf8b/README.md",
+        "https://github.com/lumiwealth/lumibot/blob/f987da3e2c81a5ae2cb6edf35457d2aa54aacf8b/LICENSE"
+      ],
+      "trading_fit_delta": "Assessed for backtesting-engine; no claim of destination replacement, profitable strategy, broker/provider/GPU run or new-host acceptance."
+    },
+    {
+      "component_id": "vectorbt",
+      "repository": "https://github.com/polakowo/vectorbt",
+      "pin_of_record": "1.1.0",
+      "pin_source": "catalogs/us-equities/engines-strategies.json:251",
+      "source_pinned_url": "https://github.com/polakowo/vectorbt/tree/259d2d89fe2e7638baf3ca76c394937cd32b656d",
+      "upstream_currency": {
+        "latest_github_stable_release": "v1.1.1",
+        "published_at": "2026-09-26T06:12:54Z",
+        "latest_release_source": "https://github.com/polakowo/vectorbt/releases/tag/v1.1.1",
+        "observed_head": "ceffc501f2d37033a79dd86a9f883e69ec6977bd",
+        "head_date": "2026-09-26T11:24:03Z",
+        "metadata_source": "https://api.github.com/repos/polakowo/vectorbt",
+        "adoption": "currency/source observation only; pin of record retained"
+      },
+      "role": "conditional/reference candidate; not newly adopted",
+      "native_install": {
+        "command": "pip install -e .",
+        "source": "https://github.com/polakowo/vectorbt/blob/259d2d89fe2e7638baf3ca76c394937cd32b656d/docs/docs/getting-started/contributing.md",
+        "evidence_class": "source-only; not run in this wave",
+        "recipe_pin": "1.1.0",
+        "recipe_source_ref": "https://github.com/polakowo/vectorbt/tree/259d2d89fe2e7638baf3ca76c394937cd32b656d",
+        "upstream_document_binding": {
+          "url": "https://github.com/polakowo/vectorbt/blob/259d2d89fe2e7638baf3ca76c394937cd32b656d/docs/docs/getting-started/contributing.md#L17",
+          "document_line": 17,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "uv run --python .venv --no-sync pytest tests/",
+        "source": "https://github.com/polakowo/vectorbt/blob/259d2d89fe2e7638baf3ca76c394937cd32b656d/.github/workflows/tests.yml",
+        "evidence_class": "source-only; not run in this wave"
+      },
+      "evidence_class": "pinned source review and currency metadata only; native commands unexecuted",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "name": "vectorbt",
+      "verdict": "Useful vectorized research sweep candidate. It does not replace selected broker state; Apache-2.0 plus Commons Clause restrictions and separate PRO terms remain material.",
+      "sources": [
+        "https://github.com/polakowo/vectorbt/blob/259d2d89fe2e7638baf3ca76c394937cd32b656d/docs/docs/getting-started/contributing.md",
+        "https://github.com/polakowo/vectorbt/blob/259d2d89fe2e7638baf3ca76c394937cd32b656d/.github/workflows/tests.yml",
+        "https://github.com/polakowo/vectorbt/blob/259d2d89fe2e7638baf3ca76c394937cd32b656d/LICENSE.md"
+      ],
+      "trading_fit_delta": "Assessed for backtesting-engine; no claim of destination replacement, profitable strategy, broker/provider/GPU run or new-host acceptance."
+    },
+    {
+      "component_id": "backtrader",
+      "repository": "https://github.com/mementum/backtrader",
+      "pin_of_record": "1.9.78.123",
+      "pin_source": "catalogs/us-equities/engines-strategies.json:297",
+      "source_pinned_url": "https://github.com/mementum/backtrader/tree/b853d7c90b6721476eb5a5ea3135224e33db1f14",
+      "upstream_currency": {
+        "latest_github_stable_release": null,
+        "published_at": null,
+        "latest_release_source": "https://api.github.com/repos/mementum/backtrader/releases/latest",
+        "observed_head": "b853d7c90b6721476eb5a5ea3135224e33db1f14",
+        "head_date": "2023-04-19T14:13:08Z",
+        "metadata_source": "https://api.github.com/repos/mementum/backtrader",
+        "adoption": "currency/source observation only; pin of record retained"
+      },
+      "role": "conditional/reference candidate; not newly adopted",
+      "native_install": {
+        "command": "pip install backtrader==1.9.78.123",
+        "source": "https://github.com/mementum/backtrader/blob/b853d7c90b6721476eb5a5ea3135224e33db1f14/README.rst",
+        "evidence_class": "source-only; not run in this wave",
+        "recipe_pin": "1.9.78.123",
+        "recipe_source_ref": "https://github.com/mementum/backtrader/tree/b853d7c90b6721476eb5a5ea3135224e33db1f14",
+        "upstream_document_binding": {
+          "url": "https://github.com/mementum/backtrader/blob/b853d7c90b6721476eb5a5ea3135224e33db1f14/README.rst#L134",
+          "document_line": 134,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "python tests/test_comminfo.py",
+        "source": "https://github.com/mementum/backtrader/blob/b853d7c90b6721476eb5a5ea3135224e33db1f14/tests/test_comminfo.py",
+        "evidence_class": "source-only; not run in this wave"
+      },
+      "evidence_class": "pinned source review and currency metadata only; native commands unexecuted",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "name": "Backtrader",
+      "verdict": "Compatibility overlap. Published 1.9.78.123 exists, but the exact same-named Git tag was not resolved; observed source head is not package provenance or selected-destination lifecycle acceptance.",
+      "sources": [
+        "https://github.com/mementum/backtrader/blob/b853d7c90b6721476eb5a5ea3135224e33db1f14/README.rst",
+        "https://github.com/mementum/backtrader/blob/b853d7c90b6721476eb5a5ea3135224e33db1f14/tests/test_comminfo.py",
+        "https://pypi.org/project/backtrader/1.9.78.123/"
+      ],
+      "source_pin_boundary": "Catalog package version retained; reviewed observed HEAD is separate and does not establish package-to-Git provenance.",
+      "trading_fit_delta": "Assessed for backtesting-engine; no claim of destination replacement, profitable strategy, broker/provider/GPU run or new-host acceptance."
+    },
+    {
+      "component_id": "backtesting-py",
+      "repository": "https://github.com/kernc/backtesting.py",
+      "pin_of_record": "0.6.6",
+      "pin_source": "catalogs/us-equities/engines-strategies.json:338",
+      "source_pinned_url": "https://github.com/kernc/backtesting.py/tree/ca2e2611621e472542ba90f7243a1fa06a7d7108",
+      "upstream_currency": {
+        "latest_github_stable_release": null,
+        "published_at": null,
+        "latest_release_source": "https://api.github.com/repos/kernc/backtesting.py/releases/latest",
+        "observed_head": "ca2e2611621e472542ba90f7243a1fa06a7d7108",
+        "head_date": "2026-08-05T12:39:16Z",
+        "metadata_source": "https://api.github.com/repos/kernc/backtesting.py",
+        "adoption": "currency/source observation only; pin of record retained"
+      },
+      "role": "conditional/reference candidate; not newly adopted",
+      "native_install": {
+        "command": "pip install -e \".[doc,test,dev]\"",
+        "source": "https://github.com/kernc/backtesting.py/blob/ca2e2611621e472542ba90f7243a1fa06a7d7108/CONTRIBUTING.md",
+        "evidence_class": "source-only; not run in this wave",
+        "recipe_pin": "0.6.6",
+        "recipe_source_ref": "https://github.com/kernc/backtesting.py/tree/ca2e2611621e472542ba90f7243a1fa06a7d7108",
+        "upstream_document_binding": {
+          "url": "https://github.com/kernc/backtesting.py/blob/ca2e2611621e472542ba90f7243a1fa06a7d7108/CONTRIBUTING.md#L50",
+          "document_line": 50,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "python -m backtesting.test",
+        "source": "https://github.com/kernc/backtesting.py/blob/ca2e2611621e472542ba90f7243a1fa06a7d7108/CONTRIBUTING.md",
+        "evidence_class": "source-only; not run in this wave"
+      },
+      "evidence_class": "pinned source review and currency metadata only; native commands unexecuted",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "name": "backtesting.py",
+      "verdict": "Small strategy prototype/diagnostic only. Its explicit upstream test module does not provide the selected broker adapter or the full universe/corporate-action contract.",
+      "sources": [
+        "https://github.com/kernc/backtesting.py/blob/ca2e2611621e472542ba90f7243a1fa06a7d7108/CONTRIBUTING.md",
+        "https://github.com/kernc/backtesting.py/blob/ca2e2611621e472542ba90f7243a1fa06a7d7108/CONTRIBUTING.md"
+      ],
+      "trading_fit_delta": "Assessed for backtesting-engine; no claim of destination replacement, profitable strategy, broker/provider/GPU run or new-host acceptance."
+    },
+    {
+      "component_id": "zipline-reloaded",
+      "repository": "https://github.com/stefan-jansen/zipline-reloaded",
+      "pin_of_record": "3.1.1",
+      "pin_source": "catalogs/us-equities/engines-strategies.json:380",
+      "source_pinned_url": "https://github.com/stefan-jansen/zipline-reloaded/tree/943010b9da848e317fc520de87edade2b884d329",
+      "upstream_currency": {
+        "latest_github_stable_release": "3.1.1",
+        "published_at": "2025-07-23T21:30:00Z",
+        "latest_release_source": "https://github.com/stefan-jansen/zipline-reloaded/releases/tag/3.1.1",
+        "observed_head": "943010b9da848e317fc520de87edade2b884d329",
+        "head_date": "2025-11-13T15:14:32Z",
+        "metadata_source": "https://api.github.com/repos/stefan-jansen/zipline-reloaded",
+        "adoption": "currency/source observation only; pin of record retained"
+      },
+      "role": "conditional/reference candidate; not newly adopted",
+      "native_install": {
+        "command": "pip install zipline-reloaded==3.1.1",
+        "source": "https://github.com/stefan-jansen/zipline-reloaded/blob/943010b9da848e317fc520de87edade2b884d329/README.md",
+        "evidence_class": "source-only; not run in this wave",
+        "recipe_pin": "3.1.1",
+        "recipe_source_ref": "https://github.com/stefan-jansen/zipline-reloaded/tree/943010b9da848e317fc520de87edade2b884d329",
+        "upstream_document_binding": {
+          "url": "https://github.com/stefan-jansen/zipline-reloaded/blob/943010b9da848e317fc520de87edade2b884d329/README.md#L41",
+          "document_line": 41,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "tox -e py312-pandas222-numpy20",
+        "source": "https://github.com/stefan-jansen/zipline-reloaded/blob/943010b9da848e317fc520de87edade2b884d329/.github/workflows/ci_tests_quick.yml",
+        "evidence_class": "source-only; not run in this wave"
+      },
+      "evidence_class": "pinned source review and currency metadata only; native commands unexecuted",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "name": "Zipline Reloaded",
+      "verdict": "Conditional equity data/calendar and adjustment reference. Compare representative dividend/split/delisting cases before changing the retained oracle or selected engine.",
+      "sources": [
+        "https://github.com/stefan-jansen/zipline-reloaded/blob/943010b9da848e317fc520de87edade2b884d329/README.md",
+        "https://github.com/stefan-jansen/zipline-reloaded/blob/943010b9da848e317fc520de87edade2b884d329/.github/workflows/ci_tests_quick.yml"
+      ],
+      "trading_fit_delta": "Assessed for backtesting-engine; no claim of destination replacement, profitable strategy, broker/provider/GPU run or new-host acceptance."
+    },
+    {
+      "component_id": "ib-async",
+      "repository": "https://github.com/ib-api-reloaded/ib_async",
+      "pin_of_record": "2.1.0",
+      "pin_source": "catalogs/us-equities/engines-strategies.json:1363",
+      "source_pinned_url": "https://github.com/ib-api-reloaded/ib_async/tree/ab629f34c1823ea4c1542f32f07377208a86bdfd",
+      "upstream_currency": {
+        "latest_github_stable_release": "v2.0.1",
+        "published_at": "2025-06-22T16:58:29Z",
+        "latest_release_source": "https://github.com/ib-api-reloaded/ib_async/releases/tag/v2.0.1",
+        "observed_head": "ab629f34c1823ea4c1542f32f07377208a86bdfd",
+        "head_date": "2025-12-06T15:32:58Z",
+        "metadata_source": "https://api.github.com/repos/ib-api-reloaded/ib_async",
+        "adoption": "currency/source observation only; pin of record retained"
+      },
+      "role": "conditional/reference candidate; not newly adopted",
+      "native_install": {
+        "command": "pip install ib_async==2.1.0",
+        "source": "https://github.com/ib-api-reloaded/ib_async/blob/ab629f34c1823ea4c1542f32f07377208a86bdfd/README.md",
+        "evidence_class": "source-only; not run in this wave",
+        "recipe_pin": "2.1.0",
+        "recipe_source_ref": "https://github.com/ib-api-reloaded/ib_async/tree/ab629f34c1823ea4c1542f32f07377208a86bdfd",
+        "upstream_document_binding": {
+          "url": "https://github.com/ib-api-reloaded/ib_async/blob/ab629f34c1823ea4c1542f32f07377208a86bdfd/README.md#L36",
+          "document_line": 36,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "poetry install --with=dev; poetry run pytest",
+        "source": "https://github.com/ib-api-reloaded/ib_async/blob/ab629f34c1823ea4c1542f32f07377208a86bdfd/README.md",
+        "evidence_class": "source-only; not run in this wave"
+      },
+      "evidence_class": "pinned source review and currency metadata only; native commands unexecuted",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "name": "ib_async",
+      "verdict": "Independent IBKR Python interface; selected Nautilus v2 uses its included Rust adapter. PyPI 2.1.0 is published while GitHub releases/latest returns v2.0.1; neither v2.1.0 nor 2.1.0 source tag resolved. Observed HEAD commands are qualified as separate source review.",
+      "sources": [
+        "https://github.com/ib-api-reloaded/ib_async/blob/ab629f34c1823ea4c1542f32f07377208a86bdfd/README.md",
+        "https://github.com/ib-api-reloaded/ib_async/blob/ab629f34c1823ea4c1542f32f07377208a86bdfd/README.md",
+        "https://pypi.org/project/ib_async/2.1.0/"
+      ],
+      "source_pin_boundary": "Catalog package version retained; reviewed observed HEAD is separate and does not establish package-to-Git provenance.",
+      "trading_fit_delta": "Assessed for backtesting-engine; no claim of destination replacement, profitable strategy, broker/provider/GPU run or new-host acceptance."
+    },
+    {
+      "component_id": "qlib",
+      "repository": "https://github.com/microsoft/qlib",
+      "pin_of_record": "0.9.7",
+      "pin_source": "catalogs/us-equities/engines-strategies.json:463",
+      "source_pinned_url": "https://github.com/microsoft/qlib/tree/be725493eb1a6bbb42bf11b37aa7669f59610ff1",
+      "upstream_currency": {
+        "latest_github_stable_release": "v0.9.7",
+        "published_at": "2025-08-15T09:49:17Z",
+        "latest_release_source": "https://github.com/microsoft/qlib/releases/tag/v0.9.7",
+        "observed_head": "be725493eb1a6bbb42bf11b37aa7669f59610ff1",
+        "head_date": "2026-09-16T06:56:07Z",
+        "metadata_source": "https://api.github.com/repos/microsoft/qlib",
+        "adoption": "currency/source observation only; pin of record retained"
+      },
+      "role": "conditional/reference candidate; not newly adopted",
+      "native_install": {
+        "command": "pip install -e \".[dev]\"",
+        "source": "https://github.com/microsoft/qlib/blob/be725493eb1a6bbb42bf11b37aa7669f59610ff1/README.md",
+        "evidence_class": "source-only; not run in this wave",
+        "recipe_pin": "0.9.7",
+        "recipe_source_ref": "https://github.com/microsoft/qlib/tree/be725493eb1a6bbb42bf11b37aa7669f59610ff1",
+        "upstream_document_binding": {
+          "url": "https://github.com/microsoft/qlib/blob/be725493eb1a6bbb42bf11b37aa7669f59610ff1/README.md#L204",
+          "document_line": 204,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "python -m pytest . -m \"not slow\" --durations=0",
+        "source": "https://github.com/microsoft/qlib/blob/be725493eb1a6bbb42bf11b37aa7669f59610ff1/.github/workflows/test_qlib_from_source.yml",
+        "evidence_class": "source-only; not run in this wave"
+      },
+      "evidence_class": "pinned source review and currency metadata only; native commands unexecuted",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "name": "Qlib",
+      "verdict": "Conditional financial ML/PIT research reference. Supply audited as-known data and deterministic baselines; its workflow does not establish broker recovery or causal profitability.",
+      "sources": [
+        "https://github.com/microsoft/qlib/blob/be725493eb1a6bbb42bf11b37aa7669f59610ff1/README.md",
+        "https://github.com/microsoft/qlib/blob/be725493eb1a6bbb42bf11b37aa7669f59610ff1/.github/workflows/test_qlib_from_source.yml"
+      ],
+      "trading_fit_delta": "Assessed for backtesting-engine; no claim of destination replacement, profitable strategy, broker/provider/GPU run or new-host acceptance."
+    },
+    {
+      "component_id": "finrl",
+      "repository": "https://github.com/ai4finance-foundation/finrl",
+      "pin_of_record": "2334a5fe6d30629157f13c3b0319e1637e15e123",
+      "pin_source": "catalogs/us-equities/engines-strategies.json:511",
+      "source_pinned_url": "https://github.com/ai4finance-foundation/finrl/tree/2334a5fe6d30629157f13c3b0319e1637e15e123",
+      "upstream_currency": {
+        "latest_github_stable_release": "v0.3.8",
+        "published_at": "2026-03-20T10:39:25Z",
+        "latest_release_source": "https://github.com/AI4Finance-Foundation/FinRL/releases/tag/v0.3.8",
+        "observed_head": "e60e26e4870f00fbc704c6297edfd9d81816b3d3",
+        "head_date": "2026-09-28T03:59:35Z",
+        "metadata_source": "https://api.github.com/repos/ai4finance-foundation/finrl",
+        "adoption": "currency/source observation only; pin of record retained"
+      },
+      "role": "conditional/reference candidate; not newly adopted",
+      "native_install": {
+        "command": "pip install -e .",
+        "source": "https://github.com/ai4finance-foundation/finrl/blob/2334a5fe6d30629157f13c3b0319e1637e15e123/README.md",
+        "evidence_class": "source-only; not run in this wave",
+        "recipe_pin": "2334a5fe6d30629157f13c3b0319e1637e15e123",
+        "recipe_source_ref": "https://github.com/ai4finance-foundation/finrl/tree/2334a5fe6d30629157f13c3b0319e1637e15e123",
+        "upstream_document_binding": {
+          "url": "https://github.com/ai4finance-foundation/finrl/blob/2334a5fe6d30629157f13c3b0319e1637e15e123/README.md#L135",
+          "document_line": 135,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "bash docker/bin/build_container.sh; bash docker/bin/test.sh",
+        "source": "https://github.com/ai4finance-foundation/finrl/blob/2334a5fe6d30629157f13c3b0319e1637e15e123/.github/workflows/test.yml",
+        "evidence_class": "source-only; not run in this wave"
+      },
+      "evidence_class": "pinned source review and currency metadata only; native commands unexecuted",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "name": "FinRL",
+      "verdict": "Research-only RL framework. Native simulator tests and model descriptions cannot replace baseline, data, capacity and broker acceptance gates.",
+      "sources": [
+        "https://github.com/ai4finance-foundation/finrl/blob/2334a5fe6d30629157f13c3b0319e1637e15e123/README.md",
+        "https://github.com/ai4finance-foundation/finrl/blob/2334a5fe6d30629157f13c3b0319e1637e15e123/.github/workflows/test.yml"
+      ],
+      "trading_fit_delta": "Assessed for backtesting-engine; no claim of destination replacement, profitable strategy, broker/provider/GPU run or new-host acceptance."
+    },
+    {
+      "component_id": "tradingagents",
+      "repository": "https://github.com/tauricresearch/tradingagents",
+      "pin_of_record": "v0.5.0",
+      "pin_source": "catalogs/us-equities/engines-strategies.json:1583",
+      "source_pinned_url": "https://github.com/tauricresearch/tradingagents/tree/v0.5.0",
+      "upstream_currency": {
+        "latest_github_stable_release": "v0.5.2",
+        "published_at": "2026-09-29T05:59:23Z",
+        "latest_release_source": "https://github.com/TauricResearch/TradingAgents/releases/tag/v0.5.2",
+        "observed_head": "8b22d43d01d9ddda5d686d093d5385884622f3de",
+        "head_date": "2026-09-29T06:15:09Z",
+        "metadata_source": "https://api.github.com/repos/tauricresearch/tradingagents",
+        "adoption": "currency/source observation only; pin of record retained"
+      },
+      "role": "conditional/reference candidate; not newly adopted",
+      "native_install": {
+        "command": "pip install .",
+        "source": "https://github.com/tauricresearch/tradingagents/blob/v0.5.0/README.md",
+        "evidence_class": "source-only; not run in this wave",
+        "recipe_pin": "v0.5.0",
+        "recipe_source_ref": "https://github.com/tauricresearch/tradingagents/tree/v0.5.0",
+        "upstream_document_binding": {
+          "url": "https://github.com/tauricresearch/tradingagents/blob/v0.5.0/README.md#L126",
+          "document_line": 126,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "pytest -q",
+        "source": "https://github.com/tauricresearch/tradingagents/blob/v0.5.0/.github/workflows/ci.yml",
+        "evidence_class": "source-only; not run in this wave"
+      },
+      "evidence_class": "pinned source review and currency metadata only; native commands unexecuted",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "name": "TradingAgents",
+      "verdict": "Research-only LLM challenger. v0.5.2 adds dated-report provenance and dated-path safeguards; those source claims still need a frozen causal comparison. No model gets numeric/risk/order state authority from this review.",
+      "sources": [
+        "https://github.com/tauricresearch/tradingagents/blob/v0.5.0/README.md",
+        "https://github.com/tauricresearch/tradingagents/blob/v0.5.0/.github/workflows/ci.yml"
+      ],
+      "trading_fit_delta": "Assessed for backtesting-engine; no claim of destination replacement, profitable strategy, broker/provider/GPU run or new-host acceptance."
+    },
+    {
+      "component_id": "pyportfolioopt",
+      "repository": "https://github.com/pyportfolio/pyportfolioopt",
+      "pin_of_record": "1.6.0",
+      "pin_source": "catalogs/us-equities/engines-strategies.json:644",
+      "source_pinned_url": "https://github.com/pyportfolio/pyportfolioopt/tree/v1.6.0",
+      "upstream_currency": {
+        "latest_github_stable_release": "v1.6.0",
+        "published_at": "2026-02-26T23:25:46Z",
+        "latest_release_source": "https://github.com/PyPortfolio/PyPortfolioOpt/releases/tag/v1.6.0",
+        "observed_head": "a6638d2e06dae6f444fd022cfd4b3c528902a85b",
+        "head_date": "2026-07-07T21:13:11Z",
+        "metadata_source": "https://api.github.com/repos/pyportfolio/pyportfolioopt",
+        "adoption": "currency/source observation only; pin of record retained"
+      },
+      "role": "conditional/reference candidate; not newly adopted",
+      "native_install": {
+        "command": "pip install pyportfolioopt==1.6.0",
+        "source": "https://github.com/pyportfolio/pyportfolioopt/blob/v1.6.0/README.md",
+        "evidence_class": "source-only; not run in this wave",
+        "recipe_pin": "1.6.0",
+        "recipe_source_ref": "https://github.com/pyportfolio/pyportfolioopt/tree/v1.6.0",
+        "upstream_document_binding": {
+          "url": "https://github.com/pyportfolio/pyportfolioopt/blob/v1.6.0/README.md#L59",
+          "document_line": 59,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "make test",
+        "source": "https://github.com/pyportfolio/pyportfolioopt/blob/v1.6.0/Makefile",
+        "evidence_class": "source-only; not run in this wave"
+      },
+      "evidence_class": "pinned source review and currency metadata only; native commands unexecuted",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "name": "PyPortfolioOpt",
+      "verdict": "Conditional optimizer baseline for mean/variance, Black-Litterman and HRP. Match inputs, constraints, costs and solver feasibility against skfolio; optimization is separate from pre-trade enforcement.",
+      "sources": [
+        "https://github.com/pyportfolio/pyportfolioopt/blob/v1.6.0/README.md",
+        "https://github.com/pyportfolio/pyportfolioopt/blob/v1.6.0/Makefile"
+      ],
+      "trading_fit_delta": "Assessed for backtesting-engine; no claim of destination replacement, profitable strategy, broker/provider/GPU run or new-host acceptance."
+    },
+    {
+      "component_id": "ib-gateway-docker",
+      "repository": "https://github.com/gnzsnz/ib-gateway-docker",
+      "pin_of_record": "no adopted Docker image pin in the layer row; observed source 8a22deaa6cab86f9ad5c86ff4f0d6efbef718f10",
+      "pin_source": "no adopted pin; frozen review source only",
+      "source_pinned_url": "https://github.com/gnzsnz/ib-gateway-docker/tree/8a22deaa6cab86f9ad5c86ff4f0d6efbef718f10",
+      "upstream_currency": {
+        "latest_github_stable_release": "ibgateway-latest@10.51.1b",
+        "published_at": "2026-09-30T12:10:09Z",
+        "latest_release_source": "https://github.com/gnzsnz/ib-gateway-docker/releases/tag/ibgateway-latest%4010.51.1b",
+        "observed_head": "8a22deaa6cab86f9ad5c86ff4f0d6efbef718f10",
+        "head_date": "2026-09-23T17:07:27Z",
+        "metadata_source": "https://api.github.com/repos/gnzsnz/ib-gateway-docker",
+        "adoption": "currency/source observation only; pin of record retained"
+      },
+      "role": "conditional/reference candidate; not newly adopted",
+      "native_install": {
+        "command": "docker-compose -f docker-compose.yml build --pull",
+        "source": "https://github.com/gnzsnz/ib-gateway-docker/blob/8a22deaa6cab86f9ad5c86ff4f0d6efbef718f10/CONTRIBUTING.md",
+        "evidence_class": "source-only; not run in this wave",
+        "recipe_pin": "no adopted Docker image pin in the layer row; observed source 8a22deaa6cab86f9ad5c86ff4f0d6efbef718f10",
+        "recipe_source_ref": "https://github.com/gnzsnz/ib-gateway-docker/tree/8a22deaa6cab86f9ad5c86ff4f0d6efbef718f10",
+        "upstream_document_binding": {
+          "url": "https://github.com/gnzsnz/ib-gateway-docker/blob/8a22deaa6cab86f9ad5c86ff4f0d6efbef718f10/CONTRIBUTING.md#L75",
+          "document_line": 75,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "docker compose up",
+        "source": "https://github.com/gnzsnz/ib-gateway-docker/blob/8a22deaa6cab86f9ad5c86ff4f0d6efbef718f10/README.md",
+        "evidence_class": "source-only; not run in this wave",
+        "class_boundary": "Supported startup operation requiring native sign-in; no unchanged acceptance suite identified in reviewed README/CONTRIBUTING. Not run."
+      },
+      "evidence_class": "pinned source review and currency metadata only; native commands unexecuted",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "name": "Dockerized IB Gateway",
+      "verdict": "Gateway packaging challenger for explicit restart/session-availability needs, not an automatic sign-in or reconciliation guarantee. Review source head is not an adopted image digest; paper/live ports and native MFA remain distinct.",
+      "sources": [
+        "https://github.com/gnzsnz/ib-gateway-docker/blob/8a22deaa6cab86f9ad5c86ff4f0d6efbef718f10/CONTRIBUTING.md",
+        "https://github.com/gnzsnz/ib-gateway-docker/blob/8a22deaa6cab86f9ad5c86ff4f0d6efbef718f10/README.md"
+      ],
+      "trading_fit_delta": "Assessed for backtesting-engine; no claim of destination replacement, profitable strategy, broker/provider/GPU run or new-host acceptance."
+    },
+    {
+      "component_id": "hftbacktest",
+      "repository": "https://github.com/nkaz001/hftbacktest",
+      "pin_of_record": "5f3ec40b2afb764e0fea112f941ed85523ef4e88",
+      "pin_source": "catalogs/us-equities/architecture/trading.json:422",
+      "source_pinned_url": "https://github.com/nkaz001/hftbacktest/tree/5f3ec40b2afb764e0fea112f941ed85523ef4e88",
+      "upstream_currency": {
+        "latest_github_stable_release": "rust-v0.9.4",
+        "published_at": "2025-12-10T16:17:40Z",
+        "latest_release_source": "https://github.com/nkaz001/hftbacktest/releases/tag/rust-v0.9.4",
+        "observed_head": "5f3ec40b2afb764e0fea112f941ed85523ef4e88",
+        "head_date": "2025-12-23T15:31:05Z",
+        "metadata_source": "https://api.github.com/repos/nkaz001/hftbacktest",
+        "adoption": "currency/source observation only; pin of record retained"
+      },
+      "role": "conditional/reference candidate; not newly adopted",
+      "native_install": {
+        "command": "cargo add hftbacktest",
+        "source": "https://github.com/nkaz001/hftbacktest/blob/5f3ec40b2afb764e0fea112f941ed85523ef4e88/hftbacktest/README.md",
+        "evidence_class": "source-only; not run in this wave",
+        "recipe_pin": "5f3ec40b2afb764e0fea112f941ed85523ef4e88",
+        "recipe_source_ref": "https://github.com/nkaz001/hftbacktest/tree/5f3ec40b2afb764e0fea112f941ed85523ef4e88",
+        "upstream_document_binding": {
+          "url": "https://github.com/nkaz001/hftbacktest/blob/5f3ec40b2afb764e0fea112f941ed85523ef4e88/hftbacktest/README.md#L30",
+          "document_line": 30,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": null,
+        "source": "https://github.com/nkaz001/hftbacktest/blob/5f3ec40b2afb764e0fea112f941ed85523ef4e88/hftbacktest/README.md",
+        "evidence_class": "source-only; not run in this wave",
+        "qualification": "Supported suite command not found in reviewed root/Rust READMEs and manifests; this finite command-retrieval gap remains open."
+      },
+      "evidence_class": "pinned source review and currency metadata only; native commands unexecuted",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "name": "HftBacktest",
+      "verdict": "Gap-specific queue-position and latency simulator. Its replay cannot change the market and assumes negligible impact; current Rust live connectors named in its README are Binance Futures/Bybit. It does not establish US-equity corporate actions or selected IBKR acceptance.",
+      "sources": [
+        "https://github.com/nkaz001/hftbacktest/blob/5f3ec40b2afb764e0fea112f941ed85523ef4e88/hftbacktest/README.md",
+        "https://github.com/nkaz001/hftbacktest/blob/5f3ec40b2afb764e0fea112f941ed85523ef4e88/hftbacktest/README.md",
+        "https://github.com/nkaz001/hftbacktest/blob/5f3ec40b2afb764e0fea112f941ed85523ef4e88/docs/order_fill.rst"
+      ],
+      "trading_fit_delta": "Assessed for backtesting-engine; no claim of destination replacement, profitable strategy, broker/provider/GPU run or new-host acceptance."
+    },
+    {
+      "component_id": "cvxportfolio",
+      "repository": "https://github.com/cvxgrp/cvxportfolio",
+      "pin_of_record": "1.5.1",
+      "pin_source": "catalogs/us-equities/engines-strategies.json:857",
+      "source_pinned_url": "https://github.com/cvxgrp/cvxportfolio/tree/1.5.1",
+      "upstream_currency": {
+        "latest_github_stable_release": "1.5.1",
+        "published_at": "2025-07-06T15:52:07Z",
+        "latest_release_source": "https://github.com/cvxgrp/cvxportfolio/releases/tag/1.5.1",
+        "observed_head": "351c782b9b8b395c1a5f886b77e0d55f1bc9396e",
+        "head_date": "2026-04-27T14:01:55Z",
+        "metadata_source": "https://api.github.com/repos/cvxgrp/cvxportfolio",
+        "adoption": "currency/source observation only; pin of record retained"
+      },
+      "role": "conditional/reference candidate; not newly adopted",
+      "native_install": {
+        "command": "pip install cvxportfolio==1.5.1",
+        "source": "https://github.com/cvxgrp/cvxportfolio/blob/1.5.1/README.rst",
+        "evidence_class": "source-only; not run in this wave",
+        "recipe_pin": "1.5.1",
+        "recipe_source_ref": "https://github.com/cvxgrp/cvxportfolio/tree/1.5.1",
+        "upstream_document_binding": {
+          "url": "https://github.com/cvxgrp/cvxportfolio/blob/1.5.1/README.rst#L56",
+          "document_line": 56,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "make test",
+        "source": "https://github.com/cvxgrp/cvxportfolio/blob/1.5.1/README.rst",
+        "evidence_class": "source-only; not run in this wave"
+      },
+      "evidence_class": "pinned source review and currency metadata only; native commands unexecuted",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "name": "CVXPortfolio",
+      "verdict": "Gap-specific multi-period constrained research with holding/transaction costs and leverage bounds. Explicit cash returns avoid optional data downloads. It is a causal-policy comparator, separate from order gateway/risk enforcement.",
+      "sources": [
+        "https://github.com/cvxgrp/cvxportfolio/blob/1.5.1/README.rst",
+        "https://github.com/cvxgrp/cvxportfolio/blob/1.5.1/README.rst",
+        "https://github.com/cvxgrp/cvxportfolio/blob/1.5.1/.github/workflows/test.yml"
+      ],
+      "trading_fit_delta": "Assessed for backtesting-engine; no claim of destination replacement, profitable strategy, broker/provider/GPU run or new-host acceptance."
+    }
+  ],
+  "corrections": [
+    {
+      "claim": "Using the earlier architecture wave's LEAN-primary / Nautilus-challenger labels as current selection.",
+      "correction": "The dated source wave is historical. Nautilus 2.0.0rc5 / IBKR is the selection of record; LEAN is the retained comparison engine and Alpaca is a separate SDK path.",
+      "deciding_source": "catalogs/us-equities/runtime-target.json:9; catalogs/us-equities/architecture/trading.json:7"
+    },
+    {
+      "claim": "GitHub releases/latest identifies the latest Nautilus candidate.",
+      "correction": "It returns stable 1.231.0. Release-list and selected-tag checks identify latest prerelease v2.0.0rc5; its annotated tag resolves to accepted commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e.",
+      "deciding_source": "https://api.github.com/repos/nautechsystems/nautilus_trader/releases?per_page=15; https://api.github.com/repos/nautechsystems/nautilus_trader/git/tags/34de0d6f886a9fe8359f9d6590f43f53c86b1d32"
+    },
+    {
+      "claim": "Closed issue #5039 closes rc5 callback failure acceptance.",
+      "correction": "The issue closed at later fix 82b66fee382086c803e27b9fd5c06f94d24d2831. The retained rc5 probe still records suppressed on_order_filled failure and continued bars. New logging and optional shutdown do not roll back callback effects.",
+      "deciding_source": "https://github.com/nautechsystems/nautilus_trader/commit/82b66fee382086c803e27b9fd5c06f94d24d2831; https://github.com/nautechsystems/nautilus_trader/issues/5039#issuecomment-5770122663; blueprints/us-equities/engine-nautilus/README.md:29"
+    }
+  ],
+  "evidence_assessment": [
+    "New evidence is public GitHub release/tag/source review and official documentation. No engine, model, broker, provider, GPU or unchanged upstream suite ran in this wave.",
+    "evidence/receipts/native-nautilus-v2-20260920.json retains two historical unchanged upstream synthetic EUR/USD example runs: 10,000 bars and 902 fills each, exact cash reconciliation and normalized economic agreement. The two initial empty-report attempts remain failures; this is upstream-example evidence, not the whole upstream suite.",
+    "blueprints/us-equities/engine-nautilus/spy-parity/verdict-v2.json is a local integration comparison: PASS, 136 checks and zero failed for one_zero. Its dividend SimulationModule and OCO open proxy are bounded mappings; the prior blocked verdict and non-general market-on-open behavior remain retained.",
+    "blueprints/us-equities/engine-nautilus/equity-replay/receipt.json states unlimited synthetic depth and retrospective close execution. No finite liquidity, queue, impact, auction or strategy profitability follows.",
+    "Source fit uses tagged READMEs/manifests/CI for every inherited engine candidate, exact license files for Lumibot/vectorbt, and gap-specific HFT/CVX source. Metadata only establishes identity/currency, not simulator quality."
+  ],
+  "failed_access": [
+    {
+      "source": "https://api.github.com/repos/ib-api-reloaded/ib_async/git/ref/tags/v2.1.0",
+      "result": "gh exit 1: HTTP 404; bare 2.1.0 source lookup also returned HTTP 404. PyPI 2.1.0 metadata succeeded; observed HEAD is separate source evidence."
+    },
+    {
+      "source": "https://api.github.com/repos/mementum/backtrader/contents/README.md?ref=1.9.78.123",
+      "result": "gh exit 1: HTTP 404; same recorded ref failed README/manifest lookup. PyPI 1.9.78.123 metadata succeeded; README.rst and an unchanged commission test recovered at observed HEAD."
+    },
+    {
+      "source": "https://docs.alpaca.markets/docs/trading/paper-trading",
+      "result": "HTTP 404; canonical https://docs.alpaca.markets/us/docs/paper-trading fetched successfully."
+    },
+    {
+      "source": "GitHub releases/latest for kernc/backtesting.py, mementum/backtrader and quantconnect/lean.brokerages.alpaca",
+      "result": "Each returned gh exit 1, HTTP 404; exact tags/source or observed head were inspected instead. This is not a capability-absence claim."
+    },
+    {
+      "source": "Case/layout assumptions: LEAN README.md, skfolio README.md, HftBacktest README.md, CVXPortfolio README.md; Qlib .github/workflows/test.yml",
+      "result": "gh exit 1, HTTP 404. Recoveries: LEAN readme.md; skfolio/HftBacktest/CVXPortfolio README.rst; Qlib test_qlib_from_source.yml. Source-command uncertainty for the HFT suite remains explicit."
+    }
+  ],
+  "omissions": [
+    "No installation, data acquisition, new backtest, strategy selection, market-data entitlement, broker sign-in, order or source/selection edit.",
+    "No whole-repository audit, universal landscape census or complete strategy/engine ranking."
+  ],
+  "next_wave": [
+    "Bound one source/native comparison of the released #5039 fix (when available) versus the retained rc5 callback guard, with failed callback effects, error visibility, continued dispatch and shutdown enabled/disabled frozen separately.",
+    "Extend the one_zero parity envelope to a finite-liquidity and corporate-action edge case only after freezing eligible as-known inputs; use HftBacktest only if tick/queue latency becomes a required contract."
+  ],
+  "reopen_on": [
+    "A released engine callback/reconciliation fix, changed selected-adapter support, failed numeric/control oracle, or a required data/execution horizon the retained envelope cannot represent."
+  ],
+  "named_candidate_accounting": {
+    "source": "catalogs/landscape/us-equities.json:2054",
+    "named_count": 16,
+    "accounted_for": 16,
+    "boundary": "accounting includes explicit source/command omissions; it is not completeness or native qualification"
+  }
+}

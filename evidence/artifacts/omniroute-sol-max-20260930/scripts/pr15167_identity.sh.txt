@@ -1,0 +1,16 @@
+#!/bin/bash
+# pr15167_identity.sh: identity of upstream PR 15167 from git alone (no REST call): the head, base and merge base, the commit's files, its stable patch-id, and the
+# same patch-id of the cherry-pick on our candidate. Run against the OmniRoute clone that holds refs/remotes/pr/15167.
+C=<OMNIROUTE-CLONE>
+echo "observed_utc=$(date -u +%FT%TZ)"
+echo "pr head:              $(git -C $C rev-parse refs/remotes/pr/15167)"
+echo "release/v3.8.52 tip:  $(git -C $C rev-parse refs/remotes/origin/release/v3.8.52)"
+echo "merge base:           $(git -C $C merge-base refs/remotes/pr/15167 refs/remotes/origin/release/v3.8.52)"
+echo "commits beyond base:  $(git -C $C rev-list --count $(git -C $C merge-base refs/remotes/pr/15167 refs/remotes/origin/release/v3.8.52)..refs/remotes/pr/15167)"
+echo "subject:              $(git -C $C log -1 --format=%s refs/remotes/pr/15167)"
+git -C $C diff --stat $(git -C $C merge-base refs/remotes/pr/15167 refs/remotes/origin/release/v3.8.52) refs/remotes/pr/15167 | sed 's/^/  /'
+echo "stable patch-id, upstream commit:   $(git -C $C show refs/remotes/pr/15167 | git patch-id --stable | cut -d' ' -f1)"
+echo "stable patch-id, our cherry-pick:   $(git -C <B3> show HEAD | git patch-id --stable | cut -d' ' -f1)"
+echo "candidate head (B3):                $(git -C <B3> rev-parse HEAD)"
+echo "running build head (B2):            $(git -C <B2> rev-parse HEAD)"
+echo "candidate commits over the release/v3.8.51 tip 2f42a9ac1: $(git -C <B3> rev-list --count 2f42a9ac19d1a247ec9ce5473b790843724b3061..HEAD)"

@@ -1,0 +1,103 @@
+#!/usr/bin/env python3
+"""Read-only capture of the two gateways' compression settings and stored context combos.
+
+GET only, loopback only, two keep-listed routes per port:
+  /api/settings/compression   (getCompressionSettings(): the CompressionConfig chatCore uses)
+  /api/context/combos         (listCompressionCombos(): stored context-combo pipelines)
+Never calls /api/settings or /api/providers*. Every response is parsed in code and filtered
+to an allowlist of non-secret CompressionConfig / combo fields before anything is written or
+printed; dropped key names (not values) are recorded.
+
+Usage: read_live_settings.py <outdir>
+"""
+import json
+import sys
+import urllib.request
+from datetime import datetime, timezone
+from pathlib import Path
+
+PORTS = {"20128": "http://127.0.0.1:20128", "20129": "http://127.0.0.1:20129"}
+ROUTES = {"compression": "/api/settings/compression", "combos": "/api/context/combos"}
+
+# CompressionConfig fields (open-sse/services/compression/types.ts L203-315 at c19983a66).
+CONFIG_KEYS = [
+    "enabled", "defaultMode", "autoTriggerMode", "autoTriggerTokens", "cacheMinutes",
+    "preserveSystemPrompt", "preserveSystemPromptMode", "mcpDescriptionCompressionEnabled",
+    "comboOverrides", "compressionComboId", "stackedPipeline", "omniglyph", "quantumLock",
+    "fidelityGate", "riskGate", "pipelineCircuitBreaker", "cavemanConfig", "cavemanOutputMode",
+    "outputStyles", "rtkConfig", "codexResponsesConfig", "relevanceConfig", "languageConfig",
+    "aggressive", "ultra", "lite", "headroom", "sessionDedup", "ccr", "contextEditing",
+    "liveZone", "engines", "activeComboId", "enginesExplicit", "contextBudget", "targetTokens",
+    "targetRatio", "ultraEngine", "ultraSlmPrewarm", "memoizeCompressionResults", "exclusions",
+]
+COMBO_KEYS = ["id", "name", "pipeline", "isDefault", "outputMode", "outputModeIntensity",
+              "languagePacks"]
+SECRETISH = ("key", "secret", "token", "password", "credential", "auth")
+
+
+def get(url):
+    req = urllib.request.Request(url, method="GET", headers={"Accept": "application/json"})
+    with urllib.request.urlopen(req, timeout=10) as r:
+        return r.status, json.loads(r.read().decode("utf-8"))
+
+
+def scrub(value, path, flagged):
+    """Recursively drop dict keys whose name looks secret-bearing; record their paths."""
+    if isinstance(value, dict):
+        out = {}
+        for k, v in value.items():
+            if any(s in k.lower() for s in SECRETISH) and k not in ("autoTriggerTokens", "targetTokens", "maxTokensPerMessage", "minTokenSurvivalPercent"):
+                flagged.append(f"{path}.{k}")
+                continue
+            out[k] = scrub(v, f"{path}.{k}", flagged)
+        return out
+    if isinstance(value, list):
+        return [scrub(v, f"{path}[]", flagged) for v in value]
+    return value
+
+
+def main():
+    outdir = Path(sys.argv[1])
+    outdir.mkdir(parents=True, exist_ok=True)
+    capture = {"schema": "s1-live-settings/1",
+               "captured_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+               "method": "GET only, loopback, keep-listed routes; allowlist-filtered", "ports": {}}
+    for port, base in PORTS.items():
+        entry = {}
+        status, body = get(base + ROUTES["compression"])
+        dropped = sorted(k for k in body.keys() if k not in CONFIG_KEYS) if isinstance(body, dict) else ["<non-object>"]
+        flagged = []
+        cfg = scrub({k: body[k] for k in CONFIG_KEYS if isinstance(body, dict) and k in body}, "config", flagged)
+        entry["compression"] = {"status": status, "config": cfg, "dropped_top_level_keys": dropped,
+                                "dropped_secretish_paths": flagged}
+        status, body = get(base + ROUTES["combos"])
+        combos = body.get("combos", []) if isinstance(body, dict) else []
+        flagged = []
+        kept = [scrub({k: c[k] for k in COMBO_KEYS if k in c}, "combo", flagged) for c in combos if isinstance(c, dict)]
+        entry["combos"] = {"status": status, "count": len(kept), "combos": kept,
+                           "dropped_secretish_paths": flagged}
+        capture["ports"][port] = entry
+    (outdir / "live-settings.json").write_text(json.dumps(capture, indent=1, sort_keys=True) + "\n")
+    # Print only named, non-secret summary fields.
+    for port, e in capture["ports"].items():
+        c = e["compression"]["config"]
+        on = sorted(k for k, v in (c.get("engines") or {}).items() if isinstance(v, dict) and v.get("enabled"))
+        print(port, "enabled=", c.get("enabled"), "defaultMode=", c.get("defaultMode"),
+              "enginesExplicit=", c.get("enginesExplicit"), "engines_on=", on,
+              "exclusions=", c.get("exclusions"), "autoTrigger=", c.get("autoTriggerMode"), c.get("autoTriggerTokens"),
+              "activeComboId=", c.get("activeComboId"))
+        print("   lite=", c.get("lite"), "sessionDedup=", c.get("sessionDedup"), "ccr=", c.get("ccr"),
+              "contextBudget=", c.get("contextBudget"), "liveZone=", c.get("liveZone"),
+              "outputStyles=", c.get("outputStyles"), "cavemanOutputMode.enabled=",
+              (c.get("cavemanOutputMode") or {}).get("enabled"), "preserveSystemPromptMode=", c.get("preserveSystemPromptMode"),
+              "cacheMinutes=", c.get("cacheMinutes"))
+        print("   dropped_top_level_keys=", e["compression"]["dropped_top_level_keys"],
+              "secretish=", e["compression"]["dropped_secretish_paths"])
+        for cb in e["combos"]["combos"]:
+            steps = [(s.get("engine"), s.get("intensity")) if isinstance(s, dict) else s for s in cb.get("pipeline", [])]
+            print("   combo", cb.get("id"), "name=", cb.get("name"), "default=", cb.get("isDefault"), "steps=", steps)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

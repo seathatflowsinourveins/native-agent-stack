@@ -24,7 +24,11 @@ jobs:
     # Raised to 20 on 2026-09-26: the unittest step alone ran 534s in run 36265075411, main's
     # job took 598s in run 36263674462, and runs 36265075411, 36265091632 and 36269293122
     # exceeded the 10-minute limit ("exceeded the maximum execution time of 10m0s").
-    timeout-minutes: 20
+    # Raised to 40 on 2026-09-29: after #502 this job took 753s in run 36572588202 (limit 1200s) and the
+    # measurement tooling still to merge for the #381 token E2E (units U1 to U5, U9, U10, U13) adds an
+    # estimated 600 to 900s of unit tests (one of them alone runs about 190s locally), which would
+    # pass the old limit; the limit stays a hang guard, not a test-time budget.
+    timeout-minutes: 40
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -150,6 +154,67 @@ jobs:
             blueprints/us-equities/data/requirements.lock
           echo "PROMOTION_GATE_PYTHON=$RUNNER_TEMP/promotion-gate-venv/bin/python3" >> "$GITHUB_ENV"
           echo "REQUIRE_PROMOTION_GATE_VENV=1" >> "$GITHUB_ENV"
+      - name: Provision the pinned tree-sitter-bash parser for the token-measurement lane tests
+        # examples/claude-native/workflows/shell-parser.pin.json pins web-tree-sitter and tree-sitter-bash (npm
+        # integrity values, the sha256 of the six files child-usage.mjs reads) and records the install command.
+        # This step runs that command with its <directory> placeholder filled in and retypes none of it. Without
+        # a verified install the kernel fails closed, so the Python lane tests and the node lane checks skip and
+        # this job passed with only the fail-closed gate exercised. tests/test_shell_parser_ci.py now fails this
+        # job when the loader does not report the pinned install, and fails the suite when this step is missing,
+        # late, retyped or no longer exported.
+        # The command is `npm install --ignore-scripts`, so no package script runs (npm/cli v10.9.8,
+        # workspaces/config/lib/definitions/definitions.js:863); the loader then checks every installed byte
+        # against the pin. The directory reaches the later steps of this job through the GITHUB_ENV file, not
+        # this step (github/docs, workflow-commands.md:652); a name outside [A-Za-z0-9._-] is refused so that
+        # no line can set another variable. The ubuntu-24.04 image 20260920.314.1 ships Node.js 22.23.2, Python
+        # 3.12.3 and npm 10.9.8 (actions/runner-images, Ubuntu2404-Readme.md).
+        run: |
+          python3 - <<'PYEOF'
+          import json, os, shlex, string, subprocess
+
+          with open("examples/claude-native/workflows/shell-parser.pin.json", encoding="utf-8") as handle:
+              pin = json.load(handle)
+          name = os.path.basename(pin["install"]["default_directory"])
+          alphanumeric = string.ascii_letters + string.digits
+          if not name or name[0] not in alphanumeric or any(char not in alphanumeric + "._-" for char in name):
+              raise SystemExit("the pin names an install directory outside [A-Za-z0-9._-]")
+          words = shlex.split(pin["install"]["command"])
+          if words[:2] != ["npm", "install"] or words.count("<directory>") != 1:
+              raise SystemExit("the pin's install command is not an npm install with one <directory>")
+          directory = os.path.join(os.environ["RUNNER_TEMP"], name)
+          os.makedirs(directory, exist_ok=True)
+          subprocess.run([directory if word == "<directory>" else word for word in words], check=True)
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env_file:
+              env_file.write("CHILD_USAGE_SHELL_PARSER=" + directory + "\n")
+          PYEOF
+      - name: Provision the pinned yaml package for the skills-modality SKILL.md reader tests
+        # tools/sota-convergence/landscape-sweep/skills-yaml.pin.json pins yaml@2.9.0 (the npm integrity recorded in
+        # vercel-labs/skills v1.7.0's lockfile and the sha256 of the 75 files skill_md.mjs runs) and records the install
+        # command. This step runs that command with its <directory> placeholder filled in and retypes none of it, as the
+        # tree-sitter step above does. Without a verified install skill_md.mjs parses nothing, so the reader tests skip
+        # and a skill survivor stops; tests/test_landscape_sweep_skills.py fails this job when the reader does not
+        # report the pinned install, and fails the suite when this step is missing, late, retyped or no longer
+        # exported. npm checks the tarball against the registry's integrity; skill_md.mjs then checks the lockfile's
+        # integrity and every file's sha256 against the pin, so a different tarball fails closed.
+        run: |
+          python3 - <<'PYEOF'
+          import json, os, shlex, string, subprocess
+
+          with open("tools/sota-convergence/landscape-sweep/skills-yaml.pin.json", encoding="utf-8") as handle:
+              pin = json.load(handle)
+          name = os.path.basename(pin["install"]["default_directory"])
+          alphanumeric = string.ascii_letters + string.digits
+          if not name or name[0] not in alphanumeric or any(char not in alphanumeric + "._-" for char in name):
+              raise SystemExit("the pin names an install directory outside [A-Za-z0-9._-]")
+          words = shlex.split(pin["install"]["command"])
+          if words[:2] != ["npm", "install"] or words.count("<directory>") != 1:
+              raise SystemExit("the pin's install command is not an npm install with one <directory>")
+          directory = os.path.join(os.environ["RUNNER_TEMP"], name)
+          os.makedirs(directory, exist_ok=True)
+          subprocess.run([directory if word == "<directory>" else word for word in words], check=True)
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env_file:
+              env_file.write("LANDSCAPE_SWEEP_SKILLS_YAML=" + directory + "\n")
+          PYEOF
       - name: Test validation failure modes
         run: python3 -m unittest
       - name: Test semantic evidence contract boundaries

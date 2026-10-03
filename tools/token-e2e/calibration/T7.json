@@ -1,0 +1,61 @@
+{
+ "schema": "token-e2e-calibration/1",
+ "template": "T7",
+ "clauses": [
+  "Retain an actual scoped historical hit and verify its claim against recipes/host-request-lane.md",
+  "no savings counter or current authority is inferred"
+ ],
+ "sources": [
+  {
+   "label": "recipes/host-request-lane.md",
+   "text": "The tracker trusts an issue only when the owner account wrote it: `author_association` `OWNER`, user type `User`, no GitHub App, and the repository owner as author."
+  },
+  {
+   "label": "frozen historical record digests",
+   "text": "record 1: 3fa9c2d41b7e0a55"
+  }
+ ],
+ "controls": [
+  {
+   "id": "ref",
+   "kind": "reference",
+   "answer": "The scoped memory query returned the earlier decision (frozen record 3fa9c2d41b7e0a55): the workstation host request lane trusts only issues written by the owner account. That matches recipes/host-request-lane.md. It is history: it establishes no savings counter and is not the current authority; the recipe is.\n\nSource excerpt: The tracker trusts an issue only when the owner account wrote it: `author_association` `OWNER`, user type `User`, no GitHub App, and the repository owner as author.",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": true
+   }
+  },
+  {
+   "id": "para",
+   "kind": "paraphrased",
+   "answer": "I retrieved the stored project decision (record 3fa9c2d41b7e0a55) that the request lane only believes the owner's own issues, and checked it against the lane recipe, which says the same thing. It records past reasoning only; it does not measure any saving and does not decide what applies now.",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": true
+   }
+  },
+  {
+   "id": "wrong-1",
+   "kind": "wrong",
+   "answer": "I answered from the recipe alone: the tracker trusts an issue only when the owner account wrote it. No historical record was retrieved, so there is no earlier decision to cite.",
+   "evidence": [],
+   "expected": {
+    "c1": false,
+    "c2": true
+   }
+  },
+  {
+   "id": "wrong-2",
+   "kind": "wrong",
+   "answer": "The retained decision (record 3fa9c2d41b7e0a55) matches the recipe, and it proves the lane saves about 40% of tokens; it is the current authority for how requests are trusted today.",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": false
+   }
+  }
+ ],
+ "extraction_controls": []
+}

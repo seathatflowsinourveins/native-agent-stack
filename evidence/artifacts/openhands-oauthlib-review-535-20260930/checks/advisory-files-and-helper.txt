@@ -1,0 +1,15 @@
+observed_utc=2026-09-30T08:54:07Z
+hashes in the reproduced install versus the hashes printed in the candidate's own callers output (evidence/wheel-relock-20260930-oauthlib-callers.txt at the head):
+  oauthlib/oauth2/rfc6749/endpoints/revocation.py: reproduced ebc5248a9cfb50e75e04298ee4a4d1a34bf06d415df2d4c6db60a4d21165ba6c | candidate's ebc5248a9cfb50e75e04298ee4a4d1a34bf06d415df2d4c6db60a4d21165ba6c | IDENTICAL
+  oauthlib/oauth2/rfc6749/grant_types/authorization_code.py: reproduced 0d6931601c4e88a078fb3ccf5f052c035ad6a4bb2171efb9c218e088a7272dc6 | candidate's 0d6931601c4e88a078fb3ccf5f052c035ad6a4bb2171efb9c218e088a7272dc6 | IDENTICAL
+  oauthlib/oauth2/rfc6749/endpoints/pre_configured.py: reproduced 6fe072e29e94f0bb6fa65bf8a223893b2702e8d77c52494b389f75bb3ebc6316 | candidate's 6fe072e29e94f0bb6fa65bf8a223893b2702e8d77c52494b389f75bb3ebc6316 | IDENTICAL
+  oauthlib/openid/connect/core/endpoints/pre_configured.py: reproduced bc6ff1a5fa23c2dcc3a782125e13d93355e73abf2e4fadc406b86ebce121e7ee | candidate's bc6ff1a5fa23c2dcc3a782125e13d93355e73abf2e4fadc406b86ebce121e7ee | IDENTICAL
+func_timeout/py2_raise.py: reproduced 19d989963807de3847a00bbe90337fd9100a79cee4327683b601e4bc96225b77 | pinned by the candidate 19d989963807de3847a00bbe90337fd9100a79cee4327683b601e4bc96225b77
+func_timeout/dafunc.py lines 20-26 (which raise helper is selected on Python 3):
+  
+  try:
+      from .py3_raise import raise_exception
+  except SyntaxError:
+      from .py2_raise import raise_exception
+  except ImportError:
+      from .py2_raise import raise_exception
