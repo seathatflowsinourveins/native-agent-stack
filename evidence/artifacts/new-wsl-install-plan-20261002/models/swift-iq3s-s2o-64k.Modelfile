@@ -1,0 +1,2 @@
+FROM swift-iq3s-s2o
+PARAMETER num_ctx 64000
