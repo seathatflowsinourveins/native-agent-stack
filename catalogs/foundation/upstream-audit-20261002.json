@@ -2,7 +2,7 @@
   "schema_version": 2,
   "kind": "upstream_quality_audit",
   "meaning": "Upstream maintenance, release currency, provenance, advisories, default-branch checks, license and published Scorecard for the GitHub repositories that the definitive manifest's foundation rows name. Information only: no default, state or slot changes through it.",
-  "observed_at": "2026-10-02T21:40:36+00:00",
+  "observed_at": "2026-10-03T13:27:14+00:00",
   "thresholds": {
     "stale_after_days": 90,
     "old_release_days": 365,
@@ -15,20 +15,20 @@
     "max_attested_assets": 5
   },
   "inputs": {
-    "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json": "894dff866e2e6f332d6927879ca89b81a7da67d066664122f163e23707c4205b",
-    "evidence/artifacts/upstream-audit-20261002/observations.json": "22972b91049eb080af366bd97d35bc0015727c65c12cd0d9edcc6ab6c772ce34"
+    "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json": "cfd08b85efca343f428fadd8253a06ce9c08afb944a4f66a2aaae15d3c08fa96",
+    "evidence/artifacts/upstream-audit-20261002/observations.json": "9a1cf45da89563977687c5fad0f0d1bd45ec0a25aea68372459b8131020b5772"
   },
   "summary": {
-    "repositories": 56,
+    "repositories": 59,
     "flag_counts": {
       "fetch_error": 0,
       "archived": 0,
       "stale": 1,
-      "no_release": 6,
+      "no_release": 7,
       "old_release": 1,
-      "no_provenance": 16,
+      "no_provenance": 17,
       "advisories": 24,
-      "ci_failing": 15,
+      "ci_failing": 20,
       "low_scorecard": 1
     },
     "archived_or_stale": 1,
@@ -42,10 +42,10 @@
     },
     "provenance": {
       "attested": 13,
-      "none": 16,
+      "none": 17,
       "unknown": 0,
       "no_digest": 0,
-      "no_assets": 21
+      "no_assets": 22
     },
     "scorecard_published": 19,
     "by_state": {
@@ -59,7 +59,7 @@
           "old_release": 0,
           "no_provenance": 6,
           "advisories": 15,
-          "ci_failing": 9,
+          "ci_failing": 12,
           "low_scorecard": 1
         },
         "archived_or_stale": 0,
@@ -81,16 +81,16 @@
         "scorecard_published": 9
       },
       "resolved": {
-        "repositories": 14,
+        "repositories": 16,
         "flag_counts": {
           "fetch_error": 0,
           "archived": 0,
           "stale": 0,
-          "no_release": 1,
+          "no_release": 2,
           "old_release": 1,
           "no_provenance": 3,
           "advisories": 6,
-          "ci_failing": 1,
+          "ci_failing": 4,
           "low_scorecard": 0
         },
         "archived_or_stale": 0,
@@ -107,7 +107,7 @@
           "none": 3,
           "unknown": 0,
           "no_digest": 0,
-          "no_assets": 7
+          "no_assets": 8
         },
         "scorecard_published": 6
       },
@@ -143,14 +143,14 @@
         "scorecard_published": 4
       },
       "measurement": {
-        "repositories": 1,
+        "repositories": 2,
         "flag_counts": {
           "fetch_error": 0,
           "archived": 0,
           "stale": 0,
           "no_release": 0,
           "old_release": 0,
-          "no_provenance": 1,
+          "no_provenance": 2,
           "advisories": 0,
           "ci_failing": 0,
           "low_scorecard": 0
@@ -166,7 +166,7 @@
         },
         "provenance": {
           "attested": 0,
-          "none": 1,
+          "none": 2,
           "unknown": 0,
           "no_digest": 0,
           "no_assets": 0
@@ -183,7 +183,7 @@
           "old_release": 0,
           "no_provenance": 2,
           "advisories": 1,
-          "ci_failing": 2,
+          "ci_failing": 1,
           "low_scorecard": 0
         },
         "archived_or_stale": 0,
@@ -206,16 +206,16 @@
       }
     },
     "installed": {
-      "repositories": 36,
+      "repositories": 38,
       "flag_counts": {
         "fetch_error": 0,
         "archived": 0,
         "stale": 0,
-        "no_release": 3,
+        "no_release": 4,
         "old_release": 0,
         "no_provenance": 11,
         "advisories": 18,
-        "ci_failing": 12,
+        "ci_failing": 14,
         "low_scorecard": 1
       },
       "archived_or_stale": 0,
@@ -224,7 +224,7 @@
         "release": 0,
         "attestations": 0,
         "advisories": 0,
-        "check_runs": 0,
+        "check_runs": 1,
         "deps_dev": 0
       },
       "provenance": {
@@ -232,11 +232,11 @@
         "none": 11,
         "unknown": 0,
         "no_digest": 0,
-        "no_assets": 11
+        "no_assets": 12
       },
       "scorecard_published": 11
     },
-    "not_audited": 4
+    "not_audited": 5
   },
   "not_audited": [
     {
@@ -266,6 +266,13 @@
       "slot_id": "memory-owner",
       "state": "measurement",
       "url": null
+    },
+    {
+      "named_as": null,
+      "reason": "finalists_without_repository",
+      "slot_id": "research-skill",
+      "state": "measurement",
+      "url": null
     }
   ],
   "rows": [
@@ -286,14 +293,14 @@
         "no_provenance",
         "advisories"
       ],
-      "observed_at": "2026-10-02T21:39:39+00:00",
+      "observed_at": "2026-10-03T13:26:15+00:00",
       "archived": false,
       "last_commit": "2026-10-01T01:48:19Z",
-      "days_since_last_commit": 1,
+      "days_since_last_commit": 2,
       "release": {
         "tag": "v0.7.27",
         "published_at": "2026-10-01T02:11:55Z",
-        "days_old": 1,
+        "days_old": 2,
         "assets": 23,
         "assets_with_digest": 23,
         "queried_assets": [
@@ -360,10 +367,10 @@
         }
       ],
       "flags": [],
-      "observed_at": "2026-10-02T21:39:39+00:00",
+      "observed_at": "2026-10-03T13:26:15+00:00",
       "archived": false,
-      "last_commit": "2026-09-24T18:16:26Z",
-      "days_since_last_commit": 8,
+      "last_commit": "2026-10-03T00:00:05Z",
+      "days_since_last_commit": 0,
       "release": {
         "tag": "v4.2.2",
         "published_at": "2026-08-04T20:36:29Z",
@@ -380,20 +387,18 @@
         "severities": []
       },
       "check_runs": {
-        "observed": 1000,
-        "total": 1000,
+        "observed": 77,
+        "total": 77,
         "total_counts": [
-          1000
+          77
         ],
-        "check_suites": 1607,
-        "complete": false,
-        "failing": null
+        "check_suites": 79,
+        "complete": true,
+        "failing": 0
       },
       "license": "MIT",
       "scorecard": "not_covered",
-      "incomplete": [
-        "check_runs"
-      ]
+      "incomplete": []
     },
     {
       "repository": "adbar/trafilatura",
@@ -408,7 +413,7 @@
         }
       ],
       "flags": [],
-      "observed_at": "2026-10-02T21:39:39+00:00",
+      "observed_at": "2026-10-03T13:26:15+00:00",
       "archived": false,
       "last_commit": "2026-10-02T16:53:21Z",
       "days_since_last_commit": 0,
@@ -460,7 +465,7 @@
         "advisories",
         "ci_failing"
       ],
-      "observed_at": "2026-10-02T21:39:39+00:00",
+      "observed_at": "2026-10-03T13:26:15+00:00",
       "archived": false,
       "last_commit": "2026-10-02T13:30:02Z",
       "days_since_last_commit": 0,
@@ -542,7 +547,7 @@
         "advisories",
         "ci_failing"
       ],
-      "observed_at": "2026-10-02T21:39:41+00:00",
+      "observed_at": "2026-10-03T13:26:17+00:00",
       "archived": false,
       "last_commit": "2026-10-02T20:22:40Z",
       "days_since_last_commit": 0,
@@ -564,12 +569,12 @@
         ]
       },
       "check_runs": {
-        "observed": 13,
-        "total": 13,
+        "observed": 20,
+        "total": 20,
         "total_counts": [
-          13
+          20
         ],
-        "check_suites": 11,
+        "check_suites": 18,
         "complete": true,
         "failing": 2
       },
@@ -593,7 +598,7 @@
         "advisories",
         "ci_failing"
       ],
-      "observed_at": "2026-10-02T21:39:43+00:00",
+      "observed_at": "2026-10-03T13:26:18+00:00",
       "archived": false,
       "last_commit": "2026-10-02T20:19:38Z",
       "days_since_last_commit": 0,
@@ -672,18 +677,20 @@
         ]
       },
       "check_runs": {
-        "observed": 180,
-        "total": 180,
+        "observed": 1000,
+        "total": 1000,
         "total_counts": [
-          180
+          1000
         ],
-        "check_suites": 190,
-        "complete": true,
-        "failing": 2
+        "check_suites": 1343,
+        "complete": false,
+        "failing": 11
       },
       "license": null,
       "scorecard": "not_covered",
-      "incomplete": []
+      "incomplete": [
+        "check_runs"
+      ]
     },
     {
       "repository": "anthropics/claude-code-action",
@@ -701,7 +708,7 @@
         "old_release",
         "advisories"
       ],
-      "observed_at": "2026-10-02T21:39:43+00:00",
+      "observed_at": "2026-10-03T13:26:18+00:00",
       "archived": false,
       "last_commit": "2026-10-02T20:23:19Z",
       "days_since_last_commit": 0,
@@ -749,9 +756,10 @@
         }
       ],
       "flags": [
-        "no_release"
+        "no_release",
+        "ci_failing"
       ],
-      "observed_at": "2026-10-02T21:39:44+00:00",
+      "observed_at": "2026-10-03T13:26:18+00:00",
       "archived": false,
       "last_commit": "2026-10-02T21:26:10Z",
       "days_since_last_commit": 0,
@@ -762,14 +770,14 @@
         "severities": []
       },
       "check_runs": {
-        "observed": 4,
-        "total": 4,
+        "observed": 8,
+        "total": 8,
         "total_counts": [
-          4
+          8
         ],
-        "check_suites": 11,
+        "check_suites": 15,
         "complete": true,
-        "failing": 0
+        "failing": 1
       },
       "license": "Apache-2.0",
       "scorecard": "not_covered",
@@ -790,14 +798,14 @@
       "flags": [
         "advisories"
       ],
-      "observed_at": "2026-10-02T21:39:46+00:00",
+      "observed_at": "2026-10-03T13:26:19+00:00",
       "archived": false,
-      "last_commit": "2026-10-02T16:52:27Z",
+      "last_commit": "2026-10-03T12:33:01Z",
       "days_since_last_commit": 0,
       "release": {
         "tag": "v0.0.78",
         "published_at": "2026-09-30T01:09:22Z",
-        "days_old": 2,
+        "days_old": 3,
         "assets": 0,
         "assets_with_digest": 0,
         "queried_assets": [],
@@ -826,6 +834,45 @@
       "incomplete": []
     },
     {
+      "repository": "anthropics/skills",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "skill-authoring",
+          "state": "resolved"
+        }
+      ],
+      "flags": [
+        "no_release"
+      ],
+      "observed_at": "2026-10-03T13:26:21+00:00",
+      "archived": false,
+      "last_commit": "2026-09-29T02:20:03Z",
+      "days_since_last_commit": 4,
+      "release": null,
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 0,
+        "total": 0,
+        "total_counts": [
+          0
+        ],
+        "check_suites": 7,
+        "complete": true,
+        "failing": 0
+      },
+      "license": null,
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
       "repository": "arize-ai/phoenix",
       "roles": [
         {
@@ -838,14 +885,14 @@
         }
       ],
       "flags": [],
-      "observed_at": "2026-10-02T21:39:46+00:00",
+      "observed_at": "2026-10-03T13:26:21+00:00",
       "archived": false,
-      "last_commit": "2026-10-02T21:18:39Z",
+      "last_commit": "2026-10-03T00:04:18Z",
       "days_since_last_commit": 0,
       "release": {
         "tag": "arize-phoenix-v20.19.0",
         "published_at": "2026-10-01T22:59:10Z",
-        "days_old": 0,
+        "days_old": 1,
         "assets": 0,
         "assets_with_digest": 0,
         "queried_assets": [],
@@ -858,12 +905,12 @@
         "severities": []
       },
       "check_runs": {
-        "observed": 50,
-        "total": 50,
+        "observed": 61,
+        "total": 61,
         "total_counts": [
-          50
+          61
         ],
-        "check_suites": 22,
+        "check_suites": 32,
         "complete": true,
         "failing": 0
       },
@@ -884,7 +931,7 @@
         }
       ],
       "flags": [],
-      "observed_at": "2026-10-02T21:39:48+00:00",
+      "observed_at": "2026-10-03T13:26:21+00:00",
       "archived": false,
       "last_commit": "2026-09-26T16:56:07Z",
       "days_since_last_commit": 6,
@@ -932,14 +979,14 @@
       "flags": [
         "no_provenance"
       ],
-      "observed_at": "2026-10-02T21:39:49+00:00",
+      "observed_at": "2026-10-03T13:26:23+00:00",
       "archived": false,
       "last_commit": "2026-09-28T14:22:46Z",
       "days_since_last_commit": 4,
       "release": {
         "tag": "0.45.3",
         "published_at": "2026-08-31T01:42:23Z",
-        "days_old": 32,
+        "days_old": 33,
         "assets": 7,
         "assets_with_digest": 7,
         "queried_assets": [
@@ -978,12 +1025,12 @@
         "severities": []
       },
       "check_runs": {
-        "observed": 127,
-        "total": 127,
+        "observed": 156,
+        "total": 156,
         "total_counts": [
-          127
+          156
         ],
-        "check_suites": 24,
+        "check_suites": 28,
         "complete": true,
         "failing": 0
       },
@@ -1004,7 +1051,7 @@
         }
       ],
       "flags": [],
-      "observed_at": "2026-10-02T21:39:50+00:00",
+      "observed_at": "2026-10-03T13:26:23+00:00",
       "archived": false,
       "last_commit": "2026-10-02T18:58:46Z",
       "days_since_last_commit": 0,
@@ -1076,14 +1123,14 @@
         }
       ],
       "flags": [],
-      "observed_at": "2026-10-02T21:39:52+00:00",
+      "observed_at": "2026-10-03T13:26:23+00:00",
       "archived": false,
-      "last_commit": "2026-10-02T15:49:22Z",
+      "last_commit": "2026-10-03T13:16:01Z",
       "days_since_last_commit": 0,
       "release": {
         "tag": "v2.1.0",
         "published_at": "2026-09-24T10:40:44Z",
-        "days_old": 8,
+        "days_old": 9,
         "assets": 0,
         "assets_with_digest": 0,
         "queried_assets": [],
@@ -1096,12 +1143,12 @@
         "severities": []
       },
       "check_runs": {
-        "observed": 25,
-        "total": 25,
+        "observed": 22,
+        "total": 22,
         "total_counts": [
-          25
+          22
         ],
-        "check_suites": 11,
+        "check_suites": 14,
         "complete": true,
         "failing": 0
       },
@@ -1122,9 +1169,9 @@
         }
       ],
       "flags": [],
-      "observed_at": "2026-10-02T21:39:53+00:00",
+      "observed_at": "2026-10-03T13:26:25+00:00",
       "archived": false,
-      "last_commit": "2026-10-02T21:30:36Z",
+      "last_commit": "2026-10-03T10:18:42Z",
       "days_since_last_commit": 0,
       "release": {
         "tag": "v20.0.26",
@@ -1142,12 +1189,12 @@
         "severities": []
       },
       "check_runs": {
-        "observed": 8,
-        "total": 8,
+        "observed": 5,
+        "total": 5,
         "total_counts": [
-          8
+          5
         ],
-        "check_suites": 16,
+        "check_suites": 12,
         "complete": true,
         "failing": 0
       },
@@ -1170,14 +1217,14 @@
       "flags": [
         "advisories"
       ],
-      "observed_at": "2026-10-02T21:39:54+00:00",
+      "observed_at": "2026-10-03T13:26:26+00:00",
       "archived": false,
       "last_commit": "2026-10-02T16:05:07Z",
       "days_since_last_commit": 0,
       "release": {
         "tag": "v2.102.0",
         "published_at": "2026-09-30T02:40:02Z",
-        "days_old": 2,
+        "days_old": 3,
         "assets": 22,
         "assets_with_digest": 22,
         "queried_assets": [
@@ -1234,12 +1281,12 @@
         ]
       },
       "check_runs": {
-        "observed": 103,
-        "total": 103,
+        "observed": 268,
+        "total": 268,
         "total_counts": [
-          103
+          268
         ],
-        "check_suites": 24,
+        "check_suites": 63,
         "complete": true,
         "failing": 0
       },
@@ -1265,9 +1312,9 @@
       "flags": [
         "advisories"
       ],
-      "observed_at": "2026-10-02T21:39:54+00:00",
+      "observed_at": "2026-10-03T13:26:27+00:00",
       "archived": false,
-      "last_commit": "2026-10-02T11:30:15Z",
+      "last_commit": "2026-10-03T11:50:04Z",
       "days_since_last_commit": 0,
       "release": {
         "tag": "v2.18.1",
@@ -1318,12 +1365,12 @@
         ]
       },
       "check_runs": {
-        "observed": 34,
-        "total": 34,
+        "observed": 24,
+        "total": 24,
         "total_counts": [
-          34
+          24
         ],
-        "check_suites": 17,
+        "check_suites": 12,
         "complete": true,
         "failing": 0
       },
@@ -1346,14 +1393,14 @@
       "flags": [
         "advisories"
       ],
-      "observed_at": "2026-10-02T21:39:55+00:00",
+      "observed_at": "2026-10-03T13:26:27+00:00",
       "archived": false,
-      "last_commit": "2026-10-02T20:16:23Z",
+      "last_commit": "2026-10-03T04:11:02Z",
       "days_since_last_commit": 0,
       "release": {
         "tag": "v0.398.0",
         "published_at": "2026-09-28T03:51:27Z",
-        "days_old": 4,
+        "days_old": 5,
         "assets": 0,
         "assets_with_digest": 0,
         "queried_assets": [],
@@ -1401,14 +1448,14 @@
         "advisories",
         "ci_failing"
       ],
-      "observed_at": "2026-10-02T21:39:57+00:00",
+      "observed_at": "2026-10-03T13:26:30+00:00",
       "archived": false,
       "last_commit": "2026-10-02T14:59:36Z",
       "days_since_last_commit": 0,
       "release": {
         "tag": "v3.8.51",
         "published_at": "2026-09-30T01:41:50Z",
-        "days_old": 2,
+        "days_old": 3,
         "assets": 17,
         "assets_with_digest": 17,
         "queried_assets": [
@@ -1449,14 +1496,14 @@
         ]
       },
       "check_runs": {
-        "observed": 120,
-        "total": 120,
+        "observed": 162,
+        "total": 162,
         "total_counts": [
-          120
+          162
         ],
-        "check_suites": 24,
+        "check_suites": 33,
         "complete": true,
-        "failing": 11
+        "failing": 20
       },
       "license": "MIT",
       "scorecard": "not_covered",
@@ -1479,7 +1526,7 @@
         "advisories",
         "ci_failing"
       ],
-      "observed_at": "2026-10-02T21:39:58+00:00",
+      "observed_at": "2026-10-03T13:26:31+00:00",
       "archived": false,
       "last_commit": "2026-10-02T15:35:20Z",
       "days_since_last_commit": 0,
@@ -1527,12 +1574,12 @@
         ]
       },
       "check_runs": {
-        "observed": 141,
-        "total": 141,
+        "observed": 142,
+        "total": 142,
         "total_counts": [
-          141
+          142
         ],
-        "check_suites": 18,
+        "check_suites": 19,
         "complete": true,
         "failing": 7
       },
@@ -1541,6 +1588,80 @@
         "date": "2026-08-24T00:00:00Z",
         "overall_score": 8
       },
+      "incomplete": []
+    },
+    {
+      "repository": "gethasp/hasp",
+      "roles": [
+        {
+          "installs": false,
+          "named_as": [
+            "arm"
+          ],
+          "slot_id": "credential-custody",
+          "state": "measurement"
+        }
+      ],
+      "flags": [
+        "no_provenance"
+      ],
+      "observed_at": "2026-10-03T13:26:33+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T21:02:00Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v1.0.44",
+        "published_at": "2026-10-02T21:29:01Z",
+        "days_old": 0,
+        "assets": 28,
+        "assets_with_digest": 28,
+        "queried_assets": [
+          {
+            "attestations": 0,
+            "digest": "sha256:1bce3b9e70a2e0c5dc5659ac3b4f1738971f3360be811b7b86514a565f050fed",
+            "name": "hasp-release-public-key.asc"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:80255aa588ada0c6467736286c716ea49480bc123ecacf3a8879f5f1e5f1058c",
+            "name": "hasp-v1.0.44-darwin-amd64.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:d0a94a49d44eee997240d5046803e7f779b3288c51cfbdc05cf4a922309322f7",
+            "name": "hasp-v1.0.44-darwin-amd64.tar.gz.sig"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:80ed01b0c842521f9cc1176fdc4a8581d92281d515bc656ac1ca48f3c1eb2c3e",
+            "name": "hasp-v1.0.44-darwin-arm64.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "digest": "sha256:6bedbec8877ddfb6e2150f16125e1fede1f31a25b8d5e47fb526402b87603ea1",
+            "name": "hasp-v1.0.44-darwin-arm64.tar.gz.sig"
+          }
+        ],
+        "attested_assets": 0,
+        "provenance": "none"
+      },
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 21,
+        "total": 21,
+        "total_counts": [
+          21
+        ],
+        "check_suites": 2,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "NOASSERTION",
+      "scorecard": "not_covered",
       "incomplete": []
     },
     {
@@ -1559,7 +1680,7 @@
         "no_release",
         "advisories"
       ],
-      "observed_at": "2026-10-02T21:39:58+00:00",
+      "observed_at": "2026-10-03T13:26:36+00:00",
       "archived": false,
       "last_commit": "2026-10-01T18:28:16Z",
       "days_since_last_commit": 1,
@@ -1632,9 +1753,10 @@
         }
       ],
       "flags": [
-        "advisories"
+        "advisories",
+        "ci_failing"
       ],
-      "observed_at": "2026-10-02T21:39:59+00:00",
+      "observed_at": "2026-10-03T13:26:36+00:00",
       "archived": false,
       "last_commit": "2026-10-02T17:50:29Z",
       "days_since_last_commit": 0,
@@ -1683,14 +1805,14 @@
         ]
       },
       "check_runs": {
-        "observed": 506,
-        "total": 506,
+        "observed": 774,
+        "total": 774,
         "total_counts": [
-          506
+          774
         ],
-        "check_suites": 203,
+        "check_suites": 328,
         "complete": true,
-        "failing": 0
+        "failing": 1
       },
       "license": "MIT",
       "scorecard": "not_covered",
@@ -1711,10 +1833,10 @@
       "flags": [
         "ci_failing"
       ],
-      "observed_at": "2026-10-02T21:40:01+00:00",
+      "observed_at": "2026-10-03T13:26:37+00:00",
       "archived": false,
       "last_commit": "2026-09-30T08:05:57Z",
-      "days_since_last_commit": 2,
+      "days_since_last_commit": 3,
       "release": {
         "tag": "v4.0.1",
         "published_at": "2026-05-20T15:37:55Z",
@@ -1767,16 +1889,17 @@
       ],
       "flags": [
         "no_provenance",
-        "advisories"
+        "advisories",
+        "ci_failing"
       ],
-      "observed_at": "2026-10-02T21:40:02+00:00",
+      "observed_at": "2026-10-03T13:26:37+00:00",
       "archived": false,
-      "last_commit": "2026-10-02T20:41:25Z",
+      "last_commit": "2026-10-03T11:05:43Z",
       "days_since_last_commit": 0,
       "release": {
         "tag": "v13.2.3",
         "published_at": "2026-09-29T09:02:18Z",
-        "days_old": 3,
+        "days_old": 4,
         "assets": 13,
         "assets_with_digest": 13,
         "queried_assets": [
@@ -1844,14 +1967,14 @@
         ]
       },
       "check_runs": {
-        "observed": 329,
-        "total": 329,
+        "observed": 274,
+        "total": 274,
         "total_counts": [
-          329
+          274
         ],
-        "check_suites": 64,
+        "check_suites": 35,
         "complete": true,
-        "failing": 0
+        "failing": 1
       },
       "license": "AGPL-3.0",
       "scorecard": {
@@ -1882,12 +2005,11 @@
         }
       ],
       "flags": [
-        "no_provenance",
-        "ci_failing"
+        "no_provenance"
       ],
-      "observed_at": "2026-10-02T21:40:03+00:00",
+      "observed_at": "2026-10-03T13:26:38+00:00",
       "archived": false,
-      "last_commit": "2026-10-02T20:13:32Z",
+      "last_commit": "2026-10-03T06:28:00Z",
       "days_since_last_commit": 0,
       "release": {
         "tag": "v3.7.8",
@@ -1931,14 +2053,14 @@
         "severities": []
       },
       "check_runs": {
-        "observed": 207,
-        "total": 207,
+        "observed": 157,
+        "total": 157,
         "total_counts": [
-          207
+          157
         ],
-        "check_suites": 66,
+        "check_suites": 16,
         "complete": true,
-        "failing": 2
+        "failing": 0
       },
       "license": "AGPL-3.0",
       "scorecard": {
@@ -1960,14 +2082,14 @@
         }
       ],
       "flags": [],
-      "observed_at": "2026-10-02T21:40:03+00:00",
+      "observed_at": "2026-10-03T13:26:39+00:00",
       "archived": false,
-      "last_commit": "2026-10-02T16:34:35Z",
+      "last_commit": "2026-10-02T21:48:55Z",
       "days_since_last_commit": 0,
       "release": {
         "tag": "v0.23.0",
         "published_at": "2026-09-12T04:55:17Z",
-        "days_old": 20,
+        "days_old": 21,
         "assets": 0,
         "assets_with_digest": 0,
         "queried_assets": [],
@@ -1980,12 +2102,12 @@
         "severities": []
       },
       "check_runs": {
-        "observed": 29,
-        "total": 29,
+        "observed": 25,
+        "total": 25,
         "total_counts": [
-          29
+          25
         ],
-        "check_suites": 25,
+        "check_suites": 22,
         "complete": true,
         "failing": 0
       },
@@ -2008,14 +2130,14 @@
       "flags": [
         "advisories"
       ],
-      "observed_at": "2026-10-02T21:40:06+00:00",
+      "observed_at": "2026-10-03T13:26:41+00:00",
       "archived": false,
-      "last_commit": "2026-10-02T21:25:12Z",
+      "last_commit": "2026-10-03T13:19:41Z",
       "days_since_last_commit": 0,
       "release": {
         "tag": "v2026.10.0",
         "published_at": "2026-10-02T01:42:32Z",
-        "days_old": 0,
+        "days_old": 1,
         "assets": 52,
         "assets_with_digest": 52,
         "queried_assets": [
@@ -2067,10 +2189,10 @@
         ]
       },
       "check_runs": {
-        "observed": 23,
-        "total": 23,
+        "observed": 17,
+        "total": 17,
         "total_counts": [
-          23
+          17
         ],
         "check_suites": 20,
         "complete": true,
@@ -2095,7 +2217,7 @@
       "flags": [
         "ci_failing"
       ],
-      "observed_at": "2026-10-02T21:40:09+00:00",
+      "observed_at": "2026-10-03T13:26:43+00:00",
       "archived": false,
       "last_commit": "2026-09-25T14:28:28Z",
       "days_since_last_commit": 7,
@@ -2141,14 +2263,14 @@
         "severities": []
       },
       "check_runs": {
-        "observed": 53,
-        "total": 53,
+        "observed": 61,
+        "total": 61,
         "total_counts": [
-          53
+          61
         ],
-        "check_suites": 46,
+        "check_suites": 49,
         "complete": true,
-        "failing": 1
+        "failing": 2
       },
       "license": "MIT",
       "scorecard": "not_covered",
@@ -2167,10 +2289,10 @@
         }
       ],
       "flags": [],
-      "observed_at": "2026-10-02T21:40:09+00:00",
+      "observed_at": "2026-10-03T13:26:43+00:00",
       "archived": false,
       "last_commit": "2026-09-29T12:37:40Z",
-      "days_since_last_commit": 3,
+      "days_since_last_commit": 4,
       "release": {
         "tag": "v1.2.3",
         "published_at": "2026-08-06T14:05:28Z",
@@ -2213,9 +2335,9 @@
         }
       ],
       "flags": [],
-      "observed_at": "2026-10-02T21:40:10+00:00",
+      "observed_at": "2026-10-03T13:26:45+00:00",
       "archived": false,
-      "last_commit": "2026-10-02T19:03:07Z",
+      "last_commit": "2026-10-03T07:45:29Z",
       "days_since_last_commit": 0,
       "release": {
         "tag": "v0.80.0",
@@ -2259,12 +2381,12 @@
         "severities": []
       },
       "check_runs": {
-        "observed": 28,
-        "total": 28,
+        "observed": 36,
+        "total": 36,
         "total_counts": [
-          28
+          36
         ],
-        "check_suites": 19,
+        "check_suites": 25,
         "complete": true,
         "failing": 0
       },
@@ -2286,14 +2408,14 @@
         }
       ],
       "flags": [],
-      "observed_at": "2026-10-02T21:40:10+00:00",
+      "observed_at": "2026-10-03T13:26:45+00:00",
       "archived": false,
       "last_commit": "2026-09-28T23:22:31Z",
-      "days_since_last_commit": 3,
+      "days_since_last_commit": 4,
       "release": {
         "tag": "v0.1.22",
         "published_at": "2026-09-28T23:23:13Z",
-        "days_old": 3,
+        "days_old": 4,
         "assets": 0,
         "assets_with_digest": 0,
         "queried_assets": [],
@@ -2338,7 +2460,7 @@
         "advisories",
         "ci_failing"
       ],
-      "observed_at": "2026-10-02T21:40:11+00:00",
+      "observed_at": "2026-10-03T13:26:46+00:00",
       "archived": false,
       "last_commit": "2026-10-01T20:29:45Z",
       "days_since_last_commit": 1,
@@ -2385,12 +2507,12 @@
         ]
       },
       "check_runs": {
-        "observed": 296,
-        "total": 296,
+        "observed": 347,
+        "total": 347,
         "total_counts": [
-          296
+          347
         ],
-        "check_suites": 22,
+        "check_suites": 29,
         "complete": true,
         "failing": 2
       },
@@ -2414,16 +2536,17 @@
         }
       ],
       "flags": [
-        "advisories"
+        "advisories",
+        "ci_failing"
       ],
-      "observed_at": "2026-10-02T21:40:12+00:00",
+      "observed_at": "2026-10-03T13:26:47+00:00",
       "archived": false,
       "last_commit": "2026-09-30T22:23:03Z",
-      "days_since_last_commit": 1,
+      "days_since_last_commit": 2,
       "release": {
         "tag": "2.9.0",
         "published_at": "2026-09-30T22:23:56Z",
-        "days_old": 1,
+        "days_old": 2,
         "assets": 0,
         "assets_with_digest": 0,
         "queried_assets": [],
@@ -2439,14 +2562,14 @@
         ]
       },
       "check_runs": {
-        "observed": 26,
-        "total": 26,
+        "observed": 30,
+        "total": 30,
         "total_counts": [
-          26
+          30
         ],
-        "check_suites": 12,
+        "check_suites": 14,
         "complete": true,
-        "failing": 0
+        "failing": 1
       },
       "license": "NOASSERTION",
       "scorecard": "not_covered",
@@ -2467,7 +2590,7 @@
       "flags": [
         "no_provenance"
       ],
-      "observed_at": "2026-10-02T21:40:13+00:00",
+      "observed_at": "2026-10-03T13:26:47+00:00",
       "archived": false,
       "last_commit": "2026-10-02T18:52:27Z",
       "days_since_last_commit": 0,
@@ -2539,16 +2662,17 @@
         }
       ],
       "flags": [
-        "advisories"
+        "advisories",
+        "ci_failing"
       ],
-      "observed_at": "2026-10-02T21:40:13+00:00",
+      "observed_at": "2026-10-03T13:26:48+00:00",
       "archived": false,
       "last_commit": "2026-10-02T19:48:46Z",
       "days_since_last_commit": 0,
       "release": {
         "tag": "v0.162.0",
         "published_at": "2026-09-29T10:11:33Z",
-        "days_old": 3,
+        "days_old": 4,
         "assets": 0,
         "assets_with_digest": 0,
         "queried_assets": [],
@@ -2569,14 +2693,14 @@
         ]
       },
       "check_runs": {
-        "observed": 268,
-        "total": 268,
+        "observed": 347,
+        "total": 347,
         "total_counts": [
-          268
+          347
         ],
-        "check_suites": 34,
+        "check_suites": 83,
         "complete": true,
-        "failing": 0
+        "failing": 2
       },
       "license": "Apache-2.0",
       "scorecard": {
@@ -2610,9 +2734,9 @@
         "advisories",
         "ci_failing"
       ],
-      "observed_at": "2026-10-02T21:40:15+00:00",
+      "observed_at": "2026-10-03T13:26:49+00:00",
       "archived": false,
-      "last_commit": "2026-10-02T21:28:40Z",
+      "last_commit": "2026-10-03T07:45:47Z",
       "days_since_last_commit": 0,
       "release": {
         "tag": "rust-v0.160.0",
@@ -2658,14 +2782,14 @@
         ]
       },
       "check_runs": {
-        "observed": 105,
-        "total": 105,
+        "observed": 1273,
+        "total": 1273,
         "total_counts": [
-          105
+          1273
         ],
-        "check_suites": 12,
+        "check_suites": 458,
         "complete": true,
-        "failing": 42
+        "failing": 47
       },
       "license": "Apache-2.0",
       "scorecard": {
@@ -2687,7 +2811,7 @@
         }
       ],
       "flags": [],
-      "observed_at": "2026-10-02T21:40:17+00:00",
+      "observed_at": "2026-10-03T13:26:51+00:00",
       "archived": false,
       "last_commit": "2026-07-24T18:56:00Z",
       "days_since_last_commit": 70,
@@ -2738,7 +2862,7 @@
       "flags": [
         "no_provenance"
       ],
-      "observed_at": "2026-10-02T21:40:17+00:00",
+      "observed_at": "2026-10-03T13:26:52+00:00",
       "archived": false,
       "last_commit": "2026-10-01T18:43:09Z",
       "days_since_last_commit": 1,
@@ -2784,12 +2908,12 @@
         "severities": []
       },
       "check_runs": {
-        "observed": 7,
-        "total": 7,
+        "observed": 14,
+        "total": 14,
         "total_counts": [
-          7
+          14
         ],
-        "check_suites": 11,
+        "check_suites": 20,
         "complete": true,
         "failing": 0
       },
@@ -2812,14 +2936,14 @@
       "flags": [
         "no_provenance"
       ],
-      "observed_at": "2026-10-02T21:40:18+00:00",
+      "observed_at": "2026-10-03T13:26:54+00:00",
       "archived": false,
       "last_commit": "2026-09-29T07:16:39Z",
-      "days_since_last_commit": 3,
+      "days_since_last_commit": 4,
       "release": {
         "tag": "mineru-4.0.10-released",
         "published_at": "2026-09-29T07:18:10Z",
-        "days_old": 3,
+        "days_old": 4,
         "assets": 1,
         "assets_with_digest": 1,
         "queried_assets": [
@@ -2838,12 +2962,12 @@
         "severities": []
       },
       "check_runs": {
-        "observed": 17,
-        "total": 17,
+        "observed": 20,
+        "total": 20,
         "total_counts": [
-          17
+          20
         ],
-        "check_suites": 16,
+        "check_suites": 19,
         "complete": true,
         "failing": 0
       },
@@ -2866,41 +2990,41 @@
       "flags": [
         "no_provenance"
       ],
-      "observed_at": "2026-10-02T21:40:19+00:00",
+      "observed_at": "2026-10-03T13:26:54+00:00",
       "archived": false,
-      "last_commit": "2026-10-02T20:50:12Z",
+      "last_commit": "2026-10-03T08:10:20Z",
       "days_since_last_commit": 0,
       "release": {
-        "tag": "v1.50.1",
-        "published_at": "2026-09-30T19:31:33Z",
-        "days_old": 2,
+        "tag": "v1.51.0",
+        "published_at": "2026-10-03T07:38:03Z",
+        "days_old": 0,
         "assets": 7,
         "assets_with_digest": 7,
         "queried_assets": [
           {
             "attestations": 0,
-            "digest": "sha256:716e8d26561b52ac60d7bc91e0ee96060fffd3fdaf024c2c3e8178500cffe488",
-            "name": "agent-server-1.50.1-linux-arm64"
+            "digest": "sha256:cfbee9c92cb17fdd6fd1cffdfe6c037837e9d61cd1ef633e9bbdfe8bd8fa0c4f",
+            "name": "agent-server-1.51.0-linux-arm64"
           },
           {
             "attestations": 0,
-            "digest": "sha256:e294fafc4dec7b95eaede6ad423321e858060f1c328a03c0aaa0d1a9f639980d",
-            "name": "agent-server-1.50.1-linux-x86_64"
+            "digest": "sha256:29f74e0fe097c39e8d5f44d417c0b06499a4de825e536c2bca9c1a2ec6be93f3",
+            "name": "agent-server-1.51.0-linux-x86_64"
           },
           {
             "attestations": 0,
-            "digest": "sha256:47c8b0ec49043cce7d3f49a704ff9b1dda68865b644b281ea8ca89bd3932149a",
-            "name": "agent-server-1.50.1-macos-arm64"
+            "digest": "sha256:ccd423310cd69d4bb39fc2fb3a0cdb566249858be417ffa39301bc1bced7e409",
+            "name": "agent-server-1.51.0-macos-arm64"
           },
           {
             "attestations": 0,
-            "digest": "sha256:dd29db3f83c9ff68b61315fdb3c31bf0065067f9210d4be9f5394169aa57b35d",
-            "name": "agent-server-1.50.1-macos-x86_64"
+            "digest": "sha256:da373fd9f85d25629494de551d70d92877da63b2d5115b10d764f6b928b5e3c7",
+            "name": "agent-server-1.51.0-macos-x86_64"
           },
           {
             "attestations": 0,
-            "digest": "sha256:ab8480537b505d778d4a897236ede2e99f8a309458924dc5164fc4b64ca392f1",
-            "name": "agent-server-1.50.1-windows-x86_64.exe"
+            "digest": "sha256:39e0ddb79de15689c867a501eff6c6d9d57960c3ad063db5d9ca1719e0c8c048",
+            "name": "agent-server-1.51.0-windows-x86_64.exe"
           }
         ],
         "attested_assets": 0,
@@ -2917,7 +3041,7 @@
         "total_counts": [
           87
         ],
-        "check_suites": 26,
+        "check_suites": 27,
         "complete": true,
         "failing": 0
       },
@@ -2941,7 +3065,7 @@
         "advisories",
         "ci_failing"
       ],
-      "observed_at": "2026-10-02T21:40:19+00:00",
+      "observed_at": "2026-10-03T13:26:55+00:00",
       "archived": false,
       "last_commit": "2026-09-30T18:53:23Z",
       "days_since_last_commit": 2,
@@ -2994,14 +3118,14 @@
         "advisories",
         "ci_failing"
       ],
-      "observed_at": "2026-10-02T21:40:20+00:00",
+      "observed_at": "2026-10-03T13:26:56+00:00",
       "archived": false,
       "last_commit": "2026-09-29T15:45:02Z",
       "days_since_last_commit": 3,
       "release": {
         "tag": "v0.34.1",
         "published_at": "2026-09-17T08:12:07Z",
-        "days_old": 15,
+        "days_old": 16,
         "assets": 40,
         "assets_with_digest": 40,
         "queried_assets": [
@@ -3042,14 +3166,14 @@
         ]
       },
       "check_runs": {
-        "observed": 54,
-        "total": 54,
+        "observed": 56,
+        "total": 56,
         "total_counts": [
-          54
+          56
         ],
-        "check_suites": 40,
+        "check_suites": 42,
         "complete": true,
-        "failing": 2
+        "failing": 3
       },
       "license": "Apache-2.0",
       "scorecard": {
@@ -3073,14 +3197,14 @@
       "flags": [
         "advisories"
       ],
-      "observed_at": "2026-10-02T21:40:20+00:00",
+      "observed_at": "2026-10-03T13:26:58+00:00",
       "archived": false,
       "last_commit": "2026-10-02T14:40:10Z",
       "days_since_last_commit": 0,
       "release": {
         "tag": "v3.15.0",
         "published_at": "2026-09-25T08:56:22Z",
-        "days_old": 7,
+        "days_old": 8,
         "assets": 37,
         "assets_with_digest": 37,
         "queried_assets": [
@@ -3126,12 +3250,12 @@
         ]
       },
       "check_runs": {
-        "observed": 44,
-        "total": 44,
+        "observed": 49,
+        "total": 49,
         "total_counts": [
-          44
+          49
         ],
-        "check_suites": 14,
+        "check_suites": 19,
         "complete": true,
         "failing": 0
       },
@@ -3155,14 +3279,14 @@
         }
       ],
       "flags": [],
-      "observed_at": "2026-10-02T21:40:22+00:00",
+      "observed_at": "2026-10-03T13:26:58+00:00",
       "archived": false,
-      "last_commit": "2026-10-02T21:22:04Z",
+      "last_commit": "2026-10-02T23:52:24Z",
       "days_since_last_commit": 0,
       "release": {
         "tag": "0.123.1",
         "published_at": "2026-09-18T01:07:54Z",
-        "days_old": 14,
+        "days_old": 15,
         "assets": 0,
         "assets_with_digest": 0,
         "queried_assets": [],
@@ -3175,12 +3299,12 @@
         "severities": []
       },
       "check_runs": {
-        "observed": 89,
-        "total": 89,
+        "observed": 87,
+        "total": 87,
         "total_counts": [
-          89
+          87
         ],
-        "check_suites": 18,
+        "check_suites": 17,
         "complete": true,
         "failing": 0
       },
@@ -3205,10 +3329,10 @@
         "stale",
         "no_release"
       ],
-      "observed_at": "2026-10-02T21:40:23+00:00",
+      "observed_at": "2026-10-03T13:27:00+00:00",
       "archived": false,
       "last_commit": "2025-09-30T06:10:27Z",
-      "days_since_last_commit": 367,
+      "days_since_last_commit": 368,
       "release": null,
       "advisories": {
         "count": 0,
@@ -3245,10 +3369,10 @@
       "flags": [
         "no_release"
       ],
-      "observed_at": "2026-10-02T21:40:25+00:00",
+      "observed_at": "2026-10-03T13:27:00+00:00",
       "archived": false,
       "last_commit": "2026-08-17T05:17:40Z",
-      "days_since_last_commit": 46,
+      "days_since_last_commit": 47,
       "release": null,
       "advisories": {
         "count": 0,
@@ -3256,12 +3380,12 @@
         "severities": []
       },
       "check_runs": {
-        "observed": 94,
-        "total": 94,
+        "observed": 96,
+        "total": 96,
         "total_counts": [
-          94
+          96
         ],
-        "check_suites": 47,
+        "check_suites": 48,
         "complete": true,
         "failing": 0
       },
@@ -3284,14 +3408,14 @@
       "flags": [
         "no_provenance"
       ],
-      "observed_at": "2026-10-02T21:40:25+00:00",
+      "observed_at": "2026-10-03T13:27:02+00:00",
       "archived": false,
       "last_commit": "2026-09-25T20:08:18Z",
       "days_since_last_commit": 7,
       "release": {
         "tag": "v0.19.1",
         "published_at": "2026-07-05T08:13:33Z",
-        "days_old": 89,
+        "days_old": 90,
         "assets": 29,
         "assets_with_digest": 29,
         "queried_assets": [
@@ -3366,12 +3490,10 @@
           "state": "pinned"
         }
       ],
-      "flags": [
-        "ci_failing"
-      ],
-      "observed_at": "2026-10-02T21:40:25+00:00",
+      "flags": [],
+      "observed_at": "2026-10-03T13:27:02+00:00",
       "archived": false,
-      "last_commit": "2026-10-02T21:35:12Z",
+      "last_commit": "2026-10-03T10:56:12Z",
       "days_since_last_commit": 0,
       "release": {
         "tag": "v2026.09.26.2",
@@ -3407,7 +3529,7 @@
         ],
         "check_suites": 8,
         "complete": true,
-        "failing": 1
+        "failing": 0
       },
       "license": "MIT",
       "scorecard": "not_covered",
@@ -3426,14 +3548,14 @@
         }
       ],
       "flags": [],
-      "observed_at": "2026-10-02T21:40:25+00:00",
+      "observed_at": "2026-10-03T13:27:03+00:00",
       "archived": false,
       "last_commit": "2026-10-02T00:41:53Z",
-      "days_since_last_commit": 0,
+      "days_since_last_commit": 1,
       "release": {
         "tag": "v2.8.3",
         "published_at": "2026-08-16T22:30:34Z",
-        "days_old": 46,
+        "days_old": 47,
         "assets": 0,
         "assets_with_digest": 0,
         "queried_assets": [],
@@ -3446,12 +3568,12 @@
         "severities": []
       },
       "check_runs": {
-        "observed": 12,
-        "total": 12,
+        "observed": 15,
+        "total": 15,
         "total_counts": [
-          12
+          15
         ],
-        "check_suites": 6,
+        "check_suites": 7,
         "complete": true,
         "failing": 0
       },
@@ -3474,7 +3596,7 @@
       "flags": [
         "no_release"
       ],
-      "observed_at": "2026-10-02T21:40:27+00:00",
+      "observed_at": "2026-10-03T13:27:05+00:00",
       "archived": false,
       "last_commit": "2026-09-28T18:06:37Z",
       "days_since_last_commit": 4,
@@ -3512,16 +3634,17 @@
       ],
       "flags": [
         "no_provenance",
-        "advisories"
+        "advisories",
+        "ci_failing"
       ],
-      "observed_at": "2026-10-02T21:40:27+00:00",
+      "observed_at": "2026-10-03T13:27:05+00:00",
       "archived": false,
       "last_commit": "2026-10-02T14:15:13Z",
       "days_since_last_commit": 0,
       "release": {
         "tag": "v3.97.9",
         "published_at": "2026-09-24T09:11:59Z",
-        "days_old": 8,
+        "days_old": 9,
         "assets": 9,
         "assets_with_digest": 9,
         "queried_assets": [
@@ -3562,14 +3685,14 @@
         ]
       },
       "check_runs": {
-        "observed": 5,
-        "total": 5,
+        "observed": 6,
+        "total": 6,
         "total_counts": [
-          5
+          6
         ],
-        "check_suites": 9,
+        "check_suites": 10,
         "complete": true,
-        "failing": 0
+        "failing": 1
       },
       "license": "AGPL-3.0",
       "scorecard": {
@@ -3591,7 +3714,7 @@
         }
       ],
       "flags": [],
-      "observed_at": "2026-10-02T21:40:27+00:00",
+      "observed_at": "2026-10-03T13:27:05+00:00",
       "archived": false,
       "last_commit": "2026-09-28T18:53:18Z",
       "days_since_last_commit": 4,
@@ -3637,12 +3760,12 @@
         "severities": []
       },
       "check_runs": {
-        "observed": 123,
-        "total": 123,
+        "observed": 144,
+        "total": 144,
         "total_counts": [
-          123
+          144
         ],
-        "check_suites": 19,
+        "check_suites": 23,
         "complete": true,
         "failing": 0
       },
@@ -3668,7 +3791,7 @@
       "flags": [
         "no_release"
       ],
-      "observed_at": "2026-10-02T21:40:28+00:00",
+      "observed_at": "2026-10-03T13:27:07+00:00",
       "archived": false,
       "last_commit": "2026-10-02T15:00:09Z",
       "days_since_last_commit": 0,
@@ -3679,12 +3802,12 @@
         "severities": []
       },
       "check_runs": {
-        "observed": 21,
-        "total": 21,
+        "observed": 22,
+        "total": 22,
         "total_counts": [
-          21
+          22
         ],
-        "check_suites": 7,
+        "check_suites": 8,
         "complete": true,
         "failing": 0
       },
@@ -3708,14 +3831,14 @@
         "no_provenance",
         "ci_failing"
       ],
-      "observed_at": "2026-10-02T21:40:29+00:00",
+      "observed_at": "2026-10-03T13:27:09+00:00",
       "archived": false,
-      "last_commit": "2026-10-01T20:12:51Z",
-      "days_since_last_commit": 1,
+      "last_commit": "2026-10-03T06:28:26Z",
+      "days_since_last_commit": 0,
       "release": {
         "tag": "v0.38.2",
         "published_at": "2026-10-01T21:44:28Z",
-        "days_old": 0,
+        "days_old": 1,
         "assets": 7,
         "assets_with_digest": 7,
         "queried_assets": [
@@ -3754,16 +3877,62 @@
         "severities": []
       },
       "check_runs": {
-        "observed": 23,
-        "total": 23,
+        "observed": 17,
+        "total": 17,
         "total_counts": [
-          23
+          17
         ],
-        "check_suites": 17,
+        "check_suites": 18,
         "complete": true,
         "failing": 1
       },
       "license": "Apache-2.0",
+      "scorecard": "not_covered",
+      "incomplete": []
+    },
+    {
+      "repository": "vercel-labs/skills",
+      "roles": [
+        {
+          "installs": true,
+          "named_as": [
+            "repository"
+          ],
+          "slot_id": "skill-discovery",
+          "state": "resolved"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-03T13:27:09+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T16:25:54Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v1.7.0",
+        "published_at": "2026-09-17T15:00:30Z",
+        "days_old": 15,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "queried_assets": [],
+        "attested_assets": 0,
+        "provenance": "no_assets"
+      },
+      "advisories": {
+        "count": 0,
+        "complete": true,
+        "severities": []
+      },
+      "check_runs": {
+        "observed": 8,
+        "total": 8,
+        "total_counts": [
+          8
+        ],
+        "check_suites": 17,
+        "complete": true,
+        "failing": 0
+      },
+      "license": "MIT",
       "scorecard": "not_covered",
       "incomplete": []
     },
@@ -3784,14 +3953,14 @@
         "ci_failing",
         "low_scorecard"
       ],
-      "observed_at": "2026-10-02T21:40:30+00:00",
+      "observed_at": "2026-10-03T13:27:10+00:00",
       "archived": false,
       "last_commit": "2026-10-02T08:44:40Z",
-      "days_since_last_commit": 0,
+      "days_since_last_commit": 1,
       "release": {
         "tag": "0.71.0",
         "published_at": "2026-09-18T22:57:29Z",
-        "days_old": 13,
+        "days_old": 14,
         "assets": 7,
         "assets_with_digest": 7,
         "queried_assets": [
@@ -3859,16 +4028,17 @@
         }
       ],
       "flags": [
-        "advisories"
+        "advisories",
+        "ci_failing"
       ],
-      "observed_at": "2026-10-02T21:40:32+00:00",
+      "observed_at": "2026-10-03T13:27:10+00:00",
       "archived": false,
-      "last_commit": "2026-10-02T03:07:52Z",
+      "last_commit": "2026-10-03T06:08:17Z",
       "days_since_last_commit": 0,
       "release": {
         "tag": "v1.30.1",
         "published_at": "2026-09-09T05:34:10Z",
-        "days_old": 23,
+        "days_old": 24,
         "assets": 5,
         "assets_with_digest": 5,
         "queried_assets": [
@@ -3916,7 +4086,7 @@
         ],
         "check_suites": 7,
         "complete": true,
-        "failing": 0
+        "failing": 3
       },
       "license": "MIT",
       "scorecard": "not_covered",
@@ -4075,7 +4245,8 @@
           "former_default"
         ],
         "flags": [
-          "no_release"
+          "no_release",
+          "ci_failing"
         ]
       }
     ],
@@ -4088,7 +4259,8 @@
           "former_default"
         ],
         "flags": [
-          "advisories"
+          "advisories",
+          "ci_failing"
         ]
       }
     ],
@@ -4144,8 +4316,19 @@
         "named_as": [
           "repository"
         ],
+        "flags": []
+      }
+    ],
+    "credential-custody": [
+      {
+        "repository": "gethasp/hasp",
+        "state": "measurement",
+        "installs": false,
+        "named_as": [
+          "arm"
+        ],
         "flags": [
-          "ci_failing"
+          "no_provenance"
         ]
       }
     ],
@@ -4157,9 +4340,7 @@
         "named_as": [
           "repository"
         ],
-        "flags": [
-          "ci_failing"
-        ]
+        "flags": []
       }
     ],
     "dagu": [
@@ -4308,7 +4489,8 @@
         ],
         "flags": [
           "no_provenance",
-          "advisories"
+          "advisories",
+          "ci_failing"
         ]
       },
       {
@@ -4319,8 +4501,7 @@
           "arm"
         ],
         "flags": [
-          "no_provenance",
-          "ci_failing"
+          "no_provenance"
         ]
       }
     ],
@@ -4394,7 +4575,8 @@
         ],
         "flags": [
           "no_provenance",
-          "advisories"
+          "advisories",
+          "ci_failing"
         ]
       },
       {
@@ -4406,8 +4588,7 @@
           "arm"
         ],
         "flags": [
-          "no_provenance",
-          "ci_failing"
+          "no_provenance"
         ]
       }
     ],
@@ -4420,7 +4601,8 @@
           "repository"
         ],
         "flags": [
-          "advisories"
+          "advisories",
+          "ci_failing"
         ]
       }
     ],
@@ -4472,7 +4654,8 @@
           "repository"
         ],
         "flags": [
-          "advisories"
+          "advisories",
+          "ci_failing"
         ]
       }
     ],
@@ -4595,6 +4778,30 @@
         ]
       }
     ],
+    "skill-authoring": [
+      {
+        "repository": "anthropics/skills",
+        "state": "resolved",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": [
+          "no_release"
+        ]
+      }
+    ],
+    "skill-discovery": [
+      {
+        "repository": "vercel-labs/skills",
+        "state": "resolved",
+        "installs": true,
+        "named_as": [
+          "repository"
+        ],
+        "flags": []
+      }
+    ],
     "structural-search": [
       {
         "repository": "ast-grep/ast-grep",
@@ -4667,7 +4874,8 @@
         ],
         "flags": [
           "no_provenance",
-          "advisories"
+          "advisories",
+          "ci_failing"
         ]
       }
     ],
@@ -4691,7 +4899,8 @@
           "repository"
         ],
         "flags": [
-          "advisories"
+          "advisories",
+          "ci_failing"
         ]
       }
     ]
