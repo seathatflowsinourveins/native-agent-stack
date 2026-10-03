@@ -31,8 +31,9 @@ def build_models(case, instrument):
             self.calls = []
 
         def get_orderbook_for_fill_simulation(self, native_instrument, order, best_bid, best_ask):
-            # Only the fixture's native OCO market-style legs are supported.
-            if order.order_type.name not in ("STOP_MARKET", "MARKET_IF_TOUCHED"):
+            # MARKET is the supported immediate LEAN-policy reduction path.
+            # The book is consumed before a native fill, never export repricing.
+            if order.order_type.name not in ("STOP_MARKET", "MARKET_IF_TOUCHED", "MARKET"):
                 raise ValueError("unsupported_stress_order_type:" + order.order_type.name)
             if native_instrument.price_precision != instrument["price_precision"]:
                 raise ValueError("stress_instrument_precision_mismatch")

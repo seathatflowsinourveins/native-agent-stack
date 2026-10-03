@@ -782,8 +782,15 @@ def main():
     parser.add_argument("--harness-commit", default=None,
                         help="Commit of the checkout being run, recorded as declared by the operator "
                              "(the isolated run cannot read Git); local_source_sha256 binds the files")
-    parser.add_argument("--case", choices=("one_zero", "one_stress"), default="one_zero")
+    parser.add_argument("--case", choices=("one_zero", "one_stress", "two_zero", "two_stress",
+                                          "adaptive_stress", "over_limit"), default="one_zero")
+    parser.add_argument("--mapping-manifest", type=Path,
+                        help="Explicit prospective six-case successor; old sealed defaults stay historical")
     args = parser.parse_args()
+    if args.mapping_manifest is not None:
+        return _load("spy_six_case_runner", SOURCE / "six_run.py").main(args, sys.modules[__name__])
+    if args.case not in ("one_zero", "one_stress"):
+        raise ValueError("six_case_requires_explicit_prospective_mapping")
     case, instrument, venue_config = case_settings(args.case)
     manifest_name = MANIFEST_STRESS if args.case == "one_stress" else MANIFEST_V2
     preregistration_name = PREREGISTRATION_STRESS if args.case == "one_stress" else "PREREGISTRATION-v2.md"

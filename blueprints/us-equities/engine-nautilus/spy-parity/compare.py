@@ -1258,7 +1258,21 @@ def main() -> int:
     parser.add_argument("--source-dir", type=Path,
                         help="Explicit current harness or sealed historical v2 source directory; no fallback")
     parser.add_argument("--verdict", type=Path, help="Optional path for the machine-readable verdict")
+    parser.add_argument("--mapping-manifest", type=Path,
+                        help="Explicit prospective six-case successor; old receipts retain old seals")
+    parser.add_argument("--oracle-audit", type=Path,
+                        help="Original hash-pinned LEAN case audit.jsonl for all 725 marks")
     args = parser.parse_args()
+
+    if args.mapping_manifest is not None:
+        spec = importlib.util.spec_from_file_location("spy_six_case_compare", SOURCE / "compare_six.py")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        runner_spec = importlib.util.spec_from_file_location("spy_six_compare_runner", SOURCE / "run.py")
+        runner = importlib.util.module_from_spec(runner_spec)
+        sys.modules[runner_spec.name] = runner
+        runner_spec.loader.exec_module(runner)
+        return module.main(args, runner)
 
     receipt = json.loads(args.receipt.read_text())
     if args.manifest is None:
