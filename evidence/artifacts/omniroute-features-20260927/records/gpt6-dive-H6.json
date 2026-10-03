@@ -1,0 +1,283 @@
+{
+  "group": "L — Codex gateway lane; rust-v0.157.1 and OmniRoute a58000c7 + local patches; read-only resolution, 2026-09-27",
+  "items": [
+    {
+      "id": "L01",
+      "feature": "Codex provider headers, WebSocket capability, retries, idle timeout and query parameters",
+      "what_it_does": "All seven fields are supported at rust-v0.157.1. http_headers supplies literals; env_http_headers resolves environment variables, omits missing/empty values and overrides a same-named literal header. query_params appends URL parameters. request_max_retries controls HTTP transport retries; stream_max_retries controls recovery from interrupted sampling streams; stream_idle_timeout_ms bounds waiting for the next parsed SSE event. supports_websockets advertises transport capability.",
+      "defaults": "Custom provider: headers/query parameters unset, supports_websockets=false, request_max_retries=4, stream_max_retries=5, stream_idle_timeout_ms=300000. Both retry counts are capped at 100. HTTP retries cover 5xx and transport failures, not 429; four retries permit five HTTP attempts. OmniRoute source defaults: stream idle 600000 ms, active lifetime 1260000 ms, readiness 80000 ms capped at 180000 ms.",
+      "controls": "Use model_providers.<id> fields or invocation-scoped -c overrides. OmniRoute affinity recognizes x-codex-session-id, then x-session-id, then x-omniroute-session, before body identifiers including prompt_cache_key. Native Codex already supplies prompt_cache_key. An explicit session header is useful only when a launcher needs a distinct, stable logical-session identifier; a constant shared by every worker can collapse account distribution. env_http_headers={\"x-omniroute-session\"=\"OMNIROUTE_SESSION_ID\"} exposes that option, but should remain unset for ordinary native CX.",
+      "current_live_value": "Snapshot observation: requestRetry=3, maxRetryIntervalSec=30, sessionAffinityTtlMs=14400000; Codex uses round-robin with stickyRoundRobinLimit=1. The repository template leaves all seven fields unset, so client defaults are inferred, not observed from a running client. The retained unit records CODEX_CLIENT_VERSION=0.157.1, readiness initial/max=600000 and active lifetime=3600000. Snapshot stream recovery and midstream continuation flags are false; the gateway WS feature flag is true, independently of the client's default false.",
+      "applies_to": "CX provider requests. Shared provider headers/retry policy can also affect its standalone SEARCH calls. These settings do not configure FW clients.",
+      "quality_risk": "Keep WebSockets off: the WS bridge calls buildHeaders without clientHeaders, losing caller-version forwarding. Lower HTTP retry counts can reduce recovery success and therefore require a lane A/B. Preserve five stream retries because gateway cooldown retries do not replace interrupted-stream recovery. Raising the client idle limit cannot defeat a shorter gateway idle/body/readiness cutoff. A multi-hour session is also different from a single response's active lifetime.",
+      "cache_effect": "Headers and timeout settings do not rewrite the prompt body. Existing per-session affinity already addresses the important continuity problem. Adding a shared static session header has no established cache benefit and can impair pool distribution. With approximately 94% cached input in the supplied measurement, preserve stable session/account selection and measure cache reads separately from retry counts.",
+      "token_effect": "Potential savings come from avoiding premature disconnects and repeated large input submissions; ordinary successful requests save no tokens. Request retries and gateway retries have different predicates, so multiplying 4 by 3 is not a valid amplification estimate. The proposed lower HTTP retry budget is experimental; the roughly 1.2% output share provides no reason to reduce answer or reasoning budgets.",
+      "upstream_status": "GitHub API verification: OmniRoute PR #13708 merged 2026-09-19 and changed HTTP caller-version forwarding; its changed files do not include the WS bridge. PR #12893 remains open/deferred and concerns minimum-version guidance. The pinned WS call still omits clientHeaders. The official Codex configuration reference documents the requested provider fields.",
+      "proposed_state": "ON-OPT-IN",
+      "proposed_config": "Keep the existing template/default invocation unchanged. Candidate values, applied only to a selected lane's model_providers.omniroute block: http_headers={version=\"0.157.1\"}; env_http_headers={}; supports_websockets=false; request_max_retries=1; stream_max_retries=5; stream_idle_timeout_ms=660000; query_params={}. Reach the candidate through the existing profile, for example: codex -p omniroute -c 'model_providers.omniroute.http_headers={version=\"0.157.1\"}' -c 'model_providers.omniroute.request_max_retries=1' -c 'model_providers.omniroute.stream_max_retries=5' -c 'model_providers.omniroute.stream_idle_timeout_ms=660000' -c 'model_providers.omniroute.supports_websockets=false'. The 660000 ms value is an experimental margin above the recorded 600000 ms readiness budget, not a guarantee of arbitrary silent reasoning. No configuration was applied.",
+      "experiment_needed": "Stage the A/B: first retain retry counts and test the idle change with genuine max-effort turns and parser-visible heartbeat observations; then compare HTTP retries 4 versus 1. Record completion success, longest SSE-event gap, gateway timeout category, HTTP attempts, sampling reconnects, account changes, cache reads, total tokens and latency. Test concurrent independent sessions before selecting any explicit affinity header. Adopt each change only after that lane preserves quality and completion reliability.",
+      "overturn_condition": "Reject retry reduction if it loses recoverable tasks or increases incomplete runs. Raise the candidate idle value only from measured legitimate event gaps and verified gateway limits. Reconsider WebSockets after caller-version forwarding is fixed and SSE-versus-WS parity passes for GPT-6 max effort, tool calls, resume and cache continuity.",
+      "citations": [
+        {
+          "ref": "https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/model-provider-info/src/lib.rs#L63-L192",
+          "claim": "Provider field definitions, custom-provider WebSocket default, retry/idle defaults and retry caps."
+        },
+        {
+          "ref": "https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/model-provider-info/src/lib.rs#L385-L510",
+          "claim": "Header precedence and omission, HTTP retry predicates, query parameters and effective retry/timeout getters."
+        },
+        {
+          "ref": "https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-client/src/retry.rs#L83-L110",
+          "claim": "HTTP attempts run from zero through max_attempts; retries use backoff and do not currently honor Retry-After."
+        },
+        {
+          "ref": "https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-api/src/sse/responses.rs#L577-L610",
+          "claim": "Client idle timeout surrounds the next parsed SSE event."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/sessionAffinityPin.ts#L196-L218",
+          "claim": "Explicit affinity-header precedence and fallback to body session identifiers/prompt_cache_key."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1136-L1160",
+          "claim": "HTTP executor forwards caller version, falling back to configured/default version."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/internal/codex-responses-ws/route.ts#L715-L719",
+          "claim": "WS bridge invokes buildHeaders without clientHeaders."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/reference/ENVIRONMENT.md#L783-L789",
+          "claim": "Gateway idle, active-lifetime and readiness timeout defaults and their different meanings."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/guides/CODEX-CLI-CONFIGURATION.md#L495-L545",
+          "claim": "Gateway heartbeats do not reset upstream-byte idle watchdogs; long-task timeout changes have gateway-wide consequences."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/pull/13708",
+          "claim": "Merged HTTP caller-version forwarding change; API state and changed-file list inspected."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/pull/12893",
+          "claim": "Open/deferred minimum-client-version guidance proposal."
+        },
+        {
+          "ref": "https://developers.openai.com/codex/config-reference/",
+          "claim": "Official documentation for all requested provider configuration fields."
+        },
+        {
+          "ref": "~/code/native-agent-stack/adoption/templates/codex.omniroute.config.toml:38",
+          "claim": "Reviewed provider block leaves the seven optional fields unset and uses name=OmniRoute."
+        },
+        {
+          "ref": "~/code/native-agent-stack/evidence/artifacts/omniroute-gateway-20260927/omniroute.service:13",
+          "claim": "Retained unit records client-version, readiness and active-timeout overrides; this is recorded evidence, not a fresh process-environment observation."
+        },
+        {
+          "ref": "$SCRATCH/omniroute-phase0/gateway-snapshot.json:1006",
+          "claim": "Snapshot retry settings, provider strategy and affinity TTL; feature flags appear at line 2089."
+        }
+      ],
+      "unverified": [
+        "Effective configuration of currently running Codex processes; repository-template values are not a live client readback.",
+        "Current gateway STREAM_IDLE_TIMEOUT_MS/FETCH_BODY_TIMEOUT_MS environment values; prohibited environment/auth stores were not read.",
+        "Measured benefit and reliability of request_max_retries=1 or stream_idle_timeout_ms=660000.",
+        "No fresh gateway inference or failure-injection experiment was run."
+      ]
+    },
+    {
+      "id": "L02",
+      "feature": "Context-window, automatic-compaction and tool-output limits for cx/gpt-6-astra and cx/gpt-6-sol",
+      "what_it_does": "The cx/ prefix does not make these models unknown at rust-v0.157.1. Codex first matches catalog prefixes, then strips one valid namespace segment and retries; cx/gpt-6-astra and cx/gpt-6-sol inherit their bundled model metadata while retaining the routed slug. Automatic compaction remains enabled. A genuinely unmatched slug instead receives fallback metadata with a 272000-token window, a 272000 override ceiling, 10000-byte tool truncation and Responses Lite disabled.",
+      "defaults": "Both pinned GPT-6 catalog entries specify context_window=272000, max_context_window=872000, auto_compact_token_limit=null and tool truncation=10000 tokens. The default usable window is 95%=258400; automatic compaction derives 90%=244800. An explicit context override is capped at max_context_window; an explicit compaction threshold is clamped to 90% of the resolved window. model_max_output_tokens is absent from the pinned configuration schema.",
+      "controls": "model_context_window, model_auto_compact_token_limit and tool_output_token_limit are root/profile keys, not provider-block fields. Tool-output limits change retained tool-result history, not model generation length. The guide's 400000/350000/32768 example targets cx/gpt-5.5. Its statement that over-90% thresholds are ignored is imprecise: implementation clamps them. Its window-minus-tool-output formula does not describe the pinned ModelInfo calculations, which apply 95% usable context and a separate 90% compaction cap.",
+      "current_live_value": "The reviewed codex.omniroute.config.toml sets cx/gpt-6-astra/max and leaves all four requested keys unset; bundled defaults therefore apply unless another configuration layer overrides them. The gateway GET snapshot does not expose the client's resolved model metadata. Its compression configuration is enabled=false, defaultMode=off, exclusions=[\"codex/*\"]; gateway compression and Codex automatic compaction are separate mechanisms.",
+      "applies_to": "CX Astra judgment and Sol extraction lanes, evaluated separately. These Codex keys do not configure FW memory frameworks or SEARCH requests.",
+      "quality_risk": "No namespace workaround or replacement model catalog is needed for these two slugs. A larger window can defer lossy local compaction and retain more evidence, but longer contexts can also change retrieval accuracy and latency. Keep the existing 10000-token tool-history cap during the context-window experiment so that two independent changes are not confounded. Do not introduce an output cap that could truncate max-effort work.",
+      "cache_effect": "Deferring compaction can preserve an existing prompt prefix longer; compaction replaces history and changes subsequent cache reuse. Retaining substantially more history also increases repeated input volume. With approximately 94% cache reads, fewer logical input tokens alone does not establish a benefit: compare cached reads, uncached input and quality across compaction boundaries.",
+      "token_effect": "Official API documentation advertises 1050000 context and 128000 maximum output for both GPT-6 models. Those API limits do not override this Codex client's bundled 872000 context ceiling. The candidate resolves to 872000 total, 828400 usable and a 784800 compaction threshold. Setting model_context_window=1050000 is capped to 872000; setting model_max_output_tokens=128000 has no supported configuration effect. OmniRoute additionally removes max_output_tokens before Codex upstream dispatch.",
+      "upstream_status": "GitHub API verification: OmniRoute PR #11179 merged 2026-08-23 and makes gateway discovery prefer max_context_window. It does not configure Codex's client-side compaction budget. At this Codex pin, namespace-aware metadata resolution is already implemented. The custom provider with env_key and no model_catalog_url does not obtain an authoritative Codex catalog merely from OmniRoute's ordinary /v1/models listing.",
+      "proposed_state": "ON-OPT-IN",
+      "proposed_config": "For ~/code/native-agent-stack/adoption/templates/codex.omniroute.config.toml, preserve the ordinary profile's current omission of these keys. The exact long-context candidate is three top-level values in a selected lane copy: model_context_window=872000; model_auto_compact_token_limit=784800; tool_output_token_limit=10000. Omit model_max_output_tokens entirely. It is immediately selectable without editing the template: codex -p omniroute -c model_context_window=872000 -c model_auto_compact_token_limit=784800 -c tool_output_token_limit=10000. Keep cx/gpt-6-astra/max; select cx/gpt-6-sol/medium separately for its own A/B. Promote these values into a lane-specific template only after that lane passes. TOML parsing, pinned-schema membership and cap arithmetic were checked; nothing was installed.",
+      "experiment_needed": "Compare the unmodified 272000/244800/10000 control against 872000/784800/10000 on matched multi-hour tasks. Cross at least one control compaction boundary; include earlier-decision recall, exact evidence recovery, tool-result truncation, resume, strict output contracts and repeated compactions. Record actual resolved model metadata, compaction count/trigger, correctness, cache reads, uncached input, total tokens and latency. Evaluate Astra/max and Sol/medium independently.",
+      "overturn_condition": "Reject the wider profile if long-context accuracy, completion reliability or measured resource use worsens without compensating quality. Recalculate limits when the qualified Codex catalog changes. If a lane reports used_fallback_model_metadata=true, repair its catalog/slug resolution before widening: a fallback model's 272000 ceiling prevents these keys alone from restoring GPT-6 metadata.",
+      "citations": [
+        {
+          "ref": "https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/models-manager/src/manager.rs#L763-L800",
+          "claim": "Single-namespace suffix matching preserves the requested slug and inherits matched metadata."
+        },
+        {
+          "ref": "https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/models-manager/models.json#L4-L38",
+          "claim": "Astra's 272000 default, 872000 maximum, 10000-token tool truncation and Responses Lite metadata."
+        },
+        {
+          "ref": "https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/models-manager/models.json#L178-L211",
+          "claim": "Sol's corresponding context, truncation, compaction and Responses Lite metadata."
+        },
+        {
+          "ref": "https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/models-manager/src/model_info.rs#L19-L43",
+          "claim": "Context override is capped by catalog maximum; tool-output override changes truncation policy."
+        },
+        {
+          "ref": "https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/models-manager/src/model_info.rs#L99-L142",
+          "claim": "Truly unknown slugs receive fallback metadata, including the 272000 ceiling and byte-based truncation."
+        },
+        {
+          "ref": "https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/protocol/src/openai_models.rs#L513-L536",
+          "claim": "Resolved window, effective-percentage usable context and min(configured threshold, 90% window) compaction calculation."
+        },
+        {
+          "ref": "https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/session/turn_context.rs#L614-L616",
+          "claim": "Turn context uses ModelInfo.usable_context_window."
+        },
+        {
+          "ref": "https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/models-manager/src/manager.rs#L479-L493",
+          "claim": "Unsupported API-key catalog discovery returns before replacing bundled metadata, including through a prior cache."
+        },
+        {
+          "ref": "https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/model-provider/src/models_endpoint.rs#L202-L209",
+          "claim": "API-key model discovery requires an explicit model_catalog_url or the built-in OpenAI endpoint."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/guides/CODEX-CLI-CONFIGURATION.md#L28-L40",
+          "claim": "The gateway guide's sample context settings target GPT-5.5."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/guides/CODEX-CLI-CONFIGURATION.md#L116-L146",
+          "claim": "Guide descriptions of compaction/tool-output keys and explicit warning that model_max_output_tokens is unsupported."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1490-L1495",
+          "claim": "Gateway removes max_tokens and max_output_tokens before native passthrough returns."
+        },
+        {
+          "ref": "https://developers.openai.com/api/docs/models/gpt-6-astra",
+          "claim": "Official Astra API context and output limits, fetched during this review."
+        },
+        {
+          "ref": "https://developers.openai.com/api/docs/models/gpt-6-sol",
+          "claim": "Official Sol API context and output limits, fetched during this review."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/pull/11179",
+          "claim": "Merged gateway model-discovery correction; it does not alter Codex client configuration."
+        },
+        {
+          "ref": "~/code/native-agent-stack/adoption/templates/codex.omniroute.config.toml:23",
+          "claim": "Reviewed template selects Astra/max and omits all four requested context/output keys."
+        },
+        {
+          "ref": "$SCRATCH/omniroute-phase0/gateway-snapshot.json:1892",
+          "claim": "Snapshot gateway compression settings; these do not reveal client compaction configuration."
+        }
+      ],
+      "unverified": [
+        "Resolved metadata/configuration in active client sessions; no client runtime readback was supplied by the gateway snapshot.",
+        "Whether another profile, CLI override or custom catalog changes a particular lane's limits.",
+        "Quality, latency, cache and token outcomes at the proposed 872000-token window.",
+        "The 1050000-token public API context is not evidence that this OAuth gateway lane can bypass the pinned Codex metadata ceiling."
+      ]
+    },
+    {
+      "id": "L03",
+      "feature": "CX semantic divergences and eligibility to replace native Codex for maximum-quality long runs",
+      "what_it_does": "Four divergences are confirmed. Codex emits reasoning.context=all_turns for the resolved GPT-6 Responses Lite models; OmniRoute's effort/summary whitelist deletes context. Codex's default summary=none omits the wire field; OmniRoute inserts summary=auto. Responses Lite sends empty top-level instructions while placing instructions into input; OmniRoute replaces the empty field with its developer-instruction placeholder. The custom-provider client clears encrypted_function_args from replayed function calls and selects client-orchestrated local compaction. The fifth alleged divergence needs correction: store=false matches native Codex, which already sets it unconditionally.",
+      "defaults": "Both GPT-6 catalog entries enable Responses Lite and default reasoning summaries to none. name=OmniRoute makes is_openai() false. Provider capabilities therefore report remote compaction unsupported; ordinary compaction follows the local summarization path. Gateway regular Codex requests default store=false; compact requests omit store. openaiStoreEnabled=true is an explicit connection exception, not the default for this OAuth pool.",
+      "controls": "No supported selective setting closes all four gaps at these pins. Thinking Budget passthrough preserves effort but does not bypass the executor whitelist or default injection. model_reasoning_summary=\"none\" still omits summary and therefore does not suppress gateway auto injection. An explicit supported non-none summary is preserved, but changes the requested behavior. name=\"OpenAI\" would flip the encryption/remote-compaction classification gates together; it leaves the other rewrites intact and is unsuitable as a parity fix. preserveEncryptedReasoning concerns reasoning items, not client-cleared encrypted_function_args.",
+      "current_live_value": "Snapshot observation: Thinking Budget mode=passthrough; its stored medium effort value is inactive in that mode. The reviewed client template uses name=OmniRoute and Astra/max, with no summary override. The described transformations are source-predicted for that configuration, not a fresh captured upstream payload. Per-connection openaiStoreEnabled and active client feature overrides are absent from the supplied snapshot.",
+      "applies_to": "CX multi-turn GPT-6 sessions, especially max-effort judgment, multi-agent communication, resume and compaction. FW translation can have additional behavior; its successful execution cannot establish native CX parity.",
+      "quality_risk": "The all_turns request is a deliberate reasoning-history semantic that the gateway removes; Codex's source describes omission as current_turn behavior. Clearing encrypted argument metadata and changing compaction mechanisms can affect continuity or delegation. Local compaction means the client asks the model to summarize and replaces history; it does not mean an offline local model. These are concrete semantic differences, while their actual quality loss remains unmeasured. Passing max effort through and completing a short mechanical probe do not establish multi-hour equivalence.",
+      "cache_effect": "Gateway instructions injection changes the request relative to native Responses Lite. Local summarization replaces history and can change cached prefixes; exact GPT-6 cache-key treatment of each changed field was not verified. Do not infer GPT-6 behavior from gateway comments about GPT-5 instructions. store=false is compatible with the existing cache-oriented request construction and is not evidence that prompt caching is disabled.",
+      "token_effect": "Injected summaries can add output; local compaction spends tokens on summarization and changes later input volume. Neither effect has a measured net benefit here. Given approximately 1.2% output and 94% cached input, suppressing reasoning state or rewriting reusable history for nominal token savings has a poor evidentiary basis. L02 can defer compaction but cannot repair these semantics.",
+      "upstream_status": "PR #11041 merged 2026-08-23 and improves OmniRoute remote-compaction V2 handling, but does not remove Codex's custom-provider capability gate. PR #14447 merged 2026-09-22 and fixes plaintext collaboration markers in translated Responses output; it does not preserve encrypted_function_args that Codex clears before sending. Issue #11707 is closed and documents Responses Lite requirements, including all_turns; closure does not establish preservation through the pinned whitelist. No complete parity fix was verified.",
+      "proposed_state": "OFF-BY-EVIDENCE",
+      "proposed_config": "This state rejects promotion of the divergent gateway path to the maximum-quality native replacement; it is not a claim that the transformations can be switched off individually. Keep the existing default path byte-identical. Quality-critical Astra workers select the native route: model_provider=\"openai\", model=\"gpt-6-astra\", model_reasoning_effort=\"max\". Preserve the explicitly selected gateway experiment as name=\"OmniRoute\", wire_api=\"responses\", supports_websockets=false, gateway Thinking Budget mode=\"passthrough\", and openaiStoreEnabled unset/false for Codex OAuth. Do not rename the gateway provider OpenAI, disable Responses Lite metadata, set effort=none, or set store=true as workarounds. Full gateway parity requires implementation changes plus a lane comparison; no such changes were made.",
+      "experiment_needed": "Before reconsidering promotion, compare sanitized native and gateway request structures and run matched multi-hour Astra/max tasks across multiple turns, an actual compaction boundary, resume and account failover. Verify reasoning.context, top-level instructions, summary omission, encrypted collaboration delivery, tool-call/result integrity and compaction results. Score earlier-decision recall and final correctness independently; measure cache reads, uncached input and total tokens. Keep the existing mechanical probe classified as mechanical evidence.",
+      "overturn_condition": "A qualified client/gateway revision or narrowly scoped compatibility implementation preserves the intended native fields, provides remote-compaction behavior without provider-name spoofing, and passes the same lane's preregistered quality/cache comparison. Store needs no parity repair because native Codex already sends false. A measured non-inferiority result is required before promoting any remaining semantic difference.",
+      "citations": [
+        {
+          "ref": "https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/client.rs#L859-L876",
+          "claim": "Summary none omits the field; Responses Lite requests all_turns; the source describes omitted context as current_turn."
+        },
+        {
+          "ref": "https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/client.rs#L897-L954",
+          "claim": "Responses Lite builds empty top-level instructions; non-OpenAI providers clear encrypted_function_args and internal metadata."
+        },
+        {
+          "ref": "https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/client.rs#L972-L999",
+          "claim": "Native client builds prompt_cache_key and unconditionally sends store=false."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L366-L393",
+          "claim": "Gateway inserts reasoning.summary=auto when absent and requests encrypted reasoning content."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1362-L1405",
+          "claim": "Native-passthrough placeholder instructions and store handling, including the connection-level exception."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1467-L1484",
+          "claim": "Reasoning whitelist preserves only effort and summary, deleting context before passthrough returns."
+        },
+        {
+          "ref": "https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/model-provider-info/src/lib.rs#L601-L611",
+          "claim": "OpenAI classification depends on provider display-name equality; backend-route support has additional conditions."
+        },
+        {
+          "ref": "https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/model-provider/src/provider.rs#L410-L423",
+          "claim": "Remote compaction V2 is enabled for OpenAI/Azure classification and unsupported for this custom provider."
+        },
+        {
+          "ref": "https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/tasks/compact.rs#L41-L66",
+          "claim": "Ordinary compaction chooses remote V2 or client-orchestrated summarization from provider capabilities."
+        },
+        {
+          "ref": "https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/compact.rs#L347-L409",
+          "claim": "Local compaction constructs summary history, replaces the active history and reports the accuracy risk of repeated compactions."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/reasoningInputPolicy.ts#L41-L58",
+          "claim": "preserveEncryptedReasoning selects reasoning-item transport; it does not recover function-call metadata removed by the client."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/guides/CODEX-CLI-CONFIGURATION.md#L183-L197",
+          "claim": "Gateway documentation recommends summary controls and Thinking Budget passthrough; it does not promise native semantic identity."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/pull/11041",
+          "claim": "Merged gateway remote-compaction handling fix; distinct from client eligibility."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/pull/14447",
+          "claim": "Merged translated-output plaintext collaboration-marker fix; distinct from outbound encrypted-argument clearing."
+        },
+        {
+          "ref": "https://github.com/diegosouzapw/OmniRoute/issues/11707",
+          "claim": "Closed Responses Lite compatibility report includes the all_turns requirement; its state was retrieved through GitHub issue search."
+        },
+        {
+          "ref": "$SCRATCH/omniroute-phase0/gateway-snapshot.json:3369",
+          "claim": "Snapshot Thinking Budget mode is passthrough; medium is a stored inactive setting."
+        }
+      ],
+      "unverified": [
+        "Actual backend quality impact of dropping all_turns, adding summaries/instructions or clearing encrypted argument metadata.",
+        "Exact GPT-6 cache-key treatment of instructions and reasoning fields.",
+        "Per-connection persistence settings and active client feature overrides; no auth store or connection credentials were read.",
+        "Automatic-compaction runtime traces and multi-hour native-versus-gateway semantic parity.",
+        "Several direct GitHub issue/PR endpoints returned HTTP 403; stated merge/status conclusions use successful API search/direct responses or fetched PR pages, not inferred closure."
+      ]
+    }
+  ],
+  "tools_used": [
+    "mcp__context_mode__ctx_fetch_and_index",
+    "mcp__context_mode__ctx_search",
+    "mcp__context_mode__ctx_execute",
+    "mcp__codebase_memory__search_graph",
+    "mcp__codebase_memory__get_code_snippet",
+    "mcp__codebase_memory__trace_path",
+    "exec_command — read-only sed, rg, git and skill-file reads",
+    "functions.exec — orchestration"
+  ]
+}

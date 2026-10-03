@@ -1,0 +1,223 @@
+{
+  "group": "RH4",
+  "items": [
+    {
+      "id": "S02",
+      "verdict": "upheld",
+      "state": "OFF-BY-EVIDENCE",
+      "config": "Retain settings {\"mcpEnabled\":false,\"mcpTransport\":\"stdio\"}; omit OmniRoute MCP client registrations and do not launch omniroute --mcp. This disables HTTP execution and avoids client catalog loading; it does not disable metadata routes or independently launched stdio processes.",
+      "findings": [
+        {
+          "lens": "quality",
+          "claim": "The disabled-state controls and stdio caveat are correct.",
+          "evidence": "HTTP execution checks mcpEnabled and transport. startMcpStdio initializes and connects independently, without that setting gate. The supplied snapshot records enabled=false, online=false and transport=stdio; it cannot establish absence of every independent process.",
+          "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/mcp/stream/route.ts#L15-L48 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/mcp-server/server.ts#L1523-L1546 ; $SCRATCH/omniroute-phase0/gateway-snapshot.json:/api/mcp/status",
+          "material": true
+        },
+        {
+          "lens": "quality",
+          "claim": "omniroute_route_request cannot transparently replace either CX or structured FW inference.",
+          "evidence": "It constructs only model/messages/stream:false and optional x-combo, omitting reasoning effort, tool definitions and response_format. It returns extracted message content and summaries rather than the native Responses or complete Chat Completions result.",
+          "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/mcp-server/server.ts#L495-L556",
+          "material": true
+        },
+        {
+          "lens": "quality",
+          "claim": "Login-off and disabled scope enforcement leave enabled MCP execution available to admitted local callers.",
+          "evidence": "requireLogin=false makes authentication unnecessary; requireManagementAuth then returns without credentials. evaluateToolScopes permits calls when enforcement is false. The tools metadata route has no mcpEnabled gate, as the proposal acknowledges.",
+          "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/shared/utils/apiAuth.ts#L445-L451 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/api/requireManagementAuth.ts#L49-L60 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/mcp-server/scopeEnforcement.ts#L99-L109 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/mcp/tools/route.ts#L5-L19",
+          "material": true
+        },
+        {
+          "lens": "cache-token",
+          "claim": "Catalog reduction offers no demonstrated saving for these unregistered lanes; description compression is not established as lossless.",
+          "evidence": "Static source enumeration confirms 45 canonical definitions and 110 unique declared tools across collections. Registration applies optional catalog filtering and enabled-by-default description compression; compression rewrites text with Caveman rules. Dynamic skills can enlarge the catalog. Schema cost and prefix effects depend on actual client serialization, so no measured saving should be credited.",
+          "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/mcp-server/server.ts#L111-L136 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/mcp-server/server.ts#L750-L783 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/mcp-server/descriptionCompressor.ts#L50-L74 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/mcp-server/server.ts#L1467-L1481",
+          "material": true
+        }
+      ],
+      "unverified": [
+        "Current client registrations, separately launched stdio processes and effective environment allowlists/scopes; snapshot observations were not refreshed.",
+        "Actual tools/list serialization, schema-token footprint, tool-selection parity and lane A/B results."
+      ]
+    },
+    {
+      "id": "S03",
+      "verdict": "upheld",
+      "state": "N/A",
+      "config": "Retain settings {\"a2aEnabled\":false}; register no A2A consumer for CX/FW/SEARCH; leave CONDUCTOR_HUB_URL unset. Agent Card discovery remains available independently of task execution.",
+      "findings": [
+        {
+          "lens": "quality",
+          "claim": "N/A is justified by the supplied consumer inventory; the disabled execution and keyless-access claims are correct.",
+          "evidence": "a2aEnabled defaults false and the JSON-RPC handler returns 503 when disabled. Authentication accepts keyless callers when neither required gateway-key authentication nor the legacy key applies. Ownerless tasks are visible to every caller. The snapshot records disabled status and zero tasks.",
+          "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/settings.ts#L185-L186 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/a2a/route.ts#L147-L185 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/a2a/authenticate.ts#L30-L62 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/a2a/taskManager.ts#L222-L228 ; $SCRATCH/omniroute-phase0/gateway-snapshot.json:/api/a2a/status",
+          "material": true
+        },
+        {
+          "lens": "quality",
+          "claim": "The separate Agent Card/fleet-discovery control is necessary and correctly specified.",
+          "evidence": "Agent Card GET calls getFleetSkills without checking a2aEnabled. getFleetSkills returns immediately when CONDUCTOR_HUB_URL is unset; otherwise it can fetch the hub's runners. Disabling A2A tasks alone does not suppress this lookup.",
+          "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/.well-known/agent.json/route.ts#L25-L29 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/conductor/fleetSkills.ts#L50-L67",
+          "material": true
+        },
+        {
+          "lens": "quality",
+          "claim": "A2A smart-routing loses the request and response semantics required by the existing lanes.",
+          "evidence": "The six-handler registry is present, but smart-routing reconstructs model/messages/stream:false plus optional x-combo and extracts the first message's content. It forwards neither effort nor tools nor response_format; protocol wrapping therefore cannot substitute for native CX or structured FW.",
+          "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/a2a/taskExecution.ts#L138-L163 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/a2a/skills/smartRouting.ts#L35-L51",
+          "material": true
+        },
+        {
+          "lens": "cache-token",
+          "claim": "No lane token saving or cache-continuity benefit follows from A2A.",
+          "evidence": "The routing skill submits another chat request; it implements no token-reduction mechanism. With no consumer, discovery/artifacts add no lane context. If adopted, the changed request contract requires its own cache and quality measurement.",
+          "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/a2a/skills/smartRouting.ts#L35-L51",
+          "material": true
+        }
+      ],
+      "unverified": [
+        "Effective CONDUCTOR_HUB_URL and legacy A2A-key presence; no environment or authentication stores were read.",
+        "Consumers outside the supplied inventory and live ownership, cancellation, streaming and task-isolation behavior."
+      ]
+    },
+    {
+      "id": "S05",
+      "verdict": "corrected",
+      "state": "OFF-BY-EVIDENCE",
+      "config": "OFF settings stand: empty hook registry; settings {\"modalityBridgeVisionEnabled\":false,\"visionBridgeEnabled\":false,\"modalityBridgeAudioEnabled\":false,\"modalityBridgeVideoEnabled\":false,\"modalityBridgeVideoAudioTranscriptionEnabled\":false,\"credentialRedactionEnabled\":false}; feature overrides {\"INJECTION_GUARD_MODE\":\"off\",\"PII_REDACTION_ENABLED\":\"false\",\"PII_RESPONSE_SANITIZATION\":\"false\"}; service environment INPUT_SANITIZER_ENABLED=false, PII_REDACTION_ENABLED=false, CREDENTIAL_REDACTION_ENABLED=false. Correct the native-vision exemption and bridge-cache claims below. Empty hooks remain an operational condition, not a registration lock.",
+      "findings": [
+        {
+          "lens": "quality",
+          "claim": "The blanket statement that catalog-recognized native-vision models skip conversion needs qualification.",
+          "evidence": "supportsVision=true skips only when conversion is not forced and the combo decision is neither process nor no-vision. A model mapped to a mixed/nonvision combo can still enter conversion despite its own native capability. The OFF recommendation remains appropriate, but model capability alone cannot establish unchanged image handling.",
+          "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/guardrails/visionBridge.ts#L288-L318",
+          "material": true
+        },
+        {
+          "lens": "quality",
+          "claim": "Hook scope and local-registration risks support keeping the registry empty.",
+          "evidence": "Chat invokes runHooks(hookContext) without comboId; combo-scoped hooks require that argument to match. Global hooks can mutate bodies/models or short-circuit requests. The management POST persists and registers enabled hooks, so the proposed empty registry does not prevent later registration under the accepted login-off posture.",
+          "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/handlers/chat.ts#L895-L924 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/middleware/registry.ts#L378-L415 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/middleware/hooks/route.ts#L79-L113",
+          "material": true
+        },
+        {
+          "lens": "quality",
+          "claim": "The proposal correctly distinguishes inspection mode from actual disablement.",
+          "evidence": "The evaluator defaults to warn after its override/environment chain and reads INPUT_SANITIZER_ENABLED directly from the environment. Mode off does not bypass scanning. New modality settings take precedence over legacy vision settings; credential masking enables when either its setting or environment flag is true. The proposed controls address these separate readers.",
+          "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/guardrails/promptInjection.ts#L138-L198 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/shared/constants/modalityBridgeDefaults.ts#L104-L143 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/guardrails/credentialMasker.ts#L138-L165",
+          "material": true
+        },
+        {
+          "lens": "cache-token",
+          "claim": "Bridge inference cost is cache-miss-dependent, and its cache is not exact with respect to the current question.",
+          "evidence": "The describe request uses a prompt composed with the last user question, but the cache key uses image reference, base prompt and configured model. It omits that question and the actual fallback producer; hits skip inference. Consequently, a later question can reuse an earlier task-focused description—an inferred fidelity risk, not an observed wrong answer. This cache is separate from provider prompt-cache reads; no net saving on the measured lanes is established.",
+          "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/guardrails/visionBridge.ts#L490-L538 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/guardrails/visionBridge.ts#L577-L586",
+          "material": true
+        }
+      ],
+      "unverified": [
+        "The researcher's fresh empty-hooks GET is not present in the supplied snapshot and was not independently reproduced.",
+        "Effective service environment, model-capability overrides and live CX/FW image handling; no inference or security-exploit tests were performed.",
+        "Complete request/response byte comparisons, strict-schema/tool accuracy, bridge-cache contents and measured net token/cache effects."
+      ]
+    },
+    {
+      "id": "S06",
+      "verdict": "upheld",
+      "state": "OFF-BY-EVIDENCE",
+      "config": "Retain the proposed target: settings {\"cloudEnabled\":false,\"tailscaleEnabled\":false,\"tailscaleUrl\":\"\"}; unset CLOUD_URL/NEXT_PUBLIC_CLOUD_URL; NEXT_TELEMETRY_DISABLED=1 and NO_UPDATE_NOTIFIER=1 in applicable build/CLI/service environments; individually set OMNIROUTE_SERVER_HOST, API_HOST, LIVE_WS_HOST and EMBED_WS_PROXY_HOST to 127.0.0.1; CLI OMNIROUTE_BASE_URL=http://127.0.0.1:20128; no remote context or running tunnel. Optional inbound defenses remain OMNIROUTE_CLOUD_SYNC_SECRETS=false and OMNIROUTE_CLOUD_SYNC_ENFORCE_SIGNATURE=true. Preserve local metrics. Version/news suppression still requires the acknowledged source or egress control; these settings do not establish complete operational OFF.",
+      "findings": [
+        {
+          "lens": "quality",
+          "claim": "Cloud export presents the stated credential boundary; inbound hardening does not remove outbound secrets.",
+          "evidence": "syncToCloud stops without a cloud URL, otherwise serializes the sync bundle to that destination. The bundle includes provider credentials and gateway API-key values. OMNIROUTE_CLOUD_SYNC_SECRETS controls inbound replacement, while signature enforcement addresses response acceptance. Neither strips outbound credentials.",
+          "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/cloudSync.ts#L5-L22 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/cloudSync.ts#L116-L136 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/sync/bundle.ts#L65-L126",
+          "material": true
+        },
+        {
+          "lens": "quality",
+          "claim": "The proposal correctly acknowledges that update checks remain possible under its existing settings.",
+          "evidence": "GET /api/system/version requests latest-version information and news independently of update-installation support. AUTO_UPDATE_MODE=off is not a disable value. OMNIROUTE_NO_UPDATE_NOTIFIER is checked only after notifier construction, when deciding whether to print. The normal OmniRoute build already supplies NEXT_TELEMETRY_DISABLED=1; the dependency's enabled default is not proof of build telemetry emission.",
+          "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/system/version/route.ts#L56-L94 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/system/autoUpdate.ts#L81-L85 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/bin/omniroute.mjs#L306-L315 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/scripts/build/build-next-isolated.mjs#L161-L174",
+          "material": true
+        },
+        {
+          "lens": "quality",
+          "claim": "Loopback binding, local CLI targeting and stopped tunnels are distinct controls.",
+          "evidence": "The main listener otherwise defaults to 0.0.0.0. CLI base-URL options/environment precede the active context. Tunnel backends can publish the local service externally; hiding their dashboard cards does not stop those processes. The proposed deployment posture is consistent with retaining keyless local access.",
+          "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/bin/cli/utils/serverHost.mjs#L16-L25 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/bin/cli/api.mjs#L24-L40 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/ops/TUNNELS_GUIDE.md#L12-L35",
+          "material": true
+        },
+        {
+          "lens": "cache-token",
+          "claim": "Retaining local telemetry is compatible with disabling optional off-host services and adds no demonstrated model-token cost.",
+          "evidence": "Request telemetry stores summaries in a bounded local history. This mechanism does not inject a usage report into model context. Disabling external checks/export/exposure therefore warrants no token-saving credit; preserving the pin and routing configuration avoids introducing unrelated cache changes.",
+          "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/shared/utils/requestTelemetry.ts#L113-L130",
+          "material": true
+        }
+      ],
+      "unverified": [
+        "Current effective host flags, inherited environment, CLI context, listener addresses and tunnel process state; recorded observations were not refreshed.",
+        "Process-wide egress absence during startup, dashboard use, development and builds; version/news suppression remains unimplemented.",
+        "The live updater-classification error's root cause; similarity to an upstream issue does not establish identical deployment conditions."
+      ]
+    },
+    {
+      "id": "S07",
+      "verdict": "upheld",
+      "state": "OFF-BY-EVIDENCE",
+      "config": "Retain supported desired payloads: /api/settings/memory {\"enabled\":false,\"skillsEnabled\":false}; /api/settings {\"customSystemPromptEnabled\":false,\"customSystemPrompt\":\"\"}; /api/settings/system-prompt {\"enabled\":false,\"prefixPrompt\":\"\",\"suffixPrompt\":\"\",\"prompt\":\"\"}. Preserve client/FW-owned memory and code indexes. x-omniroute-no-memory:true is an additional opt-out if a lane later uses a valid gateway key; it does not disable either prompt feature or existing tool sorting.",
+      "findings": [
+        {
+          "lens": "quality",
+          "claim": "Memory and skill defaults, ownership gates and lane distinctions are correctly described.",
+          "evidence": "Memory defaults disabled with a 2,000-token retrieval budget, while skillsEnabled independently defaults true. Ownership comes from a nonempty apiKeyInfo.id; no owner prevents injection and durable extraction. Retrieval requires messages[], whereas nonstreaming skill injection has its own ownership/skillsEnabled gate. Thus genuine keyless traffic and native input[] retrieval behave as the proposal states.",
+          "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/memory/settings.ts#L26-L51 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore/memoryExtraction.ts#L125-L158 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/memory/injection.ts#L318-L324 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore/memorySkillsInjection.ts#L174-L230",
+          "material": true
+        },
+        {
+          "lens": "quality",
+          "claim": "Both system-prompt controls must remain disabled independently of the memory opt-out.",
+          "evidence": "The no-memory header nulls memory ownership but still calls the injection helper. customSystemPrompt has a separate enabled/content gate. Global prefix/suffix injection has another gate and can wrap native Responses instructions. The proposed separate payloads address these independent content authorities.",
+          "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L641-L654 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1365-L1382 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/systemPrompt.ts#L210-L285",
+          "material": true
+        },
+        {
+          "lens": "cache-token",
+          "claim": "OFF does not restore original client tool-order byte identity; the proposal correctly preserves this caveat.",
+          "evidence": "injectMemoryAndSkills sorts every tools array longer than one regardless of ownership or feature flags. Native Responses passthrough subsequently consumes the current body. Disabling added context therefore preserves this existing transformation rather than proving an untouched client prefix.",
+          "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore/memorySkillsInjection.ts#L257-L264 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L2358-L2366",
+          "material": true
+        },
+        {
+          "lens": "cache-token",
+          "claim": "High provider cache-read rates and sticky accounts do not establish cache-safe memory placement or net savings.",
+          "evidence": "Memory placement uses detectCachingContext(...).hasCacheControl, which inspects explicit cache_control fields rather than provider usage receipts or affinity. Without a usable anchor, memory is prepended; provider constraints can also force leading placement. The nominal 2,000-token retrieval budget uses approximate estimation and excludes separately added skill schemas, so it is not a total added-context cap.",
+          "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore/memorySkillsInjection.ts#L148-L162 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/cachingAware.ts#L52-L103 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/memory/injection.ts#L259-L315 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/memory/retrieval/scoring.ts#L23-L28",
+          "material": true
+        }
+      ],
+      "unverified": [
+        "The researcher's fresh memory/global-prompt GET observations were not independently reproduced; those endpoints are absent from the supplied snapshot.",
+        "Installed skill inventory, individual skill settings and external context-source connections.",
+        "Actual wire captures, task-quality/token/cache A/B outcomes, and a positive per-lane enable mechanism while global flags remain false."
+      ]
+    }
+  ],
+  "cross_item": [
+    "No conflicting setting assignments were found. S02's OFF-BY-EVIDENCE and S03's N/A express different rationales for the same operational choice: leave the unused protocol disabled; neither protocol wrapper preserves full CX/FW inference semantics.",
+    "S02 and S07 controls are independent: disabling MCP does not disable automatic chat memory/skill injection, and disabling chat injection does not stop an independently launched MCP process. https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/mcp-server/server.ts#L1523-L1546 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1365-L1382",
+    "S03's unset CONDUCTOR_HUB_URL complements S06: disabling cloud sync does not suppress Agent Card fleet lookup. S06 also expressly leaves version/news checks unresolved; its OFF state is a proposed disposition, not verified zero-egress enforcement. https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/conductor/fleetSkills.ts#L50-L61 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/system/version/route.ts#L75-L84",
+    "S05 and S07 OFF controls do not jointly certify original-client byte identity: S07's unconditional tool sort remains. None of these proposals supplies measured token savings; avoided hypothetical schema/injection/bridge overhead must not be counted as realized savings on traffic already skipping those features. https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore/memorySkillsInjection.ts#L257-L264"
+  ],
+  "tools_used": [
+    "functions.exec",
+    "exec_command: sed, nl, rg, jq, read-only git and static TypeScript AST inspection",
+    "codebase-memory.search_graph",
+    "context-mode.ctx_execute_file: workspace restriction encountered; authorized shell reads used",
+    "context-mode.ctx_execute",
+    "context-mode.ctx_fetch_and_index",
+    "context-mode.ctx_search"
+  ]
+}

@@ -1,0 +1,44 @@
+"""Deterministic evidence packets: the cited source lines of each dive group, merged per file (no model calls)."""
+import json, re, sys, os, collections
+SRC = os.path.expanduser("~/.local/share/codex-ecosystem/sources/omniroute-a58000c7-pr14904")
+REPO = "~/code/native-agent-stack"
+dives_path, groups_json, outdir = sys.argv[1], sys.argv[2], sys.argv[3]
+dives = {v["id"]: v for v in json.load(open(dives_path)) if v and v.get("id")}
+groups = json.loads(groups_json)
+REF = re.compile(r"(?:https://github\.com/diegosouzapw/OmniRoute/blob/[0-9a-f]{40}/)?([A-Za-z0-9_\-./()\[\]]+\.(?:ts|tsx|mjs|js|md|json|toml|yaml|yml|py|sh|rs))(?:#L(\d+)(?:-L?(\d+))?|:(\d+)(?:-(\d+))?| L(\d+)(?:-(\d+))?)")
+CTX, CAP = 2, 80
+for g, ids in groups.items():
+    ranges = collections.defaultdict(list); unresolved = set()
+    for i in ids:
+        v = dives.get(i)
+        if not v: continue
+        for c in v.get("citations", []):
+            for m in REF.finditer(c.get("ref", "")):
+                path = m.group(1)
+                a = next((x for x in (m.group(2), m.group(4), m.group(6)) if x), None)
+                b = next((x for x in (m.group(3), m.group(5), m.group(7)) if x), None)
+                base = SRC
+                if path.startswith("~/code/native-agent-stack/"): base, path = "", path
+                elif "native-agent-stack" in c.get("ref", "") : base = REPO
+                full = os.path.join(base, path) if base else path
+                if not os.path.isfile(full) or not a: unresolved.add(c.get("ref", "")[:160]); continue
+                a = int(a); b = int(b) if b else a
+                if b - a > CAP: b = a + CAP
+                ranges[full].append((max(1, a - CTX), b + CTX))
+    out = [f"# Evidence packet {g}: cited lines at OmniRoute dd6e9607e (a58000c7+#14904+#13788) and repo files\n# items: {', '.join(ids)}\n"]
+    nlines = 0
+    for f in sorted(ranges):
+        rs = sorted(ranges[f]); merged = []
+        for a, b in rs:
+            if merged and a <= merged[-1][1] + 1: merged[-1][1] = max(merged[-1][1], b)
+            else: merged.append([a, b])
+        lines = open(f, errors="replace").read().split("\n")
+        rel = f.replace(SRC + "/", "OR:").replace(REPO + "/", "REPO:")
+        for a, b in merged:
+            out.append(f"\n## {rel} L{a}-L{min(b, len(lines))}")
+            for k in range(a, min(b, len(lines)) + 1):
+                out.append(f"{k}\t{lines[k-1]}"); nlines += 1
+    out.append("\n## Citations not resolved to a local file (URLs, commands, issues, other repos)\n" + "\n".join(sorted(unresolved)))
+    open(os.path.join(outdir, f"{g}.source.txt"), "w").write("\n".join(out))
+    json.dump([dives[i] for i in ids if i in dives], open(os.path.join(outdir, f"{g}.dives.json"), "w"), indent=1)
+    print(g, "files", len(ranges), "lines", nlines, "unresolved", len(unresolved), "bytes", os.path.getsize(os.path.join(outdir, f"{g}.source.txt")))

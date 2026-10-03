@@ -1,0 +1,77 @@
+[
+ {
+  "case": "A",
+  "model": "cx/gpt-6-astra",
+  "effort_sent": null,
+  "tools": false,
+  "status": 200,
+  "finish": "stop",
+  "tool_calls": false,
+  "usage": {
+   "prompt_tokens": 65,
+   "completion_tokens": 114,
+   "total_tokens": 179,
+   "completion_tokens_details": {
+    "reasoning_tokens": 105
+   }
+  },
+  "seconds": 6.5
+ },
+ {
+  "case": "B",
+  "model": "cx/gpt-6-astra-max",
+  "effort_sent": null,
+  "tools": false,
+  "status": 200,
+  "finish": "stop",
+  "tool_calls": false,
+  "usage": {
+   "prompt_tokens": 65,
+   "completion_tokens": 288,
+   "total_tokens": 353,
+   "completion_tokens_details": {
+    "reasoning_tokens": 279
+   }
+  },
+  "seconds": 12.2
+ },
+ {
+  "case": "C",
+  "model": "cx/gpt-6-astra-max",
+  "effort_sent": null,
+  "tools": true,
+  "status": 200,
+  "finish": "tool_calls",
+  "tool_calls": true,
+  "usage": {
+   "prompt_tokens": 2580,
+   "completion_tokens": 766,
+   "total_tokens": 3346,
+   "completion_tokens_details": {
+    "reasoning_tokens": 675
+   }
+  },
+  "seconds": 25.7
+ },
+ {
+  "case": "D",
+  "model": "cx/gpt-6-astra",
+  "effort_sent": "xhigh",
+  "tools": true,
+  "status": 200,
+  "finish": "tool_calls",
+  "tool_calls": true,
+  "usage": {
+   "prompt_tokens": 2580,
+   "completion_tokens": 439,
+   "total_tokens": 3019,
+   "prompt_tokens_details": {
+    "cached_tokens": 2432
+   },
+   "completion_tokens_details": {
+    "reasoning_tokens": 330
+   }
+  },
+  "seconds": 14.8
+ }
+]

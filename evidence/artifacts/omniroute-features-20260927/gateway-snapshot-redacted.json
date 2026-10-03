@@ -1,0 +1,3533 @@
+{
+ "/api/a2a/status": {
+  "agent": null,
+  "capabilities": null,
+  "enabled": false,
+  "online": false,
+  "skills": [],
+  "status": "disabled",
+  "tasks": {
+   "activeStreams": 0,
+   "counts": {
+    "cancelled": 0,
+    "completed": 0,
+    "failed": 0,
+    "submitted": 0,
+    "working": 0
+   },
+   "lastTaskAt": null,
+   "total": 0
+  }
+ },
+ "/api/analytics/compression": {
+  "avgDurationMs": 0,
+  "avgSavingsPct": 0,
+  "byCompressionCombo": {},
+  "byEngine": {},
+  "byMode": {
+   "off": {
+    "avgSavingsPct": 0,
+    "count": 0,
+    "skipped": 1600,
+    "tokensSaved": 0
+   }
+  },
+  "byProvider": {},
+  "bySkipReason": {
+   "excluded": 1600
+  },
+  "last24h": [
+   {
+    "count": 0,
+    "hour": "2026-09-26T15:00:00Z",
+    "tokensSaved": 0
+   },
+   {
+    "count": 0,
+    "hour": "2026-09-26T16:00:00Z",
+    "tokensSaved": 0
+   },
+   {
+    "count": 0,
+    "hour": "2026-09-26T17:00:00Z",
+    "tokensSaved": 0
+   },
+   {
+    "count": 0,
+    "hour": "2026-09-26T18:00:00Z",
+    "tokensSaved": 0
+   },
+   {
+    "count": 0,
+    "hour": "2026-09-26T19:00:00Z",
+    "tokensSaved": 0
+   },
+   {
+    "count": 0,
+    "hour": "2026-09-26T20:00:00Z",
+    "tokensSaved": 0
+   },
+   {
+    "count": 0,
+    "hour": "2026-09-26T21:00:00Z",
+    "tokensSaved": 0
+   },
+   {
+    "count": 0,
+    "hour": "2026-09-26T22:00:00Z",
+    "tokensSaved": 0
+   },
+   {
+    "count": 0,
+    "hour": "2026-09-26T23:00:00Z",
+    "tokensSaved": 0
+   },
+   {
+    "count": 0,
+    "hour": "2026-09-27T00:00:00Z",
+    "tokensSaved": 0
+   },
+   {
+    "count": 0,
+    "hour": "2026-09-27T01:00:00Z",
+    "tokensSaved": 0
+   },
+   {
+    "count": 0,
+    "hour": "2026-09-27T02:00:00Z",
+    "tokensSaved": 0
+   },
+   {
+    "count": 0,
+    "hour": "2026-09-27T03:00:00Z",
+    "tokensSaved": 0
+   },
+   {
+    "count": 0,
+    "hour": "2026-09-27T04:00:00Z",
+    "tokensSaved": 0
+   },
+   {
+    "count": 0,
+    "hour": "2026-09-27T05:00:00Z",
+    "tokensSaved": 0
+   },
+   {
+    "count": 0,
+    "hour": "2026-09-27T06:00:00Z",
+    "tokensSaved": 0
+   },
+   {
+    "count": 0,
+    "hour": "2026-09-27T07:00:00Z",
+    "tokensSaved": 0
+   },
+   {
+    "count": 0,
+    "hour": "2026-09-27T08:00:00Z",
+    "tokensSaved": 0
+   },
+   {
+    "count": 0,
+    "hour": "2026-09-27T09:00:00Z",
+    "tokensSaved": 0
+   },
+   {
+    "count": 0,
+    "hour": "2026-09-27T10:00:00Z",
+    "tokensSaved": 0
+   },
+   {
+    "count": 0,
+    "hour": "2026-09-27T11:00:00Z",
+    "tokensSaved": 0
+   },
+   {
+    "count": 0,
+    "hour": "2026-09-27T12:00:00Z",
+    "tokensSaved": 0
+   },
+   {
+    "count": 0,
+    "hour": "2026-09-27T13:00:00Z",
+    "tokensSaved": 0
+   },
+   {
+    "count": 0,
+    "hour": "2026-09-27T14:00:00Z",
+    "tokensSaved": 0
+   }
+  ],
+  "mcpDescriptionCompression": {
+   "estimatedTokensSaved": 0,
+   "snapshots": 0
+  },
+  "realUsage": {
+   "bySource": {},
+   "cacheReadTokens": 0,
+   "cacheWriteTokens": 0,
+   "completionTokens": 0,
+   "estimatedUsdSaved": 0,
+   "promptTokens": 0,
+   "requestsWithReceipts": 0,
+   "totalTokens": 0
+  },
+  "totalRequests": 0,
+  "totalSkipped": 1600,
+  "totalTokensSaved": 0,
+  "validationFallbacks": 0
+ },
+ "/api/cache": {
+  "config": {
+   "semanticCacheEnabled": true
+  },
+  "idempotency": {
+   "activeKeys": 0,
+   "windowMs": 5000
+  },
+  "promptCache": {
+   "byProvider": {
+    "codex": {
+     "cacheCreationTokens": 0,
+     "cachedRequests": 1443,
+     "cachedTokens": 110864768,
+     "inputTokens": 118355678,
+     "requests": 1443,
+     "totalRequests": 1540
+    }
+   },
+   "byStrategy": {
+    "direct": {
+     "cacheCreationTokens": 0,
+     "cachedTokens": 110864768,
+     "inputTokens": 118355678,
+     "requests": 1443
+    }
+   },
+   "estimatedCostSaved": 299.33,
+   "lastUpdated": "2026-09-27T14:27:42.236Z",
+   "requestsWithCacheControl": 1443,
+   "tokensSaved": 110864768,
+   "totalCacheCreationTokens": 0,
+   "totalCachedTokens": 110864768,
+   "totalInputTokens": 118355678,
+   "totalRequests": 1540
+  },
+  "semanticCache": {
+   "dbEntries": 0,
+   "hitRate": "0.0",
+   "hits": 0,
+   "memoryEntries": 0,
+   "misses": 0,
+   "tokensSaved": 0
+  },
+  "trend": [
+   {
+    "cacheCreationTokens": 0,
+    "cachedRequests": 0,
+    "cachedTokens": 0,
+    "inputTokens": 13849,
+    "requests": 3,
+    "timestamp": "2026-09-27T06:00:00Z"
+   },
+   {
+    "cacheCreationTokens": 0,
+    "cachedRequests": 38,
+    "cachedTokens": 1260544,
+    "inputTokens": 1525565,
+    "requests": 46,
+    "timestamp": "2026-09-27T07:00:00Z"
+   },
+   {
+    "cacheCreationTokens": 0,
+    "cachedRequests": 310,
+    "cachedTokens": 20808704,
+    "inputTokens": 22102047,
+    "requests": 343,
+    "timestamp": "2026-09-27T08:00:00Z"
+   },
+   {
+    "cacheCreationTokens": 0,
+    "cachedRequests": 111,
+    "cachedTokens": 6954368,
+    "inputTokens": 7363660,
+    "requests": 122,
+    "timestamp": "2026-09-27T09:00:00Z"
+   },
+   {
+    "cacheCreationTokens": 0,
+    "cachedRequests": 11,
+    "cachedTokens": 1659008,
+    "inputTokens": 1701901,
+    "requests": 11,
+    "timestamp": "2026-09-27T10:00:00Z"
+   },
+   {
+    "cacheCreationTokens": 0,
+    "cachedRequests": 26,
+    "cachedTokens": 1015680,
+    "inputTokens": 1170708,
+    "requests": 29,
+    "timestamp": "2026-09-27T11:00:00Z"
+   },
+   {
+    "cacheCreationTokens": 0,
+    "cachedRequests": 453,
+    "cachedTokens": 34155904,
+    "inputTokens": 36929779,
+    "requests": 468,
+    "timestamp": "2026-09-27T12:00:00Z"
+   },
+   {
+    "cacheCreationTokens": 0,
+    "cachedRequests": 221,
+    "cachedTokens": 20249984,
+    "inputTokens": 21226110,
+    "requests": 233,
+    "timestamp": "2026-09-27T13:00:00Z"
+   },
+   {
+    "cacheCreationTokens": 0,
+    "cachedRequests": 273,
+    "cachedTokens": 24760576,
+    "inputTokens": 27037491,
+    "requests": 285,
+    "timestamp": "2026-09-27T14:00:00Z"
+   }
+  ]
+ },
+ "/api/context/combos": {
+  "combos": [
+   {
+    "createdAt": "2026-09-27 06:08:09",
+    "description": "Default lossless dedup and whitespace compression",
+    "id": "default-caveman",
+    "isDefault": true,
+    "languagePacks": [
+     "en"
+    ],
+    "name": "Standard Savings",
+    "outputMode": false,
+    "outputModeIntensity": "full",
+    "pipeline": [
+     {
+      "engine": "session-dedup"
+     },
+     {
+      "engine": "lite"
+     }
+    ],
+    "updatedAt": "2026-09-27T06:08:31.686Z"
+   }
+  ]
+ },
+ "/api/fallback/chains": {},
+ "/api/headroom/status": {
+  "canStart": false,
+  "installed": false,
+  "localUrl": true,
+  "managedPid": null,
+  "path": null,
+  "python": "python3.13",
+  "running": false,
+  "url": "http://localhost:8787"
+ },
+ "/api/mcp/status": {
+  "activity": {
+   "avgDurationMs": 0,
+   "lastCallAt": null,
+   "lastCallTool": null,
+   "successRate": 0,
+   "topTools": [],
+   "totalCalls24h": 0
+  },
+  "enabled": false,
+  "heartbeat": null,
+  "heartbeatPath": "~/.local/share/omniroute/runtime/mcp-heartbeat.json",
+  "httpTransport": {
+   "online": false,
+   "startedAt": null,
+   "transport": null,
+   "uptime": null
+  },
+  "online": false,
+  "scopesEnforced": false,
+  "status": "offline",
+  "transport": "stdio"
+ },
+ "/api/models/alias": {
+  "aliases": {
+   "claude-opus-4-6-thinking": "agy/claude-opus-4-6-thinking",
+   "claude-sonnet-4-6": "agy/claude-sonnet-4-6",
+   "gemini-3.1-flash-lite-preview": "gemini/gemini-3.1-flash-lite",
+   "gemini-3.1-pro": "agy/gemini-pro-agent",
+   "gemini-3.6-flash-low": "agy/gemini-3.6-flash-low"
+  },
+  "catalogVersion": "model-metadata-v1:static"
+ },
+ "/api/search/providers": {
+  "data": [
+   {
+    "created": 1790519262,
+    "id": "serper-search",
+    "name": "Serper Search",
+    "object": "search_provider",
+    "search_types": [
+     "web",
+     "news"
+    ]
+   },
+   {
+    "created": 1790519262,
+    "id": "brave-search",
+    "name": "Brave Search",
+    "object": "search_provider",
+    "search_types": [
+     "web",
+     "news"
+    ]
+   },
+   {
+    "created": 1790519262,
+    "id": "perplexity-search",
+    "name": "Perplexity Search",
+    "object": "search_provider",
+    "search_types": [
+     "web"
+    ]
+   },
+   {
+    "created": 1790519262,
+    "id": "exa-search",
+    "name": "Exa Search",
+    "object": "search_provider",
+    "search_types": [
+     "web",
+     "news"
+    ]
+   },
+   {
+    "created": 1790519262,
+    "id": "tavily-search",
+    "name": "Tavily Search",
+    "object": "search_provider",
+    "search_types": [
+     "web",
+     "news"
+    ]
+   },
+   {
+    "created": 1790519262,
+    "id": "nimble-search",
+    "name": "Nimble Search",
+    "object": "search_provider",
+    "search_types": [
+     "web",
+     "news"
+    ]
+   },
+   {
+    "created": 1790519262,
+    "id": "firecrawl",
+    "name": "Firecrawl",
+    "object": "search_provider",
+    "search_types": [
+     "web",
+     "news"
+    ]
+   },
+   {
+    "created": 1790519262,
+    "id": "google-pse-search",
+    "name": "Google Programmable Search",
+    "object": "search_provider",
+    "search_types": [
+     "web",
+     "news"
+    ]
+   },
+   {
+    "created": 1790519262,
+    "id": "linkup-search",
+    "name": "Linkup Search",
+    "object": "search_provider",
+    "search_types": [
+     "web"
+    ]
+   },
+   {
+    "created": 1790519262,
+    "id": "searchapi-search",
+    "name": "SearchAPI",
+    "object": "search_provider",
+    "search_types": [
+     "web",
+     "news"
+    ]
+   },
+   {
+    "created": 1790519262,
+    "id": "youcom-search",
+    "name": "You.com Search",
+    "object": "search_provider",
+    "search_types": [
+     "web",
+     "news"
+    ]
+   },
+   {
+    "created": 1790519262,
+    "id": "searxng-search",
+    "name": "SearXNG Search",
+    "object": "search_provider",
+    "search_types": [
+     "web",
+     "news"
+    ]
+   },
+   {
+    "created": 1790519262,
+    "id": "ollama-search",
+    "name": "Ollama Search",
+    "object": "search_provider",
+    "search_types": [
+     "web"
+    ]
+   },
+   {
+    "created": 1790519262,
+    "id": "zai-search",
+    "name": "Z.AI Coding Plan Search",
+    "object": "search_provider",
+    "search_types": [
+     "web"
+    ]
+   },
+   {
+    "created": 1790519262,
+    "id": "jina-search",
+    "name": "Jina Search (s.jina.ai)",
+    "object": "search_provider",
+    "search_types": [
+     "web"
+    ]
+   },
+   {
+    "created": 1790519262,
+    "id": "context7",
+    "name": "Context7 (library docs)",
+    "object": "search_provider",
+    "search_types": [
+     "web"
+    ]
+   },
+   {
+    "created": 1790519262,
+    "id": "duckduckgo-free",
+    "name": "DuckDuckGo (free)",
+    "object": "search_provider",
+    "search_types": [
+     "web"
+    ]
+   },
+   {
+    "created": 1790519262,
+    "id": "x-search",
+    "name": "X Search (Grok)",
+    "object": "search_provider",
+    "search_types": [
+     "x"
+    ]
+   },
+   {
+    "created": 1790519262,
+    "id": "xquik-search",
+    "name": "Xquik X Search",
+    "object": "search_provider",
+    "search_types": [
+     "x"
+    ]
+   },
+   {
+    "created": 1790519262,
+    "id": "anysearch-search",
+    "name": "AnySearch",
+    "object": "search_provider",
+    "search_types": [
+     "web"
+    ]
+   },
+   {
+    "created": 1790519262,
+    "id": "firecrawl",
+    "name": "Firecrawl",
+    "object": "search_provider",
+    "search_types": []
+   },
+   {
+    "created": 1790519262,
+    "id": "jina-reader",
+    "name": "Jina Reader (r.jina.ai)",
+    "object": "search_provider",
+    "search_types": []
+   },
+   {
+    "created": 1790519262,
+    "id": "tavily-search",
+    "name": "Tavily Extract",
+    "object": "search_provider",
+    "search_types": []
+   },
+   {
+    "created": 1790519262,
+    "id": "tinyfish",
+    "name": "TinyFish Fetch",
+    "object": "search_provider",
+    "search_types": []
+   },
+   {
+    "created": 1790519262,
+    "id": "nimble-search",
+    "name": "Nimble Extract",
+    "object": "search_provider",
+    "search_types": []
+   },
+   {
+    "created": 1790519262,
+    "id": "anysearch-search",
+    "name": "AnySearch",
+    "object": "search_provider",
+    "search_types": []
+   }
+  ],
+  "providers": [
+   {
+    "configureHref": "/dashboard/providers",
+    "costPerQuery": 0.001,
+    "freeMonthlyQuota": 2500,
+    "id": "serper-search",
+    "kind": "search",
+    "name": "Serper Search",
+    "searchTypes": [
+     "web",
+     "news"
+    ],
+    "status": "missing"
+   },
+   {
+    "configureHref": "/dashboard/providers",
+    "costPerQuery": 0.005,
+    "freeMonthlyQuota": 1000,
+    "id": "brave-search",
+    "kind": "search",
+    "name": "Brave Search",
+    "searchTypes": [
+     "web",
+     "news"
+    ],
+    "status": "missing"
+   },
+   {
+    "configureHref": "/dashboard/providers",
+    "costPerQuery": 0.005,
+    "freeMonthlyQuota": 0,
+    "id": "perplexity-search",
+    "kind": "search",
+    "name": "Perplexity Search",
+    "searchTypes": [
+     "web"
+    ],
+    "status": "missing"
+   },
+   {
+    "configureHref": "/dashboard/providers",
+    "costPerQuery": 0.007,
+    "freeMonthlyQuota": 1000,
+    "id": "exa-search",
+    "kind": "search",
+    "name": "Exa Search",
+    "searchTypes": [
+     "web",
+     "news"
+    ],
+    "status": "missing"
+   },
+   {
+    "configureHref": "/dashboard/providers",
+    "costPerQuery": 0.008,
+    "freeMonthlyQuota": 1000,
+    "id": "tavily-search",
+    "kind": "search",
+    "name": "Tavily Search",
+    "searchTypes": [
+     "web",
+     "news"
+    ],
+    "status": "missing"
+   },
+   {
+    "configureHref": "/dashboard/providers",
+    "costPerQuery": 0.005,
+    "freeMonthlyQuota": 0,
+    "id": "nimble-search",
+    "kind": "search",
+    "name": "Nimble Search",
+    "searchTypes": [
+     "web",
+     "news"
+    ],
+    "status": "missing"
+   },
+   {
+    "configureHref": "/dashboard/providers",
+    "costPerQuery": 0.002,
+    "freeMonthlyQuota": 1000,
+    "id": "firecrawl",
+    "kind": "search",
+    "name": "Firecrawl",
+    "searchTypes": [
+     "web",
+     "news"
+    ],
+    "status": "missing"
+   },
+   {
+    "configureHref": "/dashboard/providers",
+    "costPerQuery": 0.005,
+    "freeMonthlyQuota": 3000,
+    "id": "google-pse-search",
+    "kind": "search",
+    "name": "Google Programmable Search",
+    "searchTypes": [
+     "web",
+     "news"
+    ],
+    "status": "missing"
+   },
+   {
+    "configureHref": "/dashboard/providers",
+    "costPerQuery": 0.005,
+    "freeMonthlyQuota": 1000,
+    "id": "linkup-search",
+    "kind": "search",
+    "name": "Linkup Search",
+    "searchTypes": [
+     "web"
+    ],
+    "status": "missing"
+   },
+   {
+    "configureHref": "/dashboard/providers",
+    "costPerQuery": 0.004,
+    "freeMonthlyQuota": 100,
+    "id": "searchapi-search",
+    "kind": "search",
+    "name": "SearchAPI",
+    "searchTypes": [
+     "web",
+     "news"
+    ],
+    "status": "missing"
+   },
+   {
+    "configureHref": "/dashboard/providers",
+    "costPerQuery": 0.005,
+    "freeMonthlyQuota": 0,
+    "id": "youcom-search",
+    "kind": "search",
+    "name": "You.com Search",
+    "searchTypes": [
+     "web",
+     "news"
+    ],
+    "status": "missing"
+   },
+   {
+    "configureHref": "/dashboard/providers",
+    "costPerQuery": 0,
+    "freeMonthlyQuota": 999999,
+    "id": "searxng-search",
+    "kind": "search",
+    "name": "SearXNG Search",
+    "searchTypes": [
+     "web",
+     "news"
+    ],
+    "status": "missing"
+   },
+   {
+    "configureHref": "/dashboard/providers",
+    "costPerQuery": 0,
+    "freeMonthlyQuota": 1000,
+    "id": "ollama-search",
+    "kind": "search",
+    "name": "Ollama Search",
+    "searchTypes": [
+     "web"
+    ],
+    "status": "missing"
+   },
+   {
+    "configureHref": "/dashboard/providers",
+    "costPerQuery": 0,
+    "freeMonthlyQuota": 0,
+    "id": "zai-search",
+    "kind": "search",
+    "name": "Z.AI Coding Plan Search",
+    "searchTypes": [
+     "web"
+    ],
+    "status": "missing"
+   },
+   {
+    "configureHref": "/dashboard/providers",
+    "costPerQuery": 0.002,
+    "freeMonthlyQuota": 1000,
+    "id": "jina-search",
+    "kind": "search",
+    "name": "Jina Search (s.jina.ai)",
+    "searchTypes": [
+     "web"
+    ],
+    "status": "missing"
+   },
+   {
+    "configureHref": "/dashboard/providers",
+    "costPerQuery": 0,
+    "freeMonthlyQuota": 999999,
+    "id": "context7",
+    "kind": "search",
+    "name": "Context7 (library docs)",
+    "searchTypes": [
+     "web"
+    ],
+    "status": "missing"
+   },
+   {
+    "configureHref": "/dashboard/providers",
+    "costPerQuery": 0,
+    "freeMonthlyQuota": 999999,
+    "id": "duckduckgo-free",
+    "kind": "search",
+    "name": "DuckDuckGo (free)",
+    "searchTypes": [
+     "web"
+    ],
+    "status": "missing"
+   },
+   {
+    "configureHref": "/dashboard/providers",
+    "costPerQuery": 0,
+    "freeMonthlyQuota": 0,
+    "id": "x-search",
+    "kind": "search",
+    "name": "X Search (Grok)",
+    "searchTypes": [
+     "x"
+    ],
+    "status": "missing"
+   },
+   {
+    "configureHref": "/dashboard/providers",
+    "costPerQuery": 0.00075,
+    "freeMonthlyQuota": 0,
+    "id": "xquik-search",
+    "kind": "search",
+    "name": "Xquik X Search",
+    "searchTypes": [
+     "x"
+    ],
+    "status": "missing"
+   },
+   {
+    "configureHref": "/dashboard/providers",
+    "costPerQuery": 0,
+    "freeMonthlyQuota": 0,
+    "id": "anysearch-search",
+    "kind": "search",
+    "name": "AnySearch",
+    "searchTypes": [
+     "web"
+    ],
+    "status": "missing"
+   },
+   {
+    "configureHref": "/dashboard/providers",
+    "costPerQuery": 0.002,
+    "fetchFormats": [
+     "markdown",
+     "html",
+     "links",
+     "screenshot"
+    ],
+    "freeMonthlyQuota": 1000,
+    "id": "firecrawl",
+    "kind": "fetch",
+    "name": "Firecrawl",
+    "status": "missing"
+   },
+   {
+    "configureHref": "/dashboard/providers",
+    "costPerQuery": 0.0005,
+    "fetchFormats": [
+     "markdown",
+     "text"
+    ],
+    "freeMonthlyQuota": 1000,
+    "id": "jina-reader",
+    "kind": "fetch",
+    "name": "Jina Reader (r.jina.ai)",
+    "status": "missing"
+   },
+   {
+    "configureHref": "/dashboard/providers",
+    "costPerQuery": 0.001,
+    "fetchFormats": [
+     "markdown",
+     "text"
+    ],
+    "freeMonthlyQuota": 1000,
+    "id": "tavily-search",
+    "kind": "fetch",
+    "name": "Tavily Extract",
+    "status": "missing"
+   },
+   {
+    "configureHref": "/dashboard/providers",
+    "costPerQuery": 0,
+    "fetchFormats": [
+     "markdown",
+     "html"
+    ],
+    "freeMonthlyQuota": 0,
+    "id": "tinyfish",
+    "kind": "fetch",
+    "name": "TinyFish Fetch",
+    "status": "missing"
+   },
+   {
+    "configureHref": "/dashboard/providers",
+    "costPerQuery": 0.005,
+    "fetchFormats": [
+     "markdown",
+     "html",
+     "links",
+     "screenshot"
+    ],
+    "freeMonthlyQuota": 0,
+    "id": "nimble-search",
+    "kind": "fetch",
+    "name": "Nimble Extract",
+    "status": "missing"
+   },
+   {
+    "configureHref": "/dashboard/providers",
+    "costPerQuery": 0,
+    "fetchFormats": [
+     "markdown"
+    ],
+    "freeMonthlyQuota": 0,
+    "id": "anysearch-search",
+    "kind": "fetch",
+    "name": "AnySearch",
+    "status": "missing"
+   }
+  ]
+ },
+ "/api/settings": {
+  "a2aEnabled": false,
+  "alwaysPreserveClientCache": "auto",
+  "antigravitySignatureCacheMode": "enabled",
+  "apiPort": 20128,
+  "autoDisableBannedScope": "all",
+  "autoRefreshProviderQuota": false,
+  "autoRefreshProviderQuotaInterval": 180,
+  "call_log_pipeline_enabled": 0,
+  "claudeClassifierCompat": "off",
+  "claudeFastMode": {
+   "enabled": false,
+   "supportedModels": [
+    "claude-fable-5",
+    "claude-opus-5",
+    "claude-opus-4-8",
+    "claude-opus-4-7",
+    "claude-opus-4-6"
+   ]
+  },
+  "claudeWarmup": {
+   "connections": {}
+  },
+  "cloudConfigured": false,
+  "cloudEnabled": true,
+  "cloudUrl": null,
+  "codexAutoPing": {
+   "connections": {}
+  },
+  "codexConnectionDefaultsMigrationV1": {
+   "completedAt": "2026-09-27T06:08:10.559Z",
+   "legacyFastEnabled": false,
+   "updatedConnectionIds": "<redacted>"
+  },
+  "codexServiceTier": {
+   "enabled": false
+  },
+  "codex_catalog_revalidated_version": "build:dd6e9607e",
+  "comboAutoPromoteEnabled": false,
+  "comboConfigMode": "guided",
+  "comboStickyRoundRobinLimit": null,
+  "comboStrategy": "fallback",
+  "connectionAwareExpansion": false,
+  "credentialRedactionEnabled": false,
+  "customBannedSignals": [],
+  "customSystemPrompt": "",
+  "customSystemPromptEnabled": false,
+  "dashboardPort": 20128,
+  "debugMode": false,
+  "disableSessionStickiness": false,
+  "excludeTosAvoid": false,
+  "freeAccessPolicy": "<redacted>",
+  "hasPassword": false,
+  "hiddenSidebarGroupLabels": [],
+  "hiddenSidebarItems": [],
+  "hideAutoCombos": false,
+  "hideEndpointCloudflaredTunnel": false,
+  "hideEndpointNgrokTunnel": false,
+  "hideEndpointTailscaleFunnel": false,
+  "hideNoThinkVariants": false,
+  "hidePaidModels": false,
+  "idempotencyWindowMs": 5000,
+  "localOnlyManageScopeBypassEnabled": true,
+  "localOnlyManageScopeBypassPrefixes": [
+   "/api/mcp/"
+  ],
+  "logToolSources": false,
+  "machineId": "<redacted>",
+  "maxBodySizeMb": 10,
+  "maxRetryIntervalSec": 30,
+  "mcpEnabled": false,
+  "modelVisibilityAllowlist": [],
+  "modelVisibilityDenylist": [],
+  "model_sync_last_run": "2026-09-27T14:04:48.410Z",
+  "oidcAllowedSubjects": [],
+  "oidcClientId": "",
+  "oidcClientSecret": "<redacted>",
+  "oidcDisablePasswordLogin": false,
+  "oidcEnabled": false,
+  "oidcIssuer": "",
+  "oidcRedirectPath": "/api/auth/oidc/callback",
+  "oidcScopes": [
+   "openid",
+   "profile",
+   "email"
+  ],
+  "perKeyProxyEnabled": false,
+  "preferClaudeCodeForUnprefixedClaudeModels": false,
+  "promptCacheAffinityEnabled": true,
+  "providerStrategies": {
+   "codex": {
+    "fallbackStrategy": "round-robin",
+    "stickyRoundRobinLimit": 1
+   }
+  },
+  "provider_limits_auto_sync_last_run": "2026-09-27T14:18:26.960Z",
+  "proxyEnabled": true,
+  "quotaVisibility": {},
+  "radarAdminUrl": null,
+  "radarEnabled": false,
+  "requestRetry": 3,
+  "requireLogin": false,
+  "responsesPreviousResponseIdMode": "auto",
+  "runtimePorts": {
+   "apiPort": 20128,
+   "apiPortExplicit": true,
+   "dashboardPort": 20128,
+   "dashboardPortExplicit": true,
+   "port": 20128
+  },
+  "sessionAffinityTtlMs": 14400000,
+  "settingsRevision": 16,
+  "setupComplete": true,
+  "sidebarActivePreset": null,
+  "sidebarItemOrder": {},
+  "sidebarSectionOrder": [],
+  "stickyRoundRobinLimit": 3,
+  "tailscaleEnabled": false,
+  "tailscaleUrl": "",
+  "wsAuth": false
+ },
+ "/api/settings/cache-config": {
+  "alwaysPreserveClientCache": "auto",
+  "embeddingOptions": [
+   {
+    "hasConnection": true,
+    "id": "codex",
+    "models": [],
+    "name": "<email>"
+   },
+   {
+    "baseUrl": "https://clovastudio.stream.ntruss.com/v1/api-tools/embedding/v2",
+    "hasConnection": false,
+    "id": "clova-studio",
+    "models": [
+     {
+      "dimensions": 1024,
+      "id": "clova-studio/clova-embedding-v2",
+      "name": "CLOVA Embedding v2",
+      "rawId": "clova-embedding-v2",
+      "supportedInputTypes": [
+       "text"
+      ]
+     }
+    ],
+    "name": "clova-studio"
+   },
+   {
+    "baseUrl": "https://api.cohere.com/v2/embed",
+    "hasConnection": false,
+    "id": "cohere",
+    "models": [
+     {
+      "id": "cohere/embed-v4.0",
+      "name": "Embed v4.0",
+      "rawId": "embed-v4.0",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "id": "cohere/embed-multilingual-v3.0",
+      "name": "Embed Multilingual v3.0",
+      "rawId": "embed-multilingual-v3.0",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "id": "cohere/embed-multilingual-v3.0-images",
+      "name": "Embed Multilingual v3.0 Image",
+      "rawId": "embed-multilingual-v3.0-images",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "id": "cohere/embed-multilingual-light-v3.0",
+      "name": "Embed Multilingual Light v3.0",
+      "rawId": "embed-multilingual-light-v3.0",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "id": "cohere/embed-multilingual-light-v3.0-images",
+      "name": "Embed Multilingual Light v3.0 Image",
+      "rawId": "embed-multilingual-light-v3.0-images",
+      "supportedInputTypes": [
+       "text"
+      ]
+     }
+    ],
+    "name": "cohere"
+   },
+   {
+    "baseUrl": "https://api.deepinfra.com/v1/openai/embeddings",
+    "hasConnection": false,
+    "id": "deepinfra",
+    "models": [
+     {
+      "dimensions": 4096,
+      "id": "deepinfra/Qwen/Qwen3-Embedding-8B",
+      "name": "Qwen3 Embedding 8B",
+      "rawId": "Qwen/Qwen3-Embedding-8B",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 2560,
+      "id": "deepinfra/Qwen/Qwen3-Embedding-4B",
+      "name": "Qwen3 Embedding 4B",
+      "rawId": "Qwen/Qwen3-Embedding-4B",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 1024,
+      "id": "deepinfra/Qwen/Qwen3-Embedding-0.6B",
+      "name": "Qwen3 Embedding 0.6B",
+      "rawId": "Qwen/Qwen3-Embedding-0.6B",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 1024,
+      "id": "deepinfra/BAAI/bge-large-en-v1.5",
+      "name": "BGE Large EN v1.5",
+      "rawId": "BAAI/bge-large-en-v1.5",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 768,
+      "id": "deepinfra/BAAI/bge-base-en-v1.5",
+      "name": "BGE Base EN v1.5",
+      "rawId": "BAAI/bge-base-en-v1.5",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 1024,
+      "id": "deepinfra/BAAI/bge-m3",
+      "name": "BGE-M3",
+      "rawId": "BAAI/bge-m3",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 1024,
+      "id": "deepinfra/intfloat/e5-large-v2",
+      "name": "E5 Large v2",
+      "rawId": "intfloat/e5-large-v2",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 1024,
+      "id": "deepinfra/thenlper/gte-large",
+      "name": "GTE Large",
+      "rawId": "thenlper/gte-large",
+      "supportedInputTypes": [
+       "text"
+      ]
+     }
+    ],
+    "name": "deepinfra"
+   },
+   {
+    "baseUrl": "https://api.fireworks.ai/inference/v1/embeddings",
+    "hasConnection": false,
+    "id": "fireworks",
+    "models": [
+     {
+      "dimensions": 768,
+      "id": "fireworks/nomic-ai/nomic-embed-text-v1.5",
+      "name": "Nomic Embed Text v1.5",
+      "rawId": "nomic-ai/nomic-embed-text-v1.5",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 4096,
+      "id": "fireworks/accounts/fireworks/models/qwen3-embedding-8b",
+      "name": "Qwen3 Embedding 8B",
+      "rawId": "accounts/fireworks/models/qwen3-embedding-8b",
+      "supportedInputTypes": [
+       "text"
+      ]
+     }
+    ],
+    "name": "fireworks"
+   },
+   {
+    "baseUrl": "https://generativelanguage.googleapis.com/v1beta/openai/embeddings",
+    "hasConnection": false,
+    "id": "gemini",
+    "models": [
+     {
+      "dimensions": 3072,
+      "id": "gemini/gemini-embedding-2",
+      "name": "Gemini Embedding 2",
+      "rawId": "gemini-embedding-2",
+      "supportedInputTypes": [
+       "text",
+       "image",
+       "audio",
+       "video",
+       "document"
+      ]
+     },
+     {
+      "dimensions": 3072,
+      "id": "gemini/gemini-embedding-2-preview",
+      "name": "Gemini Embedding 2 Preview",
+      "rawId": "gemini-embedding-2-preview",
+      "supportedInputTypes": [
+       "text",
+       "image",
+       "audio",
+       "video",
+       "document"
+      ]
+     },
+     {
+      "dimensions": 768,
+      "id": "gemini/gemini-embedding-001",
+      "name": "Gemini Embedding 001",
+      "rawId": "gemini-embedding-001",
+      "supportedInputTypes": [
+       "text"
+      ]
+     }
+    ],
+    "name": "gemini"
+   },
+   {
+    "baseUrl": "https://api.jina.ai/v1/embeddings",
+    "hasConnection": false,
+    "id": "jina-ai",
+    "models": [
+     {
+      "dimensions": 1024,
+      "id": "jina-ai/jina-embeddings-v5-text-small",
+      "name": "Jina Embeddings v5 Text Small",
+      "rawId": "jina-embeddings-v5-text-small",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 768,
+      "id": "jina-ai/jina-embeddings-v5-text-nano",
+      "name": "Jina Embeddings v5 Text Nano",
+      "rawId": "jina-embeddings-v5-text-nano",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 1024,
+      "id": "jina-ai/jina-embeddings-v5-omni-small",
+      "name": "Jina Embeddings v5 Omni Small",
+      "rawId": "jina-embeddings-v5-omni-small",
+      "supportedInputTypes": [
+       "text",
+       "image",
+       "audio",
+       "video",
+       "document"
+      ]
+     },
+     {
+      "dimensions": 768,
+      "id": "jina-ai/jina-embeddings-v5-omni-nano",
+      "name": "Jina Embeddings v5 Omni Nano",
+      "rawId": "jina-embeddings-v5-omni-nano",
+      "supportedInputTypes": [
+       "text",
+       "image",
+       "audio",
+       "video",
+       "document"
+      ]
+     },
+     {
+      "dimensions": 1536,
+      "id": "jina-ai/jina-code-embeddings-1.5b",
+      "name": "Jina Code Embeddings 1.5B",
+      "rawId": "jina-code-embeddings-1.5b",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 896,
+      "id": "jina-ai/jina-code-embeddings-0.5b",
+      "name": "Jina Code Embeddings 0.5B",
+      "rawId": "jina-code-embeddings-0.5b",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 2048,
+      "id": "jina-ai/jina-embeddings-v4",
+      "name": "Jina Embeddings v4",
+      "rawId": "jina-embeddings-v4",
+      "supportedInputTypes": [
+       "text",
+       "image",
+       "document"
+      ]
+     },
+     {
+      "dimensions": 1024,
+      "id": "jina-ai/jina-clip-v2",
+      "name": "Jina CLIP v2",
+      "rawId": "jina-clip-v2",
+      "supportedInputTypes": [
+       "text",
+       "image"
+      ]
+     },
+     {
+      "dimensions": 128,
+      "id": "jina-ai/jina-colbert-v2",
+      "name": "Jina ColBERT v2",
+      "rawId": "jina-colbert-v2",
+      "supportedInputTypes": [
+       "text"
+      ]
+     }
+    ],
+    "name": "jina-ai"
+   },
+   {
+    "baseUrl": "http://localhost:13305/v1/embeddings",
+    "hasConnection": false,
+    "id": "lemonade",
+    "models": [
+     {
+      "dimensions": 1024,
+      "id": "lemonade/harrier-oss-v1-0.6b",
+      "name": "Harrier OSS v1 0.6B",
+      "rawId": "harrier-oss-v1-0.6b",
+      "supportedInputTypes": [
+       "text"
+      ]
+     }
+    ],
+    "name": "lemonade"
+   },
+   {
+    "baseUrl": "http://127.0.0.1:8080/v1/embeddings",
+    "hasConnection": false,
+    "id": "llama-cpp",
+    "models": [],
+    "name": "llama-cpp"
+   },
+   {
+    "baseUrl": "http://localhost:1234/v1/embeddings",
+    "hasConnection": false,
+    "id": "lmstudio",
+    "models": [],
+    "name": "lmstudio"
+   },
+   {
+    "baseUrl": "https://api.mistral.ai/v1/embeddings",
+    "hasConnection": false,
+    "id": "mistral",
+    "models": [
+     {
+      "dimensions": 1024,
+      "id": "mistral/mistral-embed",
+      "name": "Mistral Embed",
+      "rawId": "mistral-embed",
+      "supportedInputTypes": [
+       "text"
+      ]
+     }
+    ],
+    "name": "mistral"
+   },
+   {
+    "baseUrl": "https://api.mixedbread.com/v1/embeddings",
+    "hasConnection": false,
+    "id": "mixedbread",
+    "models": [
+     {
+      "dimensions": 1024,
+      "id": "mixedbread/mixedbread-ai/mxbai-embed-large-v1",
+      "name": "Mixedbread Embed Large v1",
+      "rawId": "mixedbread-ai/mxbai-embed-large-v1",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 1024,
+      "id": "mixedbread/mixedbread-ai/mxbai-embed-2d-large-v1",
+      "name": "Mixedbread Embed 2D Large v1",
+      "rawId": "mixedbread-ai/mxbai-embed-2d-large-v1",
+      "supportedInputTypes": [
+       "text"
+      ]
+     }
+    ],
+    "name": "mixedbread"
+   },
+   {
+    "baseUrl": "https://nano-gpt.com/v1/embeddings",
+    "hasConnection": false,
+    "id": "nanogpt",
+    "models": [
+     {
+      "dimensions": 1536,
+      "id": "nanogpt/text-embedding-3-small",
+      "name": "Text Embedding 3 Small",
+      "rawId": "text-embedding-3-small",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 3072,
+      "id": "nanogpt/text-embedding-3-large",
+      "name": "Text Embedding 3 Large",
+      "rawId": "text-embedding-3-large",
+      "supportedInputTypes": [
+       "text"
+      ]
+     }
+    ],
+    "name": "nanogpt"
+   },
+   {
+    "baseUrl": "https://api.tokenfactory.nebius.com/v1/embeddings",
+    "hasConnection": false,
+    "id": "nebius",
+    "models": [
+     {
+      "dimensions": 4096,
+      "id": "nebius/Qwen/Qwen3-Embedding-8B",
+      "name": "Qwen3 Embedding 8B",
+      "rawId": "Qwen/Qwen3-Embedding-8B",
+      "supportedInputTypes": [
+       "text"
+      ]
+     }
+    ],
+    "name": "nebius"
+   },
+   {
+    "baseUrl": "https://integrate.api.nvidia.com/v1/embeddings",
+    "hasConnection": false,
+    "id": "nvidia",
+    "models": [
+     {
+      "dimensions": 1024,
+      "id": "nvidia/nvidia/nv-embedqa-e5-v5",
+      "name": "NV EmbedQA E5 v5",
+      "rawId": "nvidia/nv-embedqa-e5-v5",
+      "supportedInputTypes": [
+       "text"
+      ]
+     }
+    ],
+    "name": "nvidia"
+   },
+   {
+    "baseUrl": "http://localhost:11434/v1/embeddings",
+    "hasConnection": false,
+    "id": "ollama-local",
+    "models": [
+     {
+      "id": "ollama-local/embeddinggemma",
+      "name": "EmbeddingGemma",
+      "rawId": "embeddinggemma",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "id": "ollama-local/nomic-embed-text",
+      "name": "Nomic Embed Text",
+      "rawId": "nomic-embed-text",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "id": "ollama-local/bge-m3",
+      "name": "BGE M3",
+      "rawId": "bge-m3",
+      "supportedInputTypes": [
+       "text"
+      ]
+     }
+    ],
+    "name": "ollama-local"
+   },
+   {
+    "baseUrl": "https://api.openai.com/v1/embeddings",
+    "hasConnection": false,
+    "id": "openai",
+    "models": [
+     {
+      "dimensions": 1536,
+      "id": "openai/text-embedding-3-small",
+      "name": "Text Embedding 3 Small",
+      "rawId": "text-embedding-3-small",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 3072,
+      "id": "openai/text-embedding-3-large",
+      "name": "Text Embedding 3 Large",
+      "rawId": "text-embedding-3-large",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 1536,
+      "id": "openai/text-embedding-ada-002",
+      "name": "Text Embedding Ada 002",
+      "rawId": "text-embedding-ada-002",
+      "supportedInputTypes": [
+       "text"
+      ]
+     }
+    ],
+    "name": "openai"
+   },
+   {
+    "baseUrl": "https://openrouter.ai/api/v1/embeddings",
+    "hasConnection": false,
+    "id": "openrouter",
+    "models": [
+     {
+      "dimensions": 1536,
+      "id": "openrouter/openai/text-embedding-3-small",
+      "name": "Text Embedding 3 Small (OpenRouter)",
+      "rawId": "openai/text-embedding-3-small",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 3072,
+      "id": "openrouter/openai/text-embedding-3-large",
+      "name": "Text Embedding 3 Large (OpenRouter)",
+      "rawId": "openai/text-embedding-3-large",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 4096,
+      "id": "openrouter/qwen/qwen3-embedding-8b",
+      "name": "Qwen3 Embedding 8B (OpenRouter)",
+      "rawId": "qwen/qwen3-embedding-8b",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 2560,
+      "id": "openrouter/qwen/qwen3-embedding-4b",
+      "name": "Qwen3 Embedding 4B (OpenRouter)",
+      "rawId": "qwen/qwen3-embedding-4b",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 1024,
+      "id": "openrouter/baai/bge-m3",
+      "name": "BGE-M3 (OpenRouter)",
+      "rawId": "baai/bge-m3",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 1024,
+      "id": "openrouter/mistralai/mistral-embed-2312",
+      "name": "Mistral Embed (OpenRouter)",
+      "rawId": "mistralai/mistral-embed-2312",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 3072,
+      "id": "openrouter/google/gemini-embedding-001",
+      "name": "Gemini Embedding 001 (OpenRouter)",
+      "rawId": "google/gemini-embedding-001",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 3072,
+      "id": "openrouter/google/gemini-embedding-2",
+      "name": "Gemini Embedding 2 (OpenRouter)",
+      "rawId": "google/gemini-embedding-2",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 3072,
+      "id": "openrouter/google/gemini-embedding-2-preview",
+      "name": "Gemini Embedding 2 Preview (OpenRouter)",
+      "rawId": "google/gemini-embedding-2-preview",
+      "supportedInputTypes": [
+       "text"
+      ]
+     }
+    ],
+    "name": "openrouter"
+   },
+   {
+    "baseUrl": "https://api.together.xyz/v1/embeddings",
+    "hasConnection": false,
+    "id": "together",
+    "models": [
+     {
+      "dimensions": 1024,
+      "id": "together/BAAI/bge-large-en-v1.5",
+      "name": "BGE Large EN v1.5",
+      "rawId": "BAAI/bge-large-en-v1.5",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 768,
+      "id": "together/togethercomputer/m2-bert-80M-8k-retrieval",
+      "name": "M2 BERT 80M 8K",
+      "rawId": "togethercomputer/m2-bert-80M-8k-retrieval",
+      "supportedInputTypes": [
+       "text"
+      ]
+     }
+    ],
+    "name": "together"
+   },
+   {
+    "baseUrl": "https://api.upstage.ai/v1/embeddings",
+    "hasConnection": false,
+    "id": "upstage",
+    "models": [
+     {
+      "dimensions": 4096,
+      "id": "upstage/embedding-query",
+      "name": "Embedding Query",
+      "rawId": "embedding-query",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 4096,
+      "id": "upstage/embedding-passage",
+      "name": "Embedding Passage",
+      "rawId": "embedding-passage",
+      "supportedInputTypes": [
+       "text"
+      ]
+     }
+    ],
+    "name": "upstage"
+   },
+   {
+    "baseUrl": "https://ai-gateway.vercel.sh/v1/embeddings",
+    "hasConnection": false,
+    "id": "vercel-ai-gateway",
+    "models": [
+     {
+      "dimensions": 1536,
+      "id": "vercel-ai-gateway/text-embedding-3-small",
+      "name": "Text Embedding 3 Small",
+      "rawId": "text-embedding-3-small",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 3072,
+      "id": "vercel-ai-gateway/text-embedding-3-large",
+      "name": "Text Embedding 3 Large",
+      "rawId": "text-embedding-3-large",
+      "supportedInputTypes": [
+       "text"
+      ]
+     }
+    ],
+    "name": "vercel-ai-gateway"
+   },
+   {
+    "baseUrl": "https://api.voyageai.com/v1/embeddings",
+    "hasConnection": false,
+    "id": "voyage-ai",
+    "models": [
+     {
+      "dimensions": 1024,
+      "id": "voyage-ai/voyage-4-large",
+      "name": "Voyage 4 Large",
+      "rawId": "voyage-4-large",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 1024,
+      "id": "voyage-ai/voyage-4",
+      "name": "Voyage 4",
+      "rawId": "voyage-4",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 1024,
+      "id": "voyage-ai/voyage-4-lite",
+      "name": "Voyage 4 Lite",
+      "rawId": "voyage-4-lite",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 1024,
+      "id": "voyage-ai/voyage-3-large",
+      "name": "Voyage 3 Large",
+      "rawId": "voyage-3-large",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 1024,
+      "id": "voyage-ai/voyage-3.5",
+      "name": "Voyage 3.5",
+      "rawId": "voyage-3.5",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 512,
+      "id": "voyage-ai/voyage-3.5-lite",
+      "name": "Voyage 3.5 Lite",
+      "rawId": "voyage-3.5-lite",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 1024,
+      "id": "voyage-ai/voyage-multilingual-2",
+      "name": "Voyage Multilingual 2",
+      "rawId": "voyage-multilingual-2",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 1024,
+      "id": "voyage-ai/voyage-code-3",
+      "name": "Voyage Code 3",
+      "rawId": "voyage-code-3",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 1536,
+      "id": "voyage-ai/voyage-code-2",
+      "name": "Voyage Code 2",
+      "rawId": "voyage-code-2",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 1024,
+      "id": "voyage-ai/voyage-finance-2",
+      "name": "Voyage Finance 2",
+      "rawId": "voyage-finance-2",
+      "supportedInputTypes": [
+       "text"
+      ]
+     },
+     {
+      "dimensions": 1024,
+      "id": "voyage-ai/voyage-law-2",
+      "name": "Voyage Law 2",
+      "rawId": "voyage-law-2",
+      "supportedInputTypes": [
+       "text"
+      ]
+     }
+    ],
+    "name": "voyage-ai"
+   }
+  ],
+  "idempotencyWindowMs": 5000,
+  "modelCatalogCacheTtlMs": 60000,
+  "promptCacheEnabled": true,
+  "promptCacheStrategy": "auto",
+  "semanticCacheBackend": "memory",
+  "semanticCacheEmbeddingApiKey": "<redacted>",
+  "semanticCacheEmbeddingBaseUrl": "",
+  "semanticCacheEmbeddingDimension": 1024,
+  "semanticCacheEmbeddingModel": "harrier-oss-v1-0.6b",
+  "semanticCacheEmbeddingProvider": "lemonade",
+  "semanticCacheEnabled": true,
+  "semanticCacheMaxSize": 100,
+  "semanticCacheRedisPrefix": "omniroute:semcache:",
+  "semanticCacheRedisUrl": "",
+  "semanticCacheRequireZeroTemp": true,
+  "semanticCacheTTL": 1800000,
+  "semanticCacheThreshold": 0.8,
+  "semanticCacheVectorEnabled": false
+ },
+ "/api/settings/combo-defaults": {
+  "comboDefaults": {
+   "fallbackDelayMs": 0,
+   "handoffModel": "",
+   "handoffThreshold": 0.85,
+   "maxComboDepth": 3,
+   "maxMessagesForSummary": 30,
+   "maxRetries": 1,
+   "reasoningTokenBufferEnabled": true,
+   "retryDelayMs": 2000,
+   "strategy": "priority",
+   "trackMetrics": true,
+   "zeroLatencyOptimizationsEnabled": false
+  },
+  "providerOverrides": {}
+ },
+ "/api/settings/compression": {
+  "activeComboId": null,
+  "aggressive": {
+   "maxTokensPerMessage": 2048,
+   "minSavingsThreshold": 0.05,
+   "summarizerEnabled": true,
+   "thresholds": {
+    "fullSummary": 5,
+    "light": 2,
+    "moderate": 3,
+    "verbatim": 2
+   },
+   "toolStrategies": {
+    "errorMessage": true,
+    "fileContent": true,
+    "grepSearch": true,
+    "json": true,
+    "shellOutput": true
+   }
+  },
+  "autoTriggerMode": "lite",
+  "autoTriggerTokens": 0,
+  "cacheMinutes": 5,
+  "cavemanConfig": {
+   "compressRoles": [
+    "user"
+   ],
+   "enabled": true,
+   "intensity": "lite",
+   "minMessageLength": 50,
+   "preservePatterns": [],
+   "skipRules": []
+  },
+  "cavemanOutputMode": {
+   "autoClarity": true,
+   "enabled": false,
+   "intensity": "lite"
+  },
+  "ccr": {
+   "minChars": 600,
+   "retrievalRampFactor": 2
+  },
+  "codexResponsesConfig": {
+   "enabled": false,
+   "maxCandidateBytes": 524288,
+   "maxLines": 160,
+   "maxOutputBytes": 2097152,
+   "minBytes": 512,
+   "minLogLines": 24,
+   "minSearchMatches": 8,
+   "preserveToolNames": [
+    "Read",
+    "Glob",
+    "Grep",
+    "Write",
+    "Edit",
+    "WebSearch",
+    "WebFetch",
+    "read",
+    "glob",
+    "grep",
+    "write",
+    "edit",
+    "web_search",
+    "web_fetch"
+   ]
+  },
+  "comboOverrides": {},
+  "compressionComboId": null,
+  "contextBudget": {
+   "absoluteBudget": 0,
+   "mode": "off",
+   "outputReserve": 4096,
+   "pct": 0.85,
+   "policy": "reserve-output",
+   "safetyMargin": 1024
+  },
+  "contextEditing": {
+   "enabled": false
+  },
+  "defaultMode": "off",
+  "enabled": false,
+  "engines": {
+   "aggressive": {
+    "enabled": false
+   },
+   "caveman": {
+    "enabled": true,
+    "level": "lite"
+   },
+   "ccr": {
+    "enabled": false
+   },
+   "codex-responses": {
+    "enabled": false
+   },
+   "headroom": {
+    "enabled": false
+   },
+   "lite": {
+    "enabled": true
+   },
+   "llmlingua": {
+    "enabled": false
+   },
+   "omniglyph": {
+    "enabled": false
+   },
+   "relevance": {
+    "enabled": false
+   },
+   "rtk": {
+    "enabled": false,
+    "level": "minimal"
+   },
+   "session-dedup": {
+    "enabled": true
+   },
+   "ultra": {
+    "enabled": false
+   }
+  },
+  "enginesExplicit": false,
+  "exclusions": [
+   "codex/*"
+  ],
+  "headroom": {
+   "minRows": 8
+  },
+  "languageConfig": {
+   "autoDetect": true,
+   "defaultLanguage": "en",
+   "enabled": false,
+   "enabledPacks": [
+    "en"
+   ]
+  },
+  "lite": {
+   "compressToolResults": true
+  },
+  "liveZone": {
+   "enabled": false
+  },
+  "mcpDescriptionCompressionEnabled": true,
+  "omniglyph": {
+   "profile": "aggressive"
+  },
+  "outputStyles": [],
+  "preserveSystemPrompt": true,
+  "preserveSystemPromptMode": "always",
+  "rtkConfig": {
+   "applyToAssistantMessages": false,
+   "applyToCodeBlocks": false,
+   "applyToToolResults": true,
+   "customFiltersEnabled": true,
+   "deduplicateThreshold": 3,
+   "disabledFilters": [],
+   "enableGrouping": false,
+   "enableRenderers": false,
+   "enabled": false,
+   "enabledFilters": [],
+   "groupingThreshold": 3,
+   "intensity": "minimal",
+   "maxCharsPerResult": 12000,
+   "maxLinesPerResult": 120,
+   "preserveDocstrings": true,
+   "rawOutputMaxAgeDays": 30,
+   "rawOutputMaxBytes": 1048576,
+   "rawOutputMaxFiles": 100000,
+   "rawOutputRetention": "never",
+   "stripCodeComments": false,
+   "trustProjectFilters": false
+  },
+  "sessionDedup": {
+   "fuzzy": false,
+   "minBlockChars": 80
+  },
+  "stackedPipeline": [
+   {
+    "engine": "rtk",
+    "intensity": "standard"
+   },
+   {
+    "engine": "caveman",
+    "intensity": "full"
+   }
+  ],
+  "ultra": {
+   "compressionRate": 0.5,
+   "enabled": false,
+   "maxTokensPerMessage": 0,
+   "minScoreThreshold": 0.3,
+   "slmFallbackToAggressive": true
+  },
+  "ultraEngine": "heuristic",
+  "ultraSlmPrewarm": false
+ },
+ "/api/settings/feature-flags": {
+  "flags": [
+   {
+    "category": "security",
+    "defaultValue": "false",
+    "description": "Require an API key for all incoming requests",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "REQUIRE_API_KEY",
+    "label": "Require API Key",
+    "requiresRestart": false,
+    "source": "env",
+    "type": "boolean",
+    "warningLevel": "caution"
+   },
+   {
+    "category": "security",
+    "defaultValue": "true",
+    "description": "Enable input sanitization for all requests",
+    "effectiveValue": "true",
+    "enumValues": null,
+    "flag": "INPUT_SANITIZER_ENABLED",
+    "label": "Input Sanitizer",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "security",
+    "defaultValue": "off",
+    "description": "Set the prompt injection guard mode",
+    "effectiveValue": "off",
+    "enumValues": [
+     "off",
+     "warn",
+     "block",
+     "redact"
+    ],
+    "flag": "INJECTION_GUARD_MODE",
+    "label": "Injection Guard Mode",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "enum",
+    "warningLevel": "info"
+   },
+   {
+    "category": "security",
+    "defaultValue": "false",
+    "description": "Redact personally identifiable information from requests",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "PII_REDACTION_ENABLED",
+    "label": "PII Redaction",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "security",
+    "defaultValue": "false",
+    "description": "Sanitize PII from provider responses",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "PII_RESPONSE_SANITIZATION",
+    "label": "PII Response Sanitization",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "security",
+    "defaultValue": "redact",
+    "description": "Mode for PII response sanitization: redact (replace PII), warn (log only), block (reject), off (disable)",
+    "effectiveValue": "redact",
+    "enumValues": [
+     "redact",
+     "warn",
+     "block",
+     "off"
+    ],
+    "flag": "PII_RESPONSE_SANITIZATION_MODE",
+    "label": "PII Response Sanitization Mode",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "enum",
+    "warningLevel": "info"
+   },
+   {
+    "category": "security",
+    "defaultValue": "true",
+    "description": "Block outbound requests to private/internal IP ranges",
+    "effectiveValue": "true",
+    "enumValues": null,
+    "flag": "OUTBOUND_SSRF_GUARD_ENABLED",
+    "label": "SSRF Guard",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "security",
+    "defaultValue": "false",
+    "description": "Allow authenticated dashboard users to reveal stored API keys instead of only seeing masked values.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "ALLOW_API_KEY_REVEAL",
+    "label": "API Key Reveal",
+    "requiresRestart": false,
+    "source": "env",
+    "type": "boolean",
+    "warningLevel": "danger"
+   },
+   {
+    "category": "security",
+    "defaultValue": "false",
+    "description": "Include account prefix in AUTH log lines (e.g. \"Using <provider> account: abc12345...\"). Disabled by default so account identifiers are redacted from shared/multi-tenant process logs. Independent from Debug Mode; flipping Debug Mode does not reveal this.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "AUTH_LOG_INCLUDE_ACCOUNT_ID",
+    "label": "Log Account IDs",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "security",
+    "defaultValue": "false",
+    "description": "When OIDC is enabled, disable password login so users can only authenticate via OIDC Single Sign-On. When disabled (default), both password login and OIDC are available.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "OMNIROUTE_OIDC_DISABLE_PASSWORD_LOGIN",
+    "label": "Disable Password Login With OIDC",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "network",
+    "defaultValue": "false",
+    "description": "Enable TLS fingerprint stealth mode",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "ENABLE_TLS_FINGERPRINT",
+    "label": "TLS Fingerprint",
+    "requiresRestart": true,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "network",
+    "defaultValue": "false",
+    "description": "Allow the /v1/audio/* routes to use OpenAI-compatible provider nodes hosted outside localhost. Off by default \u2014 routing audio to a remote host changes egress identity and must be an explicit operator decision. Loopback nodes are always allowed and unaffected.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "AUDIO_REMOTE_PROVIDER_NODES",
+    "label": "Remote Audio Provider Nodes",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "danger"
+   },
+   {
+    "category": "network",
+    "defaultValue": "false",
+    "description": "Allow POST /v1/rerank (and the memory engine's rerank step, which calls it over loopback) to use OpenAI-compatible provider nodes hosted outside localhost \u2014 a LAN box or Tailscale peer running TEI, Infinity, vLLM, etc. Off by default \u2014 routing to a remote host changes egress identity and must be an explicit operator decision. Loopback nodes are always allowed and unaffected. Remote nodes must also pass the provider outbound URL policy (cloud-metadata hosts are never routed to).",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "RERANK_REMOTE_PROVIDER_NODES",
+    "label": "Remote Rerank Provider Nodes",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "danger"
+   },
+   {
+    "category": "network",
+    "defaultValue": "false",
+    "description": "When no proxy is assigned to a connection, auto-select the first working proxy from the registry. Off by default \u2014 otherwise any single registry proxy becomes a global fallback for all traffic (#3332).",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "PROXY_AUTO_SELECT_ENABLED",
+    "label": "Proxy Auto-Selection Fallback",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "caution"
+   },
+   {
+    "category": "network",
+    "defaultValue": "false",
+    "description": "Allow OAuth and provider validation flows to bypass a pinned proxy and connect directly when proxy reachability pre-checks fail. Off by default because this can change account egress IP.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "OMNIROUTE_CONTROL_PLANE_PROXY_DIRECT_FALLBACK",
+    "label": "Control-Plane Proxy Direct Fallback",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "danger"
+   },
+   {
+    "category": "network",
+    "defaultValue": "true",
+    "description": "On a network exception (timeout, connection refused/reset) for a multi-account rotation executor, when the failing account has no dedicated proxy, apply a short cooldown and skip other proxy-less accounts for the rest of the request instead of retrying each one. On by default (safe: no egress IP change, only reduces latency/cooldown risk on shared-egress accounts). Disable to restore immediate propagation on the first proxy-less throw.",
+    "effectiveValue": "true",
+    "enumValues": null,
+    "flag": "NETWORK_ROTATION_SHARED_EGRESS_GUARD",
+    "label": "Network Rotation Shared-Egress Guard",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "network",
+    "defaultValue": "true",
+    "description": "Proxy pools and the per-account rotation of opencode stop re-serving a proxy that just failed (refused TCP probe, or a 429 received through it) for a per-process period that doubles on each repeat, up to a cap. No proxy status is written; with every candidate set aside the choice is unchanged. On by default: selection order is exactly the plain rotation only with PROXY_SKIP_RECENTLY_FAILED=false.",
+    "effectiveValue": "true",
+    "enumValues": null,
+    "flag": "PROXY_SKIP_RECENTLY_FAILED",
+    "label": "Skip Recently Failed Proxies",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "caution"
+   },
+   {
+    "category": "network",
+    "defaultValue": "false",
+    "description": "For providers whose quota is bucketed by egress address, rank a pool member sharing a recently refused member's observed egress address just below healthy members. Order only, never excluded. Needs PROXY_SKIP_RECENTLY_FAILED, which produces the refusal signal it reads. Off by default: selection order is exactly the plain rotation.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "PROXY_POOL_SHARED_EGRESS_ORDER",
+    "label": "Shared Egress Pool Order",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "caution"
+   },
+   {
+    "category": "network",
+    "defaultValue": "false",
+    "description": "Opencode rotation records which account served or was skipped (masked ids only, never full account ids) and links proxy log entries to their request, so the operator can tell skipped accounts apart from unused ones. Off by default: no extra log lines, no extra columns written.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "ROTATION_ATTRIBUTION",
+    "label": "Rotation Attribution Logging",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "network",
+    "defaultValue": "false",
+    "description": "Show, under a proxy pool in the dashboard, how many observed egress IPs served its members over the last 24 h, how many connections used them and the most seen behind one IP. Read-only, computed from the proxy log, never used for routing. Off by default: the pool editor is unchanged and the observation route answers null.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "PROXY_POOL_EGRESS_OBSERVATION",
+    "label": "Proxy Pool Egress Observation",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "network",
+    "defaultValue": "false",
+    "description": "For the OpenCode executor, watch the first body byte of a streamed Responses reply (window: RESPONSES_FIRST_BYTE_TIMEOUT_MS, default 15000). A 2xx Responses stream that stays silent past the window is treated as stalled: the account is cooled down and the request rotates to the next account once; a second stall fails fast. Off by default: stalled streams keep today's wait until the stream readiness timeout.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "OPENCODE_RESPONSES_STALL_ROTATION",
+    "label": "OpenCode Responses Stall Rotation",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "caution"
+   },
+   {
+    "category": "network",
+    "defaultValue": "false",
+    "description": "For the OpenCode executor, when an upstream answers 403 or 451 carrying a user_blocked refusal (not a geo block, not a Cloudflare fingerprint rejection), cool the refused account down and rotate to the next account at most once per request; a second refusal is returned as-is without a success mark. Off by default: routing around an upstream user block can look like evasion and spread the flag across the account fleet, so the refusal is returned unchanged unless the operator opts in.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "OPENCODE_USER_BLOCKED_ROTATION",
+    "label": "OpenCode user_blocked Rotation",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "caution"
+   },
+   {
+    "category": "network",
+    "defaultValue": "false",
+    "description": "For the OpenCode multi-account rotation, pause before dispatching to the next account once two consecutive attempts failed with a transient upstream error (5xx or an empty 400 rejection). The pause starts at 1.5s, doubles per further consecutive failure, is capped at 6s per pause and 10s per request, is skipped when the client disconnects, and the failed response body is released before waiting. Off by default: failover stays immediate.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "OPENCODE_TRANSIENT_FAILOVER_BACKOFF",
+    "label": "OpenCode Transient Failover Backoff",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "caution"
+   },
+   {
+    "category": "network",
+    "defaultValue": "false",
+    "description": "On translated streaming turns, when the upstream turn carries no usable content (reasoning-only completion or zero valuable chunks), issue bounded retries through the normal credential path (up to `STREAM_RECOVERY.EMPTY_TURN_RETRY_MAX`) before anything is exposed to the client. Off by default: empty turns keep the current behavior (empty 200 or empty-content 502).",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "FLUSH_EMPTY_RETRY_ENABLED",
+    "label": "Flush Empty Turn Retry",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "caution"
+   },
+   {
+    "category": "network",
+    "defaultValue": "false",
+    "description": "For the OpenCode multi-account rotation, stop the account wave at the first 429 classified as a real rate limit (a parseable Retry-After header, or a body naming a rate/usage limit) and return that upstream 429 unchanged (status, body, Retry-After and quota headers), instead of trying every remaining account. Unclassified 429s keep rotating. Off by default: the free tier is limited per egress IP (#9611), so every 429 rotates to the next account, and an exhausted wave returns the last upstream 429.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "OPENCODE_RATE_LIMITED_429_EARLY_STOP",
+    "label": "OpenCode Rate-Limited 429 Early Stop",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "caution"
+   },
+   {
+    "category": "network",
+    "defaultValue": "false",
+    "description": "For the OpenCode multi-account rotation, park the request after repeated transient 429s (or a fresh pool-strain marker) with a heartbeat, then replay one capped leg of up to 3 sequential accounts instead of fanning out the whole fleet. Off by default: every 429 rotates to the next account exactly as before.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "OPENCODE_PARK_AND_RESUME",
+    "label": "OpenCode 429 Park And Resume",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "caution"
+   },
+   {
+    "category": "network",
+    "defaultValue": "false",
+    "description": "For streaming chat requests, when the first upstream body stalls before producing a usable event, issue one bounded second attempt through the same routing path with the same readiness budget and no account penalty. Off by default: a stalled first body fails the request without a retry.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "STREAM_READINESS_STALL_RETRY",
+    "label": "Stream Readiness Stall Retry",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "caution"
+   },
+   {
+    "category": "network",
+    "defaultValue": "false",
+    "description": "For the OpenCode multi-account rotation, after a 429 from an egress-bucketed provider on a proxy-less account under an ambient pool context, ask the connection pool for another member for the next attempt instead of retrying the same egress address. Orders, never excludes: an exhausted pool keeps the current behavior. Off by default: every 429 rotates to the next account exactly as before.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "OPENCODE_POOL_RESELECT",
+    "label": "OpenCode 429 Pool Reselect",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "caution"
+   },
+   {
+    "category": "network",
+    "defaultValue": "false",
+    "description": "Disable TLS certificate verification for MITM proxy",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "MITM_DISABLE_TLS_VERIFY",
+    "label": "Disable TLS Verify (MITM)",
+    "requiresRestart": true,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "danger"
+   },
+   {
+    "category": "network",
+    "defaultValue": "false",
+    "description": "Allow provider URLs pointing to private/internal networks",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "OMNIROUTE_ALLOW_PRIVATE_PROVIDER_URLS",
+    "label": "Allow Private Provider URLs",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "caution"
+   },
+   {
+    "category": "network",
+    "defaultValue": "true",
+    "description": "Allow adding and validating providers on local/private addresses (127.0.0.1, localhost, LAN, private IP ranges) \u2014 needed for local OpenAI-compatible models. Enabled by default (OmniRoute is local-first); turn it OFF to enforce strict public-only blocking if you only use public providers. Cloud-metadata endpoints (e.g. 169.254.169.254) stay blocked either way.",
+    "effectiveValue": "true",
+    "enumValues": null,
+    "flag": "OMNIROUTE_ALLOW_LOCAL_PROVIDER_URLS",
+    "label": "Allow Local Provider URLs",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "caution"
+   },
+   {
+    "category": "network",
+    "defaultValue": "false",
+    "description": "Enable Claude Code compatible provider mode",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "ENABLE_CC_COMPATIBLE_PROVIDER",
+    "label": "CC Compatible Provider",
+    "requiresRestart": true,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "policies",
+    "defaultValue": "disabled",
+    "description": "Set the tool use policy enforcement mode",
+    "effectiveValue": "disabled",
+    "enumValues": [
+     "disabled",
+     "warn",
+     "block"
+    ],
+    "flag": "TOOL_POLICY_MODE",
+    "label": "Tool Policy Mode",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "enum",
+    "warningLevel": "info"
+   },
+   {
+    "category": "policies",
+    "defaultValue": "false",
+    "description": "Automatically enable rate limiting based on usage patterns",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "RATE_LIMIT_AUTO_ENABLE",
+    "label": "Rate Limit Auto-Enable",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "policies",
+    "defaultValue": "false",
+    "description": "Skip OmniRoute's local context-window and max-input-token check for direct single-model requests. Upstream providers remain responsible for enforcing their actual limits. Off by default.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "DISABLE_CONTEXT_WINDOW_CHECKS",
+    "label": "Disable Context Window Checks",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "danger"
+   },
+   {
+    "category": "policies",
+    "defaultValue": "false",
+    "description": "Reject requests before dispatch when the target model lacks required capabilities (vision, tools, structured output, context window). Protects direct single-provider requests that bypass the combo-layer compatibility filter.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "CAPABILITY_FILTER_ENABLED",
+    "label": "Capability Filter",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "caution"
+   },
+   {
+    "category": "policies",
+    "defaultValue": "false",
+    "description": "Enable the OmniRoute Radar module (catalog feed screens and sync). Off by default; enabling only unlocks the UI \u2014 data sync remains a separate opt-in.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "RADAR_ENABLED",
+    "label": "Radar",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "true",
+    "description": "Generate and inject conversation summaries when combo routing switches models. Disable to treat model switches independently and prevent background handoff requests for all existing and future combos.",
+    "effectiveValue": "true",
+    "enumValues": null,
+    "flag": "UNIVERSAL_CONTEXT_HANDOFF_ENABLED",
+    "label": "Universal Context Handoff",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "true",
+    "description": "Drop internal commentary-phase output items from Responses API passthrough streams before forwarding to clients. Disable to receive raw upstream commentary.",
+    "effectiveValue": "true",
+    "enumValues": null,
+    "flag": "RESPONSES_PASSTHROUGH_DROP_COMMENTARY",
+    "label": "Drop Responses Commentary",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "false",
+    "description": "Enforce scope restrictions on MCP tool access",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "OMNIROUTE_MCP_ENFORCE_SCOPES",
+    "label": "MCP Enforce Scopes",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "caution"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "false",
+    "description": "Compress MCP tool descriptions to reduce token usage",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "OMNIROUTE_MCP_COMPRESS_DESCRIPTIONS",
+    "label": "MCP Compress Descriptions",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "false",
+    "description": "Enable background task processing at runtime",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "OMNIROUTE_ENABLE_RUNTIME_BACKGROUND_TASKS",
+    "label": "Runtime Background Tasks",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "false",
+    "description": "Disable all background services (quota refresh, sync, etc)",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "OMNIROUTE_DISABLE_BACKGROUND_SERVICES",
+    "label": "Disable Background Services",
+    "requiresRestart": true,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "caution"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "false",
+    "description": "Trust project-level filters from RTK without validation",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "OMNIROUTE_RTK_TRUST_PROJECT_FILTERS",
+    "label": "RTK Trust Project Filters",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "caution"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "true",
+    "description": "Start the real-time dashboard WebSocket server on import (port 20132, loopback-bound by default). Default: enabled. Set to '0' or 'false' to disable. LAN exposure requires LIVE_WS_HOST=0.0.0.0 + LIVE_WS_ALLOWED_ORIGINS.",
+    "effectiveValue": "true",
+    "enumValues": null,
+    "flag": "OMNIROUTE_ENABLE_LIVE_WS",
+    "label": "Live Dashboard WebSocket",
+    "requiresRestart": true,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "true",
+    "description": "Allow Codex to use the Responses-over-WebSocket transport (the codex CLI WS endpoint and codexTransport=websocket). When off, Codex falls back to HTTP Responses.",
+    "effectiveValue": "true",
+    "enumValues": null,
+    "flag": "OMNIROUTE_CODEX_WS_ENABLED",
+    "label": "Codex Responses WebSocket",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "true",
+    "description": "Allow Codex to use the local app-server WebSocket JSON-RPC transport (codexTransport=app-server). When off, connections opted into app-server fall back to Codex's other transports.",
+    "effectiveValue": "true",
+    "enumValues": null,
+    "flag": "OMNIROUTE_CODEX_APP_SERVER_ENABLED",
+    "label": "Codex App-Server Transport",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "true",
+    "description": "Route budget-exhausted requests to the emergency free fallback provider/model.",
+    "effectiveValue": "true",
+    "enumValues": null,
+    "flag": "OMNIROUTE_EMERGENCY_FALLBACK",
+    "label": "Emergency Fallback",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "caution"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "false",
+    "description": "Enable transparent early retry for truncated upstream SSE streams before any response bytes reach the client.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "STREAM_RECOVERY_ENABLED",
+    "label": "Stream Recovery",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "caution"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "false",
+    "description": "Allow stream recovery to re-request and stitch a response after bytes have already reached the client.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "STREAM_RECOVERY_MIDSTREAM_ENABLED",
+    "label": "Mid-Stream Continuation",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "danger"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "false",
+    "description": "Make mid-stream continuation tool-call safe: never resume a cut stream once a tool call was emitted (in flight or already finished with finish_reason tool_calls), and close after one empty continuation instead of spending the whole budget. Off: release behavior.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "STREAM_RECOVERY_TOOLCALL_ORDER_FIX",
+    "label": "Tool-Call-Safe Continuation",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "false",
+    "description": "Fail over once to a sibling connection when an SSE stream closes before emitting any useful frame and the bounded same-connection retry is spent; with no usable sibling the original STREAM_EARLY_EOF 502 is returned. Off by default: early-EOF stays terminal after the same-connection retry.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "STREAM_EARLY_EOF_SIBLING_FAILOVER_ENABLED",
+    "label": "Early-EOF Sibling Failover",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "true",
+    "description": "Include display-friendly name fields in /v1/models responses. Disable for clients that expect model IDs only.",
+    "effectiveValue": "true",
+    "enumValues": null,
+    "flag": "MODEL_CATALOG_INCLUDE_NAMES",
+    "label": "Model Catalog Names",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "dual",
+    "description": "Controls how model IDs are prefixed in /v1/models. 'dual' (default) emits both alias and canonical provider-id prefixes for backward compatibility. 'alias' emits only the short alias prefix (e.g. ds-web/model, not deepseek-web/model). 'canonical' emits only the full provider-id prefix.",
+    "effectiveValue": "dual",
+    "enumValues": [
+     "dual",
+     "alias",
+     "canonical"
+    ],
+    "flag": "MODELS_CATALOG_PREFIX_MODE",
+    "label": "Models Catalog Prefix Mode",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "enum",
+    "warningLevel": "info"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "true",
+    "description": "Enable periodic Arena AI leaderboard ELO sync for model intelligence rankings.",
+    "effectiveValue": "true",
+    "enumValues": null,
+    "flag": "ARENA_ELO_SYNC_ENABLED",
+    "label": "Arena ELO Sync",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "false",
+    "description": "Advertise claude/<provider>/<model> mirror ids on /v1/models so Claude Code gateway model discovery lists non-Claude models. Warning: doubles catalog entries for all clients when enabled globally.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "EXPOSE_CC_DISCOVERY_ALIASES",
+    "label": "Claude Code Discovery Aliases",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "true",
+    "description": "Master switch for the no-think/<provider>/<model> gateway aliases. On (default): /v1/models advertises a no-thinking variant for every eligible thinking-capable Claude model, and a no-think/ id sent on a request resolves back to the real model with reasoning suppressed. Off: no variants are advertised and a no-think/ id is treated like any other unknown model id. The per-model ModelSpec.noThinkingAlias opt-in/opt-out still applies while this is on.",
+    "effectiveValue": "true",
+    "enumValues": null,
+    "flag": "NO_THINKING_ALIAS_ENABLED",
+    "label": "No-Thinking Model Aliases",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "false",
+    "description": "Disable the generation of thinking level variants (e.g. -low, -medium, -high) in the /v1/models catalog.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "OMNIROUTE_DISABLE_THINKING_LEVEL_VARIANTS",
+    "label": "Disable Thinking Level Variants",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "false",
+    "description": "Enable per-tenant adaptive virtual admission lanes for provider dispatch (#9654): one tenant's burst no longer 503s another. The OMNIROUTE_CHAT_VIRTUAL_LANES env var wins over this dashboard override; changes take effect at server restart.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "OMNIROUTE_CHAT_VIRTUAL_LANES",
+    "label": "Adaptive Virtual Admission Lanes",
+    "requiresRestart": true,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "false",
+    "description": "Advertise <gateway-alias>/<model> mirror ids on /v1/models for models whose canonical owner has no active credential but a passthrough gateway with an active credential routes them. Warning: adds catalog entries for all clients when enabled globally.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "EXPOSE_FUNCTIONAL_GATEWAY_MIRRORS",
+    "label": "Functional Gateway Mirrors",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "false",
+    "description": "Enable balance detection for New-API / One-API / Sub2API aggregator compatible nodes. When enabled, compatible nodes with the aggregator flag set will report their balance in the dashboard and quota-preflight routing.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "NEWAPI_AGGREGATOR_BALANCE",
+    "label": "New-API Aggregator Balance",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "false",
+    "description": "Continue non-streaming server-owned tool calls until the model returns a client-usable response.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "SERVER_OWNED_TOOL_LOOP_ENABLED",
+    "label": "Server-Owned Tool Loop",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "caution"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "false",
+    "description": "Search stats and recent searches only count providers that still have a live connection (keyless providers such as duckduckgo-free always count). Off keeps every retained search row with a provider id.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "SEARCH_STATS_HIDE_DELETED_CONNECTIONS",
+    "label": "Hide Deleted Search Connections",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "false",
+    "description": "Dashboard provider pages: show the Free badge only on signals the provider honors \u2014 drops the display-name heuristic, non-boolean free fields and :free suffixes on registered providers without a documented free tier. Off keeps the historical badge rule.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "FREE_BADGE_REQUIRES_PROVIDER_FREE_TIER",
+    "label": "Strict Free Badge",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "false",
+    "description": "On aggregated 429/503 unavailable responses, omit Retry-After when no concrete future retry time is known (instead of a synthetic 1s), add error.retry_after_provenance (signal | none), and let combo drain paths read prose retry hints from JSON and plain-text upstream bodies.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "RETRY_AFTER_PROVENANCE_ENABLED",
+    "label": "Retry-After Provenance",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "caution"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "false",
+    "description": "When a priority combo target marked fallback-only-on-quota-exhaustion stops the combo for a cause that is provably not quota (provider circuit breaker open, predictive latency skip), answer 502 instead of the quota-looking 503. Lockout, cooldown, unavailable, exhaustion and concurrency-cap stops keep 503.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "PROTECTED_PRIORITY_INFRA_502_ENABLED",
+    "label": "Protected-Priority Infra Stops as 502",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "caution"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "false",
+    "description": "A bare Mistral 401 ({\"detail\":\"Unauthorized\"}, no explicit auth signal) is byte-identical for a revoked key and for exhausted quota. When enabled, such a 401 cools the connection down instead of parking it as expired, up to 3 times within an hour; the next one still parks it as expired, so a revoked key converges. Off by default: every bare Mistral 401 parks the connection as expired, as before.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "MISTRAL_AMBIGUOUS_401_SOFT_LOCKOUT",
+    "label": "Mistral Ambiguous 401 Soft Lockout",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "caution"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "false",
+    "description": "Let the automatic cleanup sweep delete terminal (completed/failed/cancelled/expired) Batch API jobs older than OMNIROUTE_BATCH_RETENTION_DAYS, along with their per-line checkpoints, and clear the BLOB content of uploaded files past their own expires_at. Off by default: every existing install keeps this data exactly as before until an operator opts in. The operator-triggered DELETE /api/v1/batches/delete-completed route is unaffected either way -- it is a separate, unconditional public API contract.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "BATCH_AND_FILE_AUTO_CLEANUP_ENABLED",
+    "label": "Batch & File Auto-Cleanup",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "danger"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "false",
+    "description": "Reserve the selected Antigravity account for the streaming lifecycle of the request that picked it, so a concurrent retry or the credential handoff cannot re-pick an account already committed to an in-flight stream. The reservation is scoped to (connection, callable upstream model), so one account can still serve two different models at once. When every eligible account is already leased for that model, the request returns a structured 503 POOL_BUSY with a bounded Retry-After instead of piling onto a busy account. Off by default: account selection stays exactly as before, and no reservation is taken.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "ANTIGRAVITY_ACCOUNT_LEASE_ENABLED",
+    "label": "Antigravity Account Lease",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "caution"
+   },
+   {
+    "category": "cli",
+    "defaultValue": "false",
+    "description": "Enable compatibility mode for all CLI clients",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "CLI_COMPAT_ALL",
+    "label": "CLI Compat All",
+    "requiresRestart": true,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "cli",
+    "defaultValue": "false",
+    "description": "Enable model alias compatibility layer",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "MODEL_ALIAS_COMPAT_ENABLED",
+    "label": "Model Alias Compat",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "cli",
+    "defaultValue": "false",
+    "description": "Enable automatic pricing data synchronization (requires the PRICING_SYNC_ENABLED environment variable to be set to true)",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "PRICING_SYNC_ENABLED",
+    "label": "Pricing Sync",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "cli",
+    "defaultValue": "false",
+    "description": "After a provider model sync, automatically (re)write ~/.codex/*.config.toml profile files from the live catalog. Never changes the active/default Codex config. Off by default.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "OMNIROUTE_AUTO_SYNC_CODEX_PROFILES",
+    "label": "Auto-Sync Codex Profiles",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "caution"
+   },
+   {
+    "category": "cli",
+    "defaultValue": "false",
+    "description": "After a provider model sync, automatically (re)write ~/.claude/profiles/'<name>'/settings.json Claude Code profiles from the live catalog. Never changes the active/default Claude config. Off by default.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "OMNIROUTE_AUTO_SYNC_CLAUDE_PROFILES",
+    "label": "Auto-Sync Claude Code Profiles",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "caution"
+   },
+   {
+    "category": "health",
+    "defaultValue": "false",
+    "description": "Disable the local instance health check endpoint",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "OMNIROUTE_DISABLE_LOCAL_HEALTHCHECK",
+    "label": "Disable Local Health Check",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "health",
+    "defaultValue": "false",
+    "description": "Disable the token validation health check",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "OMNIROUTE_DISABLE_TOKEN_HEALTHCHECK",
+    "label": "Disable Token Health Check",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "health",
+    "defaultValue": "false",
+    "description": "Enable network access in the skills sandbox environment",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "SKILLS_SANDBOX_NETWORK_ENABLED",
+    "label": "Skills Sandbox Network",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "caution"
+   },
+   {
+    "category": "health",
+    "defaultValue": "false",
+    "description": "In the proxy health sweep, let a probe the target refused (401/403/429: the proxy relayed, the destination refused this egress IP) reset the proxy's consecutive-failure streak, like a served probe. Off by default: a refusal stays neutral and keeps the streak (#10654). A 5xx stays inconclusive either way, and a refusal never removes, disables or re-activates a proxy.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "PROXY_HEALTH_BLOCKED_RESETS_STREAK",
+    "label": "Proxy Health: Refusal Resets Failure Streak",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "info"
+   },
+   {
+    "category": "runtime",
+    "defaultValue": "true",
+    "description": "Fetch the live xAI model catalog for xai-oauth connections from https://api.x.ai/v1/models using the OAuth bearer token, instead of the frozen static seed. On by default. Set the flag to false to keep serving the static seed. HTTP failures fall back to the seed in the discovery route; the flag getter itself does not issue HTTP.",
+    "effectiveValue": "true",
+    "enumValues": null,
+    "flag": "XAI_OAUTH_LIVE_MODEL_DISCOVERY",
+    "label": "xAI OAuth Live Model Discovery",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "caution"
+   },
+   {
+    "category": "health",
+    "defaultValue": "false",
+    "description": "Run the startup DB integrity/health check after the server starts accepting requests (via setImmediate) instead of blocking startup until it completes. Off by default: startup blocks on the check exactly like before #13717, so a corrupt database is still caught before the first request is served. On: startup returns immediately and the check (now bounded/paged and, for a real file-backed DB, isolated in a cancellable child process) runs right after.",
+    "effectiveValue": "false",
+    "enumValues": null,
+    "flag": "DB_HEALTHCHECK_STARTUP_DEFERRED_ENABLED",
+    "label": "DB Health Check: Defer Startup Scan",
+    "requiresRestart": false,
+    "source": "default",
+    "type": "boolean",
+    "warningLevel": "caution"
+   }
+  ],
+  "summary": {
+   "active": 15,
+   "inactive": 65,
+   "overriddenByDb": 0,
+   "overriddenByEnv": 2,
+   "total": 80
+  }
+ },
+ "/api/settings/model-aliases": {
+  "all": {
+   "accounts/fireworks/models/kimi-k2": "moonshotai/Kimi-K2",
+   "accounts/fireworks/models/kimi-k2p5": "moonshotai/Kimi-K2.5",
+   "agnes-1.5-flash": "agnes-3.0-flash",
+   "claude-3-5-haiku-latest": "claude-haiku-4-5-20251001",
+   "claude-3-5-sonnet-latest": "claude-sonnet-4-6",
+   "claude-3-haiku-20240307": "claude-haiku-4-5-20251001",
+   "claude-3-opus-20240229": "claude-opus-4-8",
+   "claude-3-sonnet-20240229": "claude-sonnet-4-6",
+   "codestral": "codestral-latest",
+   "codestral-2405": "codestral-2508",
+   "fireworks/accounts/fireworks/models/kimi-k2": "moonshotai/Kimi-K2",
+   "fireworks/accounts/fireworks/models/kimi-k2p5": "moonshotai/Kimi-K2.5",
+   "gemini-1.0-pro": "gemini-2.5-pro",
+   "gemini-1.5-flash": "gemini-2.5-flash",
+   "gemini-1.5-pro": "gemini-2.5-pro",
+   "gemini-2.0-flash": "gemini-2.5-flash",
+   "gemini-2.0-flash-lite": "gemini-3.1-flash-lite",
+   "gemini-3-pro-high": "gemini-3-1-pro-high",
+   "gemini-3-pro-low": "gemini-3.1-pro-low",
+   "gemini-3.1-flash-lite-preview": "gemini-3.1-flash-lite",
+   "gemini-pro": "gemini-2.5-pro",
+   "gemini-pro-vision": "gemini-2.5-pro",
+   "gemma-4": "gemini-3.1-flash-lite",
+   "kimi-k2": "moonshotai/Kimi-K2",
+   "kimi-k2p5": "moonshotai/Kimi-K2.5",
+   "llama-3-70b": "llama-3.3-70b-versatile",
+   "llama-3-8b": "llama-3.1-8b-instant",
+   "llama-3.3": "llama-3.3-70b-versatile",
+   "mistral-large": "mistral-large-latest",
+   "mistral-small": "mistral-small-latest",
+   "qwen3.8-max": "qwen3.8-max-preview"
+  },
+  "builtIn": {
+   "accounts/fireworks/models/kimi-k2": "moonshotai/Kimi-K2",
+   "accounts/fireworks/models/kimi-k2p5": "moonshotai/Kimi-K2.5",
+   "agnes-1.5-flash": "agnes-3.0-flash",
+   "claude-3-5-haiku-latest": "claude-haiku-4-5-20251001",
+   "claude-3-5-sonnet-latest": "claude-sonnet-4-6",
+   "claude-3-haiku-20240307": "claude-haiku-4-5-20251001",
+   "claude-3-opus-20240229": "claude-opus-4-8",
+   "claude-3-sonnet-20240229": "claude-sonnet-4-6",
+   "codestral": "codestral-latest",
+   "codestral-2405": "codestral-2508",
+   "fireworks/accounts/fireworks/models/kimi-k2": "moonshotai/Kimi-K2",
+   "fireworks/accounts/fireworks/models/kimi-k2p5": "moonshotai/Kimi-K2.5",
+   "gemini-1.0-pro": "gemini-2.5-pro",
+   "gemini-1.5-flash": "gemini-2.5-flash",
+   "gemini-1.5-pro": "gemini-2.5-pro",
+   "gemini-2.0-flash": "gemini-2.5-flash",
+   "gemini-2.0-flash-lite": "gemini-3.1-flash-lite",
+   "gemini-3-pro-high": "gemini-3-1-pro-high",
+   "gemini-3-pro-low": "gemini-3.1-pro-low",
+   "gemini-3.1-flash-lite-preview": "gemini-3.1-flash-lite",
+   "gemini-pro": "gemini-2.5-pro",
+   "gemini-pro-vision": "gemini-2.5-pro",
+   "gemma-4": "gemini-3.1-flash-lite",
+   "kimi-k2": "moonshotai/Kimi-K2",
+   "kimi-k2p5": "moonshotai/Kimi-K2.5",
+   "llama-3-70b": "llama-3.3-70b-versatile",
+   "llama-3-8b": "llama-3.1-8b-instant",
+   "llama-3.3": "llama-3.3-70b-versatile",
+   "mistral-large": "mistral-large-latest",
+   "mistral-small": "mistral-small-latest",
+   "qwen3.8-max": "qwen3.8-max-preview"
+  },
+  "custom": {}
+ },
+ "/api/settings/reasoning-routing-rules": {
+  "rules": []
+ },
+ "/api/settings/task-routing": {
+  "defaultTaskModelMap": {
+   "analysis": "auto/reasoning",
+   "background": "auto/chat:cheap",
+   "chat": "",
+   "coding": "auto/coding",
+   "creative": "",
+   "summarization": "auto/chat:fast",
+   "vision": "auto/vision"
+  },
+  "defaultTaskPatterns": {
+   "analysis": {
+    "patterns": [
+     "analyze",
+     "analyse",
+     "analysis",
+     "compare",
+     "evaluate",
+     "assess",
+     "explain",
+     "reasoning",
+     "pros and cons",
+     "advantages and disadvantages",
+     "what are the implications",
+     "in-depth",
+     "comprehensive"
+    ]
+   },
+   "background": {
+    "patterns": [
+     "generate a title",
+     "generate title",
+     "create a title",
+     "name this",
+     "short description",
+     "brief description",
+     "one-line summary",
+     "conversation title"
+    ]
+   },
+   "chat": {
+    "patterns": []
+   },
+   "coding": {
+    "patterns": [
+     "write code",
+     "write a function",
+     "implement",
+     "debug",
+     "fix this",
+     "fix the",
+     "refactor",
+     "unit test",
+     "write test",
+     "write a script",
+     "code review",
+     "complete this function",
+     "add a feature",
+     "javascript",
+     "typescript",
+     "python",
+     "sql query",
+     "api endpoint"
+    ],
+    "userPatterns": [
+     "```",
+     "def ",
+     "function ",
+     "class ",
+     "import ",
+     "const ",
+     "let ",
+     "var ",
+     "SELECT ",
+     "INSERT ",
+     "<html",
+     "<div"
+    ]
+   },
+   "creative": {
+    "patterns": [
+     "write a story",
+     "write a poem",
+     "write a song",
+     "creative writing",
+     "write a blog",
+     "write an article",
+     "write a script",
+     "write an essay",
+     "imagine",
+     "roleplay",
+     "brainstorm",
+     "creative"
+    ]
+   },
+   "summarization": {
+    "patterns": [
+     "summarize",
+     "summary",
+     "tldr",
+     "tl;dr",
+     "brief overview",
+     "key points",
+     "main points",
+     "what did",
+     "highlights from"
+    ]
+   },
+   "vision": {
+    "patterns": [
+     "look at this image",
+     "in this image",
+     "what do you see",
+     "describe this image",
+     "analyze this image",
+     "read this screenshot"
+    ],
+    "userPatterns": [
+     "image_url",
+     "data:image"
+    ]
+   }
+  },
+  "detectionEnabled": true,
+  "enabled": false,
+  "stats": {
+   "detected": 0,
+   "routed": 0
+  },
+  "taskModelMap": {
+   "analysis": "auto/reasoning",
+   "background": "auto/chat:cheap",
+   "chat": "",
+   "coding": "auto/coding",
+   "creative": "",
+   "summarization": "auto/chat:fast",
+   "vision": "auto/vision"
+  }
+ },
+ "/api/settings/thinking-budget": {
+  "customBudget": 10240,
+  "effortLevel": "medium",
+  "mode": "passthrough"
+ },
+ "/api/settings/tier-config": {
+  "defaults": {
+   "cheapThreshold": 1,
+   "freeThreshold": 0
+  },
+  "freeProviders": [
+   "kiro",
+   "qoder",
+   "pollinations",
+   "longcat",
+   "cloudflare-ai",
+   "nvidia-nim",
+   "groq",
+   "devin-cli-agentic",
+   "opencode",
+   "duckduckgo-web",
+   "cloudflare-playground",
+   "auggie",
+   "zcode",
+   "codex-app-server",
+   "uncloseai",
+   "aihorde"
+  ],
+  "modelOverrides": [],
+  "providerOverrides": [],
+  "version": "1.0.0"
+ },
+ "/api/system/version": {
+  "autoUpdateError": "Not a git repository. Download source or use npm install -g.",
+  "autoUpdateSupported": false,
+  "channel": "source",
+  "current": "3.8.51",
+  "latest": "3.8.50",
+  "news": null,
+  "updateAvailable": false
+ },
+ "/api/telemetry/summary": {
+  "activeConnections": 23,
+  "avg": 1924,
+  "avgLatencyMs": 1924,
+  "count": 24,
+  "errorRate": 0,
+  "memoryUsage": {
+   "arrayBuffers": 20761633,
+   "external": 20884267,
+   "heapTotal": 589316096,
+   "heapUsed": 427771320,
+   "rss": 984866816
+  },
+  "p50": 1374,
+  "p95": 5072,
+  "p99": 6836,
+  "phaseBreakdown": {
+   "connect": {
+    "avg": 1913,
+    "count": 24,
+    "p50": 1362,
+    "p95": 5061
+   },
+   "finalize": {
+    "avg": 0,
+    "count": 24,
+    "p50": 0,
+    "p95": 0
+   },
+   "parse": {
+    "avg": 0,
+    "count": 24,
+    "p50": 0,
+    "p95": 0
+   },
+   "policy": {
+    "avg": 0,
+    "count": 24,
+    "p50": 0,
+    "p95": 1
+   },
+   "resolve": {
+    "avg": 0,
+    "count": 24,
+    "p50": 0,
+    "p95": 1
+   },
+   "validate": {
+    "avg": 3,
+    "count": 24,
+    "p50": 3,
+    "p95": 4
+   }
+  },
+  "quotaMonitor": {
+   "active": 0,
+   "alerting": 0,
+   "errors": 0,
+   "exhausted": 0,
+   "statusCounts": {
+    "error": 0,
+    "exhausted": 0,
+    "healthy": 0,
+    "idle": 0,
+    "starting": 0,
+    "warning": 0
+   }
+  },
+  "sessions": {
+   "activeCount": 23,
+   "stickyBoundCount": 23
+  },
+  "totalRequests": 24,
+  "uptime": 25675.421652815
+ },
+ "/api/usage/cache-health": {
+  "byModel": [
+   {
+    "cacheReadTotal": 109886976,
+    "cacheWriteTotal": 0,
+    "calls": 1434,
+    "heavyWriteCalls": 0,
+    "model": "codex/gpt-6-astra",
+    "writeReadRatio": 0
+   },
+   {
+    "cacheReadTotal": 0,
+    "cacheWriteTotal": 0,
+    "calls": 4,
+    "heavyWriteCalls": 0,
+    "model": "codex/gpt-6-luna",
+    "writeReadRatio": 0
+   },
+   {
+    "cacheReadTotal": 977792,
+    "cacheWriteTotal": 0,
+    "calls": 48,
+    "heavyWriteCalls": 0,
+    "model": "codex/gpt-6-sol",
+    "writeReadRatio": 0
+   }
+  ],
+  "cacheReadTotal": 110864768,
+  "cacheWriteTotal": 0,
+  "coldCalls": 0,
+  "heavyWriteCallShare": 0,
+  "heavyWriteCalls": 0,
+  "heavyWriteThreshold": 1024,
+  "heavyWriteTokenShare": 0,
+  "rewriteCalls": 0,
+  "since": "2026-09-26T14:27:42.242Z",
+  "timeRange": "24h",
+  "totalCalls": 1486,
+  "truncated": false,
+  "uncachedCalls": 43,
+  "verdict": "healthy",
+  "warmCalls": 1443,
+  "writeMax": 0,
+  "writeP50": 0,
+  "writeP90": 0,
+  "writeP99": 0,
+  "writeReadRatio": 0
+ }
+}

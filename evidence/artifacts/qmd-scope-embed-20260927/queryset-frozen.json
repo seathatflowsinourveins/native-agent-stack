@@ -1,0 +1,131 @@
+{
+  "queries": [
+    {
+      "id": "frozen-retrieval-01",
+      "query": "In the September 19 source review, what prospective pytest command is listed for the eslazarev purged-cross-validation alternative?",
+      "style": "lexical",
+      "collection": "us-equities-catalog",
+      "expected_docs": [
+        "qmd://us-equities-catalog/data-evaluation-followup.md"
+      ],
+      "evidence": [
+        "catalogs/us-equities/data-evaluation-followup.md:90: \"| eslazarev alternative | `python -m pytest tests/test_purge_embargo_properties.py tests/test_walk_forward.py -q` |\""
+      ]
+    },
+    {
+      "id": "frozen-retrieval-02",
+      "query": "In the September 19 source review, which license does Storybloq itself declare when GitHub reports no classification?",
+      "style": "paraphrase",
+      "collection": "us-equities-catalog",
+      "expected_docs": [
+        "qmd://us-equities-catalog/simulation-data-review.md"
+      ],
+      "evidence": [
+        "catalogs/us-equities/simulation-data-review.md:35: \"Its README identifies PolyForm Shield 1.0\"",
+        "catalogs/us-equities/simulation-data-review.md:36: \"generic SPDX result is NOASSERTION, so it must not be labeled MIT.\""
+      ]
+    },
+    {
+      "id": "frozen-retrieval-03",
+      "query": "Two revisions of the same event for one asset come from the same feed with identical availability times and sequence numbers. How must replay handle that ambiguity?",
+      "style": "conceptual",
+      "collection": "us-equities-foundation",
+      "expected_docs": [
+        "qmd://us-equities-foundation/nanosecond-replay/README.md"
+      ],
+      "evidence": [
+        "blueprints/us-equities/nanosecond-replay/README.md:56-57: \"breaks ties only within that asset/event/feed and available-time scope; equal sequence ties reject.\""
+      ]
+    },
+    {
+      "id": "frozen-retrieval-04",
+      "query": "What is the maximum UTF-8 input size accepted by the offline Alpaca order-intent boundary?",
+      "style": "lexical",
+      "collection": "us-equities-foundation",
+      "expected_docs": [
+        "qmd://us-equities-foundation/order-contract/README.md"
+      ],
+      "evidence": [
+        "blueprints/us-equities/order-contract/README.md:46: \"oversized input (>8,192 UTF-8 bytes)\""
+      ]
+    },
+    {
+      "id": "frozen-retrieval-05",
+      "query": "In the September 24 four-candidate study's main 16-block comparison, what fraction of splits put the training winner in the lower half of the test ranking?",
+      "style": "paraphrase",
+      "collection": "us-equities-foundation",
+      "expected_docs": [
+        "qmd://us-equities-foundation/overfitting-controls/README.md",
+        "qmd://us-equities-foundation/research-evaluation/README.md"
+      ],
+      "evidence": [
+        "blueprints/us-equities/overfitting-controls/README.md:12-13: \"share of in-sample/out-of-sample block splits in which the in-sample best trial ranks at or below the out-of-sample median.\"",
+        "blueprints/us-equities/overfitting-controls/README.md:38: \"| **PBO** (S = 16, mean-label metric, 12,870 splits) | **0.776** |\"",
+        "blueprints/us-equities/research-evaluation/README.md:84-85: \"ratio is **0.552** and the CSCV probability of backtest overfitting is **0.776**.\""
+      ]
+    },
+    {
+      "id": "frozen-retrieval-06",
+      "query": "When CPU control is delegated, what floor does ecosystem-bounded-run apply to its default CPUQuota?",
+      "style": "lexical",
+      "collection": "foundation-adoption",
+      "expected_docs": [
+        "qmd://foundation-adoption/tools/README.md"
+      ],
+      "evidence": [
+        "adoption/tools/README.md:102: \"**Default:** (online CPUs − 2) × 100%, with a floor of 100%.\""
+      ]
+    },
+    {
+      "id": "frozen-retrieval-07",
+      "query": "What return value does the Linux guarded Gitleaks launcher use when another scan under the same user account is already in progress?",
+      "style": "paraphrase",
+      "collection": "foundation-adoption",
+      "expected_docs": [
+        "qmd://foundation-adoption/tools/README.md"
+      ],
+      "evidence": [
+        "adoption/tools/README.md:72: \"`75` lock held by another scan\""
+      ]
+    },
+    {
+      "id": "frozen-retrieval-08",
+      "query": "The generated catalog page is no longer stored in Git, so CI has no checked-in HTML to compare against. How does the builder check that repeated runs still produce identical output?",
+      "style": "conceptual",
+      "collection": "foundation-docs",
+      "expected_docs": [
+        "qmd://foundation-docs/decisions/2026-09-23-generated-explorer-sorted-manifest.md"
+      ],
+      "evidence": [
+        "docs/decisions/2026-09-23-generated-explorer-sorted-manifest.md:26: \"builds the explorer twice, each time into its own temporary directory,\"",
+        "docs/decisions/2026-09-23-generated-explorer-sorted-manifest.md:27: \"requires the two builds to be byte-identical (a determinism check)\""
+      ]
+    },
+    {
+      "id": "frozen-retrieval-09",
+      "query": "Which environment variable setting stops Promptfoo from sending analytics when I repeat the published embedding example?",
+      "style": "paraphrase",
+      "collection": "foundation-docs",
+      "expected_docs": [
+        "qmd://foundation-docs/promptfoo-upstream-retrieval.md"
+      ],
+      "evidence": [
+        "docs/promptfoo-upstream-retrieval.md:46: \"`PROMPTFOO_DISABLE_TELEMETRY=1`\""
+      ]
+    },
+    {
+      "id": "frozen-retrieval-10",
+      "query": "A recovery worker was given only a shell, but its parent's hook tells it to use discovery and editing tools it is forbidden to call. Which upstream issue records this mismatch?",
+      "style": "conceptual",
+      "collection": "foundation-docs",
+      "expected_docs": [
+        "qmd://foundation-docs/restricted-worker-compatibility.md"
+      ],
+      "evidence": [
+        "docs/restricted-worker-compatibility.md:8-10: \"Context Mode 1.0.169's Agent hook appended MCP/ToolSearch and Write/Edit routing to the explicitly Bash-only recovery fixture, which denied MCP tools.\"",
+        "docs/restricted-worker-compatibility.md:18-19: \"[Issue #946](https://github.com/mksglu/context-mode/issues/946) tracks this restricted-child conflict.\""
+      ]
+    }
+  ],
+  "notes": "Frozen against checkout commit 27bf3108c86db0eea706adc1d545cb31cd90ad1c. Duplicate-answer checks used recursive rg across all 268 indexed Markdown files in the four collection roots, excluding docs/ecosystem/**, with direct reads of candidate documents. No QMD or search engine was run. Evidence paths are repository-relative; quotations spanning lines normalize whitespace. The set contains 3 lexical, 4 paraphrase and 3 conceptual questions, distributed 2/3/2/3 across catalog/foundation/adoption/docs. Answering documents and information needs are disjoint from the supplied E2E tasks and the release-pinning item."
+}

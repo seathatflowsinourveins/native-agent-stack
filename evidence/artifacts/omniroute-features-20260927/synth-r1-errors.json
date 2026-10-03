@@ -1,0 +1,10 @@
+{
+ "job": "synth-r1",
+ "exit": 124,
+ "cap_seconds": 3000,
+ "error_events": [
+  "Under-development features enabled: standalone_web_search. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in <lane codex home>",
+  "Reconnecting... 1/5 (stream disconnected before completion: terminated)",
+  "Reconnecting... 2/5 (stream disconnected before completion: terminated)"
+ ]
+}

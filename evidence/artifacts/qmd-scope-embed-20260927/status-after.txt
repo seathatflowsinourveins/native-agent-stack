@@ -1,0 +1,41 @@
+QMD Status
+
+Index: ~/.cache/qmd/native-agent-stack-catalog.sqlite
+Size:  7.4 MB
+
+Documents
+  Total:    122 files indexed
+  Vectors:  744 embedded
+  Updated:  12h ago
+
+AST Chunking
+  Status:   active
+  Languages: typescript, tsx, javascript, python, go, rust
+
+Collections
+  us-equities-catalog (qmd://us-equities-catalog/)
+    Pattern:  **/*.md
+    Files:    22 (updated 12h ago)
+  us-equities-foundation (qmd://us-equities-foundation/)
+    Pattern:  **/*.md
+    Files:    100 (updated 1d ago)
+
+Examples
+  # List files in a collection
+  qmd ls us-equities-catalog
+  # Get a document
+  qmd get qmd://us-equities-catalog/path/to/file.md
+  # Search within a collection
+  qmd search "query" -c us-equities-catalog
+
+Models
+  Embedding:   https://huggingface.co/ggml-org/embeddinggemma-300M-GGUF
+  Reranking:   https://huggingface.co/ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF
+  Generation:  https://huggingface.co/tobil/qmd-query-expansion-1.7B-gguf
+
+Tips
+  Add context to collections for better search results: us-equities-catalog, us-equities-foundation
+    qmd context add qmd://<name>/ "What this collection contains"
+    qmd context add qmd://<name>/meeting-notes "Weekly team meeting notes"
+  Add update commands to keep collections fresh: us-equities-catalog, us-equities-foundation
+    qmd collection update-cmd <name> 'git stash && git pull --rebase --ff-only && git stash pop'

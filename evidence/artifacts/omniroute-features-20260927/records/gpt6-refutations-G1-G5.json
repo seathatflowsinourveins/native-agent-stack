@@ -1,0 +1,1195 @@
+{
+ "G1": {
+  "group": "G1",
+  "items": [
+   {
+    "id": "C00",
+    "verdict": "refuted",
+    "state": "OFF-BY-EVIDENCE",
+    "config": "Retain enabled=false, defaultMode='off', exclusions=['codex/*'], autoTriggerTokens=0, activeComboId=null, compressionComboId=null, comboOverrides={}, contextBudget.mode='off', outputStyles=[], cavemanOutputMode.enabled=false and no stored engines row. Leave stackedPipeline unchanged. Do not add compression headers or activate lane combos on this shared gateway. Reopen when a request-scoped compaction control or an isolated concrete target can preserve every default FW request.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "The proposed master flip violates the required byte-identical default path.",
+      "evidence": "enabled=true plus removal of codex/* enables reactive compaction for every FW request to those targets. Neither an absent/off compression header nor per-key compressionEnabled=false disables it. Native CX bypasses these reactive passes; FW does not. The proposal acknowledges the threshold-dependent mutation but still recommends ON-OPT-IN, contrary to the user's unconditional default-path requirement.",
+      "citation": "[chatCore.ts:1439-1449](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1439-L1449), [chatCore.ts:2138-2163](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L2138-L2163)",
+      "material": true
+     },
+     {
+      "lens": "quality",
+      "claim": "A header selects a plan; it does not isolate a lane or enforce lane authorization.",
+      "evidence": "Exclusions match only the concrete model and provider/model, so they cannot distinguish CX from FW or two lanes sharing codex/gpt-6-*. Keyless requests have no key policy, and named compression headers have no lane allowlist. The non-builtin stackedPipeline does avoid the seeded-default fallback, but that repair does not address either limitation.",
+      "citation": "[exclusions.ts:54-72](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/exclusions.ts#L54-L72), [apiKeyPolicy.ts:823-849](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/shared/utils/apiKeyPolicy.ts#L823-L849), [planResolution.ts:32-57](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/planResolution.ts#L32-L57), [chatCore.ts:1655-1688](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1655-L1688)",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "The selector is neutral only while it leaves both prompt compression and reactive compaction inactive.",
+      "evidence": "Above the FW threshold, the proposed configuration can truncate tool results and prepend a notice to the leading instruction message. Those changes can invalidate an existing cached prefix even without a treatment header. The response's off plan metadata does not certify absence of these later mutations. The supplied 94.16% cached-input share makes this material; no net saving follows from enabling the selector.",
+      "citation": "[chatCore.ts:1770-1787](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1770-L1787), [contextManager.ts:556-575](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/contextManager.ts#L556-L575), [contextManager.ts:653-675](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/contextManager.ts#L653-L675)",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "Actual upstream body identity, response-header delivery and lane quality/cache effects were not replayed; gateway POSTs were prohibited.",
+     "Framework-specific configuration plumbing, installed SDK behavior, connected non-codex targets and separate-instance OAuth refresh behavior remain unverified.",
+     "The effective context limit and proactiveConfig value are not established by the permitted snapshot; 610,400 is conditional on limit=872,000, ratio=0.7 and no tool reserve.",
+     "Upstream issue/PR status and absence-of-issue claims were not independently refreshed."
+    ]
+   },
+   {
+    "id": "C01",
+    "verdict": "corrected",
+    "state": "OFF-BY-EVIDENCE",
+    "config": "Retain enabled=false, defaultMode='off', autoTriggerTokens=0, autoTriggerMode='lite', cacheMinutes=5, activeComboId=null, compressionComboId=null, comboOverrides={}, contextBudget.mode='off', liveZone.enabled=false, outputStyles=[], cavemanOutputMode.enabled=false and exclusions=['codex/*']. Store no engines row; leave Standard Savings seeded and unassigned. Delete the universal future rule requiring a PUT of exactly {enabled:true}; any later activation needs a complete, independently resolved partial configuration and default-path verification.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "OFF is justified, and the engines-row warning is supported.",
+      "evidence": "The master is a hard kill for plan selection. When enabled, it separately arms reactive compaction despite defaultMode='off'. The loader derives enginesExplicit from the presence of a usable stored engines row, not from a persisted enginesExplicit=false value; saving a full settings snapshot can therefore change subsequent default-plan selection.",
+      "citation": "[strategySelector.ts:119-165](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/strategySelector.ts#L119-L165), [chatCore.ts:1443-1449](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1443-L1449), [compression.ts:875-892](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/compression.ts#L875-L892)",
+      "material": true
+     },
+     {
+      "lens": "quality",
+      "claim": "The claim that the master switch also defers combo overflow rejection is stale.",
+      "evidence": "The deferral flag is still computed and passed, but the round-robin implementation receives it as an unused parameter. Context/output-only filtering can already preserve the candidate pool independently of that flag. The concrete post-compression budget gate remains active. C18's account of this mechanism is the correct one.",
+      "citation": "[chat.ts:277-299](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/handlers/chat.ts#L277-L299), [roundRobinCombo.ts:147-153](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/combo/roundRobinCombo.ts#L147-L153), [comboStructure.ts:868-875](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/combo/comboStructure.ts#L868-L875)",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "The uncached-input share is not a hard ceiling on compression savings.",
+      "evidence": "Compression statistics subtract total estimated input tokens and do not distinguish cached from uncached tokens. Removing cached tokens can still reduce token volume and discounted cost; rewriting a prefix can instead increase uncached work. Therefore neither a 5.8% savings ceiling nor a favorable cost sign follows from the traffic split. The supplied GET snapshot, not a fresh live GET, confirms zero recorded savings and 1,600 excluded skips.",
+      "citation": "[stats.ts:255-275](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/stats.ts#L255-L275), [gateway-snapshot.json]($SCRATCH/omniroute-phase0/gateway-snapshot.json)",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "Whether the legacy dashboard's complete snapshot passes every nested schema was not exercised.",
+     "Session-dedup/Lite fidelity and append stability, actual FW traffic sizes, tokenizer calibration and cache-weighted savings remain unmeasured.",
+     "Service environment overrides, deployed bundle equivalence and upstream issue/PR status remain unverified."
+    ]
+   },
+   {
+    "id": "C16",
+    "verdict": "refuted",
+    "state": "OFF-BY-EVIDENCE",
+    "config": "Do not activate the proposed production guard bundle. Retain liveZone.enabled=false and cacheMinutes=5; do not add the breaker enablement or new lane keys/headers as a claimed reachable treatment. Keep preserveSystemPromptMode='always'; leave QuantumLock, fidelityGate, riskGate and memoizeCompressionResults absent. Retain enabled=false and exclusions=['codex/*']. Reopen after C00 has a safe lane boundary, the Live Zone stored-prefix contract is corrected or the selected engine is proven unaffected, and an explicit engine configuration passes its lane A/B.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "The proposed ON-OPT-IN treatment is unreachable under its own configuration, and its fallback engine example is lossy.",
+      "evidence": "The proposal retains master off and codex/*, so its compression header cannot activate FW GPT-6 traffic. Keyless requests also lack the principal required by Live Zone. Registering a key would satisfy identity but not the master/exclusion gates. The suggested session-dedup+lite pipeline is not a non-lossy guarantee: Lite defaults to truncating tool strings at approximately 2,000 characters and also removes repeated messages.",
+      "citation": "[strategySelector.ts:126-137](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/strategySelector.ts#L126-L137), [chatCore.ts:1787-1794](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1787-L1794), [liveZone.ts:127-132](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/liveZone.ts#L127-L132), [lite.ts:148-200](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/lite.ts#L148-L200)",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "Even a Live Zone hit need not preserve the prefix previously sent upstream.",
+      "evidence": "Live Zone stores result.body without checking result.compressed; chatCore adopts that body only when compressed=true. Caveman can return changed text with compressed=false. An isolated read-only probe using the pinned Caveman and Live Zone functions, with a plain-text char/4 stats stub to avoid database imports, reproduced a first request left raw followed by a cacheHit=true request that adopted the previously unsent transformed prefix. This resolves the proposal's explicit uncertainty about modified bodies with compressed=false.",
+      "citation": "[liveZone.ts:277-292](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/liveZone.ts#L277-L292), [liveZone.ts:204-240](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/liveZone.ts#L204-L240), [caveman.ts:462-469](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/caveman.ts#L462-L469), [chatCore.ts:1913-1919](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1913-L1919)",
+      "material": true
+     },
+     {
+      "lens": "quality",
+      "claim": "The breaker does not enforce the claimed single half-open probe.",
+      "evidence": "After cooldown, canRunEngine sets openedUntil=null. A second caller is then immediately allowed by the null-state branch before any result from the first probe. A direct pure-function probe returned true for both calls. The breaker still skips failed engines, but its concurrency protection is overstated.",
+      "citation": "[pipelineEngineBreaker.ts:90-104](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/pipelineEngineBreaker.ts#L90-L104)",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "Longer retention and a session header do not provide complete cache protection.",
+      "evidence": "The 60-minute setting only extends Live Zone's bounded process-local entries; eviction, oversized entries and full recompression remain. Subsequent reactive compaction occurs after Live Zone and can rewrite its result. Also, x-omniroute-session-id selects Live Zone identity, whereas account-affinity extraction recognizes different headers and body fields. These mechanisms must be measured separately; their savings cannot be added together.",
+      "citation": "[liveZone.ts:142-185](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/liveZone.ts#L142-L185), [chatCore.ts:1868-1903](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1868-L1903), [chatCore.ts:2138-2163](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L2138-L2163), [sessionAffinityPin.ts:197-221](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/sessionAffinityPin.ts#L197-L221)",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "The Live Zone counterexample was an isolated function probe, not a live gateway replay; its incidence with the proposed stacked pipeline is unmeasured.",
+     "Registered-key availability, current breaker/prefix-freeze environment values, worker-thread state distribution and the separate claimed monitoring GET were not verified.",
+     "Actual Live Zone hit rate, provider cache retention, memory pressure, quality parity and net savings remain unmeasured.",
+     "Upstream issue/PR status remains unverified."
+    ]
+   },
+   {
+    "id": "C17",
+    "verdict": "corrected",
+    "state": "OFF-BY-EVIDENCE",
+    "config": "Retain enabled=false, defaultMode='off', exclusions=['codex/*'] and contextBudget={mode:'off',policy:'reserve-output',outputReserve:4096,safetyMargin:1024,pct:0.85,absoluteBudget:0}; omit ladderOverride, targetTokens and targetRatio. Retain preserveSystemPromptMode='always' and preserveSystemPrompt=true. Leave Codex context-window and compaction overrides unset, but remove the claim that client compaction proves the gateway budget cannot fire.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "The adaptive header/lossy-policy bypass is confirmed and independently justifies OFF.",
+      "evidence": "Adaptive planning runs after base-plan header handling and lossy filtering. It can replace an explicit off plan with a stacked lossy ladder. Direct pure-function probes for both floor and replace-autotrigger, with a request-header off base plan and a 2,000,000-token estimate, selected session-dedup, rtk, headroom, lite and caveman. The later cache guard changes only the mode string, so it does not inspect those stacked steps.",
+      "citation": "[strategySelector.ts:224-249](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/strategySelector.ts#L224-L249), [resolveAdaptivePlan.ts:36-75](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/adaptiveCompression/resolveAdaptivePlan.ts#L36-L75)",
+      "material": true
+     },
+     {
+      "lens": "quality",
+      "claim": "The assertion that Codex compaction makes adaptive compression impossible is not valid.",
+      "evidence": "A client compaction threshold cannot be compared directly with the gateway's serialized-character estimator. The gateway uses ceil(serialized length/4), and its context limit can be overridden. FW clients also do not inherit Codex CLI compaction. Thus 244,800 client tokens versus a conditional 866,880 gateway target does not establish non-firing. The verified reason for current inactivity is the master/exclusion configuration.",
+      "citation": "[contextManager.ts:316-325](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/contextManager.ts#L316-L325), [contextManager.ts:397-418](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/contextManager.ts#L397-L418), [chatCore.ts:1734-1762](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1734-L1762)",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "The fixed reduction estimates are not measured savings or a guaranteed context fit.",
+      "evidence": "The planner predicts reductions using constants without running the engines. Hard-budget processing can remain over budget when protected content cannot be removed, and its message loop has no role exemption. These support keeping the controls off, but neither an inevitable net cost increase nor approximately zero FW savings can be derived without actual request and cache measurements.",
+      "citation": "[ladder.ts:59-84](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/adaptiveCompression/ladder.ts#L59-L84), [hardBudget.ts:162-201](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/hardBudget.ts#L162-L201)",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "The active Codex model-catalog selection and actual compaction trigger were not observed; fetched 0.157.1 source supports the 90% formula, not the claimed cross-estimator guarantee.",
+     "The effective gateway window, environment/DB overrides, FW prompt distribution and actual budget-trigger frequency remain unverified.",
+     "No end-to-end quality, schema/tool fidelity, cache-cost or overflow-reduction A/B was run.",
+     "Upstream issue/PR status remains unverified."
+    ]
+   },
+   {
+    "id": "C18",
+    "verdict": "corrected",
+    "state": "OFF-BY-EVIDENCE",
+    "config": "Retain enabled=false, defaultMode='off', exclusions=['codex/*'], DISABLE_CONTEXT_WINDOW_CHECKS=false and no routing combos or new context-window overrides. Leave proactiveConfig untouched. FW clients may handle an actual context_length_exceeded response by splitting input; do not assume every request above the proactive threshold receives that error. Do not treat DISABLE_CONTEXT_WINDOW_CHECKS as disabling output-cap normalization.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "The reactive-compaction gates and destructive history operations support OFF.",
+      "evidence": "Both passes require master enablement and a non-excluded target, and bypass native Codex passthrough. Headers and per-key prompt-compression opt-out do not control these passes. compressContext truncates tool results, removes older thinking and can drop history. Keeping codex/* protects FW even if another target is later enabled.",
+      "citation": "[chatCore.ts:1443-1449](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1443-L1449), [chatCore.ts:2212-2235](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L2212-L2235), [contextManager.ts:498-549](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/contextManager.ts#L498-L549)",
+      "material": true
+     },
+     {
+      "lens": "quality",
+      "claim": "The single-document 400 claim and complete hard-gate bypass claim need qualification.",
+      "evidence": "A document above the proactive threshold but below the hard input/window ceiling can remain unchanged and pass. A direct budget probe accepted 700,000 estimated tokens against an 872,000 window. Also, disabling context checks substitutes an enormous window and removes the input cap, but still passes the model output cap; a probe still clamped max_output_tokens to 128,000. Output normalization is therefore not wholly bypassed.",
+      "citation": "[contextManager.ts:615-635](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/contextManager.ts#L615-L635), [outputTokenBudget.ts:94-130](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore/outputTokenBudget.ts#L94-L130), [chatCore.ts:2247-2261](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L2247-L2261)",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "A compaction attempt does not necessarily turn all previously cached input into uncached input.",
+      "evidence": "Tool trimming may preserve an earlier prefix, the history notice is added only when messages are dropped, and some attempts change no content. Automatic caching concerns the longest matching prefix, not an all-or-nothing request bit. Repeated history drops remain a serious cache risk, but the proposal's every-call/all-cached-input formulation overstates the effect.",
+      "citation": "[contextManager.ts:556-581](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/contextManager.ts#L556-L581), [contextManager.ts:653-675](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/contextManager.ts#L653-L675), [cacheControlPolicy.ts:94-102](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/utils/cacheControlPolicy.ts#L94-L102)",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "Live thresholdRatio, resolved context/input limits, flag overrides and actual FW request sizes remain unverified.",
+     "The quoted 3.7x and 5-6x overestimation measurements, 24/24 versus 7/7 cache results and issue/PR states were not independently checked.",
+     "No live compaction, provider response, quality evaluation or cache-cost experiment was performed."
+    ]
+   },
+   {
+    "id": "C20",
+    "verdict": "upheld",
+    "state": "ON-GLOBAL",
+    "config": "Retain the built-in guard with no new setting. Keep enabled=false, defaultMode='off', exclusions=['codex/*'] and preserveSystemPromptMode='always'; do not disable supportsPromptCaching on Codex connections. Keep adaptive budgeting off and exclude aggressive/ultra steps from any future stacked treatment. An engine:aggressive or engine:ultra header downgrades only if the engine header is recognized and enabled, compression is reachable, and that connection is classified as caching.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "The built-in mode downgrade and its stacked-pipeline limitation are accurately described.",
+      "evidence": "For a caching provider, getCacheAwareStrategy maps scalar aggressive/ultra to standard. selectCompressionPlan replaces only plan.mode, leaving stacked steps untouched. This does not alter the current off path or substitute a model/reasoning effort. Standard still invokes Caveman, so the guard is not permission to enable lossy processing for max-effort workers.",
+      "citation": "[cachingAware.ts:112-132](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/cachingAware.ts#L112-L132), [strategySelector.ts:244-248](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/strategySelector.ts#L244-L248), [strategySelector.ts:388-413](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/strategySelector.ts#L388-L413)",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "This is conditional cache protection, not an independently measured token-saving feature.",
+      "evidence": "Codex is in the caching-provider set, explicit connection capability overrides are supported, and preserveSystemPrompt='always' remains protective independently of prefixFreeze. The guard itself neither compresses input nor changes account affinity. Its benefit depends on the selected engine and actual prefix reuse; the proposal correctly identifies the stacked bypass and requires a later lane A/B.",
+      "citation": "[cacheControlPolicy.ts:94-102](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/utils/cacheControlPolicy.ts#L94-L102), [cacheControlPolicy.ts:152-170](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/utils/cacheControlPolicy.ts#L152-L170), [cacheAwareConfig.ts:44-59](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/cacheAwareConfig.ts#L44-L59)",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "The four connections' supportsPromptCaching overrides and an actual live downgrade were not observed.",
+     "Turn-to-turn prefix stability through the complete adapter/worker/Live Zone path and the claimed favorable net cost remain unmeasured.",
+     "Upstream test-suite success, deployed bundle equivalence and issue/PR status were not established."
+    ]
+   }
+  ],
+  "cross_item": [
+   "C00 proposes enabled=true and removal of codex/*; C01, C16, C17, C18 and C20 retain enabled=false and codex/*. These cannot form one configuration. Retaining the latter values preserves the required default path; C00's proposed FW opt-in remains OFF-BY-EVIDENCE.",
+   "C16 proposes liveZone=true/cacheMinutes=60 while C01 retains liveZone=false/cacheMinutes=5. More importantly, C16's claimed reachable treatment remains behind the disabled master and excluded Codex target. [strategySelector.ts:126-137](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/strategySelector.ts#L126-L137)",
+   "C16 calls session-dedup+lite non-lossy, contradicting C00/C01's correctly identified default Lite truncation. Catalog labels do not override the tool-content deletion. [lite.ts:148-168](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/lite.ts#L148-L168)",
+   "C01 assumes active combo overflow deferral; C18 correctly identifies unused plumbing and advisory filtering. Use C18's mechanism. [roundRobinCombo.ts:147-153](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/combo/roundRobinCombo.ts#L147-L153)",
+   "C17's adaptive ladder can bypass both C00's request-level off/safe expectations and C20's scalar downgrade. Keeping contextBudget.mode='off' is a shared prerequisite, not an independent optimization choice. [strategySelector.ts:224-248](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/strategySelector.ts#L224-L248)",
+   "The 94% cache share, engine token reductions, Live Zone reuse and cache-aware downgrade are overlapping accounting mechanisms. Do not sum their savings or treat uncached input as a hard savings ceiling; compare total input, cached input, output and failed attempts for each complete treatment."
+  ],
+  "tools_used": [
+   "functions.exec",
+   "exec_command: read-only rg, sed, nl, Python parsing, git diff and isolated Node function probes",
+   "mcp__context_mode__ctx_execute_file: attempted; workspace restriction blocked access, so permitted shell reads were used",
+   "mcp__context_mode__ctx_execute",
+   "mcp__context_mode__ctx_fetch_and_index",
+   "mcp__context_mode__ctx_search"
+  ]
+ },
+ "G2": {
+  "group": "G2",
+  "items": [
+   {
+    "id": "C02",
+    "verdict": "corrected",
+    "state": "OFF-BY-EVIDENCE",
+    "config": "No writes. Retain enabled=false, defaultMode='off', exclusions=['codex/*'], autoTriggerTokens=0, activeComboId=null and sessionDedup={minBlockChars:80,fuzzy:false}. Leave the engines map unstored; enginesExplicit is derived from that condition. Send no compression header and assign no dedup combo. Add the multipart-index defect below to the prerequisites for any future trial.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "The first occurrence is not always preserved: mixed multipart/string messages can overwrite unrelated earlier content.",
+      "evidence": "Multipart keys use i*100000+p+1; string messages use i. Thus user message 0, text part 1 and tool message 2 both use key 2. An isolated execution of the pinned helpers reproduced this with valid OpenAI message shapes: appending a tool result repeating part 0 replaced unrelated part 1 with part 0's dedup marker. This is content corruption, beyond the proposal's unexplained-marker risk.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/session-dedup/index.ts#L297-L341; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/session-dedup/index.ts#L230-L274",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "Append-only history does not guarantee prefix stability, even with fuzzy=false and multiple text parts from the first request.",
+      "evidence": "The same counterexample changed an existing user message only after later messages were appended. Its serialized message body fell from 731 to 338 o200k tokens, so a token-inflation guard would not detect the corruption. Restrict the proposal's causal-stability reasoning to representations without the index collision; it is not a general FW guarantee.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/session-dedup/index.ts#L299-L341; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/pipelineGuards.ts#L47-L52",
+      "material": true
+     },
+     {
+      "lens": "quality",
+      "claim": "Enabling the master does not automatically give every headerless request the session-dedup/lite pipeline.",
+      "evidence": "With enginesExplicit=false, legacy defaultMode='off' remains off absent another selector. Lossy-policy downgrading preserves off, filters unsafe stacked steps, and substitutes the fallback only when required. The separate FW compaction objection remains valid: its enablement ignores the prompt-compression header and per-key opt-out.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/planResolution.ts#L131-L150; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/lossyRequestPolicy.ts#L49-L70; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1443-L1449",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "Production incidence of mixed multipart/string inputs; real duplicate density, latency, marker comprehension, memory contamination and lane-level net savings.",
+     "Original upstream issue/PR timelines, release-head claims and reported test runs were not independently rechecked.",
+     "No production request replay or gateway A/B was performed; the new counterexample executed isolated pinned helpers without database or gateway imports."
+    ]
+   },
+   {
+    "id": "C03",
+    "verdict": "corrected",
+    "state": "OFF-BY-EVIDENCE",
+    "config": "No writes. Retain enabled=false, defaultMode='off', exclusions=['codex/*'], activeComboId=null, ccr={minChars:600,retrievalRampFactor:2}, the inactive CCR engine and mcpEnabled=false. Assign no CCR combo or header. Leave durable-store environment settings untouched. Describe eligibility through actual request content/tools and resolved principal, rather than inferring them from mcpEnabled or keyless mode.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "The proposed CX applicability is overstated: Responses input_text/output_text parts are not CCR candidates.",
+      "evidence": "The adapter preserves content-part types. CCR processes strings and array parts with type='text'; it skips system/tool messages. Therefore native input_text/output_text arrays remain intact, while sufficiently long string-valued developer/user/assistant content can be replaced. The claimed loss of an injected protocol note on Responses restore is supported: unindexed injected messages are discarded; an isolated adapter probe confirmed both behaviors.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/bodyAdapter.ts#L62-L64; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/bodyAdapter.ts#L346-L372; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/ccr/index.ts#L800-L845",
+      "material": true
+     },
+     {
+      "lens": "quality",
+      "claim": "OFF remains justified, but mcpEnabled=false and keyless operation do not establish all claimed eligibility/isolation facts.",
+      "evidence": "CCR's capability gate checks advertised tool names, not MCP availability or successful retrieval. Eligible text is replaced with a preamble/marker, and persistence is enabled by default outside cloud runtimes. Anonymous requests share __anon__, but chatCore uses apiKeyInfo.id when present; permitting keyless requests does not force every caller into the anonymous bucket.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/ccr/protocolInstruction.ts#L63-L72; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/ccr/index.ts#L158-L198; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/ccr/index.ts#L739-L786; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1791-L1794",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "H8 cache churn is conditional on feedback reaching the compression process; it is not automatically shared through the durable tier.",
+      "evidence": "Retrieval counters are a module-local Map. handleCcrRetrieve records feedback there; durable block rows contain content/expiry metadata but no retrieval counter. A separate stdio process therefore does not automatically update the gateway's H8 state. The management retrieve route calls retrieveBlock directly without recording H8 feedback.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/ccr/index.ts#L151-L162; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/ccr/index.ts#L683-L700; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/ccrBlocks.ts#L11-L35; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/compression/retrieve/route.ts#L36-L46",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "Neither 'every retrieval returns the full block and costs more' nor 'only 6% of input is reducible' follows from source.",
+      "evidence": "Retrieval supports partial queries, including head/tail/lines/grep/stats. Net cost depends on returned content, extra inference turns, cache misses and later reuse. Shorter repeated history can also reduce cached-input tokens; the gateway's estimator accounts for cached and uncached input separately. The stacked inflation guard rejects strictly larger token counts, not equal counts or a fixed approximately 1,000-character boundary.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/mcp-server/tools/compressionTools.ts#L342-L352; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/ccr/index.ts#L698-L700; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/usage/costCalculator.ts#L139-L166; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/pipelineGuards.ts#L47-L52",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "Actual CX/FW tools arrays, CCR retrieval bridges, principal alignment and whether FW consumers implement a retrieval loop.",
+     "Live durable-store environment value, retained blocks, cross-process retrieval and deployed H8 feedback behavior; no auth store or database was read.",
+     "GPT-6 quality, retrieval frequency, net usage and original upstream issue/PR status claims."
+    ]
+   },
+   {
+    "id": "C04",
+    "verdict": "corrected",
+    "state": "OFF-BY-EVIDENCE",
+    "config": "Retain the proposed OFF configuration: enabled=false, defaultMode='off', exclusions=['codex/*'], autoTriggerTokens=0, preserveSystemPrompt=true, preserveSystemPromptMode='always', activeComboId=null and comboOverrides={}; no Lite routing override or adopting header. The optional lite.compressToolResults=false hardening is not required for this no-change resolution. If staged later, it disables truncation only where no step explicitly overrides it; it does not make Lite lossless.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "The OFF decision and principal fidelity objections are supported.",
+      "evidence": "Whitespace rewriting and redundant-message removal run regardless of compressToolResults. Tool truncation ignores Codex eligibility. Redundant removal compares role/content without checking tool_calls; an isolated pinned-source probe retained a tool response after deleting its assistant call. A per-step compressToolResults=true overrides global false, and aggressive's internal Lite fallback does not pass the global Lite options.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/lite.ts#L148-L200; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/lite.ts#L243-L271; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/cavemanAdapter.ts#L274-L297; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/aggressive.ts#L190-L194",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "The assertion that all Lite savings come from truncation must be restricted to the reported fixtures, not generalized to traffic.",
+      "evidence": "With truncation disabled, the pinned Lite code reduced two identical user messages to one, preserving the surviving text exactly: 385 to 195 o200k tokens for the serialized body. Whitespace and message dedup are independent savings mechanisms. This establishes neither acceptable quality nor a material production benefit; switching between rewritten and original histories still changes the cacheable prefix.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/lite.ts#L50-L80; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/lite.ts#L171-L200; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/cachingAware.ts#L112-L124",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "Original real-file whitespace/truncation percentages and production incidence of orphaned tool calls; the independent probes used synthetic inputs.",
+     "Effective OMNIROUTE_LITE_MAX_TOOL_LENGTH and deployed request bodies; server.env was not read.",
+     "Lane quality/cache A/B results and original upstream issue/PR/search-coverage claims."
+    ]
+   },
+   {
+    "id": "C06",
+    "verdict": "corrected",
+    "state": "OFF-BY-EVIDENCE",
+    "config": "No writes. Retain enabled=false, defaultMode='off', exclusions=['codex/*'], inactive engines['codex-responses'], codexResponsesConfig.enabled=false with the recorded defaults, and liveZone.enabled=false. Leave the engines map unstored and Codex provider headers unchanged. Any future reconsideration must address JSON numeric fidelity as well as protected tool names and omitted diagnostic lines.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "JSON minification is not lossless, including on the supposedly protected local-shell path.",
+      "evidence": "minifyJson performs JSON.parse followed by JSON.stringify. An isolated execution changed integer 1234567890123456711 to 1234567890123456800 and 1.50 to 1.5, while reducing bytes 965\u2192951 and o200k tokens 629\u2192619. Those reductions satisfy the rewrite size/token checks. The local_shell guard checks only diff/search/log candidates, so it does not recognize this numeric loss.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/codexResponses/index.ts#L137-L145; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/codexResponses/index.ts#L230-L247; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/codexResponses/index.ts#L284-L293",
+      "material": true
+     },
+     {
+      "lens": "quality",
+      "claim": "The remaining OFF rationale is supported: eligible function outputs can lose search hits and diff context; ordinary FW chat messages are ineligible.",
+      "evidence": "Search compaction retains at most three matching lines per path and diff compaction omits other context without omission markers. Eligibility protects named functions, not arbitrary file reads or searches performed through an unprotected execution function. Chat messages bypass Responses adaptation and lack the symbol metadata required by this engine.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/codexResponses/index.ts#L179-L226; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/bodyAdapter.ts#L154-L201; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/bodyAdapter.ts#L287-L296; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/codexResponses/index.ts#L271-L293",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "Stable replay is conditional; the approximately 6% ceiling applies only to the baseline uncached-input component.",
+      "evidence": "Every eligible historical item is reconsidered, so unchanged text, call pairing and configuration can reproduce the same rewrite; toggles can change earlier history. The proposal correctly recognizes later cached reads of smaller outputs, but its unqualified ceiling omits those reductions. Net benefit requires separate cached/uncached usage and extra-turn accounting; the local estimator is not proof of Codex OAuth quota savings.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/codexResponses/index.ts#L271-L294; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/usage/costCalculator.ts#L139-L166",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "Actual Codex 0.157.1 tool selection and wire shapes, including exec_command versus shell_command and Freeform versus JSON apply_patch; no client request was captured.",
+     "Original diagnostic probes, binary-string assertions, upstream history/status and live header delivery were not independently reproduced.",
+     "Production eligible-output share, task success, extra reads and Codex OAuth cached-token quota weighting."
+    ]
+   },
+   {
+    "id": "C07",
+    "verdict": "corrected",
+    "state": "OFF-BY-EVIDENCE",
+    "config": "Keep the built-in engine OFF: enabled=false, defaultMode='off', exclusions=['codex/*'], activeComboId=null, headroom.minRows=8, no Headroom compression combo/header and no engines-map write. Classify the separate, unused external proxy integration as N/A. Leave it inactive, headroomUrl absent, and existing PATH/environment untouched; their effective values were not verified.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "The built-in engine's OFF decision is supported by numeric fidelity and unrestricted tool-output rewriting.",
+      "evidence": "SmartCrusher parses raw JSON into JavaScript numbers before encoding; lexical numeric fidelity and unsafe-integer precision cannot be guaranteed. It skips system/developer roles but does not consult Codex protected-tool metadata. Reconstruction is explicitly a test oracle, not a production restoration step, so the model receives the altered representation.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/headroom/smartcrusher.ts#L91-L110; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/headroom/smartcrusher.ts#L214-L245; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/headroom/index.ts#L182-L188",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "Savings are not confined to uncached input, and deterministic encoding alone does not prove end-to-end prefix stability.",
+      "evidence": "Shorter replayed history can reduce cached-input tokens too. Headroom's local acceptance gate compares characters, while the stacked pipeline applies a whole-body token-inflation decision; appending content can change aggregate acceptance even when individual encodings are deterministic. The reported synthetic reductions do not establish net savings on this cache-heavy traffic.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/headroom/smartcrusher.ts#L104-L125; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/strategySelector.ts#L899-L931; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/pipelineGuards.ts#L47-L52; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/usage/costCalculator.ts#L156-L166",
+      "material": true
+     },
+     {
+      "lens": "quality",
+      "claim": "The external integration should be separated as N/A; its claimed effective proxy defaults are not established by OmniRoute source.",
+      "evidence": "headroomUrl is consumed by status/start management paths, not inference dispatch. Start invokes only 'proxy --port N' and inherits the environment. This proves neither effective ML/cache/rate-limit settings nor upstream destination or bind address. The provided GET snapshot observes installed=false/running=false; it does not establish unset environment variables or deployed proxy defaults.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/headroom/status/route.ts#L9-L18; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/headroom/start/route.ts#L13-L33; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/headroom/process.ts#L92-L111",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "Original Headroom synthetic token counts, fidelity-gate probe receipts, model comprehension and production array prevalence.",
+     "Host binary versions, service PATH, HEADROOM_URL/HEADROOM_PYTHON and inherited upstream settings; no environment/auth store was read.",
+     "External Headroom effective defaults, issue/release status and whether any lane already uses its MCP compression, which would affect savings attribution."
+    ]
+   }
+  ],
+  "cross_item": [
+   "All five built-in OFF states stand. The shared master/exclusion objection is valid: enabling compression without codex/* also enables non-native FW proactive/last-resort compaction independently of prompt-engine opt-out. Its default proactive threshold is 0.7 of context minus reserved tool tokens, not necessarily 0.7 of the entire window. https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1443-L1449; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L2115-L2142; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L2210-L2225",
+   "C02 correctly identifies preserved input_text/output_text part types, while C03 incorrectly treats those same native arrays as CCR candidates. Both engines require type='text' for multipart content. C06's 'lossless JSON' description likewise conflicts with C07's correct JSON.parse precision objection; the same defect applies to both.",
+   "C02/C06 recognize smaller cached replays, whereas C03/C07 impose an incorrect uncached-only savings limit. Use separate cached-input, uncached-input and additional-turn deltas; the approximately 94% cache-read share is not a 6% ceiling on total token reduction. Actual OAuth quota economics remain unverified. https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/usage/costCalculator.ts#L139-L166",
+   "The seeded fallback contains both engines rejected by C02/C04, so enabling another engine is not evidence that headerless traffic is safe. However, the fallback is conditional, and a routing-combo assignment is not the only possible isolation mechanism: the cited header-shadowing branch also requires the built-in stackedPipeline and other guards. This does not remove the shared reactive-compaction obstacle. https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/lossyRequestPolicy.ts#L49-L70; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1655-L1675",
+   "No mandatory configuration conflicts were found; C04's optional Lite hardening is the only prospective write in the otherwise no-change resolutions. Independent engine percentages must not be added: stacked accounting recomputes original-to-final savings. https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/strategySelector.ts#L899-L931",
+   "Evidence verification: all 2,889 numbered lines in 79 packet ranges matched local files; all 45 cited OmniRoute files were unchanged from a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3. Observation from the supplied GET snapshot, not a fresh live request: 0 compressed requests, 0 tokens saved and 1,600 excluded skips. These counters establish inactivity, not hypothetical quality or ROI."
+  ],
+  "tools_used": [
+   "functions.exec",
+   "exec_command: bounded rg/sed/nl reads, Python JSON and packet comparisons, read-only git comparisons",
+   "exec_command: isolated Node execution of pinned pure helpers, with imports removed where necessary; offline o200k token counts",
+   "mcp__context_mode__ctx_execute",
+   "mcp__context_mode__ctx_execute_file: attempted; workspace restriction prevented access, so permitted shell reads were used"
+  ]
+ },
+ "G3": {
+  "group": "G3",
+  "items": [
+   {
+    "id": "C05",
+    "verdict": "corrected",
+    "state": "OFF-BY-EVIDENCE",
+    "config": "No writes. Retain compression.enabled=false, defaultMode='off', exclusions=['codex/*'], rtkConfig.enabled=false, engines.rtk.enabled=false and rawOutputRetention='never'. Do not select RTK through headers, combos or adaptive ladders. Preserve the existing enginesExplicit=false state. A future per-key compression opt-out alone is insufficient to preserve other FW requests unchanged.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "The truncation and tool-identification risks support OFF.",
+      "evidence": "Responses tool outputs enter RTK without ordinary tool-call metadata; exec_command does not match the shell-name expression. Non-document outputs can reach the character cut after filtering. An independent invocation of the pinned smartTruncate function reduced valid 63,011-character JSON to 12,000 characters of invalid JSON. This verifies the cut mechanism, not the researcher's complete filter sweep.",
+      "citation": "[bodyAdapter.ts:116-151](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/bodyAdapter.ts#L116-L151); [RTK metadata resolution](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/rtk/index.ts#L34-L68); [character truncation](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/rtk/smartTruncate.ts#L52-L64)",
+      "material": true
+     },
+     {
+      "lens": "quality",
+      "claim": "The proposed future per-key isolation remedy is incomplete.",
+      "evidence": "compressionEnabled=false disables prompt compression for that key, but deliberately leaves reactive context compaction enabled. Turning the master on and removing exclusions can therefore rewrite non-passthrough FW traffic even when its key opts out. Native CX bypasses those reactive passes, so this remedy is not equivalent across lanes.",
+      "citation": "[chatCore.ts:1443-1449](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1443-L1449); [reactive compaction gate](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L2138-L2162)",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "Stable RTK output does not establish a net token or quota benefit.",
+      "evidence": "The cache-aware selector leaves RTK unchanged. Fixed transformations can preserve a subsequently cached prefix, while changed transformations can invalidate its suffix. The snapshot records zero compression savings. The measured cache share does not identify how much eligible tool text is cached or how OAuth quotas weight it; neither a guaranteed small saving nor a quantified cache penalty follows.",
+      "citation": "[cachingAware.ts:112-125](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/cachingAware.ts#L112-L125); [RTK transformation stages](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/rtk/index.ts#L314-L366)",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "Original file-retention percentages, 55-filter severity sweep, host-RTK version and double-filter measurements; only the character-cut mechanism was independently exercised.",
+     "Custom-filter presence, real CX/FW tool-output composition, actual Codex wire envelopes and OAuth quota weighting.",
+     "External Codex citations and GitHub issue, PR and release-status claims were not independently fetched."
+    ]
+   },
+   {
+    "id": "C08",
+    "verdict": "corrected",
+    "state": "OFF-BY-EVIDENCE",
+    "config": "No writes. Keep master disabled, defaultMode='off', codex/* excluded, engines.relevance.enabled=false and contextBudget.mode='off'. Keep relevance absent from pipelines, profiles, routing assignments and ladderOverride. Do not treat engine:relevance or a named-combo header alone as a verified working experiment configuration at this pin.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "The claimed named-combo activation recipe misses a runtime override.",
+      "evidence": "The missing SINGLE_MODE_OF entry confirms the engine:relevance defect. Additionally, with the snapshot's enginesExplicit=false and built-in stackedPipeline, a named header selecting relevance triggers loading of the seeded default combo. compressionComboApplied then prevents copying the header's pipeline into execution config. The advertised relevance plan can therefore execute session-dedup+lite instead. This was source-traced; the relevant pure predicates were independently checked.",
+      "citation": "[deriveDefaultPlan.ts:5-45](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/deriveDefaultPlan.ts#L5-L45); [default-combo loading](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1655-L1675); [pipeline-copy guard](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1775-L1784)",
+      "material": true
+     },
+     {
+      "lens": "quality",
+      "claim": "When actually dispatched, relevance can delete task instructions and historical facts.",
+      "evidence": "It scores eligible user messages against the last user text, including that last message, and does not test cfg.enabled before processing. An independent pinned-engine fixture retained only the Alice sentence for an Alice query and only the Bob sentence for a Bob query, deleting the instruction to keep all facts. System, assistant and tool roles are excluded.",
+      "citation": "[relevance application](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/relevance/index.ts#L104-L162); [sentence selection](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/relevance/index.ts#L39-L83)",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "Query-dependent prefix churn is real, but the proposal overstates its certainty and mislabels the 93.7% statistic.",
+      "evidence": "History changes only when sentence selection changes; another independent fixture produced identical history for two different queries. The 110,864,768/118,355,678 ratio from /api/cache is not a 24-hour all-input share: its query has no time filter and excludes requests without cache activity from the input denominator. Use the separately supplied 24-hour measurement and treat the affected prefix size and net saving as unmeasured.",
+      "citation": "[unchanged-selection return](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/relevance/index.ts#L56-L83); [cache-metrics denominator](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/settings/cacheMetrics.ts#L11-L22)",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "Original A-J probes and actual Codex AGENTS.md wire placement; the independent fixture used synthetic messages and a statistics stub.",
+     "End-to-end header, routing-combo and worker execution on the running gateway; default-combo substitution was traced from pinned source.",
+     "Upstream issue/PR status, GPT-6 quality parity and provider-reported savings."
+    ]
+   },
+   {
+    "id": "C09",
+    "verdict": "corrected",
+    "state": "OFF-BY-EVIDENCE",
+    "config": "No writes. Retain master off, defaultMode='off', autoTriggerTokens=0, contextBudget.mode='off', codex/* exclusions and enginesExplicit=false. Do not select standard/caveman through headers, pipelines, routing assignments or adaptive ladders. The proposed future cavemanConfig.enabled=false reset is only a partial guard: explicit step.config.enabled=true and single-mode standard can override it.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "The semantic-loss evidence is sound; the claim that assistant messages are never touched is false.",
+      "evidence": "compressRoles defaults to user but permits assistant and system. The implementation tests that configurable list. An independent pinned-engine fixture changed 'I'm not sure the lock is released' to 'I'm not the lock is released' for both user and explicitly enabled assistant roles. This supports OFF without relying on the upstream workload anecdote.",
+      "citation": "[role configuration schema](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/shared/validation/compressionConfigSchemas.ts#L32-L41); [role gate and rewriting](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/caveman.ts#L371-L426)",
+      "material": true
+     },
+     {
+      "lens": "quality",
+      "claim": "Lossy-header policy and cavemanConfig.enabled are not independent universal kill switches.",
+      "evidence": "Assigned/default combo configuration can retain its original pipeline after the plan is downgraded. Adaptive escalation also occurs after lossy filtering. Within a stacked caveman step, stepConfig overrides cavemanConfig; single-mode standard explicitly forces enabled=true. Therefore the conditional reset does not guarantee that all stacked caveman steps become no-ops.",
+      "citation": "[combo pipeline-copy exception](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1775-L1784); [stacked configuration precedence](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/cavemanAdapter.ts#L337-L361); [single-mode enablement](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/strategySelector.ts#L388-L412)",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "The steady-prefix argument is valid under fixed configuration; a guaranteed net loss per transition is not established.",
+      "evidence": "Caveman is classified as deterministic, and the caching selector leaves standard unchanged. Rewriting earlier user text creates a different prefix, but subsequent requests can reuse that transformed prefix. The amount of eligible text, cache reuse and quota weighting were not measured, so the proposal's categorical comparison between savings and transition cost must remain qualitative.",
+      "citation": "[deterministic whitelist](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/resultMemo.ts#L51-L63); [cache-aware selection](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/cachingAware.ts#L112-L125)",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "The proposed PUT/reset and its resulting stored rows were not exercised; snapshot cavemanConfig.enabled=true and preservePatterns=[] remain dormant.",
+     "Original fixture suite beyond the independently reproduced negation/assistant-role case, actual Codex instruction envelopes and real FW quality.",
+     "Upstream savings figures, PR status and OAuth cache/quota weighting."
+    ]
+   },
+   {
+    "id": "C10",
+    "verdict": "corrected",
+    "state": "OFF-BY-EVIDENCE",
+    "config": "No writes. Keep compression disabled, defaultMode='off', codex/* excluded, engines.aggressive.enabled=false, autoTriggerTokens=0 and contextBudget.mode='off'; no aggressive pipeline or routing selection. Keep ultra.modelPath unset. For a consistent no-change resolution with C12, leave the dormant slmFallbackToAggressive=true unchanged; reconsider it before any future SLM activation.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "The destructive history and tool-output mechanisms support OFF.",
+      "evidence": "Tool compression has no recency exemption; aging reduces older user messages to their first 120 characters and summarizes assistant messages. A separate length-triggered summarizer can affect recent non-system messages other than the last user message. The summarizer is rule-based, so this path makes no summarization-model call.",
+      "citation": "[aggressive passes](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/aggressive.ts#L67-L145); [aging behavior](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/progressiveAging.ts#L105-L148); [rule-based summarizer](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/summarizer.ts#L197-L238)",
+      "material": true
+     },
+     {
+      "lens": "quality",
+      "claim": "The header off control is weaker than the proposal states when adaptive mode is enabled.",
+      "evidence": "selectCompressionPlan runs adaptive resolution after header/lossy resolution without preserving an explicit off decision. An independent pure-resolver fixture changed a request-header off plan into a stacked plan containing aggressive and ultra when over budget. Master off still wins. Any future experiment must also verify the executed pipeline because of the shared default-combo substitution defect.",
+      "citation": "[planning order](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/strategySelector.ts#L224-L248); [adaptive escalation](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/adaptiveCompression/resolveAdaptivePlan.ts#L36-L103)",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "Recency-driven prefix churn and the stacked cache-guard gap are verified; the quoted 93.7% is not a 24-hour all-request ratio.",
+      "evidence": "Aging depends on distance from the current conversation end. The cache guard substitutes standard only for top-level aggressive/ultra modes, leaving stacked plans unchanged. This establishes a cache risk, not its measured cost. /api/cache computes its input denominator only over cache-active rows and has no time predicate.",
+      "citation": "[distance-based aging](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/progressiveAging.ts#L105-L145); [mode-only cache guard](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/cachingAware.ts#L112-L125); [metrics query](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/settings/cacheMetrics.ts#L11-L22)",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "Real aggressive output, GPT-6 quality and complete-session usage; no live compression request was sent.",
+     "Codex remote/local compaction selection and whether gateway compression would delay its trigger.",
+     "External issue/PR statuses and the running installation's worker-packaging behavior."
+    ]
+   },
+   {
+    "id": "C11",
+    "verdict": "corrected",
+    "state": "OFF-BY-EVIDENCE",
+    "config": "No writes. Retain compression.enabled=false, codex/* exclusions, engines.llmlingua.enabled=false, ultraEngine='heuristic', ultraSlmPrewarm=false and ultra.modelPath unset. Keep llmlingua absent from selected pipelines and ladders. Any future A/B must distinguish Chat strings/text blocks from native Responses input_text blocks and measure backend failures explicitly.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "Native Responses applicability is overstated: ordinary input_text blocks are not pruned by this engine.",
+      "evidence": "bodyAdapter retains message content block types. LLMLingua processes strings and array entries whose type is exactly text; input_text and output_text entries pass through. An independent fixture using the pinned adapter and engine made zero backend calls for an input_text developer message, versus one for an otherwise identical text block. String tool outputs remain exposed.",
+      "citation": "[Responses content preservation](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/bodyAdapter.ts#L148-L151); [LLMLingua content dispatch](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/llmlingua/index.ts#L286-L325)",
+      "material": true
+     },
+     {
+      "lens": "quality",
+      "claim": "OFF remains justified for content that reaches the classifier.",
+      "evidence": "System messages are spared, but eligible user, developer, assistant and tool strings can be pruned. Tag/negation shielding and heuristic case restoration do not preserve arbitrary facts or relations. The worker passes a keep rate to token compression without a JSON-preservation contract. These are source-grounded risks, not a reproduced GPT-6 quality regression.",
+      "citation": "[protected spans and case restoration](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/llmlingua/index.ts#L109-L151); [classifier call](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/llmlingua/onnxWorker.ts#L112-L148)",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "The proposed fail-open metric and 16x per-turn cache penalty are unsupported.",
+      "evidence": "llmlingua-compressed-N-messages counts successful compressed messages/parts, not failed backend calls. Warm timeouts start after dequeue and cover a backend request, including its internal chunks; queue wait is additional. The 16.13 ratio is aggregate cached/uncached input from the supplied 24-hour totals, not the size of each request's rewritten prefix. The floor and load-dependent fail-opens can cause churn, but its magnitude needs measurement.",
+      "citation": "[success-only statistics](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/llmlingua/index.ts#L478-L526); [queue and timeout behavior](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/llmlingua/worker.ts#L283-L337)",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "Actual ONNX output, latency, memory use, model availability and running-process dependency state. The applicability fixture stubbed the backend and statistics; it neither loaded nor downloaded a model.",
+     "Actual CX/FW block shapes, fail-open frequency, task quality and net usage savings.",
+     "Model-card/paper comparisons, upstream status and live DATA_DIR; no environment or auth store was read."
+    ]
+   },
+   {
+    "id": "C12",
+    "verdict": "corrected",
+    "state": "OFF-BY-EVIDENCE",
+    "config": "No writes. Keep enabled=false, defaultMode='off', autoTriggerTokens=0, contextBudget.mode='off', engines.ultra.enabled=false, ultraEngine='heuristic', ultraSlmPrewarm=false, codex/* exclusions and no ultra selections. Keep ultra.modelPath unset and the current dormant slmFallbackToAggressive=true. Future SLM testing must distinguish the modelPath branch from ultraEngine='slm' and cannot use ultraTier alone to count fallbacks.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "Tier-A loss and boundary damage support OFF.",
+      "evidence": "The scorer makes relation-bearing words such as from, to and or deletion candidates. pruneByScore trims each prose fragment; pruneProseOnly joins those fragments and preserved blocks without restoring boundary whitespace. This can change relations and glue prose to a fence despite preserving the fenced bytes themselves.",
+      "citation": "[stopwords](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/ultraHeuristic.ts#L62-L80); [pruning and trim](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/ultraHeuristic.ts#L142-L177); [fragment rejoining](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/ultra.ts#L50-L66)",
+      "material": true
+     },
+     {
+      "lens": "quality",
+      "claim": "Tier-B telemetry can hide partial fallback, and modelPath takes a materially different path.",
+      "evidence": "ultraTier becomes slm if any segment used SLM, even when others fell back. An independent mixed-success fixture confirmed this. With modelPath, dispatch calls LLMLingua directly and can fall back to aggressive; it does not first adapt raw Responses input into messages, so that shape can immediately no-op in LLMLingua and take the fallback. This requires explicit separation in any future test.",
+      "citation": "[mixed-tier attribution](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/ultra.ts#L254-L284); [modelPath dispatch and fallback](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/strategySelector.ts#L707-L745); [LLMLingua messages gate](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/llmlingua/index.ts#L468-L475)",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "The claim that net benefit is impossible by construction is too strong.",
+      "evidence": "Tier-A transforms each message without an aging/query dependency, so a consistently transformed prefix can be cached again after adoption. Tier-B introduces variable fallbacks. Neither source establishes the balance between initial misses and later savings. The proposed comparison also incorrectly calls RTK lossless; its catalog explicitly marks it lossy.",
+      "citation": "[Tier-A per-message processing](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/ultra.ts#L149-L185); [per-segment fallback](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/ultra.ts#L120-L130); [RTK classification](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engineCatalog.ts#L71-L83)",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "Actual SLM output and GPT-6 quality; the mixed-fallback fixture used a synthetic backend and did not perform inference.",
+     "Original Tier-A shrink percentages, production cache economics, installed worker availability and actual model-cache location.",
+     "External issue/PR status and model-training claims."
+    ]
+   },
+   {
+    "id": "C13",
+    "verdict": "corrected",
+    "state": "N/A",
+    "config": "No writes. Retain compression disabled, defaultMode='off', engines.omniglyph.enabled=false, codex/* exclusions, preserveSystemPromptMode='always', the dormant aggressive profile and no OmniGlyph pipeline/header selection. Re-resolve only for a supported direct-provider consumer; profile selection alone does not override native-Claude system preservation.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "N/A is supported for the stated Codex-only consumer set.",
+      "evidence": "The transport allowlist contains only anthropic and claude. Codex resolves to aggregator/unknown, and the adapter requires direct transport before rendering. It also applies the coding-safe model ceiling. Thus a vision flag or compression header cannot make the current Codex lanes consume this engine.",
+      "citation": "[transport policy](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/imageTransportPolicy.ts#L17-L32); [adapter gates](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/omniglyphAdapter.ts#L131-L148); [model ceiling](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/omniglyphAdapter.ts#L74-L80)",
+      "material": true
+     },
+     {
+      "lens": "quality",
+      "claim": "The aggressive profile does not unconditionally image the system prompt under the proposed configuration.",
+      "evidence": "When preserveSystemPrompt is true, native-Claude transformation receives compressSystem=false, overriding the profile's system-conversion behavior. On non-Claude wires the same preservation setting causes a skip. Tool/history imaging remains lossy when otherwise eligible, but the proposal overstates system-prompt exposure under its retained preservation setting.",
+      "citation": "[system-preservation gate](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/omniglyphAdapter.ts#L198-L210); [Claude transformation override](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/omniglyphAdapter.ts#L224-L238)",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "Current-lane savings are zero; package-level billing claims cannot establish GPT-6 savings.",
+      "evidence": "The closed transport gate returns the original body before conversion. Accounting is attached only after an applied transformation, with separate provider/model information. A future image conversion needs provider-specific input/cache accounting; neither OCR quality nor a net benefit follows from this adapter.",
+      "citation": "[early transport rejection](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/omniglyphAdapter.ts#L131-L148); [applied-only accounting](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/omniglyphAdapter.ts#L239-L268)",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "Package scorecards, exact-read receipts, claimed bill reductions and upstream release/issue status.",
+     "A fresh provider inventory, service environment and actual GPT-6 dense-image reading quality.",
+     "No renderer or full gateway transformation was executed."
+    ]
+   },
+   {
+    "id": "C14",
+    "verdict": "corrected",
+    "state": "OFF-BY-EVIDENCE",
+    "config": "No writes. Keep enabled=false, defaultMode='off', exclusions=['codex/*'], outputStyles=[], cavemanOutputMode={enabled:false,intensity:'lite',autoClarity:true} and languageConfig.enabled=false. Keep all compression-combo outputMode values false. A future client-side A/B must measure complete-session input, cache and output usage rather than assuming the present output share bounds total savings.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "OFF is supported, but the legacy-marker claim is wrong for the active gateway path.",
+      "evidence": "Legacy cavemanOutputMode settings resolve to terse-prose and then pass through the same applyOutputStyles call as explicit selections. An independent invocation produced '[OmniRoute Output Styles]' for the legacy setting. The old marker belongs to the separate legacy function, not a distinct active legacy-settings branch. The shared injector still adds behavioral instructions without a response_format/tools safety gate.",
+      "citation": "[legacy selection mapping](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/outputStyles/backCompat.ts#L20-L28); [active gateway injector](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1693-L1709); [injection implementation](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/outputStyles/apply.ts#L127-L188)",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "The injection counts are reproducible; the 1.23% output share is not a complete-session savings ceiling.",
+      "evidence": "Independent o200k_base counts matched all reported entries, including 116 tokens for terse-prose full, 319 for ADHD full and 673 for all four full styles. A hypothetical 65% output reduction is 0.798% of the fixed-input sample total. However, shorter assistant replies can also reduce later replayed input; the translator explicitly carries assistant content into Responses input. Actual reasoning-token effects and quota weights remain unknown.",
+      "citation": "[style construction](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/outputStyles/apply.ts#L106-L150); [assistant replay conversion](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/translator/request/openai-responses/toResponses.ts#L218-L248)",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "Prefix instability and inadequate savings telemetry are verified, but every flip does not prove a whole-prefix cache miss.",
+      "evidence": "Chat injection can toggle using the last three messages, while the native Responses branch bypasses that clarity check. String instructions/system content are trimmed before appending. These operations change cache-relevant bytes, but the miss boundary, reuse of prior variants and backend instructions treatment require measurement. Telemetry passes identical before/after token estimates and cannot measure output savings.",
+      "citation": "[Responses versus Chat injection](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/outputStyles/apply.ts#L143-L185); [clarity check](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/outputMode.ts#L96-L125); [telemetry inputs](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore/outputStyleTelemetry.ts#L34-L44)",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "Actual GPT-6 tokenization, visible-versus-reasoning output split, instructions cache-key treatment and task-quality impact.",
+     "The researcher's fresh run-telemetry GET, lifetime 'never fired' claim and routing-assignment inventory.",
+     "Upstream evaluation percentages, output-saving claims and PR status."
+    ]
+   },
+   {
+    "id": "C15",
+    "verdict": "upheld",
+    "state": "N/A",
+    "config": "No writes. Keep mcpEnabled=false and no OmniRoute MCP consumer in the stated lanes. Leave the dormant accessibility and description-compression settings unchanged. Re-resolve before introducing any HTTP or stdio MCP client; the main compression master and the feature-flag dashboard are not substitutes for the actual MCP controls.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "The consumer boundary and independent controls support N/A.",
+      "evidence": "createMcpServer reads both settings and wraps its own registered tools, prompts and resources. It does not transform arbitrary client MCP traffic passing through chat endpoints. HTTP has an mcpEnabled gate; startMcpStdio directly creates the server. The supplied snapshot reports MCP offline and zero calls, supporting no known consumer without proving absence of every external stdio process.",
+      "citation": "[MCP registration wrappers](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/mcp-server/server.ts#L750-L802); [stdio startup](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/mcp-server/server.ts#L1523-L1529); [HTTP gate](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/mcp/stream/route.ts#L15-L30)",
+      "material": true
+     },
+     {
+      "lens": "quality",
+      "claim": "The dormant JSON/CCR truncation defect and misleading feature flag are verified.",
+      "evidence": "Every qualifying text block receives smartFilterText without a content-type check. An independent invocation cut 60,014-character valid JSON to 49,866 characters of invalid JSON. CCR results are serialized into such text blocks. Description compression reads environment variables and its real setting directly; the feature-flag setter writes a separate database override without updating that environment.",
+      "citation": "[filter and hard cut](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engines/mcpAccessibility/index.ts#L14-L44); [CCR tool result serialization](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/mcp-server/server.ts#L1291-L1307); [actual description gate](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/mcp-server/descriptionCompressor.ts#L46-L55); [flag persistence](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/featureFlags.ts#L85-L108)",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "There is no demonstrated saving on CX/FW/SEARCH; future savings require an MCP consumer.",
+      "evidence": "Description rewriting occurs at registration and output filtering uses configuration captured when the server is created. This supports stable transforms within a fixed server instance and explains why settings changes require new instances. It does not establish tool-selection fidelity or a token benefit on the measured chat traffic.",
+      "citation": "[settings captured at registration](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/mcp-server/server.ts#L750-L774); [server/session lifetime](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/mcp-server/httpTransport.ts#L81-L108)",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "External stdio registrations/processes, the alternate description-compression environment variable and the researcher's separate accessibility GET.",
+     "Actual MCP description token savings, tool-selection quality and browser-snapshot savings claims.",
+     "The independent JSON test exercised the filter only, not a running CCR retrieval or MCP server."
+    ]
+   },
+   {
+    "id": "C19",
+    "verdict": "corrected",
+    "state": "N/A",
+    "config": "No writes. Keep contextEditing.enabled=false independently of the main compression switch. No current Codex lane can receive the gateway-generated clear-tool edit. For future Claude consumers, distinguish the global automatic-injection toggle from client-supplied context_management edits, which can carry their own parameters and survive this helper.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "The provider gate and independent toggle support N/A.",
+      "evidence": "Injection requires provider claude or the Claude Code protocol predicate, plus contextEditing.enabled. CodexExecutor identifies itself as codex. chatCore copies contextEditingEnabled independently of compression.enabled, exclusions and per-key opt-out, so those other settings are not its kill switch.",
+      "citation": "[executor gate](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/base.ts#L1348-L1355); [Codex provider identity](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L808-L813); [independent setting](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1443-L1450)",
+      "material": true
+     },
+     {
+      "lens": "quality",
+      "claim": "The fixed-parameter, wire-shape and unconditional sorting claims need qualification.",
+      "evidence": "The generated edit uses trigger={type:'input_tokens',value:100000} and keep={type:'tool_uses',value:3}. Existing clear_tool_uses edits are retained, including client-supplied parameters; sorting occurs only when the helper adds an edit. An independent invocation preserved keep=42 and an existing tools-before-thinking order. The global toggle therefore does not enforce those defaults or repair every existing edit list.",
+      "citation": "[context-editing merge and sorting](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/config/contextEditing.ts#L48-L81)",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "Current savings are zero; cleared-token telemetry would not by itself establish net savings for a future Claude lane.",
+      "evidence": "This helper adds a provider instruction rather than locally shortening the prompt. Telemetry records provider-reported cleared tokens only when the provider is claude. Net benefit must include provider cache reads/writes and task quality; equivalent injection into compatible relays can lack this telemetry.",
+      "citation": "[provider instruction](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/config/contextEditing.ts#L63-L81); [telemetry gate](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore/contextEditingTelemetry.ts#L21-L34)",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "Current Anthropic API acceptance, cache-invalidation behavior and recommendations from the external documentation.",
+     "Live injection/retry behavior, streaming telemetry and the researcher's later provider-inventory GET.",
+     "Client-supplied context_management behavior across the complete Codex translation/retry path and external PR statuses."
+    ]
+   }
+  ],
+  "cross_item": [
+   "Verification scope: all 6,137 numbered OmniRoute lines in G3.source.txt matched the checkout; 93 packet-cited paths other than the local alpha route had no diff from a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3. Observations labeled snapshot refer to the captured GET [gateway snapshot]($SCRATCH/omniroute-phase0/gateway-snapshot.json). No fresh gateway request, mutation, restart, auth-store read or model download was performed.",
+   "C08/C10 and other future named-combo experiments cannot assume the header names the executed engines. Legacy default-combo loading can overwrite the execution pipeline; assigned/default combos can also retain lossy steps after plan filtering. Check execution receipts before interpreting an A/B. [Default loading](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1655-L1675), [copy exception](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1775-L1784), [executed config](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/strategySelector.ts#L618-L633).",
+   "The shared off controls have different scope. HTTP exclusions disable prompt and reactive compression; per-key opt-out does not disable reactive compaction; adaptive planning can supersede header off. The WebSocket bridge does not apply exclusions. C15 MCP transforms and C19 context editing have independent controls. Keeping the current master off, contextBudget off, HTTP exclusion, MCP disabled and contextEditing disabled preserves these resolutions. [HTTP gates](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1439-L1450), [adaptive order](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/strategySelector.ts#L224-L248), [WS path](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/internal/codex-responses-ws/compression.ts#L50-L94).",
+   "C10's optional slmFallbackToAggressive=false conflicts with C12's explicit keep-true configuration if treated as mandatory. The consistent read-only resolution leaves the current true value dormant with no modelPath or ultra selection. C12 also misclassifies RTK as a lossless comparison arm, contradicting C05 and the catalog. [Fallback dispatch](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/strategySelector.ts#L740-L745), [RTK lossy flag](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/engineCatalog.ts#L71-L83).",
+   "C09 requires preserving enginesExplicit=false, while several items name engines.* values as invariants. Do not implement those invariants by saving an engines map: any stored map makes enginesExplicit true and changes future default-plan authority. The snapshot also contains dormant caveman/lite/session-dedup toggles that are true; 'all engines false' describes upstream construction defaults, not this snapshot. [Stored-map authority](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/compression.ts#L875-L887), [default resolution](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/planResolution.ts#L131-L150).",
+   "Cache denominators must stay separate: the supplied 24-hour ratio is 94.16%; the 122-row sample is 85.42%; /api/cache's 93.67% excludes cache-inactive requests from input totals and has no time filter. Its 24-hour parameter applies only to trend. None of these aggregates proves a per-request 16x penalty or compressor savings. Do not add cached-token totals to compression savings. [Metrics SQL](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/settings/cacheMetrics.ts#L11-L57), [trend-only time parameter](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/cache/route.ts#L25-L42).",
+   "SEARCH applicability is upheld for this group: both routes dispatch to handleSearch rather than chatCore compression. The alpha route is local-only and must not be cited as an upstream-pin file. [Pinned search dispatch](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/v1/search/route.ts#L356-L365), [local alpha dispatch](~/.local/share/codex-ecosystem/sources/omniroute-a58000c7-pr14904/src/app/api/v1/alpha/search/route.ts:199)."
+  ],
+  "tools_used": [
+   "functions.exec",
+   "exec_command: focused sed/rg reads, read-only Python analysis, git comparisons and in-memory Node probes",
+   "mcp__context_mode__ctx_execute",
+   "mcp__context_mode__ctx_execute_file: attempted; outside-workspace access blocked",
+   "mcp__codebase_memory__search_graph",
+   "mcp__codebase_memory__get_code_snippet",
+   "mcp__codebase_memory__trace_path"
+  ]
+ },
+ "G4": {
+  "group": "G4",
+  "items": [
+   {
+    "id": "K01",
+    "verdict": "corrected",
+    "state": "ON-GLOBAL",
+    "config": "Keep sessionAffinityTtlMs=14400000, promptCacheAffinityEnabled=true, disableSessionStickiness=false, alwaysPreserveClientCache=\"auto\", providerStrategies.codex={fallbackStrategy:\"round-robin\",stickyRoundRobinLimit:1}; leave fingerprint mode unset, promptCacheEnabled=true and promptCacheStrategy=\"auto\". CX unchanged. For FW, require the FIRST system/developer message to produce non-whitespace instructions; an existing nonempty developer message suffices. After lane A/B, use a task-specific X-Session-Id for account affinity and, separately, a stable body prompt_cache_key. Neither field supplies the fingerprint's upstream conversation identity. Do not add codexPromptCacheKeyScope at this pin.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "\u201cAlways send a system message\u201d is insufficient to prevent injected Codex instructions.",
+      "evidence": "The translator consumes the first system OR developer message as instructions, even when empty. A later nonempty system message does not repair those instructions. The executor substitutes CODEX_DEFAULT_INSTRUCTIONS whenever instructions are absent or whitespace and tools exist. Require nonempty text in the first qualifying message; do not prepend another system message to an already valid developer prompt.",
+      "citation": "[First instruction selection](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/translator/request/openai-responses/toResponses.ts#L118-L140); [fallback injection](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1362-L1385)",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "Gateway account affinity and fingerprint thread identity have different inputs; FW does not automatically receive a conversation-specific upstream thread.",
+      "evidence": "Account affinity accepts X-Session-Id and body prompt_cache_key. Fingerprint identity reads only session-id/session_id headers and falls back to the account session when neither exists. Consequently the proposed FW headers/body key can pin an account while thread-id remains account-wide. A template-wide prompt_cache_key also becomes a shared account-affinity key unless a higher-priority task header overrides it.",
+      "citation": "[Account-affinity inputs](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/sessionAffinityPin.ts#L197-L221); [fingerprint header inputs](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/config/codexIdentity.ts#L239-L246); [thread fallback](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/config/codexIdentity.ts#L295-L308)",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "Retaining the current configuration is justified, but four hours is an idle TTL, not a guarantee of uninterrupted account reuse.",
+      "evidence": "Reusing an eligible pin refreshes its expiry; subsequent OAuth occupancy selection can replace the chosen account. Existing client prompt_cache_key is retained. The supplied snapshot confirms the proposed settings, so retaining them introduces no new token saving or prefix change. The account-switch savings estimate remains observational rather than a demonstrated recoverable benefit.",
+      "citation": "[Sliding expiry](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/sessionAccountAffinity.ts#L86-L123); [occupancy override](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/auth.ts#L2159-L2176); [key preservation](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1504-L1514)",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "Backend precedence among session-id, thread-id and prompt_cache_key; whether instructions participate in its cache; cross-workspace cache sharing and public-API retention/RPM rules.",
+     "The researcher's detailed call-log calculations, 64 switches, 1.89M additional uncached tokens, occupancy causation and multi-hour continuity were not independently reproduced.",
+     "PR #14907 was independently observed open and unmerged; its implementation tests, review status, claimed cache benefits and other issue/discussion histories were not independently verified."
+    ]
+   },
+   {
+    "id": "K02",
+    "verdict": "corrected",
+    "state": "OFF-BY-EVIDENCE",
+    "config": "Keep semanticCacheVectorEnabled=false and embedding/Redis credentials unconfigured. The proposed future OMNIROUTE_SEMANTIC_CACHE_ENABLED=false controls the vector manager only. For FW cx/*, enforce temperature omission in the resolved outgoing request, or X-OmniRoute-No-Cache:true; verify Hindsight per-operation overrides and cognee LLM_ARGS/explicit arguments instead of relying solely on their global environment defaults. Treat OFF as lane exclusion: the legacy global gate remains armed. For acceptance, compare before/after hits, misses and entries; absolute misses>0 neither dates nor attributes a violation. Do not use legacy hit or tokensSaved totals as savings measurements. No configuration was written.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "OFF is supported: neither cache is safe for general max-effort, tool-bearing FW requests.",
+      "evidence": "The legacy signature omits effort, instructions and tool-call identity/history fields outside role/content. Codex subsequently strips temperature/top_p, so temperature:0 does not establish upstream determinism. Vector similarity filters do not include the output contract or effort. Keyless requests lack API-key partitioning. These mechanisms can replay a lower-effort or incompatible answer without executing the requested worker.",
+      "citation": "[Legacy signature/projection](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/semanticCache.ts#L219-L270); [sampling removal](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/translator/paramSupport.ts#L42-L48); [vector lookup/filter](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/cache/semanticCacheManager.ts#L244-L339)",
+      "material": true
+     },
+     {
+      "lens": "quality",
+      "claim": "The toggle split is real; reliable exclusion must be checked at the request boundary.",
+      "evidence": "chatCore reads flat settings.semanticCacheEnabled, whereas cache-config persists the databaseSettings cache section. The bypass header blocks both legacy reads and writes. Framework settings need qualification: Hindsight operation overrides outrank the global temperature setting, and cognee explicit arguments/LLM_ARGS can still supply temperature when LLM_TEMPERATURE is unset.",
+      "citation": "[Legacy gate](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1247-L1249); [separate settings write](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/settings/cache-config/route.ts#L140-L150); [read/write bypass](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/semanticCache.ts#L483-L510); [Hindsight v0.10.1](https://github.com/vectorize-io/hindsight/blob/v0.10.1/hindsight-api-slim/hindsight_api/config.py#L278-L315); [cognee v1.6.1](https://github.com/topoteretes/cognee/blob/v1.6.1/cognee/infrastructure/llm/config.py#L270-L297)",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "The proposal misses double-counting in legacy cache-hit accounting.",
+      "evidence": "getCachedResponse increments hits and tokens_saved, then checkSemanticCache calls recordSemanticCacheHit, which increments them again. An isolated execution of the exact functions with synthetic storage reproduced one 120-token cached response recording two hits and 240 tokens_saved. Snapshot zeros remain valid observations, but future nonzero totals cannot directly measure avoided calls or savings. A real hit avoids the whole upstream call, including discounted cached input; its benefit is not bounded by the output share.",
+      "citation": "[First increment](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/semanticCache.ts#L281-L326); [second increment](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/semanticCache.ts#L334-L345); [unconditional hit recording](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore/semanticCache.ts#L132-L152)",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "One hour is the default write TTL, not a hard upper bound on response reuse.",
+      "evidence": "SQLite promotion creates a fresh memory entry without passing the row's remaining TTL. The memory default is 30 minutes, measured from promotion. Therefore an entry promoted shortly before its one-hour database expiry can remain reusable for approximately 90 minutes after the original write. The proposal's within-one-hour repeat ceiling understates stale-answer exposure.",
+      "citation": "[Memory default](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/semanticCache.ts#L103-L109); [promotion](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/semanticCache.ts#L290-L320); [fresh insertion time/TTL](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/cacheLayer.ts#L92-L123); [write TTL](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/semanticCache.ts#L359-L376)",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "Actual deployed FW request shapes, SDK overrides, repeat rates, schema/quality A/B outcomes and provider-side savings.",
+     "Protected environment contents, current embedder listeners, stored provider credentials and exploitability of credential attachment on this host; none were inspected.",
+     "Historical counter reset time and upstream issue/PR closure claims. The supplied snapshot, not a new live GET, supplied the zero cache observations."
+    ]
+   },
+   {
+    "id": "K03",
+    "verdict": "upheld",
+    "state": "N/A",
+    "config": "Leave the feature as shipped for codex/gpt-6-*; no replay switch exists at this pin. Leave OMNIROUTE_REASONING_CACHE_CLEANUP_INTERVAL_MS unset and do not add preserveEncryptedReasoning for this purpose. On future read-back inspect stats.memoryEntries, stats.dbEntries, stats.hits, stats.misses and stats.replays. Re-resolve if capabilities select reasoning_content or a replay provider/model is introduced.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "Plaintext reasoning replay is inapplicable to the stated GPT-6 lanes and cannot restore their encrypted continuation state.",
+      "evidence": "Neither the provider set nor model patterns match codex/gpt-6-*. Replay requires the predicate and relevant message history; native Responses passthrough bypasses translation. Codex already selects opaque reasoning transport before preserveEncryptedReasoning is considered. Retaining this configuration adds no reasoning text and makes no effort change.",
+      "citation": "[Predicate and provider/model rules](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/reasoningCache.ts#L30-L124); [replay gate](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/translator/index.ts#L538-L556); [opaque registry](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/config/providers/registry/codex/index.ts#L9-L18); [transport precedence](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/reasoningInputPolicy.ts#L40-L58)",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "Zero savings and prefix neutrality are appropriate for current consumers; future replay is a fidelity cost, not a token optimization.",
+      "evidence": "When applicable, authentic reasoning is inserted into subsequent input. Stored text is truncated at 10,000 characters, and the cache expires after two hours. Those mechanisms can change a future replay provider's prefix. The management endpoint exposes entries, and requireLogin=false bypasses its authentication check; the proposal correctly treats that as a future exposure concern rather than a benefit.",
+      "citation": "[Capacity/TTL](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/reasoningCache.ts#L153-L156); [truncation](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/reasoningCache.ts#L212-L236); [entry exposure](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/cache/reasoning/route.ts#L22-L42); [login-disabled behavior](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/shared/utils/apiAuth.ts#L410-L414)",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "The researcher's later live reasoning-cache counters, model-capability lookups and service-start timestamp were not independently reproduced; mutable capability overrides remain outside this source-only verification.",
+     "Cross-account encrypted_content validity, FW quality loss from missing encrypted history, protected environment contents and unmerged replay-switch PR behavior."
+    ]
+   },
+   {
+    "id": "K04",
+    "verdict": "corrected",
+    "state": "OFF-BY-EVIDENCE",
+    "config": "Keep CX unchanged and leave the inert idempotencyWindowMs setting alone. For FW cx/*, omit temperature in the resolved request. If temperature<=0.1 must remain, use stream:true; at temperature:0 also send X-OmniRoute-No-Cache:true. Use a fresh Idempotency-Key/X-Request-Id for each logical call, sample, effort change or experiment arm; reuse only for an unchanged retry. Neither no-cache headers nor unique idempotency keys disable content-hash dedup. Do not claim the gateway's hard-coded dedup is globally disabled or that its historical savings are measured as zero.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "The independent-sample and schema-collision risks are real; the proposed lane exclusion remains appropriate.",
+      "evidence": "Dedup uses the translated body before upstream preparation and accepts non-streaming temperature<=0.1. Its hash omits Responses text.format. Isolated execution reproduced four concurrent requests invoking the upstream function once, and different text.format contracts producing the same hash. Codex later removes sampling parameters. Qualification: the claimed GPT-6 verbosity collision is not an additional differing upstream contract here, because target sanitation strips verbosity for models outside its GPT-5 regex.",
+      "citation": "[Gate/hash](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/requestDedup.ts#L159-L214); [pipeline order](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L3087-L3108); [GPT-6 verbosity stripping](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/targetRequestSanitizer.ts#L26-L48)",
+      "material": true
+     },
+     {
+      "lens": "quality",
+      "claim": "Idempotency has an additional max-effort fidelity hole: its fingerprint omits Chat reasoning_effort.",
+      "evidence": "The idempotency check precedes translation. Its allowlist includes reasoning but not reasoning_effort, thinking or output_config. With the same header key, provider/model and messages, otherwise identical medium- and max-effort Chat requests can therefore share a turn guard/replay key. The exact key function reproduced that collision. Unique keys must cover effort changes, not merely changes in messages.",
+      "citation": "[Fingerprint allowlist](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore/idempotency.ts#L11-L46); [key composition](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore/idempotency.ts#L87-L110); [early check](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L756-L783); [later effort translation](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/translator/request/openai-responses/toResponses.ts#L451-L463)",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "Avoided duplicate calls save whole calls, but zero semantic-cache counters do not measure dedup savings.",
+      "evidence": "Dedup accepts temperature 0.1 while semantic reads require exactly 0. Its in-flight entry disappears on completion or timeout, so activeKeys=0 is not historical evidence. The hard-coded five-second idempotency save window is correctly identified as independent of the reported setting. Omitting temperature preserves Codex's upstream sampling payload, but the actual cache-ratio and savings delta still require lane measurements.",
+      "citation": "[Dedup gate/lifetime](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/requestDedup.ts#L205-L262); [exact-cache eligibility](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/semanticCache.ts#L483-L492); [idempotency default](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/idempotencyLayer.ts#L64-L97); [save without configured window](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L5624-L5627)",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "Historical dedup frequency, provider-billed savings, joined-request usage/accounting, affinity side effects and response-ID rewriting.",
+     "Actual CX/FW idempotency headers and SDK retry behavior; isolated function probes establish the code defects, not their production incidence.",
+     "The researcher's journal/health observations, advisory availability and exhaustive upstream issue searches."
+    ]
+   },
+   {
+    "id": "K05",
+    "verdict": "corrected",
+    "state": "N/A",
+    "config": "Keep alwaysPreserveClientCache=\"auto\" and add no codex connection cache override. The current CX/FW conclusion stands. Correct the future-provider guidance: this setting is not a universal cache_control stripping/preservation switch; any future A/B must identify a translation or bridge path that actually consumes it.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "N/A is correct for the current Codex paths, but the claimed effect of never on every Claude-format request is false.",
+      "evidence": "Native Codex passthrough does not consume preserveCacheControl. Separately, native Claude passthrough explicitly trusts the client body regardless of cache-control settings; the generic Claude preparation path also preserves when the source format is Claude. Therefore never does not universally rewrite client breakpoints, and connecting a Claude client/provider alone does not prove this setting changes its request.",
+      "citation": "[Native Codex branch](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L2358-L2366); [Claude passthrough exception](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L2453-L2459); [source-Claude preservation](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/translator/index.ts#L624-L637)",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "This setting offers no token-saving lever for the stated CX/FW traffic; upstream cache metrics do not demonstrate marker preservation.",
+      "evidence": "Codex is deliberately excluded from explicit OpenAI-format marker passthrough. FW text-part translation reconstructs text without cache_control regardless of this setting. requestsWithCacheControl counts usage rows with cache reads/writes, and updateCacheMetrics does not persist marker-preservation events. Retaining auto therefore leaves current prefix behavior unchanged and adds zero incremental savings.",
+      "citation": "[Explicit-marker exclusion](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/utils/cacheControlPolicy.ts#L114-L134); [text reconstruction](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/translator/request/openai-responses/toResponses.ts#L74-L95); [metric meaning](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/settings/cacheMetrics.ts#L14-L21); [returned counter/no-op updater](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/db/settings/cacheMetrics.ts#L142-L174)",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "Backend handling of cache_control attached to forwarded unknown non-text parts, actual live client User-Agents and future Claude-lane A/B results.",
+     "Historical cache-thrashing reports, upstream review/merge histories and whether the cited upstream test suites pass on this build; they were not rerun."
+    ]
+   }
+  ],
+  "cross_item": [
+   "K02's no-cache header alone does not satisfy K04's independent-sample requirement; stream:true alone does not satisfy K02 at temperature:0. The combined exclusion is temperature omission, or stream:true plus X-OmniRoute-No-Cache:true when zero temperature must remain, with independently scoped idempotency keys. [Semantic eligibility](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/semanticCache.ts#L483-L510); [dedup eligibility](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/requestDedup.ts#L205-L214).",
+   "K02 identifies Hindsight retain's 0.1 default, while K04 uses temperature-zero cache counters to suggest negligible FW dedup activity. Those observations cannot establish that conclusion: 0.1 is outside semantic caching but inside dedup. Historical dedup savings remain unverified. [Hindsight defaults](https://github.com/vectorize-io/hindsight/blob/v0.10.1/hindsight-api-slim/hindsight_api/config.py#L241-L245); [dedup threshold](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/requestDedup.ts#L205-L214)."
+  ],
+  "tools_used": [
+   "exec_command: read-only sed/rg/Python inspection, redacted snapshot projections, git pin comparisons and isolated Node assertions; 3361 packet source lines matched the checkout, and eight final assertions passed without gateway calls or database access",
+   "mcp__context_mode__ctx_execute_file: attempted packet reads; blocked outside the workspace, followed by user-permitted shell reads",
+   "mcp__context_mode__ctx_execute: token-share calculations",
+   "mcp__context_mode__ctx_fetch_and_index: pinned Codex, Hindsight and cognee sources; PR #14907 metadata",
+   "mcp__context_mode__ctx_search: targeted retrieval from indexed network sources"
+  ]
+ },
+ "G5": {
+  "group": "G5",
+  "items": [
+   {
+    "id": "R01",
+    "verdict": "corrected",
+    "state": "OFF-BY-EVIDENCE",
+    "config": "Retain thinkingBudget={\"mode\":\"passthrough\",\"customBudget\":10240,\"effortLevel\":\"medium\"}; make no gateway writes or connection-default changes. Keep CX client-owned effort. After each FW lane's A/B, use cx/gpt-6-astra-max for judgment and cx/gpt-6-sol-medium for mechanical work, or equivalent explicit body effort. Do not describe auto/custom/adaptive as reliable blanket caps.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "The OFF decision stands, but custom/adaptive do not downgrade every max-effort FW request.",
+      "evidence": "For positive budgets, setCustomBudget writes reasoning_effort while preserving an existing reasoning object. Chat-to-Responses translation prefers that object, so reasoning:{effort:\"max\"} survives a customBudget of 10240. A recognized model suffix also outranks the translated effort in the executor; auto strips reasoning fields but does not remove the suffix. These exceptions invalidate the proposal's blanket downgrade claims.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/thinkingBudget.ts#L267-L340 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/translator/request/openai-responses/toResponses.ts#L451-L464 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1424-L1465",
+      "material": true
+     },
+     {
+      "lens": "quality",
+      "claim": "Non-passthrough modes do not categorically remove summary/encrypted-content inclusion; the native-CX bypass claim is supported.",
+      "evidence": "The mode gates connection fallback effort, but ensureCodexReasoningSummary runs unconditionally after effort resolution. Surviving or suffix-reconstituted non-none reasoning receives summary:auto when absent and reasoning.encrypted_content inclusion. Native Responses bypasses translateRequest, so explicit CX effort is not stripped by Thinking Budget auto.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L374-L393 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1273-L1277 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1458-L1484 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L2358-L2366",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "Other modes are not necessarily token-reducing; retaining passthrough provides zero incremental savings.",
+      "evidence": "customBudget=10240 changes a flat low effort to medium, while higher budgets can raise it further. Adaptive effortLevel=none falls through the || fallback instead of preserving its zero budget. No measured saving follows from these mappings. The historical 1.23% output share bounds eliminating that frozen output volume, not future reasoning-token growth or cost; the budget functions do not compress prompt content.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/thinkingBudget.ts#L303-L387",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "Additional live request-body counts and per-connection defaults asserted by the researcher were not independently observed; the supplied snapshot confirms passthrough/10240/medium.",
+     "Backend effort when reasoning is omitted, cache partitioning by effort, FW SDK forwarding behavior, and lane-specific quality/token effects.",
+     "GitHub issue/PR status and npm/release-head claims were not refreshed."
+    ]
+   },
+   {
+    "id": "R02",
+    "verdict": "corrected",
+    "state": "ON-OPT-IN",
+    "config": "ON-OPT-IN applies only to explicit client effort/model-suffix selection. Adaptive-header and ModelSpec default injection are inapplicable to the connected Codex path. Retain passthrough, empty reasoning rules and existing connection defaults without normalization writes. After lane-specific A/B, select cx/gpt-6-astra-max for judgment or cx/gpt-6-sol-medium for mechanical work. Keep CX unchanged. Do not send literal auto; validate final upstream effort, not merely the requested suffix.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "The proposed reachable control is the Codex suffix/body effort mechanism, not adaptive effort or ModelSpec injection.",
+      "evidence": "Codex targets openai-responses. applyDefaultReasoningEffort and wireAdaptiveEffort are restricted to the openai target. Codex independently resolves suffix/body effort and, in passthrough, falls back to connection reasoningEffort or medium. The opt-in state therefore needs this narrower interpretation.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/config/providers/registry/codex/index.ts#L9-L18 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore/upstreamBody.ts#L220-L248 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore/adaptiveEffortWiring.ts#L46-L71 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1424-L1465",
+      "material": true
+     },
+     {
+      "lens": "quality",
+      "claim": "A -max suffix wins over client defaults but does not guarantee max after all HTTP dispatch processing.",
+      "evidence": "BaseExecutor runs sanitizeReasoningEffortForProvider after Codex transformRequest. Its learned-cap branch can replace max with an accepted lower tier. Read-only tests of the pinned pure helpers confirmed max\u2192high for an accepted set containing only low/medium/high. This establishes a source-level counterexample, not a claim that the live process has learned that set.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/base.ts#L864-L875 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/base/reasoningEffort.ts#L526-L541 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/learnedReasoningEffortCaps.ts#L149-L184",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "The claim that medium\u2192max total-token growth is bounded by the current output slice is false.",
+      "evidence": "The 117,065/9,536,264 baseline output share is 1.23%, not a growth ceiling. Holding input fixed, tenfold output would increase total tokens by 11.05%. Codex deletes max_output_tokens, so the proposed configuration supplies no numeric output bound. Unchanged prompt text/cache-key derivation also does not establish unchanged backend cache behavior across efforts.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1204-L1219 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1439-L1465 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1490-L1499",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "Current learned-cap state, final FW wire effort on this running build, and actual per-account defaults.",
+     "Quality, latency, output growth, backend cache partitioning and subscription-quota effects of medium\u2192max; no lane A/B was performed.",
+     "Timeout-environment observations and upstream issue/PR status were not independently refreshed."
+    ]
+   },
+   {
+    "id": "R03",
+    "verdict": "corrected",
+    "state": "OFF-BY-EVIDENCE",
+    "config": "Retain reasoning_routing_rules=[] and add no capability override. Preserve client-owned effort and use the R02 suffix/body controls for separately tested FW lanes. Treat empty rules as absence of configured policy, not removal or authentication of the management surface.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "The GPT-6 max gate defect supports OFF, but not every matching rule returns 400 or rewrites effort.",
+      "evidence": "Without a declaring capability vocabulary, max/ultra gating and suffix parsing retain GPT-5.6-only regexes. Inherit or default preserving explicit max can therefore reject GPT-6. Force-low resolves low instead and can pass while degrading effort. applyReasoningRuleDirective writes effort for force/default; inherit with preserved budget does not inherently rewrite effort fields.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/reasoningRouting/policy.ts#L81-L98 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/reasoningRouting/policy.ts#L261-L324 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/reasoningRouting/policy.ts#L394-L403 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/reasoningRouting/policy.ts#L582-L607 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/handlers/reasoningRouting.ts#L63-L74",
+      "material": true
+     },
+     {
+      "lens": "quality",
+      "claim": "requireManagementAuth is not an authentication boundary under the chosen login-off configuration.",
+      "evidence": "The rule-management route invokes requireManagementAuth without alwaysRequireAuth. That helper returns successfully when isAuthRequired is false, and requireLogin=false produces that result. Empty rules do not prevent a caller already able to access this management surface from configuring rules. Keyless requests also have no API-key identity for lane scoping.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/settings/reasoning-routing-rules/route.ts#L12-L25 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/api/requireManagementAuth.ts#L49-L61 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/shared/utils/apiAuth.ts#L445-L451 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/shared/utils/apiKeyPolicy.ts#L814-L850",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "Empty rules are neutral; the feature-wide 'only output changes' claim requires a keep-target qualification.",
+      "evidence": "No matching rule returns null before a directive is attached. Configured rules can instead select a different model or combo, changing downstream execution and potentially cache locality and tokenization. Reasoning-only accounting is valid only when the resolved provider/model and prompt processing remain fixed.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/reasoningRouting/policy.ts#L375-L403 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/reasoningRouting/policy.ts#L443-L464 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/reasoningRouting/policy.ts#L550-L579",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "Live capability overrides and runtime rule rejection were not queried or exercised; the supplied snapshot contains zero rules.",
+     "Backend cache sensitivity to effort and the quality/token impact of any configured rule.",
+     "Current status or deployment of PR #14720 and other upstream fixes."
+    ]
+   },
+   {
+    "id": "R04",
+    "verdict": "refuted",
+    "state": "OFF-BY-EVIDENCE",
+    "config": "Reject this bundle's classification as a lossless ON-GLOBAL feature. There is no supported switch disabling these transformations at the pin: OFF-BY-EVIDENCE is the adoption decision, not a claim that the hardwired adapter is stopped. Preserve the existing gateway baseline, passthrough, empty rules and client max effort without writes. Do not extend approval to FW contracts relying on output limits or preserved reasoning fields until the adapter is corrected and fidelity tested; no configuration-only fix is available.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "Unconditional field deletion cannot satisfy the supplied lossless, safe-for-every-lane definition of ON-GLOBAL.",
+      "evidence": "The executor removes every reasoning key except effort/summary, including context, and unconditionally deletes max_tokens, max_output_tokens and truncation before native passthrough returns. FW max_tokens/max_completion_tokens are explicitly translated into the subsequently deleted max_output_tokens. Backend compatibility may motivate this behavior, but it does not preserve the caller's contract.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1467-L1502 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1537-L1539 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/translator/request/openai-responses/toResponses.ts#L434-L443",
+      "material": true
+     },
+     {
+      "lens": "quality",
+      "claim": "Matching requested/upstream max does not verify native Codex fidelity.",
+      "evidence": "The tagged Codex client source emits reasoning.context=AllTurns when Responses Lite is enabled; OmniRoute's whitelist deletes that field independently of effort. The HTTP sanitizer can additionally apply learned effort caps after suffix resolution. Thus a successful max-effort call or absence of a feature toggle cannot establish complete parity.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1474-L1484 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/base.ts#L864-L875 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/base/reasoningEffort.ts#L526-L541 ; [Codex 0.157.1 reasoning construction](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/client.rs#L859-L878)",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "The proposed mechanical suffix does not itself save tokens, and timeout/cancellation is not a numeric spend bound.",
+      "evidence": "An effort-less Sol request already falls back to medium under the retained configuration; Sol-medium therefore adds no effort reduction. Output limits are deleted. Client abort propagation limits execution duration when honored, not a specified token quantity. Keeping current configuration unchanged also does not prove that dropped reasoning fields have no cache effect or that future max-effort FW traffic retains the measured cache ratio.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1439-L1499 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore/upstreamTimeouts.ts#L298-L305",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "Whether live CX requests actually include reasoning.context, and the quality/cache impact of removing it. The refutation rests on proven lossy source behavior, not an asserted observed regression.",
+     "Actual upstream rejection of every deleted field, real GPT-6 output ceilings, current learned caps, and native-versus-gateway fidelity.",
+     "Retained effort rows were not re-observed on this running build; full executor/integration suites and parity experiments were not run.",
+     "External client/catalog claims beyond the fetched tagged client source, and upstream PR status."
+    ]
+   },
+   {
+    "id": "D01",
+    "verdict": "corrected",
+    "state": "ON-GLOBAL",
+    "config": "Retain the snapshot configuration without writes: providerStrategies.codex={\"fallbackStrategy\":\"round-robin\",\"stickyRoundRobinLimit\":1}, sessionAffinityTtlMs=14400000, global fallbackStrategy unset and existing priorities unchanged. Describe sticky-limit bypass specifically for session-bearing HTTP selection. Do not use spaced priorities as an occupancy-disabled control, or claim the strategy is universally limited to 429 recovery.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "The retained HTTP configuration is supported, but 'the strategy runs only after a 429' is too broad.",
+      "evidence": "Normal session-bearing HTTP selection uses affinity before the strategy. The internal Codex WebSocket resolver, however, selects credentials without sessionKey even on its first attempt. The opt-in empty-turn recovery path also calls getProviderCredentials without sessionKey. These are additional strategy consumers; the supplied snapshot has empty-turn recovery disabled, and current CX traffic is specified as HTTP.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/auth.ts#L1952-L2008 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/internal/codex-responses-ws/route.ts#L420-L438 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L5876-L5902 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L5937-L5942",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "Occupancy moves are not restricted to adjacent priorities; spacing priorities does not disable the mechanism.",
+      "evidence": "The predicate is candidate.priority <= selectedPriority + 1, admitting every numerically smaller priority as well as the next one. A selected priority-4 account can move to priorities 1, 2 or 3. Spacing priorities removes some downward-preference moves but still permits moves toward higher-priority accounts. The proposal's E1 cannot serve as a clean occupancy-off comparison.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/auth.ts#L2159-L2177",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "Routing is not an input-token reduction, and account choice can affect executor-generated request fields.",
+      "evidence": "Affinity reuses or creates an account pin; it does not shorten the prompt. For requests without an explicit cache/session identifier, Codex derives prompt_cache_key from account workspaceId and injects it. Therefore unchanged client prompt bytes do not prove unchanged upstream cache identity across account moves. The 429 path clears affinity and selects its retry without a session key, supporting a continuity risk but not a guaranteed exact number of cold turns.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/sessionAffinityPin.ts#L272-L322 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1204-L1219 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1504-L1514 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore/providerExecutionPipeline.ts#L371-L405",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "The researcher's later 1,826-row totals, account plan/quota observations, active-session distribution and absence of rotations were not independently observed.",
+     "Live occupancy-driven moves, post-429 account histories, WebSocket usage and per-account cache-key/default equivalence.",
+     "Backend cache sharing/retention across accounts; a switch does not establish one fully cold prefix, and two cold turns after retry remain an unmeasured possibility.",
+     "Upstream issue status and real-load comparisons of p2c or expiry-first."
+    ]
+   },
+   {
+    "id": "D03",
+    "verdict": "corrected",
+    "state": "ON-OPT-IN",
+    "config": "Retain promptCacheAffinityEnabled=true, sessionAffinityTtlMs=14400000, disableSessionStickiness=false, connectionAwareExpansion=false and the existing provider strategy. Keep default traffic direct. For later FW A/B provisioning, use separate single-dynamic-model priority combos with models=[\"cx/gpt-6-astra-max\"] for judgment and models=[\"cx/gpt-6-sol-medium\"] for mechanical work. Hold the underlying model, effort, prompts, tools, schema and prompt_cache_key policy constant between arms; isolate gateway session pins with stable per-arm session identifiers. Adopt only after quality and cache measurements. No combo was created in this review.",
+    "findings": [
+     {
+      "lens": "quality",
+      "claim": "The proposed judgment combo needs an explicit max tier; a single-model combo is not automatically behavior-equivalent to direct execution.",
+      "evidence": "A plain Astra target without client effort gets medium. Pinning the target suffix prevents that omission from silently lowering the judgment lane. Separately, combos apply compatibility filters that can return capability_mismatch, including output/context requirements. Static GPT-6 Codex metadata does declare toolCalling=true, resolving that source-level uncertainty; it does not establish live schema/tool success.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1424-L1465 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/config/providers/shared.ts#L338-L347 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/combo/comboStructure.ts#L617-L657 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/combo/targetResolution.ts#L544-L577",
+      "material": true
+     },
+     {
+      "lens": "quality",
+      "claim": "The single-target bypass and global-scope substitution descriptions need qualification.",
+      "evidence": "Account expansion occurs before applyPromptCacheAffinity tests targets.length<=1, so one dynamic model with multiple accounts can activate affinity. Also, auto and lkgp explicitly protect their strategy-selected first target; global affinity scope alone does not mean affinity may replace that head with another model. Round-robin/cache-optimized and unprotected strategies require separate analysis.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/combo/targetResolution.ts#L668-L730 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/combo/promptCacheAffinity.ts#L285-L300 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/combo/promptCacheAffinity.ts#L325-L339",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "Not editing the prefix does not guarantee retained cache hits, and shared direct/combo session pins can invalidate the proposed A/B.",
+      "evidence": "Ranking includes changing OAuth availability, so account preference is not solely a stable hash. An eligible existing provider/session pin overrides the combo's forced account. Reusing that same session across direct and combo arms can mask the affinity stage. Separate stable arm identities are needed to avoid this pin contamination while keeping request content and effort comparable.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/combo/promptCacheAffinity.ts#L137-L146 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/auth.ts#L1328-L1344 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/sessionAffinityPin.ts#L197-L222 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/sessionAffinityPin.ts#L272-L322",
+      "material": true
+     },
+     {
+      "lens": "cache-token",
+      "claim": "The potential benefit is cache-read substitution, not fewer total prompt tokens or proven savings.",
+      "evidence": "The stage expands and reorders targets without compressing the body. On the supplied frozen 24-hour aggregate, at most 5,667,673 currently uncached input tokens could be converted to cache reads, before unavoidable warmups and regressions. Explicit per-thread keys do not themselves establish cross-job prefix reuse. No benefit has been measured for an opted-in FW lane.",
+      "citation": "https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/combo/promptCacheAffinity.ts#L81-L117 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/combo/promptCacheAffinity.ts#L325-L399",
+      "material": true
+     }
+    ],
+    "unverified": [
+     "The routing combos are proposed, not verified as provisioned. The snapshot's /api/context/combos entry describes compression combos and cannot establish routing-combo inventory.",
+     "Actual FW prompt_cache_key/session-header behavior, synced capability overrides, strict-schema/tool success and lane-specific cache benefit.",
+     "Backend account/key cache partitioning, native turn-pin interactions and real load-concentration effects; the quoted probabilities are simulation results, not live evidence.",
+     "Upstream issue/PR statuses and full combo-affinity integration tests."
+    ]
+   }
+  ],
+  "cross_item": [
+   "R01 correctly identifies native Responses bypass of Thinking Budget translation; R02's quoted documentation and R04's blanket 'auto strips client reasoning' wording conflict with that path. Explicit native CX effort survives; the mode primarily gates its fallback fill. https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L2358-L2366 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1273-L1277",
+   "R01/R02/R04 largely expose the same Codex effort-resolution chain, not three independent savings mechanisms. R02's opt-in suffix remains subject to R04's subsequent sanitizer and field losses. Preserve existing connection defaults; 'unset or medium' is not authorization to normalize stored configuration. https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1424-L1484 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/base.ts#L864-L875",
+   "D03's plain Astra judgment combo conflicts with R01/R02/R04's requirement to pin judgment effort. Its A/B must compare the same base model and effort; changing both routing and effort confounds quality, latency and token results. https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1439-L1465",
+   "D01 and D03 share the provider/session affinity authority. A combo does not automatically escape the direct path's existing pin, and any cache gains overlap rather than add independently. https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/auth.ts#L1328-L1344 ; https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/auth.ts#L1965-L1987",
+   "R04 exposes a configuration-only resolution limit: the lossy adapter remains hardwired even though its lossless ON-GLOBAL endorsement is refuted. Leaving the default gateway path unchanged is compatible with this review, but cannot be represented as disabling those transformations or proving native parity. https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1467-L1502",
+   "Evidence provenance: 3,573 OmniRoute packet lines across 65 files matched the checkout; 35 final citation ranges across 20 files were verified unchanged from the pin. Six pure-source helper assertions passed. Snapshot observations were not re-labelled as fresh live observations; no gateway requests, configuration writes, restarts or auth-store reads were performed."
+  ],
+  "tools_used": [
+   "functions.exec",
+   "exec_command: targeted sed/rg/nl reads, Python JSON/packet checks, git diff, memory-only Node helper assertions",
+   "mcp__context_mode__ctx_execute",
+   "mcp__context_mode__ctx_execute_file: outside-workspace access blocked; authorized shell reads used",
+   "mcp__context_mode__ctx_fetch_and_index",
+   "mcp__context_mode__ctx_search"
+  ]
+ }
+}

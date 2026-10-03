@@ -1,0 +1,363 @@
+{
+ "source": "read-only SELECT of the shared gateway's call_logs (127.0.0.1:20128, build dd6e9607e); counts only",
+ "column_semantics": "call_logs fills reasoning_effort_requested and reasoning_effort_upstream only when the response carried encrypted reasoning (src/lib/usage/callLogs.ts L646-653); a row whose response had no reasoning logs none/none whatever the request sent. What was sent is in codex-sent-effort-20260927.json.",
+ "scope": {
+  "path": "/v1/responses",
+  "requested_model": "codex/gpt-6-astra",
+  "since": "2026-09-27T12:00:00",
+  "until": "2026-09-27T20:00:00"
+ },
+ "totals": [
+  {
+   "requested": "max",
+   "upstream": "max",
+   "rows": 3825
+  },
+  {
+   "requested": "none",
+   "upstream": "none",
+   "rows": 617
+  }
+ ],
+ "size_profile": {
+  "no_effort": {
+   "tokens_in": {
+    "n": 617,
+    "p10": 0,
+    "p50": 28099,
+    "p90": 118313,
+    "max": 227936
+   },
+   "tokens_cache_read": {
+    "n": 617,
+    "p10": 0,
+    "p50": 19200,
+    "p90": 111360,
+    "max": 227200
+   },
+   "tokens_out": {
+    "n": 617,
+    "p10": 0,
+    "p50": 190,
+    "p90": 424,
+    "max": 3335
+   },
+   "tokens_reasoning": {
+    "n": 617,
+    "p10": 0,
+    "p50": 0,
+    "p90": 0,
+    "max": 0
+   },
+   "status": {
+    "200": 464,
+    "499": 148,
+    "502": 4,
+    "503": 1
+   }
+  },
+  "max": {
+   "tokens_in": {
+    "n": 3825,
+    "p10": 39396,
+    "p50": 95731,
+    "p90": 171112,
+    "max": 244390
+   },
+   "tokens_cache_read": {
+    "n": 3825,
+    "p10": 29568,
+    "p50": 88704,
+    "p90": 166912,
+    "max": 237824
+   },
+   "tokens_out": {
+    "n": 3825,
+    "p10": 229,
+    "p50": 690,
+    "p90": 2158,
+    "max": 27991
+   },
+   "tokens_reasoning": {
+    "n": 3825,
+    "p10": 18,
+    "p50": 194,
+    "p90": 1034,
+    "max": 7948
+   },
+   "status": {
+    "200": 3825
+   }
+  }
+ },
+ "per_conversation": {
+  "conversations": 366,
+  "untagged_rows": 0,
+  "patterns": {
+   "single row, max": 109,
+   "all max (2+ rows)": 94,
+   "mixed otherwise": 89,
+   "first row no effort, the rest max": 72,
+   "single row, no effort": 2
+  },
+  "note": "session_tag is the gateway's conversation id (conversationTracker.ts); it need not map 1:1 to a codex exec session"
+ },
+ "gpt6_job_windows": {
+  "note": "windows overlap other lanes on the shared gateway: counts bound the window, they do not attribute rows to the job",
+  "jobs": [
+   {
+    "job": "dive-H1",
+    "configured": "cx/gpt-6-astra effort max",
+    "window": [
+     "2026-09-27T16:06:56Z",
+     "2026-09-27T16:43:26Z"
+    ],
+    "no_effort_rows": 117,
+    "max_rows": 888,
+    "all_rows": 1005
+   },
+   {
+    "job": "dive-H2",
+    "configured": "cx/gpt-6-astra effort max",
+    "window": [
+     "2026-09-27T16:08:26Z",
+     "2026-09-27T16:28:48Z"
+    ],
+    "no_effort_rows": 104,
+    "max_rows": 626,
+    "all_rows": 730
+   },
+   {
+    "job": "dive-H3",
+    "configured": "cx/gpt-6-astra effort max",
+    "window": [
+     "2026-09-27T16:08:51Z",
+     "2026-09-27T16:21:31Z"
+    ],
+    "no_effort_rows": 100,
+    "max_rows": 433,
+    "all_rows": 533
+   },
+   {
+    "job": "dive-H4",
+    "configured": "cx/gpt-6-astra effort max",
+    "window": [
+     "2026-09-27T16:10:41Z",
+     "2026-09-27T16:31:15Z"
+    ],
+    "no_effort_rows": 95,
+    "max_rows": 641,
+    "all_rows": 736
+   },
+   {
+    "job": "dive-H5",
+    "configured": "cx/gpt-6-astra effort max",
+    "window": [
+     "2026-09-27T16:12:56Z",
+     "2026-09-27T16:34:45Z"
+    ],
+    "no_effort_rows": 72,
+    "max_rows": 666,
+    "all_rows": 738
+   },
+   {
+    "job": "dive-H6",
+    "configured": "cx/gpt-6-astra effort max",
+    "window": [
+     "2026-09-27T16:21:31Z",
+     "2026-09-27T16:44:12Z"
+    ],
+    "no_effort_rows": 14,
+    "max_rows": 460,
+    "all_rows": 474
+   },
+   {
+    "job": "dive-H7",
+    "configured": "cx/gpt-6-astra effort max",
+    "window": [
+     "2026-09-27T16:28:51Z",
+     "2026-09-27T17:00:36Z"
+    ],
+    "no_effort_rows": 25,
+    "max_rows": 477,
+    "all_rows": 502
+   },
+   {
+    "job": "probe",
+    "configured": "cx/gpt-6-astra effort max",
+    "window": [
+     "2026-09-27T15:44:16Z",
+     "2026-09-27T15:44:52Z"
+    ],
+    "no_effort_rows": 1,
+    "max_rows": 7,
+    "all_rows": 8
+   },
+   {
+    "job": "qmd-queryset",
+    "configured": "cx/gpt-6-astra effort max",
+    "window": [
+     "2026-09-27T16:44:16Z",
+     "2026-09-27T16:55:52Z"
+    ],
+    "no_effort_rows": 13,
+    "max_rows": 165,
+    "all_rows": 178
+   },
+   {
+    "job": "refute-G1",
+    "configured": "cx/gpt-6-astra effort max",
+    "window": [
+     "2026-09-27T15:46:46Z",
+     "2026-09-27T16:08:23Z"
+    ],
+    "no_effort_rows": 52,
+    "max_rows": 350,
+    "all_rows": 402
+   },
+   {
+    "job": "refute-G2",
+    "configured": "cx/gpt-6-astra effort max",
+    "window": [
+     "2026-09-27T15:46:46Z",
+     "2026-09-27T16:06:54Z"
+    ],
+    "no_effort_rows": 48,
+    "max_rows": 339,
+    "all_rows": 387
+   },
+   {
+    "job": "refute-G3",
+    "configured": "cx/gpt-6-astra effort max",
+    "window": [
+     "2026-09-27T15:46:46Z",
+     "2026-09-27T16:12:55Z"
+    ],
+    "no_effort_rows": 88,
+    "max_rows": 410,
+    "all_rows": 498
+   },
+   {
+    "job": "refute-G4",
+    "configured": "cx/gpt-6-astra effort max",
+    "window": [
+     "2026-09-27T15:46:46Z",
+     "2026-09-27T16:10:37Z"
+    ],
+    "no_effort_rows": 63,
+    "max_rows": 371,
+    "all_rows": 434
+   },
+   {
+    "job": "refute-G5",
+    "configured": "cx/gpt-6-astra effort max",
+    "window": [
+     "2026-09-27T15:46:46Z",
+     "2026-09-27T16:08:50Z"
+    ],
+    "no_effort_rows": 53,
+    "max_rows": 353,
+    "all_rows": 406
+   },
+   {
+    "job": "refute-RH1",
+    "configured": "cx/gpt-6-astra effort max",
+    "window": [
+     "2026-09-27T16:55:53Z",
+     "2026-09-27T17:13:41Z"
+    ],
+    "no_effort_rows": 1,
+    "max_rows": 60,
+    "all_rows": 61
+   },
+   {
+    "job": "refute-RH2",
+    "configured": "cx/gpt-6-astra effort max",
+    "window": [
+     "2026-09-27T16:41:02Z",
+     "2026-09-27T17:01:27Z"
+    ],
+    "no_effort_rows": 19,
+    "max_rows": 279,
+    "all_rows": 298
+   },
+   {
+    "job": "refute-RH3",
+    "configured": "cx/gpt-6-astra effort max",
+    "window": [
+     "2026-09-27T16:41:02Z",
+     "2026-09-27T16:51:03Z"
+    ],
+    "no_effort_rows": 13,
+    "max_rows": 185,
+    "all_rows": 198
+   },
+   {
+    "job": "refute-RH4",
+    "configured": "cx/gpt-6-astra effort max",
+    "window": [
+     "2026-09-27T16:43:27Z",
+     "2026-09-27T17:02:57Z"
+    ],
+    "no_effort_rows": 16,
+    "max_rows": 232,
+    "all_rows": 248
+   },
+   {
+    "job": "refute-RH5",
+    "configured": "cx/gpt-6-astra effort max",
+    "window": [
+     "2026-09-27T16:51:07Z",
+     "2026-09-27T17:01:25Z"
+    ],
+    "no_effort_rows": 6,
+    "max_rows": 93,
+    "all_rows": 99
+   },
+   {
+    "job": "refute-RH6-r2",
+    "configured": "cx/gpt-6-astra effort max",
+    "window": [
+     "2026-09-27T17:19:05Z",
+     "2026-09-27T17:32:04Z"
+    ],
+    "no_effort_rows": 89,
+    "max_rows": 245,
+    "all_rows": 334
+   },
+   {
+    "job": "refute-RH7-r2",
+    "configured": "cx/gpt-6-astra effort max",
+    "window": [
+     "2026-09-27T17:19:05Z",
+     "2026-09-27T17:37:37Z"
+    ],
+    "no_effort_rows": 93,
+    "max_rows": 274,
+    "all_rows": 367
+   },
+   {
+    "job": "review-pr415-r2",
+    "configured": "cx/gpt-6-astra effort max",
+    "window": [
+     "2026-09-27T17:19:05Z",
+     "2026-09-27T17:26:08Z"
+    ],
+    "no_effort_rows": 43,
+    "max_rows": 128,
+    "all_rows": 171
+   },
+   {
+    "job": "synth-r1",
+    "configured": "cx/gpt-6-astra effort max",
+    "window": [
+     "2026-09-27T17:37:37Z",
+     "2026-09-27T18:27:37Z"
+    ],
+    "no_effort_rows": 70,
+    "max_rows": 352,
+    "all_rows": 422
+   }
+  ]
+ }
+}

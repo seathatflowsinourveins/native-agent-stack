@@ -1,0 +1,118 @@
+"""Deterministic OmniRoute feature verdict from the verified records (no model call).
+
+Final position per feature = its proposal as amended by its adversarial refutation (refuted -> the refuter's state
+and config; corrected -> the refuter's config; upheld -> the proposal). Features whose refutation has not returned
+are labelled `verification: pending`.
+"""
+import json
+import sys
+from pathlib import Path
+
+P, G, OUT = Path(sys.argv[1]), Path(sys.argv[2]), Path(sys.argv[3])
+STATE = {"ON-GLOBAL": "enabled_verified", "ON-OPT-IN": "enable_after_ab", "OFF-BY-EVIDENCE": "hold", "N/A": "not_applicable"}
+
+proposals = {}
+for d in json.load(open(P / "dives-round1.json")):
+    proposals[d["id"]] = ("Claude dive", d)
+for name in ["dives-gpt6-H1-H6.json", "dives-gpt6-H2-H5.json", "dives-gpt6-H7.json"]:
+    for d in json.load(open(P / name)):
+        proposals[d["id"]] = ("GPT-6 dive", d)
+
+refutes = {}
+for g, o in json.load(open(P / "gpt6-refutations.json")).items():
+    for it in o["items"]:
+        refutes[it["id"]] = ("GPT-6 refutation " + g, it)
+for job in sorted((G / "gpt6-final").glob("refute-RH*")):
+    last = job / "last.json"
+    if last.exists():
+        for it in json.load(open(last))["items"]:
+            refutes[it["id"]] = ("GPT-6 refutation " + job.name.split("-")[1], it)
+
+
+def short(text, n=700):
+    text = " ".join(str(text or "").split())
+    return text if len(text) <= n else text[:n - 1] + "…"
+
+
+features = []
+for fid in sorted(proposals):
+    who, d = proposals[fid]
+    ref = refutes.get(fid)
+    state = d["proposed_state"]
+    config = d.get("proposed_config", "")
+    sources = [c["ref"] for c in d.get("citations", [])][:8]
+    if ref:
+        how, it = ref
+        if it["verdict"] in ("refuted", "corrected"):
+            state = it["state"]
+            config = it.get("config") or config
+        sources += [f["citation"] for f in it["findings"] if f["material"]][:4]
+        verification = f"{who}; {how}: {it['verdict']}" + (
+            " — " + short(next((f['claim'] for f in it['findings'] if f['material']), ""), 240) if it["verdict"] != "upheld" else "")
+    else:
+        verification = f"{who}; adversarial refutation pending"
+    s = STATE[state]
+    corrections = []
+    if ref and ref[1]["verdict"] in ("refuted", "corrected"):
+        corrections = [{"lens": f.get("lens"), "claim": short(f["claim"], 300), "evidence": short(f["evidence"], 500),
+                        "citation": short(f["citation"], 300)} for f in ref[1]["findings"] if f["material"]]
+    features.append({
+        "id": fid, "name": d["feature"], "description": short(d.get("what_it_does"), 500), "state": s,
+        "lanes": d.get("applies_to", ""),
+        "enable": short(config, 900) if s in ("enable_after_ab", "enable_now", "enabled_verified") else "",
+        "ab_design": short(d.get("experiment_needed"), 700) if s == "enable_after_ab" else "",
+        "hold_reason": short(d.get("quality_risk"), 700) if s in ("hold", "not_applicable") else "",
+        "keep_config": short(config, 700) if s in ("hold", "not_applicable") else "",
+        "cache_effect": short(d.get("cache_effect"), 400), "overturn": short(d.get("overturn_condition"), 500),
+        "sources": list(dict.fromkeys(sources)), "verification": verification,
+        # The descriptive fields above are the proposal's text. Where a refutation corrected or refuted it, these
+        # material findings override any conflicting sentence in them.
+        "refutation_findings": corrections})
+
+counts = {}
+for f in features:
+    counts[f["state"]] = counts.get(f["state"], 0) + 1
+out = {
+    "tool": "omniroute",
+    "pin": "release/v3.8.51 a58000c7 + #14904 + #13788 (BUILD_SHA dd6e9607e)",
+    "latest": "npm latest 3.8.50; release/v3.8.51 head a58000c7 (no commits since); #14904/#13788 open (2026-09-27)",
+    "status": ("final: deterministic merge of all verified records; every feature carries its adversarial refutation. "
+               "Descriptive fields (description, hold_reason, cache_effect, enable, ab_design) are the proposal's text; "
+               "refutation_findings override them where they conflict. The GPT-6 wording pass (synth-r1) did not return: "
+               "two stream disconnects (synth-r1-errors.json), then the runner's 3000 s cap (exit 124, no usage reported); "
+               "it is kept as a failed attempt"),
+    "counts": counts,
+    "features": features,
+    "top_actions": [
+        {"action": "FW callers on cx/* at temperature 0: send `X-OmniRoute-No-Cache: true` (or omit temperature); use stream:true when temperature <= 0.1; fresh Idempotency-Key per logical call/sample/effort/arm",
+         "why": "The legacy exact semantic cache is armed (chatCore.ts L1249 `settings.semanticCacheEnabled !== false`) and has no supported global switch at this pin; its key omits effort, instructions and tool-call identity, and Codex strips temperature, so a hit replays one stochastic sample. In-flight dedup accepts non-stream temperature <= 0.1 and its hash omits Responses text.format; the idempotency fingerprint omits Chat reasoning_effort.",
+         "owner_class": "fw-client-config"},
+        {"action": "Direct-HTTP (FW) judgment callers: model `cx/gpt-6-astra-max` (suffix wins over body, codex.ts L1451-1456); never send reasoning_effort 'auto'",
+         "why": "Measured 2026-09-27 17:20Z from call_logs: no reasoning_effort -> upstream medium (105 reasoning tokens); -max -> max (279); -max plus a tool -> max (675) with the tool call returned; xhigh plus a tool -> xhigh. Codex CLI lanes send reasoning.effort=max on every request (stored bodies: 541 of 541 no-reasoning rows that kept one; probes/codex-sent-effort-20260927.json), but of their codex/gpt-6-astra /v1/responses turns (12:00-20:00Z) 617 logged 0 reasoning tokens: 464 completed (200), 148 were client-closed (499) and 5 failed upstream (502/503), while all 3,825 that reasoned completed; so 464 of 4,289 successful turns (10.8%) returned no reasoning (probes/codex-effort-coverage-20260927.json). call_logs records effort only when a response carries encrypted reasoning (callLogs.ts L646-653), so those rows show none; the -max suffix does not change it.",
+         "owner_class": "fw-client-config"},
+        {"action": "FW session identity: when sending x-omniroute-session, use one stable value per conversation, never one constant shared by independent workers",
+         "why": "The affinity key is the first of: session headers (x-codex-session-id, x-session-id, x-omniroute-session), body metadata/session ids, conversation_id, session_id, prompt_cache_key, then a sha256 of the first input (sessionAffinityPin.ts L197-221). So a caller without a header still gets affinity from its first input; an explicit header overrides the body keys, and a constant shared by independent workers pins them all to one account. call_logs.session_tag is the conversation id tracked across turns by a hash chain (conversationTracker.ts; chatCore.ts L1134), not the header. Measured: one shared header -> 1 account over 7 calls; 8 distinct headers -> 3 accounts over 8 calls (probes/account-spread.json).",
+         "owner_class": "fw-client-config"},
+        {"action": "FW structured output: tool calling, or json_schema with additionalProperties:false on every object; json_object only with the word 'json' in a user message",
+         "why": "Measured on cognee 1.6.1 through the gateway: json_object -> 400 because the chat->Responses translator moves the first system message into instructions (toResponses.ts L120-136; json_object -> text.format L37-38); strict json_schema without additionalProperties:false -> 400; tool calling works.",
+         "owner_class": "fw-client-config"},
+        {"action": "Keep compression enabled=false with exclusions ['codex/*']; do not enable the master switch",
+         "why": "Enabling it without the exclusion turns on proactive/last-resort compaction for FW chat that neither the off header nor the per-key opt-out stops (#11255); every engine that would run is lossy for Codex tool output (lite truncation, codex-responses JSON minify, session-dedup key collision).",
+         "owner_class": "gateway-operator"},
+        {"action": "Gateway operator: set the feature flags UNIVERSAL_CONTEXT_HANDOFF_ENABLED=false and OMNIROUTE_EMERGENCY_FALLBACK=false (requiresRestart=false)",
+         "why": "Both are on by default in the live gateway (gateway-snapshot-redacted.json feature flags) and inert today: there are no user combos for handoff, and no Nvidia connection for the fallback. The verdict holds both (D05, D10) because each would silently rewrite the prompt or replace the model once a combo or an Nvidia connection exists.",
+         "owner_class": "gateway-operator"},
+        {"action": "Any user combo: promptCacheAffinityEnabled stays true, universal handoff off, canonical codex/ targets, an explicit effort tier per role (max for judgment, sol medium for mechanical work)",
+         "why": "Universal handoff rewrites the system prompt on a model switch (cache break); single-model combos are not behaviour-equivalent to direct calls without an explicit effort tier.",
+         "owner_class": "gateway-operator"},
+        {"action": "Watch upstream: #14904/#13788 merge or a 3.8.51 tag (re-pin), #14907/#14908 thread-scoped prompt_cache_key, #14720/#14721/#14651/#14652 effort handling, #14484 semantic cache",
+         "why": "Each changes a resolved feature or the build", "owner_class": "upstream-watch"}],
+    "new_upstream_defects": [
+        {"title": "session-dedup key collision rewrites an earlier user message", "reproduction": "Multipart keys i*100000+p+1 collide with string-message keys i; the pinned helpers, run in isolation, rewrote an earlier message (731 -> 338 o200k tokens) without tripping the inflation guard (GPT-6 refutation G2, C02)."},
+        {"title": "codex-responses minifyJson is not lossless", "reproduction": "JSON.parse then JSON.stringify: 1234567890123456711 -> 1234567890123456800 and 1.50 -> 1.5 (GPT-6 refutation G2, C06)."},
+        {"title": "legacy semantic-cache hits are double-counted", "reproduction": "getCachedResponse and recordSemanticCacheHit both increment; one 120-token hit recorded 2 hits and 240 tokens_saved (GPT-6 refutation G4, K02)."},
+        {"title": "promoted semantic-cache entries outlive the 1 h DB TTL", "reproduction": "SQLite promotion creates a fresh 30-minute memory entry, so reuse can reach about 90 minutes after the write (G4, K02)."},
+        {"title": "idempotency fingerprint omits Chat reasoning_effort", "reproduction": "Medium and max requests with the same key, model and messages share a replay key (G4, K04)."}],
+}
+OUT.write_text(json.dumps(out, indent=1, ensure_ascii=False) + "\n")
+print(OUT, counts, sum(1 for f in features if "pending" in f["verification"]), "pending")

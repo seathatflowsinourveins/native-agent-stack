@@ -1,0 +1,265 @@
+{
+ "base_url": "http://127.0.0.1:20128",
+ "captured_at": "2026-09-27T16:09:01Z",
+ "method": "GET",
+ "note": "aggregates only; whitelist in KEEP; per-account and per-key rows dropped",
+ "reports": {
+  "cache": {
+   "body": {
+    "config": {
+     "semanticCacheEnabled": true
+    },
+    "idempotency": {
+     "activeKeys": 0,
+     "windowMs": 5000
+    },
+    "promptCache": {
+     "byProvider": {
+      "codex": {
+       "cacheCreationTokens": 0,
+       "cachedRequests": 2092,
+       "cachedTokens": 172939520,
+       "inputTokens": 184848209,
+       "requests": 2092,
+       "totalRequests": 2236
+      }
+     },
+     "byStrategy": {
+      "direct": {
+       "cacheCreationTokens": 0,
+       "cachedTokens": 172939520,
+       "inputTokens": 184848209,
+       "requests": 2092
+      }
+     },
+     "lastUpdated": "2026-09-27T16:09:01.699Z",
+     "requestsWithCacheControl": 2092,
+     "tokensSaved": 172939520,
+     "totalCacheCreationTokens": 0,
+     "totalCachedTokens": 172939520,
+     "totalInputTokens": 184848209,
+     "totalRequests": 2236
+    },
+    "semanticCache": {
+     "dbEntries": 1,
+     "hitRate": "0.0",
+     "hits": 0,
+     "memoryEntries": 1,
+     "misses": 1,
+     "tokensSaved": 0
+    }
+   },
+   "route": "/api/cache",
+   "status": 200
+  },
+  "cache_health_24h": {
+   "body": {
+    "byModel": [
+     {
+      "cacheReadTotal": 171961728,
+      "cacheWriteTotal": 0,
+      "calls": 2098,
+      "heavyWriteCalls": 0,
+      "model": "codex/gpt-6-astra",
+      "writeReadRatio": 0
+     },
+     {
+      "cacheReadTotal": 977792,
+      "cacheWriteTotal": 0,
+      "calls": 53,
+      "heavyWriteCalls": 0,
+      "model": "codex/gpt-6-sol",
+      "writeReadRatio": 0
+     },
+     {
+      "cacheReadTotal": 0,
+      "cacheWriteTotal": 0,
+      "calls": 7,
+      "heavyWriteCalls": 0,
+      "model": "codex/gpt-6-luna",
+      "writeReadRatio": 0
+     }
+    ],
+    "cacheReadTotal": 172939520,
+    "cacheWriteTotal": 0,
+    "coldCalls": 0,
+    "rewriteCalls": 0,
+    "since": "2026-09-26T16:09:01.704Z",
+    "timeRange": "24h",
+    "totalCalls": 2158,
+    "truncated": false,
+    "uncachedCalls": 66,
+    "verdict": "healthy",
+    "warmCalls": 2092
+   },
+   "route": "/api/usage/cache-health",
+   "status": 200
+  },
+  "compression_all": {
+   "body": {
+    "avgSavingsPct": 0,
+    "byCompressionCombo": {},
+    "byEngine": {},
+    "byMode": {
+     "off": {
+      "avgSavingsPct": 0,
+      "count": 0,
+      "skipped": 2321,
+      "tokensSaved": 0
+     }
+    },
+    "bySkipReason": {
+     "excluded": 2321
+    },
+    "mcpDescriptionCompression": {
+     "estimatedTokensSaved": 0,
+     "snapshots": 0
+    },
+    "realUsage": {
+     "bySource": {},
+     "cacheReadTokens": 0,
+     "cacheWriteTokens": 0,
+     "completionTokens": 0,
+     "estimatedUsdSaved": 0,
+     "promptTokens": 0,
+     "requestsWithReceipts": 0,
+     "totalTokens": 0
+    },
+    "totalRequests": 0,
+    "totalSkipped": 2321,
+    "totalTokensSaved": 0,
+    "validationFallbacks": 0
+   },
+   "route": "/api/analytics/compression?since=all",
+   "status": 200
+  },
+  "compression_settings": {
+   "body": {
+    "activeComboId": null,
+    "autoTriggerMode": "lite",
+    "autoTriggerTokens": 0,
+    "cacheMinutes": 5,
+    "cavemanOutputMode": {
+     "autoClarity": true,
+     "enabled": false,
+     "intensity": "lite"
+    },
+    "comboOverrides": {},
+    "contextBudget": {
+     "absoluteBudget": 0,
+     "mode": "off",
+     "outputReserve": 4096,
+     "pct": 0.85,
+     "policy": "reserve-output",
+     "safetyMargin": 1024
+    },
+    "defaultMode": "off",
+    "enabled": false,
+    "enginesExplicit": false,
+    "exclusions": [
+     "codex/*"
+    ],
+    "liveZone": {
+     "enabled": false
+    },
+    "mcpDescriptionCompressionEnabled": true,
+    "outputStyles": [],
+    "preserveSystemPromptMode": "always"
+   },
+   "route": "/api/settings/compression",
+   "status": 200
+  },
+  "settings": {
+   "body": {
+    "a2aEnabled": false,
+    "alwaysPreserveClientCache": "auto",
+    "comboStrategy": "fallback",
+    "disableSessionStickiness": false,
+    "idempotencyWindowMs": 5000,
+    "maxRetryIntervalSec": 30,
+    "mcpEnabled": false,
+    "promptCacheAffinityEnabled": true,
+    "providerStrategies": {
+     "codex": {
+      "fallbackStrategy": "round-robin",
+      "stickyRoundRobinLimit": 1
+     }
+    },
+    "requestRetry": 3,
+    "requireLogin": false,
+    "sessionAffinityTtlMs": 14400000,
+    "settingsRevision": 17,
+    "stickyRoundRobinLimit": 3
+   },
+   "route": "/api/settings",
+   "status": 200
+  },
+  "thinking_budget": {
+   "body": {
+    "mode": "passthrough"
+   },
+   "route": "/api/settings/thinking-budget",
+   "status": 200
+  },
+  "usage_all": {
+   "body": {
+    "byModel": [
+     {
+      "avgLatencyMs": 28948,
+      "completionTokens": 1778449,
+      "model": "gpt-6-astra",
+      "promptTokens": 184649702,
+      "provider": "codex",
+      "requests": 2176,
+      "successRatePct": "96.42",
+      "totalTokens": 186428151
+     },
+     {
+      "avgLatencyMs": 11355,
+      "completionTokens": 10106,
+      "model": "gpt-6-sol",
+      "promptTokens": 1186256,
+      "provider": "codex",
+      "requests": 53,
+      "successRatePct": "100.00",
+      "totalTokens": 1196362
+     },
+     {
+      "avgLatencyMs": 2042,
+      "completionTokens": 231,
+      "model": "gpt-6-luna",
+      "promptTokens": 5362,
+      "provider": "codex",
+      "requests": 7,
+      "successRatePct": "100.00",
+      "totalTokens": 5593
+     }
+    ],
+    "summary": {
+     "avgLatencyMs": 28447,
+     "completionTokens": 1788786,
+     "fallbackCount": 0,
+     "firstRequest": "2026-09-27T06:58:40.334Z",
+     "lastRequest": "2026-09-27T16:08:58.260Z",
+     "promptTokens": 185841320,
+     "successRatePct": 96.51,
+     "successfulRequests": 2158,
+     "totalRequests": 2236,
+     "totalTokens": 187630106,
+     "uniqueAccounts": 4,
+     "uniqueModels": 3
+    }
+   },
+   "route": "/api/usage/analytics?range=all",
+   "status": 200
+  },
+  "version": {
+   "body": {
+    "channel": "source",
+    "current": "3.8.51"
+   },
+   "route": "/api/system/version",
+   "status": 200
+  }
+ }
+}

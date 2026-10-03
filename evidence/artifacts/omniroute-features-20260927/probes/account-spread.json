@@ -1,0 +1,21 @@
+{
+ "method": "COUNT(DISTINCT connection_id) only; no ids retained",
+ "windows": {
+  "max_probes_17_20Z": {
+   "distinct_accounts": 3,
+   "calls": 8,
+   "session_headers": "one distinct x-omniroute-session per call"
+  },
+  "cognee_smoke_tool_call_attempts_3_4": {
+   "window": [
+    "2026-09-27T17:27:47Z",
+    "2026-09-27T17:51:42"
+   ],
+   "distinct_accounts": 1,
+   "calls": 7,
+   "tokens_in": 7237,
+   "tokens_reasoning": 2045,
+   "session_headers": "one shared x-omniroute-session"
+  }
+ }
+}

@@ -1,0 +1,95 @@
+#!/usr/bin/env python3
+"""Stage the sanitized evidence for the OmniRoute feature resolution and the qmd scope change (2026-09-27).
+
+Copies only research records, aggregates and scripts: model returns (JSON), usage rows, probe summaries, redacted
+settings. Masks the home directory as ~, the session scratchpad as $SCRATCH, and any email or UUID. Never copies
+packets (reproducible from build_packets.py), raw call-log rows, credentials or conversation transcripts.
+Usage: stage_records.py <scratchpad> <repo_worktree>
+"""
+import json
+import re
+import shutil
+import sys
+from pathlib import Path
+
+SP, REPO = Path(sys.argv[1]), Path(sys.argv[2])
+HOME = str(Path.home())
+UUID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", re.I)
+EMAIL = re.compile(r"[\w.+-]+@[\w-]+\.[\w.]+")
+P0, LANE, QA = SP / "omniroute-phase0", SP / "gpt6-lane", SP / "qmd-ab"
+OUT = REPO / "evidence/artifacts/omniroute-features-20260927"
+QOUT = REPO / "evidence/artifacts/qmd-scope-embed-20260927"
+
+
+def mask(text):
+    text = text.replace(str(SP), "$SCRATCH").replace(HOME, "~")
+    return EMAIL.sub("<email>", UUID.sub("<uuid>", text))
+
+
+def put(dst, src=None, text=None):
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    body = text if text is not None else Path(src).read_text(encoding="utf-8", errors="replace")
+    dst.write_text(mask(body), encoding="utf-8")
+
+
+# 1. Feature verdict (final and interim) and research records.
+for name in ["omniroute-feature-verdict.json", "omniroute-feature-verdict.interim.json"]:
+    if (P0 / name).exists():
+        put(OUT / name, P0 / name)
+put(OUT / "records/claude-dives-round1.json", P0 / "dives-round1.json")
+put(OUT / "records/gpt6-refutations-G1-G5.json", P0 / "gpt6-refutations.json")
+jobs = sorted(p.name for p in (LANE / "gpt6").iterdir() if (p / "last.json").exists())
+for job in jobs:
+    if job.startswith(("dive-", "refute-RH", "synth-")):
+        put(OUT / f"records/gpt6-{job}.json", LANE / "gpt6" / job / "last.json")
+
+# 2. GPT-6 job usage (runner's own result rows, no output text).
+import subprocess
+usage = []
+for job in sorted(p.name for p in (LANE / "gpt6").iterdir()):
+    out = subprocess.run(["bash", str(LANE / "codex_call.sh"), "--work-dir", str(LANE), "result", job],
+                         capture_output=True, text=True).stdout
+    try:
+        r = json.loads(out)
+    except ValueError:
+        r = {"status": "unreadable"}
+    row = {k: r.get(k) for k in ["status", "exit", "started", "finished", "usage", "usage_status", "model", "effort",
+                                 "codex_version", "limit"]}
+    if not r.get("started"):
+        row["note"] = "stopped before codex started (quiet window) and relaunched as the -r2 job"
+    usage.append(row | {"job": job})
+put(OUT / "gpt6-job-usage.json", text=json.dumps({"runner": "tools/sota-convergence/landscape-sweep/codex_job.py via codex_call.sh",
+    "provider": "omniroute (lane-local CODEX_HOME, stack-worker profile)", "jobs": usage}, indent=1))
+
+# 3. Phase 0 attempt 1 (Claude workflow that hit a weekly limit): per-child usage and lanes, sanitized.
+put(OUT / "phase0-attempt1-child-usage.json", P0 / "phase0-attempt1-child-usage.sanitized.json")
+
+# 4. Probes and live reads.
+for name in ["probe-max.jsonl", "probe-max-hard.jsonl"]:
+    put(OUT / f"probes/{name}", P0 / name)
+put(OUT / "gateway-snapshot-redacted.json", P0 / "gateway-snapshot.json")
+
+# 5. Scripts, prompts and schemas (as .txt so they are evidence, not code).
+for src in [P0 / "snap.py", P0 / "build_verdict.py", P0 / "probe_max.py", P0 / "stage_records.py",
+            LANE / "src/build_packets.py"]:
+    if src.exists():
+        put(OUT / f"scripts/{src.name}.txt", src)
+for src in sorted((LANE / "src").glob("*")):
+    if src.suffix in (".md", ".json") and src.name != "probe.md":
+        put(OUT / f"prompts/{src.name}", src)
+
+# 6. qmd scope change and A/B (separate artifact).
+for name in ["status-before.txt", "status-after.txt", "status-after-scope.txt", "embed-start.txt", "embed-end.txt",
+             "scope-update-start.txt", "scope-update.out", "scope-embed-start.txt", "scope-embed-end.txt",
+             "scope-embed-exit.txt", "lex-search.json", "query-pre-embed.json", "lex-search-post.json",
+             "vsearch-post.json", "query-post-embed.json", "queryset-frozen.json", "queryset-frozen.sha256",
+             "queryset-frozen-at.txt", "ab-results.json", "ab-start.txt", "ab-end.txt", "run_ab.py", "device.mjs", "device-probe.txt",
+             "prereg381-qmd-tasks.json"]:
+    src = QA / name
+    if src.exists():
+        dst = QOUT / (name + ".txt" if name.endswith((".py", ".mjs")) else name)
+        if name.endswith(".out"):
+            put(dst, text=re.sub(r"\x1b\[[0-9;?]*[A-Za-z]", "", src.read_text(errors="replace")))
+        else:
+            put(dst, src)
+print("staged", sum(1 for _ in OUT.rglob("*") if _.is_file()), "and", sum(1 for _ in QOUT.rglob("*") if _.is_file()), "files")

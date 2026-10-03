@@ -1,0 +1,42 @@
+[
+  {
+    "docid": "#a765c3",
+    "score": 0.46,
+    "file": "qmd://us-equities-catalog/agents-operations.md?index=native-agent-stack-catalog",
+    "line": 148,
+    "title": "Agents and operations for the US-equities research stack",
+    "snippet": "@@ -147,3 @@ (146 before, 0 after)\n\nThe [source follow-up](source-followup.md) adds **node_exporter v1.12.1** and **OpenLIT openlit-2.1.0** as alternatives, with no new runtime acceptance. For basic host capacity, extend the adopted Collector with its existing `host_metrics` receiver before running another exporter. Node exporter ..."
+  },
+  {
+    "docid": "#effe53",
+    "score": 0.46,
+    "file": "qmd://us-equities-catalog/foundation-memory.md?index=native-agent-stack-catalog",
+    "line": 212,
+    "title": "Token, memory and retrieval foundations",
+    "snippet": "@@ -211,4 @@ (210 before, 508 after)\n\nEvidence: [README.md](https://github.com/headroomlabs-ai/headroom/blob/bc21c9370793f7e4aa94ac4c5d9a67a8d2dd0df9/README.md), [v0.37.0](https://github.com/headroomlabs-ai/headroom/releases/tag/v0.37.0).\n\n## toon"
+  },
+  {
+    "docid": "#9948f2",
+    "score": 0.44,
+    "file": "qmd://us-equities-catalog/data-research.md?index=native-agent-stack-catalog",
+    "line": 72,
+    "title": "US-equities data and research catalog",
+    "snippet": "@@ -71,4 @@ (70 before, 85 after)\n\n**News and macro:** the GDELT wrapper is useful for discovery and coverage research, not a complete historical financial-news archive. Retain publication time, first observation, deduplication and issuer-mapping provenance. ALFRED vintages help separate original macro releases from revisions, bu..."
+  },
+  {
+    "docid": "#c4e39f",
+    "score": 0.44,
+    "file": "qmd://us-equities-catalog/source-followup.md?index=native-agent-stack-catalog",
+    "line": 22,
+    "title": "Bounded source follow-up",
+    "snippet": "@@ -21,4 @@ (20 before, 12 after)\n| --- | --- | --- | --- |\n| [node_exporter](https://github.com/prometheus/node_exporter/releases/tag/v1.12.1) | v1.12.1, 2026-07-14; Apache-2.0 | Newly added alternative | Prefer the existing Collector's host receiver for basic CPU, RAM and filesystem metrics. Adopt a separate exporter only for a..."
+  },
+  {
+    "docid": "#f57161",
+    "score": 0.43,
+    "file": "qmd://us-equities-catalog/foundation-source-review.md?index=native-agent-stack-catalog",
+    "line": 75,
+    "title": "Foundation research pass — 2026-09-19",
+    "snippet": "@@ -74,4 @@ (73 before, 25 after)\n\n- Stable v0.4.3; released 2025-11-25T17:35:02Z; tag commit `bb9ece5c1ec6a0027c8a9f7a8ee428614f8a2f44`; Apache-2.0. This is a mature metrics dependency, not a newly released model. Main `64b5afd5cd14f7d8323f9b24a1bfd12afdd1e776` dated February 17, 2026.\n- Selected implementation: [CLI/parser and ..."
+  }
+]

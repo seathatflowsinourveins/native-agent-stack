@@ -1,0 +1,93 @@
+{
+ "source": "read-only SELECT of call_logs effort and token columns (no ids)",
+ "rows": [
+  {
+   "timestamp": "2026-09-27T17:20:01.911Z",
+   "path": "/v1/chat/completions",
+   "status": 200,
+   "model": "gpt-6-astra",
+   "reasoning_effort_requested": null,
+   "reasoning_effort_upstream": null,
+   "tokens_in": 25,
+   "tokens_cache_read": 0,
+   "tokens_reasoning": 0
+  },
+  {
+   "timestamp": "2026-09-27T17:20:04.777Z",
+   "path": "/v1/chat/completions",
+   "status": 200,
+   "model": "gpt-6-astra-max",
+   "reasoning_effort_requested": null,
+   "reasoning_effort_upstream": "max",
+   "tokens_in": 25,
+   "tokens_cache_read": 0,
+   "tokens_reasoning": 32
+  },
+  {
+   "timestamp": "2026-09-27T17:20:07.055Z",
+   "path": "/v1/chat/completions",
+   "status": 200,
+   "model": "gpt-6-astra-max",
+   "reasoning_effort_requested": null,
+   "reasoning_effort_upstream": null,
+   "tokens_in": 2531,
+   "tokens_cache_read": 0,
+   "tokens_reasoning": 0
+  },
+  {
+   "timestamp": "2026-09-27T17:20:09.646Z",
+   "path": "/v1/chat/completions",
+   "status": 200,
+   "model": "gpt-6-astra",
+   "reasoning_effort_requested": null,
+   "reasoning_effort_upstream": null,
+   "tokens_in": 2531,
+   "tokens_cache_read": 0,
+   "tokens_reasoning": 0
+  },
+  {
+   "timestamp": "2026-09-27T17:20:37.250Z",
+   "path": "/v1/chat/completions",
+   "status": 200,
+   "model": "gpt-6-astra",
+   "reasoning_effort_requested": null,
+   "reasoning_effort_upstream": "medium",
+   "tokens_in": 65,
+   "tokens_cache_read": 0,
+   "tokens_reasoning": 105
+  },
+  {
+   "timestamp": "2026-09-27T17:20:49.404Z",
+   "path": "/v1/chat/completions",
+   "status": 200,
+   "model": "gpt-6-astra-max",
+   "reasoning_effort_requested": null,
+   "reasoning_effort_upstream": "max",
+   "tokens_in": 65,
+   "tokens_cache_read": 0,
+   "tokens_reasoning": 279
+  },
+  {
+   "timestamp": "2026-09-27T17:21:15.144Z",
+   "path": "/v1/chat/completions",
+   "status": 200,
+   "model": "gpt-6-astra-max",
+   "reasoning_effort_requested": null,
+   "reasoning_effort_upstream": "max",
+   "tokens_in": 2580,
+   "tokens_cache_read": 0,
+   "tokens_reasoning": 675
+  },
+  {
+   "timestamp": "2026-09-27T17:21:29.950Z",
+   "path": "/v1/chat/completions",
+   "status": 200,
+   "model": "gpt-6-astra",
+   "reasoning_effort_requested": "xhigh",
+   "reasoning_effort_upstream": "xhigh",
+   "tokens_in": 2580,
+   "tokens_cache_read": 2432,
+   "tokens_reasoning": 330
+  }
+ ]
+}

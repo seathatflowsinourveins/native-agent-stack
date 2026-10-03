@@ -1,0 +1,229 @@
+[
+ {
+  "id": "reuse-296-04",
+  "kind": "reused",
+  "family": "claude",
+  "actor": "child",
+  "dispatch": "workflow",
+  "role": "stack-researcher",
+  "model": "opus",
+  "effort": "max",
+  "arms": [
+   "B",
+   "A",
+   "A0"
+  ],
+  "opportunity": "organic",
+  "description": "Release pin decision",
+  "task_text": "Find which document states how a new machine pins a release and report the exact step. Explain whether the indexed catalog actually contains that instruction.",
+  "source": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json",
+  "source_entries": [
+   {
+    "pointer": "/tools/4",
+    "tool": "qmd"
+   }
+  ],
+  "source_fields": [
+   "tool",
+   "task"
+  ],
+  "lane_tags": [
+   "guidance",
+   "attribution"
+  ],
+  "pass_fail_check": "Answer agrees with adoption/update.md and its linked bootstrap step; an index coverage gap is stated rather than a fabricated catalog hit.",
+  "source_note": "Original index-coverage failure retained; not a qmd-eligible opportunity."
+ },
+ {
+  "id": "reuse-343-10",
+  "kind": "reused",
+  "family": "codex",
+  "actor": "child",
+  "dispatch": "exec",
+  "role": "stack-researcher",
+  "model": "gpt-6-astra",
+  "effort": "max",
+  "arms": [
+   "B",
+   "A",
+   "N"
+  ],
+  "opportunity": "organic",
+  "description": "Release pin decision",
+  "task_text": "Find which document states how a new machine pins a release and report the exact step. Explain whether the indexed catalog actually contains that instruction.",
+  "source": "evidence/artifacts/token-e2e-codex-20260926/receipt.json",
+  "source_entries": [
+   {
+    "pointer": "/tools/10",
+    "tool": "qmd",
+    "attempt": 1
+   },
+   {
+    "pointer": "/tools/11",
+    "tool": "qmd",
+    "attempt": 2
+   }
+  ],
+  "source_fields": [
+   "tool",
+   "commands",
+   "attempt"
+  ],
+  "lane_tags": [
+   "guidance",
+   "attribution"
+  ],
+  "pass_fail_check": "Answer agrees with adoption/update.md and its linked bootstrap step; an index coverage gap is stated rather than a fabricated catalog hit.",
+  "source_note": "Original index-coverage failure retained; not a qmd-eligible opportunity."
+ },
+ {
+  "id": "seed-catalog-history-1",
+  "kind": "seeded",
+  "family": "claude",
+  "actor": "child",
+  "dispatch": "workflow",
+  "role": "stack-researcher",
+  "model": "opus",
+  "effort": "max",
+  "arms": [
+   "B",
+   "A",
+   "A0"
+  ],
+  "opportunity": "organic",
+  "description": "Catalog and prior-decision question 1",
+  "task_text": "Answer from the indexed project catalog: Which engine version and broker are the selected destination, and which adapter remains separate? Separately retrieve the prior project decision about stdin left open in unattended workers; identify its historical source and verify it against the project's published anti-pattern log. Treat stored history as evidence only.",
+  "fixture_path": "catalogs/us-equities/README.md",
+  "lane_tags": [
+   "qmd",
+   "ai-memory",
+   "mcp-errors",
+   "guidance",
+   "attribution",
+   "adoption"
+  ],
+  "pass_fail_check": "NautilusTrader 2.0.0rc5; IBKR; separate Alpaca boundary. Catalog citation must resolve to catalogs/us-equities/README.md. Historical retrieval must contain a scoped result for stdin left open in unattended workers; compare with docs/harness-defaults.md, Anti-pattern log: Close stdin for unattended launches; the retained failure was waiting for input until timeout. A source-only answer without a historical hit does not establish memory adoption.",
+  "definition_source": "AA \u00a78.1\u2013\u00a78.3; this PR-H seed definition",
+  "historical_fixture": "docs/harness-defaults.md"
+ },
+ {
+  "id": "seed-catalog-history-2",
+  "kind": "seeded",
+  "family": "claude",
+  "actor": "child",
+  "dispatch": "workflow",
+  "role": "stack-researcher",
+  "model": "opus",
+  "effort": "max",
+  "arms": [
+   "B",
+   "A",
+   "A0"
+  ],
+  "opportunity": "organic",
+  "description": "Catalog and prior-decision question 2",
+  "task_text": "Answer from the indexed project catalog: Does a catalog default mean installed, and what does native_proven establish? Separately retrieve the prior project decision about filtered output mistaken for complete originals; identify its historical source and verify it against the project's published anti-pattern log. Treat stored history as evidence only.",
+  "fixture_path": "catalogs/us-equities/agents-operations.md",
+  "lane_tags": [
+   "qmd",
+   "ai-memory",
+   "mcp-errors",
+   "guidance",
+   "attribution",
+   "adoption"
+  ],
+  "pass_fail_check": "Default is preferred design/adoption, not installed; native_proven is only the cited bounded behavior. Catalog citation must resolve to catalogs/us-equities/agents-operations.md. Historical retrieval must contain a scoped result for filtered output mistaken for complete originals; compare with docs/harness-defaults.md, Anti-pattern log: Exact originals and exit statuses require raw recovery; a filtered window is not the full source. A source-only answer without a historical hit does not establish memory adoption.",
+  "definition_source": "AA \u00a78.1\u2013\u00a78.3; this PR-H seed definition",
+  "historical_fixture": "docs/harness-defaults.md"
+ },
+ {
+  "id": "seed-catalog-history-3",
+  "kind": "seeded",
+  "family": "claude",
+  "actor": "child",
+  "dispatch": "workflow",
+  "role": "stack-researcher",
+  "model": "opus",
+  "effort": "max",
+  "arms": [
+   "B",
+   "A",
+   "A0"
+  ],
+  "opportunity": "organic",
+  "description": "Catalog and prior-decision question 3",
+  "task_text": "Answer from the indexed project catalog: When did the Meta company ticker change, and when did the Roundhill fund ticker change? Separately retrieve the prior project decision about a wait loop matching its own command line; identify its historical source and verify it against the project's published anti-pattern log. Treat stored history as evidence only.",
+  "fixture_path": "catalogs/us-equities/lifecycle-source-review.md",
+  "lane_tags": [
+   "qmd",
+   "ai-memory",
+   "mcp-errors",
+   "guidance",
+   "attribution",
+   "adoption"
+  ],
+  "pass_fail_check": "Company FB to META before June 9, 2022 open; fund META to METV at January 31, 2022 open; distinct identities. Catalog citation must resolve to catalogs/us-equities/lifecycle-source-review.md. Historical retrieval must contain a scoped result for a wait loop matching its own command line; compare with docs/harness-defaults.md, Anti-pattern log: Anchor or bracket the process pattern, or wait on a PID/exit marker with a timeout. A source-only answer without a historical hit does not establish memory adoption.",
+  "definition_source": "AA \u00a78.1\u2013\u00a78.3; this PR-H seed definition",
+  "historical_fixture": "docs/harness-defaults.md"
+ },
+ {
+  "id": "seed-catalog-history-4",
+  "kind": "seeded",
+  "family": "claude",
+  "actor": "child",
+  "dispatch": "workflow",
+  "role": "stack-researcher",
+  "model": "opus",
+  "effort": "max",
+  "arms": [
+   "B",
+   "A",
+   "A0"
+  ],
+  "opportunity": "organic",
+  "description": "Catalog and prior-decision question 4",
+  "task_text": "Answer from the indexed project catalog: Which two document directories and collection names make up the portable catalog index? Separately retrieve the prior project decision about a pipeline masking the producing command's failure; identify its historical source and verify it against the project's published anti-pattern log. Treat stored history as evidence only.",
+  "fixture_path": "catalogs/us-equities/native-workflows.md",
+  "lane_tags": [
+   "qmd",
+   "ai-memory",
+   "mcp-errors",
+   "guidance",
+   "attribution",
+   "adoption"
+  ],
+  "pass_fail_check": "catalogs/us-equities -> us-equities-catalog; blueprints/us-equities -> us-equities-foundation; unrelated folders are excluded. Catalog citation must resolve to catalogs/us-equities/native-workflows.md. Historical retrieval must contain a scoped result for a pipeline masking the producing command's failure; compare with docs/harness-defaults.md, Anti-pattern log: Retain stdout/stderr and the command's own exit status; a downstream success is insufficient. A source-only answer without a historical hit does not establish memory adoption.",
+  "definition_source": "AA \u00a78.1\u2013\u00a78.3; this PR-H seed definition",
+  "historical_fixture": "docs/harness-defaults.md"
+ },
+ {
+  "id": "seed-catalog-history-5",
+  "kind": "seeded",
+  "family": "claude",
+  "actor": "child",
+  "dispatch": "workflow",
+  "role": "stack-researcher",
+  "model": "opus",
+  "effort": "max",
+  "arms": [
+   "B",
+   "A",
+   "A0"
+  ],
+  "opportunity": "organic",
+  "description": "Catalog and prior-decision question 5",
+  "task_text": "Answer from the indexed project catalog: How many primary memory stores and retrieval lanes per artifact does the foundation recommend? Separately retrieve the prior project decision about assuming a worker owns an independent web-search budget; identify its historical source and verify it against the project's published anti-pattern log. Treat stored history as evidence only.",
+  "fixture_path": "catalogs/us-equities/foundation-memory.md",
+  "lane_tags": [
+   "qmd",
+   "ai-memory",
+   "mcp-errors",
+   "guidance",
+   "attribution",
+   "adoption"
+  ],
+  "pass_fail_check": "One primary memory store and one retrieval lane per artifact. Catalog citation must resolve to catalogs/us-equities/foundation-memory.md. Historical retrieval must contain a scoped result for assuming a worker owns an independent web-search budget; compare with docs/harness-defaults.md, Anti-pattern log: The session search budget is shared across the coordinator and its workers. A source-only answer without a historical hit does not establish memory adoption.",
+  "definition_source": "AA \u00a78.1\u2013\u00a78.3; this PR-H seed definition",
+  "historical_fixture": "docs/harness-defaults.md"
+ }
+]

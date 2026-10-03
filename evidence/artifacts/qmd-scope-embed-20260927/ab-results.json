@@ -1,0 +1,436 @@
+{
+ "queryset_sha256": "577717d6a6025e1f0f763aa093fd2672e5171a38151d696581f1b5b5a6d64f38",
+ "rows": [
+  {
+   "id": "frozen-retrieval-01",
+   "style": "lexical",
+   "collection": "us-equities-catalog",
+   "expected": [
+    "qmd://us-equities-catalog/data-evaluation-followup.md"
+   ],
+   "arms": {
+    "lex": {
+     "exit": 0,
+     "seconds": 0.2,
+     "top5": [],
+     "rank": null
+    },
+    "vec": {
+     "exit": 0,
+     "seconds": 8.1,
+     "top5": [
+      "qmd://us-equities-catalog/data-evaluation-followup.md",
+      "qmd://foundation-docs/native-workflow-writing-recovery-20260921.md",
+      "qmd://foundation-docs/decisions/2026-09-25-skills-trial-and-usage.md",
+      "qmd://us-equities-foundation/mover-v3/study/README.md",
+      "qmd://foundation-docs/ultracode-token-routing-20260921.md"
+     ],
+     "rank": 1
+    },
+    "hybrid": {
+     "exit": 0,
+     "seconds": 128.2,
+     "top5": [
+      "qmd://us-equities-catalog/data-evaluation-followup.md",
+      "qmd://us-equities-catalog/foundation-source-review.md",
+      "qmd://us-equities-catalog/repository-index.md",
+      "qmd://foundation-docs/decisions/2026-09-25-skills-trial-and-usage.md",
+      "qmd://us-equities-catalog/convergence-review.md"
+     ],
+     "rank": 1
+    }
+   }
+  },
+  {
+   "id": "frozen-retrieval-02",
+   "style": "paraphrase",
+   "collection": "us-equities-catalog",
+   "expected": [
+    "qmd://us-equities-catalog/simulation-data-review.md"
+   ],
+   "arms": {
+    "lex": {
+     "exit": 0,
+     "seconds": 0.2,
+     "top5": [],
+     "rank": null
+    },
+    "vec": {
+     "exit": 0,
+     "seconds": 8.1,
+     "top5": [
+      "qmd://foundation-docs/decisions/2026-09-22-github-automation-closure.md",
+      "qmd://foundation-docs/landscape-freshness-notes.md",
+      "qmd://us-equities-catalog/simulation-data-review.md",
+      "qmd://us-equities-catalog/foundation-source-review.md",
+      "qmd://foundation-docs/candidate-quality-review-20260921.md"
+     ],
+     "rank": 3
+    },
+    "hybrid": {
+     "exit": 0,
+     "seconds": 124.7,
+     "top5": [
+      "qmd://foundation-docs/decisions/2026-09-22-github-automation-closure.md",
+      "qmd://us-equities-catalog/architecture/README.md",
+      "qmd://us-equities-catalog/foundation-source-review.md",
+      "qmd://us-equities-catalog/simulation-data-review.md",
+      "qmd://us-equities-catalog/star-audit.md"
+     ],
+     "rank": 4
+    }
+   }
+  },
+  {
+   "id": "frozen-retrieval-03",
+   "style": "conceptual",
+   "collection": "us-equities-foundation",
+   "expected": [
+    "qmd://us-equities-foundation/nanosecond-replay/README.md"
+   ],
+   "arms": {
+    "lex": {
+     "exit": 0,
+     "seconds": 0.2,
+     "top5": [
+      "qmd://foundation-docs/grand-catalog-handbook.md"
+     ],
+     "rank": null
+    },
+    "vec": {
+     "exit": 0,
+     "seconds": 7.0,
+     "top5": [
+      "qmd://us-equities-foundation/nanosecond-replay/README.md",
+      "qmd://us-equities-catalog/security-identity-review.md",
+      "qmd://foundation-adoption/update.md",
+      "qmd://foundation-docs/decisions/2026-09-24-community-sweep.md",
+      "qmd://us-equities-foundation/sim-paper-compare/README.md"
+     ],
+     "rank": 1
+    },
+    "hybrid": {
+     "exit": 0,
+     "seconds": 63.4,
+     "top5": [
+      "qmd://foundation-docs/grand-catalog-handbook.md",
+      "qmd://us-equities-foundation/nanosecond-replay/README.md",
+      "qmd://us-equities-foundation/point-in-time/README.md",
+      "qmd://us-equities-foundation/sim-paper-compare/README.md",
+      "qmd://foundation-docs/decisions/2026-09-23-bot-pr-dispatch.md"
+     ],
+     "rank": 2
+    }
+   }
+  },
+  {
+   "id": "frozen-retrieval-04",
+   "style": "lexical",
+   "collection": "us-equities-foundation",
+   "expected": [
+    "qmd://us-equities-foundation/order-contract/README.md"
+   ],
+   "arms": {
+    "lex": {
+     "exit": 0,
+     "seconds": 0.2,
+     "top5": [],
+     "rank": null
+    },
+    "vec": {
+     "exit": 0,
+     "seconds": 7.5,
+     "top5": [
+      "qmd://us-equities-foundation/order-contract/README.md",
+      "qmd://us-equities-foundation/acceptance-wave/research-protocol.md",
+      "qmd://us-equities-foundation/order-throughput/README.md",
+      "qmd://us-equities-foundation/architecture/README.md",
+      "qmd://us-equities-foundation/mover-v3/README.md"
+     ],
+     "rank": 1
+    },
+    "hybrid": {
+     "exit": 0,
+     "seconds": 114.4,
+     "top5": [
+      "qmd://us-equities-foundation/order-contract/README.md",
+      "qmd://us-equities-catalog/convergence-program/trading.md",
+      "qmd://us-equities-foundation/acceptance-wave/research-protocol.md",
+      "qmd://us-equities-foundation/order-throughput/README.md",
+      "qmd://us-equities-foundation/architecture/review-adjudication.md"
+     ],
+     "rank": 1
+    }
+   }
+  },
+  {
+   "id": "frozen-retrieval-05",
+   "style": "paraphrase",
+   "collection": "us-equities-foundation",
+   "expected": [
+    "qmd://us-equities-foundation/overfitting-controls/README.md",
+    "qmd://us-equities-foundation/research-evaluation/README.md"
+   ],
+   "arms": {
+    "lex": {
+     "exit": 0,
+     "seconds": 0.2,
+     "top5": [],
+     "rank": null
+    },
+    "vec": {
+     "exit": 0,
+     "seconds": 7.9,
+     "top5": [
+      "qmd://us-equities-foundation/broad-universe/README.md",
+      "qmd://us-equities-foundation/overfitting-controls/README.md",
+      "qmd://us-equities-foundation/mover-v3/README.md",
+      "qmd://foundation-docs/foundation-rd-readiness.md",
+      "qmd://us-equities-foundation/sim-capacity/README.md"
+     ],
+     "rank": 2
+    },
+    "hybrid": {
+     "exit": 0,
+     "seconds": 126.0,
+     "top5": [
+      "qmd://us-equities-foundation/broad-universe/README.md",
+      "qmd://us-equities-foundation/overfitting-controls/README.md",
+      "qmd://us-equities-foundation/mover-v3/README.md",
+      "qmd://foundation-docs/grand-catalog-handbook.md",
+      "qmd://foundation-docs/landscape-foundation-notes.md"
+     ],
+     "rank": 2
+    }
+   }
+  },
+  {
+   "id": "frozen-retrieval-06",
+   "style": "lexical",
+   "collection": "foundation-adoption",
+   "expected": [
+    "qmd://foundation-adoption/tools/README.md"
+   ],
+   "arms": {
+    "lex": {
+     "exit": 0,
+     "seconds": 0.2,
+     "top5": [
+      "qmd://foundation-adoption/tools/README.md"
+     ],
+     "rank": 1
+    },
+    "vec": {
+     "exit": 0,
+     "seconds": 7.4,
+     "top5": [
+      "qmd://foundation-adoption/tools/README.md",
+      "qmd://foundation-docs/next-host-stages.md",
+      "qmd://us-equities-foundation/worker-supervision/README.md",
+      "qmd://us-equities-foundation/order-throughput/README.md",
+      "qmd://foundation-docs/harness-rules-convergence-20260922.md"
+     ],
+     "rank": 1
+    },
+    "hybrid": {
+     "exit": 0,
+     "seconds": 59.5,
+     "top5": [
+      "qmd://foundation-adoption/tools/README.md",
+      "qmd://foundation-docs/next-host-stages.md",
+      "qmd://foundation-docs/grand-catalog-handbook.md",
+      "qmd://us-equities-foundation/data-lake/README.md",
+      "qmd://foundation-docs/harness-rules-convergence-20260922.md"
+     ],
+     "rank": 1
+    }
+   }
+  },
+  {
+   "id": "frozen-retrieval-07",
+   "style": "paraphrase",
+   "collection": "foundation-adoption",
+   "expected": [
+    "qmd://foundation-adoption/tools/README.md"
+   ],
+   "arms": {
+    "lex": {
+     "exit": 0,
+     "seconds": 0.2,
+     "top5": [
+      "qmd://foundation-docs/harness-defaults.md"
+     ],
+     "rank": null
+    },
+    "vec": {
+     "exit": 0,
+     "seconds": 8.5,
+     "top5": [
+      "qmd://foundation-adoption/tools/README.md",
+      "qmd://foundation-docs/secret-storage.md",
+      "qmd://foundation-docs/gap-crosswalk-92bb279.md",
+      "qmd://foundation-docs/grand-catalog-handbook.md",
+      "qmd://us-equities-foundation/adaptive-paper/README-mover.md"
+     ],
+     "rank": 1
+    },
+    "hybrid": {
+     "exit": 0,
+     "seconds": 65.4,
+     "top5": [
+      "qmd://foundation-docs/harness-defaults.md",
+      "qmd://foundation-adoption/tools/README.md",
+      "qmd://foundation-docs/secret-storage.md",
+      "qmd://foundation-docs/decisions/2026-09-22-github-automation-closure.md",
+      "qmd://us-equities-foundation/adaptive-paper/README-mover.md"
+     ],
+     "rank": 2
+    }
+   }
+  },
+  {
+   "id": "frozen-retrieval-08",
+   "style": "conceptual",
+   "collection": "foundation-docs",
+   "expected": [
+    "qmd://foundation-docs/decisions/2026-09-23-generated-explorer-sorted-manifest.md"
+   ],
+   "arms": {
+    "lex": {
+     "exit": 0,
+     "seconds": 0.2,
+     "top5": [],
+     "rank": null
+    },
+    "vec": {
+     "exit": 0,
+     "seconds": 7.7,
+     "top5": [
+      "qmd://foundation-docs/catalog-provenance.md",
+      "qmd://foundation-docs/decisions/2026-09-23-bot-pr-dispatch.md",
+      "qmd://foundation-docs/gap-crosswalk-92bb279.md",
+      "qmd://foundation-docs/tasks/2026-09-21-landscape-finalization.md",
+      "qmd://foundation-docs/catalog-retrieval.md"
+     ],
+     "rank": null
+    },
+    "hybrid": {
+     "exit": 0,
+     "seconds": 121.4,
+     "top5": [
+      "qmd://foundation-docs/catalog-provenance.md",
+      "qmd://foundation-docs/decisions/2026-09-23-generated-explorer-sorted-manifest.md",
+      "qmd://foundation-docs/contributing-evidence.md",
+      "qmd://foundation-docs/landscape-continuation.md",
+      "qmd://foundation-docs/github-automation.md"
+     ],
+     "rank": 2
+    }
+   }
+  },
+  {
+   "id": "frozen-retrieval-09",
+   "style": "paraphrase",
+   "collection": "foundation-docs",
+   "expected": [
+    "qmd://foundation-docs/promptfoo-upstream-retrieval.md"
+   ],
+   "arms": {
+    "lex": {
+     "exit": 0,
+     "seconds": 0.2,
+     "top5": [],
+     "rank": null
+    },
+    "vec": {
+     "exit": 0,
+     "seconds": 7.3,
+     "top5": [
+      "qmd://foundation-docs/promptfoo-upstream-retrieval.md",
+      "qmd://foundation-docs/native-dashboard-data.md",
+      "qmd://foundation-docs/decisions/2026-09-23-bot-pr-dispatch.md",
+      "qmd://foundation-docs/secret-storage.md",
+      "qmd://foundation-docs/decisions/2026-09-26-telemetry-writer-identity.md"
+     ],
+     "rank": 1
+    },
+    "hybrid": {
+     "exit": 0,
+     "seconds": 117.9,
+     "top5": [
+      "qmd://foundation-docs/promptfoo-upstream-retrieval.md",
+      "qmd://foundation-docs/native-dashboard-data.md",
+      "qmd://us-equities-catalog/foundation-source-review.md",
+      "qmd://foundation-docs/secret-storage.md",
+      "qmd://foundation-docs/grand-catalog-handbook.md"
+     ],
+     "rank": 1
+    }
+   }
+  },
+  {
+   "id": "frozen-retrieval-10",
+   "style": "conceptual",
+   "collection": "foundation-docs",
+   "expected": [
+    "qmd://foundation-docs/restricted-worker-compatibility.md"
+   ],
+   "arms": {
+    "lex": {
+     "exit": 0,
+     "seconds": 0.2,
+     "top5": [],
+     "rank": null
+    },
+    "vec": {
+     "exit": 0,
+     "seconds": 23.6,
+     "top5": [
+      "qmd://foundation-docs/restricted-worker-compatibility.md",
+      "qmd://foundation-docs/foundation-closure-20260921.md",
+      "qmd://foundation-docs/convergence-architecture.md",
+      "qmd://foundation-docs/grand-catalog-handbook.md",
+      "qmd://foundation-docs/native-workflow-writing-recovery-20260921.md"
+     ],
+     "rank": 1
+    },
+    "hybrid": {
+     "exit": 0,
+     "seconds": 124.2,
+     "top5": [
+      "qmd://foundation-docs/restricted-worker-compatibility.md",
+      "qmd://foundation-docs/decisions/2026-09-22-actions-hardening-fix-round.md",
+      "qmd://foundation-docs/decisions/2026-09-27-claude-harness-settings.md",
+      "qmd://foundation-docs/community-native-practice.md",
+      "qmd://foundation-docs/decisions/2026-09-27-token-lanes-subagent-start.md"
+     ],
+     "rank": 1
+    }
+   }
+  }
+ ],
+ "summary": {
+  "lex": {
+   "hit@1": 1,
+   "hit@5": 1,
+   "mrr@5": 0.1,
+   "n": 10,
+   "median_seconds": 0.2
+  },
+  "vec": {
+   "hit@1": 7,
+   "hit@5": 9,
+   "mrr@5": 0.783,
+   "n": 10,
+   "median_seconds": 7.8
+  },
+  "hybrid": {
+   "hit@1": 5,
+   "hit@5": 10,
+   "mrr@5": 0.725,
+   "n": 10,
+   "median_seconds": 119.65
+  }
+ },
+ "summary_note": "median_seconds recomputed as the true median of the 10 rows after review (the first runner took the upper middle sample)"
+}

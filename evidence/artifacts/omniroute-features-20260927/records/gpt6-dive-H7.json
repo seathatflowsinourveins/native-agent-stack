@@ -1,0 +1,199 @@
+{
+  "group": "Framework clients, service resources, and build freshness",
+  "items": [
+    {
+      "id": "L04",
+      "feature": "Framework runtime clients: session identity, reasoning effort, compression selector, and temperature",
+      "what_it_does": "Defines an explicit FW client contract that preserves max reasoning effort, supplies stable account/prompt-cache affinity, and bypasses response replay. OpenAI Python clients accept constructor default_headers and per-request extra_headers. Hindsight and Cognee expose corresponding controls, but their defaults do not establish this contract automatically.",
+      "defaults": "Gateway effort precedence is forced server rule > model suffix > reasoning.effort > reasoning_effort > connection/default medium. Ordinary SDK configuration does not establish an OmniRoute conversation identity. Hindsight v0.10.1 cache-affinity auto resolves to none for a loopback/custom base URL; its operation temperature defaults include verification=0 and consolidation=0. Cognee v1.6.1 defaults to litellm_native; temperature is forwarded when explicitly configured, and LLM_ARGS can override other settings. Gateway response caching requires explicit numeric temperature=0; omitted temperature is ineligible.",
+      "controls": "Use X-Session-Id with a stable, opaque, non-PII identifier of at most 64 characters per logical run/conversation; use distinct identities for independent concurrent runs. Affinity also accepts x-codex-session-id, x-omniroute-session, body session metadata, and prompt_cache_key. X-OmniRoute-Session-Id is a separate attribution header, not this affinity header. Select cx/gpt-6-astra-max and reasoning_effort=max. X-OmniRoute-No-Cache:true bypasses legacy cache reads and writes. Compression header values include off, default, engine:<enabled-id>, and a named combo; neither the header nor a model choice bypasses the compression master or provider/model exclusions.",
+      "current_live_value": "Observed GET snapshot: thinking-budget mode=passthrough, effortLevel=medium; sessionAffinityTtlMs=14400000; providerStrategies.codex={fallbackStrategy:round-robin,stickyRoundRobinLimit:1}; compression enabled=false, defaultMode=off, exclusions=[codex/*], enginesExplicit=false; legacy semanticCacheEnabled=true, vector cache disabled, cache entries/hits/misses=0. No deployed S3 SDK configuration or outgoing framework request was observed. The recorded landscape sweep uses codex exec, so that implementation belongs to CX; an SDK-based sweep remains a separate prospective FW client.",
+      "applies_to": "OpenAI-compatible /v1/chat/completions clients in S3 memory systems and future SDK sweep/research workers. Preserve native CX configuration and local embeddings. Use the existing cx/gpt-6-sol-medium mechanical lane only when explicitly selected for that task.",
+      "quality_risk": "Unspecified effort can silently become medium. The max model suffix protects against wrapper-injected medium, although a forced server rule still wins. Codex strips temperature and top_p, so temperature=0 does not make upstream generation deterministic; it can nevertheless activate gateway response caching before translation. The legacy cache signature omits reasoning effort. Cognee's unknown-model capability lookup can fall back from strict schema output to json_object with schema text added to the prompt; headers and a max suffix alone do not establish strict-schema parity. Enabling compression with defaultMode=off is also insufficient to preserve FW behavior: reactive context trimming is independently enabled by the master when exclusions are removed.",
+      "cache_effect": "Stable session identity and prompt_cache_key support account and provider prompt-cache continuity without rewriting prompt text. X-OmniRoute-No-Cache disables gateway response replay, not provider prompt caching. Do not use one global session ID for unrelated workers. Do not activate compression by removing codex/*: that affects both CX and FW requests routed through Codex and can change overflow handling even with the compression header set to off.",
+      "token_effect": "No measured savings are claimed. With approximately 94% of input served from prompt cache and output approximately 1.2% of total tokens, preserving cached input and avoiding retries matters more than shortening output. Explicit max effort may increase reasoning/output usage relative to accidental medium; that is the intended quality setting.",
+      "upstream_status": "Client controls were inspected in official openai-python source, Hindsight v0.10.1, Cognee v1.6.1, and LiteLLM documentation. These establish available integration surfaces, not the deployed versions or their actual requests. The pinned gateway already implements the required effort, affinity, and cache-bypass controls; compression reachability remains constrained by the existing master/exclusion gates.",
+      "proposed_state": "ON-OPT-IN",
+      "proposed_config": "Direct SDK FW lane: OpenAI/AsyncOpenAI(base_url='http://127.0.0.1:20128/v1', api_key='local-loopback', timeout=3660.0, default_headers={'X-OmniRoute-No-Cache':'true','X-OmniRoute-Compression':'off'}). The API-key value is a nonsecret SDK placeholder for the existing keyless loopback service. Per request: model='cx/gpt-6-astra-max', reasoning_effort='max', extra_headers={'X-Session-Id':sid}, extra_body={'prompt_cache_key':sid}; omit temperature/top_p and preserve the task's messages, tools and response_format. Keep sid stable within the run. Hindsight v0.10.1: HINDSIGHT_API_LLM_PROVIDER=openai; HINDSIGHT_API_LLM_BASE_URL=http://127.0.0.1:20128/v1; HINDSIGHT_API_LLM_API_KEY=local-loopback; HINDSIGHT_API_LLM_MODEL=cx/gpt-6-astra-max; HINDSIGHT_API_LLM_REASONING_EFFORT=max; HINDSIGHT_API_LLM_TIMEOUT=3660; HINDSIGHT_API_LLM_DEFAULT_HEADERS={\"X-OmniRoute-No-Cache\":\"true\",\"X-OmniRoute-Compression\":\"off\"}; HINDSIGHT_API_LLM_CACHE_AFFINITY=openai_prompt_cache_key; set HINDSIGHT_API_LLM_TEMPERATURE, HINDSIGHT_API_LLM_TEMPERATURE_VERIFICATION, HINDSIGHT_API_LLM_TEMPERATURE_RETAIN, HINDSIGHT_API_LLM_TEMPERATURE_REFLECT and HINDSIGHT_API_LLM_TEMPERATURE_CONSOLIDATION to none; audit operation-specific model/effort/affinity overrides. Its explicit affinity mode generates an operation-scoped key, avoiding a static global session header. Cognee v1.6.1: STRUCTURED_OUTPUT_FRAMEWORK=litellm_native; LLM_PROVIDER=openai; LLM_ENDPOINT=http://127.0.0.1:20128/v1; LLM_API_KEY=local-loopback; LLM_MODEL=openai/cx/gpt-6-astra-max; LLM_ARGS={\"reasoning_effort\":\"max\",\"timeout\":3660,\"extra_headers\":{\"X-OmniRoute-No-Cache\":\"true\",\"X-OmniRoute-Compression\":\"off\",\"X-Session-Id\":\"<run-id>\"},\"prompt_cache_key\":\"<run-id>\"}; leave LLM_TEMPERATURE unset and omit temperature from LLM_ARGS. Substitute a distinct run ID per independently configured worker/client; the LiteLLM openai/ prefix is consumed before gateway routing. Hold Cognee strict-schema adoption until outgoing strict json_schema is verified. Retain gateway compression enabled=false and exclusions=[codex/*]. These are proposed lane configurations; none was installed.",
+      "experiment_needed": "For each adopting lane, inspect redacted outgoing requests for max effort, stable identity, cache bypass, and unchanged tools/response_format; then run paired representative extraction, consolidation, reranking and tool-call tasks. Score correctness and schema/tool failures alongside cached-input fraction, uncached input, reasoning/output tokens, latency and retries. Use max_retries=0 during controlled SDK measurements to expose first-attempt failures; separately assess the lane's production retry policy. Compression requires a separate safe lane boundary and its own A/B before any positive selector is adopted.",
+      "overturn_condition": "Revise a framework recipe if its deployed adapter drops headers/effort/prompt_cache_key, aliases lose schema capabilities, or operation overrides defeat the contract. Admit a compression treatment only after the default-path isolation problem is resolved and that lane demonstrates quality parity plus net benefit after prompt-cache losses and retries are counted.",
+      "citations": [
+        {
+          "ref": "[Gateway GET snapshot]($SCRATCH/omniroute-phase0/gateway-snapshot.json)",
+          "claim": "Observed settings, compression exclusions, cache state and account-affinity policy; observations are from the supplied snapshot."
+        },
+        {
+          "ref": "[Affinity extraction](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/sse/services/sessionAffinityPin.ts#L197-L222), [session header handling](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/sessionManager.ts#L332-L345), [documented headers](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/reference/API_REFERENCE.md#L64-L85)",
+          "claim": "Affinity header/body precedence, X-Session-Id recognition and 64-character handling; distinguish the separate attribution header."
+        },
+        {
+          "ref": "[Codex effort resolution](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1424-L1464), [thinking-budget modes](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/guides/THINKING_BUDGET.md#L13-L28)",
+          "claim": "Forced rule/suffix/request/default effort precedence, medium fallback, and passthrough versus auto behavior."
+        },
+        {
+          "ref": "[Codex sampling exclusions](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/translator/paramSupport.ts#L42-L48), [legacy cache eligibility](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/semanticCache.ts#L478-L510), [cache signature](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/semanticCache.ts#L219-L245)",
+          "claim": "Codex drops sampling parameters; explicit temperature zero enables cache eligibility unless bypassed; reasoning effort is absent from the signature."
+        },
+        {
+          "ref": "[Compression header values](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/planResolution.ts#L24-L57), [master gate](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/strategySelector.ts#L119-L165), [exclusions and reactive gate](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1429-L1449), [reactive trimming](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L2134-L2155)",
+          "claim": "Selectors cannot cross master/exclusion gates; header off does not disable independently enabled reactive compaction."
+        },
+        {
+          "ref": "[Prompt-cache-key translation](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/translator/request/openai-responses/toResponses.ts#L395-L406), [Codex prompt-cache-key selection](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/executors/codex.ts#L1504-L1526)",
+          "claim": "Explicit prompt_cache_key survives the FW translation path and is preferred by Codex request construction."
+        },
+        {
+          "ref": "[OpenAI Python client](https://github.com/openai/openai-python/blob/main/src/openai/_client.py), [chat-completion request surface](https://github.com/openai/openai-python/blob/main/src/openai/resources/chat/completions/completions.py)",
+          "claim": "Constructor default_headers and request extra_headers/extra_body, reasoning_effort and temperature are supported SDK controls."
+        },
+        {
+          "ref": "[Hindsight v0.10.1 configuration](https://github.com/vectorize-io/hindsight/blob/v0.10.1/hindsight-api-slim/hindsight_api/config.py), [OpenAI-compatible provider](https://github.com/vectorize-io/hindsight/blob/v0.10.1/hindsight-api-slim/hindsight_api/engine/providers/openai_compatible_llm.py), [cache affinity](https://github.com/vectorize-io/hindsight/blob/v0.10.1/hindsight-api-slim/hindsight_api/engine/cache_affinity.py)",
+          "claim": "Environment controls for headers, effort, temperature and timeout; loopback auto affinity resolves to none, while explicit openai_prompt_cache_key supports operation-scoped affinity."
+        },
+        {
+          "ref": "[Cognee v1.6.1 configuration](https://github.com/topoteretes/cognee/blob/v1.6.1/cognee/infrastructure/llm/config.py), [native adapter](https://github.com/topoteretes/cognee/blob/v1.6.1/cognee/infrastructure/llm/structured_output_framework/litellm_native/native_adapter.py), [LiteLLM compatible endpoints](https://docs.litellm.ai/docs/providers/openai_compatible)",
+          "claim": "LLM_ARGS/call kwargs reach LiteLLM; provider-prefixed model routing is supported; unknown aliases can select json_object fallback instead of strict schema."
+        },
+        {
+          "ref": "[Recorded landscape sweep](~/code/native-agent-stack/tools/sota-convergence/landscape-sweep/README.md:139)",
+          "claim": "The documented sweep uses codex exec rather than an OpenAI SDK client."
+        }
+      ],
+      "unverified": [
+        "Deployed SDK, Hindsight, Cognee and LiteLLM versions; their effective configuration and outgoing wire requests.",
+        "Strict-schema capability recognition for the gateway model alias, including whether retries demote strictness.",
+        "Lane-specific quality, cache continuity, latency and token effects; no inference requests or A/B were run.",
+        "Scheduler, framework and proxy deadlines outside the reviewed client/gateway settings."
+      ]
+    },
+    {
+      "id": "O01",
+      "feature": "Service resources, timeout boundaries, and compression worker readiness",
+      "what_it_does": "Bounds gateway heap and request lifetimes without changing prompt content. Current settings accommodate long individual turns within defined limits and multi-hour sequences of such turns; they do not guarantee a single multi-hour response. Compression workers are created lazily for eligible jobs, independently of merely setting the compression master.",
+      "defaults": "Source defaults: memory auto-calibration is approximately 35% of host RAM clamped to 512–4096 MB; explicit supported memory range is 64–16384 MB. Fetch and raw-byte idle timeout defaults are 600000 ms; readiness defaults are 80000/180000 ms; active SSE lifetime defaults to 1260000 ms. Compression worker defaults are 2 workers, 120000 ms per job and 60000 ms idle eviction. Pipeline breaker defaults off.",
+      "controls": "OMNIROUTE_MEMORY_MB controls the launcher heap ceiling; omniroute serve preserves an existing NODE_OPTIONS heap override. STREAM_READINESS_TIMEOUT_MS/MAX_TIMEOUT_MS govern first-content readiness; STREAM_IDLE_TIMEOUT_MS measures upstream byte silence; STREAM_ACTIVE_TIMEOUT_MS bounds total active stream lifetime and is independent of REQUEST_TIMEOUT_MS. A separate default 110000 ms streaming fetch-start cap and a 33-minute pending-handler deadline also exist; the latter ends when the real response is handed off. CODEX_CLIENT_VERSION supplies a fallback, while a usable caller-reported version wins. OMNIROUTE_SEMANTIC_CACHE_ENABLED is a service-process control for the vector cache. COMPRESSION_PIPELINE_BREAKER_ENABLED is a process-env fallback overridden by explicit pipelineCircuitBreaker.enabled.",
+      "current_live_value": "Freshly read installed unit, byte-identical to the recorded unit: OMNIROUTE_MEMORY_MB=16384; CODEX_CLIENT_VERSION=0.157.1; STREAM_READINESS_TIMEOUT_MS=600000; STREAM_READINESS_MAX_TIMEOUT_MS=600000; STREAM_ACTIVE_TIMEOUT_MS=3600000; CLI_ALLOW_CONFIG_WRITES=false. The unit does not declare the vector-cache or pipeline-breaker flags. Snapshot: compression master=false, exclusions=[codex/*], defaultMode=off, liveZone=false; 1600 compression requests excluded and zero savings. Earlier read-only ESM resolution found all 13 static external imports of the installed compression worker, including uuid and xxhash-wasm, without importing modules or starting a worker. Effective process environment and systemd resource properties could not be checked because access to the user bus was denied.",
+      "applies_to": "The entire gateway service, including CX, FW and SEARCH resource sharing. Stream-specific deadlines apply to their corresponding streaming paths. Compression-worker findings matter only if an eligible compression treatment is subsequently admitted.",
+      "quality_risk": "A 16 GiB old-space ceiling is neither a reservation nor proof that four very large concurrent requests fit; native buffers and worker heaps need additional headroom. Existing timeouts are bounded: first-content readiness is capped at ten minutes and active SSE lifetime at one hour. Longer single-turn requirements need an explicit end-to-end timeout review; increasing only STREAM_ACTIVE_TIMEOUT_MS leaves other deadlines intact. The specific idle-worker leak is fixed in this source, but that does not prove absence of other leaks. Packaging still externalizes dependencies; static import resolution does not prove transitive/native initialization or sustained worker health.",
+      "cache_effect": "Retaining resource settings is prompt-prefix neutral. Avoiding OOMs, disconnects and retries can preserve useful session continuity, but no cache improvement was measured. Do not enable compression as a resource fix: removing exclusions can change FW context handling and invalidate cacheable prefixes. The proposed vector-cache flag does not disable the separate legacy response cache; L04's no-cache header remains necessary.",
+      "token_effect": "No direct token reduction. Preventing failed/retried calls may avoid duplicate work, but savings are unmeasured. Compression currently saves zero, and with approximately 94% cached input, reduced raw input alone would not establish a net benefit.",
+      "upstream_status": "#13091 is closed and merged at 2026-09-11T16:27:46Z; the pinned pool explicitly terminates workers during idle removal. #14933 remains open and reports the older npm 3.8.50 worker-leak/hotfix problem. #14847 remains open for missing external dependencies in standalone worker packaging and costly in-process fallback. Those reports do not establish that this installed npm-layout source build has missing dependencies. Master-on alone creates no worker; an eligible standard/rtk/supported stacked job triggers the lazy pool.",
+      "proposed_state": "ON-GLOBAL",
+      "proposed_config": "Retain the installed service values exactly: OMNIROUTE_MEMORY_MB=16384; CODEX_CLIENT_VERSION=0.157.1; STREAM_READINESS_TIMEOUT_MS=600000; STREAM_READINESS_MAX_TIMEOUT_MS=600000; STREAM_ACTIVE_TIMEOUT_MS=3600000; CLI_ALLOW_CONFIG_WRITES=false. Preserve the source default STREAM_IDLE_TIMEOUT_MS=600000 unless effective-environment verification reveals an override; do not add REQUEST_TIMEOUT_MS as a supposed universal lifetime control. At the next reviewed deployment, require effective process environment OMNIROUTE_SEMANTIC_CACHE_ENABLED=false; this belongs in service environment configuration, not client headers or a dashboard proxy field, and affects only the vector cache. Keep COMPRESSION_PIPELINE_BREAKER_ENABLED unset/false and no pipelineCircuitBreaker.enabled=true override, following C16. Retain compression enabled=false, defaultMode=off, exclusions=[codex/*], liveZone.enabled=false, preserveSystemPromptMode=always and cacheMinutes=5. Keep OMNIROUTE_CHAT_MAX_INFLIGHT_BYTES auto-derived and do not raise OMNIROUTE_CHAT_MAX_HEAVY_IN_FLIGHT blindly; inspect actual heap/cgroup headroom and admission telemetry first. Leave worker defaults unchanged while compression is disabled. This resolution retains the bounded baseline; no unit, environment, process or gateway setting was changed.",
+      "experiment_needed": "Before asserting capacity, verify the effective V8 heap, NODE_OPTIONS precedence, cgroup ceiling, peak RSS, admission rejections and actual worker count. Exercise representative concurrent long contexts and cancellation without changing prompt content. If a lane needs an individual response beyond one hour or more than ten minutes before content, measure its full timeout chain and prepare a separate bounded configuration. Before any compression adoption, start the installed worker in isolation, exercise eligible engines, verify dependency initialization, observe termination after the idle window and confirm worker count/RSS return to baseline across repeated cycles.",
+      "overturn_condition": "Change resource limits only when measured memory pressure, admission failures or legitimate deadline expirations justify it and the complete timeout/memory chain has been checked. Revisit worker readiness if an installed dependency fails, idle workers survive eviction, RSS grows without recovery, or an upstream packaging/lifecycle fix changes the evidence. Enable no breaker or compression treatment globally merely because the resource settings are retained.",
+      "citations": [
+        {
+          "ref": "[Installed service unit](~/.config/systemd/user/omniroute.service:11), [recorded service unit](~/code/native-agent-stack/evidence/artifacts/omniroute-gateway-20260927/omniroute.service:11)",
+          "claim": "Observed configured memory, client version, readiness/active timeouts and CLI write guard; installed and recorded units were compared."
+        },
+        {
+          "ref": "[Memory validation](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/scripts/build/runtime-env.mjs#L17-L19), [NODE_OPTIONS precedence](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/scripts/build/runtime-env.mjs#L109-L124), [memory environment reference](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/reference/ENVIRONMENT.md#L930-L939)",
+          "claim": "Explicit memory range, serve launcher override behavior, automatic calibration and documented coding-agent sizing guidance."
+        },
+        {
+          "ref": "[Timeout defaults](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/shared/utils/runtimeTimeouts.ts#L9-L25), [timeout environment resolution](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/shared/utils/runtimeTimeouts.ts#L122-L175), [stream watchdog semantics](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/utils/streamHandler.ts#L860-L902)",
+          "claim": "Separate readiness, byte-idle and total-active budgets; active lifetime does not inherit REQUEST_TIMEOUT_MS."
+        },
+        {
+          "ref": "[Streaming fetch-start cap](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/utils/fetchStartTimeoutPolicy.ts#L32-L51), [pending-handler deadline](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/utils/earlyStreamKeepalive.ts#L239-L258), [deadline cleared on response handoff](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/utils/earlyStreamKeepalive.ts#L607-L610)",
+          "claim": "Other deadlines remain despite a one-hour active-stream setting; the 33-minute deadline is not a cap on an already handed-off stream."
+        },
+        {
+          "ref": "[Codex caller-version handling](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/config/codexClient.ts#L29-L82)",
+          "claim": "Environment version is a fallback; usable caller headers preserve the actual client version."
+        },
+        {
+          "ref": "[Worker removal and lazy pool](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/compressionWorkerPool.ts#L230-L280), [worker eligibility](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/compressionWorkerProtocol.ts#L71-L90), [worker environment defaults](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/reference/ENVIRONMENT.md#L577-L582)",
+          "claim": "Idle removal terminates workers, the pool is lazy, only eligible jobs use it, and worker/breaker defaults are documented."
+        },
+        {
+          "ref": "[Standalone external dependencies](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/scripts/build/colocate-standalone.mjs#L134-L164), [worker failure fallback](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/strategySelector.ts#L563-L585), [installed worker bundle](~/.local/share/codex-ecosystem/tools/omniroute-3.8.51-a58000c7-pr14904-pr13788/lib/node_modules/omniroute/dist/open-sse/services/compression/compressionWorker.js:1)",
+          "claim": "Packaging retains external dependencies; worker startup/engine errors can fall back in process, while timeout handling avoids repeating expensive work. The installed bundle was the target of static import-resolution verification."
+        },
+        {
+          "ref": "[Vector-cache environment precedence](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/config/semanticCacheConfig.ts#L105-L123), [pipeline-breaker precedence](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/services/compression/pipelineEngineBreaker.ts#L57-L81), [separate legacy cache gate](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/lib/semanticCache.ts#L478-L510)",
+          "claim": "Both flags belong to the service process; vector false does not disable legacy response caching, and explicit breaker configuration overrides its environment fallback."
+        },
+        {
+          "ref": "[Admission-budget guidance](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/reference/ENVIRONMENT.md#L229-L232), [coding-agent RAM guidance](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/docs/guides/DOCKER_GUIDE.md#L325-L338)",
+          "claim": "Use actual heap/cgroup headroom and auto-derived byte admission; heap size alone does not establish safe concurrency."
+        },
+        {
+          "ref": "[PR #13091 API](https://api.github.com/repos/diegosouzapw/OmniRoute/issues/13091), [issue #14933 API](https://api.github.com/repos/diegosouzapw/OmniRoute/issues/14933), [issue #14847 API](https://api.github.com/repos/diegosouzapw/OmniRoute/issues/14847)",
+          "claim": "Observed upstream states: idle-worker fix merged; older npm leak/hotfix and standalone missing-dependency reports remain open."
+        },
+        {
+          "ref": "[Gateway GET snapshot]($SCRATCH/omniroute-phase0/gateway-snapshot.json)",
+          "claim": "Observed compression gates, guard configuration and zero compression savings."
+        }
+      ],
+      "unverified": [
+        "Effective process environment, conflicting NODE_OPTIONS or environment-file values, actual V8 heap, cgroup limits, peak RSS and worker count; the protected environment file and auth stores were not read.",
+        "Whether any current lane requires one continuous response beyond the existing readiness/active deadlines.",
+        "Compression worker startup, transitive/native dependency initialization, engine execution and sustained leak behavior; static external-import resolution is narrower evidence.",
+        "Load capacity and timeout recovery under representative concurrent max-effort traffic; no load test, inference request, restart or configuration mutation occurred."
+      ]
+    },
+    {
+      "id": "O02",
+      "feature": "Build freshness and immutable re-pin watch",
+      "what_it_does": "Keeps the current source build reproducible while identifying upstream changes that warrant a reviewed replacement. Package version checks, branch-head checks and individual cherry-pick inclusion are separate evidence.",
+      "defaults": "The gateway version endpoint compares package versions and runtime update support; it does not establish source-commit freshness or prove local fixes are included upstream. A floating npm tag or release branch is not an immutable deployment target.",
+      "controls": "Track release/v3.8.51 head, relevant main/release changes, npm dist-tags, Request/Proxy fix candidates #14904/#14872/#14886, alpha-search #13788, release tracking #14866, and compression lifecycle/packaging fixes. Pin candidate source and built-artifact identities separately; retain each local patch until its behavior exists in the candidate.",
+      "current_live_value": "Fresh local verification: checkout HEAD=dd6e9607e4884ec75c9bc0d96e60b01e9483d84e and installed dist/BUILD_SHA=dd6e9607e. Provenance is base a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3 plus the selected #14904 Request/Proxy fix and local #13788 alpha-search implementation. At the last successful branch API read on 2026-09-27 around 16:29 UTC, release/v3.8.51 still pointed exactly to a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3. A main-since-base query returned no commits. The npm dist-tags read around 16:45 UTC returned only latest=3.8.50. Snapshot version endpoint reported current=3.8.51, latest=3.8.50, channel=source, updateAvailable=false and autoUpdateSupported=false.",
+      "applies_to": "The deployed gateway and all previously resolved CX, FW and SEARCH behavior, including local alpha search, max-effort handling, account affinity, caching and disabled compression paths.",
+      "quality_risk": "A newer package number does not prove parity, and npm latest currently points below the source version. Replacing the build blindly can lose the Request/Proxy fix or alpha-search endpoint. Dropping all local patches when 3.8.51 publishes is unsafe: alpha-search is deferred to the 3.8.52 cycle. A closed release issue is not evidence that every candidate check passes.",
+      "cache_effect": "Holding the immutable build preserves the currently reviewed translation and affinity behavior. A candidate can change body normalization, prompt-cache keys, account selection or compression defaults, so cache continuity must be rechecked against the approximately 94% cached-input baseline before adoption.",
+      "token_effect": "The watch itself changes no tokens. No savings are attributed to freshness. Candidate changes must be assessed for uncached-input growth, retries and reasoning/output differences as well as correctness.",
+      "upstream_status": "Observed GitHub API states: #14904 OPEN, merged_at=null; #14872 OPEN, merged_at=null; #14886 OPEN, merged_at=null; #13788 OPEN, merged_at=null, deferred-v3.8.52; #14866 CLOSED. The three Request/Proxy PRs are competing fix candidates, while the selected #14904 behavior is already applied locally. No post-a58000c7 release-branch delta was present at the successful branch observation. Later branch/PR-detail/compare/check refreshes returned HTTP 403, so no later freshness or CI-green claim is made.",
+      "proposed_state": "ON-GLOBAL",
+      "proposed_config": "Retain deployed source SHA dd6e9607e4884ec75c9bc0d96e60b01e9483d84e and BUILD_SHA dd6e9607e, recording base a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3 plus the two selected patches. Keep automatic replacement disabled; do not switch to floating npm latest=3.8.50. Perform a read-only freshness review before an upgrade and whenever release-head movement, a new npm tag/release, a relevant security fix, a Request/Proxy merge, alpha-search merge, or worker packaging/lifecycle fix is observed. Those events trigger candidate review, not deployment. Re-pin only to an immutable candidate SHA/artifact after delta review and lane parity evidence. Remove the Request/Proxy patch only when equivalent behavior is included; retain local alpha search if the candidate still excludes deferred #13788. No watcher, build, installation or upgrade was performed.",
+      "experiment_needed": "For a candidate, establish artifact/source identity and review every relevant delta from the current tree. Verify Request reconstruction preserves body, abort and deadline behavior; CX native Responses retains max effort and prompt-cache continuity; FW preserves json_object, strict json_schema, tool calls, affinity and cache bypass; SEARCH retains local /v1/alpha/search behavior. Check compression packaging and worker lifecycle in isolation if affected. Compare default-path request bodies and prefixes, quality, cache-read fraction, uncached tokens, retries and latency before any lane adopts changed behavior.",
+      "overturn_condition": "Replace the current pin only when a specific immutable candidate contains the required fixes, preserves or deliberately carries forward each local patch, and passes the relevant lane parity checks. A new npm version, a closed issue, or branch movement alone is insufficient. A confirmed relevant security fix warrants prompt candidate review but still requires patch accounting and compatibility evidence.",
+      "citations": [
+        {
+          "ref": "[Build provenance](~/code/native-agent-stack/evidence/artifacts/omniroute-gateway-20260927/build-provenance.json:2), [installed identity record](~/code/native-agent-stack/evidence/artifacts/omniroute-gateway-20260927/installed-build-identity.txt:1), [installed BUILD_SHA](~/.local/share/codex-ecosystem/tools/omniroute-3.8.51-a58000c7-pr14904-pr13788/lib/node_modules/omniroute/dist/BUILD_SHA:1)",
+          "claim": "Base, selected patches and installed build identity; checkout HEAD and installed BUILD_SHA were freshly rechecked."
+        },
+        {
+          "ref": "[Release branch API](https://api.github.com/repos/diegosouzapw/OmniRoute/branches/release%2Fv3.8.51), [npm dist-tags](https://registry.npmjs.org/-/package/omniroute/dist-tags)",
+          "claim": "Last successful observations: release head equals a58000c7 and the only npm dist-tag is latest=3.8.50."
+        },
+        {
+          "ref": "[PR #14904 API](https://api.github.com/repos/diegosouzapw/OmniRoute/issues/14904), [PR #14872 API](https://api.github.com/repos/diegosouzapw/OmniRoute/issues/14872), [PR #14886 API](https://api.github.com/repos/diegosouzapw/OmniRoute/issues/14886)",
+          "claim": "Observed Request/Proxy fix candidates are open and unmerged; the selected fix is local."
+        },
+        {
+          "ref": "[PR #13788 API](https://api.github.com/repos/diegosouzapw/OmniRoute/issues/13788), [issue #14866 API](https://api.github.com/repos/diegosouzapw/OmniRoute/issues/14866)",
+          "claim": "Alpha-search remains open with deferred-v3.8.52 labeling; release tracking issue is closed, which does not certify candidate CI."
+        },
+        {
+          "ref": "[Local Request reconstruction patch](~/.local/share/codex-ecosystem/sources/omniroute-a58000c7-pr14904/open-sse/utils/earlyStreamKeepalive.ts:330), [local alpha-search route](~/.local/share/codex-ecosystem/sources/omniroute-a58000c7-pr14904/src/app/api/v1/alpha/search/route.ts:208)",
+          "claim": "Locally selected behaviors that must be included or carried forward independently; alpha-search is not attributed to the upstream base tree."
+        },
+        {
+          "ref": "[Version endpoint implementation](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/src/app/api/system/version/route.ts#L67-L94), [gateway GET snapshot]($SCRATCH/omniroute-phase0/gateway-snapshot.json)",
+          "claim": "Package-version/update-support checks explain the snapshot result but do not prove commit freshness."
+        },
+        {
+          "ref": "[Existing re-pin decision](~/code/native-agent-stack/docs/decisions/2026-09-27-omniroute-account-pool.md:473)",
+          "claim": "The existing re-pin condition needs per-patch inclusion checks; publication of 3.8.51 alone cannot justify dropping the deferred alpha-search patch."
+        }
+      ],
+      "unverified": [
+        "Upstream movement after the last successful API reads; subsequent refreshes returned HTTP 403.",
+        "Current PR mergeability, check conclusions and full cross-branch comparisons; closed issue status was not treated as CI evidence.",
+        "Candidate build reproducibility, artifact contents and lane parity; no replacement candidate was built or tested.",
+        "No live watcher was installed, and no automatic upgrade capability was enabled."
+      ]
+    }
+  ],
+  "tools_used": [
+    "functions.exec",
+    "exec_command",
+    "mcp__context_mode__ctx_fetch_and_index",
+    "mcp__context_mode__ctx_search",
+    "mcp__context_mode__ctx_execute"
+  ]
+}

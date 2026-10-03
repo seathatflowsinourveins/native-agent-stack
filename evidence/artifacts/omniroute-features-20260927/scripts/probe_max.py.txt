@@ -1,0 +1,47 @@
+"""Probe the gateway's -max model suffix on chat/completions (FW path), with and without tools.
+
+Four requests, each non-streaming with no temperature (so neither the semantic cache nor in-flight dedup applies)
+and a distinct session header:
+  A cx/gpt-6-astra       plain, no reasoning_effort  -> expect effort medium (connection default)
+  B cx/gpt-6-astra-max   plain, no reasoning_effort  -> expect effort max
+  C cx/gpt-6-astra-max   with one tool               -> OpenHands caveat: tools + reasoning on chat/completions
+  D cx/gpt-6-astra       reasoning_effort=xhigh + tool -> the OpenHands SDK path (its enum stops at xhigh)
+Prints status, finish reason, tool-call presence and usage only; never prints headers or keys.
+"""
+import json
+import sys
+import time
+import urllib.error
+import urllib.request
+
+BASE = "http://127.0.0.1:20128/v1/chat/completions"
+TOOL = [{"type": "function", "function": {"name": "get_weather", "description": "Get the weather for a city.",
+         "parameters": {"type": "object", "properties": {"city": {"type": "string"}}, "required": ["city"]}}}]
+CASES = [
+    ("A", "cx/gpt-6-astra", None, False),
+    ("B", "cx/gpt-6-astra-max", None, False),
+    ("C", "cx/gpt-6-astra-max", None, True),
+    ("D", "cx/gpt-6-astra", "xhigh", True),
+]
+stamp = sys.argv[1] if len(sys.argv) > 1 else "probe"
+for label, model, effort, tools in CASES:
+    body = {"model": model, "messages": [{"role": "user", "content":
+            "Use the tool to get the weather in Oslo." if tools else "Reply with the single word: ready."}]}
+    if tools:
+        body["tools"] = TOOL
+    if effort:
+        body["reasoning_effort"] = effort
+    req = urllib.request.Request(BASE, data=json.dumps(body).encode(), method="POST", headers={
+        "Content-Type": "application/json", "Authorization": "Bearer local-loopback",
+        "x-omniroute-session": f"max-probe-{stamp}-{label}"})
+    t = time.monotonic()
+    try:
+        with urllib.request.urlopen(req, timeout=600) as resp:
+            data = json.load(resp)
+            choice = data["choices"][0]
+            print(json.dumps({"case": label, "model": model, "effort_sent": effort, "tools": tools, "status": resp.status,
+                              "finish": choice.get("finish_reason"), "tool_calls": bool(choice["message"].get("tool_calls")),
+                              "usage": data.get("usage"), "seconds": round(time.monotonic() - t, 1)}))
+    except urllib.error.HTTPError as exc:
+        print(json.dumps({"case": label, "model": model, "effort_sent": effort, "tools": tools, "status": exc.code,
+                          "error": exc.read().decode(errors="replace")[:400], "seconds": round(time.monotonic() - t, 1)}))
