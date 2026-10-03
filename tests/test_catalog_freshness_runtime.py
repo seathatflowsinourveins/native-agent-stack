@@ -29,7 +29,7 @@ import os
 import re
 import tempfile
 import unittest
-from contextlib import redirect_stdout
+from contextlib import redirect_stderr, redirect_stdout
 from io import StringIO
 from pathlib import Path
 from unittest import mock
@@ -207,11 +207,17 @@ class MainReservesReportIdsTests(unittest.TestCase):
                 "foundation-layers.json", "trading-catalog.json", "trading-pins.json", "runtime-pins.json")}
         self.assertEqual(len(recorded), 1)
         self.assertLessEqual({"hftbacktest", "nautilustrader", "codex"}, recorded[0])
-        # Each id is the kind of report id it stands for here.
-        self.assertIn("hftbacktest", {entry["id"] for entry in written["trading-pins.json"]["entries"]})
-        self.assertIn("nautilustrader", {entry.get("id") for entry in written["trading-catalog.json"]["entries"]})
-        self.assertIn("codex", {component["id"] for layer in written["foundation-layers.json"]["layers"]
-                                for component in layer["components"]})
+        # Each id is the kind of report id it stands for here, and only that kind, so the
+        # assertion above fails when main() drops any one of the three reserve sources.
+        kinds = {
+            "trading pin": {entry["id"] for entry in written["trading-pins.json"]["entries"]},
+            "trading card": {entry.get("id") for entry in written["trading-catalog.json"]["entries"]},
+            "foundation component": {component["id"] for layer in written["foundation-layers.json"]["layers"]
+                                     for component in layer["components"]},
+        }
+        for report_id, kind in (("hftbacktest", "trading pin"), ("nautilustrader", "trading card"),
+                                ("codex", "foundation component")):
+            self.assertEqual({name for name, ids in kinds.items() if report_id in ids}, {kind}, report_id)
         # The spy called through: the runtime pins were still resolved and written.
         self.assertEqual(len(written["runtime-pins.json"]["entries"]), 19)
 
@@ -821,8 +827,10 @@ class RuntimeLeakGateTests(unittest.TestCase):
                 "--checked-at", CHECKED_AT, "--id", "catalog-freshness-20261002", *extra]
 
     def _build(self, *extra):
-        with redirect_stdout(StringIO()) as stdout:
+        # stderr is captured too, so a test can show that the matched text reaches neither stream.
+        with redirect_stdout(StringIO()) as stdout, redirect_stderr(StringIO()) as stderr:
             self.assertEqual(build_manifest.main(self._argv(*extra)), 0)
+        self.stderr = stderr.getvalue()
         return stdout.getvalue()
 
     def _written(self):
@@ -846,6 +854,9 @@ class RuntimeLeakGateTests(unittest.TestCase):
         # The build exited 0 (see _build); the manifest and the trading sidecar exist, unchanged.
         self.assertEqual(self._written(), without)
         self.assertEqual(output.splitlines()[-1], '{"runtime_freshness": {"gate_error": "leak_gate_tripped"}}')
+        # Neither the matched text nor the exception message is printed or logged.
+        self.assertNotIn("APCA", output + self.stderr)
+        self.assertNotIn("still contains", output + self.stderr)
         text = (self.work / fp.RUNTIME_FRESHNESS_FILE).read_text(encoding="utf-8")
         self.assertNotIn("APCA", text)
         sidecar = json.loads(text)
