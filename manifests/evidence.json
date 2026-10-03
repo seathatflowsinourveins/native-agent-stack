@@ -9161,8 +9161,8 @@
     },
     {
       "path": "blueprints/runtime-workers/comparisons/coding-worker-draft.json",
-      "sha256": "3a832886e78557107927009f65fadc8d4c4cf4c120d51c56bad632a5f6a82b37",
-      "bytes": 7036
+      "sha256": "c2d938702af60b756c65f11369864f278485f0ed082206ee8d4e17e7211f9ccf",
+      "bytes": 7271
     },
     {
       "path": "blueprints/runtime-workers/comparisons/gateway-token-draft.json",
@@ -15811,8 +15811,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-runtime-job-qualification.md",
-      "sha256": "4ff1e965dec39a50ed1e189caa15b83c42aba8181a1b0a721eb46e014acfb235",
-      "bytes": 8490
+      "sha256": "93217239ed30e2704f25e470ddaeddc2674a1d1f4688d4a2f01fab3ae5e1dc2c",
+      "bytes": 9708
     },
     {
       "path": "docs/direct-results.md",
@@ -41856,13 +41856,18 @@
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/README.md",
-      "sha256": "2e53ae17d621b077cbd5f859ee50a6d21baad6777f028044a9b38adab6d7794b",
-      "bytes": 1302
+      "sha256": "8e7290fd7eb24dbbd4b42bc2d4b9ac17028b8b20f2025541044c65c6fdb9295b",
+      "bytes": 1686
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/checks.json",
-      "sha256": "37ed25a31100f053d9592adbf203b4a06007081726bf1b9f878ae80ae9a8d480",
-      "bytes": 5472
+      "sha256": "2c3948d035c5efd1c90f22ef97e16f3d89d9566d093460035a2ea006070c3e4d",
+      "bytes": 5495
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/publication-read.json",
+      "sha256": "4594cb5a20becd2ed9b4c896aed6b5d7f685041f99936ff7d17ccb470255570f",
+      "bytes": 3695
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/source-read.json",
