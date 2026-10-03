@@ -15756,8 +15756,8 @@
     },
     {
       "path": "docs/decisions/2026-09-30-gpt-lifecycle-convergence.md",
-      "sha256": "db9b9a3fedf980bf1b551bd97c1f5837eef7db7457d56957679d431fd77b3876",
-      "bytes": 31651
+      "sha256": "66d533f5c83c9f6faa4f71265d5ced99f8d845bec18b5eecd86430831b2ae21d",
+      "bytes": 32543
     },
     {
       "path": "docs/decisions/2026-09-30-omniroute-rebuild.md",
@@ -31836,8 +31836,8 @@
     },
     {
       "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/publication-checks.json",
-      "sha256": "78882a545c28c1dcaed909326e77fc29aec3f9b04caf3629642b5927ef252b0f",
-      "bytes": 2220
+      "sha256": "3e3f88a2539a00ac40f334f9583928fff7810fc5b3e19d15dfcf5784088a618c",
+      "bytes": 2221
     },
     {
       "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/publication-ci-repair.json",
@@ -49251,8 +49251,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "0af1e69b3eb1eb84da7d2e644aeab9e32e643f22a064c251cd232599be9a12eb",
-      "bytes": 20675
+      "sha256": "e0586e93da881720e825c48106a8bf7e20115f6ad9287c86e4161e4b946b4d99",
+      "bytes": 20794
     },
     {
       "path": "observability/memory-scheduled-20260923.json",
