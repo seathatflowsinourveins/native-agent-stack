@@ -1,0 +1,283 @@
+{
+  "schema_version": 1,
+  "evidence_class": "compact pinned source inventory",
+  "recorded_date": "2026-10-03",
+  "sources": [
+    {
+      "id": "H-codex",
+      "repository": "harbor-framework/harbor",
+      "pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "path": "src/harbor/agents/installed/codex.py",
+      "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/installed/codex.py",
+      "bytes": 57185,
+      "sha256": "ee0ca8ec43617f3909d2195afe8f9e7cbd7313a8b3b558b01fde388f65b7c39c"
+    },
+    {
+      "id": "H-pi",
+      "repository": "harbor-framework/harbor",
+      "pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "path": "src/harbor/agents/installed/pi.py",
+      "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/installed/pi.py",
+      "bytes": 9463,
+      "sha256": "09bd67c9bad21ed5faf76382153c0b8527166a94c18fe4663f07a328a39bcbbc"
+    },
+    {
+      "id": "P-composer",
+      "repository": "earendil-works/pi",
+      "pin": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32",
+      "path": "packages/coding-agent/src/core/provider-composer.ts",
+      "url": "https://github.com/earendil-works/pi/blob/a13d35a742c6ef8462812a28fbe1d8c8b7431c32/packages/coding-agent/src/core/provider-composer.ts",
+      "bytes": 26959,
+      "sha256": "8e0739b7a4b1512c9d3f4380f858538099eb4515ee5b141cd89c51cc8ea58371"
+    },
+    {
+      "id": "P-openai-responses",
+      "repository": "earendil-works/pi",
+      "pin": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32",
+      "path": "packages/ai/src/api/openai-responses.ts",
+      "url": "https://github.com/earendil-works/pi/blob/a13d35a742c6ef8462812a28fbe1d8c8b7431c32/packages/ai/src/api/openai-responses.ts",
+      "bytes": 15292,
+      "sha256": "dc95a3ddf55454feb6f841055c518ca2a212a8a5bcc5982e7812da35151458cb"
+    },
+    {
+      "id": "P-provider-retry",
+      "repository": "earendil-works/pi",
+      "pin": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32",
+      "path": "packages/ai/src/utils/provider-retry.ts",
+      "url": "https://github.com/earendil-works/pi/blob/a13d35a742c6ef8462812a28fbe1d8c8b7431c32/packages/ai/src/utils/provider-retry.ts",
+      "bytes": 4066,
+      "sha256": "193036804e4825c950ceb913f310ded77efe2e052945799f45ed32fb5121b81f"
+    },
+    {
+      "id": "P-settings",
+      "repository": "earendil-works/pi",
+      "pin": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32",
+      "path": "packages/coding-agent/src/core/settings-manager.ts",
+      "url": "https://github.com/earendil-works/pi/blob/a13d35a742c6ef8462812a28fbe1d8c8b7431c32/packages/coding-agent/src/core/settings-manager.ts",
+      "bytes": 51171,
+      "sha256": "535c679f41f769d9129ffec5521508241162c9dfe0a9c7782157b193eb0e5664"
+    },
+    {
+      "id": "P-session",
+      "repository": "earendil-works/pi",
+      "pin": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32",
+      "path": "packages/coding-agent/src/core/agent-session.ts",
+      "url": "https://github.com/earendil-works/pi/blob/a13d35a742c6ef8462812a28fbe1d8c8b7431c32/packages/coding-agent/src/core/agent-session.ts",
+      "bytes": 158080,
+      "sha256": "11ce7b78ee9d4235f2cdc80632332c93935ad23d7e5d68fe1aa5b155e1a297c0"
+    },
+    {
+      "id": "P-sdk",
+      "repository": "earendil-works/pi",
+      "pin": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32",
+      "path": "packages/coding-agent/src/core/sdk.ts",
+      "url": "https://github.com/earendil-works/pi/blob/a13d35a742c6ef8462812a28fbe1d8c8b7431c32/packages/coding-agent/src/core/sdk.ts",
+      "bytes": 16984,
+      "sha256": "1fb8a84ab4dfab28344932b430c8d4abcd234a1c35ae9aebc3049269a813312d"
+    },
+    {
+      "id": "H-base",
+      "repository": "harbor-framework/harbor",
+      "pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "path": "src/harbor/agents/installed/base.py",
+      "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/installed/base.py",
+      "bytes": 43618,
+      "sha256": "4ad4d5891db891645dcdb044566cb150502fb7d2ee5fdaef80eabd652d6bf6a9"
+    },
+    {
+      "id": "O-llm",
+      "repository": "OpenHands/software-agent-sdk",
+      "pin": "1e1390acc8788346ba4804c34323284009bf3f5e",
+      "path": "openhands-sdk/openhands/sdk/llm/llm.py",
+      "url": "https://github.com/OpenHands/software-agent-sdk/blob/1e1390acc8788346ba4804c34323284009bf3f5e/openhands-sdk/openhands/sdk/llm/llm.py",
+      "bytes": 143739,
+      "sha256": "a3261d1d021eebeb81114acdf3e36c38ea08e0bbb1d037def25c0ad8995f92d3"
+    },
+    {
+      "id": "C-provider",
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/model-provider-info/src/lib.rs",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/model-provider-info/src/lib.rs",
+      "bytes": 31061,
+      "sha256": "941a8ec0e8be4b45080cac3df3d052999a4cb104811575634b1a9ed510690958"
+    },
+    {
+      "id": "C-http-retry",
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/codex-client/src/retry.rs",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/codex-client/src/retry.rs",
+      "bytes": 3840,
+      "sha256": "4e61c0e5e5037866706863c32780748ec82e114160ec759a582621de0aad4c06"
+    },
+    {
+      "id": "O-retry",
+      "repository": "OpenHands/software-agent-sdk",
+      "pin": "1e1390acc8788346ba4804c34323284009bf3f5e",
+      "path": "openhands-sdk/openhands/sdk/llm/utils/retry_mixin.py",
+      "url": "https://github.com/OpenHands/software-agent-sdk/blob/1e1390acc8788346ba4804c34323284009bf3f5e/openhands-sdk/openhands/sdk/llm/utils/retry_mixin.py",
+      "bytes": 5838,
+      "sha256": "609b84dd4185a49d51101d0876341f5bb1b5aefc160c6b7192e16d4f11170ed3"
+    },
+    {
+      "id": "H-openhands-runner",
+      "repository": "harbor-framework/harbor",
+      "pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "path": "src/harbor/agents/installed/openhands_sdk_runner.py",
+      "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/installed/openhands_sdk_runner.py",
+      "bytes": 16338,
+      "sha256": "19df88458e3427ebdac98ff64b02bf2448616dd56425094570f41561475d8ab4"
+    },
+    {
+      "id": "C-turn",
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/core/src/session/turn.rs",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/session/turn.rs",
+      "bytes": 126454,
+      "sha256": "8c27407110003a384cc7a9f85985d83ff824378f1feb22e7e5c19d927d77ca1d"
+    },
+    {
+      "id": "C-stream-retry",
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/core/src/responses_retry.rs",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/responses_retry.rs",
+      "bytes": 7313,
+      "sha256": "0a008d81033ce5eb7ab76edcd0881750ed01450c47350a6fd99077bf5a6e53c2"
+    },
+    {
+      "id": "C-features",
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/features/src/lib.rs",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/features/src/lib.rs",
+      "bytes": 65810,
+      "sha256": "124c76d1fbad7b05fd78a62b89a28282c7ecab1de7426ac18696987024ddeae0"
+    },
+    {
+      "id": "C-schema",
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/core/config.schema.json",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/config.schema.json",
+      "bytes": 229468,
+      "sha256": "7ce31bde1ed6ef15c53a96ba460bb1d0fb7b99fd9ab719b567c94c474f62b023"
+    },
+    {
+      "id": "H-job",
+      "repository": "harbor-framework/harbor",
+      "pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "path": "src/harbor/models/job/config.py",
+      "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/models/job/config.py",
+      "bytes": 21115,
+      "sha256": "195cbc3491efa2bc9947b90d6d390370dd601ade658e13daeafaf2665eb8f638"
+    },
+    {
+      "id": "H-trial-config",
+      "repository": "harbor-framework/harbor",
+      "pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "path": "src/harbor/models/trial/config.py",
+      "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/models/trial/config.py",
+      "bytes": 19860,
+      "sha256": "c95acedd896e7bab9f4007ed6373adc7e414ac2b63dfd188b7bbcae6ce5ac480"
+    },
+    {
+      "id": "H-trial",
+      "repository": "harbor-framework/harbor",
+      "pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "path": "src/harbor/trial/trial.py",
+      "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/trial/trial.py",
+      "bytes": 68864,
+      "sha256": "757f34424e35ea6e924484bff9ae75464e94acd5dec3d769bc65a9518ada79a8"
+    },
+    {
+      "id": "H-queue",
+      "repository": "harbor-framework/harbor",
+      "pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "path": "src/harbor/trial/queue.py",
+      "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/trial/queue.py",
+      "bytes": 10373,
+      "sha256": "f70040dd9e47800407ee545bd0017a37f72066ef20b28b13d2d838cfde044ebd"
+    },
+    {
+      "id": "H-cli",
+      "repository": "harbor-framework/harbor",
+      "pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "path": "src/harbor/cli/jobs.py",
+      "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/cli/jobs.py",
+      "bytes": 102441,
+      "sha256": "dd9cb7dd62b34b195d21e1d017e3a577c2aa226e671568c9c00924e96b1befd5"
+    },
+    {
+      "id": "H-openhands",
+      "repository": "harbor-framework/harbor",
+      "pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "path": "src/harbor/agents/installed/openhands_sdk.py",
+      "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/installed/openhands_sdk.py",
+      "bytes": 11155,
+      "sha256": "5542c8a2f185b000bfdb8aef46bd9bd9ea29af30d9cc2841bb286a4688da4a7e"
+    },
+    {
+      "id": "O-conversation",
+      "repository": "OpenHands/software-agent-sdk",
+      "pin": "1e1390acc8788346ba4804c34323284009bf3f5e",
+      "path": "openhands-sdk/openhands/sdk/conversation/impl/local_conversation.py",
+      "url": "https://github.com/OpenHands/software-agent-sdk/blob/1e1390acc8788346ba4804c34323284009bf3f5e/openhands-sdk/openhands/sdk/conversation/impl/local_conversation.py",
+      "bytes": 145223,
+      "sha256": "fb539877039c848fbec24b65961de0e089803553bf65d852414945c7975739c9"
+    },
+    {
+      "id": "H-task-config",
+      "repository": "harbor-framework/harbor",
+      "pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "path": "src/harbor/models/task/config.py",
+      "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/models/task/config.py",
+      "bytes": 36655,
+      "sha256": "d8c62a49acefb8cd6a0be4c4d48dc0f4f52f31f8a8a6728439aad04e1c62e9fb"
+    },
+    {
+      "id": "P-loop",
+      "repository": "earendil-works/pi",
+      "pin": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32",
+      "path": "packages/agent/src/agent-loop.ts",
+      "url": "https://github.com/earendil-works/pi/blob/a13d35a742c6ef8462812a28fbe1d8c8b7431c32/packages/agent/src/agent-loop.ts",
+      "bytes": 29088,
+      "sha256": "e773e822a2587caf314e6bb66ea6370fce3468b7eecd26d6a67afe673f81eabc"
+    },
+    {
+      "id": "P-config",
+      "repository": "earendil-works/pi",
+      "pin": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32",
+      "path": "packages/coding-agent/src/config.ts",
+      "url": "https://github.com/earendil-works/pi/blob/a13d35a742c6ef8462812a28fbe1d8c8b7431c32/packages/coding-agent/src/config.ts",
+      "bytes": 21160,
+      "sha256": "d941b87802bd76804ce8681ad5e8f17b1c044351ab45018b7a4f60c04983b4dc"
+    },
+    {
+      "id": "H-factory",
+      "repository": "harbor-framework/harbor",
+      "pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "path": "src/harbor/agents/factory.py",
+      "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/factory.py",
+      "bytes": 10281,
+      "sha256": "de65a45ba2d030e250c6351f4d0103de0752ad157ceed69c0219f631d5255ef0"
+    }
+  ],
+  "complete_original_envelopes": {
+    "count": 29,
+    "scope": "private source metadata/text and actual native tool returns; no credentials/configuration state",
+    "inventory_bytes": 161615,
+    "inventory_sha256": "93b4a75d552efe34078512f0ff0ed21afbce2ffd90afccb10759562b125522a0"
+  },
+  "native_source_check_exit": 0,
+  "retained_source_path_lookup_exit": 128,
+  "citation_correction": {
+    "source": "H-factory",
+    "line": 216,
+    "original_erroneous_line": 217
+  },
+  "limits": "Source consistency and conditional prospective method only; no native runtime delivery/enforcement, provider usage or comparative/default acceptance.",
+  "measured_defaults": 0
+}

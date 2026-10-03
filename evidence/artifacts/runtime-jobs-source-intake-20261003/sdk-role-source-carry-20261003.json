@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "evidence_class": "exact-head published source re-read",
+  "recorded_date": "2026-10-03",
+  "pr": 617,
+  "head": "f7c813a7e5569de95cc14a8fb05722b38ef465b6",
+  "source_bindings": [
+    {
+      "file": "evidence/artifacts/native-sdk-acceptance-20261002/source-suites.json",
+      "bytes": 16601,
+      "sha256": "bf629e08d9b19a9919a212efb07d6d90b307f6ae7b687896485a588e1fcca439",
+      "root_original_native_read_exit": 0
+    },
+    {
+      "file": "evidence/artifacts/native-sdk-acceptance-20261002/codex-trial.json",
+      "bytes": 6622,
+      "sha256": "1dcfd1d5cbc209c366bcaf21b2cd5ae1e3a8759e0ffa43746e57e283b22a0f08",
+      "root_original_native_read_exit": 0
+    }
+  ],
+  "reported_result_scope": "Published narrow informed four-case integration only; this bundle explicitly claims no Codex default source-suite result.",
+  "later_48_test_claim": {
+    "source": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/633#issuecomment-5972920589",
+    "status": "unverified",
+    "searched": "All five PR617 comments at named head, exact published source-suites/trial, scoped PR633 SDK artifacts and retained Jest metadata",
+    "missing": [
+      "original command",
+      "native exit",
+      "test report identity",
+      "instrumentation status",
+      "role coverage"
+    ],
+    "absence_scope": "Not found in those named sources; no global absence claim."
+  },
+  "retained_instrumented_fixture": {
+    "tests_total": 23,
+    "passed": 0,
+    "failed": 1,
+    "pending": 22,
+    "test_duration_ms": 5008,
+    "native_Jest_child_exit": null,
+    "status": "failed; unchanged historical result"
+  },
+  "role_qualification": "HOLD: researcher/reviewer, recovery/MCP, complete lifecycle, resolved identity and actual route/deadline/retry delivery remain unqualified.",
+  "independent_read": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "verdict": "HOLD on unbound 48-test claim; narrower published evidence confirmed"
+  },
+  "new_tests_or_model_calls": 0,
+  "measured_defaults": 0
+}
