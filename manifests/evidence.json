@@ -15955,8 +15955,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-currency-wave-w1.md",
-      "sha256": "45a4cc616e230dbcc65e0b308922f22a61179139845049d6fa73376618076913",
-      "bytes": 28687
+      "sha256": "3d2a68ddd68cb13ae3a0363f6e77721a585d76b16a3991b22c921a37f1986882",
+      "bytes": 29683
     },
     {
       "path": "docs/direct-results.md",
@@ -17932,6 +17932,26 @@
       "path": "evidence/artifacts/context-mode-codex-binding-20260926/upstream-resolver-tests.txt",
       "sha256": "b849a10dea3bd5741faa9828be0ee934a36214819056de3012cbcf028c652e6a",
       "bytes": 14197
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1-20261003/judgments/move-hold-judges.json",
+      "sha256": "e48737f157409da08ed1a6009fa21b5d86b1238a9247121c4de2a4e5c4be76ea",
+      "bytes": 108109
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1-20261003/judgments/repair-round-2-replies.md",
+      "sha256": "df3c6d23bf54dbba84f2e758bce9e5f9e7f6c3bdbcafb0d2324dac332e1c7696",
+      "bytes": 13041
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1-20261003/judgments/repair-round-replies.md",
+      "sha256": "b938dead74e41883796fe004c7e4ba0f11695a690a8048676226cd4dfe4a0b19",
+      "bytes": 28233
+    },
+    {
+      "path": "evidence/artifacts/currency-wave-w1-20261003/judgments/review-round-findings.json",
+      "sha256": "2b91bfe41d4f0a71667d7a440810630c0d031cce985bfa3a857732d922d47bc3",
+      "bytes": 18135
     },
     {
       "path": "evidence/artifacts/currency-wave-w1-20261003/native-checks.json",
