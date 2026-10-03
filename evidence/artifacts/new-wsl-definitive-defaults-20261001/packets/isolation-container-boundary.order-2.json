@@ -1,0 +1,186 @@
+{
+ "slot_id": "isolation-container-boundary",
+ "layer_id": "isolation",
+ "title": "Isolation",
+ "requirement": "Separate edits and apply a real filesystem/network boundary only where a task requires enforced restrictions.",
+ "slot_question": "sandbox-runtime (filesystem and network rules) and Worktrunk (edit separation) are settled. For untrusted workloads that also need a container or VM boundary with resource limits, which single option does the new host use?",
+ "a_deciding_comparison_would_measure": "For the intended untrusted workload, compare the current sandbox with one OCI/VM candidate on filesystem/network/resource enforcement, state cleanup and host compatibility.",
+ "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host.",
+ "context": "The container engine is decided in a separate slot of this round (Podman with Quadlet, or Docker Engine in rootless mode).",
+ "comparisons_on_record_where_every_named_arm_ran": [],
+ "first_round": {
+  "reviewer_notes": [
+   {
+    "about": "sandbox-runtime (srt)",
+    "first_round_status": "selected",
+    "note": "Default enforced boundary when a task needs restrictions: OS-level filesystem read/write rules and deny-by-default network through host proxies (bubblewrap with the network namespace removed on Linux and WSL2, Seatbelt on macOS). It uses the same primitives as Claude Code's sandboxed Bash and can wrap any command, including Codex and MCP servers. It has no CPU or memory limits.",
+    "cited_facts": [
+     {
+      "url": "https://github.com/anthropics/sandbox-runtime/blob/main/README.md",
+      "shows": "README (blob 388ad5ac9c): npm install -g @anthropic-ai/sandbox-runtime (L14); Linux needs bubblewrap, socat and ripgrep from apt (L547-560). Network is deny-by-default with domain allowlists; on Linux the network namespace is removed, so all traffic must pass through the host proxies (L122-130). Labelled 'Beta Research Preview' (L7). Ubuntu 24.04+ needs kernel.apparmor_restrict_unprivileged_userns=0 or an AppArmor profile (L562-568). Limits: filtering is by domain only and domain fronting may bypass it (L883-886); proxying relies on environment variables, so programs that ignore them cannot connect (L897). No README heading covers CPU or memory limits (observed)."
+     },
+     {
+      "url": "https://code.claude.com/docs/en/sandboxing",
+      "shows": "Documented: Claude Code's sandboxed Bash uses bubblewrap on Linux and on WSL2 ('same as Linux'), and WSL1 is not supported. The same primitives ship as the standalone @anthropic-ai/sandbox-runtime package, which the page links as anthropic-experimental/sandbox-runtime; the API resolves the packet's anthropics/sandbox-runtime."
+     },
+     {
+      "url": "https://api.github.com/graphql",
+      "shows": "Observed 2026-10-01: Apache-2.0; latest release v0.0.78 (2026-09-30); 226 default-branch commits since 2026-07-03; head 117eb92820 statusCheckRollup SUCCESS; 109 open issues."
+     },
+     {
+      "url": "https://api.github.com/search/issues?q=repo:anthropics/sandbox-runtime+WSL",
+      "shows": "PR #99 'fix: support WSL2 sandboxing, reject WSL1' closed 2026-01-21; issue #363 'Loses current directory under Windows WSL' open since 2026-06-30."
+     }
+    ]
+   },
+   {
+    "about": "Podman (rootless)",
+    "first_round_status": "selected",
+    "note": "OCI arm for untrusted workloads that need a container boundary and resource limits: daemonless containers that are rootless by default, so there is no root daemon socket, with pasta/Netavark networking and a unified seccomp policy. gVisor runsc is the alternative runtime to test against it.",
+    "cited_facts": [
+     {
+      "url": "https://github.com/podman-container-tools/podman/blob/main/README.md",
+      "shows": "README (blob 5fcb469ccd): no manager daemon (L40); rootless containers never have more privileges than the user who launched them (L80-81); rootless networking via pasta (L109); unified seccomp policy (L112)."
+     },
+     {
+      "url": "https://github.com/podman-container-tools/podman/blob/main/docs/tutorials/podman-for-windows.md",
+      "shows": "On Windows each Podman machine is backed by a WSLv2 distribution or a Hyper-V VM (L13-14), so Podman's own Windows backend runs on the WSL2 kernel. That points to, but does not prove, a working Ubuntu WSL2 install."
+     },
+     {
+      "url": "https://podman.io/docs/installation",
+      "shows": "Ubuntu: the podman package is in the official repositories for Ubuntu 20.10 and newer (sudo apt-get update; sudo apt-get -y install podman). The page also documents building from source."
+     },
+     {
+      "url": "https://docs.docker.com/engine/security/",
+      "shows": "Contrast with the Docker arm: the Docker daemon requires root unless you opt in to Rootless mode, and only trusted users should be allowed to control it."
+     },
+     {
+      "url": "https://api.github.com/graphql",
+      "shows": "Observed 2026-10-01: Apache-2.0; latest release v6.1.3 (2026-09-29), with the v5.8.x line also maintained (v5.8.8); 745 default-branch commits since 2026-07-03; head ccc1e20775 statusCheckRollup FAILURE (snapshot); 874 open issues."
+     }
+    ]
+   },
+   {
+    "about": "gVisor",
+    "first_round_status": "not selected",
+    "note": "The strongest non-VM boundary among the candidates: an application kernel, not a syscall filter (README L13-28). It installs from an upstream apt repo (sudo apt-get install -y runsc; Linux 5.6+, x86_64/ARM64) and ships weekly releases (release-20260928.0). Operation under WSL2 is neither documented nor verified, and runsc needs a container engine (its package auto-configures Docker only). It is kept as the hardening arm of the head-to-head."
+   },
+   {
+    "about": "boxlite",
+    "first_round_status": "not selected",
+    "note": "A hardware-isolated micro-VM per box with an egress allow-list and CPU/memory limits, and the README lists WSL2 x86_64 as supported (README L37, L167; needs KVM in WSL2, L227-243). The project is young (created 2025-12-07, v0.10.5), and open issue #1239 reports that stop leaks a detached box's VM wherever the box cgroup cannot be populated. That falls directly on the packet's state-cleanup axis."
+   },
+   {
+    "about": "microsandbox",
+    "first_round_status": "not selected",
+    "note": "A local microVM runtime with network allow-lists, CPU/memory settings, an MCP server and agent skills (README L28-41, L178-320, L445-447). README L113 says it is still beta software ('Expect breaking changes'); Linux requires KVM (L110), and WSL2 use is not documented."
+   },
+   {
+    "about": "Docker Engine / Moby",
+    "first_round_status": "not selected",
+    "note": "A mature engine (docker-v29.8.2, 2026-09-30). Docker's own docs state the daemon requires root unless Rootless mode is opted into, and that only trusted users should control it. At the same shared-kernel boundary, Podman's rootless, daemonless default fits agent isolation better."
+   }
+  ],
+  "critic": {
+   "findings": [
+    "srt facts hold: v0.0.78 (2026-09-30), HEAD 117eb92820 (2026-10-01) with rollup SUCCESS, 226 commits, 109 open issues, Apache-2.0. README lines that match: 7 (Beta Research Preview), 14 (npm install), 124 (network namespace removed), 547-560 (apt bubblewrap, socat, ripgrep), 562-568 (Ubuntu 24.04+ AppArmor userns sysctl), 886 (domain fronting) and 897 (proxying through environment variables). Lines 574-582 say gcc and libseccomp-dev are needed only on architectures without pre-generated seccomp filters, so the judge's install command is complete for x86_64. No CPU, memory or cgroup limit appears in the README. PR #99 'fix: support WSL2 sandboxing, reject WSL1' was merged 2026-01-21; issue #363 'Loses current directory under Windows WSL' has been open since 2026-06-30.",
+    "Claude Code sandboxing docs match: 'WSL2: uses bubblewrap, same as Linux. WSL1 is not supported', and the same primitives ship as @anthropic-ai/sandbox-runtime.",
+    "Podman facts hold. The repository resolves as podman-container-tools/podman; v6.1.3 and v5.8.8 were both released 2026-09-29; HEAD ccc1e20775 has rollup FAILURE (snapshot); 874 open issues. README lines 40, 80-81, 109 and 112 match. podman.io gives 'sudo apt-get -y install podman' for Ubuntu 20.10 and newer.",
+    "New and material for a clean install: the selected command installs Ubuntu's archive build, not an upstream release. Launchpad's published sources list podman 5.7.0 for 26.04 (resolute), 5.4.2 for 25.10, 5.4.1 for 25.04 and 5.8.6 for the development series. 24.04 (noble) was not returned by the query, so its version is unverified. Upstream's current lines are 6.1.3 and 5.8.8, so the currency evidence the judge cited (v6.1.3) does not describe what the install command delivers. Launchpad was read as JSON inside ctx_execute.",
+    "Podman README lines 85-87 say rootless use 'may require some additional configuration' and that 'a little configuration by an administrator is required' first. That is an extra setup step on a fresh WSL2 instance.",
+    "Only documented design separates Podman from Docker Engine: rootless, daemonless defaults favour Podman, while packaging currency on Ubuntu counts against it. No enforcement or cleanup measurement exists for any arm. Docker's own package repository was not checked in this review.",
+    "boxlite facts hold: README line 234 lists 'Windows (WSL2) x86_64' as Supported, lines 242-243 require KVM and kvm group membership, and line 167 lists CPU/memory limits and an egress allow-list. Issue #1239 ('stop leaks a detached box's VM wherever the box cgroup cannot be populated') has been open since 2026-08-14. gVisor release-20260928.0 (2026-09-30) holds; its operation under WSL2 remains unverified.",
+    "sandbox-runtime and Worktrunk stand; only the OCI/VM slot is undetermined. No popularity reasoning found."
+   ],
+   "checked_facts": [
+    {
+     "claim": "sandbox-runtime latest release v0.0.78 on 2026-09-30; HEAD 117eb92820 with checks SUCCESS; 226 commits since 2026-07-03",
+     "url": "https://api.github.com/graphql",
+     "holds": true
+    },
+    {
+     "claim": "srt README: 'Beta Research Preview'; on Linux the network namespace is removed so traffic must pass host proxies; apt bubblewrap/socat/ripgrep",
+     "url": "https://github.com/anthropics/sandbox-runtime/blob/main/README.md",
+     "holds": true
+    },
+    {
+     "claim": "srt PR #99 'support WSL2 sandboxing, reject WSL1' closed 2026-01-21",
+     "url": "https://github.com/anthropics/sandbox-runtime/pull/99",
+     "holds": true
+    },
+    {
+     "claim": "srt issue #363 'Loses current directory under Windows WSL' open since 2026-06-30",
+     "url": "https://github.com/anthropics/sandbox-runtime/issues/363",
+     "holds": true
+    },
+    {
+     "claim": "Claude Code sandboxing: WSL2 uses bubblewrap same as Linux; WSL1 not supported",
+     "url": "https://code.claude.com/docs/en/sandboxing.md",
+     "holds": true
+    },
+    {
+     "claim": "Podman latest release v6.1.3 on 2026-09-29, with v5.8.8 also released 2026-09-29",
+     "url": "https://api.github.com/graphql",
+     "holds": true
+    },
+    {
+     "claim": "Podman README: no manager daemon (line 40); rootless containers never exceed the launching user's privileges (lines 80-81)",
+     "url": "https://github.com/podman-container-tools/podman/blob/main/README.md",
+     "holds": true
+    },
+    {
+     "claim": "podman.io: podman is in the official Ubuntu repositories for 20.10 and newer via apt-get install podman",
+     "url": "https://podman.io/docs/installation",
+     "holds": true
+    },
+    {
+     "claim": "Ubuntu 26.04 (resolute) archive ships podman 5.7.0, outside upstream's current 6.1.x and 5.8.x lines",
+     "url": "https://api.launchpad.net/1.0/ubuntu/+archive/primary?ws.op=getPublishedSources&source_name=podman&exact_match=true&status=Published",
+     "holds": true
+    },
+    {
+     "claim": "boxlite README lists Windows (WSL2) x86_64 as supported and requires KVM",
+     "url": "https://github.com/boxlite-ai/boxlite/blob/main/README.md",
+     "holds": true
+    },
+    {
+     "claim": "boxlite issue #1239 (stop leaks a detached box's VM) open",
+     "url": "https://github.com/boxlite-ai/boxlite/issues/1239",
+     "holds": true
+    }
+   ],
+   "deciding_comparison": "sandbox-runtime and Worktrunk stand. The OCI/VM slot needs a head-to-head on the WSL2 host using one frozen untrusted workload: escape and out-of-tree write attempts, allowed and denied egress, and memory, CPU and fork bombs. Arms: srt; rootless Podman from the Ubuntu archive; Docker Engine in rootless mode from Docker's own repository; Podman or Docker with gVisor runsc; boxlite with /dev/kvm. Measure filesystem, network and resource enforcement; cleanup after kill or stop (no leaked VMs, containers, mounts or cgroups); WSL2 compatibility (cgroup v2 delegation under systemd, /dev/kvm, AppArmor userns); the version each documented install command actually delivers; and whether Claude Code and Codex run unchanged inside each arm. Choose the OCI/VM arm from the result."
+  },
+  "evidence_gaps": [
+   "No comparison on record; no candidate has measured enforcement or cleanup results on WSL2.",
+   "gVisor under WSL2 is neither documented nor verified (no WSL-specific issues found, and one web search returned nothing relevant).",
+   "/dev/kvm availability (nested virtualization) in the new WSL2 instance is not verified; boxlite and microsandbox depend on it.",
+   "The Ubuntu-packaged Podman version against upstream v6.1.3, and rootless cgroup v2 delegation under WSL2 systemd, are not verified.",
+   "sandbox-runtime has no CPU/memory limits, is labelled Beta Research Preview, and has a WSL issue (#363, cwd lost) open. Its Tests workflow on main was 33 success and 16 failure over the last 49 runs (2026-08-13..2026-10-01); the causes were not examined.",
+   "CI health elsewhere is head-commit statusCheckRollup snapshots only (podman, moby, microsandbox, boxlite FAILURE; gvisor PENDING), not run-history analysis."
+  ]
+ },
+ "finalists": [
+  {
+   "key": "F2",
+   "name": "gVisor",
+   "repository": "https://github.com/google/gvisor"
+  },
+  {
+   "key": "F3",
+   "name": "microsandbox",
+   "repository": "https://github.com/superradcompany/microsandbox"
+  },
+  {
+   "key": "F1",
+   "name": "boxlite",
+   "repository": "https://github.com/boxlite-ai/boxlite"
+  },
+  {
+   "key": "F4",
+   "name": "No additional component: rootless containers on the container engine that the hosting layer installs",
+   "repository": "",
+   "installs_nothing_extra": true
+  }
+ ]
+}

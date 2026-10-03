@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "tool": "jcodemunch-mcp",
+  "evidence_class": "upstream-source-review",
+  "retrieved_at": "2026-09-27T12:40:31.646Z",
+  "upstream_repository": "https://github.com/jgravelle/jcodemunch-mcp",
+  "pin": {
+    "version": "1.108.319",
+    "metadata_revision": "1c32ad22d76479fdc0385f2bbbada15b3f9f6a5f",
+    "metadata_sources": [
+      "manifests/stack.json:1674"
+    ],
+    "scope": "Repository metadata; not an installed-client observation",
+    "source_commit": "8f7b34abe16fb459e0bf1c04747d584216dfe32e"
+  },
+  "scratch_record": {
+    "reviewed_on": "2026-09-26",
+    "input_sources": [
+      "full-save/synth/currency-records.json",
+      "full-save/cur/jcodemunch-mcp/gpt6.md"
+    ],
+    "latest_release": {
+      "version": "1.108.319",
+      "published_at": "2026-09-16T14:04:32Z",
+      "source_url": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
+      "package_channels": {
+        "verification_status": "Retained scratch package-channel facts; not reverified live in this handoff",
+        "records": [
+          {
+            "channel": "PyPI",
+            "version": "1.108.319",
+            "published_at": "2026-09-16T11:38:30Z",
+            "source_url": "https://pypi.org/pypi/jcodemunch-mcp/1.108.319/json"
+          }
+        ]
+      }
+    },
+    "behind_by": {
+      "stable_release_count": 0,
+      "main_commits_after_latest": 79,
+      "scope": "Stable releases and main commits are separate channels"
+    }
+  },
+  "latest_release": {
+    "tag_name": "v1.108.319",
+    "published_at": "2026-09-16T14:04:32Z",
+    "html_url": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
+    "prerelease": false,
+    "draft": false,
+    "source_url": "https://api.github.com/repos/jgravelle/jcodemunch-mcp/releases/latest",
+    "resolved_tag_commit": "8f7b34abe16fb459e0bf1c04747d584216dfe32e"
+  },
+  "behind_by": {
+    "count": 0,
+    "unit": "stable GitHub releases",
+    "reference_pin": "1.108.319",
+    "latest": "1.108.319",
+    "method": "The repository pin equals the latest stable GitHub release version.",
+    "source_url": "https://api.github.com/repos/jgravelle/jcodemunch-mcp/releases/latest",
+    "excludes": "Unreleased main commits, prereleases, and other platform pins"
+  },
+  "changes_since_scratch": [
+    {
+      "date": "2026-09-27",
+      "field": "latest_stable_release",
+      "change": "No change to the scratch latest stable version or publication timestamp."
+    },
+    {
+      "date": "2026-09-27",
+      "field": "unreleased_main",
+      "change": "Main advanced from 79 to 86 commits after v1.108.319; the observed head changed from ffe99fdee833435442a5ff506259f68cae872c39 to de38b88625e1e86e74dded4c6ccad3ae9fa7c256. Stable release currency is unchanged."
+    }
+  ],
+  "key_new_findings": [
+    {
+      "finding": "Merged PR #893 fixes a linked worktree's own index being treated as ambiguous during re-indexing; the fix is after the latest stable release.",
+      "source_urls": [
+        "https://github.com/jgravelle/jcodemunch-mcp/pull/893"
+      ],
+      "revision": "ffe99fdee833435442a5ff506259f68cae872c39",
+      "release_status": "unreleased-main",
+      "verification": "Primary upstream release notes or source diff reviewed live on 2026-09-27",
+      "comparison_url": "https://api.github.com/repos/jgravelle/jcodemunch-mcp/compare/v1.108.319...ffe99fdee833435442a5ff506259f68cae872c39",
+      "evidence_class": "upstream-source-review"
+    },
+    {
+      "finding": "Merged PR #816 associates Go methods with their receivers and indexes struct fields; it is unreleased relative to 1.108.319.",
+      "source_urls": [
+        "https://github.com/jgravelle/jcodemunch-mcp/pull/816"
+      ],
+      "revision": "f7c56ca4d8b29469730457f3d8f8bf775a829df3",
+      "release_status": "unreleased-main",
+      "verification": "Primary upstream release notes or source diff reviewed live on 2026-09-27",
+      "comparison_url": "https://api.github.com/repos/jgravelle/jcodemunch-mcp/compare/v1.108.319...f7c56ca4d8b29469730457f3d8f8bf775a829df3",
+      "evidence_class": "upstream-source-review"
+    }
+  ],
+  "unreleased_main": {
+    "observed_on": "2026-09-27",
+    "latest_release_commit": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+    "head_commit": "de38b88625e1e86e74dded4c6ccad3ae9fa7c256",
+    "commits_after_latest_release": 86,
+    "github_behind_by": 0,
+    "status": "ahead",
+    "source_url": "https://api.github.com/repos/jgravelle/jcodemunch-mcp/compare/v1.108.319...main"
+  },
+  "residuals": [
+    "No package installation, provider execution, benchmark, or upstream test was run for this record.",
+    "The additional seven main commits were not individually reviewed; index migration and native worktree behavior were not executed."
+  ]
+}

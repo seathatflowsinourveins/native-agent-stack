@@ -1,0 +1,341 @@
+{
+  "schema_version": 1,
+  "evidence_class": "native_cli_integration_controls",
+  "source_base_revision": "56473e4b840f0e6940c031801d866e7e9bf29baf",
+  "input_guard": {
+    "bytes": 283,
+    "sha256": "69ed6c37f8517e712ce64e1550c363926bdf25e42d8bfb30efa02b71197f3485"
+  },
+  "input_lock": {
+    "bytes": 82463,
+    "sha256": "5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb"
+  },
+  "native_versions": {
+    "npm": "11.19.0",
+    "node": "v24.21.0",
+    "osv": "2.6.0"
+  },
+  "npm_controls": [
+    {
+      "case": "install",
+      "native_exit": 1,
+      "runtime": "npm11.19.0/node24.21.0",
+      "output_files": [
+        {
+          "path": "npm-install.stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "npm-install.stderr.txt",
+          "bytes": 637,
+          "sha256": "813228f309860963e373f19fe5dce00ebee8aa83e7d406ccd0e63bd233524e94"
+        }
+      ],
+      "command_observation": {
+        "path": "npm-install.native-command.txt",
+        "sha256": "591050f725b226fceacb6dd41a607fe2465def6c0432edc08051e92e1894229f",
+        "bytes": 272,
+        "basis": "Selected original npm debug-log lines; prefixes/paths sanitized, line numbers retained."
+      },
+      "post_observation": {
+        "node_modules_present": false,
+        "manifest_matches_input": true,
+        "lock_matches_input": true
+      }
+    },
+    {
+      "case": "ci",
+      "native_exit": 1,
+      "runtime": "npm11.19.0/node24.21.0",
+      "output_files": [
+        {
+          "path": "npm-ci.stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "npm-ci.stderr.txt",
+          "bytes": 632,
+          "sha256": "12dd3fb22d309e147f2b5e5fcb06040c645487b6996c846925bda70b52247852"
+        }
+      ],
+      "command_observation": {
+        "path": "npm-ci.native-command.txt",
+        "sha256": "78e902a357299fdc7b2a79b7512084ca83fc2c112cd69e7e4e2da1a85513cb7e",
+        "bytes": 262,
+        "basis": "Selected original npm debug-log lines; prefixes/paths sanitized, line numbers retained."
+      },
+      "post_observation": {
+        "node_modules_present": false,
+        "manifest_matches_input": true,
+        "lock_matches_input": true
+      }
+    },
+    {
+      "case": "install-ignore",
+      "native_exit": 1,
+      "runtime": "npm11.19.0/node24.21.0",
+      "output_files": [
+        {
+          "path": "npm-install-ignore.stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "npm-install-ignore.stderr.txt",
+          "bytes": 644,
+          "sha256": "3df09a18c83259eb852943e8801ded30e3d070adb19f96df0715e6ca03160682"
+        }
+      ],
+      "command_observation": {
+        "path": "npm-install-ignore.native-command.txt",
+        "sha256": "351569d470470479f317374dc31ce440bf20ec97f80a8e4db9465fc0fe01891c",
+        "bytes": 298,
+        "basis": "Selected original npm debug-log lines; prefixes/paths sanitized, line numbers retained."
+      },
+      "post_observation": {
+        "node_modules_present": false,
+        "manifest_matches_input": true,
+        "lock_matches_input": true
+      }
+    },
+    {
+      "case": "ci-ignore",
+      "native_exit": 1,
+      "runtime": "npm11.19.0/node24.21.0",
+      "output_files": [
+        {
+          "path": "npm-ci-ignore.stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "npm-ci-ignore.stderr.txt",
+          "bytes": 639,
+          "sha256": "0e2a6f0dfbc8166331bd4e4e62f03dd76aae4e938dc3916e4503b362279e9c24"
+        }
+      ],
+      "command_observation": {
+        "path": "npm-ci-ignore.native-command.txt",
+        "sha256": "1654f7d1ed9773f268e4f984aca1cd950b378690a1bdc20777b217a452754841",
+        "bytes": 288,
+        "basis": "Selected original npm debug-log lines; prefixes/paths sanitized, line numbers retained."
+      },
+      "post_observation": {
+        "node_modules_present": false,
+        "manifest_matches_input": true,
+        "lock_matches_input": true
+      }
+    },
+    {
+      "case": "install-prefix",
+      "native_exit": 1,
+      "runtime": "npm11.19.0/node24.21.0",
+      "output_files": [
+        {
+          "path": "npm-install-prefix.stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "npm-install-prefix.stderr.txt",
+          "bytes": 644,
+          "sha256": "db82ddd782c6966f9546348d032ae3c5311ee8e53f15f04660673c14f4c2f5e9"
+        }
+      ],
+      "command_observation": {
+        "path": "npm-install-prefix.native-command.txt",
+        "sha256": "a3f6d02228d6d8f7b705410c0c7f16ee3a67dbbd83e74bf44cc63c1e7151b5e8",
+        "bytes": 309,
+        "basis": "Selected original npm debug-log lines; prefixes/paths sanitized, line numbers retained."
+      },
+      "post_observation": {
+        "node_modules_present": false,
+        "manifest_matches_input": true,
+        "lock_matches_input": true
+      }
+    },
+    {
+      "case": "ci-prefix",
+      "native_exit": 1,
+      "runtime": "npm11.19.0/node24.21.0",
+      "output_files": [
+        {
+          "path": "npm-ci-prefix.stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "npm-ci-prefix.stderr.txt",
+          "bytes": 639,
+          "sha256": "417b69b6d42f8960cd37baaaebeb48c28fececb9c72d289aad15cb20a192b0a3"
+        }
+      ],
+      "command_observation": {
+        "path": "npm-ci-prefix.native-command.txt",
+        "sha256": "00613e888df6ccca4c05e3ddfedbf070b1b70a1ced962efe3f3469fb8356809a",
+        "bytes": 299,
+        "basis": "Selected original npm debug-log lines; prefixes/paths sanitized, line numbers retained."
+      },
+      "post_observation": {
+        "node_modules_present": false,
+        "manifest_matches_input": true,
+        "lock_matches_input": true
+      }
+    },
+    {
+      "case": "install-prefix-ignore",
+      "native_exit": 1,
+      "runtime": "npm11.19.0/node24.21.0",
+      "output_files": [
+        {
+          "path": "npm-install-prefix-ignore.stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "npm-install-prefix-ignore.stderr.txt",
+          "bytes": 651,
+          "sha256": "46b7816e3ccca428816bb99ab777f86b098c11359890d4d89c148276050b7ed5"
+        }
+      ],
+      "command_observation": {
+        "path": "npm-install-prefix-ignore.native-command.txt",
+        "sha256": "714336d9bd268dec7e70329219ee4483ebbf7272cfffaacba20e03083fc366a5",
+        "bytes": 335,
+        "basis": "Selected original npm debug-log lines; prefixes/paths sanitized, line numbers retained."
+      },
+      "post_observation": {
+        "node_modules_present": false,
+        "manifest_matches_input": true,
+        "lock_matches_input": true
+      }
+    },
+    {
+      "case": "ci-prefix-ignore",
+      "native_exit": 1,
+      "runtime": "npm11.19.0/node24.21.0",
+      "output_files": [
+        {
+          "path": "npm-ci-prefix-ignore.stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "npm-ci-prefix-ignore.stderr.txt",
+          "bytes": 646,
+          "sha256": "4265db3c389d726228062ba7d1a91d10462aca40cf8d71e34a4345ece225d0ab"
+        }
+      ],
+      "command_observation": {
+        "path": "npm-ci-prefix-ignore.native-command.txt",
+        "sha256": "13cddf30b430b728b0eccd38a08b116ec87941bf851d7b84e3d087ab540b2a05",
+        "bytes": 325,
+        "basis": "Selected original npm debug-log lines; prefixes/paths sanitized, line numbers retained."
+      },
+      "post_observation": {
+        "node_modules_present": false,
+        "manifest_matches_input": true,
+        "lock_matches_input": true
+      }
+    }
+  ],
+  "scanner_controls": [
+    {
+      "case": "ordinary-active",
+      "exit_code": 1,
+      "advisory": "GHSA-vfj7-8cjw-p6xm",
+      "output_files": [
+        {
+          "path": "ordinary-active.stdout.json",
+          "bytes": 4238,
+          "sha256": "977a6e94151eadfc050710483f14683896a8b072585076f1a34844fd71845cfe"
+        },
+        {
+          "path": "ordinary-active.stderr.txt",
+          "bytes": 382,
+          "sha256": "910710222f50d1e2e0436a5ae85c7eabaa69cfcac730e1047454f4e0ad10a971"
+        }
+      ]
+    },
+    {
+      "case": "prospective-archive",
+      "attempt": 1,
+      "exit_code": 127,
+      "verdict": "Malformed quoted-date input; not vulnerability/expiry acceptance.",
+      "output_files": [
+        {
+          "path": "prospective-archive.stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "prospective-archive.stderr.txt",
+          "bytes": 294,
+          "sha256": "51d1d7bf8dd549a7e1e7fec51000cb7010e626455904fc852033c6d05f64d26f"
+        }
+      ]
+    },
+    {
+      "case": "expired-archive",
+      "attempt": 1,
+      "exit_code": 127,
+      "verdict": "Malformed quoted-date input; not vulnerability/expiry acceptance.",
+      "output_files": [
+        {
+          "path": "expired-archive.stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "expired-archive.stderr.txt",
+          "bytes": 294,
+          "sha256": "d3f5e81d6d698b0ae93a28c9bfeec7098ed95ad8d719e7da64dc2c8afec42b2e"
+        }
+      ]
+    },
+    {
+      "case": "prospective-archive-attempt2",
+      "exit_code": 0,
+      "output_files": [
+        {
+          "path": "prospective-archive-attempt2.stdout.json",
+          "bytes": 124,
+          "sha256": "54345d5194d238b6017d0f3181f392109ce35023cc6b4bdfa8c134943dcb578e"
+        },
+        {
+          "path": "prospective-archive-attempt2.stderr.txt",
+          "bytes": 968,
+          "sha256": "500d6eb187a05311b37d0cb6d03ea2752b365cf869d44fb98bfc37930d876b11"
+        }
+      ]
+    },
+    {
+      "case": "expired-archive-attempt2",
+      "exit_code": 1,
+      "advisory": "GHSA-vfj7-8cjw-p6xm",
+      "output_files": [
+        {
+          "path": "expired-archive-attempt2.stdout.json",
+          "bytes": 4238,
+          "sha256": "977a6e94151eadfc050710483f14683896a8b072585076f1a34844fd71845cfe"
+        },
+        {
+          "path": "expired-archive-attempt2.stderr.txt",
+          "bytes": 319,
+          "sha256": "fbda52df16997854cca318d7b1c11500610161cfc6c5c8229ed17a157e7d492e"
+        }
+      ]
+    }
+  ],
+  "output_policy": "Published stdout/stderr retain original text with task-owned host paths replaced by role markers. Every published digest hashes only the published bytes; private originals remain outside the checkout. Command observations are selected original npm debug-log lines, not reconstructed executions.",
+  "environment_contract": "Owned empty HOME, separate owned user/global npm configs, each case own cache; cleared inherited environment; npm offline=true/audit=false/fund=false/update_notifier=false. Prefix cases run outside fixture cwd; no manual native-account read/copy.",
+  "limits": [
+    "Prospective private config controls only; repository exception/workflow not yet adopted.",
+    "Eight install/ci/ignore-scripts/prefix controls each EBADDEVENGINES, no node_modules, guard/lock hashes unchanged.",
+    "Own HOME, separate owned user/global npm configs and cleared inherited environment; no manual credential-store read/copy. No exhaustive filesystem audit claimed.",
+    "Explicit --force, other package managers and restored historical source remain outside supported-entry guard.",
+    "Active QMD vulnerability remains unresolved; native CLI integration controls are not upstream tests or whole-host qualification."
+  ]
+}

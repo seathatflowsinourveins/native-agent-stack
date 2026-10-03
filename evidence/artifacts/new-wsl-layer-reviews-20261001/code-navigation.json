@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "catalog": "foundation",
+  "review_date": "2026-10-01",
+  "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "reviewer": {
+    "model": "gpt-6.1-sol",
+    "effort": "max",
+    "family": "Codex"
+  },
+  "layer_id": "code-navigation",
+  "verdict": "confirmed",
+  "c4": {
+    "independent_review_performed": true,
+    "no_unresolved_material_gap": false,
+    "remaining_gaps": [
+      "No same-corpus comparison establishes exact source/reference completeness and total indexing/retrieval cost across the named tools.",
+      "Target-language changed/deleted-symbol freshness and full lifecycle recovery remain project-specific."
+    ]
+  },
+  "selected_repositories": [
+    {
+      "component_id": "serena",
+      "repository": "https://github.com/oraios/serena",
+      "pin_of_record": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "pin_source": "manifests/stack.json:880; adoption/pins-linux-x86_64.json:295,299",
+      "source_pinned_url": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/README.md",
+      "upstream_currency": "Latest published release v1.7.0: https://github.com/oraios/serena/releases/tag/v1.7.0; selected dev commit verified separately, not inferred from release numbering.",
+      "native_install": {
+        "command": "uv tool install --python 3.13 git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+        "source": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/docs/02-usage/010_installation.md",
+        "evidence_class": "source_review"
+      },
+      "native_acceptance": {
+        "command": "uv sync --extra dev --locked && uv run poe test -q --tb=short",
+        "source": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/.github/workflows/pytest.yml",
+        "evidence_class": "source_review"
+      }
+    }
+  ],
+  "alternatives": [
+    {
+      "name": "ast-grep",
+      "repository": "https://github.com/ast-grep/ast-grep",
+      "verdict": "Retain index-free syntax-pattern matching; installed/source version 0.45.3 is latest. Definition matches alone do not establish reference completeness.",
+      "sources": [
+        "https://github.com/ast-grep/ast-grep/blob/0.45.3/README.md"
+      ]
+    },
+    {
+      "name": "codebase-memory-mcp",
+      "repository": "https://github.com/DeusData/codebase-memory-mcp",
+      "verdict": "Retain conditional graph queries at current/latest 0.11.0. Static call paths need language-specific completeness and update/deletion checks.",
+      "sources": [
+        "https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/README.md"
+      ]
+    },
+    {
+      "name": "jCodeMunch",
+      "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+      "verdict": "Record pin 1.108.319; latest v1.108.320 adds policy/watch fixes. Scoped exact retrieval remains useful; paid commercial-use license applies.",
+      "sources": [
+        "https://github.com/jgravelle/jcodemunch-mcp/blob/v1.108.319/LICENSE"
+      ]
+    },
+    {
+      "name": "CodeGraph",
+      "repository": "https://github.com/colbymchenry/codegraph",
+      "verdict": "Current serious challenger: verbatim-source/call-flow retrieval and maintained benchmark claims. That benchmark is not a matched Serena reference-completeness comparison.",
+      "sources": [
+        "https://github.com/colbymchenry/codegraph/blob/v1.6.1/README.md"
+      ]
+    }
+  ],
+  "corrections": [],
+  "evidence_assessment": [
+    "Installed serena --version returned Serena 2.0.0.dev0 (exit 0); upstream pinned pyproject.toml:7 confirms the dev identity. Version/help inspection is not a native model run.",
+    "Reuse evidence/receipts/foundation-native-20260920.json for its eight bounded symbol/source/reference checks, and evidence/receipts/native-jcodemunch-20260920.json for exact retrieval. The latter's 861-token response versus 601-token focused source favors direct reads when the source is known.",
+    "Current CodeGraph v1.6.1 README:202 describes its own seven-language, four-run-per-arm measurement. It improves challenger evidence beyond the older README-only snapshot, but does not prove task-grounded reference completeness here.",
+    "Install/test commands are prospective source-backed upstream operations. No package installation, language-server indexing, provider call or new-host execution occurred."
+  ],
+  "failed_access": [
+    {
+      "source": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/docs/02-usage/050_standalone.md",
+      "result": "gh api contents: HTTP 404, exit 1; actual installation document discovered in tagged tree and read at docs/02-usage/010_installation.md."
+    }
+  ],
+  "omissions": [
+    "No commercial-license purchase or candidate activation; jCodeMunch commercial use requires the license in the pinned LICENSE.",
+    "No broader language/index benchmark or dynamic-runtime claim."
+  ],
+  "next_wave": [
+    "Use CodeGraph v1.6.1's upstream benchmark/test surfaces on a frozen exact-source/reference corpus, with Serena and focused reads as comparators; include deletion/rename and report indexing maintenance separately."
+  ],
+  "reopen_on": [
+    "A target-language gap, stale/deleted symbol, license change, or measured completeness/cost result can reopen the conditional tool choice."
+  ],
+  "new_host_acceptance": "unknown; distro not created"
+}

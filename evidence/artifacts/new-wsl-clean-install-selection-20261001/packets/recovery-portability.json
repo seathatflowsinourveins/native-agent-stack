@@ -1,0 +1,45 @@
+{
+ "layer_id": "recovery-portability",
+ "title": "Recovery and portability",
+ "requirement": "Reproduce the tools and recover actual application state on an explicitly chosen host without copying authentication stores or treating old receipts as new acceptance.",
+ "a_deciding_comparison_would_measure": "On the destination PC, select a small profile; establish native sign-ins, scoped tool calls and useful tasks, then independently restore application state and keys.",
+ "candidates": [
+  {
+   "key": "C01",
+   "name": "astral-sh/uv",
+   "repository": "https://github.com/astral-sh/uv"
+  },
+  {
+   "key": "C02",
+   "name": "Litestream",
+   "repository": "https://github.com/benbjohnson/litestream"
+  },
+  {
+   "key": "C03",
+   "name": "mise",
+   "repository": "https://github.com/jdx/mise"
+  },
+  {
+   "key": "C04",
+   "name": "Determinate Nix installer",
+   "repository": "https://github.com/DeterminateSystems/nix-installer"
+  },
+  {
+   "key": "C05",
+   "name": "Devbox",
+   "repository": "https://github.com/jetify-com/devbox"
+  },
+  {
+   "key": "C06",
+   "name": "Restic",
+   "repository": "https://github.com/restic/restic"
+  },
+  {
+   "key": "C07",
+   "name": "chezmoi",
+   "repository": "https://github.com/twpayne/chezmoi"
+  }
+ ],
+ "comparisons_on_record_where_every_named_arm_ran": [],
+ "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host."
+}

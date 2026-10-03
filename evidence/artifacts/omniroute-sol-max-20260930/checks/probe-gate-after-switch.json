@@ -1,0 +1,303 @@
+{
+ "label": "after-B3",
+ "started_utc": "2026-09-30T06:33:03Z",
+ "prompt": "Compute 48271 * 3917 and reply with only the number.",
+ "runs": [
+  {
+   "port": "20128",
+   "model": "cx/gpt-6.1-sol",
+   "body_effort": "max",
+   "extra_headers": [],
+   "correlation_id": "probe-after-B3-9baa77891213",
+   "status": 200,
+   "event_types": [
+    "response.created",
+    "response.in_progress",
+    "response.output_item.added",
+    "response.reasoning_summary_part.added",
+    "response.reasoning_summary_text.delta",
+    "response.reasoning_summary_text.done",
+    "response.reasoning_summary_part.done",
+    "response.output_item.done",
+    "response.content_part.added",
+    "response.output_text.delta",
+    "response.output_text.done",
+    "response.content_part.done",
+    "response.completed"
+   ],
+   "served_model": "gpt-6.1-sol",
+   "usage": {
+    "input": 31,
+    "output": 142,
+    "reasoning": 133
+   },
+   "seconds": 9.4,
+   "shows": "native-style max request on the base id",
+   "response_id_seen": true,
+   "call_log": {
+    "provider": "codex",
+    "model": "gpt-6.1-sol",
+    "requested_model": "codex/gpt-6.1-sol",
+    "status": 200,
+    "reasoning_source": "encrypted",
+    "effort_requested": "max",
+    "effort_upstream": "max"
+   }
+  },
+  {
+   "port": "20128",
+   "model": "cx/gpt-6.1-sol-max",
+   "body_effort": null,
+   "extra_headers": [],
+   "correlation_id": "probe-after-B3-8255fb981195",
+   "status": 200,
+   "event_types": [
+    "response.created",
+    "response.in_progress",
+    "response.output_item.added",
+    "response.reasoning_summary_part.added",
+    "response.reasoning_summary_text.delta",
+    "response.reasoning_summary_text.done",
+    "response.reasoning_summary_part.done",
+    "response.output_item.done",
+    "response.content_part.added",
+    "response.output_text.delta",
+    "response.output_text.done",
+    "response.content_part.done",
+    "response.completed"
+   ],
+   "served_model": "gpt-6.1-sol",
+   "usage": {
+    "input": 31,
+    "output": 145,
+    "reasoning": 136
+   },
+   "seconds": 9.4,
+   "shows": "model-id suffix max (parsed only when the base id is in the alias sets)",
+   "response_id_seen": true,
+   "call_log": {
+    "provider": "codex",
+    "model": "gpt-6.1-sol-max",
+    "requested_model": "codex/gpt-6.1-sol-max",
+    "status": 200,
+    "reasoning_source": "encrypted",
+    "effort_requested": null,
+    "effort_upstream": "max"
+   }
+  },
+  {
+   "port": "20128",
+   "model": "cx/gpt-6.1-sol-xhigh",
+   "body_effort": null,
+   "extra_headers": [],
+   "correlation_id": "probe-after-B3-d90dcec0e488",
+   "status": 200,
+   "event_types": [
+    "response.in_progress",
+    "response.created",
+    "response.output_item.added",
+    "response.reasoning_summary_part.added",
+    "response.reasoning_summary_text.delta",
+    "response.reasoning_summary_text.done",
+    "response.reasoning_summary_part.done",
+    "response.output_item.done",
+    "response.content_part.added",
+    "response.output_text.delta",
+    "response.output_text.done",
+    "response.content_part.done",
+    "response.completed"
+   ],
+   "served_model": "gpt-6.1-sol",
+   "usage": {
+    "input": 31,
+    "output": 100,
+    "reasoning": 91
+   },
+   "seconds": 7.5,
+   "shows": "suffix xhigh (parsed for every model)",
+   "response_id_seen": true,
+   "call_log": {
+    "provider": "codex",
+    "model": "gpt-6.1-sol-xhigh",
+    "requested_model": "codex/gpt-6.1-sol-xhigh",
+    "status": 200,
+    "reasoning_source": "encrypted",
+    "effort_requested": null,
+    "effort_upstream": "xhigh"
+   }
+  },
+  {
+   "port": "20128",
+   "model": "gpt-6.1-sol-max",
+   "body_effort": null,
+   "extra_headers": [],
+   "correlation_id": "probe-after-B3-9d5f50096114",
+   "status": 200,
+   "event_types": [
+    "response.created",
+    "response.in_progress",
+    "response.output_item.added",
+    "response.reasoning_summary_part.added",
+    "response.reasoning_summary_text.delta",
+    "response.reasoning_summary_text.done",
+    "response.reasoning_summary_part.done",
+    "response.output_item.done",
+    "response.content_part.added",
+    "response.output_text.delta",
+    "response.output_text.done",
+    "response.content_part.done",
+    "response.completed"
+   ],
+   "served_model": "gpt-6.1-sol",
+   "usage": {
+    "input": 31,
+    "output": 119,
+    "reasoning": 110
+   },
+   "seconds": 8.7,
+   "shows": "the bare id exactly as the framework lane's node forwards it (no provider prefix): must resolve to codex",
+   "response_id_seen": true,
+   "call_log": {
+    "provider": "codex",
+    "model": "gpt-6.1-sol-max",
+    "requested_model": "codex/gpt-6.1-sol-max",
+    "status": 200,
+    "reasoning_source": "encrypted",
+    "effort_requested": null,
+    "effort_upstream": "max"
+   }
+  },
+  {
+   "port": "20128",
+   "model": "cx/gpt-6-sol",
+   "body_effort": "low",
+   "extra_headers": [
+    "User-Agent",
+    "Version",
+    "originator"
+   ],
+   "correlation_id": "probe-after-B3-1b4309402779",
+   "status": 200,
+   "event_types": [
+    "response.created",
+    "response.in_progress",
+    "response.output_item.added",
+    "response.reasoning_summary_part.added",
+    "response.reasoning_summary_text.delta",
+    "response.reasoning_summary_text.done",
+    "response.reasoning_summary_part.done",
+    "response.output_item.done",
+    "response.content_part.added",
+    "response.output_text.delta",
+    "response.output_text.done",
+    "response.content_part.done",
+    "response.completed"
+   ],
+   "served_model": "codex/gpt-6-sol",
+   "usage": {
+    "input": 31,
+    "output": 59,
+    "reasoning": 50
+   },
+   "seconds": 5.4,
+   "shows": "a request carrying the 0.157.1 User-Agent and Version header, on a model that client can use (Gate A owner's probe gate)",
+   "response_id_seen": true,
+   "call_log": {
+    "provider": "codex",
+    "model": "gpt-6-sol",
+    "requested_model": "codex/gpt-6-sol",
+    "status": 200,
+    "reasoning_source": "encrypted",
+    "effort_requested": "low",
+    "effort_upstream": "low"
+   }
+  },
+  {
+   "port": "20128",
+   "model": "cx/gpt-6-astra-max",
+   "body_effort": null,
+   "extra_headers": [],
+   "correlation_id": "probe-after-B3-e959ee90e331",
+   "status": 200,
+   "event_types": [
+    "response.created",
+    "response.in_progress",
+    "response.output_item.added",
+    "response.reasoning_summary_part.added",
+    "response.reasoning_summary_text.delta",
+    "response.reasoning_summary_text.done",
+    "response.reasoning_summary_part.done",
+    "response.output_item.done",
+    "response.content_part.added",
+    "response.output_text.delta",
+    "response.output_text.done",
+    "response.content_part.done",
+    "response.completed"
+   ],
+   "served_model": "gpt-6-astra",
+   "usage": {
+    "input": 31,
+    "output": 125,
+    "reasoning": 116
+   },
+   "seconds": 12.2,
+   "shows": "the astra lane model at max: must stay max",
+   "response_id_seen": true,
+   "call_log": {
+    "provider": "codex",
+    "model": "gpt-6-astra-max",
+    "requested_model": "codex/gpt-6-astra-max",
+    "status": 200,
+    "reasoning_source": "encrypted",
+    "effort_requested": null,
+    "effort_upstream": "max"
+   }
+  },
+  {
+   "port": "20128",
+   "model": "cx/gpt-6.1-sol-nonexistent-probe",
+   "body_effort": "low",
+   "extra_headers": [],
+   "correlation_id": "probe-after-B3-cf69ee39b3c0",
+   "status": 400,
+   "error_message": "Model 'gpt-6.1-sol-nonexistent-probe' is not available in the active live catalog for provider 'codex'.",
+   "seconds": 0.0,
+   "shows": "a made-up id must answer 4xx",
+   "response_id_seen": false,
+   "call_log": null
+  },
+  {
+   "port": "20129",
+   "model": "sharedgw/gpt-6.1-sol-max",
+   "body_effort": null,
+   "extra_headers": [],
+   "correlation_id": "probe-after-B3-eb1a480eef09",
+   "status": 200,
+   "event_types": [
+    "response.created",
+    "response.in_progress",
+    "response.output_item.added",
+    "response.reasoning_summary_part.added",
+    "response.reasoning_summary_text.delta",
+    "response.reasoning_summary_text.done",
+    "response.reasoning_summary_part.done",
+    "response.output_item.done",
+    "response.content_part.added",
+    "response.output_text.delta",
+    "response.output_text.done",
+    "response.content_part.done",
+    "response.completed"
+   ],
+   "served_model": "gpt-6.1-sol",
+   "usage": {
+    "input": 31,
+    "output": 132,
+    "reasoning": 123
+   },
+   "seconds": 8.9,
+   "shows": "the framework lane's node forwarding the max suffix to 20128",
+   "call_log": "20129 rows are not read here (its store is separate and unchanged)"
+  }
+ ],
+ "finished_utc": "2026-09-30T06:34:09Z"
+}

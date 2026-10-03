@@ -208,9 +208,11 @@ TOKENIZER_PREFIX="$INSTALLED_TOKENIZER_PREFIX" \
   node scripts/recount-tokens.cjs --observability
 ```
 
-The counter uses upstream `gpt-tokenizer@3.4.0`, `o200k_base`. This gives exact
+The counter uses upstream `gpt-tokenizer@4.0.0`, `o200k_base`. This gives exact
 counts for those stored artifacts and that encoding, not an attestation of every
-provider's tokenizer. Keep full source recovery available. Do not add Context
+provider's tokenizer. The pair was first counted with 3.4.0, and 4.0.0 returns the
+same counts ([qualification](../evidence/receipts/gpt-tokenizer-400-qualification-20260929.json)).
+Keep full source recovery available. Do not add Context
 Mode/RTK estimates to cache reuse or subtract them from native provider totals.
 
 Codex cached input is a subset of input; reasoning is a subset of output.

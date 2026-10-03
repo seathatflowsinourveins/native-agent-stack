@@ -1,0 +1,635 @@
+{
+  "schema_version": 1,
+  "id": "upstream-codex-integration-20260930",
+  "recorded_date_utc": "2026-09-30",
+  "status": "accepted_within_scope",
+  "scope": "Isolated maintained-upstream Codex worker-lane integration on this Linux/WSL host. Native scratch clients and source-defined oracles; no model invocation or production-home application.",
+  "sources": [
+    {
+      "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "revision": "cc1f6ce1f983721ecb42c7da27e58f0649c132f5",
+      "role": "maintained upstream integration base",
+      "files": [
+        "tools/adoption/apply_codex_lane.py",
+        "tools/adoption/prove_codex_lane.py",
+        "tools/adoption/codex_roles.py",
+        "scripts/adoption_status.py",
+        "tests/test_codex_worker_lane.py"
+      ]
+    },
+    {
+      "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "revision": "7e0ef0dd5f9a0ebe613d6d26e3448758492f7318",
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/514",
+      "role": "upstream role carriers, source reader, doctor, creation and rollback; preserved"
+    },
+    {
+      "repository": "https://github.com/openai/codex",
+      "revision": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+      "tag": "rust-v0.159.2",
+      "files": [
+        "codex-rs/app-server/src/config_manager_service.rs",
+        "codex-rs/protocol/src/openai_models.rs"
+      ],
+      "role": "native writer/version/type/null behavior; prior native qualification and current scratch execution"
+    },
+    {
+      "artifact": "evidence/artifacts/codex-01592-qualification-20260930/qualification.json",
+      "sha256": "7d634ff5a9195a589923f9be2bf64070fe507bf50b2efc82629150e967ec896e",
+      "role": "dated native client/source qualification, not a new run"
+    },
+    {
+      "artifact": "evidence/artifacts/codex-01592-qualification-20260930/profile-migration.json",
+      "sha256": "6b53645368ed34655d6c799b661697a95f3d5cc9a5056c21797378388ee74bec",
+      "role": "local reviewed whitelist migration delta"
+    },
+    {
+      "artifact": "evidence/artifacts/codex-01592-qualification-20260930/profile-command-correction.json",
+      "sha256": "c9f7a5fd4c5bab7ccb7c665a926fc68da63a50aa5f8d9fb2bc5a5b87320b532e",
+      "role": "local exact generated-command regression/correction"
+    }
+  ],
+  "official_documentation_read": [
+    "https://developers.openai.com/codex/subagents",
+    "https://developers.openai.com/codex/app-server"
+  ],
+  "capability_verification_order": [
+    {
+      "source": "installed client",
+      "command": "codex --version; codex app-server --help",
+      "exit_code": 0,
+      "result": "codex-cli 0.159.2; stdio app-server and config overrides exposed"
+    },
+    {
+      "source": "installed-version upstream changelog",
+      "url": "https://github.com/openai/codex/releases/tag/rust-v0.159.2",
+      "command": "gh api repos/openai/codex/releases/tags/rust-v0.159.2",
+      "exit_code": 0,
+      "result": "2026-09-29 Windows console suppression patch; source/native configuration claims use the immutable source and scratch tests"
+    },
+    {
+      "source": "immutable source",
+      "revision": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+      "reference": "previous source/native qualification with current native acceptance below"
+    },
+    {
+      "source": "official documentation",
+      "reference": "official_documentation_read; retrieved pages, not search snippets"
+    }
+  ],
+  "integration": {
+    "previous_catalog_head": "5cfa2400e3ebb4aefb8419135345c1fa92b05409",
+    "upstream_base": "cc1f6ce1f983721ecb42c7da27e58f0649c132f5",
+    "main_commits_ahead": 24,
+    "owned_files": [
+      {
+        "path": "tools/adoption/apply_codex_lane.py",
+        "native_show_exit_codes": [
+          0,
+          0
+        ],
+        "native_merge_exit": 1,
+        "resolved_regions": 1,
+        "base_sha256": "a5605cb436cb5fad97394d7c35634e3901c2321a1f7aa33a8aa293a8e4f159db",
+        "upstream_sha256": "f867e186d6c12b3091f5ef9c8885dd565e2aa0203c19091f1b4218bee506b3b0",
+        "local_sha256": "73ab2454bcfe54199e7dd0e9910e8d00ac9b370e9f4695d767acc2f5a8cbff0b",
+        "integrated_sha256": "324f01b27f6f1e3cae47e18f92cfd1cca92cb99b787c2c7e6fc3de4893b77cd7",
+        "changed": true
+      },
+      {
+        "path": "tools/adoption/prove_codex_lane.py",
+        "native_show_exit_codes": [
+          0,
+          0
+        ],
+        "native_merge_exit": 0,
+        "resolved_regions": 0,
+        "base_sha256": "a399117aa14bec57fd5be59badc0121523148449ae758d7d37ecf052f7c92e23",
+        "upstream_sha256": "6bf68149a6619a866fcf7a55368137ecd61970b3b02b9b0f9c59003384ae0448",
+        "local_sha256": "d40a9fcf55092d7f08075dd626d836f959097665f83c05ad5087cd529062b0f3",
+        "integrated_sha256": "9dcff7ea43326166f0bc085ba638165894bbdd87d94075bcf953a9ce9a2dcfeb",
+        "changed": true
+      },
+      {
+        "path": "tests/test_codex_worker_lane.py",
+        "native_show_exit_codes": [
+          0,
+          0
+        ],
+        "native_merge_exit": 1,
+        "resolved_regions": 1,
+        "base_sha256": "41dc80dcfc66c88b597ecd4fc3591210b86f30e77573afd37fff7d4bdb04096e",
+        "upstream_sha256": "d0def42e8b4df1e9bd613847864dcb00382dff56d8aa812abc2d94634c881028",
+        "local_sha256": "cbe4864af05db0809a5d7eb9e3a171a0e62510688bb6a3d1e64df7164746a75f",
+        "integrated_sha256": "2253534ac185cde47d30299c00d645d2c3a7cd576e9158223006cbdc89a0e50a",
+        "changed": true
+      },
+      {
+        "path": "tests/test_render_config.py",
+        "native_show_exit_codes": [
+          0,
+          0
+        ],
+        "native_merge_exit": 0,
+        "resolved_regions": 0,
+        "base_sha256": "162e942e2bc0cbea9e47f8e95da937e1066d02af4ba5c4d9706d38774a4ac9fc",
+        "upstream_sha256": "162e942e2bc0cbea9e47f8e95da937e1066d02af4ba5c4d9706d38774a4ac9fc",
+        "local_sha256": "bb849e782f57d20c0add73a5b3f825702d2ffb27c8677c27cfcd5632963f8849",
+        "integrated_sha256": "bb849e782f57d20c0add73a5b3f825702d2ffb27c8677c27cfcd5632963f8849",
+        "changed": true
+      },
+      {
+        "path": "adoption/pins-linux-x86_64.json",
+        "native_show_exit_codes": [
+          0,
+          0
+        ],
+        "native_merge_exit": 0,
+        "resolved_regions": 0,
+        "base_sha256": "88f727fbd2c8e9ca5ab7d6c70d5a6b7215860faecef065df6a31282591eabfb0",
+        "upstream_sha256": "88f727fbd2c8e9ca5ab7d6c70d5a6b7215860faecef065df6a31282591eabfb0",
+        "local_sha256": "05e707137bb1a27d10e6b257295559ad9094c07247c2eb75db138830bb3f21b0",
+        "integrated_sha256": "05e707137bb1a27d10e6b257295559ad9094c07247c2eb75db138830bb3f21b0",
+        "changed": true
+      },
+      {
+        "path": "adoption/templates/codex.config.template.toml",
+        "native_show_exit_codes": [
+          0,
+          0
+        ],
+        "native_merge_exit": 0,
+        "resolved_regions": 0,
+        "base_sha256": "f84f0e0836db9bc59cf0676bfceff94b0812c1f972d7844a004a165a7df0f6a6",
+        "upstream_sha256": "0716d4f6996f40d762fa0c98f23ef91cd39ca7422eddedaa0b344d999c53e4da",
+        "local_sha256": "20f2e03684a9c4731b0690fbd745f82011fd6c9bafb8e9cdf016d2cbb26f8dcb",
+        "integrated_sha256": "4ea5e839ec78aa1364ce772997eb9c8ae2d27df83de5122942be624a8c0ff897",
+        "changed": true
+      },
+      {
+        "path": "adoption/templates/codex.stack-worker.config.toml",
+        "native_show_exit_codes": [
+          0,
+          0
+        ],
+        "native_merge_exit": 0,
+        "resolved_regions": 0,
+        "base_sha256": "a8b2198116337a9530abd0ae39df4a10c5767c1277816f17fd52e66bb7c4428a",
+        "upstream_sha256": "a8b2198116337a9530abd0ae39df4a10c5767c1277816f17fd52e66bb7c4428a",
+        "local_sha256": "7cc85870cfd7557b6e5fb776391c4baaf12da13da4c3d66328e02b146de310b9",
+        "integrated_sha256": "7cc85870cfd7557b6e5fb776391c4baaf12da13da4c3d66328e02b146de310b9",
+        "changed": true
+      },
+      {
+        "path": "adoption/templates/codex.AGENTS.template.md",
+        "native_show_exit_codes": [
+          0,
+          0
+        ],
+        "native_merge_exit": 0,
+        "resolved_regions": 0,
+        "base_sha256": "dd2788672367552755285c8ef504985a6cfe66c228d675e395eeb02da48af6d3",
+        "upstream_sha256": "dd2788672367552755285c8ef504985a6cfe66c228d675e395eeb02da48af6d3",
+        "local_sha256": "947641bf204afa9707ad76ef89ab145e3e71722a9ac65243326c84713e213b6d",
+        "integrated_sha256": "947641bf204afa9707ad76ef89ab145e3e71722a9ac65243326c84713e213b6d",
+        "changed": true
+      }
+    ],
+    "conflict_resolution": [
+      {
+        "path": "tools/adoption/apply_codex_lane.py",
+        "native_merge_exit": 1,
+        "regions": 1,
+        "base_region": "empty",
+        "resolution": "Keep both local migration diagnostic and upstream role-state loop, adjacent and unchanged."
+      },
+      {
+        "path": "tests/test_codex_worker_lane.py",
+        "native_merge_exit": 1,
+        "regions": 1,
+        "base_region": "empty",
+        "resolution": "Keep local native writer rejection/null/rollback test and upstream native doctor/link tests, adjacent and unchanged."
+      }
+    ],
+    "preserved_upstream_behavior": [
+      "Role pins and checksum rows have one upstream reader in codex_roles; shipped carriers retain explicit gpt-6-astra/max.",
+      "Plan.role_states, role_preconditions and nothing_to_do include both role carriers; missing roles remain work.",
+      "Native doctor before/after scratch role loading, privacy/count reporting and malformed-role rejection remain.",
+      "Create-only 0700 role directory and 0600 carriers, journal-before-write, exact readback and later-writer-preserving rollback remain.",
+      "prove_codex_lane roles_row remains part of static checks."
+    ],
+    "preserved_qualified_local_behavior": [
+      "Codex 0.159.2 pin and source-backed Sol coordinator/worker defaults, preserving explicit role definitions.",
+      "Only byte-exact whitelisted prior profiles can migrate, with required expected-profile hash.",
+      "Migration journals source proof and original mode; rollback restores only this run's exact target and preserves later writers.",
+      "Generated apply command calls profile_state() and includes --expect-profile-sha256; regression asserts the actual command line.",
+      "Native stale-version, type-invalid history.persistence and null-delete tests retain forward-compatible custom-effort behavior."
+    ],
+    "post_merge_syntax": "Both merged Python modules parsed in memory with no duplicate top-level/class symbols.",
+    "no_branch_or_remote_mutation": true
+  },
+  "source_resource_closure": {
+    "method": "AST import walk from updater and proof module, resolving repository-local modules recursively; declared native lane resources, role structural inputs/mirrors and exercised test files recorded separately.",
+    "local_modules": [
+      {
+        "path": "scripts/adoption_status.py",
+        "sha256": "4cd653e094020644e9afb577c1c74b6a6d162ba4b47b6d9fceb7fee6b9f4a988",
+        "bytes": 80117
+      },
+      {
+        "path": "scripts/codex_quota.py",
+        "sha256": "fa0e3c9e14f367da6a216eaeedfe5a6bac76274f02198f23e80b6f901a9bd94a",
+        "bytes": 16819
+      },
+      {
+        "path": "tools/adoption/apply_codex_lane.py",
+        "sha256": "324f01b27f6f1e3cae47e18f92cfd1cca92cb99b787c2c7e6fc3de4893b77cd7",
+        "bytes": 80456
+      },
+      {
+        "path": "tools/adoption/codex_roles.py",
+        "sha256": "b5815aefab0fd22eca39233207e4bdab199b0815f858c5a147e3994d133ffd6d",
+        "bytes": 27202
+      },
+      {
+        "path": "tools/adoption/prove_codex_lane.py",
+        "sha256": "9dcff7ea43326166f0bc085ba638165894bbdd87d94075bcf953a9ce9a2dcfeb",
+        "bytes": 35137
+      }
+    ],
+    "import_edges": [
+      {
+        "from": "tools/adoption/apply_codex_lane.py",
+        "to": "scripts/adoption_status.py",
+        "line": 85
+      },
+      {
+        "from": "tools/adoption/apply_codex_lane.py",
+        "to": "scripts/codex_quota.py",
+        "line": 85
+      },
+      {
+        "from": "tools/adoption/apply_codex_lane.py",
+        "to": "tools/adoption/codex_roles.py",
+        "line": 90
+      },
+      {
+        "from": "tools/adoption/apply_codex_lane.py",
+        "to": "tools/adoption/codex_roles.py",
+        "line": 91
+      },
+      {
+        "from": "tools/adoption/prove_codex_lane.py",
+        "to": "tools/adoption/apply_codex_lane.py",
+        "line": 73
+      },
+      {
+        "from": "tools/adoption/prove_codex_lane.py",
+        "to": "tools/adoption/codex_roles.py",
+        "line": 74
+      },
+      {
+        "from": "tools/adoption/prove_codex_lane.py",
+        "to": "scripts/adoption_status.py",
+        "line": 75
+      },
+      {
+        "from": "tools/adoption/prove_codex_lane.py",
+        "to": "scripts/codex_quota.py",
+        "line": 76
+      }
+    ],
+    "standard_library_import_roots": [
+      "__future__",
+      "argparse",
+      "contextlib",
+      "copy",
+      "datetime",
+      "difflib",
+      "errno",
+      "functools",
+      "hashlib",
+      "json",
+      "os",
+      "pathlib",
+      "platform",
+      "re",
+      "selectors",
+      "shlex",
+      "shutil",
+      "signal",
+      "stat",
+      "string",
+      "subprocess",
+      "sys",
+      "tempfile",
+      "threading",
+      "time",
+      "tomllib",
+      "urllib.parse",
+      "warnings"
+    ],
+    "resources": [
+      {
+        "path": "adoption/pins-linux-x86_64.json",
+        "bytes": 31875,
+        "sha256": "05e707137bb1a27d10e6b257295559ad9094c07247c2eb75db138830bb3f21b0"
+      },
+      {
+        "path": "adoption/templates/codex.config.template.toml",
+        "bytes": 13074,
+        "sha256": "4ea5e839ec78aa1364ce772997eb9c8ae2d27df83de5122942be624a8c0ff897"
+      },
+      {
+        "path": "adoption/templates/codex.stack-worker.config.toml",
+        "bytes": 4573,
+        "sha256": "7cc85870cfd7557b6e5fb776391c4baaf12da13da4c3d66328e02b146de310b9"
+      },
+      {
+        "path": "adoption/templates/codex.omniroute.config.toml",
+        "bytes": 4932,
+        "sha256": "0751419f445daaa7735e952af41fa93b1b0464de36282d22b38573653891aba8"
+      },
+      {
+        "path": "adoption/templates/codex.AGENTS.template.md",
+        "bytes": 3822,
+        "sha256": "947641bf204afa9707ad76ef89ab145e3e71722a9ac65243326c84713e213b6d"
+      },
+      {
+        "path": "adoption/agents/codex/SHA256SUMS",
+        "bytes": 174,
+        "sha256": "6c0f818d9eadc0d8fa361c2012735f4159404fc0cafcf6d266032bb556b6203a"
+      },
+      {
+        "path": "adoption/agents/codex/stack-researcher.toml",
+        "bytes": 7223,
+        "sha256": "ac77b1624fc0ac264ff5b9807e05889d20137440dea9c016441bba38b1ea8c00"
+      },
+      {
+        "path": "adoption/agents/codex/stack-verifier.toml",
+        "bytes": 6349,
+        "sha256": "281d7e8b985414d072396cc613a75adb3740570ebaaefd1a437ff2c099d5f2bd"
+      },
+      {
+        "path": "examples/codex-native/agents/stack-researcher.toml",
+        "bytes": 7223,
+        "sha256": "ac77b1624fc0ac264ff5b9807e05889d20137440dea9c016441bba38b1ea8c00"
+      },
+      {
+        "path": "examples/codex-native/agents/stack-verifier.toml",
+        "bytes": 6349,
+        "sha256": "281d7e8b985414d072396cc613a75adb3740570ebaaefd1a437ff2c099d5f2bd"
+      },
+      {
+        "path": "evidence/artifacts/token-adoption-e2e-20260926/preregistration.json",
+        "bytes": 134123,
+        "sha256": "d41152f460c475e6dabe0d8c144e7bd0ef59c0181835afbbba58a6eed445e81a"
+      }
+    ],
+    "test_inputs": [
+      {
+        "path": "tests/test_codex_worker_lane.py",
+        "bytes": 159171,
+        "sha256": "2253534ac185cde47d30299c00d645d2c3a7cd576e9158223006cbdc89a0e50a"
+      },
+      {
+        "path": "tests/test_render_config.py",
+        "bytes": 35487,
+        "sha256": "bb849e782f57d20c0add73a5b3f825702d2ffb27c8677c27cfcd5632963f8849"
+      },
+      {
+        "path": "tests/test_codex_roles.py",
+        "bytes": 11010,
+        "sha256": "6b276979114ebe2eb74a3e251f5cd2ae38638a85c1b2b6ce3687946c07e76efc"
+      },
+      {
+        "path": "tests/test_codex_agents.py",
+        "bytes": 37676,
+        "sha256": "d40fc76be4ff84d73800c0a1c63f391c87e7ef55083c85d8806e0c4e1890fec6"
+      }
+    ],
+    "limits": [
+      "This is the selected local source/resource closure, not a hash of the entire Python standard library or external executable/package trees.",
+      "Codex and Python versions are observed below; native fixture MCP node/start.mjs stand-ins are defined in the frozen test source.",
+      "Historical migration-source bytes remain bounded by the updater's exact whitelist; a matching supplied hash does not authorize a custom profile.",
+      "Host sign-ins, authentication stores and production configuration values were not read or copied."
+    ]
+  },
+  "checks": [
+    {
+      "id": "combined-units",
+      "command": "python3 -B -m unittest tests.test_codex_worker_lane tests.test_codex_roles tests.test_codex_agents tests.test_render_config -q",
+      "exit_code": 0,
+      "returned_output": [
+        "Ran 173 tests in 47.366s",
+        "OK (skipped=11)"
+      ],
+      "raw_capture": {
+        "retention": "private, outside checkout",
+        "stdout": {
+          "file": "units.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "file": "units.stderr",
+          "bytes": 397,
+          "sha256": "34c0fc551562a9dd7eb97ee137d34ef73659f732afed7d340dba23ba57632c70"
+        }
+      },
+      "evidence_class": "local_integration",
+      "scope": "Combined upstream/local structural, synthetic and fixture checks; native-gated tests skipped.",
+      "tests_run": 173,
+      "skipped": 11,
+      "passed": 162,
+      "resource_warning_count": 2
+    },
+    {
+      "id": "prior-source-negative-control",
+      "command": "Load prior qualified updater 73ab2454 in memory; run unchanged upstream RoleStepTests.test_the_pinned_rows_are_shipped_in_sha256sums_and_the_installer_holds_no_second_copy.",
+      "exit_code": 1,
+      "returned_output": [
+        "AssertionError: prior_qualified_lane_negative_control.ROLE_FILES is missing",
+        "Ran 1 test in 0.012s",
+        "FAILED (failures=1)"
+      ],
+      "raw_capture": {
+        "retention": "private, outside checkout",
+        "stdout": {
+          "file": "prior-updater-control.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "file": "prior-updater-control.stderr",
+          "bytes": 1299,
+          "sha256": "e5f5d2dda11036bcdc5a808ebcfed204f479126661d30df0fb2b38ef117aea0e"
+        }
+      },
+      "evidence_class": "local_integration",
+      "scope": "Unchanged upstream role-source oracle rejects prior qualified updater 73ab2454, loaded in memory; rejection is expected.",
+      "expected_rejection": true,
+      "source_sha256": "73ab2454bcfe54199e7dd0e9910e8d00ac9b370e9f4695d767acc2f5a8cbff0b"
+    },
+    {
+      "id": "native-config",
+      "command": "env NAS_CODEX_INTEGRATION=1 python3 -B -m unittest tests.test_codex_worker_lane.CodexIntegrationTests.test_real_app_server_apply_and_byte_exact_rollback tests.test_codex_worker_lane.CodexIntegrationTests.test_real_app_server_conflicts_validation_and_null_rollback -q",
+      "exit_code": 0,
+      "returned_output": [
+        "Ran 2 tests in 44.145s",
+        "OK"
+      ],
+      "raw_capture": {
+        "retention": "private, outside checkout",
+        "stdout": {
+          "file": "native-config.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "file": "native-config.stderr",
+          "bytes": 98,
+          "sha256": "8b0b4166da01b54c15c71d7b572676a0ce6bd418f48e5a501f9711903fa9f3a9"
+        }
+      },
+      "evidence_class": "local_integration",
+      "scope": "Actual Codex 0.159.2 scratch apply/readback/byte rollback, stale-version/type-invalid rejection and null deletion; repository local integration.",
+      "tests_run": 2
+    },
+    {
+      "id": "native-doctor-and-role-links",
+      "command": "env NAS_CODEX_INTEGRATION=1 python3 -B -m unittest tests.test_codex_worker_lane.CodexIntegrationTests.test_the_doctor_reader_accepts_the_shipped_roles_and_flags_a_malformed_one tests.test_codex_worker_lane.CodexIntegrationTests.test_codex_follows_links_below_agents_and_the_role_count_never_undercounts_it -q",
+      "exit_code": 0,
+      "returned_output": [
+        "Ran 2 tests in 50.761s",
+        "OK"
+      ],
+      "raw_capture": {
+        "retention": "private, outside checkout",
+        "stdout": {
+          "file": "native-roles.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "file": "native-roles.stderr",
+          "bytes": 98,
+          "sha256": "ae5c6a7fe3e9998ea94183e39f63ca505f987f64bccadb8916a76fe7c50f91c5"
+        }
+      },
+      "evidence_class": "local_integration",
+      "scope": "Actual Codex 0.159.2 doctor accepts two shipped carriers, rejects malformed carrier and checks 13 native link/count scenarios; unchanged source-defined oracles.",
+      "tests_run": 2,
+      "link_scenarios": 13
+    },
+    {
+      "id": "native-role-lifecycle-first-attempt",
+      "command": "python3 -B: replay unchanged RoleStepTests.test_b_apply_creates_the_roles_read_back_and_rollback_removes_them with FakeHost.base_args[1]=shutil.which('codex'), as existing native config test does.",
+      "exit_code": 1,
+      "returned_output": [
+        "Native updater wrote/read back config, AGENTS, worker profile and both role carriers.",
+        "Native profile readback returned error in mcp_servers.serena.",
+        "Ran 1 test in 2.342s",
+        "FAILED (failures=1)"
+      ],
+      "raw_capture": {
+        "retention": "private, outside checkout",
+        "stdout": {
+          "file": "native-role-lifecycle.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "file": "native-role-lifecycle.stderr",
+          "bytes": 3882,
+          "sha256": "48eab4c8733111ad8804d68cc870efcec6972c6e8ab37a96fe0d4c31c4c98efe"
+        }
+      },
+      "evidence_class": "local_integration",
+      "scope": "Retained failed fixture replay: replacing fake executable alone leaves required profile server command definitions absent.",
+      "tests_run": 1,
+      "binding_source": "import shutil,sys,unittest\nfrom unittest import mock\nfrom tests import test_codex_worker_lane as tests\noriginal_host=tests.FakeHost\nclass NativeHost(original_host):\n    def __init__(self,testcase):\n        super().__init__(testcase)\n        self.base_args[1]=shutil.which(\"codex\")\n        if not self.base_args[1]:\n            raise RuntimeError(\"native Codex unavailable\")\nwith mock.patch.object(tests,\"FakeHost\",NativeHost):\n    case=tests.RoleStepTests(\"test_b_apply_creates_the_roles_read_back_and_rollback_removes_them\")\n    result=unittest.TextTestRunner(verbosity=1).run(unittest.TestSuite([case]))\nsys.exit(0 if result.wasSuccessful() else 1)\n",
+      "correction": "One bounded Sol fixture repair supplies only serena and codebase-memory command definitions already present in the existing passed native config fixture. Product/test sources are unchanged."
+    },
+    {
+      "id": "native-role-lifecycle-and-owned-migration",
+      "command": "python3 -B: unchanged role lifecycle and owned profile bytes/mode oracles, with native FakeHost executable binding and serena/codebase-memory definitions copied from existing native config test.",
+      "exit_code": 0,
+      "returned_output": [
+        "Ran 2 tests in 43.227s",
+        "OK"
+      ],
+      "raw_capture": {
+        "retention": "private, outside checkout",
+        "stdout": {
+          "file": "native-lifecycle-repaired.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "file": "native-lifecycle-repaired.stderr",
+          "bytes": 101,
+          "sha256": "602b92043189b97c8035772d018603841a1f2690f2dd73a6729604d84bf2be4c"
+        }
+      },
+      "evidence_class": "local_integration",
+      "scope": "Actual Codex 0.159.2 with disposable MCP stand-ins: unchanged role creation/permissions/exact bytes/journal/idempotence/repeated rollback oracle and unchanged owned-profile journal/bytes/mode restoration oracle.",
+      "tests_run": 2,
+      "binding_source": "import shutil,sys,unittest\nfrom unittest import mock\nfrom tests import test_codex_worker_lane as tests\noriginal_host=tests.FakeHost\nclass NativeHost(original_host):\n    def __init__(self,testcase):\n        super().__init__(testcase)\n        self.base_args[1]=shutil.which(\"codex\")\n        if not self.base_args[1]:\n            raise RuntimeError(\"native Codex unavailable\")\n        # Native profile dependencies from the existing native config test, unchanged.\n        self.config[\"mcp_servers\"].update({\n            \"serena\":{\"command\":f\"{self.eco}/bin/serena\"},\n            \"codebase-memory\":{\"command\":\"/bin/false\"},\n        })\n        self.write_config(self.config)\nwith mock.patch.object(tests,\"FakeHost\",NativeHost):\n    cases=[\n        tests.RoleStepTests(\"test_b_apply_creates_the_roles_read_back_and_rollback_removes_them\"),\n        tests.ApplyFlowTests(\"test_owned_profile_migration_journals_and_restores_bytes_and_mode\"),\n    ]\n    result=unittest.TextTestRunner(verbosity=1).run(unittest.TestSuite(cases))\nsys.exit(0 if result.wasSuccessful() else 1)\n",
+      "oracle_source": "tests/test_codex_worker_lane.py: RoleStepTests.test_b_apply_creates_the_roles_read_back_and_rollback_removes_them; ApplyFlowTests.test_owned_profile_migration_journals_and_restores_bytes_and_mode",
+      "native_binding_reference": "tests/test_codex_worker_lane.py: CodexIntegrationTests.test_real_app_server_apply_and_byte_exact_rollback"
+    },
+    {
+      "id": "whitespace",
+      "command": "git diff --check",
+      "exit_code": 0,
+      "returned_output": "empty"
+    },
+    {
+      "id": "upstream-closure-unchanged",
+      "command": "git diff --exit-code -- tools/adoption/codex_roles.py scripts/adoption_status.py scripts/codex_quota.py adoption/agents/codex examples/codex-native/agents evidence/artifacts/token-adoption-e2e-20260926/preregistration.json tests/test_codex_roles.py tests/test_codex_agents.py",
+      "exit_code": 0,
+      "returned_output": "empty"
+    },
+    {
+      "id": "native-versions-after-acceptance",
+      "commands": [
+        "codex --version",
+        "python3 --version"
+      ],
+      "exit_codes": [
+        0,
+        0
+      ],
+      "returned_output": [
+        "codex-cli 0.159.2",
+        "Python 3.13.15"
+      ]
+    }
+  ],
+  "corrections": [
+    {
+      "wrong_claim": "git merge-file supports --label.",
+      "observed": "Installed native command rejected --label with exit 129 on the first comparison loop.",
+      "verification": "Returned native usage requires -L; corrected read-only memfd comparisons succeeded and found the exact conflict regions."
+    },
+    {
+      "wrong_assumption": "Replacing the synthetic FakeHost executable alone supplies a native-valid worker profile fixture.",
+      "observed": "Native role-lifecycle replay failed profile readback in mcp_servers.serena after successful role writes.",
+      "verification": "Copy the two required command definitions from the existing native config test; replay the unchanged lifecycle/migration oracles. Two native tests then pass exit 0."
+    }
+  ],
+  "escalation": {
+    "bounded_sol_repair": "native fixture dependency repair",
+    "acceptance": "passed, two native oracles",
+    "astra_trigger": "none unresolved"
+  },
+  "limits": [
+    "Checks are repository local integration and source-defined fixtures, not unchanged OpenAI upstream tests, provider/model acceptance or proof of quality/efficiency gains.",
+    "Successful test-runner summaries are retained verbatim; underlying passing native command streams are consumed by the unchanged oracles, not separately persisted. The first failed replay retains native returned output in its private failure capture.",
+    "The source-defined native tests and disposable adapter fixtures do not qualify production account/tool services.",
+    "All native fixture state is run-scoped and cleaned by the existing unittest cleanup; no production client home or timer was changed.",
+    "Root source guard remains disarmed; production rollout requires root's final source/owner acceptance.",
+    "No current main checkout reset/rebase or remote publication occurred."
+  ]
+}

@@ -8,8 +8,20 @@ Nothing schedules a model run: `research-state.json` keeps `execution_policy.aut
 set to `false`, and changing that is a separate decision for the landscape owners.
 
 **Cost class: high.** The 2026-09-23 completed run used 119 children at effort max. The stopped
-attempt alone used at least 168,052 output tokens. Sweep only the due layers, at most monthly
-([SOTA convergence practice](sota-convergence-practice.md)), or sooner when a reopen trigger fires.
+attempt alone used at least 168,052 output tokens. The 2026-09-29 run (20 foundation layers; 131 Claude children,
+52 of them Sonnet wrappers that each ran one GPT-6 job; 7.1 hours, of which 2.6 were a single idle gap) cost $425 at
+Claude list price: Opus 5.5 $400 and Sonnet 5.5 $25. Of that, $101 (24%) is advisor inference inside the workers,
+which `child-usage.mjs` does not count (its record prices to the other $324), and $19 is the nine superseded attempts
+the record lists. The first round was $337 and the bounded follow-up round $88; the wrappers are $27, and the GPT-6
+tokens themselves are billed to the Codex or gateway accounts and are only in the run record. Per counted child,
+advisor calls included, the discovery workers averaged $5.65, the fit refuters $4.60 and the facts refuters $4.13 (all
+Opus 5.5 at effort max, with a median of 43, 34 and 32 calls), the critic $5.50 and the two wrapper roles $0.37 and
+$0.64. Source: `evidence/artifacts/landscape-sweep-20260929-attempts/spend-scan-wf_08a5b367-311.json` (`ccusage` shows
+$398 for the run: Opus 5.5 only, since it leaves Sonnet 5.5 unpriced). Sweep only the due layers, at most monthly
+([SOTA convergence practice](sota-convergence-practice.md)), or sooner when a reopen trigger fires. Probe the GPT-6
+lane before the run (runbook step 4) and watch for `LIMIT` while it runs: the follow-up round starts by itself after
+the critic and spends Claude stages even when every GPT-6 vote will fail, and a layer with a missing vote stays
+reopened.
 
 ## 1. Scope
 

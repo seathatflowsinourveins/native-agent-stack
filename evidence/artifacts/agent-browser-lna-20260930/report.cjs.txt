@@ -1,0 +1,229 @@
+'use strict';
+// Reduce raw browser evidence outside the model and retain exact source lines.
+const fs=require('fs');
+const path=require('path');
+const crypto=require('crypto');
+const cp=require('child_process');
+const ROOT=process.cwd();
+const PW='~/.local/share/codex-ecosystem/tools/crawl4ai-0.9.4/grader/node_modules/playwright-core';
+const AGENT='~/.local/share/codex-ecosystem/tools/agent-browser-0.38.1/lib/node_modules/agent-browser';
+const REPO='~/code/native-agent-stack-live';
+const runs=JSON.parse(fs.readFileSync('artifacts/runs.json','utf8'));
+const runtime=JSON.parse(fs.readFileSync('artifacts/runtime.json','utf8'));
+const json=(name,x)=>fs.writeFileSync('artifacts/'+name,JSON.stringify(x,null,2)+'\n');
+const hash=p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
+const sources=[
+  {id:'playwright-bundle',path:PW+'/lib/coreBundle.js',ranges:[[34816,34903],[38652,38691],[39396,39460],[43317,43376],[51606,51612],[72278,72322],[72331,72371],[72373,72385],[72682,72694],[73344,73393]]},
+  {id:'agent-readme',path:AGENT+'/README.md',ranges:[[1040,1056],[1205,1213]]},
+  {id:'stack-recipes',path:REPO+'/recipes/README.md',ranges:[[98,104],[781,795]]}
+];
+let sourceText='Installed upstream source excerpts; original line numbers are preserved.\n\n';
+for(const s of sources){
+  s.sha256=hash(s.path);
+  sourceText+='SOURCE '+s.id+'\nPath: '+s.path+'\nSHA-256: '+s.sha256+'\n';
+  const lines=fs.readFileSync(s.path,'utf8').split('\n');
+  for(const [a,b] of s.ranges){sourceText+='\n';for(let i=a;i<=b;i++)sourceText+=String(i).padStart(6)+' '+lines[i-1]+'\n';}
+  sourceText+='\n';
+}
+fs.writeFileSync('artifacts/upstream-excerpts.txt',sourceText);
+const packages=[AGENT+'/package.json',PW+'/package.json',PW+'/browsers.json'];
+const manifest=JSON.parse(fs.readFileSync(REPO+'/manifests/stack.json','utf8'));
+json('source-inventory.json',{repo:cp.execFileSync('git',['-C',REPO,'rev-parse','HEAD'],{encoding:'utf8'}).trim(),
+  sources,packages:packages.map(p=>({path:p,sha256:hash(p),data:JSON.parse(fs.readFileSync(p,'utf8'))})),
+  manifestComponents:manifest.components.filter(x=>['agent-browser','playwright-cli','playwright-test'].includes(x.id)),
+  cliVersion:cp.execFileSync(process.execPath,[PW+'/lib/tools/cli-client/cli.js','--version'],{encoding:'utf8'}).trim()});
+fs.writeFileSync('artifacts/agent-browser-help.txt',cp.execFileSync(AGENT+'/bin/agent-browser-linux-x64',['--help'],{encoding:'utf8'}));
+const requestRows=fs.readFileSync('artifacts/target-requests.jsonl','utf8').trim().split('\n').filter(Boolean).map(JSON.parse);
+const summaries=[];
+for(const r of runs){
+  const s={id:r.id,tool:r.tool,override:r.override,page:r.pageObserved,error:r.error||null,
+    observed:r.pageObserved?.done===true,reached:{},preflights:0,requestLines:[],permissionCommands:r.permissionCommands,
+    promptHistograms:r.promptHistograms,netlogLna:[],cdpLna:[],pageAddressSpaces:[]};
+  for(const endpoint of ['fetch','img','frame'])s.reached[endpoint]=requestRows.some(x=>x.run===r.id&&x.method==='GET'&&new URL(x.path,'http://fixture.invalid').pathname==='/'+endpoint);
+  const rows=requestRows.filter(x=>x.run===r.id);s.preflights=rows.filter(x=>x.preflight).length;
+  s.requestLines=rows.map(x=>({method:x.method,path:x.path,origin:x.origin,preflight:x.preflight}));
+  const np='artifacts/'+r.id+'.netlog.json';
+  if(fs.existsSync(np)){
+    try{
+      const d=JSON.parse(fs.readFileSync(np,'utf8'));const types=Object.fromEntries(Object.entries(d.constants.logEventTypes).map(([k,v])=>[v,k]));
+      s.netlogLna=d.events.filter(e=>types[e.type]?.includes('LOCAL_NETWORK')).map(e=>({type:types[e.type],...e.params}));
+    }catch(e){s.netlogError=String(e);}
+  }
+  const cp='artifacts/'+r.id+'.cdp.jsonl';
+  if(fs.existsSync(cp))for(const line of fs.readFileSync(cp,'utf8').trim().split('\n').filter(Boolean)){
+    const e=JSON.parse(line);
+    if(e.method==='Audits.issueAdded'&&e.params.issue.details.corsIssueDetails)s.cdpLna.push(e.params.issue.details.corsIssueDetails);
+    if(e.method==='Network.responseReceivedExtraInfo')s.pageAddressSpaces.push(e.params.resourceIPAddressSpace);
+  }
+  summaries.push(s);
+}
+json('evidence-summary.json',summaries);
+const valid=summaries.filter(s=>s.observed);
+const checks={
+  validCases:valid.length,
+  unmeasuredCases:summaries.filter(s=>!s.observed).map(s=>s.id),
+  everyValidPageSecure:valid.every(s=>s.page.secureContext===true),
+  everyLocalControlReachedAll:valid.filter(s=>!s.override).every(s=>Object.values(s.reached).every(Boolean)),
+  everyDefaultPublicCaseBlockedAll:valid.filter(s=>s.override&&s.id!=='pw-gate-disabled-public').every(s=>Object.values(s.reached).every(x=>!x)),
+  everyDefaultPublicCaseAttributedToLna:valid.filter(s=>s.override&&s.id!=='pw-gate-disabled-public').every(s=>s.netlogLna.some(e=>e.result==='lna-permission-required')),
+  gateDisabledPublicReachedAll:Object.values(summaries.find(s=>s.id==='pw-gate-disabled-public').reached).every(Boolean),
+  noPreflight:valid.every(s=>s.preflights===0),
+  noPermissionCommandsObserved:valid.every(s=>s.permissionCommands.length===0),
+  noPermissionStateGranted:valid.every(s=>!Object.values(s.page.permissionsBefore).includes('granted')&&!Object.values(s.page.permissionsAfter).includes('granted')),
+  onlyOurTargetEndpoints:requestRows.every(x=>['/fetch','/img','/frame'].includes(new URL(x.path,'http://fixture.invalid').pathname))
+};
+json('validation.json',checks);
+if(Object.entries(checks).some(([k,v])=>typeof v==='boolean'&&!v))throw new Error('Evidence validation failed');
+const quote=x=>/^[A-Za-z0-9_\-./:=,@+]+$/.test(x)?x:"'"+x.replaceAll("'","'\\''")+"'";
+let exact='Captured effective Chromium argv; each line is shell-quoted for review.\n\n';
+for(const r of runs){
+  const argv=r.browserProcesses?.[0]?.args||r.processArguments||[];
+  exact+=r.id+'\n'+argv.map(quote).join(' ')+'\n\n';
+}
+fs.writeFileSync('artifacts/effective-commands.txt',exact);
+const mainIds=['agent-local','agent-public','pw-shell-local','pw-shell-public','pw-cli-local','pw-cli-public','pw-cli-headed-local','pw-cli-headed-public','direct-clean-local','direct-clean-public','direct-headless-local','direct-headless-public','pw-gate-disabled-public'];
+const labels={
+  'agent-local':['agent-browser 0.38.1, adapted CDP transport','AB'],
+  'agent-public':['agent-browser 0.38.1, adapted CDP transport','AB + O'],
+  'pw-shell-local':['Playwright 1.63.0, headless shell','PW-S'],
+  'pw-shell-public':['Playwright 1.63.0, headless shell','PW-S + O'],
+  'pw-cli-local':['Playwright 1.63.0, CLI Chromium config, headless CfT','PW-C'],
+  'pw-cli-public':['Playwright 1.63.0, CLI Chromium config, headless CfT','PW-C + O'],
+  'pw-cli-headed-local':['Playwright 1.63.0, CLI headed config, offscreen CfT','PW-H'],
+  'pw-cli-headed-public':['Playwright 1.63.0, CLI headed config, offscreen CfT','PW-H + O'],
+  'direct-clean-local':['Direct CfT, offscreen full browser','BASE'],
+  'direct-clean-public':['Direct CfT, offscreen full browser','BASE + O'],
+  'direct-headless-local':['Direct CfT, headless','BASE-H'],
+  'direct-headless-public':['Direct CfT, headless','BASE-H + O'],
+  'pw-gate-disabled-public':['Diagnostic: Playwright shell, LNA disabled','PW-S + O + D']
+};
+let table='| Tool / launch | Flags | Public override | /fetch reached | /img reached | /frame reached | OPTIONS | Page-observed outcome |\n|---|---|---|---|---|---|---|---|\n';
+for(const id of mainIds){
+  const s=summaries.find(x=>x.id===id);const [label,flags]=labels[id];
+  const outcome=s.page.fetch.outcome==='resolved'?'fetch resolved 200; image load; frame load + message':'fetch rejected TypeError; image error; frame load event without message';
+  table+='| '+[label,flags,s.override?'On':'Off',...['fetch','img','frame'].map(x=>s.reached[x]?'Yes':'No'),s.preflights,outcome].join(' | ')+' |\n';
+}
+table+='| Manifest pin: playwright-cli 0.1.21 / Playwright 1.64.0-alpha-1789764292000 | Unverified | Not run | Unknown | Unknown | Unknown | Unknown | Exact packages not found in inspected locations |\n';
+fs.writeFileSync('artifacts/table.md',table);
+const disabled=runs.find(r=>r.id==='pw-shell-local').browserProcesses[0].args.find(x=>x.startsWith('--disable-features='));
+const sourcesLink='[installed upstream excerpts](artifacts/upstream-excerpts.txt)';
+const conclusion='In the measured Chromium 153.0.8010.12 launches, agent-browser 0.38.1 with the documented CDP transport adaptation, Playwright 1.63.0’s shell and Chromium CLI configurations, and direct Chrome for Testing all blocked public-origin `/fetch`, `/img`, and `/frame` HTTP requests to loopback without a permission grant. '+
+  'The LNA gate is therefore in effect for those tested configurations; exact playwright-cli 0.1.21 / Playwright 1.64.0-alpha behavior remains unverified, and the requested Chromium source-file/line citation could not be obtained within the network restriction.';
+let report=`# Chromium Local Network Access configuration measurement
+
+Measured on 2026-09-30, using Chromium **153.0.8010.12** (revision **971a7443b0c9b0a9b2860529b33331b76077ec62**). The measured public-origin cases were blocked before any HTTP request reached the target, while every local-to-local control succeeded; a diagnostic with LNA disabled also succeeded. The complete per-run evidence is in [runs.json](artifacts/runs.json), the [reduced evidence](artifacts/evidence-summary.json), and the independently recorded [target request lines](artifacts/target-requests.jsonl).
+
+Two requirements remain unverified: the exact manifest-pinned playwright-cli 0.1.21 / Playwright 1.64.0-alpha package was not found in the inspected locations, and no Chromium 153 source or LNA test document was found locally for the requested source-file/line citation. No upstream network request was made to fill either gap. These results establish the installed configurations actually measured, and do not substitute Playwright 1.63.0 for the unverified alpha version.
+
+**Versions and sources.**
+
+| Component | Verification |
+|---|---|
+| agent-browser | Native binary returned 0.38.1; installed package also declares 0.38.1; source identity vercel-labs/agent-browser v0.38.1 |
+| Chrome for Testing | Both \`chromium-1243/chrome-linux64/chrome --version\` and CDP Browser.getVersion returned 153.0.8010.12 |
+| Headless shell | \`chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell --version\` returned 153.0.8010.12 |
+| Playwright API actually used | Installed playwright-core 1.63.0 under the crawl4ai grader's node_modules; its browsers.json selects Chromium and headless shell revision 1243 |
+| Installed bundled CLI implementation | Calling its cli-client/cli.js with --version returned 1.63.0 |
+| Manifest CLI pin | 0.1.21 / 1.64.0-alpha-1789764292000 is declared in the repository; no executable was found on PATH and no matching package appeared in the inspected npm/tool/cache/scratch prefixes |
+| Node | ${runtime.node} |
+| Repository read | ${JSON.parse(fs.readFileSync('artifacts/source-inventory.json')).repo} |
+
+See [native version output](artifacts/runtime.json), [package/source identities and SHA-256 values](artifacts/source-inventory.json), [offline package search](artifacts/offline-package-search.json), and [additional search](artifacts/offline-package-search-extra.json). The repository's recipes/README.md line 102 declares the CLI pin; manifests/stack.json declares Playwright 1.63.0 and upstream commit 1b025d7e20a026371cd5f98ba0cdce48892737c8. Upstream identities are [agent-browser v0.38.1](https://github.com/vercel-labs/agent-browser/tree/v0.38.1) and [Playwright v1.63.0](https://github.com/microsoft/playwright/tree/v1.63.0); these identity links were not fetched during this offline measurement.
+
+**Method and endpoint containment.**
+
+The page server used **127.0.0.1:45871** (A), and the target used **127.0.0.1:45872** (B). Before every batch, \`ss -ltn\` confirmed that the chosen ports were not occupied in the host namespace. All browser execution and both servers then ran in a new util-linux user/network namespace containing only loopback, with no external route and nftables allowing new TCP connections only to those two IPv4 endpoints. Ports 20128 and 20129 and every pre-existing host listener were outside that namespace and were never contacted. See [initial listener inventory](artifacts/host-listeners-before.txt), [two running listeners](artifacts/namespace-listeners-running.txt), [network interfaces](artifacts/namespace-addresses.json), [routes](artifacts/namespace-routes.json), [firewall rules/counters](artifacts/firewall-final.json), and [empty listener inventory after cleanup](artifacts/namespace-listeners-after.txt). The firewall snapshot is from the last batch; the same rules were installed before each batch.
+
+The fixture [page.html](scripts/page.html) concurrently performs a plain cross-origin fetch, inserts an image, and inserts an iframe. Each uses /fetch, /img, or /frame with a run identifier in the query string. It records resolved/rejected/error-name state, image events, iframe events, a target-frame postMessage, isSecureContext, and permission states before/after in the DOM and title. After five seconds it posts the same result to its own page origin, allowing the direct Chrome baseline to be observed without CDP or automation flags. Agent-browser additionally reads #results through its native CLI; Playwright reads that DOM element through its API.
+
+The target logs every request line, Origin header, and whether the method is OPTIONS before sending 200. It supplies permissive CORS response headers and Access-Control-Allow-Private-Network: true, so a CORS response mismatch is not mistaken for LNA blocking. /img returns a valid SVG; /frame sends an origin-checked postMessage. No CORS/PNA preflight arrived in any measured case. GET /fetch carried Origin: http://127.0.0.1:45871; the image/frame GETs had no Origin header. The logs, rather than a fetch rejection or iframe load event by itself, determine whether a request reached B.
+
+This measures HTTP request delivery to a real loopback TCP listener in the isolated namespace. It does not assert that Chromium avoids TCP connection establishment before enforcing LNA, or test unrelated transport APIs. All browser profiles and runtime files were created in this directory; no existing profile, credential store, .env file, or ~/.codex/auth.json was opened for inspection.
+
+**Public-address-space override and secure context.**
+
+The exact switch used was \`--ip-address-space-overrides=127.0.0.1:45871=public\`. Chromium's own CDP responseReceivedExtraInfo reports the page as Public, and Audits.issueAdded reports initiatorIPAddressSpace: Public, initiatorIsSecureContext: true, LocalNetworkAccessPermissionDenied, and PermissionBlock for the three blocked resource types. The native network log independently records client_address_space: public, resource_address_space: loopback, and result: lna-permission-required. Controls record loopback to loopback with allowed-no-less-public. See [public headless-shell CDP events](artifacts/pw-shell-public.cdp.jsonl), [native network log](artifacts/pw-shell-public.netlog.json), and [source-address-space summaries](artifacts/evidence-summary.json).
+
+Every valid page reported isSecureContext === true, including every public-override page. HTTP on 127.0.0.1 remained a secure context despite the address-space override, so an HTTPS repeat was unnecessary. This verifies the switch's accepted syntax and effect in the installed Chromium revision experimentally; it does **not** supply the requested Chromium C++/LNA-documentation file-and-line citation. That documentary requirement remains explicitly unmet because the relevant source was not found in the inspected local repository, browser installation, or scratch/source locations and fetching it would violate the two-endpoint rule.
+
+**Launch configuration.**
+
+Every test used a fresh browser context/profile with no permission grants. AB's native CDP traffic was observed for permission-changing commands and none appeared. The Playwright launch/context options passed no permissions, and its installed browser-context code grants configured permissions only when an options.permissions value exists (coreBundle.js lines 51610–51611); no page ever observed granted permission. Direct Chrome had no CDP connection. These findings are supported by [per-run options and permissions](artifacts/runs.json) and ${sourcesLink}.
+
+Agent-browser supports both --args and --executable-path, as documented in its installed README.md lines 1048 and 1052 and [native --help](artifacts/agent-browser-help.txt). Its ordinary launch opens a third TCP endpoint for CDP, which the safety rules exclude. The supported executable-path option therefore pointed at [chrome-wrapper.cjs](scripts/chrome-wrapper.cjs): it preserves the arguments actually supplied by agent-browser, replaces only --remote-debugging-port=0 with Chromium's native --remote-debugging-pipe, and adds net logging. The already-running page server carries the CDP WebSocket endpoint and forwards to the pipe, so there are still only two HTTP listeners. Pipe framing follows the installed Playwright upstream implementation, coreBundle.js lines 39396–39460 (original file packages/playwright-core/src/server/pipeTransport.ts). This is an explicit transport adaptation of agent-browser's launch, rather than a claim that the untouched default TCP transport was tested.
+
+The installed Playwright 1.63.0 CLI resolver defaults to isolated contexts and headless launch (coreBundle.js lines 72311–72314), defaults an unspecified browser to the chrome channel (72331–72336), maps --browser chromium to chrome-for-testing (72373–72385), and adds --disable-blink-features=AutomationControlled (72366–72369). Its isolated factory uses chromium.launch followed by browser.newContext (73379–73391 and 74313). The PW-C/PW-H cases reproduce that installed **1.63.0** Chromium configuration through the upstream API, explicitly selecting the installed CfT channel; they do not claim to reproduce the missing 1.64.0-alpha launcher. The headless-shell cases separately exercise chromium.launchPersistentContext with headless true and no channel, whose executable selection is implemented at coreBundle.js lines 43370–43375. The earlier generic persistent headed cases are retained as supplementary evidence and are not labeled CLI defaults. See ${sourcesLink} and [all options and effective argv](artifacts/runs.json).
+
+Headed-mode CfT used --ozone-platform=headless because no independent display server was started or contacted. This is a full-browser, offscreen platform configuration, not an observed interactive desktop. Direct BASE used no --enable-automation, remote-debugging option, permission override, or feature-disable list; --no-first-run was needed to reach the requested page on a fresh full-browser profile. All cases used --no-sandbox because the isolated user namespace maps the process to root; that process-sandbox setting is recorded and was not treated as an LNA setting.
+
+| Flag label | Meaning |
+|---|---|
+| O | --ip-address-space-overrides=127.0.0.1:45871=public |
+| AB | Agent defaults, --headless=new, --disable-features=Translate, --enable-features=NetworkService,NetworkServiceInProcess,WebMCPTesting,DevToolsWebMCPSupport; CDP pipe adaptation above |
+| PW-S | Playwright defaults, headless shell, --headless, --remote-debugging-pipe |
+| PW-C | Playwright defaults, isolated CfT context, --headless, --disable-blink-features=AutomationControlled, --remote-debugging-pipe |
+| PW-H | PW-C with headless false and --ozone-platform=headless instead of --headless |
+| BASE | Direct CfT: --ozone-platform=headless, --no-first-run, fresh --user-data-dir, --no-sandbox, --log-net-log, fixture URL |
+| BASE-H | Direct CfT: --headless, fresh --user-data-dir, --no-sandbox, --log-net-log, fixture URL |
+| D | Explicit diagnostic --disable-features=LocalNetworkAccessChecks; this is not a default launch |
+
+The full Playwright default feature-disable list in the actual command line was:
+
+\n\`\`\`text
+${disabled}
+\`\`\`
+
+Neither AB's nor Playwright's default list disables LocalNetworkAccessChecks. The diagnostic deliberately supplies its own disable-features argument; all actual argument occurrences are retained so its interpretation does not rely on assuming how duplicate switches merge. Installed upstream default switches are at coreBundle.js lines 34816–34903 (original packages/playwright-core/src/server/chromium/chromiumSwitches.ts); native launch and executable choice are at 43317–43376 (original chromium.ts). See ${sourcesLink}.
+
+**Results.** “Reached” means the target logged the HTTP GET request line.
+
+${table}
+
+Every valid run reached the five-second observation point. In blocked cases iframe.onload still fired, but the frame supplied no message and B logged no /frame request; therefore the load event is not evidence of successful iframe delivery. Chromium's page-level CDP failures in the instrumented cases identify LocalNetworkAccessPermissionDenied; the iframe has ERR_BLOCKED_BY_LOCAL_NETWORK_ACCESS_CHECKS. The native netlog identifies LNA permission denial in the direct baseline as well. See [evidence-summary.json](artifacts/evidence-summary.json).
+
+**Permission request behavior.**
+
+All controls stayed at permission state prompt, with no permission request required for loopback-to-loopback access. Public headless-shell cases internally denied LNA requests while navigator.permissions remained prompt. Public full-CfT cases (agent, CLI-style headless/headed, and direct) changed local-network-access and loopback-network from prompt to denied; local-network remained prompt. Native logs report LOCAL_NETWORK_ACCESS_PERMISSION_REQUESTED with result denied, and no grant was applied or accepted. No permission prompt was clicked; no visible desktop prompt was observed. The four CLI-style runs also returned an empty Permissions.Prompt histogram query. This establishes denial/no auto-grant for the measured offscreen launches without asserting how a separate interactive desktop would render a prompt. See [permission states and histogram responses](artifacts/runs.json) and [native LNA records](artifacts/evidence-summary.json).
+
+**Exact reproduction commands.** Run from a fresh copy of this scratch directory containing scripts/; run.sh rejects occupied ports and measure.cjs refuses to reuse a case/profile. No install or browser download is performed.
+
+\`\`\`bash
+rtk bash scripts/run.sh
+rtk node scripts/report.cjs
+\`\`\`
+
+The successful measurements here were collected in three batches after correcting the initial temporary-path failure:
+
+\`\`\`bash
+rtk bash scripts/run.sh
+rtk bash scripts/run.sh direct-clean-local direct-clean-public direct-headless-local
+rtk bash scripts/run.sh pw-cli-local pw-cli-public pw-cli-headed-local pw-cli-headed-public
+rtk node scripts/report.cjs
+\`\`\`
+
+The first batch used the earlier matrix ending at pw-gate-disabled-public; the current script includes all cases for a fresh one-command reproduction. [commands.json](artifacts/commands.json) contains the exact agent-browser commands and directly spawned browser commands, including executable paths; [effective-commands.txt](artifacts/effective-commands.txt) contains every captured Chromium command line, including Playwright-spawned processes. run.sh contains the exact clean environment, namespace, firewall, and runtime-directory settings. Neither HOME nor CODEX_HOME is repurposed; the child environment omits HOME and uses scratch XDG paths and /proc/self/cwd/state/tmp for temporary files.
+
+<details><summary>Captured effective browser commands for the primary table</summary>
+
+\`\`\`text
+${mainIds.map(id=>{const r=runs.find(x=>x.id===id);const a=r.browserProcesses?.[0]?.args||r.processArguments;return id+'\n'+a.map(quote).join(' ');}).join('\n\n')}
+\`\`\`
+
+</details>
+
+**Corrections and excluded attempts.**
+
+The first full-Chrome launches failed before loading a page because Chromium's SingletonSocket path exceeded the UNIX-socket path limit under the long absolute TMPDIR. The correction uses /proc/self/cwd/state/tmp, which resolves inside the same scratch directory; subsequent controls and process logs verify successful launches. The initial attempt is retained in [artifacts-attempt-1](artifacts-attempt-1/runs.json); its startup failures are not counted as LNA blocking. Editing run.sh while its first invocation was still executing also caused a trailing shell-command error after the measurements; later completed batches exited successfully and produced the cleanup inventory.
+
+The original direct offscreen cases direct-local/direct-public did not navigate to the fixture before their deadline, so their lack of target requests was inconclusive. The corrected direct-clean-local/direct-clean-public cases add only --no-first-run; the local control then loaded all three resources. The initial generic Playwright persistent launch was also too broad an approximation of CLI defaults: inspecting the installed CLI resolver revealed the isolated context, channel choice, and AutomationControlled argument, which were explicitly reproduced in the additional PW-C/PW-H cases. These corrections and their verification paths are retained rather than treating failed startup/navigation or an approximate launch profile as a gate result.
+
+**Validation.** The independent reduction reports ${valid.length} valid cases; all pages were secure, all local controls reached every target path, every default public case reached none and had a native lna-permission-required result, and the diagnostic with LNA disabled reached all paths. No OPTIONS request or granted permission was observed. See [validation.json](artifacts/validation.json). These are synthetic configuration checks using the installed upstream tools, not an unchanged upstream test suite or a claim of current upstream release convergence; online changelogs were not consulted under the endpoint restriction.
+
+**Conclusion (two sentences).**
+
+${conclusion} [Measurement evidence](artifacts/evidence-summary.json), [source/installation identities](artifacts/source-inventory.json).
+`;
+// Literal backticks in the version table/prose are escaped for the JS template.
+report=report.replaceAll('\`','`');
+fs.writeFileSync('results.md',report);
+console.log(JSON.stringify({checks,report:'results.md',bytes:Buffer.byteLength(report)},null,2));

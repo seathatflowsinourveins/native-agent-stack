@@ -44,11 +44,11 @@ It never writes ~/.agents/skills, ~/.claude/skills or
 the skill lock file directly -- only the `skills` CLI does, exactly as it
 would for a person running it by hand.
 
-The global skill lock path honors $XDG_STATE_HOME exactly like the upstream
-CLI: ``$XDG_STATE_HOME/skills/.skill-lock.json`` when that variable is set,
-else ``~/.agents/.skill-lock.json``. Only *that* lock path check reads the
-variable; the canonical skill folders and the claude-code symlink stay under
---home/.agents and --home/.claude regardless of $XDG_STATE_HOME.
+The global skill lock path honors $XDG_STATE_HOME exactly like the upstream CLI:
+``$XDG_STATE_HOME/skills/.skill-lock.json`` when that variable is set, else ``~/.agents/.skill-lock.json``.
+Only *that* lock path check reads the variable; the canonical skill folders and the claude-code symlink
+stay under --home/.agents and --home/.claude regardless of $XDG_STATE_HOME. Every global path is joined as
+the CLI's path.join joins it (node_path_join), so a ".." in --home or $XDG_STATE_HOME names what it wrote.
 
 With --project-dir, the same pipeline invokes the CLI in that existing directory,
 without -g, targeting --agent (default universal). The project lock is
@@ -66,15 +66,28 @@ Before any CLI or gh call, project containment is checked: .agents/skills,
 .claude/skills and skills-lock.json, which the CLI recreates or writes
 (src/installer.ts:128-131,193-200,388; src/agents.ts:158; src/local-lock.ts:65-66),
 must not pass through a symlink; each selected skill's canonical and Claude paths
-must resolve inside --project-dir; and --project-dir must not be --home.
+must resolve inside --project-dir; and --project-dir must not be --home, joined as the
+CLI joins HOME and then resolved.
 As with the global verifier, this attests
 the source tree, not all installed support files. No lock or skill is hand-written.
 Reference: vercel-labs/skills@7407f3893ad4dceab546ac002c3ef806e4000c73
 src/local-lock.ts:15-37,65-66; src/add.ts:2086-2160; src/agents.ts:815-820.
 
 A manifest marked "scope": "project" (the runtime-worker manifest) is refused
-without --project-dir; --print-codex-config, which only prints, still runs. A
-skill whose status is pruned is never installed, in either mode.
+without --project-dir, and so is --print-codex-config for it, which only prints
+but names each skill by its installed path in the project. A skill whose status
+is pruned is never installed, in either mode.
+
+--print-codex-config prints one `[[skills.config]]` table with `enabled = false` for
+every codex_enabled: false skill, selecting the installed SKILL.md by `path`, never by
+`name`: Codex applies a name rule to every loaded skill of that name, the bundled
+.system skills it ships included (openai/codex rust-v0.159.2
+codex-rs/config/src/skills_config.rs L109-119; codex-rs/skills/src/lib.rs L55-67), and
+a path rule to the one skill whose canonical path_to_skills_md it names
+(codex-rs/ext/skills/src/host_service.rs L366-371, host_outcome.rs L52-54). The path is
+the canonical copy the CLI writes (canonical_skill_dir), which is where a global install
+leaves a Codex skill (skills@7407f389 src/installer.ts:392-402) and which Codex loads
+from its $HOME/.agents/skills root (codex-rs/ext/skills/src/host_roots.rs L103-108).
 
 A manifest entry with `reuse_ref` ("adoption/skills/manifest.json") is resolved
 when the manifest is read, against the one adoption skill of the same name: its pin
@@ -186,9 +199,10 @@ def sha256_of(path: Path) -> str:
 
 
 def canonical_skill_dir(home: Path, name: str, project_dir: Path | None = None) -> Path:
-    """The upstream CLI's one canonical copy; Codex reads this directly and
+    """The upstream CLI's one canonical copy (src/installer.ts:128-131); Codex reads this directly and
     claude-code gets a relative symlink onto it (../../.agents/skills/<name>)."""
-    return (project_dir or home) / ".agents" / "skills" / name
+    return (project_dir / ".agents" / "skills" / name if project_dir is not None
+            else node_path_join(str(home), ".agents", "skills", name))
 
 
 # What JavaScript's String.prototype.trim removes (ECMA-262 WhiteSpace and LineTerminator): the 25 code points
@@ -202,13 +216,12 @@ def claude_skills_dir(home: Path, project_dir: Path | None = None) -> Path:
     """Where the CLI links claude-code skills: <project>/.claude/skills, or globally
     $CLAUDE_CONFIG_DIR/skills when that is set and not blank, else home/.claude/skills
     (skills@1.7.0 npm dist/cli.mjs L1398 claudeHome, L1511 globalSkillsDir). The global
-    path is trimmed and normalized as the CLI's trim() and path.join do: os.path.normpath,
-    except that a leading // collapses to / as in Node."""
+    path is trimmed as the CLI's trim() trims it (JS_TRIM_CHARS) and joined as its
+    path.join joins it (node_path_join)."""
     if project_dir is not None:
         return project_dir / ".claude" / "skills"
     claude_config_dir = os.environ.get("CLAUDE_CONFIG_DIR", "").strip(JS_TRIM_CHARS)
-    joined = os.path.normpath(os.path.join(claude_config_dir or str(home / ".claude"), "skills"))
-    return Path("/" + joined.lstrip("/") if joined.startswith("//") else joined)
+    return node_path_join(claude_config_dir or str(home / ".claude"), "skills")
 
 
 def project_containment_problem(project_dir: Path, home: Path, names: list[str]) -> str | None:
@@ -219,8 +232,10 @@ def project_containment_problem(project_dir: Path, home: Path, names: list[str])
     (src/remove.ts:293-331). Through a symlink, or with --project-dir at --home, an add and its
     rollback would replace and then delete a global skill. No existing component of a path the
     CLI writes may be a symlink. A selected skill's own Claude entry may be the CLI's relative
-    link onto the canonical copy, so for those paths only the resolved location is checked."""
-    if home.resolve() == project_dir:
+    link onto the canonical copy, so for those paths only the resolved location is checked.
+    --home is compared as the CLI's global home, path.join(HOME) (node_path_join), then resolved:
+    pathlib keeps a ".." that follows a symlink or a missing folder, and names another directory."""
+    if node_path_join(str(home)).resolve() == project_dir:
         return "--project-dir is --home, where the global skills and their lock live"
     for relative in PROJECT_WRITE_PATHS:
         path = project_dir
@@ -238,10 +253,10 @@ def project_containment_problem(project_dir: Path, home: Path, names: list[str])
 def lock_file_path(home: Path, project_dir: Path | None = None) -> Path:
     if project_dir is not None:
         return project_dir / "skills-lock.json"
-    xdg_state_home = os.environ.get("XDG_STATE_HOME")
+    xdg_state_home = os.environ.get("XDG_STATE_HOME")  # dist/cli.mjs L3746-3750: untrimmed, any non-empty value
     if xdg_state_home:
-        return Path(xdg_state_home) / "skills" / ".skill-lock.json"
-    return home / ".agents" / ".skill-lock.json"
+        return node_path_join(xdg_state_home, "skills", ".skill-lock.json")
+    return node_path_join(str(home), ".agents", ".skill-lock.json")
 
 
 def load_lock(home: Path, project_dir: Path | None = None) -> dict:
@@ -481,13 +496,43 @@ def process_skill(skill: dict, home: Path, skills_bin: str, dry_run: bool, force
     return "rolled-back"
 
 
-def print_codex_config(skills: list[dict]) -> None:
-    """The `[[skills.config]]` tables that turn every codex_enabled: false
-    manifest skill off in Codex's ~/.codex/config.toml (no path needed)."""
-    blocks = [
-        f'[[skills.config]]\nname = "{skill["name"]}"\nenabled = false'
-        for skill in skills if isinstance(skill, dict) and skill.get("codex_enabled") is False
-    ]
+def node_path_join(*parts: str) -> Path:
+    """Node's POSIX path.join, with which the pinned CLI builds every global path it writes: the lock
+    (skills@7407f389 src/skill-lock.ts:67-72, npm dist/cli.mjs L3746-3750), the canonical folder
+    (src/installer.ts:128-131, dist/cli.mjs L2208-2210) and the claude-code link (dist/cli.mjs L1511).
+    Node joins the non-empty parts with / and normalizes the result, so "." and ".." collapse lexically.
+    os.homedir() is HOME verbatim, so only this join removes a ".." from --home; pathlib keeps it, and
+    through a missing or symlinked folder it names another path than the CLI's. os.path.normpath
+    normalizes as Node does, except that it keeps a leading // (POSIX leaves it implementation-defined),
+    which Node collapses to /. No final part joined here ends in /, which Node would keep."""
+    joined = os.path.normpath("/".join(part for part in parts if part))
+    return Path("/" + joined.lstrip("/") if joined.startswith("//") else joined)
+
+
+def toml_basic_string(value: str) -> str:
+    """value as a TOML basic string: the quotation mark, the backslash and every control character but none other
+    escaped (TOML 1.0.0, "String"). Raises InstallError for a value that is not valid Unicode text."""
+    try:
+        value.encode("utf-8")
+    except UnicodeEncodeError:
+        raise InstallError("a skill path is not valid UTF-8 and cannot be written as a TOML string") from None
+    escaped = "".join("\\" + char if char in '"\\' else
+                      f"\\u{ord(char):04X}" if ord(char) < 0x20 or ord(char) == 0x7F else char for char in value)
+    return f'"{escaped}"'
+
+
+def print_codex_config(skills: list[dict], home: Path, project_dir: Path | None = None) -> None:
+    """The `[[skills.config]]` tables that turn every codex_enabled: false manifest skill off in Codex's
+    config.toml, each selecting its installed SKILL.md by path (see the module docstring), never by name."""
+    blocks = []
+    for skill in skills:
+        if not isinstance(skill, dict) or skill.get("codex_enabled") is not False:
+            continue
+        name = skill.get("name")
+        if not isinstance(name, str) or not re.fullmatch(r"[a-z0-9][a-z0-9._-]*", name):
+            raise InstallError(f"codex_enabled: false skill {name!r} is not one path component")
+        path = canonical_skill_dir(home, name, project_dir) / "SKILL.md"
+        blocks.append(f"[[skills.config]]\npath = {toml_basic_string(str(path))}\nenabled = false")
     print("\n\n".join(blocks))
 
 
@@ -515,9 +560,10 @@ def build_parser() -> argparse.ArgumentParser:
                               "match the manifest, or an unmanaged project Claude target "
                               "(default: refuse it as local-modified)")
     parser.add_argument("--print-codex-config", action="store_true",
-                         help="Print [[skills.config]] name/enabled=false lines for every "
+                         help="Print a [[skills.config]] path/enabled=false table for every "
                               "codex_enabled: false manifest skill (a reuse_ref entry takes the "
-                              "adoption manifest's value), then exit")
+                              "adoption manifest's value), selecting its installed SKILL.md under "
+                              "--home, or --project-dir for a project-scoped manifest, then exit")
     parser.add_argument("--json", action="store_true",
                          help="Print a compact, value-free {skill: status} summary instead of prose")
     return parser
@@ -557,7 +603,15 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     if args.print_codex_config:
-        print_codex_config(all_skills)
+        if scope == PROJECT_SCOPE and project_dir is None:
+            print(f'install-skills failed: this manifest is scoped to projects ("scope": "{PROJECT_SCOPE}"); '
+                  f"pass --project-dir, whose installed SKILL.md paths the Codex tables name", file=sys.stderr)
+            return 1
+        try:
+            print_codex_config(all_skills if isinstance(all_skills, list) else [], Path(args.home), project_dir)
+        except InstallError as error:
+            print(f"install-skills failed: {error}", file=sys.stderr)
+            return 1
         return 0
 
     if scope == PROJECT_SCOPE and project_dir is None:

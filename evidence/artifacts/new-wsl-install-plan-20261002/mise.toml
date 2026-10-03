@@ -1,0 +1,18 @@
+# Global mise pins; install.sh merges them with mise use -g. Pins unchanged after round1, except: chezmoi removed and ast-grep added (merged manifest).
+# Noninteractive doctor uses shims on PATH (set by install.sh and accept.sh).
+# Source: https://raw.githubusercontent.com/jdx/mise/bc11f90c74eba23bf0d7350efb540e62fb7d9ffd/docs/dev-tools/shims.md#L70
+# This manifest is inventory, not a local project environment; tools install globally.
+[tools]
+node = "24.21.0"
+python = "3.13.16"
+uv = "0.12.22"
+'ast-grep' = "0.45.3" # ast-grep; planned
+'ollama' = "0.35.0" # Ollama; planned
+'zizmor' = "1.30.1" # zizmor; planned
+'syft' = "1.54.0" # Syft; planned
+'github:kjanat/actionlint' = "1.17.0" # actionlint (kjanat); planned
+'betterleaks' = "1.9.0" # betterleaks; planned
+'github-cli' = "2.102.0" # gh (GitHub CLI); planned
+'worktrunk' = "0.80.0" # worktrunk; planned
+'difftastic' = "0.71.0" # difftastic; planned
+'restic' = "0.19.1" # Restic; planned

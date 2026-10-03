@@ -1,0 +1,25 @@
+You are an adversarial critic of a blind decision round. Two deciders worked independently on the same slot packet, with the finalists listed in different orders, and each named one default. Try to break each decision. The deciders were told the criteria and decision rules below.
+
+__CRITERIA__
+
+Decision rules the deciders had:
+- Name exactly one default; apply the criteria as written and state which criterion decided.
+- Measured evidence decides only like for like (the same benchmark and metric); an independent or second-party result outranks a vendor's own number; numbers from different harnesses or metrics cannot decide.
+- If nothing measured separates the finalists, the decision rests on documented fit and must say so.
+- An option that installs nothing extra is the default unless measured evidence shows a challenger's gain on the requirement's own metric with an interval that excludes zero.
+- A dependency between tools is a reason only when an upstream document states it.
+- Not evidence: stars, downloads, popularity, current use, list order. License is information only.
+
+For the slot:
+1. Re-check at its source every deciding fact each decider cited. Record each check with its URL and whether it holds.
+2. Report any unsupported claim, any factual error, any reasoning that leans on popularity or on what anyone currently uses, any numbers compared across different harnesses or metrics, and any finalist that is stronger than a named default by the criteria.
+3. Give a verdict: converged (both deciders named the same default and it survives your checks), revised (name the default that survives and why) or split (the deciders differ and your checks do not settle it; name the single measurement that would).
+4. Write the overturn check for the surviving default: the one comparison, and the result in it, that would replace it.
+
+Rules: do not open files of the local repository; use the packet and upstream public sources only. Budget: at most 6 page fetches and 20 GitHub API calls. Fetch web pages through ctx_fetch_and_index.
+
+Decisions (JSON):
+__DECISIONS__
+
+Slot packet (read this file):
+__PACKET__

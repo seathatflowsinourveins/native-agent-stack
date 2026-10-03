@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "kind": "sota_native_host_finalization",
+  "status": "qualified_with_pending_idle_activation",
+  "scope": "Selected practices and installed skills on this Linux/WSL host; second host explicitly deferred.",
+  "sources": [
+    {
+      "repository": "openai/codex",
+      "revision": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+      "version": "0.159.2"
+    },
+    {
+      "repository": "anthropics/claude-code",
+      "revision": "ec44ca97dc86c33d934c8d55b24959aabf076871",
+      "version": "2.1.285"
+    },
+    {
+      "repository": "vercel-labs/skills",
+      "revision": "7407f3893ad4dceab546ac002c3ef806e4000c73",
+      "version": "1.7.0"
+    },
+    {
+      "repository": "mattpocock/skills",
+      "revision": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60"
+    },
+    {
+      "repository": "trailofbits/skills",
+      "revision": "82fe8226252622fa807643bdca1710901198553a"
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "revision": "cc1f6ce1f983721ecb42c7da27e58f0649c132f5"
+    }
+  ],
+  "installed_skills": {
+    "selected": 27,
+    "claude": {
+      "on": 19,
+      "name_only": 5,
+      "user_invocable_only": 3
+    },
+    "codex_enabled": 11,
+    "further_repins_installed": 3,
+    "upstream_retired_removed": 1,
+    "status_checks_passed": 27,
+    "exact_source_trees": 26,
+    "allowed_tree_exception": "supply-chain-risk-auditor/scripts/uv.lock"
+  },
+  "native_skill_outcomes": {
+    "runs": 29,
+    "initial_suite_runs": 25,
+    "initial_outcome_passes": 23,
+    "original_format_failures": 2,
+    "original_codex_implicit_load_misses": 2,
+    "explicit_full_load_observation_limits": 3,
+    "adjacent_negatives": 12,
+    "observed_negative_selected_invocations": 0,
+    "matched_baseline": "Both enabled and disabled pass; no quality gain measured."
+  },
+  "claude_convergence": {
+    "native_exit": 0,
+    "original_verdict": "changes_required",
+    "requested": "opus/max",
+    "native_model": "claude-opus-5-5",
+    "model_calls": 1,
+    "findings": "Stale current-main code and receipt collision reconciled; complete source closure prepared, timers disarmed.",
+    "repair_acceptance": "Independent current-source/hash checks, exact regression and role invariants passed. Original verdict preserved; no second model approval."
+  },
+  "upstream_tests": {
+    "semgrep_scan_returned": "104 passed, 0 failed, 104 run",
+    "semgrep_workflow_returned": "65 assertions passed;66 mutation assertions passed",
+    "scope": "Unchanged selected upstream hermetic stubs/dry-run suites; no real scan/model workflow.",
+    "codex_cargo": "not run"
+  },
+  "local_native_acceptance": {
+    "integrated_units": {
+      "exit": 0,
+      "run": 173,
+      "skipped": 11
+    },
+    "native_config": {
+      "exit": 0,
+      "run": 2
+    },
+    "native_doctor_link": {
+      "exit": 0,
+      "run": 2
+    },
+    "native_role_profile_lifecycle_repaired": {
+      "exit": 0,
+      "run": 2
+    },
+    "independent_regression_role_invariants": {
+      "exit": 0,
+      "run": 3
+    },
+    "post_repair_native_lane_proof": {
+      "exit": 0,
+      "passed": 8,
+      "failed": 0
+    },
+    "counts_scope": "Groups overlap source-defined cases; do not sum into an independent test count."
+  },
+  "production_state": {
+    "activation": "not observed",
+    "owned_retry_and_expiry_timers": "disarmed,not-found/inactive/dead",
+    "host_hashes": "All three unchanged",
+    "source_guard": "16 selected module/resource inputs match",
+    "window_w_live_activity": "unknown",
+    "next_gate": "Guarded application in a quiet owned window with current reviewed hashes and complete source closure; no client termination or guard bypass."
+  },
+  "artifact_refs": [
+    "source-review.json",
+    "native-actions.json",
+    "installed-skills.json",
+    "upstream-tests.json",
+    "claude-review.json",
+    "claude-source-verification.json",
+    "upstream-codex-integration.json",
+    "owner-reconciliation.json",
+    "repair-verification.json",
+    "idle-rollout.json",
+    "catalog-scope.json",
+    "convergence.json"
+  ],
+  "limits": [
+    "No universal SOTA, model superiority, all-skills automatic activation or quality/efficiency gain.",
+    "Selected-source review is scoped; dated other catalog rows were not given a new full freshness audit.",
+    "Native passing command streams inside the lifecycle oracles were not separately retained; runner captures and independent source/closure checks bind the local acceptance.",
+    "Provider/GPU-wide, second-host, trading and paid/live-hosting acceptance remain separate.",
+    "Native usage counted once per final result. Review counters separate from29runs; coordinator/worker usage and actual billing unknown.",
+    "No remote publication or other owner receipt/branch changes."
+  ]
+}

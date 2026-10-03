@@ -1,0 +1,327 @@
+{
+ "slot_id": "memory-owner",
+ "layer_id": "durable-memory",
+ "title": "Durable memory",
+ "requirement": "Keep scoped decisions, handoffs and useful learning available across native Codex and Claude with inspectable capture, deletion and recovery.",
+ "slot_question": "Which single system owns durable memory for both Claude Code and Codex on the new host? Exactly one is installed.",
+ "a_deciding_comparison_would_measure": "Run source-grounded recall and abstention cases with scoped capture, useful-write quality, deletion and isolated restore; compare complete usage without duplicating memory owners.",
+ "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host.",
+ "context": "Two independent first-round reviewers read the same packet. Both kept ai-memory, agentmemory and deja-vu as finalists; one also kept Hindsight.",
+ "comparisons_on_record_where_every_named_arm_ran": [
+  "LongMemEval-S, session-level retrieval, 470 questions, recall_all@5, on a Mac (descriptive): agentmemory 0.9.29 with the all-MiniLM-L6-v2 embedder over its REST path 0.821; ai-memory (a 2.5 pre-release build) with Qwen3-Embedding-4B and its LLM reranker turned off 0.570; plain BM25 0.747. Not run: ai-memory with its LLM reranker, agentmemory through its Claude Code hooks, Hindsight 0.10.1 and MemPalace 3.10.0. The two systems captured different amounts of each session and used different embedders."
+ ],
+ "first_round": {
+  "reviewer_notes": [
+   {
+    "about": "ai-memory (C02)",
+    "first_round_status": "selected",
+    "note": "Provisional owner candidate: fullest documented fit to the requirement as written (typed Claude Code<->Codex handoffs, workspace/project scope, markdown-in-git capture, documented purge, backup and restore). A finalist for the deciding head-to-head, not a second memory owner to co-install.",
+    "cited_facts": [
+     {
+      "url": "https://github.com/akitaonrails/ai-memory/blob/main/README.md",
+      "shows": "[documented] 'Why ai-memory' (lines 17-80): quit Claude Code and continue in Codex with a handoff that is 'typed, owned, claimed exactly once'; the source of truth is a git-backed wiki of plain .md files and the database is a rebuildable index; lifecycle hooks capture prompts and tool calls, sanitized at a typed privacy boundary; capture, search and handoffs need zero LLM calls. Support matrix (lines 100-140): Linux, macOS and Windows via WSL2 supported; Claude Code and Codex are first-party MCP and hook integrations 'kept honest by CI'."
+     },
+     {
+      "url": "https://github.com/akitaonrails/ai-memory/blob/main/docs/lifecycle-ops.md",
+      "shows": "[documented] Safety matrix and 'What deleted means' for purge-session, purge-project and delete-workspace: destructive cascades with a preview when --confirm is omitted. `backup --to` streams a tarball built from an online sqlite3 .backup plus the wiki. `restore --from` stages and verifies the archive and refuses while the server runs. `reindex` rebuilds the index from the markdown, and `restore-page` restores a page from its version chain."
+     },
+     {
+      "url": "https://github.com/akitaonrails/ai-memory/blob/main/docs/backup.md",
+      "shows": "[documented] wiki/ is a git repository checkpointed by every consolidation pass. Sessions, observations, handoffs, users and embeddings live only in the DB, so recovering them needs `ai-memory restore --from <tarball>`; restoring from a mirror repo means rsync plus reindex."
+     },
+     {
+      "url": "https://github.com/akitaonrails/ai-memory/blob/main/docs/benchmarks/README.md",
+      "shows": "[documented, vendor's in-repo harness with commit, dataset sha256 and hardware per run] LongMemEval-S, 470 scored questions: hit@5 (any evidence session) 0.823 with the local all-MiniLM embedder (2026-09-01) and 0.815 (2026-09-21, 2.4 RC); zero-LLM FTS 0.666-0.668; recall@5 (fraction of evidence sessions) 0.680. Capture excerpts are bounded at a 2 KB privacy boundary."
+     },
+     {
+      "url": "packets/durable-memory.json#comparisons_on_record_where_every_named_arm_ran[0]",
+      "shows": "[on record, descriptive, Mac] LongMemEval-S session-level recall_all@5 (470 questions): an ai-memory 2.5 pre-release with Qwen3-Embedding-4B and its LLM reranker off scored 0.570, below plain BM25 (0.747) and agentmemory (0.821). The reranker arm was not run, and the arms captured different amounts per session with different embedders. This is a measured retrieval deficit against this selection."
+     },
+     {
+      "url": "https://api.github.com/graphql",
+      "shows": "[observed now 2026-10-01 ~17:45Z] Not archived. Last default-branch commit 2026-10-01T17:33Z; 1851 commits since 2026-07-03. 120 releases since the repo was created on 2026-05-21, including v2.5.0 (09-30), v2.5.1 and v2.5.2 (10-01). 13 open issues, 302 updated in 90 days. CI on main: the head is PENDING and two commits failed today (16:56Z and 17:03Z), a sign of high churn."
+     }
+    ]
+   },
+   {
+    "about": "Hindsight (C05)",
+    "first_round_status": "selected",
+    "note": "Challenger finalist with the strongest published memory-quality evidence and the richest learning layer (retain/recall/reflect, observations, knowledge pages). Its first-party Claude Code and Codex integration shares one bank per repo. Run it in the head-to-head as the sole owner; it needs an LLM for retain, local or hosted.",
+    "cited_facts": [
+     {
+      "url": "https://arxiv.org/abs/2512.12818",
+      "shows": "[documented; paper submitted 2025-12-14 by the Hindsight authors (affiliations not checked), not an independent reproduction] With an open-source 20B backbone, Hindsight lifts overall accuracy on LongMemEval and LoCoMo from 39% (full-context baseline on the same backbone) to 83.6%. A larger backbone reaches 91.4% on LongMemEval and up to 89.61% on LoCoMo (vs 75.78% for the strongest prior open system). These measure conversational QA accuracy, not coding-session handoff."
+     },
+     {
+      "url": "https://github.com/vectorize-io/hindsight/blob/main/README.md",
+      "shows": "[documented] Retain/recall/reflect; memory banks with strict isolation; a built-in per-bank MCP endpoint /mcp/{bank_id}/. The Coding Agents package wires Claude Code and Codex CLI. Over 25 LLM providers, including fully local ollama/lmstudio/llamacpp and the claude-code and openai-codex subscription providers. Supported Platforms: Linux x86_64/ARM64 and macOS Apple Silicon via Docker, pip and embedded pg0. The README claims independent reproduction by the VT Sanghani Center and The Washington Post; that claim was not verified here."
+     },
+     {
+      "url": "https://github.com/vectorize-io/hindsight/blob/main/hindsight-integrations/coding-agents/README.md",
+      "shows": "[documented] The default bankIdTemplate `coding-agent::{gitProject}` makes every agent share one bank per repo, scoped and shared across Claude Code and Codex. Curated knowledge pages cover architecture, conventions and in-flight work. Uninstall removes exactly what install added, and deleting the bank removes the only state the integration keeps (around line 1141)."
+     },
+     {
+      "url": "https://github.com/vectorize-io/hindsight/blob/main/hindsight-integrations/claude-code/README.md",
+      "shows": "[documented] Auto-recall on UserPromptSubmit and async auto-retain on Stop. MCP knowledge tools include agent_knowledge_delete_page. Dynamic bank IDs per agent, project or session. The local hindsight-embed daemon needs an LLM provider for fact extraction (openai, anthropic, gemini, groq, ollama, openai-codex, claude-code). The Codex README documents SessionStart, UserPromptSubmit and Stop hooks."
+     },
+     {
+      "url": "https://hindsight.vectorize.io/developer/admin-cli",
+      "shows": "[documented] `hindsight-admin backup` writes a consistent REPEATABLE READ snapshot covering banks, documents, memory units, mental models, webhooks and the audit log. `restore` deletes the target schema before import. `export-bank` writes a portable ZIP (embeddings are regenerated on import) and is read-only against a live instance. The 2026-09-22 blog adds bank clone, import and rename."
+     },
+     {
+      "url": "https://api.github.com/graphql",
+      "shows": "[observed now 2026-10-01] Not archived. Last commit 2026-10-01T16:06Z; 1338 commits since 2026-07-03. Release v0.10.2 on 2026-09-29 (71 releases). 98 open issues, 792 updated in 90 days. Workflows include test.yml, windows-smoke.yml and perf-test.yml. Most recent main commits carry no status checks; two show SUCCESS."
+     }
+    ]
+   },
+   {
+    "about": "agentmemory (C08)",
+    "first_round_status": "selected",
+    "note": "Challenger finalist with the best measured retrieval among arms that ran on record. It ships Claude Code and Codex plugins with automatic capture, /forget and /handoff skills, and export/import. It is a head-to-head arm, not a co-installed owner.",
+    "cited_facts": [
+     {
+      "url": "packets/durable-memory.json#comparisons_on_record_where_every_named_arm_ran[0]",
+      "shows": "[on record, descriptive, Mac] LongMemEval-S session-level recall_all@5 (470 questions): agentmemory 0.9.29 with all-MiniLM-L6-v2 over its REST path scored 0.821, against plain BM25 0.747 and ai-memory (reranker off) 0.570. This is the best measured arm; the Claude Code hooks path was not run."
+     },
+     {
+      "url": "https://github.com/rohitg00/agentmemory/blob/main/benchmark/LONGMEMEVAL.md",
+      "shows": "[documented, vendor harness] recall_any@5 95.2% for BM25+vector with all-MiniLM-L6-v2 and 86.2% for BM25 only, over 500 LongMemEval-S questions. The doc states these are retrieval recall, not QA accuracy, which is consistent with the stricter recall_all@5 on record."
+     },
+     {
+      "url": "https://github.com/rohitg00/agentmemory/blob/main/README.md",
+      "shows": "[documented] The Codex plugin registers @agentmemory/mcp, 6 lifecycle hooks and skills including /forget, /handoff and /lesson. Codex Desktop does not dispatch plugin hooks (openai/codex#16430); `agentmemory connect codex --with-hooks` is the workaround. The Claude Code plugin registers 12 hooks and 54 MCP tools. Key Capabilities: per-agent shared or isolated scoping, auto-forgetting, git snapshots (version, rollback, diff), /agentmemory/export and /agentmemory/import (merge, replace or skip), and a viewer on :3113. State lives in the iii-engine file KV (one JSON file per scope) or in Redis."
+     },
+     {
+      "url": "https://api.github.com/graphql",
+      "shows": "[observed now 2026-10-01] Not archived. Last commit 2026-10-01T11:28Z, but only 51 commits since 2026-07-03. Latest release v0.9.29 on 2026-08-16. 314 open issues. CI passed on 7 of the last 8 main commits. Depends on the external iii-engine runtime, pinned to v0.22.1."
+     }
+    ]
+   },
+   {
+    "about": "deja-vu",
+    "first_round_status": "not selected",
+    "note": "It has strong committed retrieval artifacts on LongMemEval-S (500 questions, with the dataset sha256): hit@5 97.2% and evidence-recall@5 91.0%. It also offers Claude Code and Codex handoff, resume and forget, and export/import sync, with no LLM. But its model is that 'the transcripts are the memory': there is no consolidation or curated write layer beyond `remember` and `promote`, so the deciding comparison's useful-write measure barely applies. It is the best extra arm for the recall head-to-head."
+   }
+  ],
+  "critic": {
+   "findings": [
+    "Every observed-now fact holds, with expected drift: ai-memory went from 1851 to 1852 commits since 2026-07-03, its HEAD moved to ae1eabe7e0 (PENDING), and open issues are 12 rather than 13.",
+    "After review the selection lists four finalist arms for the deciding head-to-head, not a chosen owner: ai-memory, Hindsight and agentmemory as the judge picked, plus deja-vu promoted from the judge's recall-only arm to a full arm.",
+    "The evidence cannot separate the finalists, and the judge's own close_call says so. The only measured head-to-head on record ranks the provisional owner, ai-memory, last on recall_all@5: 0.570, against plain BM25 at 0.747 and agentmemory at 0.821. That run had ai-memory's reranker off and used different embedders. The self-published hit@5 and recall_any numbers come from separate harnesses and cannot be compared. Calling ai-memory the 'provisional owner' therefore rests on criterion 1 (capability fit) alone and should not be read as a measured lead.",
+    "The judge demoted deja-vu to a 'recall-only arm' partly by understating it. Its README documents a curated write layer. `deja promote <id>` distills a session into a curated note with provenance, tags and a lifecycle state, and these notes outrank raw transcripts (L198). `--state rejected` marks a reverted decision (L58), and `remember` stores a durable decision (L245). So the deciding comparison's useful-write measure does apply to it.",
+    "deja-vu also leads agentmemory on currency and maintenance: 2094 vs 51 default-branch commits since 2026-07-03, a latest release 2 days old vs 46 days, green CI, and 86 vs 314 open issues. It has first-party Claude Code and Codex handoff, resume and forget, plus export/import. It should run as a full finalist.",
+    "Not verified: whether deja-vu keeps its own copies of transcripts after Claude Code's cleanup deletes the originals. Its README raises this case (L526-528), but I did not resolve it. Its recovery path (sync export/import plus re-indexing transcripts) therefore depends on something unconfirmed, and the isolated-restore test in the head-to-head covers it.",
+    "Hindsight's README claim of independent reproduction (L50) is weaker than it sounds. The README itself calls the Virginia Tech Sanghani Center and Washington Post reproducers 'research collaborators'. The arXiv author list includes Naren Ramakrishnan and Xuan Wang; their Virginia Tech affiliation was not verified on the abs page. The paper's figures measure conversational QA accuracy, not coding-session handoff.",
+    "ai-memory churns heavily: 120 releases since 2026-05-21, 3 releases in the last 2 days, and two failing default-branch commits on 2026-10-01 (16:56Z and 17:03Z). That counts for currency, but it is a risk when choosing a version to pin.",
+    "The judgment does not use popularity or current use. The 'provisional owner' label is justified by documented fit."
+   ],
+   "checked_facts": [
+    {
+     "claim": "ai-memory: created 2026-05-21; 120 releases; v2.5.2 published 2026-10-01T07:40:18Z (v2.5.1 on 10-01, v2.5.0 on 09-30); 1852 commits since 2026-07-03 (the judge saw 1851 earlier); commits a1255e34 (16:56Z) and 53985bdd (17:03Z) have FAILURE rollups; not archived",
+     "url": "https://api.github.com/graphql",
+     "holds": true
+    },
+    {
+     "claim": "ai-memory README: 'typed, owned, claimed exactly once' (L31); 'zero LLM calls' (L53); hooks 'kept honest by CI' (L103); 'Windows via WSL2 | Supported' (L110); docker run quick start (L300)",
+     "url": "https://github.com/akitaonrails/ai-memory/blob/main/README.md",
+     "holds": true
+    },
+    {
+     "claim": "ai-memory benchmarks: LongMemEval-S hit@5 0.815 with local embeddings (2.4 RC, 2026-09-21) and 0.823 (2026-09-01); zero-LLM FTS 0.666 and 0.668; recall@5 0.680",
+     "url": "https://github.com/akitaonrails/ai-memory/blob/main/docs/benchmarks/README.md",
+     "holds": true
+    },
+    {
+     "claim": "Hindsight: v0.10.2 published 2026-09-29T10:06:40Z; 71 releases; 1338 commits since 2026-07-03; HEAD at 2026-10-01T16:06Z; 98 open issues; MIT",
+     "url": "https://api.github.com/graphql",
+     "holds": true
+    },
+    {
+     "claim": "arXiv 2512.12818 (submitted 14 Dec 2025): with an open-source 20B model, Hindsight lifts overall accuracy from 39% to 83.6% over a full-context baseline on the same backbone; a larger backbone reaches 91.4% on LongMemEval and up to 89.61% on LoCoMo, vs 75.78% for the strongest prior open system",
+     "url": "https://arxiv.org/abs/2512.12818",
+     "holds": true
+    },
+    {
+     "claim": "Hindsight README: the reproducers are described as 'research collaborators' (L50); fully local providers ollama, lmstudio and llamacpp are supported (L82); supported platforms are Linux x86_64/ARM64 and macOS Apple Silicon (L166-171)",
+     "url": "https://github.com/vectorize-io/hindsight/blob/main/README.md",
+     "holds": true
+    },
+    {
+     "claim": "agentmemory: v0.9.29 (2026-08-16) is the latest GitHub release and the npm dist-tag latest; 51 commits since 2026-07-03; HEAD at 2026-10-01T11:28Z; 7 of the last 8 rollups SUCCESS; 314 open issues and 296 open PRs",
+     "url": "https://registry.npmjs.org/@agentmemory/agentmemory",
+     "holds": true
+    },
+    {
+     "claim": "agentmemory README: npx -y @agentmemory/agentmemory@latest (L87); pins iii-engine v0.22.1 (L139); codex plugin marketplace add and add (L608-609); /forget, /handoff and /lesson skills (L616); openai/codex#16430 workaround via connect codex --with-hooks (L622-627)",
+     "url": "https://github.com/rohitg00/agentmemory/blob/main/README.md",
+     "holds": true
+    },
+    {
+     "claim": "MemPalace: default branch develop; the 7 most recent commits (all on 2026-09-29) have FAILURE rollups and the previous one (2026-09-24) SUCCESS; v3.10.0 released 2026-09-16; 358 open issues",
+     "url": "https://api.github.com/graphql",
+     "holds": true
+    },
+    {
+     "claim": "deja-vu: created 2026-07-14; v0.21.4 released 2026-09-29; 63 releases; 2094 commits since 2026-07-03; HEAD rollup SUCCESS. README: 97.2% R@5 on LongMemEval-S (L30); promote produces curated notes with provenance and lifecycle state (L198); handoff --to codex (L61); forget (L160); sync export/import (L205); every column checked for Claude Code and Codex: MCP recall, auto-recall, skill, command, resume and handoff (L262, L264)",
+     "url": "https://github.com/vshulcz/deja-vu/blob/main/README.md",
+     "holds": true
+    }
+   ],
+   "deciding_comparison": "Run the judge's six-measure head-to-head on the new WSL2 host, with four arms. Install each one alone as the sole memory owner. (1) ai-memory, run with its LLM reranker on and off, using a matched embedder. (2) Hindsight, run once with a local model on the RTX 4090 and once with a hosted model. (3) agentmemory, through its Claude Code and Codex hooks path, not REST alone. (4) deja-vu as a full arm, including promote and remember notes. Measure: source-grounded recall and abstention over Claude Code -> Codex -> Claude Code chains in two projects; cross-project leakage; useful-write quality judged against the source transcripts; forget or purge, then confirm absence from both recall and indexes; backup -> fresh data dir -> restore, with recall compared for identity; and complete token, latency and cost usage, including LLM calls made during capture. As a secondary measure, report LongMemEval-S recall_all@5 with a matched embedder. The arm that leads on source-grounded recall while passing deletion and isolated restore becomes the single owner."
+  },
+  "evidence_gaps": [
+   "No candidate has run the packet's deciding comparison. The only head-to-head on record is retrieval-only and descriptive, run on a Mac, with different capture amounts and embedders.",
+   "The on-record run did not include ai-memory with its LLM reranker, agentmemory through its Claude Code hooks, Hindsight 0.10.1 or MemPalace 3.10.0.",
+   "Hindsight's LongMemEval and LoCoMo figures are conversational QA accuracy from a paper by the system's own authors. The README's independent-reproduction claim (VT Sanghani Center, Washington Post) was not verified, and no coding-session handoff evaluation exists.",
+   "The self-published recall numbers are hit@5/recall_any on separate harnesses: agentmemory 95.2%, MemPalace 96.6%, deja-vu 97.2%, ai-memory 0.823. They are not comparable with each other or with recall_all@5.",
+   "Not executed on the target host: any finalist's WSL2 install; Hindsight retain with a local Ollama model on the RTX 4090; agentmemory's pinned iii-engine v0.22.1 under WSL2; ai-memory's purge and restore round trip.",
+   "macOS arm64 support is documented for all three finalists (ai-memory menu bar app and tarballs, Hindsight platform table, agentmemory macOS data dir) but was not executed.",
+   "ai-memory's CI was mid-run and had failed on two commits today; whether v2.5.2 itself passes the full suite was not verified.",
+   "Mem0 Platform free-tier terms were not verified, so Mem0 was not treated as needs_paid_service."
+  ],
+  "second_reviewer_notes": [
+   {
+    "about": "C02 — ai-memory",
+    "first_round_status": "selected",
+    "note": "Finalist as the sole shared memory owner: strongest documented scoped handoff and lifecycle fit. Install one finalist, not all three.",
+    "cited_facts": [
+     {
+      "url": "https://github.com/akitaonrails/ai-memory/blob/e2d7d17d906dbe5a85ac83bc041a5a150268a2f3/README.md",
+      "shows": "Native Claude Code and Codex hooks/MCP, scoped shared capture, explicit handoffs, inspectable Markdown and audit records; keyless capture/search are supported."
+     },
+     {
+      "url": "https://github.com/akitaonrails/ai-memory/blob/e2d7d17d906dbe5a85ac83bc041a5a150268a2f3/docs/lifecycle-ops.md",
+      "shows": "Documented purge, page recovery and consistent SQLite-plus-wiki backup/restore. Purge is logical by default; compaction does not erase Git history or older backups. Markdown alone cannot recover sessions and handoffs."
+     },
+     {
+      "url": "https://github.com/akitaonrails/ai-memory/blob/e2d7d17d906dbe5a85ac83bc041a5a150268a2f3/docs/benchmarks/retrieval-ab-r2.md",
+      "shows": "Reproducible 2.4-RC retrieval evaluation: 470 scored LongMemEval-S questions, local-embedding hit@5 0.815 and recall@5 0.677; abstention excluded. This measures retrieval, not complete native-client usage."
+     },
+     {
+      "url": "https://github.com/akitaonrails/ai-memory/actions/runs/36913374060",
+      "shows": "Successful inspected HEAD checks include Ubuntu tests, Linux release build, fresh-resolution installation and several hook-bundle environments."
+     },
+     {
+      "url": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.5.2",
+      "shows": "Release dated 2026-10-01, with Linux x86_64 and macOS arm64 binaries. The documented native install requires mise; GPU use is optional."
+     },
+     {
+      "url": "https://github.com/akitaonrails/ai-memory/commit/e2d7d17d906dbe5a85ac83bc041a5a150268a2f3",
+      "shows": "Default-branch commit dated 2026-10-01. Repository is unarchived; inspected issue discussions were also active that day."
+     }
+    ]
+   },
+   {
+    "about": "C08 — agentmemory (rohitg00)",
+    "first_round_status": "selected",
+    "note": "Alternative sole owner: broad native capture, provenance, governance and memory evolution, with useful public retrieval evidence.",
+    "cited_facts": [
+     {
+      "url": "https://github.com/rohitg00/agentmemory/blob/b3d6cf50026655233f11c2273b898af0ca82cf03/README.md",
+      "shows": "Claude Code and Codex native plugins/hooks/MCP; project and agent scopes, provenance, audit-backed deletion, viewer, snapshots and documented export/import. Linux x86_64 and macOS arm64 engine paths are documented; vectors and LLM compression are optional."
+     },
+     {
+      "url": "https://github.com/rohitg00/agentmemory/blob/b3d6cf50026655233f11c2273b898af0ca82cf03/benchmark/LONGMEMEVAL.md",
+      "shows": "Published retrieval-only LongMemEval-S R@5 95.2%, with methodology and reproduction instructions. It is not end-to-end QA accuracy or a matched comparison against the other finalists."
+     },
+     {
+      "url": "https://github.com/rohitg00/agentmemory/blob/b3d6cf50026655233f11c2273b898af0ca82cf03/eval/README.md",
+      "shows": "Public adapter-based evaluations for LongMemEval and a small coding-session corpus; the latter compares hybrid retrieval with grep."
+     },
+     {
+      "url": "https://github.com/rohitg00/agentmemory/actions/runs/36855583061",
+      "shows": "Inspected Ubuntu and macOS test jobs succeeded across Node 20, 22, 24 and 26."
+     },
+     {
+      "url": "https://github.com/rohitg00/agentmemory/releases/tag/v0.9.29",
+      "shows": "Latest GitHub release dated 2026-08-16, within the currency window."
+     },
+     {
+      "url": "https://github.com/rohitg00/agentmemory/commit/b3d6cf50026655233f11c2273b898af0ca82cf03",
+      "shows": "Default-branch commit dated 2026-10-01. Repository is unarchived, with recently closed issue discussions."
+     }
+    ]
+   },
+   {
+    "about": "C10 — deja-vu",
+    "first_round_status": "selected",
+    "note": "Alternative sole owner: source-grounded session memory, deliberate decisions and inspectable recall with a small native runtime.",
+    "cited_facts": [
+     {
+      "url": "https://github.com/vshulcz/deja-vu/blob/7942a8d1cd780d9f1cf1d2b326b53083a5d740e4/README.md",
+      "shows": "Claude Code and Codex integration through MCP/plugins and supported hooks; project-aware work-in-progress recall, remember/promote, source provenance, recall logs and local inspection. Default operation needs no model or GPU."
+     },
+     {
+      "url": "https://github.com/vshulcz/deja-vu/blob/7942a8d1cd780d9f1cf1d2b326b53083a5d740e4/docs/guide/recover-a-deleted-session.html",
+      "shows": "Previously indexed sessions remain searchable after original transcripts are deleted. Recovery therefore does not depend solely on harness transcript retention."
+     },
+     {
+      "url": "https://github.com/vshulcz/deja-vu/blob/7942a8d1cd780d9f1cf1d2b326b53083a5d740e4/docs/guide/privacy.html",
+      "shows": "Inspectable recall receipts, project exclusions, activation policies and reversible forget tombstones. Forgetting indexed memory should not be confused with erasing original transcripts."
+     },
+     {
+      "url": "https://github.com/vshulcz/deja-vu/blob/7942a8d1cd780d9f1cf1d2b326b53083a5d740e4/docs/guide/sync-across-machines.html",
+      "shows": "Documented export/import and incremental transfer of indexed sessions, with full resend as a recovery path. This is not a demonstrated complete configuration snapshot."
+     },
+     {
+      "url": "https://github.com/vshulcz/deja-vu/blob/7942a8d1cd780d9f1cf1d2b326b53083a5d740e4/docs/benchmarks/longmemeval-s-cleaned.json",
+      "shows": "Committed 470-question retrieval result: hit@5 97.447%, stricter evidence-recall@5 91.539%; abstention excluded. These distinct metrics must not be conflated."
+     },
+     {
+      "url": "https://github.com/vshulcz/deja-vu/blob/7942a8d1cd780d9f1cf1d2b326b53083a5d740e4/docs/guide/day-zero.html",
+      "shows": "One upstream OpenCode task study ran eleven trials per arm: median tokens 53,558 for deja-vu, 104,974 for agentmemory and 126,222 without memory. This supports that limited task result, not general native-client superiority."
+     },
+     {
+      "url": "https://github.com/vshulcz/deja-vu/actions/runs/36877193754",
+      "shows": "Inspected Ubuntu and macOS end-to-end smoke checks succeeded."
+     },
+     {
+      "url": "https://github.com/vshulcz/deja-vu/releases/tag/v0.21.4",
+      "shows": "Release dated 2026-09-29, including Linux x86_64 and macOS arm64 artifacts."
+     },
+     {
+      "url": "https://github.com/vshulcz/deja-vu/commit/7942a8d1cd780d9f1cf1d2b326b53083a5d740e4",
+      "shows": "Default-branch commit dated 2026-10-01. Repository is unarchived and inspected issue activity was current."
+     }
+    ]
+   },
+   {
+    "about": "Hindsight",
+    "first_round_status": "not selected",
+    "note": "Credible challenger with native integrations and full-bank backup/restore; its PostgreSQL/model deployment is larger, while current benchmark artifacts and native coding write-quality were not verified sufficiently to displace the shortlist. [Installation](https://github.com/vectorize-io/hindsight/blob/0be6c02b2aafc2b6bdb188ef1842ac507e0cfa2b/hindsight-docs/docs/developer/installation.md), [recovery](https://github.com/vectorize-io/hindsight/blob/0be6c02b2aafc2b6bdb188ef1842ac507e0cfa2b/hindsight-docs/docs/developer/admin-cli.md)"
+   }
+  ],
+  "second_reviewer_evidence_gaps": [
+   "Currency did not eliminate any candidate: the GitHub API audit found all 17 unarchived with default-branch commits inside 2026-07-03 through 2026-10-01. Fourteen had a recent GitHub release; tigerless-labs/agent-memory and langmem returned no latest release, while letta's latest release was dated May. Recent issue activity was observed, but issue counts were not treated as quality scores.",
+   "The packet's Mac comparison favored agentmemory's tested configuration: recall_all@5 0.821 versus ai-memory 0.570 and BM25 0.747. Capture coverage and embedders differed; ai-memory's reranker and agentmemory's hooks were not tested. It does not decide complete usage on WSL2.",
+   "No fresh target-host installation or matched two-client capture/deletion/restore experiment was run. Linux/macOS CI and documented artifacts support platform plausibility, not measured WSL2 or RTX 4090 performance.",
+   "Successful HEAD CI does not prove released-package feature parity. Some inspected documentation is newer than the latest release tags.",
+   "Recovery evidence differs: ai-memory requires SQLite as well as Markdown; agentmemory documents export/import and snapshots; deja-vu exports indexed sessions, while complete configuration, policy and curated-note restoration still needs the deciding test.",
+   "Correction verified against committed sources: deja-vu retains already indexed sessions after source deletion. Its raw benchmark artifact reports hit@5 97.447%, whereas the README headline says 97.2%; neither is the stricter evidence-recall metric.",
+   "Hindsight's installation guide says PostgreSQL 14+, while its storage requirements say 15+. Use the stricter 15+ bound when evaluating an external database. Astra/Max arbitration was attempted for conflicting primary statements but rejected by the agent-thread limit; no cross-family acceptance was obtained.",
+   "Automatic approval review rejected ctx_fetch_and_index because it requires approval and this session's approval policy is never. The four-URL request fetched no pages. Judgment therefore uses the packet and GitHub API source snapshots; live benchmark pages, including Hindsight's current scores, remain unverified. Budget used: 30 GitHub API calls, 0 web searches, 4 attempted page fetches and 0 successful page fetches."
+  ]
+ },
+ "finalists": [
+  {
+   "key": "F2",
+   "name": "ai-memory",
+   "repository": "https://github.com/akitaonrails/ai-memory"
+  },
+  {
+   "key": "F4",
+   "name": "Hindsight",
+   "repository": "https://github.com/vectorize-io/hindsight"
+  },
+  {
+   "key": "F3",
+   "name": "deja-vu",
+   "repository": "https://github.com/vshulcz/deja-vu"
+  },
+  {
+   "key": "F1",
+   "name": "agentmemory (rohitg00)",
+   "repository": "https://github.com/rohitg00/agentmemory"
+  }
+ ]
+}

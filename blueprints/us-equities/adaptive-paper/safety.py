@@ -53,6 +53,13 @@ SUB_PENNY_REFUSAL = "sub_penny_minimum_price_variance"
 AVERAGE_ROUNDING = D("0.0000005")
 EXECUTION_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9:_.\-]{0,127}")
 EXECUTION_ACCOUNTING_RULE = "v4-symbol-execution-time-fallback"
+# Broker FEE activities (schema 3), as transport.normalize_fee_activity returns them: an
+# activity id "<timestamp>::<uuid>" (transport.ACTIVITY_ID; this module imports no transport
+# code), a YYYY-MM-DD date, a signed decimal net_amount (negative for a charge) and a
+# sub-type from the by-type reference's FEE list, or UNSPECIFIED when the broker gave none.
+FEE_ACTIVITY_ID = re.compile(r"[0-9]{1,32}::[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}")
+FEE_AMOUNT = re.compile(r"-?[0-9]{1,10}(?:\.[0-9]{1,9})?")
+FEE_SUB_TYPES = frozenset({"REG", "TAF", "LCT", "ORF", "OCC", "NRC", "NRV", "COM", "CAT", "UNSPECIFIED"})
 
 
 def execution_from_observation(row):
@@ -119,6 +126,26 @@ def instant(value):
     if type(value) not in (int, float) or not math.isfinite(value) or value <= 0:
         raise SafetyError("invalid_timestamp")
     return float(value)
+
+
+def _fee_row(fee):
+    """(activity_id, date, net_amount, sub_type) of one normalized FEE activity, or SafetyError."""
+    if type(fee) is not dict or set(fee) != {"id", "date", "net_amount", "sub_type"}:
+        raise SafetyError("invalid_fee_activity")
+    activity_id, day, amount, sub_type = fee["id"], fee["date"], fee["net_amount"], fee["sub_type"]
+    if type(activity_id) is not str or not FEE_ACTIVITY_ID.fullmatch(activity_id):
+        raise SafetyError("invalid_fee_activity")
+    if type(day) is not str or not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", day):
+        raise SafetyError("invalid_fee_date")
+    try:
+        day = date.fromisoformat(day).isoformat()
+    except ValueError:
+        raise SafetyError("invalid_fee_date") from None
+    if type(amount) is not str or not FEE_AMOUNT.fullmatch(amount):
+        raise SafetyError("invalid_fee_amount")
+    if type(sub_type) is not str or sub_type not in FEE_SUB_TYPES:
+        raise SafetyError("invalid_fee_sub_type")
+    return activity_id, day, D(amount), sub_type
 
 
 def symbol_name(value):
@@ -440,13 +467,20 @@ class Ledger:
                     raise SafetyError("persisted_risk_limits_differ")
                 self._set("limits", frozen)
                 version = self._get("schema_version")
-                if version not in (None, "1", "2"):
+                if version not in (None, "1", "2", "3"):
                     raise SafetyError("unsupported_ledger_schema")
                 if version in (None, "1"):
                     # Old `at` is the observation's floating-point order.updated_at,
                     # never evidence of an execution time. Keep those fills untimed.
                     self.db.execute("ALTER TABLE executions ADD COLUMN execution_time_ns INTEGER")
-                self._set("schema_version", "2")
+                # Schema 3 (2026-09-30): broker FEE activities (record_fees), created inside
+                # this transaction and only after the version check, so a refused ledger is
+                # never changed. The migration is one way: engines before it accept only
+                # None/1/2 and so refuse a migrated ledger (fail closed).
+                self.db.execute("CREATE TABLE IF NOT EXISTS fees(activity_id TEXT PRIMARY KEY, "
+                                "date TEXT NOT NULL, net_amount TEXT NOT NULL, sub_type TEXT NOT NULL, "
+                                "recorded_at REAL NOT NULL)")
+                self._set("schema_version", "3")
                 self.db.execute("CREATE INDEX IF NOT EXISTS intents_symbol ON intents(symbol,client_id)")
                 self.db.execute("CREATE INDEX IF NOT EXISTS events_client_kind ON events(client_id,kind,id)")
                 self.db.execute("CREATE INDEX IF NOT EXISTS events_adopted_symbol ON "
@@ -768,7 +802,7 @@ class Ledger:
             reason = "drawdown_cap_reached"
         elif state.gross_exposure_usd > cap:
             reason = "gross_exposure_cap_exceeded"
-        if reason and not state.halted_reason:
+        if reason and state.halted_reason in (None, "recovery_only"):
             self._set("halted_reason", reason)
             self._event("risk_halt", reason=reason)
         return self._state()
@@ -1121,6 +1155,12 @@ class Ledger:
                     changed = True
                 self._set_symbol_money(symbol, money)
             totals = [a + b for a, b in zip(totals, money)]
+        # Recorded FEE activities belong to no symbol's journal: add their money back, as
+        # record_fees booked it, so a re-derivation never drops a fee from cash, realized P&L
+        # or the realized loss.
+        for (amount,) in self.db.execute("SELECT net_amount FROM fees"):
+            amount = D(amount)
+            totals = [totals[0] + amount, totals[1] + amount, totals[2] + max(ZERO, -amount)]
         for name, amount in zip(("cash_delta", "realized", "realized_loss"), totals):
             changed |= amount != D(self._get(name))
             self._set(name, amount)
@@ -1277,6 +1317,39 @@ class Ledger:
                 self._reconcile_execution_accounting(client_id, filled)
             self._refresh_risk(at)
             return True
+
+    def record_fees(self, fees, now):
+        """Durably record broker FEE activities (transport.normalize_fee_activity rows) and
+        return the newly recorded ones. Every row is validated before the transaction; each
+        new activity id is inserted once, all in one transaction. A new fee adds net_amount
+        (negative for a charge) to cash_delta and to realized, and max(0, -net_amount) to
+        realized_loss: a fee is a realized cost that counts against the gross-loss budget,
+        and a credit never lowers the loss. peak_pnl and the risk halts then follow through
+        _refresh_risk, as after a fill. A known id with the same date, amount and sub-type is
+        a no-op; with any other value the whole batch is refused (fee_activity_changed)."""
+        now = instant(now)
+        if type(fees) not in (list, tuple):
+            raise SafetyError("invalid_fee_activities")
+        rows = [_fee_row(fee) for fee in fees]
+        with self._transaction():
+            recorded = []
+            for activity_id, day, amount, sub_type in rows:
+                known = self.db.execute("SELECT date, net_amount, sub_type FROM fees WHERE activity_id=?",
+                                        (activity_id,)).fetchone()
+                if known is not None:
+                    if (known["date"], D(known["net_amount"]), known["sub_type"]) != (day, amount, sub_type):
+                        raise SafetyError("fee_activity_changed")
+                    continue
+                text = _canonical(amount)
+                self.db.execute("INSERT INTO fees(activity_id,date,net_amount,sub_type,recorded_at) "
+                                "VALUES (?,?,?,?,?)", (activity_id, day, text, sub_type, now))
+                for name, delta in (("cash_delta", amount), ("realized", amount),
+                                    ("realized_loss", max(ZERO, -amount))):
+                    self._set(name, D(self._get(name)) + delta)
+                self._refresh_risk(now)
+                self._event("fee_recorded", activity_id=activity_id, date=day, net_amount=text, sub_type=sub_type)
+                recorded.append({"id": activity_id, "date": day, "net_amount": text, "sub_type": sub_type})
+            return recorded
 
     def request_budget(self, now, kind, client_id=None):
         """Return 0 after durable reservation, or delay <=60s WITHOUT reservation.
@@ -1451,6 +1524,13 @@ class Ledger:
         with self._lock, localcontext() as context:
             context.prec = 40
             return self._state()
+
+    def fees(self):
+        """Recorded broker FEE activities in recording order (read-only)."""
+        with self._lock:
+            return [{"activity_id": r["activity_id"], "date": r["date"], "net_amount": D(r["net_amount"]),
+                     "sub_type": r["sub_type"], "recorded_at": r["recorded_at"]}
+                    for r in self.db.execute("SELECT * FROM fees ORDER BY recorded_at, rowid")]
 
     def close(self):
         with self._lock:

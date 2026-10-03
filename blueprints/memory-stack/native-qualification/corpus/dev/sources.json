@@ -1,0 +1,612 @@
+[
+  {
+    "authority": "approved",
+    "available_from": "2026-04-03T09:00:00Z",
+    "effective_at": "2026-04-03T09:00:00Z",
+    "effective_until": "2026-05-08T09:00:00Z",
+    "path": "sources/dev-current_historical-01-s01.md",
+    "recorded_at": "2026-04-03T09:00:00Z",
+    "scenario_id": "dev-current_historical-01",
+    "sha256": "ed0c7a74103b994741ff4c2ced6dcec0f69b1f20ce0663e2742180314ff9ab34",
+    "source_id": "dev-current_historical-01-s01",
+    "split": "dev",
+    "supersedes": [],
+    "supported_facts": {
+      "retention_days": 11
+    },
+    "supports_abstention": []
+  },
+  {
+    "authority": "approved",
+    "available_from": "2026-05-08T09:00:00Z",
+    "effective_at": "2026-05-08T09:00:00Z",
+    "effective_until": null,
+    "path": "sources/dev-current_historical-01-s02.md",
+    "recorded_at": "2026-05-08T09:00:00Z",
+    "scenario_id": "dev-current_historical-01",
+    "sha256": "8c70673da80a79a0649068ac1bebedcbf34c0b8c7c240ac5147bea8141f1033b",
+    "source_id": "dev-current_historical-01-s02",
+    "split": "dev",
+    "supersedes": [
+      "dev-current_historical-01-s01"
+    ],
+    "supported_facts": {
+      "retention_days": 28
+    },
+    "supports_abstention": []
+  },
+  {
+    "authority": "approved",
+    "available_from": "2026-04-03T09:00:00Z",
+    "effective_at": "2026-04-03T09:00:00Z",
+    "effective_until": "2026-05-08T09:00:00Z",
+    "path": "sources/dev-current_historical-02-s01.md",
+    "recorded_at": "2026-04-03T09:00:00Z",
+    "scenario_id": "dev-current_historical-02",
+    "sha256": "3f052db3f38b58a7d888449b9e93d87936f1e3b431c247913268b09b3823f783",
+    "source_id": "dev-current_historical-02-s01",
+    "split": "dev",
+    "supersedes": [],
+    "supported_facts": {
+      "maintenance_day": "Friday"
+    },
+    "supports_abstention": []
+  },
+  {
+    "authority": "approved",
+    "available_from": "2026-05-08T09:00:00Z",
+    "effective_at": "2026-05-08T09:00:00Z",
+    "effective_until": null,
+    "path": "sources/dev-current_historical-02-s02.md",
+    "recorded_at": "2026-05-08T09:00:00Z",
+    "scenario_id": "dev-current_historical-02",
+    "sha256": "4f1404307af7f6d6656e6a8356290fad3db8f8812b5a4159381f2ef410f71370",
+    "source_id": "dev-current_historical-02-s02",
+    "split": "dev",
+    "supersedes": [
+      "dev-current_historical-02-s01"
+    ],
+    "supported_facts": {
+      "maintenance_day": "Monday"
+    },
+    "supports_abstention": []
+  },
+  {
+    "authority": "approved",
+    "available_from": "2026-04-03T09:00:00Z",
+    "effective_at": "2026-04-03T09:00:00Z",
+    "effective_until": "2026-06-12T09:00:00Z",
+    "path": "sources/dev-updates_conflicts-01-s01.md",
+    "recorded_at": "2026-04-03T09:00:00Z",
+    "scenario_id": "dev-updates_conflicts-01",
+    "sha256": "d229e0ab30362fd5543c7c84524facb291bc6fb08ea252fbb63e3810289f357b",
+    "source_id": "dev-updates_conflicts-01-s01",
+    "split": "dev",
+    "supersedes": [],
+    "supported_facts": {
+      "deployment_zone": "zone-d"
+    },
+    "supports_abstention": []
+  },
+  {
+    "authority": "draft",
+    "available_from": "2026-05-08T09:00:00Z",
+    "effective_at": "2026-05-08T09:00:00Z",
+    "effective_until": null,
+    "path": "sources/dev-updates_conflicts-01-s02.md",
+    "recorded_at": "2026-05-08T09:00:00Z",
+    "scenario_id": "dev-updates_conflicts-01",
+    "sha256": "49214c33fca5003766568fa8e5e70c4fff3cf5a15ded6f6f8ff24eb51428c108",
+    "source_id": "dev-updates_conflicts-01-s02",
+    "split": "dev",
+    "supersedes": [],
+    "supported_facts": {
+      "deployment_zone": "zone-e"
+    },
+    "supports_abstention": []
+  },
+  {
+    "authority": "approved",
+    "available_from": "2026-06-12T09:00:00Z",
+    "effective_at": "2026-06-12T09:00:00Z",
+    "effective_until": null,
+    "path": "sources/dev-updates_conflicts-01-s03.md",
+    "recorded_at": "2026-06-12T09:00:00Z",
+    "scenario_id": "dev-updates_conflicts-01",
+    "sha256": "92ccb4891337415eedeb25bcee4473d95e99c3f147994ab7766deb38e660b231",
+    "source_id": "dev-updates_conflicts-01-s03",
+    "split": "dev",
+    "supersedes": [
+      "dev-updates_conflicts-01-s01"
+    ],
+    "supported_facts": {
+      "deployment_zone": "zone-f"
+    },
+    "supports_abstention": []
+  },
+  {
+    "authority": "approved",
+    "available_from": "2026-04-03T09:00:00Z",
+    "effective_at": "2026-04-03T09:00:00Z",
+    "effective_until": "2026-06-12T09:00:00Z",
+    "path": "sources/dev-updates_conflicts-02-s01.md",
+    "recorded_at": "2026-04-03T09:00:00Z",
+    "scenario_id": "dev-updates_conflicts-02",
+    "sha256": "6d9aa20265fcfd61bbb9032f6ba4be05b436d7e514da99732aef19685e82ec45",
+    "source_id": "dev-updates_conflicts-02-s01",
+    "split": "dev",
+    "supersedes": [],
+    "supported_facts": {
+      "storage_quota_gib": 19
+    },
+    "supports_abstention": []
+  },
+  {
+    "authority": "draft",
+    "available_from": "2026-05-08T09:00:00Z",
+    "effective_at": "2026-05-08T09:00:00Z",
+    "effective_until": null,
+    "path": "sources/dev-updates_conflicts-02-s02.md",
+    "recorded_at": "2026-05-08T09:00:00Z",
+    "scenario_id": "dev-updates_conflicts-02",
+    "sha256": "d4e96bf44c0a4525b9f003a1b685ef5aa725cd68a0075c15a384d2cc83478540",
+    "source_id": "dev-updates_conflicts-02-s02",
+    "split": "dev",
+    "supersedes": [],
+    "supported_facts": {
+      "storage_quota_gib": 68
+    },
+    "supports_abstention": []
+  },
+  {
+    "authority": "approved",
+    "available_from": "2026-06-12T09:00:00Z",
+    "effective_at": "2026-06-12T09:00:00Z",
+    "effective_until": null,
+    "path": "sources/dev-updates_conflicts-02-s03.md",
+    "recorded_at": "2026-06-12T09:00:00Z",
+    "scenario_id": "dev-updates_conflicts-02",
+    "sha256": "019411eb3036a909cdba926cd40addd4ad48dd28db7719c37914b4f02675590f",
+    "source_id": "dev-updates_conflicts-02-s03",
+    "split": "dev",
+    "supersedes": [
+      "dev-updates_conflicts-02-s01"
+    ],
+    "supported_facts": {
+      "storage_quota_gib": 52
+    },
+    "supports_abstention": []
+  },
+  {
+    "authority": "approved",
+    "available_from": "2026-04-03T09:00:00Z",
+    "effective_at": "2026-04-03T09:00:00Z",
+    "effective_until": "2026-05-08T09:00:00Z",
+    "path": "sources/dev-workflow_ownership-01-s01.md",
+    "recorded_at": "2026-04-03T09:00:00Z",
+    "scenario_id": "dev-workflow_ownership-01",
+    "sha256": "206fb182fbfae809b44a5f63f683592071b4d8b41e952a798f9f32a02ca9a1b7",
+    "source_id": "dev-workflow_ownership-01-s01",
+    "split": "dev",
+    "supersedes": [],
+    "supported_facts": {
+      "next_action": "publish report",
+      "owner": "team-before"
+    },
+    "supports_abstention": []
+  },
+  {
+    "authority": "approved",
+    "available_from": "2026-05-08T09:00:00Z",
+    "effective_at": "2026-05-08T09:00:00Z",
+    "effective_until": null,
+    "path": "sources/dev-workflow_ownership-01-s02.md",
+    "recorded_at": "2026-05-08T09:00:00Z",
+    "scenario_id": "dev-workflow_ownership-01",
+    "sha256": "297c9344cc241d41b04cea4e581712bdeadc5b883627a2f612fbee22eee8ade4",
+    "source_id": "dev-workflow_ownership-01-s02",
+    "split": "dev",
+    "supersedes": [
+      "dev-workflow_ownership-01-s01"
+    ],
+    "supported_facts": {
+      "blocker": "signature unchecked",
+      "next_action": "compare artifact signature",
+      "owner": "team-willow",
+      "status": "blocked"
+    },
+    "supports_abstention": []
+  },
+  {
+    "authority": "approved",
+    "available_from": "2026-07-17T09:00:00Z",
+    "effective_at": "2026-07-17T09:00:00Z",
+    "effective_until": null,
+    "path": "sources/dev-workflow_ownership-01-s03.md",
+    "recorded_at": "2026-07-17T09:00:00Z",
+    "scenario_id": "dev-workflow_ownership-01",
+    "sha256": "0c56c0d3bd32c523da2efc65e1babda929e53fdb65cdffc305f93dbe895da0a1",
+    "source_id": "dev-workflow_ownership-01-s03",
+    "split": "dev",
+    "supersedes": [],
+    "supported_facts": {
+      "acceptance_complete": false,
+      "status": "blocked"
+    },
+    "supports_abstention": []
+  },
+  {
+    "authority": "approved",
+    "available_from": "2026-04-03T09:00:00Z",
+    "effective_at": "2026-04-03T09:00:00Z",
+    "effective_until": "2026-05-08T09:00:00Z",
+    "path": "sources/dev-workflow_ownership-02-s01.md",
+    "recorded_at": "2026-04-03T09:00:00Z",
+    "scenario_id": "dev-workflow_ownership-02",
+    "sha256": "40738d36eb0feb29cf9184efe9c872fa3ba257df07b6e86c6928069d9320092e",
+    "source_id": "dev-workflow_ownership-02-s01",
+    "split": "dev",
+    "supersedes": [],
+    "supported_facts": {
+      "next_action": "publish report",
+      "owner": "team-before"
+    },
+    "supports_abstention": []
+  },
+  {
+    "authority": "approved",
+    "available_from": "2026-05-08T09:00:00Z",
+    "effective_at": "2026-05-08T09:00:00Z",
+    "effective_until": null,
+    "path": "sources/dev-workflow_ownership-02-s02.md",
+    "recorded_at": "2026-05-08T09:00:00Z",
+    "scenario_id": "dev-workflow_ownership-02",
+    "sha256": "9ece37b8939ca0862a8cfe907ae9e8c45a454fa3c2fc563b4419086cff1f8d90",
+    "source_id": "dev-workflow_ownership-02-s02",
+    "split": "dev",
+    "supersedes": [
+      "dev-workflow_ownership-02-s01"
+    ],
+    "supported_facts": {
+      "blocker": "partition failed",
+      "next_action": "retry failed partition",
+      "owner": "team-birch",
+      "status": "blocked"
+    },
+    "supports_abstention": []
+  },
+  {
+    "authority": "approved",
+    "available_from": "2026-07-17T09:00:00Z",
+    "effective_at": "2026-07-17T09:00:00Z",
+    "effective_until": null,
+    "path": "sources/dev-workflow_ownership-02-s03.md",
+    "recorded_at": "2026-07-17T09:00:00Z",
+    "scenario_id": "dev-workflow_ownership-02",
+    "sha256": "6f2a128202d3aec40946ea2986a6c7dd3f3e48cf8f4275225d6e94d4c5620415",
+    "source_id": "dev-workflow_ownership-02-s03",
+    "split": "dev",
+    "supersedes": [],
+    "supported_facts": {
+      "acceptance_complete": false,
+      "status": "blocked"
+    },
+    "supports_abstention": []
+  },
+  {
+    "authority": "approved",
+    "available_from": "2026-04-03T09:00:00Z",
+    "effective_at": "2026-04-03T09:00:00Z",
+    "effective_until": null,
+    "path": "sources/dev-entities_multistep-01-s01.md",
+    "recorded_at": "2026-04-03T09:00:00Z",
+    "scenario_id": "dev-entities_multistep-01",
+    "sha256": "f2196cfafe6913de30dea95849c1b8dc852b9d7f9d4d2bc376bdb3868e680e62",
+    "source_id": "dev-entities_multistep-01-s01",
+    "split": "dev",
+    "supersedes": [],
+    "supported_facts": {
+      "entity_id": "entity-501",
+      "route_id": "route-71"
+    },
+    "supports_abstention": []
+  },
+  {
+    "authority": "approved",
+    "available_from": "2026-05-08T09:00:00Z",
+    "effective_at": "2026-05-08T09:00:00Z",
+    "effective_until": null,
+    "path": "sources/dev-entities_multistep-01-s02.md",
+    "recorded_at": "2026-05-08T09:00:00Z",
+    "scenario_id": "dev-entities_multistep-01",
+    "sha256": "457efd0f4bceba083402b966e66be9bc09ecc6bf33f1f3de88b71429c7f21b66",
+    "source_id": "dev-entities_multistep-01-s02",
+    "split": "dev",
+    "supersedes": [],
+    "supported_facts": {
+      "pool_id": "pool-91"
+    },
+    "supports_abstention": []
+  },
+  {
+    "authority": "approved",
+    "available_from": "2026-06-12T09:00:00Z",
+    "effective_at": "2026-06-12T09:00:00Z",
+    "effective_until": null,
+    "path": "sources/dev-entities_multistep-01-s03.md",
+    "recorded_at": "2026-06-12T09:00:00Z",
+    "scenario_id": "dev-entities_multistep-01",
+    "sha256": "036bebafa03cac63b65c07c19ee9481e9d4a565c43a124253e3cc3ee9be08110",
+    "source_id": "dev-entities_multistep-01-s03",
+    "split": "dev",
+    "supersedes": [],
+    "supported_facts": {
+      "pool_owner": "group-181",
+      "region": "upland"
+    },
+    "supports_abstention": []
+  },
+  {
+    "authority": "approved",
+    "available_from": "2026-07-17T09:00:00Z",
+    "effective_at": "2026-07-17T09:00:00Z",
+    "effective_until": null,
+    "path": "sources/dev-entities_multistep-01-s04.md",
+    "recorded_at": "2026-07-17T09:00:00Z",
+    "scenario_id": "dev-entities_multistep-01",
+    "sha256": "b669622d36bf3bf7cef0b520e186bf77ab4d92cf50b22fa1aa7df0ec785d3987",
+    "source_id": "dev-entities_multistep-01-s04",
+    "split": "dev",
+    "supersedes": [],
+    "supported_facts": {
+      "region": "archive-region",
+      "route_id": "archive-route"
+    },
+    "supports_abstention": []
+  },
+  {
+    "authority": "approved",
+    "available_from": "2026-04-03T09:00:00Z",
+    "effective_at": "2026-04-03T09:00:00Z",
+    "effective_until": null,
+    "path": "sources/dev-entities_multistep-02-s01.md",
+    "recorded_at": "2026-04-03T09:00:00Z",
+    "scenario_id": "dev-entities_multistep-02",
+    "sha256": "7ae150708332eca9a79eb485d8b3fb9b7d777bf14e651a251799395e72907e56",
+    "source_id": "dev-entities_multistep-02-s01",
+    "split": "dev",
+    "supersedes": [],
+    "supported_facts": {
+      "entity_id": "entity-502",
+      "route_id": "route-72"
+    },
+    "supports_abstention": []
+  },
+  {
+    "authority": "approved",
+    "available_from": "2026-05-08T09:00:00Z",
+    "effective_at": "2026-05-08T09:00:00Z",
+    "effective_until": null,
+    "path": "sources/dev-entities_multistep-02-s02.md",
+    "recorded_at": "2026-05-08T09:00:00Z",
+    "scenario_id": "dev-entities_multistep-02",
+    "sha256": "708564da046be308eaa16fd275249aab90bca91ebfa53a3cdd1ccccf63aa0be2",
+    "source_id": "dev-entities_multistep-02-s02",
+    "split": "dev",
+    "supersedes": [],
+    "supported_facts": {
+      "pool_id": "pool-92"
+    },
+    "supports_abstention": []
+  },
+  {
+    "authority": "approved",
+    "available_from": "2026-06-12T09:00:00Z",
+    "effective_at": "2026-06-12T09:00:00Z",
+    "effective_until": null,
+    "path": "sources/dev-entities_multistep-02-s03.md",
+    "recorded_at": "2026-06-12T09:00:00Z",
+    "scenario_id": "dev-entities_multistep-02",
+    "sha256": "fcc846ea418dc1d7bd5a56d411b8bf7410187b010ee88efaa0f96abecfa1d3fc",
+    "source_id": "dev-entities_multistep-02-s03",
+    "split": "dev",
+    "supersedes": [],
+    "supported_facts": {
+      "pool_owner": "group-182",
+      "region": "valley"
+    },
+    "supports_abstention": []
+  },
+  {
+    "authority": "approved",
+    "available_from": "2026-07-17T09:00:00Z",
+    "effective_at": "2026-07-17T09:00:00Z",
+    "effective_until": null,
+    "path": "sources/dev-entities_multistep-02-s04.md",
+    "recorded_at": "2026-07-17T09:00:00Z",
+    "scenario_id": "dev-entities_multistep-02",
+    "sha256": "160bbe138b228bfee1ec3bd4602a51fb33e83363e92efa1af2ddeba6233f5609",
+    "source_id": "dev-entities_multistep-02-s04",
+    "split": "dev",
+    "supersedes": [],
+    "supported_facts": {
+      "region": "archive-region",
+      "route_id": "archive-route"
+    },
+    "supports_abstention": []
+  },
+  {
+    "authority": "approved",
+    "available_from": "2026-04-03T09:00:00Z",
+    "effective_at": "2026-04-03T09:00:00Z",
+    "effective_until": null,
+    "path": "sources/dev-distractors-01-s01.md",
+    "recorded_at": "2026-04-03T09:00:00Z",
+    "scenario_id": "dev-distractors-01",
+    "sha256": "9a4d5217bdb8ca49b8ac16915bb711baaa40d399ffab6f2db40a8c2bb7d9593d",
+    "source_id": "dev-distractors-01-s01",
+    "split": "dev",
+    "supersedes": [],
+    "supported_facts": {
+      "deploy_port": 7217,
+      "project_id": "project-701"
+    },
+    "supports_abstention": []
+  },
+  {
+    "authority": "approved",
+    "available_from": "2026-07-17T09:00:00Z",
+    "effective_at": "2026-07-17T09:00:00Z",
+    "effective_until": null,
+    "path": "sources/dev-distractors-01-s02.md",
+    "recorded_at": "2026-07-17T09:00:00Z",
+    "scenario_id": "dev-distractors-01",
+    "sha256": "d74bd6c56053550ce40b8d3f835e79be9b41f955c7fc13e97e27142f9f681b43",
+    "source_id": "dev-distractors-01-s02",
+    "split": "dev",
+    "supersedes": [],
+    "supported_facts": {
+      "deploy_port": 7218,
+      "project_id": "project-801"
+    },
+    "supports_abstention": []
+  },
+  {
+    "authority": "index-noise",
+    "available_from": "2026-07-17T09:00:00Z",
+    "effective_at": "2026-07-17T09:00:00Z",
+    "effective_until": null,
+    "path": "sources/dev-distractors-01-s03.md",
+    "recorded_at": "2026-07-17T09:00:00Z",
+    "scenario_id": "dev-distractors-01",
+    "sha256": "9f11c4423532bcc3461d0707501daf364eeb280cc1054842b010f6ced580d7b5",
+    "source_id": "dev-distractors-01-s03",
+    "split": "dev",
+    "supersedes": [],
+    "supported_facts": {},
+    "supports_abstention": []
+  },
+  {
+    "authority": "unapproved-copy",
+    "available_from": "2026-05-08T09:00:00Z",
+    "effective_at": "2026-05-08T09:00:00Z",
+    "effective_until": null,
+    "path": "sources/dev-distractors-01-s04.md",
+    "recorded_at": "2026-05-08T09:00:00Z",
+    "scenario_id": "dev-distractors-01",
+    "sha256": "02d05e4b2b9457f6d0d3737681e96a7d994f575eb5ba3651df02b42d705a1b47",
+    "source_id": "dev-distractors-01-s04",
+    "split": "dev",
+    "supersedes": [],
+    "supported_facts": {
+      "deploy_port": 7218
+    },
+    "supports_abstention": []
+  },
+  {
+    "authority": "approved",
+    "available_from": "2026-04-03T09:00:00Z",
+    "effective_at": "2026-04-03T09:00:00Z",
+    "effective_until": null,
+    "path": "sources/dev-distractors-02-s01.md",
+    "recorded_at": "2026-04-03T09:00:00Z",
+    "scenario_id": "dev-distractors-02",
+    "sha256": "d195e8e7023c892ad5615106e7c17f49189372aa4aa7abc72e76e829020744bd",
+    "source_id": "dev-distractors-02-s01",
+    "split": "dev",
+    "supersedes": [],
+    "supported_facts": {
+      "project_id": "project-702",
+      "segment_limit": 36
+    },
+    "supports_abstention": []
+  },
+  {
+    "authority": "approved",
+    "available_from": "2026-07-17T09:00:00Z",
+    "effective_at": "2026-07-17T09:00:00Z",
+    "effective_until": null,
+    "path": "sources/dev-distractors-02-s02.md",
+    "recorded_at": "2026-07-17T09:00:00Z",
+    "scenario_id": "dev-distractors-02",
+    "sha256": "8195e4502b71a5c4306d2066630f78e6d6296794d853352915dea1c65400518d",
+    "source_id": "dev-distractors-02-s02",
+    "split": "dev",
+    "supersedes": [],
+    "supported_facts": {
+      "project_id": "project-802",
+      "segment_limit": 63
+    },
+    "supports_abstention": []
+  },
+  {
+    "authority": "index-noise",
+    "available_from": "2026-07-17T09:00:00Z",
+    "effective_at": "2026-07-17T09:00:00Z",
+    "effective_until": null,
+    "path": "sources/dev-distractors-02-s03.md",
+    "recorded_at": "2026-07-17T09:00:00Z",
+    "scenario_id": "dev-distractors-02",
+    "sha256": "9acd1b77afff818c2a5c86eca928148ad245d888bdc3ec37b0c5813b5e934e4f",
+    "source_id": "dev-distractors-02-s03",
+    "split": "dev",
+    "supersedes": [],
+    "supported_facts": {},
+    "supports_abstention": []
+  },
+  {
+    "authority": "unapproved-copy",
+    "available_from": "2026-05-08T09:00:00Z",
+    "effective_at": "2026-05-08T09:00:00Z",
+    "effective_until": null,
+    "path": "sources/dev-distractors-02-s04.md",
+    "recorded_at": "2026-05-08T09:00:00Z",
+    "scenario_id": "dev-distractors-02",
+    "sha256": "9174f1f73850f72f6bd0fe35da7bd7e5d50d4b53f5811ef685b46f55a92b0d90",
+    "source_id": "dev-distractors-02-s04",
+    "split": "dev",
+    "supersedes": [],
+    "supported_facts": {
+      "segment_limit": 63
+    },
+    "supports_abstention": []
+  },
+  {
+    "authority": "approved",
+    "available_from": "2026-04-03T09:00:00Z",
+    "effective_at": "2026-04-03T09:00:00Z",
+    "effective_until": null,
+    "path": "sources/dev-abstention_false_premise-01-s01.md",
+    "recorded_at": "2026-04-03T09:00:00Z",
+    "scenario_id": "dev-abstention_false_premise-01",
+    "sha256": "e54385e7bface396806a567d8c80d1ae9c723266d77993cb5303ce7c9a5b5ce2",
+    "source_id": "dev-abstention_false_premise-01-s01",
+    "split": "dev",
+    "supersedes": [],
+    "supported_facts": {
+      "ticket_status": "queued"
+    },
+    "supports_abstention": [
+      "missing_evidence"
+    ]
+  },
+  {
+    "authority": "approved",
+    "available_from": "2026-04-03T09:00:00Z",
+    "effective_at": "2026-04-03T09:00:00Z",
+    "effective_until": null,
+    "path": "sources/dev-abstention_false_premise-02-s01.md",
+    "recorded_at": "2026-04-03T09:00:00Z",
+    "scenario_id": "dev-abstention_false_premise-02",
+    "sha256": "b09df10eafd784b21d101ad3e0f1355d95d8cea8a4e8661c94f393d424316430",
+    "source_id": "dev-abstention_false_premise-02-s01",
+    "split": "dev",
+    "supersedes": [],
+    "supported_facts": {
+      "completed": false
+    },
+    "supports_abstention": [
+      "false_premise"
+    ]
+  }
+]

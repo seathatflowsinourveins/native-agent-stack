@@ -1,0 +1,47 @@
+17:26:49 ET previous ext-20260928-3: yes
+ext-20260928-4 scan start 17:26:49 ET
+scan rc=0 end 17:26:54 ET
+{"rule": "10:00|G0.20|V1000000|any", "session": "2026-09-28", "fired": 6, "candidates": ["KOD", "CLRO", "NAMI", "MEDS", "LFCR"], "regime_factor": 1.0, "sha256": "08cfc1c4189bc026f1935cd4a498e8f248e8ca4dcd9fee4fe66c7b29943ef373"}
+check rc=0 17:26:54 ET
+synthetic rc=0 17:26:59 ET
+paper start 17:26:59 ET
+paper rc=2 end 17:27:00 ET
+{"status": "not_started", "stage": "preflight", "reason": "benchmark_quotes_not_ready", "orders_submitted": 0}
+attempt 4 refused at preflight (benchmark quote age); retrying in 20 s
+ext-20260928-5 scan start 17:27:20 ET
+scan rc=0 end 17:27:26 ET
+{"rule": "10:00|G0.20|V1000000|any", "session": "2026-09-28", "fired": 6, "candidates": ["KOD", "CLRO", "NAMI", "MEDS", "LFCR"], "regime_factor": 1.0, "sha256": "8d6794db019a039cb2ab43fa57039f418b89c31ad40c0f4d3704050e3b178d5d"}
+check rc=0 17:27:26 ET
+synthetic rc=0 17:27:31 ET
+paper start 17:27:31 ET
+paper rc=2 end 17:27:32 ET
+{"status": "not_started", "stage": "preflight", "reason": "benchmark_quotes_not_ready", "orders_submitted": 0}
+attempt 5 refused at preflight (benchmark quote age); retrying in 20 s
+ext-20260928-6 scan start 17:27:52 ET
+scan rc=0 end 17:27:57 ET
+{"rule": "10:00|G0.20|V1000000|any", "session": "2026-09-28", "fired": 6, "candidates": ["KOD", "CLRO", "NAMI", "MEDS", "LFCR"], "regime_factor": 1.0, "sha256": "908a5580c117d6e7d031080fd97f6010e6cdf76b499c65c909f5a45fdb98b415"}
+check rc=0 17:27:58 ET
+synthetic rc=0 17:28:03 ET
+paper start 17:28:03 ET
+paper rc=2 end 17:28:04 ET
+{"status": "not_started", "stage": "preflight", "reason": "benchmark_quotes_not_ready", "orders_submitted": 0}
+attempt 6 refused at preflight (benchmark quote age); retrying in 20 s
+ext-20260928-7 scan start 17:28:24 ET
+scan rc=0 end 17:28:29 ET
+{"rule": "10:00|G0.20|V1000000|any", "session": "2026-09-28", "fired": 6, "candidates": ["KOD", "CLRO", "NAMI", "MEDS", "LFCR"], "regime_factor": 1.0, "sha256": "4f220e292932df78f58a844085e790d7c80e17d5dd56b537b66daace729f8e25"}
+check rc=0 17:28:29 ET
+synthetic rc=0 17:28:34 ET
+paper start 17:28:34 ET
+paper rc=2 end 17:28:35 ET
+{"status": "not_started", "stage": "preflight", "reason": "benchmark_quotes_not_ready", "orders_submitted": 0}
+attempt 7 refused at preflight (benchmark quote age); retrying in 20 s
+ext-20260928-8 scan start 17:28:55 ET
+scan rc=0 end 17:29:00 ET
+{"rule": "10:00|G0.20|V1000000|any", "session": "2026-09-28", "fired": 6, "candidates": ["KOD", "CLRO", "NAMI", "MEDS", "LFCR"], "regime_factor": 1.0, "sha256": "b907a402ce8cbac1198409a96924f00a9368dfe5c9159ad1b8336612a4f8f349"}
+check rc=0 17:29:01 ET
+synthetic rc=0 17:29:06 ET
+paper start 17:29:06 ET
+paper rc=0 end 18:29:36 ET
+data websocket error, restarting connection: sent 1000 (OK); no close frame received
+trading stream websocket error, restarting  connection: sent 1000 (OK); then received 1000 (OK)
+{"status": "passed", "flat": true, "evidence_class": "PAPER"}

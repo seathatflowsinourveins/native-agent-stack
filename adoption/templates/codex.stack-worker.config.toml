@@ -1,19 +1,19 @@
-# Codex profile for max-quality GPT-6 worker lanes. Start a worker with the profile and the same three values
+# Codex profile for primary Sol/Max worker lanes. Start a worker with the profile and the same three values
 # pinned on its command line:
-#   codex exec -p stack-worker -m gpt-6-astra -c model_reasoning_effort="max" -c web_search="live" -s <sandbox> ...
+#   codex exec -p stack-worker -m gpt-6.1-sol -c model_reasoning_effort="max" -c web_search="live" -s <sandbox> ...
+# For difficult judgment or escalation, substitute -m gpt-6-astra and keep max effort and live web search.
 # A project .codex/config.toml outranks a profile file, and `-c` outranks both (codex-rs/config/src/
-# config_layer_source.rs at rust-v0.157.1: profile 21, project 25, session flags 30). So the profile alone cannot
+# config_layer_source.rs at rust-v0.159.2: profile 21, project 25, session flags 30). So the profile alone cannot
 # guarantee the model, effort or web search in a checkout that sets them; it carries the tool settings below.
 # Codex 0.134.0 and later layer $CODEX_HOME/<name>.config.toml over config.toml for --profile <name> (profile-v2),
 # so this file holds only what a worker changes; the token-stack MCP servers themselves come from the user config
 # (codex.config.template.toml). tools/adoption/apply_codex_lane.py installs it as $CODEX_HOME/stack-worker.config.toml.
 # Decision record: docs/decisions/2026-09-26-codex-worker-lane.md.
 
-model = "gpt-6-astra"
-# max is the effort every GPT-6 step here runs at (blueprints/convergence-practice/gpt6-family-tiering-20260926,
-# control arm A0), not the user default ultra. For gpt-6-astra, ultra sends xhigh (its catalog
-# multi_agent_reasoning_effort) and turns on proactive sub-agent delegation; at max Codex sends max and tells the
-# model not to spawn sub-agents unless asked (`codex -p stack-worker debug prompt-input` shows which).
+model = "gpt-6.1-sol"
+# Max sends API max and delegates only when asked. Sol/Ultra sends xhigh (its catalog multi-agent effort) and
+# enables proactive delegation: openai/codex rust-v0.159.2 protocol/src/openai_models/reasoning_effort.rs and
+# models-manager/models.json. The worker pins max independently of the coordinator's ultra setting.
 model_reasoning_effort = "max"
 # Live retrieval: the default cached mode searches an OpenAI-maintained index only, and a read-only or
 # workspace-write sandbox keeps that default. A lane that must not browse passes -c web_search="disabled".

@@ -1,0 +1,9 @@
+R1 alert: SIGTERM after the snapshot line -> child exit -15 (-15 = ended BY SIGTERM; 0 = the signal was lost)
+R1 push: SIGTERM after the snapshot line -> child exit -15 (-15 = ended BY SIGTERM; 0 = the signal was lost)
+r1: no finding reproduces | the expectation (after the repairs) holds: True
+R2 alert: stdout a full pipe that nobody reads, a latched SIGTERM -> child exit -15 (-15 = ended BY SIGTERM)
+R2 push: stdout a full pipe that nobody reads, a latched SIGTERM -> child exit -15 (-15 = ended BY SIGTERM)
+r2: no finding reproduces | the expectation (after the repairs) holds: True
+R3 bell: selftest exit 0; new /tmp/tb* socket directories left behind: 0
+R3 sync: selftest exit 0; new /tmp/ts* socket directories left behind: 0
+r3: no finding reproduces | the expectation (after the repairs) holds: True

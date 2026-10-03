@@ -1,0 +1,21 @@
+[2026-09-30T04:44:00Z] node v24.21.0 npm 11.19.0
+[2026-09-30T04:44:00Z] npm view (registry facts)
+(lines 3 to 11 of the returned output: the JSON that npm view printed, published in full as checks/npm-view-20260930.json)
+[2026-09-30T04:44:01Z] npm pack (download the published tarball)
+(lines 13 to 133833 of the returned output: the JSON that npm pack --json printed, with its 26761-entry file list, published without that list as checks/npm-pack-summary-20260930.json)
+total 134684
+drwxr-xr-x 2 <user> <group>      4096 Sep 30 00:44 .
+drwxr-xr-x 5 <user> <group>      4096 Sep 30 00:44 ..
+-rw-r--r-- 1 <user> <group> 137907369 Sep 30 00:44 omniroute-3.8.51.tgz
+[2026-09-30T04:44:05Z] npm install
+[2026-09-30T04:45:40Z] npm install rc=0
+[2026-09-30T04:45:40Z] npm rebuild (allowlisted scripts)
+[2026-09-30T04:45:45Z] npm rebuild rc=0
+[2026-09-30T04:45:45Z] omniroute --version: 3.8.51
+[2026-09-30T04:45:45Z] BUILD_SHA: c1e30b7
+[2026-09-30T04:45:45Z] package.json version: 3.8.51
+drwxr-xr-x 2 <user> <group> 4096 Sep 30 00:45 .
+drwxr-xr-x 4 <user> <group> 4096 Sep 30 00:45 ..
+lrwxrwxrwx 1 <user> <group>   47 Sep 30 00:45 omniroute -> ../lib/node_modules/omniroute/bin/omniroute.mjs
+lrwxrwxrwx 1 <user> <group>   52 Sep 30 00:45 omniroute-reset-password -> ../lib/node_modules/omniroute/bin/reset-password.mjs
+exit 0

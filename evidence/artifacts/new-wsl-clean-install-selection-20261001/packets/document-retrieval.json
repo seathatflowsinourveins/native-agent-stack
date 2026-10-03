@@ -1,0 +1,55 @@
+{
+ "layer_id": "document-retrieval",
+ "title": "Documents and ingestion",
+ "requirement": "Find source-grounded Markdown/document content with controlled ingestion and retrieve the original body before relying on a result.",
+ "a_deciding_comparison_would_measure": "Seal a representative document corpus and relevance judgments; repeat randomized lexical/hybrid retrieval plus difficult-layout ingestion before changing defaults.",
+ "candidates": [
+  {
+   "key": "C01",
+   "name": "LlamaIndex",
+   "repository": "https://github.com/run-llama/llama_index"
+  },
+  {
+   "key": "C02",
+   "name": "pageindex",
+   "repository": "https://github.com/vectifyai/pageindex"
+  },
+  {
+   "key": "C03",
+   "name": "MinerU",
+   "repository": "https://github.com/opendatalab/mineru"
+  },
+  {
+   "key": "C04",
+   "name": "Docling",
+   "repository": "https://github.com/docling-project/docling"
+  },
+  {
+   "key": "C05",
+   "name": "MarkItDown",
+   "repository": "https://github.com/microsoft/markitdown"
+  },
+  {
+   "key": "C06",
+   "name": "Poppler",
+   "repository": "https://github.com/tsdgeos/poppler_mirror"
+  },
+  {
+   "key": "C07",
+   "name": "docs-mcp-server",
+   "repository": "https://github.com/arabold/docs-mcp-server"
+  },
+  {
+   "key": "C08",
+   "name": "tobi/qmd",
+   "repository": "https://github.com/tobi/qmd"
+  },
+  {
+   "key": "C09",
+   "name": "Context Hub",
+   "repository": "https://github.com/andrewyng/context-hub"
+  }
+ ],
+ "comparisons_on_record_where_every_named_arm_ran": [],
+ "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host."
+}

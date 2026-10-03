@@ -512,6 +512,10 @@ rests on source (OR50 `open-sse/executors/codex.ts` L346-347).
 - **The search backend is weak.** `duckduckgo-free` returned few or no results, and none for `site:` queries.
 - **The client version is pinned by hand.** `CODEX_CLIENT_VERSION` is a literal in the installed unit, so it must
   follow the Codex pin.
+  - **Update 2026-09-30.** The announced version may run ahead of the installed Codex when a released model needs it:
+    both units now carry 0.159.1 while the installed Codex is 0.157.1, because the gateway's live codex catalog is
+    queried with the announced version and lists `gpt-6.1-sol` only from 0.159.x on. A Codex client that reports its
+    own version keeps it on inference. See [the 2026-09-30 record](2026-09-30-omniroute-rebuild.md), Decision 3.
 - **One host.** These are this workstation's results. The trading lane's `blueprints/us-equities/routing/README.md:26`
   still says no Linux gateway is proposed, and `catalogs/foundation/surfaces.json` still describes the Windows
   gateway. Those files are not edited here.

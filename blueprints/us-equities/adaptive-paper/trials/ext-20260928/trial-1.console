@@ -1,0 +1,5 @@
+ext-20260928-1 scan start 16:23:35 ET
+scan rc=0 end 16:23:40 ET
+{"rule": "10:00|G20|V1000000|any", "session": "2026-09-28", "fired": 0, "candidates": [], "regime_factor": 1.0, "sha256": "5c8fb43fa1604ec2532461c67774b60f8c027c69101cec8f7348235d7e6eb77f"}
+check rc=2 16:23:40 ET
+{"status": "refused", "reason": "scan_rule_differs_from_config"}

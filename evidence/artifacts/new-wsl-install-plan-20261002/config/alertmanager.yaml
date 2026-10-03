@@ -1,0 +1,8 @@
+# SOURCE-ONLY, UNRUN on a target distribution. alertmanager v0.34.1: a receiver is a name plus optional integration lists
+# (docs/configuration.md:821-829); upstream's own fixture config/testdata/conf.nil-match_re-route.yml has a receiver with none.
+# The root route must name a receiver (README.md:59-62). One receiver with no integration sends nothing.
+# Web port and clustering are command-line flags (README.md:394-396), not configuration; see SOURCES.md, "Service starts".
+route:
+  receiver: sink
+receivers:
+  - name: sink

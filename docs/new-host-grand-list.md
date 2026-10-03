@@ -15,14 +15,15 @@ Layers: 20 foundation, 12 trading. Winners: 66 layer-winner pairs (55 distinct c
 
 | Order | Profile | Components |
 | --- | --- | --- |
-| 1 | `foundation-cpu`: Native clients, context and lexical memory foundation | `codex`, `claude-code`, `context-mode`, `qmd`, `rtk`, `ai-memory`, `mcporter` |
-| 2 | `research-runtime`: Historical LEAN/SDK research comparison and native workers | `codex`, `claude-code`, `duckdb`, `dagu`, `lean`, `alpaca-py`, `pandas`, `systemd`, `skfolio`, `edgartools`, `exchange-calendars` |
-| 3 | `observability`: Local native telemetry backends | `opentelemetry-collector-contrib`, `prometheus`, `loki`, `grafana`, `alertmanager`, `ntfy` |
-| 4 | `semantic-rag`: Optional explicit project semantic RAG | `huggingface-hub-native`, `vllm`, `qdrant`, `socraticode` |
-| 5 | `recovery`: Selected application-state recovery | `restic`, `ai-memory`, `qdrant` |
-| 6 | `macos-arm64-foundation`: Drafted, not accepted: native clients and llama.cpp Metal embedding foundation for Apple Silicon | `codex`, `claude-code`, `context-mode`, `ai-memory`, `mcporter`, `llama-cpp`, `qdrant`, `socraticode` |
-| 7 | `trading-nautilus`: Selected north-star Nautilus engine with separate broker boundaries | `nautilus-trader`, `alpaca-py` |
-| 8 | `token-efficiency`: Drafted, not accepted: the selected token-efficiency practice and its native Claude Code and Codex wiring | `codex`, `claude-code`, `rtk`, `context-mode`, `repomix`, `headroom`, `toon`, `ccusage`, `qmd`, `markitdown`, `serena`, `socraticode`, `ai-memory`, `mcporter` |
+| 1 | `new-wsl-clean-foundation`: Clean replacement WSL: minimal native foundation; source-review recommendations only | `codex`, `claude-code` |
+| 2 | `foundation-cpu`: Native clients, context and lexical memory foundation | `codex`, `claude-code`, `context-mode`, `qmd`, `rtk`, `ai-memory`, `mcporter` |
+| 3 | `research-runtime`: Historical LEAN/SDK research comparison and native workers | `codex`, `claude-code`, `duckdb`, `dagu`, `lean`, `alpaca-py`, `pandas`, `systemd`, `skfolio`, `edgartools`, `exchange-calendars` |
+| 4 | `observability`: Local native telemetry backends | `opentelemetry-collector-contrib`, `prometheus`, `loki`, `grafana`, `alertmanager`, `ntfy` |
+| 5 | `semantic-rag`: Optional explicit project semantic RAG | `huggingface-hub-native`, `vllm`, `qdrant`, `socraticode` |
+| 6 | `recovery`: Selected application-state recovery | `restic`, `ai-memory`, `qdrant` |
+| 7 | `macos-arm64-foundation`: Drafted, not accepted: native clients and llama.cpp Metal embedding foundation for Apple Silicon | `codex`, `claude-code`, `context-mode`, `ai-memory`, `mcporter`, `llama-cpp`, `qdrant`, `socraticode` |
+| 8 | `trading-nautilus`: Selected north-star Nautilus engine with separate broker boundaries | `nautilus-trader`, `alpaca-py` |
+| 9 | `token-efficiency`: Accepted 2026-09-30 as the selection, per docs/decisions/2026-09-30-task-model-routing.md: the token-efficiency practice and its Claude Code and Codex wiring | `codex`, `claude-code`, `rtk`, `context-mode`, `repomix`, `headroom`, `toon`, `ccusage`, `qmd`, `markitdown`, `serena`, `socraticode`, `ai-memory`, `mcporter` |
 
 ## Hosts and hardware tiers
 
@@ -54,7 +55,7 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 
 | Layer | Decision | Winner | Pin (upstream) | Evidence | WSL2 | macOS | Installed by | Open gaps (executable now / all) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Agent SDKs and runtime workers | retain | `codex` | 0.155.1 (behind rust-v0.156.0) | native_proven | host_verified, bootstrap 0.157.1 | untested, bootstrap 0.155.1 | foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency | 12 / 14 |
+| Agent SDKs and runtime workers | retain | `codex` | 0.155.1 (behind rust-v0.156.0) | native_proven | host_verified, bootstrap 0.159.3 | untested, bootstrap 0.155.1 | new-wsl-clean-foundation, foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency | 12 / 14 |
 | CI and supply chain | retain | `zizmor` | 1.30.1 | native_proven | host_verified | untested | — | 9 / 14 |
 |  |  | `syft` | 1.52.0 | native_proven | host_verified | untested | — |  |
 |  |  | `candidate:actions-attest` | unpinned | native_proven | accepted | untested | — |  |
@@ -76,8 +77,8 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 |  |  | `sandbox-runtime` | 0.0.77 | native_proven | host_verified | untested | — |  |
 | MCP servers and client surfaces | retain | `mcporter` | 0.13.13 (behind v0.14.0) | native_proven | host_verified, bootstrap 0.14.1 | untested, bootstrap 0.13.13 | foundation-cpu, macos-arm64-foundation, token-efficiency | 12 / 14 |
 |  |  | `mcp-inspector` | 2.7.0 | native_proven | host_verified | untested | — |  |
-| Native clients | retain | `claude-code` | 2.1.278 (behind v2.1.280) | native_proven | accepted, bootstrap 2.1.281 | untested, bootstrap 2.1.281 | foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency | 9 / 14 |
-|  |  | `codex` | 0.155.1 (behind rust-v0.156.0) | native_proven | host_verified, bootstrap 0.157.1 | untested, bootstrap 0.155.1 | foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency |  |
+| Native clients | retain | `claude-code` | 2.1.278 (behind v2.1.280) | native_proven | accepted, bootstrap 2.1.284 | untested, bootstrap 2.1.284 | new-wsl-clean-foundation, foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency | 9 / 14 |
+|  |  | `codex` | 0.155.1 (behind rust-v0.156.0) | native_proven | host_verified, bootstrap 0.159.3 | untested, bootstrap 0.155.1 | new-wsl-clean-foundation, foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency |  |
 | Observation and optional inference | keep_but_compare | `opentelemetry-collector-contrib` | 0.161.0 | synthetic | host_verified | untested | observability | 8 / 11 |
 |  |  | `prometheus` | 3.14.0 | synthetic | host_verified | untested | observability |  |
 |  |  | `loki` | 3.7.8 | synthetic | host_verified | untested | observability |  |
@@ -97,7 +98,7 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 | Web research | retain | `tavily-cli` | 0.1.8 | local_integration | conditional, bootstrap 0.1.8 | untested | — | 7 / 9 |
 |  |  | `agent-browser` | 0.38.1 | local_integration | conditional, bootstrap 0.38.1 | untested | — |  |
 |  |  | `openresearch` | 0.2.7 (behind v0.2.9) | local_integration | conditional, bootstrap 0.2.7 | untested | — |  |
-| Workers and task ownership | keep_but_compare | `claude-code` | 2.1.278 (behind v2.1.280) | local_integration | conditional, bootstrap 2.1.281 | untested, bootstrap 2.1.281 | foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency | 7 / 8 |
+| Workers and task ownership | keep_but_compare | `claude-code` | 2.1.278 (behind v2.1.280) | local_integration | conditional, bootstrap 2.1.284 | untested, bootstrap 2.1.284 | new-wsl-clean-foundation, foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency | 7 / 8 |
 |  |  | `worktrunk` | 0.79.0 | local_integration | host_verified | host_verified | — |  |
 
 ## Trading layers (north star)

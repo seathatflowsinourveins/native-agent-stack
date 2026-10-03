@@ -1,0 +1,36 @@
+{
+  "type": "object",
+  "properties": {
+    "clauses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "holds": {"type": "boolean"},
+          "answer_quote": {"type": "string"},
+          "source_quote": {"type": "string"}
+        },
+        "required": ["id", "holds", "answer_quote", "source_quote"],
+        "additionalProperties": false
+      }
+    },
+    "extractions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "component": {"type": "string"},
+          "values": {"type": "array", "items": {"type": "string"}},
+          "answer_quotes": {"type": "array", "items": {"type": "string"}}
+        },
+        "required": ["component", "values", "answer_quotes"],
+        "additionalProperties": false
+      }
+    },
+    "leak": {"type": "boolean"},
+    "leak_text": {"type": "string"}
+  },
+  "required": ["clauses", "extractions", "leak", "leak_text"],
+  "additionalProperties": false
+}

@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-01T11:07:43Z",
+  "scope": "Expanded replacement-WSL source-review packet publication integrity; no runtime or semantic acceptance.",
+  "source": {
+    "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+    "revision": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+    "files": ["scripts/host_receipts.py", "scripts/validate.py", "docs/acceptance-evidence-policy.md"]
+  },
+  "failed_attempt": {
+    "command": "rtk python3 scripts/validate.py",
+    "exit_code": 1,
+    "stdout": "Publication validation failed:\nevidence/artifacts/new-wsl-layer-reviews-20261001/storage-compute.json: evidence file is not hash-listed\nevidence/artifacts/new-wsl-layer-reviews-20261001/upstream-install-document-bindings.json: evidence file is not hash-listed\n",
+    "stdout_bytes": 260,
+    "stdout_sha256": "0b0c323551b0e000dcc421119fbd43d4be62007c7ebd1f31862f1746bb87db24",
+    "stderr_bytes": 0,
+    "cause": "Validation was started before the native registration process completed."
+  },
+  "correction": {
+    "anti_pattern": "Starting a dependent validation concurrently with evidence registration can observe an incomplete registry.",
+    "action": "Waited for scripts.host_receipts.register_file to complete successfully for all 49 then-owned paths, then reran validation sequentially.",
+    "verification_command": "rtk python3 scripts/validate.py",
+    "exit_code": 0,
+    "stdout": "{\"components\": 69, \"hashed_files\": 8769, \"profiles\": 4, \"receipts\": 180, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n",
+    "stdout_bytes": 161,
+    "stdout_sha256": "de9083a42e2295827128bc35b7164e5c539f446adb89e89747520464487247cc",
+    "stderr_bytes": 0
+  },
+  "boundary": "This records the actual completed check before this receipt itself was added. Final branch validation and registry scope are reported separately in the PR; no failed attempt is promoted to acceptance."
+}

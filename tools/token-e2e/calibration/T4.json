@@ -1,0 +1,65 @@
+{
+ "schema": "token-e2e-calibration/1",
+ "template": "T4",
+ "clauses": [
+  "Answer agrees with adoption/update.md and its linked bootstrap step",
+  "an index coverage gap is stated rather than a fabricated catalog hit"
+ ],
+ "sources": [
+  {
+   "label": "adoption/update.md pin lines",
+   "text": "`source.release_tag`/`source.release_commit` ([bootstrap step 0](bootstrap.md)).\n3. Open a re-pin PR that sets `source.release_tag` and `source.release_commit`"
+  },
+  {
+   "label": "adoption/bootstrap.md step 0",
+   "text": "**Step 0, before anything below: get the catalog at its attested release tag.**\nRead the pin and run the release check on the default branch, before the\ncheckout: the release's own `adoption/manifest.json` names the release before\nit (a commit cannot contain its own hash).\ngit checkout \"$tag\"\nif test \"$(git rev-parse HEAD)\" = \"$commit\"; then echo \"at $tag ($commit)\""
+  },
+  {
+   "label": "index coverage of adoption/update.md",
+   "text": "covered: false; queried: true"
+  }
+ ],
+ "controls": [
+  {
+   "id": "ref",
+   "kind": "reference",
+   "answer": "adoption/update.md says a new machine pins a release with source.release_tag and source.release_commit (bootstrap step 0). Step 0 checks out the attested tag and compares HEAD with the pinned commit. The index does not cover adoption/update.md, so the indexed catalog does not contain that instruction.\n\nSource excerpt: `source.release_tag`/`source.release_commit` ([bootstrap step 0](bootstrap.md)).\n3. Open a re-pin PR that sets `source.release_tag` and `source.release_commit`",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": true
+   }
+  },
+  {
+   "id": "para",
+   "kind": "paraphrased",
+   "answer": "A fresh machine fixes its release from the tag and commit stored under source in the manifest, which step 0 of the bootstrap guide applies by checking out the tag and confirming that HEAD equals the pinned commit. When I searched the index, update.md was not among the covered documents, so I cannot say the catalog holds that instruction.",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": true
+   }
+  },
+  {
+   "id": "wrong-1",
+   "kind": "wrong",
+   "answer": "adoption/update.md says a new machine should always install the newest commit of the default branch; bootstrap step 0 only creates a virtual environment. The index does not cover adoption/update.md.",
+   "evidence": [],
+   "expected": {
+    "c1": false,
+    "c2": true
+   }
+  },
+  {
+   "id": "wrong-2",
+   "kind": "wrong",
+   "answer": "adoption/update.md says a new machine pins a release with source.release_tag and source.release_commit (bootstrap step 0). The indexed catalog does contain this instruction: the search returned the update.md section as its first hit.",
+   "evidence": [],
+   "expected": {
+    "c1": true,
+    "c2": false
+   }
+  }
+ ],
+ "extraction_controls": []
+}

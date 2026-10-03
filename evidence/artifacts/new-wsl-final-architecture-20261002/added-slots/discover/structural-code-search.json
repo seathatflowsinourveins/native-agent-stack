@@ -1,0 +1,50 @@
+{
+  "candidates": [
+    {
+      "name": "ast-grep",
+      "repository": "https://github.com/ast-grep/ast-grep",
+      "why_candidate": "Tree-sitter AST-pattern search and rewrite CLI ([README](https://github.com/ast-grep/ast-grep/blob/main/README.md)); latest release [0.45.3](https://github.com/ast-grep/ast-grep/releases/tag/0.45.3), published 2026-08-31."
+    },
+    {
+      "name": "astx",
+      "repository": "https://github.com/codemodsquad/astx",
+      "why_candidate": "JavaScript/TypeScript structural search and replace CLI ([README](https://github.com/codemodsquad/astx/blob/beta/README.md)); latest release [v2.2.3](https://github.com/codemodsquad/astx/releases/tag/v2.2.3), published 2023-09-24; default-branch [commit](https://github.com/codemodsquad/astx/commit/9f0ee21ce3b1) dated 2026-08-05."
+    },
+    {
+      "name": "Greph",
+      "repository": "https://github.com/inline0/greph",
+      "why_candidate": "PHP CLI providing AST-pattern search and format-preserving rewrites ([README](https://github.com/inline0/greph/blob/main/README.md)); latest release [v0.2.3](https://github.com/inline0/greph/releases/tag/v0.2.3), published 2026-09-24."
+    },
+    {
+      "name": "GritQL",
+      "repository": "https://github.com/biomejs/gritql",
+      "why_candidate": "Declarative source-code search and rewrite language with the Grit CLI ([README](https://github.com/biomejs/gritql/blob/main/README.md)); latest GitHub release [v0.0.3](https://github.com/biomejs/gritql/releases/tag/v0.0.3), published 2026-03-30; default-branch [commit](https://github.com/biomejs/gritql/commit/4ca283484ab9) dated 2026-08-30."
+    },
+    {
+      "name": "No additional component",
+      "repository": "",
+      "why_candidate": "Baseline option using existing symbol navigation and text search to assess whether structural matching is needed; no component release applies."
+    },
+    {
+      "name": "NodeSeek",
+      "repository": "https://github.com/connorg45/nodeseek",
+      "why_candidate": "Rust CLI providing tree-sitter syntax-pattern search and rewrite ([README](https://github.com/connorg45/nodeseek/blob/main/README.md)); latest release [v0.1.0](https://github.com/connorg45/nodeseek/releases/tag/v0.1.0), published 2026-07-14."
+    },
+    {
+      "name": "rwr",
+      "repository": "https://github.com/dpep/rwr",
+      "why_candidate": "Ruby parse-tree search and rewrite CLI with metavariable patterns ([README](https://github.com/dpep/rwr/blob/main/README.md)); latest release [v0.6.10](https://github.com/dpep/rwr/releases/tag/v0.6.10), published 2026-09-26."
+    },
+    {
+      "name": "Semgrep Community Edition",
+      "repository": "https://github.com/semgrep/semgrep",
+      "why_candidate": "Open-source code-pattern search and static-analysis CLI ([README](https://github.com/semgrep/semgrep/blob/develop/README.md)); latest release [v1.179.0](https://github.com/semgrep/semgrep/releases/tag/v1.179.0), published 2026-10-02."
+    },
+    {
+      "name": "Threadmoth",
+      "repository": "https://github.com/matthewjameswatkins1978-cyber/Threadmoth",
+      "why_candidate": "CLI providing tree-sitter structural code targeting and guarded source-file rewrites, with Linux x86_64 and macOS arm64 artifacts ([README](https://github.com/matthewjameswatkins1978-cyber/Threadmoth/blob/main/README.md)); latest release [v1.10.0](https://github.com/matthewjameswatkins1978-cyber/Threadmoth/releases/tag/v1.10.0), published 2026-09-16."
+    }
+  ],
+  "search_notes": "Checked on 2026-10-02 using a 90-day cutoff of 2026-07-04. Every listed repository was verified through gh api repos/OWNER/REPO and repos/OWNER/REPO/releases/latest, plus its README; all are public, non-archived, and have a qualifying release or default-branch commit. GritQL's seed URL redirects to biomejs/gritql. Comby was excluded: its latest release is dated 2022-06-28 and its default-branch commit is dated 2026-06-08. gopatch also failed the freshness cutoff. stx lacked a verified open-source license and CLI documentation. Coccinelle remains an unverified lead because a malformed response filter prevented its README verification. Six attempted web searches timed out; discovery continued through GitHub repository search. Used 30 GitHub API calls and eight README page fetches, without opening workspace files. Entries are alphabetical. Exhaustive coverage could not be established within the budget."
+}

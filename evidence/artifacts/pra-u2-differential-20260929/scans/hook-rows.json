@@ -1,0 +1,52 @@
+{
+ "additional_context_content": {
+  "PreToolUse list1": 7367,
+  "SessionStart list1": 850,
+  "SessionStart list2": 69,
+  "SubagentStart list1": 1670
+ },
+ "additional_context_item_types": {
+  "str": 9956
+ },
+ "additional_context_pairs_success": {
+  "PreToolUse pair=True": 7367,
+  "SessionStart pair=False": 919,
+  "SubagentStart pair=False": 1670
+ },
+ "event_vs_name_prefix": {
+  "hook_additional_context hookEvent=PreToolUse nameprefix=PreToolUse colon=True": 7367,
+  "hook_additional_context hookEvent=SessionStart nameprefix=SessionStart colon=False": 919,
+  "hook_additional_context hookEvent=SubagentStart nameprefix=SubagentStart colon=False": 1670,
+  "hook_success hookEvent=PostToolUse nameprefix=PostToolUse colon=True": 220228,
+  "hook_success hookEvent=PreToolUse nameprefix=PreToolUse colon=True": 285414,
+  "hook_success hookEvent=SessionStart nameprefix=SessionStart colon=True": 1749,
+  "hook_success hookEvent=Stop nameprefix=Stop colon=False": 5749,
+  "hook_success hookEvent=SubagentStart nameprefix=SubagentStart colon=True": 5678,
+  "hook_success hookEvent=SubagentStop nameprefix=SubagentStop colon=False": 3476,
+  "hook_system_message hookEvent=PostToolUse nameprefix=PostToolUse colon=True": 5
+ },
+ "other_hook_types_by_event": {
+  "hook_system_message PostToolUse": 5
+ },
+ "success_has_hookEvent": {
+  "True": 522294
+ },
+ "success_stdout": {
+  "PostToolUse empty": 11,
+  "PostToolUse json_other": 220217,
+  "PreToolUse empty": 21,
+  "PreToolUse json_other": 278026,
+  "PreToolUse json_with_additionalContext": 7367,
+  "SessionStart json_other": 761,
+  "SessionStart json_with_additionalContext": 988,
+  "Stop json_other": 5749,
+  "SubagentStart json_other": 3946,
+  "SubagentStart json_with_additionalContext": 1732,
+  "SubagentStop json_other": 3476
+ },
+ "types": {
+  "hook_additional_context": 9956,
+  "hook_success": 522294,
+  "hook_system_message": 5
+ }
+}

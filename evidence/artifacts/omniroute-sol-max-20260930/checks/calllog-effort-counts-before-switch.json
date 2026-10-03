@@ -1,0 +1,99 @@
+{
+ "observed_utc": "2026-09-30T06:14:30Z",
+ "store": "omniroute",
+ "since": "2026-09-30T00:00:00Z",
+ "filter": "gpt-6",
+ "groups": [
+  {
+   "model": "gpt-6.1-sol",
+   "requested": "max",
+   "upstream": "xhigh",
+   "reasoning_source": "encrypted",
+   "n": 1154
+  },
+  {
+   "model": "gpt-6.1-sol",
+   "requested": "-",
+   "upstream": "-",
+   "reasoning_source": null,
+   "n": 271
+  },
+  {
+   "model": "gpt-6-astra",
+   "requested": "max",
+   "upstream": "max",
+   "reasoning_source": "encrypted",
+   "n": 270
+  },
+  {
+   "model": "gpt-6-astra-max",
+   "requested": "max",
+   "upstream": "max",
+   "reasoning_source": "encrypted",
+   "n": 108
+  },
+  {
+   "model": "gpt-6-astra-ultra",
+   "requested": "max",
+   "upstream": "max",
+   "reasoning_source": "encrypted",
+   "n": 102
+  },
+  {
+   "model": "gpt-6-astra",
+   "requested": "-",
+   "upstream": "-",
+   "reasoning_source": null,
+   "n": 89
+  },
+  {
+   "model": "gpt-6.1-sol",
+   "requested": "xhigh",
+   "upstream": "xhigh",
+   "reasoning_source": "encrypted",
+   "n": 70
+  },
+  {
+   "model": "gpt-6-astra-ultra",
+   "requested": "-",
+   "upstream": "-",
+   "reasoning_source": null,
+   "n": 41
+  },
+  {
+   "model": "gpt-6-luna",
+   "requested": "-",
+   "upstream": "-",
+   "reasoning_source": null,
+   "n": 30
+  },
+  {
+   "model": "gpt-6-astra-max",
+   "requested": "-",
+   "upstream": "-",
+   "reasoning_source": null,
+   "n": 26
+  },
+  {
+   "model": "gpt-6-sol",
+   "requested": "-",
+   "upstream": "-",
+   "reasoning_source": null,
+   "n": 14
+  },
+  {
+   "model": "gpt-6-astra-max",
+   "requested": "-",
+   "upstream": "max",
+   "reasoning_source": "encrypted",
+   "n": 3
+  },
+  {
+   "model": "gpt-6-sol",
+   "requested": "low",
+   "upstream": "low",
+   "reasoning_source": "encrypted",
+   "n": 1
+  }
+ ]
+}

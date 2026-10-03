@@ -1,0 +1,35 @@
+{
+ "schema_version": 1,
+ "kind": "decision-round-preregistration",
+ "recorded_at": "2026-10-01T20:51:08Z",
+ "purpose": "one default per contested slot for the new WSL clean install; every other finalist is recorded as an alternative with the comparison that would replace the default",
+ "trigger": "the user's first-hand directive of 2026-10-01 about 20:35Z: a definitive converged architecture with evidence from upstream evaluations and no 'one of' slots",
+ "source_main": "20ea4ae23a18565676823b9e3a23541c2100bb39",
+ "round_one_returns_sha256": "a9d203589059029eb8be55a7495b4d9a18e2415441925b8fe7f71328ef80f502",
+ "second_reviewer_return_sha256": "5c8f26d48dd448db89db7bf9ce756f8a702273e3846b17353e61e3cd128a9569",
+ "criteria_sha256": "f7e74c20e8763169122fc32b6566856fe7e352cc1e688dd8faa3a425c37d2f4f",
+ "decide_prompt_sha256": "39b2bff604833badfd2c46647a1bd26651f3b2e2ddb8f06cef1b98bf3bd86086",
+ "critic_prompt_sha256": "5300306720bd7c5507e8baf828fa57adbadd9efe7c410a33940cf53d501f1507",
+ "packets_sha256": {
+  "container-engine.order-1.json": "ecd521616f2a6a6e4036b9dc82b3e2b27132b5e01ac09f279912c8f64feb69ec",
+  "container-engine.order-2.json": "a953209b28a56a708127c3bc57fe18b8648548c45847c9274b50138dcdc3979b",
+  "isolation-container-boundary.order-1.json": "ce69a582ec5328a4a3c3db7ce0b07676471d77b083266fc168c301707b6e4eb0",
+  "isolation-container-boundary.order-2.json": "1179d213a9872c1226f86e2098a5dfbfc35cd47f4c29b57b68caaaf4722ba76a",
+  "code-search.order-1.json": "2f7aac38e186e549645cb3e4fd943f25a9145c82aee336121d8c6608e3a49ff1",
+  "code-search.order-2.json": "8e9fafa5189138325517e995bab227e8888a6306cb3985e06c6bae9b8a2e73c6",
+  "memory-owner.order-1.json": "4570b6493df94bfa3f2c925d0619c77259e0a9fd0bf1e2723ab1768e40a1bfd7",
+  "memory-owner.order-2.json": "1acb10449dcaf49dcb6db6abef37ec530a83d9613ddb154d7d3e39e0566cc43d",
+  "context-supply.order-1.json": "4fbce0ce7c889bcd38648ae04dc898dbcf6d3531da8c8b0c68b3ccb77b1a7990",
+  "context-supply.order-2.json": "22a6275c33a05cff1ce2e81102ed5709d6d0396143cf5b739638467bd7798cb5",
+  "local-model-server.order-1.json": "acf0dc2ccfbfe7cfbd2584a955654bc268f0f092885ffceed5adb681cae1378c",
+  "local-model-server.order-2.json": "02059ce01081b5696ee832cc36fb61581c180a87e7ba9720cb8c2d1ab497e293"
+ },
+ "dispatch": "per slot: two independent deciders (finalists in two seeded orders), then one adversarial critic; each model family runs the same packets and prompts",
+ "decision_rule": "a slot's default is definitive when both deciders of both families name it and both critics return converged; a split is settled by the measurement the critics name",
+ "excluded_evidence": "the project's adoption records; a comparison on record is included only where every named arm ran",
+ "not_claimed": "no candidate is installed or measured by this round; a default decided on documented fit says so",
+ "claude_family_run": {
+  "workflow_run": "wf_c0e29ea4-90f",
+  "agents": "12 deciders and 6 critics, stack-researcher, opus, effort max"
+ }
+}

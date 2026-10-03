@@ -1,0 +1,52 @@
+<!doctype html>
+<meta charset="utf-8">
+<link rel="icon" href="data:,">
+<title>LNA measurement</title>
+<pre id="results"></pre>
+<script>
+const run = new URL(location.href).searchParams.get('run');
+const target = 'http://127.0.0.1:__TARGET_PORT__';
+window.lna = {run, origin: location.origin, secureContext: isSecureContext,
+  fetch: {outcome:'pending'}, img:'pending', frame:'pending', frameMessage:false,
+  permissionsBefore:{}, permissionsAfter:{}, done:false};
+function render() {
+  document.querySelector('#results').textContent = JSON.stringify(lna, null, 2);
+  document.title = JSON.stringify(lna);
+}
+async function permissions(into) {
+  for (const name of ['local-network-access','local-network','loopback-network']) {
+    try { into[name] = (await navigator.permissions.query({name})).state; }
+    catch(e) { into[name] = {error:e.name, message:e.message}; }
+  }
+}
+async function runMeasurement() {
+  await permissions(lna.permissionsBefore);
+  fetch(target+'/fetch?run='+encodeURIComponent(run))
+    .then(async r => { lna.fetch = {outcome:'resolved',status:r.status,body:await r.text()}; render(); })
+    .catch(e => { lna.fetch = {outcome:'rejected',errorName:e.name,message:e.message}; render(); });
+  const img = document.createElement('img');
+  img.onload = () => { lna.img = 'load'; render(); };
+  img.onerror = () => { lna.img = 'error'; render(); };
+  img.src = target+'/img?run='+encodeURIComponent(run);
+  document.body.append(img);
+  const iframe = document.createElement('iframe');
+  iframe.onload = () => { lna.frame = 'load'; render(); };
+  iframe.onerror = () => { lna.frame = 'error'; render(); };
+  addEventListener('message', e => {
+    if (e.origin === target && e.data?.run === run) { lna.frameMessage = true; render(); }
+  });
+  iframe.src = target+'/frame?run='+encodeURIComponent(run);
+  document.body.append(iframe);
+  render();
+  setTimeout(async () => {
+    await permissions(lna.permissionsAfter);
+    lna.done = true;
+    render();
+    // Same-origin report channel for the direct, non-CDP browser baseline.
+    await fetch('/report?run='+encodeURIComponent(run), {
+      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(lna)
+    });
+  }, 5000);
+}
+runMeasurement();
+</script>

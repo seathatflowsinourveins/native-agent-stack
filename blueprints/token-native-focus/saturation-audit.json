@@ -1386,7 +1386,7 @@
     {
       "component_id": "claude-code",
       "repository": "https://github.com/anthropics/claude-code",
-      "version": "2.1.281",
+      "version": "2.1.284",
       "profile": "core",
       "role": "Native subscription coding client",
       "installation_assessment": "native installation/operation recorded in scoped public receipt",
@@ -1913,7 +1913,7 @@
     {
       "component_id": "codex",
       "repository": "https://github.com/openai/codex",
-      "version": "0.157.1",
+      "version": "0.159.3",
       "profile": "core",
       "role": "Native subscription coding client",
       "installation_assessment": "native installation/operation recorded in scoped public receipt",
@@ -2093,6 +2093,21 @@
           {
             "id": "codex-01571-qualification-20260926",
             "path": "evidence/receipts/codex-01571-qualification-20260926.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "codex-01592-qualification-20260930",
+            "path": "evidence/receipts/codex-01592-qualification-20260930.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "codex-01593-native-queue-20261001",
+            "path": "evidence/receipts/codex-01593-native-queue-20261001.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "codex-01593-hindsight-native-memory-20261001",
+            "path": "evidence/receipts/codex-01593-hindsight-native-memory-20261001.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -5093,10 +5108,10 @@
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "Dated selected-role acceptance exists; this matrix reconciliation performs no new installation.",
       "repository": "https://github.com/vercel/next.js",
-      "version": "16.3.6",
+      "version": "16.3.8",
       "profile": "supporting",
       "role": "Typed production application UI with native build and browser acceptance",
-      "source_pin": "a758ffcf501f6f1ddb03175bd1033508424c261e",
+      "source_pin": "b0fad0d45eb4c4430fda5eeeb442e8a5af08a5f6",
       "native_integration": {
         "recipe_source": "adoption/manifest.json#/recipe_map/nextjs",
         "recipe_document": "blueprints/convergence-practice/application-delivery/README.md",
@@ -5118,6 +5133,11 @@
           {
             "id": "wsl-application-20260920",
             "path": "evidence/receipts/wsl-application-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "nextjs-1638-qualification-20261001",
+            "path": "evidence/receipts/nextjs-1638-qualification-20261001.json",
             "kind": "native_cli_e2e"
           }
         ],

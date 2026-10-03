@@ -13,9 +13,10 @@ on:
     # Thursday 06:41 UTC. Off the top of the hour, which GitHub names as a high-load time
     # when scheduled runs can be delayed or dropped
     # (https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule),
-    # and on a day without the Monday lanes: GITHUB_TOKEN's REST budget is 1,000 requests per
-    # hour per repository (https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api),
-    # and catalog-freshness.yml's Monday fetch alone covers about 480 repositories.
+    # with the repository's GITHUB_TOKEN REST budget shared across these workflows
+    # (https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api).
+    # The daily catalog report is scheduled 24 minutes earlier; this timing does not prove
+    # that their execution or API use cannot overlap. No quota impact is measured here.
     - cron: '41 6 * * 4'
   workflow_dispatch:
 

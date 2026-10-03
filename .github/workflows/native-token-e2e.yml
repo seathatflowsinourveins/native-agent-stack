@@ -16,6 +16,12 @@ on:
       - 'tests/test_native_token_ci.py'
       - 'fixtures/**'
       - 'manifests/stack.json'
+  # Weekly re-run of the pinned upstream installs and fixture commands, so hosted
+  # evidence keeps up with upstream registries and the runner image between pin changes.
+  # Monday 07:11 UTC: off the top of the hour, which GitHub's schedule docs say can
+  # delay or drop runs, and clear of the other Monday lanes (05:13-07:53).
+  schedule:
+    - cron: '11 7 * * 1'
   workflow_dispatch:
 
 permissions:

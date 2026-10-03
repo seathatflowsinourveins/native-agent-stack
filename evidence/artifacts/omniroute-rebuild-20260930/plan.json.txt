@@ -1,0 +1,2671 @@
+{
+ "version": 1,
+ "gateways": {
+  "20128": "http://127.0.0.1:20128",
+  "20129": "http://127.0.0.1:20129"
+ },
+ "digest_routes": [
+  "/api/settings/compression",
+  "/api/context/combos",
+  "/api/model-capability-overrides",
+  "/api/resilience"
+ ],
+ "steps": [
+  {
+   "id": "T01",
+   "title": "20129: context_length 872000 override for sharedgw/gpt-6-astra-max (GC9, C-CTX)",
+   "gateway": "20129",
+   "features": [
+    "C-CTX model context-length override for the id OpenHands and pi send (proactive compaction at about 610k message tokens instead of about 280k; local context-window check at 872000)",
+    "GC9"
+   ],
+   "risk": "low",
+   "source": "src/app/api/model-capability-overrides/route.ts:177-225 (PATCH), :167-175 (GET), :227-261 (DELETE), :57-92 (list shape, newest refreshedAt first); src/lib/db/modelContextOverrides.ts:103-134",
+   "precondition": [
+    {
+     "type": "get",
+     "route": "/api/model-capability-overrides",
+     "asserts": [
+      {
+       "path": "overrides",
+       "op": "len_equals",
+       "value": 3
+      },
+      {
+       "path": "overrides.0.target",
+       "op": "contains",
+       "value": "sharedgw/cx/gpt-6-"
+      },
+      {
+       "path": "overrides.1.target",
+       "op": "contains",
+       "value": "sharedgw/cx/gpt-6-"
+      },
+      {
+       "path": "overrides.2.target",
+       "op": "contains",
+       "value": "sharedgw/cx/gpt-6-"
+      }
+     ]
+    }
+   ],
+   "captures": [
+    {
+     "name": "T01_overrides",
+     "type": "get",
+     "route": "/api/model-capability-overrides",
+     "keep": [
+      "overrides"
+     ]
+    }
+   ],
+   "write": {
+    "method": "PATCH",
+    "route": "/api/model-capability-overrides",
+    "body": {
+     "target": "sharedgw/gpt-6-astra-max",
+     "key": "context_length",
+     "value": 872000
+    }
+   },
+   "readback": [
+    {
+     "type": "get",
+     "route": "/api/model-capability-overrides",
+     "asserts": [
+      {
+       "path": "overrides",
+       "op": "len_equals",
+       "value": 4
+      },
+      {
+       "path": "overrides.0.target",
+       "op": "equals",
+       "value": "sharedgw/gpt-6-astra-max"
+      },
+      {
+       "path": "overrides.0.provider",
+       "op": "equals",
+       "value": "sharedgw"
+      },
+      {
+       "path": "overrides.0.modelId",
+       "op": "equals",
+       "value": "gpt-6-astra-max"
+      },
+      {
+       "path": "overrides.0.key",
+       "op": "equals",
+       "value": "context_length"
+      },
+      {
+       "path": "overrides.0.value",
+       "op": "equals",
+       "value": 872000
+      },
+      {
+       "path": "overrides.1.target",
+       "op": "contains",
+       "value": "sharedgw/cx/gpt-6-"
+      },
+      {
+       "path": "overrides.2.target",
+       "op": "contains",
+       "value": "sharedgw/cx/gpt-6-"
+      },
+      {
+       "path": "overrides.3.target",
+       "op": "contains",
+       "value": "sharedgw/cx/gpt-6-"
+      }
+     ]
+    }
+   ],
+   "rollback": {
+    "method": "DELETE",
+    "route": "/api/model-capability-overrides?target=sharedgw/gpt-6-astra-max&key=context_length",
+    "body": null
+   },
+   "rollback_verify": [
+    {
+     "type": "get",
+     "route": "/api/model-capability-overrides",
+     "asserts": [
+      {
+       "path": "overrides",
+       "op": "len_equals",
+       "value": 3
+      },
+      {
+       "path": "overrides.0.target",
+       "op": "contains",
+       "value": "sharedgw/cx/gpt-6-"
+      },
+      {
+       "path": "overrides.1.target",
+       "op": "contains",
+       "value": "sharedgw/cx/gpt-6-"
+      },
+      {
+       "path": "overrides.2.target",
+       "op": "contains",
+       "value": "sharedgw/cx/gpt-6-"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "T02",
+   "title": "20129: context combo gpt6-agent-safe (per-request opt-in via x-omniroute-compression: gpt6-agent-safe)",
+   "gateway": "20129",
+   "features": [
+    "session-dedup (minBlockChars 512, fuzzy off) per request",
+    "ccr per request",
+    "rtk per request (every built-in filter off; collapse of 5+ identical lines; head 24 / tail 24 / severity lines kept above 600 lines or 40000 chars)"
+   ],
+   "risk": "low",
+   "source": "src/app/api/context/combos/route.ts:32-50 (POST; strict schema :13-24), src/app/api/context/combos/[id]/route.ts:30-37 (GET), :67-79 (DELETE); src/lib/db/compressionCombos.ts (create/get/delete)",
+   "precondition": [
+    {
+     "type": "get",
+     "route": "/api/context/combos/gpt6-agent-safe",
+     "asserts": [
+      {
+       "path": "id",
+       "op": "absent"
+      }
+     ]
+    }
+   ],
+   "captures": [
+    {
+     "name": "T02_combos",
+     "type": "get",
+     "route": "/api/context/combos",
+     "keep": [
+      "combos"
+     ]
+    }
+   ],
+   "write": {
+    "method": "POST",
+    "route": "/api/context/combos",
+    "body": {
+     "id": "gpt6-agent-safe",
+     "name": "gpt6-agent-safe",
+     "description": "GPT-6 opt-in for Responses agent lanes: repeated-block dedup (first copy kept, 512+ chars) and CCR. RTK with every built-in filter off: repeated-line collapse and head/tail/severity truncation only above the caps. Plan P 2026-09-29.",
+     "pipeline": [
+      {
+       "engine": "session-dedup",
+       "config": {
+        "minBlockChars": 512,
+        "fuzzy": false
+       }
+      },
+      {
+       "engine": "ccr"
+      },
+      {
+       "engine": "rtk",
+       "intensity": "minimal",
+       "config": {
+        "applyToAssistantMessages": false,
+        "applyToCodeBlocks": false,
+        "applyToToolResults": true,
+        "customFiltersEnabled": false,
+        "deduplicateThreshold": 5,
+        "disabledFilters": [
+         "aws",
+         "biome",
+         "build-eslint",
+         "build-typescript",
+         "build-vite",
+         "build-webpack",
+         "bundle-install",
+         "composer",
+         "curl",
+         "df",
+         "docker-build",
+         "docker-logs",
+         "docker-ps",
+         "dotnet",
+         "du",
+         "error-stacktrace",
+         "gcloud",
+         "generic-output",
+         "gh",
+         "git-branch",
+         "git-diff",
+         "git-log",
+         "git-status",
+         "golangci-lint",
+         "gradle",
+         "json-output",
+         "kubectl",
+         "make",
+         "mypy",
+         "npm-audit",
+         "npm-install",
+         "nx",
+         "pip",
+         "playwright",
+         "poetry-install",
+         "prettier",
+         "ps",
+         "rsync",
+         "rubocop",
+         "ruff",
+         "shell-find",
+         "shell-grep",
+         "shell-ls",
+         "ssh",
+         "systemctl-status",
+         "terraform-plan",
+         "test-cargo",
+         "test-go",
+         "test-jest",
+         "test-pytest",
+         "test-vitest",
+         "tofu-plan",
+         "turbo",
+         "uv-sync",
+         "wget"
+        ],
+        "enableGrouping": false,
+        "enableRenderers": false,
+        "enabledFilters": [],
+        "groupingThreshold": 3,
+        "intensity": "minimal",
+        "maxCharsPerResult": 40000,
+        "maxLinesPerResult": 400,
+        "preserveDocstrings": true,
+        "rawOutputMaxAgeDays": 30,
+        "rawOutputMaxBytes": 1048576,
+        "rawOutputMaxFiles": 100000,
+        "rawOutputRetention": "never",
+        "stripCodeComments": false,
+        "trustProjectFilters": false
+       }
+      }
+     ],
+     "languagePacks": [
+      "en"
+     ],
+     "outputMode": false,
+     "outputModeIntensity": "lite",
+     "isDefault": false
+    }
+   },
+   "readback": [
+    {
+     "type": "get",
+     "route": "/api/context/combos/gpt6-agent-safe",
+     "asserts": [
+      {
+       "path": "id",
+       "op": "equals",
+       "value": "gpt6-agent-safe"
+      },
+      {
+       "path": "name",
+       "op": "equals",
+       "value": "gpt6-agent-safe"
+      },
+      {
+       "path": "isDefault",
+       "op": "equals",
+       "value": false
+      },
+      {
+       "path": "outputMode",
+       "op": "equals",
+       "value": false
+      },
+      {
+       "path": "languagePacks",
+       "op": "equals",
+       "value": [
+        "en"
+       ]
+      },
+      {
+       "path": "pipeline",
+       "op": "len_equals",
+       "value": 3
+      },
+      {
+       "path": "pipeline",
+       "op": "equals",
+       "value": [
+        {
+         "engine": "session-dedup",
+         "config": {
+          "minBlockChars": 512,
+          "fuzzy": false
+         }
+        },
+        {
+         "engine": "ccr"
+        },
+        {
+         "engine": "rtk",
+         "intensity": "minimal",
+         "config": {
+          "applyToAssistantMessages": false,
+          "applyToCodeBlocks": false,
+          "applyToToolResults": true,
+          "customFiltersEnabled": false,
+          "deduplicateThreshold": 5,
+          "disabledFilters": [
+           "aws",
+           "biome",
+           "build-eslint",
+           "build-typescript",
+           "build-vite",
+           "build-webpack",
+           "bundle-install",
+           "composer",
+           "curl",
+           "df",
+           "docker-build",
+           "docker-logs",
+           "docker-ps",
+           "dotnet",
+           "du",
+           "error-stacktrace",
+           "gcloud",
+           "generic-output",
+           "gh",
+           "git-branch",
+           "git-diff",
+           "git-log",
+           "git-status",
+           "golangci-lint",
+           "gradle",
+           "json-output",
+           "kubectl",
+           "make",
+           "mypy",
+           "npm-audit",
+           "npm-install",
+           "nx",
+           "pip",
+           "playwright",
+           "poetry-install",
+           "prettier",
+           "ps",
+           "rsync",
+           "rubocop",
+           "ruff",
+           "shell-find",
+           "shell-grep",
+           "shell-ls",
+           "ssh",
+           "systemctl-status",
+           "terraform-plan",
+           "test-cargo",
+           "test-go",
+           "test-jest",
+           "test-pytest",
+           "test-vitest",
+           "tofu-plan",
+           "turbo",
+           "uv-sync",
+           "wget"
+          ],
+          "enableGrouping": false,
+          "enableRenderers": false,
+          "enabledFilters": [],
+          "groupingThreshold": 3,
+          "intensity": "minimal",
+          "maxCharsPerResult": 40000,
+          "maxLinesPerResult": 400,
+          "preserveDocstrings": true,
+          "rawOutputMaxAgeDays": 30,
+          "rawOutputMaxBytes": 1048576,
+          "rawOutputMaxFiles": 100000,
+          "rawOutputRetention": "never",
+          "stripCodeComments": false,
+          "trustProjectFilters": false
+         }
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "rollback": {
+    "method": "DELETE",
+    "route": "/api/context/combos/gpt6-agent-safe",
+    "body": null
+   },
+   "rollback_verify": [
+    {
+     "type": "get",
+     "route": "/api/context/combos/gpt6-agent-safe",
+     "asserts": [
+      {
+       "path": "id",
+       "op": "absent"
+      }
+     ]
+    },
+    {
+     "type": "get",
+     "route": "/api/context/combos",
+     "asserts": [
+      {
+       "path": "combos",
+       "op": "equals",
+       "value": {
+        "$capture": "T02_combos",
+        "path": "combos"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "T03",
+   "title": "20129: context combo gpt6-memory-safe (per-request opt-in via x-omniroute-compression: gpt6-memory-safe)",
+   "gateway": "20129",
+   "features": [
+    "session-dedup (512) per request",
+    "ccr per request",
+    "lite whitespace folding per request (prose and memory-extraction chat only)"
+   ],
+   "risk": "low",
+   "source": "src/app/api/context/combos/route.ts:32-50 (POST; strict schema :13-24), src/app/api/context/combos/[id]/route.ts:30-37 (GET), :67-79 (DELETE); src/lib/db/compressionCombos.ts (create/get/delete)",
+   "precondition": [
+    {
+     "type": "get",
+     "route": "/api/context/combos/gpt6-memory-safe",
+     "asserts": [
+      {
+       "path": "id",
+       "op": "absent"
+      }
+     ]
+    }
+   ],
+   "captures": [
+    {
+     "name": "T03_combos",
+     "type": "get",
+     "route": "/api/context/combos",
+     "keep": [
+      "combos"
+     ]
+    }
+   ],
+   "write": {
+    "method": "POST",
+    "route": "/api/context/combos",
+    "body": {
+     "id": "gpt6-memory-safe",
+     "name": "gpt6-memory-safe",
+     "description": "GPT-6 opt-in for prose and memory-extraction chat lanes (system-first or string content): dedup, CCR, whitespace folding (lite, tool-result truncation off). Not for code or diffs. Plan P 2026-09-29.",
+     "pipeline": [
+      {
+       "engine": "session-dedup",
+       "config": {
+        "minBlockChars": 512,
+        "fuzzy": false
+       }
+      },
+      {
+       "engine": "ccr"
+      },
+      {
+       "engine": "lite"
+      }
+     ],
+     "languagePacks": [
+      "en"
+     ],
+     "outputMode": false,
+     "outputModeIntensity": "lite",
+     "isDefault": false
+    }
+   },
+   "readback": [
+    {
+     "type": "get",
+     "route": "/api/context/combos/gpt6-memory-safe",
+     "asserts": [
+      {
+       "path": "id",
+       "op": "equals",
+       "value": "gpt6-memory-safe"
+      },
+      {
+       "path": "name",
+       "op": "equals",
+       "value": "gpt6-memory-safe"
+      },
+      {
+       "path": "isDefault",
+       "op": "equals",
+       "value": false
+      },
+      {
+       "path": "outputMode",
+       "op": "equals",
+       "value": false
+      },
+      {
+       "path": "languagePacks",
+       "op": "equals",
+       "value": [
+        "en"
+       ]
+      },
+      {
+       "path": "pipeline",
+       "op": "len_equals",
+       "value": 3
+      },
+      {
+       "path": "pipeline",
+       "op": "equals",
+       "value": [
+        {
+         "engine": "session-dedup",
+         "config": {
+          "minBlockChars": 512,
+          "fuzzy": false
+         }
+        },
+        {
+         "engine": "ccr"
+        },
+        {
+         "engine": "lite"
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "rollback": {
+    "method": "DELETE",
+    "route": "/api/context/combos/gpt6-memory-safe",
+    "body": null
+   },
+   "rollback_verify": [
+    {
+     "type": "get",
+     "route": "/api/context/combos/gpt6-memory-safe",
+     "asserts": [
+      {
+       "path": "id",
+       "op": "absent"
+      }
+     ]
+    },
+    {
+     "type": "get",
+     "route": "/api/context/combos",
+     "asserts": [
+      {
+       "path": "combos",
+       "op": "equals",
+       "value": {
+        "$capture": "T03_combos",
+        "path": "combos"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "T04",
+   "title": "20129: context combo gpt6-safe-lossy (per-request opt-in via x-omniroute-compression: gpt6-safe-lossy)",
+   "gateway": "20129",
+   "features": [
+    "every lossy engine per request at its safest step config: rtk, codex-responses, headroom (minRows 16), relevance (budget 0.9), caveman (lite, assistant role), aggressive (100-turn thresholds, no tool strategies, no summarizer), llmlingua (100k-token floor, keep 0.9), ultra (keep 0.9, 8192-token floor)"
+   ],
+   "risk": "low",
+   "source": "src/app/api/context/combos/route.ts:32-50 (POST; strict schema :13-24), src/app/api/context/combos/[id]/route.ts:30-37 (GET), :67-79 (DELETE); src/lib/db/compressionCombos.ts (create/get/delete)",
+   "precondition": [
+    {
+     "type": "get",
+     "route": "/api/context/combos/gpt6-safe-lossy",
+     "asserts": [
+      {
+       "path": "id",
+       "op": "absent"
+      }
+     ]
+    }
+   ],
+   "captures": [
+    {
+     "name": "T04_combos",
+     "type": "get",
+     "route": "/api/context/combos",
+     "keep": [
+      "combos"
+     ]
+    }
+   ],
+   "write": {
+    "method": "POST",
+    "route": "/api/context/combos",
+    "body": {
+     "id": "gpt6-safe-lossy",
+     "name": "gpt6-safe-lossy",
+     "description": "GPT-6 explicit loss-tolerant opt-in: every lossy engine at its safest step config (no whitespace folding). Can round large-JSON numbers (codex-responses 4 KB+, headroom 16+ rows) and trim prose (caveman assistant-only, relevance 90%, aggressive 100+ turns back, ultra/llmlingua on huge messages). Plan P 2026-09-29.",
+     "pipeline": [
+      {
+       "engine": "session-dedup",
+       "config": {
+        "minBlockChars": 512,
+        "fuzzy": false
+       }
+      },
+      {
+       "engine": "ccr"
+      },
+      {
+       "engine": "rtk",
+       "intensity": "minimal",
+       "config": {
+        "applyToAssistantMessages": false,
+        "applyToCodeBlocks": false,
+        "applyToToolResults": true,
+        "customFiltersEnabled": false,
+        "deduplicateThreshold": 5,
+        "disabledFilters": [
+         "aws",
+         "biome",
+         "build-eslint",
+         "build-typescript",
+         "build-vite",
+         "build-webpack",
+         "bundle-install",
+         "composer",
+         "curl",
+         "df",
+         "docker-build",
+         "docker-logs",
+         "docker-ps",
+         "dotnet",
+         "du",
+         "error-stacktrace",
+         "gcloud",
+         "generic-output",
+         "gh",
+         "git-branch",
+         "git-diff",
+         "git-log",
+         "git-status",
+         "golangci-lint",
+         "gradle",
+         "json-output",
+         "kubectl",
+         "make",
+         "mypy",
+         "npm-audit",
+         "npm-install",
+         "nx",
+         "pip",
+         "playwright",
+         "poetry-install",
+         "prettier",
+         "ps",
+         "rsync",
+         "rubocop",
+         "ruff",
+         "shell-find",
+         "shell-grep",
+         "shell-ls",
+         "ssh",
+         "systemctl-status",
+         "terraform-plan",
+         "test-cargo",
+         "test-go",
+         "test-jest",
+         "test-pytest",
+         "test-vitest",
+         "tofu-plan",
+         "turbo",
+         "uv-sync",
+         "wget"
+        ],
+        "enableGrouping": false,
+        "enableRenderers": false,
+        "enabledFilters": [],
+        "groupingThreshold": 3,
+        "intensity": "minimal",
+        "maxCharsPerResult": 40000,
+        "maxLinesPerResult": 400,
+        "preserveDocstrings": true,
+        "rawOutputMaxAgeDays": 30,
+        "rawOutputMaxBytes": 1048576,
+        "rawOutputMaxFiles": 100000,
+        "rawOutputRetention": "never",
+        "stripCodeComments": false,
+        "trustProjectFilters": false
+       }
+      },
+      {
+       "engine": "codex-responses",
+       "config": {
+        "minBytes": 4096,
+        "maxOutputBytes": 2097152,
+        "maxCandidateBytes": 524288,
+        "maxLines": 160,
+        "minSearchMatches": 10000,
+        "minLogLines": 10000
+       }
+      },
+      {
+       "engine": "headroom",
+       "config": {
+        "minRows": 16
+       }
+      },
+      {
+       "engine": "relevance",
+       "config": {
+        "overlapThreshold": 0,
+        "budgetPercent": 0.9,
+        "boilerplateWeight": 0.5
+       }
+      },
+      {
+       "engine": "caveman",
+       "intensity": "lite",
+       "config": {
+        "minMessageLength": 200
+       }
+      },
+      {
+       "engine": "aggressive",
+       "config": {
+        "thresholds": {
+         "fullSummary": 100,
+         "moderate": 100,
+         "light": 100,
+         "verbatim": 100
+        },
+        "toolStrategies": {
+         "fileContent": false,
+         "grepSearch": false,
+         "shellOutput": false,
+         "json": false,
+         "errorMessage": false
+        },
+        "summarizerEnabled": false,
+        "maxTokensPerMessage": 32768,
+        "minSavingsThreshold": 0
+       }
+      },
+      {
+       "engine": "llmlingua",
+       "config": {
+        "model": "tinybert",
+        "minTokens": 100000,
+        "compressionRate": 0.9
+       }
+      },
+      {
+       "engine": "ultra",
+       "config": {
+        "compressionRate": 0.9,
+        "minScoreThreshold": 0.1,
+        "slmFallbackToAggressive": false,
+        "maxTokensPerMessage": 8192
+       }
+      }
+     ],
+     "languagePacks": [
+      "en"
+     ],
+     "outputMode": false,
+     "outputModeIntensity": "lite",
+     "isDefault": false
+    }
+   },
+   "readback": [
+    {
+     "type": "get",
+     "route": "/api/context/combos/gpt6-safe-lossy",
+     "asserts": [
+      {
+       "path": "id",
+       "op": "equals",
+       "value": "gpt6-safe-lossy"
+      },
+      {
+       "path": "name",
+       "op": "equals",
+       "value": "gpt6-safe-lossy"
+      },
+      {
+       "path": "isDefault",
+       "op": "equals",
+       "value": false
+      },
+      {
+       "path": "outputMode",
+       "op": "equals",
+       "value": false
+      },
+      {
+       "path": "languagePacks",
+       "op": "equals",
+       "value": [
+        "en"
+       ]
+      },
+      {
+       "path": "pipeline",
+       "op": "len_equals",
+       "value": 10
+      },
+      {
+       "path": "pipeline",
+       "op": "equals",
+       "value": [
+        {
+         "engine": "session-dedup",
+         "config": {
+          "minBlockChars": 512,
+          "fuzzy": false
+         }
+        },
+        {
+         "engine": "ccr"
+        },
+        {
+         "engine": "rtk",
+         "intensity": "minimal",
+         "config": {
+          "applyToAssistantMessages": false,
+          "applyToCodeBlocks": false,
+          "applyToToolResults": true,
+          "customFiltersEnabled": false,
+          "deduplicateThreshold": 5,
+          "disabledFilters": [
+           "aws",
+           "biome",
+           "build-eslint",
+           "build-typescript",
+           "build-vite",
+           "build-webpack",
+           "bundle-install",
+           "composer",
+           "curl",
+           "df",
+           "docker-build",
+           "docker-logs",
+           "docker-ps",
+           "dotnet",
+           "du",
+           "error-stacktrace",
+           "gcloud",
+           "generic-output",
+           "gh",
+           "git-branch",
+           "git-diff",
+           "git-log",
+           "git-status",
+           "golangci-lint",
+           "gradle",
+           "json-output",
+           "kubectl",
+           "make",
+           "mypy",
+           "npm-audit",
+           "npm-install",
+           "nx",
+           "pip",
+           "playwright",
+           "poetry-install",
+           "prettier",
+           "ps",
+           "rsync",
+           "rubocop",
+           "ruff",
+           "shell-find",
+           "shell-grep",
+           "shell-ls",
+           "ssh",
+           "systemctl-status",
+           "terraform-plan",
+           "test-cargo",
+           "test-go",
+           "test-jest",
+           "test-pytest",
+           "test-vitest",
+           "tofu-plan",
+           "turbo",
+           "uv-sync",
+           "wget"
+          ],
+          "enableGrouping": false,
+          "enableRenderers": false,
+          "enabledFilters": [],
+          "groupingThreshold": 3,
+          "intensity": "minimal",
+          "maxCharsPerResult": 40000,
+          "maxLinesPerResult": 400,
+          "preserveDocstrings": true,
+          "rawOutputMaxAgeDays": 30,
+          "rawOutputMaxBytes": 1048576,
+          "rawOutputMaxFiles": 100000,
+          "rawOutputRetention": "never",
+          "stripCodeComments": false,
+          "trustProjectFilters": false
+         }
+        },
+        {
+         "engine": "codex-responses",
+         "config": {
+          "minBytes": 4096,
+          "maxOutputBytes": 2097152,
+          "maxCandidateBytes": 524288,
+          "maxLines": 160,
+          "minSearchMatches": 10000,
+          "minLogLines": 10000
+         }
+        },
+        {
+         "engine": "headroom",
+         "config": {
+          "minRows": 16
+         }
+        },
+        {
+         "engine": "relevance",
+         "config": {
+          "overlapThreshold": 0,
+          "budgetPercent": 0.9,
+          "boilerplateWeight": 0.5
+         }
+        },
+        {
+         "engine": "caveman",
+         "intensity": "lite",
+         "config": {
+          "minMessageLength": 200
+         }
+        },
+        {
+         "engine": "aggressive",
+         "config": {
+          "thresholds": {
+           "fullSummary": 100,
+           "moderate": 100,
+           "light": 100,
+           "verbatim": 100
+          },
+          "toolStrategies": {
+           "fileContent": false,
+           "grepSearch": false,
+           "shellOutput": false,
+           "json": false,
+           "errorMessage": false
+          },
+          "summarizerEnabled": false,
+          "maxTokensPerMessage": 32768,
+          "minSavingsThreshold": 0
+         }
+        },
+        {
+         "engine": "llmlingua",
+         "config": {
+          "model": "tinybert",
+          "minTokens": 100000,
+          "compressionRate": 0.9
+         }
+        },
+        {
+         "engine": "ultra",
+         "config": {
+          "compressionRate": 0.9,
+          "minScoreThreshold": 0.1,
+          "slmFallbackToAggressive": false,
+          "maxTokensPerMessage": 8192
+         }
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "rollback": {
+    "method": "DELETE",
+    "route": "/api/context/combos/gpt6-safe-lossy",
+    "body": null
+   },
+   "rollback_verify": [
+    {
+     "type": "get",
+     "route": "/api/context/combos/gpt6-safe-lossy",
+     "asserts": [
+      {
+       "path": "id",
+       "op": "absent"
+      }
+     ]
+    },
+    {
+     "type": "get",
+     "route": "/api/context/combos",
+     "asserts": [
+      {
+       "path": "combos",
+       "op": "equals",
+       "value": {
+        "$capture": "T04_combos",
+        "path": "combos"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "T05",
+   "title": "20128: feature flag OMNIROUTE_CODEX_APP_SERVER_ENABLED=false (GC8)",
+   "gateway": "20128",
+   "features": [
+    "GC8 Codex app-server transport off on the CX gateway (confinement; no codex connection is opted in)"
+   ],
+   "risk": "low",
+   "source": "src/app/api/settings/feature-flags/route.ts:112-194 (PUT; value omitted removes only that override :156-157), :59-104 (GET); src/shared/constants/featureFlagDefinitions.ts:563-574 (requiresRestart false); open-sse/executors/codex.ts:392-398",
+   "precondition": [
+    {
+     "type": "get",
+     "route": "/api/settings/feature-flags",
+     "asserts": [
+      {
+       "path": "flags.46.key",
+       "op": "equals",
+       "value": "OMNIROUTE_CODEX_APP_SERVER_ENABLED"
+      },
+      {
+       "path": "flags.46.source",
+       "op": "equals",
+       "value": "default"
+      },
+      {
+       "path": "flags.46.effectiveValue",
+       "op": "equals",
+       "value": "true"
+      },
+      {
+       "path": "flags.46.requiresRestart",
+       "op": "equals",
+       "value": false
+      }
+     ]
+    }
+   ],
+   "captures": [
+    {
+     "name": "T05_flag",
+     "type": "get",
+     "route": "/api/settings/feature-flags",
+     "keep": [
+      "flags.46"
+     ]
+    }
+   ],
+   "write": {
+    "method": "PUT",
+    "route": "/api/settings/feature-flags",
+    "body": {
+     "key": "OMNIROUTE_CODEX_APP_SERVER_ENABLED",
+     "value": "false"
+    }
+   },
+   "readback": [
+    {
+     "type": "get",
+     "route": "/api/settings/feature-flags",
+     "asserts": [
+      {
+       "path": "flags.46.key",
+       "op": "equals",
+       "value": "OMNIROUTE_CODEX_APP_SERVER_ENABLED"
+      },
+      {
+       "path": "flags.46.effectiveValue",
+       "op": "equals",
+       "value": "false"
+      },
+      {
+       "path": "flags.46.source",
+       "op": "equals",
+       "value": "db"
+      }
+     ]
+    }
+   ],
+   "rollback": {
+    "method": "PUT",
+    "route": "/api/settings/feature-flags",
+    "body": {
+     "key": "OMNIROUTE_CODEX_APP_SERVER_ENABLED"
+    }
+   },
+   "rollback_verify": [
+    {
+     "type": "get",
+     "route": "/api/settings/feature-flags",
+     "asserts": [
+      {
+       "path": "flags.46.key",
+       "op": "equals",
+       "value": "OMNIROUTE_CODEX_APP_SERVER_ENABLED"
+      },
+      {
+       "path": "flags.46.effectiveValue",
+       "op": "equals",
+       "value": {
+        "$capture": "T05_flag",
+        "path": "flags.46.effectiveValue"
+       }
+      },
+      {
+       "path": "flags.46.source",
+       "op": "equals",
+       "value": {
+        "$capture": "T05_flag",
+        "path": "flags.46.source"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "T06",
+   "title": "20129: interception rule on the sharedgw node, search and fetch native passthrough (GC5)",
+   "gateway": "20129",
+   "features": [
+    "GC5 web search/fetch tool interception off for every model on the sharedgw node (confinement)"
+   ],
+   "risk": "low",
+   "source": "src/app/api/providers/[id]/interception-rules/route.ts:35-58 (PUT), :17-28 (GET), :64-75 (DELETE, this provider only); src/lib/db/interceptionRules.ts:147-179",
+   "precondition": [
+    {
+     "type": "get",
+     "route": "/api/providers/openai-compatible-responses-3393b3bd…/interception-rules",
+     "asserts": [
+      {
+       "path": "",
+       "op": "len_equals",
+       "value": 0
+      }
+     ]
+    }
+   ],
+   "captures": [
+    {
+     "name": "T06_rules",
+     "type": "get",
+     "route": "/api/providers/openai-compatible-responses-3393b3bd…/interception-rules",
+     "keep": [
+      "interceptSearch",
+      "interceptFetch",
+      "fetchBackend"
+     ]
+    },
+    {
+     "name": "T06_rows_record",
+     "type": "sqlite_ro",
+     "gateway_store": "20129",
+     "sql": "SELECT count(*) FROM key_value WHERE namespace = 'interception_rules'"
+    }
+   ],
+   "write": {
+    "method": "PUT",
+    "route": "/api/providers/openai-compatible-responses-3393b3bd…/interception-rules",
+    "body": {
+     "interceptSearch": false,
+     "interceptFetch": false
+    }
+   },
+   "readback": [
+    {
+     "type": "get",
+     "route": "/api/providers/openai-compatible-responses-3393b3bd…/interception-rules",
+     "asserts": [
+      {
+       "path": "interceptSearch",
+       "op": "equals",
+       "value": false
+      },
+      {
+       "path": "interceptFetch",
+       "op": "equals",
+       "value": false
+      },
+      {
+       "path": "",
+       "op": "len_equals",
+       "value": 2
+      }
+     ]
+    }
+   ],
+   "rollback": {
+    "method": "DELETE",
+    "route": "/api/providers/openai-compatible-responses-3393b3bd…/interception-rules",
+    "body": null
+   },
+   "rollback_verify": [
+    {
+     "type": "get",
+     "route": "/api/providers/openai-compatible-responses-3393b3bd…/interception-rules",
+     "asserts": [
+      {
+       "path": "",
+       "op": "len_equals",
+       "value": 0
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "T07",
+   "title": "20129: sharedgw connection prompt-cache declaration (K06) and 1200 s hop header timeout (GC12)",
+   "gateway": "20129",
+   "features": [
+    "K06 connection-level prompt-cache declaration: the 20129 cache-aware guard now treats the sharedgw hop as a caching provider (single-mode aggressive/ultra become standard; system prompt skipped)",
+    "GC12 / O03 hop response-header timeout 1200000 ms (max-effort non-streaming calls no longer abort at the 600 s default)"
+   ],
+   "risk": "medium",
+   "source": "src/app/api/providers/[id]/route.ts:449-451 (PATCH delegates to PUT :108-447; shallow psd merge :281-289; cloud sync :419, :509-519), :72-106 (GET, psd sanitized); src/shared/validation/providerSpecificData.ts:95-127, :578-595; src/lib/providers/requestDefaults.ts:138-178, :240-246",
+   "precondition": [
+    {
+     "type": "get",
+     "route": "/api/providers/3eea0518…",
+     "asserts": [
+      {
+       "path": "connection.id",
+       "op": "equals",
+       "value": "3eea0518…"
+      },
+      {
+       "path": "connection.provider",
+       "op": "equals",
+       "value": "openai-compatible-responses-3393b3bd…"
+      },
+      {
+       "path": "connection.providerSpecificData.timeoutMs",
+       "op": "absent"
+      },
+      {
+       "path": "connection.providerSpecificData.cache",
+       "op": "absent"
+      }
+     ]
+    }
+   ],
+   "captures": [
+    {
+     "name": "T07_conn",
+     "type": "get",
+     "route": "/api/providers/3eea0518…",
+     "keep": [
+      "connection.id",
+      "connection.provider",
+      "connection.providerSpecificData.baseUrl",
+      "connection.providerSpecificData.apiType",
+      "connection.providerSpecificData.prefix",
+      "connection.providerSpecificData.nodeName",
+      "connection.providerSpecificData.timeoutMs",
+      "connection.providerSpecificData.cache"
+     ]
+    },
+    {
+     "name": "T07_row_record",
+     "type": "sqlite_ro",
+     "gateway_store": "20129",
+     "sql": "SELECT id, provider, is_active, json_extract(provider_specific_data, '$.timeoutMs') FROM provider_connections WHERE provider = 'openai-compatible-responses-3393b3bd…'"
+    }
+   ],
+   "write": {
+    "method": "PATCH",
+    "route": "/api/providers/3eea0518…",
+    "body": {
+     "providerSpecificData": {
+      "timeoutMs": 1200000,
+      "cache": {
+       "supportsPromptCaching": true
+      }
+     }
+    }
+   },
+   "readback": [
+    {
+     "type": "get",
+     "route": "/api/providers/3eea0518…",
+     "asserts": [
+      {
+       "path": "connection.id",
+       "op": "equals",
+       "value": "3eea0518…"
+      },
+      {
+       "path": "connection.provider",
+       "op": "equals",
+       "value": "openai-compatible-responses-3393b3bd…"
+      },
+      {
+       "path": "connection.providerSpecificData.timeoutMs",
+       "op": "equals",
+       "value": 1200000
+      },
+      {
+       "path": "connection.providerSpecificData.cache",
+       "op": "equals",
+       "value": {
+        "supportsPromptCaching": true
+       }
+      },
+      {
+       "path": "connection.providerSpecificData.baseUrl",
+       "op": "equals",
+       "value": {
+        "$capture": "T07_conn",
+        "path": "connection.providerSpecificData.baseUrl"
+       }
+      },
+      {
+       "path": "connection.providerSpecificData.apiType",
+       "op": "equals",
+       "value": {
+        "$capture": "T07_conn",
+        "path": "connection.providerSpecificData.apiType"
+       }
+      },
+      {
+       "path": "connection.providerSpecificData.prefix",
+       "op": "equals",
+       "value": {
+        "$capture": "T07_conn",
+        "path": "connection.providerSpecificData.prefix"
+       }
+      },
+      {
+       "path": "connection.providerSpecificData.nodeName",
+       "op": "equals",
+       "value": {
+        "$capture": "T07_conn",
+        "path": "connection.providerSpecificData.nodeName"
+       }
+      }
+     ]
+    }
+   ],
+   "rollback": {
+    "method": "PATCH",
+    "route": "/api/providers/3eea0518…",
+    "body": {
+     "providerSpecificData": {
+      "timeoutMs": null,
+      "cache": {}
+     }
+    }
+   },
+   "rollback_verify": [
+    {
+     "type": "get",
+     "route": "/api/providers/3eea0518…",
+     "asserts": [
+      {
+       "path": "connection.providerSpecificData.timeoutMs",
+       "op": "absent"
+      },
+      {
+       "path": "connection.providerSpecificData.cache",
+       "op": "absent"
+      },
+      {
+       "path": "connection.providerSpecificData.baseUrl",
+       "op": "equals",
+       "value": {
+        "$capture": "T07_conn",
+        "path": "connection.providerSpecificData.baseUrl"
+       }
+      },
+      {
+       "path": "connection.providerSpecificData.apiType",
+       "op": "equals",
+       "value": {
+        "$capture": "T07_conn",
+        "path": "connection.providerSpecificData.apiType"
+       }
+      },
+      {
+       "path": "connection.providerSpecificData.prefix",
+       "op": "equals",
+       "value": {
+        "$capture": "T07_conn",
+        "path": "connection.providerSpecificData.prefix"
+       }
+      },
+      {
+       "path": "connection.providerSpecificData.nodeName",
+       "op": "equals",
+       "value": {
+        "$capture": "T07_conn",
+        "path": "connection.providerSpecificData.nodeName"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "T08",
+   "title": "20129: fixed hop headers on the sharedgw connection: no memory, no bridges, no exact cache at 20128 (GC13)",
+   "gateway": "20129",
+   "features": [
+    "GC13 hop headers (memory injection off on the anonymous 20128 hop, vision/audio/video bridges off, legacy exact response cache off for hop traffic; the 20129 entry cache is unchanged)"
+   ],
+   "risk": "medium",
+   "source": "src/app/api/providers/[id]/route.ts:449-451, :281-289; src/lib/providers/requestDefaults.ts:296-322 (customHeaders normalizer; names checked by src/shared/constants/upstreamHeaders.ts:67-70); open-sse/handlers/chatCore/headers.ts:29, src/lib/guardrails/registry.ts:95, src/lib/semanticCache.ts:484-502",
+   "precondition": [
+    {
+     "type": "get",
+     "route": "/api/providers/3eea0518…",
+     "asserts": [
+      {
+       "path": "connection.id",
+       "op": "equals",
+       "value": "3eea0518…"
+      },
+      {
+       "path": "connection.provider",
+       "op": "equals",
+       "value": "openai-compatible-responses-3393b3bd…"
+      },
+      {
+       "path": "connection.providerSpecificData.customHeaders",
+       "op": "absent"
+      }
+     ]
+    }
+   ],
+   "captures": [
+    {
+     "name": "T08_conn",
+     "type": "get",
+     "route": "/api/providers/3eea0518…",
+     "keep": [
+      "connection.id",
+      "connection.provider",
+      "connection.providerSpecificData.baseUrl",
+      "connection.providerSpecificData.apiType",
+      "connection.providerSpecificData.prefix",
+      "connection.providerSpecificData.nodeName"
+     ]
+    }
+   ],
+   "write": {
+    "method": "PATCH",
+    "route": "/api/providers/3eea0518…",
+    "body": {
+     "providerSpecificData": {
+      "customHeaders": {
+       "x-omniroute-no-memory": "true",
+       "x-omniroute-disabled-guardrails": "vision-bridge,audio-bridge,video-bridge",
+       "x-omniroute-no-cache": "true"
+      }
+     }
+    }
+   },
+   "readback": [
+    {
+     "type": "get",
+     "route": "/api/providers/3eea0518…",
+     "asserts": [
+      {
+       "path": "connection.providerSpecificData.customHeaders",
+       "op": "len_equals",
+       "value": 3
+      },
+      {
+       "path": "connection.providerSpecificData.customHeaders.x-omniroute-no-memory",
+       "op": "equals",
+       "value": "true"
+      },
+      {
+       "path": "connection.providerSpecificData.customHeaders.x-omniroute-disabled-guardrails",
+       "op": "equals",
+       "value": "vision-bridge,audio-bridge,video-bridge"
+      },
+      {
+       "path": "connection.providerSpecificData.customHeaders.x-omniroute-no-cache",
+       "op": "equals",
+       "value": "true"
+      },
+      {
+       "path": "connection.providerSpecificData.baseUrl",
+       "op": "equals",
+       "value": {
+        "$capture": "T08_conn",
+        "path": "connection.providerSpecificData.baseUrl"
+       }
+      },
+      {
+       "path": "connection.providerSpecificData.apiType",
+       "op": "equals",
+       "value": {
+        "$capture": "T08_conn",
+        "path": "connection.providerSpecificData.apiType"
+       }
+      },
+      {
+       "path": "connection.providerSpecificData.prefix",
+       "op": "equals",
+       "value": {
+        "$capture": "T08_conn",
+        "path": "connection.providerSpecificData.prefix"
+       }
+      },
+      {
+       "path": "connection.providerSpecificData.nodeName",
+       "op": "equals",
+       "value": {
+        "$capture": "T08_conn",
+        "path": "connection.providerSpecificData.nodeName"
+       }
+      }
+     ]
+    }
+   ],
+   "rollback": {
+    "method": "PATCH",
+    "route": "/api/providers/3eea0518…",
+    "body": {
+     "providerSpecificData": {
+      "customHeaders": null
+     }
+    }
+   },
+   "rollback_verify": [
+    {
+     "type": "get",
+     "route": "/api/providers/3eea0518…",
+     "asserts": [
+      {
+       "path": "connection.providerSpecificData.customHeaders",
+       "op": "absent"
+      },
+      {
+       "path": "connection.providerSpecificData.baseUrl",
+       "op": "equals",
+       "value": {
+        "$capture": "T08_conn",
+        "path": "connection.providerSpecificData.baseUrl"
+       }
+      },
+      {
+       "path": "connection.providerSpecificData.apiType",
+       "op": "equals",
+       "value": {
+        "$capture": "T08_conn",
+        "path": "connection.providerSpecificData.apiType"
+       }
+      },
+      {
+       "path": "connection.providerSpecificData.prefix",
+       "op": "equals",
+       "value": {
+        "$capture": "T08_conn",
+        "path": "connection.providerSpecificData.prefix"
+       }
+      },
+      {
+       "path": "connection.providerSpecificData.nodeName",
+       "op": "equals",
+       "value": {
+        "$capture": "T08_conn",
+        "path": "connection.providerSpecificData.nodeName"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "T09",
+   "title": "20129: compression settings: CCR headerless, terse-prose:lite, safest globals, per-request engines",
+   "gateway": "20129",
+   "features": [
+    "ccr in the headerless default lane (byte-identical for callers that do not advertise omniroute_ccr_retrieve)",
+    "output style terse-prose:lite on every request that does not send x-omniroute-compression: off",
+    "engine:rtk, engine:codex-responses, engine:caveman per-request header opt-in (lossy engines never run headerless: lossy request policy)",
+    "liveZone (cache-aligned compression for API-key callers; cacheMinutes 60 unchanged)",
+    "languageConfig fixed English (byte-stable style and rule text)",
+    "safest globals for rtk (every built-in filter off, caps 400 lines / 40000 chars, collapse 5+), codex-responses (4 KB floor, search/log compaction off, editor and shell tools preserved), caveman (lite, assistant role, 200-char floor, default preserve patterns), session-dedup (512), headroom (16 rows), aggressive and ultra (near-inert thresholds); these also make the peer combos allow-lossy and fw-* safer"
+   ],
+   "risk": "medium",
+   "source": "src/app/api/settings/compression/route.ts:21-46 (PUT, strict schema src/shared/validation/compressionConfigSchemas.ts:366-405), :8-19 (GET); src/lib/db/compression.ts:910-947 (per-key upsert), :524-567 (engines replace, lite merge)",
+   "precondition": [
+    {
+     "type": "get",
+     "route": "/api/settings/compression",
+     "asserts": [
+      {
+       "path": "enabled",
+       "op": "equals",
+       "value": true
+      },
+      {
+       "path": "defaultMode",
+       "op": "equals",
+       "value": "off"
+      },
+      {
+       "path": "autoTriggerTokens",
+       "op": "equals",
+       "value": 0
+      },
+      {
+       "path": "contextBudget.mode",
+       "op": "equals",
+       "value": "off"
+      },
+      {
+       "path": "activeComboId",
+       "op": "equals",
+       "value": null
+      },
+      {
+       "path": "compressionComboId",
+       "op": "equals",
+       "value": null
+      },
+      {
+       "path": "comboOverrides",
+       "op": "len_equals",
+       "value": 0
+      },
+      {
+       "path": "exclusions",
+       "op": "len_equals",
+       "value": 0
+      },
+      {
+       "path": "lite",
+       "op": "equals",
+       "value": {
+        "compressToolResults": false
+       }
+      },
+      {
+       "path": "stackedPipeline",
+       "op": "equals",
+       "value": [
+        {
+         "engine": "ccr",
+         "config": {
+          "enabled": false
+         }
+        }
+       ]
+      },
+      {
+       "path": "preserveSystemPrompt",
+       "op": "equals",
+       "value": true
+      },
+      {
+       "path": "preserveSystemPromptMode",
+       "op": "equals",
+       "value": "always"
+      },
+      {
+       "path": "cavemanOutputMode.enabled",
+       "op": "equals",
+       "value": false
+      },
+      {
+       "path": "ultraEngine",
+       "op": "equals",
+       "value": "heuristic"
+      },
+      {
+       "path": "ultraSlmPrewarm",
+       "op": "equals",
+       "value": false
+      },
+      {
+       "path": "cacheMinutes",
+       "op": "equals",
+       "value": 60
+      },
+      {
+       "path": "mcpDescriptionCompressionEnabled",
+       "op": "equals",
+       "value": true
+      },
+      {
+       "path": "enginesExplicit",
+       "op": "equals",
+       "value": true
+      },
+      {
+       "path": "engines",
+       "op": "equals",
+       "value": {
+        "aggressive": {
+         "enabled": false
+        },
+        "caveman": {
+         "enabled": false,
+         "level": "lite"
+        },
+        "ccr": {
+         "enabled": false
+        },
+        "codex-responses": {
+         "enabled": false
+        },
+        "headroom": {
+         "enabled": false
+        },
+        "lite": {
+         "enabled": false
+        },
+        "llmlingua": {
+         "enabled": false
+        },
+        "omniglyph": {
+         "enabled": false
+        },
+        "relevance": {
+         "enabled": false
+        },
+        "rtk": {
+         "enabled": false,
+         "level": "minimal"
+        },
+        "session-dedup": {
+         "enabled": false
+        },
+        "ultra": {
+         "enabled": false
+        }
+       }
+      },
+      {
+       "path": "outputStyles",
+       "op": "len_equals",
+       "value": 0
+      },
+      {
+       "path": "liveZone.enabled",
+       "op": "equals",
+       "value": false
+      },
+      {
+       "path": "lite.maxToolLength",
+       "op": "absent"
+      }
+     ]
+    }
+   ],
+   "captures": [
+    {
+     "name": "T09_compression",
+     "type": "get",
+     "route": "/api/settings/compression",
+     "keep": [
+      "engines",
+      "outputStyles",
+      "liveZone",
+      "languageConfig",
+      "rtkConfig",
+      "codexResponsesConfig",
+      "cavemanConfig",
+      "sessionDedup",
+      "headroom",
+      "aggressive",
+      "ultra",
+      "enabled",
+      "defaultMode",
+      "autoTriggerMode",
+      "autoTriggerTokens",
+      "contextBudget",
+      "activeComboId",
+      "compressionComboId",
+      "comboOverrides",
+      "exclusions",
+      "lite",
+      "stackedPipeline",
+      "preserveSystemPrompt",
+      "preserveSystemPromptMode",
+      "cavemanOutputMode",
+      "ultraEngine",
+      "ultraSlmPrewarm",
+      "cacheMinutes",
+      "mcpDescriptionCompressionEnabled",
+      "enginesExplicit",
+      "ccr"
+     ]
+    }
+   ],
+   "write": {
+    "method": "PUT",
+    "route": "/api/settings/compression",
+    "body": {
+     "engines": {
+      "session-dedup": {
+       "enabled": false
+      },
+      "ccr": {
+       "enabled": true
+      },
+      "lite": {
+       "enabled": false
+      },
+      "rtk": {
+       "enabled": true,
+       "level": "minimal"
+      },
+      "codex-responses": {
+       "enabled": true
+      },
+      "headroom": {
+       "enabled": false
+      },
+      "relevance": {
+       "enabled": false
+      },
+      "caveman": {
+       "enabled": true,
+       "level": "lite"
+      },
+      "aggressive": {
+       "enabled": false
+      },
+      "llmlingua": {
+       "enabled": false
+      },
+      "ultra": {
+       "enabled": false
+      },
+      "omniglyph": {
+       "enabled": false
+      }
+     },
+     "outputStyles": [
+      {
+       "id": "terse-prose",
+       "level": "lite"
+      }
+     ],
+     "liveZone": {
+      "enabled": true
+     },
+     "languageConfig": {
+      "enabled": true,
+      "defaultLanguage": "en",
+      "autoDetect": false,
+      "enabledPacks": [
+       "en"
+      ]
+     },
+     "rtkConfig": {
+      "applyToAssistantMessages": false,
+      "applyToCodeBlocks": false,
+      "applyToToolResults": true,
+      "customFiltersEnabled": false,
+      "deduplicateThreshold": 5,
+      "disabledFilters": [
+       "aws",
+       "biome",
+       "build-eslint",
+       "build-typescript",
+       "build-vite",
+       "build-webpack",
+       "bundle-install",
+       "composer",
+       "curl",
+       "df",
+       "docker-build",
+       "docker-logs",
+       "docker-ps",
+       "dotnet",
+       "du",
+       "error-stacktrace",
+       "gcloud",
+       "generic-output",
+       "gh",
+       "git-branch",
+       "git-diff",
+       "git-log",
+       "git-status",
+       "golangci-lint",
+       "gradle",
+       "json-output",
+       "kubectl",
+       "make",
+       "mypy",
+       "npm-audit",
+       "npm-install",
+       "nx",
+       "pip",
+       "playwright",
+       "poetry-install",
+       "prettier",
+       "ps",
+       "rsync",
+       "rubocop",
+       "ruff",
+       "shell-find",
+       "shell-grep",
+       "shell-ls",
+       "ssh",
+       "systemctl-status",
+       "terraform-plan",
+       "test-cargo",
+       "test-go",
+       "test-jest",
+       "test-pytest",
+       "test-vitest",
+       "tofu-plan",
+       "turbo",
+       "uv-sync",
+       "wget"
+      ],
+      "enableGrouping": false,
+      "enableRenderers": false,
+      "enabled": false,
+      "enabledFilters": [],
+      "groupingThreshold": 3,
+      "intensity": "minimal",
+      "maxCharsPerResult": 40000,
+      "maxLinesPerResult": 400,
+      "preserveDocstrings": true,
+      "rawOutputMaxAgeDays": 30,
+      "rawOutputMaxBytes": 1048576,
+      "rawOutputMaxFiles": 100000,
+      "rawOutputRetention": "never",
+      "stripCodeComments": false,
+      "trustProjectFilters": false
+     },
+     "codexResponsesConfig": {
+      "enabled": false,
+      "minBytes": 4096,
+      "maxOutputBytes": 2097152,
+      "maxCandidateBytes": 524288,
+      "maxLines": 160,
+      "minSearchMatches": 10000,
+      "minLogLines": 10000,
+      "preserveToolNames": [
+       "Read",
+       "Glob",
+       "Grep",
+       "Write",
+       "Edit",
+       "WebSearch",
+       "WebFetch",
+       "read",
+       "glob",
+       "grep",
+       "write",
+       "edit",
+       "web_search",
+       "web_fetch",
+       "str_replace_editor",
+       "file_editor",
+       "edit_file",
+       "terminal",
+       "execute_bash",
+       "bash",
+       "shell"
+      ]
+     },
+     "cavemanConfig": {
+      "enabled": true,
+      "intensity": "lite",
+      "compressRoles": [
+       "assistant"
+      ],
+      "minMessageLength": 200,
+      "skipRules": [],
+      "preservePatterns": [
+       "```[\\s\\S]*?```",
+       "`[^`\\n]+`",
+       "\\b(https?://\\S+)",
+       "(?:^|\\s)(\\.{0,2}/[\\w./\\-]+)",
+       "^\\s*(Error|TypeError|RangeError|SyntaxError|ReferenceError):",
+       "^\\s+at\\s"
+      ]
+     },
+     "sessionDedup": {
+      "minBlockChars": 512,
+      "fuzzy": false
+     },
+     "headroom": {
+      "minRows": 16
+     },
+     "aggressive": {
+      "thresholds": {
+       "fullSummary": 100,
+       "moderate": 100,
+       "light": 100,
+       "verbatim": 100
+      },
+      "toolStrategies": {
+       "fileContent": false,
+       "grepSearch": false,
+       "shellOutput": false,
+       "json": false,
+       "errorMessage": false
+      },
+      "summarizerEnabled": false,
+      "maxTokensPerMessage": 32768,
+      "minSavingsThreshold": 0
+     },
+     "ultra": {
+      "enabled": false,
+      "compressionRate": 0.9,
+      "minScoreThreshold": 0.1,
+      "slmFallbackToAggressive": false,
+      "maxTokensPerMessage": 8192
+     }
+    }
+   },
+   "readback": [
+    {
+     "type": "get",
+     "route": "/api/settings/compression",
+     "asserts": [
+      {
+       "path": "engines",
+       "op": "equals",
+       "value": {
+        "session-dedup": {
+         "enabled": false
+        },
+        "ccr": {
+         "enabled": true
+        },
+        "lite": {
+         "enabled": false
+        },
+        "rtk": {
+         "enabled": true,
+         "level": "minimal"
+        },
+        "codex-responses": {
+         "enabled": true
+        },
+        "headroom": {
+         "enabled": false
+        },
+        "relevance": {
+         "enabled": false
+        },
+        "caveman": {
+         "enabled": true,
+         "level": "lite"
+        },
+        "aggressive": {
+         "enabled": false
+        },
+        "llmlingua": {
+         "enabled": false
+        },
+        "ultra": {
+         "enabled": false
+        },
+        "omniglyph": {
+         "enabled": false
+        }
+       }
+      },
+      {
+       "path": "outputStyles",
+       "op": "equals",
+       "value": [
+        {
+         "id": "terse-prose",
+         "level": "lite"
+        }
+       ]
+      },
+      {
+       "path": "liveZone",
+       "op": "equals",
+       "value": {
+        "enabled": true
+       }
+      },
+      {
+       "path": "languageConfig",
+       "op": "equals",
+       "value": {
+        "enabled": true,
+        "defaultLanguage": "en",
+        "autoDetect": false,
+        "enabledPacks": [
+         "en"
+        ]
+       }
+      },
+      {
+       "path": "rtkConfig",
+       "op": "equals",
+       "value": {
+        "applyToAssistantMessages": false,
+        "applyToCodeBlocks": false,
+        "applyToToolResults": true,
+        "customFiltersEnabled": false,
+        "deduplicateThreshold": 5,
+        "disabledFilters": [
+         "aws",
+         "biome",
+         "build-eslint",
+         "build-typescript",
+         "build-vite",
+         "build-webpack",
+         "bundle-install",
+         "composer",
+         "curl",
+         "df",
+         "docker-build",
+         "docker-logs",
+         "docker-ps",
+         "dotnet",
+         "du",
+         "error-stacktrace",
+         "gcloud",
+         "generic-output",
+         "gh",
+         "git-branch",
+         "git-diff",
+         "git-log",
+         "git-status",
+         "golangci-lint",
+         "gradle",
+         "json-output",
+         "kubectl",
+         "make",
+         "mypy",
+         "npm-audit",
+         "npm-install",
+         "nx",
+         "pip",
+         "playwright",
+         "poetry-install",
+         "prettier",
+         "ps",
+         "rsync",
+         "rubocop",
+         "ruff",
+         "shell-find",
+         "shell-grep",
+         "shell-ls",
+         "ssh",
+         "systemctl-status",
+         "terraform-plan",
+         "test-cargo",
+         "test-go",
+         "test-jest",
+         "test-pytest",
+         "test-vitest",
+         "tofu-plan",
+         "turbo",
+         "uv-sync",
+         "wget"
+        ],
+        "enableGrouping": false,
+        "enableRenderers": false,
+        "enabled": false,
+        "enabledFilters": [],
+        "groupingThreshold": 3,
+        "intensity": "minimal",
+        "maxCharsPerResult": 40000,
+        "maxLinesPerResult": 400,
+        "preserveDocstrings": true,
+        "rawOutputMaxAgeDays": 30,
+        "rawOutputMaxBytes": 1048576,
+        "rawOutputMaxFiles": 100000,
+        "rawOutputRetention": "never",
+        "stripCodeComments": false,
+        "trustProjectFilters": false
+       }
+      },
+      {
+       "path": "codexResponsesConfig",
+       "op": "equals",
+       "value": {
+        "enabled": false,
+        "minBytes": 4096,
+        "maxOutputBytes": 2097152,
+        "maxCandidateBytes": 524288,
+        "maxLines": 160,
+        "minSearchMatches": 10000,
+        "minLogLines": 10000,
+        "preserveToolNames": [
+         "Read",
+         "Glob",
+         "Grep",
+         "Write",
+         "Edit",
+         "WebSearch",
+         "WebFetch",
+         "read",
+         "glob",
+         "grep",
+         "write",
+         "edit",
+         "web_search",
+         "web_fetch",
+         "str_replace_editor",
+         "file_editor",
+         "edit_file",
+         "terminal",
+         "execute_bash",
+         "bash",
+         "shell"
+        ]
+       }
+      },
+      {
+       "path": "cavemanConfig",
+       "op": "equals",
+       "value": {
+        "enabled": true,
+        "intensity": "lite",
+        "compressRoles": [
+         "assistant"
+        ],
+        "minMessageLength": 200,
+        "skipRules": [],
+        "preservePatterns": [
+         "```[\\s\\S]*?```",
+         "`[^`\\n]+`",
+         "\\b(https?://\\S+)",
+         "(?:^|\\s)(\\.{0,2}/[\\w./\\-]+)",
+         "^\\s*(Error|TypeError|RangeError|SyntaxError|ReferenceError):",
+         "^\\s+at\\s"
+        ]
+       }
+      },
+      {
+       "path": "sessionDedup",
+       "op": "equals",
+       "value": {
+        "minBlockChars": 512,
+        "fuzzy": false
+       }
+      },
+      {
+       "path": "headroom",
+       "op": "equals",
+       "value": {
+        "minRows": 16
+       }
+      },
+      {
+       "path": "aggressive",
+       "op": "equals",
+       "value": {
+        "thresholds": {
+         "fullSummary": 100,
+         "moderate": 100,
+         "light": 100,
+         "verbatim": 100
+        },
+        "toolStrategies": {
+         "fileContent": false,
+         "grepSearch": false,
+         "shellOutput": false,
+         "json": false,
+         "errorMessage": false
+        },
+        "summarizerEnabled": false,
+        "maxTokensPerMessage": 32768,
+        "minSavingsThreshold": 0
+       }
+      },
+      {
+       "path": "ultra",
+       "op": "equals",
+       "value": {
+        "enabled": false,
+        "compressionRate": 0.9,
+        "minScoreThreshold": 0.1,
+        "slmFallbackToAggressive": false,
+        "maxTokensPerMessage": 8192
+       }
+      },
+      {
+       "path": "enabled",
+       "op": "equals",
+       "value": true
+      },
+      {
+       "path": "defaultMode",
+       "op": "equals",
+       "value": "off"
+      },
+      {
+       "path": "autoTriggerTokens",
+       "op": "equals",
+       "value": 0
+      },
+      {
+       "path": "contextBudget.mode",
+       "op": "equals",
+       "value": "off"
+      },
+      {
+       "path": "activeComboId",
+       "op": "equals",
+       "value": null
+      },
+      {
+       "path": "compressionComboId",
+       "op": "equals",
+       "value": null
+      },
+      {
+       "path": "comboOverrides",
+       "op": "len_equals",
+       "value": 0
+      },
+      {
+       "path": "exclusions",
+       "op": "len_equals",
+       "value": 0
+      },
+      {
+       "path": "lite",
+       "op": "equals",
+       "value": {
+        "compressToolResults": false
+       }
+      },
+      {
+       "path": "stackedPipeline",
+       "op": "equals",
+       "value": [
+        {
+         "engine": "ccr",
+         "config": {
+          "enabled": false
+         }
+        }
+       ]
+      },
+      {
+       "path": "preserveSystemPrompt",
+       "op": "equals",
+       "value": true
+      },
+      {
+       "path": "preserveSystemPromptMode",
+       "op": "equals",
+       "value": "always"
+      },
+      {
+       "path": "cavemanOutputMode.enabled",
+       "op": "equals",
+       "value": false
+      },
+      {
+       "path": "ultraEngine",
+       "op": "equals",
+       "value": "heuristic"
+      },
+      {
+       "path": "ultraSlmPrewarm",
+       "op": "equals",
+       "value": false
+      },
+      {
+       "path": "cacheMinutes",
+       "op": "equals",
+       "value": 60
+      },
+      {
+       "path": "mcpDescriptionCompressionEnabled",
+       "op": "equals",
+       "value": true
+      },
+      {
+       "path": "enginesExplicit",
+       "op": "equals",
+       "value": true
+      }
+     ]
+    }
+   ],
+   "rollback": {
+    "method": "PUT",
+    "route": "/api/settings/compression",
+    "body_from_capture": {
+     "capture": "T09_compression",
+     "paths": [
+      "engines",
+      "outputStyles",
+      "liveZone",
+      "languageConfig",
+      "rtkConfig",
+      "codexResponsesConfig",
+      "cavemanConfig",
+      "sessionDedup",
+      "headroom",
+      "aggressive",
+      "ultra"
+     ]
+    }
+   },
+   "rollback_verify": [
+    {
+     "type": "get",
+     "route": "/api/settings/compression",
+     "asserts": [
+      {
+       "path": "engines",
+       "op": "equals",
+       "value": {
+        "$capture": "T09_compression",
+        "path": "engines"
+       }
+      },
+      {
+       "path": "outputStyles",
+       "op": "equals",
+       "value": {
+        "$capture": "T09_compression",
+        "path": "outputStyles"
+       }
+      },
+      {
+       "path": "liveZone",
+       "op": "equals",
+       "value": {
+        "$capture": "T09_compression",
+        "path": "liveZone"
+       }
+      },
+      {
+       "path": "languageConfig",
+       "op": "equals",
+       "value": {
+        "$capture": "T09_compression",
+        "path": "languageConfig"
+       }
+      },
+      {
+       "path": "rtkConfig",
+       "op": "equals",
+       "value": {
+        "$capture": "T09_compression",
+        "path": "rtkConfig"
+       }
+      },
+      {
+       "path": "codexResponsesConfig",
+       "op": "equals",
+       "value": {
+        "$capture": "T09_compression",
+        "path": "codexResponsesConfig"
+       }
+      },
+      {
+       "path": "cavemanConfig",
+       "op": "equals",
+       "value": {
+        "$capture": "T09_compression",
+        "path": "cavemanConfig"
+       }
+      },
+      {
+       "path": "sessionDedup",
+       "op": "equals",
+       "value": {
+        "$capture": "T09_compression",
+        "path": "sessionDedup"
+       }
+      },
+      {
+       "path": "headroom",
+       "op": "equals",
+       "value": {
+        "$capture": "T09_compression",
+        "path": "headroom"
+       }
+      },
+      {
+       "path": "aggressive",
+       "op": "equals",
+       "value": {
+        "$capture": "T09_compression",
+        "path": "aggressive"
+       }
+      },
+      {
+       "path": "ultra",
+       "op": "equals",
+       "value": {
+        "$capture": "T09_compression",
+        "path": "ultra"
+       }
+      },
+      {
+       "path": "enabled",
+       "op": "equals",
+       "value": true
+      },
+      {
+       "path": "defaultMode",
+       "op": "equals",
+       "value": "off"
+      },
+      {
+       "path": "autoTriggerTokens",
+       "op": "equals",
+       "value": 0
+      },
+      {
+       "path": "contextBudget.mode",
+       "op": "equals",
+       "value": "off"
+      },
+      {
+       "path": "activeComboId",
+       "op": "equals",
+       "value": null
+      },
+      {
+       "path": "compressionComboId",
+       "op": "equals",
+       "value": null
+      },
+      {
+       "path": "comboOverrides",
+       "op": "len_equals",
+       "value": 0
+      },
+      {
+       "path": "exclusions",
+       "op": "len_equals",
+       "value": 0
+      },
+      {
+       "path": "lite",
+       "op": "equals",
+       "value": {
+        "compressToolResults": false
+       }
+      },
+      {
+       "path": "stackedPipeline",
+       "op": "equals",
+       "value": [
+        {
+         "engine": "ccr",
+         "config": {
+          "enabled": false
+         }
+        }
+       ]
+      },
+      {
+       "path": "preserveSystemPrompt",
+       "op": "equals",
+       "value": true
+      },
+      {
+       "path": "preserveSystemPromptMode",
+       "op": "equals",
+       "value": "always"
+      },
+      {
+       "path": "cavemanOutputMode.enabled",
+       "op": "equals",
+       "value": false
+      },
+      {
+       "path": "ultraEngine",
+       "op": "equals",
+       "value": "heuristic"
+      },
+      {
+       "path": "ultraSlmPrewarm",
+       "op": "equals",
+       "value": false
+      },
+      {
+       "path": "cacheMinutes",
+       "op": "equals",
+       "value": 60
+      },
+      {
+       "path": "mcpDescriptionCompressionEnabled",
+       "op": "equals",
+       "value": true
+      },
+      {
+       "path": "enginesExplicit",
+       "op": "equals",
+       "value": true
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

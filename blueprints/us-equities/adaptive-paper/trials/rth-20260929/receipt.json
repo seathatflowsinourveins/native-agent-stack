@@ -1,0 +1,4199 @@
+{
+ "schema_version": 1,
+ "kind": "mover_paper_series_receipt",
+ "series": "rth-20260929",
+ "status": "five_passed_one_failed_ledger_halt",
+ "evidence_class": "PAPER",
+ "evidence_level": "metadata_plus_broker_reconciliation",
+ "gate": null,
+ "gate_note": "Not a frozen gate run. No gate receipt and no gate row changes with this record.",
+ "label": "mechanics-only test; no validated edge",
+ "broker": "alpaca",
+ "endpoint": "paper",
+ "feed": "sip",
+ "account": "account 1 (credential inventory id alpaca-paper). No credential, account id, account number or account fingerprint is recorded.",
+ "credential_route": "0600 env file store through the $PAPER_ENV_FILE pointer, passed as --env-file under /bin/bash -ic",
+ "credential_route_note": "The series unit launched through /bin/bash -ic, whose interactive start-up exports the pointer; run-series-trial.sh passed --env-file with it to scan, paper and recover, and the driver's key probe used the same pointer. Route and pointer names only.",
+ "session": {
+  "date": "2026-09-29",
+  "segment": "RTH",
+  "protocol": "mover-early-entry-v1-20260924",
+  "section": "paper_e2e"
+ },
+ "recorded_at_utc": "2026-09-30T15:15:43Z",
+ "revised_at_utc": "2026-09-30T20:53:27Z",
+ "revision_note": "Repaired on 2026-09-30 after an independent verification: websocket close-frame counts recounted and defined (websocket_lines), the offline-gate log re-checked (code.offline_gate.recheck_2026_09_30), unit results read from the systemd user manager (units[].manager_state), attempts[].scan.scan_log_sha256 renamed scan_full_sha256 (same values), the config fields the receipt had left out added, the reconciliation's command line limited to its recorded basis, and field provenance completed. No verdict and no total changed. Revised again on 2026-09-30 at 19:27:52Z to record account 1's FEE activities for 2026-09-29 from the coordinator's FEE-activity read (fees, series_totals.fees_usd and series_totals.realized_pnl_including_fees_usd), replacing the not-read statement. No verdict and no existing figure changed. Revised a third time on 2026-09-30 (revised_at_utc): field provenance added for ledger.snapshot and the development study's 0 of 768 (limitations[]), the same gaps a further independent verification found in ext-20260929. No verdict and no figure changed.",
+ "started_at": "2026-09-29T14:00:05Z",
+ "finished_at": "2026-09-29T19:44:16Z",
+ "client_id_prefix": "mvr-rth-20260929-",
+ "account_designation_note": "docs/secret-storage.md:16 lists alpaca-paper as the general paper key pair; no isolation designation applies. The series used a fresh account-1 ledger in the default root, created at schema 2 by its first paper stage.",
+ "code": {
+  "commit": "b528bb550463991bd3ca554ddf78e2a180aca301",
+  "checkout": "a durable read-only clone of that SHA under <private state root>/engines/ (git clone --no-hardlinks, detached at the SHA, then chmod -R a-w), shared by the three 2026-09-29 series",
+  "clean_basis": "At the series start the driver ran sha256sum -c frozen-b528bb55.SHA256SUMS against the clone and logged that the engine files match (series.console). The SUMS hold 70 entries: the top-level non-README files of adaptive-paper/ (40), mover-early-entry/ (20), order-contract/ (5) and incentive-monitor/ (5), which is 70 of the 208 files these four directories hold at b528bb55. All 70 equal git show b528bb55. On 2026-09-30 the clone was still at HEAD b528bb55 with an empty git status --porcelain and passed sha256sum -c again.",
+  "clean_basis_limits": "The other 138 files of those directories are not hashed by the SUMS. The clone is read-only and git reports it clean on 2026-09-30, but no hash of those files was taken at run time.",
+  "frozen_sums": {
+   "entries": 70,
+   "sha256": "36daf1949c4b27ee5c4fd17c5478c4f8f7146308b9649d26ee786b4cf88aa07f",
+   "by_directory": {
+    "adaptive-paper": 40,
+    "incentive-monitor": 5,
+    "mover-early-entry": 20,
+    "order-contract": 5
+   },
+   "files_in_those_directories_at_commit": 208,
+   "entries_equal_to_git_show": 70,
+   "driver_check_at_series_start": "engine files match frozen-b528bb55.SHA256SUMS",
+   "recheck_2026_09_30": "sha256sum -c rc 0; HEAD b528bb55; git status --porcelain empty"
+  },
+  "offline_gate": {
+   "tests": 402,
+   "result": "OK, exit 0",
+   "window_utc": "2026-09-29T05:05:52Z-05:08:34Z",
+   "modules": [
+    "tests.test_adaptive_paper_mover",
+    "tests.test_adaptive_paper_mover_native",
+    "tests.test_adaptive_paper_safety",
+    "tests.test_adaptive_paper_recovery",
+    "tests.test_mover_early_entry_scan",
+    "tests.test_mover_early_entry_rules",
+    "tests.test_adaptive_paper_transport",
+    "tests.test_adaptive_paper_native"
+   ],
+   "basis": "the three FREEZE files and the private series index, re-checked on 2026-09-30 against the private gate log and the gate's rc record (recheck_2026_09_30); the gate ran on a scratch git archive copy whose SHA256SUMS before and after the run equal the clone's.",
+   "recheck_2026_09_30": {
+    "checked_at": "2026-09-30",
+    "gate_log_sha256": "1efd458eb9501f68f9286a061b8fd54304de7ff9c760e2b36def9d516abd074c",
+    "gate_log_bytes": 2469,
+    "gate_log_modified_at": "2026-09-29T05:08:33Z",
+    "gate_log_result_lines": [
+     "Ran 402 tests in 160.774s",
+     "OK"
+    ],
+    "gate_log_fail_or_error_lines": 0,
+    "gate_rc_record_sha256": "1e5ee31a367b334123403702d7d41ecdcffa6ede61930f0b7a49a60692b604f5",
+    "gate_rc_record": "gate rc=0 start=2026-09-29T05:05:52Z end=2026-09-29T05:08:34Z",
+    "gate_copy_sums_sha256_before_run": "36daf1949c4b27ee5c4fd17c5478c4f8f7146308b9649d26ee786b4cf88aa07f",
+    "gate_copy_sums_sha256_after_run": "36daf1949c4b27ee5c4fd17c5478c4f8f7146308b9649d26ee786b4cf88aa07f",
+    "note": "The gate log and rc record are private files in a temporary directory, cited by sha256 only (the log body names host paths); they may not persist. Both SUMS hashes equal frozen_sums.sha256."
+   }
+  },
+  "runtime": {
+   "engine": "NautilusTrader LiveNode 2.0.0rc5",
+   "nautilus_trader": "2.0.0rc5",
+   "alpaca_py": "0.44.0",
+   "python": "3.12.3",
+   "numpy": "2.5.3",
+   "requests": "2.34.2",
+   "interpreter": "the pinned adaptive-paper virtual environment (adaptive-paper-20260921)",
+   "runtime_basis": "engine name from every trial receipt; package versions read from the same environment on 2026-09-30 by the builder and recorded at freeze in FREEZE.md; not observed at run time"
+  },
+  "engine_sources_sha256": [
+   {
+    "path": "adaptive-paper/benchmark.py",
+    "sha256": "6ef1551c60855e43b75e9e02f48915236518100b9f0e910f15794877c754f866"
+   },
+   {
+    "path": "adaptive-paper/corporate_actions.py",
+    "sha256": "8f0839427b9d8a3c9b3fbd02f286985c7a720bf85a3c599fce2022573bff71cd"
+   },
+   {
+    "path": "adaptive-paper/credential_guard.py",
+    "sha256": "f5a3d0d038ed3f01d486493ce416395039fb260762232785bb0a9073c777da7e"
+   },
+   {
+    "path": "adaptive-paper/credential_source.py",
+    "sha256": "0bbe30aab4e665226e230e9927ef51e7f8875c53dda6527d19e6efe76bbaeacc"
+   },
+   {
+    "path": "adaptive-paper/exits.py",
+    "sha256": "189133e6df99bda201d73d36a15f45ccbfb38979a3319ae6f75d077f5db5b3df"
+   },
+   {
+    "path": "adaptive-paper/feeds.py",
+    "sha256": "0db3009a724ae2433572c5070066d6806d7365031f9db4e81c4b69ad1cbebacb"
+   },
+   {
+    "path": "adaptive-paper/financing.py",
+    "sha256": "562652297f87d1b2650158f73795013a52d895ce116fb535a205c41a83880350"
+   },
+   {
+    "path": "adaptive-paper/leverage.py",
+    "sha256": "7f4a86f312d718a0a0b87e6eafe9a2d57b8709ec85a8746fdf7def0a5b502ea0"
+   },
+   {
+    "path": "adaptive-paper/live_manifest.py",
+    "sha256": "ca34cb59b4ff8f3a9dc763a0937a351ecab815d16164c75c319e3880a57585bd"
+   },
+   {
+    "path": "adaptive-paper/market_research.py",
+    "sha256": "bba9cf77c3c3c6dff32dec1cb01fa8c1957c6b012b7d5bd9693fcc268d557158"
+   },
+   {
+    "path": "adaptive-paper/metrics.py",
+    "sha256": "437fce8aaca350b9d8fe5d5b68212879d82e118f01d93fdcd333233709b80397"
+   },
+   {
+    "path": "adaptive-paper/mover.py",
+    "sha256": "ac34fd84485a054b27fb857b5ef3b0dfb7f7dee9c407eb42d4579e9e80e5ee88"
+   },
+   {
+    "path": "adaptive-paper/mover_runner.py",
+    "sha256": "03f9107e40feaaefc6e896db3e20d246139f8ef8b02e1a7d7da79199e62bb7f5"
+   },
+   {
+    "path": "adaptive-paper/mover_simulation.py",
+    "sha256": "8ac5955de1e814bb26fbfbca068a5719b9033b2bae0d8e50e78d7a78a546761e"
+   },
+   {
+    "path": "adaptive-paper/mover_strategy.py",
+    "sha256": "4730c5e535aa480030d6484669a9d8565ca25e4e1ea50ea12a45bd1892536cba"
+   },
+   {
+    "path": "adaptive-paper/native_adapter.py",
+    "sha256": "fbf530884c2ad3b9e0c2b1f989eda399531647cc1db3c56dc9bcac10174fea47"
+   },
+   {
+    "path": "adaptive-paper/native_strategy.py",
+    "sha256": "bc102eb6c4456cb651510fe59cf5f92decf3b70b31e0da1c833e7a27d6f1a226"
+   },
+   {
+    "path": "adaptive-paper/recovery.py",
+    "sha256": "38b6cf4f9247577f72337ca3dbd242505a43ad5cbc5cbe21349b0f1beb2f3e51"
+   },
+   {
+    "path": "adaptive-paper/runner.py",
+    "sha256": "27bc3fdc80472c3ee218d3723e506288ebc6eef536dafc8365b30474213a6ae4"
+   },
+   {
+    "path": "adaptive-paper/safety.py",
+    "sha256": "c2d44faa1e4d369b8882dec9782ef32174c404b723edd2419833146b24eb2357"
+   },
+   {
+    "path": "adaptive-paper/selector.py",
+    "sha256": "28de8ebf66b6e7135979554f73692ede772167682007d8c6ba41da6fb6fb39b3"
+   },
+   {
+    "path": "adaptive-paper/sessions.py",
+    "sha256": "95f0affee512e88dd44f196fa72bb7471e00899356793bdbb12f15c4ed84e64d"
+   },
+   {
+    "path": "adaptive-paper/simulation.py",
+    "sha256": "0119e0efe3b498be3c415eee9c1a0be922c9b5b17e3b774aa7528668c4eb0b30"
+   },
+   {
+    "path": "adaptive-paper/strategies.py",
+    "sha256": "2d488a4fdd21ad323ab07cf7fb147b3623fd6e38951abcf2fc59cf8094a1383e"
+   },
+   {
+    "path": "adaptive-paper/strategies_v1.py",
+    "sha256": "1952be269694485e12e4d927f124adca0ee29667588d6ac6651caede454c92f7"
+   },
+   {
+    "path": "adaptive-paper/transport.py",
+    "sha256": "e3038bd5562fecc7cea52df47c4ff6b94ddae7e85ce545d6684e651b856b89d9"
+   },
+   {
+    "path": "mover-early-entry/mover_scan.py",
+    "sha256": "f584b2c9d5719ceb237d7b57db9c610935b5348b7bc4fe2634359e8b61e480d9"
+   }
+  ],
+  "engine_sources_note": "the 26 adaptive-paper/*.py sources and mover-early-entry/mover_scan.py (27 path and sha256 pairs), each computed as git show b528bb55:blueprints/us-equities/<path> | sha256sum; each equals the clone's file and its SUMS entry"
+ },
+ "config": {
+  "sha256": "cbb953d517f18de05702727860a8af66859b41f4835f6c972234ec5e7cc8ab73",
+  "schema_version": 1,
+  "mode": "mover_paper",
+  "protocol": "mover-early-entry-v1-20260924",
+  "endpoint": "https://paper-api.alpaca.markets",
+  "feed": "sip",
+  "regular_session_only": false,
+  "extended_hours_enabled": true,
+  "overnight_holds": false,
+  "overnight_gross_multiple": "1.0",
+  "sessions_extended_hours": true,
+  "catalyst_orders_enabled": false,
+  "benchmarks": [
+   "SPY"
+  ],
+  "rule": "10:00|G20|V250000|any",
+  "exit": "X2",
+  "session_scope": "any_session",
+  "trial_end_et": "15:50",
+  "capital_usd": "2500",
+  "max_symbols": 5,
+  "max_held_symbols": 5,
+  "max_entry_notional_usd": "1000",
+  "max_order_notional_usd": "10000",
+  "max_order_quantity": 100,
+  "max_order_qty_mode": "notional",
+  "max_gross_exposure_usd": "10000",
+  "max_outstanding_orders": 20,
+  "max_gross_loss_usd": "250",
+  "max_drawdown_usd": "250",
+  "max_leverage": "4",
+  "max_api_requests_per_minute": 150,
+  "max_submit_requests_per_minute": 130,
+  "quote_max_age_seconds": 3,
+  "max_spread_bps": "100",
+  "entry": {
+   "limit_cap_bps": "50",
+   "timeout_seconds": 60,
+   "window_seconds": 30
+  },
+  "exit_orders": {
+   "limit_cap_bps": "50",
+   "timeout_seconds": 10,
+   "max_orders_per_symbol": 20
+  },
+  "order_timeout_seconds": 10,
+  "duration_seconds": 3600,
+  "cleanup_seconds": 600,
+  "min_entry_close_seconds": 600,
+  "flatten_reserve_seconds": 120,
+  "max_scan_age_seconds": 300,
+  "stream_quote_timeout_seconds": 3,
+  "appreciation_allowance": "2",
+  "gross_guard_fraction": "0.9",
+  "rung": "4",
+  "rung_sessions": [
+   1,
+   20
+  ],
+  "leverage_policy": "leverage-schedule-v1-20260922",
+  "leverage_policy_decision_record": "agent-lab/docs/decisions/2026-09-22-leverage-schedule-and-entitlement.md",
+  "leverage_schedule": {
+   "RTH": {
+    "trend": "4",
+    "range": "1",
+    "risk_off": "0",
+    "unavailable": "0"
+   },
+   "PRE": {
+    "trend": "1",
+    "range": "1",
+    "risk_off": "0",
+    "unavailable": "0"
+   },
+   "POST": {
+    "trend": "1",
+    "range": "1",
+    "risk_off": "0",
+    "unavailable": "0"
+   },
+   "CLOSED": {
+    "trend": "0",
+    "range": "0",
+    "risk_off": "0",
+    "unavailable": "0"
+   }
+  },
+  "overnight_max_leverage": "2",
+  "drawdown_ladder": [
+   {
+    "from_drawdown_fraction": "0",
+    "max_leverage": "4"
+   },
+   {
+    "from_drawdown_fraction": "0.25",
+    "max_leverage": "2"
+   },
+   {
+    "from_drawdown_fraction": "0.5",
+    "max_leverage": "1"
+   },
+   {
+    "from_drawdown_fraction": "0.75",
+    "max_leverage": "0"
+   }
+  ],
+  "notes": "RTH mover series 2026-09-29 on paper account 1 (protocol mover-early-entry-v1-20260924 paper_e2e, family F, mechanics-only: no rule-exit validated, so the most-traded development rule 10:00|G20|V250000|any as in Mac trial A and pc-20260928). Changes from config-mover-pc-20260928.json: trial_end_et 15:50 (coordinator window: last start 15:40, hard flatten 15:50) and request caps 150 per minute with 130 submits, so the account stays at or below 180 per minute with the scanner's and refused preflights' reads outside the ledger. Leverage: rung 4 under the canonical leverage-schedule-v1-20260922 block, max_leverage 4; entries at most min(10000/2, 2500 x 4) = 5000 USD (2x at entry); lifetime gross-loss and drawdown budgets 250 (capital/10). Late scan and entry at each trial start, exit X2, hard flatten min(start + 68 min, 15:50 ET)."
+ },
+ "scanner_rule": {
+  "frozen_config_rule": "10:00|G20|V250000|any",
+  "rule_txt": "10:00|G0.20|V250000|any",
+  "every_attempt_argument": "10:00|G0.20|V250000|any",
+  "note": "rule.txt holds the scanner's ratio form (G0.20 is 20 percent, 23 bytes, no trailing newline) and the config holds percent points (G20); every scan.log shows the rule.txt form and check validated each scan against the config."
+ },
+ "frozen_acceptance": {
+  "source": "FREEZE.md (private; it names account fingerprints)",
+  "freeze_sha256": "4e595a8dcde301ac502361a0c3563e287ec64db5abe750044d2a7d9faee6f7f7",
+  "pass_clause_text": [
+   "- **Operational pass.** The receipt `status` is `passed` or `completed_no_signals`, and all of the following hold:",
+   "  - `flat` true;",
+   "  - end reconciliation `cash_match` and `positions_match` true;",
+   "  - 0 open orders;",
+   "  - `pnl_consistent` true;",
+   "  - no duplicate or unexplained broker effects (`duplicate_executions` 0);",
+   "  - no ledger halt;",
+   "  - no HTTP 429.",
+   "- **Recorded, not thresholded.**",
+   "  - Fills and slippage per leg, exit reasons, realized P&L and any fees.",
+   "  - Planned versus realized gross/equity, which is the leverage actually applied.",
+   "  - Request and submit peaks per 60 s, from the receipts' HTTP observations and `x-ratelimit-remaining`.",
+   "  - Websocket reconnects and gaps, and recoveries.",
+   "  - `paper_compare.py` differences from the historical fill model (as in #205 trial A). Decision 11 applies: this is acceptance evidence only after the tool is checked to accept `b528bb55` receipts. Otherwise it is recorded as not run.",
+   "- **Anything else** is recorded as `needs_attention` or failed, with its reason. Recovery runs before the next trial and before 16:00 ET."
+  ],
+  "next_trial_rule_text": "- **When the next trial may start:** only after the previous trial ends `passed` or `completed_no_signals`, or after its `recover` passes, with no HTTP 429 in any of its attempts. The last start is 15:40 ET.",
+  "stop_rule_text": [
+   "a ledger halt, a failed recovery, or a SIP refusal;",
+   "a preflight refusal other than benchmark quote age (not flat, or open orders);",
+   "six benchmark refusals in a row;",
+   "a scan with no fired symbol;",
+   "any 429, or the kill switch;",
+   "the 15:40 ET last start;",
+   "the unit backstop at 16:15:05 ET (`RuntimeMaxSec` 6h15min). The backstop sends SIGTERM to the whole cgroup: the engine flattens as a controller stop, but no automatic `recover` follows."
+  ],
+  "evaluation": "A trial is pass only if every clause holds: engine status passed or completed_no_signals; flat; end reconciliation cash_match and positions_match true; 0 open orders; totals.pnl_consistent true; execution_stats.duplicate_executions 0 and no unexplained broker/ledger difference in the broker reconciliation; ledger_risk.halted_reason null at the trial's end; no HTTP 429 in the receipt's HTTP observations, no transport rate_limited mark and no non-200 scan page. A trial with a failed clause is needs_attention when the engine itself reported needs_attention, and fail otherwise; a clause the files cannot evaluate is recorded as null, and a trial whose verdict rests on such a clause would be inconclusive. The verdict ignores what the engine or the driver printed.",
+  "paper_compare": "not run: decision 11 makes it acceptance evidence only after the tool is checked against b528bb55 receipts; no paper_compare output exists in the series directories"
+ },
+ "dry_run": {
+  "when_utc": "2026-09-29T05:14:31Z",
+  "when_et": "01:14:31",
+  "driver_check": "check passed: rth-20260929 would start trial 1; no trial started",
+  "key_probe_http_status": 200,
+  "check": "valid",
+  "synthetic": "completed_no_signals, flat",
+  "note": "after the freeze and before any timer; no paper or recover stage and no order path. The synthetic run refused every entry with leverage_ceiling_zero at 01:15 ET (the CLOSED cell), an artifact of the hour (private series index)."
+ },
+ "series_procedure": {
+  "per_attempt": "scan (mover_scan.py with rule.txt), mover_runner.py check, synthetic (SYN) on the same scan, paper; recover when paper ends needs_attention (run-series-trial.sh)",
+  "launch": "paper-rth-20260929.timer fired at 10:00:05 ET and started paper-rth-20260929.service (Type=exec, CPUWeight 1000, RuntimeMaxSec 6h15min, OnFailure=paper-alert@%n.service), which ran /bin/bash -ic 'exec sh series-driver.sh rth-20260929 1 1 1540 6' with ENGINE_SHA=b528bb550463991bd3ca554ddf78e2a180aca301",
+  "driver": "series-driver.sh checks the kill switch, that the clone is at ENGINE_SHA and sha256sum -c frozen-b528bb55.SHA256SUMS, probes the key with one GET /v2/account, then runs trial after trial through retry-benchmark.sh (at most 6 attempts per trial, retried only on benchmark_quotes_not_ready) until the last start, a trial that neither passed nor recovered, or any HTTP 429 in the key probe, in mover-paper.json or mover-recovery.json, or in the scan pages",
+  "driver_pass_rule": "yes when mover-paper.json status is passed or completed_no_signals, or mover-recovery.json status is passed, and no 429 was found; it does not read ledger_risk.halted_reason",
+  "driver_exit_codes": "0 past the last start (or check passed); 2 usage; 3 series stopped; 4 not started (switch, clone, files); 5 no working paper key (the script's header)",
+  "scripts_note": "series-driver.sh (sha256 feff8f5692b03900add1909b9554e7343357dbc170ad5b783ff5836331d1f608, modified 2026-09-29T05:09:48Z), run-series-trial.sh (bbd917040783e8d3e41ed43af137060a52d31d9587d6988f160e124aaa095ca4, 05:09:26Z) and retry-benchmark.sh (4f82d5f936257869450c72d6f9cc03b0cf0f2fa584891d1abfc9b8a95fe1f27e, 2026-09-28T20:25:56Z) predate the three FREEZE files (05:11:26Z-05:12:32Z). FREEZE.md names retry-benchmark.sh and the driver arguments but hashes no script; the private series index (written 05:20:57Z) hashes all three, and on 2026-09-30 each file still has that sha256.",
+  "freeze_plan": "Trials rth-20260929-N run in sequence from the 10:00:05 ET timer, each only after the previous one ended passed or completed_no_signals or recovered, with no 429; the last start is 15:40 ET and the hard flatten min(start + 68 min, 15:50 ET). The series stops on the stop rules quoted in frozen_acceptance.stop_rule_text, the first of which is a ledger halt.",
+  "series_end": "15:44:16 ET series ends: past last start 1540 ET",
+  "key_probe": {
+   "request": "GET /v2/account",
+   "http_status": 200,
+   "observed_at": "2026-09-29T14:00:05.401353Z",
+   "x_ratelimit_limit": "200",
+   "x_ratelimit_remaining": "199",
+   "probes": 1,
+   "note": "one probe before the first trial; the driver probes again every 120 s only while the key fails"
+  },
+  "deviations_from_freeze": [
+   "Ledger-halt stop not implemented by the driver (not exercised): the freeze stops the series on a ledger halt, but series-driver.sh reads only the receipts' status and 429s. After trial 6 latched gross_loss_cap_reached it logged rth-20260929-6 rc=0: yes, and the series ended at 15:44:16 ET only because the 15:40 ET last start had passed. No trial started after the halt, and the ledger itself refuses one (next_trial_cannot_clear_risk_halt, safety.py:628)."
+  ]
+ },
+ "attempts": [
+  {
+   "attempt": 1,
+   "trial_id": "rth-20260929-1",
+   "unit": "paper-rth-20260929",
+   "started_at": "2026-09-29T14:00:05Z",
+   "ended_at": "2026-09-29T15:00:30Z",
+   "et": {
+    "scan_start": "10:00:05",
+    "check": "10:00:14",
+    "synthetic": "10:00:19",
+    "paper_start": "10:00:19",
+    "paper_end": "11:00:30",
+    "end": "11:00:30"
+   },
+   "scan": {
+    "argument_rule": "10:00|G0.20|V250000|any",
+    "fired": 13,
+    "candidates": [
+     "BKYI",
+     "IOVA",
+     "BEX",
+     "YMT",
+     "AXTX"
+    ],
+    "scan_time": "2026-09-29T14:00:05Z",
+    "age_seconds_at_trial_start": 15.55,
+    "scan_full_sha256": "8022e34e9f795d78a0bedf4468977b9a6066596f80df6b829ed11e49daf5a31d"
+   },
+   "check": "valid",
+   "synthetic": "passed (SYN, flat)",
+   "rule": "10:00|G20|V250000|any",
+   "exit_rule": "X2",
+   "caps": {
+    "entry_notional_usd": "1000",
+    "gross_budget_usd": "5000.00",
+    "gross_guard_usd": "9000.00",
+    "ledger_max_order_notional_usd": "10000",
+    "max_order_quantity": 100,
+    "engine_leverage_multiple": "4",
+    "leverage_L": "4",
+    "sizing_equity_usd": "2500.00",
+    "session_number": 1,
+    "drawdown_fraction": "0.000000"
+   },
+   "caps_source": "paper stage sizing (mover-paper.json sizing and session)",
+   "preflight": {
+    "account_status": "ACTIVE",
+    "positions": 0,
+    "open_orders": 0,
+    "observed_at": "2026-09-29T14:00:20.496686Z"
+   },
+   "status": "passed",
+   "orders_submitted": 10,
+   "entries": [
+    {
+     "symbol": "BKYI",
+     "qty": "100",
+     "limit_price": "3.78",
+     "average_fill_price": "3.7798",
+     "fills": 5,
+     "status": "filled"
+    },
+    {
+     "symbol": "IOVA",
+     "qty": "71",
+     "limit_price": "13.94",
+     "average_fill_price": "13.89",
+     "fills": 2,
+     "status": "filled"
+    },
+    {
+     "symbol": "BEX",
+     "qty": "24",
+     "limit_price": "40.46",
+     "average_fill_price": "40.26",
+     "fills": 1,
+     "status": "filled"
+    },
+    {
+     "symbol": "YMT",
+     "qty": "100",
+     "limit_price": "2.18",
+     "average_fill_price": "2.169",
+     "fills": 5,
+     "status": "filled"
+    },
+    {
+     "symbol": "AXTX",
+     "qty": "26",
+     "limit_price": "38.33",
+     "average_fill_price": "38.26",
+     "fills": 2,
+     "status": "filled"
+    }
+   ],
+   "exits": [
+    {
+     "symbol": "BKYI",
+     "qty": "100",
+     "limit_price": "3.39",
+     "average_fill_price": "3.40",
+     "fills": 2,
+     "reason": "x2_time",
+     "status": "filled",
+     "ledger_status": "filled",
+     "realized_pnl_usd": "-37.98"
+    },
+    {
+     "symbol": "IOVA",
+     "qty": "71",
+     "limit_price": "13.78",
+     "average_fill_price": "13.85",
+     "fills": 1,
+     "reason": "x2_time",
+     "status": "filled",
+     "ledger_status": "filled",
+     "realized_pnl_usd": "-2.84"
+    },
+    {
+     "symbol": "BEX",
+     "qty": "24",
+     "limit_price": "41.38",
+     "average_fill_price": "41.59",
+     "fills": 1,
+     "reason": "x2_time",
+     "status": "filled",
+     "ledger_status": "filled",
+     "realized_pnl_usd": "31.92"
+    },
+    {
+     "symbol": "YMT",
+     "qty": "100",
+     "limit_price": "1.98",
+     "average_fill_price": "1.98",
+     "fills": 2,
+     "reason": "x2_time",
+     "status": "filled",
+     "ledger_status": "filled",
+     "realized_pnl_usd": "-18.90"
+    },
+    {
+     "symbol": "AXTX",
+     "qty": "26",
+     "limit_price": "37.09",
+     "average_fill_price": "37.252308",
+     "fills": 5,
+     "reason": "x2_time",
+     "status": "filled",
+     "ledger_status": "filled",
+     "realized_pnl_usd": "-26.20"
+    }
+   ],
+   "legs": [
+    {
+     "symbol": "BKYI",
+     "state": "closed",
+     "exit_reason": "x2_time",
+     "exit_triggered_at": "2026-09-29T15:00:25.117429Z",
+     "exit_wait_reason": null,
+     "realized_pnl_usd": "-37.98"
+    },
+    {
+     "symbol": "IOVA",
+     "state": "closed",
+     "exit_reason": "x2_time",
+     "exit_triggered_at": "2026-09-29T15:00:23.962685Z",
+     "exit_wait_reason": null,
+     "realized_pnl_usd": "-2.84"
+    },
+    {
+     "symbol": "BEX",
+     "state": "closed",
+     "exit_reason": "x2_time",
+     "exit_triggered_at": "2026-09-29T15:00:23.641879Z",
+     "exit_wait_reason": null,
+     "realized_pnl_usd": "31.92"
+    },
+    {
+     "symbol": "YMT",
+     "state": "closed",
+     "exit_reason": "x2_time",
+     "exit_triggered_at": "2026-09-29T15:00:25.881054Z",
+     "exit_wait_reason": null,
+     "realized_pnl_usd": "-18.90"
+    },
+    {
+     "symbol": "AXTX",
+     "state": "closed",
+     "exit_reason": "x2_time",
+     "exit_triggered_at": "2026-09-29T15:00:24.799622Z",
+     "exit_wait_reason": null,
+     "realized_pnl_usd": "-26.20"
+    }
+   ],
+   "skipped_entries": [],
+   "fills": {
+    "engine_fill_events": 26,
+    "ledger_executions": 26,
+    "broker_fill_activities": 26,
+    "matched": 26,
+    "unconfirmed": 0,
+    "at_reference_quote": 12,
+    "better_than_reference": 3,
+    "worse_than_reference": 11
+   },
+   "rejects": {
+    "native_rejections": 0,
+    "pre_wire_refusals": 0,
+    "cancels": 0
+   },
+   "errors": {
+    "error_type": null,
+    "error_reason": null,
+    "adapter_errors": 0,
+    "callback_faults": 0,
+    "average_invariant_mismatches": 0,
+    "duplicate_executions": 0,
+    "open_fill_gaps_at_stop": 0,
+    "halts": {
+     "seed_items": 25,
+     "halted": 0
+    },
+    "websocket_restart_lines": {
+     "data": 0,
+     "trading": 1
+    },
+    "websocket_lines_without_close_frame": 0,
+    "websocket_lines_no_close_frame_either_way": 0,
+    "data_stream_gap_lines": 0
+   },
+   "dropped_crossed_quotes": {
+    "BKYI": 84,
+    "IOVA": 444,
+    "SPY": 285,
+    "YMT": 6,
+    "total": 819
+   },
+   "native_quotes": 284174,
+   "requests": {
+    "read": 484,
+    "submit": 10,
+    "cancel": 0,
+    "peak_requests_any_60s": 23,
+    "peak_submits_any_60s": 5,
+    "engine_reported": {
+     "read": 484,
+     "submit": 10
+    },
+    "ledger_reads_in_5s_before_trial_start": 10,
+    "http_observations": {
+     "count": 505,
+     "by_kind_status": {
+      "data_read:200": 1,
+      "read:200": 494,
+      "submit:200": 10
+     },
+     "min_x_ratelimit_remaining": 187
+    }
+   },
+   "trial_start": "2026-09-29T14:00:20.549880Z",
+   "hard_flatten_at": "2026-09-29T15:08:20.549880Z",
+   "elapsed_seconds": 3609.3,
+   "force_reason": null,
+   "force_at": null,
+   "handoff_to_recovery": null,
+   "realized_pnl_usd": {
+    "engine": "-54.00",
+    "ledger_delta": "-54.00",
+    "broker_recomputed_cash_flow": "-54.00"
+   },
+   "buy_notional_usd": "3542.07",
+   "sell_notional_usd": "3488.07",
+   "entry_gross_to_sizing_equity": "1.417",
+   "reconciliation_end": {
+    "cash_match": true,
+    "positions_match": true,
+    "open_orders": 0,
+    "positions": 0,
+    "ledger_cash_delta_usd_since_ledger_start": "-54.00"
+   },
+   "ledger_risk": {
+    "lifetime_realized_pnl_usd": "-54.00",
+    "lifetime_gross_loss_usd": "85.92",
+    "drawdown_usd": "113.64",
+    "halted_reason": null
+   },
+   "flat_at_end": true,
+   "paper_rc": 0,
+   "driver_line": "11:00:30 ET rth-20260929-1 rc=0: yes",
+   "acceptance": {
+    "clauses": {
+     "status_passed_or_completed_no_signals": true,
+     "flat": true,
+     "cash_match": true,
+     "positions_match": true,
+     "zero_open_orders": true,
+     "pnl_consistent": true,
+     "no_duplicate_or_unexplained_effects": true,
+     "no_ledger_halt": true,
+     "no_http_429": true
+    },
+    "values": {
+     "engine_status": "passed",
+     "flat": true,
+     "reconciliation_end": {
+      "cash_delta_usd": "-54.00",
+      "cash_match": true,
+      "open_orders": 0,
+      "positions": 0,
+      "positions_match": true
+     },
+     "pnl_consistent": true,
+     "duplicate_executions": 0,
+     "orders_disagreeing_with_broker": [],
+     "unconfirmed_executions": 0,
+     "ledger_intents_not_listed_by_broker": [],
+     "halted_reason": null,
+     "http_429_in_receipt": 0,
+     "rate_limited_marks": 0,
+     "http_observations": 505,
+     "scan_pages": 33,
+     "scan_pages_non_200": 0,
+     "orders_agreeing_with_broker": "10 of 10"
+    },
+    "verdict": "pass",
+    "failed_clauses": []
+   },
+   "flat_basis": "end reconciliation: cash_match and positions_match true, 0 open orders, 0 positions"
+  },
+  {
+   "attempt": 2,
+   "trial_id": "rth-20260929-2",
+   "unit": "paper-rth-20260929",
+   "started_at": "2026-09-29T15:00:30Z",
+   "ended_at": "2026-09-29T16:00:53Z",
+   "et": {
+    "scan_start": "11:00:30",
+    "check": "11:00:39",
+    "synthetic": "11:00:43",
+    "paper_start": "11:00:43",
+    "paper_end": "12:00:53",
+    "end": "12:00:53"
+   },
+   "scan": {
+    "argument_rule": "10:00|G0.20|V250000|any",
+    "fired": 10,
+    "candidates": [
+     "BKYI",
+     "IOVA",
+     "BEX",
+     "AXTX",
+     "SSTI"
+    ],
+    "scan_time": "2026-09-29T15:00:30Z",
+    "age_seconds_at_trial_start": 15.112,
+    "scan_full_sha256": "e5fd51e872373af6649c8772c02f0568c9b086d448512b656f89f8dafefcbbc2"
+   },
+   "check": "valid",
+   "synthetic": "passed (SYN, flat)",
+   "rule": "10:00|G20|V250000|any",
+   "exit_rule": "X2",
+   "caps": {
+    "entry_notional_usd": "1000",
+    "gross_budget_usd": "4892.00",
+    "gross_guard_usd": "9000.00",
+    "ledger_max_order_notional_usd": "10000",
+    "max_order_quantity": 100,
+    "engine_leverage_multiple": "2",
+    "leverage_L": "4",
+    "sizing_equity_usd": "2446.00",
+    "session_number": 2,
+    "drawdown_fraction": "0.021600"
+   },
+   "caps_source": "paper stage sizing (mover-paper.json sizing and session)",
+   "preflight": {
+    "account_status": "ACTIVE",
+    "positions": 0,
+    "open_orders": 0,
+    "observed_at": "2026-09-29T15:00:45.106226Z"
+   },
+   "status": "passed",
+   "orders_submitted": 10,
+   "entries": [
+    {
+     "symbol": "BKYI",
+     "qty": "100",
+     "limit_price": "3.41",
+     "average_fill_price": "3.3998",
+     "fills": 4,
+     "status": "filled"
+    },
+    {
+     "symbol": "IOVA",
+     "qty": "71",
+     "limit_price": "13.92",
+     "average_fill_price": "13.86",
+     "fills": 1,
+     "status": "filled"
+    },
+    {
+     "symbol": "BEX",
+     "qty": "23",
+     "limit_price": "41.97",
+     "average_fill_price": "41.683913",
+     "fills": 2,
+     "status": "filled"
+    },
+    {
+     "symbol": "AXTX",
+     "qty": "26",
+     "limit_price": "37.52",
+     "average_fill_price": "37.34",
+     "fills": 2,
+     "status": "filled"
+    },
+    {
+     "symbol": "SSTI",
+     "qty": "100",
+     "limit_price": "8.30",
+     "average_fill_price": "8.26",
+     "fills": 1,
+     "status": "filled"
+    }
+   ],
+   "exits": [
+    {
+     "symbol": "BKYI",
+     "qty": "100",
+     "limit_price": "3.24",
+     "average_fill_price": "3.24",
+     "fills": 2,
+     "reason": "x2_time",
+     "status": "filled",
+     "ledger_status": "filled",
+     "realized_pnl_usd": "-15.98"
+    },
+    {
+     "symbol": "IOVA",
+     "qty": "71",
+     "limit_price": "13.99",
+     "average_fill_price": "14.06",
+     "fills": 4,
+     "reason": "x2_time",
+     "status": "filled",
+     "ledger_status": "filled",
+     "realized_pnl_usd": "14.20"
+    },
+    {
+     "symbol": "BEX",
+     "qty": "23",
+     "limit_price": "41.01",
+     "average_fill_price": "41.21",
+     "fills": 3,
+     "reason": "x2_time",
+     "status": "filled",
+     "ledger_status": "filled",
+     "realized_pnl_usd": "-10.90"
+    },
+    {
+     "symbol": "AXTX",
+     "qty": "26",
+     "limit_price": "36.88",
+     "average_fill_price": "37.06",
+     "fills": 5,
+     "reason": "x2_time",
+     "status": "filled",
+     "ledger_status": "filled",
+     "realized_pnl_usd": "-7.28"
+    },
+    {
+     "symbol": "SSTI",
+     "qty": "100",
+     "limit_price": "8.20",
+     "average_fill_price": "8.24",
+     "fills": 2,
+     "reason": "x2_time",
+     "status": "filled",
+     "ledger_status": "filled",
+     "realized_pnl_usd": "-2.00"
+    }
+   ],
+   "legs": [
+    {
+     "symbol": "BKYI",
+     "state": "closed",
+     "exit_reason": "x2_time",
+     "exit_triggered_at": "2026-09-29T16:00:47.913831Z",
+     "exit_wait_reason": null,
+     "realized_pnl_usd": "-15.98"
+    },
+    {
+     "symbol": "IOVA",
+     "state": "closed",
+     "exit_reason": "x2_time",
+     "exit_triggered_at": "2026-09-29T16:00:47.103429Z",
+     "exit_wait_reason": null,
+     "realized_pnl_usd": "14.20"
+    },
+    {
+     "symbol": "BEX",
+     "state": "closed",
+     "exit_reason": "x2_time",
+     "exit_triggered_at": "2026-09-29T16:00:50.646777Z",
+     "exit_wait_reason": null,
+     "realized_pnl_usd": "-10.90"
+    },
+    {
+     "symbol": "AXTX",
+     "state": "closed",
+     "exit_reason": "x2_time",
+     "exit_triggered_at": "2026-09-29T16:00:47.207597Z",
+     "exit_wait_reason": null,
+     "realized_pnl_usd": "-7.28"
+    },
+    {
+     "symbol": "SSTI",
+     "state": "closed",
+     "exit_reason": "x2_time",
+     "exit_triggered_at": "2026-09-29T16:00:47.618985Z",
+     "exit_wait_reason": null,
+     "realized_pnl_usd": "-2.00"
+    }
+   ],
+   "skipped_entries": [],
+   "fills": {
+    "engine_fill_events": 26,
+    "ledger_executions": 26,
+    "broker_fill_activities": 26,
+    "matched": 26,
+    "unconfirmed": 0,
+    "at_reference_quote": 21,
+    "better_than_reference": 3,
+    "worse_than_reference": 2
+   },
+   "rejects": {
+    "native_rejections": 0,
+    "pre_wire_refusals": 0,
+    "cancels": 0
+   },
+   "errors": {
+    "error_type": null,
+    "error_reason": null,
+    "adapter_errors": 0,
+    "callback_faults": 0,
+    "average_invariant_mismatches": 0,
+    "duplicate_executions": 0,
+    "open_fill_gaps_at_stop": 0,
+    "halts": {
+     "seed_items": 29,
+     "halted": 0
+    },
+    "websocket_restart_lines": {
+     "data": 1,
+     "trading": 1
+    },
+    "websocket_lines_without_close_frame": 1,
+    "websocket_lines_no_close_frame_either_way": 0,
+    "data_stream_gap_lines": 0
+   },
+   "dropped_crossed_quotes": {
+    "BKYI": 5,
+    "IOVA": 243,
+    "SPY": 275,
+    "total": 523
+   },
+   "native_quotes": 131699,
+   "requests": {
+    "read": 484,
+    "submit": 10,
+    "cancel": 0,
+    "peak_requests_any_60s": 23,
+    "peak_submits_any_60s": 5,
+    "engine_reported": {
+     "read": 484,
+     "submit": 10
+    },
+    "ledger_reads_in_5s_before_trial_start": 10,
+    "http_observations": {
+     "count": 505,
+     "by_kind_status": {
+      "data_read:200": 1,
+      "read:200": 494,
+      "submit:200": 10
+     },
+     "min_x_ratelimit_remaining": 188
+    }
+   },
+   "trial_start": "2026-09-29T15:00:45.111650Z",
+   "hard_flatten_at": "2026-09-29T16:08:45.111650Z",
+   "elapsed_seconds": 3608.2,
+   "force_reason": null,
+   "force_at": null,
+   "handoff_to_recovery": null,
+   "realized_pnl_usd": {
+    "engine": "-21.96",
+    "ledger_delta": "-21.96",
+    "broker_recomputed_cash_flow": "-21.96"
+   },
+   "buy_notional_usd": "4079.61",
+   "sell_notional_usd": "4057.65",
+   "entry_gross_to_sizing_equity": "1.668",
+   "reconciliation_end": {
+    "cash_match": true,
+    "positions_match": true,
+    "open_orders": 0,
+    "positions": 0,
+    "ledger_cash_delta_usd_since_ledger_start": "-75.96"
+   },
+   "ledger_risk": {
+    "lifetime_realized_pnl_usd": "-75.96",
+    "lifetime_gross_loss_usd": "122.08",
+    "drawdown_usd": "135.60",
+    "halted_reason": null
+   },
+   "flat_at_end": true,
+   "paper_rc": 0,
+   "driver_line": "12:00:53 ET rth-20260929-2 rc=0: yes",
+   "acceptance": {
+    "clauses": {
+     "status_passed_or_completed_no_signals": true,
+     "flat": true,
+     "cash_match": true,
+     "positions_match": true,
+     "zero_open_orders": true,
+     "pnl_consistent": true,
+     "no_duplicate_or_unexplained_effects": true,
+     "no_ledger_halt": true,
+     "no_http_429": true
+    },
+    "values": {
+     "engine_status": "passed",
+     "flat": true,
+     "reconciliation_end": {
+      "cash_delta_usd": "-75.96",
+      "cash_match": true,
+      "open_orders": 0,
+      "positions": 0,
+      "positions_match": true
+     },
+     "pnl_consistent": true,
+     "duplicate_executions": 0,
+     "orders_disagreeing_with_broker": [],
+     "unconfirmed_executions": 0,
+     "ledger_intents_not_listed_by_broker": [],
+     "halted_reason": null,
+     "http_429_in_receipt": 0,
+     "rate_limited_marks": 0,
+     "http_observations": 505,
+     "scan_pages": 33,
+     "scan_pages_non_200": 0,
+     "orders_agreeing_with_broker": "10 of 10"
+    },
+    "verdict": "pass",
+    "failed_clauses": []
+   },
+   "flat_basis": "end reconciliation: cash_match and positions_match true, 0 open orders, 0 positions"
+  },
+  {
+   "attempt": 3,
+   "trial_id": "rth-20260929-3",
+   "unit": "paper-rth-20260929",
+   "started_at": "2026-09-29T16:00:53Z",
+   "ended_at": "2026-09-29T17:01:15Z",
+   "et": {
+    "scan_start": "12:00:53",
+    "check": "12:01:02",
+    "synthetic": "12:01:06",
+    "paper_start": "12:01:06",
+    "paper_end": "13:01:15",
+    "end": "13:01:15"
+   },
+   "scan": {
+    "argument_rule": "10:00|G0.20|V250000|any",
+    "fired": 10,
+    "candidates": [
+     "BKYI",
+     "IOVA",
+     "BEX",
+     "AXTX",
+     "SSTI"
+    ],
+    "scan_time": "2026-09-29T16:00:54Z",
+    "age_seconds_at_trial_start": 13.897,
+    "scan_full_sha256": "7f9eedb9c7160a132158fce08b35fdb0b406c4e34532731e6bb023d4c416c323"
+   },
+   "check": "valid",
+   "synthetic": "passed (SYN, flat)",
+   "rule": "10:00|G20|V250000|any",
+   "exit_rule": "X2",
+   "caps": {
+    "entry_notional_usd": "1000",
+    "gross_budget_usd": "2424.04",
+    "gross_guard_usd": "9000.00",
+    "ledger_max_order_notional_usd": "10000",
+    "max_order_quantity": 100,
+    "engine_leverage_multiple": "1",
+    "leverage_L": "4",
+    "sizing_equity_usd": "2424.04",
+    "session_number": 3,
+    "drawdown_fraction": "0.030384"
+   },
+   "caps_source": "paper stage sizing (mover-paper.json sizing and session)",
+   "preflight": {
+    "account_status": "ACTIVE",
+    "positions": 0,
+    "open_orders": 0,
+    "observed_at": "2026-09-29T16:01:07.888727Z"
+   },
+   "status": "passed",
+   "orders_submitted": 6,
+   "entries": [
+    {
+     "symbol": "BKYI",
+     "qty": "100",
+     "limit_price": "3.27",
+     "average_fill_price": "3.26",
+     "fills": 1,
+     "status": "filled"
+    },
+    {
+     "symbol": "IOVA",
+     "qty": "70",
+     "limit_price": "14.14",
+     "average_fill_price": "14.07",
+     "fills": 1,
+     "status": "filled"
+    },
+    {
+     "symbol": "BEX",
+     "qty": "22",
+     "limit_price": "41.55",
+     "average_fill_price": "41.35",
+     "fills": 1,
+     "status": "filled"
+    }
+   ],
+   "exits": [
+    {
+     "symbol": "BKYI",
+     "qty": "100",
+     "limit_price": "2.77",
+     "average_fill_price": "2.78",
+     "fills": 5,
+     "reason": "x2_time",
+     "status": "filled",
+     "ledger_status": "filled",
+     "realized_pnl_usd": "-48.00"
+    },
+    {
+     "symbol": "IOVA",
+     "qty": "70",
+     "limit_price": "14.97",
+     "average_fill_price": "15.032143",
+     "fills": 3,
+     "reason": "x2_time",
+     "status": "filled",
+     "ledger_status": "filled",
+     "realized_pnl_usd": "67.35"
+    },
+    {
+     "symbol": "BEX",
+     "qty": "22",
+     "limit_price": "41.03",
+     "average_fill_price": "41.23",
+     "fills": 3,
+     "reason": "x2_time",
+     "status": "filled",
+     "ledger_status": "filled",
+     "realized_pnl_usd": "-2.64"
+    }
+   ],
+   "legs": [
+    {
+     "symbol": "BKYI",
+     "state": "closed",
+     "exit_reason": "x2_time",
+     "exit_triggered_at": "2026-09-29T17:01:11.458438Z",
+     "exit_wait_reason": null,
+     "realized_pnl_usd": "-48.00"
+    },
+    {
+     "symbol": "IOVA",
+     "state": "closed",
+     "exit_reason": "x2_time",
+     "exit_triggered_at": "2026-09-29T17:01:10.137434Z",
+     "exit_wait_reason": null,
+     "realized_pnl_usd": "67.35"
+    },
+    {
+     "symbol": "BEX",
+     "state": "closed",
+     "exit_reason": "x2_time",
+     "exit_triggered_at": "2026-09-29T17:01:12.763485Z",
+     "exit_wait_reason": null,
+     "realized_pnl_usd": "-2.64"
+    }
+   ],
+   "skipped_entries": [
+    {
+     "symbol": "AXTX",
+     "rank": 4,
+     "reason": "notional_below_one_share"
+    },
+    {
+     "symbol": "SSTI",
+     "rank": 5,
+     "reason": "notional_below_one_share"
+    }
+   ],
+   "fills": {
+    "engine_fill_events": 14,
+    "ledger_executions": 14,
+    "broker_fill_activities": 14,
+    "matched": 14,
+    "unconfirmed": 0,
+    "at_reference_quote": 12,
+    "better_than_reference": 0,
+    "worse_than_reference": 2
+   },
+   "rejects": {
+    "native_rejections": 0,
+    "pre_wire_refusals": 0,
+    "cancels": 0
+   },
+   "errors": {
+    "error_type": null,
+    "error_reason": null,
+    "adapter_errors": 0,
+    "callback_faults": 0,
+    "average_invariant_mismatches": 0,
+    "duplicate_executions": 0,
+    "open_fill_gaps_at_stop": 0,
+    "halts": {
+     "seed_items": 36,
+     "halted": 0
+    },
+    "websocket_restart_lines": {
+     "data": 1,
+     "trading": 1
+    },
+    "websocket_lines_without_close_frame": 1,
+    "websocket_lines_no_close_frame_either_way": 0,
+    "data_stream_gap_lines": 0
+   },
+   "dropped_crossed_quotes": {
+    "BKYI": 2,
+    "IOVA": 200,
+    "SPY": 114,
+    "total": 316
+   },
+   "native_quotes": 120066,
+   "requests": {
+    "read": 484,
+    "submit": 6,
+    "cancel": 0,
+    "peak_requests_any_60s": 21,
+    "peak_submits_any_60s": 3,
+    "engine_reported": {
+     "read": 484,
+     "submit": 6
+    },
+    "ledger_reads_in_5s_before_trial_start": 10,
+    "http_observations": {
+     "count": 501,
+     "by_kind_status": {
+      "data_read:200": 1,
+      "read:200": 494,
+      "submit:200": 6
+     },
+     "min_x_ratelimit_remaining": 189
+    }
+   },
+   "trial_start": "2026-09-29T16:01:07.897286Z",
+   "hard_flatten_at": "2026-09-29T17:09:07.897286Z",
+   "elapsed_seconds": 3607.4,
+   "force_reason": null,
+   "force_at": null,
+   "handoff_to_recovery": null,
+   "realized_pnl_usd": {
+    "engine": "16.71",
+    "ledger_delta": "16.71",
+    "broker_recomputed_cash_flow": "16.71"
+   },
+   "buy_notional_usd": "2220.60",
+   "sell_notional_usd": "2237.31",
+   "entry_gross_to_sizing_equity": "0.916",
+   "reconciliation_end": {
+    "cash_match": true,
+    "positions_match": true,
+    "open_orders": 0,
+    "positions": 0,
+    "ledger_cash_delta_usd_since_ledger_start": "-59.25"
+   },
+   "ledger_risk": {
+    "lifetime_realized_pnl_usd": "-59.25",
+    "lifetime_gross_loss_usd": "172.72",
+    "drawdown_usd": "118.89",
+    "halted_reason": null
+   },
+   "flat_at_end": true,
+   "paper_rc": 0,
+   "driver_line": "13:01:15 ET rth-20260929-3 rc=0: yes",
+   "acceptance": {
+    "clauses": {
+     "status_passed_or_completed_no_signals": true,
+     "flat": true,
+     "cash_match": true,
+     "positions_match": true,
+     "zero_open_orders": true,
+     "pnl_consistent": true,
+     "no_duplicate_or_unexplained_effects": true,
+     "no_ledger_halt": true,
+     "no_http_429": true
+    },
+    "values": {
+     "engine_status": "passed",
+     "flat": true,
+     "reconciliation_end": {
+      "cash_delta_usd": "-59.25",
+      "cash_match": true,
+      "open_orders": 0,
+      "positions": 0,
+      "positions_match": true
+     },
+     "pnl_consistent": true,
+     "duplicate_executions": 0,
+     "orders_disagreeing_with_broker": [],
+     "unconfirmed_executions": 0,
+     "ledger_intents_not_listed_by_broker": [],
+     "halted_reason": null,
+     "http_429_in_receipt": 0,
+     "rate_limited_marks": 0,
+     "http_observations": 501,
+     "scan_pages": 33,
+     "scan_pages_non_200": 0,
+     "orders_agreeing_with_broker": "6 of 6"
+    },
+    "verdict": "pass",
+    "failed_clauses": []
+   },
+   "flat_basis": "end reconciliation: cash_match and positions_match true, 0 open orders, 0 positions"
+  },
+  {
+   "attempt": 4,
+   "trial_id": "rth-20260929-4",
+   "unit": "paper-rth-20260929",
+   "started_at": "2026-09-29T17:01:15Z",
+   "ended_at": "2026-09-29T18:01:50Z",
+   "et": {
+    "scan_start": "13:01:15",
+    "check": "13:01:23",
+    "synthetic": "13:01:28",
+    "paper_start": "13:01:28",
+    "paper_end": "14:01:50",
+    "end": "14:01:50"
+   },
+   "scan": {
+    "argument_rule": "10:00|G0.20|V250000|any",
+    "fired": 8,
+    "candidates": [
+     "BKYI",
+     "IOVA",
+     "BEX",
+     "NCPL",
+     "SSTI"
+    ],
+    "scan_time": "2026-09-29T17:01:15Z",
+    "age_seconds_at_trial_start": 14.201,
+    "scan_full_sha256": "f962ad62c2a530cc0b32156b468d11d523ebb0abec77d1ac94c9bf8848985fe3"
+   },
+   "check": "valid",
+   "synthetic": "passed (SYN, flat)",
+   "rule": "10:00|G20|V250000|any",
+   "exit_rule": "X2",
+   "caps": {
+    "entry_notional_usd": "1000",
+    "gross_budget_usd": "4881.50",
+    "gross_guard_usd": "9000.00",
+    "ledger_max_order_notional_usd": "10000",
+    "max_order_quantity": 100,
+    "engine_leverage_multiple": "2",
+    "leverage_L": "4",
+    "sizing_equity_usd": "2440.75",
+    "session_number": 4,
+    "drawdown_fraction": "0.023700"
+   },
+   "caps_source": "paper stage sizing (mover-paper.json sizing and session)",
+   "preflight": {
+    "account_status": "ACTIVE",
+    "positions": 0,
+    "open_orders": 0,
+    "observed_at": "2026-09-29T17:01:29.192865Z"
+   },
+   "status": "passed",
+   "orders_submitted": 8,
+   "entries": [
+    {
+     "symbol": "BKYI",
+     "qty": "100",
+     "limit_price": "2.79",
+     "average_fill_price": "2.78",
+     "fills": 1,
+     "status": "filled"
+    },
+    {
+     "symbol": "IOVA",
+     "qty": "66",
+     "limit_price": "15.12",
+     "average_fill_price": "15.045455",
+     "fills": 2,
+     "status": "filled"
+    },
+    {
+     "symbol": "BEX",
+     "qty": "24",
+     "limit_price": "41.50",
+     "average_fill_price": "41.30",
+     "fills": 6,
+     "status": "filled"
+    },
+    {
+     "symbol": "NCPL",
+     "qty": "100",
+     "limit_price": "1.28",
+     "average_fill_price": "1.28",
+     "fills": 1,
+     "status": "filled"
+    }
+   ],
+   "exits": [
+    {
+     "symbol": "BKYI",
+     "qty": "100",
+     "limit_price": "2.95",
+     "average_fill_price": "2.96",
+     "fills": 2,
+     "reason": "x2_time",
+     "status": "filled",
+     "ledger_status": "filled",
+     "realized_pnl_usd": "18.00"
+    },
+    {
+     "symbol": "IOVA",
+     "qty": "66",
+     "limit_price": "14.82",
+     "average_fill_price": "14.89",
+     "fills": 4,
+     "reason": "x2_time",
+     "status": "filled",
+     "ledger_status": "filled",
+     "realized_pnl_usd": "-10.26"
+    },
+    {
+     "symbol": "BEX",
+     "qty": "24",
+     "limit_price": "40.50",
+     "average_fill_price": "40.666667",
+     "fills": 4,
+     "reason": "x2_time",
+     "status": "filled",
+     "ledger_status": "filled",
+     "realized_pnl_usd": "-15.20"
+    },
+    {
+     "symbol": "NCPL",
+     "qty": "100",
+     "limit_price": "1.30",
+     "average_fill_price": "1.30",
+     "fills": 1,
+     "reason": "x2_time",
+     "status": "filled",
+     "ledger_status": "filled",
+     "realized_pnl_usd": "2.00"
+    }
+   ],
+   "legs": [
+    {
+     "symbol": "BKYI",
+     "state": "closed",
+     "exit_reason": "x2_time",
+     "exit_triggered_at": "2026-09-29T18:01:35.567523Z",
+     "exit_wait_reason": null,
+     "realized_pnl_usd": "18.00"
+    },
+    {
+     "symbol": "IOVA",
+     "state": "closed",
+     "exit_reason": "x2_time",
+     "exit_triggered_at": "2026-09-29T18:01:30.627340Z",
+     "exit_wait_reason": null,
+     "realized_pnl_usd": "-10.26"
+    },
+    {
+     "symbol": "BEX",
+     "state": "closed",
+     "exit_reason": "x2_time",
+     "exit_triggered_at": "2026-09-29T18:01:31.256931Z",
+     "exit_wait_reason": null,
+     "realized_pnl_usd": "-15.20"
+    },
+    {
+     "symbol": "NCPL",
+     "state": "closed",
+     "exit_reason": "x2_time",
+     "exit_triggered_at": "2026-09-29T18:01:48.853979Z",
+     "exit_wait_reason": null,
+     "realized_pnl_usd": "2.00"
+    }
+   ],
+   "skipped_entries": [
+    {
+     "symbol": "SSTI",
+     "rank": 5,
+     "reason": "entries_not_enabled"
+    }
+   ],
+   "fills": {
+    "engine_fill_events": 21,
+    "ledger_executions": 21,
+    "broker_fill_activities": 21,
+    "matched": 21,
+    "unconfirmed": 0,
+    "at_reference_quote": 18,
+    "better_than_reference": 1,
+    "worse_than_reference": 2
+   },
+   "rejects": {
+    "native_rejections": 0,
+    "pre_wire_refusals": 0,
+    "cancels": 0
+   },
+   "errors": {
+    "error_type": null,
+    "error_reason": null,
+    "adapter_errors": 0,
+    "callback_faults": 0,
+    "average_invariant_mismatches": 0,
+    "duplicate_executions": 0,
+    "open_fill_gaps_at_stop": 0,
+    "halts": {
+     "seed_items": 38,
+     "halted": 0
+    },
+    "websocket_restart_lines": {
+     "data": 0,
+     "trading": 1
+    },
+    "websocket_lines_without_close_frame": 0,
+    "websocket_lines_no_close_frame_either_way": 0,
+    "data_stream_gap_lines": 0
+   },
+   "dropped_crossed_quotes": {
+    "BKYI": 5,
+    "IOVA": 171,
+    "SPY": 51,
+    "total": 227
+   },
+   "native_quotes": 99908,
+   "requests": {
+    "read": 488,
+    "submit": 8,
+    "cancel": 0,
+    "peak_requests_any_60s": 22,
+    "peak_submits_any_60s": 4,
+    "engine_reported": {
+     "read": 488,
+     "submit": 8
+    },
+    "ledger_reads_in_5s_before_trial_start": 10,
+    "http_observations": {
+     "count": 507,
+     "by_kind_status": {
+      "data_read:200": 1,
+      "read:200": 498,
+      "submit:200": 8
+     },
+     "min_x_ratelimit_remaining": 188
+    }
+   },
+   "trial_start": "2026-09-29T17:01:29.201035Z",
+   "hard_flatten_at": "2026-09-29T18:09:29.201035Z",
+   "elapsed_seconds": 3620.8,
+   "force_reason": null,
+   "force_at": null,
+   "handoff_to_recovery": null,
+   "realized_pnl_usd": {
+    "engine": "-5.46",
+    "ledger_delta": "-5.46",
+    "broker_recomputed_cash_flow": "-5.46"
+   },
+   "buy_notional_usd": "2390.20",
+   "sell_notional_usd": "2384.74",
+   "entry_gross_to_sizing_equity": "0.979",
+   "reconciliation_end": {
+    "cash_match": true,
+    "positions_match": true,
+    "open_orders": 0,
+    "positions": 0,
+    "ledger_cash_delta_usd_since_ledger_start": "-64.71"
+   },
+   "ledger_risk": {
+    "lifetime_realized_pnl_usd": "-64.71",
+    "lifetime_gross_loss_usd": "198.18",
+    "drawdown_usd": "124.35",
+    "halted_reason": null
+   },
+   "flat_at_end": true,
+   "paper_rc": 0,
+   "driver_line": "14:01:50 ET rth-20260929-4 rc=0: yes",
+   "acceptance": {
+    "clauses": {
+     "status_passed_or_completed_no_signals": true,
+     "flat": true,
+     "cash_match": true,
+     "positions_match": true,
+     "zero_open_orders": true,
+     "pnl_consistent": true,
+     "no_duplicate_or_unexplained_effects": true,
+     "no_ledger_halt": true,
+     "no_http_429": true
+    },
+    "values": {
+     "engine_status": "passed",
+     "flat": true,
+     "reconciliation_end": {
+      "cash_delta_usd": "-64.71",
+      "cash_match": true,
+      "open_orders": 0,
+      "positions": 0,
+      "positions_match": true
+     },
+     "pnl_consistent": true,
+     "duplicate_executions": 0,
+     "orders_disagreeing_with_broker": [],
+     "unconfirmed_executions": 0,
+     "ledger_intents_not_listed_by_broker": [],
+     "halted_reason": null,
+     "http_429_in_receipt": 0,
+     "rate_limited_marks": 0,
+     "http_observations": 507,
+     "scan_pages": 33,
+     "scan_pages_non_200": 0,
+     "orders_agreeing_with_broker": "8 of 8"
+    },
+    "verdict": "pass",
+    "failed_clauses": []
+   },
+   "flat_basis": "end reconciliation: cash_match and positions_match true, 0 open orders, 0 positions"
+  },
+  {
+   "attempt": 5,
+   "trial_id": "rth-20260929-5",
+   "unit": "paper-rth-20260929",
+   "started_at": "2026-09-29T18:01:50Z",
+   "ended_at": "2026-09-29T19:02:19Z",
+   "et": {
+    "scan_start": "14:01:50",
+    "check": "14:01:57",
+    "synthetic": "14:02:02",
+    "paper_start": "14:02:02",
+    "paper_end": "15:02:19",
+    "end": "15:02:19"
+   },
+   "scan": {
+    "argument_rule": "10:00|G0.20|V250000|any",
+    "fired": 8,
+    "candidates": [
+     "BKYI",
+     "IOVA",
+     "BEX",
+     "NCPL",
+     "SSTI"
+    ],
+    "scan_time": "2026-09-29T18:01:50Z",
+    "age_seconds_at_trial_start": 13.218,
+    "scan_full_sha256": "2c63a65ee0a3ed18370f625f6f84f65590af818946e343a9ff7cd402c598f307"
+   },
+   "check": "valid",
+   "synthetic": "passed (SYN, flat)",
+   "rule": "10:00|G20|V250000|any",
+   "exit_rule": "X2",
+   "caps": {
+    "entry_notional_usd": "1000",
+    "gross_budget_usd": "4870.58",
+    "gross_guard_usd": "9000.00",
+    "ledger_max_order_notional_usd": "10000",
+    "max_order_quantity": 100,
+    "engine_leverage_multiple": "2",
+    "leverage_L": "4",
+    "sizing_equity_usd": "2435.29",
+    "session_number": 5,
+    "drawdown_fraction": "0.025884"
+   },
+   "caps_source": "paper stage sizing (mover-paper.json sizing and session)",
+   "preflight": {
+    "account_status": "ACTIVE",
+    "positions": 0,
+    "open_orders": 0,
+    "observed_at": "2026-09-29T18:02:03.209255Z"
+   },
+   "status": "passed",
+   "orders_submitted": 6,
+   "entries": [
+    {
+     "symbol": "IOVA",
+     "qty": "66",
+     "limit_price": "14.99",
+     "average_fill_price": "14.92",
+     "fills": 1,
+     "status": "filled"
+    },
+    {
+     "symbol": "BEX",
+     "qty": "24",
+     "limit_price": "40.87",
+     "average_fill_price": "40.67",
+     "fills": 2,
+     "status": "filled"
+    },
+    {
+     "symbol": "NCPL",
+     "qty": "100",
+     "limit_price": "1.31",
+     "average_fill_price": "1.31",
+     "fills": 1,
+     "status": "filled"
+    }
+   ],
+   "exits": [
+    {
+     "symbol": "IOVA",
+     "qty": "66",
+     "limit_price": "14.80",
+     "average_fill_price": "14.87",
+     "fills": 1,
+     "reason": "x2_time",
+     "status": "filled",
+     "ledger_status": "filled",
+     "realized_pnl_usd": "-3.30"
+    },
+    {
+     "symbol": "BEX",
+     "qty": "24",
+     "limit_price": "40.47",
+     "average_fill_price": "40.702083",
+     "fills": 4,
+     "reason": "x2_time",
+     "status": "filled",
+     "ledger_status": "filled",
+     "realized_pnl_usd": "0.77"
+    },
+    {
+     "symbol": "NCPL",
+     "qty": "100",
+     "limit_price": "1.28",
+     "average_fill_price": "1.28",
+     "fills": 7,
+     "reason": "x2_time",
+     "status": "filled",
+     "ledger_status": "filled",
+     "realized_pnl_usd": "-3.00"
+    }
+   ],
+   "legs": [
+    {
+     "symbol": "IOVA",
+     "state": "closed",
+     "exit_reason": "x2_time",
+     "exit_triggered_at": "2026-09-29T19:02:05.577073Z",
+     "exit_wait_reason": null,
+     "realized_pnl_usd": "-3.30"
+    },
+    {
+     "symbol": "BEX",
+     "state": "closed",
+     "exit_reason": "x2_time",
+     "exit_triggered_at": "2026-09-29T19:02:11.238635Z",
+     "exit_wait_reason": null,
+     "realized_pnl_usd": "0.77"
+    },
+    {
+     "symbol": "NCPL",
+     "state": "closed",
+     "exit_reason": "x2_time",
+     "exit_triggered_at": "2026-09-29T19:02:13.260630Z",
+     "exit_wait_reason": null,
+     "realized_pnl_usd": "-3.00"
+    }
+   ],
+   "skipped_entries": [
+    {
+     "symbol": "BKYI",
+     "rank": 1,
+     "reason": "entries_not_enabled"
+    },
+    {
+     "symbol": "SSTI",
+     "rank": 5,
+     "reason": "entries_not_enabled"
+    }
+   ],
+   "fills": {
+    "engine_fill_events": 16,
+    "ledger_executions": 16,
+    "broker_fill_activities": 16,
+    "matched": 16,
+    "unconfirmed": 0,
+    "at_reference_quote": 13,
+    "better_than_reference": 3,
+    "worse_than_reference": 0
+   },
+   "rejects": {
+    "native_rejections": 0,
+    "pre_wire_refusals": 0,
+    "cancels": 0
+   },
+   "errors": {
+    "error_type": null,
+    "error_reason": null,
+    "adapter_errors": 0,
+    "callback_faults": 0,
+    "average_invariant_mismatches": 2,
+    "duplicate_executions": 0,
+    "open_fill_gaps_at_stop": 0,
+    "halts": {
+     "seed_items": 38,
+     "halted": 0
+    },
+    "websocket_restart_lines": {
+     "data": 1,
+     "trading": 1
+    },
+    "websocket_lines_without_close_frame": 1,
+    "websocket_lines_no_close_frame_either_way": 0,
+    "data_stream_gap_lines": 0
+   },
+   "dropped_crossed_quotes": {
+    "IOVA": 129,
+    "SPY": 253,
+    "total": 382
+   },
+   "native_quotes": 70376,
+   "requests": {
+    "read": 484,
+    "submit": 6,
+    "cancel": 0,
+    "peak_requests_any_60s": 21,
+    "peak_submits_any_60s": 3,
+    "engine_reported": {
+     "read": 484,
+     "submit": 6
+    },
+    "ledger_reads_in_5s_before_trial_start": 10,
+    "http_observations": {
+     "count": 501,
+     "by_kind_status": {
+      "data_read:200": 1,
+      "read:200": 494,
+      "submit:200": 6
+     },
+     "min_x_ratelimit_remaining": 189
+    }
+   },
+   "trial_start": "2026-09-29T18:02:03.218278Z",
+   "hard_flatten_at": "2026-09-29T19:10:03.218278Z",
+   "elapsed_seconds": 3615.7,
+   "force_reason": null,
+   "force_at": null,
+   "handoff_to_recovery": null,
+   "realized_pnl_usd": {
+    "engine": "-5.53",
+    "ledger_delta": "-5.53",
+    "broker_recomputed_cash_flow": "-5.53"
+   },
+   "buy_notional_usd": "2091.80",
+   "sell_notional_usd": "2086.27",
+   "entry_gross_to_sizing_equity": "0.859",
+   "reconciliation_end": {
+    "cash_match": true,
+    "positions_match": true,
+    "open_orders": 0,
+    "positions": 0,
+    "ledger_cash_delta_usd_since_ledger_start": "-70.24"
+   },
+   "ledger_risk": {
+    "lifetime_realized_pnl_usd": "-70.24",
+    "lifetime_gross_loss_usd": "204.48",
+    "drawdown_usd": "129.88",
+    "halted_reason": null
+   },
+   "flat_at_end": true,
+   "paper_rc": 0,
+   "driver_line": "15:02:19 ET rth-20260929-5 rc=0: yes",
+   "acceptance": {
+    "clauses": {
+     "status_passed_or_completed_no_signals": true,
+     "flat": true,
+     "cash_match": true,
+     "positions_match": true,
+     "zero_open_orders": true,
+     "pnl_consistent": true,
+     "no_duplicate_or_unexplained_effects": true,
+     "no_ledger_halt": true,
+     "no_http_429": true
+    },
+    "values": {
+     "engine_status": "passed",
+     "flat": true,
+     "reconciliation_end": {
+      "cash_delta_usd": "-70.24",
+      "cash_match": true,
+      "open_orders": 0,
+      "positions": 0,
+      "positions_match": true
+     },
+     "pnl_consistent": true,
+     "duplicate_executions": 0,
+     "orders_disagreeing_with_broker": [],
+     "unconfirmed_executions": 0,
+     "ledger_intents_not_listed_by_broker": [],
+     "halted_reason": null,
+     "http_429_in_receipt": 0,
+     "rate_limited_marks": 0,
+     "http_observations": 501,
+     "scan_pages": 33,
+     "scan_pages_non_200": 0,
+     "orders_agreeing_with_broker": "6 of 6"
+    },
+    "verdict": "pass",
+    "failed_clauses": []
+   },
+   "flat_basis": "end reconciliation: cash_match and positions_match true, 0 open orders, 0 positions",
+   "average_invariant_note": "2 records on mvr-rth-20260929-5-0000005 (BEX sell 24): the broker's reported average was one unit in the 6th decimal above the executions' exact average; see average_invariant_mismatches"
+  },
+  {
+   "attempt": 6,
+   "trial_id": "rth-20260929-6",
+   "unit": "paper-rth-20260929",
+   "started_at": "2026-09-29T19:02:19Z",
+   "ended_at": "2026-09-29T19:44:16Z",
+   "et": {
+    "scan_start": "15:02:19",
+    "check": "15:02:26",
+    "synthetic": "15:02:31",
+    "paper_start": "15:02:31",
+    "paper_end": "15:44:16",
+    "end": "15:44:16"
+   },
+   "scan": {
+    "argument_rule": "10:00|G0.20|V250000|any",
+    "fired": 8,
+    "candidates": [
+     "BKYI",
+     "IOVA",
+     "BEX",
+     "NCPL",
+     "SSTI"
+    ],
+    "scan_time": "2026-09-29T19:02:19Z",
+    "age_seconds_at_trial_start": 13.474,
+    "scan_full_sha256": "b67a442b1161406f3b3accc6485bfdab42bda8334b8c2854d5a62dce302c9903"
+   },
+   "check": "valid",
+   "synthetic": "passed (SYN, flat)",
+   "rule": "10:00|G20|V250000|any",
+   "exit_rule": "X2",
+   "caps": {
+    "entry_notional_usd": "1000",
+    "gross_budget_usd": "2429.76",
+    "gross_guard_usd": "9000.00",
+    "ledger_max_order_notional_usd": "10000",
+    "max_order_quantity": 100,
+    "engine_leverage_multiple": "1",
+    "leverage_L": "4",
+    "sizing_equity_usd": "2429.76",
+    "session_number": 6,
+    "drawdown_fraction": "0.028096"
+   },
+   "caps_source": "paper stage sizing (mover-paper.json sizing and session)",
+   "preflight": {
+    "account_status": "ACTIVE",
+    "positions": 0,
+    "open_orders": 0,
+    "observed_at": "2026-09-29T19:02:32.466064Z"
+   },
+   "status": "passed",
+   "orders_submitted": 6,
+   "entries": [
+    {
+     "symbol": "BKYI",
+     "qty": "100",
+     "limit_price": "3.12",
+     "average_fill_price": "3.11",
+     "fills": 1,
+     "status": "filled"
+    },
+    {
+     "symbol": "IOVA",
+     "qty": "66",
+     "limit_price": "14.97",
+     "average_fill_price": "14.90",
+     "fills": 2,
+     "status": "filled"
+    },
+    {
+     "symbol": "BEX",
+     "qty": "22",
+     "limit_price": "41.14",
+     "average_fill_price": "40.925455",
+     "fills": 3,
+     "status": "filled"
+    }
+   ],
+   "exits": [
+    {
+     "symbol": "BKYI",
+     "qty": "100",
+     "limit_price": "3.06",
+     "average_fill_price": "3.07",
+     "fills": 2,
+     "reason": "risk_halt",
+     "status": "filled",
+     "ledger_status": "filled",
+     "realized_pnl_usd": "-4.00"
+    },
+    {
+     "symbol": "IOVA",
+     "qty": "66",
+     "limit_price": "14.49",
+     "average_fill_price": "14.56",
+     "fills": 1,
+     "reason": "risk_halt",
+     "status": "filled",
+     "ledger_status": "filled",
+     "realized_pnl_usd": "-22.44"
+    },
+    {
+     "symbol": "BEX",
+     "qty": "22",
+     "limit_price": "39.85",
+     "average_fill_price": "40.05",
+     "fills": 1,
+     "reason": "risk_halt",
+     "status": "filled",
+     "ledger_status": "filled",
+     "realized_pnl_usd": "-19.26"
+    }
+   ],
+   "legs": [
+    {
+     "symbol": "BKYI",
+     "state": "closed",
+     "exit_reason": "risk_halt",
+     "exit_triggered_at": "2026-09-29T19:44:11.426015Z",
+     "exit_wait_reason": null,
+     "realized_pnl_usd": "-4.00"
+    },
+    {
+     "symbol": "IOVA",
+     "state": "closed",
+     "exit_reason": "risk_halt",
+     "exit_triggered_at": "2026-09-29T19:44:11.426015Z",
+     "exit_wait_reason": null,
+     "realized_pnl_usd": "-22.44"
+    },
+    {
+     "symbol": "BEX",
+     "state": "closed",
+     "exit_reason": "risk_halt",
+     "exit_triggered_at": "2026-09-29T19:44:11.426015Z",
+     "exit_wait_reason": null,
+     "realized_pnl_usd": "-19.26"
+    }
+   ],
+   "skipped_entries": [
+    {
+     "symbol": "NCPL",
+     "rank": 4,
+     "reason": "notional_below_one_share"
+    },
+    {
+     "symbol": "SSTI",
+     "rank": 5,
+     "reason": "notional_below_one_share"
+    }
+   ],
+   "fills": {
+    "engine_fill_events": 10,
+    "ledger_executions": 10,
+    "broker_fill_activities": 10,
+    "matched": 10,
+    "unconfirmed": 0,
+    "at_reference_quote": 7,
+    "better_than_reference": 3,
+    "worse_than_reference": 0
+   },
+   "rejects": {
+    "native_rejections": 0,
+    "pre_wire_refusals": 0,
+    "cancels": 0
+   },
+   "errors": {
+    "error_type": null,
+    "error_reason": null,
+    "adapter_errors": 0,
+    "callback_faults": 0,
+    "average_invariant_mismatches": 0,
+    "duplicate_executions": 0,
+    "open_fill_gaps_at_stop": 0,
+    "halts": {
+     "seed_items": 40,
+     "halted": 0
+    },
+    "websocket_restart_lines": {
+     "data": 1,
+     "trading": 1
+    },
+    "websocket_lines_without_close_frame": 1,
+    "websocket_lines_no_close_frame_either_way": 0,
+    "data_stream_gap_lines": 0
+   },
+   "dropped_crossed_quotes": {
+    "IOVA": 60,
+    "SPY": 46,
+    "total": 106
+   },
+   "native_quotes": 42743,
+   "requests": {
+    "read": 336,
+    "submit": 6,
+    "cancel": 0,
+    "peak_requests_any_60s": 21,
+    "peak_submits_any_60s": 3,
+    "engine_reported": {
+     "read": 336,
+     "submit": 6
+    },
+    "ledger_reads_in_5s_before_trial_start": 10,
+    "http_observations": {
+     "count": 353,
+     "by_kind_status": {
+      "data_read:200": 1,
+      "read:200": 346,
+      "submit:200": 6
+     },
+     "min_x_ratelimit_remaining": 189
+    }
+   },
+   "trial_start": "2026-09-29T19:02:32.473879Z",
+   "hard_flatten_at": "2026-09-29T19:50:00Z",
+   "elapsed_seconds": 2503.5,
+   "force_reason": "risk_halt",
+   "force_at": "2026-09-29T19:44:11.426015Z",
+   "handoff_to_recovery": null,
+   "realized_pnl_usd": {
+    "engine": "-45.70",
+    "ledger_delta": "-45.70",
+    "broker_recomputed_cash_flow": "-45.70"
+   },
+   "buy_notional_usd": "2194.76",
+   "sell_notional_usd": "2149.06",
+   "entry_gross_to_sizing_equity": "0.903",
+   "reconciliation_end": {
+    "cash_match": true,
+    "positions_match": true,
+    "open_orders": 0,
+    "positions": 0,
+    "ledger_cash_delta_usd_since_ledger_start": "-115.94"
+   },
+   "ledger_risk": {
+    "lifetime_realized_pnl_usd": "-115.94",
+    "lifetime_gross_loss_usd": "250.18",
+    "drawdown_usd": "175.58",
+    "halted_reason": "gross_loss_cap_reached"
+   },
+   "flat_at_end": true,
+   "paper_rc": 0,
+   "driver_line": "15:44:16 ET rth-20260929-6 rc=0: yes",
+   "acceptance": {
+    "clauses": {
+     "status_passed_or_completed_no_signals": true,
+     "flat": true,
+     "cash_match": true,
+     "positions_match": true,
+     "zero_open_orders": true,
+     "pnl_consistent": true,
+     "no_duplicate_or_unexplained_effects": true,
+     "no_ledger_halt": false,
+     "no_http_429": true
+    },
+    "values": {
+     "engine_status": "passed",
+     "flat": true,
+     "reconciliation_end": {
+      "cash_delta_usd": "-115.94",
+      "cash_match": true,
+      "open_orders": 0,
+      "positions": 0,
+      "positions_match": true
+     },
+     "pnl_consistent": true,
+     "duplicate_executions": 0,
+     "orders_disagreeing_with_broker": [],
+     "unconfirmed_executions": 0,
+     "ledger_intents_not_listed_by_broker": [],
+     "halted_reason": "gross_loss_cap_reached",
+     "http_429_in_receipt": 0,
+     "rate_limited_marks": 0,
+     "http_observations": 353,
+     "scan_pages": 33,
+     "scan_pages_non_200": 0,
+     "orders_agreeing_with_broker": "6 of 6"
+    },
+    "verdict": "fail",
+    "failed_clauses": [
+     "no_ledger_halt"
+    ]
+   },
+   "flat_basis": "end reconciliation: cash_match and positions_match true, 0 open orders, 0 positions",
+   "risk_halt_note": "the ledger latched gross_loss_cap_reached (lifetime gross loss 250.18 of the 250 USD budget); the engine forced risk_halt exits at 15:44:11 ET and still reported passed"
+  }
+ ],
+ "orders": [
+  {
+   "client_order_id": "mvr-rth-20260929-1-0000001",
+   "symbol": "BKYI",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "100",
+   "limit_price": "3.78",
+   "reference_quote": {
+    "ask": "3.77"
+   },
+   "average_fill_price": "3.7798",
+   "adverse_slippage_vs_reference_usd_per_share": "0.0098",
+   "fills_at_reference_quote": 2,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 3,
+   "engine_fills": 5,
+   "ledger_executions": 5,
+   "broker_fill_activities": 5,
+   "submitted_at": "2026-09-29T14:00:22.641514Z",
+   "filled_at": "2026-09-29T14:00:30.808599Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 1
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-1-0000002",
+   "symbol": "IOVA",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "71",
+   "limit_price": "13.94",
+   "reference_quote": {
+    "ask": "13.88"
+   },
+   "average_fill_price": "13.89",
+   "adverse_slippage_vs_reference_usd_per_share": "0.01",
+   "fills_at_reference_quote": 0,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 2,
+   "engine_fills": 2,
+   "ledger_executions": 2,
+   "broker_fill_activities": 2,
+   "submitted_at": "2026-09-29T14:00:22.655980Z",
+   "filled_at": "2026-09-29T14:00:25.145690Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 1
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-1-0000003",
+   "symbol": "BEX",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "24",
+   "limit_price": "40.46",
+   "reference_quote": {
+    "ask": "40.26"
+   },
+   "average_fill_price": "40.26",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 1,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 1,
+   "ledger_executions": 1,
+   "broker_fill_activities": 1,
+   "submitted_at": "2026-09-29T14:00:22.866698Z",
+   "filled_at": "2026-09-29T14:00:23.553155Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 1
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-1-0000004",
+   "symbol": "AXTX",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "26",
+   "limit_price": "38.33",
+   "reference_quote": {
+    "ask": "38.14"
+   },
+   "average_fill_price": "38.26",
+   "adverse_slippage_vs_reference_usd_per_share": "0.12",
+   "fills_at_reference_quote": 0,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 2,
+   "engine_fills": 2,
+   "ledger_executions": 2,
+   "broker_fill_activities": 2,
+   "submitted_at": "2026-09-29T14:00:24.259896Z",
+   "filled_at": "2026-09-29T14:00:26.602375Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 1
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-1-0000005",
+   "symbol": "YMT",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "100",
+   "limit_price": "2.18",
+   "reference_quote": {
+    "ask": "2.17"
+   },
+   "average_fill_price": "2.169",
+   "adverse_slippage_vs_reference_usd_per_share": "-0.001",
+   "fills_at_reference_quote": 4,
+   "fills_better_than_reference": 1,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 5,
+   "ledger_executions": 5,
+   "broker_fill_activities": 5,
+   "submitted_at": "2026-09-29T14:00:25.166428Z",
+   "filled_at": "2026-09-29T14:00:30.796869Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 1
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-1-0000006",
+   "symbol": "BEX",
+   "side": "sell",
+   "reason": "x2_time",
+   "qty": "24",
+   "limit_price": "41.38",
+   "reference_quote": {
+    "bid": "41.58"
+   },
+   "average_fill_price": "41.59",
+   "adverse_slippage_vs_reference_usd_per_share": "-0.01",
+   "fills_at_reference_quote": 0,
+   "fills_better_than_reference": 1,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 1,
+   "ledger_executions": 1,
+   "broker_fill_activities": 1,
+   "submitted_at": "2026-09-29T15:00:23.703143Z",
+   "filled_at": "2026-09-29T15:00:24.232679Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 1
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-1-0000007",
+   "symbol": "IOVA",
+   "side": "sell",
+   "reason": "x2_time",
+   "qty": "71",
+   "limit_price": "13.78",
+   "reference_quote": {
+    "bid": "13.84"
+   },
+   "average_fill_price": "13.85",
+   "adverse_slippage_vs_reference_usd_per_share": "-0.01",
+   "fills_at_reference_quote": 0,
+   "fills_better_than_reference": 1,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 1,
+   "ledger_executions": 1,
+   "broker_fill_activities": 1,
+   "submitted_at": "2026-09-29T15:00:24.051710Z",
+   "filled_at": "2026-09-29T15:00:24.792294Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 1
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-1-0000008",
+   "symbol": "AXTX",
+   "side": "sell",
+   "reason": "x2_time",
+   "qty": "26",
+   "limit_price": "37.09",
+   "reference_quote": {
+    "bid": "37.27"
+   },
+   "average_fill_price": "37.252308",
+   "adverse_slippage_vs_reference_usd_per_share": "0.017692",
+   "fills_at_reference_quote": 1,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 4,
+   "engine_fills": 5,
+   "ledger_executions": 5,
+   "broker_fill_activities": 5,
+   "submitted_at": "2026-09-29T15:00:24.864489Z",
+   "filled_at": "2026-09-29T15:00:29.436808Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 1
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-1-0000009",
+   "symbol": "BKYI",
+   "side": "sell",
+   "reason": "x2_time",
+   "qty": "100",
+   "limit_price": "3.39",
+   "reference_quote": {
+    "bid": "3.40"
+   },
+   "average_fill_price": "3.40",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 2,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 2,
+   "ledger_executions": 2,
+   "broker_fill_activities": 2,
+   "submitted_at": "2026-09-29T15:00:25.165879Z",
+   "filled_at": "2026-09-29T15:00:26.823819Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 1
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-1-0000010",
+   "symbol": "YMT",
+   "side": "sell",
+   "reason": "x2_time",
+   "qty": "100",
+   "limit_price": "1.98",
+   "reference_quote": {
+    "bid": "1.98"
+   },
+   "average_fill_price": "1.98",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 2,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 2,
+   "ledger_executions": 2,
+   "broker_fill_activities": 2,
+   "submitted_at": "2026-09-29T15:00:25.941954Z",
+   "filled_at": "2026-09-29T15:00:27.086576Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 1
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-2-0000001",
+   "symbol": "AXTX",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "26",
+   "limit_price": "37.52",
+   "reference_quote": {
+    "ask": "37.34"
+   },
+   "average_fill_price": "37.34",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 2,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 2,
+   "ledger_executions": 2,
+   "broker_fill_activities": 2,
+   "submitted_at": "2026-09-29T15:00:45.906374Z",
+   "filled_at": "2026-09-29T15:00:47.781253Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 2
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-2-0000002",
+   "symbol": "IOVA",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "71",
+   "limit_price": "13.92",
+   "reference_quote": {
+    "ask": "13.86"
+   },
+   "average_fill_price": "13.86",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 1,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 1,
+   "ledger_executions": 1,
+   "broker_fill_activities": 1,
+   "submitted_at": "2026-09-29T15:00:45.975191Z",
+   "filled_at": "2026-09-29T15:00:47.079454Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 2
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-2-0000003",
+   "symbol": "SSTI",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "100",
+   "limit_price": "8.30",
+   "reference_quote": {
+    "ask": "8.26"
+   },
+   "average_fill_price": "8.26",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 1,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 1,
+   "ledger_executions": 1,
+   "broker_fill_activities": 1,
+   "submitted_at": "2026-09-29T15:00:46.084717Z",
+   "filled_at": "2026-09-29T15:00:47.009110Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 2
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-2-0000004",
+   "symbol": "BKYI",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "100",
+   "limit_price": "3.41",
+   "reference_quote": {
+    "ask": "3.40"
+   },
+   "average_fill_price": "3.3998",
+   "adverse_slippage_vs_reference_usd_per_share": "-0.0002",
+   "fills_at_reference_quote": 3,
+   "fills_better_than_reference": 1,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 4,
+   "ledger_executions": 4,
+   "broker_fill_activities": 4,
+   "submitted_at": "2026-09-29T15:00:46.669826Z",
+   "filled_at": "2026-09-29T15:00:50.448590Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 2
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-2-0000005",
+   "symbol": "BEX",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "23",
+   "limit_price": "41.97",
+   "reference_quote": {
+    "ask": "41.77"
+   },
+   "average_fill_price": "41.683913",
+   "adverse_slippage_vs_reference_usd_per_share": "-0.086087",
+   "fills_at_reference_quote": 0,
+   "fills_better_than_reference": 2,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 2,
+   "ledger_executions": 2,
+   "broker_fill_activities": 2,
+   "submitted_at": "2026-09-29T15:00:47.642183Z",
+   "filled_at": "2026-09-29T15:00:49.625078Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 2
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-2-0000006",
+   "symbol": "IOVA",
+   "side": "sell",
+   "reason": "x2_time",
+   "qty": "71",
+   "limit_price": "13.99",
+   "reference_quote": {
+    "bid": "14.06"
+   },
+   "average_fill_price": "14.06",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 4,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 4,
+   "ledger_executions": 4,
+   "broker_fill_activities": 4,
+   "submitted_at": "2026-09-29T16:00:47.140700Z",
+   "filled_at": "2026-09-29T16:00:49.808079Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 2
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-2-0000007",
+   "symbol": "AXTX",
+   "side": "sell",
+   "reason": "x2_time",
+   "qty": "26",
+   "limit_price": "36.88",
+   "reference_quote": {
+    "bid": "37.06"
+   },
+   "average_fill_price": "37.06",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 5,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 5,
+   "ledger_executions": 5,
+   "broker_fill_activities": 5,
+   "submitted_at": "2026-09-29T16:00:47.309820Z",
+   "filled_at": "2026-09-29T16:00:50.905862Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 2
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-2-0000008",
+   "symbol": "SSTI",
+   "side": "sell",
+   "reason": "x2_time",
+   "qty": "100",
+   "limit_price": "8.20",
+   "reference_quote": {
+    "bid": "8.24"
+   },
+   "average_fill_price": "8.24",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 2,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 2,
+   "ledger_executions": 2,
+   "broker_fill_activities": 2,
+   "submitted_at": "2026-09-29T16:00:47.651395Z",
+   "filled_at": "2026-09-29T16:00:48.666196Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 2
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-2-0000009",
+   "symbol": "BKYI",
+   "side": "sell",
+   "reason": "x2_time",
+   "qty": "100",
+   "limit_price": "3.24",
+   "reference_quote": {
+    "bid": "3.25"
+   },
+   "average_fill_price": "3.24",
+   "adverse_slippage_vs_reference_usd_per_share": "0.01",
+   "fills_at_reference_quote": 0,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 2,
+   "engine_fills": 2,
+   "ledger_executions": 2,
+   "broker_fill_activities": 2,
+   "submitted_at": "2026-09-29T16:00:47.943965Z",
+   "filled_at": "2026-09-29T16:00:49.409401Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 2
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-2-0000010",
+   "symbol": "BEX",
+   "side": "sell",
+   "reason": "x2_time",
+   "qty": "23",
+   "limit_price": "41.01",
+   "reference_quote": {
+    "bid": "41.21"
+   },
+   "average_fill_price": "41.21",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 3,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 3,
+   "ledger_executions": 3,
+   "broker_fill_activities": 3,
+   "submitted_at": "2026-09-29T16:00:50.720335Z",
+   "filled_at": "2026-09-29T16:00:52.945326Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 2
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-3-0000001",
+   "symbol": "IOVA",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "70",
+   "limit_price": "14.14",
+   "reference_quote": {
+    "ask": "14.07"
+   },
+   "average_fill_price": "14.07",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 1,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 1,
+   "ledger_executions": 1,
+   "broker_fill_activities": 1,
+   "submitted_at": "2026-09-29T16:01:09.695803Z",
+   "filled_at": "2026-09-29T16:01:10.066206Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 3
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-3-0000002",
+   "symbol": "BKYI",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "100",
+   "limit_price": "3.27",
+   "reference_quote": {
+    "ask": "3.26"
+   },
+   "average_fill_price": "3.26",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 1,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 1,
+   "ledger_executions": 1,
+   "broker_fill_activities": 1,
+   "submitted_at": "2026-09-29T16:01:10.467073Z",
+   "filled_at": "2026-09-29T16:01:10.787534Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 3
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-3-0000003",
+   "symbol": "BEX",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "22",
+   "limit_price": "41.55",
+   "reference_quote": {
+    "ask": "41.35"
+   },
+   "average_fill_price": "41.35",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 1,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 1,
+   "ledger_executions": 1,
+   "broker_fill_activities": 1,
+   "submitted_at": "2026-09-29T16:01:11.812998Z",
+   "filled_at": "2026-09-29T16:01:12.677048Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 3
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-3-0000004",
+   "symbol": "IOVA",
+   "side": "sell",
+   "reason": "x2_time",
+   "qty": "70",
+   "limit_price": "14.97",
+   "reference_quote": {
+    "bid": "15.04"
+   },
+   "average_fill_price": "15.032143",
+   "adverse_slippage_vs_reference_usd_per_share": "0.007857",
+   "fills_at_reference_quote": 1,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 2,
+   "engine_fills": 3,
+   "ledger_executions": 3,
+   "broker_fill_activities": 3,
+   "submitted_at": "2026-09-29T17:01:10.166594Z",
+   "filled_at": "2026-09-29T17:01:12.712040Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 3
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-3-0000005",
+   "symbol": "BKYI",
+   "side": "sell",
+   "reason": "x2_time",
+   "qty": "100",
+   "limit_price": "2.77",
+   "reference_quote": {
+    "bid": "2.78"
+   },
+   "average_fill_price": "2.78",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 5,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 5,
+   "ledger_executions": 5,
+   "broker_fill_activities": 5,
+   "submitted_at": "2026-09-29T17:01:11.541976Z",
+   "filled_at": "2026-09-29T17:01:14.977676Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 3
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-3-0000006",
+   "symbol": "BEX",
+   "side": "sell",
+   "reason": "x2_time",
+   "qty": "22",
+   "limit_price": "41.03",
+   "reference_quote": {
+    "bid": "41.23"
+   },
+   "average_fill_price": "41.23",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 3,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 3,
+   "ledger_executions": 3,
+   "broker_fill_activities": 3,
+   "submitted_at": "2026-09-29T17:01:12.796158Z",
+   "filled_at": "2026-09-29T17:01:14.646224Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 3
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-4-0000001",
+   "symbol": "IOVA",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "66",
+   "limit_price": "15.12",
+   "reference_quote": {
+    "ask": "15.05"
+   },
+   "average_fill_price": "15.045455",
+   "adverse_slippage_vs_reference_usd_per_share": "-0.004545",
+   "fills_at_reference_quote": 1,
+   "fills_better_than_reference": 1,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 2,
+   "ledger_executions": 2,
+   "broker_fill_activities": 2,
+   "submitted_at": "2026-09-29T17:01:29.901409Z",
+   "filled_at": "2026-09-29T17:01:31.172344Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 4
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-4-0000002",
+   "symbol": "BEX",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "24",
+   "limit_price": "41.50",
+   "reference_quote": {
+    "ask": "41.30"
+   },
+   "average_fill_price": "41.30",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 6,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 6,
+   "ledger_executions": 6,
+   "broker_fill_activities": 6,
+   "submitted_at": "2026-09-29T17:01:30.093674Z",
+   "filled_at": "2026-09-29T17:01:34.615094Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 4
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-4-0000003",
+   "symbol": "NCPL",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "100",
+   "limit_price": "1.28",
+   "reference_quote": {
+    "ask": "1.28"
+   },
+   "average_fill_price": "1.28",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 1,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 1,
+   "ledger_executions": 1,
+   "broker_fill_activities": 1,
+   "submitted_at": "2026-09-29T17:01:34.338595Z",
+   "filled_at": "2026-09-29T17:01:35.098624Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 4
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-4-0000004",
+   "symbol": "BKYI",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "100",
+   "limit_price": "2.79",
+   "reference_quote": {
+    "ask": "2.78"
+   },
+   "average_fill_price": "2.78",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 1,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 1,
+   "ledger_executions": 1,
+   "broker_fill_activities": 1,
+   "submitted_at": "2026-09-29T17:01:34.754853Z",
+   "filled_at": "2026-09-29T17:01:35.551332Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 4
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-4-0000005",
+   "symbol": "IOVA",
+   "side": "sell",
+   "reason": "x2_time",
+   "qty": "66",
+   "limit_price": "14.82",
+   "reference_quote": {
+    "bid": "14.89"
+   },
+   "average_fill_price": "14.89",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 4,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 4,
+   "ledger_executions": 4,
+   "broker_fill_activities": 4,
+   "submitted_at": "2026-09-29T18:01:30.663203Z",
+   "filled_at": "2026-09-29T18:01:33.438690Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 4
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-4-0000006",
+   "symbol": "BEX",
+   "side": "sell",
+   "reason": "x2_time",
+   "qty": "24",
+   "limit_price": "40.50",
+   "reference_quote": {
+    "bid": "40.70"
+   },
+   "average_fill_price": "40.666667",
+   "adverse_slippage_vs_reference_usd_per_share": "0.033333",
+   "fills_at_reference_quote": 2,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 2,
+   "engine_fills": 4,
+   "ledger_executions": 4,
+   "broker_fill_activities": 4,
+   "submitted_at": "2026-09-29T18:01:31.389606Z",
+   "filled_at": "2026-09-29T18:01:34.212809Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 4
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-4-0000007",
+   "symbol": "BKYI",
+   "side": "sell",
+   "reason": "x2_time",
+   "qty": "100",
+   "limit_price": "2.95",
+   "reference_quote": {
+    "bid": "2.96"
+   },
+   "average_fill_price": "2.96",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 2,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 2,
+   "ledger_executions": 2,
+   "broker_fill_activities": 2,
+   "submitted_at": "2026-09-29T18:01:35.601399Z",
+   "filled_at": "2026-09-29T18:01:36.982838Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 4
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-4-0000008",
+   "symbol": "NCPL",
+   "side": "sell",
+   "reason": "x2_time",
+   "qty": "100",
+   "limit_price": "1.30",
+   "reference_quote": {
+    "bid": "1.30"
+   },
+   "average_fill_price": "1.30",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 1,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 1,
+   "ledger_executions": 1,
+   "broker_fill_activities": 1,
+   "submitted_at": "2026-09-29T18:01:48.878031Z",
+   "filled_at": "2026-09-29T18:01:49.651082Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 4
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-5-0000001",
+   "symbol": "IOVA",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "66",
+   "limit_price": "14.99",
+   "reference_quote": {
+    "ask": "14.92"
+   },
+   "average_fill_price": "14.92",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 1,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 1,
+   "ledger_executions": 1,
+   "broker_fill_activities": 1,
+   "submitted_at": "2026-09-29T18:02:04.242677Z",
+   "filled_at": "2026-09-29T18:02:05.494903Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 5
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-5-0000002",
+   "symbol": "NCPL",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "100",
+   "limit_price": "1.31",
+   "reference_quote": {
+    "ask": "1.31"
+   },
+   "average_fill_price": "1.31",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 1,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 1,
+   "ledger_executions": 1,
+   "broker_fill_activities": 1,
+   "submitted_at": "2026-09-29T18:02:06.324409Z",
+   "filled_at": "2026-09-29T18:02:07.162178Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 5
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-5-0000003",
+   "symbol": "BEX",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "24",
+   "limit_price": "40.87",
+   "reference_quote": {
+    "ask": "40.67"
+   },
+   "average_fill_price": "40.67",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 2,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 2,
+   "ledger_executions": 2,
+   "broker_fill_activities": 2,
+   "submitted_at": "2026-09-29T18:02:08.500238Z",
+   "filled_at": "2026-09-29T18:02:10.185804Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 5
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-5-0000004",
+   "symbol": "IOVA",
+   "side": "sell",
+   "reason": "x2_time",
+   "qty": "66",
+   "limit_price": "14.80",
+   "reference_quote": {
+    "bid": "14.87"
+   },
+   "average_fill_price": "14.87",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 1,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 1,
+   "ledger_executions": 1,
+   "broker_fill_activities": 1,
+   "submitted_at": "2026-09-29T19:02:05.618389Z",
+   "filled_at": "2026-09-29T19:02:06.525326Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 5
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-5-0000005",
+   "symbol": "BEX",
+   "side": "sell",
+   "reason": "x2_time",
+   "qty": "24",
+   "limit_price": "40.47",
+   "reference_quote": {
+    "bid": "40.67"
+   },
+   "average_fill_price": "40.702084",
+   "adverse_slippage_vs_reference_usd_per_share": "-0.032084",
+   "fills_at_reference_quote": 1,
+   "fills_better_than_reference": 3,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 4,
+   "ledger_executions": 4,
+   "broker_fill_activities": 4,
+   "submitted_at": "2026-09-29T19:02:11.323623Z",
+   "filled_at": "2026-09-29T19:02:14.621994Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 5
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-5-0000006",
+   "symbol": "NCPL",
+   "side": "sell",
+   "reason": "x2_time",
+   "qty": "100",
+   "limit_price": "1.28",
+   "reference_quote": {
+    "bid": "1.28"
+   },
+   "average_fill_price": "1.28",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 7,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 7,
+   "ledger_executions": 7,
+   "broker_fill_activities": 7,
+   "submitted_at": "2026-09-29T19:02:13.304721Z",
+   "filled_at": "2026-09-29T19:02:18.616506Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 5
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-6-0000001",
+   "symbol": "IOVA",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "66",
+   "limit_price": "14.97",
+   "reference_quote": {
+    "ask": "14.90"
+   },
+   "average_fill_price": "14.90",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 2,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 2,
+   "ledger_executions": 2,
+   "broker_fill_activities": 2,
+   "submitted_at": "2026-09-29T19:02:33.497535Z",
+   "filled_at": "2026-09-29T19:02:35.332042Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 6
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-6-0000002",
+   "symbol": "BKYI",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "100",
+   "limit_price": "3.12",
+   "reference_quote": {
+    "ask": "3.11"
+   },
+   "average_fill_price": "3.11",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 1,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 1,
+   "ledger_executions": 1,
+   "broker_fill_activities": 1,
+   "submitted_at": "2026-09-29T19:02:33.683771Z",
+   "filled_at": "2026-09-29T19:02:34.215254Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 6
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-6-0000003",
+   "symbol": "BEX",
+   "side": "buy",
+   "reason": "entry",
+   "qty": "22",
+   "limit_price": "41.14",
+   "reference_quote": {
+    "ask": "40.94"
+   },
+   "average_fill_price": "40.925455",
+   "adverse_slippage_vs_reference_usd_per_share": "-0.014545",
+   "fills_at_reference_quote": 0,
+   "fills_better_than_reference": 3,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 3,
+   "ledger_executions": 3,
+   "broker_fill_activities": 3,
+   "submitted_at": "2026-09-29T19:02:34.846348Z",
+   "filled_at": "2026-09-29T19:02:37.571734Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 6
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-6-0000004",
+   "symbol": "BKYI",
+   "side": "sell",
+   "reason": "risk_halt",
+   "qty": "100",
+   "limit_price": "3.06",
+   "reference_quote": {
+    "bid": "3.07"
+   },
+   "average_fill_price": "3.07",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 2,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 2,
+   "ledger_executions": 2,
+   "broker_fill_activities": 2,
+   "submitted_at": "2026-09-29T19:44:11.459133Z",
+   "filled_at": "2026-09-29T19:44:13.291573Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 6
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-6-0000005",
+   "symbol": "IOVA",
+   "side": "sell",
+   "reason": "risk_halt",
+   "qty": "66",
+   "limit_price": "14.49",
+   "reference_quote": {
+    "bid": "14.56"
+   },
+   "average_fill_price": "14.56",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 1,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 1,
+   "ledger_executions": 1,
+   "broker_fill_activities": 1,
+   "submitted_at": "2026-09-29T19:44:11.523172Z",
+   "filled_at": "2026-09-29T19:44:12.346649Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 6
+  },
+  {
+   "client_order_id": "mvr-rth-20260929-6-0000006",
+   "symbol": "BEX",
+   "side": "sell",
+   "reason": "risk_halt",
+   "qty": "22",
+   "limit_price": "39.85",
+   "reference_quote": {
+    "bid": "40.05"
+   },
+   "average_fill_price": "40.05",
+   "adverse_slippage_vs_reference_usd_per_share": "0",
+   "fills_at_reference_quote": 1,
+   "fills_better_than_reference": 0,
+   "fills_worse_than_reference": 0,
+   "engine_fills": 1,
+   "ledger_executions": 1,
+   "broker_fill_activities": 1,
+   "submitted_at": "2026-09-29T19:44:15.365496Z",
+   "filled_at": "2026-09-29T19:44:15.777561Z",
+   "type": "limit",
+   "time_in_force": "day",
+   "extended_hours": false,
+   "final_status": {
+    "engine": "filled",
+    "ledger": "filled",
+    "broker": "filled"
+   },
+   "broker_agrees_with_ledger": true,
+   "trial": 6
+  }
+ ],
+ "fills_at_reference_quote": {
+  "fills": 83,
+  "better_than_reference": 13,
+  "worse_than_reference": 17,
+  "of": 113,
+  "basis": "Each ledger execution price (every one matched to a broker FILL activity on cum_qty, qty and price) compared with its order's reference quote from the engine events: the ask for a buy, the bid for a sell. Better means below the ask for a buy or above the bid for a sell; worse means the fill price was beyond its reference quote, within its limit (the cause is not recorded; Alpaca paper fills are simulated from real-time quotes, https://docs.alpaca.markets/us/docs/paper-trading)."
+ },
+ "engine_receipt_average_differences": [
+  {
+   "client_order_id": "mvr-rth-20260929-5-0000005",
+   "engine_receipt": "40.702083",
+   "ledger_and_broker": "40.702084"
+  }
+ ],
+ "websocket_lines": {
+  "source": "each attempt's paper.log; the series console repeats each log's last 3 lines (run-series-trial.sh prints tail -3)",
+  "logged_by": "alpaca-py 0.44.0 logs every websockets.WebSocketException of its data and trading streams, clean closes included, as '... websocket error, restarting connection: <exception text>' (alpaca/data/live/websocket.py:468-475, alpaca/trading/stream.py:215-226)",
+  "library": "websockets 17.1 in the pinned environment",
+  "forms": {
+   "sent 1000 (OK); then received 1000 (OK)": "the closing handshake completed: close code 1000 sent and received; websockets raises ConnectionClosedOK (protocol.py:237-245)",
+   "sent 1000 (OK); no close frame received": "the client sent close code 1000 and received no close frame; websockets raises ConnectionClosedError, the closing handshake did not complete (exceptions.py:118-131 and 168-175, protocol.py:237-245; the deprecated code attribute then reads 1006, abnormal closure, exceptions.py:142-143)",
+   "no close frame received or sent": "neither side sent a close frame; websockets raises ConnectionClosedError (same source)"
+  },
+  "counters": "attempts[].errors.websocket_lines_without_close_frame counts the lines containing 'no close frame received' (both ConnectionClosedError forms); websocket_lines_no_close_frame_either_way counts the subset containing 'no close frame received or sent'. Recorded, not thresholded.",
+  "series_counts": {
+   "lines": 10,
+   "by_stream_and_form": {
+    "trading: sent 1000 (OK); then received 1000 (OK)": 6,
+    "data: sent 1000 (OK); no close frame received": 4
+   },
+   "lines_without_close_frame": 4
+  },
+  "in_this_series": "every trading-stream line completed the closing handshake and every data-stream line received no close frame",
+  "isolation_check_20260923": "trials/20260923b-needs-attention/transport-isolation-1e2c96a.json (transport 1e2c96a, not b528bb55) recorded the trading-stream line with a completed closing handshake 0.016 s and the data-stream line with no close frame received 0.018 s after stop() was called, and no restart line before it; that directory's README names only the trading-stream line. The logs here carry no timestamps, so these runs neither confirm nor rule out the same timing."
+ },
+ "average_invariant_mismatches": {
+  "trial": 5,
+  "count": 2,
+  "records": [
+   {
+    "client_order_id": "mvr-rth-20260929-5-0000005",
+    "filled_qty": "22",
+    "broker_average": "40.698637",
+    "executions_notional_usd": "895.37",
+    "executions_average_rounded_6dp": "40.698636",
+    "difference_usd": "0.000014",
+    "tolerance_usd": "0.000011"
+   },
+   {
+    "client_order_id": "mvr-rth-20260929-5-0000005",
+    "filled_qty": "24",
+    "broker_average": "40.702084",
+    "executions_notional_usd": "976.85",
+    "executions_average_rounded_6dp": "40.702083",
+    "difference_usd": "0.000016",
+    "tolerance_usd": "0.000012"
+   }
+  ],
+  "meaning": "native_adapter.py:532-552 at b528bb55, the E2 invariant, recorded and never a freeze: once booked executions tile (0, filled], their notional must equal filled times the broker's reported average within filled times 0.0000005 USD (AVERAGE_ROUNDING, native_adapter.py:71), the half-unit of Alpaca's 6-decimal average. Each record is one check that failed that tolerance; the counter is execution_stats.average_invariant_mismatches (548).",
+  "reading": "At 22 and at 24 shares filled, the broker's average (40.698637, 40.702084) was one unit in the 6th decimal above the executions' exact average rounded to nearest (40.698636, 40.702083): differences of 0.000014 and 0.000016 USD against tolerances of 0.000011 and 0.000012. The executions themselves match the broker's FILL activities, 4 of 4 on cum_qty, qty and price.",
+  "acceptance": "No frozen clause covers them: the freeze lists no invariant, and the brief records them as recorded, not thresholded. They are not a duplicate effect, and the reconciliation shows no unexplained difference for this order (the ledger's average equals the broker's 40.702084).",
+  "engine_receipt_average": "the engine receipt reports 40.702083 for this exit (its executions-based figure), the series' only engine-versus-broker average difference"
+ },
+ "risk_halt": {
+  "trial": 6,
+  "halted_reason": "gross_loss_cap_reached",
+  "gross_loss_budget_usd": "250",
+  "realized_loss_before_trial_6_usd": "204.48",
+  "trial_6_realized_loss_usd": "45.70",
+  "realized_loss_at_end_usd": "250.18",
+  "engine_force_at": "2026-09-29T19:44:11.426015Z",
+  "engine_force_at_et": "15:44:11",
+  "ledger_event_order": "the ledger's only risk_halt event (reason gross_loss_cap_reached) follows trial 6's last entry execution (15:02:37 ET) and precedes its first exit reservation (15:44:11 ET)",
+  "rule": "safety.py at b528bb55: _state (684-699) counts gross loss as realized_loss plus each open position's unrealized loss at the bid (696), and _refresh_risk (752-766) latches gross_loss_cap_reached once gross loss reaches max_gross_loss_usd",
+  "reading": "The halt latched while trial 6's three positions were open, so the test used realized loss 204.48 plus their unrealized loss at the bid. The risk_halt exits then realized 45.70 of loss (BKYI -4.00, IOVA -22.44, BEX -19.26), leaving realized_loss at 250.18.",
+  "permanence": "a risk halt is permanent for this ledger: a next trial is refused (next_trial_cannot_clear_risk_halt, safety.py:628)",
+  "engine_status": "passed (the engine's status does not consider the ledger halt)",
+  "driver": "the driver logged rth-20260929-6 rc=0: yes (its status-based pass rule) and ended at 15:44:16 ET on the 15:40 ET last-start rule; no trial started after the halt",
+  "acceptance": "fails the frozen clause no halt (halted_reason not null at the trial's end)"
+ },
+ "cleanup": {
+  "flat": true,
+  "series_end_positions": 0,
+  "series_end_open_orders": 0,
+  "broker_positions_at_reconciliation_read": 0,
+  "broker_open_orders_at_reconciliation_read": 0,
+  "ledger_positions_nonzero": 0,
+  "proof": "trial 6's end reconciliation at 15:44 ET (cash_match and positions_match true, 0 open orders, 0 positions), every ledger position at 0 in the snapshot and the independent broker read (0 positions, 0 open orders)"
+ },
+ "broker_reconciliation": {
+  "observed_at": "2026-09-30T09:06:14.127547Z",
+  "tool": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/reconcile_ext_series.py (main)",
+  "tool_sha256": "50b9da4c17f16b6a84cd418ed9fbb7afca6b4a9e26fc56a6b6753c15e2a6cbff",
+  "tool_note": "run from a byte-identical private copy (same sha256); cited here instead of copied",
+  "stdout": "reconcile-rth-20260929.stdout.json",
+  "stdout_sha256": "d1c4646e1050116c21f348c96590279b31ec5eef69bd60a50d54fe09038bc1f2",
+  "stdout_note": "byte-identical to the run's stdout; the private-detail check found nothing to redact",
+  "run": "run once by the trading-lane coordinator at 2026-09-30 09:06Z from a byte-identical copy of the tool, with the pinned adaptive-paper interpreter (the stdout records python 3.12.3 and alpaca-py 0.44.0), prefix mvr-rth-20260929- and the window below (both in the stdout). The command line is not recorded. The coordinator's brief routes account 1's credential as the $PAPER_ENV_FILE pointer passed as --env-file under /bin/bash -ic; the tool requires --env-file and --ledger (reconcile_ext_series.py:219-220), and its docstring (lines 6-8 and 12) prescribes passing both through shell variables, so that neither path appears on a recorded command line.",
+  "method": "alpaca-py TradingClient.get_orders(status=all, after, until, limit=500, asc); GET /v2/account/activities?activity_types=FILL (after, until, asc, page_size=100, page_token); get_all_positions; get_orders(status=open); joined in memory to the engine mover ledger (sqlite mode=ro) on client order id and (cum_qty, qty, price)",
+  "alpaca_py": "0.44.0",
+  "python": "3.12.3",
+  "window": {
+   "after": "2026-09-29T14:00:00Z",
+   "until": "2026-09-29T20:20:00Z"
+  },
+  "prefix": "mvr-rth-20260929-",
+  "orders_listed_in_window": 46,
+  "orders_with_series_prefix": 46,
+  "orders_without_series_prefix": 0,
+  "order_final_status_counts": {
+   "filled": 46
+  },
+  "fill_activity_pages": 2,
+  "fill_activities_in_window": 113,
+  "fill_activities_not_joined_to_series_orders": 0,
+  "ledger_intents": 46,
+  "ledger_executions": 113,
+  "ledger_intents_not_listed_by_broker": [],
+  "ledger_broker_ids_not_in_listing": 0,
+  "executions_matched_on_cum_qty_qty_price": 113,
+  "executions_matched_on_execution_id": 113,
+  "max_ledger_vs_broker_time_skew_seconds": 0.004,
+  "unconfirmed_executions": [],
+  "orders_agreeing_with_ledger": 46,
+  "broker_sells_minus_buys_usd": {
+   "by_trial": {
+    "1": "-54.00",
+    "2": "-21.96",
+    "3": "16.71",
+    "4": "-5.46",
+    "5": "-5.53",
+    "6": "-45.70"
+   },
+   "total": "-115.94"
+  },
+  "realized_pnl_usd_broker_recomputed": {
+   "1": "-54.00",
+   "2": "-21.96",
+   "3": "16.71",
+   "4": "-5.46",
+   "5": "-5.53",
+   "6": "-45.70",
+   "total": "-115.94"
+  },
+  "realized_note": "The tool's broker_recomputed_realized_pnl figure is sells minus buys from the FILL activities. It equals realized P&L only for a trial that ended flat; realized_pnl_usd_broker_recomputed keeps those trials only.",
+  "positions_now": 0,
+  "position_symbols_now": [],
+  "open_orders_now": 0,
+  "ledger_positions_nonzero": [],
+  "independence": "Separate from the engine transport and ledger writer, same broker API and account: independent of the engine code, not of the broker."
+ },
+ "journal_query": {
+  "queried_at": "2026-09-30T15:15:43Z",
+  "command": "journalctl --user --no-pager -o json USER_UNIT=<unit>.service",
+  "journald": "systemd 255 (255.4-1ubuntu8.17)",
+  "result": "The series unit has start records and a resource-accounting record only: no EXIT_STATUS, EXIT_CODE or UNIT_RESULT record and no success record.",
+  "exit_results": "For paper-rth-20260929, which has no journal exit record, the exit status and result come from the systemd user manager's state, read with systemctl --user show on 2026-09-30 (units[].manager_state).",
+  "unit_files": "the unit and timer files' sha256 (private_artifacts_sha256) equal the private series index's table on 2026-09-30"
+ },
+ "units": [
+  {
+   "unit": "paper-rth-20260929",
+   "role": "series-driver.sh rth-20260929 on account 1 ($PAPER_ENV_FILE)",
+   "started_at": "2026-09-29T14:00:05Z",
+   "stopped_at": "2026-09-29T19:44:16Z",
+   "journal_records": [
+    "unit_resources",
+    "unit_started",
+    "unit_starting"
+   ],
+   "journal_exit_records": 0,
+   "exit_status": 0,
+   "result": "success",
+   "inferred": false,
+   "result_note": "The journal holds this unit's start records and its resource-accounting record at stop: no EXIT_STATUS, EXIT_CODE or UNIT_RESULT record and no success record. The exit status and result come from the systemd user manager's state (manager_state), not from the journal.",
+   "console_end": "15:44:16 ET series ends: past last start 1540 ET",
+   "manager_state": {
+    "queried_at": "2026-09-30T18:57:30Z",
+    "command": "systemctl --user show --timestamp=us+utc <unit>.service -p Result -p ExecMainCode -p ExecMainStatus -p ExecMainStartTimestamp -p ExecMainExitTimestamp -p NRestarts",
+    "result": "success",
+    "exec_main_code": 1,
+    "exec_main_code_meaning": "CLD_EXITED: the main process exited on its own, not by a signal",
+    "exec_main_status": 0,
+    "exec_main_start": "2026-09-29T14:00:05.291443Z",
+    "exec_main_exit": "2026-09-29T19:44:16.478157Z",
+    "n_restarts": 0,
+    "manager_running_since": "2026-09-24T04:23:13.051772Z",
+    "note": "The systemd user manager has run since 2026-09-24, before this unit started, so this is the run's own recorded result. The manager keeps it in memory: a manager restart clears it."
+   }
+  }
+ ],
+ "series_totals": {
+  "attempts": 6,
+  "verdicts": {
+   "pass": [
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "fail": [
+    6
+   ],
+   "needs_attention": [],
+   "inconclusive": []
+  },
+  "engine_statuses": {
+   "passed": 6
+  },
+  "orders_submitted_engine": 46,
+  "orders_listed_by_broker": 46,
+  "entries_filled": 23,
+  "exits_filled": 23,
+  "fill_events": 113,
+  "fills_at_reference_quote": 83,
+  "fills_better_than_reference": 13,
+  "fills_worse_than_reference": 17,
+  "rejects": 0,
+  "cancels": 0,
+  "unconfirmed_fills": 0,
+  "benchmark_quotes_not_ready_refusals": 0,
+  "retries": 0,
+  "average_invariant_mismatches": 2,
+  "duplicate_executions": 0,
+  "peak_requests_any_60s": 23,
+  "peak_submits_any_60s": 5,
+  "min_x_ratelimit_remaining": 187,
+  "http_429": 0,
+  "realized_pnl_usd": {
+   "engine_trials_sum": "-115.94",
+   "ledger_delta_sum": "-115.94",
+   "broker_recomputed": "-115.94"
+  },
+  "fees_usd": "-0.65",
+  "realized_pnl_including_fees_usd": "-116.59",
+  "fees_note": "fees_usd is account 1's FEE activities for 2026-09-29 (fees.total_usd). The engine has no fee model, so realized_pnl_usd excludes them; realized_pnl_including_fees_usd is realized_pnl_usd plus fees_usd.",
+  "gross_loss_usd": "250.18",
+  "gross_loss_note": "the sum of the losing legs' realized P&L across the six trials; equal to the ledger's realized_loss and to trial 6's lifetime_gross_loss_usd (this ledger began with this series and ended flat)",
+  "planned_gross_budget_usd": [
+   "5000.00",
+   "4892.00",
+   "2424.04",
+   "4881.50",
+   "4870.58",
+   "2429.76"
+  ],
+  "engine_leverage_multiple": [
+   "4",
+   "2",
+   "1",
+   "2",
+   "2",
+   "1"
+  ],
+  "buy_notional_usd": [
+   "3542.07",
+   "4079.61",
+   "2220.60",
+   "2390.20",
+   "2091.80",
+   "2194.76"
+  ],
+  "entry_gross_to_sizing_equity": [
+   "1.417",
+   "1.668",
+   "0.916",
+   "0.979",
+   "0.859",
+   "0.903"
+  ]
+ },
+ "ledger": {
+  "state_root": "the default root (a fresh account-1 ledger at schema 2)",
+  "at_series_end": {
+   "lifetime_realized_pnl_usd": "-115.94",
+   "lifetime_gross_loss_usd": "250.18",
+   "drawdown_usd": "175.58",
+   "halted_reason": "gross_loss_cap_reached",
+   "cash_delta_usd": "-115.94",
+   "peak_pnl_usd": "59.64",
+   "peak_pnl_note": "safety.py peak_pnl: the mark-to-market peak of realized plus unrealized P&L (752-762); reached during trial 1, whose drawdown 113.64 equals 59.64 minus its realized -54.00. Not a realized figure; no second source can recompute it.",
+   "positions": "7 symbols, all at 0"
+  },
+  "note": "This ledger was created fresh by trial 1 (schema 2), so its lifetime figures are this series' figures. The halt is permanent for it.",
+  "snapshot": {
+   "account": 1,
+   "sha256": "fa68e4663bf2466dfaf326be2785b806df8dea6e535445646eb5d4d92c8a3f88",
+   "taken_at": "2026-09-30T09:08Z",
+   "method": "SQLite online-backup copy of the live mover ledger opened mode=ro, taken by the coordinator while no process held either state root; read here with mode=ro&immutable=1; not committed"
+  }
+ },
+ "fees": {
+  "account_1_fee_activities_for_2026_09_29": [
+   {
+    "type": "FEE",
+    "fee": "REG",
+    "date": "2026-09-29",
+    "net_amount_usd": "-0.34"
+   },
+   {
+    "type": "FEE",
+    "fee": "TAF",
+    "date": "2026-09-29",
+    "net_amount_usd": "-0.30"
+   },
+   {
+    "type": "FEE",
+    "fee": "CAT",
+    "date": "2026-09-29",
+    "net_amount_usd": "-0.01"
+   }
+  ],
+  "total_usd": "-0.65",
+  "covers": "all account-1 trading on 2026-09-29, which the FEE read attributes to this series alone (the only account-1 trading that day); this receipt's broker reconciliation shows no order without the series prefix in its 14:00-20:20Z window",
+  "bases_recomputed_from_ledger": null,
+  "bases_note": "Not recomputed: the FEE read never reads an activity's description, so the proceeds, shares and executions each fee was charged on are not recorded for account 1 (account 2's are, from the cash-gap output's descriptions).",
+  "source": "fee-activities-20260929.json, the coordinator's read-only FEE-activity read (private; sha256 in fee_read and private_artifacts_sha256)",
+  "fee_read": {
+   "file": "fee-activities-20260929.json",
+   "location": "<private state root>/trials/reconcile-20260929/ (private; not committed)",
+   "sha256": "2d02c55b8e5bc7757134b57676c9221aa23b9f8f8482eafdbc1382e77ea541b5",
+   "recorded_at_utc": "2026-09-30T18:13Z",
+   "by": "the trading-lane coordinator",
+   "method": "GET /v2/account/activities/FEE, read-only, on the paper endpoint for account 1 and account 2, through the allow-listed fee read of the engine fee-fix branch (transport.fee_activities at 7f9e12f2). It never reads an activity's description; its record keeps each activity's date, fee type and net amount and no activity id. Credentials by pointer only: $PAPER_ENV_FILE for account 1, $PAPER_ENV_FILE_2 for account 2.",
+   "evidence_class": "local integration read, not an upstream test",
+   "records_activity_ids": false,
+   "posting": "the broker posts one FEE activity per fee type per day for the account and does not attribute fees to a series"
+  },
+  "engine_fee_model": "none in b528bb55: realized P&L and every end reconciliation here exclude fees, except series_totals.realized_pnl_including_fees_usd"
+ },
+ "paper_lane_row": {
+  "dashboard_lane": "Alpaca paper accounts 1 and 2",
+  "cites_at_branch_base": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/README.md",
+  "update": "the coordinator's step: the builder branch did not touch the grand-dashboard state (a shared hot file); the coordinator's integration commit in the same pull request points the paper row at the 2026-09-29 receipts",
+  "this_receipt_supports": "account 1: RTH series on 2026-09-29, 5 of 6 trials passed and trial 6 failed on a ledger halt (gross_loss_cap_reached), flat at 15:44 ET; account 1's ledger is permanently halted"
+ },
+ "committed_copies": {
+  "mover-paper-1.json": {
+   "source": "rth-20260929/1/mover-paper.json",
+   "sha256": "586dd52f8b073a53626aa095ab1101e06de79aef4c9ed9816c512e7a994fff5a",
+   "sanitization": "10 broker_order_ref values replaced by \"withheld\""
+  },
+  "mover-paper-2.json": {
+   "source": "rth-20260929/2/mover-paper.json",
+   "sha256": "5e5a89cb1999ea4bb131dabbf4eeb5c5f158aa24108acc41c44f7f106ad875bc",
+   "sanitization": "10 broker_order_ref values replaced by \"withheld\""
+  },
+  "mover-paper-3.json": {
+   "source": "rth-20260929/3/mover-paper.json",
+   "sha256": "4ab8939437a320f085dc610d95a307c60f990d8df3567bb7b32dbd65ace69e9f",
+   "sanitization": "6 broker_order_ref values replaced by \"withheld\""
+  },
+  "mover-paper-4.json": {
+   "source": "rth-20260929/4/mover-paper.json",
+   "sha256": "6bbd86281ebae39d943920d22d83d1ed2cb1e4835136305480665f47886c1776",
+   "sanitization": "8 broker_order_ref values replaced by \"withheld\""
+  },
+  "mover-paper-5.json": {
+   "source": "rth-20260929/5/mover-paper.json",
+   "sha256": "48ba8696c423e7e8eac3817e8975256e1cfaf13bcf92b33f70859d92af202206",
+   "sanitization": "6 broker_order_ref values replaced by \"withheld\""
+  },
+  "mover-paper-6.json": {
+   "source": "rth-20260929/6/mover-paper.json",
+   "sha256": "75b565b9cd88b8f7f53a4ce8c8a9673a955b15db668807be124c772b768defdd",
+   "sanitization": "6 broker_order_ref values replaced by \"withheld\""
+  },
+  "series.console": {
+   "source": "rth-20260929/series.console",
+   "sha256": "520a87e2951501384256b4ca324a29cebe1bfaa6734e185fbca52b3def9e3d5c",
+   "sanitization": "none; byte-identical to the private file"
+  },
+  "frozen-b528bb55.SHA256SUMS": {
+   "source": "frozen-b528bb55.SHA256SUMS",
+   "sha256": "36daf1949c4b27ee5c4fd17c5478c4f8f7146308b9649d26ee786b4cf88aa07f",
+   "sanitization": "none; byte-identical to the private file"
+  },
+  "reconcile-rth-20260929.stdout.json": {
+   "source": "reconcile-20260929/rth-20260929.json",
+   "sha256": "d1c4646e1050116c21f348c96590279b31ec5eef69bd60a50d54fe09038bc1f2",
+   "sanitization": "none; byte-identical to the private file"
+  }
+ },
+ "committed_copies_note": "Retained private files committed here after the private-detail check (account fingerprints and their prefixes, broker order ids and refs, execution ids, the host user, home and tmp paths, key-like strings) and sanitize_check.py. Each mover-paper-N.json differs from its private source only inside the broker_order_ref values; each source hash is in private_artifacts_sha256.",
+ "private_artifacts_sha256": {
+  "rth-20260929/1/mover-paper.json": "c87aac0ff147ba536f031e573678ca098d36fe8d71ffc66035b744fd9115cc3f",
+  "rth-20260929/2/mover-paper.json": "569cd6d849cca5bc108e1290f4955bf5a218b308d5870e886667ea870dbf429f",
+  "rth-20260929/3/mover-paper.json": "77c9d28d99b1b62c91648e8cb40577eefa4025f003771309f74e97f4e885c6ef",
+  "rth-20260929/4/mover-paper.json": "cd991bb9222ddb1b7acba417f9ad0f3916b38d8044f05d0b1d19c49138051c79",
+  "rth-20260929/5/mover-paper.json": "167644948e7207587b4271d25578aaf3ce0752abc439db581c222fe1dd144c69",
+  "rth-20260929/6/mover-paper.json": "03def434b0faf14fee60c823abaf40128a76b9186efd738dca73bd26049a59e1",
+  "rth-20260929/config-mover-rth-20260929.json": "cbb953d517f18de05702727860a8af66859b41f4835f6c972234ec5e7cc8ab73",
+  "rth-20260929/rule.txt": "1731a58ff06d66eb05ef936ed16d50db777f004f132a7b0406dd418f4d5ed8bb",
+  "rth-20260929/series.console": "520a87e2951501384256b4ca324a29cebe1bfaa6734e185fbca52b3def9e3d5c",
+  "rth-20260929/1/scan.json": "231ad97353f98052a7ed3899b5b2154d21f43e658bebd2d2a5b069b82a74dfe2",
+  "rth-20260929/1/scan.log": "f12f10108915684905a4f89c8e51d9e3ba263180da7d3b5d277010f9f319c226",
+  "rth-20260929/1/scan-full.json": "8022e34e9f795d78a0bedf4468977b9a6066596f80df6b829ed11e49daf5a31d",
+  "rth-20260929/1/check.json": "aa5690394698618359586a8c50d1f2cd7c563ee5b48bbd3fcacafb8f08a8222e",
+  "rth-20260929/1/synthetic.json": "0559897bf5e3592c738cf413a0a628f813942deecb8f11bfd10153cedfa2d177",
+  "rth-20260929/1/synthetic.log": "5a82c7e8b81ea8eaba36b17cada32adf1770912b7ef681037a9d0add1d63054c",
+  "rth-20260929/1/paper.log": "03263405ccf5296d577961d033d9d7eb9338cc892236431af6a4acb6e717f047",
+  "rth-20260929/1/live/events.jsonl": "c4166d9253f2d7334aee8964738097cd9967dccb03cabe7647f83a98510692a8",
+  "rth-20260929/1/pages/ledger.jsonl": "0f287c5348e3bcd5cfca11dc806c40d022be0120cf5d5f867650a2d66b17dcac",
+  "rth-20260929/2/scan.json": "5ad93b67bb944aed7ea66eb78f8d56425a7c93b5d452e63e408e18262b3e453d",
+  "rth-20260929/2/scan.log": "e445fe56222cb717629d03c78076be712c81b6747bbc711c40dbc84baa420744",
+  "rth-20260929/2/scan-full.json": "e5fd51e872373af6649c8772c02f0568c9b086d448512b656f89f8dafefcbbc2",
+  "rth-20260929/2/check.json": "515704f1d64f2d0ea9c5ab5637eea955f240c33a8f9b77c00a5d1405a40377c6",
+  "rth-20260929/2/synthetic.json": "204b4baaf1a5eb5a836d1c5d39a95a096c840b6d9c0d70a45a32985ee0f9275d",
+  "rth-20260929/2/synthetic.log": "5a82c7e8b81ea8eaba36b17cada32adf1770912b7ef681037a9d0add1d63054c",
+  "rth-20260929/2/paper.log": "c7eb9afbba496d2f4c1ebefc47ac523f12acbede12edeb9865ec895195b7cae4",
+  "rth-20260929/2/live/events.jsonl": "615f8557e08de0de48d2db37a8c95921a851597649eac939b470debf602d50f7",
+  "rth-20260929/2/pages/ledger.jsonl": "4fe48aebe13ab224ad7b73de8bfa8e8e4e263a30a8b252ffb8c9ceae1d96852f",
+  "rth-20260929/3/scan.json": "dcd7b2a9f2c6fc757de67a6c8d8d68d9f8c83b7afcf7f03517d9e4c3dfc6c8b3",
+  "rth-20260929/3/scan.log": "43e4062e1e54d40c5282d903aa43b2d628989284d3cb8c14d7c2b13ea29ab1cc",
+  "rth-20260929/3/scan-full.json": "7f9eedb9c7160a132158fce08b35fdb0b406c4e34532731e6bb023d4c416c323",
+  "rth-20260929/3/check.json": "18da9db861defa6aa20e722b331af379715bb5fd48f4f6c96041d36fb2978591",
+  "rth-20260929/3/synthetic.json": "10e278a6ee747cd6038462a2d7196ae696804f3bd0d457d777ecc9a33dbd8772",
+  "rth-20260929/3/synthetic.log": "5a82c7e8b81ea8eaba36b17cada32adf1770912b7ef681037a9d0add1d63054c",
+  "rth-20260929/3/paper.log": "307d1f3a3285b618097fd74d4b6d0f73d733b0f8bc61d5f45de70a739defb541",
+  "rth-20260929/3/live/events.jsonl": "4af8e51cead18f1b110097bb31becc1fe13f5f5819a3ea33faf0b7f292f14910",
+  "rth-20260929/3/pages/ledger.jsonl": "b6ee139292659acc0d520220edae4859d64ca33f53e23bdd02ff118cd368babe",
+  "rth-20260929/4/scan.json": "b29dbde36f797b0615759b7277acdd29774b2f0d08c1b93c4f0d856e9f7ba097",
+  "rth-20260929/4/scan.log": "271f74e5d0eacb790ea8f9833b9da70360159a93a48f6f219fad59774f684d4e",
+  "rth-20260929/4/scan-full.json": "f962ad62c2a530cc0b32156b468d11d523ebb0abec77d1ac94c9bf8848985fe3",
+  "rth-20260929/4/check.json": "60617ab84eb0a4dda9413122c0362fd75b8dee15a5f868c9ab46b5fb4adb9510",
+  "rth-20260929/4/synthetic.json": "f424595369b2f45de2058b9e6cfef99e4b929481a145aa2c9660195f945501f8",
+  "rth-20260929/4/synthetic.log": "5a82c7e8b81ea8eaba36b17cada32adf1770912b7ef681037a9d0add1d63054c",
+  "rth-20260929/4/paper.log": "03263405ccf5296d577961d033d9d7eb9338cc892236431af6a4acb6e717f047",
+  "rth-20260929/4/live/events.jsonl": "43bbd5859a14c316e02477b05af5a9bb8011eaaa20426d61f75785e4f5ac4fd4",
+  "rth-20260929/4/pages/ledger.jsonl": "574ceee02a3f1545b6c53f93a43df405704c6486de18c4861810704ee4d0bb91",
+  "rth-20260929/5/scan.json": "bff2fc38249b766d60762ec124dae986b610cfca980e5337f32e935ad4259da9",
+  "rth-20260929/5/scan.log": "19b6c7713cbaf846f83559d88abf4dcbf1dcb0951dee7655771f146a02465e9c",
+  "rth-20260929/5/scan-full.json": "2c63a65ee0a3ed18370f625f6f84f65590af818946e343a9ff7cd402c598f307",
+  "rth-20260929/5/check.json": "59ef4fb6177999388eddd768c04342a7fc6a036829eb3165e73d98e628acca40",
+  "rth-20260929/5/synthetic.json": "9bf84b1b02ac587ce021e81842845c0fcca16ea0b8ff8b75ead0b43b4a74e1ec",
+  "rth-20260929/5/synthetic.log": "5a82c7e8b81ea8eaba36b17cada32adf1770912b7ef681037a9d0add1d63054c",
+  "rth-20260929/5/paper.log": "307d1f3a3285b618097fd74d4b6d0f73d733b0f8bc61d5f45de70a739defb541",
+  "rth-20260929/5/live/events.jsonl": "196d23bcd5321f7dd389b2b87a5924c03ab1865b3cbba356ff63f1c1c2fb5757",
+  "rth-20260929/5/pages/ledger.jsonl": "80be9347efb59913766fb54ce3002fe7ed90fcdab5bcedebbdd499a64e241a91",
+  "rth-20260929/6/scan.json": "fee6ffaa0b9b75c27eea42a8840d8cd281379d04c9843b3c64c2cd1a9fcbfd36",
+  "rth-20260929/6/scan.log": "ad7a5cc3efc159e405b2605b42c1a2956df72748ed62e0375f81d3a8e2c9a930",
+  "rth-20260929/6/scan-full.json": "b67a442b1161406f3b3accc6485bfdab42bda8334b8c2854d5a62dce302c9903",
+  "rth-20260929/6/check.json": "7c1d47c8160ebbd104576a4e3dafdd5185a9e172d57994f33e52d72e4b527592",
+  "rth-20260929/6/synthetic.json": "79e9d6fe7aa1b4eea9e1659ae091b0730ecf1129f81944cbd7ca54fadbbdd986",
+  "rth-20260929/6/synthetic.log": "5a82c7e8b81ea8eaba36b17cada32adf1770912b7ef681037a9d0add1d63054c",
+  "rth-20260929/6/paper.log": "307d1f3a3285b618097fd74d4b6d0f73d733b0f8bc61d5f45de70a739defb541",
+  "rth-20260929/6/live/events.jsonl": "eaca68bf5591b740d9c5d89e03bb39eda73791c4cd597d323999fab9e33093d0",
+  "rth-20260929/6/pages/ledger.jsonl": "5844f8c075f6efdfdd95cafdc83a7e83d62436edd2915e47d63e98fc9d82531a",
+  "rth-20260929/check-probe-20260929T051430Z.json": "3688b6460b433b82281197ad4aeb8d29ba785f46387a6e731193c8cce1c1606e",
+  "rth-20260929/probe-20260929T140005Z.json": "d4f6ee07ed62d86de8804f9c89f828677b2e947a244be10650f5fecbaf2e90dc",
+  "series-driver.sh": "feff8f5692b03900add1909b9554e7343357dbc170ad5b783ff5836331d1f608",
+  "run-series-trial.sh": "bbd917040783e8d3e41ed43af137060a52d31d9587d6988f160e124aaa095ca4",
+  "retry-benchmark.sh": "4f82d5f936257869450c72d6f9cc03b0cf0f2fa584891d1abfc9b8a95fe1f27e",
+  "frozen-b528bb55.SHA256SUMS": "36daf1949c4b27ee5c4fd17c5478c4f8f7146308b9649d26ee786b4cf88aa07f",
+  "reconcile-20260929/rth-20260929.json": "d1c4646e1050116c21f348c96590279b31ec5eef69bd60a50d54fe09038bc1f2",
+  "reconcile-20260929/reconcile_ext_series.py": "50b9da4c17f16b6a84cd418ed9fbb7afca6b4a9e26fc56a6b6753c15e2a6cbff",
+  "reconcile-20260929/fee-activities-20260929.json": "2d02c55b8e5bc7757134b57676c9221aa23b9f8f8482eafdbc1382e77ea541b5",
+  "systemd user unit paper-rth-20260929.service": "79da68b2ceea69d9706b29309a3b47a21945e30b27e93fa8f48be147ef36be0e",
+  "systemd user unit paper-rth-20260929.timer": "d3b2eecceca6c8b5445c6ed0fa2de3e03c0502f8c999900f7b7293562a86d188"
+ },
+ "private_artifacts_note": "Hashes of retained private files that carry no account fingerprint (checked before hashing). The files in committed_copies are committed here; the rest stay private: the config and rule.txt (their content is in config and scanner_rule), the scan, check and synthetic files, the engine logs and events, the scan page ledgers, the probes, the series scripts and the systemd units. The engine ledgers, the NautilusTrader logs and the scan page caches stay private and are not hashed; the ledger snapshot is cited in ledger.snapshot.",
+ "private_notes_sha256": {
+  "rth-20260929/FREEZE.md": "4e595a8dcde301ac502361a0c3563e287ec64db5abe750044d2a7d9faee6f7f7",
+  "SERIES-INDEX.md": "f53fab8bde06b4e317691c030bce74fba3661dd731ffdcc232947ed913993284"
+ },
+ "private_notes_note": "FREEZE.md and the private series index name account fingerprints, so they stay private and are cited by sha256 only; the frozen acceptance and procedure text quoted in this receipt carries no fingerprint.",
+ "field_provenance": {
+  "legend": "asserted: the builder stops unless two or more sources agree. single_source: copied from one source with no cross-source assertion. derived: computed by the builder from the named source. literal: text or a constant written into the builder. Descriptive labels and notes are literal.",
+  "asserted": {
+   "code.engine_sources_sha256, code.frozen_sums counts": "git show b528bb55, the clone's files and the SUMS entries (all three equal)",
+   "config (sha256)": "sha256 of the config file, check.json and every mover-paper.json (preflight too)",
+   "attempts[].scan (fired, candidates, argument_rule)": "scan.log and the series console's scan line",
+   "attempts[].scan_sha256 chain": "sha256 of scan.json, check.json scan_sha256 and mover-paper.json scan_sha256",
+   "attempts[].rule, exit_rule": "mover-paper.json, check.json and the config",
+   "attempts[].check, synthetic": "check.json and the console rc; synthetic.json and synthetic.log",
+   "attempts[].fills (engine, ledger, broker, matched)": "engine fill events and execution_stats, ledger executions, broker FILL activities (reconciliation)",
+   "attempts[].requests (read, submit, cancel)": "ledger requests table from trial_start to the paper end and the engine-reported native.requests (equal for every trial)",
+   "attempts[].realized_pnl_usd": "engine totals and per-symbol realized, the ledger executions' cash flow and the broker recompute (equal for every trial that ended flat)",
+   "attempts[].buy_notional_usd, sell_notional_usd": "ledger executions (matched to broker activities) and the engine totals (within 0.01 USD: the engine multiplies 6-decimal averages)",
+   "attempts[].reconciliation_end.ledger_cash_delta_usd_since_ledger_start": "engine end reconciliation and the cumulative ledger execution cash flow",
+   "attempts[].trial_start": "engine receipt timing and the ledger trials table (within 1 ms)",
+   "orders[] (symbol, side, qty, limit, final status, fill counts)": "engine receipt, ledger intents and executions, broker listing",
+   "orders[].average_fill_price": "ledger intents and the broker listing (equal); engine-receipt differences are listed in engine_receipt_average_differences",
+   "orders[].reference_quote": "engine events (mover_entry_submitted ask, mover_exit_submitted bid) and each order's reference_price in the engine receipt",
+   "committed_copies": "sha256 of each committed file against its private source",
+   "units[0] times": "systemd user journal, the manager state (units[0].manager_state.exec_main_start and exec_main_exit) and the series console",
+   "series_totals.realized_pnl_usd": "per-trial engine receipts, ledger deltas and the broker recompute",
+   "series_totals.gross_loss_usd, ledger.at_series_end (realized, realized_loss, cash_delta)": "the losing legs, trial 6's ledger_risk, the ledger meta and the broker recompute",
+   "risk_halt (reason, losses, event order)": "the ledger's risk_halt event and meta, trial 5 and trial 6 ledger_risk and trial 6's legs",
+   "average_invariant_mismatches.records": "the engine receipt's two records, recomputed by the builder",
+   "code.offline_gate": "FREEZE.md, the private series index, and the private gate log and rc record re-read on 2026-09-30 (402 tests, OK, rc 0, the same window; cited by sha256 in code.offline_gate.recheck_2026_09_30)",
+   "attempts[].scan.scan_full_sha256": "the sha256 printed in scan.log and in the series console's scan line, equal to sha256 of the private scan-full.json (private_artifacts_sha256)",
+   "scanner_rule (frozen_config_rule, rule_txt, every_attempt_argument)": "the config file, rule.txt and every attempt's scan.log, equal after the percent-points to ratio conversion (G20 is G0.20)",
+   "engine_receipt_average_differences": "each engine receipt's order average against the ledger intent and the broker listing (orders[].average_fill_price)",
+   "series_procedure.scripts_note (script sha256)": "sha256sum of each private script on 2026-09-30 and the private series index's table (equal); private_artifacts_sha256 repeats them",
+   "journal_query.unit_files": "sha256 of the private unit and timer files on 2026-09-30 and the private series index's table (equal)",
+   "ledger.snapshot (account, taken_at, sha256, method)": "the coordinator's snapshot record in its receipt brief (account 1's ledger copied on 2026-09-30 at 09:08Z with the SQLite online-backup API from a mode=ro source, and the snapshot's sha256 prefix) and the snapshot tool's code (it opens the source mode=ro and copies it with the online-backup API; private, and neither committed nor hashed here because it names an account-root fingerprint prefix), against the builder's checks: the snapshot file's modification time is 2026-09-30T09:08:01Z and its sha256, recomputed from the file, is ledger.snapshot.sha256. That no process held either state root rests on the coordinator's record alone.",
+   "limitations[] (0 of 768 development passes)": "blueprints/us-equities/mover-early-entry/README.md:19 and evidence/summary-dev-val-run-v1.json there (768 rule-exits under development, selection.development_passes empty), as committed at this branch's base; the coordinator's brief states the same"
+  },
+  "single_source": {
+   "config (every field of the config file)": "the config file; its sha256 is asserted above, so these are the values the engine ran, but no second source repeats them. Layout: mover.* and sessions.* are shown at the top level (sessions.extended_hours as sessions_extended_hours), mover.rung_schedule as rung and rung_sessions, leverage_policy.version as leverage_policy, leverage_policy.decision_record as leverage_policy_decision_record and leverage_policy.schedule as leverage_schedule",
+   "frozen_acceptance text, series_procedure freeze text": "FREEZE.md, quoted verbatim (the file stays private and is cited by sha256)",
+   "code.runtime versions": "the pinned environment read on 2026-09-30 by the builder; FREEZE.md records the same versions at freeze",
+   "code.runtime.engine": "mover-paper.json native.engine",
+   "attempts[].started_at, ended_at, et": "series console (ET wall times)",
+   "attempts[].caps, preflight, session numbers": "mover-paper.json sizing, session and preflight",
+   "attempts[].skipped_entries, legs, exit reasons": "mover-paper.json symbols",
+   "attempts[].errors (error_type, adapter_errors, callback_faults, average_invariant_mismatches, duplicate_executions, open_fill_gaps_at_stop, halts)": "engine receipt",
+   "attempts[].errors websocket and stream-gap lines": "each attempt's paper.log (the console repeats a subset)",
+   "attempts[].dropped_crossed_quotes, native_quotes": "engine receipt native",
+   "attempts[].requests.http_observations": "engine receipt (preflight.http holds every HTTP observation of the run, the preflight reads included)",
+   "attempts[].force_reason, force_at, hard_flatten_at, elapsed_seconds, handoff_to_recovery": "engine receipt",
+   "attempts[].ledger_risk": "engine receipt ledger_risk (Decimal tails below 1e-12 USD shown as cents; the raw strings remain in the committed engine receipts)",
+   "orders[].submitted_at, filled_at, type, time_in_force, extended_hours": "broker listing",
+   "orders[].reason, cancel_reason": "engine receipt",
+   "broker_reconciliation (observed_at, alpaca_py, python, window, prefix, orders_listed_in_window, orders_with_series_prefix, orders_without_series_prefix, order_final_status_counts, fill_activity_pages, fill_activities_in_window, fill_activities_not_joined_to_series_orders, ledger_intents, ledger_executions, ledger_intents_not_listed_by_broker, ledger_broker_ids_not_in_listing, executions_matched_on_cum_qty_qty_price, executions_matched_on_execution_id, max_ledger_vs_broker_time_skew_seconds, unconfirmed_executions, orders_agreeing_with_ledger, broker_sells_minus_buys_usd, positions_now, position_symbols_now, open_orders_now, ledger_positions_nonzero)": "the committed reconciliation stdout, under its own names where they differ (alpaca_py_version, orders_with_prefix, orders_without_prefix_in_window, status_counts, fill_activities_without_prefix_order, ledger_intents_with_prefix, ledger_executions_with_prefix, executions_matched_on_execution_id_too, max_ledger_vs_activity_time_skew_seconds, broker_recomputed_realized_pnl_usd_by_trial and _total); orders_agreeing_with_ledger counts its orders' agree flags",
+   "broker_reconciliation.run": "the coordinator's brief of 2026-09-30 (tool copy sha256, interpreter, time, credential route), the tool's argument parser and docstring (reconcile_ext_series.py:6-8, 12 and 219-220) and the stdout (prefix, window, python, alpaca_py_version); the command line itself is not recorded",
+   "units[] except the series unit's times": "systemd user journal and the manager state (units[].manager_state)",
+   "ledger.peak_pnl_usd": "ledger meta peak_pnl (mark-to-market; no second source can recompute it)",
+   "dry_run": "each series' dryrun-20260929 files and check-probe record",
+   "risk_halt.rule, average_invariant_mismatches.meaning": "the engine source at b528bb55 (cited file:line)",
+   "units[].manager_state, the exit_status and result it gives, journal_query.exit_results": "systemctl --user show --timestamp=us+utc, read-only, at manager_state.queried_at; the manager's UserspaceTimestamp (manager_running_since) predates the units",
+   "series_procedure.key_probe": "the private probe record probe-20260929T140005Z.json (hashed in private_artifacts_sha256): request, http_status, observed_at and the rate-limit headers; the series console's line 4 repeats rc=0 and http_status=200",
+   "series_procedure.scripts_note (modification times)": "stat of the private scripts, the three FREEZE files and the private series index on 2026-09-30 (modification times in UTC)",
+   "journal_query (queried_at, command, journald, result)": "the builder's journalctl --user -o json query at queried_at (the records per unit are in units[].journal_records) and systemctl --version for journald",
+   "websocket_lines (logged_by, library, forms)": "the pinned environment's websockets 17.1 (exceptions.py:118-131, 142-143 and 158-175; protocol.py:237-245) and alpaca-py 0.44.0 (alpaca/data/live/websocket.py:468-475; alpaca/trading/stream.py:215-226), read on 2026-09-30",
+   "websocket_lines.isolation_check_20260923": "the committed trials/20260923b-needs-attention/transport-isolation-1e2c96a.json (restart_log_records) and that directory's README",
+   "paper_lane_row (dashboard_lane, cites_at_branch_base)": "observability/grand-dashboard/state.json at the branch base f03f41c7 (the paper lane's title and evidence_ref)",
+   "fees (account_1_fee_activities_for_2026_09_29, covers, fee_read)": "the coordinator's FEE-activity read fee-activities-20260929.json (sha256 in fees.fee_read and private_artifacts_sha256): one broker read that keeps no activity description, so no second source repeats the amounts or states their bases; covers takes the series attribution from the read and the prefix check from broker_reconciliation"
+  },
+  "derived": {
+   "orders[].fills_at_reference_quote, fills_better_than_reference, fills_worse_than_reference, fills_at_reference_quote": "ledger execution prices against the asserted reference quotes",
+   "orders[].adverse_slippage_vs_reference_usd_per_share": "broker average minus the reference ask for a buy, reference bid minus the broker average for a sell; signed (negative is price improvement)",
+   "attempts[].requests peaks": "sliding 60 s windows over ledger request timestamps (the 5 s before trial_start included)",
+   "attempts[].entry_gross_to_sizing_equity": "buy notional divided by the trial's sizing equity",
+   "attempts[].acceptance": "the clause values listed in each attempt, under frozen_acceptance.evaluation",
+   "series_totals counts": "the attempts and orders above",
+   "private_artifacts_sha256, private_notes_sha256": "sha256 of each private file",
+   "attempts[].errors.websocket_lines_without_close_frame, websocket_lines_no_close_frame_either_way; websocket_lines.series_counts": "counted from each attempt's paper.log: the lines containing 'no close frame received', the subset containing 'no close frame received or sent', and each stream's lines by form; series_counts sums the attempts (each line belongs to one attempt)",
+   "code.clean_basis_limits (138)": "208 files under the four directories at b528bb55 (git ls-tree -r) less the SUMS' 70 entries",
+   "fees.total_usd, fees.fee_read.sha256": "the sum of the three rows, equal to the read's own account-1 total (-0.65); sha256 of the private read file",
+   "series_totals.fees_usd, realized_pnl_including_fees_usd": "fees.total_usd; series_totals.realized_pnl_usd (-115.94) plus fees.total_usd (-0.65)",
+   "fees.bases_recomputed_from_ledger (null)": "unknown: the FEE read keeps no activity description, so there is no stated fee basis to recompute from the ledger (fees.bases_note)"
+  },
+  "literal": {
+   "units[].role, notes, labels": "the builder's descriptions",
+   "attempts[].flat_basis, cleanup.proof": "text written after the asserts on the end reconciliation and the broker read",
+   "revised_at_utc, revision_note": "the builder's record of this repair",
+   "paper_lane_row (update, this_receipt_supports and the other fields)": "the builder's summary of the verdicts above",
+   "fees.bases_note, engine_fee_model, series_totals.fees_note": "the builder's statements; the engine's lack of a fee model is from the b528bb55 source"
+  }
+ },
+ "error": null,
+ "limitations": [
+  "Metadata plus broker-reconciled evidence, not a frozen gate run. It qualifies no gate.",
+  "The broker read uses the same broker API and account as the engine, so it is independent of the engine code but not of the broker.",
+  "Alpaca paper fills are simulated by the broker from quotes. They are not exchange executions and do not establish live slippage, queue position or partial-fill behaviour.",
+  "Mechanics only: the protocol's development study passed 0 of 768 rule-exits, so no result here evaluates a strategy.",
+  "paper_compare.py was not run (decision 11: the tool is not checked against b528bb55 receipts), so no historical fill-model comparison is recorded.",
+  "The engine logs carry no timestamps, so websocket and stream-gap lines cannot be placed in time. The 2026-09-23 isolation check's committed output (trials/20260923b-needs-attention/transport-isolation-1e2c96a.json, transport 1e2c96a) recorded a trading-stream line with a completed closing handshake 0.016 s and a data-stream line with no close frame received 0.018 s after the engine's stop() was called, and no restart line before it; its README names only the trading-stream line. These runs neither confirm nor rule out the same timing.",
+  "The journal holds no exit record for the series unit (journal_query). Its result (success, exit status 0) comes from the systemd user manager's state, read on 2026-09-30 (units[0].manager_state); the manager has run since 2026-09-24, but a manager restart would clear that state. The driver's last line reads series ends: past last start 1540 ET.",
+  "Fees: the broker posted REG, TAF and CAT fees for 2026-09-29 on account 1, -0.65 USD in total (fees). The engine has no fee model, so no figure here includes them except series_totals.realized_pnl_including_fees_usd (-116.59). They rest on one read that keeps no activity description, so their bases are not recomputed from the ledger.",
+  "The halt's exact mark-to-market figure at 15:44:11 ET is not recorded: the ledger's risk_halt event carries no timestamp or amount, and the marks were overwritten by later quotes."
+ ],
+ "evidence_note": "Built from the private series workspace (the engine's own receipts, consoles, logs and events), a read-only snapshot of account 1's mover ledger, the systemd user journal, git show b528bb55 and the coordinator's read-only broker reconciliation (GET only, paper endpoint), whose stdout is committed here. Figures present in two or more of those sources were cross-checked by assertion, and a mismatch stops the build; field_provenance names the rest. No credential, account id, account number, account fingerprint, broker order id or ref, activity id, execution id or host path is recorded."
+}

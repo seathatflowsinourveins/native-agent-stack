@@ -667,8 +667,10 @@ class DryRun(unittest.TestCase):
         self.assertEqual(min(r["params"]["start"][:10] for r in reqs), "2021-01-04")
         with self.assertRaises(ValueError):                          # a mixed list is refused as a whole
             CO.dry_run_requests(cal, [first, "2021-02-01"], ["AAA"])
+        run_identity = {"study_tree": "t", "protocol_sha256": "p", "runtime_lock_sha256": "r"}
         with self.assertRaises(ValueError):                          # dry_run refuses before any fetch
-            CO.dry_run(cal, ["2021-01-04"], ["AAA"], None, "/nonexistent", "2026-09-25", clock=fixed_clock)
+            CO.dry_run(cal, ["2021-01-04"], ["AAA"], None, "/nonexistent", "2026-09-25T00:00:00Z", run_identity,
+                       clock=fixed_clock)
 
     def test_dry_run_command_writes_counts_once_from_an_exposed_window(self):
         import run

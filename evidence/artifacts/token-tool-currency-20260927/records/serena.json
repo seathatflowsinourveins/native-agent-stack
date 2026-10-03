@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "tool": "serena",
+  "evidence_class": "upstream-source-review",
+  "retrieved_at": "2026-09-27T12:40:20.547Z",
+  "upstream_repository": "https://github.com/oraios/serena/",
+  "pin": {
+    "version": "2.0.0.dev0",
+    "source_pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+    "metadata_revision": "1c32ad22d76479fdc0385f2bbbada15b3f9f6a5f",
+    "metadata_sources": [
+      "manifests/stack.json:878",
+      "adoption/pins-linux-x86_64.json:295"
+    ],
+    "verified_against_worktree_on": "2026-09-27"
+  },
+  "scratch_record": {
+    "reviewed_on": "2026-09-26",
+    "input_sources": [
+      "full-save/synth/currency-records.json",
+      "full-save/cur/serena/gpt6.md"
+    ],
+    "latest_release": {
+      "version": "1.7.0",
+      "tag": "v1.7.0",
+      "published_at": "2026-08-09T18:38:06Z",
+      "development_version": "2.0.0.dev0"
+    },
+    "behind_by": {
+      "reported_stable_releases": 0,
+      "qualification": "Scratch also explicitly says the development pin is 123 commits ahead of v1.7.0 and 30 commits behind main; the simple zero is not a same-channel comparison.",
+      "commits_ahead_of_stable": 123,
+      "main_commits_ahead": 30,
+      "main_head": "7a2968335f2198b966864de1ce3655c8e485a653"
+    }
+  },
+  "latest_release": {
+    "tag_name": "v1.7.0",
+    "published_at": "2026-08-09T18:38:06Z",
+    "html_url": "https://github.com/oraios/serena/releases/tag/v1.7.0",
+    "prerelease": false,
+    "draft": false,
+    "source_url": "https://api.github.com/repos/oraios/serena/releases/latest"
+  },
+  "behind_by": {
+    "count": null,
+    "unit": "stable releases",
+    "basis": "Not a comparable stable-release pin: the adopted development commit is 123 commits ahead of v1.7.0. The retained fixed-SHA comparison does not re-verify the live main distance; the historical 30-commit distance remains in scratch_record.",
+    "development_commits_behind_main": null,
+    "main_distance_status": "not_reverified",
+    "development_pin_commits_ahead_of_stable": 123,
+    "source_urls": [
+      "https://api.github.com/repos/oraios/serena/compare/v1.7.0...c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "https://api.github.com/repos/oraios/serena/compare/c6fbd1c5932df2494ffa0020af5a9fbe80b82143...7a2968335f2198b966864de1ce3655c8e485a653"
+    ]
+  },
+  "changes_since_scratch": [
+    {
+      "field": "latest_stable_release",
+      "status": "unchanged"
+    },
+    {
+      "date": "2026-09-27",
+      "field": "main_distance",
+      "status": "not_reverified",
+      "previous": "30 commits behind main was labelled unchanged",
+      "current": "null; the comparison target is a fixed scratch SHA, not live main",
+      "reason": "Dated repair erratum preserves the historical distance without asserting a new branch-head observation."
+    },
+    {
+      "field": "behind_by_representation",
+      "previous": "0 stable releases behind with development-channel caveat",
+      "current": "null for non-comparable stable-release lag; keep the fixed stable comparison and historical scratch main distance separate",
+      "reason": "Clarification preserves the scratch facts without implying a stable upgrade path."
+    }
+  ],
+  "key_new_findings": [
+    {
+      "finding": "The later source revision upgrades the MCP SDK pin from 1.28.1 to 2.2.0 and migrates imports from fastmcp to mcpserver. Wire compatibility and native client behavior are not established by this source review.",
+      "source_urls": [
+        "https://github.com/oraios/serena/commit/c4dc91a7dac4ea560dc7658581a63dac33a76e6c"
+      ],
+      "revision": "c4dc91a7dac4ea560dc7658581a63dac33a76e6c",
+      "channel": "unreleased main after development pin",
+      "verification": "primary source retrieved on 2026-09-27; no executable or provider acceptance claimed",
+      "evidence_class": "upstream-source-review"
+    },
+    {
+      "finding": "A later search implementation caches line-start offsets and uses binary search for coordinate lookup. This is an implementation change; no host speedup was measured by this review.",
+      "source_urls": [
+        "https://github.com/oraios/serena/commit/f581cf642d4afa437713982c3b1e84cfb90459e5"
+      ],
+      "revision": "f581cf642d4afa437713982c3b1e84cfb90459e5",
+      "channel": "unreleased main after development pin",
+      "verification": "primary source retrieved on 2026-09-27; no executable or provider acceptance claimed",
+      "evidence_class": "upstream-source-review"
+    }
+  ],
+  "package_channels": [
+    {
+      "package": "serena-agent",
+      "latest": "1.7.0",
+      "published_at": "2026-08-09T18:38:37.549487Z",
+      "source_url": "https://pypi.org/pypi/serena-agent/json",
+      "channel": "PyPI info.version; stable channel",
+      "retrieved_on": "2026-09-27"
+    }
+  ],
+  "limitations": [
+    "Source/documentation review only; this record does not establish installed behavior, native tests, model execution, savings or upgrade acceptance.",
+    "Scratch host measurements and executable probes were not rerun or promoted into this evidence class."
+  ]
+}

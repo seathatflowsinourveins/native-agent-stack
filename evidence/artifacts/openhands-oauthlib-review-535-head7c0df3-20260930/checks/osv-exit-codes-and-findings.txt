@@ -1,0 +1,12 @@
+observed_utc=2026-09-30T19:28:43Z
+osv-scanner binary sha256: ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108
+CI pin (.github/workflows/security-scan.yml at the head): ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108
+candidate lock, the head's ordinary config: scan exit 0
+candidate lock, EMPTY config (control): scan exit 1
+previously reviewed lock 383ccc, EMPTY config (control): scan exit 1
+osv-cand-lock-with-ci-config.raw -> no findings
+osv-cand-lock-empty-config.raw -> {"oauthlib==3.3.1": ["GHSA-hj66-6f7g-4r5v", "GHSA-xpv3-w29h-x7cv"]}
+osv-reviewed383-lock-empty-config.raw -> {"oauthlib==3.3.1": ["GHSA-hj66-6f7g-4r5v", "GHSA-xpv3-w29h-x7cv"], "pyjwt==2.14.0": ["GHSA-42vr-xj54-vc7v"], "urllib3==2.7.0": ["GHSA-8988-9cw3-xx77", "GHSA-gh4c-6fx4-qh6g", "GHSA-vxq7-64xx-v4gw"]}
+stderr: Scanned <pr-tree>/blueprints/runtime-workers/openhands/requirements.lock file and found 174 packages
+ordinary config filtered: GHSA-hj66-6f7g-4r5v and 1 alias have been filtered out becau
+ordinary config filtered: GHSA-xpv3-w29h-x7cv and 1 alias have been filtered out becau

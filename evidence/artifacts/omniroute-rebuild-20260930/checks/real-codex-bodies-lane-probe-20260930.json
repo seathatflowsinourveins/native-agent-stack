@@ -1,0 +1,608 @@
+{
+ "schema": "omniroute-real-codex-bodies-lane-probe/1",
+ "taken_utc": "2026-09-30T03:36Z",
+ "class": "our integration check on real request bodies: offline, no model call, nothing sent to any gateway or provider; counts only, the bodies are private state and are not published",
+ "bodies": "eight request bodies that the pi-practice session captured from real Codex 0.159.2 fit-vote jobs on gpt-6.1-sol (four prompts, each once for the headerless lane 'ab-on' and once for the gpt6-safe-lossy header lane 'ab-lossy'): {instructions, input items as the client held them}; 60 to 78 input items each, 0.4 to 0.5 MB, 30 to 35 of the items encrypted reasoning that no engine can read; tool outputs and messages are content-part arrays",
+ "how": "the gateway's pre-translation compression step run offline (scripts/real_bodies_probe.ts.txt over scripts/gatewayPath.ts.txt, compression modules from the live 20128 build's source B2 ae5539a56) with the live 20129 compression settings and combos read back at 2026-09-30T03:14:14+00:00, provider openai-compatible-responses, model gpt-6-astra-max, header none (ab-on) or gpt6-safe-lossy (ab-lossy); network blocked",
+ "headerless_lane": [
+  {
+   "file": "ab-on-git-github-automation",
+   "plan": {
+    "mode": "stacked",
+    "source": "default",
+    "pipeline": [
+     "session-dedup",
+     "ccr",
+     "lite"
+    ]
+   },
+   "tokens": [
+    79428,
+    79428
+   ],
+   "changed_items": 0,
+   "items": 69,
+   "compressed": false
+  },
+  {
+   "file": "ab-on-mcp-surfaces",
+   "plan": {
+    "mode": "stacked",
+    "source": "default",
+    "pipeline": [
+     "session-dedup",
+     "ccr",
+     "lite"
+    ]
+   },
+   "tokens": [
+    79550,
+    79550
+   ],
+   "changed_items": 0,
+   "items": 69,
+   "compressed": false
+  },
+  {
+   "file": "ab-on-quality-evaluation",
+   "plan": {
+    "mode": "stacked",
+    "source": "default",
+    "pipeline": [
+     "session-dedup",
+     "ccr",
+     "lite"
+    ]
+   },
+   "tokens": [
+    72069,
+    72069
+   ],
+   "changed_items": 0,
+   "items": 64,
+   "compressed": false
+  },
+  {
+   "file": "ab-on-semantic-rag",
+   "plan": {
+    "mode": "stacked",
+    "source": "default",
+    "pipeline": [
+     "session-dedup",
+     "ccr",
+     "lite"
+    ]
+   },
+   "tokens": [
+    74141,
+    74141
+   ],
+   "changed_items": 0,
+   "items": 78,
+   "compressed": false
+  }
+ ],
+ "lossy_header_lane": [
+  {
+   "file": "ab-lossy-git-github-automation",
+   "header": "gpt6-safe-lossy",
+   "plan": {
+    "mode": "stacked",
+    "source": "request-header",
+    "pipeline": [
+     "session-dedup",
+     "ccr",
+     "rtk:minimal",
+     "codex-responses",
+     "headroom",
+     "relevance",
+     "caveman:lite",
+     "aggressive",
+     "llmlingua",
+     "ultra"
+    ]
+   },
+   "tokens": [
+    63401,
+    63246
+   ],
+   "savings_percent": 0.24,
+   "engines_that_changed_tokens": [
+    {
+     "engine": "caveman",
+     "tokens": [
+      55090,
+      55089
+     ],
+     "techniques": [
+      "caveman-rules"
+     ]
+    },
+    {
+     "engine": "ultra",
+     "tokens": [
+      63400,
+      63246
+     ],
+     "techniques": [
+      "ultra"
+     ]
+    }
+   ],
+   "fallbackApplied": true,
+   "validation_errors": {
+    "count": 2,
+    "kind": [
+     "inline code changed or missing"
+    ]
+   },
+   "changed_items": 2,
+   "items": 77,
+   "changed_items_detail": {
+    "message": {
+     "items": 2,
+     "chars": [
+      42158,
+      41540
+     ],
+     "lines": [
+      284,
+      282
+     ],
+     "inline_code_spans": [
+      68,
+      68
+     ],
+     "exact_strings_total_and_missing": {
+      "long_numbers": [
+       0,
+       0
+      ],
+      "hex_ids": [
+       14,
+       1
+      ],
+      "file_paths": [
+       89,
+       0
+      ],
+      "error_lines": [
+       2,
+       0
+      ]
+     }
+    }
+   },
+   "exact_strings_over_all_items": {
+    "long_numbers": {
+     "in_input": 5,
+     "missing_after": 0
+    },
+    "hex_ids": {
+     "in_input": 26,
+     "missing_after": 1
+    },
+    "file_paths": {
+     "in_input": 685,
+     "missing_after": 0
+    },
+    "error_lines": {
+     "in_input": 3,
+     "missing_after": 0
+    }
+   }
+  },
+  {
+   "file": "ab-lossy-mcp-surfaces",
+   "header": "gpt6-safe-lossy",
+   "plan": {
+    "mode": "stacked",
+    "source": "request-header",
+    "pipeline": [
+     "session-dedup",
+     "ccr",
+     "rtk:minimal",
+     "codex-responses",
+     "headroom",
+     "relevance",
+     "caveman:lite",
+     "aggressive",
+     "llmlingua",
+     "ultra"
+    ]
+   },
+   "tokens": [
+    64630,
+    64530
+   ],
+   "savings_percent": 0.15,
+   "engines_that_changed_tokens": [
+    {
+     "engine": "caveman",
+     "tokens": [
+      56774,
+      56717
+     ],
+     "techniques": [
+      "caveman-rules"
+     ]
+    },
+    {
+     "engine": "ultra",
+     "tokens": [
+      64573,
+      64530
+     ],
+     "techniques": [
+      "ultra"
+     ]
+    }
+   ],
+   "fallbackApplied": true,
+   "validation_errors": {
+    "count": 1,
+    "kind": [
+     "inline code changed or missing"
+    ]
+   },
+   "changed_items": 2,
+   "items": 60,
+   "changed_items_detail": {
+    "message": {
+     "items": 2,
+     "chars": [
+      37689,
+      37293
+     ],
+     "lines": [
+      186,
+      184
+     ],
+     "inline_code_spans": [
+      26,
+      26
+     ],
+     "exact_strings_total_and_missing": {
+      "long_numbers": [
+       0,
+       0
+      ],
+      "hex_ids": [
+       13,
+       0
+      ],
+      "file_paths": [
+       67,
+       19
+      ],
+      "error_lines": [
+       2,
+       0
+      ]
+     }
+    }
+   },
+   "exact_strings_over_all_items": {
+    "long_numbers": {
+     "in_input": 6,
+     "missing_after": 0
+    },
+    "hex_ids": {
+     "in_input": 30,
+     "missing_after": 0
+    },
+    "file_paths": {
+     "in_input": 595,
+     "missing_after": 19
+    },
+    "error_lines": {
+     "in_input": 2,
+     "missing_after": 0
+    }
+   }
+  },
+  {
+   "file": "ab-lossy-quality-evaluation",
+   "header": "gpt6-safe-lossy",
+   "plan": {
+    "mode": "stacked",
+    "source": "request-header",
+    "pipeline": [
+     "session-dedup",
+     "ccr",
+     "rtk:minimal",
+     "codex-responses",
+     "headroom",
+     "relevance",
+     "caveman:lite",
+     "aggressive",
+     "llmlingua",
+     "ultra"
+    ]
+   },
+   "tokens": [
+    67879,
+    67639
+   ],
+   "savings_percent": 0.35,
+   "engines_that_changed_tokens": [
+    {
+     "engine": "caveman",
+     "tokens": [
+      59736,
+      59564
+     ],
+     "techniques": [
+      "caveman-rules"
+     ]
+    },
+    {
+     "engine": "ultra",
+     "tokens": [
+      67706,
+      67639
+     ],
+     "techniques": [
+      "ultra"
+     ]
+    }
+   ],
+   "fallbackApplied": true,
+   "validation_errors": {
+    "count": 1,
+    "kind": [
+     "inline code changed or missing"
+    ]
+   },
+   "changed_items": 3,
+   "items": 65,
+   "changed_items_detail": {
+    "message": {
+     "items": 2,
+     "chars": [
+      43072,
+      42199
+     ],
+     "lines": [
+      409,
+      407
+     ],
+     "inline_code_spans": [
+      31,
+      31
+     ],
+     "exact_strings_total_and_missing": {
+      "long_numbers": [
+       0,
+       0
+      ],
+      "hex_ids": [
+       3,
+       0
+      ],
+      "file_paths": [
+       94,
+       10
+      ],
+      "error_lines": [
+       3,
+       1
+      ]
+     }
+    },
+    "custom_tool_call_output": {
+     "items": 1,
+     "chars": [
+      40037,
+      39956
+     ],
+     "lines": [
+      11,
+      9
+     ],
+     "inline_code_spans": [
+      249,
+      249
+     ],
+     "exact_strings_total_and_missing": {
+      "long_numbers": [
+       0,
+       0
+      ],
+      "hex_ids": [
+       0,
+       0
+      ],
+      "file_paths": [
+       9,
+       0
+      ],
+      "error_lines": [
+       0,
+       0
+      ]
+     }
+    }
+   },
+   "exact_strings_over_all_items": {
+    "long_numbers": {
+     "in_input": 1,
+     "missing_after": 0
+    },
+    "hex_ids": {
+     "in_input": 15,
+     "missing_after": 0
+    },
+    "file_paths": {
+     "in_input": 424,
+     "missing_after": 10
+    },
+    "error_lines": {
+     "in_input": 3,
+     "missing_after": 1
+    }
+   }
+  },
+  {
+   "file": "ab-lossy-semantic-rag",
+   "header": "gpt6-safe-lossy",
+   "plan": {
+    "mode": "stacked",
+    "source": "request-header",
+    "pipeline": [
+     "session-dedup",
+     "ccr",
+     "rtk:minimal",
+     "codex-responses",
+     "headroom",
+     "relevance",
+     "caveman:lite",
+     "aggressive",
+     "llmlingua",
+     "ultra"
+    ]
+   },
+   "tokens": [
+    69573,
+    69160
+   ],
+   "savings_percent": 0.59,
+   "engines_that_changed_tokens": [
+    {
+     "engine": "caveman",
+     "tokens": [
+      60596,
+      60490
+     ],
+     "techniques": [
+      "caveman-rules"
+     ]
+    },
+    {
+     "engine": "ultra",
+     "tokens": [
+      69467,
+      69160
+     ],
+     "techniques": [
+      "ultra"
+     ]
+    }
+   ],
+   "fallbackApplied": true,
+   "validation_errors": {
+    "count": 1,
+    "kind": [
+     "inline code changed or missing"
+    ]
+   },
+   "changed_items": 3,
+   "items": 60,
+   "changed_items_detail": {
+    "message": {
+     "items": 2,
+     "chars": [
+      38346,
+      37759
+     ],
+     "lines": [
+      293,
+      291
+     ],
+     "inline_code_spans": [
+      32,
+      32
+     ],
+     "exact_strings_total_and_missing": {
+      "long_numbers": [
+       1,
+       0
+      ],
+      "hex_ids": [
+       10,
+       0
+      ],
+      "file_paths": [
+       71,
+       16
+      ],
+      "error_lines": [
+       2,
+       0
+      ]
+     }
+    },
+    "custom_tool_call_output": {
+     "items": 1,
+     "chars": [
+      39812,
+      38750
+     ],
+     "lines": [
+      11,
+      9
+     ],
+     "inline_code_spans": [
+      110,
+      110
+     ],
+     "exact_strings_total_and_missing": {
+      "long_numbers": [
+       0,
+       0
+      ],
+      "hex_ids": [
+       26,
+       0
+      ],
+      "file_paths": [
+       98,
+       2
+      ],
+      "error_lines": [
+       0,
+       0
+      ]
+     }
+    }
+   },
+   "exact_strings_over_all_items": {
+    "long_numbers": {
+     "in_input": 15,
+     "missing_after": 0
+    },
+    "hex_ids": {
+     "in_input": 78,
+     "missing_after": 0
+    },
+    "file_paths": {
+     "in_input": 570,
+     "missing_after": 18
+    },
+    "error_lines": {
+     "in_input": 3,
+     "missing_after": 0
+    }
+   }
+  }
+ ],
+ "totals": {
+  "headerless_lane": {
+   "tokens_in": 305188,
+   "tokens_out": 305188,
+   "items_changed": 0
+  },
+  "lossy_header_lane": {
+   "tokens_in": 265483,
+   "tokens_out": 264575,
+   "saved_tokens": 908,
+   "saved_percent": 0.34
+  }
+ },
+ "reading": "The headerless lane [session-dedup, ccr, lite] changed 0 items and 0 tokens on all four real bodies (it never fires on this traffic, as the live call logs of the pi-practice session show: 0 compressed tokens in 118 rows). The gpt6-safe-lossy lane saved 908 of 265483 tokens (0.34%), from caveman rules and ultra on two prompt messages per body and, in two bodies, one tool output (live: 0.36% over 55 rows). The gateway's own validation printed 'inline code changed or missing' and fallbackApplied true in all four. By our regex count of exact strings present in the input and missing after, the changed items lost 45 file-path occurrences in the prompt messages and 2 in tool outputs, 1 hex id and 1 error line: that is the kind of exact value the 2026-09-29 rule says a lossy lane must not lose, for a 0.34% saving.",
+ "limits": [
+  "The offline probe is a mirror of chatCore's pre-translation step (scripts/gatewayPath.ts.txt), not the live request path; the live counters agree in direction (0 and 0.36%).",
+  "The exact-string counts come from our own regexes over concatenated item text (long numbers of 10 or more digits, 12 or more hex characters, absolute-style paths, lines with Error/Traceback/FAILED/Exception/exit code); a path counted as missing may have been shortened or merged rather than deleted, and an occurrence that moved between items is counted by string, not by position. They indicate, they do not prove semantic loss.",
+  "Four prompts of one kind (fit-vote reviews): not a sample of all Codex work, and no string-shaped shell outputs (older models) were captured."
+ ]
+}

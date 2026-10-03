@@ -14,6 +14,11 @@ to evaluate a proposed change. Source pins live in
 [the stack manifest](../manifests/stack.json); evidence classes and publication
 limits live in [the evidence guide](evidence.md).
 
+For the current macOS/workstation operating selection and the immediate North
+Star R&D starting boundary, use the [October 2 two-host architecture decision](decisions/2026-10-02-two-host-north-star-architecture.md).
+It separates native clients, SDK/gateway workers and the optional Pi runtime,
+and distinguishes local acceptance from the workstation's remaining activation.
+
 The working sequence is:
 
 ```text
@@ -128,9 +133,11 @@ same-task context management uses
 and requires a new task. Configuration presence alone is not activation evidence.
 [Codex models](https://learn.chatgpt.com/docs/models).
 
-Claude Ultracode combines `xhigh` reasoning with dynamic workflows. The native
-setting is `ultracode: true`; it is not an external repository or a persisted
-`effortLevel` value. Model capability and workflow availability still apply.
+Claude Code 2.1.284 decoupled Ultracode from effort: `ultracode: true` enables
+its dynamic workflows at any effort level. This stack saves `xhigh` as the
+fallback and requests `max` through its native terminal launcher; these are
+separate choices, not measured quality gains. Model capability and workflow
+availability still apply. [Tagged Claude changelog](https://github.com/anthropics/claude-code/blob/v2.1.285/CHANGELOG.md#L206).
 Keep the requested model and record the one that actually ran. The `best` alias
 can resolve to Fable, whose usage-credit behavior requires an account-specific
 check before unattended work. [Claude model configuration](https://code.claude.com/docs/en/model-config).

@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "kind": "unchanged_upstream_test_execution",
+  "recorded_at_utc": "2026-10-01",
+  "repository": "https://github.com/volcengine/OpenViking",
+  "tag": "v0.4.22",
+  "commit": "e8716760934d95ef73414484a45bfe475b9296e2",
+  "source": "https://github.com/volcengine/OpenViking/blob/v0.4.22/examples/codex-memory-plugin/README.md",
+  "test_sources": "https://github.com/volcengine/OpenViking/tree/v0.4.22/examples/codex-memory-plugin/scripts",
+  "native_environment": {"command": "rtk node --version", "exit_code": 0, "returned_output": "v24.21.0", "scope": "Existing host PATH executable, not replacement-host acceptance"},
+  "checkout": {
+    "native_clone": "git clone --branch v0.4.22 --depth 1 https://github.com/volcengine/OpenViking.git <isolated-private-source-checkout>",
+    "clone_exit_code": 0,
+    "native_git_status_exit_code": 0,
+    "working_tree_clean_after_test": true,
+    "source_changes": "none"
+  },
+  "execution": {
+    "working_directory": "examples/codex-memory-plugin",
+    "command": "rtk node --test scripts/*.test.mjs",
+    "source_test_files": 12,
+    "exit_code": 0,
+    "returned_counts": {"tests": 167, "passed": 167, "failed": 0, "cancelled": 0, "skipped": 0, "todo": 0},
+    "returned_duration_ms": 4231.594388,
+    "stdout": "evidence/artifacts/new-wsl-layer-reviews-20261001/openviking-0422-native-plugin-tests.stdout.txt",
+    "stdout_bytes": 13797,
+    "stdout_sha256": "b3ce94aa6870869a8e5f3254a217931781e71eb16d34d50545846e3918162ed5",
+    "stderr_bytes": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "evidence_boundary": {
+    "fixture_contract": "Upstream temporary-state, test-configuration and mock-server fixtures exercise shipped plugin modules and subprocess hooks. Config tests override the native configuration paths; capture fixtures clear inherited OpenViking keys and use their fixture server/state. The doctor checks imported parsing helpers; marketplace subprocess checks use node --check on repository files.",
+    "capability_scope": "Codex plugin capture/recall utilities, scope/configuration guards, completed-turn capture, SessionEnd/PreCompact, startup/resume commit behavior and related recovery fixtures at this pin",
+    "real_codex_or_claude_lifecycle": "not exercised",
+    "live_openviking_server": "not exercised",
+    "provider_or_model_execution": "none",
+    "representative_semantic_quality": "not measured",
+    "snapshot_restore_with_acl_or_vector_index": "not exercised",
+    "native_installation": "none; source checkout and unchanged tests only",
+    "new_host_execution": "none",
+    "independent_rerun": "passed unchanged suite; same fixture-only acceptance boundary"
+  },
+  "independent_observation": {
+    "reviewer_role": "stack-verifier",
+    "model_basis": "Fixed Astra/max verifier role; not a separately observed provider response model ID.",
+    "command": "rtk node --test scripts/*.test.mjs",
+    "exit_code": 0,
+    "returned_summary": "ℹ tests 167\nℹ suites 0\nℹ pass 167\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 4444.276368",
+    "node_version": {"returned_output": "v24.21.0", "exit_code": 0},
+    "head_and_tag": {"commit": "e8716760934d95ef73414484a45bfe475b9296e2", "head_exit_code": 0, "tag_exit_code": 0},
+    "source_unchanged": {"test_files": 12, "all_hashes_unchanged": true, "git_status_before_exit_code": 0, "git_status_before_output": "", "git_status_after_exit_code": 0, "git_status_after_output": ""},
+    "prior_receipt_check": "Original public stdout hash, byte count and reported counts match the companion artifact.",
+    "private_original_stdout": {"file": "independent-openviking-0422-plugin-tests.stdout", "bytes": 13796, "sha256": "dd79294b8cd21cab203570b78837825be2b1d06aee1ca53da422e5cda77ace66", "mode": "0600"},
+    "private_original_stderr": {"file": "independent-openviking-0422-plugin-tests.stderr", "bytes": 0, "mode": "0600"},
+    "scope_sources": [
+      "https://github.com/volcengine/OpenViking/blob/v0.4.22/examples/memory-plugin-shared/testing/support.mjs#L134",
+      "https://github.com/volcengine/OpenViking/blob/v0.4.22/examples/codex-memory-plugin/scripts/auto-recall.test.mjs#L72",
+      "https://github.com/volcengine/OpenViking/blob/v0.4.22/examples/codex-memory-plugin/scripts/marketplace.test.mjs#L200"
+    ],
+    "scope": "Temporary configurations, mock servers, plugin-module subprocesses, a fake Codex executable and syntax checks. Independent fixture acceptance is not native client, provider, semantic-quality or snapshot/ACL/vector-restore acceptance."
+  },
+  "closure_effect": "Native fixture acceptance strengthens the conditional challenger; real cross-client quality, one-writer, scope and restore gates remain open."
+}

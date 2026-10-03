@@ -1,0 +1,3 @@
+trading stream websocket error, restarting  connection: sent 1000 (OK); then received 1000 (OK)
+trading stream websocket error, restarting  connection: sent 1000 (OK); then received 1000 (OK)
+{"status": "needs_attention", "flat": true, "evidence_class": "PAPER"}

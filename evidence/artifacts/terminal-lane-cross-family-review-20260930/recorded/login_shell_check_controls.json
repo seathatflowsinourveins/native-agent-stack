@@ -1,0 +1,145 @@
+{
+  "cases": [
+    {
+      "case": "A profile only",
+      "as_expected": true,
+      "pass": true,
+      "missing_in_login_shell": [],
+      "empty_files_shadowing_profile": [],
+      "probe_completed": true,
+      "exit": 0
+    },
+    {
+      "case": "B empty .bash_profile (the incident)",
+      "as_expected": true,
+      "pass": false,
+      "missing_in_login_shell": [
+        "claude",
+        "codex",
+        "nativestack",
+        "rtk"
+      ],
+      "empty_files_shadowing_profile": [
+        ".bash_profile"
+      ],
+      "probe_completed": true,
+      "exit": 0
+    },
+    {
+      "case": "C real .bash_profile handing off to .profile",
+      "as_expected": true,
+      "pass": true,
+      "missing_in_login_shell": [],
+      "empty_files_shadowing_profile": [],
+      "probe_completed": true,
+      "exit": 0
+    },
+    {
+      "case": "D empty .bash_login",
+      "as_expected": true,
+      "pass": false,
+      "missing_in_login_shell": [
+        "claude",
+        "codex",
+        "nativestack",
+        "rtk"
+      ],
+      "empty_files_shadowing_profile": [
+        ".bash_login"
+      ],
+      "probe_completed": true,
+      "exit": 0
+    },
+    {
+      "case": "E no startup files",
+      "as_expected": true,
+      "pass": false,
+      "missing_in_login_shell": [
+        "claude",
+        "codex",
+        "nativestack",
+        "rtk"
+      ],
+      "empty_files_shadowing_profile": [],
+      "probe_completed": true,
+      "exit": 0
+    },
+    {
+      "case": "F healthy .bash_profile beside an empty .bash_login that bash never reads",
+      "as_expected": true,
+      "pass": true,
+      "missing_in_login_shell": [],
+      "empty_files_shadowing_profile": [],
+      "probe_completed": true,
+      "exit": 0,
+      "earlier_check_said_pass": false,
+      "earlier_check_was_wrong_here": true
+    },
+    {
+      "case": "G non-empty .bash_profile that exits 0 before the probe runs",
+      "as_expected": true,
+      "pass": false,
+      "missing_in_login_shell": [],
+      "empty_files_shadowing_profile": [],
+      "probe_completed": false,
+      "exit": 0,
+      "earlier_check_said_pass": true,
+      "earlier_check_was_wrong_here": true
+    },
+    {
+      "case": "H .bash_profile that exits 1",
+      "as_expected": true,
+      "pass": false,
+      "missing_in_login_shell": [],
+      "empty_files_shadowing_profile": [],
+      "probe_completed": false,
+      "exit": 1
+    },
+    {
+      "case": "I a shell function named claude while no executable is on PATH",
+      "as_expected": true,
+      "pass": false,
+      "missing_in_login_shell": [
+        "claude",
+        "codex",
+        "nativestack",
+        "rtk"
+      ],
+      "empty_files_shadowing_profile": [],
+      "probe_completed": true,
+      "exit": 0
+    },
+    {
+      "case": "J a startup file hashes claude to a path that does not exist (hash -p, after the hand-off: assigning PATH flushes the hash): type -P prints the stale path",
+      "as_expected": true,
+      "pass": false,
+      "missing_in_login_shell": [
+        "claude"
+      ],
+      "empty_files_shadowing_profile": [],
+      "probe_completed": true,
+      "exit": 0,
+      "earlier_check_said_pass": true,
+      "earlier_check_was_wrong_here": true
+    },
+    {
+      "case": "K a non-executable claude on PATH (mode 0644): type -P falls back to it and exec exits 126",
+      "as_expected": true,
+      "pass": false,
+      "missing_in_login_shell": [
+        "claude"
+      ],
+      "empty_files_shadowing_profile": [],
+      "probe_completed": true,
+      "exit": 0
+    }
+  ],
+  "all_cases_as_expected": true,
+  "real_host": {
+    "pass": true,
+    "missing_in_login_shell": [],
+    "empty_files_shadowing_profile": [],
+    "probe_completed": true,
+    "exit": 0
+  }
+}

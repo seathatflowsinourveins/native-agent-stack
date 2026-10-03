@@ -72,14 +72,14 @@ Decision, 2026-09-28: a separate weekly report-only checker. Alternatives compar
   never sees the pin the sweep read, and its Action targets projects you own
   (README.md:181-184). Pin drift needs the comparison either way, so only the no-commit
   condition is re-derived here.
-* Add these repositories to the Monday catalog-freshness lane. Its fetch_repository()
+* Add these repositories to the catalog-freshness lane (daily since 2026-10-02). Its fetch_repository()
   records the head, archived state and renames but compares no pin; this checker reuses
   that fetch instead.
 * No scheduled check, re-reading each pin at the next sweep. The rejection of
   anthropics/claude-code-security-review rests partly on its last commit (2026-02-11), so
   only a scheduled observation reports the maintenance change that would reopen it.
 
-Overturn: retire this checker when the Monday lane compares the catalogued pins itself, or
+Overturn: retire this checker when the catalog-freshness lane compares the catalogued pins itself, or
 when a Scorecard Maintained run disagrees with this checker's stale flag for a catalogued
 repository.
 """

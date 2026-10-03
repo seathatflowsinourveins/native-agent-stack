@@ -1,0 +1,37 @@
+"""Read-only check of one installed omniroute prefix: its BUILD_SHA, the alpha/search route files (added by upstream PR 13788) and the
+occurrences of the local affinity function pickMoreAvailableOAuthPeer in the built output. Prints counts and identifiers only (no path).
+Usage: carry_presence_check.py <the npm prefix directory, which holds lib/node_modules/omniroute>
+Same counting as installed_check.py of the rebuild record (evidence/artifacts/omniroute-rebuild-20260930/scripts/installed_check.py.txt)."""
+import datetime
+import json
+import sys
+from pathlib import Path
+
+prefix = Path(sys.argv[1])
+package = prefix / "lib/node_modules/omniroute"
+if not package.is_dir():
+    sys.exit("package directory not found")
+out = {"observed_utc": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
+build_sha = None
+for candidate in package.rglob("BUILD_SHA"):
+    build_sha = candidate.read_text(encoding="utf-8").strip()
+    break
+routes = sorted({str(p.relative_to(package)).replace("\\", "/") for p in package.rglob("*") if "alpha" in p.parts and "search" in p.parts and p.is_file()})
+occurrences = 0
+files_with = 0
+for path in package.rglob("*"):
+    if not path.is_file() or path.suffix not in (".js", ".mjs", ".cjs", ".json", ".ts"):
+        continue
+    if path.stat().st_size > 20_000_000:
+        continue
+    try:
+        text = path.read_text(encoding="utf-8", errors="ignore")
+    except OSError:
+        continue
+    hits = text.count("pickMoreAvailableOAuthPeer")
+    if hits:
+        occurrences += hits
+        files_with += 1
+out["npm 3.8.51 package"] = {"build_sha": build_sha, "alpha/search route files": len(routes),
+                             "pickMoreAvailableOAuthPeer occurrences": occurrences, "files_with_pickMoreAvailableOAuthPeer": files_with}
+print(json.dumps(out, indent=1))

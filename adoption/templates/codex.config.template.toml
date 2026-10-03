@@ -1,4 +1,10 @@
-model = "gpt-6-astra"
+# User-selected native coordinator: Sol/Ultra (user decision 2026-09-30; routing record
+# docs/decisions/2026-09-30-sol-primary-quality-defaults.md). Ultra sends Sol's catalog multi-agent effort, xhigh,
+# and enables proactive delegation (openai/codex rust-v0.159.2 protocol/src/openai_models/reasoning_effort.rs
+# and models-manager/models.json). tools/adoption/render_config.py fills CODEX_MODEL from the platform's Codex pin:
+# gpt-6.1-sol from Codex 0.159.1, which added it to the bundled catalog (rust-v0.159.1 release notes), and gpt-6-astra
+# on an older pin (macOS 0.155.1), a model that client's catalog lists; --set CODEX_MODEL=<model> names another.
+model = "${CODEX_MODEL}"
 model_reasoning_effort = "ultra"
 approval_policy = "never"
 sandbox_mode = "danger-full-access"
@@ -7,7 +13,7 @@ mcp_oauth_credentials_store = "file"
 # only, and only full access picks live (codex-rs/core/src/config/mod.rs L2659-2670 and L3050-3094 at rust-v0.157.1;
 # docs/harness-defaults.md, row 2026-09-26). A lane that must not browse passes -c web_search="disabled".
 web_search = "live"
-# The client is pinned (manifests/stack.json; evidence/receipts/codex-01571-qualification-20260926.json), so Codex
+# The client is pinned (manifests/stack.json; evidence/receipts/codex-01592-qualification-20260930.json), so Codex
 # neither checks for updates nor prompts about them at startup: "Set to `false` only if your Codex updates are
 # centrally managed" (codex-rs/config/src/config_toml.rs L520-523).
 check_for_update_on_startup = false
@@ -15,15 +21,27 @@ check_for_update_on_startup = false
 [agents]
 enabled = true
 max_concurrent_threads_per_session = 3
-# A child whose spawn call names no effort otherwise keeps the parent's, `ultra` above, which for gpt-6-astra sends
-# xhigh and turns on proactive delegation in the child too. With this default it runs at max and spawns only when
-# asked (codex-rs/core/src/agent/child_config.rs L196-250; core/src/session/multi_agents.rs L77-111). Effort alone
-# keeps the parent's model; a default_subagent_model without an effort would give that model's catalog default, `low`
-# for gpt-6-astra. agents.max_depth is "Ignored by V2" (codex-rs/config/src/config_toml.rs L719-720) and gpt-6-astra
-# is a V2 model (models-manager/models.json), so nothing caps nesting depth here; max_concurrent_threads_per_session
-# still caps concurrent children at 3: V2 counts the root thread, adds one and subtracts it again
-# (core/src/config/mod.rs L2733-2746 and L1591-1605).
+# Generic children use Sol/Max: effort alone keeps the parent's model, while a model alone selects its catalog
+# default (low for Sol). Explicit spawn selections replace these defaults, then the selected role config applies,
+# preserving Astra judgment-role overrides (openai/codex rust-v0.159.2 core/src/agent/child_config.rs L62-73,
+# L204-249). Max sends API max and delegates only when asked; Ultra above sends xhigh and delegates proactively
+# (protocol/src/openai_models/reasoning_effort.rs and models-manager/models.json at the same pin). The child model is
+# the coordinator's CODEX_MODEL, so a pin before 0.159.1 runs gpt-6-astra children at max.
+default_subagent_model = "${CODEX_MODEL}"
 default_subagent_reasoning_effort = "max"
+
+# The skills catalog the model sees. Unset, Codex budgets it at 2% of the model's context window (5,440 tokens for the
+# 272,000-token window of gpt-6.1-sol and gpt-6-astra in models-manager/models.json) and at 8,000 characters only when
+# the window is unknown; a set value is capped at 10,000 tokens (codex-rs/ext/skills/src/render.rs L19-22 and L126-152
+# at rust-v0.159.2, L17-20 and L123-149 at rust-v0.157.1; the key is core/config.schema.json L4122-4127 at
+# rust-v0.159.2). The manifest's 25 catalog-visible skills render to about 11,900 bytes with a 28-character skills
+# root, which render.rs charges at about 2,990 tokens (each line and its newline at ceil(bytes / 4), L154-160 and L25),
+# so a fixed 6,000 leaves room for Codex's five .system skills and plugin skills on any model a child runs
+# (docs/decisions/2026-09-30-skills-llm-native-listing.md). Per-skill [[skills.config]] disables stay out of this
+# template: tools/adoption/install_skills.py --print-codex-config prints the manifest's, each keyed by the installed
+# SKILL.md path (adoption/skills/lifecycle.md).
+[skills]
+max_context_tokens = 6000
 
 # User scope, so every worktree Codex is launched from inherits these servers without a project-local
 # .codex/config.toml (docs/decisions/2026-09-25-codex-mcp-scope.md). serena and socraticode take no
@@ -171,6 +189,7 @@ trusted_hash = "sha256:00dc3791bfd4ae0b46c43cb8ee8a391b6da63e5b7690cebfe1bd59cf8
 [hooks.state."${HOME}/.codex/hooks.json:session_start:0:0"]
 trusted_hash = "sha256:6994cf4fb1fc4534ee5efb35367f0f85b3bcd5fb3e200b0b3fd73c9d337397cc"
 
+
 [hooks.state."${HOME}/.codex/hooks.json:session_end:0:0"]
 trusted_hash = "sha256:9a190d2120d2c9dd8dcb4adfb956379e2bfc9d74435eaea9262b22a31b5649fd"
 
@@ -204,6 +223,14 @@ daemon_auto_start = false
 # README.md). Without it each command runs as `shell -lc`, the same login shell the snapshot would have captured
 # (core/src/tools/runtimes/mod.rs L268-276), at the cost of starting that shell per command.
 shell_snapshot = false
+
+# Notify only when Codex needs a decision: an approval (approval-requested), a plan-mode prompt or a `request_user_input` question (both
+# reported as plan-mode-prompt, tui/src/chatwidget/tool_requests.rs L449-458 at rust-v0.155.1 and rust-v0.157.1) or an asynchronous question
+# (async-question, added after 0.155.1, so inert at the macOS pin). `agent-turn-complete` (a finished turn) is left out on purpose. The list
+# is plain strings, so a misspelled kind loads cleanly and never notifies; the kinds are type_name() in
+# codex-rs/tui/src/chatwidget/notifications.rs. The channel stays Codex's own per-terminal `auto` (docs/decisions/2026-09-28-terminal-experience.md).
+[tui]
+notifications = ["approval-requested", "plan-mode-prompt", "async-question"]
 
 # Local ecosystem observation; content is removed before collector persistence.
 [otel]

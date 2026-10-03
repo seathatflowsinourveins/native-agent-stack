@@ -1,0 +1,334 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-09-27",
+  "component": "agentsview",
+  "evidence_class": "multi_class_summary",
+  "verdict": "hold",
+  "qualified": false,
+  "pin_change_prepared": false,
+  "host_switch_performed": false,
+  "latest_release": {
+    "tag": "v0.44.0",
+    "published_at": "2026-09-21T13:56:12Z",
+    "draft": false,
+    "prerelease": false,
+    "checked_live": "2026-09-27",
+    "endpoint": "https://api.github.com/repos/kenn-io/agentsview/releases/latest"
+  },
+  "baseline": {
+    "version": "0.43.0",
+    "commit": "9be7745ad1906ee24e04eb05bb86c872ef0939a1",
+    "installed_binary_used_with_isolated_data": true
+  },
+  "candidate": {
+    "version": "0.44.0",
+    "commit": "413a87f7bfbd67b2815b1119ac51abc1efbeeaba",
+    "built_at": "2026-09-21T12:48:49Z",
+    "asset": "agentsview_0.44.0_linux_amd64.tar.gz",
+    "sha256": "037ea7a46d52e06b20363b4aa7cd7f28e32f31d8215803d6e9a0c96bac5818e3",
+    "published_checksum_match": true,
+    "install_channel": "Official GitHub release archive and SHA256SUMS; extracted in a new unit scratch prefix.",
+    "installation_scope": "Linux amd64 scratch only; PATH and host configuration unchanged."
+  },
+  "repository_pin_locations": {
+    "current_version": "0.43.0",
+    "recorded_at": "2026-09-28",
+    "search": {
+      "command": "git grep -n -I -E '0\\.43\\.0|v0\\.43\\.0'",
+      "pattern": "0\\.43\\.0|v0\\.43\\.0",
+      "tree": "Tracked working-tree files of PR #420 at merge commit 7514c2af.",
+      "files_with_matches": 68,
+      "excluded_dated_prefixes": ["evidence/artifacts/", "evidence/hosts/", "docs/decisions/"],
+      "excluded_files_with_matches": 39,
+      "classified_files": 29,
+      "limit": "Version strings only. Links pinned to the 0.43.0 build commit 9be7745a are not matched; the docs/native-dashboards.md entry notes the ones found there."
+    },
+    "classification_rule": "A re-pin target is a reference that an existing check compares with manifests/stack.json, a mirror that earlier re-pins changed for their own component (3058b237, #446, changed every file below except the two dashboard documents and tests/test_native_token_ci.py), or guidance that states the installed version's behavior. A dated record keeps the value it recorded; a re-pin adds a new dated record instead of rewriting it (ff20470b appended a dated ai-memory note to catalogs/landscape/foundation.json).",
+    "repin_targets": [
+      {
+        "path": "manifests/stack.json",
+        "locations": [
+          {"line_at_record": 67, "kind": "pin", "match": "\"repository\": \"https://github.com/kenn-io/agentsview/releases/tag/v0.43.0\""},
+          {"line_at_record": 68, "kind": "pin", "match": "\"version\": \"0.43.0\""},
+          {"line_at_record": 87, "kind": "pin", "match": "\"https://github.com/kenn-io/agentsview/releases/tag/v0.43.0\""}
+        ]
+      },
+      {
+        "path": "blueprints/token-native-focus/saturation-audit.json",
+        "enforced_by": "tests/test_stack_lifecycle.py:28-32 requires repository and version to equal manifests/stack.json.",
+        "locations": [
+          {"line_at_record": 357, "kind": "checked_mirror", "match": "\"repository\": \"https://github.com/kenn-io/agentsview/releases/tag/v0.43.0\""},
+          {"line_at_record": 358, "kind": "checked_mirror", "match": "\"version\": \"0.43.0\""}
+        ]
+      },
+      {
+        "path": "catalogs/landscape/upstream-snapshot.json",
+        "enforced_by": "scripts/landscape.py:1373-1381 requires selected_version and the selected repository to equal manifests/stack.json; .github/workflows/validate.yml:107 runs it.",
+        "locations": [
+          {"line_at_record": 200, "kind": "checked_mirror", "match": "\"selected_repository_url\": \"https://github.com/kenn-io/agentsview/releases/tag/v0.43.0\""},
+          {"line_at_record": 201, "kind": "checked_mirror", "match": "\"selected_version\": \"0.43.0\""}
+        ]
+      },
+      {
+        "path": "scripts/native_token_ci.py",
+        "enforced_by": "scripts/native_token_ci.py:1740-1742 stops a run with 'Manifest pin changed' when PINS differs from manifests/stack.json.",
+        "locations": [
+          {"line_at_record": 64, "kind": "checked_mirror", "match": "\"agentsview\": \"0.43.0\""},
+          {"line_at_record": 635, "kind": "version_specific_guidance", "match": "(internal/telemetry/telemetry.go at v0.43.0)", "change": "Re-verify the telemetry opt-out at the new tag and update the citation."}
+        ]
+      },
+      {
+        "path": "recipes/README.md",
+        "locations": [
+          {"line_at_record": 82, "kind": "install_reference", "match": "Official [kenn-io/agentsview v0.43.0](https://github.com/kenn-io/agentsview/releases/tag/v0.43.0) archive", "change": "Component table install row: pin, release link and gh release view tag."},
+          {"line_at_record": 813, "kind": "version_specific_guidance", "match": "At v0.43.0, `session list` and `session search` leave out", "change": "History-and-usage AgentsView block: restate default session inclusion at the new tag with the worker inclusion flags."}
+        ]
+      },
+      {
+        "path": "docs/token-efficiency-stack.json",
+        "dated_record_lines": {"count": 12, "basis": "Lines inside rows[agentsview].card, the 2026-09-27 per-tool card edition (#437): dated card facts that describe the pin the card recorded. They keep 0.43.0 after a re-pin, and the explorer shows a pin-drift note until a new card edition is recorded; a re-pin changes only the two locations below."},
+        "locations": [
+          {"line_at_record": 1583, "kind": "install_reference", "match": "\"gh release view v0.43.0 --repo kenn-io/agentsview --json assets\"", "change": "install"},
+          {"line_at_record": 1591, "kind": "install_reference", "match": "\"install_note\": \"Official [kenn-io/agentsview v0.43.0]", "change": "install_note"}
+        ]
+      },
+      {
+        "path": "docs/native-dashboards.md",
+        "note": "Its 2026-09-27 sections also cite upstream source at the 0.43.0 build commit 9be7745a on 16 lines (200-276 at record); re-verify those citations with these statements.",
+        "locations": [
+          {"line_at_record": 197, "kind": "version_specific_guidance", "match": "Without it, v0.43.0 checks no", "change": "Re-verify the dashboard API authentication default behind --require-auth."},
+          {"line_at_record": 252, "kind": "version_specific_guidance", "match": "At v0.43.0", "change": "Re-verify live-mode serve behavior without --no-sync."}
+        ]
+      },
+      {
+        "path": "docs/native-dashboard-data.md",
+        "locations": [
+          {"line_at_record": 159, "kind": "version_specific_guidance", "match": "The installed 0.43.0 command returns a human-readable sync status.", "change": "Re-verify single-session sync output."},
+          {"line_at_record": 166, "kind": "version_specific_guidance", "match": "blob/v0.43.0/cmd/agentsview/session_sync.go", "change": "Update the tagged source link."}
+        ]
+      },
+      {
+        "path": "tests/test_native_token_ci.py",
+        "locations": [
+          {"line_at_record": 1589, "kind": "comment", "match": "kenn-io/agentsview 0.43.0 --version/--help recipe contract", "change": "The test reads ci.PINS; update the comment."}
+        ]
+      }
+    ],
+    "not_repin_targets": [
+      {"path": "catalogs/foundation/new-wsl-architecture-20261001.json", "class": "dated_record", "basis": "20261001", "reason": "The dated 2026-10-01 architecture edition names AgentsView 0.43.0 as an alternative of the observation layer, citing the landscape record; a dated edition is not rewritten by a re-pin."},
+      {"path": "catalogs/landscape/foundation.json", "class": "dated_record", "basis": "\"checked_at\": \"2026-09-22\"", "reason": "The AgentsView why_not_default belongs to the grandfathered 2026-09-22 verdict wave (scripts/landscape.py:56-75); tools/sota-convergence/build_verdicts.py --check, run by .github/workflows/validate.yml:115, compares it with layer-verdicts-20260922.json."},
+      {"path": "catalogs/sota-convergence/README.md", "class": "dated_record", "basis": "\"now\" is the GitHub latest release on 2026-09-22", "reason": "Dated 2026-09-22 convergence summary."},
+      {"path": "catalogs/sota-convergence/layer-verdicts-20260922.json", "class": "dated_record", "basis": "20260922", "reason": "Hash-registered 2026-09-22 verdict wave."},
+      {"path": "catalogs/sota-convergence/manifest-20260922.json", "class": "dated_record", "basis": "20260922", "reason": "Dated convergence manifest."},
+      {"path": "catalogs/sota-convergence/manifest-20260923.json", "class": "dated_record", "basis": "20260923", "reason": "Dated convergence manifest."},
+      {"path": "catalogs/sota-convergence/manifest-20260926.json", "class": "dated_record", "basis": "20260926", "reason": "Dated convergence manifest; one of its matches is an unrelated RTK version."},
+      {"path": "catalogs/sota-convergence/manifest-20260929.json", "class": "dated_record", "basis": "20260929", "reason": "Dated convergence manifest, added with the 2026-09-29 landscape-sweep record; its catalog pin fields copy the pinned version. The search counts above describe the 2026-09-28 tree."},
+      {"path": "catalogs/us-equities/star-audit.json", "class": "dated_record", "basis": "\"checked_at\": \"2026-09-19\"", "reason": "Prior-baseline source link in a dated star audit."},
+      {"path": "docs/ecosystem/claude-repository-evidence.html", "class": "dated_record", "basis": "claude-repository-evidence-20260921", "reason": "Rendered page of the 2026-09-21 evidence run."},
+      {"path": "docs/ecosystem/claude-upstream-checks.html", "class": "dated_record", "basis": "claude-upstream-checks-20260921", "reason": "Rendered page of the 2026-09-21 upstream checks."},
+      {"path": "docs/grand-catalog-handbook.md", "class": "dated_record", "basis": "frozen on **September 22, 2026**", "reason": "Handbook of the frozen 2026-09-22 catalog; it repeats the verdict-wave text."},
+      {"path": "docs/landscape-freshness-notes.md", "class": "dated_record", "basis": "The observation ended at **2026-09-21 22:40:29 UTC**.", "reason": "Dated 2026-09-21 freshness observation."},
+      {"path": "docs/native-dashboard-operations-resolution.md", "class": "dated_record", "basis": "Observed on 2026-09-21.", "reason": "Dated operational recovery record."},
+      {"path": "docs/stack.md", "class": "dated_record", "basis": "Snapshot: September 19, 2026.", "reason": "Dated inventory snapshot. Measured 2026-09-28: its last change is 2026-09-19, no earlier re-pin changed it, and 14 of its 47 rows differ from manifests/stack.json by version (15 when the repository URL is compared)."},
+      {"path": "evidence/receipts/component-history.json", "class": "dated_record", "basis": "\"kind\": \"historical_inventory\"", "reason": "Historical inventory recorded 2026-09-19."},
+      {"path": "evidence/receipts/current-session-observation-20260920.json", "class": "dated_record", "basis": "20260920", "reason": "Dated receipt."},
+      {"path": "evidence/receipts/native-dashboard-access-20260921.json", "class": "dated_record", "basis": "20260921", "reason": "Dated receipt."},
+      {"path": "evidence/receipts/native-dashboard-data-20260921.json", "class": "dated_record", "basis": "20260921", "reason": "Dated receipt."},
+      {"path": "evidence/receipts/token-practice-gap-followup-20260920.json", "class": "dated_record", "basis": "20260920", "reason": "Dated receipt."},
+      {"path": "tests/test_agentsview_qualification.py", "class": "dated_record", "basis": "agentsview-044-qualification-20260927", "reason": "Asserts this record's 2026-09-27 baseline observations, which stay true after a re-pin."},
+      {"path": "tests/test_env_freshness.py", "class": "unrelated_package", "basis": "alpaca-py", "reason": "An alpaca-py release fixture, not AgentsView."}
+    ],
+    "platform_pin_files": "adoption/pins-linux-x86_64.json and adoption/pins-macos-arm64.json contain no agentsview entry."
+  },
+  "gates": {
+    "release_integrity": "passed",
+    "upstream_targeted_classification": "passed",
+    "upstream_broad_tests": "passed_outside_codex_sandbox",
+    "upstream_serve_runtime_tests": "passed",
+    "copied_archive_population_and_usage": "passed",
+    "synthetic_population_visibility": "passed",
+    "synthetic_ccusage_parity": "failed",
+    "occupied_explicit_port_control": "passed",
+    "intended_recipe_sequence": "passed_on_isolated_state",
+    "unchanged_full_save_runner": "not_run",
+    "fresh_four_native_lanes": "blocked",
+    "independent_gpt6_review": "not_completed",
+    "independent_claude_review": "incomplete"
+  },
+  "mcp_accounting_decision": {
+    "status": "Use inclusive CLI usage plus ccusage on identical selected logs for the accounting boundary. Do not use MCP get_usage_summary for complete Codex exec usage.",
+    "observations": "On the copied archive, v0.43.0 MCP reports the Codex counters and v0.44.0 MCP reports zero; CLI and ccusage agree across both versions.",
+    "scope": "No upstream MCP fix; non-automated subset only. No cost, complete-history, or efficiency claim.",
+    "sources": [
+      "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/internal/mcp/tools.go#L705",
+      "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/internal/service/usage.go#L208",
+      "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/cmd/agentsview/usage.go#L163",
+      "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/cmd/agentsview/usage.go#L582"
+    ]
+  },
+  "required_future_recipe_rewire": {
+    "files": {
+      "recipes/README.md": {
+        "current_location": "recipes/README.md component table row `agentsview` (install; line 82 on 2026-09-28) and recipes/README.md#history-and-usage (AgentsView block, which starts at line 796; its version sentence is line 813 on 2026-09-28); line numbers move as other changes land",
+        "changes": "Version, worker inclusion flags, explicit-port failure handling and accounting boundary."
+      },
+      "docs/token-efficiency-stack.json": {
+        "current_lines": "1583-1591",
+        "fields": ["install", "install_note", "use"],
+        "changes": "Update release references and mirrored session search inclusion flags; this file feeds scripts/build_ecosystem.py."
+      }
+    },
+    "other_version_references": "Change every location under repository_pin_locations.repin_targets in the same pin PR; repository_pin_locations.not_repin_targets keep their recorded values.",
+    "search_flags": [
+      "--include-automated",
+      "--include-one-shot",
+      "--include-children"
+    ],
+    "source_scope": "Keep selected source directories and cwd allowlist before first sync.",
+    "port_handling": "Treat failure of the explicitly selected port as a stop condition. Choose another free explicit port or upstream --port 0 deliberately; do not silently continue to an unrelated listener.",
+    "same_pr_requirement": "Apply the recipe rewire with any future pin change after qualification passes.",
+    "sources": [
+      "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/docs/commands.md",
+      "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/cmd/agentsview/serve_runtime.go#L57",
+      "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/internal/parser/codex.go#L422"
+    ]
+  },
+  "reviews": {
+    "gpt6": {
+      "status": "not_completed",
+      "method": "Only the two failed codex exec launches listed in native_codex_attempts are recorded.",
+      "tests_run_by_reviewer": 0,
+      "returned_report_retained": false,
+      "independence_limit": "A GPT-6 child of this GPT-6 builder would not establish author-independent or cross-family review under the full-save plan section 2.2 step 5.",
+      "counts_as_native_lane_replay": false
+    },
+    "claude": {
+      "status": "incomplete",
+      "model_selection": "opus",
+      "effort": "xhigh",
+      "tools": ["Read", "Agent"],
+      "permission_mode": "plan",
+      "strict_mcp_config": true,
+      "output_format": "json",
+      "launch_context": "inside_builder_codex_sandbox",
+      "exit_code": 130,
+      "stopped_by": "build_session",
+      "signal": "SIGINT",
+      "reason": "The build session stopped the stalled native review; no returned report was retained.",
+      "launch_record": "units/w3/agentsview/gpt6-build-events.jsonl item_122 (launch and exit); stopping rationale immediately before its completion",
+      "stdout_ref": "units/w3/agentsview/claude-review.private.json",
+      "stdout_bytes": 0,
+      "requalification_context": "outside_codex_sandbox",
+      "provider_execution_status": "unknown",
+      "provider_usage": null
+    },
+    "native_codex_attempts": [
+      {
+        "mode": "normal",
+        "exit_code": 1,
+        "model": "gpt-6",
+        "effort": "high",
+        "sandbox": "read-only",
+        "launch_record": "units/w3/agentsview/gpt6-build-events.jsonl item_123",
+        "stderr_ref": "units/w3/agentsview/gpt6-review.stderr",
+        "jsonl_ref": "units/w3/agentsview/gpt6-review.private.jsonl",
+        "jsonl_bytes": 0,
+        "last_message_ref": "units/w3/agentsview/gpt6-review.private.md",
+        "last_message_exists": false
+      },
+      {
+        "mode": "ephemeral",
+        "exit_code": 1,
+        "model": "gpt-6",
+        "effort": "high",
+        "sandbox": "read-only",
+        "launch_record": "units/w3/agentsview/gpt6-build-events.jsonl item_138",
+        "stderr_ref": "units/w3/agentsview/gpt6-review-attempt2.stderr",
+        "jsonl_ref": "units/w3/agentsview/gpt6-review-attempt2.private.jsonl",
+        "jsonl_bytes": 0,
+        "last_message_ref": "units/w3/agentsview/gpt6-review-attempt2.private.md",
+        "last_message_exists": false
+      }
+    ],
+    "native_codex_failure": "failed to initialize in-process app-server client: Read-only file system (os error 30)",
+    "native_codex_provider_executions": 0
+  },
+  "residuals": [
+    "The selected unchanged upstream MCP/parser/db suite passes outside the Codex sandbox with TMPDIR outside /tmp on both tags; earlier environmental failures remain in upstream-tests.json. No upstream fix is a requalification prerequisite for these failures.",
+    "Fresh Claude main/child and Codex exec/subagent acceptance with fixed model, route and effort is not established. The retained archive contains one Claude session and one Codex session with no children.",
+    "Neither required independent review completed. Claude requalification must run outside the Codex sandbox; its interrupted attempt's provider usage is unknown.",
+    "The synthetic fixture produced zero ccusage counters. Preserve that failed observation separately from successful copied-archive parity.",
+    "The 2026-09-26 returned-results (RR) E2E runner, rr/agentsview/run.sh, which the full-save plan's qualification procedure designates, hardcodes writes and source locations outside this unit. Its native command sequence was adapted to isolated scratch state; the unchanged runner was not executed.",
+    "No whole-repository upstream ./... suite, frontend tests, Windows acceptance, macOS acceptance, or performance qualification.",
+    "No re-pin, production recipe change or host switch. The coordinator harness registered the six build files in manifests/evidence.json; repair registration and repository-wide validation remain with that harness."
+  ],
+  "sources": [
+    "https://github.com/kenn-io/agentsview/releases/tag/v0.44.0",
+    "https://github.com/kenn-io/agentsview/releases/download/v0.44.0/SHA256SUMS",
+    "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/scripts/install.sh",
+    "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/go.mod",
+    "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/.github/workflows/ci.yml#L233",
+    "https://github.com/kenn-io/agentsview/pull/1855",
+    "https://github.com/ccusage/ccusage/tree/ecb676cce27cb5dd0090c7804a5cecc35e8ba805/rust/adapters/codex",
+    "docs/acceptance-evidence-policy.md",
+    "https://docs.python.org/3.13/library/unittest.html#unittest.TestCase.assertRaises"
+  ],
+  "repository_tests": {
+    "evidence_class": "structural_validation",
+    "command": "python3 -m unittest tests.test_agentsview_qualification tests.test_foundation_stack_pins",
+    "tests_run": 9,
+    "exit_code": 0,
+    "result": "OK",
+    "TMPDIR": "/var/tmp/claude-w3-agentsview-go",
+    "failing_first": "The original five FileNotFoundError errors establish no discriminating control. Before receipt repair, the updated nine-test run failed with two assertions and three missing-field errors against existing artifacts (exit 1).",
+    "sanitization_control": {
+      "inputs": ["generated home path", "generated UUID", "nested forbidden key"],
+      "method": "The same check used for published artifacts must raise AssertionError for each planted input. A separate run disarms assertNotRegex and assertFalse using unittest.mock.patch.object; all three assertRaises self-checks then fail.",
+      "disarmed_tests_run": 1,
+      "disarmed_subtest_failures": 3,
+      "disarmed_exit_code": 1,
+      "enabled_covering_tests_run": 9,
+      "enabled_exit_code": 0,
+      "reproduction_ref": "units/w3/agentsview/repair-sanitization-control.py",
+      "returned_output_ref": "units/w3/agentsview/repair-validation.md"
+    },
+    "scope": "Evidence scope/sanitization and current foundation pin regressions. Not upstream acceptance."
+  },
+  "prior_records": [
+    {
+      "path": "evidence/artifacts/sota-refresh-20260923/pins-tools/agentsview.json",
+      "verdict": "qualified",
+      "evidence_class": "native_proven",
+      "scope_basis": "limits[0] and limits[2]: checksum verification and first-line --version/--help checks, without full sync/serve E2E or qualification of the new command surface.",
+      "satisfies_full_qualification": false,
+      "reconciled_at": "2026-09-27",
+      "governing_repin_record": "qualification.json",
+      "disposition": "Preserve the historical receipt, pins-tools/README.md and catalog summary. Their qualified wording covers the narrow historical checks; this 2026-09-27 hold governs any re-pin under the full procedure."
+    }
+  ],
+  "errata": [
+    {
+      "date": "2026-09-27",
+      "reason": "Evidence-review repair (reviewer identity and returned report not retained); historical failed attempts and the 2026-09-23 receipt are preserved.",
+      "corrections": [
+        "Withdraw unsupported completed GPT-6 review, verdict and independently_checked claims; only two exit-1 launches are retained.",
+        "Replace the failed broad upstream gate with the passing coordinator control results in upstream-tests.json; preserve environmental failures.",
+        "Add the historical verdict boundary and missing docs/token-efficiency-stack.json and docs/stack.md re-pin locations.",
+        "Classify this record as a multi-class summary and repository tests as structural validation; the original missing-file red run was not a discriminating control.",
+        "Record who stopped Claude, SIGINT/130 and sandbox conditions; replace unexplained RR terminology with full-save E2E descriptions.",
+        "Acknowledge coordinator registration separately from builder edits."
+      ]
+    },
+    {
+      "date": "2026-09-28",
+      "reason": "Evidence-review repair (reviewer identity and returned report not retained); dated records and the 2026-09-27 erratum text are preserved except the reason wording corrected below.",
+      "corrections": [
+        "Replace the five-file re-pin list with a classification of every file matching the recorded git grep outside the dated evidence/artifacts, evidence/hosts and docs/decisions prefixes: 18 locations in nine re-pin files and 20 dated or unrelated files, each with its basis.",
+        "Add the mirrors that existing checks compare with manifests/stack.json (blueprints/token-native-focus/saturation-audit.json and catalogs/landscape/upstream-snapshot.json), the recipes/README.md install row, and version-specific guidance in recipes/README.md, docs/native-dashboards.md, docs/native-dashboard-data.md, scripts/native_token_ci.py and tests/test_native_token_ci.py.",
+        "Withdraw the 2026-09-27 instruction to update docs/stack.md: it is a dated 2026-09-19 snapshot that earlier re-pins left unchanged.",
+        "Remove the word independent from the 2026-09-27 erratum reason, because no retained record names that reviewer."
+      ]
+    }
+  ],
+  "recommended_lane": "lane:foundation"
+}

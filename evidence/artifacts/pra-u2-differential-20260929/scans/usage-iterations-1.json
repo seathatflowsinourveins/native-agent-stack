@@ -1,0 +1,162 @@
+{
+ "assistant_rows": 436898,
+ "cache_creation_keys": {
+  "ephemeral_1h_input_tokens": 436898,
+  "ephemeral_5m_input_tokens": 436898
+ },
+ "cache_creation_split_vs_combined": {
+  "differ": 3351,
+  "equal": 433547
+ },
+ "files": 5131,
+ "files_with_iterations": 4660,
+ "invariant_top_equals_sum_of_message_iterations": {
+  "top!=sum(message)": 4219,
+  "top==sum(message)": 287614
+ },
+ "iteration_cache_creation_keys": {
+  "advisor_message": {
+   "ephemeral_1h_input_tokens": 3314,
+   "ephemeral_5m_input_tokens": 3314
+  },
+  "fallback_message": {
+   "ephemeral_1h_input_tokens": 3,
+   "ephemeral_5m_input_tokens": 3
+  },
+  "message": {
+   "ephemeral_1h_input_tokens": 291337,
+   "ephemeral_5m_input_tokens": 291337
+  }
+ },
+ "iteration_counter_types": {
+  "advisor_message:cache_creation_input_tokens:num": 3314,
+  "advisor_message:cache_read_input_tokens:num": 3314,
+  "advisor_message:input_tokens:num": 3314,
+  "advisor_message:output_tokens:num": 3314,
+  "fallback_message:cache_creation_input_tokens:num": 3,
+  "fallback_message:cache_read_input_tokens:num": 3,
+  "fallback_message:input_tokens:num": 3,
+  "fallback_message:output_tokens:num": 3,
+  "message:cache_creation_input_tokens:num": 291337,
+  "message:cache_read_input_tokens:num": 291337,
+  "message:input_tokens:num": 291337,
+  "message:output_tokens:num": 291337
+ },
+ "iteration_entries_not_objects": 0,
+ "iteration_keys": {
+  "advisor_message": {
+   "cache_creation": 3314,
+   "cache_creation_input_tokens": 3314,
+   "cache_read_input_tokens": 3314,
+   "input_tokens": 3314,
+   "model": 3314,
+   "output_tokens": 3314,
+   "type": 3314
+  },
+  "fallback_message": {
+   "cache_creation": 3,
+   "cache_creation_input_tokens": 3,
+   "cache_read_input_tokens": 3,
+   "input_tokens": 3,
+   "model": 3,
+   "output_tokens": 3,
+   "type": 3
+  },
+  "message": {
+   "cache_creation": 291337,
+   "cache_creation_input_tokens": 291337,
+   "cache_read_input_tokens": 291337,
+   "input_tokens": 291337,
+   "model": 81,
+   "output_tokens": 291337,
+   "type": 291337
+  }
+ },
+ "iteration_lengths": {
+  "0": 4211,
+  "1": 283916,
+  "2": 402,
+  "3": 3293,
+  "5": 11
+ },
+ "iteration_models": {
+  "advisor_message": {
+   "claude-fable-5-1": 1281,
+   "claude-opus-5-5": 2033
+  },
+  "fallback_message": {
+   "claude-opus-4-8": 3
+  },
+  "message": {
+   "(absent)": 291334,
+   "claude-opus-5-5": 3
+  }
+ },
+ "iteration_types": {
+  "advisor_message": 3314,
+  "fallback_message": 3,
+  "message": 291337
+ },
+ "iterations_not_a_list": 0,
+ "message_iteration_model_vs_row_model": {
+  "differ": 3
+ },
+ "model_of_rows_with_iterations": {
+  "claude-haiku-4-5-20251001": 585,
+  "claude-opus-4-8": 29,
+  "claude-opus-5-5": 225044,
+  "claude-sonnet-5": 40447,
+  "claude-sonnet-5-5": 25728
+ },
+ "rows_with_advisor_block": 4907,
+ "rows_with_advisor_block_without_iterations": 4596,
+ "rows_with_iterations_list": 291833,
+ "rows_with_usage": 436898,
+ "server_tool_blocks": {
+  "advisor_tool_result:advisor_tool_result": 2430,
+  "server_tool_use:advisor": 2477
+ },
+ "stream_shapes_for_ids_with_iterations": {
+  "rows=1 with_it=all distinct_iterations=1": 31437,
+  "rows=>1 with_it=all distinct_iterations=1": 73585,
+  "rows=>1 with_it=some distinct_iterations=1": 88684
+ },
+ "top_equals_message_plus_advisor": {
+  "top!=message+advisor": 3303
+ },
+ "usage_enum": {
+  "inference_geo": {
+   "(null)": 317,
+   "not_available": 436581
+  },
+  "service_tier": {
+   "(null)": 317,
+   "standard": 436581
+  },
+  "speed": {
+   "(absent)": 144748,
+   "(null)": 317,
+   "standard": 291833
+  }
+ },
+ "usage_keys": {
+  "cache_creation": 436898,
+  "cache_creation_input_tokens": 436898,
+  "cache_read_input_tokens": 436898,
+  "inference_geo": 436898,
+  "input_tokens": 436898,
+  "iterations": 292150,
+  "output_tokens": 436898,
+  "output_tokens_details": 292150,
+  "server_tool_use": 292150,
+  "service_tier": 436898,
+  "speed": 292150
+ },
+ "versions_with_iterations": {
+  "2.1.280": 14,
+  "2.1.281": 14417,
+  "2.1.282": 38083,
+  "2.1.283": 175093,
+  "2.1.284": 64226
+ }
+}

@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "kind": "finalization_publication_checks",
+  "recorded_at_utc": "2026-09-30T08:32:38Z",
+  "evidence_class": "actual_returned_local_check_output",
+  "status": "passed",
+  "checks": [
+    {
+      "command": "rtk python3 scripts/validate_convergence.py evidence/artifacts/sota-finalization-20260930/convergence.json --json",
+      "exit_code": 0,
+      "returned_output": "{\"records\": [{\"errors\": [], \"observations\": 42, \"path\": \"evidence/artifacts/sota-finalization-20260930/convergence.json\", \"valid\": true}], \"valid\": true}"
+    },
+    {
+      "command": "rtk python3 scripts/validate.py",
+      "exit_code": 0,
+      "returned_output": "{\"components\": 69, \"hashed_files\": 8134, \"profiles\": 4, \"receipts\": 173, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.",
+      "scope": "Before registering this check artifact; final registration validation follows."
+    },
+    {
+      "command": "rtk python3 scripts/validate_catalogs.py",
+      "exit_code": 0,
+      "returned_output": "{\"beyond_star_catalog_repositories\": 102, \"models\": 20, \"public_stars\": 357, \"repository_entries\": 154, \"starred_catalog_repositories\": 46, \"unique_catalog_repositories\": 148}\nCatalog structure and evidence classes validated; source claims and native executions were not rerun."
+    },
+    {
+      "command": "rtk python3 scripts/build_ecosystem.py --check",
+      "exit_code": 0,
+      "returned_output": "{\"bytes\": 14139964, \"input_sha256\": \"962ff6725bccdff60787be1c70fbee7de0561e369dcf5772ebd19c4116f6755d\", \"output_sha256\": \"6258340fccb6d756942416141fd00cfdc5c015cf9a0429e5899ad8da2547eec4\", \"status\": \"passed\"}"
+    },
+    {
+      "command": "rtk proxy git diff --check",
+      "exit_code": 0,
+      "returned_output": ""
+    },
+    {
+      "command": "native owned-timer systemctl show",
+      "exit_code": 0,
+      "returned_output": "Both timers: LoadState=not-found, ActiveState=inactive, SubState=dead, NextElapseUSecMonotonic=infinity"
+    },
+    {
+      "command": "native sha256sum reviewed production config/AGENTS/profile",
+      "exit_code": 0,
+      "returned_output": "All three exact reviewed hashes unchanged; no credential values or private paths copied."
+    }
+  ],
+  "late_upstream_observation": {"observed_at_utc":"2026-09-30T08:37:40Z","native_main_api_exit":0,"native_compare_api_exit":0,"reviewed_base":"cc1f6ce1f983721ecb42c7da27e58f0649c132f5","latest_main":"f03f41c7f3601532b8635f8f112a3d2731454375","new_commits":1,"source_compare_url":"https://github.com/seathatflowsinourveins/native-agent-stack/compare/cc1f6ce1f983721ecb42c7da27e58f0649c132f5...f03f41c7f3601532b8635f8f112a3d2731454375","native_commit_title":"Terminal lane: repairs after the cross-family review and its re-check (gpt-6.1-sol and gpt-6-astra-ultra through the packaged Codex lane on OmniRoute) (#532)","selected_source_resource_overlap":[],"scope":"New terminal-lane commit does not change any of the16qualified module/resource inputs. Shared harness log and registry changes are separate terminal-owner work; no fresh full-landscape or terminal qualification is inferred."},
+  "owned_transient_cleanup": {
+    "source": "systemd/systemd@db11bab38ccf1ed257f310d29070843d4c58ea01, v255 native systemctl reset-failed",
+    "before": "Owned retry service LoadState=loaded, ActiveState=failed, Result=exit-code; expiry service not-found/inactive; both timers already not-found/inactive.",
+    "native_reset_failed_exit": 0,
+    "native_observation_exit": 0,
+    "after": "Owned retry service LoadState=not-found, ActiveState=inactive, Result=success; no scheduled activation.",
+    "scope": "Cleared only this run's failed transient service metadata. Original refusal output and native exit2 remain in idle-rollout.json; no clients/configuration changed."
+  },
+  "retained_checker_failures": [
+    {
+      "operation": "Convergence immutable pin validation",
+      "exit_code": 1,
+      "correction": "Replace version tag labels with actual immutable tag commit hashes from native GH reads."
+    },
+    {
+      "operation": "Post-review convergence record",
+      "exit_code": 1,
+      "returned_error": "record.frozen_inputs: unknown fields",
+      "correction": "Keep original model-run frozen inputs/base unchanged and record repair base through supported primary-source/discovery fields; final42-observation check exit0."
+    },
+    {
+      "operation": "First in-isolate copy attempt",
+      "exit_code": null,
+      "returned_error": "ReferenceError: structuredClone is not defined",
+      "correction": "No mutation occurred. Serializable JSON parse/stringify clone replaced unavailable runtime helper."
+    }
+  ],
+  "limits": [
+    "Declared convergence checker verifies schema and consistency, not source truth or new native execution.",
+    "Source/test/native acceptance and failures are linked separately; no new model/GPU/provider run or remote publication.",
+    "Global activation remains pending quiet owned window; native retry timers are disarmed.",
+    "Generated guide check covers its declared inputs, not all repository documents."
+  ]
+}

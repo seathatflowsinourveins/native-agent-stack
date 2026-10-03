@@ -49,7 +49,8 @@ EXPECTED_PROPOSE_IF = (
     "github.ref == 'refs/heads/main' && needs.freshness.outputs.drift == 'true' && "
     "(inputs.max_repos || 0) == 0 && needs.freshness.outputs.upstream_errors == '0' && "
     "needs.freshness.outputs.partial_errors == '0' && "
-    "(inputs.open_pr == true || (github.event_name == 'schedule' && vars.CATALOG_FRESHNESS_PROPOSE == 'true'))"
+    "(inputs.open_pr == true || (github.event_name == 'schedule' && "
+    "github.event.schedule == '17 6 * * 1' && vars.CATALOG_FRESHNESS_PROPOSE == 'true'))"
 )
 EXPECTED_PROPOSE_CONCURRENCY_GROUP = (
     "${{ github.workflow }}-propose-${{ inputs.open_pr == true && 'manual' || 'scheduled' }}"
@@ -818,6 +819,12 @@ class CatalogFreshnessWorkflowTextTests(unittest.TestCase):
         self.assertIsNotNone(match, f"{job_id} job not found")
         return match.group(1)
 
+    def test_daily_report_schedules_partition_all_seven_days_at_0617_utc(self):
+        top_level = self.text.split("\njobs:\n", 1)[0]
+        schedules = re.findall(r"(?m)^    - cron: '([^']+)'$", top_level)
+        # Disjoint day sets cover Sunday (0) through Saturday (6) exactly once.
+        self.assertCountEqual(schedules, ["17 6 * * 1", "17 6 * * 0,2-6"])
+
     def test_open_pr_dispatch_input_is_a_boolean_defaulting_false(self):
         match = re.search(
             r"open_pr:\s*\n\s*description:[^\n]*\n\s*type:\s*boolean\s*\n\s*default:\s*false", self.text,
@@ -854,12 +861,12 @@ class CatalogFreshnessWorkflowTextTests(unittest.TestCase):
         block = match.group(1)
         self.assertIn(f"group: {EXPECTED_PROPOSE_CONCURRENCY_GROUP}", block)
         self.assertIn("cancel-in-progress: false", block)
-        # queue: max is the documented fix for the same problem, but this
-        # repository's pinned actionlint 1.7.12 rejects that key (checked
-        # directly -- docs/decisions/2026-09-23-bot-pr-dispatch.md); it must not
-        # be reintroduced as an actual concurrency key without re-verifying
-        # actionlint support first (the surrounding prose may still *mention*
-        # `queue:` to explain why it is not used).
+        # queue: max is the documented fix for the same problem, but the
+        # actionlint pinned on 2026-09-23 (rhysd/actionlint 1.7.12) rejected that
+        # key (checked directly -- docs/decisions/2026-09-23-bot-pr-dispatch.md).
+        # kjanat/actionlint 1.17.0, pinned since 2026-09-28, accepts it; adopting
+        # it is a separate change that updates this assertion (the surrounding
+        # prose may still *mention* `queue:` to explain why it is not used).
         active_keys = [
             line.strip().split(":", 1)[0] for line in block.splitlines()
             if line.strip() and not line.strip().startswith("#")
@@ -939,6 +946,74 @@ class CatalogFreshnessWorkflowTextTests(unittest.TestCase):
         self.assertIn('if [ -z "$existing" ] && ! gh pr create', body)
         self.assertIn('existing="$(find_open_pr)"', body)
         self.assertIn('gh pr edit "$existing" --title "$title" --body-file "$body_file"', body)
+
+    def _run_pr_metadata(self, lanes="", existing=True, race=False):
+        """Execute the actual metadata shell with a synthetic gh; no network calls."""
+        job = self._job_body("propose")
+        step = job[job.index("- name: Open or update the evidence PR"):job.index("- name: Note that this PR")]
+        script = step.split("        run: |\n", 1)[1]
+        script = "\n".join(line[10:] for line in script.splitlines())
+        stub = r'''
+gh() {
+  printf '%s\n' "$*" >> "$TEST_CALLS"
+  case "$1 $2" in
+    "pr list")
+      if [ "$TEST_EXISTING" = 1 ] || [ -f "$TEST_CREATED" ]; then printf '527\n'; fi ;;
+    "pr view")
+      case "$*" in
+        *"--json labels"*) printf '%s\n' "$TEST_LANES" ;;
+        *) printf 'https://example.invalid/pull/527\n' ;;
+      esac ;;
+    "pr create")
+      if [ "$TEST_RACE" = 1 ]; then : > "$TEST_CREATED"; return 1; fi ;;
+    "pr edit") ;;
+    *) return 99 ;;
+  esac
+}
+'''
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "freshness").mkdir()
+            env = {**os.environ, "RUNNER_TEMP": directory, "GITHUB_OUTPUT": str(root / "output"),
+                   "TEST_CALLS": str(root / "calls"), "TEST_CREATED": str(root / "created"),
+                   "TEST_LANES": lanes, "TEST_EXISTING": str(int(existing)), "TEST_RACE": str(int(race))}
+            result = subprocess.run(["bash", "-c", stub + script], env=env, capture_output=True,
+                                    text=True, timeout=30, check=False)
+            body_path = root / "freshness/pr-body.md"
+            return result, (root / "calls").read_text(), body_path.read_text() if body_path.exists() else ""
+
+    def test_pr_metadata_creates_a_shared_report_with_a_valid_source_section(self):
+        from tests.test_sota_sources_gate import NODE, GATE, body, inline_script, run_check, sota_job
+        if not NODE:
+            self.skipTest("node unavailable; CI supplies it for the native source gate")
+        result, calls, rendered = self._run_pr_metadata(existing=False)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertRegex(calls, r"pr create .*--label lane:shared")
+        self.assertIn("Lane: `lane:shared`", rendered)
+        outcome = run_check(inline_script(sota_job(GATE)), [body(rendered)])[0]
+        self.assertIsNone(outcome["failed"], outcome)
+
+    def test_pr_metadata_preserves_one_lane_and_rejects_ambiguous_lanes(self):
+        for supplied, expected in (("", "lane:shared"), ("lane:foundation", "lane:foundation"),
+                                   ("lane:trading", "lane:trading"), ("lane:shared", "lane:shared")):
+            with self.subTest(lanes=supplied):
+                result, calls, rendered = self._run_pr_metadata(supplied)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertRegex(calls, rf"pr edit 527 .*--add-label {expected}")
+                self.assertIn(f"Lane: `{expected}`", rendered)
+        for lanes in ("lane:foundation\nlane:shared", "lane:unknown"):
+            with self.subTest(lanes=lanes):
+                result, calls, _ = self._run_pr_metadata(lanes)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertNotIn("pr edit", calls)
+                self.assertNotIn("pr create", calls)
+
+    def test_pr_metadata_rechecks_the_lane_after_a_create_race(self):
+        result, calls, rendered = self._run_pr_metadata("lane:trading", existing=False, race=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertRegex(calls, r"pr create .*--label lane:shared")
+        self.assertRegex(calls, r"pr edit 527 .*--add-label lane:trading")
+        self.assertIn("Lane: `lane:trading`", rendered)
 
     def test_unfetched_wording_says_pin_changes_are_still_drift(self):
         report = fp.render_drift_markdown(

@@ -1,0 +1,37 @@
+{
+ "schema": "token-e2e-calibration/1",
+ "template": "T9",
+ "clauses": [],
+ "sources": [],
+ "controls": [],
+ "extraction_controls": [
+  {
+   "id": "x-inline",
+   "component": "payload",
+   "answer": "Here is the table as JSON: [{\"id\":1,\"name\":\"a\"},{\"id\":2,\"name\":\"b\"}] which keeps every field.",
+   "evidence": [],
+   "expected": {
+    "values": [
+     "[{\"id\":1,\"name\":\"a\"},{\"id\":2,\"name\":\"b\"}]"
+    ],
+    "answer_quotes": [
+     "[{\"id\":1,\"name\":\"a\"},{\"id\":2,\"name\":\"b\"}]"
+    ]
+   }
+  },
+  {
+   "id": "x-toon",
+   "component": "payload",
+   "answer": "The compact form of the rows is:\n[2]{id,name}:\n  1,a\n  2,b\nThat is all of them.",
+   "evidence": [],
+   "expected": {
+    "values": [
+     "[2]{id,name}:\n  1,a\n  2,b"
+    ],
+    "answer_quotes": [
+     "[2]{id,name}:\n  1,a\n  2,b"
+    ]
+   }
+  }
+ ]
+}

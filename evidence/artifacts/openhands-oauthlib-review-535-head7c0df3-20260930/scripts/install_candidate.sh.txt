@@ -1,0 +1,24 @@
+#!/bin/bash
+# install_candidate.sh: reproduce the recipe's hashed install sequence for the candidate lock into a fresh CPython 3.13.15 venv: the build-requirements lock
+# (binary only), then the candidate lock with --no-build-isolation, then uv pip check and the SDK import check. UV_NO_CONFIG=1 as in the recipe. Low priority.
+set -u
+W=<REVIEW-SCRATCH>
+export UV_NO_CONFIG=1 UV_CACHE_DIR=<RELOCK-SCRATCH>/uv-cache
+rm -rf "$W/venv"
+echo "[$(date -u +%FT%TZ)] uv $(uv --version)"
+echo "[$(date -u +%FT%TZ)] venv"; nice -n 19 uv venv --python 3.13.15 "$W/venv" 2>&1 | tail -2; echo "venv exit: ${PIPESTATUS[0]}"
+echo "[$(date -u +%FT%TZ)] build lock"; nice -n 19 uv pip install --python "$W/venv/bin/python" --require-hashes --no-deps --only-binary :all: --index-url https://pypi.org/simple -r "$W/build.lock" 2>&1 | tail -3; echo "build lock install exit: ${PIPESTATUS[0]}"
+echo "[$(date -u +%FT%TZ)] candidate lock"; nice -n 19 uv pip install --python "$W/venv/bin/python" --require-hashes --no-deps --no-build-isolation --index-url https://pypi.org/simple -r "$W/cand.lock" 2>&1 | tail -3; echo "candidate lock install exit: ${PIPESTATUS[0]}"
+echo "[$(date -u +%FT%TZ)] pip check"; uv pip check --python "$W/venv/bin/python" 2>&1 | tail -3; echo "uv pip check exit: ${PIPESTATUS[0]}"
+echo "[$(date -u +%FT%TZ)] sdk import"
+"$W/venv/bin/python" - <<'PY'
+import importlib.metadata as m
+assert m.version("openhands-sdk") == m.version("openhands-tools") == "1.50.0", (m.version("openhands-sdk"), m.version("openhands-tools"))
+from openhands.sdk import LLM, Agent, Conversation
+from openhands.tools.terminal import TerminalTool
+print("SDK/tools", m.version("openhands-sdk"), "imports passed; no model request")
+PY
+echo "sdk import exit: $?"
+"$W/venv/bin/python" -c 'import importlib.metadata as m; print("installed:", " | ".join(f"{n} {m.version(n)}" for n in ("urllib3","PyJWT","oauthlib","requests-oauthlib","google-auth-oauthlib","requests","httpx","openhands-sdk","openhands-tools")))'
+echo "distributions installed: $("$W/venv/bin/python" -c 'import importlib.metadata as m; print(sum(1 for _ in m.distributions()))')"
+echo "[$(date -u +%FT%TZ)] done"

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Put the Codex worker lane on one Codex home, through Codex's own config writer. Dry run by default.
 
-The lane (docs/decisions/2026-09-26-codex-worker-lane.md) is three changes, four with --omniroute-profile:
+The lane (docs/decisions/2026-09-26-codex-worker-lane.md) is four changes, five with --omniroute-profile:
 
   config.toml   written only through `codex app-server` `config/batchWrite` with `expectedVersion`, the writer
                 Codex's own clients use: [mcp_servers.context-mode] exactly as adoption/templates/
@@ -16,6 +16,20 @@ The lane (docs/decisions/2026-09-26-codex-worker-lane.md) is three changes, four
   stack-worker.config.toml
                 the worker profile, adoption/templates/codex.stack-worker.config.toml, for `codex exec -p
                 stack-worker`. Created only when absent (or already identical).
+  agents/stack-researcher.toml, agents/stack-verifier.toml
+                the two Codex role carriers of adoption/agents/codex/ (the E2E's `agent_type` roles), checked
+                against that directory's SHA256SUMS and the structural rules of codex_roles.py before anything is
+                copied, and created only when absent (or already identical) under $CODEX_HOME/agents:
+                create-only, mode 0600, in a 0700 folder
+                this run makes. Codex discovers them there, so no [agents.<name>] table is written and config.toml
+                and the profile do not move. A linked or non-directory agents folder, or a differing role file,
+                is refused. With --worker-roles, also agents/evidence-reviewer.toml, agents/isolated-builder.toml
+                and agents/semantic-evidence-reviewer.toml, the worker roles of adoption/agents/codex/workers/,
+                checked against that folder's SHA256SUMS and installed, read back and rolled back the same way
+                (docs/decisions/2026-09-26-stack-agents-role-dispatch.md, addendum "F4 Codex roles"). Not while
+                the token-adoption E2E's Gate A window is open: every installed role's description enters every
+                parent's spawn_agent text. A worker role already in place, byte for byte, never counts as an extra
+                role file on a run without the flag.
   omniroute.config.toml
                 only with --omniroute-profile: the gateway profile, adoption/templates/codex.omniroute.config.toml,
                 for `codex -p omniroute` through a local OmniRoute. Created only when absent (or already identical).
@@ -27,7 +41,10 @@ Modes:
   (default)   dry run. Checks the preconditions, prints each planned change against the live files, then
               rehearses the same batchWrite, AGENTS.md block and profiles on private copies in a scratch Codex
               home (network namespace off where bwrap works) and prints Codex's own read-back of the result:
-              `codex mcp get`, `codex debug prompt-input` with and without `-p stack-worker` (and `-p omniroute`).
+              `codex mcp get`, `codex debug prompt-input` with and without `-p stack-worker` (and `-p omniroute`),
+              and `codex doctor --json` before and after the role files are copied in: its exit code is ignored
+              (it is 1 in a scratch home, where auth.credentials fails) and startup warnings that rise with the
+              role files fail the rehearsal, while an unreadable config.load is only a warning.
               Nothing under the target Codex home is written; the scratch home is removed afterwards.
   --apply     refuses while a `codex` process runs or when a file differs from the --expect-* hash the dry run
               printed. Writes a run record and 0600 backups of config.toml and AGENTS.md first (never auth.json
@@ -38,8 +55,8 @@ Modes:
 
 It never opens auth.json, never touches ~/.claude, and never edits a project's .codex/config.toml: Codex's writer
 refuses any file but the user config ("Only writes to the user config are allowed", app-server/src/
-config_manager_service.rs at rust-v0.157.1). A project config that still pins context-mode to one directory is
-reported as a host step with the exact tables to delete (--project-config).
+config_manager_service.rs at rust-v0.157.1, byte-identical at rust-v0.159.2). A project config that still pins
+context-mode to one directory is reported as a host step with the exact tables to delete (--project-config).
 
 Exit status: 0 done (or nothing to do), 2 refused before any write, 3 a write or read-back failed or rollback met a
 conflict, 1 unexpected error.
@@ -52,11 +69,14 @@ import contextlib
 import copy
 import datetime
 import difflib
+import errno
 import hashlib
 import json
 import os
 import re
+import shlex
 import shutil
+import stat
 import string
 import subprocess
 import sys
@@ -71,6 +91,14 @@ sys.path.insert(0, str(ROOT))
 # rule of the adoption status report.
 from scripts import adoption_status, codex_quota  # noqa: E402
 
+# The pure helpers of the two role carriers (design 3.2 of U13): one definition of each rule for this installer, the
+# static row of prove_codex_lane.py and the tests.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import codex_roles  # noqa: E402
+from codex_roles import (  # noqa: E402,F401  (re-exported: the tests and prove_codex_lane.py reach them through here)
+    ROLE_FILES, agents_toml_count, doctor_config_load, doctor_problem, doctor_role_state, live_role_tables, path_kind,
+    role_table_count, system_role_count)
+
 TEMPLATES = ROOT / "adoption" / "templates"
 USER_TEMPLATE = TEMPLATES / "codex.config.template.toml"
 AGENTS_TEMPLATE = TEMPLATES / "codex.AGENTS.template.md"
@@ -83,20 +111,35 @@ OMNIROUTE_PROFILE = "omniroute"
 GATEWAY_MODEL_PREFIX = "cx/"
 # User-scope servers whose template start-up allowance the lane restores when they are registered. A host that
 # registered them with `codex mcp add` has no value, so Codex waits its default 30 s (codex-mcp/src/rmcp_client.rs
-# L103 and L342 at rust-v0.157.1), while the template gives serena 60 s and socraticode 120 s.
+# L103 and L342 at rust-v0.157.1, the same lines at L105 and L344 at rust-v0.159.2), while the template gives serena
+# 60 s and socraticode 120 s.
 STARTUP_TIMEOUT_SERVERS = ("serena", "socraticode")
 BLOCK_BEGIN = "<!-- native-agent-stack:codex-user-instructions:begin"
 BLOCK_END = "<!-- native-agent-stack:codex-user-instructions:end -->"
 TOP_RULE_MARKER = "native-agent-stack:top-rule"
 EXCEPTIONS_MARKER = "native-agent-stack:rtk-exceptions"
-# adoption/pins-linux-x86_64.json "codex"; the writer's behaviour below was read and probed at this version.
-CODEX_VERSION = "0.157.1"
+# adoption/pins-linux-x86_64.json "codex" (tests/test_codex_worker_lane.py keeps the two equal). The writer's
+# behaviour below was read and probed at 0.157.1; at 0.159.2 the source it cites is unchanged (compared at the two tag
+# commits on 2026-09-30) and CodexIntegrationTests ran again against the real binary.
+CODEX_VERSION = "0.159.3"
 CONTEXT_MODE_VERSION = "1.0.169"
 # start.mjs of context-mode 1.0.169: the npm install and the plugin pin 6f0cc684 carry the same file.
 START_MJS_SHA256 = "0324441841b2aef98db606194ec779c014fba3c8031c725f1be273c65f26e57b"
 HEADROOM_OFFLINE_KEYS = ("HEADROOM_OFFLINE", "HF_HUB_OFFLINE", "TRANSFORMERS_OFFLINE", "DO_NOT_TRACK")
 RECORD_SCHEMA = "native-agent-stack/codex-lane-apply/v1"
 REQUEST_TIMEOUT = 60.0
+# The two Codex role carriers (docs/decisions/2026-09-26-codex-worker-lane.md, addendum of 2026-09-29): custom-agent
+# files that Codex discovers under $CODEX_HOME/agents, with no [agents.<name>] table (codex-rs/agent-roles/src/
+# loader.rs and discovery.rs at rust-v0.157.1, byte-identical at rust-v0.159.2).
+ROLES_SOURCE = ROOT / "adoption" / "agents" / "codex"
+# The digests of the carriers are adoption/agents/codex/SHA256SUMS (codex_roles.sha256sums), checked before anything
+# is copied; tests/test_codex_agents.py pins the same two rows as independent literals. This module holds no copy.
+# The worker roles (--worker-roles) come from their own folder and its SHA256SUMS, so the carriers' pinned folder keeps
+# exactly its two files.
+WORKER_ROLES_SOURCE = codex_roles.WORKER_ROLES_SOURCE
+# The system config layer is always pushed (config/src/loader/mod.rs); its folder is /etc/codex (config/src/state.rs).
+SYSTEM_CODEX_DIR = Path("/etc/codex")
+DOCTOR_TIMEOUT = 120.0
 
 
 class Refused(Exception):
@@ -215,6 +258,20 @@ def atomic_write(path: Path, data: bytes, mode: int, expect_sha: str | None, cre
         if tmp is not None:
             with contextlib.suppress(FileNotFoundError):
                 os.unlink(tmp)
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# the role carriers: the pure helpers are tools/adoption/codex_roles.py (imported above)
+
+def role_source_problems() -> dict[str, list[str]]:
+    """The rule ids each shipped carrier breaks (codex_roles.source_problems over ROLES_SOURCE): an empty list means
+    it is exactly its row in SHA256SUMS and structurally sound."""
+    return codex_roles.source_problems(ROLES_SOURCE)
+
+
+def worker_role_source_problems() -> dict[str, list[str]]:
+    """The same for the worker roles (codex_roles.worker_source_problems over WORKER_ROLES_SOURCE)."""
+    return codex_roles.worker_source_problems(WORKER_ROLES_SOURCE)
 
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -425,6 +482,45 @@ class Plan:
             self.new_agents = with_block(current_agents, self.block)
         except Refused:
             self.new_agents = None  # reported by preconditions()
+        # The role carriers, and the worker roles with --worker-roles. The agents folder is read only when it is a real
+        # directory: a link is never followed.
+        self.agents_dir = self.codex_home / "agents"
+        self.agents_dir_kind = path_kind(self.agents_dir)
+        self.worker_roles = bool(getattr(args, "worker_roles", False))
+        self.role_files = ROLE_FILES + (codex_roles.WORKER_ROLE_FILES if self.worker_roles else ())
+        sources = {**{name: ROLES_SOURCE for name in ROLE_FILES},
+                   **{name: WORKER_ROLES_SOURCE for name in codex_roles.WORKER_ROLE_FILES}}
+        self.role_sources = {}
+        for name in self.role_files:
+            try:
+                self.role_sources[name] = (sources[name] / name).read_bytes()
+            except OSError:
+                self.role_sources[name] = None  # reported by preconditions()
+        self.source_problems = role_source_problems()
+        if self.worker_roles:
+            self.source_problems.update(worker_role_source_problems())
+        self.role_kind, self.role_live = {}, {}
+        for name in self.role_files:
+            kind = path_kind(self.agents_dir / name) if self.agents_dir_kind in ("absent", "dir") else "other"
+            live = None
+            if kind == "file":
+                try:
+                    live = (self.agents_dir / name).read_bytes()
+                except OSError:
+                    kind = "other"
+            self.role_kind[name], self.role_live[name] = kind, live
+        # Without the flag, a worker role already in place byte for byte (a host that opted in before) is known, not an
+        # extra role file; a different file under a worker role's name still counts as extra.
+        self.worker_roles_in_place = 0
+        if not self.worker_roles and self.agents_dir_kind == "dir":
+            for name in codex_roles.WORKER_ROLE_FILES:
+                if path_kind(self.agents_dir / name) != "file":
+                    continue
+                try:
+                    same = (self.agents_dir / name).read_bytes() == (WORKER_ROLES_SOURCE / name).read_bytes()
+                except OSError:
+                    same = False
+                self.worker_roles_in_place += same
 
     # --- state of each part
     def config_changes(self) -> list[dict]:
@@ -450,6 +546,70 @@ class Plan:
     def omniroute_state(self) -> str | None:
         """create | same | differs for the gateway profile; None when --omniroute-profile was not given."""
         return file_state(self.omniroute_bytes, self.omniroute_template) if self.omniroute else None
+
+    def role_states(self) -> dict[str, str]:
+        """create | same | differs for each role carrier against its source. A role file that is not a regular file
+        (a link, a directory), or any file under an agents folder that is not a real directory, counts as differs:
+        it is never overwritten and never read through."""
+        states = {}
+        for name in self.role_files:
+            kind = self.role_kind[name]
+            if kind == "absent":
+                states[name] = "create"
+            elif kind == "file":
+                states[name] = "same" if self.role_live[name] == self.role_sources[name] else "differs"
+            else:
+                states[name] = "differs"
+        return states
+
+    def nothing_to_do(self) -> bool:
+        """The lane is already fully in place: the config keys, the AGENTS.md block, the profiles and the roles."""
+        return (not any(change["changed"] for change in self.config_changes()) and not self.agents_changed()
+                and self.profile_state() == "same" and self.omniroute_state() in (None, "same")
+                and all(state == "same" for state in self.role_states().values()))
+
+    def role_preconditions(self) -> list[tuple[str, str, str]]:
+        """[(level, name, detail)] for the role carriers (and the worker roles with --worker-roles). Counts and file
+        names of the known role files only: a warning or an extra file never has its name or path printed."""
+        checks = []
+        for name in self.role_files:
+            data = self.role_sources[name]
+            problems = self.source_problems[name] or (["source_missing"] if data is None else [])
+            checks.append(("fail", f"agent role source {name}", ", ".join(problems)) if problems else
+                          ("ok", f"agent role source {name}",
+                           f"sha256 {sha256_bytes(data)[:12]} equals its pinned row"))
+        kind = self.agents_dir_kind
+        if kind not in ("absent", "dir"):
+            checks.append(("fail", "agents directory", "exists and is not a real directory (a link or a file); "
+                           "move it aside privately first"))
+        else:
+            checks.append(("ok", "agents directory",
+                           "absent; will be created" if kind == "absent" else "a real directory"))
+            for name, state in self.role_states().items():
+                if state == "differs":
+                    checks.append(("fail", f"agent role {name}", "exists and differs from the source, or is not a "
+                                   "regular file; move it aside privately first"))
+            total = agents_toml_count(self.agents_dir)
+            known = sum(k != "absent" for k in self.role_kind.values()) + self.worker_roles_in_place
+            extra = None if total is None else max(0, total - known)
+            checks.append(("warn" if extra is None or extra else "ok", "extra agent role files",
+                           "unknown (a link to a folder below agents, which Codex enters, or a part that cannot be read)"
+                           if extra is None else str(extra)))
+        tables, unreadable = role_table_count(self.live), 0
+        for data in (self.profile_bytes, self.profile_template):
+            if data is None:
+                continue
+            try:
+                tables += role_table_count(tomllib.loads(data.decode("utf-8")))
+            except ValueError:
+                unreadable += 1
+        checks.append(("warn" if tables or unreadable else "ok", "agent role tables",
+                       f"{tables}" + (f" ({unreadable} file unreadable)" if unreadable else "")))
+        system = system_role_count(SYSTEM_CODEX_DIR)
+        checks.append(("warn" if system is None or system else "ok", "system agent roles",
+                       "unknown (a link to a folder below its agents folder, or a part that cannot be read)"
+                       if system is None else str(system)))
+        return checks
 
     def base_provider_step(self) -> list[str]:
         """Report lines when config.toml still carries the gateway route the profile now holds (a host step): the
@@ -533,6 +693,7 @@ class Plan:
                            {"create": "absent; will be created", "same": "already the template",
                             "differs": f"{self.omniroute_path} exists and differs from the template; move it "
                                        "aside privately first"}[omniroute]))
+        checks += self.role_preconditions()
         running = codex_processes(self.args.codex_process_name)
         checks.append((("fail" if for_apply else "warn") if running else "ok", "codex processes",
                        f"{len(running)} running (pids {', '.join(running)})" if running else "none"))
@@ -673,6 +834,40 @@ def check_readbacks(found: dict, eco_root: str) -> list[str]:
     return problems
 
 
+def run_doctor(codex: str, env: dict, wrapper: list[str] | None, cwd: Path) -> str | None:
+    """stdout of `codex doctor --json` in the scratch home, whatever its exit code (see doctor_config_load); None on a
+    timeout or when it cannot start. It runs update, network and provider checks too, hence the wrapper's network
+    namespace and DOCTOR_TIMEOUT."""
+    try:
+        return run_codex(codex, ["doctor", "--json"], env, cwd, timeout=DOCTOR_TIMEOUT, wrapper=wrapper).stdout
+    except (subprocess.SubprocessError, OSError):
+        return None
+
+
+def rehearse_roles(plan: Plan, codex: str, env: dict, wrapper: list[str] | None, codex_home: Path,
+                   cwd: Path) -> tuple[list[str], list[str]]:
+    """Codex's own view of the role files: `codex doctor --json` before and after the planned role files (the two
+    carriers, and the worker roles with --worker-roles) are copied into the scratch home, compared through
+    doctor_role_state. Counts only in the report; (lines, problems)."""
+    before = run_doctor(codex, env, wrapper, cwd)
+    agents = codex_home / "agents"
+    agents.mkdir(mode=0o700)
+    os.chmod(agents, 0o700)
+    for name in plan.role_files:
+        (agents / name).write_bytes(plan.role_sources[name])
+        os.chmod(agents / name, 0o600)
+    state = doctor_role_state(before, run_doctor(codex, env, wrapper, cwd))
+    if state["state"] == "unknown":
+        line = "  [warn] doctor config.load unknown: the role files' load warnings could not be read back"
+    elif state["load_failed"]:
+        line = "  codex doctor config.load: failed with the role files"
+    else:
+        line = (f"  codex doctor config.load: startup warnings {state['startup_warnings_before']} -> "
+                f"{state['startup_warnings_after']} with the role files ({state['role_warnings']} agent role warnings)")
+    problem = doctor_problem(state)
+    return [line], [problem] if problem else []
+
+
 def rehearse(plan: Plan, codex: str) -> tuple[list[str], list[str]]:
     """Run the batchWrite, the AGENTS.md block and the profile on copies in a scratch Codex home. Returns
     (report lines, problems)."""
@@ -726,6 +921,9 @@ def rehearse(plan: Plan, codex: str) -> tuple[list[str], list[str]]:
             lines.append(f"  prompt input -p {OMNIROUTE_PROFILE}: {found.get('prompt_input_omniroute')}")
         lines.append(f"  -p {PROFILE_NAME} servers: {json.dumps(found.get('profile_servers'))}")
         problems += check_readbacks(found, plan.eco_root)
+        role_lines, role_problems = rehearse_roles(plan, codex, env, wrapper, codex_home, cwd)
+        lines += role_lines
+        problems += role_problems
     finally:
         if plan.args.keep_rehearsal:
             lines.append(f"  kept: {scratch}")
@@ -754,6 +952,8 @@ def print_plan(plan: Plan, checks: list[tuple[str, str, str]]) -> None:
         print(f"AGENTS.md: {'writes the managed block' if plan.agents_changed() else 'block already in place'} "
               f"(sha256 {agents_sha} -> {sha256_bytes(plan.new_agents.encode('utf-8'))})")
     print(f"{PROFILE_NAME}.config.toml: {plan.profile_state()}")
+    for name, state in plan.role_states().items():
+        print(f"agents/{name}: {state}")
     if plan.omniroute:
         print(f"{OMNIROUTE_PROFILE}.config.toml: {plan.omniroute_state()}")
         for line in plan.base_provider_step():
@@ -781,11 +981,19 @@ def cmd_plan(args: argparse.Namespace, codex: str) -> int:
         return 3
     agents_sha = sha256_bytes(plan.agents_bytes) if plan.agents_bytes is not None else "absent"
     print("result: rehearsal passed. Apply in a quiet window (no codex process) with:")
+    # Every flag that changes the plan or its checks is repeated, so that following the printed command applies
+    # exactly what was rehearsed (a printed command without --worker-roles installed only the two carriers).
     print(f"  python3 {Path(__file__).resolve().relative_to(ROOT)} --apply"
           + (f" --codex-home {plan.codex_home}" if args.codex_home else "")
           + (f" --eco-root {plan.eco_root}" if args.eco_root else "")
           + (f" --host-path '{plan.host_path}'" if args.host_path else "")
+          + (f" --codex {shlex.quote(args.codex)}" if args.codex else "")
+          + (f" --state-dir {shlex.quote(args.state_dir)}" if args.state_dir else "")
+          + "".join(f" --project-config {shlex.quote(path)}" for path in (args.project_config or []))
+          + (f" --codex-process-name {shlex.quote(args.codex_process_name)}"
+             if args.codex_process_name != "codex" else "")
           + (" --omniroute-profile" if plan.omniroute else "")
+          + (" --worker-roles" if plan.worker_roles else "")
           + f" --expect-config-sha256 {sha256_bytes(plan.config_bytes)} --expect-agents-sha256 {agents_sha}")
     print(f"workers then start with: {worker_command()}")
     return 0
@@ -824,8 +1032,7 @@ def cmd_apply(args: argparse.Namespace, codex: str) -> int:
         print("refused: nothing written")
         return 2
     changes = plan.config_changes()
-    if (not any(c["changed"] for c in changes) and not plan.agents_changed() and plan.profile_state() == "same"
-            and plan.omniroute_state() in (None, "same")):
+    if plan.nothing_to_do():  # the roles count too: a host set up before they existed still gets them
         print("already in place: nothing to do")
         return 0
     root.mkdir(parents=True, exist_ok=True)
@@ -857,6 +1064,16 @@ def cmd_apply(args: argparse.Namespace, codex: str) -> int:
     if plan.omniroute:  # records of runs without --omniroute-profile, and older records, have no such entry
         record["omniroute_profile"] = {"path": str(plan.omniroute_path), "existed": plan.omniroute_bytes is not None,
                                        "sha256_after": sha256_bytes(plan.omniroute_template), "state": "pending"}
+    role_pins_now = codex_roles.sha256sums(ROLES_SOURCE / codex_roles.SHA256SUMS_NAME)
+    if plan.worker_roles:  # a run without the flag takes no worker-role pins (it only compares installed copies)
+        role_pins_now.update(codex_roles.sha256sums(WORKER_ROLES_SOURCE / codex_roles.SHA256SUMS_NAME))
+    role_states = plan.role_states()
+    record["agent_roles"] = {  # records of runs of an older tool have none, and rollback then leaves the roles alone
+        "dir": str(plan.agents_dir), "existed_dir": plan.agents_dir_kind == "dir", "creating_dir": False,
+        "created_dir": False,
+        "files": {name: {"path": str(plan.agents_dir / name), "existed": role_states[name] != "create",
+                         "sha256_after": role_pins_now[name], "state": "pending", "creating": False,
+                         "created": False} for name in plan.role_files}}
     write_record(run, record)
     if latest.is_symlink() or latest.exists():
         latest.unlink()
@@ -917,6 +1134,39 @@ def cmd_apply(args: argparse.Namespace, codex: str) -> int:
             record[part]["state"] = "done"
             write_record(run, record)
             print(f"{path.name}: in place")
+        # 3b. the role carriers, after the profiles: create-only, mode 0600, in a 0700 folder when this run makes it.
+        # Each creation is journaled first, like the profiles', so rollback trusts an interrupted one.
+        roles = record["agent_roles"]
+        if any(state == "create" for state in role_states.values()):
+            if plan.agents_dir_kind == "absent":
+                roles["creating_dir"] = True
+                write_record(run, record)
+                try:
+                    plan.agents_dir.mkdir(mode=0o700)
+                except FileExistsError:
+                    roles["creating_dir"] = False  # it appeared since it was read; it is not ours
+                else:
+                    os.chmod(plan.agents_dir, 0o700)
+                    roles["created_dir"] = True
+                write_record(run, record)
+            if path_kind(plan.agents_dir) != "dir":
+                raise Failed("the agents directory is not a real directory; no role file written")
+        for name in plan.role_files:
+            entry, path = roles["files"][name], plan.agents_dir / name
+            if role_states[name] == "create":
+                entry["creating"] = True
+                write_record(run, record)
+                try:
+                    atomic_write(path, plan.role_sources[name], 0o600, None, create_only=True)
+                except FileExistsError:
+                    entry["creating"] = False  # another writer made it in between; it is not ours
+                    raise Failed(f"agents/{name} appeared since it was read; left as it is") from None
+                entry["created"] = True
+            if sha256_file(path) != entry["sha256_after"]:
+                raise Failed(f"read-back: agents/{name} does not hold the source")
+            entry["state"] = "done"
+            write_record(run, record)
+            print(f"agents/{name}: in place")
         # 4. Codex's own view
         found = readbacks(codex, env, None, Path("/"), omniroute=plan.omniroute)
         record["readback"] = found
@@ -955,6 +1205,42 @@ def cmd_rollback(args: argparse.Namespace, codex: str) -> int:
         print(f"refused: {len(running)} codex processes running (pids {', '.join(running)})")
         return 2
     outcome, conflicts = {}, []
+    # 3b. the role carriers, applied after the profiles and so undone before them: a file only when this run created
+    # it (or was creating it when it stopped) and it still holds what the run wrote, the folder only when this run
+    # made it and it is empty. A record without "agent_roles" (a run of an older tool) leaves them alone.
+    roles = record.get("agent_roles")
+    if roles:
+        for name, entry in roles["files"].items():
+            key, path = f"agents/{name}", Path(entry["path"])
+            if not (entry.get("created") or entry.get("creating")):
+                outcome[key] = "not created by this run"
+                continue
+            kind = path_kind(path)
+            if kind == "absent":
+                outcome[key] = "already absent"
+            elif kind == "file" and sha256_file(path) == entry["sha256_after"]:
+                path.unlink()
+                outcome[key] = "removed"
+            else:
+                conflicts.append(f"{key} changed since the run; left in place")
+        directory = Path(roles["dir"])
+        if roles.get("created_dir") or roles.get("creating_dir"):
+            kind = path_kind(directory)
+            if kind == "absent":
+                outcome["agents directory"] = "already absent"
+            elif kind != "dir":
+                conflicts.append("agents directory is no longer a real directory; left in place")
+            else:
+                try:
+                    directory.rmdir()
+                    outcome["agents directory"] = "removed (the run created it)"
+                except OSError as error:
+                    if error.errno not in (errno.ENOTEMPTY, errno.EEXIST):
+                        conflicts.append(f"agents directory could not be removed ({error.strerror}); left in place")
+                    else:
+                        outcome["agents directory"] = "left in place (not empty)"
+        else:
+            outcome["agents directory"] = "not created by this run"
     # 3. the profiles: remove one only if this run created it (or was creating it when it stopped) and nobody
     # changed it since. A record without "omniroute_profile" (no --omniroute-profile, or an older run) has only one.
     for part in ("profile", "omniroute_profile"):
@@ -1095,6 +1381,12 @@ def build_parser() -> argparse.ArgumentParser:
                         help="also install adoption/templates/codex.omniroute.config.toml as "
                              "$CODEX_HOME/omniroute.config.toml, the opt-in profile for `codex -p omniroute` through a "
                              "local OmniRoute gateway (created only when absent; rollback removes it)")
+    parser.add_argument("--worker-roles", action="store_true",
+                        help="also install the worker roles of adoption/agents/codex/workers/ (evidence-reviewer, "
+                             "isolated-builder, semantic-evidence-reviewer) under $CODEX_HOME/agents, like the two "
+                             "carriers (created only when absent; rollback removes them). Not while the "
+                             "token-adoption E2E's Gate A window is open: every installed role's description enters "
+                             "every parent's spawn_agent text")
     parser.add_argument("--keep-rehearsal", action="store_true", help="dry run: keep the scratch Codex home")
     parser.add_argument("--codex-process-name", default="codex",
                         help="the executable name the no-running-Codex check looks for (default: codex)")

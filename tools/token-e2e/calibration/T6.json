@@ -1,0 +1,56 @@
+{
+ "schema": "token-e2e-calibration/1",
+ "template": "T6",
+ "clauses": [
+  "Conditions agree with the frozen scripts/host_requests.py implementation and recipes/host-request-lane.md"
+ ],
+ "sources": [
+  {
+   "label": "scripts/host_requests.py trust()",
+   "text": "def trust(item: dict) -> tuple[bool, list[str]]:\n    \"\"\"Whether an issue, pull request or comment is the owner account's own. Fails closed on any\n    missing field. Nothing else (labels, title, body, a requesting-host value) grants trust.\"\"\"\n    reasons = []\n    if item.get(\"author_association\") != \"OWNER\":\n        reasons.append(f\"author_association is {clean(item.get('author_association'), 32) or 'missing'}\")\n    user = item.get(\"user\") if isinstance(item.get(\"user\"), dict) else {}\n    if user.get(\"type\") != \"User\":\n        reasons.append(f\"user.type is {clean(user.get('type'), 32) or 'missing'}\")\n    if \"performed_via_github_app\" not in item:\n        reasons.append(\"performed_via_github_app is missing\")\n    elif item[\"performed_via_github_app\"] is not None:\n        reasons.append(\"created through a GitHub App\")\n    owner = repository_owner(item)\n    if owner is None or str(user.get(\"login\") or \"\").lower() != owner.lower():\n        reasons.append(\"author is not the repository owner\")\n    return not reasons, reasons"
+  },
+  {
+   "label": "recipes/host-request-lane.md",
+   "text": "The tracker trusts an issue only when the owner account wrote it: `author_association` `OWNER`,\nAnything else is listed as untrusted and can never be claimed."
+  }
+ ],
+ "controls": [
+  {
+   "id": "ref",
+   "kind": "reference",
+   "answer": "trust() in scripts/host_requests.py trusts an item only when author_association is OWNER, user.type is User, performed_via_github_app is present and null (not created through a GitHub App), and the author's login is the repository owner. Anything else is untrusted, as the recipe says: the tracker trusts an issue only when the owner account wrote it.\n\nSource excerpt: def trust(item: dict) -> tuple[bool, list[str]]:\n    \"\"\"Whether an issue, pull request or comment is the owner account's own. Fails closed on any\n    missing field. Nothing else (labels, title, body, a requesting-host value) grants trust.\"\"\"\n    reasons = []\n    if item.get(\"author_association\") != \"OWNER\":\n        reasons.append(f\"author_association is {clean(item.get('author_association'), 32) or 'missing'}\")\n    user = item.get(\"user\") if isinstance(item.get(\"user\"), dict) else {}\n    if user.get(\"type\") != \"User\":\n        reasons.append(f\"user.type is {clean(user.get('type'), 32) or 'missing'}\")\n    if \"performed_via_github_app\" not in item:\n        reasons.append(\"performed_via_github_app is missing\")\n    elif item[\"performed_via_github_app\"] is not None:\n        reasons.append(\"created through a GitHub App\")\n    owner = repository_owner(item)\n    if owner is None or str(user.get(\"login\") or \"\").lower() != owner.lower():\n        reasons.append(\"author is not the repository owner\")\n    return not reasons, reasons",
+   "evidence": [],
+   "expected": {
+    "c1": true
+   }
+  },
+  {
+   "id": "para",
+   "kind": "paraphrased",
+   "answer": "The lane calls an item the owner's own only if all four checks pass: the association is OWNER, the user is of type User, the item was not made through a GitHub App (the field exists and is null), and the login equals the repository owner. It fails closed on any missing field; labels and titles never grant trust.",
+   "evidence": [],
+   "expected": {
+    "c1": true
+   }
+  },
+  {
+   "id": "wrong-1",
+   "kind": "wrong",
+   "answer": "The lane trusts an item whenever author_association is OWNER and user.type is User; whether it came through a GitHub App or who the repository owner is does not matter.",
+   "evidence": [],
+   "expected": {
+    "c1": false
+   }
+  },
+  {
+   "id": "wrong-2",
+   "kind": "wrong",
+   "answer": "trust() requires user.type to be Bot and accepts any author_association, because a GitHub label such as host:workstation grants trust to the requesting host.",
+   "evidence": [],
+   "expected": {
+    "c1": false
+   }
+  }
+ ],
+ "extraction_controls": []
+}

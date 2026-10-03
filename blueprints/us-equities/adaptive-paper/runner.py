@@ -36,7 +36,7 @@ from sessions import (DEFAULT_SESSION_POLICY, SessionKind, boundary_receipt, ext
                      must_end_flat, next_trading_day, session_at, validate_session_policy)
 from strategies import AdaptivePolicy, PolicyConfig, RegimeSelector, SelectorConfig, limit_price
 from transport import (AlpacaPaperTransport, DATA_FEEDS, TransportError, RejectedSubmission, order_contract_status,
-                       preflight, halt_statuses_supported, nasdaq_halt_seed)
+                       preflight, halt_statuses_supported, nasdaq_halt_seed, fee_activities, fee_checkpoint)
 
 SOURCE = Path(__file__).resolve().parent
 LAST_OUTPUT = None
@@ -758,6 +758,12 @@ def reconcile(ledger, snapshot, baseline_cash):
     expected = {p.symbol: p.qty for p in ledger.positions().values() if p.qty}
     if actual != expected:
         raise SafetyError("position_mismatch")
+    if "fees" in snapshot:
+        # Broker FEE activities (REG, TAF, CAT, ...) created since the ledger's cash baseline,
+        # from the transport's allow-listed read, are recorded durably before the comparison.
+        # The comparison and its 0.01 USD tolerance are unchanged: deposits, withdrawals,
+        # journals, dividends, interest and every other activity stay unexplained and fail it.
+        ledger.record_fees(snapshot["fees"], time.time())
     cash_delta = Decimal(snapshot["account"]["cash"]) - Decimal(baseline_cash)
     if abs(cash_delta - ledger.accounting().cash_delta_usd) > Decimal("0.01"):
         raise SafetyError("cash_mismatch_or_unmodeled_fees")
@@ -2374,12 +2380,47 @@ def main():
                 if metadata["config_sha256"] != summary["config_sha256"]:
                     raise SafetyError("recovery_config_differs_from_frozen_trial")
             else:
+                fee_start = (previous_metadata.get("fee_window_start", previous_metadata["started_at"])
+                             if previous_metadata else None)
+                if previous_metadata is None:
+                    def admit_checkpoint_read(kind, **_):
+                        if ledger.request_budget(time.time(), "read"):
+                            raise SafetyError("fee_checkpoint_budget_exhausted")
+                    fee_start = time.time()
+                    try:
+                        checkpoint = fee_checkpoint(key, secret, after=datetime.fromtimestamp(fee_start, timezone.utc),
+                                                    before_request=admit_checkpoint_read,
+                                                    request_observer=responses.append)
+                    except (TransportError, SafetyError) as exc:
+                        if str(exc) not in ("fee_activity_posted_during_checkpoint", "fee_checkpoint_budget_exhausted"):
+                            raise
+                        summary.update(status="not_started", stage="trial_start", reason=str(exc))
+                        save(args.output, summary)
+                        print(json.dumps({"status": "not_started", "stage": "trial_start", "reason": str(exc),
+                                          "orders_submitted": 0}))
+                        return 2
+                    ledger.record_fees(checkpoint["fees"], time.time())
+                    baseline_cash = format(Decimal(checkpoint["account"]["cash"])
+                                           - ledger.accounting().cash_delta_usd, "f")
+                    now = time.time()
                 if previous_metadata:
                     if previous_metadata["config_sha256"] != summary["config_sha256"]:
                         raise SafetyError("next_trial_config_differs_from_frozen_limits")
                     if (ledger.positions() or ledger.unresolved()) and not resumable_hold:
                         raise SafetyError("next_trial_requires_recovery")
                     if not resumable_hold:
+                        # Keep the first checkpoint's cash baseline and fee window (legacy:
+                        # started_at). Reserve every read durably before sending, including
+                        # failed pages, and book the fees before comparing unchanged cash tolerance.
+                        def admit_next_fee_read(kind, **_):
+                            if ledger.request_budget(time.time(), "read"):
+                                raise SafetyError("preflight_budget_inconsistent")
+                        fees = fee_activities(key, secret,
+                                              after=datetime.fromtimestamp(fee_start, timezone.utc),
+                                              before_request=admit_next_fee_read,
+                                              request_observer=responses.append)
+                        now = time.time()
+                        ledger.record_fees(fees, now)
                         expected_cash = Decimal(previous_metadata["baseline_cash"]) + ledger.accounting().cash_delta_usd
                         if abs(Decimal(observation["account"]["cash"]) - expected_cash) > Decimal("0.01"):
                             raise SafetyError("next_trial_cash_mismatch")
@@ -2398,7 +2439,8 @@ def main():
                 metadata = {"trial_id": args.trial,
                             "started_at": previous_metadata["started_at"] if previous_metadata else now,
                             "current_trial_started_at": now, "config_sha256": summary["config_sha256"],
-                            "baseline_cash": previous_metadata["baseline_cash"] if previous_metadata else observation["account"]["cash"],
+                            "fee_window_start": fee_start,
+                            "baseline_cash": previous_metadata["baseline_cash"] if previous_metadata else baseline_cash,
                             "phase": "starting"}
                 save(metadata_path, metadata)
             def fresh_port(recovering=False):
@@ -2410,6 +2452,10 @@ def main():
                     quote_timeout=config["quote_max_age_seconds"], feed=config["feed"],
                     required_quote_symbols=needed if recovering and needed else config["benchmarks"],
                     history_start=datetime.fromtimestamp(metadata["started_at"], timezone.utc),
+                    # This lane keeps its first checkpoint baseline and fee window; legacy
+                    # metadata keeps started_at, which follows the original account read.
+                    fee_history_start=datetime.fromtimestamp(metadata.get("fee_window_start", metadata["started_at"]),
+                                                           timezone.utc),
                     extended_hours_allowed=session_policy["extended_hours"],
                     include_margin=leverage_policy is not None))
             for sig in (signal.SIGINT, signal.SIGTERM):

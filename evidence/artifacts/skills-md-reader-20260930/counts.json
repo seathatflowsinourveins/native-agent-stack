@@ -1,0 +1,1625 @@
+{
+ "schema_version": 1,
+ "checkout_commit": "f74412dfaf673476a11f7b8041d3a94114ce0a16",
+ "code_under_test": {
+  "tools/sota-convergence/landscape-sweep/skill_md.mjs": {
+   "sha256": "4fbd76f219192d629ee962d5aeeb8580cea2a903c3b03fa90c51da8cc69e5791",
+   "bytes": 12700
+  },
+  "tools/sota-convergence/landscape-sweep/skills-yaml.pin.json": {
+   "sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "bytes": 12714
+  },
+  "tools/sota-convergence/landscape-sweep/source_reviews.py": {
+   "sha256": "5ccae0e2b5f0e9c5b640727837705fae46121d20b8909780934daf9898a5191d",
+   "bytes": 84195
+  }
+ },
+ "run_start_utc": "2026-10-01T00:56:03Z",
+ "run_end_utc": "2026-10-01T00:57:01Z",
+ "tools": {
+  "node": "v24.21.0",
+  "npm": "11.19.0",
+  "git": "2.43.0",
+  "python": "3.13.15"
+ },
+ "packages": {
+  "skills@1.7.0": {
+   "integrity": "sha512-OfePnDft+Xt9/tCoHdCUe5fkM8i+Q3QOSQO53hm7mKtsXyvc+CKOAAliVWZ484HS3cWx+6r+ob0AArixs3jYXw==",
+   "shasum": "28a0d4f65a261d38cbd1737fb10f1b7f99926ac5",
+   "dependencies": {
+    "tar": "^7.5.20",
+    "yaml": "^2.8.3"
+   },
+   "git_head": "7407f3893ad4dceab546ac002c3ef806e4000c73",
+   "dist_cli_mjs": {
+    "sha256": "fde68534019765fb69510a0038ca7df2810a6ffed4c26fef9beabdcf6cc6701c"
+   },
+   "oracle_extract": {
+    "sha256": "d0ecaaee5951c937578f542506f7d00dadf39e8f8847968f3389bd52e7af8456"
+   },
+   "yaml_its_install_resolved": "2.9.1"
+  },
+  "yaml@2.9.0": {
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "git_head": "ddb21b04cb889722cec8f89dc1b67f19d62d7f7d"
+  },
+  "yaml@2.9.1": {
+   "integrity": "sha512-3NxN8+78OdzbT7C/WjGsyfPAtJaN3FNDsWxv7Y7mcDsT/oOmgW8BpyQQFFBnvZE3j9Y2Sdz1ULFLezL7Eb2yFw==",
+   "git_head": "1440ecd3d1bff41e4ac399f8f6839e810328bd16"
+  },
+  "yaml_dist_tags": {
+   "next": "3.0.0-2",
+   "latest": "2.9.1"
+  }
+ },
+ "reader": {
+  "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+  "ok": true,
+  "package": "yaml@2.9.0",
+  "pin": {
+   "sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b"
+  }
+ },
+ "corpus": {
+  "sources": [
+   {
+    "source": "addyosmani/agent-skills@2686b620fc1f",
+    "skill_md": 25
+   },
+   {
+    "source": "affaan-m/ECC@c70874fae9eb",
+    "skill_md": 1027
+   },
+   {
+    "source": "alpacahq/alpaca-skills@39111abee6b6",
+    "skill_md": 15
+   },
+   {
+    "source": "anthropics/claude-code@2282079d6ac8",
+    "skill_md": 10
+   },
+   {
+    "source": "anthropics/skills@8a1541c4a3ff",
+    "skill_md": 20
+   },
+   {
+    "source": "bgauryy/octocode@c265e3f94131",
+    "skill_md": 13
+   },
+   {
+    "source": "cloudflare/security-audit-skill@c1c8a8c14710",
+    "skill_md": 1
+   },
+   {
+    "source": "ComposioHQ/awesome-claude-skills@be2a406907db",
+    "skill_md": 864
+   },
+   {
+    "source": "getsentry/skills@d18b7aa8ba87",
+    "skill_md": 28
+   },
+   {
+    "source": "huggingface/skills@80f9fa530e46",
+    "skill_md": 26
+   },
+   {
+    "source": "mattpocock/skills@d81f3a183412",
+    "skill_md": 37
+   },
+   {
+    "source": "microsoft/playwright-cli@b85c7a736bb4",
+    "skill_md": 2
+   },
+   {
+    "source": "microsoft/skills@3495f50ae0d7",
+    "skill_md": 205
+   },
+   {
+    "source": "obra/superpowers@8ca22dba9a94",
+    "skill_md": 15
+   },
+   {
+    "source": "openai/skills@49f948faa925",
+    "skill_md": 44
+   },
+   {
+    "source": "semgrep/skills@68177b8830f9",
+    "skill_md": 3
+   },
+   {
+    "source": "superagent-ai/skills@0da315b873ed",
+    "skill_md": 14
+   },
+   {
+    "source": "trailofbits/skills@82fe82262526",
+    "skill_md": 85
+   },
+   {
+    "source": "typesafe-ai/skills@65a39f393687",
+    "skill_md": 1
+   },
+   {
+    "source": "vercel-labs/agent-browser@d01253d9db28",
+    "skill_md": 10
+   },
+   {
+    "source": "vercel-labs/agent-skills@063bee94c3f4",
+    "skill_md": 9
+   },
+   {
+    "source": "vercel-labs/skills@3694740352ee",
+    "skill_md": 1
+   }
+  ],
+  "total": 2455,
+  "regular_files": 2455,
+  "fetch_failures": 0,
+  "index": {
+   "sha256": "b3edb522cb836aee675d25f66f173ddc09d528e911d36901d23a74d7dd69cee9"
+  },
+  "skipped_by_the_cli": [
+   {
+    "key": "microsoft/skills@3495f50ae0d7:.github/plugins/azure-skills/skills/azure-app-onboard/deploy/SKILL.md",
+    "warning": "missing required frontmatter field(s): name, description"
+   },
+   {
+    "key": "microsoft/skills@3495f50ae0d7:.github/plugins/azure-skills/skills/azure-app-onboard/prepare/SKILL.md",
+    "warning": "missing required frontmatter field(s): name, description"
+   },
+   {
+    "key": "microsoft/skills@3495f50ae0d7:.github/plugins/azure-skills/skills/azure-app-onboard/scaffold/SKILL.md",
+    "warning": "missing required frontmatter field(s): name, description"
+   }
+  ]
+ },
+ "comparisons": {
+  "corpus": {
+   "reader_vs_cli_parseSkillMd_with_its_installed_yaml": {
+    "oracle_yaml": "2.9.1",
+    "compared": 2455,
+    "pairs_reader_oracle": {
+     "skip/skip": 3,
+     "take/take": 2452
+    },
+    "line_break_refusals": 0,
+    "contradictions": 0,
+    "field_differences": {}
+   },
+   "reader_vs_cli_parseSkillMd_with_yaml_2.9.0": {
+    "oracle_yaml": "2.9.0",
+    "compared": 2455,
+    "pairs_reader_oracle": {
+     "skip/skip": 3,
+     "take/take": 2452
+    },
+    "line_break_refusals": 0,
+    "contradictions": 0,
+    "field_differences": {}
+   },
+   "reader_vs_skills_add_list_end_to_end": {
+    "cli": "Found 1694 skills, 1694 names listed, 4 warnings (3 compared, 0 on copies the reader gives no verdict, 1 planted)",
+    "reader": "2452 take (1693 distinct non-empty names, 0 empty), 3 skip, 0 error",
+    "controls": {
+     "planted invalid warned": true,
+     "planted valid listed": true,
+     "found count = listed names": true
+    },
+    "agreement": true,
+    "exit": 0,
+    "cli_exit": 0
+   },
+   "compare_exit": 0
+  },
+  "edge": {
+   "reader_vs_cli_parseSkillMd_with_its_installed_yaml": {
+    "oracle_yaml": "2.9.1",
+    "compared": 139,
+    "pairs_reader_oracle": {
+     "error/skip": 7,
+     "error/take": 2,
+     "skip/skip": 68,
+     "take/take": 62
+    },
+    "line_break_refusals": 9,
+    "contradictions": 0,
+    "field_differences": {}
+   },
+   "reader_vs_cli_parseSkillMd_with_yaml_2.9.0": {
+    "oracle_yaml": "2.9.0",
+    "compared": 139,
+    "pairs_reader_oracle": {
+     "error/skip": 7,
+     "error/take": 2,
+     "skip/skip": 68,
+     "take/take": 62
+    },
+    "line_break_refusals": 9,
+    "contradictions": 0,
+    "field_differences": {}
+   },
+   "reader_vs_skills_add_list_end_to_end": {
+    "cli": "Found 7 skills, 7 names listed, 76 warnings (68 compared, 7 on copies the reader gives no verdict, 1 planted)",
+    "reader": "62 take (5 distinct non-empty names, 2 empty), 68 skip, 9 error",
+    "controls": {
+     "planted invalid warned": true,
+     "planted valid listed": true,
+     "found count = listed names": true
+    },
+    "agreement": true,
+    "exit": 0,
+    "cli_exit": 0
+   },
+   "compare_exit": 0
+  }
+ },
+ "edge_cases": {
+  "CR-only line endings": {
+   "reader": "error",
+   "cli": "skip"
+  },
+  "LS between keys": {
+   "reader": "error",
+   "cli": "skip"
+  },
+  "LS in the body only": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "LS inside a description": {
+   "reader": "error",
+   "cli": "take"
+  },
+  "NEL between keys": {
+   "reader": "error",
+   "cli": "skip"
+  },
+  "PS between keys": {
+   "reader": "error",
+   "cli": "skip"
+  },
+  "UTF-16 LE file": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "UTF-8 BOM before the frontmatter": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "YAML directive": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "alias fan-out in metadata": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "alias to a sequence": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "aliased description": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "anchored description": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "at sign description": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "backtick description": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "bad escape on another key": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "block header extra text": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "block holding colon text": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "block less-indented later line": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "block more-indented leading blank": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "block on the next line": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "block with comment header": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "block-mapping description": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "block-mapping quoted key": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "block-sequence description": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "clip block blank lines only": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "comment line before next-line scalar": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "comment only frontmatter": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "complex key": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "continuation starting with a bracket": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "continuation starting with a quote": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "continuation starting with a tag-like bang": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "continuation starting with an ampersand": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "continuation starting with colon space": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "continuation starting with question space": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "crlf frontmatter": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "dash space description": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "dash-dash description": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "description of control characters only": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "document end marker inside": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "double-quoted": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "double-quoted bad escape": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "double-quoted beyond max": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "double-quoted empty": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "double-quoted good escapes": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "double-quoted multi-line": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "double-quoted short hex": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "double-quoted surrogate": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "duplicate description": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "duplicate nested key": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "empty description": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "empty flow mapping description": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "empty frontmatter": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "explicit indentation block": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "false description": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "flow collection with mismatched brackets": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "flow mapping continued at column 0": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "flow mapping description": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "flow sequence continued at column 0": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "flow sequence description": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "flow sequence with an empty item": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "folded block no content": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "folded strip block": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "indented first line": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "internal metadata": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "invalid UTF-8 in the description": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "keep block blank lines only": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "keep block no content": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "key-line comment before next-line scalar": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "literal block": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "literal block no content": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "local tag description": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "lone CR after the opening marker": {
+   "reader": "error",
+   "cli": "skip"
+  },
+  "lone CR before the closing marker": {
+   "reader": "error",
+   "cli": "skip"
+  },
+  "lone CR between keys": {
+   "reader": "error",
+   "cli": "skip"
+  },
+  "lone CR in the body only": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "merge key": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "name in upper case": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "name of one CSI sequence": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "name of spaces only (quoted)": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "name with BEL and backspace": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "name with a C1 control": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "name with a CSI sequence inside": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "name with a line break inside": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "name with a raw ESC byte": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "name with an OSC title sequence": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "negative number description": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "nel inside a plain description": {
+   "reader": "error",
+   "cli": "take"
+  },
+  "nested block scalar": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "nested block scalar under-indented line": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "nested comment at column 0": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "nested flow sequence": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "nested mapping under-indented key": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "nested metadata": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "nested plain holding colon": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "nested unclosed flow": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "next-line flow description": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "no frontmatter": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "non-specific tag name": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "null description": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "number description": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "percent description": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "plain comment then continuation": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "plain continuation colon": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "plain continuation comment then more": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "plain continuation dash": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "plain ending colon": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "plain holding colon no space": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "plain holding colon space": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "plain multi-line": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "plain multi-line name": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "plain multi-line with comment between": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "plain multi-line with trailing tabs": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "plain next line": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "plain next line colon": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "plain next line two lines": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "plain one-line": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "question plain": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "quoted duplicate key": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "quoted name with spaces": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "quoted next line": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "root is a list": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "root is a scalar": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "single-quoted apostrophe": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "single-quoted empty": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "single-quoted multi-line": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "single-quoted multi-line with blank lines": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "tab after colon": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "tab indentation": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "tag on another key": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "tagged int description": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "tagged str description": {
+   "reader": "take",
+   "cli": "take"
+  },
+  "text after quoted": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "true description": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "unclosed flow description": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "undefined alias description": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "under-indented double-quoted continuation": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "under-indented single-quoted continuation": {
+   "reader": "skip",
+   "cli": "skip"
+  },
+  "zero description": {
+   "reader": "skip",
+   "cli": "skip"
+  }
+ },
+ "yaml_2.9.0_vs_2.9.1": {
+  "cli_parseSkillMd_results": {
+   "corpus": {
+    "compared": 2455,
+    "differing": 0
+   },
+   "edge": {
+    "compared": 139,
+    "differing": 0
+   }
+  },
+  "random_multi_line_scalars": {
+   "versions": [
+    "2.9.0",
+    "2.9.1"
+   ],
+   "cases": 200000,
+   "seed": 20260930,
+   "differing": 0,
+   "error_flips": 0,
+   "first": []
+  },
+  "random_exit": 0
+ },
+ "symlinks": {
+  "sources": [
+   {
+    "source": "addyosmani/agent-skills@2686b620fc1f",
+    "symlinks": 1,
+    "symlinked_search_locations": [
+     ".opencode/skills"
+    ],
+    "skill_md_symlinks": 0,
+    "plugin_manifests_unknown": false,
+    "names": 25,
+    "outcomes": {
+     "same pick": 25
+    }
+   },
+   {
+    "source": "affaan-m/ECC@c70874fae9eb",
+    "symlinks": 0,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "plugin_manifests_unknown": false,
+    "names": 294,
+    "outcomes": {
+     "same pick": 294
+    }
+   },
+   {
+    "source": "alpacahq/alpaca-skills@39111abee6b6",
+    "symlinks": 0,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "plugin_manifests_unknown": false,
+    "names": 14,
+    "outcomes": {
+     "same pick": 14
+    }
+   },
+   {
+    "source": "anthropics/claude-code@2282079d6ac8",
+    "symlinks": 0,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "plugin_manifests_unknown": false,
+    "names": 10,
+    "outcomes": {
+     "same pick": 10
+    }
+   },
+   {
+    "source": "anthropics/skills@8a1541c4a3ff",
+    "symlinks": 0,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "plugin_manifests_unknown": false,
+    "names": 20,
+    "outcomes": {
+     "same pick": 20
+    }
+   },
+   {
+    "source": "bgauryy/octocode@c265e3f94131",
+    "symlinks": 1,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "plugin_manifests_unknown": false,
+    "names": 12,
+    "outcomes": {
+     "same pick": 12
+    }
+   },
+   {
+    "source": "cloudflare/security-audit-skill@c1c8a8c14710",
+    "symlinks": 0,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "plugin_manifests_unknown": false,
+    "names": 1,
+    "outcomes": {
+     "same pick": 1
+    }
+   },
+   {
+    "source": "ComposioHQ/awesome-claude-skills@be2a406907db",
+    "symlinks": 0,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "plugin_manifests_unknown": false,
+    "names": 28,
+    "outcomes": {
+     "same pick": 28
+    }
+   },
+   {
+    "source": "getsentry/skills@d18b7aa8ba87",
+    "symlinks": 2,
+    "symlinked_search_locations": [
+     ".agents/skills"
+    ],
+    "skill_md_symlinks": 0,
+    "plugin_manifests_unknown": false,
+    "names": 28,
+    "outcomes": {
+     "same pick": 28
+    }
+   },
+   {
+    "source": "huggingface/skills@80f9fa530e46",
+    "symlinks": 0,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "plugin_manifests_unknown": false,
+    "names": 25,
+    "outcomes": {
+     "same pick": 25
+    }
+   },
+   {
+    "source": "mattpocock/skills@d81f3a183412",
+    "symlinks": 1,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "plugin_manifests_unknown": false,
+    "names": 37,
+    "outcomes": {
+     "same pick": 37
+    }
+   },
+   {
+    "source": "microsoft/playwright-cli@b85c7a736bb4",
+    "symlinks": 0,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "plugin_manifests_unknown": false,
+    "names": 2,
+    "outcomes": {
+     "same pick": 2
+    }
+   },
+   {
+    "source": "microsoft/skills@3495f50ae0d7",
+    "symlinks": 60,
+    "symlinked_search_locations": [
+     ".opencode/skills"
+    ],
+    "skill_md_symlinks": 0,
+    "plugin_manifests_unknown": false,
+    "names": 13,
+    "outcomes": {
+     "same pick": 13
+    }
+   },
+   {
+    "source": "obra/superpowers@8ca22dba9a94",
+    "symlinks": 0,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "plugin_manifests_unknown": false,
+    "names": 15,
+    "outcomes": {
+     "same pick": 15
+    }
+   },
+   {
+    "source": "openai/skills@49f948faa925",
+    "symlinks": 0,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "plugin_manifests_unknown": false,
+    "names": 43,
+    "outcomes": {
+     "no pick either way": 1,
+     "same pick": 42
+    }
+   },
+   {
+    "source": "semgrep/skills@68177b8830f9",
+    "symlinks": 1,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "plugin_manifests_unknown": false,
+    "names": 3,
+    "outcomes": {
+     "same pick": 3
+    }
+   },
+   {
+    "source": "superagent-ai/skills@0da315b873ed",
+    "symlinks": 0,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "plugin_manifests_unknown": false,
+    "names": 14,
+    "outcomes": {
+     "same pick": 14
+    }
+   },
+   {
+    "source": "trailofbits/skills@82fe82262526",
+    "symlinks": 2,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "plugin_manifests_unknown": false,
+    "names": 83,
+    "outcomes": {
+     "same pick": 83
+    }
+   },
+   {
+    "source": "typesafe-ai/skills@65a39f393687",
+    "symlinks": 0,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "plugin_manifests_unknown": false,
+    "names": 1,
+    "outcomes": {
+     "same pick": 1
+    }
+   },
+   {
+    "source": "vercel-labs/agent-browser@d01253d9db28",
+    "symlinks": 0,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "plugin_manifests_unknown": false,
+    "names": 1,
+    "outcomes": {
+     "same pick": 1
+    }
+   },
+   {
+    "source": "vercel-labs/agent-skills@063bee94c3f4",
+    "symlinks": 1,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "plugin_manifests_unknown": false,
+    "names": 9,
+    "outcomes": {
+     "same pick": 9
+    }
+   },
+   {
+    "source": "vercel-labs/skills@3694740352ee",
+    "symlinks": 0,
+    "symlinked_search_locations": [],
+    "skill_md_symlinks": 0,
+    "plugin_manifests_unknown": false,
+    "names": 1,
+    "outcomes": {
+     "same pick": 1
+    }
+   }
+  ],
+  "totals": {
+   "no pick either way": 1,
+   "same pick": 678
+  },
+  "sources_with_a_symlinked_search_location": 3,
+  "sources_with_a_skill_md_symlink": 0,
+  "exit": 0
+ },
+ "ci_provisioning": {
+  "tarball_sha512_is_the_pinned_integrity": true,
+  "pinned_files_matching_the_tarball": "75 of 75",
+  "step": {
+   "npm": "10.9.8",
+   "exit": 0,
+   "exported": "LANDSCAPE_SWEEP_SKILLS_YAML=<runner-temp>/skills-yaml-2.9.0"
+  },
+  "reader": {
+   "node": "v22.23.2",
+   "exit": 0,
+   "record": {
+    "ok": true,
+    "package": "yaml@2.9.0",
+    "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+    "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b"
+   },
+   "pin_sha256_is_this_pin": true
+  },
+  "exit": 0
+ },
+ "negative_controls": {
+  "control-sanitize": {
+   "expect": "exit 1 (a reader without stripTerminalEscapes in sanitizeMetadata)",
+   "exit": 1
+  },
+  "control-typeof": {
+   "expect": "exit 1 (a reader without parseSkillMd's string check)",
+   "exit": 1
+  },
+  "control-flip": {
+   "expect": "exit 1 (one corpus skip flipped to take before the end-to-end comparison)",
+   "exit": 1
+  },
+  "control-tampered": {
+   "expect": "exit 3 and hash_mismatch (one byte appended to the installed composer.js)",
+   "exit": 3,
+   "answer": {
+    "reader": {
+     "ok": false,
+     "reason": "hash_mismatch"
+    },
+    "results": []
+   }
+  },
+  "mutants_applied": "mutants written"
+ },
+ "steps": [
+  {
+   "step": "versions",
+   "exit": 0
+  },
+  {
+   "step": "corpus",
+   "exit": 0
+  },
+  {
+   "step": "edge",
+   "exit": 0
+  },
+  {
+   "step": "symlinks",
+   "exit": 0
+  },
+  {
+   "step": "install-yaml-2.9.0",
+   "exit": 0
+  },
+  {
+   "step": "install-yaml-2.9.1",
+   "exit": 0
+  },
+  {
+   "step": "install-skills-cli",
+   "exit": 0
+  },
+  {
+   "step": "pack",
+   "exit": 0
+  },
+  {
+   "step": "install-npm-10",
+   "exit": 0
+  },
+  {
+   "step": "fetch-node-22",
+   "exit": 0
+  },
+  {
+   "step": "ci-step",
+   "exit": 0
+  },
+  {
+   "step": "registry",
+   "exit": 0
+  },
+  {
+   "step": "cli-yaml-version",
+   "exit": 0
+  },
+  {
+   "step": "oracle-cli-corpus",
+   "exit": 0
+  },
+  {
+   "step": "oracle-290-corpus",
+   "exit": 0
+  },
+  {
+   "step": "compare-corpus",
+   "exit": 0
+  },
+  {
+   "step": "fixture-corpus",
+   "exit": 0
+  },
+  {
+   "step": "e2e-corpus",
+   "exit": 0
+  },
+  {
+   "step": "e2e-compare-corpus",
+   "exit": 0
+  },
+  {
+   "step": "oracle-cli-edge",
+   "exit": 0
+  },
+  {
+   "step": "oracle-290-edge",
+   "exit": 0
+  },
+  {
+   "step": "compare-edge",
+   "exit": 0
+  },
+  {
+   "step": "fixture-edge",
+   "exit": 0
+  },
+  {
+   "step": "e2e-edge",
+   "exit": 0
+  },
+  {
+   "step": "e2e-compare-edge",
+   "exit": 0
+  },
+  {
+   "step": "oracle-versions",
+   "exit": 0
+  },
+  {
+   "step": "yaml-random",
+   "exit": 0
+  },
+  {
+   "step": "control-mutants",
+   "exit": 0
+  },
+  {
+   "step": "control-sanitize",
+   "exit": 1
+  },
+  {
+   "step": "control-typeof",
+   "exit": 1
+  },
+  {
+   "step": "control-flip",
+   "exit": 1
+  },
+  {
+   "step": "control-tampered",
+   "exit": 3
+  },
+  {
+   "step": "reader-empty",
+   "exit": 0
+  }
+ ],
+ "retained_outside_the_repository": {
+  "ci-step.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "ci-step.stdout": {
+   "sha256": "972ab3006cda685a6cf5195c2f16b52f76e6733db664435e8713d608be44a930",
+   "bytes": 571
+  },
+  "cli-corpus.stderr": {
+   "sha256": "96e3ec66a04ef52917220a5595ba2e56729d2a199366a783d29b0699e4e17df4",
+   "bytes": 547
+  },
+  "cli-corpus.stdout": {
+   "sha256": "d44fb7ad7401f52a6a654f1f5ff7fe2a5ba448a70a4d060f41de796914f69629",
+   "bytes": 475818
+  },
+  "cli-edge.stderr": {
+   "sha256": "6da900af78fd9244da30bfe545cf9d0526c0e5137c2f4fb588e8d3eabf721122",
+   "bytes": 13278
+  },
+  "cli-edge.stdout": {
+   "sha256": "e1e801687c5abf88717ae3dd51170c3aecf671fb3708452d6c7a130b6333b1f6",
+   "bytes": 858
+  },
+  "cli-yaml-version.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "cli-yaml-version.stdout": {
+   "sha256": "5ba2db80e8ed2521570b58d5f1acba3a6b83978e500931fc9768dd85355489a8",
+   "bytes": 6
+  },
+  "compare-corpus.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "compare-corpus.stdout": {
+   "sha256": "a97f8bcd5420d38ab01ab2c8ceb0e82832a4306848d011e9ca8565bf8acf6ecc",
+   "bytes": 736
+  },
+  "compare-edge.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "compare-edge.stdout": {
+   "sha256": "92a1df4bcaa26981fa18f95a18b0df87fe3775bd8705e607b1cbe86d0a06bf0f",
+   "bytes": 7775
+  },
+  "control-flip.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "control-flip.stdout": {
+   "sha256": "ce380c91cda76c4fff6fd75c6a20fbb87cb7ba7022481b54a363a1a298c764aa",
+   "bytes": 445
+  },
+  "control-mutants.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "control-mutants.stdout": {
+   "sha256": "6aafb8f4fafe1585efb8445409e3b4ea5baf638a9c3dcefef241ac1575daa49c",
+   "bytes": 16
+  },
+  "control-sanitize.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "control-sanitize.stdout": {
+   "sha256": "6ffa2a168e61d7d1c0d57b4b7c89fc393974cba83f0d9e08ee2378b8481abe88",
+   "bytes": 5745
+  },
+  "control-tampered.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "control-tampered.stdout": {
+   "sha256": "9de3b76960db8c488f64457aa67bdb91e60c4b287d1eaca6fd8ede31c3d6163c",
+   "bytes": 62
+  },
+  "control-typeof.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "control-typeof.stdout": {
+   "sha256": "aba35886882ed6bdedeae2ee1de43c9640062efaabb81277bd436dd12bb9be91",
+   "bytes": 7611
+  },
+  "corpus.json": {
+   "sha256": "e0913c0be7e5139d81d5e67d88548bffb8f6219ac3ec03d6fa5642b3e590cf6f",
+   "bytes": 24406512
+  },
+  "corpus.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "corpus.stdout": {
+   "sha256": "1070ca101325e4f038ede351c3a32534237321553e70294fd404ed48a164a5d4",
+   "bytes": 1143
+  },
+  "e2e-compare-corpus.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "e2e-compare-corpus.stdout": {
+   "sha256": "d8e161af24bff26b0d46afe69d1b52227f5198adeb431b2cd8f67aaaead66fb9",
+   "bytes": 319
+  },
+  "e2e-compare-edge.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "e2e-compare-edge.stdout": {
+   "sha256": "053f589b2d3703df28bd4309393ac260d2fdd9e3a0c01b754d117ce62b25b3e7",
+   "bytes": 866
+  },
+  "e2e-corpus.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "e2e-corpus.stdout": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "e2e-edge.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "e2e-edge.stdout": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "edge.json": {
+   "sha256": "646a313aad0cd572832080859d028afda55f8595d989eeb620b30987f6cfaba0",
+   "bytes": 28304
+  },
+  "edge.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "edge.stdout": {
+   "sha256": "fd1f5037a1b1908fd30c0d54d7859fe5d4574fee18835afba54763939b7263e7",
+   "bytes": 10
+  },
+  "fetch-node-22.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "fetch-node-22.stdout": {
+   "sha256": "1c98e952b6077486dd9a33a45009faeed8acd8730ce13527303c5af2ed14cc38",
+   "bytes": 35
+  },
+  "fixture-corpus-index.json": {
+   "sha256": "06e9725ad1816610ce4353eed604c14dd97baa550207c76479546d81ed000c58",
+   "bytes": 225021
+  },
+  "fixture-corpus.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "fixture-corpus.stdout": {
+   "sha256": "1fb0c07d3a990cf778f79b6b688b2b3eda4c07f9f898efcd9c1c8ae4f365aa14",
+   "bytes": 27
+  },
+  "fixture-edge-index.json": {
+   "sha256": "0a7de26d4c49e1b5d30b7178ae759f3da22b85eead0d19106488e8b19779b30a",
+   "bytes": 5845
+  },
+  "fixture-edge.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "fixture-edge.stdout": {
+   "sha256": "fed4c157d2e8f98b3ebab330fdfe4f36e7e517452760e9611a1eb860068185e5",
+   "bytes": 26
+  },
+  "install-npm-10.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "install-npm-10.stdout": {
+   "sha256": "41fcd409eab93f589e77ddb9817fde45343692cd78042cfac5cad46c251a42ec",
+   "bytes": 23
+  },
+  "install-skills-cli.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "install-skills-cli.stdout": {
+   "sha256": "54e3532c53a61bb17c6ac9353ee93d273f1644b4d8bb603e7d3473717b6b5a53",
+   "bytes": 90
+  },
+  "install-yaml-2.9.0.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "install-yaml-2.9.0.stdout": {
+   "sha256": "885a202ac038ade11a959c8ce05bbc398690121aabe992678c570b75d1a5213a",
+   "bytes": 26
+  },
+  "install-yaml-2.9.1.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "install-yaml-2.9.1.stdout": {
+   "sha256": "075d52f618f01df7f428da630fb3df45bdfe4bce85ea5ca682c88ba533e9b4e5",
+   "bytes": 26
+  },
+  "mutant-sanitize-edge.json": {
+   "sha256": "05fa110f2996b61f93fb195a3279975e734b7b63cd25d7892704e6c4ef3dffcd",
+   "bytes": 40964
+  },
+  "mutant-typeof-edge.json": {
+   "sha256": "b8417bfa971820efef42b686c595f99791ce55909acda5974fdcb248700709c3",
+   "bytes": 40450
+  },
+  "oracle-290-corpus.json": {
+   "sha256": "73928ec96099bf437f2981a8dc9dc1533d8fb7b44a7c7a02d69d7f5e03d0e005",
+   "bytes": 1112840
+  },
+  "oracle-290-corpus.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "oracle-290-corpus.stdout": {
+   "sha256": "730ad04633aad5c69d83c9242466fcd0a1a36d36fedf48ac106a970acff8d890",
+   "bytes": 119
+  },
+  "oracle-290-edge.json": {
+   "sha256": "c594edfc4f4053e1e847421727c56e55b2efb96d23da6d269c1c264592a1eb0b",
+   "bytes": 29493
+  },
+  "oracle-290-edge.stderr": {
+   "sha256": "e2951cc52a002b062650942cac0eafc11e2517900f8f7a1d6edd980bea1bffa5",
+   "bytes": 342
+  },
+  "oracle-290-edge.stdout": {
+   "sha256": "30971e916cae4650478b82c7b0813770561c40bf584a824ed030f673f11abfab",
+   "bytes": 118
+  },
+  "oracle-cli-corpus.json": {
+   "sha256": "c9f0d1c717b8f4f4fc07967cc68f465879a33f4d6444c8822956fa8bb98ce160",
+   "bytes": 1112840
+  },
+  "oracle-cli-corpus.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "oracle-cli-corpus.stdout": {
+   "sha256": "e02f4a057b9e33eb8e6e6f3b517045a601bba43ad68097a80c1496b83179e792",
+   "bytes": 119
+  },
+  "oracle-cli-edge.json": {
+   "sha256": "8d3c200310ddc66d0a21059bc3c4f6d5a1e07e14610bde60929e0ac7864741d1",
+   "bytes": 29493
+  },
+  "oracle-cli-edge.stderr": {
+   "sha256": "adb393b485083c92a72f021da1e4fc620917583dd2f531ac102fba41c5c4e285",
+   "bytes": 342
+  },
+  "oracle-cli-edge.stdout": {
+   "sha256": "dd68ace32951317e670004aee78674e8418edd93d937dfaff43e76abb05a6890",
+   "bytes": 118
+  },
+  "oracle-versions.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "oracle-versions.stdout": {
+   "sha256": "4c01242b4fcc66165cf838bf540dcb1730c42186b21dadfe9e67f119c55fca07",
+   "bytes": 45
+  },
+  "pack.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "pack.stdout": {
+   "sha256": "d7cef526fed56ba16ed4c9f0c71629039b206e75206be157292c9ef324db09cc",
+   "bytes": 53139
+  },
+  "reader-corpus-flipped.json": {
+   "sha256": "6994e91b4e134ee9c00828d6e9797c2532a5d0b5fa15e4f1e7139ca518122537",
+   "bytes": 1285328
+  },
+  "reader-corpus.json": {
+   "sha256": "f0f88a4e88d8cc0e31290f4b4da0b613a75f020ea9db523ed8e2bedfdac7fe5f",
+   "bytes": 1359040
+  },
+  "reader-edge.json": {
+   "sha256": "aa480494b49f4d1770686a4a68e07e001522562d17d262f1694ba49340c1cc1f",
+   "bytes": 40841
+  },
+  "reader-empty.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "reader-empty.stdout": {
+   "sha256": "c7081371836382860bfcd37546efb29a3db51db29a42c229fac911bef911c291",
+   "bytes": 249
+  },
+  "registry.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "registry.stdout": {
+   "sha256": "ed777fa3ce977b3f1ee41b9e56e6dbe5f881c07de18d2dac142b9c548ad4d0f7",
+   "bytes": 650
+  },
+  "skills-1.7.0.tgz": {
+   "sha256": "8d1466f792baaee945dae88e05ee403d6f9e78a3ae8dcbf61496035ca274418d",
+   "bytes": 137505
+  },
+  "symlinks.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "symlinks.stdout": {
+   "sha256": "9c7efee64a9bd95d5f622f8e00753c52e8ef9e9e009290a972b587a09b8c3fc4",
+   "bytes": 5473
+  },
+  "versions.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "versions.stdout": {
+   "sha256": "1cbaf330744909c3c9d8320a8fd03bfce82db226261746e9336a5360c131c322",
+   "bytes": 51
+  },
+  "yaml-2.9.0.tgz": {
+   "sha256": "008fa204cb1ba700e0272ba045abbf09a6ffe63456e8146ba97cac6c2ad1ef91",
+   "bytes": 112086
+  },
+  "yaml-2.9.1.tgz": {
+   "sha256": "4ef6c54cf559b8a207b7b518378230805a1c84af239b14960e8c67c7d59de5d3",
+   "bytes": 112114
+  },
+  "yaml-random.stderr": {
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "bytes": 0
+  },
+  "yaml-random.stdout": {
+   "sha256": "36870f172a4e0a590036781b782abfd465df19cbc529404a954bf74096b6287e",
+   "bytes": 103
+  }
+ }
+}

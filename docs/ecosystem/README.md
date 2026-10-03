@@ -30,7 +30,8 @@ still works offline; the guide and manifest links require the checkout layout.
 
 The views connect a layered ecosystem map, foundation and trading capabilities,
 current choices and alternatives, the repository explorer, selected-stack setup,
-token-efficiency evidence, and dated source provenance. Every
+token-efficiency evidence, the new-WSL final architecture, and dated source
+provenance. Every
 current public index identity and the existing 342-star snapshot are retained. The separate
 current-integrations lane makes newly observed Tavily setup searchable without
 silently enlarging the canonical index or accepted component manifest. Stars and
@@ -124,6 +125,56 @@ unsupported formats, files over 2 MiB and bundles over 16 MiB. It never follows
 arbitrary raw-log references. Publication review must establish that the declared
 public files are suitable for sharing; the hash check establishes byte identity.
 Receipts without public attachments say so explicitly.
+
+**Final architecture** (tab 05) appears when the dated edition
+[`catalogs/foundation/new-wsl-architecture-20261001.json`](../../catalogs/foundation/new-wsl-architecture-20261001.json)
+is present; without it the tab stays hidden. It is the install manifest for a
+new WSL distribution: one row per layer of both catalogs (the 20 foundation
+layers and the 12 us-equities layers of the research state) plus `cross:` rows
+for the distribution itself, runtime workers, the GPT-6 harnesses, the
+credential practice and the convergence practice. The header shows the edition
+date, its base commit, scope, the verdict rules verbatim, what each verdict and
+evidence class means, the five closure items of
+[the research state](../../catalogs/landscape/research-state.json) and the
+edition's sources, and states how many rows are closed. One table per catalog
+lists each row's source-host selection of record (the winners column, which is
+this host's bookkeeping and not a merit result) at its pin, verdict, evidence class,
+reasons and install command; expanding a row shows the closure items with what
+is missing, the winners' pin locators, install and acceptance commands and
+upstream currency, the alternatives, the ordered new-host steps and the gates.
+
+The build validates the edition before it renders: every `layer_id` is a known
+catalog layer or a `cross:` id, a layer being identified by its catalog and id; a
+winner's `component_id` must be a `manifests/stack.json` component, and when the
+stack's recorded version differs from the edition's pin the build still passes,
+the page notes the drift on that winner and the `--check` JSON lists it under
+`architecture_pin_drift`; a winner may carry a short `role` (at most 120
+characters), shown beside its name; repositories and currency links pass the
+public HTTPS gate; each cited `source_path` must be a repository file, which is
+hashed into the page's inputs and linked at the publication ref; a source not yet
+on main is cited as a `pending_source` with its pull request and is linked, not
+hashed, until its file exists, when it is hashed and labelled as landed after the
+edition's base; verdicts and evidence classes come from fixed enums; a row is
+`closed` if and only if all five closure items are `met`, so a closed row names
+nothing missing and an open row's `missing` names each item that is not met in
+its own `cN:` segment and no met item; a row with a winner whose acceptance is
+`none_recorded` is `none_recorded`, and otherwise its class is one that a
+winner's acceptance carries (where the winners carry several, the edition
+records the one listed last in the policy table); and the edition's
+`close_only_when_sha256` must match the research state's five closure texts. A
+catalog layer without a row is listed as a gap rather than failing the build.
+
+A winner's acceptance class describes a run that the cited source, or one file
+that source links, shows was run on a host and what it returned. A check that is
+only prescribed, planned, not run or failed is `none_recorded`. Schema, pin,
+hash and contract-test checks are `structural_validation`. A version print is
+metadata, not an acceptance. The `command` names the check the record is about;
+on a `none_recorded` entry it names the check to run on the new host, of which
+no run is recorded.
+The build cannot read prose, so this rule is held by review, not by a validator:
+an independent review on 2026-10-01 found 32 of the 119 winner classes
+overstated, and the edition was corrected. The record of this edition is
+[`docs/decisions/2026-10-01-new-wsl-architecture-edition.md`](../decisions/2026-10-01-new-wsl-architecture-edition.md).
 
 ## Rebuild and check
 

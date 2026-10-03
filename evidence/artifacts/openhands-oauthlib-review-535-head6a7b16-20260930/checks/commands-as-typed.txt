@@ -1,0 +1,12 @@
+Commands of the review as typed (transcribed from the session; the scripts named are in scripts/). Times: git fetch and the head/lock verification 2026-09-30T09:24Z; the reproduced
+hashed installs ran 09:24:2xZ (checks/install-log.txt); run_review_outputs.sh generated the identity, closure, advisory-file, pin-source and OSV outputs at 09:26:01Z to 09:26:05Z; the independent
+sweep and consumer_search.sh were run at 09:26:05Z and 09:27:00Z. Every output file carries its own observed time where its script prints one.
+
+ 1. git fetch -q origin refs/pull/535/head:refs/remotes/pr/535b main                 (git protocol; no REST call); git rev-parse refs/remotes/pr/535b
+ 2. git show refs/remotes/pr/535b:<lock and build lock> into the scratch directory; sha256sum
+ 3. install_candidate.sh: with UV_NO_CONFIG=1: uv venv --python 3.13.15 <venv>; uv pip install --python <venv>/bin/python --require-hashes --no-deps --only-binary :all:
+    --index-url https://pypi.org/simple -r <build-requirements lock at the head>; uv pip install --python <venv>/bin/python --require-hashes --no-deps --no-build-isolation
+    --index-url https://pypi.org/simple -r <candidate lock>; uv pip check --python <venv>/bin/python      (the candidate's own recorded install commands)
+ 4. run_review_outputs.sh      (identity; closure difference against the PR base's lock; advisory-file hashes; pin sources; OSV-Scanner 2.6.0 three scans with exit codes)
+ 5. <venv>/bin/python oauthlib_independent_scan.py <venv>/lib/python3.13/site-packages
+ 6. consumer_search.sh         (git grep at the head for consumers of the lock and for macOS handling)

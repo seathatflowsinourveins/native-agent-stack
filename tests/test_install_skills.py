@@ -26,6 +26,9 @@ of the real `skills` CLI (v1.7.0) to exercise install_skills.py end to end:
                     lock "malformed" (truncated, entry kept) or "unreadable".
                     A set, non-blank $CLAUDE_CONFIG_DIR moves the global link
                     to $CLAUDE_CONFIG_DIR/skills, as in skills 1.7.0.
+  Every global path (canonical folder, lock, link) is joined as skills 1.7.0's
+  path.join joins it (node_join), so a ".." in HOME or $XDG_STATE_HOME lands
+  under the normalized folder and the folder it passes through is never made.
 
 Every invocation is also appended to calls.log next to the fake script
 (independent of --home), so tests can assert not just the outcome but
@@ -38,22 +41,27 @@ install_skills.py is run as a real subprocess (like tests/test_render_config.py'
 does across process boundaries with a real (fake) CLI. $XDG_STATE_HOME is
 stripped from the child environment by default so a variable already set on
 the host running these tests can never redirect a lock-file write outside the
-test's own temporary directory; only the dedicated XDG test re-adds it,
-pointed at a second temporary directory. $CLAUDE_CONFIG_DIR is stripped the
-same way, and only the tests that name it set it.
+test's own temporary directory. Only the tests that name it set it again, each
+inside its own temporary directory: the XDG tests (XdgStateHomeLockPathTests)
+and the ".." cases built by dotdot_paths. The path unit test
+test_global_paths_join_as_node_does_and_project_paths_are_unchanged also sets
+it, in this process under mock.patch.dict, for paths it computes and never
+writes. $CLAUDE_CONFIG_DIR is stripped the same way, and only the tests that
+name it set it.
 """
 
 import hashlib
 import importlib.util
 import json
 import os
-import re
 import shutil
 import subprocess
 import sys
 import tempfile
+import tomllib
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "tools" / "adoption" / "install_skills.py"
@@ -94,11 +102,20 @@ with open(LOG, "a", encoding="utf-8") as fh:
     fh.write(json.dumps(sys.argv[1:]) + "\n")
 
 
+def node_join(*parts: str) -> Path:
+    # Node's POSIX path.join, which skills 1.7.0 builds every global path with (npm dist/cli.mjs L10 imports it
+    # from "path"): the non-empty parts joined with / and normalized, so ".." collapses; a leading // becomes /.
+    joined = os.path.normpath("/".join(part for part in parts if part))
+    return Path("/" + joined.lstrip("/") if joined.startswith("//") else joined)
+
+
 def lock_path(home: Path) -> Path:
+    # dist/cli.mjs L3746-3750: a non-empty XDG_STATE_HOME, untrimmed, else os.homedir(), which is HOME verbatim,
+    # each through path.join.
     xdg = os.environ.get("XDG_STATE_HOME")
     if xdg:
-        return Path(xdg) / "skills" / ".skill-lock.json"
-    return home / ".agents" / ".skill-lock.json"
+        return node_join(xdg, "skills", ".skill-lock.json")
+    return node_join(str(home), ".agents", ".skill-lock.json")
 
 
 def load_lock(path: Path) -> dict:
@@ -119,8 +136,7 @@ def claude_skills_dir(target: Path, project: bool) -> Path:
     if project:
         return target / ".claude" / "skills"
     config_dir = os.environ.get("CLAUDE_CONFIG_DIR", "").strip(JS_TRIM_CHARS)
-    joined = os.path.normpath(os.path.join(config_dir or str(target / ".claude"), "skills"))
-    return Path("/" + joined.lstrip("/") if joined.startswith("//") else joined)
+    return node_join(config_dir or str(target / ".claude"), "skills")
 
 
 argv = sys.argv[1:]
@@ -133,7 +149,9 @@ if argv[0] == "--version":
 
 home = Path(os.environ["HOME"])
 project = "-g" not in argv
-target = Path.cwd() if project else home
+# Globally the canonical folder is path.join(os.homedir(), ".agents", "skills") (dist/cli.mjs L2208-2210), so every
+# global path below starts from the normalized HOME, before anything is made or removed; a project uses its cwd.
+target = Path.cwd() if project else node_join(str(home))
 
 if argv[0] == "add":
     url = argv[1]
@@ -321,12 +339,12 @@ class InstallSkillsTestCase(unittest.TestCase):
         return path
 
     def run_install(self, manifest: Path, *extra: str, env: dict | None = None,
-                    fake_bin: Path | None = None) -> subprocess.CompletedProcess:
+                    fake_bin: Path | None = None, home_arg: str | None = None) -> subprocess.CompletedProcess:
         full_env = dict(os.environ)
         full_env.pop("XDG_STATE_HOME", None)  # never let the host redirect the lock write
         full_env.pop("CLAUDE_CONFIG_DIR", None)  # nor the global Claude link
         full_env.update(env or {})
-        args = [sys.executable, str(SCRIPT), "--manifest", str(manifest), "--home", str(self.home)]
+        args = [sys.executable, str(SCRIPT), "--manifest", str(manifest), "--home", home_arg or str(self.home)]
         if fake_bin is not None:
             args += ["--skills-bin", str(fake_bin)]
         args += list(extra)
@@ -336,6 +354,23 @@ class InstallSkillsTestCase(unittest.TestCase):
         path = (Path(xdg_state_home) / "skills" / ".skill-lock.json") if xdg_state_home \
             else (self.home / ".agents" / ".skill-lock.json")
         return json.loads(path.read_text()) if path.is_file() else {}
+
+    def dotdot_paths(self, label: str, via: str) -> tuple[dict | None, str | None, Path]:
+        """(env, --home argument, lock) with a ".." through the missing folder tmp/missing in --home ("home") or in
+        XDG_STATE_HOME ("xdg"); the home is tmp/<label>. skills 1.7.0 joins both with path.join, which collapses
+        the ".." (dist/cli.mjs L2208-2210, L3746-3750), so the returned lock is the normalized path and tmp/missing
+        is never made. pathlib keeps the "..", and a path through a missing folder does not exist."""
+        missing = self.tmp_path / "missing"
+        if via == "home":
+            return None, str(missing / ".." / label), self.tmp_path / label / ".agents" / ".skill-lock.json"
+        state = f"state-{label}"
+        return ({"XDG_STATE_HOME": str(missing / ".." / state)}, str(self.tmp_path / label),
+                self.tmp_path / state / "skills" / ".skill-lock.json")
+
+    def assert_fake_cli_made_no_missing_folder(self) -> None:
+        """A fake-CLI fidelity check, not a check of install_skills.py, which makes no path itself: like skills
+        1.7.0, whose path.join collapses a ".." before any mkdir, the fake CLI never makes tmp/missing."""
+        self.assertFalse((self.tmp_path / "missing").exists())
 
 
 class DryRunTests(InstallSkillsTestCase):
@@ -712,6 +747,39 @@ sys.exit(code)
                 self.assertEqual(json.loads(global_lock.read_text()), {"lockfileVersion": 3, "skills": {}})
                 self.assertFalse((self.home / "skills-lock.json").exists())
 
+    def test_project_dir_is_compared_with_the_home_the_cli_joins(self):
+        # The CLI's global home is path.join(HOME) (dist/cli.mjs L2208-2210), so --home tmp/link/../h is tmp/h, the
+        # project. pathlib keeps the "..": through the symlink link -> x/y it names tmp/x/h. A ".." after a real
+        # directory (the control) names tmp/h either way. Each is refused before any skills or gh call.
+        (self.tmp_path / "x" / "y").mkdir(parents=True)
+        (self.tmp_path / "link").symlink_to("x/y", target_is_directory=True)
+        (self.tmp_path / "real").mkdir()
+        path_env = {"PATH": str(self.bin_dir) + os.pathsep + os.environ["PATH"]}
+        gh_log = self.bin_dir / "gh_calls.log"
+        self.project = self.tmp_path / "h"
+        self.project.mkdir()
+        for via in ("real", "link"):
+            with self.subTest(home=f"{via}/../h"):
+                calls_before = calls_log(self.fake_bin)
+                gh_before = gh_log.read_text() if gh_log.exists() else ""
+                result = self.run_install(self.manifest, "--project-dir", str(self.project), "--agent", "universal",
+                                          fake_bin=self.fake_bin, env=path_env,
+                                          home_arg=str(self.tmp_path / via / ".." / "h"))
+                self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                self.assertIn("project containment: --project-dir is --home", result.stderr)
+                self.assertEqual(calls_log(self.fake_bin), calls_before)  # not even --version ran
+                self.assertEqual(gh_log.read_text() if gh_log.exists() else "", gh_before)
+                self.assertFalse((self.project / ".agents").exists())
+        # tmp/x/h, which pathlib names for link/../h, is not the CLI's global home: an ordinary project.
+        self.project = self.tmp_path / "x" / "h"
+        self.project.mkdir()
+        result = self.run_install(self.manifest, "--project-dir", str(self.project), "--agent", "universal",
+                                  "--dry-run", fake_bin=self.fake_bin, env=path_env,
+                                  home_arg=str(self.tmp_path / "link" / ".." / "h"))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertNotIn("project containment", result.stderr)
+        self.assertIn("would run", result.stdout)
+
     def test_adding_claude_target_to_existing_universal_install_creates_its_link(self):
         first = self.install()
         self.assertEqual(first.returncode, 0, first.stdout + first.stderr)
@@ -816,6 +884,58 @@ class AddAndVerifyTests(InstallSkillsTestCase):
         self.assertIn("ok", second.stdout)
         self.assertEqual([c[0] for c in calls_log(fake_bin)], ["--version", "add", "--version"])
 
+    def test_install_through_dotdot_in_home_or_xdg_state_home_is_verified(self):
+        # The post-add check reads the canonical folder and the lock where the CLI wrote them (dotdot_paths),
+        # so a matching add through tmp/missing/.. is installed, not rolled back as unverified.
+        content = "# New skill\n"
+        for label, via in (("home-dotdot", "home"), ("xdg-dotdot", "xdg")):
+            with self.subTest(case=label):
+                env, home_arg, lock = self.dotdot_paths(label, via)
+                bin_dir = self.tmp_path / f"bin-{label}"
+                bin_dir.mkdir()
+                fake_bin = write_fake_skills_bin(
+                    bin_dir, {"new-skill": {"skill_md": content, "tree_sha": tree_sha("new")}})
+                manifest = self.write_manifest([make_skill("new-skill", content, tree_sha("new"))])
+                result = self.run_install(manifest, "--json", env=env, fake_bin=fake_bin, home_arg=home_arg)
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertEqual(json.loads(result.stdout)["skills"], {"new-skill": "installed"})
+                self.assertEqual([c[0] for c in calls_log(fake_bin)], ["--version", "add"])
+                skill_md = self.tmp_path / label / ".agents" / "skills" / "new-skill" / "SKILL.md"
+                self.assertEqual(skill_md.read_text(), content)
+                self.assertEqual(json.loads(lock.read_text())["skills"]["new-skill"]["skillFolderHash"],
+                                 tree_sha("new"))
+                self.assert_fake_cli_made_no_missing_folder()
+
+    def test_global_paths_join_as_node_does_and_project_paths_are_unchanged(self):
+        installer = load_installer_module()
+        home, project = Path("/h/missing/../base"), Path("/p/missing/../project")
+        with mock.patch.dict(os.environ):
+            os.environ.pop("XDG_STATE_HOME", None)
+            os.environ.pop("CLAUDE_CONFIG_DIR", None)
+            self.assertEqual(installer.canonical_skill_dir(home, "x"), Path("/h/base/.agents/skills/x"))
+            self.assertEqual(installer.lock_file_path(home), Path("/h/base/.agents/.skill-lock.json"))
+            self.assertEqual(installer.claude_skills_dir(home), Path("/h/base/.claude/skills"))
+            os.environ["XDG_STATE_HOME"] = "//s/missing/../state"  # a leading // collapses to /, as in Node
+            self.assertEqual(installer.lock_file_path(home), Path("/s/state/skills/.skill-lock.json"))
+            # main() resolves --project-dir; each project path is the given directory joined by pathlib, as before.
+            self.assertEqual(installer.canonical_skill_dir(home, "x", project), project / ".agents" / "skills" / "x")
+            self.assertEqual(installer.lock_file_path(home, project), project / "skills-lock.json")
+            self.assertEqual(installer.claude_skills_dir(home, project), project / ".claude" / "skills")
+
+    @unittest.skipUnless(shutil.which("node"), "node is not on PATH")
+    def test_node_path_join_matches_node(self):
+        # The one join every global path goes through, against node's own path.join (no case ends in /, which
+        # Node keeps and a Path cannot).
+        cases = [["/a/missing/../state", "skills", ".skill-lock.json"], ["//a/b", ".agents", "skills", "x"],
+                 ["///a", ".agents"], ["rel/../../x", ".agents"], ["a/./b//c", "skills"], ["/..", "x"],
+                 ["", "skills"], ["/a/b/", ".claude", "skills"], ["..", "x"], ["", ""]]
+        script = ("const {join} = require('path'); "
+                  "console.log(JSON.stringify(JSON.parse(process.argv[1]).map(parts => join(...parts))));")
+        result = subprocess.run(["node", "-e", script, json.dumps(cases)], capture_output=True, text=True,
+                                check=True, timeout=60)
+        installer = load_installer_module()
+        self.assertEqual([str(installer.node_path_join(*parts)) for parts in cases], json.loads(result.stdout))
+
 
 class MismatchRollbackTests(InstallSkillsTestCase):
     def test_tree_sha_mismatch_after_add_rolls_back_and_exits_one(self):
@@ -862,7 +982,7 @@ class GlobalRollbackReadBackTests(InstallSkillsTestCase):
     NAME = "drift-skill"
     CONTENT = "# Drifted skill\n"
 
-    def run_drift(self, home_label: str = "home", env: dict | None = None,
+    def run_drift(self, home_label: str = "home", env: dict | None = None, home_arg: str | None = None,
                   **fixture) -> subprocess.CompletedProcess:
         """A tree mismatch after add, so the global rollback runs; each label gets its own home and binary."""
         self.home = self.tmp_path / home_label
@@ -872,7 +992,7 @@ class GlobalRollbackReadBackTests(InstallSkillsTestCase):
         self.fake_bin = write_fake_skills_bin(bin_dir, {self.NAME: {
             "skill_md": self.CONTENT, "tree_sha": tree_sha("actually-installed"), **fixture}})
         manifest = self.write_manifest([make_skill(self.NAME, self.CONTENT, tree_sha("pinned"))])
-        return self.run_install(manifest, "--json", fake_bin=self.fake_bin, env=env)
+        return self.run_install(manifest, "--json", fake_bin=self.fake_bin, env=env, home_arg=home_arg)
 
     def artifacts(self) -> dict:
         canonical = self.home / ".agents" / "skills" / self.NAME
@@ -973,7 +1093,7 @@ class GlobalRollbackReadBackTests(InstallSkillsTestCase):
                 link = (link_dir or self.home / ".claude" / "skills") / self.NAME
                 self.assertTrue(link.is_symlink())
                 self.assertIn(f"left: {link}", result.stderr)
-                self.assertFalse((self.tmp_path / "missing").exists())
+                self.assert_fake_cli_made_no_missing_folder()
 
     @unittest.skipUnless(shutil.which("node"), "node is not on PATH")
     def test_js_trim_chars_match_node(self):
@@ -1015,6 +1135,40 @@ class GlobalRollbackReadBackTests(InstallSkillsTestCase):
         self.assertIn("rolled back", result.stderr)
         self.assertNotIn(": error:", result.stderr)
         self.assertEqual(self.artifacts(), {"canonical": False, "lock": False, "claude-link": False})
+
+    def test_dotdot_in_home_or_xdg_state_home_is_read_back_where_the_cli_keeps_it(self):
+        # The canonical folder and the lock are read back at the CLI's path.join paths (dotdot_paths): a kept
+        # folder or lock entry through tmp/missing/.. is not read as removed.
+        for label, via, retained, reason in (
+                ("home-dotdot-canonical", "home", ["canonical"], "rollback retained, in use by another agent"),
+                ("home-dotdot-lock", "home", ["lock"], "rollback incomplete"),
+                ("xdg-dotdot-lock", "xdg", ["lock"], "rollback incomplete")):
+            with self.subTest(case=label):
+                env, home_arg, lock = self.dotdot_paths(label, via)
+                result = self.run_drift(label, env=env, home_arg=home_arg, retain_after_remove=retained)
+                self.assert_error(result, reason)
+                canonical = self.home / ".agents" / "skills" / self.NAME
+                kept = {"canonical": canonical.is_dir(), "lock": self.NAME in json.loads(lock.read_text())["skills"]}
+                self.assertEqual(kept, {key: key in retained for key in kept})
+                self.assertIn(f"canonical={kept['canonical']}, lock={kept['lock']}, claude-link=False", result.stderr)
+                self.assertIn(f"left: {canonical}" if kept["canonical"] else f"left: its entry in {lock}",
+                              result.stderr)
+                self.assert_fake_cli_made_no_missing_folder()
+
+    def test_dotdot_control_remove_that_deletes_everything_is_rolled_back(self):
+        for label, via in (("home-dotdot-control", "home"), ("xdg-dotdot-control", "xdg")):
+            with self.subTest(case=label):
+                env, home_arg, lock = self.dotdot_paths(label, via)
+                result = self.run_drift(label, env=env, home_arg=home_arg)
+                self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                self.assertEqual(json.loads(result.stdout)["skills"], {self.NAME: "rolled-back"})
+                self.assertNotIn(": error:", result.stderr)
+                # The fake CLI wrote and emptied the lock at the normalized path; nothing else is left.
+                self.assertEqual(json.loads(lock.read_text())["skills"], {})
+                self.assertFalse((self.home / ".agents" / "skills" / self.NAME).exists())
+                link = self.home / ".claude" / "skills" / self.NAME
+                self.assertFalse(link.exists() or link.is_symlink())
+                self.assert_fake_cli_made_no_missing_folder()
 
 
 class LocalModifiedTests(InstallSkillsTestCase):
@@ -1136,8 +1290,16 @@ class ManifestScopeAndPruneTests(InstallSkillsTestCase):
                     self.assertIn("--project-dir", result.stderr)
         self.assertEqual(calls_log(fake_bin), [])  # refused before even the version check
         self.assertFalse((self.home / ".agents").exists())
-        printed = self.run_install(scoped, "--print-codex-config")  # print-only; installs nothing
+        # A path-keyed Codex table names the project's installed SKILL.md, so printing needs --project-dir too.
+        printed = self.run_install(scoped, "--print-codex-config")
+        self.assertEqual(printed.returncode, 1, printed.stdout + printed.stderr)
+        self.assertIn("--project-dir", printed.stderr)
+        self.assertNotIn("[[skills.config]]", printed.stdout)
+        project = self.tmp_path / "project"
+        project.mkdir()
+        printed = self.run_install(scoped, "--print-codex-config", "--project-dir", str(project))  # print-only
         self.assertEqual(printed.returncode, 0, printed.stdout + printed.stderr)
+        self.assertEqual(list(project.iterdir()), [])
         scoped.write_text(json.dumps(dict(data, scope="planet")))
         for mode in ((), ("--print-codex-config",)):
             with self.subTest(scope="planet", mode=mode):
@@ -1165,7 +1327,23 @@ class ManifestScopeAndPruneTests(InstallSkillsTestCase):
         self.assertNotIn("unknown", only.stderr)
 
 
+def printed_tables(stdout: str) -> list[dict]:
+    """The [[skills.config]] tables --print-codex-config printed, parsed as Codex parses config.toml."""
+    return tomllib.loads(stdout).get("skills", {}).get("config", [])
+
+
 class PrintCodexConfigTests(InstallSkillsTestCase):
+    """--print-codex-config keys each table by the installed SKILL.md path, never by name. Codex applies a
+    name rule to every loaded skill of that name (openai/codex rust-v0.159.2
+    codex-rs/config/src/skills_config.rs L109-119), its bundled .system copy included, and a path rule to the
+    one skill whose canonical path_to_skills_md it names (codex-rs/ext/skills/src/host_service.rs L366-371,
+    host_outcome.rs L52-54). skills 1.7.0 installs a global Codex skill only at the canonical
+    ~/.agents/skills/<name> (vercel-labs/skills@7407f389 src/installer.ts L392-402), which Codex loads from its
+    $HOME/.agents/skills root (codex-rs/ext/skills/src/host_roots.rs L103-108)."""
+
+    def skill_md(self, name: str, root: Path | None = None) -> str:
+        return str((root or self.home) / ".agents" / "skills" / name / "SKILL.md")
+
     def test_prints_only_codex_disabled_skills_and_never_touches_the_binary(self):
         on_skill = make_skill("codex-on", "# on\n", tree_sha("on"), codex_enabled=True)
         off_skill = make_skill("codex-off", "# off\n", tree_sha("off"), codex_enabled=False)
@@ -1173,10 +1351,9 @@ class PrintCodexConfigTests(InstallSkillsTestCase):
         result = self.run_install(manifest, "--print-codex-config",
                                   fake_bin=Path("/nonexistent/skills-binary"))
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertIn('[[skills.config]]', result.stdout)
-        self.assertIn('name = "codex-off"', result.stdout)
-        self.assertIn("enabled = false", result.stdout)
+        self.assertEqual(printed_tables(result.stdout), [{"path": self.skill_md("codex-off"), "enabled": False}])
         self.assertNotIn("codex-on", result.stdout)
+        self.assertNotRegex(result.stdout, r"(?m)^name = ")
 
     def test_multiple_disabled_skills_each_get_their_own_table(self):
         skills = [make_skill(f"off-{i}", f"# {i}\n", tree_sha(f"off-{i}"), codex_enabled=False)
@@ -1185,8 +1362,48 @@ class PrintCodexConfigTests(InstallSkillsTestCase):
         result = self.run_install(manifest, "--print-codex-config")
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertEqual(result.stdout.count("[[skills.config]]"), 3)
-        for i in range(3):
-            self.assertIn(f'name = "off-{i}"', result.stdout)
+        self.assertEqual(printed_tables(result.stdout),
+                         [{"path": self.skill_md(f"off-{i}"), "enabled": False} for i in range(3)])
+
+    def test_skill_creator_is_disabled_by_its_installed_path_never_by_its_name(self):
+        # Codex ships its own .system/skill-creator (codex-rs/skills/src/assets/samples/skill-creator/SKILL.md L2
+        # at rust-v0.159.2), so a name rule would hide the bundled copy along with the pinned one.
+        result = self.run_install(ADOPTION_MANIFEST, "--print-codex-config")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        tables = printed_tables(result.stdout)
+        self.assertIn({"path": self.skill_md("skill-creator"), "enabled": False}, tables)
+        self.assertEqual([table for table in tables if set(table) != {"path", "enabled"}], [])
+        self.assertNotRegex(result.stdout, r"(?m)^name = ")
+
+    def test_path_is_joined_as_the_cli_joins_the_canonical_folder_and_quoted_for_toml(self):
+        # The canonical folder is path.join(os.homedir(), ".agents", "skills", name) (dist/cli.mjs L2208-2210), which
+        # collapses a ".." lexically; a quote or backslash in the path stays a valid TOML basic string.
+        home = self.tmp_path / 'we"ird\\home'
+        home.mkdir()
+        off_skill = make_skill("off-skill", "# off\n", tree_sha("off"), codex_enabled=False)
+        result = self.run_install(self.write_manifest([off_skill]), "--print-codex-config",
+                                  home_arg=str(self.tmp_path / "missing" / ".." / home.name))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(printed_tables(result.stdout), [{"path": self.skill_md("off-skill", home), "enabled": False}])
+        self.assertFalse((self.tmp_path / "missing").exists())
+
+    def test_a_project_scoped_manifest_names_the_project_copy(self):
+        off_skill = make_skill("off-skill", "# off\n", tree_sha("off"), codex_enabled=False)
+        scoped = self.tmp_path / "scoped.json"
+        scoped.write_text(json.dumps(dict(make_manifest([off_skill]), scope="project")))
+        project = self.tmp_path / "project"
+        project.mkdir()
+        result = self.run_install(scoped, "--print-codex-config", "--project-dir", str(project))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(printed_tables(result.stdout),
+                         [{"path": self.skill_md("off-skill", project.resolve()), "enabled": False}])
+        self.assertEqual(list(project.iterdir()), [])
+
+    def test_a_disabled_name_that_is_not_one_path_component_is_refused(self):
+        off_skill = make_skill("../escape", "# off\n", tree_sha("off"), codex_enabled=False)
+        result = self.run_install(self.write_manifest([off_skill]), "--print-codex-config")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertNotIn("[[skills.config]]", result.stdout)
 
 
 class ReuseRefGateTests(InstallSkillsTestCase):
@@ -1230,7 +1447,9 @@ class ReuseRefGateTests(InstallSkillsTestCase):
         on = self.reuse(lambda s: s.get("codex_enabled") is True)
         result = self.run_install(self.write_manifest([off, on]), "--print-codex-config")
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertEqual(re.findall(r'(?m)^name = "([^"]+)"$', result.stdout), [off["name"]])
+        self.assertEqual(printed_tables(result.stdout),
+                         [{"path": str(self.home / ".agents" / "skills" / off["name"] / "SKILL.md"),
+                           "enabled": False}])
 
     def test_reused_entry_that_restates_a_gate_is_refused(self):
         entry = self.reuse(lambda s: s.get("codex_enabled") is False)

@@ -1,0 +1,4 @@
+1:  [2m📋 Loaded env from <masked>.env[0m
+2:  [33m⚠ PORT in <masked>.env is ignored, the environment set it first[0m
+3:  [33m⚠ REQUIRE_API_KEY in <masked>.env is ignored, the environment set it first[0m
+5:  [2m✨ Generated STORAGE_ENCRYPTION_KEY in <masked>.env[0m

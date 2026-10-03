@@ -1,0 +1,15 @@
+#!/bin/bash
+# Published copy of the script as it ran on 2026-09-30. Host paths are replaced by the placeholders named in the assignments below
+# (<work directory>, <bin directory of Node 24.21.0>, <npm cache>, <throwaway directory>); nothing else differs.
+# audit_global_refused.sh: what `npm audit signatures` does with the smoke-tested global prefix (why the audit ran in a throwaway project).
+# Clean environment; prints the time, the command, its output with the debug-log path masked, and the exit code.
+set -u
+OM=<work directory>
+W=$OM/audit
+NODEBIN=<bin directory of Node 24.21.0>
+echo "observed_utc=$(date -u +%FT%TZ)"
+echo "command: npm audit signatures --global --prefix <prefix of the smoke-tested install>"
+out=$(/usr/bin/env -i "HOME=$W/home" "TMPDIR=$W/tmp" "PATH=$NODEBIN:/usr/bin:/bin" "npm_config_cache=<npm cache>" "LANG=C.UTF-8" "TERM=dumb" \
+  npm audit signatures --global --prefix "$OM/prefix" 2>&1); rc=$?
+printf '%s\n' "$out" | sed -E 's#^(npm error A complete log of this run can be found in: ).*#\1<npm cache>/_logs/<timestamp>-debug-0.log#'
+echo "exit $rc"

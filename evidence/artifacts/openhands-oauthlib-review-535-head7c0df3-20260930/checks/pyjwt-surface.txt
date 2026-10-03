@@ -1,0 +1,95 @@
+observed_utc=2026-09-30T19:28:42Z
+--- installed: pyjwt-2.15.0.dist-info urllib3-2.8.0.dist-info 
+--- top-level packages that import jwt (import jwt / from jwt), file counts:
+      7 litellm
+      3 oauthlib
+      1 redis
+      1 mcp
+      1 google
+--- uses of the JWKS client API changed in 2.15.0 (PyJWKClient, get_signing_key_from_jwt, JWKSetCache, fetch_data) outside jwt itself:
+google/oauth2/id_token.py:144:        jwks_client = jwt_lib.PyJWKClient(certs_url)
+google/oauth2/id_token.py:145:        signing_key = jwks_client.get_signing_key_from_jwt(id_token)
+--- importers of google.oauth2.id_token (the module that calls the JWKS client) outside the google package:
+(end of list)
+--- oauthlib lines that import jwt:
+oauthlib/common.py:201:    import jwt  # noqa: PLC0415
+oauthlib/common.py:219:    import jwt  # noqa: PLC0415
+oauthlib/oauth2/rfc6749/clients/service_application.py:152:        import jwt  # noqa: PLC0415
+oauthlib/oauth1/rfc5849/signature.py:571:        import jwt.algorithms as jwt_algorithms  # noqa: PLC0415
+--- PyJWT 2.15.0 changelog, the whole section (git show 2.15.0:CHANGELOG.rst, tag commit 1d41a6478e1562e68ff667fcd703356acf085f68):
+`v2.15.0 <https://github.com/jpadilla/pyjwt/compare/2.14.0...2.15.0>`__
+-----------------------------------------------------------------------
+
+Security
+~~~~~~~~
+
+- Wrap recursion errors from deeply nested JWT payloads in ``DecodeError``
+  instead of exposing a raw ``RecursionError``.
+
+Added
+~~~~~
+
+- Support Python 3.15 by @kytta in `#1202 <https://github.com/jpadilla/pyjwt/pull/1202>`__
+
+Changed
+~~~~~~~
+
+- ``JWKSetCache`` now stores the parsed ``PyJWKSet`` rather than the raw JWKS
+  payload, so a cache hit no longer re-parses every key. ``JWKSetCache.put()``
+  accepts either form and raises ``PyJWKSetError`` for anything else. As a
+  result, ``PyJWKClient.get_jwk_set()`` returns the same ``PyJWKSet`` instance
+  for as long as it stays cached, rather than a freshly built one per call in
+  `#1208 <https://github.com/jpadilla/pyjwt/pull/1208>`__
+- ``PyJWKClient.fetch_data()`` now raises
+  ``PyJWKClientError("The JWKS endpoint did not return a JSON object")`` when
+  the endpoint response is not a JSON object, instead of returning it for
+  ``get_jwk_set()`` to reject. Callers reaching the JWKS through
+  ``get_jwk_set()`` see the same error as before in
+  `#1208 <https://github.com/jpadilla/pyjwt/pull/1208>`__
+
+Fixed
+~~~~~
+
+- Return cached ``PyJWKSet`` values from ``PyJWKClient.get_jwk_set()`` instead
+  of raising ``PyJWKClientError("The JWKS endpoint did not return a JSON
+  object")``. ``JWKSetCache.put()`` documents ``PyJWKSet`` as the cached value,
+  so callers pre-populating the cache to avoid a network round-trip could not
+  read it back in `#914 <https://github.com/jpadilla/pyjwt/issues/914>`__ and
+  `#1208 <https://github.com/jpadilla/pyjwt/pull/1208>`__
+- ``PyJWKClient.get_jwk_set()`` now caches the key set it returns, so a
+  ``fetch_data()`` override that filters or transforms the JWKS is no longer
+  undone by the next cache hit in
+  `#1208 <https://github.com/jpadilla/pyjwt/pull/1208>`__
+- Raise the documented ``PyJWTError`` subclass instead of leaking a
+  ``TypeError`` when the ``exp``, ``nbf``, or ``iat`` claim decodes to a
+  non-numeric, non-string value such as a list, dict, or ``null``.
+- Reject OKP JWK private keys when their public ``x`` component does not
+  match the private ``d`` component.
+- Treat malformed JWK Set members as unusable keys rather than letting
+  ``AttributeError`` or ``TypeError`` escape ``PyJWKSet``. A member that is not
+  a JSON object is skipped, a key whose components have the wrong type raises
+  ``InvalidKeyError`` and is skipped, and a set left with no usable keys raises
+  ``PyJWKSetError``. A single bad entry no longer fails an otherwise usable
+  JWK Set in `#1208 <https://github.com/jpadilla/pyjwt/pull/1208>`__
+- Wrap ``http.client.HTTPException`` (e.g. ``IncompleteRead`` from a
+  truncated response) in ``PyJWKClient.fetch_data`` as
+  ``PyJWKClientConnectionError``, matching the other network failure
+  modes the method already documents.
+
+--- the four oauthlib source files the advisory reviews name, against the sha256 recorded by the review of the previous lock (evidence/artifacts/openhands-oauthlib-review-535-head6a7b16-20260930/checks/independent-scan.txt, lines 30-33):
+   oauthlib/oauth2/rfc6749/endpoints/revocation.py ebc5248a9cfb50e75e04298ee4a4d1a34bf06d415df2d4c6db60a4d21165ba6c matches
+   oauthlib/oauth2/rfc6749/grant_types/authorization_code.py 0d6931601c4e88a078fb3ccf5f052c035ad6a4bb2171efb9c218e088a7272dc6 matches
+   oauthlib/oauth2/rfc6749/endpoints/pre_configured.py 6fe072e29e94f0bb6fa65bf8a223893b2702e8d77c52494b389f75bb3ebc6316 matches
+   oauthlib/openid/connect/core/endpoints/pre_configured.py bc6ff1a5fa23c2dcc3a782125e13d93355e73abf2e4fadc406b86ebce121e7ee matches
+--- the four advisory-related oauthlib files: references to jwt or signed tokens (grep -n -E 'jwt|signed_token|ServiceApplication'):
+oauthlib/oauth2/rfc6749/endpoints/revocation.py: 0
+oauthlib/oauth2/rfc6749/grant_types/authorization_code.py: 0
+oauthlib/oauth2/rfc6749/endpoints/pre_configured.py: 0
+oauthlib/openid/connect/core/endpoints/pre_configured.py: 2
+    89:        self.jwt = JWTToken(
+    135:            self, default_token="Bearer", token_types={"Bearer": self.bearer, "JWT": self.jwt}
+--- the oauthlib function that contains each lazy jwt import (the nearest def above the import line):
+   oauthlib/common.py:201 inside def generate_signed_token(private_pem, request):
+   oauthlib/common.py:219 inside def verify_signed_token(public_pem, token):
+   oauthlib/oauth2/rfc6749/clients/service_application.py:152 inside def prepare_request_body(self,
+   oauthlib/oauth1/rfc5849/signature.py:571 inside def _get_jwt_rsa_algorithm(hash_algorithm_name: str):

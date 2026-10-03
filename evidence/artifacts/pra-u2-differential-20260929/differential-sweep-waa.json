@@ -1,0 +1,179 @@
+{
+ "kind": "pra_u2_differential",
+ "mode": "lanes_sweep",
+ "paths": 381557,
+ "equal": 381552,
+ "changed_allowed": 5,
+ "new_paths": 254003,
+ "added_allowed": 254003,
+ "unexpected_changed": {},
+ "unexpected_added": {},
+ "unexpected_removed": {},
+ "exit_codes": [
+  [
+   0,
+   0
+  ]
+ ],
+ "unexpected": 0,
+ "allowed_by_entry": {
+  "U2 stage 1 added #1": 4786,
+  "U2 stage 1 added #2": 40,
+  "U2 stage 1 added #3": 913,
+  "U2 stage 1 added #4": 182,
+  "U2 stage 1 added #5": 16508,
+  "U2 stage 1 added #6": 1488,
+  "U2 stage 1 added #7": 360,
+  "U2 stage 1 added #8": 183500,
+  "U2 stage 1 added #9": 9672,
+  "U2 stage 1 added #10": 520,
+  "U2 stage 1 changed #2": 4,
+  "U2 stage 2 added #1": 16733,
+  "U2 stage 2 added #2": 3813,
+  "U2 stage 3 added #1": 5208,
+  "U2 stage 3 added #2": 480,
+  "U2 stage 3 added #3": 9408,
+  "U2 stage 3 changed #4": 1,
+  "U2 repair round added #1": 392
+ },
+ "effects": {
+  "children_in_window": [
+   707,
+   707
+  ],
+  "main_sessions_in_window": [
+   37,
+   37
+  ],
+  "rtk_parts_children": {
+   "base": {
+    "status": "not_measured",
+    "calls": 0,
+    "unknown_calls": 0,
+    "unknown_call_share": null,
+    "eligible_parts": 0,
+    "ineligible_parts": 0,
+    "eligible_calls": 0,
+    "observed_covered_parts": 0,
+    "replayed_covered_parts": 0,
+    "coverage": null,
+    "call_coverage": null,
+    "explicit_rtk_on_excluded_or_sensitive": 0,
+    "proxy_parts": 0,
+    "observed_covered_succeeded_calls": null,
+    "eligible_call_states": null
+   },
+   "new": {
+    "status": "not_measured",
+    "calls": 0,
+    "unknown_calls": 0,
+    "unknown_call_share": null,
+    "eligible_parts": 0,
+    "ineligible_parts": 0,
+    "eligible_calls": 0,
+    "observed_covered_parts": 0,
+    "replayed_covered_parts": 0,
+    "coverage": null,
+    "call_coverage": null,
+    "explicit_rtk_on_excluded_or_sensitive": 0,
+    "proxy_parts": 0,
+    "observed_covered_succeeded_calls": 0,
+    "eligible_call_states": {
+     "attempted": 0,
+     "cancelled_or_unfinished": 0,
+     "cancelled_with_result": 0,
+     "executed": 0,
+     "failed": 0,
+     "interrupted": 0,
+     "invalid": 0,
+     "rejected": 0,
+     "succeeded": 0,
+     "unknown": 0
+    }
+   }
+  },
+  "rtk_parts_main": {
+   "base": {
+    "status": "not_measured",
+    "calls": 0,
+    "unknown_calls": 0,
+    "unknown_call_share": null,
+    "eligible_parts": 0,
+    "ineligible_parts": 0,
+    "eligible_calls": 0,
+    "observed_covered_parts": 0,
+    "replayed_covered_parts": 0,
+    "coverage": null,
+    "call_coverage": null,
+    "explicit_rtk_on_excluded_or_sensitive": 0,
+    "proxy_parts": 0,
+    "observed_covered_succeeded_calls": null,
+    "eligible_call_states": null
+   },
+   "new": {
+    "status": "not_measured",
+    "calls": 0,
+    "unknown_calls": 0,
+    "unknown_call_share": null,
+    "eligible_parts": 0,
+    "ineligible_parts": 0,
+    "eligible_calls": 0,
+    "observed_covered_parts": 0,
+    "replayed_covered_parts": 0,
+    "coverage": null,
+    "call_coverage": null,
+    "explicit_rtk_on_excluded_or_sensitive": 0,
+    "proxy_parts": 0,
+    "observed_covered_succeeded_calls": 0,
+    "eligible_call_states": {
+     "attempted": 0,
+     "cancelled_or_unfinished": 0,
+     "cancelled_with_result": 0,
+     "executed": 0,
+     "failed": 0,
+     "interrupted": 0,
+     "invalid": 0,
+     "rejected": 0,
+     "succeeded": 0,
+     "unknown": 0
+    }
+   }
+  },
+  "final_return_children": {
+   "actors_with_background_pending": 1,
+   "background_pending": 1,
+   "background_pending_with_events": 0,
+   "background_started": 19,
+   "by_final": {
+    "other": 2,
+    "text": 118,
+    "tool_use": 553
+   },
+   "empty_text": 0,
+   "measured": 673,
+   "not_applicable": 0,
+   "unobserved": 34,
+   "wait_notice": 1
+  },
+  "final_return_main": {
+   "actors_with_background_pending": 0,
+   "background_pending": 0,
+   "background_pending_with_events": 0,
+   "background_started": 28,
+   "by_final": {
+    "other": 0,
+    "text": 29,
+    "tool_use": 0
+   },
+   "empty_text": 0,
+   "measured": 29,
+   "not_applicable": 2,
+   "unobserved": 6,
+   "wait_notice": 0
+  },
+  "actors_unknown_calls_moved": {
+   "unknown_to_known_calls": 0,
+   "known_to_unknown_calls": 0
+  }
+ }
+}

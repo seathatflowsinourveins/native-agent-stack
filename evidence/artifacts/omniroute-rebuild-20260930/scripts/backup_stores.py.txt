@@ -1,0 +1,105 @@
+#!/usr/bin/env python3
+"""Consistent point-in-time copies of the two OmniRoute stores before a build switch (migrations are not reversible).
+
+Our integration script for a host operation, not an upstream tool. It uses SQLite's online backup API from a read-only
+connection (safe beside the running gateway in WAL mode), keeps the copies in a 0700 directory under the private state
+dir with 0600 files, runs PRAGMA integrity_check on each copy and prints only names, sizes, digests and counts:
+no row content, no credential value.
+
+  backup_stores.py            # copy both stores, print the record
+  backup_stores.py --verify DIR   # re-check a previous copy directory (integrity + sha256 against its record)
+
+Restore (manual, stop the unit first): copy DIR/<store>/storage.sqlite over the store's storage.sqlite, delete the
+stale storage.sqlite-wal and storage.sqlite-shm next to it, then start the unit."""
+import argparse
+import datetime
+import hashlib
+import json
+import os
+import sqlite3
+import sys
+from pathlib import Path
+
+HOME = Path.home()
+STATE = Path(os.environ.get("TOKENSAVE_STATE_DIR", str(HOME / ".local/state/native-agent-stack/omniroute-tokensave-20260929")))
+STORES = {"omniroute": HOME / ".local/share/omniroute/storage.sqlite", "omniroute-fw": HOME / ".local/share/omniroute-fw/storage.sqlite"}
+
+
+def sha256(path):
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for block in iter(lambda: handle.read(1 << 20), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def private(path):
+    path.mkdir(mode=0o700, parents=True, exist_ok=True)
+    os.chmod(path, 0o700)
+    return path
+
+
+def facts(path):
+    connection = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
+    try:
+        integrity = connection.execute("PRAGMA integrity_check").fetchone()[0]
+        user_version = connection.execute("PRAGMA user_version").fetchone()[0]
+        tables = connection.execute("SELECT count(*) FROM sqlite_master WHERE type='table'").fetchone()[0]
+        migrations = None
+        for name in ("_omniroute_migrations", "migrations", "schema_migrations"):
+            row = connection.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?", (name,)).fetchone()
+            if row:
+                migrations = connection.execute(f'SELECT count(*) FROM "{name}"').fetchone()[0]
+                break
+        return {"integrity_check": integrity, "user_version": user_version, "tables": tables, "migration_rows": migrations}
+    finally:
+        connection.close()
+
+
+def backup():
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    root = private(STATE / f"db-backups-{stamp}")
+    record = {"taken": stamp, "stores": {}}
+    for name, source in STORES.items():
+        if not source.exists():
+            raise SystemExit(f"missing store {name}")
+        directory = private(root / name)
+        target = directory / "storage.sqlite"
+        reader = sqlite3.connect(f"file:{source}?mode=ro", uri=True)
+        writer = sqlite3.connect(str(target))
+        try:
+            reader.backup(writer)
+        finally:
+            writer.close()
+            reader.close()
+        os.chmod(target, 0o600)
+        record["stores"][name] = {"bytes": target.stat().st_size, "sha256": sha256(target), **facts(target)}
+    manifest = root / "record.json"
+    manifest.write_text(json.dumps(record, indent=2) + "\n")
+    os.chmod(manifest, 0o600)
+    print(json.dumps({"dir": root.name, **record}, indent=2))
+    bad = [n for n, s in record["stores"].items() if s["integrity_check"] != "ok"]
+    if bad:
+        raise SystemExit(f"integrity_check not ok for {bad}")
+
+
+def verify(directory):
+    root = Path(directory)
+    record = json.loads((root / "record.json").read_text())
+    problems = []
+    for name, expected in record["stores"].items():
+        target = root / name / "storage.sqlite"
+        if sha256(target) != expected["sha256"]:
+            problems.append(f"{name}: sha256 differs")
+        if facts(target)["integrity_check"] != "ok":
+            problems.append(f"{name}: integrity_check not ok")
+    print("verify:", "ok" if not problems else problems)
+    if problems:
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--verify")
+    options = parser.parse_args()
+    verify(options.verify) if options.verify else backup()

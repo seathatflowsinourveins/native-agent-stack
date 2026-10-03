@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "native_skill_publication_checks",
+  "evidence_class": "offline_artifact_check",
+  "checked_at": "2026-09-30",
+  "scope": "Publication snapshot after skill lifecycle evidence registration; no live model execution",
+  "checks": [
+    {
+      "command": "python3 scripts/validate_convergence.py evidence/artifacts/native-skill-lifecycle-20260930/convergence.json --root . --json",
+      "exit_code": 0,
+      "signal": null,
+      "output": "{\"records\": [{\"errors\": [], \"observations\": 7, \"path\": \"evidence/artifacts/native-skill-lifecycle-20260930/convergence.json\", \"valid\": true}], \"valid\": true}"
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "exit_code": 0,
+      "signal": null,
+      "output": "{\"components\": 69, \"hashed_files\": 8089, \"profiles\": 4, \"receipts\": 171, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution."
+    },
+    {
+      "command": "python3 scripts/validate_catalogs.py",
+      "exit_code": 0,
+      "signal": null,
+      "output": "{\"beyond_star_catalog_repositories\": 102, \"models\": 20, \"public_stars\": 357, \"repository_entries\": 154, \"starred_catalog_repositories\": 46, \"unique_catalog_repositories\": 148}\nCatalog structure and evidence classes validated; source claims and native executions were not rerun."
+    },
+    {
+      "command": "python3 scripts/build_ecosystem.py --check",
+      "exit_code": 0,
+      "signal": null,
+      "output": "{\"bytes\": 14126199, \"input_sha256\": \"bf814a9a48998d1194b2541f8abe508e4c91154db776fd19eddf06fa1534c7ac\", \"output_sha256\": \"754e15a0c4f58e1a8fe0100ec75f80bcebb088fa3dea4aaef622144686c30787\", \"status\": \"passed\"}"
+    }
+  ],
+  "failed_conditions": [
+    {
+      "command": "python3 scripts/validate.py",
+      "exit_code": 1,
+      "returned_output": "Publication validation failed:\nadoption/skills/manifest.json: SHA-256 mismatch",
+      "correction": "Registered the changed source and new evidence files through scripts/host_receipts.py."
+    },
+    {
+      "command": "python3 scripts/validate_convergence.py evidence/artifacts/native-skill-lifecycle-20260930/convergence.json --root . --json",
+      "exit_code": 1,
+      "returned_output_excerpt": "observations: duplicate task/role/condition attempt",
+      "correction": "Assigned unique chronological native-CLI attempt numbers across recorded scopes."
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "exit_code": 1,
+      "returned_output": "Publication validation failed:\n:memory:.ses: path must be canonical, relative, and inside publication",
+      "correction": "Moved three pre-existing temporary artifacts unchanged and unread into private lifecycle backup."
+    }
+  ],
+  "limits": [
+    "The captured renderer digests belong to that snapshot; adding this check log changes the publication file set.",
+    "These checks validate integrity/structure and rendering, not source truth, universal SOTA quality or live provider/GPU operation."
+  ]
+}

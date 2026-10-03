@@ -1,0 +1,30 @@
+observed_utc=2026-09-30T09:27:00Z
+head: 6a7b16465e50689334d9dd15ff4fed99a9cd7485
+=== references to the OpenHands requirements.lock outside evidence directories and manifests (path or relative form)
+.github/osv-scanner-lockfiles.json:52:      "path": "blueprints/runtime-workers/openhands/requirements.lock",
+.github/osv-scanner-lockfiles.json:227:      "reason": "Frozen native compile-input reproducibility fixture copied from the reviewed main lock, with original bytes, baseline SHA, command and
+.github/osv-scanner-lockfiles.json:232:      "reason": "Frozen native compile-input reproducibility fixture, retained with its original hash and command in the relock receipt. It constrains 
+.github/osv-scanner.toml:41:# (blueprints/runtime-workers/openhands/requirements.lock) until its relock onto oauthlib 4.0.0, and the frozen
+blueprints/runtime-workers/gpt-researcher/install.sh:22:uv pip install --python "$prefix/venv/bin/python" --require-hashes --no-build-isolation --no-deps -r "$recipe_dir/requirements.lock"
+blueprints/runtime-workers/openhands/host.py:324:    if digest(HERE / "requirements.lock") != pins["requirements_sha256"]:
+blueprints/runtime-workers/openhands/install-container.sh:19:  --no-build-isolation --index-url https://pypi.org/simple -r /recipe/requirements.lock
+docs/decisions/2026-09-22-github-automation-closure.md:277:  `blueprints/runtime-workers/openhands/requirements.lock` (oauthlib 3.3.1,
+tests/test_osv_lockfile_coverage.py:81:    "blueprints/runtime-workers/openhands/requirements.lock": {
+=== macOS / darwin / arm64 handling in the OpenHands recipe code (evidence, research and README excluded)
+(end of matches)
+=== pins.json platforms
+image platform: linux/amd64 | gateway_proxy platform: linux/amd64
+=== the exact-lock entry and its scope comment in tests/test_osv_lockfile_coverage.py
+73-    },
+74-    # Candidate 1.50.0 Linux x86_64 / CPython 3.13.15 closure ONLY; fresh
+75-    # alias/from-import-aware source review binds both OAuthlib advisories to
+76-    # these exact artifacts. The recipe consumes this lock inside its pinned
+77-    # linux/amd64 image (Dockerfile CPython 3.13.15), not a native macOS venv.
+78-    # Other platforms/interpreters or changed source require a new review.
+79-    # bc's final candidate-head review remains pending. The joint oauthlib 4.0.0
+80-    # relock removes this entry; it grants no image or arbitrary worker-code acceptance.
+81:    "blueprints/runtime-workers/openhands/requirements.lock": {
+82-        "advisories": ["GHSA-hj66-6f7g-4r5v", "GHSA-xpv3-w29h-x7cv"],
+83-        "sha256": "383ccc5b87702174e471732872f002f1621186710402d048acc2b1910306e106",
+84-        "evidence": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930.json",
+85-    },

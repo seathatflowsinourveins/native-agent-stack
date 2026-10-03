@@ -1,0 +1,27 @@
+== 1. the lists the workflow builds (its own jq lines)
+ordinary: 55 entries, sha256 of the list: 8ced5afda38b24b072668d0d6de61a71b90b4821b4ff217c92459474156bc386
+frozen: 1 entries, sha256 of the list: 57588263080a0eb2fb01c13371301e7763607602cbc2272df807673ceef5f987
+inventory: 56 entries
+frozen entry: --lockfile=:evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml
+sum check: 56 == 56 
+exit: 0 
+
+== 2. the workflow's scan step itself, run by bash with the pinned binary (the step's run: block extracted from .github/workflows/security-scan.yml)
+step script sha256: bc092b630dabd7794baa26d5f7ecfa28934c76acc4e27745b9c914d106cc92f7
+WRITE_SARIF=false: step exit 0; ids filtered out per scan: ['GHSA-vcvr-r3jv-pc5j']; 'Filtered N vulnerabilities' lines: ['Filtered 175 local/unscannable package/s from the scan.', 'Filtered 9 vulnerabilities from output', 'Filtered 1 vulnerability from output']
+    scanned-file lines of both scans: 56
+    osv-scanner.sarif: not written
+    osv-scanner-frozen-macos.sarif: not written
+WRITE_SARIF=true: step exit 0; ids filtered out per scan: ['GHSA-vcvr-r3jv-pc5j', 'GHSA-vcvr-r3jv-pc5j']; 'Filtered N vulnerabilities' lines: ['Filtered 175 local/unscannable package/s from the scan.', 'Filtered 9 vulnerabilities from output', 'Filtered 1 vulnerability from output', 'Filtered 175 local/unscannable package/s from the scan.', 'Filtered 9 vulnerabilities from output', 'Filtered 1 vulnerability from output']
+    scanned-file lines of both scans: 112
+    osv-scanner.sarif: 1168 bytes, sha256 4568c81b00798436..., runs 1, results 0
+    osv-scanner-frozen-macos.sarif: 1168 bytes, sha256 4568c81b00798436..., runs 1, results 0
+
+== 3. native controls with the pinned binary
+frozen lock under the ORDINARY config: exit 1; {'next==16.3.5': ['GHSA-vcvr-r3jv-pc5j']}
+frozen lock under the FROZEN config: exit 0; no findings; filtered out: ['GHSA-vcvr-r3jv-pc5j']
+live application-delivery lock (next 16.3.6) under the ORDINARY config: exit 0; no findings
+tagged packages key (`!!str packages:`): as an ordinary lock (ordinary config) exit 1, {'next==16.3.5': ['GHSA-vcvr-r3jv-pc5j']}; under the frozen config exit 0, no findings
+packages through a YAML merge key (`<<: *base`): as an ordinary lock (ordinary config) exit 1, {'next==16.3.5': ['GHSA-vcvr-r3jv-pc5j']}; under the frozen config exit 0, no findings
+Unicode line separator after `packages:`: as an ordinary lock (ordinary config) exit 1, {'next==16.3.5': ['GHSA-vcvr-r3jv-pc5j']}; under the frozen config exit 0, no findings
+literal apostrophes inside a quoted key: as an ordinary lock (ordinary config) exit 1, {'next==16.3.5': ['GHSA-vcvr-r3jv-pc5j']}; under the frozen config exit 0, no findings
