@@ -11,13 +11,13 @@
     "The first native review timed out without a verdict. The completed review exceeded its 450-word constraint with 566 words and reported an internal Claude Fable 5.1 advisor alongside Opus 5.5.",
     "Native policy agreement and peer acknowledgement do not establish implementation, runtime or CI acceptance. The model reviewed base revision 999eebd; independent source controls qualify the subsequent implementation.",
     "Two of 193 affected source tests skipped: no frozen workflow exemptions existed, and PyYAML was unavailable. The text workflow parser was tested. Nine portable-default tests also passed.",
-    "The first archive publication head 122700335726e9782633ce13a03d5c08cc99e1b8 failed four Linux full-suite assertions: missing documentary lock binding, stale source quotation and two generic-effort expectations. Narrow documentation/test corrections preserve the guard, scanner policy, actual template, explicit Max roles and historical evidence; this failed head is not counted as accepted.",
+      "The first archive publication head 122700335726e9782633ce13a03d5c08cc99e1b8 failed the same four assertions in both Linux and macOS full suites: missing documentary lock binding, stale source quotation and two generic-effort expectations. Narrow documentation/test corrections preserve the guard, scanner policy, actual template, explicit Max roles and historical evidence; this failed head is not counted as accepted.",
     "The native three-part SARIF controller uses the exact inventory and pinned scanner, but does not execute GitHub's Bash mapfile block or upload SARIF. Exact workflow execution remains a fresh CI gate.",
     "The installed Codex 0.160.0 default service tier and Sol/Ultra fields were source/schema checked without a model request. The generic Ultra template correction does not qualify older portable pins, SDK routes or explicit Max profiles.",
     "Full-stack readiness remains false. Surviving workstation, account, historical-data fitness, native paper faults and broader lifecycle gates retain their separate ownership and acceptance requirements.",
     "Whole-task usage, failed-request settlement, escaped-descendant cleanup, billing and net savings remain unknown. Raw sessions, personal paths and authentication/configuration details remain private."
   ],
-  "recorded_at_utc": "2026-10-03T02:04:35Z",
+  "recorded_at_utc": "2026-10-03T02:08:23Z",
   "evidence_class": "Bounded native policy convergence, independent source validation and task-local pinned scanner measurements.",
   "data": {
     "decision_unit": "north-star-publication-security-archive-20261002",
@@ -148,7 +148,15 @@
         "test_the_user_template_renders_on_each_platform_the_model_its_rows_name (Linux and macOS subcases)"
       ],
       "repair_scope": "Full immutable lock-path/hash citation and current generic Ultra source/test expectations, preserving explicit Max and legacy-model boundaries.",
-      "macos": "pending_original_run"
+      "macos": {
+        "tests": 9848,
+        "seconds": 1755.723,
+        "failures": 4,
+        "errors": 0,
+        "skips": 1333,
+        "exit_code": 1,
+        "verbose_log_sha256": "2aeb81f30b120d7ce4d0090f84c93e85b6830001ed5d7cc75f5d4593a4022289"
+      }
     }
   },
   "provenance": {

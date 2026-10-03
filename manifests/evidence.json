@@ -13,7 +13,7 @@
         "The first native review timed out without a verdict. The completed review exceeded its 450-word constraint with 566 words and reported an internal Claude Fable 5.1 advisor alongside Opus 5.5.",
         "Native policy agreement and peer acknowledgement do not establish implementation, runtime or CI acceptance. The model reviewed base revision 999eebd; independent source controls qualify the subsequent implementation.",
         "Two of 193 affected source tests skipped: no frozen workflow exemptions existed, and PyYAML was unavailable. The text workflow parser was tested. Nine portable-default tests also passed.",
-        "The first archive publication head 122700335726e9782633ce13a03d5c08cc99e1b8 failed four Linux full-suite assertions: missing documentary lock binding, stale source quotation and two generic-effort expectations. Narrow documentation/test corrections preserve the guard, scanner policy, actual template, explicit Max roles and historical evidence; this failed head is not counted as accepted.",
+        "The first archive publication head 122700335726e9782633ce13a03d5c08cc99e1b8 failed the same four assertions in both Linux and macOS full suites: missing documentary lock binding, stale source quotation and two generic-effort expectations. Narrow documentation/test corrections preserve the guard, scanner policy, actual template, explicit Max roles and historical evidence; this failed head is not counted as accepted.",
         "The native three-part SARIF controller uses the exact inventory and pinned scanner, but does not execute GitHub's Bash mapfile block or upload SARIF. Exact workflow execution remains a fresh CI gate.",
         "The installed Codex 0.160.0 default service tier and Sol/Ultra fields were source/schema checked without a model request. The generic Ultra template correction does not qualify older portable pins, SDK routes or explicit Max profiles.",
         "Full-stack readiness remains false. Surviving workstation, account, historical-data fitness, native paper faults and broader lifecycle gates retain their separate ownership and acceptance requirements.",
@@ -48009,8 +48009,8 @@
     },
     {
       "path": "evidence/receipts/north-star-publication-security-convergence-20261002.json",
-      "sha256": "dedbd113f698a83fa8b19733f0180699d7e5084c499ee9525b9894e54edbf014",
-      "bytes": 9553
+      "sha256": "edaac4fec56117577e258fce2a0216fc492a5bfef931d32a708a0656e7b2261c",
+      "bytes": 9810
     },
     {
       "path": "evidence/receipts/notification-types-20260929.json",
