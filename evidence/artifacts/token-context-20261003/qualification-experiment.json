@@ -1,0 +1,598 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "native-agent-engineering",
+  "task_and_failure": "Qualify five token/context candidate jobs for source-faithful long research/engineering without touching peer layers. This source/runtime unit preserves pre-freeze failures; it does not freeze the pending comparative protocol.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/promptfoo/promptfoo",
+      "revision": "34f74d34e140b5e17d23770dfb2340057b1936b8"
+    },
+    {
+      "url": "https://github.com/rtk-ai/rtk",
+      "revision": "e001f773f80b22b7dc4c7a79521b30e35aaef026"
+    },
+    {
+      "url": "https://github.com/ccusage/ccusage",
+      "revision": "d9821088b98aa536c7a385aa1a4579d6fa02269b"
+    },
+    {
+      "url": "https://github.com/toon-format/toon",
+      "revision": "a9e6d97eca931379824f3b6a1ba8fbfbda7d3c53"
+    }
+  ],
+  "discovery_provenance": [
+    "Coordinator search-first and five bounded Sol/max lifecycle-job workers; workstation Opus/max and GPT Researcher source leads retained, primary sources reread",
+    "Native consequential Astra/max and Opus/max reads, with exact main counters reconciled and critique incorporated",
+    "Independent pinned-provider completeness critic found continuation, child-model/effort, SDK-resolution and modality gaps"
+  ],
+  "license_and_compatibility": "Pinned upstream sources used through native commands in disposable prefixes/containers; licensing remains that of each pinned source. No host default installation, account/config/auth copies or peer-layer change. RTK Git guard failures and TOON BOM defect remain incompatibility gates.",
+  "baseline_and_candidate": {
+    "baseline": "Native focused formatting/reads, compaction/caching/deferred tools/delegation and exact per-request usage records",
+    "candidate": "One nominated candidate per job: Context Mode, RTK, TOON, existing owner-bound QMD/Serena consumption, ccusage; this unit tests selected prerequisites only"
+  },
+  "frozen_inputs": {
+    "base_revision": "56473e4b840f0e6940c031801d866e7e9bf29baf",
+    "tasks": [
+      "harness-read",
+      "meter-claude",
+      "meter-codex",
+      "meter-codex-control",
+      "meter-tests",
+      "protocol-read",
+      "repair-read",
+      "rtk-artifacts",
+      "rtk-tests",
+      "toon-fidelity",
+      "toon-tests"
+    ],
+    "roles": [
+      "command-worker",
+      "coordinator",
+      "meter-worker",
+      "structured-worker"
+    ],
+    "sources": [
+      {
+        "path": "evidence/artifacts/token-context-20261003/harness-source-read.json",
+        "sha256": "63dcec9a9dd0051e8333d32a1cfe32e8aa783c5639cb6d5c41058444ef97c60b"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "evidence/artifacts/token-context-20261003/meter-qualification.json",
+        "sha256": "c97a9fd0c8723df499620330eb12a16da6966491e89dc43cec86fc6ba1c04c0b"
+      },
+      {
+        "path": "evidence/artifacts/token-context-20261003/toon-qualification.json",
+        "sha256": "e2a77e1929f26fc7e098a57377c4e7cd91dc9ffaae41eff7eecdeaf141bcdd7c"
+      },
+      {
+        "path": "evidence/artifacts/token-context-20261003/rtk-native-tests.json",
+        "sha256": "c068f95798dd73a6f51ed609be19a97307e9b927680c2506894d4ad5906c05f9"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "evidence/artifacts/token-context-20261003/protocol-opus-read.json",
+        "sha256": "b4adf401452c5f8788c3654c700d3ad3b4b9fc136d7b2218ad8809631efea56d"
+      },
+      {
+        "path": "evidence/artifacts/token-context-20261003/rtk-repair-astra-read.json",
+        "sha256": "f70eabd08db3501b1dc0550dbccdf0e7f06d2f7fe2dc4662c87dcbd1e4ba207b"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "Qualification contracts: unchanged native upstream commands, exact roundtrip/exit/critical facts, release/executable identity, no peer/auth changes. Preserve failed gates; narrative source vote never activates a default. Final comparative task/quality/statistical contract stays NOT FROZEN.",
+    "usage_rule": "Exact unique response/request counters counted once; cached/reasoning subsets not added. Research reads are overhead, not treatment savings. CLI/tests/artifacts do not substitute for provider counters. Unknown fields remain null; whole study coverage is partial."
+  },
+  "runtime_and_platform": {
+    "platform": "Declared Linux/amd64 destination with rootless Docker; disposable official Rust containers for native tests",
+    "tools": [
+      {
+        "name": "Codex CLI",
+        "version": "0.160.0"
+      },
+      {
+        "name": "Claude Code",
+        "version": "2.1.288"
+      },
+      {
+        "name": "RTK",
+        "version": "0.51.0"
+      },
+      {
+        "name": "ccusage",
+        "version": "20.0.26"
+      },
+      {
+        "name": "TOON",
+        "version": "4.1.1"
+      },
+      {
+        "name": "gpt-tokenizer/o200k_base",
+        "version": "4.0.0"
+      }
+    ],
+    "isolation": "Only owned disposable source/state/selected counters mounted. Container default homes stay empty. No credential values/auth files or native homes/config mounts. No compressor stack; no active token-tool installation."
+  },
+  "commands": [
+    "Native codex exec Astra/max read-only pinned Promptfoo harness source",
+    "Native claude -p Opus/max read-only draft protocol",
+    "Native codex exec Astra/max read-only final bounded RTK repair source",
+    "cargo test --all in declared disposable Rust1.91.0 container, unchanged source",
+    "cargo +1.97.1 test --locked --workspace --jobs 2 in declared disposable Rust1.97.1 container",
+    "ccusage codex session --id SELECTED --json --offline --no-cost --speed standard in selected-record container",
+    "ccusage claude session --id SELECTED --json --offline --mode display in selected-record container",
+    "CI=1 pnpm run test at pinned TOON source",
+    "Released TOON strict decode/semantic comparison controls",
+    "Existing token_manifest.count_files with gpt-tokenizer4.0.0/o200k_base"
+  ],
+  "observations": [
+    {
+      "id": "astra-harness",
+      "task": "harness-read",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/harness-source-read.json",
+          "sha256": "63dcec9a9dd0051e8333d32a1cfe32e8aa783c5639cb6d5c41058444ef97c60b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 77347,
+        "cache_creation": 0,
+        "cache_read": 390528,
+        "output": 8565,
+        "reasoning_in_output": 4763,
+        "total": 476440,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "opus-draft-hold",
+      "task": "protocol-read",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 1,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/protocol-opus-read.json",
+          "sha256": "b4adf401452c5f8788c3654c700d3ad3b4b9fc136d7b2218ad8809631efea56d"
+        }
+      ],
+      "usage": {
+        "uncached_input": 4,
+        "cache_creation": 15289,
+        "cache_read": 8412,
+        "output": 66838,
+        "reasoning_in_output": 63592,
+        "total": 90543,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "astra-repair-conditional",
+      "task": "repair-read",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 2,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/rtk-repair-astra-read.json",
+          "sha256": "f70eabd08db3501b1dc0550dbccdf0e7f06d2f7fe2dc4662c87dcbd1e4ba207b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 18847,
+        "cache_creation": 0,
+        "cache_read": 59264,
+        "output": 4091,
+        "reasoning_in_output": 3104,
+        "total": 82202,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "rtk-readonly-failure",
+      "task": "rtk-tests",
+      "role": "command-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 3,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "failed",
+      "exit_code": 101,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/rtk-native-tests.json",
+          "sha256": "c068f95798dd73a6f51ed609be19a97307e9b927680c2506894d4ad5906c05f9"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "rtk-root-permission-failure",
+      "task": "rtk-tests",
+      "role": "command-worker",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 3,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "failed",
+      "exit_code": 101,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/rtk-native-tests.json",
+          "sha256": "c068f95798dd73a6f51ed609be19a97307e9b927680c2506894d4ad5906c05f9"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "rtk-final-guard-failure",
+      "task": "rtk-tests",
+      "role": "command-worker",
+      "condition": "candidate",
+      "attempt": 3,
+      "command_index": 3,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "failed",
+      "exit_code": 101,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/rtk-native-tests.json",
+          "sha256": "c068f95798dd73a6f51ed609be19a97307e9b927680c2506894d4ad5906c05f9"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "ccusage-workspace",
+      "task": "meter-tests",
+      "role": "meter-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 4,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/meter-qualification.json",
+          "sha256": "c97a9fd0c8723df499620330eb12a16da6966491e89dc43cec86fc6ba1c04c0b"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "ccusage-codex-main",
+      "task": "meter-codex",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 5,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/meter-qualification.json",
+          "sha256": "c97a9fd0c8723df499620330eb12a16da6966491e89dc43cec86fc6ba1c04c0b"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "ccusage-codex-exact-only",
+      "task": "meter-codex-control",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 5,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/meter-qualification.json",
+          "sha256": "c97a9fd0c8723df499620330eb12a16da6966491e89dc43cec86fc6ba1c04c0b"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "ccusage-claude-main",
+      "task": "meter-claude",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 6,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/meter-qualification.json",
+          "sha256": "c97a9fd0c8723df499620330eb12a16da6966491e89dc43cec86fc6ba1c04c0b"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "toon-upstream-tests",
+      "task": "toon-tests",
+      "role": "structured-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 7,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/toon-qualification.json",
+          "sha256": "e2a77e1929f26fc7e098a57377c4e7cd91dc9ffaae41eff7eecdeaf141bcdd7c"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "toon-root-bom-control",
+      "task": "toon-fidelity",
+      "role": "structured-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 8,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/toon-qualification.json",
+          "sha256": "e2a77e1929f26fc7e098a57377c4e7cd91dc9ffaae41eff7eecdeaf141bcdd7c"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "rtk-complete-artifacts",
+      "task": "rtk-artifacts",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 9,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/rtk-artifact-qualification.json",
+          "sha256": "04b742c80f1f26d72ab78dd3fdec1c304cb0440b1dcb49b4e14906ce259ebff4"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    }
+  ],
+  "failures_and_skips": [
+    {
+      "run_id": "opus-draft-hold",
+      "reason": "HOLD plus1352-word reply exceeds1000-word contract; accepted-only gate corrected before comparative run"
+    },
+    {
+      "run_id": "rtk-readonly-failure",
+      "reason": "Checkout-relative pi test cannot write read-only source"
+    },
+    {
+      "run_id": "rtk-root-permission-failure",
+      "reason": "Namespace-root write bypass fails upstream0555 healing fixture"
+    },
+    {
+      "run_id": "rtk-final-guard-failure",
+      "reason": "Final non-root native guard suite has two failures;18 later integration files unexecuted; no further repair"
+    },
+    {
+      "run_id": "ccusage-codex-exact-only",
+      "reason": "Released parser fails synthetic new-exact-record-only projection; full native stream legacy fallback passed"
+    },
+    {
+      "run_id": "toon-root-bom-control",
+      "reason": "Released CLI changes U+FEFF-root-string values/types without decode rejection; JSON-wide scope rejected"
+    }
+  ],
+  "limitations": [
+    "The contract checker verifies declared consistency/hash integrity, not truth or a complete upstream/provider run",
+    "Source/runtime qualification receipts bind private original outputs through hashes and independent coordinator observation; sanitized summaries are not upstream acceptance by themselves",
+    "Context Mode container source-build qualification is pending; actual released bundle, native hooks/continuity, main/child/retry/compaction/advisor coverage and owner-bound retrieval/window remain open",
+    "Three research reads share no study comparison: summaries reconcile native streams but are not independent invoices. Whole-research usage and paid costs remain unknown",
+    "No powered comparisons, measured default promotion or accepted final PR yet"
+  ],
+  "decision_and_scope": {
+    "decision": "trial",
+    "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+    "qualification_run_ids": []
+  },
+  "rollback": "Keep existing native client/profile/defaults. Disposable study state can be removed through owned native cleanup after evidence custody; no peer state is changed.",
+  "next_decision_changing_test": "Fully bind/calibrate/freeze the fixed two-client job comparisons after an Opus/max read; observe natural compaction/resume and all native accounting scopes, then qualify any winner in fresh native main/child sessions. RTK prerequisite stays excluded without a separately justified future protocol.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [
+      "astra-harness",
+      "opus-draft-hold",
+      "astra-repair-conditional",
+      "rtk-readonly-failure",
+      "rtk-root-permission-failure",
+      "rtk-final-guard-failure",
+      "ccusage-workspace",
+      "ccusage-codex-main",
+      "ccusage-codex-exact-only",
+      "ccusage-claude-main",
+      "toon-upstream-tests",
+      "toon-root-bom-control",
+      "rtk-complete-artifacts"
+    ],
+    "coverage_artifact": null
+  }
+}

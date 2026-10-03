@@ -1,0 +1,104 @@
+{
+  "study": "token-context-20261003",
+  "status": "exploratory qualification; no default activation",
+  "source_pin": "ccusage/ccusage@d9821088b98aa536c7a385aa1a4579d6fa02269b",
+  "version": "20.0.26",
+  "upstream_test": {
+    "evidence_class": "native_cli_execution",
+    "command": "cargo +1.97.1 test --locked --workspace --jobs 2",
+    "source_recipe": [
+      "nix/tests.nix:29-39",
+      "rust/justfile:11-13"
+    ],
+    "image": "docker.io/library/rust@sha256:408fe88047cef61a2087653b0c5255fa51c0f2d6d94ddedd7a2562a9b91a46f6",
+    "exit_code": 0,
+    "passed": 944,
+    "failed": 0,
+    "ignored": 3,
+    "filtered_out": 0,
+    "result_blocks": 58,
+    "tracked_source_hashes_unchanged": 501,
+    "native_output_sha256": "e90958f6ccef0e3d8d878853f494d5cad842360876cde15543727544e02ce5b2",
+    "native_stderr_sha256": "0be411dd42faa2659d0ffd5a8c0263567f763911f346bb663264d3dd3278317b",
+    "command_record_sha256": "dc9b27220158b26deb342e98d119523c5f934a1c20ea607f051d81673494dad3",
+    "ignored_scope": "Real Grok-home smoke and two doctests; real client homes were not exposed",
+    "not_run": [
+      "Full Nix derivation/CI",
+      "JS/lint/security/release-package checks"
+    ]
+  },
+  "integration_checks": [
+    {
+      "id": "m1-codex",
+      "evidence_class": "native_cli_execution",
+      "input_scope": "Only one new identified native research session projected to usage+session metadata; no conversations/auth/config/unrelated histories",
+      "command": "ccusage codex session --id SELECTED --json --offline --no-cost --speed standard",
+      "exit_code": 0,
+      "native_oracle": {
+        "input_tokens_including_cached": 467875,
+        "cached_subset": 390528,
+        "output_tokens": 8565,
+        "reasoning_subset": 4763,
+        "total": 476440
+      },
+      "returned": {
+        "inputTokens": 77347,
+        "cacheReadTokens": 390528,
+        "cacheCreationTokens": 0,
+        "outputTokens": 8565,
+        "reasoningOutputTokens": 4763,
+        "totalTokens": 476440
+      },
+      "exact_categories_reconcile": true,
+      "stdout_sha256": "17e66f8fc6b382b1b9ba29dbcbc89fe5830063e4ae7422d6108ff65256f53daf"
+    },
+    {
+      "id": "m1-codex-exact-only-negative",
+      "evidence_class": "offline_artifact_check",
+      "input_scope": "Synthetic projection removing legacy cumulative token_count while preserving new exact token_usage_record entries",
+      "command": "Same released CLI and isolated container",
+      "exit_code": 1,
+      "result": "No Codex session found",
+      "interpretation": "Released parser does not accept these exact-only records; full native stream legacy fallback passed. This is not a native full-session failure or compaction test.",
+      "stderr_sha256": "548a5ecc6029bb061b4e5b24b28166551e82c70b847cf063d7901ee980b9586f"
+    },
+    {
+      "id": "m1-claude",
+      "evidence_class": "native_cli_execution",
+      "input_scope": "Only selected new Claude protocol-read assistant usage/session metadata; seven entries/two unique request-message pairs, conversations stripped",
+      "command": "ccusage claude session --id SELECTED --json --offline --mode display",
+      "exit_code": 0,
+      "native_oracle": {
+        "ordinary_input": 4,
+        "cache_creation": 15289,
+        "cache_read": 8412,
+        "output": 66838,
+        "total": 90543
+      },
+      "returned": {
+        "inputTokens": 4,
+        "cacheCreationTokens": 15289,
+        "cacheReadTokens": 8412,
+        "outputTokens": 66838,
+        "totalTokens": 90543
+      },
+      "exact_categories_reconcile": true,
+      "cost_warning": "Display mode returned 0 because selected records lack costUSD. This zero is not invoice/subscription spend or a saving; cost remains unknown.",
+      "input_sha256": "16ffdddb3806723e19e65b854aea58cacedc65ca95a249ef95a776b0263fea9e",
+      "stdout_sha256": "310c04c0f9bb29dbcef907c265c95310c4b90332570769aa2bb4c653278e489b"
+    }
+  ],
+  "isolation": "Disposable containers keep unchanged empty default homes, network none for CLI integration, only owned selected records and binary mounted; no HOME/CODEX_HOME replacement or account/config mounts",
+  "candidate_binary_sha256": "f978214d6d373d2a2e242c5f329b59fcb4181c3fb0cd5b831d6f153ee69b4370",
+  "limitations": [
+    "Main-thread exact categories reconciled in both clients; children, advisor, retry and natural compaction integration remain unqualified",
+    "Released synthetic fixtures are not fresh client invocation or actual provider savings",
+    "Host session-ID filtering happens after loading histories; this study avoids host history scans",
+    "No candidate meter default installed. Native counters remain the oracle. Whole-study provider usage/cost is incomplete."
+  ],
+  "corrections": [
+    "Earlier source recipe locator nix/checks.nix corrected to nix/tests.nix after exact source reread",
+    "Root guessed missing command/hash filenames and wrong check cwd, then verified actual command.json, artifacts.sha256 and source/key-input checks from source cwd; wrong-cwd failures retained",
+    "Root accidentally printed a 501-line source-check summary; processing/checking is now quiet and native output retained privately"
+  ]
+}
