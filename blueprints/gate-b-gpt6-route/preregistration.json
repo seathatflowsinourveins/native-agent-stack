@@ -1,0 +1,4148 @@
+{
+  "schema_version": 1,
+  "id": "gate-b-gpt6-route",
+  "title": "Gate B criterion: the settled GPT-6 route for the landscape-sweep lane, with a gated OpenHands smoke check",
+  "status": "DRAFT",
+  "frozen": false,
+  "run_started": false,
+  "execution_authorized": false,
+  "results": null,
+  "created": "2026-09-28",
+  "date_note": "The record carries the host's local date, 2026-09-28; observations are UTC on 2026-09-29.",
+  "lane": "lane:foundation",
+  "pinned_main": "11648f9a9d900b285866510ba1be4fcdfb58295b",
+  "pin_note": "Every repository citation is verified at this commit. origin/main was at b0fb65b4 at 2026-09-29T03:04:26Z (git ls-remote); no cited line was re-read there.",
+  "companion": "PREREGISTRATION.md",
+  "sections": [
+    "Scope and the decision gated",
+    "Arms, each with its harness, pins and what it can run today",
+    "Task set",
+    "Metrics and usage accounting (counted once)",
+    "Pass rule",
+    "Statistics",
+    "Owner and roles",
+    "Freeze and amendment procedure",
+    "Budget and capacity",
+    "What each consumer does with each outcome",
+    "Alternatives considered, and the comparison that would overturn this",
+    "User decisions required (numbered, each with a recommended default)",
+    "Sources (pins, URLs, file:line)",
+    "Decisions taken in the repair",
+    "Repair-round dispositions",
+    "Appendix A: sizing and power script"
+  ],
+  "revision": "repair round 1 of 1, after the method and citation refuters",
+  "requested_by": {
+    "move": "F-WK-2",
+    "sources": [
+      "docs/decisions/2026-09-28-ecosystem-roadmap.md:176",
+      "docs/decisions/2026-09-28-ecosystem-roadmap.md:180-183"
+    ],
+    "text": "a dated Gate B draft, frozen before any measured acceptance run, with three arms, a pass rule and an owner, for the user to confirm"
+  },
+  "decision_rights": {
+    "as_written": {
+      "reading": "confirming the criterion is a user-only action",
+      "source": "docs/decisions/2026-09-28-ecosystem-roadmap.md:252"
+    },
+    "update_2026_09_29": {
+      "reading": "the Gate B criterion is an owner decision made with evidence under the user's delegation",
+      "source": "docs/decisions/2026-09-28-ecosystem-roadmap.md:311",
+      "delegation": "docs/decisions/2026-09-28-delegated-decisions.md:3"
+    },
+    "caveats": [
+      {
+        "text": "the roadmap changes no authority",
+        "source": "docs/decisions/2026-09-28-ecosystem-roadmap.md:3"
+      },
+      {
+        "text": "the delegation record applied the delegation to named items",
+        "source": "docs/decisions/2026-09-28-delegated-decisions.md:5-8"
+      }
+    ],
+    "rule": "the accountable owner may confirm under the update's reading after one objection round with live peers; the user can take any item back; decisions that change a user-decided record stay with the user; the owner itself is user decision 2",
+    "objection_round_source": "docs/decisions/2026-09-28-delegated-decisions.md:13"
+  },
+  "labels": {
+    "doc": "documented at the cited source",
+    "obs": "observed by this repair's author at the stated UTC time, GET requests and local reads only",
+    "src": "source review at the stated pin, never executed",
+    "hist": "retained historical receipt, reference evidence only (AGENTS.md:42)",
+    "nv": "not verified",
+    "inf": "inference",
+    "prop": "proposed here"
+  },
+  "gated_decisions": {
+    "D1": {
+      "blocking": true,
+      "question": "Which GPT-6 lane does the landscape-sweep consumer run on this workstation?",
+      "values": {
+        "native": {
+          "text": "incumbent and code default: codex exec --ignore-user-config --skip-git-repo-check -s read-only -m gpt-6-astra",
+          "sources": [
+            "tools/sota-convergence/landscape-sweep/build_args.py:554-557",
+            "tools/sota-convergence/landscape-sweep/codex_job.py:15-16"
+          ]
+        },
+        "omniroute": {
+          "text": "--gpt6-provider omniroute --codex-host <HOST>; base URL http://127.0.0.1:20128/v1, model cx/gpt-6-astra, effort max, no --omniroute-header, keyless placeholder; refuses --quota-stop-percent",
+          "sources": [
+            "tools/sota-convergence/landscape-sweep/build_args.py:94-101,593-626",
+            "tools/sota-convergence/landscape-sweep/codex_job.py:18-25",
+            "tools/sota-convergence/landscape-sweep/build_args.py:606-608",
+            "tools/sota-convergence/landscape-sweep/codex_job.py:193-195"
+          ]
+        }
+      },
+      "why_this_comparison": [
+        "docs/decisions/2026-09-27-omniroute-account-pool.md:318",
+        "adoption/templates/codex.omniroute.config.toml:21-22"
+      ]
+    },
+    "D1v": {
+      "blocking": false,
+      "default": "off",
+      "question": "May the verdict lane codex_lane.py follow D1?",
+      "facts": "no provider switch; web search disabled (tools/sota-convergence/codex_lane.py:9-13)",
+      "rule": "only family F2 can support a change, and only a separately reviewed code change can make it"
+    },
+    "D2": {
+      "blocking": false,
+      "this_cohort": "pending",
+      "question": "Is OpenHands via OmniRoute (#425 control arm, merged f6e5a038) admitted for bounded GPT-6 coding-worker trials?",
+      "why_not_decidable": [
+        "blueprints/runtime-workers/openhands/receipt.py:282",
+        "blueprints/runtime-workers/openhands/host.py:1328-1330",
+        "blueprints/runtime-workers/openhands/README.md:29-31",
+        "blueprints/runtime-workers/openhands/README.md:917-921"
+      ],
+      "roadmap": [
+        "docs/decisions/2026-09-28-ecosystem-roadmap.md:183",
+        "docs/decisions/2026-09-28-ecosystem-roadmap.md:284"
+      ]
+    }
+  },
+  "gate_b_passed": {
+    "definition": "D1 has a recorded value under a decision-table row whose Gate B column reads passed; the two untested rows count only as decision 15 allows; VOID and INCOMPLETE are never passed; a person starts the wave",
+    "passed_outcomes": [
+      "stage0_native",
+      "ni",
+      "inferior",
+      "inconclusive",
+      "unpowered",
+      "time_box"
+    ],
+    "open_outcomes": [
+      "void",
+      "incomplete"
+    ],
+    "wave_start_source": "docs/decisions/2026-09-28-ecosystem-roadmap.md:210"
+  },
+  "waiting_consumers": [
+    {
+      "consumer": "the 32-layer verdict wave",
+      "sources": [
+        "docs/decisions/2026-09-28-ecosystem-roadmap.md:210",
+        "docs/decisions/2026-09-28-ecosystem-roadmap.md:312"
+      ]
+    },
+    {
+      "consumer": "the security-audit trial (M5b gate 3, M5c)",
+      "sources": [
+        "docs/decisions/2026-09-25-skills-trial-and-usage.md:660",
+        "docs/decisions/2026-09-25-skills-trial-and-usage.md:664",
+        "docs/decisions/2026-09-28-ecosystem-roadmap.md:315"
+      ]
+    }
+  ],
+  "not_decided": [
+    {
+      "item": "the agent-sdks layer default",
+      "sources": [
+        "docs/grand-catalog-handbook.md:602",
+        "catalogs/landscape/foundation.json:4739",
+        "docs/decisions/2026-09-27-omniroute-account-pool.md:309-312"
+      ]
+    },
+    {
+      "item": "the 20129 engines-on route and sharedgw aliases",
+      "sources": [
+        "blueprints/runtime-workers/openhands/README.md:147-148",
+        "tools/sota-convergence/landscape-sweep/README.md:211"
+      ]
+    },
+    {
+      "item": "R02 effort (#445)"
+    },
+    {
+      "item": "S3's LLM route",
+      "sources": [
+        "docs/decisions/2026-09-28-ecosystem-roadmap.md:202"
+      ]
+    },
+    {
+      "item": "Claude lanes [prop]; the Mac or any other host",
+      "sources": [
+        "docs/decisions/2026-09-27-omniroute-account-pool.md:515-517"
+      ]
+    },
+    {
+      "item": "#426-#428, parked behind the criterion and #425; their PR bodies define only control and engines-on arms [doc: gh pr view at 2026-09-29T02:38Z]",
+      "sources": [
+        "docs/decisions/2026-09-28-ecosystem-roadmap.md:239"
+      ]
+    }
+  ],
+  "cannot_show": [
+    {
+      "text": "a lane result, not a route result: B's lane differs in more than the provider",
+      "sources": [
+        "tools/sota-convergence/landscape-sweep/README.md:105-117,122-130",
+        "tools/sota-convergence/landscape-sweep/build_args.py:311-355,367-370"
+      ]
+    },
+    {
+      "text": "B uses the gateway's search backend",
+      "sources": [
+        "tools/sota-convergence/landscape-sweep/README.md:121",
+        "docs/decisions/2026-09-27-omniroute-account-pool.md:512"
+      ]
+    },
+    {
+      "text": "two gateway request rewrites at a58000c7",
+      "sources": [
+        "docs/decisions/2026-09-27-omniroute-account-pool.md:434-439"
+      ]
+    },
+    {
+      "text": "two Codex-side divergences for any non-OpenAI provider, bound to the Codex binary",
+      "sources": [
+        "docs/decisions/2026-09-27-omniroute-account-pool.md:440-443"
+      ]
+    },
+    {
+      "text": "B's MCP servers run outside Codex's read-only sandbox [doc]",
+      "sources": [
+        "tools/sota-convergence/landscape-sweep/README.md:129"
+      ]
+    },
+    {
+      "text": "short packets may not exercise the rewrites or compaction"
+    },
+    {
+      "text": "scope fixed to this workstation, the sealed fingerprint, the Codex binary and both arms' sealed inputs"
+    }
+  ],
+  "harness": {
+    "runner": "promptfoo 0.123.1 openai:codex-sdk, bundled @openai/codex-sdk 0.153.4",
+    "runner_class": "upstream",
+    "runner_sources": [
+      "tools/capability-gate/codex-profile-exec:2-5",
+      "docs/decisions/2026-09-27-capability-gate-harness.md:6-11",
+      "tools/capability-gate/m13.yaml:22-44"
+    ],
+    "provider_config": {
+      "working_dir": "the arm's staged <work>/empty",
+      "skip_git_repo_check": true,
+      "sandbox_mode": "read-only",
+      "model_reasoning_effort": "max",
+      "web_search_mode": {
+        "F1": "live",
+        "F2": "disabled"
+      },
+      "output_schema": "the frozen schema object",
+      "approval_policy": null,
+      "model_provider": null,
+      "maxRetries": 0,
+      "inherit_process_env": true,
+      "sources": [
+        "tools/sota-convergence/landscape-sweep/codex_job.py:13,434",
+        "tools/sota-convergence/landscape-sweep/codex_job.py:425-436",
+        "tools/capability-gate/m13.yaml:27"
+      ],
+      "upstream_doc_lines": "promptfoo/promptfoo@0.123.1:site/docs/providers/openai-codex-sdk.md lines 70, 72, 218, 219, 231, 238, 242 and 301"
+    },
+    "evaluate_options": {
+      "maxConcurrency": {
+        "stage0": 1,
+        "stage1": 2
+      },
+      "cache": false,
+      "timeoutMs": 3000000,
+      "timeout_source": "tools/sota-convergence/landscape-sweep/codex_job.py:13",
+      "concurrency_note": "at most two attempts of either arm in flight",
+      "concurrency_source": "tools/capability-gate/m13.yaml:5-6"
+    },
+    "curated_environment": {
+      "gate": "VOID",
+      "rule": "promptfoo starts under env -i with a frozen name list fixed at the seal (at least HOME, PATH, LANG, TERM, TMPDIR, USER); no name containing KEY, SECRET, TOKEN, PASSWORD, CREDENTIAL or AUTH; no RUST_LOG*",
+      "arm_b_adds": [
+        "CODEX_HOME",
+        "OMNIROUTE_API_KEY"
+      ],
+      "reasons": [
+        "tools/sota-convergence/landscape-sweep/build_args.py:325-327",
+        "tools/sota-convergence/landscape-sweep/README.md:114",
+        "tools/sota-convergence/landscape-sweep/build_args.py:336-337",
+        "tools/sota-convergence/landscape-sweep/codex_job.py:375-379"
+      ],
+      "stale_earlier_citation": "adoption/templates/codex.omniroute.config.toml:9-13",
+      "declared_difference": "the consumer passes the operator's full environment minus RUST_LOG*",
+      "placeholder_sources": [
+        "tools/sota-convergence/landscape-sweep/codex_job.py:18-25",
+        "tools/sota-convergence/landscape-sweep/README.md:143"
+      ]
+    },
+    "argv_readback": {
+      "gate": "VOID",
+      "compare_with": "tools/sota-convergence/landscape-sweep/codex_job.py:425-436",
+      "allowed_differences": [
+        "--experimental-json in place of --json",
+        "--cd <the arm's work directory> in place of the runner's working directory",
+        "the prompt on stdin in place of the last argument with stdin /dev/null",
+        "the SDK's temporary --output-schema path in place of <job>/schema.json, with equal canonical bytes",
+        "no -o <job>/last.json"
+      ],
+      "allowed_differences_source": "@openai/codex-sdk@0.153.4:dist/index.js lines 176-274 [src]",
+      "control_changes": [
+        "--config web_search=\"disabled\"",
+        "--config mcp_servers.context-mode.enabled=false",
+        "effort medium in place of max"
+      ],
+      "pilot_role": "confirms the list; any new difference needs a dated pre-seal amendment or alternative 4"
+    },
+    "environment_readback": {
+      "gate": "VOID",
+      "rule": "names equal the curated list plus arm B's two cli_env names; CODEX_INTERNAL_ORIGINATOR_OVERRIDE absent after the launcher"
+    },
+    "schema_check": {
+      "gate": "VOID",
+      "rule": "sha256 of canonical JSON (sorted keys, compact separators), captured before exec because the SDK deletes its temporary file"
+    },
+    "records": "promptfoo's stored raw (completed items and usage) and sessionId, then the Codex rollout named by that sessionId; the launcher never copies the event stream",
+    "records_nv": "that promptfoo's stored eval output keeps raw is [nv] until the pilot; if not, the pre-seal amendment names the rollout as the record for items and usage, or takes alternative 4",
+    "local_code": [
+      {
+        "component": "launcher",
+        "language": "shell",
+        "reads": "argv, environment names, the prompt on stdin, the --output-schema file",
+        "emits": "launch.json per attempt and the private prompt file, then exec of the sealed Codex binary",
+        "steps": [
+          "save the prompt (0600) and record its sha256 and the attempt nonce",
+          "record the canonical-JSON sha256 of the schema before exec",
+          "record received argv, executed argv and environment names",
+          "remove CODEX_INTERNAL_ORIGINATOR_OVERRIDE",
+          "insert --ignore-user-config (A) or --profile stack-worker (B) after exec",
+          "change directory to the --cd value",
+          "exec Codex with stdin from the saved prompt; never fork or tee"
+        ],
+        "tests": "a fake Codex binary: flag insertion per arm, originator removal, record fields, stdin hand-off, same pid after exec, canonical schema hash",
+        "pattern": "tools/capability-gate/codex-profile-exec:6-9"
+      },
+      {
+        "component": "hook",
+        "language": "JavaScript (promptfoo beforeEach)",
+        "reads": "nothing",
+        "emits": "a fresh random Stage 0 token file with its sha256; the attempt nonce as a test variable",
+        "tests": "freshness, uniqueness, no reuse",
+        "pattern": "tools/capability-gate/m13.yaml:18-19"
+      },
+      {
+        "component": "observer",
+        "language": "Python",
+        "reads": "promptfoo JSON output (per-assertion results, raw items and usage, sessionId, errors); launcher records; only the rollouts named by those sessionIds; nonce matches and aggregates from the gateway operator, with no IDs or bodies",
+        "emits": "attempt classes, Stage 0 item results per run, identity verdicts, per-packet scores, the usage table, VOID and INCOMPLETE causes",
+        "tests": "planted fixtures for every class and item, both planted relabels, usage removed, web-search items without results, argv and environment read-back cases"
+      },
+      {
+        "component": "analysis",
+        "language": "Python (pinned environment)",
+        "reads": "the observer's per-packet table",
+        "emits": "the estimate, bootstrap bound and p, the exact-branch p when it governs, the branch, the informative-set check and the decision-table row; exit 2 on VOID",
+        "tests": "appendix A's boundary fixtures: all concordant, 19 against 20 nonzero differences, a zero-width interval"
+      },
+      {
+        "component": "scorer-control generator",
+        "language": "Python",
+        "reads": "the frozen packets and expected values",
+        "emits": "synthetic outputs that promptfoo's echo provider replays through the frozen assertions",
+        "tests": "each control's predicted verdict"
+      }
+    ],
+    "local_code_class": {
+      "policy": "Local integration check",
+      "pr_table": "local_integration",
+      "sources": [
+        "docs/acceptance-evidence-policy.md:30",
+        ".github/pull_request_template.md:17-20",
+        "docs/decisions/2026-09-27-capability-gate-harness.md:6-11"
+      ]
+    },
+    "pins": {
+      "codex_cli": {
+        "version": "0.157.1",
+        "observed": "2026-09-29T02:27:37Z",
+        "seal": "path and sha256"
+      },
+      "codex_upstream": "rust-v0.158.0 published 2026-09-28T05:07:23Z (gh api); moving changes both arms and needs a new cohort",
+      "promptfoo": {
+        "version": "0.123.1",
+        "codex_sdk": "0.153.4",
+        "observed": "2026-09-29T02:27:37Z"
+      },
+      "analysis_environment": {
+        "python": "3.14",
+        "numpy": "2.5.3",
+        "scipy": "1.18.1",
+        "statsmodels": "0.15.0",
+        "command": "uv run --no-project",
+        "precedent": "bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/plan.json key analysis_environment",
+        "resolved_here": "python 3.14.7 [obs 2026-09-29T03:25:21Z]"
+      }
+    }
+  },
+  "arms": [
+    {
+      "id": "A",
+      "name": "native Codex",
+      "role": "incumbent",
+      "harness": "promptfoo 0.123.1 openai:codex-sdk with the Gate B launcher",
+      "harness_class": "upstream runner with local integration",
+      "model": "gpt-6-astra",
+      "provider": "openai (native ChatGPT login)",
+      "base_url": "Codex default",
+      "effort": "max",
+      "codex_home": "unset (~/.codex)",
+      "working_dir": "native-staged work/empty",
+      "skip_git_repo_check": "true",
+      "launcher_inserts": "--ignore-user-config",
+      "consumer_argv": "codex exec --ignore-user-config --skip-git-repo-check -s read-only -m gpt-6-astra -c model_reasoning_effort=\"max\" -c web_search=\"live\" --output-schema <job>/schema.json -o <job>/last.json --json <prompt>",
+      "consumer_argv_source": "tools/sota-convergence/landscape-sweep/codex_job.py:15-16,433-436",
+      "sign_in": "the host's existing ChatGPT login in ~/.codex; nothing is copied, read or printed (AGENTS.md:43)",
+      "sealed_inputs": [
+        "~/.codex/AGENTS.md",
+        "the skill trees under ~/.codex/skills and ~/.agents/skills",
+        "the working directory listing",
+        "the Codex binary (path and sha256)"
+      ],
+      "sealed_inputs_sources": [
+        "tools/sota-convergence/landscape-sweep/README.md:110",
+        "tools/sota-convergence/landscape-sweep/README.md:122"
+      ],
+      "working_dir_note": "empty: a native restage removes .claude/settings.json; outside any Git checkout",
+      "working_dir_source": "tools/sota-convergence/landscape-sweep/README.md:130",
+      "model_effort_evidence": "client side only: the launcher's argv and the rollout turn_context for the attempt's sessionId; the event stream carries no model field",
+      "model_effort_evidence_source": "docs/decisions/2026-09-28-delegated-decisions.md:127",
+      "runnable_today": "partly: codex-cli 0.157.1 and promptfoo 0.123.1 on PATH [obs 2026-09-29T02:27:37Z]; login and live quota not read; local code, packets, schemas and controls not built",
+      "decides_d2_this_cohort": null
+    },
+    {
+      "id": "B",
+      "name": "OmniRoute GPT-6 on 20128, no headers",
+      "role": "candidate",
+      "harness": "promptfoo 0.123.1 openai:codex-sdk with the Gate B launcher",
+      "harness_class": "upstream runner with local integration",
+      "model": "cx/gpt-6-astra",
+      "provider": "omniroute (lane home)",
+      "base_url": "http://127.0.0.1:20128/v1",
+      "effort": "max",
+      "codex_home": "work/codex-home",
+      "working_dir": "omniroute-staged work/empty",
+      "skip_git_repo_check": "true",
+      "launcher_inserts": "--profile stack-worker",
+      "consumer_argv": "codex exec -p stack-worker --skip-git-repo-check -s read-only -m cx/gpt-6-astra -c model_reasoning_effort=\"max\" -c web_search=\"live\" --output-schema <job>/schema.json -o <job>/last.json --json <prompt>",
+      "consumer_argv_source": "tools/sota-convergence/landscape-sweep/codex_job.py:18-25",
+      "cli_env": {
+        "CODEX_HOME": "<work>/codex-home",
+        "OMNIROUTE_API_KEY": "local-loopback"
+      },
+      "cli_env_source": "tools/sota-convergence/landscape-sweep/codex_job.py:22-25",
+      "lane_home": {
+        "config.toml": [
+          "model cx/gpt-6-astra, model_provider omniroute, model_reasoning_effort max",
+          "[features] shell_snapshot = false, standalone_web_search = true",
+          "[shell_environment_policy.filters] OMNIROUTE_API_KEY = \"exclude\"",
+          "[model_providers.omniroute] loopback base_url, env_key OMNIROUTE_API_KEY, requires_openai_auth false, wire_api responses, supports_standalone_web_search true",
+          "[mcp_servers.*] serena, ai-memory, socraticode, headroom, codebase-memory, qmd, context-mode"
+        ],
+        "stack-worker.config.toml": "the worker profile, verbatim",
+        "AGENTS.md": "the managed block: the top rule and RTK's instructions",
+        "sources": [
+          "tools/sota-convergence/landscape-sweep/README.md:105-117",
+          "tools/sota-convergence/landscape-sweep/build_args.py:311-355"
+        ]
+      },
+      "working_dir_settings": "work/empty/.claude/settings.json: one exact Read(...) rule per file under $HOME/.agents/skills, which context-mode needs to load the skills",
+      "working_dir_settings_sources": [
+        "tools/sota-convergence/landscape-sweep/build_args.py:203-219,367-370",
+        "tools/sota-convergence/landscape-sweep/README.md:122-126"
+      ],
+      "sealed_inputs": [
+        "the lane-home files",
+        "the working directory's .claude/settings.json",
+        "the skill trees under <lane home>/skills and ~/.agents/skills",
+        "the MCP server entry points named in the lane config (path and sha256)",
+        "the ai-memory service version read at the seal [nv: read path fixed in the pilot]",
+        "the Codex binary (path and sha256)"
+      ],
+      "gateway_now": {
+        "observed_at": "2026-09-29T02:27:37Z",
+        "unit": "omniroute.service active since 2026-09-29T00:42:44Z",
+        "install": "omniroute-3.8.51-81c9b6da-pr13788-affinity2",
+        "build_sha": "5fc47d970 (81c9b6da with #13788 and affinity2)",
+        "models": "600 IDs, 60 GPT-6, including cx/gpt-6-astra and cx/gpt-6-astra-max",
+        "detailed_logging": "enabled false on both ports",
+        "port_20129": "out of scope; active since 00:41:49Z, install omniroute-3.8.51-81c9b6da-pr13788, BUILD_SHA c3fa5a15e (81c9b6da with #13788)"
+      },
+      "earlier_build_facts": [
+        {
+          "fact": "before the 2026-09-29 rebuild 20128 ran 045aa81f3 and 20129 ran dd6e9607e",
+          "source": "blueprints/runtime-workers/openhands/evidence/repair-round-commands.json:254"
+        },
+        {
+          "fact": "on 2026-09-27 20128 ran dd6e9607e",
+          "source": "docs/decisions/2026-09-27-omniroute-account-pool.md:137"
+        },
+        {
+          "fact": "/v1/responses logs a gateway-generated correlation ID; only /v1/chat/completions keeps the caller's (read at 045aa81f3 and dd6e9607e)",
+          "source": "blueprints/runtime-workers/openhands/README.md:459-467"
+        },
+        {
+          "fact": "effort columns filled only when the response carries encrypted reasoning (installed 3.8.51)",
+          "source": "tools/sota-convergence/landscape-sweep/README.md:208"
+        },
+        {
+          "fact": "providerRequest recorded only while detailed logging is on",
+          "source": "tools/sota-convergence/landscape-sweep/README.md:209"
+        },
+        {
+          "fact": "request rewrites read at a58000c7: all_turns dropped; placeholder instructions and summary auto",
+          "source": "docs/decisions/2026-09-27-omniroute-account-pool.md:434-439"
+        },
+        {
+          "fact": "G5 no-auth and anonymous-fallback lists copied from 045aa81f3 and dd6e9607e; an upgrade must re-read them",
+          "source": "blueprints/runtime-workers/openhands/README.md:788-790"
+        },
+        {
+          "fact": "#14904 reported HTTP 500 on /v1/responses at release/v3.8.51; closed unmerged upstream at 2026-09-28T23:49:37Z [doc: gh pr view at 2026-09-29T03:25:20Z]; whether 81c9b6da holds an equivalent fix is [nv]",
+          "source": "adoption/templates/codex.omniroute.config.toml:18-20"
+        }
+      ],
+      "earlier_build_facts_status": "each is a seal prerequisite to re-derive on the running build",
+      "effort_evidence": "providerRequest for the attempt's nonce row (decision 6) or a non-null reasoning_effort_upstream; never requestBody",
+      "effort_evidence_source": "tools/sota-convergence/landscape-sweep/README.md:208-209",
+      "runnable_today": "routes listed [obs]; not measurable until the build receipt, a fingerprint read-back with logging on, the re-derived facts, the local code and the packets exist",
+      "decides_d2_this_cohort": null
+    },
+    {
+      "id": "C",
+      "name": "OpenHands via OmniRoute",
+      "role": "D2 only; gated smoke check",
+      "harness": "#425 recipe host.py and dispatch.py (control arm)",
+      "harness_class": "recipe-local integration",
+      "model": "cx/gpt-6-astra-max",
+      "provider": "omniroute control arm",
+      "base_url": "http://gw:8081/v1 to 20128",
+      "effort": "max",
+      "codex_home": "n/a",
+      "working_dir": "n/a",
+      "skip_git_repo_check": "n/a",
+      "launcher_inserts": "n/a",
+      "recipe": {
+        "merged": "f6e5a038",
+        "sdk": "OpenHands SDK and agent-server 1.49.6 at fcc102a (tag v1.49.6)",
+        "images": [
+          "agent-server sha256:02ef66fd",
+          "nginx proxy sha256:ed04ec1f"
+        ],
+        "limits": "Responses, reasoning_effort=max, 40 iterations, 1,200 s",
+        "sources": [
+          "blueprints/runtime-workers/openhands/pins.json:3-6",
+          "blueprints/runtime-workers/openhands/pins.json:17",
+          "blueprints/runtime-workers/openhands/pins.json:25",
+          "blueprints/runtime-workers/openhands/README.md:155-162",
+          "blueprints/runtime-workers/openhands/README.md:177-178"
+        ]
+      },
+      "grading": "official SWE-bench 4.1.0 through OpenHands/benchmarks@405bae71",
+      "grading_sources": [
+        "blueprints/runtime-workers/openhands/pins.json:48-50",
+        "blueprints/runtime-workers/openhands/README.md:1019-1024"
+      ],
+      "cannot_decide_d2_because": [
+        {
+          "reason": "receipt hard-codes evidence_complete False",
+          "source": "blueprints/runtime-workers/openhands/receipt.py:282"
+        },
+        {
+          "reason": "exit 0 needs task_passed and evidence_complete",
+          "source": "blueprints/runtime-workers/openhands/host.py:1328-1330"
+        },
+        {
+          "reason": "an independent observer must be qualified first",
+          "source": "blueprints/runtime-workers/openhands/README.md:29-31"
+        },
+        {
+          "reason": "P3 raises NotImplementedError",
+          "source": "blueprints/runtime-workers/openhands/README.md:917-921"
+        },
+        {
+          "reason": "P0-P2 not run",
+          "source": "blueprints/runtime-workers/openhands/README.md:20-22"
+        },
+        {
+          "reason": "G2 and P3 are coordinator-recorded stage gates, none recorded",
+          "source": "blueprints/runtime-workers/openhands/README.md:895-912"
+        },
+        {
+          "reason": "G5 refuses on unblocked no-auth providers; both gateways list codex-app-server (46), devin-cli-agentic (127), auggie (28) and zcode (14) [obs 2026-09-29T02:27:37Z]",
+          "source": "blueprints/runtime-workers/openhands/README.md:772-778"
+        }
+      ],
+      "runnable_today": "nothing: no openhands tool directory; harbor not on PATH [obs 2026-09-29T03:04:26Z]",
+      "decides_d2_this_cohort": false
+    }
+  ],
+  "tasks": {
+    "stage0": {
+      "arms": [
+        "A",
+        "B"
+      ],
+      "serialized": true,
+      "block": "one block, maxConcurrency 1, logging on",
+      "basis": [
+        "tools/sota-convergence/landscape-sweep/README.md:147-153",
+        "docs/acceptance-evidence-policy.md:42-53"
+      ],
+      "items": [
+        {
+          "n": 1,
+          "item": "effort",
+          "arms": [
+            "B"
+          ],
+          "passes_when": "20128's providerRequest for the attempt's nonce row shows effort max, or a non-null reasoning_effort_upstream equals max",
+          "control": "one B run at effort medium reads medium"
+        },
+        {
+          "n": 2,
+          "item": "shell",
+          "arms": [
+            "A",
+            "B"
+          ],
+          "passes_when": "a command_execution item's output carries the fresh hook token",
+          "control": "one run per arm whose hook writes no token file"
+        },
+        {
+          "n": 3,
+          "item": "MCP",
+          "arms": [
+            "B"
+          ],
+          "passes_when": "an mcp_tool_call item of server context-mode, tool ctx_execute, carries the token",
+          "a_has_no_mcp": [
+            "tools/sota-convergence/landscape-sweep/codex_job.py:33",
+            "tools/sota-convergence/landscape-sweep/README.md:130"
+          ],
+          "control": "one B run with context-mode disabled (tools/capability-gate/m13.yaml:56-59)"
+        },
+        {
+          "n": 4,
+          "item": "schema",
+          "arms": [
+            "A",
+            "B"
+          ],
+          "passes_when": "is-json with the frozen schema",
+          "control": "a planted wrong-shape output fails and a planted correct one passes (no model call)"
+        },
+        {
+          "n": 5,
+          "item": "usage",
+          "arms": [
+            "A",
+            "B"
+          ],
+          "passes_when": "turn.completed usage on every attempt",
+          "control": "a real attempt with usage removed is reported missing (no model call)"
+        },
+        {
+          "n": 6,
+          "item": "search",
+          "arms": [
+            "A",
+            "B"
+          ],
+          "passes_when": "for every frozen query where A's matched run got a result, B's run got one",
+          "record": "the results field of web_search items in promptfoo's raw; else the rollout named by sessionId; else untested (INCOMPLETE), settled in the pilot",
+          "record_evidence": "evidence/artifacts/sota-refresh-20260926/codex/accept_codex_ws.py:82-95 [hist, fixture against a fake search server]",
+          "control": "one B run with web_search disabled gets none"
+        },
+        {
+          "n": 7,
+          "item": "identity",
+          "arms": [
+            "A",
+            "B"
+          ],
+          "passes_when": "client side matches the arm; every B nonce appears in a 20128 /v1/responses row and no A nonce appears in any",
+          "control": "two planted relabels are flagged (no model call)",
+          "nonce_in_payloads": "[nv] until the pilot",
+          "fallback": "without decision 6, time windows in an exclusive window (decision 7); without either, untested (INCOMPLETE)"
+        }
+      ],
+      "probes": {
+        "P1": "items 2-5 and 7: the file token through the shell (and ctx_execute for B)",
+        "P2": "items 4-7: 6 frozen web queries answered with the URLs retrieved",
+        "nonce": "every prompt ends with 'attempt: <nonce>', the same form in both arms"
+      },
+      "repeats_K": 3,
+      "pairing": "interleaved A, B, A, B; matched by index",
+      "failure_rule": {
+        "b_fails": "at least 2 of the 3 runs whose matched A run passed; B-only items: at least 2 of 3 B runs",
+        "a_fails": "A fails an item in at least 2 of 3 runs: INCOMPLETE, never a D1 decision or overturn",
+        "gateway_record_missing": "items 1 and 7: missing gateway records with omniroute client evidence are untested (INCOMPLETE), not a B failure",
+        "infrastructure": "one frozen retry, then INCOMPLETE"
+      },
+      "standing_checks": [
+        {
+          "id": "E1a",
+          "what": "shell GET to 20128's management API inside the read-only sandbox, one run per arm",
+          "control": "the observer's GET outside the sandbox succeeds"
+        },
+        {
+          "id": "E1b",
+          "what": "B's ctx_execute GET to the same endpoint; expected reached",
+          "expected_source": "tools/sota-convergence/landscape-sweep/README.md:129",
+          "controls": [
+            "the observer's GET outside Codex succeeds",
+            "context-mode disabled does not reach"
+          ],
+          "risk_source": "docs/decisions/2026-09-27-omniroute-account-pool.md:290-296"
+        },
+        {
+          "id": "Q1",
+          "what": "scripts/codex_quota.py --json --gate P below the live used_percent exits 3",
+          "source": "scripts/codex_quota.py:28-30"
+        }
+      ],
+      "model_runs": 21,
+      "model_runs_breakdown": {
+        "P1_P2": 12,
+        "effort_medium": 1,
+        "no_token": 2,
+        "context_mode_disabled": 1,
+        "search_disabled": 1,
+        "E1a": 2,
+        "E1b": 1,
+        "E1b_context_mode_disabled": 1
+      }
+    },
+    "pilot": {
+      "status": "exploratory; never acceptance",
+      "packets": 12,
+      "runs": 24,
+      "measures": [
+        "per-packet differences h",
+        "arm A's mean score",
+        "usage and wall time per run",
+        "argv and environment read-backs",
+        "whether promptfoo's stored output keeps raw",
+        "rollout presence and fields",
+        "results on web_search items",
+        "the CODEX_HOME placeholder",
+        "providerRequest effort",
+        "correlation-ID behaviour on the running build",
+        "whether 20128's logged payloads carry the attempt nonce"
+      ],
+      "calibration_band": [
+        0.2,
+        0.8
+      ],
+      "calibration_rule": "arm A's pilot mean outside the band: revise packet construction and repeat on new packets; pilot packets never enter Stage 1",
+      "source": "docs/decisions/2026-09-28-ecosystem-roadmap.md:43,176"
+    },
+    "stage1": {
+      "runs_only_after": "Stage 0 passes",
+      "F1": {
+        "required": true,
+        "n": "from the pre-seal sizing amendment",
+        "reserve": "ceil(0.2 n)",
+        "order": "AB and BA alternating by packet index",
+        "block_packets": 20,
+        "source": "docs/decisions/2026-09-28-ecosystem-roadmap.md:25",
+        "shape": "3 fact fields and 1 verdict field; at least 15% negative expected answers in a frozen negative representation; the attempt-nonce line is the only prompt difference between arms",
+        "expected_values": "from primary sources through gh api GET with as-of UTC; re-checked by a second session before the seal and after the run",
+        "drift": "a changed fact drops the packet from both arms; the next reserve packet in frozen order replaces it; capacity-stopped pairs rerun in both arms later",
+        "scoring": {
+          "assertion": "is-json only",
+          "source": "promptfoo/promptfoo@0.123.1:site/docs/configuration/expected-outputs/deterministic.md lines 340-389",
+          "per_packet": "matched field assertions / 4",
+          "normalization": [
+            "case",
+            "surrounding whitespace",
+            "leading v on tags",
+            "the negative representation"
+          ]
+        },
+        "scorer_controls": {
+          "runner": "promptfoo echo provider through the frozen assertions",
+          "when": [
+            "before the seal",
+            "before the analysis"
+          ],
+          "controls": [
+            "exact expected values score 4 of 4",
+            "one planted wrong value per field fails that field only",
+            "case change, surrounding whitespace and leading v pass as frozen",
+            "a near miss (1.2.30 for 1.2.3) fails",
+            "the negative representation passes and a fabricated value fails"
+          ],
+          "on_mismatch": "fails qualification before the seal; VOID after the run"
+        },
+        "provenance": "web_search, MCP tool or shell per scored fact; reported, never a decision leg"
+      },
+      "F2": {
+        "required": false,
+        "decision": 5,
+        "source": "tools/sota-convergence/codex_lane.py:9-13",
+        "rule": "codex_lane's argv; B changes only the provider; scoring, scorer controls, drift and provenance follow F1"
+      }
+    },
+    "stageC": {
+      "arm": "C",
+      "scheduled": false,
+      "frozen_row": null,
+      "preconditions": [
+        "an independent observer qualified for #425 and a merged recipe change under which evidence_complete can become true",
+        "P3 implemented and run; G2, P3 and G5 recorded as passed",
+        "a P0-P2 receipt at most 900 s old at dispatch",
+        "decision 8's G5 blocking applied with its own fingerprint"
+      ],
+      "precondition_sources": [
+        "blueprints/runtime-workers/openhands/README.md:895-912",
+        "blueprints/runtime-workers/openhands/README.md:873-893"
+      ],
+      "then": "a dated seal amendment before any Stage C data freezes one SWE-bench row never used in an exploratory #425 run; one conversation runs",
+      "grader_controls": [
+        "gold resolves",
+        "empty does not",
+        "conftest.py printing PASSED lines does not",
+        "a test-file edit does not"
+      ],
+      "grader_note": "SWE-bench 4.1.0 predates v5.0.0's grading fix #620 (SWE-bench/SWE-bench@v5.0.1:CHANGELOG.md lines 12, 34-35, 41)"
+    }
+  },
+  "metrics": {
+    "stage1_primary": "per-packet score in [0, 1]",
+    "estimand": "Δ = mean over scored packets of score(B) - score(A) = -E[h]",
+    "attempt_classes": {
+      "assigned_by": "the independent observer from stored items, errors and exit data, never a wrapper's passed field (docs/acceptance-evidence-policy.md:65-69)",
+      "S": "completed, schema-valid; scored",
+      "F": "completed, schema-invalid or empty; 0",
+      "X": "failed after Codex started: timeoutMs abort, transport error or 5xx, Codex error; 0",
+      "X_note": "71 of the 287 candidates of the 2026-09-26 sweep carry a missing gpt-6-astra vote (docs/decisions/2026-09-28-ecosystem-roadmap.md:34)",
+      "L": "capacity refusal; not scored; rerun both arms after the condition changes (docs/convergence-architecture.md:164-168)",
+      "invalid": "harness failure before Codex starts; kept, rerun, never scored"
+    },
+    "reported_not_decision_legs": [
+      "completion rate per arm",
+      "L count per arm and source",
+      "Δ by provenance",
+      "per-arm means",
+      "packets with h != 0 and those differing by more than one field",
+      "correlation between the arms"
+    ],
+    "stage0": "items pass or fail under the frozen failure rule; E1a, E1b and Q1 recorded with controls",
+    "stageC": [
+      "exit code, evidence_complete, failure_stage",
+      "official verdict and four grader controls",
+      "effort sent upstream",
+      "entry-gateway usage"
+    ]
+  },
+  "accounting": {
+    "authority": "turn.completed usage stored in promptfoo's raw, one per Codex attempt",
+    "keys": [
+      "input_tokens",
+      "cached_input_tokens",
+      "cache_write_input_tokens",
+      "output_tokens",
+      "reasoning_output_tokens"
+    ],
+    "subsets": "cached and cache-write inside input; reasoning inside output; total = input + output",
+    "subsets_source": "evidence/artifacts/omniroute-routing-20260928/route-gpt6-runs.json:4",
+    "sdk_zero_fill": "the SDK sets a missing cache_write_input_tokens to 0 (@openai/codex-sdk@0.153.4:dist/index.js lines 88-90), so a zero is not evidence of zero cache writes",
+    "cross_checks_never_added": [
+      "promptfoo tokenUsage",
+      "B's gateway rows joined by nonce"
+    ],
+    "count_every_attempt": [
+      "pilot",
+      "Stage 0 runs and controls",
+      "Stage 1 attempts of every class",
+      "invalid attempts",
+      "Stage C"
+    ],
+    "separate_reporting_source": "docs/convergence-architecture.md:149-158",
+    "unknown_source": "docs/token-practice.md:319-322",
+    "invisible_retries": "Codex transport retries inside a turn are not visible [nv]; declared, not estimated",
+    "mcp_local_model_work": {
+      "text": "socraticode embeds through a local LM Studio endpoint; outside Codex usage, declared unknown, never added",
+      "source": "adoption/templates/codex.config.template.toml:60-67"
+    },
+    "claude_side": "native counters, never summed with GPT-6 (AGENTS.md:28)",
+    "arm_C": {
+      "text": "entry-gateway rows by time window, model and path; no output-token total",
+      "source": "blueprints/runtime-workers/openhands/README.md:440-457"
+    },
+    "wall_time": "launcher start time and promptfoo latency; reported, never a decision leg",
+    "dollars": "none computed"
+  },
+  "evidence_classes": [
+    {
+      "output": "this draft, its JSON, the draft-contract test, the hash rows, appendix A",
+      "policy": "structural validation",
+      "pr_table": "source_review"
+    },
+    {
+      "output": "packets, expected values, schemas, planted and scorer controls",
+      "policy": "synthetic fixture",
+      "pr_table": "synthetic"
+    },
+    {
+      "output": "Stage 0 and Stage 1 runs",
+      "policy": "local integration check",
+      "pr_table": "local_integration"
+    },
+    {
+      "output": "the #425 dispatch for arm C",
+      "policy": "local integration check",
+      "pr_table": "local_integration"
+    },
+    {
+      "output": "the grader's gold and empty-patch controls",
+      "policy": "upstream example or native operation",
+      "pr_table": "native_proven"
+    },
+    {
+      "output": "the observer's re-derivation; the second-session fact re-check",
+      "policy": "independent observation",
+      "pr_table": "native_proven"
+    },
+    {
+      "output": "b9abcc5f's probe, route-job1/2, receipt 8, this repair's host observations",
+      "policy": "reference only",
+      "pr_table": "not claimed"
+    }
+  ],
+  "evidence_class_sources": [
+    "docs/acceptance-evidence-policy.md:26-33",
+    ".github/pull_request_template.md:17-20"
+  ],
+  "pass_rule": {
+    "precedence": [
+      "VOID",
+      "INCOMPLETE",
+      "decided"
+    ],
+    "precedence_sources": [
+      "evidence/artifacts/token-adoption-e2e-20260926/preregistration.json:3153-3169",
+      "bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/plan.json key decision_rule.invalid"
+    ],
+    "block": {
+      "definition": "one promptfoo invocation over a frozen, contiguous slice of the schedule",
+      "stage0": "one block",
+      "stage1_packets_per_block": 20,
+      "checks_before_and_after": [
+        "gateway fingerprint read-back",
+        "re-hash of the sealing table and sealed inputs",
+        "curated environment check",
+        "live native quota read with Q1 as its control"
+      ],
+      "void_scope": "the whole block leaves scoring; attempts stay retained with usage",
+      "cohort_rule": "no sealed artifact changed: rerun the slice as a new block; a sealed artifact changed: new cohort and new seal, without reusing packets whose Stage 1 outcome was observed",
+      "observed_means": "the observer classified or scored an attempt, or anyone read its output"
+    },
+    "void_if": [
+      "a frozen artifact's sha256 differs from the sealing table",
+      "the Codex binary's hash or version differs between arms or from the seal",
+      "the gateway fingerprint differs from the seal or between blocks (BUILD_SHA, Thinking Budget mode, blocked providers, combos and model-combo mappings, reasoning-routing rules, compression settings, the detailed-logging state sealed as on, the hooks and middleware registry)",
+      "a sealed input of either arm differs, or a Git repository sits above a working directory",
+      "the executed argv falls outside the five source-derived differences or a control's single change",
+      "the environment names differ from the curated list plus B's two cli_env names",
+      "the canonical schema hash differs from the frozen schema",
+      "on a scored attempt client-side evidence contradicts the arm, or an A nonce appears at 20128",
+      "a D1 control does not behave as predicted (Stage 0, scorer, or grader once Stage C runs)",
+      "the analysis environment differs from the frozen one",
+      "usage is counted twice"
+    ],
+    "void_sources": [
+      "docs/decisions/2026-09-27-omniroute-account-pool.md:290-296",
+      "bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/plan.json key gateway_fingerprint"
+    ],
+    "void_effect": "no statistic; the analysis exits 2; attempts kept; the cohort rule decides rerun or new cohort",
+    "not_void": {
+      "wire_diff": "B's requestBody against providerRequest, reported",
+      "pre_listed": [
+        "reasoning.context all_turns dropped",
+        "effort mapped",
+        "placeholder instructions only when empty",
+        "summary auto"
+      ],
+      "sources": [
+        "docs/decisions/2026-09-27-omniroute-account-pool.md:434-439",
+        "tools/sota-convergence/landscape-sweep/README.md:209"
+      ]
+    },
+    "standing_rules": {
+      "shell_containment": {
+        "rule": "E1a reached: dispatch stops, containment finding, INCOMPLETE until the gateway owner rules",
+        "source": "docs/decisions/2026-09-27-omniroute-account-pool.md:290-296,300"
+      },
+      "mcp_containment": "E1b reached (expected): recorded in D1's scope, reported to the gateway owner and the user (decision 16); dispatch continues because each block's fingerprint read-back voids a block in which the gateway configuration changed",
+      "dispatch_hold": "Q1 not exiting 3: no Stage 1 block is dispatched until fixed",
+      "never_decide_d1": true
+    },
+    "incomplete_if": [
+      "a Stage 0 item is untested",
+      "A fails a Stage 0 item in at least 2 of 3 runs",
+      "a Stage 0 infrastructure failure persists after its one retry",
+      "an arm cannot run: sign-in, quota refusal, native reserve reached, gateway restart or rebuild, 401, or detailed logging unavailable",
+      "the shell-containment rule is open",
+      "fewer than n packets are scored after the reserve is used",
+      "arm A's Stage 1 mean falls outside the informative band (new packet set, new seal)"
+    ],
+    "incomplete_effect": "never a pass; native stays in force; Gate B open; the same frozen checks top up",
+    "incomplete_source": "evidence/artifacts/token-adoption-e2e-20260926/preregistration.json:3167",
+    "informative_band": [
+      0.1,
+      0.9
+    ],
+    "stage0_native": {
+      "rule": "B fails an item under the frozen rule with every control behaving: D1 = native, Stage 1 does not run, B not max-quality-qualified",
+      "source": "tools/sota-convergence/landscape-sweep/README.md:147"
+    },
+    "stage1_order": [
+      "informative set, else INCOMPLETE",
+      "NI by the Statistics test",
+      "inferior: at least 20 packets with h != 0 and the one-sided 95% lower bound of E[h] above δ",
+      "otherwise inconclusive"
+    ],
+    "decision_table": [
+      {
+        "outcome": "void",
+        "name": "VOID",
+        "when": "a VOID condition holds in a block",
+        "d1": "unchanged (native in force)",
+        "gate_b": "open",
+        "convergence": "stays planned (trial)",
+        "column": "open"
+      },
+      {
+        "outcome": "incomplete",
+        "name": "INCOMPLETE",
+        "when": "an INCOMPLETE condition holds",
+        "d1": "unchanged (native in force)",
+        "gate_b": "open",
+        "convergence": "stays planned (trial)",
+        "column": "open"
+      },
+      {
+        "outcome": "stage0_native",
+        "name": "Stage 0 native",
+        "when": "B fails a Stage 0 item under the frozen rule, and every control behaved",
+        "d1": "native",
+        "gate_b": "passed",
+        "convergence": "reject",
+        "column": "native_decided"
+      },
+      {
+        "outcome": "ni",
+        "name": "Stage 1 non-inferior",
+        "when": "the NI test passes on a complete, valid run",
+        "d1": "omniroute",
+        "gate_b": "passed",
+        "convergence": "adopt_within_scope",
+        "column": "omniroute",
+        "label": {
+          "delta_0.05": "gateway lane non-inferior within δ; max-quality-qualified for the landscape-sweep lane within scope",
+          "delta_0.10": "non-inferior within 0.10; not max-quality-qualified"
+        },
+        "scope": [
+          "this host",
+          "the sealed fingerprint",
+          "the Codex binary",
+          "the sealed inputs of both arms",
+          "the curated environment",
+          "the landscape-sweep lane",
+          "the E1b result"
+        ]
+      },
+      {
+        "outcome": "inferior",
+        "name": "Stage 1 inferior",
+        "when": "rule 3 holds on a complete, valid run",
+        "d1": "native",
+        "gate_b": "passed",
+        "convergence": "reject",
+        "column": "native_decided"
+      },
+      {
+        "outcome": "inconclusive",
+        "name": "Stage 1 inconclusive",
+        "when": "neither NI nor inferior on a complete, valid run",
+        "d1": "native",
+        "gate_b": "passed",
+        "convergence": "retain",
+        "column": "native_inconclusive"
+      },
+      {
+        "outcome": "unpowered",
+        "name": "Stage 1 unpowered",
+        "when": "before the seal, the sizing rule finds no n up to n_max (decision 12), or no calibrated α′",
+        "d1": "native (untested)",
+        "gate_b": "passed (decision 15)",
+        "convergence": "retain, no qualification run",
+        "column": "native_untested"
+      },
+      {
+        "outcome": "time_box",
+        "name": "Time box",
+        "when": "14 days after the seal, no decided row has been reached",
+        "d1": "native (untested)",
+        "gate_b": "passed (decision 15)",
+        "convergence": "retain, no qualification run",
+        "column": "native_untested"
+      }
+    ],
+    "improvement_leg": {
+      "text": "pooled weekly capacity across the gateway's accounts; documented, not measured",
+      "sources": [
+        "docs/acceptance-evidence-policy.md:81-85",
+        "docs/decisions/2026-09-27-omniroute-account-pool.md:3-6",
+        "tools/sota-convergence/landscape-sweep/README.md:103"
+      ]
+    },
+    "d2_admission": {
+      "this_cohort": "pending",
+      "admitted_only_if": [
+        "evidence_complete true and no failure_stage",
+        "an official 4.1.0 verdict present",
+        "gold resolves and empty does not, exploit results recorded",
+        "P0-P2 receipt at most 900 s old",
+        "G2, P3 and G5 passed",
+        "upstream effort max evidenced"
+      ],
+      "otherwise": "pending, never refuted",
+      "sources": [
+        "tools/sota-convergence/landscape-sweep/templates.json:2",
+        "d161f691:blueprints/memory-layer-s3/PREREGISTRATION.md:33"
+      ]
+    },
+    "time_box": {
+      "days_after_seal": 14,
+      "row": "time_box",
+      "label": "native by time box, not a test result",
+      "extension": "only by a dated amendment recorded before expiry",
+      "pre_seal": "no time box; after 21 days from confirmation without a seal the owner reports the blocking prerequisite to the user; nothing is settled by default"
+    }
+  },
+  "statistics": {
+    "unit": "packet; one run per arm in Stage 1",
+    "harm": "h = score_A - score_B in [-1, 1], steps of 1/4",
+    "alpha": 0.05,
+    "delta": {
+      "default": 0.05,
+      "alternative": 0.1,
+      "decision": 3
+    },
+    "step": 0.25,
+    "paired_net_test": {
+      "precedent": "73fc873e:blueprints/gpt6-lane-compression-ab/preregistration.json lines 2985-2994",
+      "api": "scipy.stats.bootstrap",
+      "data": "(score_a, score_b)",
+      "statistic": "mean(a - b)",
+      "paired": true,
+      "vectorized": true,
+      "method": "percentile",
+      "n_resamples": 99999,
+      "confidence_level": 0.95,
+      "alternative": "less",
+      "seed": 20260928,
+      "p_rule": "p_NI = (1 + count(bootstrap_distribution >= δ)) / (99999 + 1); NI when p_NI < α′",
+      "scipy_defaults_overridden": {
+        "method": "BCa",
+        "n_resamples": 9999,
+        "paired": false,
+        "alternative": "two-sided",
+        "observed": "inspect.signature under the pinned environment, 2026-09-29"
+      }
+    },
+    "exact_fallback": {
+      "when": "fewer than 20 packets with h != 0, or a zero-width or nonfinite bootstrap interval",
+      "switch_nonzero": 20,
+      "precedent": "73fc873e:blueprints/gpt6-lane-compression-ab/preregistration.json lines 2965 and 2994",
+      "bound": "U(a) = binomtest(h+, n, less).proportion_ci(1 - a/2, exact).high - 0.25 * binomtest(h-, n, greater).proportion_ci(1 - a/2, exact).low",
+      "validity": "0 < h <= 1 when h > 0 and h <= -1/4 when h < 0, so E[h] <= P(h > 0) - 1/4 P(h < 0); Bonferroni covers both bounds; with binary scores the step is 1 and this is #431's rule",
+      "p_rule": "p = inf{a in (0,1): U(a) < δ} by bisection; p = 1 when none; NI when p < α",
+      "all_concordant_n400_upper": 0.0092
+    },
+    "switch_step": "the exact branch is more conservative, so one more discordant packet can move a data set from not NI (exact) to NI (bootstrap); inherited from #431 and included in the simulated rates",
+    "earlier_guard_rejected": {
+      "reason": "harmful-only exact test: very low power and an inversion at the switch",
+      "sources": [
+        "73fc873e:blueprints/gpt6-lane-compression-ab/preregistration.json lines 2951 and 3176"
+      ]
+    },
+    "calibration": {
+      "rule": "the first α′ in the grid whose worst false-NI rate at E[h] = δ has an upper 95% Clopper-Pearson bound at or below the calibration bound, at the selected n",
+      "bar_source": "73fc873e:blueprints/gpt6-lane-compression-ab/preregistration.json line 3034",
+      "deviation_from_431": "#431 leaves the gate open when calibration fails; here α′ is fixed before any data so the criterion stays decidable",
+      "small_sample_reference": "Bowyer et al., arXiv 2503.01747 (abstract)"
+    },
+    "multiplicity": {
+      "F1_only": "one hypothesis; no correction",
+      "F1_and_F2": "statsmodels multipletests([p1, p2], alpha=0.05, method='holm'); missing hypothesis p = 1",
+      "precedent": "73fc873e:blueprints/gpt6-lane-compression-ab/preregistration.json key analysis.multiplicity"
+    },
+    "diagnostic_only": "scipy.stats.permutation_test; nonsignificant equality is not non-inferiority",
+    "sizing": {
+      "rule": "simulate the full rule; n = smallest grid value with P(NI | identical arms) >= target under every required law and the pilot law; calibrate α′ at that n with the calibration replicates; if α′ lowers power below target take the next n; n above n_max or no α′: the unpowered row",
+      "n_grid": [
+        100,
+        155,
+        200,
+        250,
+        300,
+        400,
+        500
+      ],
+      "alpha_boot_grid": [
+        0.05,
+        0.045,
+        0.04,
+        0.035,
+        0.03
+      ],
+      "target_power": 0.8,
+      "required_laws": [
+        "M1 r=0.05",
+        "M1 r=0.10",
+        "M1 r=0.20",
+        "M1 r=0.30"
+      ],
+      "laws": {
+        "M1": "|h| = 1/4, 1/2, 3/4, 1 with weights 0.6, 0.2, 0.1, 0.1",
+        "M2": "|h| = 1 only (reported, not required)",
+        "pilot": "the pilot's 12 observed differences, resampled"
+      },
+      "calibration_bound": 0.055,
+      "calibration_reps": 10000,
+      "n_max_from": "decision 12",
+      "n_max_default": 400,
+      "never_shrinks": "a pilot with few differences does not lower n: the exact branch governs there",
+      "selected_n": null,
+      "selected_alpha_boot": null
+    },
+    "planning_results": {
+      "kind": "planning simulation, not a result",
+      "source": "appendix A, gate_b_sizing.py, seed 20260929, 1,000 replicates per power cell, 4,000 per calibration null law, 2,000 bootstrap resamples per replicate",
+      "ran": {
+        "finished_utc": "2026-09-29T03:01:07Z",
+        "seconds": 321,
+        "exit": 0,
+        "environment": "uv 0.12.17, python 3.14.7, numpy 2.5.3, scipy 1.18.1"
+      },
+      "shortcut_check": {
+        "fixture-a": {
+          "scipy": 0.0355,
+          "shortcut": 0.0355
+        },
+        "fixture-b": {
+          "scipy": 0.0871,
+          "shortcut": 0.0871
+        }
+      },
+      "earlier_formula_n": {
+        "m1_delta_0.05": 155,
+        "m1_delta_0.10": 39,
+        "m2_delta_0.05": 197,
+        "m2_delta_0.10": 50
+      },
+      "exact_branch_max_harmful_by_beneficial_0_to_10": {
+        "delta_0.05": {
+          "n40": [
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1
+          ],
+          "n155": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            3,
+            3,
+            3
+          ],
+          "n400": [
+            11,
+            11,
+            11,
+            11,
+            11,
+            11,
+            11,
+            11,
+            11,
+            10,
+            9
+          ]
+        },
+        "delta_0.10": {
+          "n40": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "n100": [
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4
+          ],
+          "n200": [
+            11,
+            11,
+            11,
+            11,
+            11,
+            11,
+            12,
+            12,
+            11,
+            10,
+            9
+          ]
+        }
+      },
+      "delta_0.05": {
+        "power_alpha_0.05_by_n": {
+          "n": [
+            100,
+            155,
+            200,
+            250,
+            300,
+            400,
+            500
+          ],
+          "M1 r=0.05": [
+            0.09,
+            0.26,
+            0.43,
+            0.52,
+            0.69,
+            0.96,
+            1.0
+          ],
+          "M1 r=0.10": [
+            0.03,
+            0.15,
+            0.56,
+            0.88,
+            0.99,
+            1.0,
+            1.0
+          ],
+          "M1 r=0.20": [
+            0.37,
+            0.85,
+            0.92,
+            0.96,
+            0.99,
+            1.0,
+            1.0
+          ],
+          "M1 r=0.30": [
+            0.59,
+            0.71,
+            0.83,
+            0.9,
+            0.93,
+            0.98,
+            0.99
+          ],
+          "M1 r=0.02": [
+            0.36,
+            0.8,
+            0.89,
+            0.96,
+            0.98,
+            1.0,
+            1.0
+          ],
+          "M2 r=0.05": [
+            0.09,
+            0.25,
+            0.4,
+            0.53,
+            0.7,
+            0.97,
+            1.0
+          ],
+          "M2 r=0.10": [
+            0.02,
+            0.1,
+            0.36,
+            0.73,
+            0.84,
+            0.92,
+            0.96
+          ],
+          "M2 r=0.20": [
+            0.15,
+            0.41,
+            0.49,
+            0.55,
+            0.57,
+            0.73,
+            0.79
+          ],
+          "M2 r=0.30": [
+            0.22,
+            0.29,
+            0.34,
+            0.44,
+            0.47,
+            0.56,
+            0.62
+          ]
+        },
+        "n": 400,
+        "calibration_cp95_upper_by_alpha_boot": {
+          "0.05": 0.0678,
+          "0.045": 0.0559,
+          "0.04": 0.0551,
+          "0.035": 0.0548
+        },
+        "alpha_boot": 0.035,
+        "power_required_laws_at_alpha_boot": [
+          0.96,
+          1.0,
+          0.99,
+          0.96
+        ],
+        "power_b_worse_by_0.02": 0.81,
+        "n155_power_b_worse_by_0.02": 0.52
+      },
+      "delta_0.10": {
+        "power_alpha_0.05_by_n": {
+          "n": [
+            100,
+            155,
+            200,
+            250,
+            300,
+            400,
+            500
+          ],
+          "M1 r=0.05": [
+            0.89,
+            0.99,
+            0.99,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "M1 r=0.10": [
+            0.43,
+            0.76,
+            0.98,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "M1 r=0.20": [
+            0.6,
+            0.99,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "M1 r=0.30": [
+            0.96,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "M1 r=0.02": [
+            0.99,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "M2 r=0.05": [
+            0.89,
+            0.98,
+            0.99,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "M2 r=0.10": [
+            0.44,
+            0.75,
+            0.97,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "M2 r=0.20": [
+            0.39,
+            0.85,
+            0.93,
+            0.96,
+            0.98,
+            1.0,
+            1.0
+          ],
+          "M2 r=0.30": [
+            0.52,
+            0.72,
+            0.81,
+            0.88,
+            0.94,
+            0.98,
+            0.99
+          ]
+        },
+        "n": 200,
+        "calibration_cp95_upper_by_alpha_boot": {
+          "0.05": 0.0668,
+          "0.045": 0.0562,
+          "0.04": 0.0495
+        },
+        "alpha_boot": 0.04,
+        "power_required_laws_at_alpha_boot": [
+          1.0,
+          0.98,
+          1.0,
+          1.0
+        ],
+        "power_b_worse_by_0.02": 1.0,
+        "n155_power_b_worse_by_0.02": 0.99
+      },
+      "reading": "At the earlier draft's n = 155 the stated 80% power held only near 20% discordance; the low-discordance regime (5-10% of packets differ) gave 0.26 and 0.15. The earlier floor n = 40 can never return NI at δ = 0.05."
+    },
+    "appendix_script_sha256": "6efb2b9612577e48d30d0636f5b8c26648e2b1f919eb4ff5748ccc4a0f00187f",
+    "appendix_output_sha256": "fcb11580502e65b5d35b025ca61572c4b89614bf3c1c2faf134b84d895a03d5a",
+    "environment": "pinned at the seal; a mismatch is VOID; no statistic on a VOID or INCOMPLETE run"
+  },
+  "frozen_values": {
+    "alpha": 0.05,
+    "delta_default": 0.05,
+    "delta_alternative": 0.1,
+    "step": 0.25,
+    "switch_nonzero": 20,
+    "bootstrap_resamples": 99999,
+    "bootstrap_seed": 20260928,
+    "alpha_boot_grid": [
+      0.05,
+      0.045,
+      0.04,
+      0.035,
+      0.03
+    ],
+    "calibration_bound": 0.055,
+    "calibration_reps": 10000,
+    "target_power": 0.8,
+    "n_grid": [
+      100,
+      155,
+      200,
+      250,
+      300,
+      400,
+      500
+    ],
+    "required_laws": [
+      "M1 r=0.05",
+      "M1 r=0.10",
+      "M1 r=0.20",
+      "M1 r=0.30"
+    ],
+    "sim_seed": 20260929,
+    "planning_n_delta_005": 400,
+    "planning_alpha_boot_delta_005": 0.035,
+    "planning_n_delta_010": 200,
+    "planning_alpha_boot_delta_010": 0.04,
+    "n_max_default": 400,
+    "informative_band": [
+      0.1,
+      0.9
+    ],
+    "pilot_band": [
+      0.2,
+      0.8
+    ],
+    "pilot_packets": 12,
+    "stage0_repeats": 3,
+    "stage0_model_runs": 21,
+    "reserve_fraction": 0.2,
+    "block_packets": 20,
+    "time_box_days": 14,
+    "timeout_ms": 3000000,
+    "max_concurrency_stage0": 1,
+    "max_concurrency_stage1": 2
+  },
+  "owner": {
+    "move": "F-WK-2",
+    "current": "unassigned (docs/decisions/2026-09-28-ecosystem-roadmap.md:176)",
+    "requirement": "a session that operates no arm",
+    "proposal": "native-agent-stack-2d",
+    "proposal_status": "user decision 2",
+    "proposal_reason": {
+      "text": "operates no arm; holds Gate A as the peer stated, not verified; stages the wave",
+      "sources": [
+        "docs/decisions/2026-09-28-ecosystem-roadmap.md:304",
+        "docs/decisions/2026-09-28-ecosystem-roadmap.md:306"
+      ]
+    },
+    "alternative": "ecosystem-roadmap-2026",
+    "alternative_source": "docs/decisions/2026-09-28-ecosystem-roadmap.md:203",
+    "confirmation": "the owner under the reading at docs/decisions/2026-09-28-ecosystem-roadmap.md:311 after one objection round (decision 1)"
+  },
+  "roles": [
+    {
+      "role": "accountable owner",
+      "who": "user decision 2"
+    },
+    {
+      "role": "gateway operator",
+      "who": "token-save-practice-e2e-status",
+      "who_source": "docs/decisions/2026-09-28-ecosystem-roadmap.md:134",
+      "status": "[prop]",
+      "recorded_offer": "docs/decisions/2026-09-28-ecosystem-roadmap.md:295",
+      "tasks": [
+        "F-WK-3 receipt",
+        "fingerprint read-back before and after each block",
+        "detailed logging, exclusive window and G5 only where decided",
+        "nonce search returning matches only",
+        "the #425 steps (F-2W-1, accepted)"
+      ],
+      "tasks_source": "docs/decisions/2026-09-28-ecosystem-roadmap.md:201"
+    },
+    {
+      "role": "A/B operator (runner)",
+      "who": "a session on this host with the native Codex login",
+      "rule": "runs promptfoo from the curated environment; never reads auth state"
+    },
+    {
+      "role": "seal author",
+      "who": "a session other than the runner"
+    },
+    {
+      "role": "independent observer and analyst",
+      "who": "not the owner, a runner or the gateway operator",
+      "rule": "reads only the rollouts its attempts named; may be qualified as #425's trace observer",
+      "source": "blueprints/runtime-workers/openhands/README.md:29-31"
+    },
+    {
+      "role": "fact re-checker",
+      "who": "a second session"
+    },
+    {
+      "role": "reviewers",
+      "who": "GPT-6 read-only codex exec at effort max; a Claude evidence-reviewer",
+      "rule": "one review and one repair round each"
+    }
+  ],
+  "freeze_procedure": [
+    {
+      "step": 1,
+      "name": "draft PR (this change)",
+      "contents": [
+        "blueprints/gate-b-gpt6-route/PREREGISTRATION.md",
+        "blueprints/gate-b-gpt6-route/preregistration.json",
+        "tests/test_gate_b_gpt6_route_preregistration.py",
+        "manifests/evidence.json rows via register_file"
+      ],
+      "rules": [
+        "lane:foundation and a non-empty SOTA sources section (AGENTS.md:37)",
+        "python3 scripts/validate.py before the commit (AGENTS.md:17)",
+        "shared hot file: take main's copy and re-register (docs/lanes.md:96-110)"
+      ],
+      "fail_first": [
+        {
+          "when": "2026-09-29T03:28:47Z",
+          "state": "blueprint directory absent (moved aside)",
+          "rc": 1,
+          "summary": "Ran 10 tests, FAILED (failures=1, errors=9)",
+          "test_sha256": "eca1663c45f7dde6addb797834d431d99a0788f90d29ea9cda5da98c1b6e38d3"
+        },
+        {
+          "when": "2026-09-29T03:28:47Z",
+          "state": "the unrepaired draft in place (a4187edb, 35270235)",
+          "rc": 1,
+          "summary": "Ran 10 tests, FAILED (failures=2, errors=8)",
+          "test_sha256": "eca1663c45f7dde6addb797834d431d99a0788f90d29ea9cda5da98c1b6e38d3"
+        }
+      ],
+      "fail_first_earlier_revision": "the same two conditions at 03:07:14Z and 03:07:24Z, with an earlier revision of the test file, gave the same counts",
+      "fail_first_precedents": [
+        "#416 PR body: 'Fail-first: 10 failures of 21 for the amendment, then 2 of 23'",
+        "#431 PR body line 35"
+      ]
+    },
+    {
+      "step": 2,
+      "name": "exploratory work, never acceptance"
+    },
+    {
+      "step": 3,
+      "name": "prerequisites",
+      "items": [
+        "order with Gate A per decision 4",
+        "the F-WK-3 receipt (docs/decisions/2026-09-28-ecosystem-roadmap.md:185-189)",
+        "re-derived earlier-build facts and admissible model IDs",
+        "a fingerprint read-back with logging on",
+        "decisions 1-16 recorded",
+        "a clear schedule (docs/decisions/2026-09-28-delegated-decisions.md:99-103)",
+        "local code merged, fail-first shown",
+        "scorer controls qualified",
+        "one planned convergence record blueprints/convergence-practice/gate-b-route-20260928/experiment.json"
+      ],
+      "record_sources": [
+        "scripts/validate_convergence.py:102-105,212,233-238",
+        "scripts/validate_convergence.py:136-146"
+      ]
+    },
+    {
+      "step": 4,
+      "name": "pre-seal sizing amendment",
+      "records": [
+        "n",
+        "n2",
+        "reserve",
+        "δ",
+        "α′",
+        "power and false-NI tables at n",
+        "pilot law",
+        "budget",
+        "native reserve"
+      ]
+    },
+    {
+      "step": 5,
+      "name": "GPT-6 and Claude reviews, one repair round"
+    },
+    {
+      "step": 6,
+      "name": "confirmation"
+    },
+    {
+      "step": 7,
+      "name": "seal",
+      "chronology_source": "blueprints/retrieval-quality-v2/PREREGISTRATION.md:234-235"
+    },
+    {
+      "step": 8,
+      "name": "after the seal",
+      "rules": [
+        "never edited again",
+        "append-only dated amendments with hashes and before/after-data timing",
+        "a change after an observed result starts a new cohort",
+        "failed attempts kept with usage",
+        "a missed bar is a documented FAIL"
+      ],
+      "sources": [
+        "73fc873e:blueprints/gpt6-lane-compression-ab/preregistration.json lines 3137 and 3139",
+        "452f7b14:blueprints/compaction-window-ab/preregistration.json line 1078",
+        "docs/acceptance-evidence-policy.md:57-63",
+        "d161f691:blueprints/memory-layer-s3/PREREGISTRATION.md:25"
+      ]
+    }
+  ],
+  "sealing": {
+    "sealed_at": null,
+    "execution_revision": null,
+    "sealing_amendment": null,
+    "hash_table": null,
+    "fingerprint_readback": null,
+    "sizing_amendment": null,
+    "seal_author": null,
+    "hash_table_covers": [
+      "packets, reserve and expected values with as-of times",
+      "schemas (canonical JSON)",
+      "the promptfoo config",
+      "the hook",
+      "the launcher",
+      "the observer",
+      "the analysis code",
+      "the scorer controls",
+      "the Codex binary",
+      "the sealed inputs of both arms",
+      "the curated environment name list",
+      "the fingerprint read-back",
+      "the analysis environment",
+      "the schedule and its blocks"
+    ],
+    "rehash": "before launch and before each block",
+    "chronology": "merge time and native records; a matching hash proves bytes, not when they were written"
+  },
+  "amendments": {
+    "policy": "append-only and dated, with old and new hashes and whether each came before or after the data",
+    "log": []
+  },
+  "budget": {
+    "model_runs": {
+      "pilot": 24,
+      "stage0": 21,
+      "stage1": "2n plus reserve packets and limit reruns: 800 at planning n = 400 (δ = 0.05), 400 at n = 200 (δ = 0.10); F2 adds 2·n2",
+      "stageC": 0
+    },
+    "tokens": "unknown until the pilot; no estimate claimed",
+    "scale_reference_hist": [
+      {
+        "job": "route-job1",
+        "input": 2530158,
+        "cached": 2356864,
+        "output": 23409,
+        "minutes": 13.5,
+        "source": "evidence/artifacts/omniroute-routing-20260928/route-gpt6-runs.json:7-26"
+      },
+      {
+        "job": "route-job2",
+        "input": 3108187,
+        "cached": 2875776,
+        "output": 34696,
+        "minutes": 18.6,
+        "source": "evidence/artifacts/omniroute-routing-20260928/route-gpt6-runs.json:69-90"
+      }
+    ],
+    "wall_time_inf": "10-20 minutes per attempt with two in flight: 800 attempts about 67-133 h; 400 about 33-67 h",
+    "capacity": {
+      "pool_obs": {
+        "observed_at": "2026-09-29T02:28:20Z",
+        "cache_fetched": "01:18:44Z-01:18:53Z",
+        "accounts": 6,
+        "plans": {
+          "prolite": 5,
+          "pro": 1
+        },
+        "window_seconds": 604800,
+        "used_percent_range": [
+          45,
+          96
+        ],
+        "points_remaining": 126,
+        "points_total": 600,
+        "resets": [
+          "2026-10-03T17:14Z",
+          "2026-10-04T07:02Z"
+        ]
+      },
+      "native_login": {
+        "text": "not read; last read 43% at 2026-09-28T00:30:32Z [hist]",
+        "source": "evidence/artifacts/omniroute-routing-20260928/route-gpt6-runs.json:142"
+      },
+      "overlap_nv": "whether the native login is one of the pooled accounts"
+    },
+    "rules": [
+      "read scripts/codex_quota.py and the pool aggregate live before each block; never gate on a recorded reset",
+      "stop A at the native reserve (decision 12): INCOMPLETE, not failed",
+      "the verdict wave keeps quota priority (docs/token-practice.md:330)",
+      "Claude-side usage counted separately"
+    ]
+  },
+  "consumer_actions": {
+    "columns": [
+      {
+        "id": "omniroute",
+        "name": "omniroute",
+        "rows": [
+          "ni"
+        ]
+      },
+      {
+        "id": "native_decided",
+        "name": "native (decided)",
+        "rows": [
+          "stage0_native",
+          "inferior"
+        ]
+      },
+      {
+        "id": "native_inconclusive",
+        "name": "native (inconclusive)",
+        "rows": [
+          "inconclusive"
+        ]
+      },
+      {
+        "id": "native_untested",
+        "name": "native (untested)",
+        "rows": [
+          "unpowered",
+          "time_box"
+        ]
+      },
+      {
+        "id": "open",
+        "name": "open",
+        "rows": [
+          "void",
+          "incomplete"
+        ]
+      }
+    ],
+    "rows": [
+      {
+        "id": "sweep-lane",
+        "consumer": "Landscape-sweep GPT-6 lane, the wave's discovery and refute jobs",
+        "source": "docs/decisions/2026-09-28-ecosystem-roadmap.md:210",
+        "actions": {
+          "omniroute": "the operator passes --gpt6-provider omniroute with the sealed settings; the code default stays native",
+          "native_decided": "native",
+          "native_inconclusive": "native; gateway use only under decision 11",
+          "native_untested": "native",
+          "open": "the wave stays held (docs/decisions/2026-09-28-ecosystem-roadmap.md:312)"
+        }
+      },
+      {
+        "id": "wave-start",
+        "consumer": "The 32-layer wave start",
+        "source": "docs/decisions/2026-09-28-ecosystem-roadmap.md:210",
+        "actions": {
+          "omniroute": "a person may start it on the gateway lane",
+          "native_decided": "a person may start it on the native lane",
+          "native_inconclusive": "a person may start it on the native lane",
+          "native_untested": "a person may start it on the native lane if decision 15 allows; otherwise held",
+          "open": "held"
+        }
+      },
+      {
+        "id": "verdict-lane",
+        "consumer": "Verdict lane codex_lane.py",
+        "source": "tools/sota-convergence/codex_lane.py:9-13",
+        "actions": {
+          "omniroute": "native; if F2 was on and its hypothesis passed, a reviewed code change may add the switch implementing exactly the tested argv",
+          "native_decided": "native",
+          "native_inconclusive": "native",
+          "native_untested": "native",
+          "open": "native"
+        }
+      },
+      {
+        "id": "m5",
+        "consumer": "M5b gate 3 and M5c",
+        "source": "docs/decisions/2026-09-25-skills-trial-and-usage.md:660,664",
+        "actions": {
+          "omniroute": "released; M5c lists Harbor among its harnesses (docs/decisions/2026-09-25-skills-trial-and-usage.md:670-672), and Harbor strips provider prefixes (harbor-framework/harbor@1e5c5c6d:src/harbor/agents/installed/codex.py:1339), so M5c uses the gateway only after its own invocation is checked against the qualified lane",
+          "native_decided": "released; native",
+          "native_inconclusive": "released; native",
+          "native_untested": "released on native if decision 15 allows; otherwise held",
+          "open": "held"
+        }
+      },
+      {
+        "id": "gateway-profile",
+        "consumer": "Gateway profile note",
+        "source": "adoption/templates/codex.omniroute.config.toml:21-22",
+        "actions": {
+          "omniroute": "a reviewed PR may name the qualified scope",
+          "native_decided": "unchanged",
+          "native_inconclusive": "unchanged",
+          "native_untested": "unchanged",
+          "open": "unchanged"
+        }
+      },
+      {
+        "id": "pool-overturn",
+        "consumer": "Account-pool overturn",
+        "source": "docs/decisions/2026-09-27-omniroute-account-pool.md:476-477",
+        "actions": {
+          "omniroute": "not triggered",
+          "native_decided": "triggered only if decision 9 counts Gate B as the gateway-parity run",
+          "native_inconclusive": "not triggered",
+          "native_untested": "not triggered",
+          "open": "not triggered"
+        }
+      },
+      {
+        "id": "sweep-direction",
+        "consumer": "The user's direction that the sweep runs through the gateway lane",
+        "source": "docs/decisions/2026-09-27-omniroute-account-pool.md:304-305",
+        "actions": {
+          "omniroute": "consistent",
+          "native_decided": "the wave's sweep runs native, a reversal that decision 10 confirms",
+          "native_inconclusive": "native unless decision 11 allows capacity use; the reversal needs decision 10",
+          "native_untested": "native, the reversal under decision 10, labelled untested",
+          "open": "unchanged; the wave is held"
+        }
+      },
+      {
+        "id": "openhands",
+        "consumer": "OpenHands, #425 (D2, independent of D1)",
+        "source": null,
+        "actions": {
+          "omniroute": "pending: Stage C is not schedulable in this cohort",
+          "native_decided": "pending",
+          "native_inconclusive": "pending",
+          "native_untested": "pending",
+          "open": "pending"
+        }
+      },
+      {
+        "id": "runtime-recipes",
+        "consumer": "#426-#428",
+        "source": "docs/decisions/2026-09-28-ecosystem-roadmap.md:239",
+        "actions": {
+          "omniroute": "parked behind #425; they may cite B's Stage 0 effort and usage items as reference for their 20128 control arm, never as their own acceptance",
+          "native_decided": "parked",
+          "native_inconclusive": "parked",
+          "native_untested": "parked",
+          "open": "parked"
+        }
+      },
+      {
+        "id": "agent-sdks",
+        "consumer": "agent-sdks layer default",
+        "source": "docs/grand-catalog-handbook.md:602",
+        "actions": {
+          "omniroute": "unchanged",
+          "native_decided": "unchanged",
+          "native_inconclusive": "unchanged",
+          "native_untested": "unchanged",
+          "open": "unchanged"
+        }
+      },
+      {
+        "id": "engines-on",
+        "consumer": "#431 engines-on (20129)",
+        "source": null,
+        "actions": {
+          "omniroute": "unaffected; that route needs its own non-inferiority test",
+          "native_decided": "unaffected",
+          "native_inconclusive": "unaffected",
+          "native_untested": "unaffected",
+          "open": "unaffected"
+        }
+      },
+      {
+        "id": "convergence-record",
+        "consumer": "The planned record gate-b-route-20260928",
+        "source": null,
+        "actions": {
+          "omniroute": "adopt_within_scope",
+          "native_decided": "reject",
+          "native_inconclusive": "retain",
+          "native_untested": "retain, with no qualification run",
+          "open": "stays planned, decision trial"
+        }
+      }
+    ]
+  },
+  "alternatives": [
+    {
+      "n": 1,
+      "name": "quality-first Harbor design",
+      "why_not": [
+        "arm A would need Harbor to inject the host's auth.json (harbor-framework/harbor@1e5c5c6d:src/harbor/agents/installed/codex.py lines 1299-1327), which AGENTS.md:43 forbids",
+        "Harbor strips the model prefix (same file, line 1339)",
+        "1e5c5c6d is identical to tag v0.23.0 (gh api compare), and Harbor v0.23.0 cannot run the unchanged profile (docs/decisions/2026-09-27-capability-gate-harness.md:21)",
+        "sessions far longer than lookup packets"
+      ]
+    },
+    {
+      "n": 2,
+      "name": "operability-first design",
+      "why_not": [
+        "ran from the interactive CODEX_HOME",
+        "no computable rule for intersection-union with Holm",
+        "named a default coding worker (docs/grand-catalog-handbook.md:602)"
+      ]
+    },
+    {
+      "n": 3,
+      "name": "comparative OpenHands contrast",
+      "why_not": [
+        "needs new glue or the auth-store copy"
+      ]
+    },
+    {
+      "n": 4,
+      "name": "the consumer's codex_call.sh under promptfoo's custom-script provider",
+      "role": "fallback if the argv or environment read-back cannot be reconciled",
+      "why_not": [
+        "adds a local wrapper around a local runner"
+      ],
+      "source": "tools/sota-convergence/landscape-sweep/codex_job.py:686-689"
+    },
+    {
+      "n": 5,
+      "name": "inspect_swe",
+      "why_not": [
+        "routes model calls through Inspect's sandbox_agent_bridge (meridianlabs-ai/inspect_swe@7eb8dd64:src/inspect_swe/_codex_cli/codex_cli.py lines 369-388); not Codex's own login [inf]"
+      ]
+    },
+    {
+      "n": 6,
+      "name": "the recorded mechanical parity probe (b9abcc5f)",
+      "source": "docs/decisions/2026-09-27-omniroute-account-pool.md:304-308",
+      "why_not": [
+        "historical, no failing controls, older build"
+      ]
+    },
+    {
+      "n": 7,
+      "name": "waiting for omniroute-codex-max-parity",
+      "source": "docs/decisions/2026-09-27-omniroute-account-pool.md:315-316",
+      "why_not": [
+        "not frozen and not run"
+      ]
+    },
+    {
+      "n": 8,
+      "name": "the earlier harmful-only exact guard",
+      "why_not": [
+        "F-GUARD"
+      ]
+    },
+    {
+      "n": 9,
+      "name": "gateway identity by time window under concurrency",
+      "why_not": [
+        "F-IDENT"
+      ]
+    }
+  ],
+  "overturn_conditions": [
+    "a later independently preregistered cohort in the same scope contradicts D1",
+    "D1 = omniroute lapses when the route-relevant fingerprint (all fields but the logging switch), the Codex binary, either arm's sealed inputs, the curated environment list or the search backend changes; Stage 0 must pass again, and a new Stage 1 cohort is needed if prompt parity changes (tools/sota-convergence/landscape-sweep/README.md:171-186)",
+    "the logging switch is excluded from the lapse set: it controls recording (tools/sota-convergence/landscape-sweep/README.md:209) [src, not measured]; evidence that it changes the upstream request lapses D1",
+    "G5 applied later lapses a D1 = omniroute until Stage 0 passes again",
+    "a native D1 from Stage 0 reopens when the failed item's cause changes (docs/decisions/2026-09-27-omniroute-account-pool.md:478)",
+    "Gate A fails a required row: token fixes and a rerun come before Gate B (docs/decisions/2026-09-28-ecosystem-roadmap.md:283)",
+    "the chosen lane's schema-valid completion rate over the first 100 wave jobs falls more than δ below its Stage 1 rate",
+    "a qualified observer and recipe change make Stage C schedulable; #431 selecting engines-on changes arm C only through a new cohort",
+    "better tooling (docs/decisions/2026-09-27-capability-gate-harness.md:33-37)",
+    "any other host needs its own run (AGENTS.md:42)"
+  ],
+  "user_decisions": [
+    {
+      "number": 1,
+      "id": "confirm",
+      "question": "Confirm this criterion",
+      "decider": "owner",
+      "default": "confirm after the GPT-6 and Claude reviews, one repair round and one objection round with live peers",
+      "alternative": "the user confirms, as the roadmap first recorded (docs/decisions/2026-09-28-ecosystem-roadmap.md:252)",
+      "basis": [
+        "docs/decisions/2026-09-28-ecosystem-roadmap.md:311"
+      ],
+      "recorded": null
+    },
+    {
+      "number": 2,
+      "id": "accountable_owner",
+      "question": "Accountable owner for F-WK-2",
+      "decider": "user",
+      "default": "native-agent-stack-2d: it operates no arm, holds Gate A as the peer stated and stages the wave",
+      "alternative": "ecosystem-roadmap-2026",
+      "basis": [
+        "docs/decisions/2026-09-28-ecosystem-roadmap.md:176",
+        "docs/decisions/2026-09-28-ecosystem-roadmap.md:304",
+        "docs/decisions/2026-09-28-ecosystem-roadmap.md:306",
+        "docs/decisions/2026-09-28-ecosystem-roadmap.md:203"
+      ],
+      "recorded": null
+    },
+    {
+      "number": 3,
+      "id": "margin_and_sizing",
+      "question": "Margin δ and the sizing rule",
+      "decider": "owner",
+      "default": "δ = 0.05, n by the frozen sizing rule (planning n = 400, α′ = 0.035)",
+      "alternative": "δ = 0.10 (planning n = 200) only with the label 'non-inferior within 0.10, not max-quality-qualified'",
+      "recorded": null
+    },
+    {
+      "number": 4,
+      "id": "gate_a_order",
+      "question": "Seal order with Gate A",
+      "decider": "owner",
+      "default": "the seal waits for Gate A's recorded pass",
+      "alternative": "seal outside window W, accepting that a later token-stack change lapses a D1 = omniroute",
+      "basis": [
+        "docs/decisions/2026-09-28-ecosystem-roadmap.md:306",
+        "docs/decisions/2026-09-28-ecosystem-roadmap.md:283",
+        "docs/decisions/2026-09-28-delegated-decisions.md:99-103"
+      ],
+      "note": "an inference: the cited lines order Gate A before the waves and before Gate B only on a failed row",
+      "recorded": null
+    },
+    {
+      "number": 5,
+      "id": "family_f2",
+      "question": "Family F2 (verdict lane)",
+      "decider": "owner",
+      "default": "off",
+      "alternative": "on: adds 2·n2 runs and the Holm family",
+      "recorded": null
+    },
+    {
+      "number": 6,
+      "id": "detailed_logging",
+      "question": "Detailed pipeline logging on 20128 for the whole sealed window",
+      "decider": "user",
+      "default": "yes, bodies private under the gateway owner's retention rule",
+      "alternative": "no: items 1 and 7 are then untested unless decision 7 provides an exclusive window and responses carry encrypted reasoning",
+      "basis": [
+        "docs/decisions/2026-09-27-omniroute-account-pool.md:285-302"
+      ],
+      "recorded": null
+    },
+    {
+      "number": 7,
+      "id": "exclusive_window",
+      "question": "An exclusive 20128 window for Stage 0",
+      "decider": "user",
+      "default": "not required while decision 6 is yes",
+      "alternative": "required if decision 6 is no, with other GPT-6 callers paused and told in advance",
+      "recorded": null
+    },
+    {
+      "number": 8,
+      "id": "g5_blocking",
+      "question": "G5 no-auth provider blocking on 20128",
+      "decider": "user",
+      "default": "not applied in this cohort",
+      "alternative": "applied when Stage C becomes schedulable, which lapses a D1 = omniroute until Stage 0 passes again",
+      "recorded": null
+    },
+    {
+      "number": 9,
+      "id": "parity_run",
+      "question": "Gate B as the account-pool's preregistered gateway-parity run",
+      "decider": "user",
+      "default": "yes for Stage 0 native or Stage 1 inferior on a complete, valid run; no otherwise",
+      "alternative": "never",
+      "basis": [
+        "docs/decisions/2026-09-27-omniroute-account-pool.md:476-477",
+        "docs/decisions/2026-09-27-omniroute-account-pool.md:3-6"
+      ],
+      "recorded": null
+    },
+    {
+      "number": 10,
+      "id": "sweep_direction",
+      "question": "A native D1 reverses the sweep's gateway direction",
+      "decider": "user",
+      "default": "accept the reversal for the wave",
+      "alternative": "keep the gateway direction",
+      "basis": [
+        "docs/decisions/2026-09-27-omniroute-account-pool.md:304-305"
+      ],
+      "recorded": null
+    },
+    {
+      "number": 11,
+      "id": "capacity_use",
+      "question": "Gateway capacity use after a native D1",
+      "decider": "user",
+      "default": "no",
+      "alternative": "allowed, labelled 'gateway, not max-quality-qualified'",
+      "basis": [
+        "docs/token-practice.md:324-333"
+      ],
+      "recorded": null
+    },
+    {
+      "number": 12,
+      "id": "budget",
+      "question": "Budget, native reserve and n_max",
+      "decider": "owner",
+      "default": "pilot, Stage 0 and Stage 1 at the sized n, with n_max = 400; stop A at the reserve the owner sets",
+      "alternative": "a larger n_max",
+      "basis": [
+        "docs/token-practice.md:324-333"
+      ],
+      "recorded": null
+    },
+    {
+      "number": 13,
+      "id": "exploratory_425",
+      "question": "Exploratory #425 runs",
+      "decider": "owner",
+      "default": "allowed on a different SWE-bench row, never acceptance",
+      "alternative": "none",
+      "basis": [
+        "docs/decisions/2026-09-28-ecosystem-roadmap.md:43"
+      ],
+      "recorded": null
+    },
+    {
+      "number": 14,
+      "id": "hosts",
+      "question": "Hosts",
+      "decider": "owner",
+      "default": "this workstation only",
+      "alternative": "a second host with its own run",
+      "basis": [
+        "AGENTS.md:42"
+      ],
+      "recorded": null
+    },
+    {
+      "number": 15,
+      "id": "untested_native",
+      "question": "Whether an untested native settlement releases the gate",
+      "decider": "user",
+      "default": "yes: the wave may start on the native lane, labelled untested",
+      "alternative": "no: the unpowered and time-box rows keep Gate B open",
+      "recorded": null
+    },
+    {
+      "number": 16,
+      "id": "mcp_reach",
+      "question": "E1b's management-API reach and the account-pool posture",
+      "decider": "user",
+      "default": "record and report; D1 is still decided",
+      "alternative": "treat the reach as the posture overturn: login and key requirements back on",
+      "basis": [
+        "docs/decisions/2026-09-27-omniroute-account-pool.md:300"
+      ],
+      "recorded": null
+    }
+  ],
+  "fixed_not_offered": [
+    {
+      "text": "no auth store is ever copied",
+      "source": "AGENTS.md:43"
+    }
+  ],
+  "repair_round": {
+    "date": "2026-09-29",
+    "inputs": {
+      "draft_md_sha256": "a4187edbc30a4dbbed19a3388171ddb873c448bc13dd96a53b027c8d7df5165e",
+      "draft_json_sha256": "35270235c5a04f20ecb8beadae09955ecd9d141da5c30fcd22d1867ee2cf853e",
+      "reviews": [
+        "refute:method (25 items)",
+        "refute:citations (43 items)"
+      ]
+    },
+    "model_calls": 0,
+    "gateway_requests": "GET only",
+    "credentials_read": false,
+    "dispositions": [
+      {
+        "id": "CLAIM-1",
+        "source": "refute:method",
+        "review_verdict": "confirmed",
+        "action": "fixed",
+        "where": "Scope (\"Gate B passed\"); Pass rule (decision table)",
+        "note": "eight total rows; each cause the refuter listed is fixed under its own ID"
+      },
+      {
+        "id": "CLAIM-2",
+        "source": "refute:method",
+        "review_verdict": "confirmed",
+        "action": "fixed",
+        "where": "Arms; Task set",
+        "note": "working directory and Git check set, item 6's record named, Stage C gated"
+      },
+      {
+        "id": "CLAIM-3",
+        "source": "refute:method",
+        "review_verdict": "refuted (claim held)",
+        "action": "fixed",
+        "where": "Metrics (usage accounting)",
+        "note": "the claim held; the one gap, MCP-side local model work, is now declared unknown"
+      },
+      {
+        "id": "CLAIM-4",
+        "source": "refute:method",
+        "review_verdict": "confirmed",
+        "action": "fixed",
+        "where": "Statistics; appendix A",
+        "note": "power recomputed for the full rule; 80% held only near 20% discordance at n = 155"
+      },
+      {
+        "id": "CLAIM-5",
+        "source": "refute:method",
+        "review_verdict": "confirmed",
+        "action": "fixed",
+        "where": "Arms (local integration code)",
+        "note": "five local components specified with reads, emits and tests; the D2 runner labelled"
+      },
+      {
+        "id": "CLAIM-6",
+        "source": "refute:method",
+        "review_verdict": "confirmed",
+        "action": "fixed",
+        "where": "JSON arms and user decisions",
+        "note": "the arm argv is compared with the consumer's for both arms; deciders unified; the test enforces agreement"
+      },
+      {
+        "id": "F-IDENT",
+        "source": "refute:method",
+        "review_verdict": "confirmed",
+        "action": "fixed",
+        "where": "Task set (item 7); Pass rule",
+        "note": "nonce attribution; Stage 0 serialized; a missing gateway row is INCOMPLETE"
+      },
+      {
+        "id": "F-FPRINT",
+        "source": "refute:method",
+        "review_verdict": "confirmed",
+        "action": "fixed",
+        "where": "Pass rule (VOID); overturn",
+        "note": "logging sealed on for the window, excluded from the lapse set; G5 not in this cohort"
+      },
+      {
+        "id": "F-GUARD",
+        "source": "refute:method",
+        "review_verdict": "confirmed",
+        "action": "fixed",
+        "where": "Statistics",
+        "note": "#431 harmful-minus-beneficial fallback; power simulated with the guard"
+      },
+      {
+        "id": "F-CWD",
+        "source": "refute:method",
+        "review_verdict": "confirmed",
+        "action": "fixed",
+        "where": "Arms (harness, A, B)",
+        "note": "working_dir = staged <work>/empty, skip_git_repo_check true, settings Read rules sealed"
+      },
+      {
+        "id": "F-SEARCH",
+        "source": "refute:method",
+        "review_verdict": "unverified",
+        "action": "fixed",
+        "where": "Task set (item 6)",
+        "note": "reads results in stored items, else the rollout, else INCOMPLETE, settled in the pilot"
+      },
+      {
+        "id": "F-D2",
+        "source": "refute:method",
+        "review_verdict": "confirmed",
+        "action": "fixed",
+        "where": "Scope; Arm C; Stage C",
+        "note": "a smoke check that cannot decide D2; dispatch gated on observer qualification"
+      },
+      {
+        "id": "F-UNSEALED",
+        "source": "refute:method",
+        "review_verdict": "confirmed",
+        "action": "fixed",
+        "where": "Arms A and B; Pass rule (VOID)",
+        "note": "~/.codex/AGENTS.md and the skill trees sealed; lane-home rule replaced by sealed-input hashes"
+      },
+      {
+        "id": "F-E1",
+        "source": "refute:method",
+        "review_verdict": "confirmed",
+        "action": "fixed",
+        "where": "Task set (E1b); Standing rules",
+        "note": "a ctx_execute probe with two controls; decision 16"
+      },
+      {
+        "id": "F-SCORER",
+        "source": "refute:method",
+        "review_verdict": "confirmed",
+        "action": "fixed",
+        "where": "Task set (scorer controls)",
+        "note": "planted wrong values, normalization edge cases and negative answers"
+      },
+      {
+        "id": "F-LOCALCODE",
+        "source": "refute:method",
+        "review_verdict": "confirmed",
+        "action": "fixed",
+        "where": "Arms (local integration code)",
+        "note": "launcher, hook, observer, analysis and scorer controls specified and labelled"
+      },
+      {
+        "id": "F-TIMEBOX",
+        "source": "refute:method",
+        "review_verdict": "confirmed",
+        "action": "fixed",
+        "where": "Pass rule (decision table, time box)",
+        "note": "the time box maps to one row and one action"
+      },
+      {
+        "id": "F-INFORM",
+        "source": "refute:method",
+        "review_verdict": "confirmed",
+        "action": "fixed",
+        "where": "Task set (pilot); Pass rule (INCOMPLETE)",
+        "note": "pilot calibration band; an uninformative set is INCOMPLETE"
+      },
+      {
+        "id": "F-CITE-ENV",
+        "source": "refute:method",
+        "review_verdict": "confirmed",
+        "action": "fixed",
+        "where": "Arms (curated environment)",
+        "note": "citation moved to build_args.py and README; curated environment"
+      },
+      {
+        "id": "F-SCHEMA-BYTES",
+        "source": "refute:method",
+        "review_verdict": "confirmed",
+        "action": "fixed",
+        "where": "Arms (launcher, argv read-back)",
+        "note": "canonical JSON hash, captured before exec"
+      },
+      {
+        "id": "F-ARGV-LIST",
+        "source": "refute:method",
+        "review_verdict": "confirmed",
+        "action": "fixed",
+        "where": "Arms (argv read-back)",
+        "note": "differences fixed from SDK source; originator removed; no pilot-derived allowances"
+      },
+      {
+        "id": "F-TIMEOUT",
+        "source": "refute:method",
+        "review_verdict": "confirmed",
+        "action": "fixed",
+        "where": "Arms (evaluateOptions, launcher)",
+        "note": "timeoutMs: 3000000; the launcher execs, so no orphaned Codex"
+      },
+      {
+        "id": "F-BLOCK",
+        "source": "refute:method",
+        "review_verdict": "confirmed",
+        "action": "fixed",
+        "where": "Pass rule (Blocks)",
+        "note": "block defined; VOID scope and cohort rule stated"
+      },
+      {
+        "id": "F-GATEA",
+        "source": "refute:method",
+        "review_verdict": "confirmed",
+        "action": "reworded",
+        "where": "User decisions (4)",
+        "note": "now an owner decision with its inference stated"
+      },
+      {
+        "id": "GAP",
+        "source": "refute:method",
+        "review_verdict": "unverified",
+        "action": "fixed",
+        "where": "Arms; Sources",
+        "note": "host facts re-observed; promptfoo lines verified; the statistics re-run in the pinned environment"
+      },
+      {
+        "id": "F01",
+        "source": "refute:citations",
+        "review_verdict": "refuted",
+        "action": "fixed",
+        "where": "Arm B; Pass rule (VOID)",
+        "note": "[features] and the filter listed; the diff rule replaced by sealed-input hashes"
+      },
+      {
+        "id": "F02",
+        "source": "refute:citations",
+        "review_verdict": "refuted",
+        "action": "fixed",
+        "where": "Arm B (earlier-build facts)",
+        "note": "each fact pinned to its source build: 045aa81f3/dd6e9607e, a58000c7, installed 3.8.51"
+      },
+      {
+        "id": "F03",
+        "source": "refute:citations",
+        "review_verdict": "refuted",
+        "action": "fixed",
+        "where": "Pins",
+        "note": "re-pinned to 11648f9a; later main heads noted"
+      },
+      {
+        "id": "F04",
+        "source": "refute:citations",
+        "review_verdict": "refuted",
+        "action": "fixed",
+        "where": "Scope",
+        "note": "two gateway rewrites against two Codex-side behaviours"
+      },
+      {
+        "id": "F05",
+        "source": "refute:citations",
+        "review_verdict": "refuted",
+        "action": "fixed",
+        "where": "Arms (evaluateOptions)",
+        "note": "at most two attempts of either arm in flight"
+      },
+      {
+        "id": "F06",
+        "source": "refute:citations",
+        "review_verdict": "refuted",
+        "action": "fixed",
+        "where": "Scope (D1)",
+        "note": "refusal cited at build_args.py:606-608"
+      },
+      {
+        "id": "F07",
+        "source": "refute:citations",
+        "review_verdict": "refuted",
+        "action": "fixed",
+        "where": "Arm A; Budget",
+        "note": "route-job1 at 7-26, route-job2 at 69-90"
+      },
+      {
+        "id": "F08",
+        "source": "refute:citations",
+        "review_verdict": "refuted",
+        "action": "fixed",
+        "where": "Arm C",
+        "note": "G2 cited at README:895-912, G5 at 772-778"
+      },
+      {
+        "id": "F09",
+        "source": "refute:citations",
+        "review_verdict": "refuted",
+        "action": "fixed",
+        "where": "Metrics (arm C usage)",
+        "note": "cited at README:440-457"
+      },
+      {
+        "id": "F10",
+        "source": "refute:citations",
+        "review_verdict": "refuted",
+        "action": "fixed",
+        "where": "Statistics; Sources",
+        "note": "p_rule at 2993, exact_fallback at 2994, range extended"
+      },
+      {
+        "id": "F11",
+        "source": "refute:citations",
+        "review_verdict": "refuted",
+        "action": "fixed",
+        "where": "Freeze (seal)",
+        "note": "cited at PREREGISTRATION.md:234-235"
+      },
+      {
+        "id": "F12",
+        "source": "refute:citations",
+        "review_verdict": "refuted",
+        "action": "fixed",
+        "where": "Freeze (draft PR)",
+        "note": "fail-first records cited from the PR bodies"
+      },
+      {
+        "id": "F13",
+        "source": "refute:citations",
+        "review_verdict": "refuted",
+        "action": "fixed",
+        "where": "Scope",
+        "note": "labelled [doc] with README:129"
+      },
+      {
+        "id": "F14",
+        "source": "refute:citations",
+        "review_verdict": "refuted",
+        "action": "fixed",
+        "where": "Freeze (prerequisites)",
+        "note": "one record may carry several candidates"
+      },
+      {
+        "id": "F15",
+        "source": "refute:citations",
+        "review_verdict": "refuted",
+        "action": "fixed",
+        "where": "Scope (not decided)",
+        "note": "roadmap:239 quoted; PR bodies cited for the missing native arm"
+      },
+      {
+        "id": "F16",
+        "source": "refute:citations",
+        "review_verdict": "refuted",
+        "action": "fixed",
+        "where": "Scope (not decided)",
+        "note": "the #431 link cited at openhands README:147-148"
+      },
+      {
+        "id": "F17",
+        "source": "refute:citations",
+        "review_verdict": "refuted",
+        "action": "fixed",
+        "where": "Scope (not decided)",
+        "note": "the Claude-lane exclusion labelled [prop]"
+      },
+      {
+        "id": "F18",
+        "source": "refute:citations",
+        "review_verdict": "refuted",
+        "action": "fixed",
+        "where": "Owner and roles",
+        "note": "the gateway operator's role labelled [prop]; roadmap:295 quoted"
+      },
+      {
+        "id": "F19",
+        "source": "refute:citations",
+        "review_verdict": "refuted",
+        "action": "fixed",
+        "where": "Metrics (class X)",
+        "note": "71 of the 287 candidates"
+      },
+      {
+        "id": "F20",
+        "source": "refute:citations",
+        "review_verdict": "refuted",
+        "action": "fixed",
+        "where": "Alternatives (1)",
+        "note": "1e5c5c6d shown identical to tag v0.23.0"
+      },
+      {
+        "id": "F21",
+        "source": "refute:citations",
+        "review_verdict": "unverified",
+        "action": "fixed",
+        "where": "Statistics",
+        "note": "SciPy defaults read from the pinned environment"
+      },
+      {
+        "id": "F22",
+        "source": "refute:citations",
+        "review_verdict": "unverified",
+        "action": "fixed",
+        "where": "Alternatives (1)",
+        "note": "the uncited session count removed"
+      },
+      {
+        "id": "F23",
+        "source": "refute:citations",
+        "review_verdict": "confirmed (stale citation)",
+        "action": "fixed",
+        "where": "Arms (curated environment)",
+        "note": "stale citation replaced by build_args.py:325-327 and 336-337"
+      },
+      {
+        "id": "U01",
+        "source": "refute:citations",
+        "review_verdict": "unverified",
+        "action": "fixed",
+        "where": "Arms; Sources",
+        "note": "promptfoo 0.123.1 doc lines read through gh api"
+      },
+      {
+        "id": "U02",
+        "source": "refute:citations",
+        "review_verdict": "unverified",
+        "action": "fixed",
+        "where": "Arms (pins)",
+        "note": "rust-v0.158.0 publication read through gh api"
+      },
+      {
+        "id": "U03",
+        "source": "refute:citations",
+        "review_verdict": "unverified",
+        "action": "fixed",
+        "where": "Alternatives (1)",
+        "note": "Harbor lines read at 1e5c5c6d"
+      },
+      {
+        "id": "U04",
+        "source": "refute:citations",
+        "review_verdict": "unverified",
+        "action": "reworded",
+        "where": "Alternatives (5)",
+        "note": "lines 369-388 read; the login consequence labelled [inf]"
+      },
+      {
+        "id": "U05",
+        "source": "refute:citations",
+        "review_verdict": "unverified",
+        "action": "fixed",
+        "where": "Stage C",
+        "note": "changelog lines 12, 34-35 and 41 read"
+      },
+      {
+        "id": "U06",
+        "source": "refute:citations",
+        "review_verdict": "unverified",
+        "action": "fixed",
+        "where": "Arm C",
+        "note": "tag v1.49.6 = fcc102a6; 405bae71 exists"
+      },
+      {
+        "id": "U07",
+        "source": "refute:citations",
+        "review_verdict": "unverified",
+        "action": "reworded",
+        "where": "Metrics",
+        "note": "abstract only; section attributions and the sizing formula removed"
+      },
+      {
+        "id": "U08",
+        "source": "refute:citations",
+        "review_verdict": "unverified",
+        "action": "reworded",
+        "where": "Statistics",
+        "note": "the CLT claim stated as the abstract gives it"
+      },
+      {
+        "id": "U09",
+        "source": "refute:citations",
+        "review_verdict": "unverified",
+        "action": "fixed",
+        "where": "Arm B; Budget; Sources",
+        "note": "pool, models and PR list re-observed; the call-log row claim dropped"
+      },
+      {
+        "id": "R-CALIB",
+        "source": "this repair",
+        "review_verdict": "found",
+        "action": "fixed",
+        "where": "Statistics",
+        "note": "the percentile bootstrap exceeds the size bar at α′ = 0.05; α′ calibrated pre-data"
+      },
+      {
+        "id": "R-CACHEWRITE",
+        "source": "this repair",
+        "review_verdict": "found",
+        "action": "fixed",
+        "where": "Metrics (usage accounting)",
+        "note": "the SDK zero-fills a missing cache-write count"
+      },
+      {
+        "id": "R-ROLLOUT-SCOPE",
+        "source": "this repair",
+        "review_verdict": "found",
+        "action": "fixed",
+        "where": "Arm A; Owner and roles",
+        "note": "the observer reads only the rollouts its attempts named"
+      },
+      {
+        "id": "R-CONV-RECORD",
+        "source": "this repair",
+        "review_verdict": "found",
+        "action": "fixed",
+        "where": "Freeze (prerequisites)",
+        "note": "the planned record moves to confirmation"
+      }
+    ],
+    "decisions_taken": [
+      {
+        "id": "DT-1",
+        "choice": "a total decision table of eight rows; untested-native rows close the gate as native subject to decision 15",
+        "findings": [
+          "CLAIM-1",
+          "F-TIMEBOX"
+        ]
+      },
+      {
+        "id": "DT-2",
+        "choice": "#431's paired net-difference test and exact harmful-minus-beneficial fallback, beneficial side scaled by the 1/4 step; n by simulating the full rule; α′ calibrated before data",
+        "deviation_from_431": "α′ is calibrated on a frozen grid instead of leaving the gate open when calibration fails",
+        "findings": [
+          "CLAIM-4",
+          "F-GUARD",
+          "R-CALIB"
+        ]
+      },
+      {
+        "id": "DT-3",
+        "choice": "identity by attempt nonce in 20128's logged request payloads; Stage 0 serialized",
+        "findings": [
+          "F-IDENT"
+        ]
+      },
+      {
+        "id": "DT-4",
+        "choice": "logging sealed on for the whole window and excluded from the lapse set; no G5 in this cohort",
+        "findings": [
+          "F-FPRINT"
+        ]
+      },
+      {
+        "id": "DT-5",
+        "choice": "Stage C gated; D2 pending in every outcome of this cohort",
+        "findings": [
+          "F-D2",
+          "CLAIM-2"
+        ]
+      },
+      {
+        "id": "DT-6",
+        "choice": "curated environment without credential-bearing names, a declared difference",
+        "findings": [
+          "F-CITE-ENV",
+          "F23"
+        ]
+      },
+      {
+        "id": "DT-7",
+        "choice": "argv differences fixed from SDK source; approval_policy and model_provider unset; originator removed",
+        "findings": [
+          "F-ARGV-LIST",
+          "CLAIM-6"
+        ]
+      },
+      {
+        "id": "DT-8",
+        "choice": "the launcher execs Codex; records from promptfoo raw and the named rollout; timeoutMs 3000000",
+        "findings": [
+          "F-TIMEOUT",
+          "F-LOCALCODE"
+        ]
+      },
+      {
+        "id": "DT-9",
+        "choice": "an uninformative packet set is INCOMPLETE; pilot band [0.20, 0.80]",
+        "findings": [
+          "F-INFORM"
+        ]
+      },
+      {
+        "id": "DT-10",
+        "choice": "Gate A order is owner decision 4 with its inference stated",
+        "findings": [
+          "F-GATEA"
+        ]
+      },
+      {
+        "id": "DT-11",
+        "choice": "E1b with two controls; reach recorded and reported; decision 16",
+        "findings": [
+          "F-E1"
+        ]
+      },
+      {
+        "id": "DT-12",
+        "choice": "δ = 0.05 default with planning n = 400; δ = 0.10 with n = 200 as the alternative; n_max 400",
+        "findings": [
+          "CLAIM-4"
+        ]
+      },
+      {
+        "id": "DT-13",
+        "choice": "the planned convergence record is added at confirmation, not in this draft PR",
+        "findings": [
+          "R-CONV-RECORD"
+        ]
+      },
+      {
+        "id": "DT-14",
+        "choice": "the owner stays a user decision; the roadmap's lines on who confirms quoted both ways",
+        "findings": []
+      }
+    ]
+  },
+  "citation_checks": [
+    {
+      "path": ".github/pull_request_template.md",
+      "lines": "17-20",
+      "needles": [
+        "`synthetic` (fixture), `source_review`. Never label a claim a class stronger"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "lines": "17",
+      "needles": [
+        "Run `python3 scripts/validate.py` before committing changed evidence or manifests."
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "lines": "28",
+      "needles": [
+        "Count once: never sum cumulative snapshots"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "lines": "37",
+      "needles": [
+        "non-empty `## SOTA sources`"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "lines": "42",
+      "needles": [
+        "Historical receipts are reference evidence"
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "lines": "43",
+      "needles": [
+        "do not fetch private state or authentication stores"
+      ]
+    },
+    {
+      "path": "adoption/templates/codex.config.template.toml",
+      "lines": "60-67",
+      "needles": [
+        "EMBEDDING_PROVIDER = \"lmstudio\""
+      ]
+    },
+    {
+      "path": "adoption/templates/codex.omniroute.config.toml",
+      "lines": "18-20",
+      "needles": [
+        "reports HTTP 500 for every /v1/responses request on release/v3.8.51"
+      ]
+    },
+    {
+      "path": "adoption/templates/codex.omniroute.config.toml",
+      "lines": "21-22",
+      "needles": [
+        "Max-effort GPT-6 lanes keep Codex's native openai provider as their default"
+      ]
+    },
+    {
+      "path": "adoption/templates/codex.omniroute.config.toml",
+      "lines": "9-13",
+      "needles": [
+        "env_key_instructions and no [shell_environment_policy.filters]"
+      ]
+    },
+    {
+      "path": "blueprints/retrieval-quality-v2/PREREGISTRATION.md",
+      "lines": "234-235",
+      "needles": [
+        "A matching sha256 shows that the sealed bytes did not change. It does not show when they were sealed."
+      ]
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/README.md",
+      "lines": "1019-1024",
+      "needles": [
+        "Gold patch and known-negative official controls must run under the frozen image"
+      ]
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/README.md",
+      "lines": "147-148",
+      "needles": [
+        "Control stays the default until the #431 A/B selects the engines arm."
+      ]
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/README.md",
+      "lines": "155-162",
+      "needles": [
+        "`http://10.0.2.2:20128/v1` | `cx/gpt-6-astra-max`"
+      ]
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/README.md",
+      "lines": "177-178",
+      "needles": [
+        "a 40-iteration limit and a 1,200-second conversation deadline"
+      ]
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/README.md",
+      "lines": "20-22",
+      "needles": [
+        "probe must pass on the live topology; it has not run yet"
+      ]
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/README.md",
+      "lines": "29-31",
+      "needles": [
+        "`evidence_complete` deliberately stays false until an independent observer is qualified."
+      ]
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/README.md",
+      "lines": "3-7",
+      "needles": [
+        "This repair ran offline contract tests only."
+      ]
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/README.md",
+      "lines": "440-457",
+      "needles": [
+        "**time window + model + path** at the entry gateway"
+      ]
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/README.md",
+      "lines": "459-467",
+      "needles": [
+        "Only `/v1/chat/completions` keeps a caller's ID"
+      ]
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/README.md",
+      "lines": "772-778",
+      "needles": [
+        "a no-auth provider is named, by id or alias, in neither the allowlist nor `blockedProviders`;"
+      ]
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/README.md",
+      "lines": "788-790",
+      "needles": [
+        "A gateway upgrade must re-read them."
+      ]
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/README.md",
+      "lines": "873-893",
+      "needles": [
+        "`verified_at` between 0 and 900 seconds old;"
+      ]
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/README.md",
+      "lines": "895-912",
+      "needles": [
+        "The coordinator writes it after observing those gates live"
+      ]
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/README.md",
+      "lines": "917-921",
+      "needles": [
+        "which raises `NotImplementedError`. None of them has run."
+      ]
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/repair-round-commands.json",
+      "lines": "254",
+      "needles": [
+        "045aa81f3 (the 20128 build) and dd6e9607e (the 20129 build)"
+      ]
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/host.py",
+      "lines": "1328-1330",
+      "needles": [
+        "if receipt.get(\"task_passed\") and receipt.get(\"evidence_complete\"):"
+      ]
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/pins.json",
+      "lines": "17",
+      "needles": [
+        "sha256:02ef66fd"
+      ]
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/pins.json",
+      "lines": "25",
+      "needles": [
+        "sha256:ed04ec1f"
+      ]
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/pins.json",
+      "lines": "3-6",
+      "needles": [
+        "\"commit\": \"fcc102a697874d54a357e36004e02c95040dbdc0\""
+      ]
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/pins.json",
+      "lines": "48-50",
+      "needles": [
+        "\"commit\": \"405bae7140d7e961a75f4910a0b2e7069731db96\""
+      ]
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/receipt.py",
+      "lines": "282",
+      "needles": [
+        "\"evidence_complete\": False"
+      ]
+    },
+    {
+      "path": "catalogs/landscape/foundation.json",
+      "lines": "4739",
+      "needles": [
+        "The verdict changes only through a re-preregistered rerun of the sealed three-arm workers comparison"
+      ]
+    },
+    {
+      "path": "docs/acceptance-evidence-policy.md",
+      "lines": "26-33",
+      "needles": [
+        "| Evidence class | Required provenance and observation | Claim boundary |"
+      ]
+    },
+    {
+      "path": "docs/acceptance-evidence-policy.md",
+      "lines": "30",
+      "needles": [
+        "Our integration; never described as an official upstream test"
+      ]
+    },
+    {
+      "path": "docs/acceptance-evidence-policy.md",
+      "lines": "42-53",
+      "needles": [
+        "has been run at least once with its condition absent"
+      ]
+    },
+    {
+      "path": "docs/acceptance-evidence-policy.md",
+      "lines": "57-63",
+      "needles": [
+        "Retain exact argument vectors, working directory, start/end times, exit codes, stdout/stderr and artifact hashes."
+      ]
+    },
+    {
+      "path": "docs/acceptance-evidence-policy.md",
+      "lines": "65-69",
+      "needles": [
+        "Parsing a wrapper's own `passed` field is not independent confirmation."
+      ]
+    },
+    {
+      "path": "docs/acceptance-evidence-policy.md",
+      "lines": "81-85",
+      "needles": [
+        "use a source-backed improvement and a matching comparison before replacing an accepted default"
+      ]
+    },
+    {
+      "path": "docs/convergence-architecture.md",
+      "lines": "149-158",
+      "needles": [
+        "Unknown usage stays unknown."
+      ]
+    },
+    {
+      "path": "docs/convergence-architecture.md",
+      "lines": "164-168",
+      "needles": [
+        "need a changed condition, not an automatic loop or paid fallback"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
+      "lines": "513-520",
+      "needles": [
+        "the GPT-6 route is settled (Gate B)"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
+      "lines": "660",
+      "needles": [
+        "The user sets a per-run budget."
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
+      "lines": "660,664",
+      "needles": [
+        "The user sets a per-run budget.",
+        "Queued behind Gate A and Gate B"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
+      "lines": "664",
+      "needles": [
+        "Queued behind Gate A and Gate B"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
+      "lines": "670-672",
+      "needles": [
+        "Harbor for native transcripts"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-27-capability-gate-harness.md",
+      "lines": "21",
+      "needles": [
+        "cannot run the unchanged profile in existing worktrees"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-27-capability-gate-harness.md",
+      "lines": "33-37",
+      "needles": [
+        "A promptfoo profile setting: drop the launcher."
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-27-capability-gate-harness.md",
+      "lines": "6-11",
+      "needles": [
+        "Local code is limited to three things:"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
+      "lines": "137",
+      "needles": [
+        "`BUILD_SHA` is `dd6e9607e`"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
+      "lines": "285-302",
+      "needles": [
+        "Passwordless and keyless, by the user's decision."
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
+      "lines": "290-296",
+      "needles": [
+        "Any local process can call the management API, including hook registration."
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
+      "lines": "290-296,300",
+      "needles": [
+        "Any local process can call the management API, including hook registration.",
+        "any untrusted local process"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
+      "lines": "3-6",
+      "needles": [
+        "The gateway is adopted for pooled GPT-6 access."
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
+      "lines": "300",
+      "needles": [
+        "any untrusted local process"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
+      "lines": "304-305",
+      "needles": [
+        "The landscape sweep, on the user's direction"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
+      "lines": "304-308",
+      "needles": [
+        "8-check mechanical parity probe on build `dd6e9607e`"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
+      "lines": "309-312",
+      "needles": [
+        "The preregistered three-arm workers comparison remains the acceptance gate"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
+      "lines": "315-316",
+      "needles": [
+        "It is not frozen in this repository and has not run."
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
+      "lines": "318",
+      "needles": [
+        "Native Codex remains the max-quality default until a preregistered comparison says otherwise."
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
+      "lines": "434-439",
+      "needles": [
+        "`reasoning.context: \"all_turns\"` is dropped."
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
+      "lines": "440-443",
+      "needles": [
+        "Codex clears `encrypted_function_args` for non-OpenAI providers"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
+      "lines": "476-477",
+      "needles": [
+        "or a preregistered gateway-parity run favours native"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
+      "lines": "478",
+      "needles": [
+        "A search-backend bake-off"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
+      "lines": "512",
+      "needles": [
+        "`duckduckgo-free` returned few or no results"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
+      "lines": "515-517",
+      "needles": [
+        "These are this workstation's results."
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-28-delegated-decisions.md",
+      "lines": "127",
+      "needles": [
+        "the Codex event stream carries no model field"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-28-delegated-decisions.md",
+      "lines": "13",
+      "needles": [
+        "One objection round with the live peer sessions"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-28-delegated-decisions.md",
+      "lines": "3",
+      "needles": [
+        "you decide with evidance manfiest"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-28-delegated-decisions.md",
+      "lines": "5-8",
+      "needles": [
+        "The decisions covered the open items from the 2026-09-28 status report:"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-28-delegated-decisions.md",
+      "lines": "99-103",
+      "needles": [
+        "no carrier or instruction change during the run;"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
+      "lines": "134",
+      "needles": [
+        "the gateway owner is `token-save-practice-e2e-status`;"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
+      "lines": "176",
+      "needles": [
+        "a dated Gate B draft (below), frozen before any measured acceptance run"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
+      "lines": "180-183",
+      "needles": [
+        "needs three arms, a pass rule and an owner, for the user to confirm"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
+      "lines": "183",
+      "needles": [
+        "OpenHands via OmniRoute, which the user decided on 2026-09-28 (#425)."
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
+      "lines": "185-189",
+      "needles": [
+        "#445's admissible values, re-derived on the new build;"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
+      "lines": "201",
+      "needles": [
+        "| gateway owner, accepted |"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
+      "lines": "202",
+      "needles": [
+        "#390 r6 fixes the LLM route by the user's direction"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
+      "lines": "203",
+      "needles": [
+        "`ecosystem-roadmap-2026` (claimed 2026-09-28)"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
+      "lines": "210",
+      "needles": [
+        "on the Gate B route, after both gates pass"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
+      "lines": "239",
+      "needles": [
+        "#426, #427 and #428, behind the Gate B criterion and #425;"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
+      "lines": "25",
+      "needles": [
+        "The latest sweep is `catalogs/sota-convergence/manifest-20260926.json`."
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
+      "lines": "252",
+      "needles": [
+        "Confirm the Gate B criterion once it is drafted."
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
+      "lines": "283",
+      "needles": [
+        "token-practice fixes and a re-run come before Gate B and the wave."
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
+      "lines": "284",
+      "needles": [
+        "needs no runtime-worker run: #425-#428 leave the critical path."
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
+      "lines": "295",
+      "needles": [
+        "it will offer the Gate B draft after its resolver's live Stage B."
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
+      "lines": "3",
+      "needles": [
+        "changes no authority."
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
+      "lines": "304",
+      "needles": [
+        "on the user's direct instruction"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
+      "lines": "306",
+      "needles": [
+        "stage the 32-layer wave and prove the token stack end to end first, then run the full waves."
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
+      "lines": "311",
+      "needles": [
+        "owner decisions made with evidence under the user's delegation"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
+      "lines": "312",
+      "needles": [
+        "waits only on Gate A and Gate B"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
+      "lines": "315",
+      "needles": [
+        "M5b and M5c on Gates A and B"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
+      "lines": "34",
+      "needles": [
+        "71 of its 287 candidates carry a `gpt-6-astra` fit vote whose reasoning reads only \"missing\""
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
+      "lines": "43",
+      "needles": [
+        "an exploratory #425 OpenHands run may inform a written criterion"
+      ]
+    },
+    {
+      "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
+      "lines": "43,176",
+      "needles": [
+        "an exploratory #425 OpenHands run may inform a written criterion",
+        "it does not count as the acceptance run"
+      ]
+    },
+    {
+      "path": "docs/grand-catalog-handbook.md",
+      "lines": "602",
+      "needles": [
+        "re-preregistered rerun of the sealed three-arm workers comparison"
+      ]
+    },
+    {
+      "path": "docs/lanes.md",
+      "lines": "96-110",
+      "needles": [
+        "take `main`'s copy and re-register your own files."
+      ]
+    },
+    {
+      "path": "docs/token-practice.md",
+      "lines": "319-322",
+      "needles": [
+        "whole-account figure, not a token count"
+      ]
+    },
+    {
+      "path": "docs/token-practice.md",
+      "lines": "324-333",
+      "needles": [
+        "to spend the GPT-6 weekly quota now, in priority order"
+      ]
+    },
+    {
+      "path": "docs/token-practice.md",
+      "lines": "330",
+      "needles": [
+        "The verdict wave gets the budget first"
+      ]
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/route-gpt6-runs.json",
+      "lines": "142",
+      "needles": [
+        "quota gate: used 43% ordinary_usage_allowed True"
+      ]
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/route-gpt6-runs.json",
+      "lines": "4",
+      "needles": [
+        "Codex reports input_tokens with cached and cache-write input inside it, and output_tokens with reasoning inside it."
+      ]
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/route-gpt6-runs.json",
+      "lines": "69-90",
+      "needles": [
+        "\"job\": \"route-job2\""
+      ]
+    },
+    {
+      "path": "evidence/artifacts/omniroute-routing-20260928/route-gpt6-runs.json",
+      "lines": "7-26",
+      "needles": [
+        "\"job\": \"route-job1\""
+      ]
+    },
+    {
+      "path": "evidence/artifacts/sota-refresh-20260926/codex/accept_codex_ws.py",
+      "lines": "82-95",
+      "needles": [
+        "\"has_results\": \"results\" in i"
+      ]
+    },
+    {
+      "path": "evidence/artifacts/token-adoption-e2e-20260926/preregistration.json",
+      "lines": "3153-3169",
+      "needles": [
+        "\"outcome_rule\": {"
+      ]
+    },
+    {
+      "path": "evidence/artifacts/token-adoption-e2e-20260926/preregistration.json",
+      "lines": "3167",
+      "needles": [
+        "\"on_incomplete\": \"top_up_and_rerun_same_frozen_checks\""
+      ]
+    },
+    {
+      "path": "scripts/codex_quota.py",
+      "lines": "28-30",
+      "needles": [
+        "3 gate reached"
+      ]
+    },
+    {
+      "path": "scripts/validate_convergence.py",
+      "lines": "102-105,212,233-238",
+      "needles": [
+        "if record[\"status\"] == \"planned\":",
+        "declared = manifest[\"convergence_records\"]",
+        "(is_record or canonical) and name not in declared"
+      ]
+    },
+    {
+      "path": "scripts/validate_convergence.py",
+      "lines": "136-146",
+      "needles": [
+        "adopt_within_scope: observed scoped qualification required"
+      ]
+    },
+    {
+      "path": "tools/capability-gate/codex-profile-exec",
+      "lines": "2-5",
+      "needles": [
+        "exec --experimental-json ...` with no profile argument"
+      ]
+    },
+    {
+      "path": "tools/capability-gate/codex-profile-exec",
+      "lines": "6-9",
+      "needles": [
+        "exec \"$CODEX\" exec --profile"
+      ]
+    },
+    {
+      "path": "tools/capability-gate/m13.yaml",
+      "lines": "18-19",
+      "needles": [
+        "file://m13_hooks.js:beforeEach"
+      ]
+    },
+    {
+      "path": "tools/capability-gate/m13.yaml",
+      "lines": "22-44",
+      "needles": [
+        "id: openai:codex-sdk"
+      ]
+    },
+    {
+      "path": "tools/capability-gate/m13.yaml",
+      "lines": "27",
+      "needles": [
+        "inherit_process_env: true"
+      ]
+    },
+    {
+      "path": "tools/capability-gate/m13.yaml",
+      "lines": "5-6",
+      "needles": [
+        "with at most maxConcurrency in flight"
+      ]
+    },
+    {
+      "path": "tools/capability-gate/m13.yaml",
+      "lines": "56-59",
+      "needles": [
+        "enabled: false"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/codex_lane.py",
+      "lines": "9-13",
+      "needles": [
+        "-c 'web_search=\"disabled\"'"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/README.md",
+      "lines": "103",
+      "needles": [
+        "OmniRoute pools the operator's accounts."
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/README.md",
+      "lines": "105-117",
+      "needles": [
+        "`build_args.py` writes `<work-dir>/codex-home/` with three files:"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/README.md",
+      "lines": "105-117,122-130",
+      "needles": [
+        "`build_args.py` writes `<work-dir>/codex-home/` with three files:",
+        "Codex lists user skills from `$CODEX_HOME/skills` and `$HOME/.agents/skills`"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/README.md",
+      "lines": "110",
+      "needles": [
+        "which the native lane's workers get from `~/.codex/AGENTS.md`"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/README.md",
+      "lines": "114",
+      "needles": [
+        "Without the filter, a real key would reach every command the model runs."
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/README.md",
+      "lines": "121",
+      "needles": [
+        "`site:` queries returned nothing and plain queries few results"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/README.md",
+      "lines": "122",
+      "needles": [
+        "Codex lists user skills from `$CODEX_HOME/skills` and `$HOME/.agents/skills`"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/README.md",
+      "lines": "122-126",
+      "needles": [
+        "with **one exact rule per file** under `$HOME/.agents/skills`"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/README.md",
+      "lines": "123",
+      "needles": [
+        "That tool refuses a path outside its project directory, here the runner's `<work-dir>/empty`"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/README.md",
+      "lines": "129",
+      "needles": [
+        "outside Codex's read-only sandbox"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/README.md",
+      "lines": "130",
+      "needles": [
+        "because the native lane has no context-mode"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/README.md",
+      "lines": "142",
+      "needles": [
+        "`codex exec -p stack-worker --skip-git-repo-check -s read-only -m cx/gpt-6-astra"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/README.md",
+      "lines": "143",
+      "needles": [
+        "the staged placeholder `local-loopback` fills an unset variable"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/README.md",
+      "lines": "147",
+      "needles": [
+        "do not claim a gateway result as max quality until it passes"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/README.md",
+      "lines": "147-153",
+      "needles": [
+        "an MCP call such as `ctx_execute`;"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/README.md",
+      "lines": "171-186",
+      "needles": [
+        "Check prompt parity without a model call"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/README.md",
+      "lines": "208",
+      "needles": [
+        "**Null effort columns prove nothing.**"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/README.md",
+      "lines": "208-209",
+      "needles": [
+        "**What a gateway sent upstream** is `pipelinePayloads.providerRequest`"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/README.md",
+      "lines": "209",
+      "needles": [
+        "It is recorded only while the gateway's detailed pipeline logging is on"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/README.md",
+      "lines": "211",
+      "needles": [
+        "harness acceptance remains open"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/build_args.py",
+      "lines": "203-219,367-370",
+      "needles": [
+        "\"\"\"One exact Read(...) allow rule per file under <home>/.agents/skills",
+        "write_json(settings, {\"permissions\": {\"allow\": skill_rules}})"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/build_args.py",
+      "lines": "311-355",
+      "needles": [
+        "\"[shell_environment_policy.filters]\","
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/build_args.py",
+      "lines": "311-355,367-370",
+      "needles": [
+        "\"[shell_environment_policy.filters]\",",
+        "write_json(settings, {\"permissions\": {\"allow\": skill_rules}})"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/build_args.py",
+      "lines": "325-327",
+      "needles": [
+        "excludes unless ignore_default_excludes is false, and it defaults to true"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/build_args.py",
+      "lines": "336-337",
+      "needles": [
+        "{OMNIROUTE_KEY_ENV} = \"exclude\""
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/build_args.py",
+      "lines": "554-557",
+      "needles": [
+        "parser.add_argument(\"--gpt6-provider\", choices=PROVIDERS, default=\"native\","
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/build_args.py",
+      "lines": "606-608",
+      "needles": [
+        "--quota-stop-percent reads the native Codex login; it cannot gate the OmniRoute"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/build_args.py",
+      "lines": "94-101,593-626",
+      "needles": [
+        "OMNIROUTE_DEFAULT_URL = \"http://127.0.0.1:20128/v1\"",
+        "if args.gpt6_provider == \"omniroute\":"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/codex_job.py",
+      "lines": "13",
+      "needles": [
+        "bounded to 3000 s (exit 124 on timeout)"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/codex_job.py",
+      "lines": "13,434",
+      "needles": [
+        "in the empty directory <work-dir>/empty",
+        "\"--skip-git-repo-check\", \"-s\", \"read-only\","
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/codex_job.py",
+      "lines": "15-16",
+      "needles": [
+        "codex exec --ignore-user-config --skip-git-repo-check -s read-only -m gpt-6-astra"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/codex_job.py",
+      "lines": "15-16,433-436",
+      "needles": [
+        "codex exec --ignore-user-config --skip-git-repo-check -s read-only -m gpt-6-astra",
+        "head = [codex, \"exec\", \"--ignore-user-config\"]"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/codex_job.py",
+      "lines": "18-25",
+      "needles": [
+        "`codex exec -p stack-worker --skip-git-repo-check -s read-only"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/codex_job.py",
+      "lines": "193-195",
+      "needles": [
+        "it cannot gate a gateway"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/codex_job.py",
+      "lines": "22-25",
+      "needles": [
+        "codex.api_key_placeholder (\"local-loopback\") fills an"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/codex_job.py",
+      "lines": "33",
+      "needles": [
+        "--ignore-user-config keeps the host's Codex config out of the lane"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/codex_job.py",
+      "lines": "375-379",
+      "needles": [
+        "if not key.startswith(\"RUST_LOG\")"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/codex_job.py",
+      "lines": "425-436",
+      "needles": [
+        "def codex_argv(codex: str, directory: Path, model: str, prompt: str, lane: dict | None = None) -> list[str]:"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/codex_job.py",
+      "lines": "685-689",
+      "needles": [
+        "cwd=str(base / \"empty\"), stdin=subprocess.DEVNULL, stdout=events, stderr=errors,"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/codex_job.py",
+      "lines": "686-689",
+      "needles": [
+        "open(directory / \"events.jsonl\", \"wb\") as events"
+      ]
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/templates.json",
+      "lines": "2",
+      "needles": [
+        "a missing result is pending, never refuted"
+      ]
+    }
+  ],
+  "sources": {
+    "pr_heads": {
+      "#416": "452f7b14",
+      "#431": "73fc873e",
+      "#445": "bddb0072",
+      "#390": "d161f691"
+    },
+    "pr_bodies_read": "gh pr view at 2026-09-29T02:38Z: #416, #426, #427, #428, #431",
+    "comment": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/469#issuecomment-5880981981",
+    "upstream": [
+      "promptfoo/promptfoo@0.123.1: site/docs/providers/openai-codex-sdk.md lines 33, 70, 72, 218, 219, 231, 238, 242, 301; site/docs/configuration/expected-outputs/deterministic.md lines 340-389; site/docs/configuration/reference.md line 50",
+      "installed promptfoo 0.123.1 dist/src/codex-sdk-CHgLS7xg.js and evaluator-DlYW7Rgb.js [src]",
+      "installed @openai/codex-sdk 0.153.4 dist/index.js lines 5-27, 79-92, 88-90, 98-121, 145-146, 176-274; dist/index.d.ts lines 78-82 [src]",
+      "openai/codex rust-v0.158.0, published 2026-09-28T05:07:23Z",
+      "harbor-framework/harbor@1e5c5c6d (tag v0.23.0): src/harbor/agents/installed/codex.py lines 1299-1327, 1339",
+      "meridianlabs-ai/inspect_swe@7eb8dd64: src/inspect_swe/_codex_cli/codex_cli.py lines 369-388",
+      "SWE-bench/SWE-bench@v5.0.1: CHANGELOG.md lines 12, 34-35, 41",
+      "OpenHands/software-agent-sdk@fcc102a (tag v1.49.6); OpenHands/benchmarks@405bae71",
+      "scipy 1.18.1: bootstrap signature defaults; scipy/stats/_resampling.py line 297 [obs]",
+      "Miller, https://arxiv.org/abs/2411.00640 (abstract)",
+      "Bowyer et al., https://arxiv.org/abs/2503.01747 (abstract)"
+    ]
+  },
+  "live_observations": [
+    {
+      "utc": "2026-09-29T02:27:37Z",
+      "what": "codex --version 0.157.1; promptfoo --version 0.123.1; both units active with start times and install names; dist/BUILD_SHA 5fc47d970 and c3fa5a15e; GET /v1/models ID and owner counts and GET /api/logs/detail?limit=0 on both ports"
+    },
+    {
+      "utc": "2026-09-29T02:28:20Z",
+      "what": "GET /api/usage/provider-limits on 20128, aggregates only"
+    },
+    {
+      "utc": "2026-09-29T02:38:20Z",
+      "what": "gh pr list --state open: no Gate B or rebuild-receipt PR among 30; gh pr view of #416, #426, #427, #428 and #431"
+    },
+    {
+      "utc": "2026-09-29T03:04:26Z",
+      "what": "no openhands tool directory; harbor not on PATH; git ls-remote main b0fb65b4"
+    },
+    {
+      "utc": "2026-09-29T03:25:20Z",
+      "what": "gh pr view 14904 -R diegosouzapw/OmniRoute: CLOSED at 2026-09-28T23:49:37Z, not merged; uv resolved python 3.14.7, numpy 2.5.3, scipy 1.18.1, statsmodels 0.15.0"
+    }
+  ]
+}
