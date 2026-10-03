@@ -1,0 +1,7 @@
+$ python3 test_update_check.py <the first deployed version 2>   (red: the suite stops at its first case)
+  File "<scratch>/a2/uc2/test_update_check.py", line 73, in <module>
+    case("closed PR notifies once", any("15167" in n for n in notes) and rec["carried"][1]["notified_closed"])
+KeyError: 'notified_closed'
+$ python3 red_scan.py <the first deployed version 2>
+old v2 on a decoy package: {'sol_catalog': True, 'alpha_search_route': True, 'carries_both': True}
+old v2 has a per-member read limit: False

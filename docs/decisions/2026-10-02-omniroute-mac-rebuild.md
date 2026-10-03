@@ -66,15 +66,25 @@ The details are in `evidence/artifacts/omniroute-mac-rebuild-20261002/le18-20261
 - **Update check, version 2,** deployed with version 1 kept beside it as the rollback. It still installs nothing. It
   adds notifications for:
   - a carried upstream PR closed without a merge, once per closure;
-  - a new official release, with a read of its npm package for the two capabilities this build carries: the GPT-6.1 Sol
-    catalog entry and the `/v1/alpha/search` route. A release with both can replace this build even if the carried PRs
-    merged under other numbers.
+  - a new official release, with a read of its npm package for the two capabilities this build carries, checked by
+    structure: a GPT-6.1 Sol model object in the server bundle, and the `/api/v1/alpha/search/route` entry of the
+    server's route manifest together with its route file. The result is a notice, not a switch gate; a switch still
+    has to pass the switch tool's probe gate.
 
-  Tests:
-  - A scan of this build's own package finds both capabilities; a scan of release v3.8.51 finds neither.
+  The deployed script is the one revised after this change's automated review (10:02Z):
+  - Reads are bounded per package, per file and in total.
+  - A notification counts only when it was delivered, and the state that suppresses a repeat is written after delivery.
+  - A failed package read keeps the release pending.
+  - A failed PR lookup keeps the PR's previous record.
+
+  Tests, retained in `checks/update-check-v2/`:
+  - A 16-case suite passes. It stops at its first case against the first deployment, whose literal scan also accepted a
+    decoy package.
+  - This build's own package carries both capabilities; release v3.8.51 carries neither.
   - A dry run against a scratch state folder reports a new release and logs its notification.
-  - Stubbed runs cover the closed-unmerged and carries-everything paths.
-  - The first real run (05:38Z) changed nothing.
+  - The first real run of the revised script changed nothing.
+  - The receipt records a completeness critic: what was not observed (a real new release, desktop delivery, the
+    scheduled run) and what was not read.
 - **Not done here:** LE-18's third item, the `omniroute` row of `manifests/stack.json`. It is the lane:shared manifest
   owner's change.
 

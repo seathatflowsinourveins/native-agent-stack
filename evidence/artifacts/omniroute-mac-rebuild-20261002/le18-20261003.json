@@ -30,21 +30,41 @@
     }
   },
   "update_check_v2": {
-    "script": "scripts/omniroute-update-check.v2.py.txt (as deployed; sha256 5d7398c654588e38...); version 1 stays as scripts/omniroute-update-check.py.txt and beside the deployed script as omniroute-update-check.v1.py (sha256 42120a0f77da9369...), the rollback",
+    "script": "scripts/omniroute-update-check.v2.py.txt, as deployed at 10:02Z after the review of this pull request (sha256 dd79843ca0e347f952bfae47ea972eb82b7cd2306fd204c8e5900e0a53ef0424). The first deployment of 05:38Z (sha256 5d7398c654588e38...) was replaced. Version 1 stays as scripts/omniroute-update-check.py.txt and beside the deployed script as omniroute-update-check.v1.py (sha256 42120a0f77da9369...), the rollback.",
     "adds": [
       "a notification when a carried upstream PR is closed without a merge (once per closure)",
-      "a notification when a new official release appears since the last check, with a capability read of its npm package (read in memory, never installed): the GPT-6.1 Sol catalog entry and the /v1/alpha/search route, the two capabilities this build carries; a release with both can replace this build even if the carried PRs merged under other numbers",
+      "a notification when a new official release appears since the last check, with a capability read of its npm package (read in memory, never installed), checked by structure: a GPT-6.1 Sol model object ({id:\"gpt-6.1-sol\",name:...}) in a server-bundle file, and the /api/v1/alpha/search/route entry of the server's app-paths manifest together with the route file it names; strings elsewhere count for nothing. The result is a notice, not a switch gate: a switch still has to pass switch_gateway.py's probe gate (live catalog, effort-max calls, codex exec).",
+      "bounded reads: 400 MiB per compressed package, 64 MiB per decompressed file (a larger file is skipped and listed), 1 GiB of decompressed reads per package",
+      "delivery-based state: a notification counts only when osascript exits 0; the notified closure, the notified release and the advanced release tag are written only after delivery, so a failed delivery or a failed package read leaves the item pending for the next run; a failed PR lookup keeps the PR's previous record; a successful capability result is kept on later runs",
       "a dry mode for tests (OMNIROUTE_UPDATE_CHECK_DRY=1) that logs the restart and the notifications instead of performing them"
     ],
-    "unchanged": "the Codex-follow restart rule, the carries-everything notification, the launch agent (same path, schedule and interpreter), and the rule that nothing is installed or switched",
-    "tests": [
-      "positive control: the scan of this build's own package finds both capabilities",
-      "negative control: the capability read of release v3.8.51 from the npm registry finds neither",
-      "dry functional run against a scratch state folder whose previous record names v3.8.50: a new release v3.8.51 is reported, its package is read, neither capability is found, one notification is logged, and the Codex-follow step logs a would-restart instead of restarting",
-      "stubbed paths: a closed unmerged carried PR notifies once and not again; carried PRs merged before the latest release give the carries-everything notice and, for a new release, the capability notice"
-    ],
+    "unchanged": "the Codex-follow restart rule, the carries-everything notification (now once per release tag), the launch agent (same path, schedule and interpreter), and the rule that nothing is installed or switched",
+    "tests": {
+      "suite": "checks/update-check-v2/test_update_check.py.txt, 16 cases (closed PR once, failed delivery retried, failed lookup keeps the closure, failed package read stays pending and is read again, capability result kept, carries-everything once per tag, decoy strings rejected, model object and manifest route accepted, a manifest entry without its route file rejected, the per-file and total read limits); output checks/update-check-v2/test-output.txt: all passed",
+      "red_check": "checks/update-check-v2/red-check.txt: against the first deployed version 2 the suite stops at its first case, and its literal scan accepts a decoy package as carrying both capabilities",
+      "controls": "checks/update-check-v2/controls.txt: this build's own package carries both capabilities; release v3.8.51 from the npm registry carries neither",
+      "dry_run": "checks/update-check-v2/dry_test.sh.txt and dry-run-output.txt: against a scratch state folder that names v3.8.50, the new release v3.8.51 is reported, its package is read, neither capability is found, one notification is logged and the release advances; the Codex-follow step logs a would-restart",
+      "first_real_run": "checks/update-check-v2/first-real-run.txt: 2026-10-03T10:02Z, Codex follow unchanged, no new release, both carried PRs open, no notification"
+    },
     "python": "/usr/bin/python3 3.9.6, the launch agent's interpreter",
-    "evidence_class": "local_integration and synthetic (the stubbed paths)"
+    "evidence_class": "local_integration and synthetic (the stubbed GitHub and npm reads and the synthetic packages)"
+  },
+  "completeness_critic": {
+    "by": "the coordinator (Claude session sota-architecture-unified-catalog), after the automated review of this pull request; not an independent model",
+    "missed_modalities": [
+      "Upstream effort on the wire: not read back; it needs the gateway's database or a debug-logging restart (the first limit of receipt.json stands).",
+      "A real new release: the new-release path ran against v3.8.51 as a stand-in, a synthetic package and stubs; the first true run on a new release is the next confirmation.",
+      "Desktop delivery: osascript's exit code stands for delivery; macOS can accept a notification it does not show (Focus modes). A user-visible confirmation is not recorded.",
+      "The launchd schedule: the reviewed script ran by hand; its first scheduled run (09:17 local) is still to be observed.",
+      "The workstation gateway: out of scope here; its record is docs/decisions/2026-09-30-omniroute-rebuild.md."
+    ],
+    "unread_sources": [
+      "OmniRoute's release notes and changelog conventions: a renamed model id or route path would make the structural scan report a missing capability (a false negative on a notice; the probe gate is unaffected)."
+    ],
+    "candidate_classes": [
+      "Package-update services (Dependabot, Renovate) do not apply: the gateway is a host-installed npm package outside any repository manifest.",
+      "An automatic nightly rebuild-and-switch stays rejected (decision record, Alternatives)."
+    ]
   },
   "not_done_here": [
     "LE-18's third item, reconciling the omniroute row of manifests/stack.json with each host's running build, is addressed to the lane:shared manifest owner and lands as its own lane:shared change."

@@ -1,0 +1,27 @@
+"""Red check for the scan findings: the first deployed v2's literal scan against a decoy package and an oversize member."""
+import importlib.util
+import io
+import os
+import sys
+import tarfile
+
+os.environ["OMNIROUTE_UPDATE_CHECK_DRY"] = "1"
+spec = importlib.util.spec_from_file_location("old", sys.argv[1])
+assert spec and spec.loader
+old = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(old)
+
+
+def package(files):
+    buf = io.BytesIO()
+    with tarfile.open(fileobj=buf, mode="w:gz") as tar:
+        for name, body in files.items():
+            info = tarfile.TarInfo(name)
+            info.size = len(body)
+            tar.addfile(info, io.BytesIO(body))
+    return buf.getvalue()
+
+
+decoy = package({"package/dist/.build/next/server/chunks/a.js": b'/* gpt-6.1-sol alpha/search */ var x = "gpt-6.1-sol";'})
+print("old v2 on a decoy package:", old.scan(decoy))
+print("old v2 has a per-member read limit:", hasattr(old, "MAX_MEMBER"))

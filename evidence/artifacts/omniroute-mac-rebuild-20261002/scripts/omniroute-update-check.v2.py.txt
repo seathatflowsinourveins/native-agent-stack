@@ -8,9 +8,14 @@
 2. Upstream notice (version 2, 2026-10-03), recorded in omniroute-update.json, with a macOS notification for each:
    - an official OmniRoute release carries every upstream PR this build carries (omniroute-build.json);
    - a carried PR was closed without being merged, so the carry needs a decision;
-   - a new official release appeared since the last check. Its npm package is read (not installed) for the two
-     capabilities this build carries: the GPT-6.1 Sol catalog entry and the /v1/alpha/search route. When both are
-     present the release can replace this build even if the carried PRs merged under other numbers.
+   - a new official release appeared since the last check. Its npm package is read (never installed) for the two
+     capabilities this build carries, checked by structure: a GPT-6.1 Sol model object (`id:"gpt-6.1-sol"` with a
+     name) in the server bundle, and the `/api/v1/alpha/search/route` entry of the server's app-paths manifest with
+     the route file it names. The result is a notice, not a switch gate: a switch still has to pass the switch
+     tool's probe gate (live catalog, effort-max calls, codex exec).
+   A notification counts as delivered only when osascript exits 0. State that suppresses a repeat (the notified
+   closure, the notified release, the advanced release tag) is written only after delivery; a failed package read or
+   a failed delivery leaves the release pending for the next run. A failed PR lookup keeps the PR's previous record.
    Nothing is installed or switched by this check.
 It never reads the gateway's data directory or any credential.
 Usage: omniroute-update-check.py [--capability <release tag> | --scan-file <package .tgz>]
@@ -21,6 +26,7 @@ from __future__ import annotations
 import io
 import json
 import os
+import re
 import subprocess
 import sys
 import tarfile
@@ -36,9 +42,12 @@ GH = os.environ.get("GH_BIN", str(Path.home() / ".local/bin/gh"))
 REGISTRY = "https://registry.npmjs.org/omniroute/"
 # A dry run (for tests) logs the restart and the notifications instead of performing them.
 DRY = os.environ.get("OMNIROUTE_UPDATE_CHECK_DRY") == "1"
-# The capabilities this build carries, as byte strings that appear in the built package when present.
-CAPABILITIES = {"sol_catalog": b"gpt-6.1-sol", "alpha_search_route": b"alpha/search"}
-MAX_TARBALL = 400 * 1024 * 1024
+MAX_TARBALL = 400 * 1024 * 1024  # compressed package
+MAX_MEMBER = 64 * 1024 * 1024  # one decompressed file
+MAX_TOTAL = 1024 * 1024 * 1024  # all decompressed files read
+SOL_MODEL = re.compile(rb'\{id:"gpt-6\.1-sol",name:"[^"]+"')
+ROUTE_KEY = "/api/v1/alpha/search/route"
+SERVER = "/dist/.build/next/server/"
 
 
 def now() -> str:
@@ -49,12 +58,17 @@ def log(event: dict) -> None:
     print(json.dumps({"at": now(), **event}), flush=True)
 
 
-def notify(message: str) -> None:
+def notify(message: str) -> bool:
+    """Post a macOS notification; True only when it was delivered (osascript exit 0)."""
     text = message.replace("\\", "").replace('"', "'")
     if DRY:
         log({"notification": text, "dry": True})
-        return
-    subprocess.run(["/usr/bin/osascript", "-e", f'display notification "{text}" with title "OmniRoute update"'])
+        return True
+    rc = subprocess.run(["/usr/bin/osascript", "-e", f'display notification "{text}" with title "OmniRoute update"'],
+                        capture_output=True).returncode
+    if rc:
+        log({"notification_failed": text, "exit": rc})
+    return rc == 0
 
 
 def installed_codex() -> str | None:
@@ -96,19 +110,39 @@ def gh_json(path: str) -> dict:
 
 
 def scan(data: bytes) -> dict:
-    """Which carried capabilities a package tarball contains (read in memory, never extracted to disk)."""
-    found = {name: False for name in CAPABILITIES}
+    """Which carried capabilities a package tarball contains, by structure (read in memory, never extracted)."""
+    sol, route_manifest, members, total, skipped = False, None, set(), 0, []
     with tarfile.open(fileobj=io.BytesIO(data), mode="r:gz") as tar:
         for member in tar:
-            if not member.isfile() or not member.name.endswith((".js", ".mjs", ".cjs", ".json", ".ts")):
+            if not member.isfile():
                 continue
+            members.add(member.name)
+            in_server = SERVER in "/" + member.name
+            wanted = in_server and (member.name.endswith(".js") or member.name.endswith("server/app-paths-manifest.json"))
+            if not wanted:
+                continue
+            if member.size > MAX_MEMBER:
+                skipped.append(member.name)
+                continue
+            total += member.size
+            if total > MAX_TOTAL:
+                return {"sol_catalog": False, "alpha_search_route": False, "carries_both": False,
+                        "error": "decompressed size over the read limit"}
             handle = tar.extractfile(member)
-            body = handle.read() if handle else b""
-            for name, needle in CAPABILITIES.items():
-                found[name] = found[name] or needle in body
-            if all(found.values()):
-                break
-    return {**found, "carries_both": all(found.values())}
+            body = handle.read(MAX_MEMBER + 1) if handle else b""
+            if member.name.endswith("server/app-paths-manifest.json") and member.name.count("/app/") == 0:
+                try:
+                    route_manifest = json.loads(body)
+                except ValueError:
+                    route_manifest = None
+            elif not sol and SOL_MODEL.search(body):
+                sol = True
+    target = (route_manifest or {}).get(ROUTE_KEY)
+    route = bool(target) and any(name.endswith("next/server/" + target) for name in members)
+    result: dict = {"sol_catalog": sol, "alpha_search_route": route, "carries_both": sol and route}
+    if skipped:
+        result["skipped_over_member_limit"] = skipped[:5]
+    return result
 
 
 def capability(tag: str) -> dict:
@@ -127,47 +161,63 @@ def capability(tag: str) -> dict:
         return {"version": version, "error": str(exc)[:200]}
 
 
+def carried_state(pr: int, previous: dict, released: str) -> dict:
+    before = next((p for p in previous.get("carried") or [] if p.get("pr") == pr), {})
+    try:
+        info = gh_json(f"repos/diegosouzapw/OmniRoute/pulls/{pr}")
+        if "state" not in info:
+            raise ValueError("no state in the response")
+    except Exception as exc:  # noqa: BLE001
+        # Keep what was last observed, so a failed lookup never erases a recorded closure.
+        return dict(before or {"pr": pr}, lookup_error=str(exc)[:120])
+    merged_at = info.get("merged_at")
+    return {"pr": pr, "state": info.get("state"), "merged_at": merged_at,
+            "closed_unmerged": info.get("state") == "closed" and not merged_at,
+            "in_latest_release": bool(merged_at and merged_at <= released),
+            "notified_closed": bool(before.get("notified_closed"))}
+
+
 def upstream_notice() -> None:
     build = json.loads((PREFIX / "omniroute-build.json").read_text())
     previous_path = STATE / "omniroute-update.json"
     previous = json.loads(previous_path.read_text()) if previous_path.is_file() else {}
     try:
         rel = gh_json("repos/diegosouzapw/OmniRoute/releases/latest")
+        if not rel.get("tag_name"):
+            raise ValueError("no tag_name in the response")
     except Exception as exc:  # noqa: BLE001
         log({"upstream": "unreadable", "error": str(exc)[:200]})
         return
-    tag, released = rel.get("tag_name"), rel.get("published_at") or ""
-    carried = []
-    for pr in build["carried_pull_requests"]:
-        try:
-            info = gh_json(f"repos/diegosouzapw/OmniRoute/pulls/{pr}")
-        except Exception:  # noqa: BLE001
-            info = {}
-        merged_at = info.get("merged_at")
-        carried.append({"pr": pr, "state": info.get("state"), "merged_at": merged_at,
-                        "closed_unmerged": info.get("state") == "closed" and not merged_at,
-                        "in_latest_release": bool(merged_at and merged_at <= released)})
-    ready = all(c["in_latest_release"] for c in carried)
-    new_release = bool(tag) and bool(previous.get("latest_release")) and tag != previous.get("latest_release")
-    record = {"checked_at": now(), "check_version": 2, "latest_release": tag, "published_at": released,
+    tag, released = rel["tag_name"], rel.get("published_at") or ""
+    carried = [carried_state(pr, previous, released) for pr in build["carried_pull_requests"]]
+    ready = bool(carried) and all(c.get("in_latest_release") for c in carried)
+    seen = previous.get("latest_release")
+    new_release = bool(seen) and tag != seen
+    record = {"checked_at": now(), "check_version": 2, "latest_release": seen or tag, "published_at": released,
               "carried": carried, "official_release_carries_everything": ready, "new_release": new_release,
+              "notified_ready_for": previous.get("notified_ready_for"), "capability": previous.get("capability"),
               "build": build.get("name")}
+    if ready and record["notified_ready_for"] != tag:
+        if notify(f"OmniRoute {tag} carries every PR the local build carries; switch to the official release."):
+            record["notified_ready_for"] = tag
+    for c in carried:
+        if c.get("closed_unmerged") and not c.get("notified_closed"):
+            if notify(f"Upstream PR {c['pr']}, carried by the local OmniRoute build, was closed without a merge."):
+                c["notified_closed"] = True
     if new_release:
-        record["capability"] = capability(tag or "")
+        cap = capability(tag)
+        if "error" in cap:
+            record["pending_release"], record["capability_error"] = tag, cap
+        else:
+            detail = ("it carries both capabilities of the local build (the switch's probe gate still decides)"
+                      if cap.get("carries_both") else "it lacks a capability of the local build")
+            if notify(f"New OmniRoute release {tag}: {detail}."):
+                record["latest_release"], record["capability"] = tag, cap
+            else:
+                record["pending_release"] = tag
     STATE.mkdir(parents=True, exist_ok=True)
     previous_path.write_text(json.dumps(record, indent=2) + "\n")
     log({"upstream": record})
-    if ready:
-        notify(f"OmniRoute {tag} carries every PR the local build carries; switch to the official release.")
-    for c in carried:
-        already = any(p.get("pr") == c["pr"] and p.get("closed_unmerged") for p in previous.get("carried") or [])
-        if c["closed_unmerged"] and not already:
-            notify(f"Upstream PR {c['pr']}, carried by the local OmniRoute build, was closed without a merge.")
-    if new_release:
-        cap = record["capability"]
-        detail = ("it carries both capabilities of the local build" if cap.get("carries_both")
-                  else "it lacks a capability of the local build" if "error" not in cap else "its package was unreadable")
-        notify(f"New OmniRoute release {tag}: {detail}.")
 
 
 def main() -> int:

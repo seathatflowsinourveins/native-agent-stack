@@ -1,0 +1,19 @@
+$ OMNIROUTE_UPDATE_CHECK_DRY=1 python3 test_update_check.py <the version-2 script>
+PASS closed PR notifies once
+PASS closed PR is not notified again
+PASS failed delivery is not acknowledged
+PASS failed delivery is retried
+PASS failed lookup keeps the recorded closure
+PASS failed lookup does not re-notify
+PASS failed package read keeps the release pending
+PASS pending release is read again and then advanced
+PASS capability result carried forward
+PASS carries-everything notice
+PASS carries-everything notice once per tag
+PASS decoy strings are not capabilities
+PASS model object and manifest route are capabilities
+PASS manifest entry without its route file is not a route
+PASS member over the read limit is skipped
+PASS total decompressed limit stops the scan
+all passed
+exit=0
