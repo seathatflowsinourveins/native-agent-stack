@@ -15896,8 +15896,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "fd5afe19e297caa79eb14e4b89cb83ec1947589668fbd340a1bb3312ac3eca5c",
-      "bytes": 142312
+      "sha256": "85a0f5d92161b16c67bdeb111bdb5b67c247f0fd241e0a9ef032d8cb9b51e8eb",
+      "bytes": 142363
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
