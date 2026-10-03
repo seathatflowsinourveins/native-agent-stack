@@ -6,8 +6,7 @@ name: Suite shards trial, ubuntu-24.04 (draft pull request only)
 # image's system python3). Record, rules and oracle: blueprints/convergence-practice/suite-shards-trial-20261003/
 # (README.md, experiment.json, compare.py). It belongs to a DRAFT pull request that is never merged; none of its
 # job names is a required context in .github/main-ruleset.json, and it changes no other workflow. Its macOS twin is
-# suite-shards-trial-macos.yml, a separate workflow so that a stalled macOS queue never holds this evidence and
-# either run can be cancelled alone.
+# suite-shards-trial-macos.yml, a separate workflow so that a stalled macOS queue never holds the Linux evidence.
 #
 # Parallel steps: github/docs content/actions/reference/workflows-and-actions/workflow-syntax.md at
 # c67a9362ec63f3993d095bf70bd11724359cc50e, lines 1193-1224 (`parallel`: every step of the group is a background
@@ -21,21 +20,28 @@ name: Suite shards trial, ubuntu-24.04 (draft pull request only)
 # a paths filter on this file, so pushing to the branch (synchronize) never re-runs the trial and the observed
 # record can never land on this branch by accident.
 #
-# Repetition (preregistered, experiment.json quality_rule): the first workflow run whose compare result
-# (compare_run_attempt 1) is adopt, reject or no verdict decides this OS; later runs are reported and cannot
-# overturn it. A repeat is allowed only after a run that ended incomplete, or in which compare.py did not run or
-# exited non-zero (so it wrote no result.json), by closing and reopening the pull request when no run of either
-# trial workflow is in progress. A run in which compare.py exited 0 decides even if its upload failed (its outcome
-# lines in that step's log then stand for result.json). No run is cancelled by hand, and the pull request is never
-# closed or reopened while a run of either trial workflow is in progress: a run that ends incomplete through a hand
-# cancellation or such a reopen after its first serial, shards or controls job started is a protocol deviation,
-# which ends this OS's trial without a verdict and draws no repeat. Never re-run any job, the compare job included:
-# compare.py makes the OS incomplete when its own GITHUB_RUN_ATTEMPT, or the run_attempt of any run or control
-# directory, is not 1. Whether a re-run job's upload (overwrite: false) would fail on the first attempt's artifact
-# name, and whether its data would reach a compare job, is unverified; the outcome is incomplete either way.
-# cancel-in-progress is true: a reopen during a run, which the protocol forbids, cancels that run instead of
-# queueing an unattended second run behind it. Its cost: one reopen starts both trial workflows, so a repeat for one
-# OS waits until the other OS's run has ended too.
+# Protocol (preregistered; README.md and experiment.json's quality_rule state it word for word): A run decides an OS
+# when its result.json, or, only if that file's upload failed, the outcome line compare.py printed, gives adopt,
+# reject or no verdict for that OS; a run in which neither exists is incomplete. A result.json lists the OS that its
+# run did not measure as not measured, which decides nothing. Per OS, the deciding run is the first run of that OS's
+# own trial workflow that decides it. Until an OS's trial ends, a repeat is allowed for it only by closing and
+# reopening the draft pull request when no run of either trial workflow is in progress. Once an OS's trial has
+# ended, at its deciding run or without a verdict, nothing changes it: its later runs are reported only, and
+# cancelling or reopening during such a run is not a deviation for that OS. Any coordinator action other than the
+# close-and-reopen repeat that changes the head, or that makes a run incomplete after its first serial, shards or
+# controls job started, is a protocol deviation that ends the trial of each OS it affects without a verdict:
+# pushing a commit, or cancelling that run by hand, reopening during it or deleting its artifacts or the run itself.
+# No run starts while the pull request conflicts with main, because GitHub runs no pull_request workflow on a pull
+# request with a merge conflict: the trial of an OS that then still needs a run ends without a verdict (not
+# measured), and no push may resolve the conflict.
+#
+# Re-runs: never re-run any job, the compare job included: compare.py makes the OS incomplete when its own
+# GITHUB_RUN_ATTEMPT, or the run_attempt of any run or control directory, is not 1. Whether a re-run job's upload
+# (overwrite: false) would fail on the first attempt's artifact name, and whether its data would reach a compare job,
+# is unverified; the outcome is incomplete either way. cancel-in-progress is true: a reopen during a run, a protocol
+# deviation, cancels that run instead of queueing an unattended second run behind it. Its cost: one reopen starts
+# both trial workflows, so a repeat for one OS waits until the other OS's run has ended, or has been cancelled once
+# that OS's trial ended.
 #
 # Jobs: inventory (the fail-closed parity and coverage gate, shard lists built at run time from the head);
 # serial (arm S x 3) and shards (arms G4 and G4T x 3; at most 2 + 2 timed jobs at once); controls (a passing, a
@@ -55,7 +61,7 @@ permissions:
 concurrency:
   group: suite-shards-trial-linux-${{ github.event.pull_request.number }}
   # github/docs data/reusables/actions/actions-group-concurrency.md at 336b7f54, line 11: true also cancels a run in
-  # progress in this group. See "Repetition" above.
+  # progress in this group. See "Re-runs" above.
   cancel-in-progress: true
 
 defaults:
@@ -115,7 +121,8 @@ jobs:
   serial:
     needs: inventory
     runs-on: ubuntu-24.04
-    # validate allows 40 minutes for its whole job; the suite step below has its own hang guard.
+    # validate allows 40 minutes for its whole job at the trial base 9b0b8d6d (main raised it to 60 on 2026-10-03);
+    # the suite step below has its own hang guard.
     timeout-minutes: 75
     env:
       ARM: S
@@ -758,7 +765,8 @@ jobs:
           echo "testing the pull request head $actual"
       # Pattern downloads: a missing artifact downloads nothing instead of failing the step
       # (actions/download-artifact src/download-artifact.ts at 3e5f45b2, lines 149-163 and 176-246), so compare.py
-      # always runs and records a missing run directory as an incomplete run. The arm-runs are not merged: each
+      # always runs and records a missing run directory, or a file of a successful inventory job's artifact that did
+      # not arrive, as an incomplete run. The arm-runs are not merged: each
       # artifact lands in its own arm-<run name> directory (lines 186-195), and compare.py counts only the run
       # directory that artifact's name gives, so no job's files can pass as another run's.
       - name: Download the inventory
@@ -778,7 +786,7 @@ jobs:
           pattern: controls
           path: ${{ runner.temp }}/results/controls
       # An oracle that fails its own tests here writes no result.json: this step fails, compare.py does not run, and
-      # the run decides nothing (README.md, "Which run decides").
+      # the run is incomplete (README.md, "Which run decides").
       - name: Run the oracle's own tests on this interpreter (fail-closed)
         run: python3 -m unittest discover -s "$TRIAL_DIR" -p "test_*.py" -v
       # compare.py repeats the controls-check job's check on the same control artifact: when that job failed but this
@@ -789,7 +797,8 @@ jobs:
           NEEDS_JSON: ${{ toJSON(needs) }}
         run: printf '%s\n' "$NEEDS_JSON" > "$RUNNER_TEMP/needs.json"
       # result.json (with this job's own run attempt), the exit files and the job results are the record; the step
-      # summary below is a rendering of text the pull request controls, never the record.
+      # summary below is a rendering of text the pull request controls, never the record. compare.py writes
+      # summary.md and checkout-status.json first, result.json last, then its outcome lines.
       - name: Compare every run with the serial arm (compare.py)
         env:
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}

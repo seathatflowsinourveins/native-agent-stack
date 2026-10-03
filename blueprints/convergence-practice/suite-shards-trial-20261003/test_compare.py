@@ -26,6 +26,7 @@ import tempfile
 import unittest
 from fractions import Fraction
 from pathlib import Path
+from unittest import mock
 
 HERE = Path(__file__).resolve().parent
 if str(HERE) not in sys.path:
@@ -42,6 +43,7 @@ INDEX = json.loads((FIXTURES / "index.json").read_text(encoding="utf-8"))
 FIXTURE_WEIGHTS = FIXTURES / "weights-fixture.json"
 WORKFLOWS = {"ubuntu-24.04": ROOT / ".github/workflows/suite-shards-trial-linux.yml",
              "macos-15": ROOT / ".github/workflows/suite-shards-trial-macos.yml"}
+DECISION_RECORD = ROOT / "docs/decisions/2026-10-03-suite-shards-trial.md"
 OS = "ubuntu-24.04"
 SHA = "0123456789abcdef0123456789abcdef01234567"
 PYTHON = json.loads((FIXTURES / "controls/foreground.probe.json").read_text(encoding="utf-8"))["python_version"]
@@ -177,6 +179,15 @@ def setup_failure(directory: Path, steps=None):
     (directory / "timing.json").write_text(json.dumps({
         "clock": "fixture", "step_ns": None, "wall_ns": None,
         "problems": ["timing-start.json is missing or unreadable: the test phase was never timed"]}))
+
+
+def lose(directory: Path, label: str):
+    """What a control step whose script never ran (a runner fault) leaves: its list, which an earlier step wrote, and
+    no probe, command, log or exit status; for the hang control also no heartbeat (record.py finish then writes none)."""
+    for suffix in (".probe.json", ".command", ".log", ".exit"):
+        (directory / f"{label}{suffix}").unlink(missing_ok=True)
+    if label == "shard-3":
+        rewrite_json(directory / "heartbeat.json", beats=[], beats_after_recheck=0)
 
 
 class TreeCase(unittest.TestCase):
@@ -780,6 +791,86 @@ class VerdictTests(TreeCase):
         self.assertFalse(result["controls"][OS]["unmeasurable"])
         self.assertEqual(self.verdict(result)["outcome"], "reject")
 
+    def test_any_unrecorded_control_step_outcome_alone_gives_no_verdict_not_reject(self):
+        # R3-3: an absent outcome is never evidence of failure. One, two or three of the four control step outcomes are
+        # unrecorded, no recorded one is wrong and every other expectation holds: the controls are unmeasurable.
+        # Previous head: unmeasurable only when all four were missing, so each of these rejected.
+        needs = json.loads(json.dumps(NEEDS))
+        needs["controls-check"]["result"] = "failure"  # the check job fails on the same evidence
+        for missing in (("control-3",), ("control-0", "control-2"), ("control-0", "control-1", "control-2")):
+            with self.subTest(missing=missing), tempfile.TemporaryDirectory() as tmp:
+                tree = Tree(Path(tmp)).full()
+                rewrite_json(tree.control_dir / "meta.json",
+                             steps={key: value for key, value in CONTROL_STEPS.items() if key not in missing})
+                result = tree.result(needs=needs)
+                verdict = result["verdicts"][OS]
+                self.assertTrue(result["controls"][OS]["unmeasurable"], result["controls"][OS]["problems"])
+                self.assertEqual((verdict["outcome"], verdict["selected_arm"]), ("no verdict", None), verdict["reasons"])
+                self.assertIn(f"records no outcome for {', '.join(missing)} ", verdict["reasons"][0])
+
+    def test_a_wrong_recorded_outcome_beside_an_unrecorded_one_rejects(self):
+        # R3-3: a recorded wrong outcome is evidence: control-1 recorded as success (a masked failure) beside an
+        # unrecorded control-3 still fails the controls.
+        self.tree.full()
+        steps = {key: value for key, value in CONTROL_STEPS.items() if key != "control-3"}
+        steps["control-1"] = {"outcome": "success", "conclusion": "success"}
+        rewrite_json(self.tree.control_dir / "meta.json", steps=steps)
+        result = self.tree.result()
+        self.assertFalse(result["controls"][OS]["unmeasurable"])
+        self.assertEqual((self.verdict(result)["outcome"], self.verdict(result)["reasons"]),
+                         ("reject", ["no sharded arm is eligible"]))
+
+    def test_a_control_step_lost_to_a_runner_fault_is_incomplete_not_reject(self):
+        # R3-4: after the foreground step succeeded, a control step left no probe, no log and no exit status: its
+        # script never ran (a runner fault inside the control group), so nothing shows how that control behaves, and
+        # its recorded outcome (failure, wrong for the passing control) is the fault's. The OS is incomplete. Previous
+        # head: the controls failed, both sharded arms became ineligible, and the OS got reject.
+        needs = json.loads(json.dumps(NEEDS))
+        needs["controls-check"]["result"] = "failure"
+        for index in range(len(compare.CONTROL_SHARDS)):
+            label = f"shard-{index}"
+            with self.subTest(label), tempfile.TemporaryDirectory() as tmp:
+                tree = Tree(Path(tmp)).full()
+                lose(tree.control_dir, label)
+                rewrite_json(tree.control_dir / "meta.json", steps={
+                    **CONTROL_STEPS, f"control-{index}": {"outcome": "failure", "conclusion": "failure"}})
+                result = tree.result(needs=needs)
+                self.assertIncomplete(result["verdicts"][OS], "a runner fault inside the control group), and no other "
+                                                              f"control evidence failed: {label}")
+                controls = result["controls"][OS]
+                self.assertEqual(controls["lost_steps"], [label])
+                self.assertTrue(controls["failed_only_through_lost_steps"], controls["problems"])
+                self.assertFalse(controls["passed"] or controls["unmeasurable"])
+                self.assertIn("INCOMPLETE (steps lost to a runner fault", compare.summary_markdown(result))
+
+    def test_a_lost_control_step_beside_an_unrecorded_outcome_is_incomplete(self):
+        # R3-4 before R3-3: a lost step makes the OS incomplete, which comes before the no verdict of unmeasurable
+        # controls; neither gap is evidence.
+        self.tree.full()
+        lose(self.tree.control_dir, "shard-2")
+        rewrite_json(self.tree.control_dir / "meta.json",
+                     steps={key: value for key, value in CONTROL_STEPS.items() if key not in ("control-0", "control-2")})
+        result = self.tree.result()
+        self.assertFalse(result["controls"][OS]["unmeasurable"])
+        self.assertIncomplete(self.verdict(result), "a runner fault inside the control group")
+
+    def test_a_lost_control_step_beside_wrong_recorded_evidence_rejects(self):
+        # R3-4: evidence that exists and shows wrong behaviour still fails the controls: control shard 2 is lost, and
+        # the failing control's exit status is 0 although its log says FAILED.
+        self.tree.full()
+        lose(self.tree.control_dir, "shard-2")
+        (self.tree.control_dir / "shard-1.exit").write_text("0\n")
+        result = self.tree.result()
+        self.assertEqual((self.verdict(result)["outcome"], self.verdict(result)["reasons"]),
+                         ("reject", ["no sharded arm is eligible"]))
+        self.assertEqual(result["controls"][OS]["lost_steps"], ["shard-2"])
+        self.assertFalse(result["controls"][OS]["failed_only_through_lost_steps"])
+        # The lost step's list comes from an earlier step, so a wrong one is evidence too.
+        (self.tree.control_dir / "shard-1.exit").write_text("1\n")
+        (self.tree.control_dir / "shard-2.txt").write_text("test_ctl_pass\n")
+        controls = self.tree.result()["controls"][OS]
+        self.assertFalse(controls["failed_only_through_lost_steps"], controls["problems"])
+
     def test_a_cancelled_control_job_status_is_incomplete_not_reject(self):
         # F6: the control run's own job status cancelled (for example after a job-level timeout that the needs context
         # reports as a failure). Previous head: only a failed control expectation, so reject.
@@ -854,8 +945,80 @@ class VerdictTests(TreeCase):
         result = self.tree.full().result()
         self.assertEqual(set(result["verdicts"]), set(make_shards.ARMS))
         other = result["verdicts"]["macos-15"]
-        self.assertEqual(other["outcome"], "no verdict")
+        self.assertEqual(other["outcome"], "not measured")
         self.assertIn("no run directory", other["reasons"][0])
+
+    def test_the_os_a_run_did_not_measure_is_not_measured_never_no_verdict(self):
+        # R3-9: a Linux-only result.json lists macOS as not measured, and a macOS-only one Linux, never as no verdict,
+        # which the deciding-run rule could have read as that OS's decision. Previous head: no verdict.
+        result = self.tree.full().result()
+        self.assertEqual(result["verdicts"]["macos-15"]["outcome"], "not measured")
+        self.assertIn("- **macos-15**: not measured (no run directory", compare.summary_markdown(result))
+        macos = compare.build_result(self.tree.results, self.tree.inventory, SHA, "macos-15", NEEDS,
+                                     weights=FIXTURE_WEIGHTS, compare_attempt="1")
+        self.assertEqual(macos["verdicts"]["ubuntu-24.04"]["outcome"], "not measured")
+        self.assertEqual(macos["verdicts"]["macos-15"]["outcome"], "incomplete", "its own OS, without runs")
+        unscoped = compare.build_result(self.tree.results, self.tree.inventory, SHA, None, NEEDS,
+                                        weights=FIXTURE_WEIGHTS, compare_attempt="1")
+        self.assertEqual((unscoped["verdicts"][OS]["outcome"], unscoped["verdicts"]["macos-15"]["outcome"]),
+                         ("adopt", "not measured"))
+
+    def test_an_inventory_file_absent_after_a_successful_inventory_job_is_incomplete(self):
+        # R3-2: the inventory job succeeded, so its gate wrote and uploaded every file; a file absent from the compare
+        # job's download is a partly downloaded artifact set (a runner fault). Previous head: no verdict, final under
+        # the deciding-run rule. A file that is present but inconsistent still gives no verdict (the test above).
+        for name in ("report.json", "inventory.txt", "module_ids.json", "shards/G4/shard-1.txt", "shards/G4T/tail.txt",
+                     None):
+            with self.subTest(name or "the whole artifact"), tempfile.TemporaryDirectory() as tmp:
+                tree = Tree(Path(tmp)).full()
+                if name is None:
+                    shutil.rmtree(tree.inventory)
+                    tree.inventory.mkdir()
+                else:
+                    (tree.inventory / name).unlink()
+                self.assertIncomplete(tree.result()["verdicts"][OS], "a partly downloaded artifact set (a runner fault)")
+        rewrite_json(self.tree.full().inventory / "report.json", ok=False)
+        self.assertEqual(self.verdict()["outcome"], "no verdict", "present but inconsistent")
+
+    def cli(self, out: Path, summary: Path, status: Path) -> int:
+        needs = self.tree.results.parent / "needs.json"
+        needs.write_text(json.dumps(NEEDS))
+        return compare.main(["verdict", "--results", str(self.tree.results), "--inventory", str(self.tree.inventory),
+                             "--expected-sha", SHA, "--run-attempt", "1", "--os", OS, "--needs", str(needs),
+                             "--out", str(out), "--summary-md", str(summary), "--checkout-status", str(status),
+                             "--skip-list-recompute"])
+
+    def test_a_failed_summary_or_status_write_leaves_no_result_json(self):
+        # R3-1: summary.md and checkout-status.json are written before result.json, so a failure in either leaves no
+        # result.json and no outcome line, and the run is incomplete; a failure after result.json exists is impossible
+        # by construction. Previous head: result.json came first and stayed beside the failure, decisive in a run that
+        # the protocol then called repeatable.
+        self.tree.full()
+        out = self.tree.results.parent
+        missing = out / "no-such-directory"
+        for label, summary, status in (("summary.md", missing / "summary.md", out / "checkout-status.json"),
+                                       ("checkout-status.json", out / "summary.md", missing / "checkout-status.json")):
+            with self.subTest(label):
+                with contextlib.redirect_stdout(io.StringIO()) as printed, self.assertRaises(OSError):
+                    self.cli(out / "result.json", summary, status)
+                self.assertFalse((out / "result.json").exists())
+                self.assertEqual(printed.getvalue(), "")
+
+    def test_result_json_appears_whole_and_before_the_outcome_lines(self):
+        # R3-1: result.json is renamed into place from a temporary file, which a failed rename removes; the outcome
+        # lines are printed only once result.json exists.
+        self.tree.full()
+        out = self.tree.results.parent
+        with mock.patch.object(compare.os, "replace", side_effect=OSError("no space left")), \
+                contextlib.redirect_stdout(io.StringIO()) as printed, self.assertRaises(OSError):
+            self.cli(out / "result.json", out / "summary.md", out / "checkout-status.json")
+        self.assertEqual([path.name for path in out.iterdir() if path.name.startswith("result.json")], [])
+        self.assertEqual(printed.getvalue(), "")
+        seen = []
+        with mock.patch("builtins.print", side_effect=lambda *args, **kwargs: seen.append((out / "result.json").exists())):
+            self.assertEqual(self.cli(out / "result.json", out / "summary.md", out / "checkout-status.json"), 0)
+        self.assertEqual(seen, [True] * len(compare.OSES))
+        self.assertEqual(json.loads((out / "result.json").read_text())["verdicts"][OS]["outcome"], "adopt")
 
     def test_the_cli_writes_the_three_outputs(self):
         self.tree.full()
@@ -1108,6 +1271,7 @@ class ControlTests(TreeCase):
             "the passing step failed on its own": steps(**{"control-0": "failure"}),
             "the step outcomes are unrecorded": lambda d: rewrite_json(d / "meta.json", steps={
                 "foreground": {"outcome": "success", "conclusion": "success"}}),
+            # R3-3: one outcome missing beside recorded ones is unmeasurable too (previous head: failed, reject).
             "one control step's outcome is unrecorded": lambda d: rewrite_json(d / "meta.json", steps={
                 key: value for key, value in CONTROL_STEPS.items() if key != "control-3"}),
             # F5: 16 s apart is beyond the 15 s spread.
@@ -1126,7 +1290,9 @@ class ControlTests(TreeCase):
                 report = compare.check_controls(tree.control_artifact, OS, "failure", SHA)
                 self.assertFalse(report["passed"], label)
                 self.assertTrue(report["started"], label)
-                self.assertEqual(report["unmeasurable"], label == "the step outcomes are unrecorded", label)
+                self.assertEqual(report["unmeasurable"], label in ("the step outcomes are unrecorded",
+                                                                   "one control step's outcome is unrecorded"), label)
+                self.assertEqual((report["lost_steps"], report["failed_only_through_lost_steps"]), ([], False), label)
 
     def probe(self, directory: Path, label: str, env=True, python=None, shift=0, drop=None):
         path = directory / f"{label}.probe.json"
@@ -1208,6 +1374,30 @@ class ControlTests(TreeCase):
         self.assertFalse(report["passed"])
         self.assertTrue(any("not attributable to the 1-minute limit" in problem for problem in report["problems"]),
                         report["problems"])
+
+    def test_the_checks_across_steps_judge_only_the_steps_that_ran(self):
+        # R3-4: a lost hang step leaves no heartbeat to judge and a lost failing step no deadline, and the start spread
+        # is taken over the steps that ran; what the steps that ran recorded is still judged.
+        for label in ("shard-3", "shard-1"):
+            with self.subTest(label), tempfile.TemporaryDirectory() as tmp:
+                tree = Tree(Path(tmp))
+                directory = tree.controls()
+                lose(directory, label)
+                report = compare.check_controls(tree.control_artifact, OS, "failure", SHA)
+                self.assertIsNotNone(report["start_spread_seconds"])
+                if label == "shard-1":
+                    self.assertIsNotNone(report["hang"]["stop_after_probe_seconds"])
+                    self.assertIsNone(report["hang"]["stop_deadline_after_probe_seconds"])
+                else:
+                    self.assertIsNone(report["hang"]["stop_after_probe_seconds"])
+                self.assertEqual(report["lost_steps"], [label])
+                self.assertTrue(report["failed_only_through_lost_steps"], report["problems"])
+                if label == "shard-3":
+                    continue
+                self.beats(directory, keep_until=40 * SECOND)  # the hang step stopped early: recorded wrong behaviour
+                report = compare.check_controls(tree.control_artifact, OS, "failure", SHA)
+                self.assertFalse(report["failed_only_through_lost_steps"])
+                self.assertTrue(any("before its 1-minute limit" in problem for problem in report["problems"]))
 
     def test_unrecorded_control_step_outcomes_alone_are_unmeasurable(self):
         # F4: only the four control steps' outcomes are missing; the foreground step's is recorded.
@@ -1429,6 +1619,30 @@ class WorkflowTests(unittest.TestCase):
                 self.assertIn("pattern: controls\n          path: ${{ runner.temp }}/results/controls\n", compare_job)
                 self.assertEqual(text.count("merge-multiple"), 1)
                 self.assertIn("pattern: inventory\n          merge-multiple: true\n", compare_job)
+
+
+def normalized(text: str) -> str:
+    """text with each line's leading whitespace and comment markers (#) removed and every run of whitespace one space."""
+    return " ".join(" ".join(re.sub(r"^\s*#*", "", line) for line in text.splitlines()).split())
+
+
+class ProtocolTextTests(unittest.TestCase):
+    """The protocol (compare.PROTOCOL) reads word for word the same wherever it is stated."""
+
+    def test_every_document_states_the_protocol_word_for_word(self):
+        # Three review rounds each found a document that stated a rule differently from the others.
+        record = json.loads((HERE / "experiment.json").read_text(encoding="utf-8"))
+        documents = {"README.md": (HERE / "README.md").read_text(encoding="utf-8"),
+                     "experiment.json quality_rule": record["predeclared_metrics"]["quality_rule"],
+                     DECISION_RECORD.name: DECISION_RECORD.read_text(encoding="utf-8")}
+        for path in WORKFLOWS.values():
+            documents[f"{path.name} header"] = path.read_text(encoding="utf-8").split("\non:\n", 1)[0]
+        self.assertEqual(len(compare.PROTOCOL), 7)
+        for name, text in documents.items():
+            text = normalized(text)
+            for sentence in compare.PROTOCOL:
+                with self.subTest(document=name, sentence=sentence[:48]):
+                    self.assertIn(sentence, text)
 
 
 if __name__ == "__main__":
