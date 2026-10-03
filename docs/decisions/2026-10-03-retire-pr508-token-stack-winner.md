@@ -217,12 +217,15 @@ Read [`docs/decisions/2026-09-30-task-model-routing.md`](../../docs/decisions/20
 written-at SHA: **:32–33, :64, :196–201, :213–216 and :311–314**. Its description of #508 as open was true on its date.
 The historical text stays unchanged.
 
-After #508 closes unmerged, the **#508-merges branch** of the overturn condition at **:213–216** can no longer fire.
+After #508 closes unmerged, the **#508-merges branch** of the overturn condition at **:213–216** is dormant, not void:
+it cannot fire while #508 stays closed, but #508's branch and head are kept and a closed pull request can be
+[reopened](https://docs.github.com/en/graphql/reference/pulls#mutation-reopenpullrequest), so a reopened #508 that
+merges with different membership rows would fire it and require the restatement it names.
 That paragraph also names independent Gate A and code-navigation-current-choice changes; closure does not erase those
-conditions. For adding ast-grep to the accepted profile, the surviving admission condition is **:217–218**, expanded
-at **:219–225**: reviewed pins on both platforms, a host receipt for each and the follow-up profile/check updates.
-No admission follows from this retirement. The head-blob link at **:311–314** stays reachable because #508's branch
-and head are kept.
+conditions. While #508 stays closed, the admission condition for adding ast-grep to the accepted profile is **:217–218**,
+expanded at **:219–225**: reviewed pins on both platforms, a host receipt for each and the follow-up profile/check
+updates. No admission follows from this retirement. The head-blob link at **:311–314** stays reachable because #508's
+branch and head are kept.
 
 ## 7. Not decided here
 
