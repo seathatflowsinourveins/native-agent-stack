@@ -1,0 +1,84 @@
+{
+ "schema_version": 1,
+ "id": "new-wsl-embedding-model-20261002",
+ "kind": "native_model_e2e",
+ "component_ids": ["huggingface-hub-native"],
+ "evidence_class": "Local integration check",
+ "recorded_at_utc": "2026-10-03T03:44:02Z",
+ "claim": "On one workstation (WSL2, RTX 4090 with 24 GB) in a throwaway Ubuntu 26.04.1 distribution on 2026-10-02 and 2026-10-03, with the generation model swift-iq3s-s2o-64k resident, the preregistered comparison for the new WSL's embedding model gave the slot to E1: qwen3-embedding:0.6b (Q8_0, Ollama library manifest ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d) on Ollama 0.35.0 as qwen3-embedding-8k (num_ctx 8192). On MTEB 2.22.1's CQADupstackUnixRetrieval (test split: 47,382 documents, 1,072 queries) its nDCG@10 was 0.49827 against 0.41394 for EmbeddingGemma on the same server: E1 minus E2 0.084331, 95% paired bootstrap interval over queries 0.067738 to 0.100656 (10,000 resamples, seed 20260927). Nemotron-3-Embed-1B, which needs a second model server, scored 0.5014; E3 minus E1 was 0.003124 with an interval of -0.012194 to 0.018141 that includes zero, so by the second-server rule it does not take the slot. WeMM-Embedding-2B passed the fit gate but ran out of GPU memory in its full run and is out. The reranking condition was not run.",
+ "slot": {
+  "manifest": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+  "slot_id": "embedding-model",
+  "measurement_id": "embedding-model",
+  "deciding_measurement_as_named": "Retrieval quality on one fixed public retrieval set through each model's served route, with the generation model resident; a model that needs a second model server must beat the best single-server model by an interval that excludes zero.",
+  "arms_as_named": "Qwen3-Embedding-0.6B through Ollama, EmbeddingGemma through Ollama and Nemotron-3-Embed-1B; WeMM-Embedding-2B was added by amendment 4 before any Part B run"
+ },
+ "preregistration": {
+  "path": "PREREGISTRATION-local-models.md",
+  "sha256": "454f879d03d61fa5a8e9f0d877e62cd94878abcd32f8f09b16ac9514492c3a0b",
+  "original_sha256": "d161feaacd6b3082b3adf37e80a368b58bd6f68205efd399102b8d84d0d0f78b",
+  "copy_notes": "COPY-NOTES.md",
+  "sections": ["Part B", "Amendment 4 (Part B freeze sheet)", "Amendment 4a (script review fixes and hashes)", "Window pb1 and deviation 4",
+               "Window pb2 and the result of Part B"]
+ },
+ "host": {
+  "scope": "one workstation, WSL2 (WSL 3.0.1.0), NVIDIA GeForce RTX 4090 with 24,564 MiB; a throwaway Ubuntu 26.04.1 distribution built from the merged recipe, not the destination distribution",
+  "condition": "condition N: the Windows applications held 4,407 MiB (pb1) and 4,046 MiB (pb2) after the workstation's services were stopped; the generation model was loaded first and checked after each run",
+  "windows_utc": ["2026-10-02T23:13:16Z to 23:47:28Z (pb1)", "2026-10-02T23:48:48Z to 23:59:51Z (pb2)", "2026-10-03T00:01:16Z to 00:01:28Z (decision statistic, on records alone)"]
+ },
+ "environment": "a separate virtual environment in the measurement distribution: MTEB 2.22.1 (tag commit 79857d39), sentence-transformers 6.1.0, transformers 5.18.0, torch 2.14.1 (CUDA 13.0), datasets 5.0.1, pytrec-eval-terrier 0.5.10, numpy 2.5.3; qwen-vl-utils 0.0.14 and accelerate 1.15.0 added before E4; build-essential (gcc 15.2.0) and torchvision 0.29.1 added in deviation 4",
+ "task": "CQADupstackUnixRetrieval, dataset mteb/cqadupstack-unix at revision 6c6430d3a6d36f8d2a829195bc5dc94d7e063e53, split test: 47,382 documents, 1,072 queries, 1,693 relevance judgements; no chunking, no reranker; batch size 16",
+ "arms": {
+  "E1": {"system": "qwen3-embedding:0.6b on Ollama 0.35.0 as qwen3-embedding-8k (FROM qwen3-embedding:0.6b, PARAMETER num_ctx 8192), through MTEB's OpenAIAPIEncodeWrapper against /v1/embeddings with MTEB's Qwen3-Embedding instruction before queries and nothing before documents",
+         "run": "completed in window pb1, 1,166 s of evaluation; resident 2,857,191,341 bytes, entirely on the GPU beside the generation model", "ndcg_at_10": 0.49827, "per_query_mean": 0.4982736, "gate_c": "passes"},
+  "E2": {"system": "embeddinggemma (:latest = :300m, manifest 85462619ee721b466c5927d109d4cb765861907d5417b9109caebc4e614679f1, BF16, its own num_ctx 2048) on the same server with EmbeddingGemma's query and document prompts",
+         "run": "completed in window pb1, 771 s of evaluation; resident 681,417,113 bytes", "ndcg_at_10": 0.41394, "per_query_mean": 0.4139431, "gate_c": "passes"},
+  "E3": {"system": "nvidia/Nemotron-3-Embed-1B-BF16 at MTEB's registered revision f880174635613cff04033875fc6a69296cb72006 (model.safetensors sha256 f959c3b04e66b42de280bfb97c140cb7e0bfe25e3ecb0b4464c68a8436b2d04f), in the evaluation process: a second model server",
+         "gate_f": "pb1: exit 2, a setup error (triton found no C compiler), not a fit result; pb2: exit 0, parameters on CUDA, torch peak 9,160,205,824 bytes, the generation model listed entirely on the GPU afterwards",
+         "run": "completed in window pb2, 460 s of evaluation, torch peak 10,616,148,992 bytes", "ndcg_at_10": 0.5014, "per_query_mean": 0.5013977, "gate_c": "passes"},
+  "E4": {"system": "tencent/WeMM-Embedding-2B at MTEB's registered revision df8094e5caf29083d9cac28e96fad6cfbe3ee57f (model.safetensors sha256 e1a1ad752808c26965aa97d37bf4a9bca71d838513f41e83790cb1e71cac6e59), in the evaluation process: a second model server",
+         "gate_f": "pb1: exit 2, a setup error (torchvision missing), not a fit result; pb2: exit 0, torch peak 13,006,749,184 bytes",
+         "run": "out of memory in the full run after 47.5 s, torch peak 15,978,033,152 bytes, no predictions: recorded as does not fit beside the generation model (amendment 4a, item 8)"}
+ },
+ "decision_statistic": [
+  {"challenger": "E1-pb1", "baseline": "E2-pb1", "queries": 1072, "mean_challenger": 0.498274, "mean_baseline": 0.413943, "difference": 0.084331,
+   "interval_95": [0.067738, 0.100656], "resamples": 10000, "seed": 20260927, "tie": false, "above_zero": true, "reading": "not a tie: E1 is the single-server winner"},
+  {"challenger": "E3-pb2", "baseline": "E1-pb1", "queries": 1072, "mean_challenger": 0.501398, "mean_baseline": 0.498274, "difference": 0.003124,
+   "interval_95": [-0.012194, 0.018141], "resamples": 10000, "seed": 20260927, "tie": true, "above_zero": false, "reading": "the interval includes zero: E3 does not take the slot"},
+  {"challenger": "E3-pb2", "baseline": "E2-pb1", "queries": 1072, "mean_challenger": 0.501398, "mean_baseline": 0.413943, "difference": 0.087455,
+   "interval_95": [0.072733, 0.102348], "resamples": 10000, "seed": 20260927, "tie": false, "above_zero": true, "reading": "recorded, not deciding"}
+ ],
+ "decision": "By the rule fixed before any run the higher nDCG@10 of the two single-server arms takes the slot (E1, not a tie), and a second-server arm takes it only with an interval entirely above zero against that winner (E3: no; E4: out of memory). The embedding slot goes to E1, so both local-model slots are served by the one model server.",
+ "reproduction": "rerun on 2026-10-03 from the published copies alone, in part-b/runs: python3 -B ../../scripts/partb/partb_bootstrap.py --challenger <run> --baseline <run> for the three comparisons printed the three lines of part-b/bootstrap.txt unchanged",
+ "measured_ollama_digests": {
+  "meaning": "manifest digests the measurement recorded; the library digest is the install plan's pin, the derived digest is for comparison only",
+  "qwen3-embedding:0.6b": "ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d",
+  "qwen3-embedding-8k:latest": "e3c32ffa36019b43b729c6da039b463bd28890b14135e76013bb0c1255766d83",
+  "library_model_layer": "sha256:06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439 (639,150,592 bytes)",
+  "registry_check": "registry.ollama.ai served the manifest of qwen3-embedding:0.6b with this sha256 on 2026-10-03"
+ },
+ "deviations": [
+  "Deviation 4: both gate F errors in window pb1 were setup errors (exit 2), not fit results; the window script printed 'out: gate F failed' for both, which contradicted amendment 4a item 7, and was corrected; exactly the two packages the errors named were added (build-essential for triton, torchvision for torch 2.14.1) and E3 and E4 ran gate F and their runs in window pb2 under the same rules; E1 and E2 were not rerun."
+ ],
+ "limitations": [
+  "One public retrieval task (CQADupstack Unix: English technical questions from a StackExchange forum), one workstation, one throwaway distribution, one run per arm: a local integration check, not an acceptance on the destination distribution.",
+  "Nemotron's tie holds for this task only; multilingual retrieval, longer documents and other domains were not measured.",
+  "The two Ollama arms are GGUF conversions served by the one model server; a difference from the reference weights is a difference of the systems, not of the models alone.",
+  "E1's and E2's prompts are MTEB's reference prompts as observed with a stub before the runs (amendment 4a): E1 sends the Qwen3 instruction before queries and nothing before documents; E2 sends EmbeddingGemma's query and document prompts.",
+  "Gate F reads the model server's listing: in window pb2 the card's memory in use fell between steps while the server kept listing the generation model entirely on the GPU, consistent with the Windows driver moving part of it off the card, so E3 passing gate F does not show co-residency. In window pb1 the readings matched the resident models, so E1's co-residency with the generation model is supported by both readings.",
+  "E4's first error text was lost: after its evaluation failed out of memory, the script's memory query raised the same sticky CUDA error and the outer handler replaced the text; the outcome is not in doubt, because only the evaluation's handler sets out_of_memory.",
+  "The reranking condition was not run: no installed retrieval owner can call an external reranker (QMD reranks in-process with its bundled model), and zerank-2 (7.49 GiB of weights) cannot be resident beside the generation model on this card.",
+  "Recorded, not deciding: evaluation time E1 1,166 s, E2 771 s, E3 460 s (E3 in-process, not comparable with the Ollama arms); resident sizes E1 2,857,191,341 bytes and E2 681,417,113 bytes.",
+  "manifests/stack.json has no Ollama or MTEB component; component_ids name huggingface-hub-native, the native route for the revision-pinned snapshots of E3 and E4, which the measurement downloaded through the huggingface_hub library at MTEB's registered revisions (its version is in the throwaway's freeze list, which was not retained).",
+  "The 31 MB prediction files and the run records stay private and are listed by sha256 in files.json; the published per-query nDCG@10 files reproduce the decision statistic.",
+  "With a server-wide context of 64,000 the embedder loaded at its full context and took 5.78 GB (Part A, A1b); the measured system sets the context per model (qwen3-embedding-8k, 8,192 tokens), never server-wide."
+ ],
+ "files": {
+  "files.json": "19ae0f1dfb8ed34056d1261ae9766ba4e41f4221f709945e7f1f68e6888a9872",
+  "PREREGISTRATION-local-models.md": "454f879d03d61fa5a8e9f0d877e62cd94878abcd32f8f09b16ac9514492c3a0b",
+  "part-b/bootstrap.txt": "3715a13234ad46aa150dcebdfd1930c638998e73cd31c5319f473a5b09bf1302",
+  "part-b/runs/E1-pb1/per-query.jsonl": "5229f9066eff87aa29d6213c70e997ae41cc0201e27049e75748f402c1bccbde",
+  "part-b/runs/E2-pb1/per-query.jsonl": "550981cc7c8e28968eaa2d4310c0f4fd2fde2468eaf8474af9d9c35baba645f5",
+  "part-b/runs/E3-pb2/per-query.jsonl": "4a56af7a7454728da8fb6a3b98c4a3b1a43deef2961ca9c839036d4434261505"
+ }
+}
