@@ -4030,8 +4030,8 @@
     },
     {
       "path": ".github/workflows/security-scan.yml",
-      "sha256": "b7f1ba386dde30312b11713b41009a5fe75a9d52fd10a4b8db294eb24d207241",
-      "bytes": 13965
+      "sha256": "76219f352b6eee1e498e7bcea91daaffc52a235ebf908e53fbf1e2e75e6a607a",
+      "bytes": 14553
     },
     {
       "path": ".github/workflows/supply-chain.yml",
@@ -46578,6 +46578,16 @@
       "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/integrated-osv-tests.stdout.txt",
       "bytes": 0,
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/macos-portability-correction.md",
+      "sha256": "a5e818c83f779137dec59e0dc1d5d2742552742055de770519e554d15ce68f02",
+      "bytes": 5617
+    },
+    {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/macos-portability-integration.stdout.txt",
+      "sha256": "c6a0fc5f9311456adab5889d9dec5921c006fea6533071a90d1f7c4d33d20619",
+      "bytes": 276
     },
     {
       "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/npm-ci-ignore.native-command.txt",
