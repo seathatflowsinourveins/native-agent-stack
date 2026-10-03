@@ -7788,6 +7788,66 @@
       "bytes": 16076
     },
     {
+      "path": "blueprints/memory-layer-s3/PREREGISTRATION.md",
+      "sha256": "bfc392c8e6d7225a29a0f4e883b92af2af82b8f5b18c5f71891f3cc6555c62a3",
+      "bytes": 120965
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/r6/eval-frameworks-report.md",
+      "sha256": "c5f25772de014b945a20b02c2e4b464d34c59f90e9f09060500600ebff0c7f55",
+      "bytes": 17143
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/r6/gateway-ab-designs.md",
+      "sha256": "d38e9973eda2ae1c84fb2f635959a2068a4358267bb4df51586460959a0ee73b",
+      "bytes": 9207
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/r6/memory-merit-synth.md",
+      "sha256": "89da63f6197d03384e7b716270cb04130d4b3f534dc2a88a247791d05824688f",
+      "bytes": 21124
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/r6/r6-claude-review.md",
+      "sha256": "aac90a9b092c7a1ea38cb42c455bd00768cabc7a8696b6035001c458924a4824",
+      "bytes": 16488
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/r6/s3-r6-inputs.md",
+      "sha256": "22389274ad57b42b4ad365a9495ab630331cc2ba4e7f76cfe9a10c3d52901e31",
+      "bytes": 5018
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/sweep-20260927-mac/README.md",
+      "sha256": "f483ab23aaf9f2d0c414364895b6e6e7dcd5a08f863ad708baf25567d4d39be6",
+      "bytes": 3433
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/sweep-20260927-mac/embed.md",
+      "sha256": "a50bed303d79b3f35bb92e4a18a6f8270f8728ee1b006f83c08c332768b4014d",
+      "bytes": 22181
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/sweep-20260927-mac/gen.md",
+      "sha256": "bbb5c6a881305868ff3e2e40dc62f87fd3083f1fb2ee12281a61f905470ba44c",
+      "bytes": 20470
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/sweep-20260927-mac/memllm.md",
+      "sha256": "dfcee43461c567b3eaf467720bd1af2344aaa027bbdeecbfc2d81aaafdc9bfeb",
+      "bytes": 28704
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/sweep-20260927-mac/memsys.md",
+      "sha256": "556eb2c0e26cc35835ea615a0c251edc11eb80c7f12d7f6b5ce81f5e239157de",
+      "bytes": 19813
+    },
+    {
+      "path": "blueprints/memory-layer-s3/inputs/sweep-20260927-mac/rerank.md",
+      "sha256": "943368b875af6a09ddd4712da61c6cd6133835c0aa6c65522d23139d0970efd1",
+      "bytes": 23880
+    },
+    {
       "path": "blueprints/memory-lifecycle-probe/README.md",
       "sha256": "c50ba6b05cba66095a357f1185429761b251462b9b91d1d23a51532b317bc042",
       "bytes": 9126
@@ -8861,6 +8921,11 @@
       "path": "blueprints/memory-stack/longmemeval/.gitignore",
       "sha256": "cf45ee658753072c0e197c98fc851f610e278ab01ed5dfb61b73e2e5854eb6ae",
       "bytes": 85
+    },
+    {
+      "path": "blueprints/memory-stack/longmemeval/A17-SUPERSESSION.md",
+      "sha256": "377ab0d329aa8629824cde33ec9ab7b8ffed4cbb98f588e20c5103229ce14518",
+      "bytes": 3185
     },
     {
       "path": "blueprints/memory-stack/longmemeval/PREREGISTRATION.md",
