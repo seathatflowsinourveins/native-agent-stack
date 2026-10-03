@@ -1,0 +1,734 @@
+{
+  "schema_version": 1,
+  "component": "codex-sdk",
+  "sdk_release": "0.160.0",
+  "date": "2026-10-03",
+  "source_pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+  "repository_base": "65a0d370ed8c075d922ff60857287e33d3a14788",
+  "evidence_kind": "instrumented diagnostic of one unchanged first-party local mock fixture",
+  "status": "native fixture remains failed; bounded diagnosis completed; cause unknown",
+  "acceptance": {
+    "unchanged_native_fixture_pass": false,
+    "instrumented_diagnostic": true,
+    "independent_localhost_control": true,
+    "external_provider_execution": false,
+    "live_role_acceptance": false,
+    "actual_provider_model_effort": null,
+    "quality": null,
+    "token_savings": null,
+    "authoritative_usage": null,
+    "complete_native_cache_counts": null,
+    "namespace_helper_full_suite_acceptance": false,
+    "reason": "Node probe overhead and the separate 10000 ms observer deadline can alter timing. All seven probes hit; the original Jest 5000 ms fixture timeout remained unchanged and still failed. Observed child/request/events do not prove the cause or any repair."
+  },
+  "decision_boundary": {
+    "required_review": "Astra/max consequential source judgment",
+    "trigger": "First-party positive mock fixtures still fail after one bounded source-supported companion staging repair; causal explanation remained unproven.",
+    "prior_astra_result": "HOLD further adaptive repairs; diagnosis only.",
+    "permitted_observer_scope": "One instrumented unchanged positive fixture, auth-excluding namespace, primitive metadata, original Jest timeout, no debug environment or source changes.",
+    "adaptive_repairs_in_this_diagnostic": 0,
+    "additional_tests_after_this_diagnostic": 0,
+    "next_state": "STOP; native role canary and further repair remain held for coordinator/Astra judgment."
+  },
+  "installed_helpers": {
+    "node": {
+      "version": "24.21.0",
+      "bytes": 126595440,
+      "sha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+      "inspect_help_native_exit": 0,
+      "source_pin": "955266bfdd854cd280dffd47548673914484e4c0"
+    },
+    "jest": {
+      "version": "29.7.0",
+      "package_bytes": 1472,
+      "package_sha256": "679fd6f49e8dcb1fd82b7d610c5d555b70204ad2e5e5092e284e9bc10eb9f353",
+      "entry_bytes": 324,
+      "entry_sha256": "2a9b435eab8a343bd09fe285b2e2043ff9ff89fae4e1d1f46ba3df28659d8a2c",
+      "native_entry": "/state/codex-source/node_modules/jest/bin/jest.js"
+    },
+    "bwrap": {
+      "version": "0.12.0",
+      "bytes": 194848,
+      "sha256": "75d6e611c1d41cf3a183a54085d4e83342901b91d058dd2c655692ff13207216",
+      "source_pin": "2a76602a8c71f36c1527cf9fc3417d9149822e0c",
+      "scope": "Previously source-qualified private transient helper; not a component adoption or full upstream-suite acceptance."
+    },
+    "codex": {
+      "version": "0.160.0",
+      "bytes": 289101384,
+      "sha256": "12eb3e81114588aca3b7998f4f19e8997b056aca08e57a7ca7c8a3ec8c652aad",
+      "scope": "Reused exact private native binary identity and version/help receipt, no provider call."
+    },
+    "codex_code_mode_host": {
+      "bytes": 74072976,
+      "sha256": "37cab1584302611e9936902219640ab5e7a79fcfccd2504c6e85ea8cb97d0e10",
+      "scope": "Previously staged official same-release read-only sibling; not added or changed during this diagnostic."
+    },
+    "ss": {
+      "version": "iproute2-6.1.0",
+      "version_native_exit": 0,
+      "help_native_exit": 0,
+      "scope": "Numeric/listener/process query ran only inside the new PID/network namespace; no host process scan."
+    },
+    "python": {
+      "version": "3.12.3",
+      "version_native_exit": 0,
+      "http_server_help_native_exit": 0,
+      "scope": "Installed public standard-library native CLI, with -I -S; no site/user/dotenv import."
+    },
+    "curl": {
+      "version": "8.5.0",
+      "version_native_exit": 0,
+      "scope": "--disable first suppresses curlrc; cleared environment plus --noproxy '*' and numeric loopback URL."
+    }
+  },
+  "namespace": {
+    "boundary": "Same previously qualified private bwrap carrier; no namespace permissions weakened.",
+    "flags": [
+      "--unshare-all",
+      "--die-with-parent",
+      "--new-session",
+      "--clearenv"
+    ],
+    "shared_network": false,
+    "host_home_mounts": [],
+    "host_auth_config_mounts": [],
+    "inherited_environment": false,
+    "externally_set_HOME": false,
+    "externally_set_CODEX_HOME": false,
+    "fixture_internal_CODEX_HOME": "Unchanged upstream setupCodexHome.ts creates/restores/removes temporary fixture-local state; no host state exposed.",
+    "fresh_namespace_directories": [
+      "<fresh-fixture-home>",
+      "/tmp",
+      "/var/tmp",
+      "/work",
+      "/etc"
+    ],
+    "synthetic_user_group_carrier": {
+      "uid": 1000,
+      "gid": 1000,
+      "upstream_pattern": "containers/bubblewrap demos/bubblewrap-shell.sh --file FD11/FD12",
+      "host_account_files_read_or_copied": false,
+      "artifacts": [
+        {
+          "file": "ns-passwd.stub",
+          "bytes": 144,
+          "sha256": "10a05165fa905b3a60e0ea22f6deeb402eca40af4df163fec92ad1d8509f71c5"
+        },
+        {
+          "file": "ns-group.stub",
+          "bytes": 35,
+          "sha256": "db94e93d8845a7eb7ee33b806fa88986ced0a23527ef2b3623c3ae97ae38da06"
+        }
+      ]
+    },
+    "readonly_public_mounts": [
+      "/usr/bin",
+      "/usr/lib/x86_64-linux-gnu",
+      "/usr/lib/git-core",
+      "/lib64/ld-linux-x86-64.so.2",
+      "<public-node-prefix>"
+    ],
+    "fixture_mounts": [
+      "<owned-sdk-mock-state> to /state",
+      "<owned-codex-binary> to /native/codex",
+      "<owned-official-companion> to /native/codex-code-mode-host"
+    ],
+    "local_control_extra_readonly_mount": "Public /usr/lib/python3.12 only, for the independent native Python CLI.",
+    "model_requests_to_external_provider": 0,
+    "active_gateway_requests": 0,
+    "active_client_settings_or_auth_read_or_copied": false,
+    "source_tracked_status_after_diagnostic": {
+      "native_exit": 0,
+      "actual_stdout": ""
+    }
+  },
+  "independent_loopback_control": {
+    "scope": "Native local-only HTTP readiness control, separate from SDK fixture and from acceptance.",
+    "native_server_argv": [
+      "/usr/bin/python3",
+      "-I",
+      "-S",
+      "-u",
+      "-m",
+      "http.server",
+      "--bind",
+      "127.0.0.1",
+      "--directory",
+      "/work",
+      "32178"
+    ],
+    "native_listener_argv": [
+      "/usr/bin/ss",
+      "-H",
+      "-4",
+      "-n",
+      "-t",
+      "-l",
+      "-p",
+      "sport = :32178"
+    ],
+    "native_client_argv": [
+      "/usr/bin/curl",
+      "--disable",
+      "--noproxy",
+      "*",
+      "--connect-timeout",
+      "1",
+      "--max-time",
+      "2",
+      "--head",
+      "--fail",
+      "--silent",
+      "--show-error",
+      "http://127.0.0.1:32178/"
+    ],
+    "original_tool_return": {
+      "chunk_id": "4d49dd",
+      "exit_code": 0,
+      "wall_time_seconds": 0.102210358,
+      "output": "LISTEN 0      5      127.0.0.1:32178 0.0.0.0:* users:((\"python3\",pid=3,fd=3))\nss_native_exit=0\nHTTP/1.0 200 OK\r\nServer: SimpleHTTP/0.6 Python/3.12.3\r\nDate: Sat, 03 Oct 2026 10:10:10 GMT\r\nContent-type: text/html; charset=utf-8\r\nContent-Length: 187\r\n\r\ncurl_native_exit=0\nserver_cleanup_native_exit=143\nTerminated\n"
+    },
+    "native_listener_exit": 0,
+    "native_http_client_exit": 0,
+    "native_owned_server_cleanup_exit": 143,
+    "cleanup_scope": "Deliberate TERM and wait of this control's owned server; native143 is retained as cleanup signal, not a failed SDK fixture.",
+    "proves": "An actual native HTTP HEAD succeeded against an owned server in the protected fresh network namespace.",
+    "does_not_prove": "SDK child startup, its connection, parsed proxy registration, roles, provider routes or real model counters.",
+    "artifacts": [
+      {
+        "locator": "<private-sdk-mock-state>/logs/loopback-control-server.stdout.txt",
+        "bytes": 67,
+        "sha256": "e80e32f941d0504ba093f4e2983707c3178ff016852db703d0a48d442f4bc934",
+        "actual_stdout_or_stderr": "Serving HTTP on 127.0.0.1 port 32178 (http://127.0.0.1:32178/) ...\n"
+      },
+      {
+        "locator": "<private-sdk-mock-state>/logs/loopback-control-server.stderr.txt",
+        "bytes": 61,
+        "sha256": "a22a985978198cff7861216d4e3016bd0b51b57bc0ac624d6affa77be53b2d8f",
+        "actual_stdout_or_stderr": "127.0.0.1 - - [03/Oct/2026 10:10:10] \"HEAD / HTTP/1.1\" 200 -\n"
+      }
+    ]
+  },
+  "instrumented_fixture_diagnostic": {
+    "upstream_fixture": "sdk/typescript/tests/run.test.ts::Codex returns thread events",
+    "selected_unchanged_node_name": "Codex returns thread events",
+    "original_jest_timeout_ms": 5000,
+    "observer_deadline_ms": 10000,
+    "timeout_scope": "Observer wall-clock cap only; no Jest timeout setting, fixture edit, detach/max-hit or debug environment.",
+    "first_party_launch_reference": "https://jestjs.io/docs/29.7/troubleshooting",
+    "native_observer_argv": [
+      "/node/bin/node",
+      "inspect",
+      "--probe",
+      "node:internal/child_process:530",
+      "--expr",
+      "JSON.stringify({pid:self.pid,stdin:!!self.stdin,stdout:!!self.stdout,stderr:!!self.stderr,stdoutFd:self.stdout?._handle?.fd??null,stderrFd:self.stderr?._handle?.fd??null})",
+      "--probe",
+      "node:internal/child_process:272",
+      "--expr",
+      "JSON.stringify({pid:this.pid,exitCode,signalCode})",
+      "--probe",
+      "node:net:2423",
+      "--expr",
+      "JSON.stringify({listening:self.listening,loopback:self.address()?.address===\"127.0.0.1\",port:self.address()?.port??null})",
+      "--probe",
+      "node:_http_server:1168",
+      "--expr",
+      "JSON.stringify({post:req.method===\"POST\",responsesPath:req.url===\"/responses\",remoteLoopback:socket.remoteAddress===\"127.0.0.1\"})",
+      "--probe",
+      "node:_http_server:1293",
+      "--expr",
+      "req.method===\"POST\"&&req.url===\"/responses\"",
+      "--probe",
+      "node:internal/readline/interface:468",
+      "--expr",
+      "(()=>{try{return JSON.parse(line).type??\"no-event-type\"}catch{return \"non-json\"}})()",
+      "--probe",
+      "node:internal/streams/readable:558",
+      "--expr",
+      "JSON.stringify({fd:stream._handle?.fd??null,bytes:chunk.length})",
+      "--cond",
+      "stream._handle?.fd!==undefined",
+      "--json",
+      "--timeout=10000",
+      "--",
+      "/state/codex-source/node_modules/jest/bin/jest.js",
+      "--runInBand",
+      "--runTestsByPath",
+      "tests/run.test.ts",
+      "--testNamePattern=^Codex returns thread events$",
+      "--json",
+      "--outputFile=/state/logs/diagnostic-positive-jest-native.json"
+    ],
+    "native_cwd": "/state/codex-source/sdk/typescript",
+    "original_tool_return": {
+      "chunk_id": "2626d2",
+      "exit_code": 0,
+      "wall_time_seconds": 8.740795933,
+      "output": ""
+    },
+    "observer_exit_is_fixture_exit": false,
+    "native_probe_report_version": 2,
+    "probe_hit_counts": [
+      1,
+      2,
+      1,
+      1,
+      1,
+      4,
+      6
+    ],
+    "missed_probe_indices": [],
+    "expression_errors": [],
+    "observer_timeout": false,
+    "native_target_terminal": {
+      "event": "error",
+      "code": "probe_target_exit",
+      "exitCode": 1,
+      "pending": [],
+      "attribution": "Actual first-party Node probe terminal error.exitCode; target is Jest, separate from observer original tool exit0."
+    },
+    "native_jest_result": {
+      "numFailedTests": 1,
+      "numPassedTests": 0,
+      "numPendingTests": 22,
+      "numTotalTests": 23,
+      "success": false,
+      "assertion_duration_ms": 5009,
+      "actual_failure_messages": [
+        "Error: thrown: \"Exceeded timeout of 5000 ms for a test.\nAdd a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout.\"\n    at /state/codex-source/sdk/typescript/tests/run.test.ts:20:5\n    at _dispatchDescribe (/state/codex-source/node_modules/jest-circus/build/index.js:91:26)\n    at describe (/state/codex-source/node_modules/jest-circus/build/index.js:55:5)\n    at Object.<anonymous> (/state/codex-source/sdk/typescript/tests/run.test.ts:19:9)\n    at Runtime._execModule (/state/codex-source/node_modules/jest-runtime/build/index.js:1439:24)\n    at Runtime._loadModule (/state/codex-source/node_modules/jest-runtime/build/index.js:1022:12)\n    at Runtime.requireModule (/state/codex-source/node_modules/jest-runtime/build/index.js:882:12)\n    at jestAdapter (/state/codex-source/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:77:13)\n    at runTestInternal (/state/codex-source/node_modules/jest-runner/build/runTest.js:367:16)\n    at runTest (/state/codex-source/node_modules/jest-runner/build/runTest.js:444:34)"
+      ]
+    },
+    "event_times": {
+      "relative_event_times_ms": null,
+      "absolute_event_times": null,
+      "reason": "The actual native probe report contains ordered hits and source locations, without event timestamps. No times reconstructed from order, durations or file metadata."
+    },
+    "observed_logical_fields": {
+      "listener": {
+        "listening": true,
+        "loopback": true,
+        "port": 36349
+      },
+      "codex_child": {
+        "pid": 23,
+        "stdin": true,
+        "stdout": true,
+        "stderr": true,
+        "stdout_fd": 32,
+        "stderr_fd": 34
+      },
+      "stdout_types": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "turn.completed"
+      ],
+      "http_parser": {
+        "post": true,
+        "responsesPath": true,
+        "remoteLoopback": true
+      },
+      "http_request_dispatch": true,
+      "codex_child_termination": {
+        "pid": 23,
+        "exitCode": 0,
+        "signalCode": ""
+      },
+      "child_stderr": {
+        "bytes": 218,
+        "chunks": 2,
+        "matched_fd": 34,
+        "semantic_categories": null
+      },
+      "proxy_parsed_registration_count": null,
+      "provider_model_effort": null,
+      "actual_usage": null,
+      "unclassified_auxiliary_child": {
+        "pid": null,
+        "exitCode": -2,
+        "observed_before_fixture_spawn": true,
+        "attributed_to_codex": false
+      }
+    },
+    "capture_limits": [
+      "Node built-in breakpoints were source-bound and all hit. Source TypeScript offsets were not treated as emitted executable bindings.",
+      "HTTP parser/dispatch booleans are observed; the proxy's requests.push count and semantic stderr text are not.",
+      "Primitive observer expressions excluded child argv/env, HTTP headers/body, prompt text and raw stderr content.",
+      "The probe's own stderr was empty; target terminal stderr contains first-party Jest diagnostics and remains in the complete protected private native report.",
+      "Child exit0, synthetic turn.completed and observer exit0 do not establish fixture acceptance, root cause, a repair, role quality or provider metrics."
+    ],
+    "protected_original_artifacts": [
+      {
+        "locator": "<private-sdk-mock-state>/logs/diagnostic-positive-probe-native.stdout.json",
+        "bytes": 6744,
+        "sha256": "c6cd86a938b087a6b9c5f452bc5867d7c42ab2a70f9dfe0267c729766cb859f0",
+        "scope": "Complete actual native v2 report; source-sanitized primitive probes, private fixture diagnostics."
+      },
+      {
+        "locator": "<private-sdk-mock-state>/logs/diagnostic-positive-probe-native.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "locator": "<private-sdk-mock-state>/logs/diagnostic-positive-jest-native.json",
+        "bytes": 9442,
+        "sha256": "9bcdab7d81bd96d861c30403c5aa3f57f6559161628dad038dcabd841de2ab48",
+        "scope": "Complete actual native Jest JSON, one failed positive plus22 name-filtered skips."
+      }
+    ]
+  },
+  "sources": [
+    {
+      "repository": "nodejs/node",
+      "pin": "955266bfdd854cd280dffd47548673914484e4c0",
+      "file": "doc/api/debugger.md",
+      "bytes": 23168,
+      "sha256": "7491a33d903cbd502687fa9e2eb4ee64f056365625d4f9c9721254b407220753",
+      "native_original_fetch_exit": 0,
+      "url": "https://github.com/nodejs/node/blob/955266bfdd854cd280dffd47548673914484e4c0/doc/api/debugger.md"
+    },
+    {
+      "repository": "nodejs/node",
+      "pin": "955266bfdd854cd280dffd47548673914484e4c0",
+      "file": "lib/internal/debugger/inspect.js",
+      "bytes": 9875,
+      "sha256": "ec378a59d544640d9e649d33127019ed1e51173c129459358b4cbb90f920e3e9",
+      "native_original_fetch_exit": 0,
+      "url": "https://github.com/nodejs/node/blob/955266bfdd854cd280dffd47548673914484e4c0/lib/internal/debugger/inspect.js"
+    },
+    {
+      "repository": "nodejs/node",
+      "pin": "955266bfdd854cd280dffd47548673914484e4c0",
+      "file": "lib/internal/debugger/inspect_probe.js",
+      "bytes": 40385,
+      "sha256": "a87f17a8fb7e50d3b0a029b4ef46e0b9fd2fd41b933bef88f63f62461750b128",
+      "native_original_fetch_exit": 0,
+      "url": "https://github.com/nodejs/node/blob/955266bfdd854cd280dffd47548673914484e4c0/lib/internal/debugger/inspect_probe.js"
+    },
+    {
+      "repository": "nodejs/node",
+      "pin": "955266bfdd854cd280dffd47548673914484e4c0",
+      "file": "lib/internal/child_process.js",
+      "bytes": 32777,
+      "sha256": "ace05809adf0d02482984f6b9fb8418b3c788df2d8fb8fec3527bfcfd7465d2f",
+      "native_original_fetch_exit": 0,
+      "url": "https://github.com/nodejs/node/blob/955266bfdd854cd280dffd47548673914484e4c0/lib/internal/child_process.js"
+    },
+    {
+      "repository": "nodejs/node",
+      "pin": "955266bfdd854cd280dffd47548673914484e4c0",
+      "file": "lib/net.js",
+      "bytes": 86162,
+      "sha256": "b4bc6d76e255c67673a3bdf4676e0816e1f13906e4a46a6bdcc07dd614329ffa",
+      "native_original_fetch_exit": 0,
+      "url": "https://github.com/nodejs/node/blob/955266bfdd854cd280dffd47548673914484e4c0/lib/net.js"
+    },
+    {
+      "repository": "nodejs/node",
+      "pin": "955266bfdd854cd280dffd47548673914484e4c0",
+      "file": "lib/_http_server.js",
+      "bytes": 43902,
+      "sha256": "cd81e1020a8f2b3f6731b2db28648d889ec99db4fbff45ed608821bcc4209be9",
+      "native_original_fetch_exit": 0,
+      "url": "https://github.com/nodejs/node/blob/955266bfdd854cd280dffd47548673914484e4c0/lib/_http_server.js"
+    },
+    {
+      "repository": "nodejs/node",
+      "pin": "955266bfdd854cd280dffd47548673914484e4c0",
+      "file": "lib/internal/readline/interface.js",
+      "bytes": 47413,
+      "sha256": "f44550c930d874922437a194116987f36cb541eed1dc074c8b851728c75d2549",
+      "native_original_fetch_exit": 0,
+      "url": "https://github.com/nodejs/node/blob/955266bfdd854cd280dffd47548673914484e4c0/lib/internal/readline/interface.js"
+    },
+    {
+      "repository": "nodejs/node",
+      "pin": "955266bfdd854cd280dffd47548673914484e4c0",
+      "file": "lib/internal/streams/readable.js",
+      "bytes": 54872,
+      "sha256": "554afb7d2d72d87aadc2dcddab103d81451cd7b0e77b91425e19330a2fc57775",
+      "native_original_fetch_exit": 0,
+      "url": "https://github.com/nodejs/node/blob/955266bfdd854cd280dffd47548673914484e4c0/lib/internal/streams/readable.js"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "sdk/typescript/src/exec.ts",
+      "bytes": 14203,
+      "sha256": "cac7c2ef4f834bc1cdca133d3950f229451460d9c495eb017dd931c63eaacc79",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/sdk/typescript/src/exec.ts"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "sdk/typescript/tests/run.test.ts",
+      "bytes": 26283,
+      "sha256": "2ebd05b461504a53c0a9453efb877f3fee06202284fd6dc5ddef035f3be33255",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/sdk/typescript/tests/run.test.ts"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "sdk/typescript/tests/responsesProxy.ts",
+      "bytes": 5679,
+      "sha256": "53f86d2a5c313966a9e5c9dd9fc69676755f7dbf50be530558d254571424b0f6",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/sdk/typescript/tests/responsesProxy.ts"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "sdk/typescript/tests/setupCodexHome.ts",
+      "bytes": 746,
+      "sha256": "7212a09dd1169661746eb9c5f7d90271beb336134648c268804a256e241e1e44",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/sdk/typescript/tests/setupCodexHome.ts"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "sdk/typescript/jest.config.cjs",
+      "bytes": 838,
+      "sha256": "c5babef9cbbbf1e3ada6fec43c56415fee9f3e6562fc8db9103f3afba52e4b0c",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/sdk/typescript/jest.config.cjs"
+    },
+    {
+      "repository": "containers/bubblewrap",
+      "pin": "2a76602a8c71f36c1527cf9fc3417d9149822e0c",
+      "file": "network.c",
+      "bytes": 5429,
+      "sha256": "1cfe04fcc38d33d5197feb96fc503d3fd51d234fb9392699a00bf4780ed6e9f0",
+      "native_original_fetch_exit": 0,
+      "matches_owned_build_source": true,
+      "decisive_raw_lines": [
+        137,
+        198
+      ],
+      "url": "https://github.com/containers/bubblewrap/blob/2a76602a8c71f36c1527cf9fc3417d9149822e0c/network.c"
+    },
+    {
+      "repository": "containers/bubblewrap",
+      "pin": "2a76602a8c71f36c1527cf9fc3417d9149822e0c",
+      "file": "bubblewrap.c",
+      "bytes": 113001,
+      "sha256": "3f17ee26057cae9d660801ca8d9ba84722f1bafdcd072d5151ee1c64eeeb15f4",
+      "native_original_fetch_exit": 0,
+      "matches_owned_build_source": true,
+      "decisive_raw_lines": [
+        [
+          1852,
+          1860
+        ],
+        [
+          3207,
+          3208
+        ]
+      ],
+      "url": "https://github.com/containers/bubblewrap/blob/2a76602a8c71f36c1527cf9fc3417d9149822e0c/bubblewrap.c"
+    },
+    {
+      "repository": "containers/bubblewrap",
+      "pin": "2a76602a8c71f36c1527cf9fc3417d9149822e0c",
+      "file": "demos/bubblewrap-shell.sh",
+      "bytes": 1204,
+      "sha256": "dd2ed261e8a29df26d4ca8e629d57e882b7fdf0f019cb495a26bc1a74ca17c51",
+      "scope": "Previously original-read maintained FD11/12 synthetic account carrier; reused, not a new run.",
+      "url": "https://github.com/containers/bubblewrap/blob/2a76602a8c71f36c1527cf9fc3417d9149822e0c/demos/bubblewrap-shell.sh"
+    },
+    {
+      "repository": "iproute2/iproute2",
+      "pin": "83699d3d5077bbb3957030938f746601317767d2",
+      "file": "misc/ss.c",
+      "bytes": 136027,
+      "sha256": "b3f67bf0a3cdc30f84414f6d7b109a8e5fb9466760d253c04022b6a0924ee9b9",
+      "native_original_fetch_exit": 0,
+      "decisive_raw_lines": [
+        [
+          575,
+          640
+        ],
+        [
+          667,
+          719
+        ]
+      ],
+      "url": "https://github.com/iproute2/iproute2/blob/83699d3d5077bbb3957030938f746601317767d2/misc/ss.c"
+    },
+    {
+      "repository": "python/cpython",
+      "pin": "f6650f9ad73359051f3e558c2431a109bc016664",
+      "file": "Lib/http/server.py",
+      "bytes": 48516,
+      "sha256": "6ef28116c245a8e5e7f2d57f17607b7df706fd86110cf1c5a2b8416151b41248",
+      "native_original_fetch_exit": 0,
+      "decisive_raw_lines": [
+        1274,
+        1319
+      ],
+      "url": "https://github.com/python/cpython/blob/f6650f9ad73359051f3e558c2431a109bc016664/Lib/http/server.py"
+    },
+    {
+      "repository": "curl/curl",
+      "pin": "7161cb17c01dcff1dc5bf89a18437d9d729f1ecd",
+      "file": "docs/cmdline-opts/disable.d",
+      "bytes": 482,
+      "sha256": "d1df58cd8c78f4c9feded9f3e9f0e839dfbfe00d763a1d586745104e78a72e7a",
+      "native_original_fetch_exit": 0,
+      "url": "https://github.com/curl/curl/blob/7161cb17c01dcff1dc5bf89a18437d9d729f1ecd/docs/cmdline-opts/disable.d"
+    },
+    {
+      "repository": "curl/curl",
+      "pin": "7161cb17c01dcff1dc5bf89a18437d9d729f1ecd",
+      "file": "docs/cmdline-opts/noproxy.d",
+      "bytes": 1178,
+      "sha256": "85b4975f8668ae78bcd3ada2d60b1120e156f471432ef916acb59ea389c9b9e4",
+      "native_original_fetch_exit": 0,
+      "url": "https://github.com/curl/curl/blob/7161cb17c01dcff1dc5bf89a18437d9d729f1ecd/docs/cmdline-opts/noproxy.d"
+    },
+    {
+      "repository": "curl/curl",
+      "pin": "7161cb17c01dcff1dc5bf89a18437d9d729f1ecd",
+      "file": "docs/cmdline-opts/head.d",
+      "bytes": 487,
+      "sha256": "e035f1944ec6ea5a775f2827787421b322ba995b1a4fdaab78f9f5d35262db84",
+      "native_original_fetch_exit": 0,
+      "url": "https://github.com/curl/curl/blob/7161cb17c01dcff1dc5bf89a18437d9d729f1ecd/docs/cmdline-opts/head.d"
+    },
+    {
+      "repository": "curl/curl",
+      "pin": "7161cb17c01dcff1dc5bf89a18437d9d729f1ecd",
+      "file": "docs/cmdline-opts/connect-timeout.d",
+      "bytes": 819,
+      "sha256": "a5a1ec45bc79ee0e3ac2fc5565933dc3395dd5c934760741629c2a37193ec224",
+      "native_original_fetch_exit": 0,
+      "url": "https://github.com/curl/curl/blob/7161cb17c01dcff1dc5bf89a18437d9d729f1ecd/docs/cmdline-opts/connect-timeout.d"
+    },
+    {
+      "repository": "curl/curl",
+      "pin": "7161cb17c01dcff1dc5bf89a18437d9d729f1ecd",
+      "file": "docs/cmdline-opts/max-time.d",
+      "bytes": 874,
+      "sha256": "d360a932ee8d8385898e8e26aa0582a519477a5afde8022f5276e8b5bed829cb",
+      "native_original_fetch_exit": 0,
+      "url": "https://github.com/curl/curl/blob/7161cb17c01dcff1dc5bf89a18437d9d729f1ecd/docs/cmdline-opts/max-time.d"
+    }
+  ],
+  "retained_failures_and_corrections": [
+    {
+      "kind": "Native fixture failure",
+      "result": "One failed positive, original5000ms timeout,22 filtered skips. The instrumented diagnostic did not repair it.",
+      "source": "Actual native Jest JSON and Node target exit1."
+    },
+    {
+      "kind": "Unclassified auxiliary spawn failure",
+      "result": "Native onexit -2 withoutPID is retained separately; no cause or Codex attribution."
+    },
+    {
+      "kind": "Named source fetch",
+      "path": "nodejs/node@955266bfdd854cd280dffd47548673914484e4c0/test/parallel/test-net-basic.js",
+      "native_curl_exit": 22,
+      "actual_stderr": "curl: (22) The requested URL returned error: 404\n",
+      "scope": "No file at this named original URL; no broad capability absence claim. No such test was run."
+    },
+    {
+      "kind": "Official docs retrieval",
+      "path": "https://docs.python.org/release/3.12.3/library/http.server.html#command-line-interface",
+      "result": "Browser Internal Error/inaccessible; not an HTTP404 or absence claim.",
+      "verification": "Installed native --help0 plus original CPython source0/fullpin/hash qualified only the native CLI used."
+    },
+    {
+      "kind": "Observer formatting correction",
+      "result": "A web result was a string; object spreading produced character-index output. Corrected by type-aware compact output. Source fetch/native test statuses were unchanged."
+    },
+    {
+      "kind": "Source line-number correction",
+      "result": "Browser rendered network.c line count187 was not the raw original count199.",
+      "verification": "Exact pinned raw curl0 byte-matched owned build source; raw137–198 and bubblewrap raw3207–3208 are authoritative."
+    },
+    {
+      "kind": "Named installed entry correction",
+      "result": "SDK-local node_modules/jest entry guesses were not found; exact central owned-source node_modules/jest/bin/jest.js exists and was used.",
+      "verification": "Bounded owned path metadata0 and installed Jest29.7.0 package/entry hashes; no reinstall or package absence claim."
+    },
+    {
+      "kind": "Original prior OS-exit attribution",
+      "result": "Prior phase native0/1/1 exits remain attributed to original worker unified-exec completion returns sessions46011/87097/70804, separately from independently retained Jest JSON. No reconstructed original status file was authored.",
+      "reference": "codex-sdk-0160-native-mock-controls.json"
+    },
+    {
+      "kind": "Retained prior failures",
+      "result": "Previous26 positive timeouts/6 negative passes and bounded companion repair1 failure/22 filtered skips remain failed historical readiness. This new diagnostic does not replace or promote them.",
+      "reference": "codex-sdk-0160-native-mock-controls.json"
+    },
+    {
+      "kind": "Receipt byte-count observer failure",
+      "result": "Post-patch JavaScript formatter returned ReferenceError: TextEncoder is not defined. The authorized file patch had already completed.",
+      "verification": "Bounded native Python read returned0, parsed the on-disk JSON, and observed29291 bytes / SHA256199874e0cfde51239b070a45289eb0b5b5273c20d0f49dd0cc3b90de8412ac96. Native byte counting replaced the unavailable helper. No test result, fixture or source changed."
+    },
+    {
+      "kind": "Normal publication hook failure and bounded metadata repair",
+      "native_normal_commit_exit": 1,
+      "actual_normal_commit_output": "6:22AM INF 0 commits scanned.\n6:22AM INF scanned ~30218 bytes (30.22 KB) in 166ms\n6:22AM WRN leaks found: 1\n",
+      "redacted_native_scan_exit": 1,
+      "report_identity": {
+        "bytes": 705,
+        "sha256": "c8d2e2a569a2c85e8d2947d6c73ea1a86203139a46a739de0b907cbbf5227d0f"
+      },
+      "finding": {
+        "rule_id": "generic-api-key",
+        "file": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-diagnostics.json",
+        "initial_line": 112
+      },
+      "verification": "The finding was the digest metadata key named passwd_sha256 for the synthetic FD11 carrier. Its value was the known artifact SHA256, without account-file content or credentials.",
+      "bounded_repair": "Preserve the exact carrier file identities under ordinary file/bytes/sha256 artifact objects. No suppression, allowlist, rule, hook or secret-policy change.",
+      "native_recheck": {
+        "native_exit": 0,
+        "actual_output": "\n    ○\n    │╲\n    │ ○\n    ○ ░\n    ░    gitleaks\n\n6:25AM INF 0 commits scanned.\n6:25AM INF scanned ~32497 bytes (32.50 KB) in 161ms\n6:25AM INF no leaks found\n",
+        "policy_bypassed": false
+      },
+      "source": {
+        "repository": "seathatflowsinourveins/native-agent-stack",
+        "pin": "65a0d370ed8c075d922ff60857287e33d3a14788",
+        "hook_file": "scripts/git-hooks/pre-commit",
+        "hook_bytes": 608,
+        "hook_sha256": "58fd9d28e55ac2396c487d1cd7f1ac1743737abcf16de5787ab75cb33cc4fb9a",
+        "config_file": ".gitleaks.toml",
+        "config_bytes": 32556,
+        "config_sha256": "36d8049cef393b9786c912975cbad5eddf676d1e357f2773ed47afee0dc7d342",
+        "native_installed_gitleaks": "8.30.1",
+        "native_version_exit": 0,
+        "native_help_exit": 0
+      }
+    },
+    {
+      "kind": "Publication source-output guards",
+      "actual_native_exit_codes": [
+        1,
+        1
+      ],
+      "result": "Two selected-source formatters raised AssertionError before printing because serialized output exceeded3500 bytes.",
+      "verification": "Narrowed original hook/rule excerpts then returned0 under the guard; full file hashes were retained. No SDK fixture, source, test status or native Gitleaks finding changed."
+    }
+  ],
+  "publication": {
+    "owned_artifact": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-diagnostics.json",
+    "worktree_base": "65a0d370ed8c075d922ff60857287e33d3a14788",
+    "baseline_validate": {
+      "native_exit": 0,
+      "hashed_files": 9477,
+      "status": "passed",
+      "scope": "Native integrity/scope only; no provider or GPU execution."
+    },
+    "changed_evidence_validate": {
+      "native_exit": 1,
+      "actual_stdout": "Publication validation failed:\nevidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-diagnostics.json: evidence file is not hash-listed\n",
+      "actual_stderr": "",
+      "scope": "Only the owned new artifact awaits coordinator hash registration; no other validator finding.",
+      "expected_pending_coordinator_registration": true,
+      "registration_or_validator_bypass": false
+    },
+    "registration_owner": "root coordinator only",
+    "push_performed": false,
+    "public_content": "No personal/host paths, raw model conversations, auth/config values or claimed provider usage. Private artifact locators are symbolic; exact owned locators delivered directly to coordinator."
+  }
+}
