@@ -366,6 +366,38 @@ locally with `GH_TOKEN` set and no `--offline`, using
   for urllib3 2.8.0 or PyJWT 2.15.0 that only a later release fixes. **Not covered:** the image's server binary (PyInstaller
   build of upstream's unchanged uv.lock, urllib3 2.7.0 and PyJWT 2.13.0 or older) and the grader venv, as for the earlier PyJWT
   relock. Evidence: `evidence/receipts/osv-urllib3-next-20260930.json`.
+  **Dependabot alert 16 (2026-10-03).** Dependabot raised the same advisory (GHSA-vcvr-r3jv-pc5j, critical) as alert 16
+  on the frozen variant's `package.json`. Dependabot alerts come from GitHub's dependency graph, whose inputs are the
+  repository's manifests and lock files and dependency submissions, not OSV-Scanner configs (GitHub Docs, read
+  2026-10-03), so the alert is independent of the OSV exception's scope and needed a decision of its own. It was
+  dismissed as `not_used` at 2026-10-03T04:51:57Z with a comment citing this review: the artifact keeps only
+  `package.json` and its lock, nothing installs, builds or serves it, and "Live recipe lock pins next 16.3.6+". That
+  lock, `blueprints/convergence-practice/application-delivery/pnpm-lock.yaml`, pins `next` 16.3.8 since #587; the frozen
+  config's reason, written when it pinned 16.3.6, still says 16.3.6. The `authorization` of
+  `evidence/receipts/dependabot-alert-16-dismissal-20261003.json`, which also holds the API readback, sources and
+  reasoning, records the authority for the dismissal: it describes the user's message of 2026-10-03 and its limits,
+  without quoting it, and how far section 8's precedent ("Fixture alerts dismissed", alerts 7-15) carries.
+  `tests/test_frozen_macos_variant_no_use.py` is a tripwire for direct references, not a proof of no use. It fails when
+  a scanned file names the artifact directory, in any ASCII letter case, on a line it does not pin, or a pinned line is no
+  longer found; when the artifact directory gains a file, OS metadata excepted; when the variant's `package.json` or
+  lock no longer pins `next` 16.3.5, or the lock's sha256 differs from the value `FROZEN_LOCKS` binds; when
+  `.github/osv-scanner-frozen-macos.toml` no longer holds exactly one exception for the advisory, with `ignoreUntil`
+  2026-12-24 and no key besides `id`, `ignoreUntil` and `reason`; and when `git ls-files` cannot run. It scans every
+  tracked file except `*.md`, `evidence/**`, `manifests/evidence.json` and `catalogs/**`, and in those reads only the
+  configuration and scripts it recognises by name, suffix, directory, shebang or Git mode (the module lists them; agent,
+  command and skill definitions under `.claude`, `.codex` or `.agents`, names matched in any ASCII letter case, are
+  configuration), so another file there, such as a JSON launch configuration under `evidence/**`, is not scanned; a
+  route that never spells the directory's name, such as a step that reads the path from the OSV inventory, is not
+  caught either (the receipt's `indirect_routes` records why these routes stay limits, the alternatives declined, the
+  dated backstop of the OSV exception, and the same day's convergence decision to rename both files to `.frozen` and
+  stop scanning them in a follow-up pull request, which supersedes this dismissal when it merges), and the guard is
+  only as strong as review of the module itself, since any part of it can be changed in the change that adds a use
+  and the main ruleset requires no code-owner review.
+  **Overturn:** reopen the alert if an application is built, run or served from the frozen lock (then the overturn
+  above applies). The dismissal lasts until the alert is reopened: recheck alert 16 when the exception in
+  `.github/osv-scanner-frozen-macos.toml` (`ignoreUntil` 2026-12-24) is renewed, changed or removed, which that
+  module's review-date test (or, for a changed reason, its pinned reason line) turns into a failure, or when the
+  tripwire fails.
   **Retired historical WSL retrieval partition (2026-10-03).** The original
   `blueprints/convergence-practice/wsl-retrieval/package-lock.json` remains at
   SHA256 `5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb`.

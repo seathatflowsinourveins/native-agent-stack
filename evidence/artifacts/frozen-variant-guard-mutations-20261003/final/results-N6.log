@@ -1,0 +1,30 @@
+F.........
+======================================================================
+FAIL: test_git_tracks_nothing_beyond_the_three_files_there (tests.test_frozen_macos_variant_no_use.ArtifactDirectoryTests.test_git_tracks_nothing_beyond_the_three_files_there)
+Paths compared in any ASCII letter case; OS metadata files aside. Fewer files pass: removing the variant or
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 393, in test_git_tracks_nothing_beyond_the_three_files_there
+    self.assertEqual(
+    ~~~~~~~~~~~~~~~~^
+        extra, [],
+        ^^^^^^^^^^
+        f"Git tracks {extra} in {ARTIFACT} (paths compared in any ASCII letter case) besides {ARTIFACT_FILES}: "
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        f"{REOPEN}.",
+        ^^^^^^^^^^^^^
+    )
+    ^
+AssertionError: Lists differ: ['rebuild.sh'] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+'rebuild.sh'
+
+- ['rebuild.sh']
++ [] : Git tracks ['rebuild.sh'] in evidence/artifacts/macos-application-20260924 (paths compared in any ASCII letter case) besides ['run-summary.json', 'variant/package.json', 'variant/pnpm-lock.yaml']: reopen Dependabot alert 16 and remove the frozen OSV exception (its config .github/osv-scanner-frozen-macos.toml, its inventory key in .github/osv-scanner-lockfiles.json and its FROZEN_LOCKS row in tests/test_osv_lockfile_coverage.py) before installing, building or serving from the lock (docs/decisions/2026-09-22-github-automation-closure.md, 'Dependabot alert 16').
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.392s
+
+FAILED (failures=1)

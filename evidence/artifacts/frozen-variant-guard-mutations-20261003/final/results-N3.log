@@ -1,0 +1,21 @@
+.......F..
+======================================================================
+FAIL: test_the_frozen_osv_exception_still_ends_on_the_pinned_review_date (tests.test_frozen_macos_variant_no_use.FrozenOsvExceptionReviewTests.test_the_frozen_osv_exception_still_ends_on_the_pinned_review_date)
+The recheck of alert 16 is tied to this exception: removing it, renewing or otherwise changing its
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 531, in test_the_frozen_osv_exception_still_ends_on_the_pinned_review_date
+    self.assertEqual(
+    ~~~~~~~~~~~~~~~~^
+        until, REVIEW_DATE,
+        ^^^^^^^^^^^^^^^^^^^
+        f"{FROZEN_CONFIG}: the exception for {ADVISORY} has ignoreUntil {written!r}, not {REVIEW_DATE}: {RECHECK}.",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+AssertionError: datetime.date(2027, 3, 24) != datetime.date(2026, 12, 24) : .github/osv-scanner-frozen-macos.toml: the exception for GHSA-vcvr-r3jv-pc5j has ignoreUntil datetime.date(2027, 3, 24), not 2026-12-24: recheck Dependabot alert 16 (reopen it unless the renewed exception's reasoning still holds) and update this pinned date.
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.389s
+
+FAILED (failures=1)
