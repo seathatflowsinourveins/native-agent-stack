@@ -9676,8 +9676,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "cafdde5e9aabfbe9d61bc138e4201596e2b0436f978b4dd8a8039eaed70dcd32",
-      "bytes": 483389
+      "sha256": "0ed295d853b40018643f40d72095a48d159961893f53160cefe0aba88c1fa50f",
+      "bytes": 483886
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -15026,8 +15026,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "2217a36d560e887b651aaf57028580175e1644c45134c6ef3d8208913998b02c",
-      "bytes": 251264
+      "sha256": "9ae92eeee236a24f390b22127cdd9571b42be3d4d61b23a16bb4101684c4e747",
+      "bytes": 253461
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -15765,6 +15765,11 @@
       "bytes": 16881
     },
     {
+      "path": "docs/decisions/2026-10-03-omniroute-3851-pin.md",
+      "sha256": "dc22610e9a76a64c67a2ce4a13126d2efa74b974d666d7f6036662ac282f187a",
+      "bytes": 23724
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -15846,8 +15851,8 @@
     },
     {
       "path": "docs/foundation-stack.md",
-      "sha256": "5a20461ffdd76482f30e8beb0f5ea670ccc53dc656931c5de91ec2dd2c80cea8",
-      "bytes": 39778
+      "sha256": "cc6481095ca9319c89e6f79c50e6b77beb0b0e19dce34c4f790c864919219058",
+      "bytes": 41611
     },
     {
       "path": "docs/full-stack-convergence.md",
@@ -15966,8 +15971,8 @@
     },
     {
       "path": "docs/native-dashboards.md",
-      "sha256": "3e1a49e3a6e7d90fd6985d85c4e56c32c5d232e4d6d073f471338b7e753592bc",
-      "bytes": 17709
+      "sha256": "7873026e9de4f06c651de7edc5c4fdc05cc61b7eb34267160d263864e8c98ae9",
+      "bytes": 17782
     },
     {
       "path": "docs/native-foundation-resolution-20260921.md",
@@ -16126,7 +16131,7 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "b43af443e3ec7dd81efe16f7adc6ead8fe99a4748bc59a541f8ca8696799b80e",
+      "sha256": "ddc29198abf0afc46d0bf16c04b3352582bddc3e6aac10a1cd5d3d16ac3e33ab",
       "bytes": 587560
     },
     {
@@ -48326,8 +48331,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "b10693331a67883d86a47ec40b6345f5f48d80aa287a991e20df4b40355ed72a",
-      "bytes": 100006
+      "sha256": "4db6a6019f75f4750844fa2bff55b39dd65058c46dedb2998690d4309451cf44",
+      "bytes": 100776
     },
     {
       "path": "observability/README.md",
@@ -48606,13 +48611,13 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "2961a95fe20b829b92a9a01812bf6aa240955378674d1ee7afc8e4df727cc041",
-      "bytes": 124550
+      "sha256": "66249c7e442ea691b5d07d935435bd52c0ab5925a85dc17cc7584d9e540f3adf",
+      "bytes": 125483
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
-      "sha256": "beabed12521161b15c8e44ce8dccff02a78e863b844c706d99391fe38a847201",
-      "bytes": 8125
+      "sha256": "5165e75affc97436910612b9056ef464dc3ca1d2f0585c17625f0ce3f371f83c",
+      "bytes": 8294
     },
     {
       "path": "recipes/claude-codex-foreground-review.md",
@@ -50446,7 +50451,7 @@
     },
     {
       "path": "tools/token-report/README.md",
-      "sha256": "d1f538abf502fc3575991144ea15f72fc93eae0fd67393fb5edc8be007f28d87",
+      "sha256": "94364783b721fe7d206defa23e5fbbbfedd6a61078b9fdc8cedde346c777aeb3",
       "bytes": 25833
     },
     {
