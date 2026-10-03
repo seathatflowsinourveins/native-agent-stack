@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "north_star_action": "Faithful and economical token/context use during complex cumulative R&D.",
+  "evidence_class": "native_proven / source_review; consequential judgment only",
+  "trigger": "Actual native result representation differs from stricter physical-stream preregistration; select a prospective observable endpoint without regrading.",
+  "native_invocation": {
+    "client": "Codex0.160.0",
+    "native_model": "gpt-6-astra",
+    "native_effort": "max",
+    "native_provider": "omniroute",
+    "configured_endpoint": "http://127.0.0.1:20128/v1",
+    "approval": "never",
+    "sandbox": "read-only",
+    "attempts": 1,
+    "retries_scheduled": 0,
+    "exit": 0,
+    "started_at": "2026-10-03T14:28:53.609246Z",
+    "completed_at": "2026-10-03T14:34:26.663069Z",
+    "wire_backend_invoice": "UNKNOWN"
+  },
+  "answer_contract": {
+    "words": 425,
+    "cap": 550,
+    "pass": true,
+    "frozen_inputs": 18,
+    "unchanged": true,
+    "read_commands": 18,
+    "all_read_command_exits": 0
+  },
+  "native_usage": {
+    "response_ids": 6,
+    "input_includes_cache": 194157,
+    "cache_read_subset": 145280,
+    "cache_write": 0,
+    "output_includes_reasoning": 8136,
+    "reasoning_subset": 4962,
+    "disjoint_total": 202293,
+    "every_prefix_and_final_reconcile": true,
+    "unobserved_attempts_helpers_invoice": "UNKNOWN"
+  },
+  "root_acceptance": "Source-supported prospective native call/result endpoint; not producer admission, strict-carrier regrade, savings/protection, or user approval.",
+  "sources": [
+    {
+      "repository": "promptfoo/promptfoo",
+      "revision": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "file": "src/providers/openai/codex-sdk.ts:1860-1872,2421-2431"
+    },
+    {
+      "repository": "openai/codex",
+      "revision": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "codex-rs/rollout-trace/README.md:157-170,208-210"
+    }
+  ],
+  "custody": {
+    "input_freeze_sha256": "630a5476fe3f75fcac6569481bde1596fa1a67d0b3ab9d0279f877187373f6a3",
+    "execution_freeze_sha256": "c5b4067bd6447f2b5c2cdaf0e0e01203d923a0690dc953b6758ef6603f4f6668",
+    "answer_sha256": "bf3be0b0a2dfd4763904c8e370f0d7b63d880bdbc0c31e5d9a945d67496deaa3",
+    "root_reconciliation_sha256": "0f2d7eceb281cada31ac18076c4ae30bea5193f7fbf1cfe512683678be9be7f5",
+    "worker_manifest_sha256": "fa83ae23b85e1e48dc7c257f24887ce8966cc1eadf4a5fb9326c45ddada59a05"
+  },
+  "corrections_and_failures": [
+    "Inherited standalone_web_search warning is an emitted CLI error item, not a failed source command; stderr is empty.",
+    "Initial root metadata projection used wrong native discriminators and failed StopIteration. Direct top-level token_usage_record and CommandExecution projections independently reconcile; no native retry."
+  ],
+  "completeness_critic": "Independent native role inventory must cover nested/deferred child calls and link every required invocation to a complete result. Provider completed items alone cannot prove completeness.",
+  "privacy": "Counts and hashes only; no raw conversation, native IDs, host/auth paths, or active client configuration."
+}

@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "north_star_action": "Observe faithful native main/child source calls, scratch behavior and inclusive counters before token comparison.",
+  "evidence_class": "local_integration; synthetic admission fixture, not unchanged upstream acceptance",
+  "status": "UNQUALIFIED: strict registered carrier; narrower role/fact/counter observations retained",
+  "native_invocation": {
+    "client": "Codex0.160.0",
+    "native_parent_and_child_model": "gpt-6.1-sol",
+    "native_parent_and_child_effort": "max",
+    "native_provider": "openai",
+    "actual_endpoint_wire_backend": "UNKNOWN",
+    "attempts": 1,
+    "scheduled_retries": 0,
+    "native_cli_exit": 0,
+    "started_at": "2026-10-03T14:03:27.486710Z",
+    "completed_at": "2026-10-03T14:09:51.112869Z"
+  },
+  "registration": {
+    "frozen_files": 28,
+    "unchanged": true,
+    "freeze_sha256": "4f25faee5aea74d851e21a3d6d312dc454e3bdb7d757a3b9028eb8aa6d460e66",
+    "preregistration_sha256": "57a44fff248d10f6cee9db572dc9dd4501c8e0729c8eb70fd0d490d52632a028",
+    "config_sha256": "c133c65a3a7841e3392a2cb7f311dad03556df994754dd96f25140a47e7d4348"
+  },
+  "observations": {
+    "actual_roles": 2,
+    "native_response_groups": 23,
+    "tool_calls": 21,
+    "planned_fact_and_control_invocations": 12,
+    "separate_bound_guidance_invocations": 5,
+    "collaboration_invocations": 4,
+    "four_factual_lines_exact_in_both_original_native_role_finals": true,
+    "two_44_byte_scratch_copies_exact": true,
+    "both_input_write_probe_paths_absent": true,
+    "first_full_native_requests_and_previous_id_chains_observed": true,
+    "effective_full_deferred_inventory_and_encrypted_assignment": "UNKNOWN",
+    "owned_process_snapshots": 192,
+    "seen_owned_pids": 11,
+    "all_seen_owned_pids_absent_after_reap": true,
+    "unseen_short_lived_processes": "UNKNOWN"
+  },
+  "native_usage": {
+    "main": 357508,
+    "child": 222238,
+    "inclusive_disjoint_total": 579746,
+    "input_includes_cache": 571511,
+    "cache_read_subset": 525568,
+    "cache_write": 0,
+    "output_includes_reasoning": 8235,
+    "reasoning_subset": 4149,
+    "every_prefix_and_final_reconciled": true,
+    "provider_returned_parent_scope": 357508,
+    "invoice_and_unseen_helpers": "UNKNOWN"
+  },
+  "strict_missing_conditions": [
+    "Native CommandExecution combines diagnostics in its stdout representation; physical stdout/stderr split is UNKNOWN.",
+    "Both input-write calls return linked native code_mode_response exit1 with filesystem diagnostics but lack ordinary CommandExecution/TerminalOperation; actual OS execution attribution is UNKNOWN."
+  ],
+  "preserved_status": "Original P1 STOP closed; 55 original slots UNRUN_FINAL. New R2 56 producers prepared but UNRUN/UNFROZEN. No comparison/default selected.",
+  "sources": [
+    {
+      "repository": "promptfoo/promptfoo",
+      "revision": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "file": "src/providers/openai/codex-sdk.ts:1860-1872,2421-2431"
+    },
+    {
+      "repository": "openai/codex",
+      "revision": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "codex-rs/rollout-trace/README.md:157-170,208-210"
+    }
+  ],
+  "custody": {
+    "worker_receipt_sha256": "4e7c0da7cdf6d1106f24bdc5491711b2f728e69b9ccdb344dc989df112feb263",
+    "worker_manifest_sha256": "9a89a2d8bba753084c910220c17c977b0825798d87efe1857c90618914997aff",
+    "root_counter_sha256": "67decfaee0ccf563c73c3fcb32e5ffe2ca431d638335aab9e8a5d7b6e3227c8b",
+    "root_prefix_sha256": "fa8f55b23878a9ad9aadda3248a47dc4cd11a9e736dc57af3a231253c88693be",
+    "root_original_role_fidelity_sha256": "c494204055df378446dfe857be55f557284a46fc1e8035c856950a748b4661fe",
+    "root_owned_process_postcheck_sha256": "95ecd7b941534ec31ea34b8af2527a26092b97199a877f5ff1b55652d9f884b0"
+  },
+  "corrections": [
+    "Native provider label openai is observed; the inherited route is not inferred to be OmniRoute.",
+    "Nested child.facts array is observed; an initial guessed top-level child facts projection failed and remains retained.",
+    "Code-mode result text does not establish pre-execution rejection or physical OS execution."
+  ],
+  "completeness_critic": "Native nested invocation/result inventory and each family B lifecycle still need explicit prospective binding. Physical streams cannot be reconstructed from aggregated result text.",
+  "privacy": "Counts and hashes only; no raw conversation, native IDs, host/auth paths, or active client configuration."
+}

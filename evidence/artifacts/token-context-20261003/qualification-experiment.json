@@ -87,7 +87,10 @@
       "unit9-profile-repair",
       "unit9-source-defaults",
       "unit10-profile-judgment",
-      "unit10-profile-controls"
+      "unit10-profile-controls",
+      "unit11-native-carrier",
+      "unit11-observable-endpoint",
+      "unit11-qmd-readonly-predicates"
     ],
     "roles": [
       "command-worker",
@@ -226,7 +229,10 @@
     "Native Codex sandbox distinct frozen unquoted dot-free profile allowed harmless control",
     "Pinned native release/source and existing-record checks; three limited native default decisions",
     "Native Codex exec Astra/max consequential source judgment, one attempt through20128",
-    "Independent original-output/hash/inventory integration check on five native Codex sandbox controls (native exits0/1/0/1/1)"
+    "Independent original-output/hash/inventory integration check on five native Codex sandbox controls (native exits0/1/0/1/1)",
+    "Native unchanged Promptfoo Codex carrier: one parent/child synthetic admission case",
+    "Native Codex exec Astra/max prospective native call/result boundary judgment through configured20128",
+    "Supported native better-sqlite3 read-only API selected predicate and independent file observation"
   ],
   "observations": [
     {
@@ -2491,6 +2497,99 @@
         "total": null,
         "native_retries": null
       }
+    },
+    {
+      "id": "unit11-native-carrier",
+      "task": "unit11-native-carrier",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 65,
+      "evidence_class": "native_cli_execution",
+      "scope": "Strict carrier remains UNQUALIFIED despite narrower source/copy/role/counter observations; no physical-stream or OS attribution regrade.",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit11-native-carrier-observation.json",
+          "sha256": "528b079a96b7b035ef42f28cb75f65e1b63cdfc3a9345d4f3e55811618f03690"
+        }
+      ],
+      "usage": {
+        "uncached_input": 45943,
+        "cache_creation": 0,
+        "cache_read": 525568,
+        "output": 8235,
+        "reasoning_in_output": 4149,
+        "total": 579746,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit11-observable-endpoint-astra",
+      "task": "unit11-observable-endpoint",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 66,
+      "evidence_class": "native_cli_execution",
+      "scope": "Source-supported prospective methodological judgment; all56producers UNRUN/UNFROZEN, no default/userapproval.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit11-observable-endpoint-judgment.json",
+          "sha256": "13b8da1c258d356bfa59dbccfe53ef4f895edeaaaf3ba6ae517b29cb3ea1010f"
+        }
+      ],
+      "usage": {
+        "uncached_input": 48877,
+        "cache_creation": 0,
+        "cache_read": 145280,
+        "output": 8136,
+        "reasoning_in_output": 4962,
+        "total": 202293,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit11-qmd-readonly-predicates",
+      "task": "unit11-qmd-readonly-predicates",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 67,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Selected read-only connection/value/current-byte observation only; initial false aggregate and native PRAGMA readonly false retained. No model/MCP/currentcorpus acceptance.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit11-qmd-readonly-predicates.json",
+          "sha256": "7912837aec6cdf471203fe08d0844134955de4ef6e70fd1464e3e4e22093e03f"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
     }
   ],
   "failures_and_skips": [
@@ -2649,6 +2748,10 @@
     {
       "run_id": "unit9-native-profile-repair",
       "reason": "Model-free bounded Sol repair allowed1/stdout0/stderr133, bwrap installedclientnotvisible; deniedUNRUN/all11inputhashesmatch. Nativeusage unavailable/no model launched, nozeroaccountclaim; producerbundle unprepared."
+    },
+    {
+      "run_id": "unit11-native-carrier",
+      "reason": "NativeCLI0/schemafactsandcounterviews retained; strict registered physical-stream split and OS-execution provenance missing. Contract remainsUNQUALIFIED/HOLD, no historicalregrade/retry/saving/default."
     }
   ],
   "limitations": [
@@ -2688,7 +2791,8 @@
     "Unit9 original markerFAIL/native trace processvisibilityUNKNOWN and OpuswordFAIL remain; distinct groupcleanupPASS is integrationonly. Namedprofile original and repairallowedcontrolsFAIL/deniedUNRUN; R2producerbundle unprepared. Hiddeninputs/billing/nativeP2/retrievalowner remain open.",
     "Unit10 correction: PR608 comment5969106337 supplied the retrieval-owner handoff at12:21:24Z. The Unit9 pending statement was stale, corrected after exact-head review; the complete named owner record is not yet accessible. Owner snapshot remains a lead, pinned-source/runtime/corpus/client qualification pending; no new retrieval operation.",
     "Unit10 five sandbox controls pass only a distinct model-free harmless-fixture integration. Three expected native negative exits1 remain in original outputs and receipt; observer aggregate success is not native producer exit or unchanged upstream tests. Actual exec/skill/child/MCP/Claude/R2/P2 admission remains unqualified. Astra285466 is separate review overhead, native wire/helpers/invoice unknown.",
-    "Unit10 owner record arrived after the location request:13,020bytes/fullSHA15bd8a386e640e9c98827ed6d4c4a18d9ace796889e5a59be7b7ebfab3fbc2cd verified from complete local copy. Earlier inaccessible wording is historical; current runtime/corpus/client admission remains open. Source status wrapper may repair legacy columns; owner current-schema snapshot is a lead, not lifetime no-write proof."
+    "Unit10 owner record arrived after the location request:13,020bytes/fullSHA15bd8a386e640e9c98827ed6d4c4a18d9ace796889e5a59be7b7ebfab3fbc2cd verified from complete local copy. Earlier inaccessible wording is historical; current runtime/corpus/client admission remains open. Source status wrapper may repair legacy columns; owner current-schema snapshot is a lead, not lifetime no-write proof.",
+    "Unit11 strict carrier remains unqualified; prospective native-call/result boundary accepted only as method. Independent nested role/call/result inventory and each family treatment lifecycle required;56producers prepared UNRUN/UNFROZEN. Selected QMD readonly predicates are dated, not nativeMCP/corpus/lifetime no-write acceptance."
   ],
   "decision_and_scope": {
     "decision": "trial",

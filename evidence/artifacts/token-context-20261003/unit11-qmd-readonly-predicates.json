@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "north_star_action": "Consume architecture-owned document retrieval without changing its index, models or installation.",
+  "evidence_class": "local_integration / source_review; selected current startup predicates",
+  "status": "PASS selected readonly connection and value predicates; fresh native MCP/model consumption remains UNQUALIFIED",
+  "native_operation": {
+    "library": "better-sqlite3 13.0.3",
+    "native_readonly_connection": true,
+    "selected_statements": 10,
+    "exit": 0,
+    "started_at": "2026-10-03T14:22:08.012640+00:00",
+    "completed_at": "2026-10-03T14:22:08.087122+00:00",
+    "stdout_bytes": 5288,
+    "stderr_bytes": 0,
+    "model_usage": null
+  },
+  "selected_predicates": {
+    "native_readonly": true,
+    "journal_mode_wal": true,
+    "user_version_at_least1": true,
+    "all14_schema_objects_present": true,
+    "legacy_tables_absent": true,
+    "fts_SQL_shape_current": true,
+    "fts_livecolumns_current": true,
+    "cjk_version1": true,
+    "vector_columns_current": true,
+    "vector_covering_index_current": true,
+    "config_digest_matches": true
+  },
+  "index_observation": {
+    "db_wal_shm_bytes_hashes_mtimes_unchanged": true,
+    "atomic_snapshot": false,
+    "concurrent_writers_and_future_no_write": "UNKNOWN",
+    "normalized_configuration_digest_matches": true,
+    "configuration_values_published": false
+  },
+  "scope": "Finite known schema/config/lazy-vector startup branches at the observation time; no QMDStore constructor, MCP start, query/get, model/cache/index-write or corpus/current-main acceptance in this unit.",
+  "correction": "The initial aggregate added an unregistered all-statements-readonly requirement. Native SQLite classifies bare PRAGMA journal_mode as possibly writing, so its flag is false. Official docs distinguish query form from assignment and explain that false does not establish an actual write. Native connection readonly:true, exact no-assignment query and observed unchanged DB/WAL/SHM remain recorded. The original false aggregate is retained, not regraded benchmark evidence.",
+  "sources": [
+    {
+      "repository": "WiseLibs/better-sqlite3",
+      "release": "v13.0.3",
+      "revision": "dbc2ea1165fef1f599b9be12faea33fa5e9d7ffb",
+      "files": [
+        "lib/database.js",
+        "docs/api.md"
+      ]
+    },
+    {
+      "repository": "tobi/qmd",
+      "revision": "facd35e01359e59d938bc9418e93fb9318addee3",
+      "files": [
+        "src/mcp/server.ts",
+        "src/store.ts",
+        "src/collections.ts"
+      ]
+    },
+    {
+      "url": "https://www.sqlite.org/c3ref/stmt_readonly.html"
+    },
+    {
+      "url": "https://www.sqlite.org/pragma.html#pragma_journal_mode"
+    }
+  ],
+  "custody": {
+    "native_receipt_sha256": "e2788c048f7b781b1e8e947aaacac0384337c606592c5c401a7a38da25697de2",
+    "initial_false_aggregate_sha256": "1dfdb2eee10dcbf97850c88e1fc0c69004da75a2ecc0915bde70b62fa7500961",
+    "corrected_interpretation_sha256": "0da14ba97e7b942b66a525030dbcdbe1034c7492cea3f4daf60ed8892b646c99",
+    "freeze_sha256": "2bdd61736a5ba570006015c76bd050e9fb23af91b2d0a1c52d5c73fe30f6b55f"
+  },
+  "completeness_critic": "QMD startup getStatus can lazily repair vector metadata. Current predicates close known branches only; actual fresh-client args, source-byte fidelity, corpus age, role counters and lifecycle remain separate gates.",
+  "privacy": "Counts and hashes only; no raw conversation, native IDs, host/auth paths, or active client configuration.",
+  "source_locator_correction": "Initial uncommitted receipt abbreviated the MCP source to src/mcp.ts; exact pinned source binding independently verified as src/mcp/server.ts."
+}
