@@ -15922,14 +15922,14 @@
       "bytes": 21453
     },
     {
-      "path": "docs/decisions/2026-10-03-retire-pr320-loki-denominator-host-receipts.md",
-      "sha256": "9751296fedcb316b2a44bf0c09b6886fe32b7daaaaa30d1ec4d226ac35c158c3",
-      "bytes": 19619
-    },
-    {
       "path": "docs/decisions/2026-10-03-omniroute-sdk-worker-0160.md",
       "sha256": "9138deaedcb1662d06f5486ca1af962133c07442e52bdf610eada436b5f21790",
       "bytes": 25043
+    },
+    {
+      "path": "docs/decisions/2026-10-03-retire-pr320-loki-denominator-host-receipts.md",
+      "sha256": "9751296fedcb316b2a44bf0c09b6886fe32b7daaaaa30d1ec4d226ac35c158c3",
+      "bytes": 19619
     },
     {
       "path": "docs/direct-results.md",
