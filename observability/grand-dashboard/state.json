@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-10-03T00:28:54Z",
-  "meaning": "Recorded checkpoint selecting repository Codex/SDK 0.160.0 with same-host native-account and gateway marker qualification. The shared launcher and daemon still run 0.159.3 until a coordinated switch. Earlier queue, Hindsight, foundation, paper and simulation evidence retains its original scope; no new-host or model-quality acceptance is claimed. The gate for the new WSL distribution is carried over unchanged from main's checkpoint of 2026-10-02T22:57:25Z, which states its source selection on main apart from its host qualification, which is open.",
+  "recorded_at_utc": "2026-10-03T11:54:43Z",
+  "meaning": "Recorded checkpoint adding nine gate rows for work merged through PR 622 (the 2026-10-03 retirement of the historical WSL retrieval fixture with its isolated archive scan, the new-WSL definitive defaults, local model server gate, distribution recipe, install plan and client configuration, the Mac memory qualification closure, the SDK useful-task preparation and the two-host architecture). The Codex native-daemon-queue and SDK-pair gate rows come from the checkpoint of 2026-10-03T00:28:54Z, whose meaning was: Recorded checkpoint selecting repository Codex/SDK 0.160.0 with same-host native-account and gateway marker qualification. The shared launcher and daemon still run 0.159.3 until a coordinated switch. Earlier queue, Hindsight, foundation, paper and simulation evidence retains its original scope; no new-host or model-quality acceptance is claimed. Every other entry is carried over unchanged from the checkpoint of 2026-10-02T22:57:25Z, whose meaning was: Recorded checkpoint adding one gate for the new WSL distribution: its source selection on main is stated apart from its host qualification, which is open. Every other entry is carried over unchanged from the checkpoint of 2026-10-01T19:18:16Z, whose meaning was: Recorded checkpoint aligning Codex 0.159.3 and its SDK pair; native queue, capture and SDK qualification retain their linked scopes and limits. Existing foundation, paper and simulation records are preserved; the gateway request remains held.",
   "lanes": [
     {
       "kind": "lane",
@@ -368,6 +368,69 @@
       "title": "New WSL distribution sources (manifest + recipe + install plan + handbook) and host qualification (useful task per client + roles + lifecycle)",
       "state": "source selection on main / host qualification open / 64-row plan ran once on the destination distribution - record private - public receipt with its acceptance",
       "evidence_ref": "docs/decisions/2026-10-02-new-wsl-layer-consensus.md"
+    },
+    {
+      "kind": "gate",
+      "id": "new-wsl-definitive-defaults-20261001",
+      "title": "New WSL definitive defaults (one default per slot)",
+      "state": "37 layers / 89 slots / 31 definitive / 56 install something / 22 resolved 7 split 4 measurement 25 open / install decisions not merit acceptance",
+      "evidence_ref": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json"
+    },
+    {
+      "kind": "gate",
+      "id": "new-wsl-local-model-server-20261002",
+      "title": "New WSL local model server gate (llama-server or Ollama)",
+      "state": "Ollama default by preregistered gate / 300 s llama-server 0 of 3 Ollama 2 of 3 / 1200 s confirmatory 0 of 3 vs 3 of 3 / one workstation / not a merit acceptance",
+      "evidence_ref": "evidence/artifacts/new-wsl-definitive-defaults-20261001/settlements.json"
+    },
+    {
+      "kind": "gate",
+      "id": "new-wsl-distro-recipe-20261002",
+      "title": "New WSL distribution recipe (Ubuntu 26.04.1 on WSL 3.0.1)",
+      "state": "run 3 P1 to F5 passed with a rootless container / cgroup isolation held / tty1 getty masked by bootcmd / stage 2 and 24.04.5 rollback not established",
+      "evidence_ref": "evidence/artifacts/new-wsl-rehearsal-20261002/runs-on-wsl-3.0.1.json"
+    },
+    {
+      "kind": "gate",
+      "id": "new-wsl-install-plan-20261002",
+      "title": "New WSL install plan (64 manifest rows)",
+      "state": "36 default 3 measurement-only 25 not installed / throwaway run install 35 exit 0 3 skipped / final post-install 35 exit 0 29 skipped",
+      "evidence_ref": "evidence/artifacts/new-wsl-install-plan-20261002/real-distribution-validation.json"
+    },
+    {
+      "kind": "gate",
+      "id": "new-wsl-client-configuration-20261002",
+      "title": "New WSL Claude Code and Codex client configuration",
+      "state": "clients wired only to what the definitive manifest installs / authorization settings opt-in / 145 tool tests pass / no real client session on a new distribution",
+      "evidence_ref": "docs/decisions/2026-10-02-new-wsl-client-configuration.md"
+    },
+    {
+      "kind": "gate",
+      "id": "mac-memory-qualification-closure-20261002",
+      "title": "Mac native memory qualification closure",
+      "state": "closed 2026-10-02 / retain existing native core / ai-memory 2.5.2 and Ollama 0.34.4 retained / no comparative winner / full-stack readiness not established",
+      "evidence_ref": "blueprints/memory-stack/native-qualification/closure.json"
+    },
+    {
+      "kind": "gate",
+      "id": "sdk-useful-task-preparation-20261002",
+      "title": "SDK useful-task acceptance preparation",
+      "state": "source preparation accepted and published / 3 oracle-discrimination runs retained / 7 frozen artifacts unchanged / not target SDK execution",
+      "evidence_ref": "blueprints/convergence-practice/clean-resolution-20261002/open-work.json"
+    },
+    {
+      "kind": "gate",
+      "id": "two-host-architecture-20261002",
+      "title": "Two-host architecture for North Star R and D (macOS and workstation)",
+      "state": "two-host design resolved / offline R and D starts with SPY one_stress mapping / 179 starter tests pass / workstation activation not attested",
+      "evidence_ref": "docs/decisions/2026-10-02-two-host-north-star-architecture.md"
+    },
+    {
+      "kind": "gate",
+      "id": "wsl-retrieval-retirement-20261003",
+      "title": "Historical WSL retrieval fixture retirement and archive scan",
+      "state": "entry points retired / 8 npm controls refuse / 50 inputs in 3 disjoint groups return 0 on OSV 2.6.0 / 0 SARIF results / 161 tests 2 skips / QMD still affected",
+      "evidence_ref": "evidence/receipts/wsl-retrieval-retirement-20261003.json"
     }
   ],
   "workers": [
