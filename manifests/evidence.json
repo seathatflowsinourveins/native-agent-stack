@@ -4172,6 +4172,16 @@
       "bytes": 14571
     },
     {
+      "path": ".github/workflows/suite-shards-trial-linux.yml",
+      "sha256": "0c2ce1b79a61f7d8ea09ba551d2d7c2d4633d4d6e71ed30ec79acf1a981e497c",
+      "bytes": 43205
+    },
+    {
+      "path": ".github/workflows/suite-shards-trial-macos.yml",
+      "sha256": "7c0e0cdaa32e5b1e9f972f97111a7f53c88d537f17f591f0a138e90c945caa45",
+      "bytes": 41095
+    },
+    {
       "path": ".github/workflows/supply-chain.yml",
       "sha256": "a752c1be5c7e73642085b3fd91f3e97c4b42167dbe5b3452b2bd1191652e9c24",
       "bytes": 7411
@@ -6231,6 +6241,261 @@
       "path": "blueprints/convergence-practice/service-reboot/upstream-tests.sh",
       "sha256": "8143d570f8f321db56b5deefc718c9e7aa7e4e00676c7f146f196b55272d0e7c",
       "bytes": 2816
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/README.md",
+      "sha256": "d32f497c405772803911345583ac6438ef60bcfe0934ed1943b82d4cb2fdae1b",
+      "bytes": 45442
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/compare.py",
+      "sha256": "02b3bbe618fb983b957cff1b5ccf49f62ee77dd063bd9f404d668b7e4938459f",
+      "bytes": 85527
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/controls/test_ctl_crash.py",
+      "sha256": "0bf36b68e97a4c882982de4d99af0406858f2fa14431862a4ce7ae51c519666f",
+      "bytes": 720
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/controls/test_ctl_fail.py",
+      "sha256": "b067142a620e8ce0afad350f30acd0d533aafbed782f2032c5402b974e2b23e4",
+      "bytes": 753
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/controls/test_ctl_hang.py",
+      "sha256": "c1e7282dce23394e37299f9d80c5b9849b760ea06c5d07561b6c36d4559fe353",
+      "bytes": 1429
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/controls/test_ctl_pass.py",
+      "sha256": "faaba7ea49fe4092e1d40fed74f316e24131a13adf91f15afe0f934f61a554b6",
+      "bytes": 512
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/experiment.json",
+      "sha256": "127d1be7b75667c2d30da8493a01c3adb2368841e2762a9e37a0f5dbcfde19f5",
+      "bytes": 64764
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/controls/foreground.probe.json",
+      "sha256": "6343be46de51999ccfcd649eff647c5c5d0df9e877002614379e6875cee7a344",
+      "bytes": 802
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/controls/heartbeat.json",
+      "sha256": "7b93614dcacfb0dcb38d6c4ebf763b99c6d01d201efaba9d4f36eed0a617d306",
+      "bytes": 3149
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/controls/shard-0.log",
+      "sha256": "f25993da6e4d499d57cb90f2ae466ee330e21b11af1f9a4ca31ebd01f4a91367",
+      "bytes": 190
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/controls/shard-0.probe.json",
+      "sha256": "1c13cc730d86d93aeb1474983fce2c7418a5a92867ae7a10bc9a8077e785f383",
+      "bytes": 801
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/controls/shard-1.log",
+      "sha256": "c1d01fb03d2892dd64a88190ea9af2735cb074724af823b19fe0b8672f2f2fc9",
+      "bytes": 640
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/controls/shard-1.probe.json",
+      "sha256": "5fe8d13e3c15457b01717a854446e6123da78771c273e8690130e5b50a1c8322",
+      "bytes": 801
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/controls/shard-2.log",
+      "sha256": "8b82ab471624517a831d7bbe332c73dedf15981431507ced7cb48be8c7f9e88e",
+      "bytes": 49
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/controls/shard-2.probe.json",
+      "sha256": "7cfb01958b9b8b0e8daef53f114fa17d71d0dc1e743c9d1356830bbf92696989",
+      "bytes": 801
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/controls/shard-3.log",
+      "sha256": "4ee70ce57f64709fb153093840e3cbbf00e70b1d6a3281d923b8f1be53f05a22",
+      "bytes": 49
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/controls/shard-3.probe.json",
+      "sha256": "17795fb2f3cd25dcc543a9121a668a3dc7e394d52d82081d28856111d0427d80",
+      "bytes": 801
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/index.json",
+      "sha256": "17594182ad87e8d536c2f0cdde9b5fd3a8ef893ae5d60d26718fd0fe3de13565",
+      "bytes": 8307
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/inventory/inventory.txt",
+      "sha256": "d496298d250c50e76918deec71507238626cbf2f90f952f4adc98de8da295518",
+      "bytes": 668
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/inventory/module_ids.json",
+      "sha256": "ff2dc7366c771e5fd33e711c31f0e0bc18e1f024e68c8e74473b3b5c504db8c2",
+      "bytes": 873
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/inventory/report.json",
+      "sha256": "3e2dce5643d445a21a7f73b5d13a916fde325f0f42c8545f8bda0892d9347970",
+      "bytes": 1072
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/inventory/shards/G4/shard-0.txt",
+      "sha256": "4cced5a9ce3a7750c906f0b5fa1a9892247e1eac10b3909f93af86d20a4c8aa5",
+      "bytes": 17
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/inventory/shards/G4/shard-1.txt",
+      "sha256": "68ced2c7bdd4cabfcddf4e2a2099823752ce2e69c0ca071af4d409093ed4573f",
+      "bytes": 16
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/inventory/shards/G4/shard-2.txt",
+      "sha256": "1eac0b78f96457746a11b344b3522d24dfaaafec762831b99d923ae18617a422",
+      "bytes": 48
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/inventory/shards/G4/shard-3.txt",
+      "sha256": "e912f83496f467101d683ddda0f899f526a08320a0d84f73b036548e35ea445e",
+      "bytes": 34
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/inventory/shards/G4/tail.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/inventory/shards/G4T/shard-0.txt",
+      "sha256": "4cced5a9ce3a7750c906f0b5fa1a9892247e1eac10b3909f93af86d20a4c8aa5",
+      "bytes": 17
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/inventory/shards/G4T/shard-1.txt",
+      "sha256": "68ced2c7bdd4cabfcddf4e2a2099823752ce2e69c0ca071af4d409093ed4573f",
+      "bytes": 16
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/inventory/shards/G4T/shard-2.txt",
+      "sha256": "0ce51d2fef28efe10729fe351a0cd137542cac82e521245beace76acea372aa3",
+      "bytes": 17
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/inventory/shards/G4T/shard-3.txt",
+      "sha256": "a37f7eb0e0a41ffe505ce75798df1cbed5284d900fc2864cfc3a47a3940756e3",
+      "bytes": 36
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/inventory/shards/G4T/tail.txt",
+      "sha256": "f50dc18df037de5f79745a45c34b834b8a110451c94bccdf2601df001de9bf55",
+      "bytes": 29
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/runs/G4-shard-0.log",
+      "sha256": "dd4b961964da67afba2418e1b5aa14e17f067c29b108e11205567acc3777a7e0",
+      "bytes": 445
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/runs/G4-shard-1.log",
+      "sha256": "6d2482a84c3414fc9f3d19a1f104a7d75ca2955dd17e45a91876676c3a95735c",
+      "bytes": 1725
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/runs/G4-shard-2.log",
+      "sha256": "f1f0607c3752ec910149836f6e48dcebb03e6bdc9198ec24602c679265571411",
+      "bytes": 288
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/runs/G4-shard-3.log",
+      "sha256": "ba5445b9be9496f5e66b105ad6ccc35f0419b1d30d2d6ca6a14b7520f192fb9a",
+      "bytes": 1086
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/runs/G4T-shard-0.log",
+      "sha256": "dd4b961964da67afba2418e1b5aa14e17f067c29b108e11205567acc3777a7e0",
+      "bytes": 445
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/runs/G4T-shard-1.log",
+      "sha256": "6d2482a84c3414fc9f3d19a1f104a7d75ca2955dd17e45a91876676c3a95735c",
+      "bytes": 1725
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/runs/G4T-shard-2.log",
+      "sha256": "25df704d1413375ad466c6256b5c2cd6df38da15a5345d20129f34823364173c",
+      "bytes": 951
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/runs/G4T-shard-3.log",
+      "sha256": "014993312d4a1d67b92eeb6945497378a1895378f87bcca666e0b8c0945b579a",
+      "bytes": 351
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/runs/G4T-tail.log",
+      "sha256": "815c4973a776fe33beeb5502f281e545a834863fb6f16851e24e6a13dbfdbc00",
+      "bytes": 169
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/runs/S-r1.log",
+      "sha256": "3a341d389108ceec013610fe34b607e80f1b27c9888f23372d1bed84bb8f4a7f",
+      "bytes": 3235
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/runs/S-r2.log",
+      "sha256": "3a341d389108ceec013610fe34b607e80f1b27c9888f23372d1bed84bb8f4a7f",
+      "bytes": 3235
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/runs/S-r3.log",
+      "sha256": "3a341d389108ceec013610fe34b607e80f1b27c9888f23372d1bed84bb8f4a7f",
+      "bytes": 3235
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/fixtures/weights-fixture.json",
+      "sha256": "ddf20bb273b19101e814c853d0c8f5dc9e8dcff4f5a5f52610740e057f2edd5d",
+      "bytes": 319
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/inventory.py",
+      "sha256": "86d1d50ac5d883c863014135a1ab7dc8b33965e9ee1c8ce9793b721b387adcea",
+      "bytes": 12784
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/logparse.py",
+      "sha256": "722f26cd461270cd7d1de37b5d9a00a466f228198a6a387189e8c39f66445d12",
+      "bytes": 34802
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/make_fixtures.py",
+      "sha256": "a0fee507be9bce61d461361476c19215e24fdadbd24698f2bb404904ab79b941",
+      "bytes": 14690
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/make_shards.py",
+      "sha256": "cbe887c55b0cd2ecba2cea0382451377dbb6b2de029f936e2cba84fcc9733fd4",
+      "bytes": 10105
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/record.py",
+      "sha256": "7dc55b647d17d05362f49f850fa86f4a1800dd406f63df5ae5d5aeb19107226c",
+      "bytes": 10303
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/test_compare.py",
+      "sha256": "40abed4ff10f6cc39399dc481dd464bf07c1b224dc0f229c73af018e71155802",
+      "bytes": 115048
+    },
+    {
+      "path": "blueprints/convergence-practice/suite-shards-trial-20261003/weights.json",
+      "sha256": "4450c53bda755f29a402838d25cc9f638fb7a16174af518034b16d0f741536ff",
+      "bytes": 10878
     },
     {
       "path": "blueprints/convergence-practice/validation.json",
@@ -15976,6 +16241,11 @@
       "path": "docs/decisions/2026-10-03-retire-pr320-loki-denominator-host-receipts.md",
       "sha256": "9751296fedcb316b2a44bf0c09b6886fe32b7daaaaa30d1ec4d226ac35c158c3",
       "bytes": 19619
+    },
+    {
+      "path": "docs/decisions/2026-10-03-suite-shards-trial.md",
+      "sha256": "27edab44998b528975f5d4563642ef048d532454104d1e06c6c6d0e635b1f89f",
+      "bytes": 51619
     },
     {
       "path": "docs/direct-results.md",
@@ -51144,8 +51414,8 @@
     },
     {
       "path": "tests/test_workflow_security_coverage.py",
-      "sha256": "10f6aaa08fb86cd17d07e764394e50e3ee1d92aadae79f0e173548a8b83d6111",
-      "bytes": 10624
+      "sha256": "2a37ea3eeed1cebe86e80547ac40f2ac39132330900631d52c99f8784920b499",
+      "bytes": 10888
     },
     {
       "path": "tests/test_wsl_memory_maintenance.py",
@@ -51787,6 +52057,7 @@
     "blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json",
     "blueprints/convergence-practice/omniroute-runtime-enhancements/experiment.json",
     "blueprints/convergence-practice/omniroute-runtime-workers/experiment.json",
-    "blueprints/convergence-practice/omniroute-runtime-workers/experiment-sdk-0160-20261003.json"
+    "blueprints/convergence-practice/omniroute-runtime-workers/experiment-sdk-0160-20261003.json",
+    "blueprints/convergence-practice/suite-shards-trial-20261003/experiment.json"
   ]
 }
