@@ -14,6 +14,7 @@ inventories. None of this is upstream acceptance or a GitHub-hosted run.
 
 import collections
 import contextlib
+import hashlib
 import importlib.util
 import io
 import json
@@ -281,6 +282,22 @@ class MutatedFixtureTests(unittest.TestCase):
         self.assertFalse(arms["P3C"]["eligible"])
 
 
+class FixtureFreezeTests(unittest.TestCase):
+    """experiment.json freezes fixtures/index.json and fixtures/inventory-controls.txt by hash. Every other file under
+    fixtures/ is frozen through the per-file sha256 that index.json lists for it, which this test checks, so a changed,
+    added or removed fixture log fails here and in the trial's compare job."""
+
+    def test_every_fixture_log_matches_its_sha256_in_the_index(self):
+        listed = {entry["file"]: entry["sha256"] for entry in INDEX["runs"] + INDEX["mutations"]}
+        self.assertEqual(len(listed), len(INDEX["runs"]) + len(INDEX["mutations"]), "a file is listed twice")
+        self.assertEqual((len(INDEX["runs"]), len(INDEX["mutations"])), (20, 7))
+        present = sorted(path.relative_to(FIXTURES).as_posix() for path in FIXTURES.rglob("*") if path.is_file())
+        self.assertEqual(present, sorted([*listed, "index.json", "inventory-controls.txt"]))
+        for relative, digest in sorted(listed.items()):
+            with self.subTest(file=relative):
+                self.assertEqual(hashlib.sha256((FIXTURES / relative).read_bytes()).hexdigest(), digest)
+
+
 class ResultsDirectoryTests(unittest.TestCase):
     def test_real_s_and_parallel_logs_are_equivalent_and_eligible(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -381,7 +398,8 @@ class ResultsDirectoryTests(unittest.TestCase):
                 self.assertEqual(compare.main(argv), 2)
                 unsorted.write_text("", encoding="utf-8")
                 self.assertEqual(compare.main(argv), 2)
-            self.assertEqual(printed.getvalue(), "macos-15: reject\n")  # equal timings miss the speed rule
+            # Equal timings miss the speed rule on macos-15; ubuntu-24.04 has no run directory and is listed anyway.
+            self.assertEqual(printed.getvalue(), "macos-15: reject\nubuntu-24.04: no verdict\n")
             self.assertIn("not sorted and de-duplicated", errors.getvalue())
             self.assertIn("the inventory is empty", errors.getvalue())
 
@@ -541,6 +559,65 @@ class StrictIdMappingTests(unittest.TestCase):
                 for os_name, verdict in result["verdicts"].items():
                     self.assertEqual((verdict["outcome"], verdict["selected_arm"]), ("no verdict", None), os_name)
                     self.assertIn("id_mapping.ok is false", verdict["reasons"][0])
+
+
+class EveryOsListedTests(unittest.TestCase):
+    """Every OS of compare.ARMS is listed in result.json and in the summary. An OS without any run directory gets no
+    verdict with the reason "no run directory", and a failed id mapping gives every OS no verdict, with or without
+    runs."""
+
+    SECONDS = {"S": (100.0, 100.0, 100.0), "P3": (40.0, 40.0, 40.0)}
+
+    def test_an_os_without_run_directories_is_listed_with_no_verdict(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            layout = Layout(tmp)
+            layout.standard(arms=("S", "P3"), seconds=self.SECONDS)
+            result = layout.result()
+        self.assertEqual(sorted(result["verdicts"]), sorted(compare.ARMS))
+        macos, linux = result["verdicts"]["macos-15"], result["verdicts"]["ubuntu-24.04"]
+        self.assertEqual((macos["outcome"], macos["selected_arm"]), ("adopt", "P3"))
+        self.assertEqual((linux["outcome"], linux["selected_arm"], linux["reasons"]),
+                         ("no verdict", None, ["no run directory"]))
+        self.assertEqual(sorted(linux["arms"]), sorted(compare.ARMS["ubuntu-24.04"]))
+        for arm, entry in linux["arms"].items():
+            with self.subTest(arm=arm):
+                self.assertEqual((entry["runs"], entry["eligible_runs"], entry["eligible"]), (0, 0, False))
+        self.assertEqual(linux["baseline"]["s_runs"], 0)
+        summary = compare.summary_markdown(result)
+        self.assertIn("- **ubuntu-24.04**: no verdict (no run directory); flaky ids in S: 0", summary)
+        for arm in compare.ARMS["ubuntu-24.04"]:
+            self.assertIn(f"| ubuntu-24.04 | {arm} | 0 | 0 | - | - | - | - | - | - | - | no |", summary)
+
+    def test_an_empty_results_directory_gives_no_verdict_on_every_os(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            layout = Layout(tmp)
+            (layout.root / "results").mkdir()
+            result = layout.result()
+        self.assertTrue(result["id_mapping"]["ok"], result["id_mapping"]["problems"])
+        self.assertEqual(sorted(result["verdicts"]), sorted(compare.ARMS))
+        for os_name, verdict in result["verdicts"].items():
+            with self.subTest(os=os_name):
+                self.assertEqual((verdict["outcome"], verdict["selected_arm"], verdict["reasons"]),
+                                 ("no verdict", None, ["no run directory"]))
+        summary = compare.summary_markdown(result)
+        for os_name in compare.ARMS:
+            self.assertIn(f"- **{os_name}**: no verdict (no run directory)", summary)
+
+    def test_a_failed_mapping_gives_no_verdict_to_an_os_with_or_without_runs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            layout = Layout(tmp)
+            layout.standard(arms=("S", "P3"), seconds=self.SECONDS)
+            result = layout.result(base=sorted(CONTROL_IDS + B1_BASE[1:]))
+        self.assertFalse(result["id_mapping"]["ok"])
+        macos, linux = result["verdicts"]["macos-15"], result["verdicts"]["ubuntu-24.04"]
+        for verdict in (macos, linux):
+            self.assertEqual((verdict["outcome"], verdict["selected_arm"]), ("no verdict", None))
+            self.assertIn("id_mapping.ok is false", verdict["reasons"][0])
+        self.assertEqual(linux["reasons"][1:], ["no run directory"])
+        summary = compare.summary_markdown(result)
+        self.assertIn("- **macos-15**: no verdict (id_mapping.ok is false", summary)
+        self.assertIn("; no run directory); flaky ids in S: 0", summary)
+        self.assertIn("- id mapping: FAILED, so no OS gets a verdict", summary)
 
 
 class CheckoutStatusTests(unittest.TestCase):

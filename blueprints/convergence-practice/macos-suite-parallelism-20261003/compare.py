@@ -1439,17 +1439,20 @@ def build_result(results: Path, base_path: Path, trial_path: Path, expectations_
     mapping = check_id_mapping(base, trial)
     verdicts = {}
     for os_name in ARMS:
-        if any(run.os == os_name for run in runs):
-            verdicts[os_name] = verdict_for_os(os_name, [run for run in runs if run.os == os_name],
-                                               controls, min_repeats)
-            verdicts[os_name]["baseline"] = baselines[os_name]
-            if not mapping["ok"]:
-                # experiment.json quality_rule, ID MAPPING: otherwise neither OS gets a verdict.
-                verdicts[os_name]["outcome"] = "no verdict"
-                verdicts[os_name]["selected_arm"] = None
-                verdicts[os_name]["reasons"].insert(
-                    0, "id_mapping.ok is false: the base and trial inventories differ by more than the B1 rewrite, "
-                       "so neither OS gets a verdict")
+        # Every preregistered OS is listed, with its arms, whether or not any of its runs arrived.
+        mine = [run for run in runs if run.os == os_name]
+        verdicts[os_name] = verdict_for_os(os_name, mine, controls, min_repeats)
+        verdicts[os_name]["baseline"] = baselines[os_name]
+        if not mine:
+            # No run directory of this OS (timed, control or crash) reached compare.py: no verdict, said plainly.
+            verdicts[os_name].update(outcome="no verdict", selected_arm=None, reasons=["no run directory"])
+        if not mapping["ok"]:
+            # experiment.json quality_rule, ID MAPPING: otherwise neither OS gets a verdict, with or without runs.
+            verdicts[os_name]["outcome"] = "no verdict"
+            verdicts[os_name]["selected_arm"] = None
+            verdicts[os_name]["reasons"].insert(
+                0, "id_mapping.ok is false: the base and trial inventories differ by more than the B1 rewrite, "
+                   "so neither OS gets a verdict")
     return {
         "schema": SCHEMA,
         "decision_rule": {
@@ -1468,6 +1471,8 @@ def build_result(results: Path, base_path: Path, trial_path: Path, expectations_
             "id_mapping": "the inventories differ only by the prefix " + repr(B1_PREFIX) + f" on exactly the "
                           f"{B1_IDS} base ids of the six B1 classes, as a bijection; otherwise every OS gets "
                           "no verdict",
+            "every_os": "every OS of the preregistration is listed in verdicts; one without any run directory "
+                        "gets no verdict (reason: no run directory)",
         },
         "inputs": {"inventory_base": {"count": len(base), "sha256": sha256_of(base_path)},
                    "inventory_trial": {"count": len(trial), "sha256": sha256_of(trial_path)},
