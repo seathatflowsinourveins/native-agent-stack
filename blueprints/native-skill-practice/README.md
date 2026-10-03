@@ -143,7 +143,8 @@ human-labelled replications pass (P1, then P1b with the P1 threshold frozen).
   run therefore starts with a canary: 10 frozen cases are re-scored and compared
   with their stored answers, and the run records how many answers changed,
   because two third-party evaluations saw answers move under the same version
-  ID. The P1 freeze packet names the 10 cases.
+  ID. The 10 cases and their stored answers are not frozen yet, so no run can
+  start before they are.
 - **A2 Custody.** Send only public or research-grade text whose terms allow
   third-party processing. Never send broker or account state, positions, orders,
   credentials, private receipts, host paths, licensed news, the SEC contact
@@ -185,11 +186,20 @@ human-labelled replications pass (P1, then P1b with the P1 threshold frozen).
   with `codex exec --output-schema`. Validation checks the shape, not whether a
   disposition is right.
 - **A7 Crosswalk routing.** `tools/sota-convergence/gap_crosswalk.py` records a
-  pair that no reviewer saw as `screened_out`: it has no final status, counts
-  toward no gap status, and consumers treat it as unknown. A pair whose gap text
-  contains a digit always goes to review (A3). Every crosswalk built after
-  2026-10-03 takes this rule and records it in `method.routing`. The retained
-  92bb279 crosswalk keeps the 2026-09-23 rule, so `build --check` still
-  reproduces it: its 725 unreviewed pairs read `not_addressed`, which is a screen
-  output, not a review decision. Re-recording it under the new rule first needs
+  pair that no reviewer saw as `screened_out`: it has no final status and counts
+  toward no gap status. A gap that has candidate pairs but no reviewed pair gets
+  the gap status `screened_out`, so it is not read as `open`, which means that no
+  reviewed pair addresses the gap or that no receipt names its layer. A pair
+  whose gap text contains a digit always goes to review (A3). Every crosswalk
+  built after 2026-10-03 takes this rule and records it in `method.routing`. The
+  crosswalk's two readers, `scripts/component_matrix.py` and
+  `tools/sota-convergence/gap_wave_ledger.py`, read only the retained 92bb279
+  crosswalk and do not handle `screened_out` yet, so they need that change
+  before they read a crosswalk built under this rule. The retained crosswalk
+  keeps the 2026-09-23 rule, so `build --check` still reproduces it: its 725
+  unreviewed pairs read `not_addressed`, which is a screen output, not a review
+  decision. Recording them as `screened_out` (A7 alone) takes no model call. It
+  needs a rule id without the digit route, and a re-record of the crosswalk, its
+  page and the gap-wave ledgers that embed its sha256; 135 of its gaps would then
+  read `screened_out`. Applying the digit route (A3) to it as well adds Opus
   reviews of the 369 unreviewed pairs whose gap text contains a digit.
