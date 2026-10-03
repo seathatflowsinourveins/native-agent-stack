@@ -44,6 +44,43 @@ order of use that amendment 2 states for A1b. Its record shows that order (`raw/
 arm, `after_arm_load` lists the arm alone, followed by `after_embedder_call` and `after_long_prompt`. The copy stays
 byte-identical to the file that ran.
 
+## Known defects in the as-run scripts, and their impact
+
+A review found two defects in step scripts after they had run. Both scripts stay as they ran, since an edit would not
+repair a past run; each impact rests on the original records, named by path and sha256 as `files.json` lists them.
+
+**The Part B window could not enforce its precondition.** In `scripts/steps/W-partb-window.sh`, `inside` (line 18) pipes
+the remote command into `clean` without `pipefail`, so its status is that of `clean`'s final `grep -v`, and `precheck`
+(line 28) returns `PIPESTATUS[0]`, the status of that wrapper. So `precheck` returned 0 whenever the remote side printed
+any line other than a `Failed to translate` line, whatever the remote precheck's own exit: a failed precondition would not
+have stopped the window at line 41 or 48. The defect affected only the exit status. The script recorded the precondition
+but could not enforce it, and the printed observation is the precondition evidence: `scripts/steps/M11p-precheck.sh` (an
+identical copy, sha256 `acf640a2…`) prints the two values its exit tests and exits 0 exactly when both are empty (lines
+10-11), and the window appended each printed line to its log, `raw/_gpu-window.txt` (sha256 `42c3758a…`). Each admitted
+window has two such lines, one before the workstation's services were stopped (line 41) and one after they stopped and
+before the generation model was loaded (line 48), and each records `resident=[] llama-server pids=[]`:
+
+| Window | Admitted runs | Precheck lines in `raw/_gpu-window.txt` |
+| --- | --- | --- |
+| pb1 | E1-pb1, E2-pb1 | `2026-10-02T23:13:16Z`, `2026-10-02T23:13:27Z` |
+| pb2 | E3-pb2 | `2026-10-02T23:48:48Z`, `2026-10-02T23:48:55Z` |
+
+These are the three runs the decision statistics use, so no qualification is left unknown by this defect. The copy's
+original (`43254cf8…` in `files.json`) is the revision deviation 4 recorded before window pb2, and the defect is stated
+for that revision. Window pb1 ran the revision amendment 4a hashed (`688722f7…`), which was not retained, so whether it
+had the same defect cannot be checked from source; the lines above do not depend on it, because they are the precheck's
+own output.
+
+**The G0 checksum count did not gate the runs.** `scripts/steps/M11-g0-run.sh` line 12 prints the number of lines of
+`sha256sum -c setup/hashes.txt` output, standard error included, that do not end in `: OK`, and the warm-up and the three
+scored runs follow without testing it, so a nonzero count would not have stopped a run. The count is diagnostic only, and
+the printed value is the evidence: each G0 record prints `prepared files changed since setup: 0` on its second line,
+before the warm-up, in `raw/M11-g0-S1.txt` (sha256 `4849c444…`), `raw/M11-g0-S2.txt` (`09046e46…`) and
+`raw/M11-g0-S1b.txt` (`e85547ce…`). A count of 0 means every line ended in `: OK`, so the six files that
+`M10-g0-setup.sh` hashed into `setup/hashes.txt` (lines 88-89) were unchanged when each arm's runs began. No decision rests
+on a G0 pass: every arm that ran G0 (S1, S2 and S1b) failed it, each record's summary reads
+`scored runs passed: 0 of 3 | arm passes G0: False`, and all three are out (`part-a-receipt.json`, `arms`).
+
 ## Reproducing the decision statistics
 
 From this folder, on the published records alone (no model, no network):
