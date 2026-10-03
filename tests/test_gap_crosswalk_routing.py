@@ -3,7 +3,8 @@ read offline. Nothing here calls TypeSafe.
 
 The rules come from section 3.1 of the design report "Jev and TypeSafe: typed judgments for the foundation and
 north-star R&D" (2026-10-03, revision r1, sha256 6fdd8bc2). A7: a pair that no reviewer saw gets no final decision
-(`screened_out`). A3: a pair whose gap text contains a digit always goes to review.
+(`screened_out`), and a gap with candidate pairs but no reviewed pair gets the gap status `screened_out`, not `open`.
+A3: a pair whose gap text contains a digit always goes to review.
 
 CrosswalkRoutingTests builds one fixture twice with build(): as a new crosswalk, which takes the new rule, and as the
 retained 92bb279 crosswalk, which keeps the 2026-09-23 rule. The second build is the negative control: the A7 and A3
@@ -32,11 +33,16 @@ NEW_RULE = "a7-screened-out-a3-digit-review-20261003"
 LAYER = "quality-evaluation"  # gap_crosswalk.OWNERS names an owner for it
 R0, R1 = "receipts/r0.json", "receipts/r1.json"
 GAPS = ["No native comparison against an alternative was run.",  # no digit
-        "The check needs a rerun on 2 hosts."]                      # a digit
-# (gap index, receipt) -> (P(settles), P(partially)); the tool's THRESHOLD is 0.3, so only (0, R1) passes the screen.
-SCREEN = {(0, R0): (0.05, 0.05), (0, R1): (0.2, 0.4), (1, R0): (0.05, 0.05), (1, R1): (0.05, 0.1)}
-# Reviews: the queued pair of gap 0 and both pairs of gap 1. Gap 0's first pair has none.
-REVIEWS = {(0, R1): "partially", (1, R0): "not_addressed", (1, R1): "settles"}
+        "The check needs a rerun on 2 hosts.",                      # a digit
+        "No upstream test was rerun.",                              # no digit, and no pair passes the screen
+        "No check on a second surface was run."]                    # no digit; its reviewed pair does not address it
+# (gap index, receipt) -> (P(settles), P(partially)); the tool's THRESHOLD is 0.3, so only (0, R1) and (3, R0) pass
+# the screen.
+SCREEN = {(0, R0): (0.05, 0.05), (0, R1): (0.2, 0.4), (1, R0): (0.05, 0.05), (1, R1): (0.05, 0.1),
+          (2, R0): (0.05, 0.05), (2, R1): (0.1, 0.1), (3, R0): (0.1, 0.3), (3, R1): (0.05, 0.05)}
+# Reviews: the queued pairs of gaps 0 and 3, and both pairs of gap 1. Gap 0's first pair, both pairs of gap 2 and gap
+# 3's second pair have none.
+REVIEWS = {(0, R1): "partially", (1, R0): "not_addressed", (1, R1): "settles", (3, R0): "not_addressed"}
 
 
 def load_tool():
@@ -128,6 +134,11 @@ class CrosswalkRoutingTests(unittest.TestCase):
         self.assertEqual(doc["method"].get("routing", {}).get("id"), NEW_RULE, "the document names its rule")
         self.assertIn("`screened_out`", page)
 
+    def check_a7_gap_status(self, doc: dict, page: str) -> None:
+        self.assertEqual(gaps(doc)[2]["status"], "screened_out", "a gap with no reviewed pair is not read as open")
+        self.assertEqual(gaps(doc)[3]["status"], "open", "a gap whose reviewed pair does not address it stays open")
+        self.assertIn("| screened_out | 1 |", page)
+
     def check_a3(self, doc: dict) -> None:
         for receipt in (R0, R1):
             entry = pairs(doc)[(1, receipt)]
@@ -143,6 +154,9 @@ class CrosswalkRoutingTests(unittest.TestCase):
     def test_a7_a_pair_no_reviewer_saw_has_no_final_decision(self):
         self.check_a7(*self.new)
 
+    def test_a7_a_gap_with_no_reviewed_pair_is_not_open(self):
+        self.check_a7_gap_status(*self.new)
+
     def test_a3_a_gap_with_a_digit_sends_every_pair_to_review(self):
         self.check_a3(self.new[0])
         self.check_a3_refusal(NEW_ID)
@@ -151,9 +165,12 @@ class CrosswalkRoutingTests(unittest.TestCase):
         doc, page = self.frozen
         self.assertEqual(pairs(doc)[(0, R0)]["final_decision"], "not_addressed", "the screen closed the pair")
         self.assertFalse(pairs(doc)[(1, R0)]["queued"], "the digit did not send the pair to review")
+        self.assertEqual(gaps(doc)[2]["status"], "open", "a gap with no reviewed pair reads as open")
         self.assertNotIn("routing", doc["method"])
         self.assertFalse(any("review_route" in entry for entry in pairs(doc).values()))
-        for name, check in (("A7", lambda: self.check_a7(doc, page)), ("A3", lambda: self.check_a3(doc)),
+        for name, check in (("A7", lambda: self.check_a7(doc, page)),
+                            ("A7 gap status", lambda: self.check_a7_gap_status(doc, page)),
+                            ("A3", lambda: self.check_a3(doc)),
                             ("A3 refusal", lambda: self.check_a3_refusal(FROZEN_ID))):
             with self.subTest(check=name), self.assertRaises(AssertionError):
                 check()

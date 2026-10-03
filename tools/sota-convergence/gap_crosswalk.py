@@ -266,15 +266,19 @@ def sha_file(path):
 # Routing of each (gap, receipt) pair, from section 3.1 of the design report "Jev and TypeSafe: typed judgments for
 # the foundation and north-star R&D" (2026-10-03, revision r1, sha256 6fdd8bc2).
 # A7: the screen orders and filters the review queue but sets no final decision. A pair that no reviewer saw is
-# recorded as screened_out, which is not a final status: it counts toward no gap status, and a consumer treats it as
-# unknown. A3: Jev must not decide a pair whose support can turn on a number or a date, so a pair whose gap text
-# contains a digit always goes to review. The gap text is the claim here; receipts nearly always carry dates and
-# versions, so the same test over them would queue every pair. Number words ("two hosts") are not detected.
+# recorded as screened_out, which is not a final decision and counts toward no gap status. A gap that has candidate
+# pairs but no reviewed pair gets the gap status screened_out, so it is not read as open; open means that no reviewed
+# pair addresses the gap, or that no receipt names its layer. A3: Jev must not decide a pair whose support can turn on
+# a number or a date, so a pair whose gap text contains a digit always goes to review. The gap text is the claim here;
+# receipts nearly always carry dates and versions, so the same test over them would queue every pair. Number words
+# ("two hosts") are not detected.
 # Every crosswalk takes ROUTING and records it in method.routing, except the retained 92bb279 ledger: it was built
 # and reviewed under the 2026-09-23 rule (P >= THRESHOLD queued, every other unreviewed pair closed as not_addressed),
 # and `build --check` reproduces it under that rule. Its unreviewed not_addressed entries are screen outputs, not
 # review decisions. Re-recording it under ROUTING first needs reviews of its unreviewed pairs whose gap text contains
-# a digit. A crosswalk document without method.routing was built under the 2026-09-23 rule.
+# a digit. A crosswalk document without method.routing was built under the 2026-09-23 rule. The crosswalk's two
+# readers, scripts/component_matrix.py and tools/sota-convergence/gap_wave_ledger.py, read only that ledger's gap
+# status and do not handle screened_out yet.
 # Overturn: the report's section 7 lets the screen set a final status only after two preregistered held-out
 # replications pass (P1, then P1b with the P1 threshold frozen).
 ROUTING = "a7-screened-out-a3-digit-review-20261003"
@@ -369,7 +373,8 @@ def build(args):
                     recs.append(entry)
                 if pairs:
                     raise SystemExit(f"review names receipts outside the candidates: {lid}[{i}] {sorted(pairs)}")
-                status = STATUS[best]
+                screened = bool(recs) and all(e["final_decision"] == SCREENED_OUT for e in recs)
+                status = SCREENED_OUT if screened else STATUS[best]  # A7: no reviewer saw any pair of this gap
                 gaps.append({"index": i, "text": text, "status": status, "category": rv["category"],
                              "category_reason": rv["category_reason"], "next_check": rv.get("next_check") or None,
                              "typesafe_blocker_advisory": {"choice": j["answers"]["blocker"]["choice"],
@@ -394,7 +399,9 @@ def build(args):
             "id": routing,
             "rule": ("A pair enters review when P(settles)+P(partially) >= threshold_p_addressed (review_route "
                      "typesafe_threshold) or when its gap text contains a digit (digit_in_gap). A pair that no reviewer "
-                     "saw is screened_out: no final status, counted toward no gap status, unknown to consumers."),
+                     "saw is screened_out: it has no final decision and counts toward no gap status. A gap with "
+                     "candidate pairs but no reviewed pair has the status screened_out; open means that no reviewed "
+                     "pair addresses the gap or that no receipt names its layer."),
         }
     doc = {
         "schema_version": 1, "id": CROSSWALK_ID, "checked_at": "2026-09-23",
@@ -434,7 +441,8 @@ def render(doc):
            f"2. **TypeSafe screen.** `{MODEL}` (question revision `{SCHEMA_REVISION}`) gives each pair P(settles)+P(partially). A pair enters review at P ≥ {THRESHOLD}. The [preregistration](../{EVID}/PREREGISTRATION.md) fixed that rule before any call, and the eval on the 315 reviewed `bdd04ca` gaps chose the threshold: {t['tp']} of {t['tp'] + t['fn']} addressed gaps were caught, with {t['fp']} false positives out of {t['fp'] + t['tn']}.{digit_rule}",
            f"3. **Review.** Opus reviewers decided every queued pair and categorized every gap. A second, independent Opus reviewer re-checked each positive decision, and a disagreement replaces it. TypeSafe's own blocker categories agreed with the reviewed labels on {ev['blocker_agreement']['agree']} of {ev['blocker_agreement']['total']} eval gaps, below the preregistered 0.60 bar, so they are kept only as `typesafe_blocker_advisory`.", "",
            "## Totals", "", "| Status | Gaps |", "| --- | ---: |"]
-    out += [f"| {k} | {st.get(k, 0)} |" for k in ("settled_by_receipt", "advanced_by_receipt", "open")]
+    statuses = ("settled_by_receipt", "advanced_by_receipt", "open") + ((SCREENED_OUT,) if routed else ())
+    out += [f"| {k} | {st.get(k, 0)} |" for k in statuses]
     out += ["", "| Category | Gaps |", "| --- | ---: |"] + [f"| {k} | {v} |" for k, v in ca.most_common()]
     out += ["", "## Per layer", "", "| Catalog | Layer | Owner | Gaps | By receipt (settled/advanced) | executable_now |",
             "| --- | --- | --- | ---: | ---: | ---: |"]
@@ -457,8 +465,9 @@ def render(doc):
     out += ["## Limits", "",
             "- **Indexes.** `index` refers to the rows at the source revision. A later re-record needs a new crosswalk.",
             ("- **Screened out.** A pair below the threshold whose gap text has no digit was not reviewed. It is recorded as "
-             "`screened_out`, which is no decision: it counts toward no status, and a reader treats it as unknown. On the "
-             "eval set the threshold missed 2 of 29 addressed gaps." if routed else
+             "`screened_out`, which is no decision, and it counts toward no gap status. A gap none of whose pairs was "
+             "reviewed has the status `screened_out`, not `open`: whether an existing receipt addresses it is unknown. "
+             "On the eval set the threshold missed 2 of 29 addressed gaps." if routed else
              "- **Recall.** TypeSafe screens pairs, so a pair below the threshold was not reviewed. On the eval set this missed 2 of 29 addressed gaps."),
             "- **Categories.** They are reviewer judgments under the stated operating context (one WSL2 workstation, paper orders only, no paid data, no second machine). They are not a guarantee that a check will succeed.", ""]
     return "\n".join(out)
