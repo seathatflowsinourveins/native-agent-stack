@@ -1,0 +1,186 @@
+{
+  "study": "token-context-20261003",
+  "scope": "Pre-freeze Context Mode source tests and model-free shipped-tool integration; no client activation or protection/efficiency acceptance",
+  "source": {
+    "version": "1.0.169",
+    "commit": "589d8214d56740a28b5f7bf63167743d586b0b40",
+    "tree": "2daa0e69cd0f5a3b030573be7bbbfd3d0aa30603",
+    "shipped_cli_sha256": "c95375fe138cabeda11acec671d1e0fb613b806d1bbab8f372b221fc7ebfe1e2",
+    "shipped_server_sha256": "dadb1987cb345a3ed4c5af6e648dc3e4250ec87f172f3ca309dc64dba3ffe5f2",
+    "source_built_server_sha256": "e7162fe44bc899b6a8582864b47d3e00e5f84fa3098022226a5725b3822709ec",
+    "installed_reviewed_commit": "6f0cc6841c687e754059f36714a11233fda1a02b",
+    "installed_bundle_equals_released_bundle": false,
+    "installed_profile_changed": false
+  },
+  "dependencies": {
+    "acquisition": "Documented npm install in owned rootless Node24.21.0 container; non-frozen resolution",
+    "npm_ci_exit": 1,
+    "npm_ci_failure": "No npm lock; upstream release carries bun.lock",
+    "npm_install_exit": 0,
+    "generated_lock_sha256": "1390523c39e3fee7a581f70df9d724aa27cf67ccdba5ac1002b8ed4e3cd6c87f",
+    "captured_dependency_files": 5803,
+    "reverified": true,
+    "sdk_resolved": "1.32.0",
+    "sdk_bun_lock": "1.26.0",
+    "reproducible_bun_frozen_acceptance": false
+  },
+  "unchanged_upstream_tests": [
+    {
+      "command": "npm test -- tests/session/session-db.test.ts tests/session/session-db-bytes-migration.test.ts tests/session/session-snapshot.test.ts tests/session/session-pipeline.test.ts tests/hooks/precompact-snapshot-event.test.ts tests/hooks/codex-goal-compact.test.ts tests/hooks/sessionstart-resume-event.test.ts tests/store-bytecap.test.ts",
+      "artifact_kind": "Source build via unchanged npm pretest",
+      "exit_code": 0,
+      "files_passed": 8,
+      "tests_passed": 145,
+      "coverage": "Selected model-free session persistence, snapshots, resume and byte-cap tests; not full suite"
+    },
+    {
+      "command": "npm run test:use-cases",
+      "exit_code": 0,
+      "cases_passed": 10,
+      "cases_failed": 0,
+      "python_conditional": "Python branch not exercised"
+    },
+    {
+      "command": "npm run test:ecosystem",
+      "exit_code": 0,
+      "scenarios_passed": 13,
+      "scenarios_skipped": 0,
+      "usage_meaning": "Synthetic fixture bytes/bytes4 estimates; embedded reported tests and savings are fixture content, not client execution"
+    },
+    {
+      "command": "npm exec --offline -- tsx tests/mcp-integration.ts",
+      "exit_code": 1,
+      "passed": 3,
+      "failed": 21,
+      "artifact_kind": "Legacy MCP harness against source-built server",
+      "cause": "Harness expects old version0.4.0/five unprefixed tools; current registry has eleven ctx_* tools",
+      "limits": "Negative passes can also be unknown-tool errors; no current-tool/public-fetch acceptance"
+    }
+  ],
+  "current_tool_harness": {
+    "tool": "MCP Inspector2.9.0 native CLI",
+    "pin": "ae865a19178ddf6f375780a02e9c77c4cf4da184",
+    "executable_sha256": "d8acbe3f114088d95e6ece605ab0a2e24f80ee58dac242b3017a7e9c09e8afaf",
+    "lock_sha256": "aa4f83383ea4d678a8dbb72c7df2c2379cea86adc7609dcf180230acf08208a6",
+    "help_exit": 0,
+    "release_content_diff_exit": 0,
+    "artifact": "Complete unchanged released tree and shipped server, with adjacent captured non-frozen dependencies"
+  },
+  "current_operations": [
+    {
+      "name": "initialize",
+      "exit_code": 0,
+      "reported_server": "context-mode1.0.169",
+      "protocol": "2025-11-25",
+      "stdout_sha256": "9167c8482876697ca8238a98fcac18b4da4cb9a8d6653b721f2feb837446b97a"
+    },
+    {
+      "name": "tools/list",
+      "exit_code": 0,
+      "tools": 11,
+      "stdout_sha256": "d6cd4e02ec137850b1dd10a431f02bf6abcd93208b9ae8b8c248c337e1bf89fc"
+    },
+    {
+      "name": "ctx_execute",
+      "exit_code": 0,
+      "stdout_bytes": 6,
+      "returned_text_bytes": 47,
+      "returned_text_o200k_tokens": 14,
+      "source_derived_response_cmp_exit": 0,
+      "stdout_sha256": "6f23a3aec8802b1b4a53181effcb7ed358526a48e50b75724a803354fd49e698"
+    },
+    {
+      "name": "ctx_execute_file",
+      "exit_code": 0,
+      "fixture_bytes": 1513,
+      "stdout_bytes": 24,
+      "returned_text_bytes": 333,
+      "returned_text_o200k_tokens": 77,
+      "source_derived_response_cmp_exit": 0,
+      "stdout_sha256": "6efc9e2644507d24dc74f024b0571197215b8c2b13893177d17725d010697bc7"
+    },
+    {
+      "name": "ctx_execute large output",
+      "exit_code": 0,
+      "source_derived_stdout_budget_bytes": 1010000,
+      "returned_text_bytes": 245,
+      "returned_text_o200k_tokens": 71,
+      "meaning": "Default indexed-source pointer for repeated padding; raw stdout token count, content recall and complete-original recovery unknown",
+      "stdout_sha256": "f410c39c2d27d49f1b900260670dd667b108136736ce0dfebe9b4d3935de2db5"
+    },
+    {
+      "name": "malformed ctx_execute args",
+      "exit_code": 5,
+      "is_error": true,
+      "meaning": "Actual string/number schema validation; synthetic negative"
+    },
+    {
+      "name": "unknown tool",
+      "exit_code": 5,
+      "meaning": "Inspector tool_not_found client rejection; not a direct server rejection"
+    },
+    {
+      "name": "ctx_index",
+      "exit_code": 0,
+      "fixture_bytes": 17362,
+      "fixture_o200k_tokens": 4585,
+      "returned_text_bytes": 158,
+      "returned_text_o200k_tokens": 43,
+      "stdout_sha256": "133eb6ee253a03df84fe8366f86ee6ea27a0151a153240fe559ba672ab449eb7"
+    },
+    {
+      "name": "ctx_search separate invocation",
+      "exit_code": 0,
+      "returned_text_bytes": 588,
+      "returned_text_o200k_tokens": 161,
+      "exact_term_and_source_check_exit": 0,
+      "scope": "One expected search_codebase term and fixed-mcp-tools source, partial excerpt",
+      "stdout_sha256": "b84f09ecdb6652e357a5cdee7273a69e9b640980bc25dcdacfa3efc0bc57d667"
+    }
+  ],
+  "counting": {
+    "counter": "Existing token_manifest.count_files, gpt-tokenizer4.0.0/o200k_base",
+    "selected_schema_artifact": {
+      "bytes": 8024,
+      "o200k_tokens": 1749,
+      "sha256": "15ff456f9791832d035daf96610ac97297378ee9e5ba61cdc924fa40c2b1c8d8"
+    },
+    "rule": "These are separate actual artifact boundaries; source, pointers, results and schemas overlap and are not summed. No provider/context protection saving inference."
+  },
+  "isolation": "Owned server-only config/state/project, explicit private Inspector config/storage/OAuth/client paths, memory secret store, stored-auth-only; native HOME/account profiles untouched. No upgrade/purge/fetch/model calls.",
+  "cleanup": {
+    "owned_process_search_exit": 1,
+    "owned_process_output_bytes": 0,
+    "inspector_storage_files": 0,
+    "meaning": "Observed scoped absence after native disconnect; retained caches/receipts are not active registrations"
+  },
+  "retained_private_artifacts": {
+    "qualification_sha256": "5c5e635329f67587a2630a8633ade54923513e259b7883722aeb7cfb2fb61de3",
+    "receipt_manifest_sha256": "b677b1cb88426c89cd5214825f3d6a46b90b576a66192a78210ccfbb184921d3",
+    "original_receipt_artifacts": 125,
+    "original_manifest_check_exit": 0,
+    "all_context_dependencies_reverified": true
+  },
+  "failures_and_corrections": [
+    "Initial empty Docker context selected wrong endpoint; explicit installed rootless endpoint corrected without daemon change",
+    "npm ci rejected missing npm lock; documented npm install retained as non-frozen",
+    "Whole legacy MCP harness failed; selected current shipped tools qualified separately, without editing tests",
+    "Archive metadata comparison failed; native full release-content comparison passed",
+    "Fixture selector and jq receipt rendering failed before relevant calls; corrected without runtime repair",
+    "Initial direct artifact-counter config omitted node carrier; existing module default restored, no candidate call repeated",
+    "Draft receipt invented test:mcp script and redundant --run; original argv and package.json verified and corrected before publication"
+  ],
+  "sources": [
+    "https://github.com/mksglu/context-mode/tree/589d8214d56740a28b5f7bf63167743d586b0b40",
+    "https://github.com/modelcontextprotocol/inspector/blob/ae865a19178ddf6f375780a02e9c77c4cf4da184/clients/cli/README.md",
+    "https://github.com/modelcontextprotocol/inspector/blob/ae865a19178ddf6f375780a02e9c77c4cf4da184/docs/environment-variables.md"
+  ],
+  "limits": [
+    "Default100MiB cap not reached; unchanged bytecap unit test lowers cap to1KiB",
+    "Frozen dependency reproduction, all-byte original recovery and large-output recall remain unknown",
+    "Natural Codex/Claude main/child invocation, P2 compaction/resume and provider-native comparison counters unqualified",
+    "Browser fixture not exercised here; PDF/CJK/image/audio preservation unqualified",
+    "No unchanged full suite or native-client acceptance inferred from selected operations",
+    "Existing distribution plugin preserved; no promotion or definitive row amendment"
+  ]
+}

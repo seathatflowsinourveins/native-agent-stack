@@ -1,0 +1,85 @@
+{
+  "study": "token-context-20261003",
+  "evidence_class": "native_cli_integration_check",
+  "scope": "Actual root main-thread natural-compaction meter accounting; no child-inclusive study total or protection comparison",
+  "candidate": {
+    "version": "ccusage20.0.26",
+    "pin": "d9821088b98aa536c7a385aa1a4579d6fa02269b",
+    "binary_sha256": "f978214d6d373d2a2e242c5f329b59fcb4181c3fb0cd5b831d6f153ee69b4370"
+  },
+  "preregistration": {
+    "prepared_at": "2026-10-03T04:38:36.237802+00:00",
+    "sha256": "9f5264fdbdc73c3a080f95d660694a303e2b7b0d9ec2dbb14d4be3486e51836c",
+    "candidate_executed_after_freeze": true,
+    "cutoff_timestamp": "2026-10-03T04:32:15.579Z",
+    "source_prefix_lines": 2102,
+    "source_prefix_bytes": 9166678,
+    "source_prefix_sha256": "8ac153fdd7ece1ea7226ed7ede11fa595a8f9da1646304422d1bfbb2a704c2e8",
+    "usage_projection_sha256": "3e1710a8d2d4d0c5eb86a724228de58c9565cc0dbcd6303fce363077e96abd92",
+    "synthetic_exact_only_sha256": "48af823d5ad99d352e6323454722b5302c2fa7beb45e88cddffcf506b43c1f83"
+  },
+  "native": {
+    "unique_responses": 199,
+    "nested_checkpoint_duplicates": 3,
+    "input_inclusive": 25441585,
+    "cached_subset": 24683520,
+    "cache_write_subset": 0,
+    "output": 177690,
+    "reasoning_subset": 68259,
+    "total": 25619275,
+    "thread_total_matches": true
+  },
+  "released_meter": {
+    "exit_code": 0,
+    "input_inclusive": 24813461,
+    "uncached_input": 749717,
+    "cached_subset": 24063744,
+    "cache_write_subset": 0,
+    "output": 151998,
+    "reasoning_subset": 68259,
+    "total": 24965459,
+    "exact_categories_match": false,
+    "last_legacy_snapshot_matches": true,
+    "missing_pricing": true,
+    "stdout_sha256": "223c80e0730137c11061708543d6e480408d67c3de0938b088dd104e14f3f1de"
+  },
+  "omissions": {
+    "input_inclusive": 628124,
+    "cached_subset": 619776,
+    "output": 25692,
+    "reasoning_subset": 0,
+    "total": 653816,
+    "exactly_matches_three_native_compaction_responses": true,
+    "compaction_response_totals": [
+      225104,
+      207996,
+      220716
+    ]
+  },
+  "synthetic_control": {
+    "exit_code": 1,
+    "error": "No Codex session found",
+    "meaning": "Legacy token_count records removed from the selected native projection; synthetic control, not another session",
+    "stderr_sha256": "2e8dc16a2c14407bd06a47b6b0a3e6fbcc452472786fc249c875f872bdb124de"
+  },
+  "command": "ccusage codex session --id SELECTED --json --offline --no-cost --speed standard",
+  "original_native_outer_invocation_envelope": {
+    "start_utc": "2026-10-03T04:39:56.954Z",
+    "completion_utc": "2026-10-03T04:39:58.050Z",
+    "scope": "Original native outer tool call carrying both sequential Docker commands; individual subprocess UTC times remain unavailable"
+  },
+  "isolation": "Existing unchanged binary, rootless disposable network-disabled/read-only containers, capabilities dropped/no-new-privileges; only owned selected usage files and binary mounted at empty native default home. No HOME/CODEX_HOME replacement, auth/config mount or account change.",
+  "cleanup": "Native --rm completion; independent scoped docker ps output empty",
+  "native_counter_usage": "No model calls in this meter integration; original goal-session model usage is the test input, not additional usage.",
+  "outcome": "Released meter scope excluded; exact native usage records retained. No token saving, cost reduction, compaction quality or protection superiority claim.",
+  "sources": [
+    "https://github.com/ccusage/ccusage/blob/d9821088b98aa536c7a385aa1a4579d6fa02269b/rust/adapters/codex/src/parser.rs#L318",
+    "https://github.com/openai/codex/releases/tag/rust-v0.160.0"
+  ],
+  "limits": [
+    "CLI original UTC start/end unavailable; command, exit, wall duration and original returned output retained",
+    "Provider cost unknown; --no-cost and missingPricing are not evidence of free usage",
+    "Root child/advisor/request-retry totals excluded from this main-thread input",
+    "P2 fixed continuity/resume and protection comparison remain unqualified"
+  ]
+}

@@ -45,10 +45,15 @@
       "rtk-artifacts",
       "rtk-tests",
       "toon-fidelity",
-      "toon-tests"
+      "toon-tests",
+      "native-calibration",
+      "context-source-tests",
+      "context-current-tools",
+      "meter-compaction"
     ],
     "roles": [
       "command-worker",
+      "context-worker",
       "coordinator",
       "meter-worker",
       "structured-worker"
@@ -128,7 +133,16 @@
     "ccusage claude session --id SELECTED --json --offline --mode display in selected-record container",
     "CI=1 pnpm run test at pinned TOON source",
     "Released TOON strict decode/semantic comparison controls",
-    "Existing token_manifest.count_files with gpt-tokenizer4.0.0/o200k_base"
+    "Existing token_manifest.count_files with gpt-tokenizer4.0.0/o200k_base",
+    "Promptfoo eval -c calibration.json --no-cache --repeat 1 -j 1 -o results.json; native SDK providers",
+    "Promptfoo eval -c calibration-regrade.json --model-outputs retained.json --no-cache; actually invokes configured native providers",
+    "Promptfoo eval --assertions schema.json --model-outputs retained.json --no-cache -j 1; native echo providers",
+    "npm test -- eight selected upstream Context Mode session/hooks/store files; source rebuild",
+    "npm exec --offline -- tsx tests/mcp-integration.ts; unchanged legacy source-built harness",
+    "Pinned Inspector2.9.0 native tools/call ctx_execute on shipped Context Mode sentinel",
+    "Pinned Inspector2.9.0 native tools/call ctx_search after separate native ctx_index",
+    "ccusage codex session --id SELECTED --json --offline --no-cost --speed standard; preregistered native third-compaction cutoff",
+    "Same released ccusage command on separately labelled exact-only synthetic control"
   ],
   "observations": [
     {
@@ -533,6 +547,285 @@
         "total": null,
         "native_retries": null
       }
+    },
+    {
+      "id": "native-calibration-first",
+      "task": "native-calibration",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 10,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": true,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/native-calibration.json",
+          "sha256": "56f4d5279102a64e9aae06cd5a98281e73d56a8b946bf8286a86e0c34c73f7b4"
+        }
+      ],
+      "usage": {
+        "uncached_input": 26211,
+        "cache_creation": 10536,
+        "cache_read": 199363,
+        "output": 3294,
+        "reasoning_in_output": 1953,
+        "total": 239404,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "native-calibration-unintended-live",
+      "task": "native-calibration",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 11,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/native-calibration.json",
+          "sha256": "56f4d5279102a64e9aae06cd5a98281e73d56a8b946bf8286a86e0c34c73f7b4"
+        }
+      ],
+      "usage": {
+        "uncached_input": 25277,
+        "cache_creation": 3146,
+        "cache_read": 149177,
+        "output": 3742,
+        "reasoning_in_output": 2371,
+        "total": 181342,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "native-calibration-echo-regrade",
+      "task": "native-calibration",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 3,
+      "command_index": 12,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/native-calibration.json",
+          "sha256": "56f4d5279102a64e9aae06cd5a98281e73d56a8b946bf8286a86e0c34c73f7b4"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "context-selected-tests",
+      "task": "context-source-tests",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 13,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/context-mode-qualification.json",
+          "sha256": "72431dbf70c68acb68913d2dc343384ce651bf801b741151d48930a2e4c001b9"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "context-legacy-mcp",
+      "task": "context-source-tests",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 14,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/context-mode-qualification.json",
+          "sha256": "72431dbf70c68acb68913d2dc343384ce651bf801b741151d48930a2e4c001b9"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "context-current-execute",
+      "task": "context-current-tools",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 15,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/context-mode-qualification.json",
+          "sha256": "72431dbf70c68acb68913d2dc343384ce651bf801b741151d48930a2e4c001b9"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "context-current-search",
+      "task": "context-current-tools",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 16,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/context-mode-qualification.json",
+          "sha256": "72431dbf70c68acb68913d2dc343384ce651bf801b741151d48930a2e4c001b9"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "meter-native-compaction-gap",
+      "task": "meter-compaction",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 17,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/meter-compaction-qualification.json",
+          "sha256": "9684aa3f8401b64ce3b5634e7e5c5c1149271a04fcd999c140372f8617456670"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "meter-compaction-exact-only",
+      "task": "meter-compaction",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 18,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Pre-freeze source/runtime qualification only; no comparative/default activation",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/meter-compaction-qualification.json",
+          "sha256": "9684aa3f8401b64ce3b5634e7e5c5c1149271a04fcd999c140372f8617456670"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
     }
   ],
   "failures_and_skips": [
@@ -559,14 +852,40 @@
     {
       "run_id": "toon-root-bom-control",
       "reason": "Released CLI changes U+FEFF-root-string values/types without decode rejection; JSON-wide scope rejected"
+    },
+    {
+      "run_id": "native-calibration-first",
+      "reason": "Assertion syntax failure after live model calls; later echo regrade passes same retained outputs"
+    },
+    {
+      "run_id": "native-calibration-unintended-live",
+      "reason": "--model-outputs without --assertions did not replay; unintended second native calls retained despite passing functional grades"
+    },
+    {
+      "run_id": "context-legacy-mcp",
+      "reason": "Whole unchanged obsolete harness fails against current ctx_* registry; current shipped tool checks separate"
+    },
+    {
+      "run_id": "meter-native-compaction-gap",
+      "reason": "Released meter excludes653816 actual native compaction tokens; native exact and thread counters reconcile"
+    },
+    {
+      "run_id": "meter-compaction-exact-only",
+      "reason": "Synthetic projection without legacy token_count records remains unparsed"
     }
   ],
   "limitations": [
     "The contract checker verifies declared consistency/hash integrity, not truth or a complete upstream/provider run",
     "Source/runtime qualification receipts bind private original outputs through hashes and independent coordinator observation; sanitized summaries are not upstream acceptance by themselves",
-    "Context Mode container source-build qualification is pending; actual released bundle, native hooks/continuity, main/child/retry/compaction/advisor coverage and owner-bound retrieval/window remain open",
+    "Context Mode selected source-built tests and shipped current-tool Inspector operations are complete within their receipts. Full/frozen-dependency acceptance, native-client hooks/continuity and comparative binding remain pending.",
     "Three research reads share no study comparison: summaries reconcile native streams but are not independent invoices. Whole-research usage and paid costs remain unknown",
-    "No powered comparisons, measured default promotion or accepted final PR yet"
+    "No powered comparisons, measured default promotion or accepted final PR yet",
+    "The latest native Claude query modelUsage covers only its upstream-declared pipeline; native list estimates are not invoices.",
+    "The two selected live calibrations include Codex child exact records; broader goal/research usage is not declared complete.",
+    "Actual root natural compaction validates accounting coverage only; fixed P2 quality/resume remains open.",
+    "Context Mode selected source tests and shipped Inspector checks are distinct; non-frozen dependencies/full original recovery remain limits.",
+    "S1 fixed questions now allow adequate focused native computation; no useful natural TOON opportunity is manufactured.",
+    "Initial local consistency check rejected duplicate task/role/condition attempt tuples; per-task attempt identifiers were corrected before publication, without repeating measurements."
   ],
   "decision_and_scope": {
     "decision": "trial",
@@ -591,7 +910,16 @@
       "ccusage-claude-main",
       "toon-upstream-tests",
       "toon-root-bom-control",
-      "rtk-complete-artifacts"
+      "rtk-complete-artifacts",
+      "native-calibration-first",
+      "native-calibration-unintended-live",
+      "native-calibration-echo-regrade",
+      "context-selected-tests",
+      "context-legacy-mcp",
+      "context-current-execute",
+      "context-current-search",
+      "meter-native-compaction-gap",
+      "meter-compaction-exact-only"
     ],
     "coverage_artifact": null
   }
