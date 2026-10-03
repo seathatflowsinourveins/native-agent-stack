@@ -1,0 +1,320 @@
+{
+  "contender": "ukgovernmentbeis/inspect_ai",
+  "revision": {
+    "contender": "ukgovernmentbeis/inspect_ai",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "UKGovernmentBEIS/inspect_ai",
+        "tag": null,
+        "commit": "c05398d897affcb85bd4cb9d10a7c03e1779a18e",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": null,
+    "commit": "c05398d897affcb85bd4cb9d10a7c03e1779a18e",
+    "read_at": "2026-10-02T03:02:58+00:00"
+  },
+  "dossier": {
+    "contender": "ukgovernmentbeis/inspect_ai",
+    "revision": {
+      "tag": "0.3.275",
+      "commit": "c05398d897affcb85bd4cb9d10a7c03e1779a18e",
+      "read_at": "2026-10-03; shallow clone, HEAD of main. The task input gave no tag; the local ref .git/refs/tags/0.3.275 resolves to this same commit and CHANGELOG.md:1 is '## 0.3.275 (01 October 2026)'."
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Python framework and `inspect` CLI for running large-language-model evaluations, created by the UK AI Security Institute (README.md:3); SECURITY.md:5 says Meridian Research Labs maintains it. An evaluation is a Task: a dataset of labelled Samples (input/target) + a solver or agent + one or more scorers (docs/index.qmd:87-93). In the repo: built-in solvers, tools, model graders and metrics; MCP client tools; Docker and local sandboxes; in-process and in-sandbox agent bridges; an eval-set runner with retry/resume; a versioned eval-log format with per-sample scores and errors; an HTTP log viewer; a control channel; an ACP server. README.md is a short developer-setup note that defers to https://inspect.aisi.org.uk/ (not fetched); user docs were read from docs/*.qmd. Facts for the stated needs: (1) several scorers per Task are supported and each sample's scores are stored per scorer name in EvalSample.scores (src/inspect_ai/log/_log.py:456). (2) claude_code()/codex_cli()/gemini_cli() agents are not in this repo; the docs place them in the separate inspect-swe package (docs/tutorial.qmd:351-370); the repo provides sandbox_agent_bridge() plus a Claude-Code-only demo in examples/. 'Verifier' and 'trial' are not Inspect terms; the closest are Scorer and epochs. (3) No declarative CI regression gate for prompts/skills/agents was found in this repo: eval-set exit code reflects task status only (src/inspect_ai/_eval/evalset.py:1740), `inspect eval` exits 0 on a task error (docs/control-channel.qmd:64), and no metric-threshold option exists; the docs mention a separate Inspect Flow package with declarative specs (docs/eval-sets.qmd:155-165) that could not be inspected here.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Inspect is a framework for large language model evaluations created by the UK AI Security Institute.",
+          "citation": "README.md:3"
+        },
+        {
+          "claim": "Provides many built-in components, including facilities for prompt engineering, tool usage, multi-turn dialog, and model graded evaluations.",
+          "citation": "README.md:5"
+        },
+        {
+          "claim": "Extensions (e.g. new elicitation and scoring techniques) can be provided by other Python packages.",
+          "citation": "README.md:5"
+        },
+        {
+          "claim": "Includes a collection of over 200 pre-built evaluations ready to run on any model (details at inspect.aisi.org.uk/evals/).",
+          "citation": "README.md:9"
+        },
+        {
+          "claim": "Docs for coding agents: structured index at /llms.txt, user guide at /llms-guide.txt, and /llms-full.txt with API and CLI reference; any page as Markdown by appending .md to its .html path.",
+          "citation": "README.md:11"
+        },
+        {
+          "claim": "Development install: clone the repo, then pip install -e \".[dev]\".",
+          "citation": "README.md:15-21"
+        },
+        {
+          "claim": "uv alternative: `uv sync --extra dev` from the checked-in uv.lock; dependencies remain declared in requirements*.txt and exposed through pyproject.toml; change the requirements file and refresh the lockfile rather than using `uv add`.",
+          "citation": "README.md:23-29"
+        },
+        {
+          "claim": "`make hooks` installs pre-commit hooks; `make check` runs linting/formatting; `make test` runs the tests (prefix with `uv run` in a uv environment).",
+          "citation": "README.md:31-44"
+        },
+        {
+          "claim": "The web UI lives in the git submodule src/inspect_ai/_view/ts-mono/; submodule steps are only needed for TypeScript/React frontend work.",
+          "citation": "README.md:48-52"
+        },
+        {
+          "claim": "Docs are built with Quarto after pip install -e \".[doc]\" (cd docs; quarto render).",
+          "citation": "README.md:54-62"
+        }
+      ],
+      "install": [
+        {
+          "method": "PyPI user install (README.md itself documents only developer installs)",
+          "command": "pip install inspect-ai",
+          "citation": "docs/index.qmd:35-39"
+        },
+        {
+          "method": "Editable developer install from a clone (pip)",
+          "command": "git clone https://github.com/UKGovernmentBEIS/inspect_ai.git\ncd inspect_ai\npip install -e \".[dev]\"",
+          "citation": "README.md:17-21"
+        },
+        {
+          "method": "Developer environment from the lockfile (uv)",
+          "command": "uv sync --extra dev",
+          "citation": "README.md:25-27"
+        },
+        {
+          "method": "Docs toolchain (needs Quarto)",
+          "command": "pip install -e \".[doc]\"\ncd docs\nquarto render",
+          "citation": "README.md:58-62"
+        },
+        {
+          "method": "Model provider SDK, needed to run evals against a hosted model (OpenAI shown; Anthropic, Google and HF variants are listed too)",
+          "command": "pip install openai",
+          "citation": "docs/index.qmd:43-77"
+        },
+        {
+          "method": "Companion package providing claude_code(), codex_cli(), gemini_cli() agents (separate project, not in this repo)",
+          "command": "pip install inspect-swe",
+          "citation": "docs/tutorial.qmd:351"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - every CI job runs on ubuntu-latest (.github/workflows/build.yml:248, and all other workflows); the package is pure Python ('Operating System :: OS Independent', pyproject.toml:178); amd64 glibc and musl sandbox-tools artifacts are pinned (src/inspect_ai/tool/_sandbox_tools_utils/SHA256SUMS:1-4). The workflows do not state the runner CPU architecture.",
+        "wsl2": "unknown - no WSL2 statement in README, docs or code; the only mention is a browser-opening helper in scripts/release-sandbox-tools.sh:65-69.",
+        "macos_arm64": "unknown - no explicit support statement and no macOS CI runner (all workflows use ubuntu-latest, e.g. build.yml:248). Indirect signals only: package classified OS Independent (pyproject.toml:178); docs mention the macOS mps device for the HF provider (docs/providers.qmd:1012) and macosx:// notifications (docs/intervention.qmd:170); the arm64 sandbox-tools artifacts are Linux binaries for containers (SHA256SUMS:3-4).",
+        "gpu": "no (not required) - the core dependency list has no GPU package (requirements.txt); only optional local-inference providers use one: the HF provider auto-uses CUDA or mps if available (docs/providers.qmd:1012) and vLLM/SGLang need user-installed packages (docs/providers.qmd:1133-1142)."
+      },
+      "integrations": {
+        "cli": "`inspect` console script (pyproject.toml:186-187 -> inspect_ai._cli.main:main, src/inspect_ai/_cli/main.py:21-66) and `python -m inspect_ai` (src/inspect_ai/__main__.py:1-4). Subcommands registered at _cli/main.py:43-56: eval, eval-set, eval-retry, score, view (start/bundle/embed), log (list/dump/convert/schema/export-config/recover), ctl (task/sample/model/process/config), acp, list tasks, info, cache, sandbox cleanup, trace, download restic. eval/eval-set/eval-retry accept --json launch/done records and --detach (docs/control-channel.qmd:49-100). `inspect eval-set` exits 1 unless all tasks succeeded (src/inspect_ai/_cli/eval.py:1681-1682); `inspect eval` exits 0 even when a task errors (docs/control-channel.qmd:64; _cli/eval.py:2199-2204).",
+        "mcp": "MCP client, not server: mcp_server_stdio/http/sse/sandbox connect models to external MCP servers (docs/tools-mcp.qmd:39-62; src/inspect_ai/tool/_mcp/); the `mcp` package is an optional dependency checked at use (src/inspect_ai/tool/_mcp/server.py:196-208; listed only in requirements-dev.txt:17). sandbox_agent_bridge(bridged_tools=[BridgedToolsSpec]) exposes host-side Inspect tools to sandboxed CLI agents as MCP tools (docs/agent-bridge.qmd:148-196). No MCP server exposing Inspect's own eval or log operations was found (no mcp.server/FastMCP imports under src/).",
+        "sdk_or_api": "Python SDK: inspect_ai exports eval, eval_async, eval_set, eval_retry, score, Task, task, Epochs, view, edit_score, recompute_metrics (src/inspect_ai/__init__.py:5-59); subpackages scorer, solver, dataset, model, tool, agent, log, analysis (samples_df/evals_df/messages_df/events_df), hooks, approval, review, util. HTTP/IPC: the `inspect view` FastAPI log-viewer API (routes src/inspect_ai/_view/fastapi_server.py:212-641; schema src/inspect_ai/_view/inspect-openapi.json; default bind 127.0.0.1:7575, src/inspect_ai/_util/constants.py:12-13; optional Authorization-token middleware, fastapi_server.py:662-674; non-loopback bind refused without auth, _view/network.py:97-110); a control server on a Unix domain socket for `inspect ctl` (docs/control-channel.qmd:45; src/inspect_ai/_control/server.py:1703-1728); an ACP (Agent Client Protocol) server via --acp-server and `inspect acp` (docs/intervention.qmd:16-28).",
+        "claude_code_or_codex": "In this repo: sandbox_agent_bridge() starts a model proxy inside the sandbox (port 13131) that forwards OpenAI/Anthropic/Google API calls from a CLI agent to the Inspect model (src/inspect_ai/agent/_bridge/sandbox/bridge.py:49-100, 221-233; docs/agent-bridge.qmd:70-121). A demo claude_code() agent execs the real `claude --print --dangerously-skip-permissions` in the container (examples/evals_in_eval/claude.py:15-58; Dockerfile installs @anthropic-ai/claude-code, examples/evals_in_eval/Dockerfile:24) and is labelled 'a demonstration of the basic mechanics' (claude.py:1-3). No Codex CLI agent or example in the repo (bridge code only accommodates codex-cli wire behavior, e.g. src/inspect_ai/agent/_bridge/responses_impl.py:262). The named agents claude_code(), codex_cli(), gemini_cli() are documented as living in the separate inspect-swe package (docs/tutorial.qmd:349-370; docs/agents.qmd:14) and could not be inspected. Agent-facing tooling: `inspect eval --json/--detach` and `inspect ctl ... --json` are designed for coding agents (docs/control-channel.qmd:43-124); AGENTS.md (CLAUDE.md just contains `@AGENTS.md`) and four contributor skills under .agents/skills/ (AGENTS.md:297-299); the companion inspect-skills plugin and llms.txt docs (docs/index.qmd:82; README.md:11) are not verifiable here; the skill() tool gives models Agent Skills inside a sandbox (docs/tools-standard.qmd:609-649)."
+      },
+      "telemetry_and_network": "No default telemetry, analytics or phone-home found in src/ (searches for telemetry/analytics/sentry/posthog hit only the opt-in items below). Opt-in only: the legacy env hook INSPECT_TELEMETRY=<module.function> sends model_usage, eval_log_location and eval_log events to the named provider, and INSPECT_API_KEY_OVERRIDE can read/modify API-key env vars; both are deprecated and a startup banner lists them when enabled (src/inspect_ai/hooks/_legacy.py:1-34, 50-98; src/inspect_ai/hooks/_startup.py:16-36); any installed package that registers an `inspect_ai` entry point is imported at startup (src/inspect_ai/_util/entrypoints.py:19-31). Required or likely network services and accounts: an API key and network access for the chosen model provider (docs/index.qmd:43-77; the mockllm provider needs none, src/inspect_ai/model/_providers/mockllm.py:15-25); Docker Engine + Compose for the docker sandbox (src/inspect_ai/util/_sandbox/docker/prereqs.py:28-100); Hugging Face for hf_dataset (docs/index.qmd:110). Runtime downloads: sandbox-tools binaries from the public S3 bucket inspect-sandbox-tools.s3.us-east-2.amazonaws.com when not bundled in the wheel (musl sandboxes, editable installs), SHA-256 checked against the vendored SHA256SUMS and rejected on mismatch (src/inspect_ai/tool/_sandbox_tools_utils/sandbox.py:63, 642-654, 685-727; CHANGELOG.md:171); the restic binary from github.com/restic/restic releases for checkpointing, checked against vendored sums (src/inspect_ai/util/_restic/resolver.py:47; src/inspect_ai/util/_restic/README.md:1-7); Docker Hub images aisiuk/inspect-tool-support and aisiuk/inspect-computer-tool (src/inspect_ai/util/_sandbox/docker/config.py:116; src/inspect_ai/tool/_tools/_computer/_common.py:360-364). Local services: `inspect view` binds 127.0.0.1:7575 by default and refuses a non-loopback bind without an authorization token or --unsafe-allow-unauthenticated (src/inspect_ai/_util/constants.py:12-13; src/inspect_ai/_view/network.py:97-110); the control channel is a Unix domain socket with a peer-UID check (docs/control-channel.qmd:45; src/inspect_ai/_control/server.py:259-273); the sandbox bridge proxy listens on loopback inside the sandbox and withholds web_search, code_execution and remote MCP unless granted (docs/agent-bridge.qmd:80, 125-134; src/inspect_ai/agent/_bridge/sandbox/bridge.py:155-163). Logs (inputs, outputs, tool calls) are written locally to ./logs or INSPECT_LOG_DIR by default (docs/eval-sets.qmd:43). CI only: docs rendering uses no API keys (.github/workflows/build.yml:166-171); sync_model_data.yml uses TOGETHER_API_KEY/FIREWORKS_API_KEY secrets weekly (.github/workflows/sync_model_data.yml:34-41)."
+    },
+    "code": {
+      "languages": [
+        "Python (primary: ~834 modules under src/inspect_ai plus src/inspect_sandbox_tools and src/inspect_tool_support)",
+        "TypeScript/React (log viewer; source lives in the ts-mono git submodule, empty in this checkout; prebuilt bundle committed at src/inspect_ai/_view/dist)",
+        "Shell (container entrypoints, scripts/release-sandbox-tools.sh)",
+        "Lua (Quarto doc filters under docs/_extensions)",
+        "Quarto Markdown (docs/*.qmd)"
+      ],
+      "entry_points": [
+        {
+          "path": "pyproject.toml:186-187 -> src/inspect_ai/_cli/main.py:59-66",
+          "what": "`inspect` console script (click group; subcommands registered at main.py:43-56). Also `python -m inspect_ai` (src/inspect_ai/__main__.py)."
+        },
+        {
+          "path": "src/inspect_ai/_cli/eval.py:988,1327,2368",
+          "what": "`inspect eval`, `eval-set`, `eval-retry` (shared exec path eval_exec at :1913); eval-set exits 1 unless all tasks succeeded (:1681-1682)."
+        },
+        {
+          "path": "src/inspect_ai/__init__.py:5-59",
+          "what": "Python SDK: eval, eval_async, eval_set, eval_retry, score, Task, task, Epochs, view, edit_score, recompute_metrics."
+        },
+        {
+          "path": "src/inspect_ai/_cli/log.py, score.py, view.py, ctl/_group.py:368, acp.py",
+          "what": "Other subcommands: `inspect log` (list/dump/convert/schema/export-config/recover), `inspect score`, `inspect view` (start/bundle/embed), `inspect ctl`, `inspect acp`."
+        },
+        {
+          "path": "src/inspect_ai/_view/fastapi_server.py",
+          "what": "HTTP server behind `inspect view` (log files, log edit/delete, events); Authorization-token middleware at :662-674; default 127.0.0.1:7575."
+        },
+        {
+          "path": "src/inspect_ai/_control/server.py",
+          "what": "Control-channel server on a Unix domain socket that `inspect ctl` talks to (bind at :1703-1728)."
+        },
+        {
+          "path": "src/inspect_sandbox_tools/pyproject.toml:110-111",
+          "what": "`inspect-sandbox-tools` (src/inspect_sandbox_tools/_cli/main.py): JSON-RPC tool server plus model_proxy, built into PyInstaller binaries and injected into sandbox containers."
+        },
+        {
+          "path": "src/inspect_tool_support/pyproject.toml:83-84",
+          "what": "`inspect-tool-support`: legacy container-image tool server (includes playwright web browser); image aisiuk/inspect-tool-support is built by .github/workflows/docker.yml."
+        }
+      ],
+      "architecture": "Under src/inspect_ai unless noted. _cli/ (click app: eval.py, log.py, score.py, view.py, acp.py, ctl/) -> _eval/ (eval.py: eval/eval_async/eval_retry; evalset.py: eval_set with retry and sample reuse; score.py; task/task.py: Task; task/run.py: per-sample pipeline solver -> scorers -> EvalSample, with error/retry/limit handling). Building blocks: dataset/ (Sample; csv/json/hf sources), solver/ (TaskState, generate, prompt/multiple_choice/etc.), scorer/ (scorers, metrics, epoch reducers in _reducer/, Score incl. Score.unscored), agent/ (react, deepagent, human agent, _bridge/ in-process and sandbox bridges, _acp/ Agent Client Protocol), tool/ (standard tools, _mcp/ MCP client, _sandbox_tools_utils/ injection of the PyInstaller-built inspect-sandbox-tools binary), model/ (Model API plus ~50 provider modules in _providers/, including mockllm), util/_sandbox/ (SandboxEnvironment ABC with built-in docker/ and local providers; other providers are external packages), util/_checkpoint + util/_restic (checkpoint/resume), log/ (EvalLog/EvalSample models in _log.py, recorders for .eval/.json plus realtime buffer in _recorders/, recovery in _recover/, edits), _control/ (control-channel server for `inspect ctl`), _view/ (FastAPI log-viewer server; prebuilt UI in dist/, source in the ts-mono submodule), analysis/ (pandas dataframes), hooks/, approval/, review/, event/, _display/ (rich/textual/plain). Separate packages in-tree: src/inspect_sandbox_tools (tool server and model_proxy injected into containers) and src/inspect_tool_support (legacy container-image tools). Extensions from other pip packages load through the `inspect_ai` entry-point group (src/inspect_ai/_util/entrypoints.py:19).",
+      "packaging_and_release": "Build: setuptools + setuptools_scm, version derived from git tags matching [0-9]*.[0-9]*.[0-9]* (pyproject.toml:1-21); wheel package data includes the prebuilt viewer (_view/dist), SHA256SUMS and sandbox_tools_version.txt (pyproject.toml:36-49); sdist trimmed by MANIFEST.in. PyPI release is a manual maintainer script, not a workflow: scripts/pypi-release.py (`python3 -m build` at :696, `twine upload` of dist/* at :719-724, tag pushed only after upload at :733-734; auth from ~/.pypirc or TWINE_USERNAME/TWINE_PASSWORD at :424-447; process documented in src/inspect_sandbox_tools/design/RELEASING.md:86-94). No GitHub Actions PyPI-publish workflow exists in .github/workflows (design/sandbox-tools-ci-gates.md:9 refers to a 'PyPI publish flow'). No signing, Sigstore, SLSA or PEP 740 attestation config and no published wheel/sdist checksums were found. Integrity controls that do exist: the four sandbox-tools artifacts (amd64/arm64 x glibc/musl, version 32) are pinned by SHA-256 in src/inspect_ai/tool/_sandbox_tools_utils/SHA256SUMS:1-4 and verified at runtime download (sandbox.py:685-727), in the release script's pre-build gate (pypi-release.py:282-324), in a post-build wheel-contents check (:327-352) and in the CI release gate (build.yml:596-641); upload_to_s3.py refuses to overwrite a published version with different bytes and round-trip verifies uploads (upload_to_s3.py:132-143, 173-182). Those PyInstaller binaries are built locally by maintainers with Docker and are not reproducible (BINARY_INTEGRITY.md:52-54; RELEASING.md:39-54); glibc builds are bundled in the wheel, musl builds are fetched from S3 at runtime (RELEASING.md:94). restic: pinned version plus vendored upstream SHA256SUMS (src/inspect_ai/util/_restic/README.md:1-7; authenticity check is a manual gpg step, :21-27). Other publish paths: .github/workflows/npm-publish.yml (tag push -> npm publish of the viewer library using Trusted Publishing/id-token, :4-7, 28-30, 99-101) and .github/workflows/docker.yml (manual dispatch -> multi-arch aisiuk/inspect-computer-tool and aisiuk/inspect-tool-support images to Docker Hub with no-cache, :1-86; no image signing found).",
+      "tests_and_ci": "Framework: pytest (xdist, timeout, mock, cov, dotenv, reportlog, textual-snapshot) with anyio so every async test also has a trio variant (tests/conftest.py:36-55; pyproject.toml:98-115; requirements-dev.txt:30-39). Tests: ~642 test_*.py files under tests/ (subdirs _cli, _control, _eval, _util, _view, agent, analysis, approval, checkpoint, dataset, hooks, log, model, review, scorer, solver, timeline, tools, util, plus 44 top-level files), 18 under src/inspect_sandbox_tools/tests (own pytest config), 6 under src/inspect_tool_support and 2 other in-package files; ~800 tests call eval() (tests/conftest.py:216-217). Scoring and failure-handling tests include tests/scorer/test_multiscorer.py, tests/scorer/test_reducers.py, tests/test_score_on_error.py and tests/test_fail_on_error.py. Gated classes are skipped by default and the run still exits green: --runslow, --runapi (needs provider keys), --runflaky, --runtrio (tests/conftest.py:58-79, 938-954; .agents/skills/slow-tests/SKILL.md:8-25); PR CI runs no live-provider tests and only some slow areas; tests needing the ts-mono submodule skip when it is absent (tests/test_npm_publish_workflow.py:72). Workflows (.github/workflows, every job on ubuntu-latest): build.yml = ruff lint+format, mypy (py3.10/3.11), pre-commit (uv-lock, typos, yaml/json checks, private-key detection), docs render (Quarto, no code execution), test matrix py3.10/3.11 running `pytest -ra --doctest-modules -n logical --timeout=900 ...` (:350; skipped for docs-only changes, :286-298), sandbox-tools-unit, detect-slow -> check-version-bump -> slow-tool-tests-dev / slow-tool-tests-release (Docker, `pytest --runslow -m slow tests/tools/`, :517-655), slow-tests for the checkpoint area (:661-696), and package build+inspect via hynek/build-and-inspect-python-package (:698-728); log_viewer.yml = OpenAPI/schema drift, submodule-on-main, viewer tests, dist-up-to-date; suppressions.yml = ledger gate for noqa/type-ignore; changelog-lint.yml; pr-gate.yml (contribution-policy gate, enforcing); pr-stale.yml; suppressions-comment.yml; sync_model_data.yml (weekly PR); docker.yml and npm-publish.yml (publishing); test.yml is a stub. Local equivalents: `make check` (ruff, mypy, suppressions-check) and `make test` (Makefile:16-33).",
+      "dependencies": "Direct dependency counts (non-comment lines): requirements.txt = 41 runtime deps, exposed as project dependencies (pyproject.toml:5-6; e.g. pydantic>=2.13.0, fastapi>=0.119.0, anyio>=4.14.0, httpx, click, textual>=6.2.0, rich, tiktoken, s3fs/aiobotocore/boto3, fsspec, numpy, uvicorn, agent-client-protocol>=0.12.0); requirements-dev.txt = 58 ([dev] extra: provider SDKs anthropic/openai/google-genai/groq/mistralai/together/xai_sdk/azure-*, mcp, inspect-scout, mypy, pytest stack, ruff==0.9.6); requirements-doc.txt = 9 ([doc], includes quarto-cli); requirements-dist.txt = 2 ([dist]: build, twine); requirements-math.txt = 2 ([math]). Provider SDKs and mcp are not core dependencies (installed on demand: docs/index.qmd:43-77; src/inspect_ai/tool/_mcp/server.py:196-208). src/inspect_sandbox_tools/pyproject.toml: 9 runtime (aiohttp, httpx, jsonrpcserver, packaging, pydantic, returns, semver, tenacity, psutil) + 11 dev + 2 dist; src/inspect_tool_support/pyproject.toml: 11 runtime (incl. playwright, mcp) + 4 dev + 2 dist; examples/bridge/langchain/requirements.txt has 5. uv.lock records a dev resolution (README.md:29). requires-python >=3.10 (pyproject.toml:165); CI covers only Python 3.10 and 3.11 (build.yml:73, 255). TypeScript workspace dependencies (pnpm) live in the ts-mono submodule, absent from this checkout, so they are not counted. Dependabot: daily pip (lockfile-only) and weekly GitHub Actions, with ignores for several majors (.github/dependabot.yml:2-34).",
+      "security_policy": "SECURITY.md (repo root): report privately by email to security@meridianlabs.ai, not via public issues (:5); acknowledgement within 3 business days, assessment within 10 business days, fix target 30 days (:16-18); fixes only for the latest PyPI release (:26); no bug bounty (:22); disclosure via GitHub security advisory and CVE where applicable (:51). In scope: code execution or file access from opening a log/dataset, Docker sandbox escape, secrets written to logs, flaws in the log viewer/server, release/packaging/CI flaws (:32-38). Out of scope: the `local` sandbox having no isolation, model code running in a sandbox, loading untrusted task/solver/scorer/config files (runs that code), Docker's limited isolation, third-party dependency bugs, scanner or LLM-generated reports without a working proof of concept (:40-47)."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:5 - built-in components include prompt engineering, tool usage, multi-turn dialog and model-graded evaluations; extensions can come from other Python packages.",
+        "verified": "yes",
+        "evidence": "Solvers prompt_template, system_message, chain_of_thought, self_critique, multiple_choice, use_tools, generate (src/inspect_ai/solver/__init__.py:3-37); model_graded_qa/model_graded_fact (src/inspect_ai/scorer/__init__.py:35); extensions load through the `inspect_ai` entry-point group (src/inspect_ai/_util/entrypoints.py:19-31; docs/extensions-hooks.qmd:105-135)."
+      },
+      {
+        "claim": "README.md:9 - includes over 200 pre-built evaluations ready to run on any model.",
+        "verified": "partial",
+        "evidence": "docs/evals/evals.json lists 267 entries (129 with source 'evals' from inspect_evals, 138 with source 'harbor' from inspect_harbor), but the implementations are separate pip packages (docs/evals/evals-filter.js:126; docs/evals/inspect-evals.mk:1; docs/evals/sync_harbor.py:25-33). This repo itself holds only 21 top-level scripts under examples/. 'Any model' was not tested."
+      },
+      {
+        "claim": "README.md:23-29 - `uv sync --extra dev` reproduces the dev environment from uv.lock; dependencies are declared in requirements*.txt and exposed through pyproject.toml.",
+        "verified": "yes",
+        "evidence": "pyproject.toml:5-10 maps dependencies and the dev/doc/dist/math extras to requirements*.txt; uv.lock exists; [tool.uv] default-groups = ['dev'] (pyproject.toml:197-202) and CI uses plain `uv sync` (.github/workflows/build.yml:107); pre-commit uv-lock hook (.pre-commit-config.yaml:12-17)."
+      },
+      {
+        "claim": "README.md:48-52 - the web UI lives in the git submodule src/inspect_ai/_view/ts-mono/.",
+        "verified": "partial",
+        "evidence": ".gitmodules:1-3 declares it, but the directory is empty in this checkout, so TypeScript source and its tests were not inspectable. The built UI is committed at src/inspect_ai/_view/dist and packaged (pyproject.toml:45); .github/workflows/log_viewer.yml:263-281 fails CI if dist differs from a fresh build; tests/test_npm_publish_workflow.py:72 skips when the submodule is missing."
+      },
+      {
+        "claim": "docs/multiple-scorers.qmd:71-87 (README defers to the docs) - a Task can take a list of scorers and 'preserve the individual score values with each sample'.",
+        "verified": "yes",
+        "evidence": "src/inspect_ai/_eval/task/run.py:2990-3047 runs each scorer per sample and writes state.scores[name] and results[name]; create_eval_sample stores scores={k: v.score} (run.py:3391) into EvalSample.scores: dict[str, Score] (src/inspect_ai/log/_log.py:456); duplicate scorer names get numeric suffixes (src/inspect_ai/scorer/_scorer.py:262-269); per-sample score_* dataframe columns (docs/dataframe.qmd:492); tests/scorer/test_multiscorer.py:57-105."
+      },
+      {
+        "claim": "docs/handling-errors.qmd:44,95-125 and docs/scoring-policy.qmd:16-39 - failed samples are not scored unless score_on_error is set; errors, retries and unscored (NaN) results stay recorded.",
+        "verified": "yes",
+        "evidence": "Scorers run only if error is None or (score_on_error and no retries left and not cancelled) (src/inspect_ai/_eval/task/run.py:2985-2989); the logged sample carries scores=results plus error, error_retries and limit (run.py:3149-3164; src/inspect_ai/log/_log.py:539-543); Score.unscored() stores NaN with reason/explanation and is excluded from metrics (src/inspect_ai/scorer/_metric.py:157-179); EvalScore.scored_samples/unscored_samples (log/_log.py:810-814); tests/test_score_on_error.py:177-290."
+      },
+      {
+        "claim": "docs/index.qmd:23 and docs/tutorial.qmd:351 (README defers to the docs) - Inspect can run external agents like Claude Code, Codex CLI and Gemini CLI; 'Each one runs the real agent inside your sandbox' (via inspect-swe).",
+        "verified": "partial",
+        "evidence": "Infrastructure is in this repo: sandbox_agent_bridge() (src/inspect_ai/agent/_bridge/sandbox/bridge.py:49-69, exported at src/inspect_ai/agent/__init__.py:7,37) with an in-sandbox model proxy (bridge.py:221-233). The named agents are in the separate inspect-swe package (docs/tutorial.qmd:351-370; docs/agents.qmd:14), not inspectable here. In-repo: a Claude Code demo that execs the real `claude` CLI (examples/evals_in_eval/claude.py:18-58; examples/evals_in_eval/Dockerfile:24) and no Codex example (no 'codex' hits under examples/). Bridge tests target the bridge machinery (tests/tools/test_tools_bridge.py:1-5; tests/agent/test_bridge_tool_grants.py:1-8); no test launching the real claude or codex CLIs was found. 'Verifier' and 'trial' are not Inspect terms (only unrelated Gemini thought-signature comments match); the equivalents are scorers that can call sandbox().exec/read_file after the agent finishes (docs/multiple-scorers.qmd:221-264) and epochs (docs/tasks.qmd:47)."
+      },
+      {
+        "claim": "docs/control-channel.qmd:64 - a task error is not a crash: plain `inspect eval` still exits 0 with status 'error'; eval-set's success flag and exit code reflect per-task outcomes.",
+        "verified": "yes",
+        "evidence": "eval_command ignores eval_exec's result (src/inspect_ai/_cli/eval.py:1245-1324) and eval_exec returns True after eval() (:2199-2204); eval-set ends with ctx.exit(0 if success else 1) (:1681-1682); success = every log status == 'success' and not invalidated (src/inspect_ai/_eval/evalset.py:1200, 1740). fail_on_error governs sample-error tolerance, not score values (docs/handling-errors.qmd:24-63). No min-score/threshold gate option was found in src/ or docs/, so a pass/fail gate on metric values (for prompts, skills or agents) needs user code that reads the log (e.g. read_eval_log / EvalResults.scores)."
+      },
+      {
+        "claim": "docs/multiple-scorers.qmd:204 and docs/metrics.qmd:380-390 - the 'collect' reducer preserves each value; pass_at_k, pass_k and at_least_k reducers exist.",
+        "verified": "partial",
+        "evidence": "Reducers exist (src/inspect_ai/scorer/_reducer/reducer.py:130 at_least, :164 pass_at, :209 pass_k, :304 collect). collect requires scalar scores, raises on dict/list values and drops unscored (NaN) scores (reducer.py:304-324), so results marked unscored are not carried through it."
+      },
+      {
+        "claim": "src/inspect_sandbox_tools/design/BINARY_INTEGRITY.md:203-211 - digest failures only warn by default ('soft launch') unless INSPECT_SANDBOX_TOOLS_STRICT_DIGESTS is set.",
+        "verified": "no",
+        "evidence": "Code differs: _download_from_s3 raises PrerequisiteError on a digest mismatch or a missing pinned digest with no env switch (src/inspect_ai/tool/_sandbox_tools_utils/sandbox.py:685-727); CHANGELOG.md:171 records the variable as removed. The design doc is stale; the code was preferred."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Build workflow wall-clock on PR pushes (project CI, window 2026-08-31 to 2026-09-01)",
+        "metric": "median / p90 seconds, successful runs",
+        "value": "346 s / 670 s (n=34); code-only pushes 341 s median (n=27)",
+        "source": "design/ci-perf/report.md:93-111",
+        "independent": false
+      },
+      {
+        "what": "`test (3.11)` CI job (pytest with xdist on the GitHub runner)",
+        "metric": "execution time median / p90",
+        "value": "331 s / 347 s (n=39); `test (3.10)` 328 s / 339 s",
+        "source": "design/ci-perf/report.md:71-72",
+        "independent": false
+      },
+      {
+        "what": "Overhead of the control-channel server on a one-sample mockllm eval()",
+        "metric": "eval wall time",
+        "value": "249 ms with the server vs 35 ms without",
+        "source": "design/ci-perf/report.md:17-19",
+        "independent": false
+      },
+      {
+        "what": "Full test suite on 4 workers with the control server forced off by an autouse fixture (A/B; a matching fixture now exists at tests/conftest.py:210-230)",
+        "metric": "suite wall time",
+        "value": "725.8 s -> 529.0 s (-27%); worker time 697.6 s -> 512.3 s",
+        "source": "design/ci-perf/report.md:21-25",
+        "independent": false
+      },
+      {
+        "what": "CI cost per push across the four workflows",
+        "metric": "runner-minutes, median over 52 pushes",
+        "value": "18.5",
+        "source": "design/ci-perf/report.md:114-116",
+        "independent": false
+      },
+      {
+        "what": "react() vs deepagent() vs claude_code() agents on Cybench and Terminal Bench 2.0",
+        "metric": "performance difference",
+        "value": "none observed per the docs; no figures, models, sample sizes or run counts are published",
+        "source": "docs/deepagent.qmd:52",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope gap against the stated needs: the named Claude Code / Codex CLI agents live in the separate inspect-swe package, not this repo (docs/tutorial.qmd:351-370; docs/agents.qmd:14); the repo has only a Claude Code demo (examples/evals_in_eval/claude.py:1-3) and no Codex example, and no test launching the real claude or codex CLIs was found, so their behavior is not exercised by this repo's checks.",
+      "No built-in metric-threshold or regression gate: eval-set success is status-only (src/inspect_ai/_eval/evalset.py:1740), `inspect eval` exits 0 when a task errors (docs/control-channel.qmd:64; src/inspect_ai/_cli/eval.py:2199-2204), and fail_on_error counts sample errors only (docs/handling-errors.qmd:24-63). CI gating on scores for prompts, skills or agents needs custom code; the docs' declarative option (Inspect Flow, docs/eval-sets.qmd:155-165) is a separate package not inspectable here.",
+      "A green run does not mean covered: slow/api/flaky/trio tests are skipped by default and the run still exits green (tests/conftest.py:938-954; .agents/skills/slow-tests/SKILL.md:8-12); PR CI runs no live-provider tests and only tests/tools plus the checkpoint area of the slow tests (AGENTS.md:176-181; .github/workflows/build.yml:517-563, 661-696); submodule-dependent tests skip when ts-mono is absent (tests/test_npm_publish_workflow.py:72). Verifying a change needs explicit flags and a read of the -ra skip summary.",
+      "Pre-1.0 churn: version 0.3.275 with 16 releases between 21 Aug and 1 Oct 2026 (CHANGELOG.md:1, 353) and 'Development Status :: 4 - Beta' (pyproject.toml:169). Scorer results changed in a patch release (f1() now counts repeated tokens, 'scores can rise or fall', CHANGELOG.md:51) and an `inspect ctl` payload field changed incompatibly (CHANGELOG.md:98); deprecated APIs are slated for removal at 0.4 (src/inspect_ai/analysis/__init__.py:93-101).",
+      "Release provenance: PyPI publishing is a manual maintainer script using a PyPI token from ~/.pypirc or TWINE_* env vars (scripts/pypi-release.py:424-447, 696-724); no CI-built provenance, signatures or attestations and no published wheel checksums were found. The injected sandbox-tools binaries run inside sandboxes, are non-reproducible PyInstaller builds whose trust anchor is merge rights (src/inspect_sandbox_tools/design/BINARY_INTEGRITY.md:8-12, 47-54), and Docker Hub images are not digest-pinned (BINARY_INTEGRITY.md:58-59).",
+      "Code-execution surface by design: tasks, solvers, scorers and config files are Python that runs with the user's privileges; the `local` sandbox is unisolated and Docker gives limited isolation (SECURITY.md:30-47); every installed package with an inspect_ai entry point is imported at startup (src/inspect_ai/_util/entrypoints.py:19-31); INSPECT_API_KEY_OVERRIDE and INSPECT_TELEMETRY hooks can read keys or ship logs when set (src/inspect_ai/hooks/_legacy.py:19-34, 50-61); the Claude Code demo runs the CLI with --dangerously-skip-permissions (examples/evals_in_eval/claude.py:23).",
+      "Thin platform evidence: every workflow job runs on ubuntu-latest and tests run on Python 3.10/3.11 only (.github/workflows/build.yml:248, 255, 73); no macOS, Windows, WSL2 or arm64 host jobs, so macOS arm64 and WSL2 behavior is unverified upstream; the docker sandbox needs Docker Engine and Compose (src/inspect_ai/util/_sandbox/docker/prereqs.py:28-100).",
+      "Governance and maintenance: README names UK AISI while SECURITY.md:5 says Meridian Research Labs maintains Inspect; external PRs need a maintainer-accepted issue or are auto-closed (CONTRIBUTING.md:7-26; .github/workflows/pr-gate.yml:1-11, 41) and inactive PRs close after 60+7 days (.github/workflows/pr-stale.yml:27-28); security fixes cover only the latest PyPI release (SECURITY.md:26); some design docs lag the code (BINARY_INTEGRITY.md:203-211 vs sandbox.py:685-727); viewer source sits in a separate submodule repo (.gitmodules:1-3)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "ukgovernmentbeis/inspect_ai",
+      "checks": [
+        {
+          "field": "readme.install[0] (PyPI user install)",
+          "statement": "PyPI user install (README.md itself documents only developer installs): `pip install inspect-ai`.",
+          "citation": "docs/index.qmd:35-39",
+          "holds": true,
+          "note": "docs/index.qmd:35-39 reads 'Install Inspect from PyPI with: pip install inspect-ai'. pyproject.toml:161 names the project inspect_ai, which normalizes to inspect-ai on PyPI. README.md:15-62 covers only clone/editable, uv-sync and docs-toolchain installs and defers to the docs at :7, so the parenthetical is accurate too. examples/evals_in_eval/Dockerfile:21 uses the same `pip install inspect-ai`."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, file LICENSE.",
+          "citation": "LICENSE:1",
+          "holds": true,
+          "note": "LICENSE:1-21 is the standard MIT text ('Copyright (c) 2024 UK AI Security Institute', :3). pyproject.toml:166 (license text 'MIT License') and :173 ('License :: OSI Approved :: MIT License') agree."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - every CI job runs on ubuntu-latest (build.yml:248 and all other workflows); the package is pure Python ('Operating System :: OS Independent', pyproject.toml:178); amd64 glibc and musl sandbox-tools artifacts are pinned (SHA256SUMS:1-4); the workflows do not state the runner CPU architecture.",
+          "citation": ".github/workflows/build.yml:248; pyproject.toml:178; src/inspect_ai/tool/_sandbox_tools_utils/SHA256SUMS:1-4",
+          "holds": true,
+          "note": "build.yml:247-255 is the pytest job (runs-on: ubuntu-latest, Python 3.10/3.11 matrix). All 26 runs-on lines across the 11 workflow files are ubuntu-latest. There are no matrix.os, macOS, Windows or reusable-workflow jobs. pyproject.toml:178 has the OS Independent classifier. There is no setup.py, ext_modules or bdist_wheel/plat-name configuration, so the wheel is pure Python. SHA256SUMS:1-2 pin amd64-musl-v32 and amd64 (glibc)-v32, and :3-4 pin arm64. No workflow states a CPU architecture. Not graded: the macos_arm64 indirect citations also check out (docs/providers.qmd:1012 mps; docs/intervention.qmd:170 macosx://)."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "In-repo: sandbox_agent_bridge() runs an in-sandbox model proxy (port 13131) forwarding OpenAI/Anthropic/Google API calls to the Inspect model. A demo claude_code() agent execs the real `claude --print --dangerously-skip-permissions` (installed via Dockerfile) and is labelled a basic-mechanics demonstration. There is no Codex CLI agent or example (bridge code only accommodates codex-cli wire behavior). claude_code()/codex_cli()/gemini_cli() live in the separate inspect-swe package. Agent-facing tooling: --json/--detach and ctl --json, AGENTS.md (CLAUDE.md = @AGENTS.md), four skills in .agents/skills, and the skill() tool.",
+          "citation": "src/inspect_ai/agent/_bridge/sandbox/bridge.py:49-100, 221-233; docs/agent-bridge.qmd:70-121; examples/evals_in_eval/claude.py:1-3, 15-58; examples/evals_in_eval/Dockerfile:24; src/inspect_ai/agent/_bridge/responses_impl.py:262; docs/tutorial.qmd:349-370; docs/agents.qmd:14; docs/control-channel.qmd:43-124; AGENTS.md:297-299; docs/tools-standard.qmd:609-649",
+          "holds": true,
+          "note": "bridge.py:60 sets port 13131. The docstring at :72-78 lists the OpenAI Completions/Responses, Anthropic and Google endpoints, and :221-233 execs `model_proxy` in the sandbox. claude.py:1-3 calls it a 'demonstration of the basic mechanics', and :20-26 builds `claude --print --dangerously-skip-permissions --model inspect`. Dockerfile:24 installs @anthropic-ai/claude-code. responses_impl.py:262-263 has the codex-cli namespace comment. There are no 'codex' hits under examples/ and no def codex_cli/gemini_cli in any .py. tutorial.qmd:351 and :370 and agents.qmd:14 place the named agents in inspect-swe. control-channel.qmd:43 says --json suits coding agents like Claude Code, and :49-100 cover --json/--detach. CLAUDE.md:1 is '@AGENTS.md'. AGENTS.md:297-299 points to .agents/skills, which holds four SKILL.md files. tools-standard.qmd:609-649 documents skill(). Minor imprecision, not decision-changing: a second near-identical claude_code() demo exists at examples/http_proxy/claude.py:1-26, so 'a demo' is accurate but the purpose/risks wording 'only a Claude Code demo' undercounts."
+        },
+        {
+          "field": "claim_checks[7] (docs/control-channel.qmd:64, verified: yes)",
+          "statement": "A task error is not a crash: plain `inspect eval` still exits 0 with status 'error', while eval-set's success flag and exit code reflect per-task outcomes. fail_on_error governs sample-error tolerance, not score values, and no metric-threshold gate option exists.",
+          "citation": "docs/control-channel.qmd:64; src/inspect_ai/_cli/eval.py:1245-1324, 1681-1682, 2199-2204; src/inspect_ai/_eval/evalset.py:1200, 1740; docs/handling-errors.qmd:24-63",
+          "holds": true,
+          "note": "control-channel.qmd:64 states this verbatim. eval_command calls eval_exec without using its result (eval.py:1245-1324; the function ends there), and eval_exec's eval branch returns True after eval() (:2199-2204). The only ctx.exit in eval.py is :1682 `ctx.exit(0 if success else 1)`, and _cli/main.py has no exit-code logic. evalset.py:1200 sets success = all_evals_succeeded(results), and :1740 requires status == 'success' and not invalidated. handling-errors.qmd:24-63 describes fail_on_error as a sample-error threshold. CLI threshold help texts (eval.py:110, 116, 118, 151) cover errors and incomplete samples only, and no min-score/fail-under/score-threshold option exists in src/ or docs/. tests/_control/test_launch_handoff.py:227 asserts exit 0 for `inspect eval --json` on a run whose task status is 'error' (:769-773), and :636-656 asserts eval-set exit 1 with success false."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

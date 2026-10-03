@@ -1,0 +1,293 @@
+{
+  "contender": "letta-ai/letta-code",
+  "revision": {
+    "contender": "letta-ai/letta-code",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "letta-ai/letta-code",
+        "tag": "v0.34.1",
+        "commit": "9ef9a0bee79a1b9e92bdc3f67a75e986d7287ce9",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.34.1",
+    "commit": "9ef9a0bee79a1b9e92bdc3f67a75e986d7287ce9",
+    "read_at": "2026-10-02T03:02:23+00:00"
+  },
+  "dossier": {
+    "contender": "letta-ai/letta-code",
+    "revision": {
+      "tag": "v0.34.1",
+      "commit": "9ef9a0bee79a1b9e92bdc3f67a75e986d7287ce9",
+      "read_at": "2026-10-02T03:02:23+00:00"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Letta Code is a TypeScript harness (terminal TUI, headless `letta -p`, a `letta server` App Server, plus a separate desktop app) for long-lived 'stateful' LLM coding agents. Each agent has durable memory kept as git-tracked Markdown files ('MemFS') that are compiled into its system prompt, a recall store of all its messages (Letta Cloud API or local JSONL transcripts), background 'reflection/dreaming' workers that commit memory and skill edits, plus skills, hooks, mods, crons and chat channels (README.md:5-11; src/agent/prompts/letta_root_memfs.md:5-24). Memory is scoped per Letta agent identity; it is separate from Claude Code's and Codex's own stores (~/.claude, ~/.codex, CLAUDE.md, AGENTS.md), which Letta Code reads or drives but does not write.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Letta Code is a stateful agent harness; agents have memory, identity and a sense of experience over time, and learn by rewriting their own memory, skills, prompts and even the harness (through mods).",
+          "citation": "README.md:5"
+        },
+        {
+          "claim": "Agents are reachable through a local CLI, a desktop app (macOS/Windows/Linux), a browser at chat.letta.com (including mobile) and messaging integrations (Telegram, Slack, Discord, custom channels).",
+          "citation": "README.md:7-11"
+        },
+        {
+          "claim": "Self-improvement & Learning: agents rewrite their context (memory blocks, skill learning); configure periodic dreaming with /sleeptime, investigate with /doctor [symptom], view memory with /palace.",
+          "citation": "README.md:22"
+        },
+        {
+          "claim": "Message search: /search across all messages and agents; agents can search their own conversations or other agents' conversations.",
+          "citation": "README.md:23"
+        },
+        {
+          "claim": "MemFS: all context (including memory blocks) is tracked via git; sync it to a custom GitHub repository with `/memory-repository set git@github.com:...`.",
+          "citation": "README.md:24"
+        },
+        {
+          "claim": "Skills load from global (~/.letta), project-scoped (.agents/skills) and agent-scoped (stored in MemFS) locations; view with /skills, create with /skill-creator.",
+          "citation": "README.md:25"
+        },
+        {
+          "claim": "Remote computers (`letta server --computer-name ...`) and Secrets (env-var injection with obfuscated values) require signing in with Letta.",
+          "citation": "README.md:31-32"
+        },
+        {
+          "claim": "Automatic client-side dreaming is disabled by default on native Windows (opt in with LETTA_ENABLE_WINDOWS_AUTO_REFLECTION=1); manual /dream and /reflect, macOS, Linux (including WSL) and server-side dreaming are unaffected.",
+          "citation": "README.md:34"
+        },
+        {
+          "claim": "Install with `npm install -g @letta-ai/letta-code`, then run `letta` in a project directory.",
+          "citation": "README.md:40-46"
+        },
+        {
+          "claim": "Letta Cloud is the default; on first launch choose to sign in with Letta or proceed locally (saved); `letta setup`, `letta backend cloud|local` change the default; `--backend cloud|local` is a one-off override.",
+          "citation": "README.md:51"
+        },
+        {
+          "claim": "/connect configures your own LLM API keys (OpenAI / ChatGPT, Anthropic, Z.ai coding plan, etc.); /model swaps models.",
+          "citation": "README.md:53"
+        },
+        {
+          "claim": "Letta Cloud stores agents' memory, identity and conversations while Letta Code runs on a laptop, GitHub Actions, a Cloud sandbox or a remote computer; on resume bundled default system prompts become Cloud-managed unless LETTA_CODE_PRESERVE_CLOUD_SYSTEM_PROMPT=1.",
+          "citation": "README.md:59"
+        },
+        {
+          "claim": "AgentFile (.af) export/import was removed (/export, /download, --import, --from-af); memory import/export and conversation transcript export are unaffected.",
+          "citation": "README.md:97-101"
+        },
+        {
+          "claim": "Community AUR packages (yay -S letta-code / letta-code-git) and a Nix flake (nix run / nix profile install github:letta-ai/letta-code) are offered; docs/nix.md has Home Manager and NixOS service examples.",
+          "citation": "README.md:121-134"
+        }
+      ],
+      "install": [
+        {
+          "method": "npm global install (package requires Node >= 22.19.0 per package.json:143-146; the README does not state this)",
+          "command": "npm install -g @letta-ai/letta-code",
+          "citation": "README.md:40-44"
+        },
+        {
+          "method": "Nix flake, run once (Linux and macOS with flakes enabled)",
+          "command": "nix run github:letta-ai/letta-code",
+          "citation": "README.md:128-132; docs/nix.md:5-11"
+        },
+        {
+          "method": "Nix flake, install into a profile",
+          "command": "nix profile install github:letta-ai/letta-code",
+          "citation": "README.md:131; docs/nix.md:19-24"
+        },
+        {
+          "method": "AUR on Arch Linux (community maintained, not upstream-built)",
+          "command": "yay -S letta-code   # release;  yay -S letta-code-git   # nightly",
+          "citation": "README.md:121-126"
+        },
+        {
+          "method": "PyPI wheel with bundled Node runtime (documented only in the wheel README python/README.md, not the root README; glibc Linux 2.28+ x86-64/ARM64 and macOS 14+, Python 3.9+)",
+          "command": "uv tool install letta   # or: pipx install letta   # or: python -m pip install letta",
+          "citation": "python/README.md:8-32"
+        },
+        {
+          "method": "From source (contributor workflow; Bun required)",
+          "command": "bun install && bun run dev   # or: bun run build && bun link",
+          "citation": "CONTRIBUTING.md:16-43"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - CI runs unit, API-integration and package/build jobs on ubuntu-24.04 (.github/workflows/ci.yml:147,190,232-233); PyPI wheel built for manylinux_2_28_x86_64 (.github/workflows/pypi-wheels.yml:30-33); Dockerfile uses node:22.19-bookworm-slim (docker/Dockerfile:1). The optional kernel sandbox needs `bwrap` on PATH (src/sandbox/availability.ts:138-166).",
+        "wsl2": "unknown - README.md:34 only groups 'Linux (including WSL)' with macOS as not-native-Windows for the dreaming default; there is no WSL-specific support statement or CI job (ci.yml:147,229-237 use ubuntu, macOS and Windows runners only), and src/sandbox/availability.ts:150-151 notes unprivileged user namespaces do not work in WSL1.",
+        "macos_arm64": "yes - CI unit/API/package jobs on macos-14 (.github/workflows/ci.yml:147,190,230-231); wheel macosx_14_0_arm64 on macos-15 (pypi-wheels.yml:41-43; python/README.md:29-31); package.json:218 chmods the node-pty darwin-arm64 spawn-helper; sandbox uses sandbox-exec (src/sandbox/availability.ts:117-126).",
+        "gpu": "no - not required or used by Letta Code itself; models are remote APIs or an external inference server (Ollama, llama.cpp, LM Studio) configured through /connect (src/providers/byok-providers.ts:279-284,341-343)."
+      },
+      "integrations": {
+        "cli": "Yes - `letta` bin (package.json:8-10) with an Ink TUI, headless `-p` with --output-format text|json|stream-json and --input-format stream-json (src/cli/args.ts:116-120,150-189), and subcommands including memory, shared-memory, trajectories, mcp, skills, install, backend, setup, server, cron, channels, messages, agents, model, secret (src/cli/subcommands/router.ts:76-158; help text src/index.ts:163-262; README.md:8).",
+        "mcp": "MCP client only. `letta mcp list|get|tools|search|call` (src/index.ts:188,221; src/cli/subcommands/mcp.ts) and src/mcp-client.ts:1-41,106-125 use @modelcontextprotocol/sdk client transports (stdio, streamable HTTP, SSE), also exported as ./mcp-client and ./mcp-oauth (package.json:82-91). No MCP server implementation found: grep of src for McpServer, StdioServerTransport and sdk/server returned no matches.",
+        "sdk_or_api": "Yes, protocol-level: `letta server --listen [url]` runs an App Server speaking a v2 WebSocket protocol (src/cli/subcommands/server.ts:8-41; src/cli/subcommands/app-server.ts:117-137; src/types/protocol_v2.ts); `--openai-api` adds OpenAI-compatible /v1/models, /v1/chat/completions and /v1/responses where each agent is a model (server.ts:23; src/websocket/app-server-openai.ts); non-loopback listeners are refused without --ws-auth (src/websocket/app-server.ts:172); the container CI starts an authenticated App Server with --backend local (.github/workflows/container.yml:109-146). Library subpaths ./app-server-client, ./protocol, ./channels, ./schedules (package.json:53-136). Separate repos: @letta-ai/letta-agent-sdk (dependency, package.json:153) and @letta-ai/letta-acp (published by .github/workflows/release-cascade.yml:155-210).",
+        "claude_code_or_codex": "README documents none. In code, Letta Code orchestrates them, not the reverse. (1) Agent tool subagent_type 'claude-code' or 'codex' runs the locally installed `claude --print --input-format stream-json ...` or `codex app-server --stdio` as background workers after a preflight (src/tools/descriptions/Task.md:31-51; src/tools/impl/external-coding-agent.ts:19,193-223,295-319; src/tools/impl/codex-app-server.ts:96-112). (2) When the server is Letta Cloud it uploads those runs' native session JSONL (~/.claude/projects/**/<id>.jsonl, ~/.codex/sessions/YYYY/MM/DD/rollout-*-<id>.jsonl) in 256 KiB chunks to /v1/conversations/<id>/native-session/chunks (src/tools/impl/native-session-capture.ts:27,46-65,120-138,161-167). (3) `letta trajectories detect|export|list|view|search` and /init read Claude Code, Codex, Hermes, OpenClaw, OpenHands and Deep Agents session stores to seed memory (src/cli/subcommands/trajectories.ts:20-45; src/skills/builtin/initializing-memory/SKILL.md:88-110). (4) Hooks use Claude-Code-compatible event names but load from ~/.letta/settings.json, .letta/settings.json and .letta/settings.local.json (src/hooks/types.ts:1-28; src/hooks/loader.ts:31-89). (5) /connect offers a 'ChatGPT / Codex plan' model provider (src/providers/byok-providers.ts:117-124); `claude` and `codex` are personality presets (src/cli/args.ts:104-105). No MCP server, plugin, hook or config for native Claude Code or Codex sessions found, and no code path writing ~/.claude, ~/.codex, CLAUDE.md or AGENTS.md (grep of src for those paths finds only the read paths in native-session-capture.ts:46-65 and prompt text)."
+      },
+      "telemetry_and_network": "Telemetry is ON by default; opt out with LETTA_CODE_TELEM=0|false or DO_NOT_TRACK=1 (src/telemetry/index.ts:392-405; initialized at src/index.ts:889-892; unit tests force LETTA_CODE_TELEM=0, scripts/run-unit-tests.cjs:99-101). A random persistent device UUID is stored in ~/.letta/settings.json and sent as X-Letta-Code-Device-ID (src/settings-manager.ts:636-644,976-980; src/backend/api/metadata.ts:100-107). Events are batched (flush every 2 min or 50 events; 3 s bounded drain at exit; src/telemetry/index.ts:360-363,523-530,959-976) and POSTed as service 'letta-code' to /v1/metadata/telemetry (src/telemetry/index.ts:935-944; src/backend/api/metadata.ts:93-110). In the CLI runtime the destination is always https://api.letta.com, whatever the backend or LETTA_BASE_URL, with a Bearer key only if one exists (src/backend/api/metadata.ts:60-77; src/auth/oauth.ts:10; src/backend/api/request.ts:89,104-112). Payloads: session_start (process.argv joined as startup_command with no redaction, so a prompt passed as `letta -p '...'` is included; version, platform, node version; src/telemetry/index.ts:643-663); session_end (duration, message/tool counts, token stats); tool_usage (tool name, success, duration, response size, error type and stderr/error-message text; src/tools/manager.ts:1903-1910,1970-1977); user_input (length, slash-command name, model id, not the text; src/telemetry/index.ts:806-821); reflection_* events; error events with message plus the last 50 lines of the debug log, sent only when the configured server URL contains api.letta.com, which is the default even in local mode (src/telemetry/index.ts:410-420,760-803; src/backend/api/server-url.ts:8-15). reflection_arena_vote carries a transcript payload but belongs to the opt-in reflection_arena experiment (default off; src/telemetry/index.ts:187-206; src/experiments/manager.ts:46-52,114-123), whose Hugging Face upload also needs HF_TOKEN (src/cli/helpers/reflection-arena-hf-upload.ts:154-162). Debug logs are always written to ~/.letta/logs/debug/<agent>/<session>.log (5 files x 10 MB per agent) unless LETTA_CODE_TELEM is 0/false (src/utils/debug.ts:6-9,68-71,93-108). Accounts and services: Letta Cloud is the default backend (src/cli/subcommands/backend.ts:38; README.md:51) with OAuth device-code login to app.letta.com (src/auth/oauth.ts:12-17); agents, conversations and the MemFS git remote https://api.letta.com/v1/git/<agent>/state.git live there (src/agent/memory-git.ts:228-232; src/backend/api/memfs-git-proxy.ts:45-60). Local mode (first-run choice or `letta backend local`) keeps state under ~/.letta/lc-local-backend (override LETTA_LOCAL_BACKEND_DIR) and needs only the LLM endpoints configured via /connect (src/auth/setup-ui.tsx:86,141-142; src/utils/local-backend-paths.ts:19-26). Remote computers, shared memory repos, hosted secrets and chat.letta.com need a Letta account (README.md:31-32,70; src/skills/builtin/managing-shared-memory/SKILL.md:8). On startup the CLI fetches https://registry.npmjs.org/@letta-ai/letta-code/latest and silently runs `npm install -g @letta-ai/letta-code@latest` unless DISABLE_AUTOUPDATER=1, a prerelease, a source checkout, desktop-managed or a PyPI install (src/updater/auto-update.ts:33-34,179-181,279-293,295-355,394-418,520-555; src/index.ts:648-650). Native Claude Code/Codex sessions launched via Letta are uploaded only when the server is Cloud (src/tools/impl/native-session-capture.ts:161-167). The package lists @scarf/scarf (package.json:158; bun.lock:237; no import of it in src), src/telemetry/index.ts:393-395 says DO_NOT_TRACK is honored by 'install-time analytics packages', and README.md:140-145 embeds a static.scarf.sh tracking pixel; the dependency's own install-time behavior is outside this repo and was not inspected."
+    },
+    "code": {
+      "languages": [
+        "TypeScript (incl. TSX for the Ink/React TUI)",
+        "JavaScript (build, CI and check scripts)",
+        "Python (PyPI wheel packaging only)",
+        "Shell",
+        "Nix"
+      ],
+      "entry_points": [
+        {
+          "path": "src/standalone-entry.ts",
+          "what": "Bundle entry: build.js:76-90 bundles it into letta.js, the npm `bin` target (package.json:8-10); registers pi-ai OAuth loaders then imports ./index (standalone-entry.ts:1-11)."
+        },
+        {
+          "path": "src/index.ts",
+          "what": "Main CLI: strict flag parsing (src/cli/args.ts), subcommand dispatch, backend selection (cloud API vs local), TUI vs headless, telemetry init (index.ts:889-892), startup auto-update (index.ts:648-650); help text at index.ts:163-262."
+        },
+        {
+          "path": "src/cli/subcommands/router.ts",
+          "what": "Subcommand router (router.ts:76-158): memory, shared-memory, trajectories, mcp, skills/install, backend, setup, server, cron, channels, messages, agents, model, secret, sandbox, teleport, local-backend, usage, update/version."
+        },
+        {
+          "path": "src/cli/subcommands/memory.ts",
+          "what": "`letta memory status|diff|pull|backup|backups|restore|export|tokens` (memory.ts:17-47) over the per-agent git-backed memory directory."
+        },
+        {
+          "path": "src/cli/subcommands/server.ts",
+          "what": "`letta server`: remote-computer listener, channels, or `--listen` App Server (WebSocket v2, optional OpenAI-compatible routes), delegating to app-server.ts and src/websocket/app-server.ts (server.ts:8-41; app-server.ts:117-137)."
+        },
+        {
+          "path": "src/headless.ts",
+          "what": "Headless mode behind `letta -p` (text/json/stream-json output, stream-json input; src/cli/args.ts:116-120,150-189); has its own approval loop separate from the TUI (AGENTS.md:285-287)."
+        },
+        {
+          "path": "src/app-server-client.ts",
+          "what": "Client library for the App Server protocol, exported as @letta-ai/letta-code/app-server-client (package.json:65-71; build.js:165-175,231-241)."
+        },
+        {
+          "path": "src/mcp-client.ts",
+          "what": "MCP client library exported as @letta-ai/letta-code/mcp-client (package.json:82-86; build.js:177-190); used by `letta mcp`."
+        }
+      ],
+      "architecture": "Layered TypeScript monolith with layer rules enforced by scripts/check-layer-boundaries.js (AGENTS.md:132-160). Key modules: src/cli/ (Ink/React TUI in app/ and components/, slash commands in commands/registry.ts, subcommands/); src/websocket/ (App Server and remote listener; protocol in src/types/protocol_v2.ts); src/agent/ (domain: memory-filesystem.ts, memory-git.ts, memory-git-hooks.ts, memory-worktree.ts, memory-conflict-repair.ts, memory-constraints*.ts, subagents/builtin/{reflection,memory,recall,init,fork,general-purpose}.md, prompts/*.md, skills.ts); src/tools/ (schemas, descriptions, impl/: Bash, Read/Edit/Write, Task/Agent incl. external claude-code/codex workers, workflow, monitor, native-session-capture.ts); src/backend/ (Backend interface; APIBackend over @letta-ai/letta-client for Letta Cloud in backend.ts and api/; LocalBackend in local/ with conversations/<id>/{manifest.json,messages.jsonl} and agents/<id>.json under the storage dir, providers/auth.json, pi-ai turn executor); src/providers/ (BYOK/OAuth catalog); src/permissions/ and src/sandbox/ (permission modes, cross-agent memory guard, seatbelt/bwrap/Windows sandbox); src/hooks/ (Claude-Code-compatible hook events); src/mods/ (local TypeScript extension engine); src/channels/ (Telegram, Slack, Discord, custom); src/cron/; src/telemetry/; src/updater/; src/web/ (memory viewer); src/skills/builtin/ (initializing-memory, managing-shared-memory, syncing-memory-filesystem, etc.). About 2,245 files sit under src/ including tests, prompts and skills. Memory model: one git repo of Markdown per agent at ~/.letta/agents/<id>/memory (API/Cloud backend; origin https://api.letta.com/v1/git/<id>/state.git) or <storage>/memfs/<id>/memory (local backend, no remote unless /memory-repository is set); root Markdown is compiled into the system prompt, child directories are indexed by MEMORY.md, a pre-commit hook validates frontmatter, edits count only once committed, the harness pushes committed changes after each turn, and reflection subagents work in a private worktree that the harness merges (src/agent/memory-filesystem.ts:29-57; src/backend/local/paths.ts:48-53; src/agent/memory-git-hooks.ts:24-36; src/agent/prompts/letta_root_memfs.md:26-56,62; AGENTS.md:762-771). MemFS cannot be disabled on memfs-capable backends; --ephemeral and --stateless runs skip memory (src/agent/memory-filesystem.ts:497-499; src/cli/args.ts:243-256). bin/letta.js is a leftover launcher for prebuilt per-platform binaries that nothing else in the checkout references; package.json `bin` points to the root letta.js.",
+      "packaging_and_release": "Artifacts: (1) npm @letta-ai/letta-code: one Node-targeted ESM bundle letta.js built by Bun (build.js:76-90,156-163) plus dist/* subpath libraries, bundled skills and vendored Ink patches (package.json:11-52; build.js:165-369); node-pty, @vscode/ripgrep and sharp stay external and resolve at install (build.js:111-120,138). (2) PyPI `letta` wheels bundling a SHA-256-pinned Node 22.19.0 archive plus the app for manylinux_2_28 x86_64/aarch64, macOS 14 x86_64/arm64 and Windows x64 (scripts/build-pypi.py:23-52,91-92; .github/workflows/pypi-wheels.yml:24-100; python/README.md:29-32). (3) Multi-arch (linux/amd64, linux/arm64) container to ghcr.io/letta-ai/letta-code and Docker Hub letta/letta (release.yml:192-238; docker/Dockerfile). (4) GitHub Release whose only asset is letta.js (release.yml:240-261). (5) Nix flake with bun.lock-derived deps (flake.nix; bun.nix; docs/nix.md:86-101); AUR packages are community maintained (README.md:121-126). Flow: prepare-release.yml opens a 'chore: bump version to X' PR (prepare-release.yml:119-169); merging it triggers release.yml, which runs `bun run check`, build, help/version smoke and a real-API ping, tags vX, runs `npm publish --access public --tag <latest|prerelease label>` under an id-token (OIDC) job, waits for npm visibility, pushes the container, creates the GitHub Release, builds and publishes PyPI wheels for stable versions via pypa/gh-action-pypi-publish, and dispatches the desktop-bump and SDK/ACP release-cascade workflows (release.yml:3-330; release-cascade.yml:1-210). Integrity: no checksum files, signatures, SBOM or provenance/attestation steps appear in any workflow (grep of .github for provenance|attest|cosign|sigstore|sha256sum|checksum|SBOM found none); the only hash check is the pinned Node archive digest inside build-pypi.py. Whether npm or PyPI trusted publishing attaches provenance automatically is not visible from the repo.",
+      "tests_and_ci": "Framework: Bun's built-in test runner (`bun test`, sharded by scripts/run-unit-tests.cjs:15-40,96-103); tests sit beside source (AGENTS.md:221). About 946 test files: 914 *.test.ts (23 of them under scripts/), 29 *.test.tsx and 3 *.test.cjs; 12 API-gated integration test files in src/integration-tests (need LETTA_API_KEY; ci.yml:177-218). Unit runs force LETTA_CODE_TELEM=0 (run-unit-tests.cjs:99-101). `bun run check` runs 12 gates: madge cycles, layer boundaries, exported-function style, filename casing, file-size ratchet, module ownership, test-mock isolation, test-coverage policy, skill frontmatter, bundled skill scripts, biome, tsc (scripts/check.js:15-28). 17 workflow files in .github/workflows: ci.yml (change classifier; lint/type check; update-chain smoke; unit shards on ubuntu x64, ubuntu arm64, macos-14 and windows; API integration shards; package matrix on macOS arm64, Linux x64, Linux arm64 and Windows x64 with npm pack and global-install test, local-backend headless smoke and publish dry-run; Node 18 smoke; live headless scenarios via Cloud and via the local backend with several model providers; Ollama smoke and reflection-headless as continue-on-error), container.yml (image build and authenticated App Server smoke), pypi-wheels.yml (wheel build and install smoke), release.yml, prepare-release.yml, release-cascade.yml, nightly-update-smoke.yml, telegram-live-smoke.yml, pr-title.yml, contribution-guard.yml (AI-disclosure policy), review.yml and letta.yml (LLM-agent PR review and issue bot with repo write tokens), sync-tools-to-cloud.yml, and four scheduled agent-watch workflows (Claude Code, Codex, pi-ai, built-in skills) that run an LLM agent to open parity PRs (claude-agent-watch.yml:3-6; AGENTS.md:888-901).",
+      "dependencies": "package.json: 21 runtime dependencies (including @letta-ai/letta-client, @letta-ai/letta-agent-sdk 0.8.24, @letta-ai/trajectory 0.2.0, @modelcontextprotocol/sdk 1.30.0, @earendil-works/pi-ai ^0.99.1, ink 5.2.1, react 18.2.0, node-pty, sharp and the @janhapke/sharp-electron fork, ws, shiki, @scarf/scarf), 1 optionalDependency (@vscode/ripgrep) and 19 devDependencies (package.json:150-196). bun.lock is the lockfile and CI installs with --frozen-lockfile (ci.yml:98-101). python/pyproject.toml declares no Python dependencies (the wheel bundles Node and the app). docker/Dockerfile (node:22.19-bookworm-slim, apt tools, `npm install --global @letta-ai/letta-code@<version>`). flake.nix and generated bun.nix for Nix. vendor/ holds patched Ink files copied into node_modules by scripts/postinstall-patches.js (package.json:218).",
+      "security_policy": "none - no SECURITY.md or other security/vulnerability-reporting file exists in the checkout (glob **/SECURITY* is empty); only AI_POLICY.md (AI-contribution disclosure) and CONTRIBUTING.md."
+    },
+    "claim_checks": [
+      {
+        "claim": "MemFS: all context (including memory blocks) is tracked via git; `/memory-repository set <git url>` syncs it to a custom repository (README.md:24).",
+        "verified": "partial",
+        "evidence": "Memory files and skills are a real git repo: local mode runs git init on branch main and commits as <agentId>@letta.com (src/agent/memory-git.ts:1316-1378); Cloud mode uses origin https://api.letta.com/v1/git/<agent>/state.git (memory-git.ts:228-232); a pre-commit hook enforces frontmatter rules (src/agent/memory-git-hooks.ts:24-36); a post-commit hook pushes to the extra remote in letta.memoryRepository.url after every commit, installed in local mode too (memory-git-hooks.ts:242-291; memory-git.ts:1136-1141; src/cli/commands/memory-repository.ts:49-61). But conversation history is not in git: it is a separate recall store the agent cannot mutate (src/agent/prompts/letta_root_memfs.md:12), kept by the Cloud API or as local JSONL (src/backend/local/local-transcript.ts:82-88)."
+      },
+      {
+        "claim": "Letta Cloud is the default; first launch chooses sign-in or local; `letta setup`, `letta backend cloud|local` and `--backend` control it (README.md:51).",
+        "verified": "yes",
+        "evidence": "Saved preference defaults to 'api' (Cloud) in src/cli/subcommands/backend.ts:38-45,65-77; setup text at src/auth/setup-ui.tsx:86,141-142; `--backend` flag at src/cli/args.ts:125-132; setup subcommand at src/cli/subcommands/setup.ts:15-32. The code still calls local mode 'experimental' (LETTA_LOCAL_BACKEND_EXPERIMENTAL, src/backend/local/paths.ts:14-15; createExperimentalLocalBackend, src/backend/backend.ts:724-729)."
+      },
+      {
+        "claim": "Letta Cloud stores agents' memory, identity and conversations while Letta Code runs elsewhere (README.md:59).",
+        "verified": "yes",
+        "evidence": "APIBackend declares remoteMemfs and serverSecrets (src/backend/backend.ts:376-390); the memory remote is https://api.letta.com/v1/git/<agent>/state.git (src/agent/memory-git.ts:228-232; src/backend/api/memfs-git-proxy.ts:45-60). Remote MemFS is limited to Letta Cloud: explicit enable throws 'MemFS sync failed (expected api.letta.com ...)' on other servers and auto-enable skips non-Cloud servers (src/agent/memory-filesystem.ts:196-209,544-546,656-668), so a self-hosted API server is not a MemFS remote."
+      },
+      {
+        "claim": "Remote computers and Secrets require signing in with Letta (README.md:31-32).",
+        "verified": "partial",
+        "evidence": "Remote computers: environmentRouting is Cloud-only (src/backend/backend.ts:177-182,386-388). Secrets: Cloud agent secrets live on the server, but local agents have their own store in the OS credential manager with a 0600 JSON file fallback at <storage>/secrets/local-agent-secrets.json (src/utils/secrets-store.ts:1-8,69-110), so sign-in is needed for cross-machine secrets, not for local-mode secrets. The code differs from the README here."
+      },
+      {
+        "claim": "Automatic client-side dreaming is disabled by default on native Windows; manual /dream, /reflect and server-side dreaming are unaffected (README.md:34).",
+        "verified": "yes",
+        "evidence": "src/reflection-settings.ts:6-11 gates on process.platform !== 'win32' or LETTA_ENABLE_WINDOWS_AUTO_REFLECTION=1; src/cli/helpers/reflection-launcher.ts:792-794 skips only non-manual triggers; the client also skips launching when Cloud reports server-side reflection ownership ('cutover') (reflection-launcher.ts:754-768,800-806)."
+      },
+      {
+        "claim": "Dreaming is configured with /sleeptime, investigated with /doctor [symptom], and memory is viewed with /palace (README.md:22).",
+        "verified": "yes",
+        "evidence": "src/cli/commands/registry.ts:77-85 (/doctor), 86-97 (/dream, /reflect), 139-156 (/palace, /sleeptime); triggers off|step-count|compaction-event, requiring memfs unless off (src/cli/args.ts:303-319); /palace writes a self-contained HTML viewer to ~/.letta/viewers and opens the browser (src/web/generate-memory-viewer.ts:1-7,41)."
+      },
+      {
+        "claim": "Install with `npm install -g @letta-ai/letta-code` and run `letta` (README.md:40-46).",
+        "verified": "partial",
+        "evidence": "package.json:8-10 supplies the `letta` bin, but engines require Node >= 22.19.0 and Bun >= 1.3.2 (package.json:143-146), which the README does not state, and CI also smoke-runs --help on Node 18 (.github/workflows/ci.yml:375-408). The install runs a postinstall script (package.json:218) and npm installs auto-update themselves at startup (src/updater/auto-update.ts:279-293,520-555); neither is mentioned in the README."
+      },
+      {
+        "claim": "AgentFile (.af) export/import was removed: /export, /download, --import, --from-af unsupported; memory and transcript export unaffected (README.md:97-101).",
+        "verified": "yes",
+        "evidence": "No /export or /download in the command registry (src/cli/commands/registry.ts:49-667), no import/from-af flags in the CLI flag catalog (src/cli/args.ts:28-320), no .af handling in src. Memory export remains: `letta memory export --agent <id> --out <dir>` (src/cli/subcommands/memory.ts:284-319) and `letta messages transcript --conversation <id> --out <path>` (src/index.ts:214)."
+      },
+      {
+        "claim": "Skills load from global (~/.letta), project (.agents/skills) and agent-scoped (MemFS) locations (README.md:25).",
+        "verified": "yes",
+        "evidence": "src/agent/skills.ts:1-7 lists the priority order; lines 181-193 define PROJECT_SKILLS_DIR=.agents/skills (with legacy .skills) and GLOBAL_SKILLS_DIR=~/.letta/skills; agent skills live under $MEMORY_DIR/skills/<name>/SKILL.md (src/agent/subagents/builtin/reflection-v2.md:45; src/skills/builtin/initializing-memory/SKILL.md:31). Global path is ~/.letta/skills, slightly more specific than the README wording."
+      },
+      {
+        "claim": "Agents learn and evolve over long horizons by rewriting their own memory, skills, prompts and the harness via mods (README.md:5).",
+        "verified": "partial",
+        "evidence": "Mechanisms exist: a background reflection subagent edits memory and skills and commits with trailers (src/agent/subagents/builtin/reflection-v2.md:16-20,176-211); edits take effect only after commit and recompile (src/agent/prompts/letta_root_memfs.md:54-56); mods are local TypeScript files in ~/.letta/mods (AGENTS.md:513-523; src/mods/mod-engine.ts). Whether this improves outcomes is not checkable from the repo: no evaluation results are published (only scripts/latency-benchmark.ts and an opt-in reflection-arena A/B experiment, src/experiments/manager.ts:46-52)."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Cross-tool scope: no integration was found that lets native Claude Code or native Codex sessions read or write Letta memory (no MCP server in src, no plugin/hook/config targeting ~/.claude or ~/.codex). Letta Code only launches `claude`/`codex` as its own subagents (src/tools/descriptions/Task.md:31-35), imports their history once through `letta trajectories` (src/cli/subcommands/trajectories.ts:31-36), and uploads native-session JSONL only when the server is Letta Cloud (src/tools/impl/native-session-capture.ts:161-167). Its durable memory is scoped to Letta agents under ~/.letta/agents/<id>/memory or <LETTA_LOCAL_BACKEND_DIR|~/.letta/lc-local-backend>/memfs/<id>/memory (src/agent/memory-filesystem.ts:46-57; src/backend/local/paths.ts:48-53) and is injected into context only by Letta Code itself.",
+      "Telemetry/privacy: on by default and sent to https://api.letta.com from the CLI regardless of backend, including un-redacted argv (so a `-p` prompt), tool stderr/error text and, for error events, the last 50 debug-log lines (src/telemetry/index.ts:392-405,643-663,760-803; src/backend/api/metadata.ts:60-77; src/tools/manager.ts:1903-1910,1970-1977); a persistent device ID is attached (src/settings-manager.ts:636-644). Opt-out is env-var only (LETTA_CODE_TELEM=0 or DO_NOT_TRACK=1) and also turns off the debug log file (src/utils/debug.ts:93-99). A static.scarf.sh pixel is embedded in the README (README.md:140-145).",
+      "Cloud default and feature split: Letta Cloud is the default backend (src/cli/subcommands/backend.ts:38). Remote MemFS sync, shared memory repos, remote computers, hosted secrets and server-side reflection are Cloud features (src/agent/memory-filesystem.ts:544-546,656-668; src/skills/builtin/managing-shared-memory/SKILL.md:8; src/backend/backend.ts:177-182; src/cli/helpers/reflection-launcher.ts:754-806). Local mode is still named experimental in code (src/backend/local/paths.ts:14-15; src/backend/backend.ts:724-729), has needed explicit transcript migrations between versions (src/backend/local/local-transcript.ts:24-80), and does not support /clear-messages (src/cli/app/use-submit-handler.ts:1963-1970). On Cloud, memory and conversations are stored by Letta (README.md:59).",
+      "Deletion/recovery semantics are agent-driven and git-based, with no purge path: memory deletion is rm plus a commit by the agent or a reflection worker (src/agent/subagents/builtin/reflection-v2.md:104; src/agent/prompts/letta_root_memfs.md:54-77), so removed text stays in .git history and in any remote (Cloud origin or /memory-repository target, memory-git-hooks.ts:242-291). Message history is described as immutable to the agent (letta_root_memfs.md:12); /clear-messages is hidden and API-backend only (use-submit-handler.ts:1946-1983); `letta agents` has only list/create (src/cli/subcommands/agents.ts:19-20) and agent deletion goes through the TUI selector or App Server agent_delete (src/cli/components/AgentSelector.tsx:499; src/websocket/listener/commands/agents-conversations.ts:272-274); deleteConversation is optional per backend (src/backend/backend.ts:263-266). Recovery: `letta memory backup` copies the memory dir to a sibling memory-backup-* on the same disk and `restore --force` does rmSync then copy (src/cli/subcommands/memory.ts:233-282); /memfs reset moves memory to a /tmp directory (use-submit-handler.ts:2626-2672); failed reflection merges preserve a branch (AGENTS.md:762-771).",
+      "Permission and isolation defaults: the default permission mode is `unrestricted`, which auto-allows every tool except explicit deny rules (src/permissions/mode.ts:9-10,109-111; src/permissions/startup.ts:58). Kernel sandboxing of agent shells is opt-in via LETTA_FS_SANDBOX=1; by default only memory subagents are confined and in-process file tools get a static cross-agent guard, so a parent agent's shell is not walled off from other agents' memory directories (src/sandbox/availability.ts:53-94; src/permissions/cross-agent-guard.ts:5-19). AGENTS.md:666-680 describes shell wrapping as a baseline, which the code contradicts. On Linux the sandbox needs bwrap with user namespaces, otherwise it continues unsandboxed after a warning (src/sandbox/availability.ts:102-115,138-166).",
+      "Install/update behavior changes the installed version by itself: npm installs auto-update at startup by default (src/updater/auto-update.ts:279-293,520-555; src/index.ts:648-650; disable with DISABLE_AUTOUPDATER=1); install runs a postinstall that patches vendored Ink into node_modules (package.json:218; scripts/postinstall-patches.js:1-5); the manifest includes @scarf/scarf and an @janhapke/sharp-electron fork (package.json:152,158); the README omits the Node >= 22.19.0 requirement (package.json:143-146). Unpinned auto-update plus changing memory/transcript formats make version drift a factor for any long-lived memory store.",
+      "Release integrity and security process: GitHub Releases attach only an unsigned letta.js (.github/workflows/release.yml:240-261); no checksum, signature, SBOM or attestation step exists in any workflow; npm and PyPI publish via OIDC trusted publishing (release.yml:19-23,171-173,318-329) and the container is pushed unsigned to GHCR and Docker Hub letta/letta (release.yml:215-238), a name that previously served the now end-of-life Python server (docker/entrypoint.sh:25). PyPI name `letta` now ships this CLI, not an SDK or server (python/pyproject.toml:8; python/README.md:80-82). No SECURITY.md or vulnerability-reporting policy exists.",
+      "Maintenance, scope and licensing: pre-1.0 (0.34.1) with a release on every merged version-bump commit (release.yml:3-9) and recent renames/removals (envs to computers, README.md:94-95; `letta app-server` deprecated, src/cli/subcommands/router.ts:101-105; AgentFile removed, README.md:97-101; extensions renamed to mods, AGENTS.md:503-521 vs src/mods/). Broad product surface (desktop, channels, crons, mods, remote computers; about 2,245 files under src/) of which durable memory is one part, with substantial LLM-agent automation holding repo write tokens (review.yml:53-66; letta.yml:11-24; claude-agent-watch.yml:3-6). Docs live mostly on docs.letta.com, outside the repo (docs/ holds only nix.md, two plans and mod examples). License is Apache-2.0 plus a Brand Assets Exclusion for the Letta and Letta Code name, logo and art (LICENSE:192-198); src/agent/prompts bundles near-verbatim third-party agent prompts (Claude Code ~v2.1.50, Codex, Gemini CLI) with provenance notes but no per-file license statement (src/agent/prompts/README.md:14-40)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "letta-ai/letta-code",
+      "checks": [
+        {
+          "field": "readme.install[0] (npm global install)",
+          "statement": "Install with `npm install -g @letta-ai/letta-code`; the package requires Node >= 22.19.0 per package.json:143-146, which the README does not state.",
+          "citation": "README.md:40-44; package.json:143-146 (also package.json:8-10)",
+          "holds": true,
+          "note": "README.md:40-44 shows exactly `npm install -g @letta-ai/letta-code`. package.json:8-10 maps bin `letta` to letta.js. package.json:143-146 sets engines node \">=22.19.0\" (and bun \">=1.3.2\"). The README never states a Node version; it only links to npm's install docs at line 40. CI also packs the tarball, installs it globally and runs it (ci.yml:339-348)."
+        },
+        {
+          "field": "license",
+          "statement": "License is Apache-2.0, in file LICENSE.",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-3 is the Apache License 2.0 text and LICENSE:178-190 the standard notice ('Copyright 2025, Letta authors'). package.json:142 also says \"license\": \"Apache-2.0\". LICENSE:192-198 adds a Brand Assets Exclusion: the Letta and Letta Code names, logo, wordmark, images and ASCII art are not Apache-licensed. The dossier already records this under risks, so SPDX Apache-2.0 for the code is accurate."
+        },
+        {
+          "field": "readme.platforms.macos_arm64",
+          "statement": "yes - CI unit/API/package jobs on macos-14; wheel macosx_14_0_arm64 built on macos-15; package.json:218 chmods the node-pty darwin-arm64 spawn-helper; sandbox uses sandbox-exec.",
+          "citation": ".github/workflows/ci.yml:147,190,230-231; .github/workflows/pypi-wheels.yml:41-43; python/README.md:29-31; package.json:218; src/sandbox/availability.ts:117-126",
+          "holds": true,
+          "note": "ci.yml:147 (unit) and ci.yml:190 (API) list macos-14 in their matrices. ci.yml:230-231 is the package job 'macOS arm64 (macos-14)'. pypi-wheels.yml:41-43 builds macosx_14_0_arm64 on macos-15. python/README.md:29-31 says 'macOS (14+, Intel and Apple Silicon)'. package.json:218's postinstall chmods node-pty prebuilds/darwin-arm64/spawn-helper. availability.ts:117-126 maps darwin to the seatbelt backend when sandbox-exec exists. Minor: the API job runs only on pushes and same-repo PRs (ci.yml:181)."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "README documents none; Letta Code orchestrates Claude Code/Codex (external-agent subagent types with preflight, Cloud-only native-session upload in 256 KiB chunks, trajectories import, Claude-Code-compatible hooks loaded from .letta settings, ChatGPT/Codex plan provider, claude/codex personalities); nothing writes ~/.claude, ~/.codex, CLAUDE.md or AGENTS.md and no MCP server exists.",
+          "citation": "src/tools/descriptions/Task.md:31-51; src/tools/impl/external-coding-agent.ts:19,193-223,295-319; src/tools/impl/codex-app-server.ts:96-112; src/tools/impl/native-session-capture.ts:27,46-65,120-138,161-167; src/cli/subcommands/trajectories.ts:20-45; src/skills/builtin/initializing-memory/SKILL.md:88-110; src/hooks/types.ts:1-28; src/hooks/loader.ts:31-89; src/providers/byok-providers.ts:117-124; src/cli/args.ts:104-105",
+          "holds": true,
+          "note": "Every cited range matches. external-coding-agent.ts:19 declares the types ['claude-code','codex']. Lines 199-222 build `claude --print --verbose --input-format stream-json ...` and `codex app-server --stdio`, and the real claude spawn uses the same flags (claude-stream-session.ts:116-121,142). Preflight is defined at 295-319 and called at 413-417 and 456-460. In native-session-capture.ts: CHUNK_BYTES = 256*1024 (27), ~/.claude/projects and ~/.codex/sessions/YYYY/MM/DD/rollout-*-<id>.jsonl (46-65), POST /v1/conversations/<id>/native-session/chunks (120-138), and a Cloud-only gate (161-167). Hooks: types.ts:2 says 'Claude Code-compatible', and loader.ts reads ~/.letta/settings.json, .letta/settings.json and .letta/settings.local.json. Negative claims: a case-insensitive grep finds no claude/codex in README.md. Non-test src references .claude/.codex only at native-session-capture.ts:49,63 (reads). There is no MCP server SDK import or whole-word McpServer. Nit: the parenthetical 'only the read paths in native-session-capture.ts:46-65 and prompt text' misses src/tools/impl/enter-worktree-messages.ts:15, which reads AGENTS.md. It is still a read, so 'no code path writing' holds."
+        },
+        {
+          "field": "claim_checks[1] (Letta Cloud is the default)",
+          "statement": "Letta Cloud is the default; first launch chooses sign-in or local; `letta setup`, `letta backend cloud|local` and `--backend` control it. Verified: yes (local mode still called 'experimental' in code).",
+          "citation": "README.md:51; src/cli/subcommands/backend.ts:38-45,65-77; src/auth/setup-ui.tsx:86,141-142; src/cli/args.ts:125-132; src/cli/subcommands/setup.ts:15-32; src/backend/local/paths.ts:14-15; src/backend/backend.ts:724-729",
+          "holds": true,
+          "note": "README.md:51 says this verbatim. backend.ts:38 falls back to `preferredBackendMode ?? \"api\"` (Cloud), and lines 65-77 save the choice. setup-ui.tsx:141-142 offers 'Sign in with Letta ... or continue locally', with the login option labelled '(default)' at line 152; line 86 is the local-mode confirmation. setup.ts:15-32 re-runs setup. args.ts:125-132 defines `--backend` as \"cloud\" or \"local\". paths.ts:14-15 defines LETTA_LOCAL_BACKEND_EXPERIMENTAL, and backend.ts:724-729 is createExperimentalLocalBackend. The dossier's 'yes' verdict is correct."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

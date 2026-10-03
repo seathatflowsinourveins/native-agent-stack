@@ -1,0 +1,283 @@
+{
+  "contender": "lancedb/lancedb",
+  "revision": {
+    "contender": "lancedb/lancedb",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "lancedb/lancedb",
+        "tag": "v0.39.0",
+        "commit": "0c33b2754d0c498d8e2f9c147c41429a1b5d3f1b",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.39.0",
+    "commit": "0c33b2754d0c498d8e2f9c147c41429a1b5d3f1b",
+    "read_at": "2026-10-02T03:02:19+00:00"
+  },
+  "dossier": {
+    "contender": "lancedb/lancedb",
+    "revision": {
+      "tag": "v0.39.0",
+      "commit": "0c33b2754d0c498d8e2f9c147c41429a1b5d3f1b",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "LanceDB is an embedded (in-process) multimodal/vector database library built on the Lance columnar format. It has a Rust core (rust/lancedb), Python (PyO3) and Node.js/TypeScript (napi-rs) SDKs, and a Java client limited to LanceDB Cloud/Enterprise. Tables live on local disk, memory:// or object storage. It offers ANN vector indexes (IVF-Flat/PQ/SQ/RQ, IVF-HNSW variants), BM25 full-text and substring indexes, scalar indexes, hybrid search with rerankers, table versions/tags/branches, and an optional embedding-function registry that calls external or local embedding models. It is a storage/search library: this repository contains no repository crawler, code-aware chunker, CLI, MCP server or daemon (searches and manifests below).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "\"The Multimodal AI Lakehouse\"; \"LanceDB is designed for fast, scalable, and production-ready vector search. It is built on top of the Lance columnar format.\"",
+          "citation": "README.md:16,22"
+        },
+        {
+          "claim": "\"Fast Vector Search: Search billions of vectors in milliseconds with state-of-the-art indexing.\"",
+          "citation": "README.md:44"
+        },
+        {
+          "claim": "\"Comprehensive Search: Support for vector similarity search, full-text search and SQL.\"",
+          "citation": "README.md:45"
+        },
+        {
+          "claim": "\"Multimodal Support: Store, query and filter vectors, metadata and multimodal data (text, images, videos, point clouds, and more).\"",
+          "citation": "README.md:46"
+        },
+        {
+          "claim": "\"Advanced Features: Zero-copy, automatic versioning, manage versions of your data without needing extra infrastructure. GPU support in building vector index.\"",
+          "citation": "README.md:47"
+        },
+        {
+          "claim": "\"Open Source & Local: 100% open source, runs locally or in your cloud. No vendor lock-in.\"",
+          "citation": "README.md:50"
+        },
+        {
+          "claim": "\"Cloud and Enterprise: Production-scale vector search with no servers to manage. Complete data sovereignty and security.\"",
+          "citation": "README.md:51"
+        },
+        {
+          "claim": "\"Seamless Integration: Python, Node.js, Rust, and REST APIs for easy integration. Native Python and Javascript/Typescript support.\"",
+          "citation": "README.md:55"
+        },
+        {
+          "claim": "\"Rich Ecosystem: Integrations with LangChain, LlamaIndex, Apache-Arrow, Pandas, Polars, DuckDB and more on the way.\"",
+          "citation": "README.md:56"
+        },
+        {
+          "claim": "Install is deferred to external docs: \"Follow the Quickstart doc to set up LanceDB locally.\" (the README itself contains no install command)",
+          "citation": "README.md:60"
+        },
+        {
+          "claim": "SDK table lists Python, Typescript and Rust SDKs plus a REST API (docs.lancedb.com/api-reference/rest); Java is not mentioned in the README",
+          "citation": "README.md:62-69"
+        },
+        {
+          "claim": "(Absence) The README makes no statement about an MCP server, a CLI, Claude Code/Codex integration, code or repository indexing, embedding services, or telemetry; the whole file was read",
+          "citation": "README.md:1-97"
+        }
+      ],
+      "install": [
+        {
+          "method": "Python / PyPI (Linux x86_64 and aarch64 manylinux, macOS arm64, Windows x86_64 wheels; Python >=3.10)",
+          "command": "pip install lancedb",
+          "citation": "python/README.md:7-9; wheels: .github/workflows/pypi-publish.yml:30-163; python/pyproject.toml:19"
+        },
+        {
+          "method": "Python / PyPI variant for x86_64 hosts without AVX2 (pre-Haswell); conflicts with `lancedb`",
+          "command": "pip install lancedb-compat",
+          "citation": "python/README.md:11-23"
+        },
+        {
+          "method": "Python preview (beta) releases from the Gemfury index; may be deleted after 6 months",
+          "command": "pip install --pre --extra-index-url https://pypi.fury.io/lancedb/ lancedb",
+          "citation": "python/README.md:32-39; release_process.md:16-25"
+        },
+        {
+          "method": "Node.js / npm (downloads a per-platform native package; Node >=22; Linux x64/arm64 glibc+musl, macOS arm64 only in practice)",
+          "command": "npm install @lancedb/lancedb",
+          "citation": "nodejs/README.md:5-16; nodejs/package.json:23-34,69-71"
+        },
+        {
+          "method": "Rust / crates.io (embedded library; MSRV 1.91.0)",
+          "command": "cargo add lancedb",
+          "citation": "rust/lancedb/src/lib.rs:20-24; Cargo.toml:13"
+        },
+        {
+          "method": "Java / Maven (client for LanceDB Cloud and Enterprise only; no local database)",
+          "command": "<dependency><groupId>com.lancedb</groupId><artifactId>lancedb-core</artifactId><version>0.39.0</version></dependency>",
+          "citation": "docs/src/java/java.md:5-19"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - PyPI manylinux_2_28 x86_64 wheel (.github/workflows/pypi-publish.yml:36-41) and npm linux-x64-gnu/musl packages (nodejs/package.json:27-29). Default x86_64 builds target Haswell (AVX2+FMA+F16C) and crash with 'Illegal instruction' on older CPUs (.cargo/config.toml:43-47; python/README.md:11-15); a `lancedb-compat` wheel exists for pre-AVX2 hosts (pypi-publish.yml:49-61). No musllinux Python wheel job is defined (pypi-publish.yml:30-61).",
+        "wsl2": "unknown - no mention of WSL or WSL2 anywhere in the repository (case-insensitive search of all non-lock files). A WSL2 distro would be an ordinary Linux target for the wheels/npm packages, but this is neither documented nor tested upstream.",
+        "macos_arm64": "yes - Python wheel for aarch64-apple-darwin (.github/workflows/pypi-publish.yml:96-103) and @lancedb/lancedb-darwin-arm64 (nodejs/package.json:26; nodejs/npm/darwin-arm64/package.json:1-16); CI on macos-14/15 (.github/workflows/rust.yml:203-207, python.yml:163-166, nodejs.yml:167-172). No Intel macOS wheel or npm package is built (pypi-publish.yml:100-103; nodejs/package.json:23-34).",
+        "gpu": "yes (limited) - the only GPU feature is IVF vector-index building in the Python SDK via `accelerator=` (e.g. 'cuda'), which dispatches to the optional `pylance` package (python/python/lancedb/table.py:3141-3186; python/python/lancedb/index.py:340-342). It is rejected on LanceDB Cloud (python/python/lancedb/remote/table.py:500-502), has 'Only in Python SDK' status in the Rust docs (rust/lancedb/src/lib.rs:13-16) and no Node option. Embedding models pick their own device (e.g. SentenceTransformerEmbeddings.device defaults to 'cpu', python/python/lancedb/embeddings/sentence_transformers.py:26-27). Nothing requires a GPU."
+      },
+      "integrations": {
+        "cli": "none found - rust/lancedb/Cargo.toml has no [[bin]] (only [[example]], lines 187-220), python/pyproject.toml has no [project.scripts] (lines 1-150), nodejs/package.json has no `bin` (lines 1-112); the only `fn main` are rust/lancedb/examples/*.rs and the python/nodejs build.rs files.",
+        "mcp": "none found - a case-insensitive search for 'mcp' and 'model context protocol' across all non-lockfile content of the repository returns no matches.",
+        "sdk_or_api": "Rust crate `lancedb` (rust/lancedb/src/lib.rs:20-24); Python package `lancedb` with sync and async APIs (python/python/lancedb/__init__.py:102-119, 432); Node `@lancedb/lancedb` (nodejs/package.json:2-21; nodejs/lancedb/index.ts:301-340); Java `lancedb-core`, Cloud/Enterprise REST only (docs/src/java/java.md:5-7; java/README.md:1-30). The REST API is the hosted LanceDB Cloud API at https://{db}.{region}.api.lancedb.com with an x-api-key header (docs/openapi.yml:1-31); no local HTTP server ships in this repo (RestAdapter appears only in tests: rust/lancedb/src/remote/db.rs:2423-2478). Embedding providers plug in through registries (python/python/lancedb/embeddings/registry.py:10-90; nodejs/lancedb/embedding/registry.ts:28-105; rust/lancedb/src/embeddings.rs:31-113).",
+        "claude_code_or_codex": "Ambiguous / not inspectable. .claude-plugin/marketplace.json:1-19 ('LanceDB plugins for Claude Code') and .agents/plugins/marketplace.json:1-20 (Codex) both declare a plugin 'lancedb' with source ./plugins/lancedb (lines 10 and 11) described as 'Write, review, debug, and document LanceDB pipelines in Python and TypeScript...' (marketplace.json:11). That directory does not exist at v0.39.0 (no plugins/ files in the working tree; .git/index lists both manifests but nothing under plugins/lancedb), so the plugin contents (skills, commands, MCP config) cannot be read. The stated purpose is authoring LanceDB code, not repository code search. Separately: .agents/skills/lancedb-update-lance-dependency/SKILL.md:1-12 is a maintainer-only Codex skill; .github/workflows/codex-fix-ci.yml and codex-update-lance-dependency.yml run the Codex CLI in maintainer CI; AGENTS.md (root, python/, nodejs/) and REVIEW.md are contributor/reviewer guidance. No CLAUDE.md or .mcp.json exists."
+      },
+      "telemetry_and_network": "No telemetry or phone-home code found in the Rust, Python, Node or Java sources: searches for posthog/sentry/telemetry/analytics/usage-tracking return only the opt-in OpenTelemetry metrics bridge, which installs a process-global recorder only when instrument_lancedb_metrics() is called and reports into the application's own MeterProvider (python/python/lancedb/otel.py:35-100; nodejs/lancedb/otel.ts:20-50; rust/lancedb/Cargo.toml:165-173). Local mode (`lancedb.connect('<path>')` or `memory://`) needs no account and contacts no LanceDB server (python/python/lancedb/__init__.py:187-217, 289-301). A `db://` URI switches to LanceDB Cloud/Enterprise, requires an API key (arg or LANCEDB_API_KEY) (__init__.py:269-288), talks to https://<db>.<region>.api.lancedb.com unless host_override is set (rust/lancedb/src/remote/client.rs:531-538), and sends x-api-key (client.rs:631-638), a `LanceDB-Rust-Client/<ver>` user agent (client.rs:161) and, only if configured via ClientConfig.user_id or LANCEDB_USER_ID, an `x-lancedb-user-id` header 'for tracking purposes' (client.rs:100-106,181-200). OAuth flows contact the configured issuer or Azure IMDS 169.254.169.254 (rust/lancedb/src/remote/oauth.rs:20-21). Network is also used when a provider is selected: OpenAI (default https://api.openai.com/v1; rust/lancedb/src/embeddings/openai.rs:129-133; python/python/lancedb/embeddings/openai.py:124-140), Ollama (default http://localhost:11434; python/python/lancedb/embeddings/ollama.py:27), Cohere/Gemini/Bedrock/Voyage/Jina/Watsonx etc. (python/python/lancedb/embeddings/__init__.py:6-23), and Hugging Face hub model downloads for local models (rust/lancedb/src/embeddings/sentence_transformers.rs:142-164; nodejs/lancedb/embedding/transformers.ts:77-95; python/python/lancedb/embeddings/sentence_transformers.py:83-88). s3://, gs://, az:// URIs use the cloud SDKs (python/python/lancedb/__init__.py:192-213). Docs website only (not the library): docs/mkdocs.yml:144-150 enables Google Analytics (G-B7NFM40W74) and docs/src/extra_js/reo.js:1 loads https://static.reo.dev/<id>/reo.js. Dev/CI builds read pre-release Lance wheels from https://pypi.fury.io/lance-format/ and /lancedb/ (python/Makefile:1; .github/workflows/python.yml:31)."
+    },
+    "code": {
+      "languages": [
+        "Rust",
+        "Python",
+        "TypeScript",
+        "Java"
+      ],
+      "entry_points": [
+        {
+          "path": "rust/lancedb/src/lib.rs",
+          "what": "Rust crate `lancedb` (`lancedb::connect(...)`, lib.rs:46-50); library only, no binary target"
+        },
+        {
+          "path": "python/python/lancedb/__init__.py",
+          "what": "Python package: `connect` (:102), `connect_async` (:432), `connect_namespace`; native module `lancedb._lancedb` from python/src/lib.rs (#[pymodule] at :57) built by maturin (python/pyproject.toml:101-103)"
+        },
+        {
+          "path": "nodejs/lancedb/index.ts",
+          "what": "`@lancedb/lancedb`: `connect` (:301-340), `connectNamespace` (:544-589); compiled to dist/index.js with subpath exports ./embedding, ./embedding/openai, ./embedding/transformers (nodejs/package.json:15-21); native addon from nodejs/src/lib.rs via napi-rs"
+        },
+        {
+          "path": "java/lancedb-core/src/main/java/com/lancedb/LanceDbNamespaceClientBuilder.java",
+          "what": "Java builder for a Cloud/Enterprise REST namespace client (java/README.md:1-30); also LanceDbRestClient, LanceDbTableLsm"
+        },
+        {
+          "path": "python/python/lancedb/embeddings/registry.py",
+          "what": "`get_registry()` embedding-function registry: extension point for custom or provider embedding functions (registry.py:183-208)"
+        },
+        {
+          "path": "rust/lancedb/examples/",
+          "what": "The only `fn main` targets (simple, openai, sentence_transformers, hybrid_search, full_text_search, ivf_pq, bedrock, polars, bench_*); examples, not shipped binaries (rust/lancedb/Cargo.toml:187-220)"
+        },
+        {
+          "path": "docs/openapi.yml",
+          "what": "OpenAPI spec of the hosted LanceDB Cloud REST API (docs/openapi.yml:1-15); describes a remote service, not an in-repo server"
+        }
+      ],
+      "architecture": "Cargo workspace with three members, rust/lancedb, nodejs and python (Cargo.toml:1-3), on exact-pinned Lance crates (=12.0.0), Arrow 58 and DataFusion 54 (Cargo.toml:16-53). Core crate rust/lancedb/src: connection.rs and database/{listing,namespace}.rs (local FS, memory, object stores, Lance namespaces); table.rs plus table/* (create_index, add_data, merge, optimize, schema_evolution, query, dataset, checkpoint); query.rs and query/hybrid.rs; index.rs (+scalar/vector; Auto, BTree, Bitmap, LabelList, FM substring, BM25 FTS, IvfFlat/Pq/Sq/Rq, IvfHnswPq/Sq/Flat, index.rs:29-102); embeddings.rs (+openai, sentence_transformers via candle, bedrock) with an in-memory registry (:80-113); rerankers/rrf.rs; remote/* (REST client, OAuth, SQL; feature `remote`); dataloader/permutation; materialized_view; function.rs. Bindings: python/src/*.rs (PyO3) + python/python/lancedb (db.py, table.py, query.py, pydantic.py, embeddings/ with ~17 providers, rerankers/ ~10, remote/, otel.py); nodejs/src/*.rs (napi-rs) + nodejs/lancedb/*.ts (embedding/{openai,transformers}, rerankers/rrf); java/lancedb-core (REST namespace client only). It runs in-process with no server. Embedding configuration is optional: the function name and args are stored in Arrow schema metadata key `embedding_functions` (python embeddings/registry.py:147-158; nodejs embedding/registry.ts:146-166) and, on string queries, the query is embedded with it (python query.py:975-984; nodejs table.ts:1247-1269). Version history: version/checkout/checkout_tag/checkout_latest/restore/list_versions, tags and branches (rust table.rs:2036-2121,2341,2372; python table.py:2394-2444; nodejs table.ts:855-915). Not present in the repo: repository/file crawling, code-aware chunking (no tree-sitter/AST matches; python/python/lancedb/context.py:14-23 is a pandas row-window helper), file-change tracking, CLI, MCP server, daemon.",
+      "packaging_and_release": "All four SDKs share one version (0.39.0) and one `vX.Y.Z` tag (release_process.md:3-7; .bumpversion.toml:1-2); a manual `Create release commit` workflow bumps and tags (.github/workflows/make-release-commit.yml:12-73); stable releases about every 2 weeks, preview (beta) releases in between and possibly deleted after 6 months (release_process.md:16-25). Tag `v*` triggers: gh-release.yml (GitHub Release with generated changelog only; no files, checksums or signatures attached, :74-85); pypi-publish.yml (maturin wheels: manylinux_2_28 x86_64 and aarch64, `lancedb-compat` x86-64-v2 variant, macOS arm64, Windows x64, :30-163; stable tags published with pypa/gh-action-pypi-publish@release/v1 under `id-token: write` (:164-214), beta tags uploaded to Gemfury with a FURY_TOKEN secret (:182-204)); npm-publish.yml (7 napi targets, tests on mac arm64/linux x64/linux arm64 before publish, `npm config set provenance true`, beta -> `--tag preview`, :35-449; also runs nightly); cargo-publish.yml (crates.io via rust-lang/crates-io-auth-action, skips *-beta* tags, :3-39); java-publish.yml (Maven OSSRH with GPG signing, :36-65). No checksum, SBOM, cosign or SLSA steps were found in .github (searched); only npm provenance and Maven GPG signing exist as signed/attested outputs. Most third-party actions are pinned by tag rather than SHA (e.g. pypi-publish.yml:212).",
+      "tests_and_ci": "Frameworks: Rust `cargo test` with rstest, test-log, serial_test (rust/lancedb/Cargo.toml:101-124); Python pytest + pytest-asyncio/pytest-mock and doctests, markers slow/s3_test (python/pyproject.toml:54-70,115-121); Node jest/ts-jest (nodejs/package.json:90); Java JUnit 5 + Mockito (java/lancedb-core/pom.xml:50-61). Test files, approximate: Rust 67 src files with inline #[cfg(test)] modules + 6 integration files in rust/lancedb/tests/ (blob_integration, embedding_registry_test, embeddings_parallel_test, first_class_function_slice1/2, object_store_test) + src/remote/sql_test.rs; Python 56 in python/python/tests (45 top-level + 11 under docs/) + 2 in python/tests (test_oauth.py, test_otel.py, a path none of the CI pytest commands I read targets: run_tests/action.yml:27-31, python.yml:159,266) + ci/tests/test_set_lance_version.py; Node 20 `*.test.ts` in nodejs/__test__ + 9 in nodejs/examples; Java 2 classes. Roughly 165 test files in total. CI workflows (.github/workflows): rust.yml (fmt, clippy with/without `remote`, cargo-deny, no-lockfile build, Linux all-features tests with localstack docker-compose, remote tests needing a secret, macOS 14/15, Windows x64+arm64, MSRV 1.91.0); python.yml (ruff, pyright, doctest, Linux py3.10/3.13 with integration tests, macOS 14, Windows, min-deps); nodejs.yml (biome, clippy, Linux Node 22/24/26 jest + docs-drift check + example tests against ci/mock_openai.py, macOS 15); java.yml (checkstyle + `mvnw clean install`, Java 17); npm-publish.yml and pypi-publish.yml (cross-platform build dry runs; Windows Node tests disabled, npm-publish.yml:331-333); dev.yml (PR labeler, conventional-commit title check); ci-scripts.yml; license-header-check.yml; typos.yml; docs.yml; docs-link-check.yml (nightly); plus the release and Codex maintenance workflows. Embedding providers that need live services (OpenAI, Ollama, ...) are tested only in `slow`-marked, skip-if-unavailable tests that default CI excludes (python/python/tests/test_embeddings_slow.py:477-499; run_tests/action.yml:27-31), and python/lancedb/embeddings/*.py is excluded from doctests (python/pyproject.toml:116).",
+      "dependencies": "Root Cargo.toml: 59 shared [workspace.dependencies] (lines 16-77). rust/lancedb/Cargo.toml: 72 [dependencies] (17 optional: arrow-flight, prost, metrics, metrics-util, async-openai, aws-sdk-bedrockruntime, reqwest, tonic, http, urlencoding, polars-arrow, polars, hf-hub, candle-core/-transformers/-nn, tokenizers; lines 13-99) and 19 dev-dependencies (101-124). python/Cargo.toml: 23 dependencies + 1 build-dependency (pyo3 0.28, abi3-py310). nodejs/Cargo.toml: 18 dependencies + 1 build-dependency (napi 3, aws-lc-sys/aws-lc-rs exact pins at :41-42). python/pyproject.toml: 8 runtime dependencies (deprecation, numpy, overrides for py<3.12, packaging, pyarrow>=16, pydantic>=2.7.4,<3, tqdm, lance-namespace>=0.3.2; lines 5-14), optional extras pylance 1, otel 1, tests 15, dev 4, docs 4, clip 3, siglip 4, embeddings 17, azure 1 (lines 46-99), build backend maturin>=1.10, lockfile python/uv.lock; the `tests` extra pins pylance==9.0.0 (:66) while the Rust workspace pins lance =12.0.0. nodejs/package.json: 2 dependencies (@opentelemetry/api, reflect-metadata), 2 optionalDependencies (@huggingface/transformers 3.0.2, openai 4.29.2), 2 peerDependencies (apache-arrow >=15 <=18.1.0, optional @types/node), 24 devDependencies (lines 40-112), pnpm 11.1.1, Node >=22. nodejs/examples/package.json: 4 dependencies + 6 devDependencies. java/lancedb-core/pom.xml: 5 compile (lance-core, arrow-vector, arrow-memory-netty, httpclient5, jackson-databind) + 6 test dependencies. docs/requirements.txt: 9 documentation build requirements. Lockfiles: Cargo.lock, python/uv.lock, nodejs/pnpm-lock.yaml. Dependabot updates lockfiles only (.github/dependabot.yml:8-71); cargo-deny enforces licenses, sources and advisories (deny.toml:122-200).",
+      "security_policy": "none - no SECURITY.md at the repository root, in .github/, or in any subdirectory (glob for SECURITY* and .github/**/*.md finds nothing), and .github/ISSUE_TEMPLATE/config.yml:1-5 only links a Discord community. Supply-chain checks exist instead: cargo-deny for advisories/bans/licenses/sources (.github/workflows/rust.yml:67-76; deny.toml) with 15 explicitly ignored RUSTSEC advisories (deny.toml:36-117) and Dependabot (.github/dependabot.yml)."
+    },
+    "claim_checks": [
+      {
+        "claim": ".claude-plugin/marketplace.json:6-12 announces 'LanceDB plugins for Claude Code' (and .agents/plugins/marketplace.json the Codex equivalent): a plugin 'lancedb' with source ./plugins/lancedb",
+        "verified": "no",
+        "evidence": "Both manifests point at ./plugins/lancedb (.claude-plugin/marketplace.json:10; .agents/plugins/marketplace.json:11), but no plugins/ directory exists at v0.39.0: the glob finds no files, and .git/index lists both manifests but no path under plugins/lancedb. The plugin contents cannot be inspected. The declared purpose (marketplace.json:11) is writing/reviewing/debugging LanceDB pipelines, not repository code search. No MCP, CLI or server code exists elsewhere in the repo."
+      },
+      {
+        "claim": "README.md:45 'Support for vector similarity search, full-text search and SQL'",
+        "verified": "partial",
+        "evidence": "Vector search (python/python/lancedb/table.py:1614-1698; rust/lancedb/src/query.rs) and native BM25 FTS (rust/lancedb/src/index.rs:57-77; Tantivy FTS was removed, table.py:3529-3533) are implemented, as is a substring (FM) index (index.rs:52-55). SQL *queries* are remote-only: python/python/lancedb/db.py:799-803 says 'Local connections do not support SQL', rust/lancedb/src/database.rs:336-345 returns NotSupported by default, and docs/src/python/python.md:31-41 documents SQL only for a remote database. Locally only SQL-style filter strings (`where`, table.py:1643,1904) are accepted. Code differs from the README."
+      },
+      {
+        "claim": "README.md:47 'Zero-copy, automatic versioning, manage versions of your data without needing extra infrastructure'",
+        "verified": "yes",
+        "evidence": "Rust Table::version/checkout/checkout_tag/checkout_latest/restore/list_versions (rust/lancedb/src/table.rs:2036-2121), tags (:2341) and branches (:2372); Python table.py:2394-2444 ('Data is not copied' on restore, :2431-2432); Node table.ts:855-915. Caveats: a checked-out table is read-only until restore (table.rs:2060-2073); optimize() removes versions older than 7 days by default (table.py:2109-2111) and cleanup_old_versions defaults to two weeks (table.py:2040-2042); read_consistency_interval defaults to None, so other processes' writes are not seen until checkout_latest() (python/python/lancedb/__init__.py:140-149; rust/lancedb/src/connection.rs:867-870,899)."
+      },
+      {
+        "claim": "README.md:47 'GPU support in building vector index'",
+        "verified": "partial",
+        "evidence": "Python-only, through the optional pylance package: create_index(accelerator=...) dispatches to self.to_lance().create_index (python/python/lancedb/table.py:3141-3186; index.py:340-342). LanceDB Cloud rejects it (python/python/lancedb/remote/table.py:500-502). rust/lancedb/src/lib.rs:13-16 states 'Only in Python SDK'; nodejs/lancedb has no accelerator option (search found none)."
+      },
+      {
+        "claim": "README.md:44 'Search billions of vectors in milliseconds with state-of-the-art indexing'",
+        "verified": "not_checkable",
+        "evidence": "The index types exist (rust/lancedb/src/index.rs:29-102), but no benchmark, recall, QPS or latency figures are published in the repository (searched md/toml/yml/html). Only benchmark programs exist (rust/lancedb/examples/bench_open_missing_table.rs, bench_streaming_dataloader.rs) with no recorded results."
+      },
+      {
+        "claim": "README.md:55-56 'Seamless Integration: Python, Node.js, Rust, and REST APIs' and 'Rich Ecosystem: LangChain, LlamaIndex, Apache-Arrow, Pandas, Polars, DuckDB'",
+        "verified": "partial",
+        "evidence": "Python, Node and Rust SDKs exist. The 'REST API' is the hosted LanceDB Cloud API (docs/openapi.yml:4-15), not a local server; RestAdapter appears only in tests (rust/lancedb/src/remote/db.rs:2423-2478). A Java client exists but is Cloud/Enterprise-only (docs/src/java/java.md:5-7; REVIEW.md:22-24), while AGENTS.md:5 lists Java as a binding and the README omits it. Arrow/Pandas/Polars/DuckDB are used in code and tests (python/pyproject.toml:54-70; python/python/tests/test_duckdb.py; rust/lancedb/Cargo.toml:86-87,178). No LangChain or LlamaIndex integration code is in this repo (only links at README.md:56 and rust/lancedb/src/lib.rs:14)."
+      },
+      {
+        "claim": "README.md:50 'Open Source & Local: 100% open source, runs locally or in your cloud'",
+        "verified": "yes",
+        "evidence": "Apache-2.0 (LICENSE:1-4; Cargo.toml:8). The library runs in-process (rust/lancedb/src/lib.rs:20); local path and memory:// connections need no account (python/python/lancedb/__init__.py:187-190,215-220,289-301). The Cloud/Enterprise service is not in this repo, only its client (`remote` feature, rust/lancedb/Cargo.toml:155-164)."
+      },
+      {
+        "claim": "python/python/lancedb/embeddings/openai.py:26-40 (docstring): OpenAIEmbeddings 'can also be used for open source models that are compatible with the OpenAI API', e.g. an Ollama model name with base_url",
+        "verified": "no",
+        "evidence": "base_url is accepted (openai.py:46,128-129), but `_ndims` raises ValueError('Unknown model name ...') for any name other than text-embedding-ada-002/3-small/3-large (openai.py:69-78), and ndims() is called whenever embeddings are auto-computed (python/python/lancedb/table.py:873,892). The Node OpenAI function exposes only apiKey and model (nodejs/lancedb/embedding/openai.ts:10-13,48-52) and throws for unknown models (:60-71); the Rust one accepts only the same three models (rust/lancedb/src/embeddings/openai.rs:38-51) though it has api_base() (:129-133). A native Ollama function exists in Python (embeddings/ollama.py:17-33; its ndims() needs a live server). Code differs from the docstring."
+      },
+      {
+        "claim": "python/python/lancedb/table.py:1683-1684 (docstring): for a string query, 'the query type is vector if the table has embedding functions else fts'",
+        "verified": "yes",
+        "evidence": "python/python/lancedb/query.py:975-984 embeds the string with the vector column's embedding function (compute_query_embeddings_with_retry) and runs vector search, else falls back to FTS. The embedding config is stored in the Arrow schema metadata key `embedding_functions` at create time (db.py:1944-1949; embeddings/registry.py:130-158) and re-read on open (table.py:3782-3795). Node: nodejs/lancedb/table.ts:1247-1269 and embedding/registry.ts:146-166. Limits: the function must be registered in the process and secrets re-supplied via `$var:` variables because hard-coded sensitive keys are rejected (embeddings/base.py:57-84); Node uses only the first function (table.ts:1260,1274); LanceDB Cloud ignores embedding_functions at create_table (remote/db.py:632-637)."
+      },
+      {
+        "claim": "nodejs/README.md:14-16 supported platforms include 'MacOS (Intel and ARM/M1/M2)'",
+        "verified": "no",
+        "evidence": "napi targets list only aarch64-apple-darwin for macOS (nodejs/package.json:23-34); nodejs/npm contains only darwin-arm64 for macOS (nodejs/npm/darwin-arm64/package.json:1-16); npm-publish.yml:40-47 builds only aarch64-apple-darwin; the Python release workflow likewise builds only aarch64-apple-darwin (pypi-publish.yml:100-103). Code differs from the README."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Scope: the repo is a storage/search library, not a code-search tool. Searches found no repository crawler, code-aware chunker (tree-sitter/AST), file-change tracking, CLI, MCP server or daemon (rust/lancedb/Cargo.toml:187-220 has only examples; python/pyproject.toml has no scripts; nodejs/package.json has no bin; AGENTS.md:1-5). Chunking, re-indexing and the agent-facing tool layer would have to be built on top.",
+      "Claude Code/Codex integration cannot be verified: .claude-plugin/marketplace.json:10 and .agents/plugins/marketplace.json:11 reference ./plugins/lancedb, which does not exist at v0.39.0. The described purpose is writing LanceDB code (marketplace.json:11), and the only Codex assets are maintainer-only (.agents/skills/lancedb-update-lance-dependency/SKILL.md:1-12; .github/workflows/codex-fix-ci.yml).",
+      "Embedding-service compatibility is narrow in practice: the built-in OpenAI functions only know three OpenAI model names in Python (embeddings/openai.py:69-78; table.py:873,892), Node (nodejs/lancedb/embedding/openai.ts:60-71) and Rust (rust/lancedb/src/embeddings/openai.rs:38-51), and Node exposes no base-URL option (openai.ts:10-13,48-52). Python has a native Ollama function (embeddings/ollama.py:17-33). Live-service embedding tests are slow-marked and excluded from default CI (python/python/tests/test_embeddings_slow.py:477-499; .github/workflows/run_tests/action.yml:27-31).",
+      "Recoverable-state caveats: embedding functions must be re-registered each process and `$var:` secrets re-set ('Variables are reset in new Python sessions', embeddings/base.py:73-77; registry.py:160-174); the Rust registry is in-memory (rust/lancedb/src/embeddings.rs:91-113); read_consistency_interval defaults to None so concurrent writers are not seen until checkout_latest() (python/python/lancedb/__init__.py:140-149; rust/lancedb/src/connection.rs:867-870); optimize() prunes versions older than 7 days by default (table.py:2109-2111), so old versions are not retained indefinitely.",
+      "Platform: default x86_64 builds need AVX2/FMA/F16C and crash with 'Illegal instruction' on older CPUs (python/README.md:11-15; .cargo/config.toml:43-47); no Intel-macOS wheel or npm package although nodejs/README.md:14-16 claims it (pypi-publish.yml:100-103; nodejs/package.json:23-34); no musl Python wheels (pypi-publish.yml:30-61); WSL2 undocumented; Python >=3.10 and Node >=22 required (python/pyproject.toml:19; nodejs/package.json:69-71); Windows Node tests are disabled in release CI (npm-publish.yml:331-333).",
+      "Maintenance/stability: pre-1.0 (0.39.0) with the 'Development Status :: 3 - Alpha' classifier (python/pyproject.toml:28); breaking changes land in minor releases, and Lance minor bumps count as breaking (release_process.md:65-92); Lance crates are exact-pinned at =12.0.0 (Cargo.toml:16-29); releases about every 2 weeks and preview releases may be removed after 6 months (release_process.md:16-25).",
+      "Security hygiene: no SECURITY.md or disclosure policy; deny.toml:36-117 ignores 15 RUSTSEC advisories, including a tantivy segfault on malformed input (RUSTSEC-2025-0003, :54-59) and pyo3 advisories affecting the Python bindings (RUSTSEC-2026-0176/0177, :87-91). SentenceTransformerEmbeddings and the CrossEncoder reranker default trust_remote_code=True, which executes model-repo code fetched from Hugging Face (python/python/lancedb/embeddings/sentence_transformers.py:30,37,86-88; rerankers/cross_encoder.py:31,42).",
+      "Release/CI supply chain: GitHub Releases carry no assets, checksums or attestations (gh-release.yml:74-85); only npm provenance (npm-publish.yml:440) and Maven GPG signing (java-publish.yml:45-65) are signed; most third-party actions are tag-pinned (pypi-publish.yml:212); license-header-check.yml:26 pipes an install script from a mutable `master` URL into bash; maintainer workflows run `codex exec --dangerously-bypass-approvals-and-sandbox` with write-scoped tokens (codex-fix-ci.yml:19-22,179); dev and CI builds pull pre-release Lance wheels from a third-party Gemfury index (python/Makefile:1; python.yml:31)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "lancedb/lancedb",
+      "checks": [
+        {
+          "field": "readme.install[0] (Python / PyPI)",
+          "statement": "`pip install lancedb`: wheels for Linux x86_64 and aarch64 manylinux, macOS arm64 and Windows x86_64; Python >=3.10",
+          "citation": "python/README.md:7-9; .github/workflows/pypi-publish.yml:30-163; python/pyproject.toml:19",
+          "holds": true,
+          "note": "python/README.md:8 has `pip install lancedb`. pypi-publish.yml builds manylinux_2_28 wheels for x86_64 (:36-41) and aarch64 (:43-48). The only macOS target is aarch64-apple-darwin (:102). Windows builds on windows-latest with the x86_64 MSVC linker env (:127-131), and build_windows_wheel/action.yml passes no other target. pyproject.toml:19 has requires-python = \">=3.10\". There is no Windows arm64 or Intel-mac Python wheel, which matches the statement."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX Apache-2.0, license file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:2-4 is the 'Apache License, Version 2.0, January 2004' text, with the standard appendix at :179-202. It agrees with Cargo.toml:8 (license = \"Apache-2.0\"), nodejs/package.json:35 (\"Apache-2.0\") and the python/pyproject.toml:31 classifier 'License :: OSI Approved :: Apache Software License'. No other LICENSE, COPYING or NOTICE file exists in the tree."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes: manylinux_2_28 x86_64 wheel and npm linux-x64 gnu/musl packages; default x86_64 builds target Haswell (AVX2+FMA+F16C) and crash with 'Illegal instruction' on older CPUs; a lancedb-compat wheel covers pre-AVX2 hosts; no musllinux Python wheel job",
+          "citation": ".github/workflows/pypi-publish.yml:36-41,49-61,30-61; nodejs/package.json:27-29; .cargo/config.toml:43-47; python/README.md:11-15",
+          "holds": true,
+          "note": "pypi-publish.yml:36-41 is the x86_64 manylinux 2_28 'lancedb' build, and :49-61 is the 'lancedb-compat' build with -Ctarget-cpu=x86-64-v2. build_linux_wheel/action.yml targets only x86_64- and aarch64-unknown-linux-gnu (:58,:75), so there is no musllinux Python wheel. nodejs/package.json:27 and :29 list x86_64-unknown-linux-gnu and -musl, and nodejs/npm/linux-x64-gnu and linux-x64-musl exist. .cargo/config.toml:43-47 sets target-cpu=haswell with +avx2,+fma,+f16c for both x86_64 Linux triples. python/README.md:13 says older CPUs 'crash with `Illegal instruction` at `import lancedb`'. npm-publish.yml:151-153 also avoids RUSTFLAGS on purpose so npm binaries keep these flags."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Ambiguous / not inspectable: the Claude Code and Codex marketplace manifests declare plugin 'lancedb' with source ./plugins/lancedb, which does not exist at v0.39.0. The stated purpose is writing LanceDB code. The other agent assets are maintainer-only, and there is no CLAUDE.md or .mcp.json.",
+          "citation": ".claude-plugin/marketplace.json:1-19 (:10, :11); .agents/plugins/marketplace.json:1-20 (:11); .agents/skills/lancedb-update-lance-dependency/SKILL.md:1-12; .github/workflows/codex-fix-ci.yml; .github/workflows/codex-update-lance-dependency.yml",
+          "holds": true,
+          "note": ".claude-plugin/marketplace.json:6 reads 'LanceDB plugins for Claude Code.', :10 has source ./plugins/lancedb, and :11 has the 'Write, review, debug, and document LanceDB pipelines…' description. .agents/plugins/marketplace.json:11 has path ./plugins/lancedb. .git/HEAD is 0c33b2754d0c498d8e2f9c147c41429a1b5d3f1b, and there is no sparse checkout. Globbing **/plugins/** finds only .agents/plugins/marketplace.json. .git/index lists both manifests but no plugins/lancedb entry; the scan reached entries that sort after it (python/…, rust/lancedb/src/lib.rs). SKILL.md is a maintainer skill for bumping the Lance dependency. Both codex-*.yml workflows are workflow_dispatch jobs that run `npm install -g @openai/codex` and `codex exec`. AGENTS.md exists at the root, python/ and nodejs/, and REVIEW.md holds automated PR-review guidance. There is no CLAUDE.md or .mcp.json. Minor wording issue: the sentence implies both manifests carry the description, but only the Claude manifest has one; the Codex manifest has no description field."
+        },
+        {
+          "field": "claim_checks[7] (OpenAIEmbeddings docstring, verified: no)",
+          "statement": "The OpenAIEmbeddings docstring says it works with open models behind an OpenAI-compatible API (an Ollama model name plus base_url). Verified 'no': _ndims accepts only three OpenAI model names, and ndims() is called whenever embeddings are auto-computed. Node and Rust are restricted the same way.",
+          "citation": "python/python/lancedb/embeddings/openai.py:26-40; evidence: openai.py:46,69-78,128-129; python/python/lancedb/table.py:873,892; nodejs/lancedb/embedding/openai.ts:10-13,48-52,60-71; rust/lancedb/src/embeddings/openai.rs:38-51,129-133; python/python/lancedb/embeddings/ollama.py:17-33",
+          "holds": true,
+          "note": "base_url is a field (openai.py:46) and is passed to openai.OpenAI (:128-129). _ndims (:69-78) raises ValueError('Unknown model name …') for any other name, even when dim is set. table.py:892 calls conf.function.ndims() on every auto-embedded batch, and :873 calls it when building the vector field without a schema. In Node, OpenAIOptions has only apiKey and model (:10-13), the client config is only apiKey (:48-52), and ndims() throws for unknown models (:60-71). Rust FromStr accepts only the three models (:38-51) but offers api_base() (:129-133). OllamaEmbeddings is registered at ollama.py:17, and its ndims() embeds 'foo' through the server (:32-33). Minor citation issue: the quoted sentence is at openai.py:23-24, outside the cited 26-40, which covers only the Ollama example."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "Optional (non-blocking): in readme.integrations.claude_code_or_codex, attribute the 'Write, review, debug, and document LanceDB pipelines…' description only to .claude-plugin/marketplace.json:11. .agents/plugins/marketplace.json declares the plugin (path at :11) but has no description field.",
+        "Optional (non-blocking): in claim_checks[7], widen the citation from python/python/lancedb/embeddings/openai.py:26-40 to :23-40. The quoted sentence 'can also be used for open source models that are compatible with the OpenAI API' is at lines 23-24."
+      ]
+    }
+  ]
+}

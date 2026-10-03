@@ -1,0 +1,284 @@
+{
+  "contender": "temporalio/temporal",
+  "revision": {
+    "contender": "temporalio/temporal",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "temporalio/temporal",
+        "tag": "v1.32.0",
+        "commit": "d94e34a1ebba5410a2e7d07119a76896909591aa",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v1.32.0",
+    "commit": "d94e34a1ebba5410a2e7d07119a76896909591aa",
+    "read_at": "2026-10-02T03:02:51+00:00"
+  },
+  "dossier": {
+    "contender": "temporalio/temporal",
+    "revision": {
+      "tag": "v1.32.0",
+      "commit": "d94e34a1ebba5410a2e7d07119a76896909591aa",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Temporal Server, the server half of the Temporal durable-execution platform (Go, MIT). It stores an append-only event history per workflow execution in a database (Cassandra, MySQL 8, PostgreSQL 12 or SQLite). It dispatches workflow and activity tasks through task queues to worker processes that users write and host with a Temporal SDK. It applies retry policies, timeouts, cancel/terminate, signals, queries and updates to those executions (docs/architecture/README.md:20-35,44-61). The frontend exposes gRPC (7233) and HTTP/JSON (7243) APIs (service/frontend/http_api_server.go:39-50; config/development-sqlite.yaml:68-73). Built-in Schedules are enabled by default (frontend.enableSchedules, common/dynamicconfig/constants.go:983-987). Specs are cron strings, calendar specs or intervals, with jitter, timezone and start/end limits (service/worker/scheduler/spec.go:147-209,333-338). Overlap policies are SKIP (default), BUFFER_ONE, BUFFER_ALL, CANCEL_OTHER, TERMINATE_OTHER and ALLOW_ALL (service/worker/scheduler/buffer.go:51-101; service/worker/scheduler/workflow.go:1344-1352). The catch-up window defaults to 365 days with a 10 s minimum (workflow.go:201-202). Schedules also support pause-on-failure (workflow.go:923-939), limited actions (workflow.go:761-771), backfill and trigger-now. The only schedule action type is starting a Temporal workflow (service/frontend/workflow_handler.go:4592-4597; service/worker/scheduler/activities.go:67-77). The server does not run shell commands, DAGs or OS processes: workflows are code in an SDK language and user code runs in user-owned processes (README.md:64; docs/architecture/README.md:28,48-49). The Web UI, the temporal CLI (including 'server start-dev') and the SDKs live in other repositories; this repo only references the UI as a docker image (develop/docker-compose/docker-compose.yml:85-87). The README does not mention Schedules, telemetry, platform support or performance.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Temporal is a durable execution platform that enables developers to build scalable applications without sacrificing productivity or reliability.",
+          "citation": "README.md:23"
+        },
+        {
+          "claim": "The Temporal server executes units of application logic called Workflows in a resilient manner that automatically handles intermittent failures, and retries failed operations.",
+          "citation": "README.md:24"
+        },
+        {
+          "claim": "Temporal is a mature technology that originated as a fork of Uber's Cadence; it is developed by Temporal Technologies, a startup by the creators of Cadence.",
+          "citation": "README.md:26-27"
+        },
+        {
+          "claim": "Run 'brew install temporal' then 'temporal server start-dev' to start a pre-built image along with all the dependencies.",
+          "citation": "README.md:35-40"
+        },
+        {
+          "claim": "Refer to the Temporal CLI documentation for more installation options (link to docs.temporal.io/cli, not opened for this dossier).",
+          "citation": "README.md:42"
+        },
+        {
+          "claim": "Clone or download samples for Go or Java and run them with the local Temporal server; the sets of samples differ between Go and Java.",
+          "citation": "README.md:46-47"
+        },
+        {
+          "claim": "Use the Temporal CLI to interact with the running server, e.g. 'temporal operator namespace list' and 'temporal workflow list'.",
+          "citation": "README.md:51-55"
+        },
+        {
+          "claim": "Open http://localhost:8233 to try the Temporal Web UI and view sample workflows executing.",
+          "citation": "README.md:60"
+        },
+        {
+          "claim": "This repository contains the source code of the Temporal server. To implement Workflows, Activities and Workers, use one of the supported languages.",
+          "citation": "README.md:64"
+        },
+        {
+          "claim": "Links to architecture docs, local build/run instructions (CONTRIBUTING.md) and testing docs for contributors.",
+          "citation": "README.md:73-75"
+        },
+        {
+          "claim": "License: MIT.",
+          "citation": "README.md:80"
+        }
+      ],
+      "install": [
+        {
+          "method": "Homebrew: installs the Temporal CLI (separate repo temporalio/cli) whose dev server is started with 'server start-dev'. Command code is not in this repo.",
+          "command": "brew install temporal && temporal server start-dev",
+          "citation": "README.md:37-40; CONTRIBUTING.md:17-19"
+        },
+        {
+          "method": "Download Temporal CLI release archive from GitHub (no command given; URL only; not fetched). The only non-Homebrew route named for the CLI.",
+          "command": "(none given) download from https://github.com/temporalio/cli",
+          "citation": "CONTRIBUTING.md:19"
+        },
+        {
+          "method": "Build server and tools from source on Linux or macOS. Needs Go at the go.mod version (go 1.26.8, go.mod:3); Ubuntu: 'sudo apt install golang', macOS: 'brew install go'. Makefile default goal is 'install: bins'.",
+          "command": "git clone https://github.com/temporalio/temporal.git && cd temporal && make",
+          "citation": "CONTRIBUTING.md:11-13,47-67; Makefile:3-6"
+        },
+        {
+          "method": "Run the built server with in-memory SQLite (no external dependencies; data lost on exit). Make target runs ./temporal-server --config-file config/development-sqlite.yaml --allow-no-auth start.",
+          "command": "make start",
+          "citation": "CONTRIBUTING.md:130-134; Makefile:704,734-735"
+        },
+        {
+          "method": "Run the built server with file-backed SQLite (WAL, synchronous=2).",
+          "command": "make start-sqlite-file",
+          "citation": "CONTRIBUTING.md:143-147; Makefile:737-738; config/development-sqlite-file.yaml:18-22"
+        },
+        {
+          "method": "Optional docker-compose dependencies for development (MySQL, Cassandra, PostgreSQL, Elasticsearch 7.10.1, Prometheus, Grafana, Tempo, temporalio/ui:latest). Requires docker.",
+          "command": "make start-dependencies",
+          "citation": "CONTRIBUTING.md:23-34; Makefile:686-687; develop/docker-compose/docker-compose.yml:5-87"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes. .goreleaser.yml:27-38 builds temporal-server for linux/amd64; docker/docker-bake.hcl:82 builds a linux/amd64 image; .github/workflows/features-integration.yml:28-41 builds and runs the amd64 image in CI. The main test matrix runs on Linux arm64 runners (.github/workflows/run-tests.yml:101-110,218).",
+        "wsl2": "yes, for development only: CONTRIBUTING.md:43 says to install WSL2 + Ubuntu and follow the Ubuntu steps. No WSL-specific code or CI found (only that line matches).",
+        "macos_arm64": "yes. .goreleaser.yml:32-38 builds darwin/arm64; README.md:38 and CONTRIBUTING.md:12-18 use Homebrew; develop/docker-compose/docker-compose.darwin.yml exists. CI only cross-compiles darwin/arm64 (.github/workflows/run-tests.yml:274); no macOS runner executes tests.",
+        "gpu": "no. Not applicable: grep for GPU, CUDA and NVIDIA across the working directory found no matches."
+      },
+      "integrations": {
+        "cli": "Built in this repo: temporal-server (cmd/server/main.go:34-248; subcommands start, render-config, validate-dynamic-config; flags --config-file, --allow-no-auth, --service); tdbg admin/debug CLI (cmd/tools/tdbg/main.go:9-13; tools/tdbg/tdbg_commands.go:24-78: execution, shard, history-host, taskqueue, membership, dlq, schedule, decode; 'execution show' reads history from the DB, tdbg_commands.go:105-107); schema tools temporal-sql-tool, temporal-cassandra-tool, temporal-elasticsearch-tool (.goreleaser.yml:39-86; Makefile:610-646). The user-facing 'temporal' CLI (workflow list, operator namespace, server start-dev) is a separate repo (CONTRIBUTING.md:17-19) and its code is not in this working directory.",
+        "mcp": "none found: a case-insensitive search for 'mcp' and 'model context protocol' across the whole working directory returned no files.",
+        "sdk_or_api": "gRPC WorkflowService/OperatorService on the frontend (default port 7233, config/development-sqlite.yaml:68-73) plus an HTTP/JSON gateway (port 7243, disabled when httpPort is 0/unset: common/config/config.go:87-89; service/frontend/http_api_server.go:39-50,157-175). Schedule RPCs (CreateSchedule, PatchSchedule, ListScheduleMatchingTimes) are in the frontend handler (service/frontend/workflow_handler.go:3813,4779,4902). SDKs are separate repos (Go, Java, TypeScript, .NET, Python, Ruby sample repos listed at CONTRIBUTING.md:167); go.temporal.io/sdk v1.44.0 is only a dependency here (go.mod:71). The temporaltest package starts an in-process server on loopback for Go tests (temporaltest/server.go:19-33).",
+        "claude_code_or_codex": "none found as a product integration. Contributor-facing agent config only: AGENTS.md (agent development guide, AGENTS.md:1-3,25-80), .claude/skills/review/SKILL.md (a review skill that imports .github/copilot-instructions.md, SKILL.md:1-10), .cursor/rules/review.mdc (review.mdc:1-9), .github/copilot-instructions.md (review guidelines), and .github/workflows/claude-review-teams.yml (CI workflow that runs Claude reviews on opted-in PRs, lines 1-19)."
+      },
+      "telemetry_and_network": "The README is silent on telemetry. The code phones home by default. The frontend starts a version checker (service/frontend/service.go:502; service/frontend/version_checker.go:48-84) that runs at start and then every 24 h (version_checker.go:21,70-84). It POSTs JSON to https://version-info.temporal.io/check (common/versioninfo/caller.go:19-21,41-46,90-96). The payload is product, server version, arch, OS, persistence store name, cluster ID, timestamp and the names/versions of SDKs seen (common/versioninfo/request.go:10-20; version_checker.go:136-147). The reply is saved in cluster metadata (version_checker.go:153-173). It is enabled unless env TEMPORAL_VERSION_CHECK_DISABLED is non-empty at process start, or dynamic-config key frontend.enableServerVersionCheck is false (common/dynamicconfig/constants.go:909-913). CI sets the env var (.github/workflows/run-tests.yml:25); each GitHub release also dispatches a release in temporalio/version-info-service (.github/workflows/trigger-version-info-service.yml:30-39). Whether the temporal CLI dev server leaves the check on cannot be determined here. No account, license key or login is used in the server start path (cmd/server/main.go:154-244); docs/architecture/README.md:61 names Temporal Cloud only as an optional hosted alternative. OpenTelemetry tracing is off unless an 'otel' YAML stanza or OTEL_TRACES_EXPORTER is set (docs/development/tracing.md:26-27,88-97; common/telemetry/env.go:20). Prometheus/StatsD/OTel metrics are config-driven (config/development-sqlite.yaml:59-65; common/config/config_template_embedded.yaml:277-287). Required services: a persistence store. SQLite needs none (pure-Go modernc driver, common/persistence/sql/sqlplugin/sqlite/driver.go:7-8). Otherwise Cassandra, MySQL or PostgreSQL is needed. Elasticsearch/OpenSearch is optional for advanced visibility (config_template_embedded.yaml:9-14,179-194; run-tests.yml:117-151). Dev SQLite config ports: gRPC 7233, HTTP 7243, history 7234, matching 7235, worker 7239, membership 6933-6939, Prometheus 127.0.0.1:8000, pprof 7936 (config/development-sqlite.yaml:57-91), bound to localhost via bindOnLocalHost. The embedded template binds 127.0.0.1 (config_template_embedded.yaml:307-340) and pprof defaults to localhost (common/pprof/pprof.go:49-51). Authorization defaults to a no-op authorizer (common/authorization/authorizer.go:64-69); startup warns that future versions will require --allow-no-auth (cmd/server/main.go:203-209). Outbound calls occur only if configured (archival providers, JWT key-source URIs at config_template_embedded.yaml:288-300, Elasticsearch, OTLP). The dev compose file pulls unpinned latest images such as temporalio/ui, grafana and prometheus (develop/docker-compose/docker-compose.yml:60-87)."
+    },
+    "code": {
+      "languages": [
+        "Go (primary; go 1.26.8)",
+        "Protocol Buffers (proto/, generated code in api/)",
+        "SQL and CQL (schema/)",
+        "Shell",
+        "YAML, HCL and Dockerfile (config, CI, packaging)"
+      ],
+      "entry_points": [
+        {
+          "path": "cmd/server/main.go",
+          "what": "temporal-server binary: urfave/cli app with 'start' (--service, --config-file, --allow-no-auth), 'render-config' and 'validate-dynamic-config' (main.go:34-248); SIGINT/SIGTERM stop it (temporal/interrupt.go:9-21)"
+        },
+        {
+          "path": "cmd/tools/tdbg/main.go",
+          "what": "tdbg admin/debug CLI (tools/tdbg/tdbg_commands.go:24-78)"
+        },
+        {
+          "path": "cmd/tools/sql/main.go",
+          "what": "temporal-sql-tool: schema create/setup/update for MySQL and PostgreSQL (Makefile:619-641; .goreleaser.yml:51-62)"
+        },
+        {
+          "path": "cmd/tools/cassandra/main.go",
+          "what": "temporal-cassandra-tool: Cassandra schema management (Makefile:610-615; .goreleaser.yml:39-50)"
+        },
+        {
+          "path": "cmd/tools/elasticsearch/main.go",
+          "what": "temporal-elasticsearch-tool: visibility index setup (Makefile:643-646; .goreleaser.yml:63-74)"
+        },
+        {
+          "path": "temporal/server.go",
+          "what": "temporal.NewServer(opts...) library entry point (server.go:44-46), used by cmd/server and temporaltest; default services are frontend, history, matching, worker (server.go:35-40)"
+        },
+        {
+          "path": "temporaltest/server.go",
+          "what": "In-process test server on loopback for Go end-to-end tests (server.go:19-33)"
+        },
+        {
+          "path": "docker/scripts/sh/entrypoint.sh",
+          "what": "Container entrypoint: resolves BIND_ON_IP then execs 'temporal-server start' (entrypoint.sh:7,16)"
+        }
+      ],
+      "architecture": "One Go module (go.temporal.io/server, go.mod:1). The single temporal-server binary runs up to five logical services chosen by --service (frontend, internal-frontend, history, matching, worker; default excludes internal-frontend: temporal/server.go:25-40), wired with uber fx (temporal/fx.go). Services start in order matching, history, frontend, worker and stop in reverse (temporal/server_impl.go:44-53,109-146). Key modules: service/frontend (public gRPC API in workflow_handler.go, HTTP gateway in http_api_server.go, version_checker.go); service/history (per-shard workflow mutable state and event history, timer/transfer/visibility/outbound queues, one package per API under service/history/api/*, e.g. requestcancelworkflow, terminateworkflow, recordactivitytaskheartbeat); service/matching (task queues polled by workers); service/worker (system workflows run by an SDK worker inside the server: scheduler, batcher, scanner, deletenamespace, migration, workerdeployment, dlq; service/worker/fx.go:47-59); chasm/ and chasm/lib/{workflow,activity,scheduler,callback,nexusoperation} (CHASM state-machine framework, docs/architecture/chasm.md:9-11); common/ (persistence plugins for Cassandra, MySQL, PostgreSQL, SQLite and Elasticsearch visibility; dynamicconfig; membership via ringpop; metrics; rpc; authorization; archiver; telemetry; versioninfo; effect); schema/; proto/ and api/; tools/ and cmd/tools/; tests/ (functional); temporaltest/. Scheduling: V1 schedules are a system workflow with ID prefix 'temporal-sys-scheduler:' (service/worker/scheduler/workflow.go:72-73). The CHASM scheduler (chasm/lib/scheduler) is not the default: history.enableCHASMSchedulerCreation=false and enableCHASMSchedulerMigration=false (constants.go:3159-3186), and docs/architecture/schedules.md:2 says it is 'not yet generally available'. Run history is the persisted event history (limits 51,200 events / 50 MiB, constants.go:431-451; namespace retention minimum 1 h local, constants.go:218-222). Retries: default activity retry policy is 1 s initial, x2, max interval 100x, unlimited attempts (common/retrypolicy/retry_policy.go:76-81; service/history/workflow/retry.go:31-112). Timeouts: schedule-to-start, start-to-close, schedule-to-close, heartbeat (service/history/timer_queue_active_task_executor.go:238,316-319,429-453). Cancellation: RequestCancel appends a cancel-requested event and a workflow task for workflow code to handle (service/history/api/requestcancelworkflow/api.go:73-86). Terminate closes the execution server-side (terminateworkflow/api.go:67-74). Activities see cancel via heartbeat response (recordactivitytaskheartbeat/api.go:82,103); pushed cancel via worker commands is off by default and best-effort (constants.go:208-212; docs/architecture/worker-commands.md:3,34). Batch cancel/terminate/signal/delete/reset by query is in service/worker/batcher/workflow.go:44-67 (default 1 concurrent batch per namespace, constants.go:1120-1122). No process supervision exists in the server; the only os/exec use is the DB passwordCommand (common/config/persistence.go:305-317). common/effect is a server-internal callback buffer for Workflow Update with no transactional guarantees (docs/architecture/effect-package.md:3-12,24-29). Premises: event sourcing, deterministic workflow code, at-least-once or at-most-once activities, user code in user-owned workers (docs/architecture/README.md:20-35).",
+      "packaging_and_release": "Release: .github/workflows/release.yml:3-25 runs on GitHub release 'released' and calls .github/actions/build-binaries/action.yml:27-35 (GoReleaser v2.13.1, 'release --clean'). .goreleaser.yml builds temporal-server, temporal-cassandra-tool, temporal-sql-tool, temporal-elasticsearch-tool and tdbg for linux, darwin and windows on amd64 and arm64 with CGO_ENABLED=0 (lines 26-86). Archives are named {project}_{version}_{os}_{arch} and include ./config/* (lines 11-24); zip on windows. Checksums are sha256 in checksums.txt (lines 88-90). GoReleaser changelog is disabled (lines 92-93) and no CHANGELOG file exists. No signing, attestation, SBOM or provenance configuration was found (search of .github, .goreleaser.yml, docker and Makefile for cosign, attest, slsa, sbom, gpg returned nothing). Docker: docker/docker-bake.hcl builds 'server' and 'admin-tools' images for linux/amd64 and linux/arm64 (lines 44-94) from alpine:3.24.1 (line 40-42); the server image runs as non-root user temporal uid 1000 (docker/targets/server.Dockerfile:11-18); the admin-tools image bundles the temporal CLI downloaded from github.com/temporalio/cli releases (docker/targets/admin-tools.Dockerfile:14-26; .github/actions/build-docker-images/scripts/main.go:373-380). .github/workflows/build-and-publish.yml:41-76 pushes images to Docker Hub temporaliotest/* on main, cloud/* and release/* pushes (latest only for main, line 74). Manual workflows promote them to temporalio/* with 'crane copy' (.github/workflows/promote-docker-image.yml:94-121). The Go module go.temporal.io/server has retract directives for v1.30.0, v1.26.1 and v1.26.0 (go.mod:5-9). Version string is 1.32.0 (common/headers/version_checker.go:26); tag v1.32.0 resolves to the read commit (.git/packed-refs:2).",
+      "tests_and_ci": "Go testing with testify, gomock and in-repo helpers (parallelsuite, testvars, await: docs/development/testing.md:36-110); build tags test_dep, TEMPORAL_DEBUG, disable_grpc_modules (testing.md:7-10). About 889 _test.go files (888 outside hidden dirs plus .github/actions/build-docker-images/scripts/main_test.go); 134 are in tests/ (functional); 2,641 top-level Test functions across 850 files plus suite methods; 38 Benchmark functions in 17 files (counts from repo search). Categories: unit, integration (DB-backed) and functional (CONTRIBUTING.md:73-77). Make targets unit-test, integration-test, functional-test, functional-with-fault-injection-test, mixed-brain-test and leak-test (Makefile:508-551); race detector and shuffle on by default, 35 m timeout (Makefile:59,66-75). 20 workflow files in .github/workflows. run-tests.yml: unit, integration (Cassandra, MySQL, PostgreSQL, Elasticsearch containers), functional matrix across cass_es, cass_es8, cass_os2, cass_os3, sqlite, mysql8, postgres12, postgres12_pgx (full on push/label/persistence changes, smoke otherwise; lines 98-170), ndc and xdc tests, goroutine-leak test (309-336), mixed-brain test against a released server with omes load (466-517), and cross-compile of windows/amd64 and darwin/arm64 (272-276). linters.yml: golangci-lint, nilaway, actionlint, protobuf/API lint, workflowcheck, fmt, parallelize-tests. govulncheck.yml on PRs. features-integration.yml runs SDK feature tests (TypeScript, Go, Python, Java, .NET, Ruby) against the built image, including a CHASM-scheduler variant (lines 70-133). Also check-release-dependencies, flaky-tests-report, optimize-test-sharding, ci-success-report, stale, claude-review-teams and release/promote workflows. All runners are Linux; the main matrix uses arm64 runners (run-tests.yml:101-110).",
+      "dependencies": "go.mod (go 1.26.8, go.mod:3): 79 direct requires and 144 '// indirect' (223 total), plus one 'tool' directive (golang.org/x/perf/cmd/benchstat, go.mod:243). tests/mixedbrain/go.mod: 8 direct and 15 indirect, with replace go.temporal.io/server => ../.. (lines 5-36). Notable direct deps: go.temporal.io/api v1.63.5, go.temporal.io/sdk v1.44.0, go.temporal.io/auto-scaled-workers v0.2.0-1.32.0.158.0 (go.mod:69-71), uber fx, grpc, gocql, pgx, go-sql-driver/mysql, modernc.org/sqlite, olivere/elastic, AWS S3 SDK, cloud.google.com/go/storage, OpenTelemetry, prometheus client, robfig/cron/v3 (go.mod:12-88). Indirect entries include AWS lambda, ecs and bedrockagentcore SDKs, cloud.google.com/go/run and k8s.io/client-go (go.mod:93-94,122,136,141,228-233); no first-party Go source imports them, and their provenance (likely via auto-scaled-workers) cannot be confirmed because that module's source is not in this clone. auto-scaled-workers is wired into the worker service (service/worker/fx.go:7,56). Other manifests: .github/mise.toml (protoc 23.4), .gitmodules (grafana dashboards submodule), docker base image alpine 3.24.1. No vendor directory.",
+      "security_policy": "none: no SECURITY.md anywhere in the working directory (the only file matching *ecurity* is tests/activity_api_batch_security_test.go) and no vulnerability-reporting instructions in README.md or CONTRIBUTING.md. CI runs govulncheck on pull requests (.github/workflows/govulncheck.yml:1-16). A contributor CLA is required (CONTRIBUTING.md:5)."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:24 - The server executes Workflows in a resilient manner that automatically handles intermittent failures, and retries failed operations.",
+        "verified": "partial",
+        "evidence": "Server-side durability and retry bookkeeping exist: event-sourced history (docs/architecture/README.md:32), retry/backoff computation (service/history/workflow/retry.go:31-112), default activity retry 1 s initial x2 with unlimited attempts (common/retrypolicy/retry_policy.go:76-81; common/dynamicconfig/constants.go:2655-2660). But durability depends on the chosen store: 'make start' uses in-memory SQLite, so state is lost on exit (config/development-sqlite.yaml:18-20; CONTRIBUTING.md:28-30,134). File-backed SQLite is a separate target (config/development-sqlite-file.yaml:18-22). Retried code runs in user-hosted workers (docs/architecture/README.md:28,48-52)."
+      },
+      {
+        "claim": "README.md:64 - This repo is the server; Workflows, Activities and Workers are implemented with a supported language.",
+        "verified": "yes",
+        "evidence": "Workflows are code in SDK languages and user code runs in user-owned environments (docs/architecture/README.md:22,28,48-49). The only schedule action is StartWorkflow (service/frontend/workflow_handler.go:4592-4597; service/worker/scheduler/activities.go:67-77), and scheduled workflows may not carry a cron schedule (workflow_handler.go:3962-3964). The only os/exec use in non-tooling server code is the DB passwordCommand (common/config/persistence.go:305-317). No built-in shell-command runner or user-facing DAG model found; the only 'DAG' hits are worker-versioning redirect rules (service/matching/version_rule_helpers.go:353-354)."
+      },
+      {
+        "claim": "README.md:35-40,51-55 - 'brew install temporal' + 'temporal server start-dev' starts a pre-built image with all dependencies; 'temporal workflow list' and 'temporal operator namespace list' query it.",
+        "verified": "not_checkable",
+        "evidence": "'start-dev' appears only in README.md:39 (search of the whole tree). cmd/server/main.go:80-246 defines only start, render-config and validate-dynamic-config. CONTRIBUTING.md:17-19 and the docker build helper (.github/actions/build-docker-images/scripts/main.go:373-380) show the temporal CLI is a separate repo (temporalio/cli) not present here. The only CLI built here for workflow admin is tdbg (tools/tdbg/tdbg_commands.go:24-78). Also, brew installs a CLI binary, not an 'image' as the README sentence says. Code and README differ on wording; code not available to check."
+      },
+      {
+        "claim": "README.md:60 - The Web UI is at http://localhost:8233.",
+        "verified": "partial",
+        "evidence": "UI source is not in this repo. For the repo's own dev flow, CONTRIBUTING.md:167 says the UI is at localhost:8080 once 'make start-dependencies' runs the temporalio/ui:latest container (develop/docker-compose/docker-compose.yml:85-87; docker-compose.darwin.yml:24-28 maps 8080). Port 8233 is not defined anywhere in this repo, so it is presumably from the CLI dev server (not checkable)."
+      },
+      {
+        "claim": "README.md:23 - Temporal enables scalable applications.",
+        "verified": "not_checkable",
+        "evidence": "No published benchmark or capacity numbers in docs, Makefile, CI or develop/. There are 38 Go Benchmark functions in 17 files but no recorded results. docs/architecture/matching-service.md:15 mentions task-queue partitioning (default 4) for throughput, which is a design statement, not a measurement."
+      },
+      {
+        "claim": "docs/architecture/schedules.md:1-2 - The documentation pertains to the CHASM-based Scheduler, which is not yet generally available.",
+        "verified": "yes",
+        "evidence": "history.enableCHASMSchedulerCreation defaults false, migration defaults false, routing defaults true but excludes CreateSchedule (common/dynamicconfig/constants.go:3159-3186). CreateSchedule creates a V1 workflow-based schedule unless the flag or the 'chasm-scheduler' experiment header is set (service/frontend/workflow_handler.go:3845,3868-3871,3878-3888; service/frontend/experiments.go:3-6). So default behaviour is the V1 system workflow in service/worker/scheduler/workflow.go, which that doc does not describe."
+      },
+      {
+        "claim": "docs/architecture/README.md:34-35 - Activity code must either be idempotent or non-retryable (at least once or at most once).",
+        "verified": "yes",
+        "evidence": "With no explicit policy the server applies unlimited attempts (common/retrypolicy/retry_policy.go:76-81), which gives at-least-once. A caller must set MaximumAttempts for at-most-once behaviour (service/history/workflow/retry.go:95)."
+      },
+      {
+        "claim": "docs/architecture/worker-commands.md:3 - The server can push actions (e.g. activity cancellation) to workers without relying on heartbeats.",
+        "verified": "partial",
+        "evidence": "Pushing activity cancellation is gated by system.enableCancelActivityWorkerCommand, default false (common/dynamicconfig/constants.go:208-212). The doc itself says commands are best-effort (worker-commands.md:34). By default cancel is delivered in the heartbeat response (service/history/api/recordactivitytaskheartbeat/api.go:82,103)."
+      },
+      {
+        "claim": "docs/architecture/effect-package.md:29 - The effect package was created for Workflow Update and is used only there, with no transactional guarantees.",
+        "verified": "yes",
+        "evidence": "Imported by 7 non-test files, all in the history service's workflow-update and workflow-task-completion paths (e.g. service/history/workflow/update/update.go, service/history/api/updateworkflow/api.go, service/history/api/respondworkflowtaskcompleted/api.go). The no-guarantee note is at effect-package.md:24-26. It is a server-internal utility, not a user-facing effect or undo mechanism."
+      },
+      {
+        "claim": "README.md:80 - MIT License (and README.md:26 Cadence origin).",
+        "verified": "yes",
+        "evidence": "LICENSE:1-23 is the MIT text, copyright Temporal Technologies 2025 and Uber Technologies 2020 (consistent with the Cadence-fork statement; the shallow clone has no history to prove it, .git/shallow). schema/sqlite/LICENSE:1-25 is also MIT and adds a 2021 Datadog copyright (line 7). docker/docker-bake.hcl:62,88 label images MIT. No NOTICE or third-party license file exists."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Default-on phone-home not mentioned in the README: the frontend POSTs product, version, arch, OS, persistence store name, cluster ID and SDK names/versions to https://version-info.temporal.io/check at start and every 24 h; opt-out is only the TEMPORAL_VERSION_CHECK_DISABLED env var or dynamic config frontend.enableServerVersionCheck (common/versioninfo/caller.go:19-21; common/versioninfo/request.go:10-20; service/frontend/version_checker.go:21,136-147; common/dynamicconfig/constants.go:909-913).",
+      "Scope: the server only schedules and starts Temporal workflows; no command runner, DAG model or process supervision exists in this repo. Running existing commands means writing and operating an SDK worker whose activities spawn processes (README.md:64; docs/architecture/README.md:22,28,48-49; service/frontend/workflow_handler.go:4592-4597). Server-side cancel is a history event handled by workflow code, and terminate only updates workflow state, so any child-process cleanup is the worker author's job (service/history/api/requestcancelworkflow/api.go:82-86; service/history/api/terminateworkflow/api.go:67-74). The Web UI and the temporal CLI (including start-dev) are separate repos that cannot be verified from this clone (CONTRIBUTING.md:17-19; develop/docker-compose/docker-compose.yml:85-87, UI image unpinned at :latest).",
+      "Local durability and setup: 'make start' uses in-memory SQLite, so all state is lost on exit; file-backed SQLite is a different target and the configs are named 'development-*' (config/development-sqlite.yaml:18-20; CONTRIBUTING.md:134,143-147). SQLite is limited to one connection in these configs (config/development-sqlite.yaml:21-22). 'temporal-server start' with no config loads the embedded template, which defaults to Cassandra unless env DB is set (cmd/server/main.go:176-178; common/config/config_template_embedded.yaml:16-17). A namespace must be created by hand (CONTRIBUTING.md:161-165), and numHistoryShards is fixed once the cluster is initialised (temporal/fx.go:887-895). Production ops docs are not in the repo (docs/README.md:17-20).",
+      "No authentication by default: the empty authorizer setting yields a no-op authorizer, and startup only warns that future versions will require --allow-no-auth (common/authorization/authorizer.go:64-69; cmd/server/main.go:203-209). Dev and template configs bind loopback (config/development-sqlite.yaml:72; common/config/config_template_embedded.yaml:312), but the Docker entrypoint sets BIND_ON_IP to the container's resolved IP (docker/scripts/sh/entrypoint.sh:7).",
+      "Scheduler in transition: new schedules use the V1 workflow-based scheduler by default, while the CHASM scheduler is flagged not yet GA and has migration flags default off; docs/architecture/schedules.md describes only the CHASM design (common/dynamicconfig/constants.go:3159-3186; docs/architecture/schedules.md:1-2). Release hygiene signals: go.mod retracts v1.30.0, v1.26.1 and v1.26.0 (go.mod:5-9).",
+      "Release integrity and CI supply chain: releases ship sha256 checksums only, with no signing, attestation or SBOM configured (.goreleaser.yml:88-90; no matches for cosign/attest/slsa/sbom/gpg in .github, docker, Makefile). CI fetches some tools unpinned: crane from releases/latest (.github/workflows/promote-docker-image.yml:96), the actionlint script from main (.github/workflows/linters.yml:23), and the govulncheck action at @main (.github/workflows/govulncheck.yml:16). Dev compose uses :latest images (develop/docker-compose/docker-compose.yml:62,72,79,86).",
+      "No security policy or reporting channel in the repo (no SECURITY.md); a contributor CLA is required (CONTRIBUTING.md:5); there is no NOTICE or third-party license file. License is MIT throughout (LICENSE:1-23; schema/sqlite/LICENSE:1-25) but dependency licenses were not audited.",
+      "Build and dependency surface: building from source needs Go 1.26.8 (go.mod:3). The module graph has 79 direct and 144 indirect requires including AWS, GCP and Kubernetes client libraries (go.mod:93-94,122,136,141,228-233). The external module go.temporal.io/auto-scaled-workers is wired into the worker service (go.mod:70; service/worker/fx.go:7,56), but its source is not in this clone, so its behaviour is unverified; a 'subprocess' compute provider is mentioned only in a commented test config (config/dynamicconfig/development-sql.yaml:50-51). CI executes tests only on Linux (mostly arm64 runners); macOS and Windows get cross-compile only (.github/workflows/run-tests.yml:101-110,272-276)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "temporalio/temporal",
+      "checks": [
+        {
+          "field": "readme.install[2] (build from source)",
+          "statement": "Build server and tools from source on Linux or macOS. Needs Go at the go.mod version (go 1.26.8, go.mod:3); Ubuntu: 'sudo apt install golang', macOS: 'brew install go'. Makefile default goal is 'install: bins'. Command: git clone https://github.com/temporalio/temporal.git && cd temporal && make",
+          "citation": "CONTRIBUTING.md:11-13,47-67; Makefile:3-6; go.mod:3",
+          "holds": true,
+          "note": "CONTRIBUTING.md:11-13 lists Go ('minimum version required listed in go.mod'), 'brew install go' for macOS and 'sudo apt install golang' for Ubuntu. Line 50 is the git clone, 58 is 'make' and 66 is 'make bins'. go.mod:3 is 'go 1.26.8'. Makefile:3 'install: bins' is the first target, and there is no .DEFAULT_GOAL or include, so plain 'make' runs it. bins (Makefile:6) builds temporal-server, temporal-cassandra-tool, temporal-sql-tool, temporal-elasticsearch-tool and tdbg with plain 'go build' and CGO_ENABLED=0 (Makefile:37,366-388). Only wording differs: the doc calls the go.mod version a minimum."
+        },
+        {
+          "field": "license",
+          "statement": "spdx: MIT, file: LICENSE",
+          "citation": "LICENSE:1-23; README.md:80",
+          "holds": true,
+          "note": "LICENSE is the standard MIT text, copyright Temporal Technologies 2025 and Uber Technologies 2020. README.md:80 and CONTRIBUTING.md:262 also say MIT. All five nested LICENSE files are MIT as well, so MIT holds repo-wide. They do add third-party copyright holders: common/persistence/visibility/store/query/LICENSE (Xargin 2017); common/persistence/sql/sqlplugin/sqlite/LICENSE, schema/sqlite/LICENSE and temporaltest/LICENSE (Datadog 2021); common/testing/protoassert/LICENSE (Mat Ryer, Tyler Bunnell and contributors). The dossier cites only schema/sqlite/LICENSE and elsewhere says no third-party license file exists. That is inaccurate, but it does not affect this statement."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes. .goreleaser.yml:27-38 builds temporal-server for linux/amd64; docker/docker-bake.hcl:82 builds a linux/amd64 image; .github/workflows/features-integration.yml:28-41 builds and runs the amd64 image in CI. The main test matrix runs on Linux arm64 runners (.github/workflows/run-tests.yml:101-110,218).",
+          "citation": ".goreleaser.yml:27-38; docker/docker-bake.hcl:82; .github/workflows/features-integration.yml:28-41; .github/workflows/run-tests.yml:101-110,218",
+          "holds": true,
+          "note": "The temporal-server build lists goos linux/darwin/windows and goarch amd64/arm64 (.goreleaser.yml:32-38). docker-bake.hcl:82 sets the server target's platforms to [linux/amd64, linux/arm64]. features-integration.yml:28-41 runs on ubuntu-latest and calls build-binaries with single-arch amd64, which means GOOS=linux and GOARCH=amd64 (.github/actions/build-binaries/action.yml:47-57). It then builds and loads a linux/amd64 image. That range shows only the build: the image is run by the temporalio/features reusable workflows at lines 43-133. run-tests.yml:101-110 sets runner_arm to ubuntu-24.04-arm64-8-cores or ubuntu-24.04-arm. Pre-build (line 218), unit (281), integration (341) and the functional matrix (399) all use it."
+        },
+        {
+          "field": "readme.integrations.sdk_or_api",
+          "statement": "gRPC WorkflowService/OperatorService on the frontend (default port 7233) plus an HTTP/JSON gateway (port 7243, disabled when httpPort is 0/unset). Schedule RPCs (CreateSchedule, PatchSchedule, ListScheduleMatchingTimes) are in the frontend handler. SDKs are separate repos (Go, Java, TypeScript, .NET, Python, Ruby sample repos); go.temporal.io/sdk v1.44.0 is only a dependency here. The temporaltest package starts an in-process server on loopback for Go tests.",
+          "citation": "config/development-sqlite.yaml:68-73; common/config/config.go:87-89; service/frontend/http_api_server.go:39-50,157-175; service/frontend/workflow_handler.go:3813,4779,4902; CONTRIBUTING.md:167; go.mod:71; temporaltest/server.go:19-33",
+          "holds": true,
+          "note": "The dev config sets the frontend's grpcPort to 7233 and httpPort to 7243 (lines 70 and 73). config.go:87-89 says 'If unset/0, HTTP will be disabled' and that the setting applies only to the frontend. http_api_server.go:39-50 defines HTTPAPIServer, which forwards to gRPC, and lines 157-175 register the WorkflowService and OperatorService gateway handlers. The gRPC services are registered at service/frontend/service.go:493,495. CreateSchedule, PatchSchedule and ListScheduleMatchingTimes are defined at exactly lines 3813, 4779 and 4902. CONTRIBUTING.md:167 lists the six sample repos, and go.mod:71 is go.temporal.io/sdk v1.44.0. temporaltest/server.go:19-20 documents a server listening on local loopback for end-to-end tests. It calls temporal.NewServer in-process (temporaltest/internal/lite_server.go:291) and uses FrontendIP 127.0.0.1 (server.go:156)."
+        },
+        {
+          "field": "claim_checks[1] (README.md:64)",
+          "statement": "README.md:64 - This repo is the server; Workflows, Activities and Workers are implemented with a supported language. verified: yes (only schedule action is StartWorkflow; scheduled workflows may not carry a cron schedule; only os/exec use in non-tooling server code is the DB passwordCommand; only 'DAG' hits are worker-versioning redirect rules).",
+          "citation": "README.md:64; docs/architecture/README.md:22,28,48-49; service/frontend/workflow_handler.go:4592-4597,3962-3964; service/worker/scheduler/activities.go:67-77; common/config/persistence.go:305-317; service/matching/version_rule_helpers.go:353-354",
+          "holds": true,
+          "note": "The README.md:64 text matches. In the architecture README, line 22 says workflows are code in SDK languages, line 28 says user code runs in user-owned environments, and lines 48-49 say workers run Workflow and Activity code through the SDK. workflow_handler.go:4592-4597 handles only ScheduleAction_StartWorkflow, and no other ScheduleAction_* variant appears anywhere in the repo. activities.go:67-77 calls FrontendClient.StartWorkflowExecution. workflow_handler.go:3962-3964 returns errCronNotAllowed. Outside tools/, cmd/tools/, tests/ and .github/, 'os/exec' is imported only by common/config/persistence.go, where exec.CommandContext runs PasswordCommand (line 311). A case-insensitive search for 'DAG' matches only version_rule_helpers.go (lines 353-354 and 490-511), all about redirect rules."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "Non-blocking (verdict is pass): in the claim check for README.md:80, replace 'No NOTICE or third-party license file exists' with: no NOTICE file exists, but five nested MIT LICENSE files carry third-party copyrights. They are common/persistence/visibility/store/query/LICENSE (Xargin 2017); common/persistence/sql/sqlplugin/sqlite/LICENSE, schema/sqlite/LICENSE and temporaltest/LICENSE (Datadog 2021); and common/testing/protoassert/LICENSE (Mat Ryer, Tyler Bunnell and contributors 2012-2020). Make the same correction in the seventh risk ('there is no NOTICE or third-party license file') and cite all five files next to LICENSE:1-23.",
+        "Non-blocking: in platforms.linux_x86_64, '.github/workflows/features-integration.yml:28-41 builds and runs the amd64 image' should cite lines 28-41 for the build and lines 43-133 for the run. In those later lines the image artifact is handed to the temporalio/features reusable workflows, which run it."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,343 @@
+{
+  "contender": "harbor-framework/harbor",
+  "revision": {
+    "contender": "harbor-framework/harbor",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "harbor-framework/harbor",
+        "tag": "v0.23.0",
+        "commit": "1e5c5c6db929a10a140d05e606882c671ae20729",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.23.0",
+    "commit": "1e5c5c6db929a10a140d05e606882c671ae20729",
+    "read_at": "2026-10-02T03:02:16+00:00"
+  },
+  "dossier": {
+    "contender": "harbor-framework/harbor",
+    "revision": {
+      "tag": "v0.23.0",
+      "commit": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Harbor is a Python (>=3.12, pyproject.toml:9) framework and CLI (`harbor`, aliases `hr`/`hb`: pyproject.toml:35-38) that runs agents against containerized tasks and records graded results. A task is a directory (instruction.md, task.toml, environment/ Dockerfile or compose, tests/test.sh, optional solution/: docs-mintlify/core-concepts/tasks/overview.mdx:6-20); a trial is one agent attempt on one task; a job is tasks x agents x attempts run with a concurrency limit (default 4: src/harbor/models/job/config.py:414-421) on local Docker/Podman/Apple container/Singularity or remote sandbox providers (29 EnvironmentType values: src/harbor/models/environment_type.py:4-33). Per trial: start environment, install and run the agent, upload tests/ and run the verifier, which must write /logs/verifier/reward.txt (one number) or reward.json (labeled numeric keys) (src/harbor/verifier/verifier.py:165-268), then persist result.json, agent logs, an ATIF trajectory, verifier logs and artifacts. 46 agent names are built in (src/harbor/models/agent/name.py:4-50), including real-CLI integrations `claude-code` and `codex` that install the vendor CLI inside the container at trial time. Optional pieces: RewardKit (criteria / LLM-judge verifier toolkit), Harbor Hub registry/upload/hosted rollouts (Supabase-backed), a local web viewer, `harbor analyze`/`check` (LLM-driven rubric review), and 85 benchmark adapters (adapters/*/README.md). Facts relevant to the three stated needs (no judgement): (1) multi-scorer values are kept per sample as a dict in each trial's result.json, but a 'case' is a task directory whose scorer code lives in its tests/ (or RewardKit files), not a labeled-dataset-plus-scorer registry; (2) containerized suites with the real Claude Code and Codex CLIs, each trial graded by a verifier, are directly supported; (3) no declarative CI regression gate (thresholds, baselines or reward-based exit status) was found.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Harbor is a framework from the creators of Terminal-Bench for evaluating and optimizing agents and language models.",
+          "citation": "README.md:10"
+        },
+        {
+          "claim": "Evaluate arbitrary agents like Claude Code, OpenHands, Codex CLI, and more.",
+          "citation": "README.md:12"
+        },
+        {
+          "claim": "Build and share your own benchmarks and environments.",
+          "citation": "README.md:13"
+        },
+        {
+          "claim": "Conduct experiments in thousands of environments in parallel through providers like Daytona, Modal, LangSmith, Blaxel, Novita Sandbox, Tensorlake, and Runta.",
+          "citation": "README.md:14"
+        },
+        {
+          "claim": "Generate rollouts for RL optimization.",
+          "citation": "README.md:15"
+        },
+        {
+          "claim": "Install with `uv tool install harbor` or `pip install harbor`.",
+          "citation": "README.md:21-27"
+        },
+        {
+          "claim": "Harbor is the official harness for Terminal-Bench-2.0.",
+          "citation": "README.md:31"
+        },
+        {
+          "claim": "`harbor run --dataset terminal-bench@2.0 --agent claude-code --model anthropic/claude-opus-4-1 --n-concurrent 4` (with ANTHROPIC_API_KEY) 'will launch the benchmark locally using Docker'.",
+          "citation": "README.md:33-41"
+        },
+        {
+          "claim": "To run on a cloud provider (like Daytona) pass the `--env` flag (`--env daytona`, with DAYTONA_API_KEY and e.g. `--n-concurrent 100`).",
+          "citation": "README.md:41-51"
+        },
+        {
+          "claim": "`harbor datasets list` explores all supported third-party benchmarks (like SWE-Bench and Aider Polyglot).",
+          "citation": "README.md:59-63"
+        },
+        {
+          "claim": "Evaluate an agent and model on a dataset with `harbor run -d \"<dataset@version>\" -m \"<model>\" -a \"<agent>\"`.",
+          "citation": "README.md:65-69"
+        },
+        {
+          "claim": "Absence noted: the README says nothing about telemetry, platform support (macOS/WSL2/GPU), tests/CI, security policy, the Python version requirement, or regression gating.",
+          "citation": "README.md:1-85"
+        }
+      ],
+      "install": [
+        {
+          "method": "uv tool (PyPI)",
+          "command": "uv tool install harbor",
+          "citation": "README.md:21-23"
+        },
+        {
+          "method": "pip (PyPI)",
+          "command": "pip install harbor",
+          "citation": "README.md:25-27"
+        },
+        {
+          "method": "uv tool with a non-Docker sandbox extra (or all providers via harbor[cloud])",
+          "command": "uv tool install \"harbor[modal]\"   # or: uv tool install \"harbor[cloud]\"",
+          "citation": "docs-mintlify/getting-started/installation.mdx:32-46; docs-mintlify/core-concepts/sandboxes/pre-integrated-sandboxes.mdx:17-29"
+        },
+        {
+          "method": "nightly pre-release built from main",
+          "command": "uv tool install --prerelease explicit \"harbor>=0.dev0\"",
+          "citation": "docs-mintlify/contributing/release-policy.mdx:32-36; docs/content/docs/getting-started.mdx:27-29"
+        },
+        {
+          "method": "from source (development checkout)",
+          "command": "git clone https://github.com/harbor-framework/harbor.git && cd harbor && uv sync --all-extras --dev",
+          "citation": "AGENTS.md:191-197"
+        },
+        {
+          "method": "RewardKit verifier toolkit (separate PyPI package)",
+          "command": "uv tool install harbor-rewardkit",
+          "citation": "packages/rewardkit/README.md:8-12"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - upstream CI runs the non-runtime suite plus Docker and Podman runtime tests on ubuntu-26.04 GitHub runners (.github/workflows/pytest.yml:15-21,56-84); the workflow does not state the CPU architecture and the README makes no platform statement.",
+        "wsl2": "unknown - no WSL2 statement in README.md, docs-mintlify/, docs/content/ or src/ (the only 'WSL' hit outside lockfiles is one adapter README: adapters/deveval/README.md:266). Native Windows with Windows containers is CI-tested (pytest.yml:21,86-94) and Docker declares windows=True (src/harbor/environments/docker/docker.py:322).",
+        "macos_arm64": "yes (code-level only, not CI-tested) - the `apple-container` local runtime requires an Apple-silicon Mac (src/harbor/environments/apple_container.py:37-46; listed at docs-mintlify/core-concepts/sandboxes/pre-integrated-sandboxes.mdx:101-103); Docker mode builds for the daemon's own platform via `docker version` (src/harbor/environments/docker/utils.py:35-54). The README is silent and pytest.yml has no macOS runner (:21).",
+        "gpu": "yes, remote providers only - local docker/podman/apple-container declare no GPU capability and a task with gpus>0 is rejected at validation (src/harbor/environments/base.py:753-758; src/harbor/environments/docker/docker.py:312-325; podman.py:158-159 inherits it). Supported on daytona, modal (not in VM runtime), gke (single-container only), beam and opensandbox (docs-mintlify/core-concepts/sandboxes/pre-integrated-sandboxes.mdx:153-160; gpus flag at daytona/environment.py:1063, beam.py:617, opensandbox.py:145, gke.py:545, modal.py:987)."
+      },
+      "integrations": {
+        "cli": "Yes - `harbor` (aliases `hr`, `hb`) -> harbor.cli.main:app (pyproject.toml:35-38; src/harbor/cli/main.py:48-185). Commands: `run` (= `job start`), `job` (init/schema/resume/regrade/share/download), `trial` (start/regrade/handoff/download/schema), `task`, `dataset`, `agent list|schema`, `check`, `analyze`, `view`, `exec` (marked experimental: src/harbor/cli/exec.py:45-52), `upload`, `publish`, `hub`, `auth`, `plugins`, `cache`. Automation-relevant flags: -p/--path, -d/--dataset, -t/--task, -a/--agent, -m/--model, --ak/--ae/--ve, -e/--env, -n, -k, -r, --skill, --extra-instruction, --disable-verification, --print-config, --dry-run, -y/--yes (src/harbor/cli/jobs.py:427,457,539,563,593,619,628,669,709,798,953,976,1032,1050,1072,1102,1141,1279).",
+        "mcp": "No MCP server that operates Harbor was found. Searching the clone for MCP server frameworks matched only FastMCP sidecar fixtures inside example tasks and adapters (examples/tasks/hello-mcp, examples/jobs/mcp-proof/server/server.py, adapters/gaia2, adapters/tau3-bench) and an MCP client in an agent runner (src/harbor/agents/installed/antigravity_sdk_runner.py:83-94). Every `mcp_servers` hit in src/ is configuration of MCP servers made available to the agent under test (src/harbor/models/task/config.py:617-637; registered into Claude Code via claude_code.py:1859). Docs-only: a hosted documentation MCP endpoint, https://docs.harborframework.com/mcp, with `claude mcp add --transport http harbor-docs ...` and `codex mcp add harbor-docs --url ...` (docs-mintlify/ai-agents.mdx:6-31).",
+        "sdk_or_api": "Python SDK: lazily exported Job, JobConfig, Trial, TrialConfig, BaseAgent, BaseEnvironment, BaseVerifier, Verifier and models (src/harbor/__init__.py:94-169); usage `await Job.create(JobConfig(...)); await job.run()` (docs-mintlify/core-concepts/agents/pre-integrated-agents.mdx:41-66). The 'API & SDK reference' and 'CLI reference' pages are placeholders ('coming soon': docs-mintlify/api-sdk-reference/index.mdx:6; docs-mintlify/cli-reference/index.mdx:6). Local HTTP API: `harbor view` runs a FastAPI/uvicorn server (46 route decorators in src/harbor/viewer/server.py; default host 127.0.0.1: src/harbor/cli/view.py:190,344) for the bundled React UI. Hosted HTTP API: Harbor Hub remote-rollout endpoints (Supabase edge functions) need an API key as a bearer token and prior access approval (docs-mintlify/core-concepts/hosted-harbor/api.mdx:6-22; docs-mintlify/core-concepts/hosted-harbor/index.mdx:9-12). Job plugins load via `--plugin module:Class` or the `harbor.plugins` entry-point group (packages/harbor-langsmith/pyproject.toml:15-16; packages/harbor-atif2otel/pyproject.toml:14-15).",
+        "claude_code_or_codex": "(1) As evaluated agents: `claude-code` and `codex` are built-in integrations that install the real CLI inside the task container and run it non-interactively, with ATIF trajectory output, resume, native/ATIF trajectory loading, native config files (settings.json / config.toml via --ak config=), skills and MCP registration (src/harbor/agents/installed/claude_code.py:98-112,425-450,1799-1917; src/harbor/agents/installed/codex.py:72-79,343-370,1362-1451; docs-mintlify/core-concepts/agents/pre-integrated-agents.mdx:88-143); `harbor trial handoff` resumes a finished Claude Code session locally with `claude --resume` (claude-code only: claude_code.py:184-210; src/harbor/cli/trials.py:873). Example job configs: examples/configs/agents/claude-code-job.yaml, codex-job.yaml (they use the deprecated `orchestrator:` key). (2) As judges inside verifiers: RewardKit agent judges download and run Claude Code or Codex (packages/rewardkit/src/rewardkit/agents.py:30-31,400-560); `harbor analyze`/`check` default to agent claude-code (src/harbor/cli/analyze.py:100-101,258-259). (3) For coding agents working on Harbor: six Claude Code skills in skills/ (create-task, create-adapter, harbor-exec, publish, rewardkit, upload-parity-experiments) installable by symlink with scripts/install-claude-skills.sh:1-16 or `npx skills add harbor-framework/harbor --skill rewardkit` (docs/content/docs/rewardkit/index.mdx:9-14); AGENTS.md (titled 'CLAUDE.md - Harbor Framework') plus packages/rewardkit/CLAUDE.md and apps/viewer/CLAUDE.md guide coding agents; the docs MCP endpoint above works with both CLIs."
+      },
+      "telemetry_and_network": "README.md says nothing about telemetry or network requirements. TELEMETRY: on by default, no first-run notice or consent prompt found (src/harbor/cli/notifications.py only shows a registry tip). After CLI commands and jobs, a detached `python -c` helper POSTs `harbor.command_finished` and `harbor.job_finished` events to PostHog (https://us.i.posthog.com/i/v0/e/, hard-coded project key; requests.post, 10 s timeout, one attempt, dropped if offline) with an anonymous random install id stored at platformdirs user_config_path('harbor')/telemetry_id, person profiles and GeoIP disabled, and an allowlist of fields; opt out with HARBOR_TELEMETRY set to 0/false/no/off/disabled (src/harbor/telemetry.py:35-45,75-79,395-480,500-536; src/harbor/cli/main.py:53-77; src/harbor/job.py:1105,1115; docs/content/docs/usage-stats.mdx:6-101; docs-mintlify/telemetry/telemetry.mdx:6-41). Fields include agent/model names, dataset refs, environment type, token and cost totals, mean reward, feature flags, CI flag, `invoked_by` (detects CLAUDECODE, CODEX_SANDBOX etc.), and public git repo refs after an unauthenticated probe of the git host (telemetry.py:47-67,82-160,726-781). The test suite forces HARBOR_TELEMETRY=off (tests/conftest.py:14). Telemetry is not auto-disabled in CI (telemetry.py:580-581 only sets a `ci` field). No update checks or other analytics hosts found in src/ (searched for pypi.org, update checks, sentry/segment/mixpanel). HARBOR HUB: a Supabase project (https://ofhuhcpkvzjlejydnvyd.supabase.co, embedded publishable key, overridable with HARBOR_SUPABASE_URL) backs registry dataset resolution (default for `-d name@version`), package-task download (`-t org/name`), `harbor auth login` (OAuth, credentials in ~/.harbor/credentials.json), `upload`, `publish`, `--upload` and `--launch` (src/harbor/auth/constants.py:7-13,38-49; src/harbor/registry/client/factory.py:34-45; src/harbor/registry/client/harbor/harbor.py:23-27; src/harbor/tasks/client.py:368-388; src/harbor/cli/jobs.py:1263-1278). Local `-p` runs need no Harbor account; uploads are opt-in; hosted rollouts need access approval plus an API key (docs-mintlify/core-concepts/hosted-harbor/index.mdx:9-12). RUNTIME NETWORK for local Docker runs: image pulls/builds; in-container agent installs (downloads.claude.ai bootstrap.sh; nvm from raw.githubusercontent.com, nodejs.org and the npm registry for Codex: claude_code.py:444, codex.py:360-369); LLM endpoints with ANTHROPIC_API_KEY/OPENAI_API_KEY forwarded to the agent (claude_code.py:108-112; codex.py:1388-1399); git sparse clones for git-based tasks (src/harbor/tasks/client.py:233-331); verifier scripts that fetch tools (examples/tasks/hello-world/tests/test.sh:3-13). Claude Code is launched with CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 (claude_code.py:1828). Task network policy defaults to `public` (src/harbor/models/task/config.py:250-251). OPT-IN extras: cloud sandbox accounts/keys, LangSmith/OTel/MLflow plugins (packages/harbor-langsmith/README.md:5-9), `harbor analyze`/`check` (default models claude-haiku-4-5 / claude-sonnet-4-6) and RewardKit LLM/agent judges (litellm provider credentials; installers from claude.ai and chatgpt.com: rewardkit/agents.py:30-31). The older docs/ site depends on @vercel/analytics (docs/package.json:14)."
+    },
+    "code": {
+      "languages": [
+        "Python (src/harbor: 356 .py files; requires >=3.12, .python-version 3.13; adapters, packages/*)",
+        "TypeScript/TSX (apps/viewer: React Router 7 + Vite; docs/: Next.js + Fumadocs)",
+        "Shell (scripts/, task tests/test.sh and solution/solve.sh)",
+        "MDX/Markdown (docs-mintlify/, docs/content/)",
+        "YAML/TOML/JSON configuration (workflows, task.toml, job configs, registry.json)",
+        "Dockerfile / docker-compose"
+      ],
+      "entry_points": [
+        {
+          "path": "pyproject.toml:35-38",
+          "what": "Console scripts `harbor`, `hr`, `hb` -> harbor.cli.main:app (Typer); build backend uv_build (pyproject.toml:40-42)."
+        },
+        {
+          "path": "src/harbor/cli/main.py",
+          "what": "CLI module: Typer app whose callback sets HARBOR_LAUNCH_SOURCE and schedules command telemetry (53-77); registers run/job/trial/task/dataset/agent/check/analyze/view/exec/upload/publish/hub/auth etc. (134-185); `python -m` entry at 187-188."
+        },
+        {
+          "path": "src/harbor/cli/jobs.py",
+          "what": "`harbor run` / `harbor job start` (`start` 1920, `_execute_job` 1973-2151), `resume` (2176), `regrade` (2685), `init`/`schema` (2953-2958)."
+        },
+        {
+          "path": "src/harbor/__init__.py",
+          "what": "Python API with lazy exports (Job, JobConfig, Trial, BaseAgent, BaseEnvironment, BaseVerifier, models), lines 94-169."
+        },
+        {
+          "path": "src/harbor/cli/view.py",
+          "what": "`harbor view` server main: uvicorn running the FastAPI app in src/harbor/viewer/server.py (46 route decorators), default host 127.0.0.1 (view.py:190,344,435); serves the React UI built from apps/viewer."
+        },
+        {
+          "path": "packages/rewardkit/src/rewardkit/__main__.py",
+          "what": "`rewardkit` console script (packages/rewardkit/pyproject.toml:37-38): discovers criteria files and judge TOMLs in a tests dir and writes reward.json + reward-details.json (runner.py:538-685)."
+        },
+        {
+          "path": "src/harbor/agents/installed/claude_code.py",
+          "what": "Real Claude Code integration (install 425-450; run 1799-1917, `claude --verbose --output-format=stream-json ... --print`); sibling src/harbor/agents/installed/codex.py (install 343-370; run 1362-1480, `codex exec ... --json`)."
+        },
+        {
+          "path": "src/harbor/verifier/verifier.py",
+          "what": "Verifier: uploads tests/, runs test.sh, downloads /logs/verifier and parses reward.txt / reward.json (165-268)."
+        }
+      ],
+      "architecture": "Typer CLI (src/harbor/cli/: main.py, jobs.py, trials.py, tasks.py, datasets.py, analyze.py, view.py, hub/auth/upload/publish) builds a JobConfig (src/harbor/models/job/config.py) -> Job.create/run (src/harbor/job.py, job_plan.py) expands tasks x agents x n_attempts into TrialConfigs and runs them through TrialQueue (src/harbor/trial/queue.py: asyncio semaphore, retry with include/exclude exception lists, default 0 retries) -> Trial (src/harbor/trial/trial.py base lifecycle; single_step.py, multi_step.py, regrade.py, artifact_handler.py, network_policy.py, simulated_user.py): environment start, agent setup/install, agent run, artifact collection, verifier, finalize and secret scrubbing. Agents: src/harbor/agents/ (base.py; installed/base.py BaseInstalledAgent with exec_as_agent, error-pattern classification into ApiRateLimitError/ApiUsageLimitError/AgentAuthenticationError/etc.; installed/claude_code.py, codex.py and ~44 others; terminus_2/ own agent; oracle.py runs the task solution; nop.py; factory.py with import-path and ACP agents). Environments: src/harbor/environments/ (base.py, factory.py lazy registry with pip-extra hints, docker/ compose runtime + nftables egress-control sidecar, podman.py, apple_container.py, singularity/, ~25 provider modules). Verifier: src/harbor/verifier/ (shared-container or separate verifier sandbox). Scoring/aggregation: src/harbor/models/{trial,job,verifier,trajectories (ATIF)}, src/harbor/metrics/ (mean/min/max/sum/uv_script), src/harbor/utils/pass_at_k.py. Hub/registry: src/harbor/registry/, tasks/client.py, download/, upload/, publisher/, hub/, hosted/, auth/, storage/ (Supabase). src/harbor/telemetry.py (PostHog). Viewer: src/harbor/viewer/ + apps/viewer. Workspace packages: packages/rewardkit (criteria -> dimensions -> reward.json + reward-details.json; LLM and agent judges), packages/harbor-langsmith and packages/harbor-atif2otel (job plugins). Other trees: adapters/ (85 benchmark converters, 84 with parity_experiment.json), examples/, skills/ (Claude Code skills), rfcs/, docs/ (Fumadocs) and docs-mintlify/ (deployed docs). Evidence layout per trial: config.json, lock.json, result.json, exception.txt, trial.log, agent/ (CLI output claude-code.txt / codex.txt, native sessions, trajectory.json), verifier/ (test-stdout.txt, reward.txt|json, e.g. ctrf.json or RewardKit reward-details.json), artifacts/ (+manifest.json); per job: config.json, lock.json (Harbor version/commit, task and skill digests), result.json (stats.evals with reward_stats, exception_stats, metrics, pass_at_k), job.log (src/harbor/models/trial/paths.py:84-146,189-305 [its docstring says results.json, the code writes result.json]; src/harbor/job.py:636-654; src/harbor/models/job/lock.py:60-63,143-148,175-195,266-274; src/harbor/models/job/result.py:15-26,129-169).",
+      "packaging_and_release": "Build backend uv_build (pyproject.toml:40-42); PyPI package `harbor` (plus harbor-rewardkit, harbor-langsmith, harbor-atif2otel via scripts/publish-*.sh). Stable releases are cut by a maintainer running scripts/publish.sh locally: pytest (excluding live-provider tests), bun viewer build, `uv version --bump minor`, `uv build`, scripts/verify-wheel-extras.sh (resolves every extra), `uv publish --token \"$UV_PUBLISH_TOKEN\"`, then CITATION.cff update, annotated tag, push and `gh release create --generate-notes` with no attached assets (scripts/publish.sh:27-63). Nightly: .github/workflows/nightly.yml publishes a `.devYYYYMMDDHHMM` pre-release from main daily at 06:00 UTC using PyPI trusted publishing/OIDC (environment `pypi`, `uv publish --trusted-publishing always`; lines 8-56). No checksum, signature, SBOM or attestation step exists in the workflows or scripts (a search for attest/sigstore/cosign/sha256sum/SBOM/slsa/provenance matched only an unrelated adapter-review checklist line, .github/workflows/adapter-review.yml:732); whether PyPI attestations are produced implicitly cannot be determined from the repo. The viewer UI is built from apps/viewer and copied into src/harbor/viewer/static (gitignored: .gitignore:232) by scripts/build-viewer.sh at release time, so a plain source checkout lacks the UI until built with bun. The egress-control sidecar image is pinned by digest (src/harbor/environments/docker/harbor-docker-egress-control-sidecar/Dockerfile:1). Policy: stable releases 'usually biweekly', nightly daily (docs-mintlify/contributing/release-policy.mdx:6-36); versions 0.21.0 (2026-08-10), 0.22.0 (2026-08-22), 0.23.0 (2026-09-12) (docs-mintlify/changelog.mdx:6-49; CITATION.cff:7-8).",
+      "tests_and_ci": "pytest (+pytest-asyncio auto mode, pytest-cov, pytest-xdist, hypothesis), ruff, ty (pyproject.toml:103-139,157-164; AGENTS.md:238-260); markers unit, integration, runtime (needs Docker), windows_containers. About 430 test_*.py files: 408 under tests/ (376 unit, 27 integration of which 10 are *_live.py provider tests with 9 explicitly ignored by scripts/publish.sh:27-38, 5 runtime) plus 13 in packages/rewardkit/tests, 3 in packages/harbor-langsmith/tests and 6 in packages/harbor-atif2otel/tests; tests/golden holds 13 JSON golden files for terminus_2. tests/conftest.py sets HARBOR_TELEMETRY=off (:14). Real-container e2e tests use the `oracle` agent (expects reward 1.0) and `nop` (0.0) (tests/integration/test_hello_user_e2e.py:25-54) and Harbor's own Terminus-2 against a fake aiohttp LLM server with golden trajectories (tests/integration/test_deterministic_terminus_2_invalid_json.py:1-60); claude-code/codex tests are AsyncMock-based (tests/unit/agents/installed/test_claude_code_install.py:14-34; test_agent_install_execution.py:47-71). CI = 15 workflow files in .github/workflows: pytest.yml (PR/push to main + manual; matrix ubuntu-26.04 and windows-2025; Python 3.13; `uv sync --all-packages --all-extras --locked`; Linux runs `pytest tests/ -m 'not runtime'` with coverage, starts the Podman socket, then `pytest tests/ -m runtime -n 4`; Windows runs non-runtime tests then `-m windows_containers`; Codecov upload with fail_ci_if_error false; only secret CODECOV_TOKEN: lines 3-104); ty.yml (`uv run ty check`); ruff-format.yml, named 'Ruff' (`ruff check .` and `ruff format --check .` on PRs); nightly.yml; check-registry-format.yml (registry.json format/duplicates); cff-validator.yml; sync-registry.yml (pushes registry.json to Supabase with secrets); update-parity-summary.yml (regenerates adapters/parity_summary.csv and commits to main); adapter-review.yml, claude.yml, claude-code-review.yml (anthropics/claude-code-action@v1); deploy-docs-preview.yml (Vercel, docs/); pr-labeler.yml, pr-diff-links.yml, reviewer-mentions.yml (pull_request_target). pytest.yml runs only `tests/`, so the package suites (rewardkit, harbor-langsmith, harbor-atif2otel) run in no workflow; they run in maintainer scripts (scripts/publish-rewardkit.sh:5; scripts/publish.sh:27-38 covers rewardkit and langsmith via testpaths, pyproject.toml:127; publish-harbor-langsmith.sh:5; publish-harbor-atif2otel.sh:5). No macOS job; Python 3.12 (declared minimum) is not in the matrix. Documented local checks: `uv run pytest tests/unit/`, `uv run ruff check --fix .`, `uv run ruff format .`, `uv run ty check` (AGENTS.md:218-260). Adapter practice: oracle run must reach 100% and parity run ranges must overlap (docs/content/docs/datasets/adapters.mdx:247-252,327-335); scripts/validate_adapter.py checks adapter structure.",
+      "dependencies": "Root pyproject.toml: 22 required runtime dependencies (lines 10-33: pydantic, typer, litellm, supabase, fastapi, uvicorn, requests, httpx, jinja2, pyyaml, rich, tenacity, filelock, platformdirs, pyjwt, jsonschema, dirhash, pathspec, shortuuid, toml, python-dotenv, packaging); 29 optional extras (lines 51-101: 27 sandbox/agent/integration extras plus meta-extras `cloud` and `all`); dev dependency group of 16 (lines 103-121); root uv.lock pins 336 packages (e.g. litellm 1.93.0 at uv.lock:2755-2756, supabase 2.28.2, transformers 5.5.3 pinned >=5.3.0,<=5.5.3 for CVE-2026-4372: pyproject.toml:89-98). Workspace members: packages/rewardkit/pyproject.toml (1 required: litellm>=1.83; extras documents, image, all), packages/harbor-langsmith/pyproject.toml (2: harbor>=0.13.0, requests), packages/harbor-atif2otel/pyproject.toml (1: opentelemetry-proto; extras test, plugin). Also 62 adapter-level pyproject.toml files (52 with their own uv.lock) and examples/agents/strands/pyproject.toml. JavaScript: apps/viewer/package.json (37 dependencies, 10 devDependencies; both bun.lock and package-lock.json present) and docs/package.json (16 dependencies, 12 devDependencies; docs/bun.lock).",
+      "security_policy": "none - no SECURITY.md or equivalent anywhere in the clone (glob for SECURITY*/security* returned no files; .github/ holds only workflow YAMLs, labeler.yml and reviewer-mentions.json); no CODEOWNERS, dependabot config or .pre-commit-config.yaml either."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:12 - Evaluate arbitrary agents like Claude Code, OpenHands, Codex CLI, and more.",
+        "verified": "yes",
+        "evidence": "AgentName lists claude-code, codex, openhands and 43 more (src/harbor/models/agent/name.py:4-50); custom agents load by import path (src/harbor/agents/factory.py:114-128). claude-code: install() fetches the real CLI inside the container via `curl -fsSL https://downloads.claude.ai/claude-code-releases/bootstrap.sh | bash` (npm on Alpine) (src/harbor/agents/installed/claude_code.py:425-450) and run() pipes the instruction to `claude --verbose --output-format=stream-json ... --print` (claude_code.py:1889-1904). codex: install() runs the nvm installer then `npm install -g @openai/codex@latest` unless a version is pinned (src/harbor/agents/installed/codex.py:343-370) and run() calls `codex exec --dangerously-bypass-approvals-and-sandbox --skip-git-repo-check --json` (codex.py:1433-1451). Caveat: upstream tests for both are AsyncMock-based (tests/unit/agents/installed/test_claude_code_install.py:14-34; test_agent_install_execution.py:47-71) and pytest.yml carries no model-API secrets (only CODECOV_TOKEN, .github/workflows/pytest.yml:104), so live end-to-end runs of the real CLIs are not exercised by upstream CI."
+      },
+      {
+        "claim": "README.md:14 - Conduct experiments in thousands of environments in parallel through providers like Daytona, Modal, LangSmith, Blaxel, Novita Sandbox, Tensorlake, and Runta.",
+        "verified": "partial",
+        "evidence": "Providers exist: EnvironmentType has daytona, modal, langsmith, blaxel, novita, tensorlake and runta (src/harbor/models/environment_type.py:7,9,11,16,20,25,32) with pip extras (pyproject.toml:57-86). Concurrency is a user-set integer, default 4, with no upper bound in the model (src/harbor/models/job/config.py:414-421). The repo contains no scale test or measurement of 'thousands' of parallel environments; the Hub docs mention per-provider concurrency limits for hosted jobs (docs-mintlify/core-concepts/jobs/run-a-job.mdx:163-167). The scale claim is not checkable from code."
+      },
+      {
+        "claim": "README.md:15 - Generate rollouts for RL optimization.",
+        "verified": "partial",
+        "evidence": "Building blocks exist: Job/Trial/TrialConfig API (src/harbor/__init__.py:94-169), trace export and success/failure dataset export (src/harbor/cli/traces.py:11; src/harbor/cli/sweeps.py:23-80), the `tinker` extra (pyproject.toml:89-98) and an RL doc page (docs/content/docs/training-workflows/rl.mdx). But that page imports `OrchestratorConfig` (rl.mdx:38,61), which no longer exists in code (only a legacy `orchestrator` key migration remains: src/harbor/models/job/config.py:354-393), and AGENTS.md lists an examples/training/ directory (AGENTS.md:123) that is absent from the tree."
+      },
+      {
+        "claim": "README.md:21-27 - install with `uv tool install harbor` or `pip install harbor`.",
+        "verified": "partial",
+        "evidence": "Package metadata and console scripts are valid (pyproject.toml:2-3,35-42) and publish paths exist (scripts/publish.sh:52-55; .github/workflows/nightly.yml:52-56). The README omits `requires-python >=3.12` (pyproject.toml:9) and that sandbox providers other than Docker need extras such as `harbor[daytona]` (docs-mintlify/getting-started/installation.mdx:32-46; src/harbor/environments/factory.py:187-197). PyPI availability itself was not checked (no access outside the clone)."
+      },
+      {
+        "claim": "README.md:31-41,59-63 - Harbor is the official harness for Terminal-Bench-2.0; `harbor run --dataset terminal-bench@2.0 --agent claude-code --model anthropic/claude-opus-4-1 --n-concurrent 4` launches locally in Docker; `harbor datasets list` explores third-party benchmarks.",
+        "verified": "partial",
+        "evidence": "Flags exist (src/harbor/cli/jobs.py:539,593,619,1102) and registry.json has terminal-bench 2.0 (registry.json:94012-94014); local Docker is the default environment (docs-mintlify/core-concepts/sandboxes/pre-integrated-sandboxes.mdx:131) and needs the docker CLI plus a running daemon (src/harbor/environments/docker/docker.py:171-189). Code differs from the README in two ways: dataset names resolve through the Harbor Hub Supabase backend by default rather than the raw.githubusercontent registry.json URL in constants (src/harbor/registry/client/factory.py:34-45; src/harbor/registry/client/harbor/harbor.py:23-27,108-119; src/harbor/constants.py:9-11), so the example needs Hub network access; and `harbor datasets list` only prints a link to the Hub website unless `--legacy` is passed (src/harbor/cli/datasets.py:55-62; 'datasets' is a hidden alias of `dataset`: src/harbor/cli/main.py:150). 'Official harness' is an organizational claim, not checkable from code."
+      },
+      {
+        "claim": "README.md:41-51 - to run on a cloud provider (like Daytona) pass `--env daytona` with DAYTONA_API_KEY.",
+        "verified": "partial",
+        "evidence": "`-e/--env` exists (src/harbor/cli/jobs.py:798-799) and `daytona` is an EnvironmentType, but the Daytona SDK is an optional extra (pyproject.toml:57); without `harbor[daytona]` the factory raises ImportError telling the user to install it (src/harbor/environments/factory.py:187-197). The README's install step does not install it."
+      },
+      {
+        "claim": "[docs] Each trial is graded by the task's verifier: tests/test.sh must write /logs/verifier/reward.txt (a number) or reward.json (labeled numeric metrics); reward.json wins if both exist (docs-mintlify/core-concepts/tasks/verifier.mdx:6-30).",
+        "verified": "yes",
+        "evidence": "Verifier.verify() uploads tests/, executes test.sh, downloads the verifier dir, prefers reward.json, else reward.txt, else raises RewardFileNotFoundError (src/harbor/verifier/verifier.py:165-268); JSON values must be finite numbers (verifier.py:104-122). Rewards are stored per trial as a dict (src/harbor/models/verifier/result.py:4-5; src/harbor/models/trial/result.py:81) and result.json is written at finalize (src/harbor/trial/trial.py:464-471). Nuances: the verifier still runs after agent exceptions/timeouts (src/harbor/trial/single_step.py:75-87,52); the test script's exit code is ignored and only the reward file counts (verifier.py:229-232,257-266; ExecResult carries return_code without raising: src/harbor/environments/base.py:86-89); stdout and stderr go to one file, verifier/test-stdout.txt (src/harbor/utils/scripts.py:153-158)."
+      },
+      {
+        "claim": "[docs] Anonymous usage stats are enabled by default, opt out with HARBOR_TELEMETRY=off, only allowlisted fields are sent, no person profiles/GeoIP (docs/content/docs/usage-stats.mdx:6-12,78-101; docs-mintlify/telemetry/telemetry.mdx:6-41). The README is silent.",
+        "verified": "partial",
+        "evidence": "Code matches on default-on, the opt-out values {0,false,no,off,disabled}, a random install-id file, a detached single-attempt sender, an allowlist before send, and `$process_person_profile=False` / `$geoip_disable=True` (src/harbor/telemetry.py:40-45,75-79,395-476,479-480,500-536). Mismatch: usage-stats.mdx:85 lists 'repo org/name values' as never collected, but the code records `public_repo_refs` (host/org/name of any --repo/--task-git-url source that answers an unauthenticated git probe) (telemetry.py:726-781); the docs-mintlify page says 'public sources' (telemetry.mdx:16) and agrees with the code."
+      },
+      {
+        "claim": "[docs] RewardKit 'has zero external dependencies' (docs/content/docs/rewardkit/index.mdx:18).",
+        "verified": "no",
+        "evidence": "packages/rewardkit/pyproject.toml:21-23 requires `litellm>=1.83`; extras add markitdown and Pillow (:25-31); agent judges download the Claude Code and Codex installers at run time (packages/rewardkit/src/rewardkit/agents.py:30-31,400-560). The newer docs-mintlify RewardKit quick-start is a placeholder (docs-mintlify/core-concepts/rewardkit/quick-start.mdx:6-8); the working description is docs/content/docs/rewardkit/index.mdx (multi-dimension reward.json and reward-details.json: lines 191-214,300-307)."
+      },
+      {
+        "claim": "[need-derived, not a README claim] Harbor is a declarative CI regression gate for prompts, skills and agents.",
+        "verified": "no",
+        "evidence": "No threshold, baseline or pass-rate option exists in JobConfig/VerifierConfig/MetricConfig (src/harbor/models/job/config.py:396-461; src/harbor/models/trial/config.py:320-343). `harbor run` prints tables and returns after job.run() with no reward- or error-based exit status (src/harbor/cli/jobs.py:2106-2151); `harbor analyze`/`check` exit 1 only on analysis errors, not on failing rubric checks (src/harbor/cli/analyze.py:206-207,367-368); `harbor job regrade` only prints a reward delta (src/harbor/cli/jobs.py:2635-2682). Closest declarative thresholds: per-step `min_reward` in multi-step task.toml, which aborts later steps and sets no exit code (src/harbor/models/task/config.py:760-772; src/harbor/trial/multi_step.py:181-228), and RewardKit all-pass/threshold/required-pass aggregation inside one verifier (docs/content/docs/rewardkit/index.mdx:155). Prompt templates (src/harbor/agents/options.py:63-66), `--skill` injection with SHA-256 digests in lock files (docs-mintlify/core-concepts/jobs/skills.mdx:82-92; src/harbor/models/job/lock.py:143-148) and `--extra-instruction` (src/harbor/cli/jobs.py:1072) are inputs that can be varied between runs, not gates."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "HLE adapter parity: claude-code@2.1.76 with claude-haiku-4-5, original harness (adapter author's fork, adapters/hle/parity_experiment.json:11) vs Harbor, 249-task parity subset, 3 runs per side",
+        "metric": "Accuracy (%), mean +/- sample SEM",
+        "value": "original 10.71 +/- 0.94; Harbor 10.98 +/- 0.36",
+        "source": "adapters/hle/parity_experiment.json:26-27 (mirrored at adapters/parity_summary.csv:65)",
+        "independent": false
+      },
+      {
+        "what": "BFCL adapter parity: codex@0.77.0, 123-task subset (3.4% of 3,641), 3 runs; original side is a parity fork of BFCL using the CodexWriteFileHandler chosen as the best match to Harbor (other original handlers score 66.94% and 76.42% on gpt-5-mini)",
+        "metric": "Accuracy (%), mean +/- SEM",
+        "value": "gpt-5-mini-2025-08-07: original 83.20 +/- 0.72, Harbor 83.47 +/- 0.98; gpt-4o-mini-2024-07-18: original 65.85 +/- 1.69, Harbor 65.31 +/- 1.08",
+        "source": "adapters/bfcl/README.md:229-230,256-263,269-271",
+        "independent": false
+      },
+      {
+        "what": "ACE-Bench adapter parity: claude-code@2.1.110 with claude-haiku-4-5, 3 runs; the original eval was aligned to Harbor's checker with four fixes before the two sides matched",
+        "metric": "Accuracy, mean +/- SEM",
+        "value": "normal (823 tasks): original 83.64% +/- 0.43%, Harbor 83.23% +/- 0.80%; special (150 tasks): original 92.44% +/- 0.97%, Harbor 90.89% +/- 0.97%",
+        "source": "adapters/ace-bench/README.md:178-183",
+        "independent": false
+      },
+      {
+        "what": "ABC-Bench adapter: codex@0.118.0 with openai/gpt-5-mini, 224 tasks, 3 runs; compared against the older Terminal-Bench adapter rather than the original harness",
+        "metric": "Resolved Rate (%), mean +/- SEM",
+        "value": "Terminal-Bench adapter 45.39 +/- 2.48; Harbor adapter 45.69 +/- 0.98",
+        "source": "adapters/parity_summary.csv:6",
+        "independent": false
+      },
+      {
+        "what": "Frontier-CS algorithmic adapter: claude-code@2.1.112 with claude-opus-4-6, 10 problems, 3 runs; README attributes the large spread to token-limit-truncated trials counted as 0",
+        "metric": "Partial score (0-100), mean +/- SEM across problems",
+        "value": "original 68.92% +/- 11.54%; Harbor 53.37% +/- 9.88%",
+        "source": "adapters/frontier-cs-algorithm/README.md:203-205,243-245,271-278",
+        "independent": false
+      },
+      {
+        "what": "AA-LCR adapter: single run on 99 tasks; baseline is the no-agent leaderboard, so the README states scores are not directly comparable",
+        "metric": "Accuracy (pass@1)",
+        "value": "claude-code@2.1.104 + claude-haiku-4-5: leaderboard 43.7%, Harbor 62.6% (62/99); codex@0.117.0 + gpt-5-mini: leaderboard 68%, Harbor 68.7% (68/99)",
+        "source": "adapters/aa-lcr/README.md:126,132-133",
+        "independent": false
+      },
+      {
+        "what": "Oracle-agent sanity runs (reference solutions) used to validate adapted tasks and verifiers",
+        "metric": "Tasks reaching full reward",
+        "value": "BFCL 3,641 tasks at 100% reward; AA-LCR 99/99 (one task excluded for a ground-truth error)",
+        "source": "adapters/bfcl/README.md:225; adapters/aa-lcr/README.md:139",
+        "independent": false
+      },
+      {
+        "what": "Project-wide parity coverage; all figures are published by adapter contributors in the project's own repo and its HF dataset with API costs covered by the team (docs/content/docs/datasets/adapters.mdx:16); no independent third-party measurements of Harbor itself were found in the repository",
+        "metric": "Rows / adapters with parity data",
+        "value": "adapters/parity_summary.csv has 297 lines (header + 296 rows); 84 adapters ship parity_experiment.json",
+        "source": "adapters/parity_summary.csv:1; scripts/generate_parity_summary.py:1-10; .github/workflows/update-parity-summary.yml:3-34",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Telemetry is on by default, also in CI, and the README does not mention it: PostHog events are sent after CLI commands and jobs (src/harbor/telemetry.py:40-45,411-436,479-480,580-581; src/harbor/cli/main.py:53-77); opt-out requires HARBOR_TELEMETRY=0/false/no/off/disabled. Payload includes agent/model names, dataset refs, token/cost totals and public repo refs, which needs an extra unauthenticated probe of the git host (telemetry.py:82-160,726-781); the older docs say repo org/name is never collected (docs/content/docs/usage-stats.mdx:85). Default dataset and package-task resolution also depends on a Hub Supabase project with an embedded publishable key (src/harbor/auth/constants.py:7-13; src/harbor/registry/client/factory.py:34-45), so `-d`/`-t` runs need Hub network access while local `-p` runs do not.",
+      "Runs are not hermetic or version-pinned by default: the agent CLI is fetched at trial time (Claude Code via `curl ... downloads.claude.ai/.../bootstrap.sh | bash`, Codex via the nvm installer plus `npm install -g @openai/codex@latest`), and the `version` option is 'Omit for latest' (src/harbor/agents/installed/claude_code.py:436-449; codex.py:352-370; src/harbor/agents/options.py:59-62); the resolved version is detected only best-effort after install (src/harbor/agents/installed/base.py:1056-1064). Example verifiers also apt-get/curl uv and pytest at verify time (examples/tasks/hello-world/tests/test.sh:3-13), and the default task network mode is `public` (src/harbor/models/task/config.py:250-251), so results depend on live upstream releases and network unless pinned and restricted.",
+      "No CI-gate semantics: there is no pass-rate/threshold option and no reward-based exit status after a job (src/harbor/cli/jobs.py:2106-2151; src/harbor/models/job/config.py:396-461). Agent/API failures (rate limit, usage limit, auth) are classified as typed exceptions but the verifier still runs afterwards, a missing reward counts as 0 in `mean`, pass@k is computed only for single-key 0/1 rewards, and retries default to 0 (src/harbor/trial/single_step.py:75-87; src/harbor/metrics/base.py:14-35; src/harbor/utils/pass_at_k.py:44-51; src/harbor/models/job/config.py:291-322; src/harbor/agents/installed/base.py:34-160). A CI wrapper would have to parse jobs/<job>/result.json itself, and the CLI prompts for host-env confirmation unless -y/--yes is passed (src/harbor/cli/jobs.py:291-295,953-963). `harbor analyze`/`check` default to Claude Code with Anthropic models and exit non-zero only on analysis errors (src/harbor/cli/analyze.py:100-101,206-207,258-259,367-368).",
+      "Harbor itself can delete or alter failure evidence: a retried trial's directory is rmtree'd before the next attempt (src/harbor/trial/queue.py:222); re-running an existing job directory deletes trial dirs lacking result.json (src/harbor/job.py:261-269); `harbor job resume` deletes trial dirs whose exception is CancelledError by default (src/harbor/cli/jobs.py:2186-2195,2305-2351); finalization rewrites text files to replace sensitive env values with [REDACTED] (src/harbor/trial/trial.py:1008-1053); verifier logs can be filtered with include_logs/exclude_logs (src/harbor/models/trial/config.py:323-339). The verifier ignores the test script's exit code and merges stderr into test-stdout.txt (src/harbor/verifier/verifier.py:229-232; src/harbor/utils/scripts.py:153-158).",
+      "Agents run with permission checks disabled and API keys in the container environment: Claude Code defaults to --permission-mode=bypassPermissions with IS_SANDBOX=1 and Codex runs with --dangerously-bypass-approvals-and-sandbox (src/harbor/agents/installed/claude_code.py:77-88,1828-1831; codex.py:1438). The default verifier shares the agent's container (a separate verifier sandbox is opt-in: docs-mintlify/core-concepts/tasks/verifier.mdx:49-59); egress control needs nftables kernel support and a NET_ADMIN/NET_RAW sidecar (docs-mintlify/core-concepts/tasks/network-policies.mdx:53; src/harbor/environments/docker/docker-compose-egress-control.yaml:9-11). No SECURITY policy file exists; stable releases are published from a maintainer machine with a PyPI token (scripts/publish.sh:55) with no signing or attestation step, while nightly uses OIDC trusted publishing (.github/workflows/nightly.yml:25-56).",
+      "Upstream verification does not exercise the real CLIs or the multi-scorer component in PR CI: claude-code/codex tests are AsyncMock-based and pytest.yml exposes only CODECOV_TOKEN (tests/unit/agents/installed/test_agent_install_execution.py:47-71; .github/workflows/pytest.yml:104); Docker e2e tests use oracle/nop and Terminus-2 with a fake LLM server (tests/integration/test_hello_user_e2e.py:25-54); pytest.yml runs only `tests/`, so packages/rewardkit (13 test files), harbor-langsmith (3) and harbor-atif2otel (6) run in no workflow, only in maintainer publish scripts (scripts/publish-rewardkit.sh:5; scripts/publish.sh:27-38; publish-harbor-atif2otel.sh:5). CI uses Python 3.13 only although >=3.12 is declared (pytest.yml:42-43; pyproject.toml:9) and has no macOS runner.",
+      "Maintenance and documentation drift: pre-1.0 with frequent minor releases (v0.21.0 2026-08-10, v0.22.0 2026-08-22, v0.23.0 2026-09-12) and breaking changes listed under Unreleased (CHANGELOG.md:3-60; docs-mintlify/changelog.mdx:6-49; CITATION.cff:7-8; docs-mintlify/contributing/release-policy.mdx:13-16). Two doc trees coexist: docs/ (Fumadocs, deployed by deploy-docs-preview.yml:68-77) and docs-mintlify/ (deployed at docs.harborframework.com: docs-mintlify/README.md:3-4); the CLI reference, API/SDK reference and RewardKit quick-start in docs-mintlify are placeholders (docs-mintlify/cli-reference/index.mdx:6; api-sdk-reference/index.mdx:6; core-concepts/rewardkit/quick-start.mdx:6-8); the RL doc uses a removed class (docs/content/docs/training-workflows/rl.mdx:38); example job configs use the deprecated `orchestrator:` key (examples/configs/agents/claude-code-job.yaml:4-7; src/harbor/models/job/config.py:354-393).",
+      "Platform, scope and licensing limits: local runs need the docker CLI and a running daemon (src/harbor/environments/docker/docker.py:171-189) with docker compose; local Docker/Podman/Apple container declare no GPU support (src/harbor/environments/base.py:753-758); WSL2 and Docker-on-macOS are undocumented and macOS is not in CI. The scorer model is per-task verifier scripts plus optional RewardKit (LLM/agent judges are non-deterministic and need provider credentials: docs/content/docs/rewardkit/index.mdx:365-391), not a labeled-dataset scorer registry. Harbor and its packages are Apache-2.0 (LICENSE; pyproject.toml:6), but adapters wrap third-party datasets under their own terms (e.g. crustbench notes GNU GPL: adapters/crustbench/README.md:19,29) and vendor MIT/Apache evaluator code (adapters/dacode/template/tests/evaluators/LICENSE; adapters/osworld/src/osworld/task-template/tests/evaluators/upstream/LICENSE). Hosted rollouts require a Hub account, API key and approval (docs-mintlify/core-concepts/hosted-harbor/index.mdx:9-12)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "harbor-framework/harbor",
+      "checks": [
+        {
+          "field": "readme.install[0] (uv tool (PyPI))",
+          "statement": "Install with `uv tool install harbor`.",
+          "citation": "README.md:21-23",
+          "holds": true,
+          "note": "README.md:22 reads `uv tool install harbor` inside a ```bash tab=\"uv\" block (21-23). Consistent with pyproject.toml:2 (name = \"harbor\"), pyproject.toml:35-38 (console scripts harbor/hr/hb -> harbor.cli.main:app) and scripts/publish.sh:55 (`uv publish --token \"$UV_PUBLISH_TOKEN\"`). Whether the PyPI listing exists was not checked, because PyPI is outside the working directory and not a cited page."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX Apache-2.0, file LICENSE.",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-2 is the unmodified 'Apache License, Version 2.0, January 2004' text; the appendix boilerplate (189-201) is left unfilled. pyproject.toml:6-7 declares license = \"Apache-2.0\" and license-files = [\"LICENSE\"]."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - upstream CI runs the non-runtime suite plus Docker and Podman runtime tests on ubuntu-26.04 GitHub runners; the workflow does not state the CPU architecture and the README makes no platform statement.",
+          "citation": ".github/workflows/pytest.yml:15-21,56-84",
+          "holds": true,
+          "note": "pytest.yml:21 sets the matrix to [ubuntu-26.04, windows-2025]. The Linux-only steps run `pytest tests/ -m \"not runtime\"` with coverage (56-62), start podman.socket (68-72), then run `pytest tests/ -m runtime -n 4` (74-84). The runtime-marked suites include tests/runtime/test_network_policy_matrix_docker.py:19 and tests/runtime/test_network_policy_matrix_podman.py:17, plus Docker e2e tests such as tests/integration/test_hello_user_e2e.py:21. No architecture is stated anywhere, and README.md has no platform statement. So 'yes' rests on the standard (x64) ubuntu runner label, as the dossier itself says."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "claude-code and codex are built-in integrations that install the real CLI inside the task container and run it non-interactively, with ATIF output, resume, native/ATIF trajectory loading, native config (settings.json / config.toml via --ak config=), skills and MCP registration; `harbor trial handoff` resumes a Claude Code session with `claude --resume` (claude-code only); the example configs use the deprecated `orchestrator:` key; RewardKit agent judges download and run Claude Code or Codex; analyze/check default to claude-code; there are six Claude Code skills plus an install script and an npx route; AGENTS.md ('CLAUDE.md - Harbor Framework') plus two other CLAUDE.md files exist; the docs MCP endpoint works with both CLIs.",
+          "citation": "src/harbor/agents/installed/claude_code.py:98-112,184-210,425-450,1799-1917; src/harbor/agents/installed/codex.py:72-79,343-370,1362-1451; docs-mintlify/core-concepts/agents/pre-integrated-agents.mdx:88-143; src/harbor/cli/trials.py:873; packages/rewardkit/src/rewardkit/agents.py:30-31,400-560; src/harbor/cli/analyze.py:100-101,258-259; scripts/install-claude-skills.sh:1-16; docs/content/docs/rewardkit/index.mdx:9-14; docs-mintlify/ai-agents.mdx:6-31",
+          "holds": true,
+          "note": "claude_code.py:99-107 sets capabilities atif/resume/load_native_trajectory/load_atif_trajectory/handoff/native_config, and 108-112 sets ANTHROPIC_API_KEY/ANTHROPIC_AUTH_TOKEN. install() at 425-450 runs `npm install -g @anthropic-ai/claude-code` on Alpine, otherwise curl of downloads.claude.ai bootstrap.sh. run() registers skills (1851), MCP servers (1859) and --settings (1865-1869), resumes (1870/1880) and calls `claude --verbose --output-format=stream-json ... --print` (1889-1904). handoff() returns ['claude','--resume',id] (184-210), and trials.py:873 registers the `handoff` command. codex.py:72-78 has the same capabilities without handoff. install() at 343-370 uses nvm plus npm with version_spec defaulting to @latest. The run body at 1362-1451 builds config.toml (1404-1409), registers skills (1411), resumes (1415-1424) and calls `codex exec ... --json`. Codex MCP registration is real but sits in the config builder at codex.py:1254-1278, just outside the cited range. The docs table at 88-143 matches, including `--ak config=` at 137/142. Both examples/configs/agents/claude-code-job.yaml:4 and codex-job.yaml:4 use `orchestrator:`, which src/harbor/models/job/config.py:379-385 flags as deprecated. RewardKit agents.py:30-31 holds the claude.ai/chatgpt.com installer URLs, with _ensure_claude_installed at 400-467, _ensure_codex_installed at 540ff, and ClaudeCodeBackend:665 / CodexBackend:1012. analyze.py:100 and 258 default `--agent` to 'claude-code'. skills/ has exactly create-adapter, create-task, harbor-exec, publish, rewardkit and upload-parity-experiments. The install script symlinks them. The npx command is at rewardkit/index.mdx:13. AGENTS.md:1 is '# CLAUDE.md - Harbor Framework', and packages/rewardkit/CLAUDE.md and apps/viewer/CLAUDE.md exist. ai-agents.mdx:9-16 gives `claude mcp add --transport http harbor-docs ...` and `codex mcp add harbor-docs --url ...`."
+        },
+        {
+          "field": "claim_checks[0] (README.md:12)",
+          "statement": "README.md:12 'Evaluate arbitrary agents like Claude Code, OpenHands, Codex CLI, and more' - verified: yes (46 AgentName values incl. claude-code/codex/openhands; import-path custom agents; real CLI install/run for claude-code and codex), with the caveat that upstream tests are AsyncMock-based and pytest.yml carries only CODECOV_TOKEN, so live real-CLI runs are not exercised by upstream CI.",
+          "citation": "README.md:12; src/harbor/models/agent/name.py:4-50; src/harbor/agents/factory.py:114-128; src/harbor/agents/installed/claude_code.py:425-450,1889-1904; src/harbor/agents/installed/codex.py:343-370,1433-1451; tests/unit/agents/installed/test_claude_code_install.py:14-34; tests/unit/agents/installed/test_agent_install_execution.py:47-71; .github/workflows/pytest.yml:104",
+          "holds": true,
+          "note": "name.py:5-50 has exactly 46 members, including CLAUDE_CODE (8), CODEX (15) and OPENHANDS (29). factory.py:114-128 resolves `import_path` (or 'module:Class' names) through _import_agent_class. The install and run commands match the code. Two minor elisions: the quoted codex command drops `--model {model}` (codex.py:1440) and `--enable unified_exec` (1442), and on musl/Alpine Codex is installed with npm directly, without nvm (codex.py:357-358). Both test files use AsyncMock environments, and Codex is in the mocked agent list (test_agent_install_execution.py:30). pytest.yml:104 is its only secret. ANTHROPIC_API_KEY appears only in claude.yml:37, claude-code-review.yml:39 and adapter-review.yml:152, all for anthropics/claude-code-action review bots, not Harbor trials. So the caveat holds."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

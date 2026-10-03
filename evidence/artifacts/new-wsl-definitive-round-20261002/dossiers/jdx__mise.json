@@ -1,0 +1,302 @@
+{
+  "contender": "jdx/mise",
+  "revision": {
+    "contender": "jdx/mise",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "jdx/mise",
+        "tag": "v2026.9.18",
+        "commit": "5a63dc5e8536b70c2d6661a8fe9d099aeb742ab7",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v2026.9.18",
+    "commit": "5a63dc5e8536b70c2d6661a8fe9d099aeb742ab7",
+    "read_at": "2026-10-02T03:02:20+00:00"
+  },
+  "dossier": {
+    "contender": "jdx/mise",
+    "revision": {
+      "tag": "v2026.9.18",
+      "commit": "5a63dc5e8536b70c2d6661a8fe9d099aeb742ab7",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "mise (mise-en-place) is a single Rust CLI that reads a committed mise.toml (and an optional mise.lock) to install per-project language runtimes and CLI tools, set env vars and run tasks (README.md:56-65). This release also ships `mise bootstrap` (OS packages, managed files, services, repos, dotfiles, shell activation, macOS defaults, apply over SSH) and `mise dot` (dotfile apply, plus a bare-Git history of explicitly tracked files that can sync through a user-supplied Git remote with per-file age encryption) (docs/bootstrap.md:7-14; docs/dotfiles.md:5-18; docs/history.md:5-9). No backup/restore engine for application state was found; the docs defer that to the OS backup tools (docs/history.md:1179-1181).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "mise manages development tools, environment variables and project tasks. Declare them in mise.toml, commit the file, and use the same setup in the shell, the editor and CI.",
+          "citation": "README.md:56-58"
+        },
+        {
+          "claim": "Tools: install Node.js, Python, Go and hundreds more, with different versions for each project.",
+          "citation": "README.md:60"
+        },
+        {
+          "claim": "Bootstrap: declare machine setup, including system packages, dotfiles and services (links to https://mise.jdx.dev/bootstrap.html).",
+          "citation": "README.md:63"
+        },
+        {
+          "claim": "Install on macOS or Linux with `curl https://mise.run | sh`; the binary lands at ~/.local/bin/mise.",
+          "citation": "README.md:71-76"
+        },
+        {
+          "claim": "On Windows install with `winget install jdx.mise`; other package managers are in the installation guide.",
+          "citation": "README.md:78-80"
+        },
+        {
+          "claim": "`mise exec node@24 -- node --version` installs Node.js if needed and runs it for this command without changing project configuration; no shell activation is required.",
+          "citation": "README.md:87-92"
+        },
+        {
+          "claim": "For an existing project that already has a reviewed mise.toml, run `mise install` from its directory and `mise tasks ls` to discover its tasks.",
+          "citation": "README.md:94-95"
+        },
+        {
+          "claim": "`mise run hello` installs the configured tool if needed, loads NODE_ENV and runs the task; commit mise.toml so teammates and CI can run the same command.",
+          "citation": "README.md:119-121"
+        },
+        {
+          "claim": "Version requests such as '24' select a release in that series; use exact pins or a lockfile when everyone must use the same resolved version.",
+          "citation": "README.md:124-126"
+        },
+        {
+          "claim": "Shell activation is optional and makes project tools and env vars available when entering a directory.",
+          "citation": "README.md:128-131"
+        },
+        {
+          "claim": "`mise config ls`, `mise ls --current` and `mise exec -- ...` show which config files are loaded and which versions are selected; `mise doctor` checks shell activation.",
+          "citation": "README.md:155-163"
+        },
+        {
+          "claim": "The README (whole file) says nothing about backups, encrypted or deduplicated storage, restore, or credential/secret handling; its only machine-state statement is the Bootstrap bullet.",
+          "citation": "README.md:1-206 (absence; Bootstrap bullet at README.md:63)"
+        }
+      ],
+      "install": [
+        {
+          "method": "mise.run installer (macOS and Linux; the installer script only supports Darwin and Linux, x86_64/aarch64/armv7)",
+          "command": "curl https://mise.run | sh",
+          "citation": "README.md:74; docs/installing-mise.md:82 (curl -fsSL form); packaging/standalone/install.envsubst:46-82"
+        },
+        {
+          "method": "mise.run installer pinned to an exact release via the documented MISE_VERSION option (command form composed from the documented option at :128 and the env-before-sh pattern at :88)",
+          "command": "curl -fsSL https://mise.run | MISE_VERSION=v2025.12.0 sh",
+          "citation": "docs/installing-mise.md:88,128,150-157"
+        },
+        {
+          "method": "GitHub Releases binary, with SHASUMS256.txt checked via minisign (also GPG-signed .asc)",
+          "command": "curl -fL -o mise \"https://github.com/jdx/mise/releases/download/v${mise_version}/mise-v${mise_version}-${mise_platform}\"",
+          "citation": "docs/installing-mise.md:389-407"
+        },
+        {
+          "method": "Homebrew (macOS/Linux; docs call it not preferred)",
+          "command": "brew install mise",
+          "citation": "docs/installing-mise.md:349-359"
+        },
+        {
+          "method": "Cargo source build",
+          "command": "cargo install --locked mise",
+          "citation": "docs/installing-mise.md:263-271"
+        },
+        {
+          "method": "apt on Debian 11+/Ubuntu 22.04+ via extrepo",
+          "command": "sudo apt install -y extrepo; sudo extrepo enable mise; sudo apt update; sudo apt install -y mise",
+          "citation": "docs/installing-mise.md:244-251"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - official linux-x64 (glibc >= 2.18) and linux-x64-musl binaries (docs/installing-mise.md:165-182); release build target x86_64-unknown-linux-gnu with PGO+BOLT (.github/workflows/release.yml:104-107); CI builds and runs the e2e suite on Linux x86_64 (.github/workflows/test-impl.yml:71-93,277-326) plus a bootstrap-over-SSH full-host job (test-impl.yml:370-385); linux-x64 is in the default lockfile platform set (settings.toml:1819-1825).",
+        "wsl2": "unknown - documented only as 'use a Linux installation of mise inside WSL' (docs/faq.md:137-139; docs/troubleshooting.md:202); no WSL-specific install guidance or CI job (no 'wsl' match under .github/); the only WSL code guards Windows shims leaking into WSL (src/shims.rs:1107-1113). Linux history autosave relies on a systemd user service (docs/history.md:62-65).",
+        "macos_arm64": "yes - official macos-arm64 binary (docs/installing-mise.md:165-174), PGO-built, Developer-ID signed and notarized in the release workflow (.github/workflows/release.yml:164-193,205-273); CI runs unit tests plus dotfiles/bootstrap/history e2e on macOS arm64 (macos-14 or a Namespace arm64 runner; .github/workflows/test-impl.yml:124-207); the full e2e suite runs on Linux only (test-impl.yml:175-176).",
+        "gpu": "no - no GPU-specific functionality; the conda backend docs say native requirements such as a GPU driver belong to the host (docs/dev-tools/backends/conda.md:116) and list an 'nvidia' CUDA channel (docs/dev-tools/backends/conda.md:109)."
+      },
+      "integrations": {
+        "cli": "yes - the `mise` binary with about 74 top-level subcommands (src/cli/mod.rs:320-399), including install, use, lock, exec, run, bootstrap (alias bs), dotfiles (alias dot), ssh, doctor, self-update and mcp. Many commands accept --json (docs/bootstrap.md:249-258, 288-296; docs/dotfiles.md:819-835).",
+        "mcp": "yes - `mise mcp` is a stdio MCP server built on rmcp (src/cli/mcp.rs:4-56, 507-525; docs/mcp.md:5-9). Resources: mise://tools, tasks, env, config; tools: list_commands, run_task, install_tool (install_tool returns not-yet-implemented: docs/mcp.md:124-128). mise://env returns real values including secrets (docs/mcp.md:53-63). Docs say MISE_EXPERIMENTAL=1 is required (docs/mcp.md:12-14) but the code has no such gate (see claim_checks).",
+        "sdk_or_api": "none found - the mise library crate is explicitly 'not a stable public API' (src/lib.rs:1-3; Cargo.toml:60-64, doc = false) and there is no HTTP server (docs/mcp.md:7-9). Machine-readable CLI output (--json) and JSON Schemas for mise.toml/settings/tasks under schema/ exist (Cargo.toml:43; schema/ listing); a GitHub Action jdx/mise-action is referenced (docs/dev-tools/mise-lock.md:658-659).",
+        "claude_code_or_codex": "No Claude Code or Codex plugin for using mise was found. Adjacent facts: any MCP client can use `mise mcp` (docs/mcp.md:29-51; src/cli/mcp.rs:45-47 names Claude and Cursor); `mise skills` lists/syncs agent skills shipped by packslip-backend tools (src/cli/skills/mod.rs:6-17); crates/mise-agent-env detects agents incl. Codex from env vars (crates/mise-agent-env/README.md:1-27); docs use Claude Code only as an example history.describe_command (docs/history.md:1210-1224) and ~/.codex as a tracking example (docs/dotfiles.md:44-51). The repo's own .claude/settings.json, .codex/config.toml, .codex/hooks.json and AGENTS.md configure contributor agents (hooks call a third-party `entire` CLI if installed; .codex registers the `hk` MCP server) and are not shipped features (AGENTS.md:1-6, 298-317; .claude/settings.json:1-100; .codex/config.toml:1-7)."
+      },
+      "telemetry_and_network": "No account is required; a GitHub token is optional (docs/dev-tools/github-tokens.md:10). ON BY DEFAULT: (1) install tracking - a fire-and-forget POST of {full backend id, version, os, arch} to https://mise-versions.jdx.dev/api/tools/<tool> for core/registry tools, issued BEFORE the install runs (src/versions_host.rs:154-191,220-225; src/backend/mod.rs:3963-3965); use_versions_host_track defaults to true (settings.toml:4038-4054); (2) version lists, release metadata and GitHub attestations are fetched from mise-versions.jdx.dev (use_versions_host default true: settings.toml:4002-4036; src/versions_host.rs:66-151), with an x-mise-ci: true header in CI (crates/mise-util/src/versions_host.rs:17-24); (3) `mise version` and `mise doctor` fetch https://mise.jdx.dev/releases.tsv (cached) (src/cli/version.rs:115-125,418-423; src/cli/doctor/mod.rs:466); auto-update is off by default (settings.toml:297-311); (4) every HTTP request carries a User-Agent of mise/<version> <shell> (src/lib.rs:133-141). OPT-IN ONLY: OpenTelemetry export of task traces/logs (otel.enabled and otel.logs default false and an OTLP endpoint env var is required: settings.toml:2312-2348; src/otel/mod.rs:22-35,79-92); a floating registry from mise.jdx.dev (registry_floating default false; baked-in registry otherwise: settings.toml:2725-2727; src/registry.rs:27-37,290-310). Opt-outs: MISE_USE_VERSIONS_HOST_TRACK=0, use_versions_host=false, or --offline/MISE_OFFLINE which blocks all HTTP (settings.toml:2290-2303); locked installs are not offline (docs/dev-tools/mise-lock.md:37-40). Other network: upstream hosts per backend (GitHub API/releases, language registries); history sync uses the user's own Git remote and Git credentials (docs/history.md:234-262,389-409); remote bootstrap uses the local OpenSSH client and may fetch the official release binary from GitHub, verified with minisign and SHA-256 (docs/bootstrap/remote.md:162-169; src/system/remote.rs:1470,1575-1576)."
+    },
+    "code": {
+      "languages": [
+        "Rust (edition 2024, MSRV 1.95: Cargo.toml:21,56)",
+        "Bash (e2e tests, scripts/, packaging/standalone/install.envsubst)",
+        "PowerShell (e2e-win/*.Tests.ps1, scripts/*.ps1)",
+        "TypeScript/JavaScript (VitePress docs site: package.json; cloudflare/workers/mise-run.js)",
+        "Lua (vfox plugin runtime: crates/vfox/Cargo.toml:10-15)",
+        "Objective-C (macOS notification helper: Cargo.toml:46)",
+        "TOML/YAML data (registry/*.toml, settings.toml, vendor/aqua-registry)"
+      ],
+      "entry_points": [
+        {
+          "path": "src/main.rs",
+          "what": "`mise` binary (Cargo.toml:66-68); main() at :45 registers hooks, builds the tokio runtime and calls cli::Cli::run"
+        },
+        {
+          "path": "src/cli/mod.rs",
+          "what": "Command definitions and dispatch: `Commands` enum, about 74 subcommands (:318-399); global flags incl. --locked (:247-253)"
+        },
+        {
+          "path": "src/cli/bootstrap.rs",
+          "what": "`mise bootstrap` (alias bs): run_phases (:1399) applies accounts, plugins, packages, files, services, firewall, compose, repos, dotfiles, shell, macOS defaults, launchd, systemd, user, tools; `remote` SSH subcommand with explicit target selection (:3359-3367)"
+        },
+        {
+          "path": "src/cli/dotfiles/mod.rs",
+          "what": "`mise dotfiles` / `mise dot`: add, apply, capture, conflicts, diff, edit, exclude, history, include, origin, paths, pull, recover, rollback, save, status, sync, track, unapply, undo, untrack, watch (:127-148)"
+        },
+        {
+          "path": "src/cli/lock.rs",
+          "what": "`mise lock`: resolves tools and writes mise.lock for selected platforms (e.g. --platform linux-x64,macos-arm64; :135-136,176); lockfile logic in src/lockfile.rs and src/lockfile/"
+        },
+        {
+          "path": "src/cli/mcp.rs",
+          "what": "`mise mcp` stdio MCP server; run() at :507"
+        },
+        {
+          "path": "crates/mise-shim/Cargo.toml",
+          "what": "`mise-shim` std-only native shim binary ([[bin]] at :13-15, publish = false, no dependencies)"
+        },
+        {
+          "path": "crates/vfox/Cargo.toml",
+          "what": "`vfox-cli` binary plus the vfox library (Lua plugin host): :22-28"
+        }
+      ],
+      "architecture": "Cargo workspace of 13 packages (root `mise` plus 12 crates; Cargo.toml:2-16). The library (src/lib.rs) holds core logic; the binary (src/main.rs + src/cli/) sits on top and core code reaches commands only through hooks in src/frontend.rs (AGENTS.md:68). Key modules: src/config/ (mise.toml parsing, settings, trust: src/config/config_file/mod.rs), src/toolset/ (tool requests, versions, install), src/backend/ (aqua, github, packslip, http, s3, cargo, npm, pipx, gem, go, dotnet, conda, spm, asdf, vfox, ubi), src/plugins/core/ (Node, Python, Go, Ruby, Java, Bun, Deno, Elixir, Erlang, .NET, Swift, Zig, Rust: docs/core-tools.md:19-31), src/lockfile.rs and src/lockfile/ (mise.lock), src/task/ (tasks and task cache), src/shell/ and src/shims.rs (activation, shims), src/system/ (bootstrap: packages/ managers apk, apt, aur, brew, dnf, flatpak, mas, nix, pacman, scoop, winget, zypper; files, services, firewall, compose, repos, secrets, remote SSH; and src/system/history/ = bare-Git store of tracked files with age-encrypted blobs, sync and a watcher), src/oci/, src/daemons/ (experimental, pitchfork-backed), src/otel/ (opt-in telemetry). Crates: mise-util (env/fs/http/age/PGP/sandbox helpers), mise-settings (typed settings generated from settings.toml), mise-sigstore, aqua-registry, vfox, mise-bootstrap (resource graph/plan), mise-cache-core, mise-brew-metadata/-relocation, mise-shim, mise-agent-env, mise-interactive-config. Data: registry/*.toml (about 1,010 tool shorthands plus 5 daemon presets), vendored aqua registry (vendor/aqua-registry), schema/*.json. TLS backend is selectable: native-tls default, rustls, rustls-native-roots (Cargo.toml:346-381). Docs are a VitePress site in docs/.",
+      "packaging_and_release": "Calendar versions (Cargo.toml:20 = 2026.9.18; CHANGELOG.md:3, dated 2026-09-30). Tag v* triggers .github/workflows/release.yml: tar.gz/tar.xz/tar.zst for linux-x64, linux-x64-musl, linux-arm64(+musl), linux-armv7(+musl) built with cross, PGO and BOLT on x64 glibc (release.yml:84-151); macos-x64 and macos-arm64, PGO on arm64, codesigned and Apple-notarized (:152-281); Windows x64/arm64 zip (:282-317); rpm and deb repos signed with a GPG key (:361-410). scripts/release.sh zipsign-signs the tar.gz/zip archives (verified by `mise self-update` with the embedded zipsign.pub: src/cli/self_update.rs:463-481,748), writes SHASUMS256.txt and SHASUMS512.txt, GPG clear-signs them (.asc) and minisign-signs them (.minisig) (release.sh:30-31,46-47,57-69), and GPG/minisign-signs install.sh (release.sh:72-78). The release job creates a draft GitHub release, attests SHASUMS256.txt with GitHub Artifact Attestations (actions/attest, release.yml:606-623), publishes a sigstore-signed packslip manifest (packslip.sigstore.json, release.yml:636-703; self-update checks it for v2026.9.3+: docs/installing-mise.md:43-51), then diffs asset digests before un-drafting (release.yml:720-750). mise.run is a Cloudflare worker proxying https://mise.jdx.dev/install.sh (cloudflare/workers/mise-run.js:22-26). Other channels have their own workflows: crates.io, npm, Docker (ghcr.io/jdx/mise, jdxcode/mise: docs/installing-mise.md:316-327), COPR, PPA, snap, Alpine, winget (.github/workflows/*-publish.yml, docker.yml, winget.yml, release-alpine.yml).",
+      "tests_and_ci": "Rust unit tests via cargo test / cargo-nextest with insta snapshots and mockito (tasks.toml:156-165; .config/nextest.toml:1-69; Cargo.toml:336-344): about 5,600 #[test]/#[tokio::test] attributes across about 469 .rs files (ripgrep count), nextest config cites about 4,090 tests (.config/nextest.toml:42). End-to-end bash scripts under e2e/ (about 1,180 files named test_*, run by e2e/run_all_tests in an ephemeral Docker image, 8 tranches; 103 cover dotfiles/bootstrap/history, e.g. e2e/cli/test_dotfiles_credential_omissions, e2e/lockfile/test_lockfile_locked_mode). Windows Pester suite: 88 *.Tests.ps1 files in e2e-win/. 34 workflow files in .github/workflows. test.yml -> test-impl.yml jobs: build-ubuntu, build-windows, unit-macos (macOS arm64 unit tests plus dotfiles/bootstrap/watcher e2e), lint (cargo deny, cargo machete, MSRV verify, clippy -D warnings, assert `mise run render` leaves no diff), e2e (8 tranches on Linux), bootstrap-linux-host (converges a Linux host over SSH), windows-unit, windows-e2e, and a test-ci aggregate gate (test-impl.yml:34-517). Trusted vs untrusted runs are split by actor (test.yml:22-41). release.yml reruns the full e2e suite against the packaged release tarball on the release PR (:318-360). Other workflows: perf.yml/perf-pr.yml (instruction-count benchmarks), zizmor.yml (workflow security lint), test-vfox*.yml, test-plugins.yml, registry*.yml, docs*.yml.",
+      "dependencies": "Cargo.toml (root `mise`): 132 [dependencies] (5 optional: aws-lc-rs, openssl, self-replace, tar, zipsign-api), 7 target-specific (unix: exec, mise-brew-relocation, nix; macOS: core-foundation, core-foundation-sys; Windows: winapi, windows-sys), 11 build, 6 dev (Cargo.toml:85-344). Workspace crates: mise-util 82 (+4 target-specific, 5 dev; crates/mise-util/Cargo.toml:10-154; includes landlock/seccompiler for the Linux sandbox), mise-cache-core 17 (+2 dev), aqua-registry 15, vfox 19 (2 optional; +2 dev), mise-sigstore 14 (+1 dev), mise-settings 10 (+3 build), mise-interactive-config 7 (+1 dev, 1 build), mise-bootstrap 4 (+1 dev), mise-brew-metadata 3, mise-brew-relocation 3 (+2 dev), mise-agent-env 0, mise-shim 0 (std only). Cargo.lock is committed; deny.toml enforces an SPDX license allow-list and advisories (deny.toml:72-107). Docs tooling: package.json with 15 devDependencies and no runtime dependencies, plus aube-lock.yaml/aube-workspace.yaml and .mise/locks/*/package.json sidecars. Repo dev tools are declared in mise.toml (24 entries, many 'latest') with a committed mise.lock (mise.toml:7-31).",
+      "security_policy": "SECURITY.md (root). Covers: single-maintainer access to the core repo and the resulting bus factor (:8-16); dependency policy (:18-21); the mise.jdx.dev asset host (:23-27); native Rust verification for aqua-backend tools - cosign, SLSA, GitHub attestations, minisign, checksums - with MISE_AQUA_* toggles (:29-59); mise.lock (:61-67); the risk of asdf plugins (:69-87); only the most recent version is supported (:89-91); reporting by email to security@<MISE_JDX_DOMAIN_IN_README> (a literal placeholder, :93-95) with an optional PGP key, fingerprint 70B4 0C16 536D 6FCE A883 F865 335E D915 E315 E085 (:97-102); and the release GPG key used to sign deb packages and SHASUMS files (:162-165). Related docs: docs/security.md (safe mode, minimum release age), docs/paranoid.md."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:56-58,94-95 - tools are declared in a committed mise.toml and `mise install` reproduces them (mise.lock honoured, --locked supported).",
+        "verified": "yes",
+        "evidence": "src/cli/install.rs:493-508 builds ResolveOptions with use_locked_version: true, warn_not_in_lockfile: true and locked: Settings::get().locked; --locked is a global flag (src/cli/mod.rs:247-253). e2e/lockfile/test_lockfile_locked_mode:19-40 shows `mise install --locked` failing with 'No lockfile URL found' when mise.lock has no URL for the current platform, and `--locked --dry-run` printing 'would install' when it has one."
+      },
+      {
+        "claim": "README.md:124-126 - exact pins or a lockfile make everyone use the same resolved version.",
+        "verified": "partial",
+        "evidence": "Locked mode only demands a per-platform download URL for backends that support URL locking (src/backend/mod.rs:3815-3830); when an entry has no checksum mise records a new blake3 checksum instead of failing (src/backend/mod.rs:4886-4893); asdf, cargo, gem, go, npm, pypi/pipx, ubi, core:dotnet/rust/swift and vfox backend plugins are exempt from URL checks (docs/dev-tools/mise-lock.md:259-263); transitive dependencies are locked only for npm (embedded aube) and uv-backed PyPI tools (docs/dev-tools/mise-lock.md:267-292, 610-618). Recorded non-SLSA provenance plus checksum is reused without re-verification unless locked_verify_provenance or paranoid is set; SLSA locks are always re-verified (src/backend/aqua.rs:2711-2749; crates/mise-settings/src/accessors.rs:45-47). Locked installs still need network (docs/dev-tools/mise-lock.md:37-40)."
+      },
+      {
+        "claim": "README.md:73-75 - `curl https://mise.run | sh` installs mise; docs/installing-mise.md:150-157 - set MISE_VERSION to pin a version for reproducible installs.",
+        "verified": "partial",
+        "evidence": "mise.run proxies https://mise.jdx.dev/install.sh (cloudflare/workers/mise-run.js:22-26). The script uses checksums baked into itself only when the requested version equals its own version (packaging/standalone/install.envsubst:137-153); for any other version it downloads SHASUMS256.txt from GitHub and does not verify its signature (install.envsubst:213-227, comment 'TODO: verify with minisign or gpg if available'). Verifying install.sh itself is a separate manual GPG step (docs/installing-mise.md:133-147). MISE_VERSION is honoured (install.envsubst:298-302)."
+      },
+      {
+        "claim": "README.md:63 - Bootstrap declares machine setup including system packages, dotfiles and services.",
+        "verified": "yes",
+        "evidence": "src/cli/bootstrap.rs:1399-1860 runs secrets preflight, accounts, plugins, packages, files, services, firewall, compose, repos, dotfiles, shell, macOS defaults, launchd, systemd, user, then tools, in the order documented at docs/bootstrap.md:154-195. Host package managers are in src/system/packages/mod.rs:1-26 (apk, apt, aur, brew, dnf, flatpak, mas, nix, pacman, scoop, winget, zypper); dotfile commands in src/cli/dotfiles/mod.rs:127-148. Remote application needs an explicit target: 'select a remote target by name, --tag, or --all' (src/cli/bootstrap.rs:3359-3367)."
+      },
+      {
+        "claim": "docs/history.md:819-829 and docs/dotfiles.md:923-929 - tracked-file capture omits credential stores (.netrc, *.age, *.key, *.pem, *.gpg, *.kdbx, id_*, *token*, *secret*, credentials*, oauth*; github_tokens.toml, hosts.yml, age.txt in the mise config dir) and *.local.toml.",
+        "verified": "yes",
+        "evidence": "Lists at src/system/history/tracked.rs:30-43; capture_exclusion/is_builtin_credential at :1123-1146 match on the file NAME only. e2e/cli/test_dotfiles_credential_omissions:15-26 shows secrets.fish, id_test, id_test.pub and client_secret.pub kept out of commits; :44-48 shows a credential-named file captured only after `--allow-plaintext`; :67-72 shows ~/.app-secrets/app.toml (content `client = ...`) captured in plaintext because only file names are tested. Names such as .npmrc, .env or .git-credentials match none of the 14 patterns."
+      },
+      {
+        "claim": "docs/history.md:982-985 - tracked files marked encrypt are stored age-encrypted; missing keys or recipients stop the operation; mise never falls back to plaintext.",
+        "verified": "yes",
+        "evidence": "src/system/history/shadow.rs:372-379 bails with 'encrypted tracked files require [history.encryption].recipients; nothing was committed'; encrypted files become mise-encrypted-file-v1 blobs (shadow.rs:441-467); publishing is blocked when an earlier commit holds plaintext for a now-encrypted path (src/system/history/sync/files.rs:132). Only contents are encrypted - filenames and metadata stay visible (docs/history.md:982-983); plaintext limit per file is 1 GiB (crates/mise-util/src/agecrypt.rs:129)."
+      },
+      {
+        "claim": "docs/bootstrap/remote.md:301-303 - local environment variables are deliberately not copied to SSH hosts.",
+        "verified": "yes",
+        "evidence": "src/system/remote.rs:647-651 builds the remote command as `env MISE_TRUSTED_CONFIG_PATHS=... MISE_ENV=...` only; secrets must come from the target environment or --prompt-secrets (src/system/secrets.rs:87,393-409). Caveat: the project source directory is archived wholesale and the default excludes are only .git, target and node_modules (src/system/remote.rs:2267-2272), so files such as .env or *.pem inside it are transferred unless the user adds excludes (docs/bootstrap/remote.md:32-33,125-128)."
+      },
+      {
+        "claim": "docs/history.md:1179-1181 - checkpoints restore file contents only, not installed packages or service state; use the system's backup tools for that.",
+        "verified": "yes",
+        "evidence": "History is a bare Git repository of captured files (src/system/history/shadow.rs:1-12); regular files above 16 MiB are left out and an entry is cut at 100,000 files or 1 GiB (shadow.rs:24-29). e2e/cli/test_dotfiles_removed_backup_interfaces:2-11 asserts that the earlier 'backup/local-only model is removed' (--no-backup, --encrypt-backups, `machines`, `history purge` all fail). The dotfiles command list has no verify/fsck/backup subcommand (src/cli/dotfiles/mod.rs:127-148) and src/system/history has no fsck/verify/integrity code (searched)."
+      },
+      {
+        "claim": "settings.toml:4041-4052 - anonymous download statistics are sent to mise-versions.jdx.dev after successfully installing a tool (tool name and version, OS/arch from the User-Agent, hashed IP).",
+        "verified": "partial",
+        "evidence": "Enabled by default (settings.toml:4038-4040). The code sends a fire-and-forget POST of {full, version, os, arch} (src/versions_host.rs:154-191,220-225) from a call placed BEFORE the install runs, with the comment 'Do this before install' (src/backend/mod.rs:3963-3965) - not after success; OS and arch travel in the JSON body, not only the User-Agent. It is skipped when offline, use_versions_host=false, use_versions_host_track=false, or the tool is not a core/registry tool (versions_host.rs:155-168). IP hashing is server-side and not checkable here."
+      },
+      {
+        "claim": "docs/mcp.md:12-14 - the MCP server requires MISE_EXPERIMENTAL=1.",
+        "verified": "no",
+        "evidence": "src/cli/mcp.rs:507-525 starts the stdio server with no experimental check and src/cli/mod.rs:522 dispatches Mcp directly; ensure_experimental is called only for other features (deps, daemons, oci, task caching, age directive: e.g. src/deps/engine.rs:216, src/cli/daemons.rs:140, src/cli/oci/build.rs:101, src/task/task_cache.rs:263, src/agecrypt/directive.rs:69). docs/cli/mcp.md:1-35 and e2e/cli/test_mcp:5-13 do not mention a gate either. Code differs from the docs page."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Measurement hygiene for the project's own startup-cost benchmark (cachegrind instruction counts via `tak`, recorded per commit on main into git notes refs/notes/tak, which is not present in this shallow clone). Not a tool-performance result.",
+        "metric": "run-to-run variation",
+        "value": "about 0.02% for instruction counts vs 4-20% for wall clock on the same hardware",
+        "source": ".github/workflows/perf.yml:3-6,64-67",
+        "independent": false
+      },
+      {
+        "what": "CI wall time of the mise unit test suite on macOS (project CI timing, not a tool-performance benchmark)",
+        "metric": "seconds",
+        "value": "121s on the dedicated Namespace runner vs 263s on shared GitHub-hosted macos-14",
+        "source": ".config/nextest.toml:55-59",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "SCOPE - no backup/restore engine for application state. The only state-history feature (`mise dot` history) is a bare-Git store of explicitly tracked config files; docs say it does not restore packages or service state and to use system backup tools (docs/history.md:1179-1181; docs/bootstrap/setup.md:360-361). Files over 16 MiB are omitted and entries are cut at 100,000 files / 1 GiB (src/system/history/shadow.rs:24-29); retention is indefinite with no compaction (docs/history.md:1361-1365); there is no verify/fsck command (src/cli/dotfiles/mod.rs:127-148); an earlier backup/local-only model was removed before release (e2e/cli/test_dotfiles_removed_backup_interfaces:2-11). Encryption is per-file age to recipients with filenames and metadata visible (docs/history.md:982-983). restic is only an installable registry tool (registry/restic.toml:1-3).",
+      "CREDENTIALS - the credential guard is a file-name heuristic (11 globs + 3 names; src/system/history/tracked.rs:30-43) that does not read contents or parent-directory names (docs/history.md:826-829; e2e/cli/test_dotfiles_credential_omissions:67-72); .npmrc, .env and .git-credentials are not covered. An include list or --allow-plaintext stores credential-named files in plaintext (docs/history.md:586-605,634-647). All committed versions are shared with the origin and deleting a secret later leaves it in history (docs/history.md:239-243,998-1003). Remote bootstrap archives the source dir excluding only .git/target/node_modules by default (src/system/remote.rs:2267-2272). mise itself reads existing GitHub auth stores: GITHUB_TOKEN env, gh hosts.yml, github_tokens.toml (docs/dev-tools/github-tokens.md:29-60).",
+      "TELEMETRY - install tracking and the versions-host lookups are ON by default (use_versions_host_track and use_versions_host default true: settings.toml:4002-4054); the tracking POST (tool, backend id, version, os, arch) is sent before the install runs (src/backend/mod.rs:3963-3965; src/versions_host.rs:154-191); `mise version`/`doctor` fetch https://mise.jdx.dev/releases.tsv (src/cli/version.rs:418-423). Opt out with MISE_USE_VERSIONS_HOST_TRACK=0, use_versions_host=false or offline mode (settings.toml:2290-2303).",
+      "EXECUTION TRUST - install, exec, run and watch implicitly trust and persist trust for the active project config in normal mode (not CI, not paranoid) (src/cli/mod.rs:471-477; src/config/config_file/mod.rs:539-560; docs/paranoid.md:23-26), so `mise install` on an unreviewed checkout can run config-defined hooks, templates or postinstall code; mitigations are MISE_SAFE=1 (docs/security.md:47-97) or paranoid=true (docs/paranoid.md:28-34); README.md:94-95 says to review mise.toml first. A trust-related security fix is in the latest release (CHANGELOG.md:55-57).",
+      "REPRODUCIBILITY LIMITS - lock guarantees vary by backend: URL-lock exemptions (docs/dev-tools/mise-lock.md:259-263), transitive locks only for npm and uv-backed PyPI (docs/dev-tools/mise-lock.md:267-292); recorded non-SLSA provenance is reused without re-verification by default (src/backend/aqua.rs:2711-2749; docs/dev-tools/mise-lock.md:722-726); locked is not offline (docs/dev-tools/mise-lock.md:37-40); lockfiles are not auto-created unless lockfile=true or `mise lock` is run (docs/dev-tools/mise-lock.md:58-61; crates/mise-settings/src/accessors.rs:25-43); older mise rejects newer lockfile versions (docs/dev-tools/mise-lock.md:546); lockfile_mode='generate' is still a trial (docs/dev-tools/mise-lock.md:384-406). Install-script checksums for non-current versions come from an unsigned-checked SHASUMS256.txt (packaging/standalone/install.envsubst:213-227).",
+      "MAINTENANCE AND CHURN - a single maintainer holds core-repo access and SECURITY.md names the bus-factor problem (SECURITY.md:8-16); only the latest release is supported (SECURITY.md:89-91); releases are frequent (v2026.9.18 dated 2026-09-30: CHANGELOG.md:3) and the deprecation policy removes behavior 12 months after warning (AGENTS.md:197-208). Bootstrap/dotfiles/history are recent and have cross-machine constraints: older clients reject manifests with new fields and cannot roll back schema-v2 checkpoints (docs/dotfiles.md:986-989; docs/history.md:666-670). Several features remain experimental (daemons, OCI, task cache, deps: docs/daemons.md:7-11; src/cli/oci/build.rs:101; src/task/task_cache.rs:263; src/deps/engine.rs:216).",
+      "PLATFORM PREREQUISITES - history needs a git binary (docs/history.md:1369-1371); autosave uses a systemd user service on Linux or a LaunchAgent on macOS, with `mise dot watch --once` from cron as the alternative (docs/history.md:62-65,1345-1349); remote bootstrap targets need a POSIX shell plus cksum, mktemp, tar and uname and cannot be native Windows (docs/bootstrap/remote.md:12-14); official Linux gnu binaries need glibc >= 2.18, else the musl build (docs/installing-mise.md:176-179); WSL2 has no dedicated CI or guidance beyond 'install Linux mise in WSL' (docs/faq.md:137-139); macOS CI runs a subset of e2e while the full suite runs on Linux (.github/workflows/test-impl.yml:175-207).",
+      "LICENSING AND SUPPLY CHAIN - root license is MIT (LICENSE:1-3) but the binary embeds LGPL-3.0 bash chpwd hook scripts into `mise activate bash` output (src/assets/bash_zsh_support/LICENSE:1; src/shell/bash.rs:55-62); dependency licenses are policed by a cargo-deny allow-list that includes MPL-2.0 (deny.toml:93-107) and two advisories are ignored, RUSTSEC-2026-0173 and RUSTSEC-2023-0071 (rsa Marvin attack via sigstore) (deny.toml:72-74); the SECURITY.md reporting address is a literal placeholder (SECURITY.md:93-95); asdf plugins run arbitrary code (SECURITY.md:69-87); the root crate has 132 direct runtime dependencies (Cargo.toml:85-290)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "jdx/mise",
+      "checks": [
+        {
+          "field": "install[0] (mise.run installer)",
+          "statement": "mise.run installer (macOS and Linux; the installer script only supports Darwin and Linux, x86_64/aarch64/armv7): `curl https://mise.run | sh`",
+          "citation": "README.md:74; docs/installing-mise.md:82; packaging/standalone/install.envsubst:46-82 (plus cloudflare/workers/mise-run.js:24-25 and scripts/render-install.sh:23, which show what mise.run serves)",
+          "holds": true,
+          "note": "README.md:74 is exactly `curl https://mise.run | sh`, and docs/installing-mise.md:82 gives the `curl -fsSL` form. In install.envsubst, get_os (:46-55) maps Darwin to macos and Linux to linux and errors on any other OS. get_arch (:57-82) accepts x86_64, aarch64/arm64 and armv7l, adds musl detection, and exits on anything else. The worker sends `/` to https://mise.jdx.dev/install.sh, which render-install.sh builds from install.envsubst. The default path is ~/.local/bin/mise (:325), which matches README.md:75. Not stated in the claim: an unpinned run installs the newest release that is at least 24h old, not the newest release (install.envsubst:298-315; docs/installing-mise.md:150-153)."
+        },
+        {
+          "field": "license",
+          "statement": "License SPDX MIT, file LICENSE",
+          "citation": "LICENSE:1-21; Cargo.toml:28",
+          "holds": true,
+          "note": "LICENSE:1 reads 'MIT License', followed by 'Copyright (c) 2025 Jeff Dickey' and the standard MIT permission and warranty text. The root crate declares license = \"MIT\" (Cargo.toml:28)."
+        },
+        {
+          "field": "platforms.linux_x86_64",
+          "statement": "yes: official linux-x64 (glibc >= 2.18) and linux-x64-musl binaries; release target x86_64-unknown-linux-gnu with PGO+BOLT; CI builds and runs the e2e suite on Linux x86_64, plus a bootstrap-over-SSH full-host job; linux-x64 is in the default lockfile platform set",
+          "citation": "docs/installing-mise.md:165-182; .github/workflows/release.yml:104-107; .github/workflows/test-impl.yml:71-93,277-326,370-385; settings.toml:1819-1825",
+          "holds": true,
+          "note": "Docs list linux-x64 and linux-x64-musl and the glibc 2.18 minimum (:169-179). release.yml:104-107 is the linux-x64 entry: target x86_64-unknown-linux-gnu, pgo: 1, bolt: 1. In test-impl.yml, build-ubuntu (:71-93) and e2e (:277-326, 8 tranches in Docker) run on ubuntu-latest or the namespace linux-amd64 runner. bootstrap-linux-host (:370-385) runs 'Converge a complete Linux host over SSH'. settings.toml:1823-1825 lists linux-x64 in the default lockfile_platforms. Context: test-impl skips e2e on the release PR because release.yml runs it there (:281-283)."
+        },
+        {
+          "field": "integrations.mcp",
+          "statement": "`mise mcp` is a stdio MCP server built on rmcp. Resources: mise://tools, tasks, env, config. Tools: list_commands, run_task, install_tool (install_tool returns not-yet-implemented). mise://env returns real values including secrets. Docs say MISE_EXPERIMENTAL=1 is required, but the code has no such gate.",
+          "citation": "src/cli/mcp.rs:4-56,507-525; docs/mcp.md:5-9,12-14,53-63,124-128",
+          "holds": true,
+          "note": "mcp.rs imports rmcp (:4-16), and run() serves rmcp::transport::stdio() (:507-525). list_resources returns the four mise:// URIs (:266-271). The tool router defines list_commands, install_tool and run_task. install_tool returns 'Tool installation not yet implemented' (:155-164). docs/mcp.md:55-56 says mise://env values can include secrets, and :12-14 says MISE_EXPERIMENTAL=1 is required. No experimental gate exists in code: mcp.rs never calls ensure_experimental (crates/mise-settings/src/accessors.rs:49-54), dispatch at src/cli/mod.rs:522 calls cmd.run() directly, and src/cli/mod.rs has no other experimental check."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "README.md:56-58,94-95: tools are declared in a committed mise.toml and `mise install` reproduces them (mise.lock honoured, --locked supported). verified: yes",
+          "citation": "src/cli/install.rs:493-508; src/cli/mod.rs:247-253; e2e/lockfile/test_lockfile_locked_mode:19-40",
+          "holds": true,
+          "note": "install.rs sets use_locked_version: true (:494) and warn_not_in_lockfile: true (:505). With that set, the version resolves from mise.lock (src/toolset/tool_version.rs:661-666). The global --locked flag (src/cli/mod.rs:247-253) becomes settings.locked = true (src/cli/mod.rs:932-933). In the e2e test, `mise install --locked` fails with 'No lockfile URL found' (:26), and `--locked --dry-run` prints 'would install' (:40). One small wording slip: `locked: Settings::get().locked` (install.rs:508) is set on InstallOptions, not ResolveOptions, which ends at :506. The claim itself still holds."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

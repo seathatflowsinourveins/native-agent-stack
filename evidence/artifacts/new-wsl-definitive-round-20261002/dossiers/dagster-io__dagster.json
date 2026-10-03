@@ -1,0 +1,293 @@
+{
+  "contender": "dagster-io/dagster",
+  "revision": {
+    "contender": "dagster-io/dagster",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "dagster-io/dagster",
+        "tag": "1.13.25",
+        "commit": "ff792970f74c364549b5ed877b921f1044cb720e",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "1.13.25",
+    "commit": "ff792970f74c364549b5ed877b921f1044cb720e",
+    "read_at": "2026-10-02T03:02:11+00:00"
+  },
+  "dossier": {
+    "contender": "dagster-io/dagster",
+    "revision": {
+      "tag": "1.13.25",
+      "commit": "ff792970f74c364549b5ed877b921f1044cb720e",
+      "read_at": "2026-10-02T03:02:11+00:00"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Dagster (Dagster Labs) is a Python orchestrator for data assets and jobs. Python functions declared as assets/ops form a DAG that runs on demand, on cron schedules, from sensors or declarative automation, with stored run history, retries and a web UI (README.md:31-35). Local single-machine use is `dg dev` / `dagster dev`, which starts a webserver (UI + GraphQL), a daemon (scheduler, sensor, run-queue, optional monitoring/retry daemons) and gRPC code servers (python_modules/dagster/dagster/_cli/dev.py:248-292). State is SQLite under $DAGSTER_HOME; if DAGSTER_HOME is unset it goes to a temp dir deleted on exit (docs/docs/deployment/oss/oss-instance-configuration.md:21-38; _cli/utils.py:50-72). The unit of work is Python code; an existing command is run by wrapping it in an asset/op that calls PipesSubprocessClient (_core/pipes/subprocess.py:117-128). Findings come from static reading of the repo at the tag; nothing was executed.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Dagster is a cloud-native data pipeline orchestrator for the whole development lifecycle, with integrated lineage and observability, a declarative programming model, and best-in-class testability.",
+          "citation": "README.md:31"
+        },
+        {
+          "claim": "It is designed for developing and maintaining data assets, such as tables, data sets, machine learning models, and reports.",
+          "citation": "README.md:33"
+        },
+        {
+          "claim": "With Dagster, you declare - as Python functions - the data assets that you want to build. Dagster then helps you run your functions at the right time and keep your assets up-to-date.",
+          "citation": "README.md:35"
+        },
+        {
+          "claim": "Example: three @dg.asset Python functions form a graph that is loaded into Dagster's web UI.",
+          "citation": "README.md:39-73"
+        },
+        {
+          "claim": "Dagster is built to be used at every stage of the data development lifecycle - local development, unit tests, integration tests, staging environments, all the way up to production.",
+          "citation": "README.md:75"
+        },
+        {
+          "claim": "Dagster is available on PyPI and officially supports Python 3.9 through Python 3.14.",
+          "citation": "README.md:81"
+        },
+        {
+          "claim": "Install command: `uv add dagster dagster-webserver dagster-dg-cli`.",
+          "citation": "README.md:83-85"
+        },
+        {
+          "claim": "Identify the key assets you need to create using a declarative approach, or you can focus on running basic tasks.",
+          "citation": "README.md:101"
+        },
+        {
+          "claim": "Put your pipelines into production with a robust multi-tenant, multi-tool engine that scales technically and organizationally.",
+          "citation": "README.md:105"
+        },
+        {
+          "claim": "Centralize your metadata in one tool with built-in observability, diagnostics, cataloging, and lineage.",
+          "citation": "README.md:109"
+        },
+        {
+          "claim": "Dagster provides a growing library of integrations for today's most popular data tools. Integrate with the tools you already use, and deploy to your infrastructure.",
+          "citation": "README.md:115"
+        },
+        {
+          "claim": "Dagster is Apache 2.0 licensed.",
+          "citation": "README.md:149"
+        },
+        {
+          "claim": "Absence: the 150-line README does not mention schedules/cron, the daemon, retries, cancellation, `dagster dev`/`dg dev`, where run history is stored, running existing commands, or telemetry; those topics appear only in docs/ and code.",
+          "citation": "README.md:1-150"
+        }
+      ],
+      "install": [
+        {
+          "method": "uv (README quick start; also in docs)",
+          "command": "uv add dagster dagster-webserver dagster-dg-cli",
+          "citation": "README.md:83-85; docs/docs/getting-started/installation.md:69"
+        },
+        {
+          "method": "pip (docs)",
+          "command": "pip install dagster dagster-webserver dagster-dg-cli",
+          "citation": "docs/docs/getting-started/installation.md:72"
+        },
+        {
+          "method": "uvx project scaffold (docs, marked recommended)",
+          "command": "uvx create-dagster@latest project my-project",
+          "citation": "docs/docs/getting-started/installation.md:33"
+        },
+        {
+          "method": "Homebrew tap for create-dagster (docs)",
+          "command": "brew install dagster-io/tap/create-dagster",
+          "citation": "docs/docs/getting-started/installation.md:41"
+        },
+        {
+          "method": "curl installer for create-dagster (docs; script source is not in this repo)",
+          "command": "curl -LsSf https://dg.dagster.io/create-dagster/install.sh | sh",
+          "citation": "docs/docs/getting-started/installation.md:53"
+        },
+        {
+          "method": "pip, run webserver and daemon as separate processes on one machine (docs)",
+          "command": "pip install dagster-webserver; pip install dagster; export DAGSTER_HOME=...; dagster-webserver -h 0.0.0.0 -p 3000; dagster-daemon run",
+          "citation": "docs/docs/deployment/oss/deployment-options/deploying-dagster-as-a-service.md:25,36,53,71,80"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - docs give Linux/Unix steps (docs/docs/getting-started/installation.md:95-99; quickstart.md:54-58). The Python test suite runs in Debian-based amd64 containers on Buildkite's Kubernetes queue (python_modules/automation/automation/docker/images/buildkite-test/Dockerfile:127; .buildkite/buildkite-shared/buildkite_shared/step_builders/command_step_builder.py:13,158). Packages are pure Python (hatchling build) with native grpcio/protobuf dependencies (python_modules/dagster/pyproject.toml:1-3,29-34).",
+        "wsl2": "unknown - no WSL2-specific runtime statement found. The only WSL mention is that Windows contributors must use WSL to follow the contributor setup (docs/docs/about/contributing.md:20); no doc or CI job confirms WSL2 for `dagster dev`.",
+        "macos_arm64": "yes (documented, not CI-tested) - docs give macOS/Unix steps (docs/docs/getting-started/quickstart.md:54-58) and an Apple-silicon note about grpcio wheels for contributors (docs/docs/about/contributing.md:72-74). No macOS or Windows job exists in .buildkite or .github/workflows (Linux Kubernetes queue and ubuntu-latest only).",
+        "gpu": "unknown / not applicable - the orchestrator has no GPU or CUDA code (no matches in python_modules/dagster/dagster/**/*.py). GPU use would sit inside the Python code or commands Dagster launches."
+      },
+      "integrations": {
+        "cli": "yes. `dagster` (api, job, run, instance, schedule, sensor, asset, debug, project, dev, code-server, definitions: python_modules/dagster/dagster/_cli/__init__.py:19-32; script at pyproject.toml:72). `dagster run` has list/delete/wipe/migrate-repository only, with no cancel command (_cli/run.py:21-95); `dagster schedule` has preview/list/start/stop/logs/restart/wipe/debug (_cli/schedule.py:38-421). `dagster-daemon` run/liveness-check/wipe/debug (_daemon/cli/__init__.py:34-168). `dagster-webserver` (python_modules/dagster-webserver/pyproject.toml:25). `dg` check/dev/launch/list/scaffold/api/plus/labs/utils (python_modules/libraries/dagster-dg-cli/dagster_dg_cli/cli/__init__.py:41-49); its `dg api` commands target Dagster+ with API tokens, not a local instance (dagster_dg_cli/cli/api/run.py:66-96,428). `create-dagster` (create-dagster/pyproject.toml:20). `dagster-graphql` (dagster-graphql/pyproject.toml:24).",
+        "mcp": "Only a hosted Dagster+ MCP server (beta; needs a Dagster+ account via OAuth or user token): https://mcp.agent.dagster.cloud/mcp, EU https://mcp.agent.eu.dagster.cloud/mcp (docs/docs/getting-started/ai-tools/dagster-mcp.md:7-24,38-47). No MCP server for a local OSS instance exists in this repo: a search for 'mcp' hits only docs, sidebars and .claude agent files that mention a Buildkite MCP. The repo's own .mcp.json is empty (.mcp.json:1-3).",
+        "sdk_or_api": "Python SDK (`import dagster as dg`: README.md:40-67). GraphQL API served by the webserver at /graphql with launchRun and terminateRun mutations (docs/docs/api/graphql/index.md:25-31,167-235). Python GraphQL client with submit_job_execution, get_run_status, terminate_run, terminate_runs (python_modules/dagster-graphql/dagster_graphql/client/client.py:257,314,420,443). Webserver REST endpoints POST /report_asset_materialization, /report_asset_check, /report_asset_observation (docs/docs/api/rest-api.md:47-53; python_modules/dagster-webserver/dagster_webserver/webserver.py:193-203) and GET /server_info (webserver.py:110-117,302). dagster-pipes protocol library for external processes (python_modules/dagster-pipes).",
+        "claude_code_or_codex": "Documented: a `dagster` plugin bundling the `dagster-expert` skill and the Dagster+ MCP server, for Claude Code (`/plugin marketplace add dagster-io/skills`, `/plugin install dagster@dagster`), Codex (`codex plugin marketplace add dagster-io/skills --ref release-stable`, `codex plugin add dagster@dagster`), Cursor and Copilot (docs/docs/getting-started/ai-tools/plugin.md:7-28,71-91). The skill content is in the separate dagster-io/skills repo and was not inspected. `dg scaffold branch` uses claude-code-sdk via the optional `ai` extra (python_modules/libraries/dagster-dg-cli/pyproject.toml:27-31; dagster_dg_cli/cli/scaffold/branch/command.py:224-227,262-268). The repo also carries contributor-facing CLAUDE.md, .claude/ agents/commands and settings.json for working on Dagster itself (CLAUDE.md:1-9; .claude/settings.json:1-66); that is not a product integration."
+      },
+      "telemetry_and_network": "README says nothing about telemetry or network use (README.md:1-150). Docs and code: (1) Backend usage telemetry is ON by default for non-ephemeral instances; opt out with `telemetry: enabled: false` in $DAGSTER_HOME/dagster.yaml (docs/docs/about/telemetry.md:7-22; python_modules/dagster/dagster/_core/instance/methods/settings_methods.py:60-74). Events are written to $DAGSTER_HOME/logs or ~/.dagster/logs: action, timestamps, instance_id, user_id (kept in ~/.dagster/.telemetry), Python/Dagster versions, OS, run_storage_id, CI flag, plus counts of jobs/schedules/sensors/assets and SHA-256 hashes of job, repo, location, run and step names (python_modules/libraries/dagster-shared/dagster_shared/telemetry/__init__.py:89-97,161-233,300-347; _core/telemetry.py:227-331,371-389,503-515). (2) dagster-webserver and dagster-daemon upload those logs by plain HTTP POST to http://telemetry.dagster.io/actions (override: DAGSTER_TELEMETRY_URL), roughly hourly or when logs exceed 10 MB (_core/telemetry_upload.py:11-13,37-84,121; dagster_webserver/cli.py:317; _daemon/daemon.py:96-98). DAGSTER_DISABLE_TELEMETRY (or BUILDKITE/TF_BUILD) only skips the upload step and is not the documented opt-out (telemetry_upload.py:15-20,42-43). (3) With telemetry enabled the browser UI loads https://dagster.io/oss-telemetry.js (js_modules/app-oss/src/extractInitializationData.ts:39-45; dagster_webserver/webserver.py:229-232; docs telemetry.md:11). (4) `dg` and `create-dagster` query pypi.org/pypi/<pkg>/json (5 s timeout) for newer versions; disable with DAGSTER_DG_UPDATE_CHECK_ENABLED=0 (python_modules/libraries/dagster-shared/dagster_shared/libraries/__init__.py:110-132; dagster-dg-core/dagster_dg_core/context.py:716-717; create-dagster/create_dagster/version_check.py:13-71). `dg` also has its own telemetry wrapper gated by dg config and dagster.yaml (dagster_dg_core/utils/telemetry.py:43-63,102-161). (5) Local operation needs no account or external service: default storage is local SQLite (_core/instance/ref.py:280-339) and the webserver binds 127.0.0.1:3000 with no authentication (dagster_webserver/cli.py:41-42; docs/docs/deployment/oss/deployment-options/running-dagster-locally.md:75-80). Dagster+ (hosted) is optional; it is needed only for the MCP server, `dg api`/`dg plus` commands and Dagster+ deployments (dagster-mcp.md:7-24)."
+    },
+    "code": {
+      "languages": [
+        "Python (core, CLI, daemon, gRPC code server, webserver, ~68 packages under python_modules/libraries)",
+        "TypeScript/React/Next.js (web UI, js_modules/)",
+        "Protocol Buffers (python_modules/dagster/dagster/_grpc/protos/dagster_api.proto)",
+        "ANTLR4 grammar (python_modules/dagster/dagster/_core/definitions/antlr_asset_selection/AssetSelection.g4)",
+        "YAML/Helm chart (helm/dagster)",
+        "Shell (scripts/build_and_publish.sh)"
+      ],
+      "entry_points": [
+        {
+          "path": "python_modules/dagster/dagster/_cli/__init__.py:18-50",
+          "what": "`dagster` CLI group (script defined at python_modules/dagster/pyproject.toml:72): api, job, run, instance, schedule, sensor, asset, debug, project, dev, code-server, definitions."
+        },
+        {
+          "path": "python_modules/dagster/dagster/_cli/dev.py:140-334",
+          "what": "`dagster dev` (marked superseded by `dg dev`): starts dagster-webserver and `python -m dagster._daemon run` as subprocesses plus proxy code servers; exits if either dies; on shutdown waits 60 s then kills."
+        },
+        {
+          "path": "python_modules/dagster/dagster/_daemon/cli/__init__.py:34-168",
+          "what": "`dagster-daemon` (pyproject.toml:73): run, liveness-check, wipe, debug heartbeat commands; daemon threads built in _daemon/controller.py:357-384."
+        },
+        {
+          "path": "python_modules/dagster-webserver/dagster_webserver/cli.py:204-352",
+          "what": "`dagster-webserver` (Starlette/uvicorn): serves the prebuilt UI, /graphql and REST endpoints; default 127.0.0.1:3000; `--read-only` flag."
+        },
+        {
+          "path": "python_modules/libraries/dagster-dg-cli/dagster_dg_cli/cli/__init__.py:26-50",
+          "what": "`dg` CLI (pyproject.toml:25): `dg dev` delegates to dagster._cli.dev.dev_command_impl (dagster_dg_cli/cli/dev.py:127,191); also launch, list, check, scaffold, api, plus."
+        },
+        {
+          "path": "python_modules/dagster/dagster/_grpc/server.py:1289-1444",
+          "what": "gRPC code server: StartRun spawns a multiprocessing 'spawn' run-worker process per run; CancelExecution sets that run's termination event; a cleanup thread marks runs failed when their worker dies."
+        },
+        {
+          "path": "python_modules/libraries/create-dagster/pyproject.toml:19-20",
+          "what": "`create-dagster` project scaffolder (create_dagster.cli:main)."
+        },
+        {
+          "path": "python_modules/dagster-graphql/pyproject.toml:24",
+          "what": "`dagster-graphql` CLI; Python client in dagster_graphql/client/client.py."
+        }
+      ],
+      "architecture": "Monorepo: python_modules/ (Python), js_modules/ (React UI), docs/ (Docusaurus), helm/dagster, examples/, .buildkite/. Core package python_modules/dagster/dagster: _core/definitions (assets/ops/jobs/schedules/sensors, RetryPolicy in definitions/policy.py); _core/execution + _core/executor (in_process and multiprocess executors, one spawned process per step: executor/multiprocess.py); _core/instance (DagsterInstance, dagster.yaml defaults in instance/ref.py:280-339); _core/storage (SQLite/Postgres/MySQL run, event-log and schedule storage; Alembic migrations in _core/storage/alembic/versions); _core/launcher (DefaultRunLauncher sends gRPC StartRun to a code server); _core/run_coordinator (Default/Queued); _core/pipes (PipesSubprocessClient); _grpc (code server and run-worker spawn); _daemon (scheduler, sensor, backfill, queued-run-coordinator, run-monitoring, auto-retry/event_log_consumer, asset and freshness daemons, each in a thread with heartbeats stored in the instance); _scheduler/scheduler.py (cron tick evaluation using vendored croniter in _vendored/croniter via _utils/schedules.py:11); components (YAML components incl. PythonScriptComponent and UvRunComponent); _cli. Other packages: dagster-webserver (UI + GraphQL host), dagster-graphql (Graphene schema + client), dagster-pipes (zero-runtime-dependency protocol library), libraries/dagster-shared (ipc, telemetry, yaml), dagster-dg-core/dagster-dg-cli/create-dagster (dg tooling), dagster-cloud-cli (Dagster+ CLI), and integration libraries (aws, k8s, docker, dbt, ...). Process model of `dagster dev`: parent plus webserver, daemon and gRPC code servers (tests expect 4 child processes: python_modules/dagster/dagster_tests/cli_tests/command_tests/dagster_dev_command_tests/test_dagster_dev_command.py:100,122,158); each run adds one run-worker process and one process per step (default max_concurrent = cpu_count, spawn start method: _core/executor/multiprocess.py:129-143), plus tail and orphan-watcher helper processes for compute-log capture on POSIX (_core/execution/compute_logs.py:123-145; scripts/watch_orphans.py:25-36).",
+      "packaging_and_release": "Build backend hatchling (python_modules/dagster/pyproject.toml:1-3). Packages are versioned in lockstep: core 1.13.25, libraries 0.29.25 (CHANGES.md:3); dagster-webserver pins dagster==1.13.25 and ships the prebuilt UI as a wheel artifact (python_modules/dagster-webserver/pyproject.toml:15-16,28-29). Published to PyPI; container images are built for linux/amd64 and linux/arm64 (python_modules/automation/automation/docker/cli.py:14). There is no GitHub Actions release or publish workflow (.github/workflows holds only docs, stale-bot, merge-gate and yarn.lock jobs). The in-repo publish path is a manually approved Buildkite block step (.buildkite/dagster-buildkite/dagster_buildkite/pipelines/prerelease_package.py:17-61) running scripts/build_and_publish.sh: sed-edits versions, `python3 -m build`, `python3 -m twine upload --username __token__ --password $PYPI_TOKEN` (scripts/build_and_publish.sh:93-111), then commits and pushes tag `<package>/v<version>` (:116-124). No checksum, signing, attestation/provenance, trusted-publishing or SBOM step was found in .github, .buildkite, scripts or python_modules/automation (searched for sigstore/cosign/attest/checksum/gpg; gpg appears only for apt keys in a CI Dockerfile). The annotated git tag 1.13.25 -> ff79297 exists (.git/packed-refs:2-3), but the pipeline that cut the core release is not in this repo. Release notes are CHANGES.md (undated). Compatibility policy: semver for public stable APIs; Preview APIs may break in patch releases; libraries stay 0.y.z (docs/docs/about/releases.md:8-55).",
+      "tests_and_ci": "pytest (+ xdist, split, timeout, rerunfailures, asyncio, syrupy snapshots) via the `dagster[test]` extra (python_modules/dagster/pyproject.toml:87-109), run through per-package tox.ini with tox-uv; python_modules/dagster/tox.ini:40-72 defines ~30 envs (api, cli, core, daemon, scheduler, launcher, storage, execution/pipes, ...). Jest for the UI (js_modules/app-oss/package.json:62; ui-core/package.json:9). Lint/type: ruff 0.16.2, ty 0.0.74, pyright 1.1.389, mypy 1.8.0 (pyproject.toml:116-166). Approximate test-file counts by glob: ~1,289 test_*.py under python_modules (571 in python_modules/dagster/dagster_tests, 542 under python_modules/libraries), 237 under examples/, 211 *.test.ts(x) under js_modules/. Relevant tests: dagster_tests/daemon_tests, scheduler_tests, launcher_tests, cli_tests/.../test_dagster_dev_command.py (e2e: dev starts, a schedule run is enqueued, child processes exit), execution_tests/pipes_tests (incl. test_reattach.py), dagster-graphql client_tests/test_terminate_run.py and test_terminate_runs.py. CI is a Buildkite pipeline (.buildkite/dagster-buildkite/dagster_buildkite/pipelines/dagster_oss_main.py:11-25) running repo-wide ruff/ty/prettier, SQL schema check, GraphQL client back-compat, helm, docs, UI and per-package tox steps (steps/dagster.py:32-173; steps/dagster_ui.py:22-57) on Linux Kubernetes (EKS) agents with a 35-minute default step timeout (buildkite_shared/step_builders/command_step_builder.py:10,13,158). Python matrix is 3.10/3.12/3.14 on release branches and 3.12 by default otherwise; 3.11 and 3.13 are omitted 'to stay below buildkite limits' (buildkite_shared/python_version.py:9-20,36-59). GitHub Actions only: docs build/deploy (build-docs.yml), docs frontmatter check (check-docs.yml), Copybara sync gate and maintainer-edits gate (merge gates referencing a private dagster-io/internal repo: copybara-sync-gate.yml:1-17,53), yarn.lock updater, stale-issue bot. Buildkite results are not visible from the repo.",
+      "dependencies": "Python manifests are pyproject.toml per package with uv.lock and `[tool.uv] exclude-newer = \"48h\"`. python_modules/dagster/pyproject.toml:22-57: 32 requirement lines / 28 distinct packages (click, coloredlogs, Jinja2, alembic, grpcio, grpcio-health-checking, protobuf, python-dotenv, pytz, requests, six, tabulate, tomli, tqdm, tzdata, structlog, sqlalchemy, toposort, watchdog, docstring-parser, universal_pathlib, rich, filelock, antlr4-python3-runtime, dagster-pipes==1.13.25, dagster-shared==1.13.25; psutil and pywin32 are Windows-only); extras: docker, test (~21 lines), mypy, pyright, ruff, ty. python_modules/dagster-webserver/pyproject.toml:13-19: 5 (click, dagster, dagster-graphql, starlette, uvicorn[standard]) + optional notebook. python_modules/dagster-graphql/pyproject.toml:12-18: 5 (dagster, graphene, gql[requests], requests, starlette). python_modules/dagster-pipes/pyproject.toml:5-19: 0 runtime deps. python_modules/libraries/dagster-shared/pyproject.toml:12-19: 6 (PyYAML, packaging, platformdirs, pydantic, typing_extensions, tomlkit). dagster-dg-core/pyproject.toml:12-31: 18. dagster-dg-cli/pyproject.toml:12-19: 6 (dagster-cloud-cli, dagster-dg-core, dagster-rest-resources, dagster, requests, typer) + optional `ai` extra (anthropic, claude-code-sdk). JS (bundled into the webserver wheel, not installed by users): js_modules/app-oss/package.json 22 deps + 23 dev; ui-core/package.json 49 deps + 11 peer + 90 dev; ui-components/package.json 13 deps + 6 peer + 56 dev. Vendored: croniter 6.0.0 (MIT-style license) and dateutil 2.9.0post0 (Apache-2.0) in python_modules/dagster/dagster/_vendored (README.md:7-10 there).",
+      "security_policy": "none found - no SECURITY.md at the repo root or in .github/ (file search); .github/ISSUE_TEMPLATE/config.yml:1-25 has no security contact; a grep for vulnerability-reporting text in root *.md, .github/, docs/docs/about, docs/docs/deployment/oss and docs/docs/guides/operate found only CHANGES.md fix notes (CHANGES.md:293,921). .github/dependabot.yml:1-19 configures npm and pip with open-pull-requests-limit: 0."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:81 - officially supports Python 3.9 through Python 3.14.",
+        "verified": "partial",
+        "evidence": "Code differs from README and wins: python_modules/dagster/pyproject.toml:12 requires >=3.10,<3.15 (same in webserver, graphql, pipes, shared and dg-* pyprojects), so 3.9 cannot be installed. docs/docs/getting-started/installation.md:11 and docs/docs/about/contributing.md:44 say 3.10+. CI covers 3.10/3.12/3.14 (.buildkite/buildkite-shared/buildkite_shared/python_version.py:9-20). python_modules/dagster/README.md:81 repeats the stale 3.9 text."
+      },
+      {
+        "claim": "README.md:35 - Dagster helps you run your functions at the right time and keep assets up to date (scheduling).",
+        "verified": "yes",
+        "evidence": "Cron schedules are evaluated every minute by the scheduler daemon (python_modules/dagster/dagster/_scheduler/scheduler.py:194-266; timezone defaults to UTC at :600-602; croniter vendored). Conditions: a daemon must be running (docs/docs/deployment/execution/dagster-daemon.md:7; started by `dagster dev`, _cli/dev.py:276-292); schedules default to STOPPED (_core/definitions/decorators/schedule_decorator.py:55); a non-partitioned schedule does not catch up after downtime - only the latest missed tick is evaluated (scheduler.py:637-639); partitioned catch-up is capped at 5 (_core/scheduler/scheduler.py:263); max_tick_retries defaults to 0 (:274-281)."
+      },
+      {
+        "claim": "README.md:35/:101 - work is declared as Python functions; docs say external code 'is not required to know anything about Dagster' (docs/docs/integrations/external-pipelines/index.md:18). Implied: existing commands can be orchestrated.",
+        "verified": "partial",
+        "evidence": "Existing commands run only through a Python wrapper: PipesSubprocessClient.run(command=[...]) calls subprocess.Popen (python_modules/dagster/dagster/_core/pipes/subprocess.py:117-128); docs example examples/docs_snippets/docs_snippets/integrations/external_pipelines/dagster_pipes/asset_wrapper.py:6-21; docs name it the equivalent of Airflow's BashOperator (docs/docs/migration/airflow-to-dagster/airflow-operator-migration/bash-operator-general.md:25). The in-repo components wrap only `python <script>` and `uv run <script>` (components/lib/executable_component/python_script_component.py:58-65; uv_run_component.py:58-63). No shell-command component or dagster-shell package exists in this repo (search)."
+      },
+      {
+        "claim": "docs/docs/deployment/execution/run-monitoring.md:30 - when Dagster terminates a run it moves to CANCELING and sends a termination signal to the run worker (cancellation of the run's process tree).",
+        "verified": "partial",
+        "evidence": "Cancel is cooperative signalling: DefaultRunLauncher.terminate reports CANCELING then calls gRPC cancel_execution (_core/launcher/default_run_launcher.py:153-184); the code server sets the run's termination event (_grpc/server.py:1289-1317); a thread sends SIGINT to the run worker (_utils/__init__.py:353-382; dagster_shared/ipc.py:64-71); the multiprocess executor forwards term events to step processes (_core/executor/multiprocess.py:227-240). PipesSubprocessClient sends SIGINT to its direct child and waits 20 s with no kill escalation (_core/pipes/subprocess.py:42-48,135-141). No process groups/sessions or tree kills exist in non-test code (no start_new_session/killpg/setsid matches); interrupt_then_kill_ipc_subprocess is defined but unused (dagster_shared/ipc.py:47-52). The 'mark as canceled immediately' policy only flips status and warns resources may remain (dagster_graphql/implementation/execution/__init__.py:72-88)."
+      },
+      {
+        "claim": "docs/docs/deployment/execution/run-monitoring.md:7 - Dagster can detect hanging runs and restart crashed run workers.",
+        "verified": "partial",
+        "evidence": "Worker-health checks run only if the launcher supports them (_daemon/monitoring/run_monitoring.py:121-171). The base class returns False for health checks and resume (_core/launcher/base.py:94-117) and DefaultRunLauncher does not override them; only the K8s, Docker, ECS, Celery, Celery-K8s and Azure Container Apps launchers do (e.g. dagster-k8s/dagster_k8s/launcher.py:328,380). Docs say the same (run-monitoring.md:84-88,97-104). Run monitoring is disabled by default and max_runtime_seconds defaults to 0 (_core/instance/methods/settings_methods.py:111-112,209). Start/cancel timeouts default to 180 s when monitoring is on (:103-108). When a code server survives, it marks a run whose worker died as failed (_grpc/server.py:584-605)."
+      },
+      {
+        "claim": "docs/docs/deployment/execution/run-retries.md:7 - with run retries configured, a new run is kicked off whenever a run fails for any reason.",
+        "verified": "partial",
+        "evidence": "Opt-in: run_retries.enabled defaults to False and max_retries to 0 (_core/instance/methods/settings_methods.py:149-154); needs the event-log-consumer daemon (_core/instance/methods/daemon_methods.py:94-95). Default strategy is FROM_FAILURE (_daemon/auto_run_reexecution/auto_run_reexecution.py:28; strategies ALL_STEPS/FROM_FAILURE/FROM_ASSET_FAILURE at _core/execution/plan/resume_retry.py:4-7); FROM_FAILURE needs an I/O manager that can read earlier outputs (docs run-retries.md:51). Op-level RetryPolicy supports delay, LINEAR/EXPONENTIAL backoff and jitter, default max_retries=1 (_core/definitions/policy.py:11-64); a crashed step process is reported and can be retried (_core/executor/multiprocess.py:297-319)."
+      },
+      {
+        "claim": "docs/docs/deployment/oss/oss-instance-configuration.md:192-194 (and run-coordinators.md:22) - the default run coordinator is DefaultRunCoordinator and there is no notion of Queued runs.",
+        "verified": "no",
+        "evidence": "Code differs from docs and wins: the default for a persistent instance is QueuedRunCoordinator (_core/instance/ref.py:319-323,446-451), whose own docstring says the daemon must be alive for runs to launch (_core/run_coordinator/queued_run_coordinator.py:90-92), with max_concurrent_runs default 10 (:109-111) and a queue daemon required (_core/instance/methods/daemon_methods.py:90-91). CHANGES.md:2340 (1.10.0) records the default change. DefaultRunCoordinator remains the default only for ephemeral instances (_core/instance/factory.py:56)."
+      },
+      {
+        "claim": "docs/docs/about/telemetry.md:7-22 - usage telemetry is collected from backend and frontend, logged at $DAGSTER_HOME/logs, and can be disabled with `telemetry: enabled: false`.",
+        "verified": "yes",
+        "evidence": "Default True unless ephemeral or disabled in settings (_core/instance/methods/settings_methods.py:60-74); log files written by dagster_shared/telemetry/__init__.py:63-86,144-146; uploaded to http://telemetry.dagster.io/actions (_core/telemetry_upload.py:11-13,121); frontend script https://dagster.io/oss-telemetry.js loaded only when enabled (js_modules/app-oss/src/extractInitializationData.ts:39-45). The 'no names of assets/ops/jobs' statement matches code that hashes names with SHA-256 (_core/telemetry.py:227-228,371-373); Dagster-maintained resource module/class names are sent in clear (:334-352)."
+      },
+      {
+        "claim": "README.md:83-85 - `uv add dagster dagster-webserver dagster-dg-cli` installs Dagster.",
+        "verified": "yes",
+        "evidence": "Same command in docs/docs/getting-started/installation.md:69. The three distributions exist: dagster (python_modules/dagster/pyproject.toml:6), dagster-webserver (python_modules/dagster-webserver/pyproject.toml:6) and dagster-dg-cli (python_modules/libraries/dagster-dg-cli/pyproject.toml:6, script `dg` at :25). dagster-dg-cli also pulls dagster-cloud-cli and dagster-rest-resources (:12-19)."
+      },
+      {
+        "claim": "README.md:149 - Dagster is Apache 2.0 licensed.",
+        "verified": "yes",
+        "evidence": "LICENSE is the Apache License 2.0 text (LICENSE:1-30); python_modules/dagster/pyproject.toml:10 sets license = \"Apache-2.0\"; each package carries its own LICENSE. Vendored croniter (MIT-style) and dateutil (Apache-2.0) keep their license files (python_modules/dagster/dagster/_vendored/croniter/LICENSE, .../dateutil/LICENSE; _vendored/README.md:7-10)."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Crash recovery on the default local launcher is limited. DefaultRunLauncher has no worker-health check or run-resume (base class returns False: python_modules/dagster/dagster/_core/launcher/base.py:94-117; only K8s, Docker, ECS, Celery, Celery-K8s and Azure Container Apps launchers override). Run monitoring and run retries are off by default and max_runtime_seconds defaults to 0 (_core/instance/methods/settings_methods.py:111-112,149-154,209). Docs say crash detection needs a non-default launcher (docs/docs/deployment/execution/run-monitoring.md:84-88,97-104). If a run worker and its code server both die, nothing in _daemon reconciles the STARTED run unless a timeout is configured (_daemon/monitoring/run_monitoring.py:121-171; a code server that survives marks the run failed: _grpc/server.py:584-605).",
+      "Cancellation is cooperative and does not bound the process tree. Terminate -> gRPC cancel -> termination event -> SIGINT to run worker -> term events to step processes (_core/launcher/default_run_launcher.py:153-184; _grpc/server.py:1289-1317; dagster_shared/ipc.py:64-71; _core/executor/multiprocess.py:227-240). PipesSubprocessClient signals only its direct child with SIGINT and waits 20 s; there is no SIGKILL escalation, so on timeout a TimeoutExpired propagates and the child is left running (_core/pipes/subprocess.py:117-141). Non-test code has no process-group/session handling (CREATE_NEW_PROCESS_GROUP only for Dagster's own service subprocesses on Windows: dagster_shared/ipc.py:26), and the 'mark as canceled immediately' option warns resources may not be cleaned up (dagster_graphql/implementation/execution/__init__.py:72-88; run_monitoring.py:278-290 does the same on timeout).",
+      "Scheduling depends on a live daemon and has limited catch-up. Schedules default to STOPPED (schedule_decorator.py:55); non-partitioned schedules run only the latest missed tick after downtime (_scheduler/scheduler.py:637-639); partitioned catch-up is capped at 5 and failed ticks are not retried by default (_core/scheduler/scheduler.py:263,274-281). With the default QueuedRunCoordinator, no run (including UI-launched) starts without the daemon (queued_run_coordinator.py:90-92). `dagster dev` exits if either the webserver or daemon subprocess dies and does not restart them; docs call it dev-only (_cli/dev.py:293-307; docs/.../running-dagster-locally.md:12,75-80). No systemd/launchd unit or init-system guide ships (search of docs and code).",
+      "Run history is ephemeral unless DAGSTER_HOME is set: without it `dagster dev`/`dg dev` store everything in .tmp_dagster_home_* under the cwd and delete it on exit (_cli/utils.py:50-72; docs/docs/deployment/oss/oss-instance-configuration.md:21). Default storage is per-instance SQLite files (_core/instance/ref.py:280-339). Ticks are kept indefinitely except skipped sensor ticks (7 days) (oss-instance-configuration.md:345).",
+      "Scope and footprint. The unit of work is a Python asset/op (README.md:35); existing commands need a Python wrapper (PipesSubprocessClient), and the in-repo components wrap only `python`/`uv run` scripts (components/lib/executable_component/python_script_component.py:58-65; uv_run_component.py:58-63). Idempotent re-attach primitives (PipesLaunchHandle) exist but no shipped client uses them; only a test does (_core/pipes/reattach.py:27-190; dagster_tests/execution_tests/pipes_tests/test_reattach.py). Local footprint: 4 child processes for `dagster dev` (test_dagster_dev_command.py:100,122,158), one run worker per run and one process per step with default concurrency = cpu_count (_core/executor/multiprocess.py:129-143), default cap of 10 concurrent runs (queued_run_coordinator.py:109-111), 28 direct Python dependencies in core including grpcio, protobuf, SQLAlchemy and alembic (python_modules/dagster/pyproject.toml:22-57); the documented install route pulls dagster-cloud-cli and dagster-rest-resources (dagster-dg-cli/pyproject.toml:12-19).",
+      "Security and privacy surface. Telemetry is on by default with plain-HTTP upload to telemetry.dagster.io and a script loaded from dagster.io by the UI (_core/telemetry_upload.py:11-13; js_modules/app-oss/src/extractInitializationData.ts:43); the documented opt-out is a dagster.yaml setting (docs/docs/about/telemetry.md:17-22). The local webserver has no authentication (docs/.../running-dagster-locally.md:77) while docs show binding 0.0.0.0 for service use (deploying-dagster-as-a-service.md:53); GraphQL launchRun/terminateRun are reachable by any client that can connect (docs/docs/api/graphql/index.md:167-235), with a `--read-only` flag available (dagster_webserver/cli.py:135-142). PipesSubprocessClient passes the full parent environment to the child (_core/pipes/subprocess.py:120-125). No SECURITY.md or vulnerability-reporting policy exists (see security_policy).",
+      "Release provenance and maintenance visibility. No GitHub release workflow; publishing is a manual Buildkite step using a PyPI token with twine and no signing, checksum or attestation (scripts/build_and_publish.sh:107-111). CI runs on external Buildkite, Linux only (no macOS/Windows job found), and skips Python 3.11 and 3.13 (buildkite_shared/python_version.py:19-20). The public repo is gated against a private internal repo via Copybara (.github/workflows/copybara-sync-gate.yml:1-17,53). The clone is shallow with one commit, so commit activity could not be assessed. Frequent patch releases (CHANGES.md:3,23,48); Preview/Beta APIs may change in patch/minor releases and libraries are 0.y.z (docs/docs/about/releases.md:23-55).",
+      "Docs and README drift plus CLI churn. README says Python 3.9+ but metadata requires >=3.10 (README.md:81 vs python_modules/dagster/pyproject.toml:12); docs name DefaultRunCoordinator as default while code (and CHANGES.md:2340) use QueuedRunCoordinator (oss-instance-configuration.md:192-194 vs _core/instance/ref.py:319-323); `dagster dev` is marked superseded by `dg dev` and emits a runtime warning (_cli/dev.py:136-139); `dagit` and --dagit-* flags are deprecated (dagster_webserver/cli.py:329-333). The only documented AI-agent integrations are the Dagster+ hosted MCP server (needs a Dagster+ account) and a skill in an external repo (docs/docs/getting-started/ai-tools/dagster-mcp.md:7-24; plugin.md:7)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "dagster-io/dagster",
+      "checks": [
+        {
+          "field": "readme.install[0] (uv)",
+          "statement": "uv (README quick start; also in docs): `uv add dagster dagster-webserver dagster-dg-cli`",
+          "citation": "README.md:77,83-85; docs/docs/getting-started/installation.md:63-69; python_modules/dagster/pyproject.toml:6; python_modules/dagster-webserver/pyproject.toml:6; python_modules/libraries/dagster-dg-cli/pyproject.toml:6,25",
+          "holds": true,
+          "note": "Revision confirmed: .git/HEAD = ff792970f74c364549b5ed877b921f1044cb720e, which tag 1.13.25 peels to (.git/packed-refs:2-3). README.md:83-85 has the exact command under 'Quick Start' (:77). installation.md:69 repeats it in the uv tab of 'Installation requirements for manually creating or updating a project' (:63-65), with the pip equivalent at :72. All three distributions are defined in-repo at 1.13.25: dagster, dagster-webserver, and dagster-dg-cli with its `dg` script at :25."
+        },
+        {
+          "field": "license",
+          "statement": "spdx Apache-2.0, file LICENSE",
+          "citation": "LICENSE:1-3,189-201; README.md:149; python_modules/dagster/pyproject.toml:10; python_modules/**/pyproject.toml license fields; python_modules/dagster/dagster/_vendored/dateutil/LICENSE:4-18,30-54; python_modules/dagster/dagster/_vendored/croniter/LICENSE:1-7",
+          "holds": true,
+          "note": "LICENSE is the Apache License 2.0 text, with 'Copyright 2025 Dagster Labs, Inc.' in the appendix (:189). README.md:149 says Apache 2.0. Every python_modules pyproject.toml declares Apache-2.0, including dagster-cloud-cli and dagster-rest-resources, which the documented install pulls in. Vendored croniter is MIT. A minor inaccuracy elsewhere in the dossier does not affect the project license: vendored dateutil is listed as Apache-2.0 only, but its LICENSE adds a BSD-3-Clause notice that 'Applies to all code' (:30-54)."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - docs give Linux/Unix steps; the Python test suite runs in Debian-based amd64 containers on Buildkite's Kubernetes queue; packages are pure Python (hatchling) with native grpcio/protobuf dependencies",
+          "citation": "docs/docs/getting-started/installation.md:95-99; docs/docs/getting-started/quickstart.md:54-58; python_modules/automation/automation/docker/images/buildkite-test/Dockerfile:127; .buildkite/buildkite-shared/buildkite_shared/step_builders/command_step_builder.py:13,158; python_modules/dagster/pyproject.toml:1-3,29-34",
+          "holds": true,
+          "note": "installation.md:95-99 is the Linux tab (activate the venv, run `dg --version`); quickstart.md:54-58 is the 'MacOS/Unix' tab. Dockerfile:127 adds a Docker apt source with `arch=amd64` for linux/debian. The base images are python:3.x-slim (buildkite-test/versions.yaml:1-15), and the Dockerfile downloads linux-amd64 binaries (:45-54). command_step_builder.py:13 defaults the queue to 'kubernetes-eks', and :158 assigns every step to it. pyproject.toml:1-3 uses hatchling with no native build hooks (:214-222), and :29-34 lists grpcio, grpcio-health-checking and protobuf."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "Only a hosted Dagster+ MCP server (beta; Dagster+ account via OAuth or user token; US/EU URLs). No MCP server for a local OSS instance exists in this repo: a search for 'mcp' hits only docs, sidebars and .claude agent files that mention a Buildkite MCP. The repo's .mcp.json is empty.",
+          "citation": "docs/docs/getting-started/ai-tools/dagster-mcp.md:7-24,38-47; .mcp.json:1-3",
+          "holds": false,
+          "note": "The cited parts hold. dagster-mcp.md:7-13 includes the 'only available in Dagster+' and 'Beta' partials (docs/docs/partials/_DagsterPlus.md:3, _Beta.md:3). Lines 19-22 give the US and EU URLs, :28-59 cover OAuth or user-token headers, and :38-47 give the Claude Code example. .mcp.json:1-3 is {\"mcpServers\": {}}. The conclusion also holds at 1.13.25: dg registers only check/utils/launch/list/scaffold/dev/api/labs/plus (dagster_dg_cli/cli/__init__.py:41-49), and the `ai` extra contains only anthropic and claude-code-sdk (dagster-dg-cli/pyproject.toml:27-31). The search sentence is false as written. A case-insensitive 'mcp' search also hits CHANGES.md:71,158,186,1213,1339. Line 1339 (1.11.5) announced a local `dg mcp` MCP server, and :1213 (1.11.11) moved its `mcp` dependency to the `ai` extra. The search also hits python_modules/libraries/dagster-dg-cli/uv.lock:425,2471 (mcp only as a transitive dependency of claude-code-sdk), dagster-rest-resources/dagster_rest_resources/__generated__/enums.py:368,371 (TOOL_TYPE_MCP) and dagster-datahub (DataHub MetadataChangeProposal, unrelated)."
+        },
+        {
+          "field": "claim_checks[0] (README.md:81, Python 3.9-3.14, verified: partial)",
+          "statement": "README claims Python 3.9 through 3.14, but python_modules/dagster/pyproject.toml:12 requires >=3.10,<3.15 (same in webserver, graphql, pipes, shared and dg-* pyprojects); docs say 3.10+; CI covers 3.10/3.12/3.14; python_modules/dagster/README.md:81 repeats the stale 3.9 text.",
+          "citation": "README.md:81; python_modules/dagster/pyproject.toml:12; python_modules/dagster-webserver/pyproject.toml:12; python_modules/dagster-graphql/pyproject.toml:11; python_modules/dagster-pipes/pyproject.toml:11; python_modules/libraries/dagster-shared/pyproject.toml:11; python_modules/libraries/dagster-dg-core/pyproject.toml:8; python_modules/libraries/dagster-dg-cli/pyproject.toml:8; docs/docs/getting-started/installation.md:11; docs/docs/about/contributing.md:44; .buildkite/buildkite-shared/buildkite_shared/python_version.py:9-20; python_modules/dagster/README.md:81",
+          "holds": true,
+          "note": "Every citation reproduces. README.md:81 says 3.9 through 3.14. All listed pyprojects have requires-python '>=3.10,<3.15', and so does create-dagster's (:8). installation.md:11 and contributing.md:44 say 3.10 or higher. python_version.py:19-20 returns 3.10/3.12/3.14 with 3.11 and 3.13 omitted. That full matrix runs only on release branches; other branches default to 3.12 (:37-59), as the dossier notes elsewhere. python_modules/dagster/README.md:81 has the same 3.9 text. 'partial' is the correct rating."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "readme.integrations.mcp: replace 'a search for 'mcp' hits only docs, sidebars and .claude agent files that mention a Buildkite MCP' with: 'Outside docs, sidebars and .claude, 'mcp' appears in CHANGES.md, lockfiles, a generated Dagster+ enum (python_modules/libraries/dagster-rest-resources/dagster_rest_resources/__generated__/enums.py:368,371) and dagster-datahub, where MCP means DataHub's MetadataChangeProposal. CHANGES.md:1339 (1.11.5) announced a local `dg mcp` MCP server, and CHANGES.md:1213 (1.11.11) moved its `mcp` dependency to the `ai` extra. At 1.13.25, dg registers no mcp group (python_modules/libraries/dagster-dg-cli/dagster_dg_cli/cli/__init__.py:41-49), the `ai` extra lists only anthropic and claude-code-sdk (python_modules/libraries/dagster-dg-cli/pyproject.toml:27-31), and `mcp` appears only as a transitive dependency of claude-code-sdk (python_modules/libraries/dagster-dg-cli/uv.lock:425). That earlier local server is therefore no longer shipped.'",
+        "Minor, does not affect the verdict. In code.dependencies and in the README.md:149 claim check, change 'dateutil 2.9.0post0 (Apache-2.0)' to 'dateutil 2.9.0post0 (Apache-2.0 AND BSD-3-Clause; python_modules/dagster/dagster/_vendored/dateutil/LICENSE:4-18,30-54)'."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,319 @@
+{
+  "contender": "vectifyai/pageindex",
+  "revision": {
+    "contender": "vectifyai/pageindex",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "vectifyai/pageindex",
+        "tag": "v0.2.21",
+        "commit": "6d23caf416858f2ca136840305d1f479a86f6ef7",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.2.21",
+    "commit": "6d23caf416858f2ca136840305d1f479a86f6ef7",
+    "read_at": "2026-10-02T03:02:57+00:00"
+  },
+  "dossier": {
+    "contender": "vectifyai/pageindex",
+    "revision": {
+      "tag": "v0.2.21",
+      "commit": "6d23caf416858f2ca136840305d1f479a86f6ef7",
+      "read_at": "2026-10-02T03:02:57+00:00"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "PageIndex (Vectify AI) is a Python SDK plus helper scripts for \"vectorless, reasoning-based RAG\" over long PDFs. It builds a hierarchical tree index per document (titles, node ids, 1-based page ranges, LLM-written summaries). It answers questions by running an LLM agent that lists documents, reads the tree (get_document_structure), then reads page text (get_page_content) (README.md:14-16, 46-49; pageindex/agent_tools.py:305-307; cookbook/pageindex-flash-demo.ipynb cell-10 output). One client has two modes. Local (open source): PDF text layer, pypdfium2 layout analysis, PyPDF2 page text, LiteLLM calls for summaries and chat, JSON files under ./.pageindex. Cloud (PageIndex-hosted API at https://api.pageindex.ai): server-side parsing/OCR, folders, relevance sort, block-level citations, MCP server; API key required (README.md:180-208; pageindex/client.py:315-453). Facts bearing on the stated needs: (1) The repo contains no lexical, vector or hybrid search and no embedding code. Local browse_documents lists by recency only and rejects relevance ranking (agent_tools.py:729-749). Relevance ranking exists only in the hosted Cloud tool, whose code is not in the repo. (2) The local client ingests only .pdf files with a text layer. It stores extracted page text plus the tree as JSON, not the original file (local_api.py:118-122, 160-173). Markdown is handled only by a standalone heading-tree builder (page_index_md.py, run_pageindex.py --md_path) that the client and agent tools do not use. (3) There is no converter in the repo for Office, EPUB, HTML or scans to Markdown. Local mode refuses image-only PDFs (\"run OCR before indexing it\", flash/api.py:166-169). OCR exists only server-side in Cloud (README.md:180). (4) MCP is offered only by the hosted Cloud server. The repo ships an MCP client and in-process tool adapters for Python agent frameworks, and no standalone MCP server. No Claude Code or Codex integration was found.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "SDK local mode: `pip install -U pageindex` ships local mode, which can \"index, retrieve, and chat entirely on your machine with your own LLM key, or point the same client at PageIndex Cloud with an API key.\"",
+          "citation": "README.md:33"
+        },
+        {
+          "claim": "PageIndex Flash: \"fast tree index generation for text-based PDFs, now the default indexing method in PageIndex SDK local mode.\"",
+          "citation": "README.md:34"
+        },
+        {
+          "claim": "\"Vectorless, Reasoning-based RAG ... No Vector DB, No Chunking\"; PageIndex \"replaces the vector index with a hierarchical tree index and lets an LLM reason its way through it.\"",
+          "citation": "README.md:14-16, 46"
+        },
+        {
+          "claim": "Retrieval has two steps: (1) generate a tree-structure index for each document; (2) agentically search that tree with LLM reasoning.",
+          "citation": "README.md:48-49"
+        },
+        {
+          "claim": "\"The tree structure itself is extracted from the document layout without an LLM; the index model only summarizes and refines it.\"",
+          "citation": "README.md:101"
+        },
+        {
+          "claim": "Local vs Cloud table: Local handles text-based PDFs, indexes on your machine and stores in a local directory; Cloud handles text-based, scanned and image-rich documents; OCR & image understanding is Cloud-only (dash under Local).",
+          "citation": "README.md:199-205"
+        },
+        {
+          "claim": "Table rows: citations are page-level (Local) vs block-level (Cloud); Metadata, Folders and MCP server are Cloud-only (dash under Local).",
+          "citation": "README.md:204, 206-208"
+        },
+        {
+          "claim": "\"With PageIndex Cloud, document indexing and storage run in the cloud: PageIndex handles parsing, OCR, image understanding, tree-index construction, and managed storage for you\"; the chat/retrieval layer stays compatible with your own model provider.",
+          "citation": "README.md:180"
+        },
+        {
+          "claim": "PageIndex File System: a Cloud-only, file-level tree indexing layer that lets PageIndex reason over an entire corpus (\"Scale PageIndex to Millions of Documents\").",
+          "citation": "README.md:35, 212"
+        },
+        {
+          "claim": "\"Drop PageIndex tools into the OpenAI Agents SDK, the Claude Agent SDK, or any other framework.\"",
+          "citation": "README.md:108-110"
+        },
+        {
+          "claim": "Local indexing runs \"about $0.001 per page\" with gpt-5.6-luna (a 1,000-page textbook \"a little over a dollar\"); the 9 to 1,098-page benchmark documents finished in roughly 13 seconds to 4.5 minutes.",
+          "citation": "README.md:117, 126"
+        },
+        {
+          "claim": "PageIndex reached a \"state-of-the-art 98.7% accuracy\" on FinanceBench, \"vastly outperforming vector-based RAG.\"",
+          "citation": "README.md:164"
+        },
+        {
+          "claim": "For dedicated deployment (VPC or on-premises) the reader is told to contact the vendor.",
+          "citation": "README.md:219"
+        },
+        {
+          "claim": "Positioned for \"financial reports, legal documents, regulatory filings, technical manuals, medical literature, academic textbooks, and any other long, complex professional document.\"",
+          "citation": "README.md:71"
+        }
+      ],
+      "install": [
+        {
+          "method": "pip (PyPI)",
+          "command": "pip install -U pageindex",
+          "citation": "README.md:79"
+        },
+        {
+          "method": "pip extra for the Claude Agent SDK adapter (documented in a code docstring and error message, not in the README)",
+          "command": "pip install 'pageindex[claude]'",
+          "citation": "pageindex/client.py:2251-2252; pageindex/integrations/claude_agent_sdk.py:30-36"
+        },
+        {
+          "method": "pip extra for the Anthropic SDK tool-runner adapter (documented in a code docstring and error message, not in the README)",
+          "command": "pip install 'pageindex[anthropic]'",
+          "citation": "pageindex/client.py:2145-2146; pageindex/integrations/anthropic_sdk.py:36-41"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - CI runs the full test matrix on ubuntu-latest (.github/workflows/tests.yml:18; publish.yml:29). README gives only the platform-neutral `pip install -U pageindex` (README.md:79). The repo declares no compiled extension of its own (pyproject.toml:20-25). Runner architecture is implicit, not stated in the workflows.",
+        "wsl2": "unknown - WSL is not mentioned anywhere in the repo (grep found nothing) and there is no WSL CI job; the Linux CI above is the nearest evidence.",
+        "macos_arm64": "unknown - no macOS job in CI (tests.yml:18 is ubuntu-only), no macOS statement in the README, and pyproject.toml:8-18 lists no Operating System classifiers. The code does anticipate spawn-style multiprocessing (pageindex/flash/parser_pdfium_parallel.py:163; pageindex/local_api.py:77-82).",
+        "gpu": "no - no GPU, CUDA or torch references in code or dependencies (grep for gpu|cuda|torch matched nothing). Model inference is remote through LiteLLM or a user-supplied api_base (pageindex/utils.py:166-200; pageindex/client.py:425-434)."
+      },
+      "integrations": {
+        "cli": "No installed console script (pyproject.toml has no scripts table). Repo-root script run_pageindex.py (not part of the packaged `pageindex` package, pyproject.toml:20) takes --pdf_path or --md_path, --mode flash|standard (default flash), --index-model/--summary-model, --optimize, --summary/--no-summary and --if-add-node-text, and writes ./results/<name>_structure.json (run_pageindex.py:9-61, 143-155, 203-211; documented in pageindex/flash/README.md:22-29). `python -m pageindex.tree_optimize --pdf ... --structure ...` is a second CLI that needs pymupdf (pageindex/tree_optimize.py:134-149, 929-1032). Both only build or refine tree JSON; neither searches or serves documents.",
+        "mcp": "Cloud only. Hosted MCP server at https://api.pageindex.ai/mcp (read-only subset at /mcp?tools=read), Bearer PageIndex API key (pageindex/integrations/claude_agent_sdk.py:20-28; pageindex/agent_tools.py:1490-1510; pageindex/client.py:453). README marks 'MCP server' Cloud yes / Local no and links https://docs.pageindex.ai/mcp (README.md:208; not fetched). The repo contains only an MCP client (pageindex/mcp_bridge.py:1-13) and in-process tool servers for Python agent frameworks (pageindex/integrations/openai_agents.py:33-74; claude_agent_sdk.py:30-65). It has no standalone stdio/HTTP MCP server for local documents. The frozen cloud tool contract lists 5 tools: browse_documents, get_document, get_document_structure, get_page_content, remove_document (tests/data/cloud_mcp_contract.json:3-214). Code comments also name cloud-only search_documents, get_folder_structure and get_document_image (agent_tools.py:6-8, 48-60, 235-236); the live list is discovered at runtime (agent_tools.py:1530-1545).",
+        "sdk_or_api": "Python SDK (PyPI `pageindex`, Python >=3.10, pyproject.toml:28): PageIndexClient, PageIndexLocalClient, PageIndexCloudClient (pageindex/__init__.py:4-5; client.py:315, 2651, 2685). Methods: submit_document, get_ocr, get_page_content, get_tree, get_document_structure, get_document, list_documents, delete_document, chat (answer lane plus chat_completions/responses/messages protocols), get_citations/resolve_citations, and cloud-only folder, block and page-image methods (client.py:736-2640). Cloud REST API at https://api.pageindex.ai with an `api_key` header: POST /doc/, GET /doc/{id}/?type=ocr|tree, /doc/{id}/metadata/, /docs/, DELETE /doc/{id}/, POST /chat/completions/, deprecated /retrieval/, /folder/ and /folders/ (pageindex/cloud_api.py:33-565). Docs are linked from README.md:104-110 (not fetched).",
+        "claude_code_or_codex": "None found for Claude Code or Codex themselves: no plugin, skill, AGENTS.md, CLAUDE.md or .mcp.json in the repo. Adjacent adapters exist. Claude Agent SDK: client.as_claude_mcp() / claude_agent_config() return a remote {type: http, url: .../mcp, Authorization: Bearer} entry for cloud clients and an in-process SDK MCP server for local clients, which needs `pageindex[claude]` (client.py:2240-2340; integrations/claude_agent_sdk.py:18-65). OpenAI Agents SDK: as_openai_tools() / openai_agent_config() (client.py:1985-2113). Anthropic SDK tool runner: as_anthropic_tools() / anthropic_runner_config() (client.py:2115-2238). Plain functions for any framework: agent_tools() (client.py:1951-1983). .claude/commands/dedupe.md and .github/workflows/issue-dedupe.yml are the maintainers' own issue-triage automation, not a user integration."
+      },
+      "telemetry_and_network": "README is silent on telemetry; it names only an LLM key (README.md:87) and, for cloud, a PageIndex API key (README.md:182-189). Code: no analytics, telemetry or tracking code found (grep for telemetry|analytics|posthog|sentry|mixpanel matched only the comment at pageindex/local_chat.py:484). The OpenAI-Agents-SDK chat lanes run with tracing disabled (local_chat.py:483-489). Local mode network use: every indexing summary, tree-expansion and description call and every chat turn goes to the configured LLM endpoint via LiteLLM (default models gpt-5.6-luna / gpt-5.6-sol; utils.py:166-200, 1255-1256), so page text leaves the machine unless index_backend/chat_backend api_base points at a local server (client.py:425-434). pageindex.utils sets LITELLM_LOCAL_MODEL_COST_MAP=True by default so LiteLLM does not fetch its model-cost map (utils.py:17-18; tests/test_package_surface.py:158-188). Cloud mode (api_key or index='cloud'): documents, queries and the key go to https://api.pageindex.ai (client.py:453; cloud_api.py:33-34, 74-80); with own-model chat over cloud documents, page content flows through the caller's process to the caller's model provider (client.py:386-388). The SDK identifies itself to the cloud MCP server as clientInfo 'pageindex-python-sdk' plus the package version on initialize (mcp_bridge.py:160-168). Importing pageindex.utils auto-loads the nearest .env (utils.py:15-16). Accounts needed: an LLM-provider key (local) and/or a PageIndex API key (cloud; client.py:352-353). Whether LiteLLM or other third-party dependencies phone home cannot be determined from this repo, which sets no other switch for them."
+    },
+    "code": {
+      "languages": [
+        "Python (package, CLI scripts and tests; 96 .py files under pageindex/, 74 of them in pageindex/flash/)",
+        "JavaScript (one GitHub Actions helper: .github/scripts/autoclose-labeled-issues.js)",
+        "Shell (one GitHub Actions helper: .github/scripts/comment-on-duplicates.sh)"
+      ],
+      "entry_points": [
+        {
+          "path": "pageindex/__init__.py",
+          "what": "Public SDK: PageIndexClient, PageIndexLocalClient, PageIndexCloudClient, ChatStream, PageIndexAPIError; lazy page_index_flash, md_to_tree, optimize_tree, highlight_region."
+        },
+        {
+          "path": "run_pageindex.py",
+          "what": "CLI script at the repo root, not installed by the wheel: PDF (flash or standard mode) or Markdown to a tree JSON in ./results/<name>_structure.json."
+        },
+        {
+          "path": "pageindex/flash/api.py",
+          "what": "page_index_flash(): PDF to tree JSON (fully LLM-free with summary=False, optimize=False) and flash_rejection_reason() (refusal policy)."
+        },
+        {
+          "path": "pageindex/page_index_md.py",
+          "what": "md_to_tree(): Markdown to a heading tree (ATX '#' headings and bold-only lines, line numbers, optional text/summaries); standalone, not wired into the client. Its demo __main__ references a sample .md absent from examples/documents."
+        },
+        {
+          "path": "pageindex/page_index_classic.py",
+          "what": "page_index_main()/page_index(): older 'standard' LLM-built PDF tree (TOC detection, page-offset repair), also used by local mode='standard'."
+        },
+        {
+          "path": "pageindex/tree_optimize.py",
+          "what": "optimize_tree plus `python -m pageindex.tree_optimize` CLI: merge/LLM-expand refinement of an existing tree JSON (imports pymupdf)."
+        },
+        {
+          "path": "pageindex/agent_tools.py",
+          "what": "TOOL_CONTRACT (5 tools), call_tool(), agent instructions and citation prompts; the local tool layer mirroring the cloud MCP tools."
+        },
+        {
+          "path": "pageindex/mcp_bridge.py",
+          "what": "McpBridge: minimal MCP streamable-HTTP client for the hosted https://api.pageindex.ai/mcp server."
+        }
+      ],
+      "architecture": "One Python package, pageindex/. (1) Facade: client.py (PageIndexClient, resolves index=/chat= slots) delegates to local_api.py (LocalAPI over local_store.py's JSON DocStore: <storage_path>/docs/<doc_id>/{doc.json,tree.json,pages.json} plus manifest.json; default ./.pageindex) or cloud_api.py (requests-based REST calls to https://api.pageindex.ai). (2) Indexing, PDF only: pageindex/flash/ is a layout-statistics pipeline over pypdfium2 char-level spans. The stages are parser_pdfium_charlevel, parser_pdfium_parallel (spawn process pool), clustering/blocks/columns, classification (header/footer/TOC), heading_detection, title and outline_assembly. embedded_toc.py reconciles PDF bookmarks, main.py has extract_toc and api.py the public page_index_flash. tree_optimize.py then merges nodes and expands them with an LLM. utils.py holds the LiteLLM wrappers llm_completion/llm_acompletion (10-attempt retry loop), SummaryScheduler summaries and ConfigLoader with config.yaml. Stored page text comes from PyPDF2 (local_api.py:208-216), while the tree comes from pypdfium2. page_index_classic.py is the older LLM-built 'standard' mode and page_index_md.py the standalone Markdown heading-tree builder. (3) Retrieval has no index lookup: local_chat.py runs an LLM agent loop (OpenAI Agents SDK via LiteLLM, or Anthropic Messages; tracing disabled) over agent_tools.py tools browse_documents (time-ordered listing), get_document, get_document_structure, get_page_content and, with management enabled, remove_document. get_page_content caps a response at about 95,000 characters (agent_tools.py:39-42, 1076-1112). For cloud clients the tools are discovered from the hosted MCP server through mcp_bridge.py. (4) integrations/ holds the OpenAI Agents, Anthropic SDK and Claude Agent SDK adapters; imaging.py highlights bounding boxes with Pillow.",
+      "packaging_and_release": "Poetry-core build backend (pyproject.toml:65-67); sdist and wheel built with `python -m build` (publish.yml:90). Tag-driven: pushing a PEP 440 `v*` tag runs publish.yml (lines 22-25). The version is injected from the tag by sed (publish.yml:86-89), so the committed pyproject.toml still carries the placeholder version 0.2.10 (pyproject.toml:3) although the tag is v0.2.21. The 5-leg test matrix gates publishing (publish.yml:27-64). PyPI upload uses OIDC trusted publishing (environment `pypi`, id-token: write, pypa/gh-action-pypi-publish pinned by SHA; publish.yml:66-69, 92-93). A GitHub Release with generated notes and dist/* attached is created, except for 'dev' tags (publish.yml:95-105). No checksum, signature or provenance step is defined in the workflow (any attestation behaviour of the publish action is not set here and cannot be verified from the repo). pyproject declares only the `pageindex` package plus config.yaml and flash/data/*.json (pyproject.toml:20-25); run_pageindex.py, examples/, cookbook/ and tests/ are outside it and no console script is declared.",
+      "tests_and_ci": "pytest (`python -m pytest -q`, tests.yml:46). 11 test modules in tests/ (test_client, test_agent_tools, test_local_chat, test_flash_extraction, test_issue_163, test_tree_format, test_package_surface, test_naming, test_imaging, test_page_index, test_page_index_md) with about 655 `def test_` functions (parametrization not counted); test_page_index_md.py uses unittest style. Fixtures: tests/conftest.py (builds minimal PDFs, sets dummy provider keys, lines 4-8), tests/data/flash/*.pdf (ar, hi, ja, zh), tests/data/cloud_mcp_contract.json (frozen cloud MCP tool contract), tests/fixtures/naming-v1.json. Seven live-cloud tests skip unless PAGEINDEX_API_KEY is set (tests/test_agent_tools.py:2271-2647), and CI passes that secret to the test step (tests.yml:47-48). No retrieval-quality or evaluation runner was found in the repo (benchmarks live in external repos named in the README). Workflows in .github/workflows/ (8): tests.yml (push to main, PRs, manual; ubuntu-latest only; Python 3.10 and 3.13 x with/without agent frameworks x pypdfium2 5, plus a py3.10 pypdfium2<5 leg; `gate` job); publish.yml (same matrix, then publish); codeql.yml (language `actions` only, push/PR to main and weekly; lines 25-29); dependency-review.yml (PRs to main, fail-on-severity moderate); issue-dedupe.yml (anthropics/claude-code-action triaging new issues), backfill-dedupe.yml, autoclose-labeled-issues.yml and remove-autoclose-label.yml (issue housekeeping). No lint, type-check, coverage, macOS or Windows jobs found.",
+      "dependencies": "pyproject.toml (Poetry): 13 required runtime dependencies (requests, urllib3, openai, openai-agents, mcp, litellm, PyPDF2, pypdfium2, sortedcontainers, regex, python-dotenv, pyyaml, Pillow; lines 27-43), 2 optional extras (claude-agent-sdk, anthropic; lines 45-54) and 1 dev dependency (pytest; line 57); python >=3.10. requirements.txt: 13 entries (CI install source) pinning litellm==1.97.0, PyPDF2==3.0.1, pypdfium2==5.13.0, python-dotenv==1.2.2, pyyaml==6.0.2 and sortedcontainers==2.4.0, with the rest lower-bounded. No lockfile (poetry.lock/uv.lock) found. pymupdf is imported lazily (tree_optimize.py:136; utils.py:548) but only mentioned as a comment in requirements.txt:8, not declared in pyproject.toml.",
+      "security_policy": "none - no SECURITY.md (or SECURITY*) file anywhere in the repo, and the README has no vulnerability-reporting instructions. Related automation: dependency-review on PRs (.github/workflows/dependency-review.yml), Dependabot for github-actions only (.github/dependabot.yml:1-10), CodeQL scanning only GitHub Actions workflows (.github/workflows/codeql.yml:25-29)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Local mode can \"index, retrieve, and chat entirely on your machine with your own LLM key\" (README.md:33); the quickstart is PageIndexClient(index=..., chat=...), submit_document(...), chat(...) (README.md:83-97).",
+        "verified": "partial",
+        "evidence": "The quickstart API shape matches the code (client.py:198-222, 270-288, 736-794, 1165-1190; default models utils.py:1255-1256; cookbook/pageindex-flash-demo.ipynb). Storage is local JSON under ./.pageindex (client.py:654; local_store.py:73-125). But local mode is not offline: summaries, tree expansion, the document description and every chat turn call an LLM through LiteLLM (utils.py:166-200; local_api.py:237-258). Page text therefore goes to the configured provider unless index_backend/chat_backend api_base points at a local endpoint (client.py:425-434). Only tree extraction is LLM-free (flash/README.md:3-5; flash/api.py:184 with summary=False, optimize=False)."
+      },
+      {
+        "claim": "\"No Vector DB, No Chunking\"; retrieval is an LLM reasoning over a hierarchical tree (README.md:16, 46-49).",
+        "verified": "yes",
+        "evidence": "No embedding, vector-store or BM25 code or dependency exists (pyproject.toml:27-48; a grep for embedding|faiss|chroma|bm25|cosine matched only unrelated comments). Local retrieval is an agent loop over browse_documents (time-ordered listing), get_document, get_document_structure and get_page_content (agent_tools.py:305-307, 723-834, 905-1125). Relevance ranking is explicitly refused locally (agent_tools.py:738-749). The stored units are per-page text (local_api.py:154-156) and page-range nodes."
+      },
+      {
+        "claim": "Local \"handles text-based PDFs\" with no OCR or image understanding (README.md:201, 205).",
+        "verified": "yes",
+        "evidence": "local_api.py:118-122 rejects any non-.pdf file (\"only PDF files are supported in local mode\"). flash/api.py:166-169 refuses image-only PDFs (\"run OCR before indexing it\"), flash/api.py:19-21, 64-67 refuses encrypted PDFs, and flash/api.py:16, 170-173 refuses structure-less documents over 10 pages in flash mode. client.py:849-852: no OCR model runs locally. Page text is plain PyPDF2 extract_text stored under a key named 'markdown' (local_api.py:155-156, 208-216). No Office/EPUB/HTML handling exists (grep for docx|epub|pptx|xlsx|html found none). Markdown files are not accepted by submit_document (local_api.py:119-122)."
+      },
+      {
+        "claim": "Cloud \"handles parsing, OCR, image understanding, tree-index construction, and managed storage\"; handles scanned and image-rich documents (README.md:180, 201).",
+        "verified": "not_checkable",
+        "evidence": "Processing is server-side. The SDK only uploads the file (POST {BASE_URL}/doc/, cloud_api.py:74-80) and reads OCR/tree results (cloud_api.py:90-113, 194-216). Its docstring says \"Upload a PDF document\" (cloud_api.py:47). The SDK does no file-type validation for cloud uploads, and no Office/EPUB/HTML handling or list of supported cloud formats appears in the repo. get_ocr(format='raw') is described as 'concatenated markdown' (cloud_api.py:96; client.py:843)."
+      },
+      {
+        "claim": "Metadata is Cloud-only (dash under Local) (README.md:206).",
+        "verified": "partial",
+        "evidence": "README and code differ; the code is taken as authoritative. Local submit_document validates and stores a metadata dict (local_api.py:91-101, 161-170). get_document, get_tree, get_ocr and list_documents return it (local_api.py:325-333, 347-349, 385), and client.py:767-769 says '(both modes)'. No metadata filtering or search exists in either client (list_documents filters by exact name only: local_api.py:374-375; cloud_api.py:451-481). Whether Cloud has server-side metadata features cannot be checked here."
+      },
+      {
+        "claim": "Citations are page-level locally and block-level in Cloud (README.md:204).",
+        "verified": "yes",
+        "evidence": "The local citation prompts are page-only (\"Local page content has no block_id\", agent_tools.py:1630-1655). get_block raises in local mode (client.py:876-899); block lookup is the cloud endpoint /doc/{id}/block/{block_id}/ (cloud_api.py:115-140). get_citations returns only {document, doc_id, page} for page-level citations, with no page text (client.py:2437-2445), so a caller must fetch pages with get_page_content to verify."
+      },
+      {
+        "claim": "MCP server: Cloud only (README.md:208).",
+        "verified": "yes",
+        "evidence": "The MCP endpoint is the hosted {BASE_URL}/mcp (client.py:453; agent_tools.py:1490-1510; integrations/claude_agent_sdk.py:20-28). The repo has only an MCP client (mcp_bridge.py:1-13) and in-process tool servers inside Python agent frameworks (integrations/openai_agents.py:33-74; claude_agent_sdk.py:30-65). The `mcp` package is used for types only (anthropic_sdk.py:42; openai_agents.py:36). No server entry point or console script exists (pyproject.toml has no scripts)."
+      },
+      {
+        "claim": "Flash extracts the tree \"from the document layout without an LLM; the index model only summarizes and refines it\" and is the default local indexing method (README.md:34, 101).",
+        "verified": "yes",
+        "evidence": "Local submit_document defaults to mode 'flash' (local_api.py:107-108). The pipeline is a pypdfium2 layout-statistics extractor (flash/main.py:1-6, 124-133). summary=False, optimize=False runs fully LLM-free (flash/README.md:14-17; flash/api.py:184, 197-204). The default local path also runs an LLM merge/expand pass, node summaries and a document description (local_api.py:237-258; flash/api.py:228-244), so the LLM does more than summarize. Page text for storage comes from PyPDF2, not the flash parser (local_api.py:208-216), with an ad hoc page-bounds cross-check (local_api.py:191-206)."
+      },
+      {
+        "claim": "PageIndex File System is a Cloud-only layer that reasons over an entire corpus (README.md:35, 212).",
+        "verified": "not_checkable",
+        "evidence": "No corresponding code exists in the repo. The local library is a flat, newest-first list with unique names (local_api.py:176-189, 356-393). The local agent instructions tell the model to page through the whole library 50 documents at a time before concluding a document is absent (agent_tools.py:1611-1617). Cloud folders and relevance sort are referenced only as server tools (agent_tools.py:6-8, 506-517, 738-749)."
+      },
+      {
+        "claim": "\"Drop PageIndex tools into the OpenAI Agents SDK, the Claude Agent SDK, or any other framework\" (README.md:108-110).",
+        "verified": "yes",
+        "evidence": "client.as_openai_tools()/openai_agent_config() (client.py:1985-2113; integrations/openai_agents.py:77-102), as_claude_mcp()/claude_agent_config() (client.py:2240-2340; integrations/claude_agent_sdk.py:18-65), as_anthropic_tools()/anthropic_runner_config() (client.py:2115-2238) and plain functions via agent_tools() (client.py:1951-1983). Local clients get in-process tools; cloud clients get the hosted MCP tools."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Local (open-source) indexing cost, gpt-5.6-luna as index model, nine PDFs of 9 to 1,098 pages",
+        "metric": "USD per page",
+        "value": "about $0.0011 per page (chart label 'corpus average'); README: 'about $0.001 per page', a 1,000-page textbook 'a little over a dollar'",
+        "source": "README.md:117; assets/index-cost-light.png",
+        "independent": false
+      },
+      {
+        "what": "Local indexing wall-clock time with tree optimization, same nine PDFs",
+        "metric": "end-to-end seconds",
+        "value": "roughly 13 s to 4.5 min for 9 to 1,098 pages; proportional fit 218 s per 1,000 pages (R^2 = 0.924)",
+        "source": "README.md:126; pageindex/flash/README.md:63-68; pageindex/flash/assets/time_vs_pages.png",
+        "independent": false
+      },
+      {
+        "what": "Flash pipeline LLM token usage (merge, expand and summaries) on nine PDFs",
+        "metric": "input/output tokens per document",
+        "value": "e.g. 9 pages: 8,715 in / 4,673 out; 222 pages: 280,975 / 136,982; 1,098 pages: 1,587,265 / 646,958",
+        "source": "pageindex/flash/README.md:70-79",
+        "independent": false
+      },
+      {
+        "what": "Local query accuracy vs cost (flash indexing, no OCR): 62 lookup questions over 34 PDFs (1,945 pages) from MMLongBench-Doc-V2",
+        "metric": "accuracy and average cost per question (log axis about $0.003 to $0.10)",
+        "value": "labelled chart points only: gpt-5.6-luna high 96.8%; gpt-5.6-terra high 100%; gpt-5.6-sol medium/high 100% and none/low 96.8%. Other effort levels are plotted but unlabelled; full data is in the external repo VectifyAI/PageIndex-OSS-Benchmark, not in the working directory",
+        "source": "README.md:139-149; assets/results-light.png",
+        "independent": false
+      },
+      {
+        "what": "Cost per query: PageIndex retrieval vs passing the whole PDF natively to gpt-5.6-sol (prompt caching excluded, identical answers)",
+        "metric": "cost ratio (native / PageIndex)",
+        "value": "2.1x at 52 pages, 3.4x at 85, 7.8x at 198, 16.6x at 420; at 805 pages the PDF exceeds the context window (chart assumes about 1,650 tokens/page)",
+        "source": "README.md:153; assets/query-cost-light.png",
+        "independent": false
+      },
+      {
+        "what": "FinanceBench (financial document QA; the dataset is third-party, the run is by the project via its Mafin 2.5 write-up)",
+        "metric": "accuracy",
+        "value": "PageIndex 98.7% vs vector RAG 50% (as charted); evaluation repo VectifyAI/Mafin2.5-FinanceBench and blog are external and not verifiable from this repo",
+        "source": "README.md:164-175; assets/financebench-light.png",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Ingestion scope. The local client accepts only .pdf files with a text layer (pageindex/local_api.py:118-122). Image-only, encrypted and structure-less long PDFs are refused (flash/api.py:16, 19-21, 166-173). Markdown is handled only by the standalone md_to_tree/CLI, which builds a heading-regex tree: ATX '#' headings and bold-only lines (page_index_md.py:32-68; run_pageindex.py:157-211). With default CLI flags the output has titles and line numbers but no body text (run_pageindex.py:175-198). It is not stored in or served by PageIndexClient or the agent tools. No Office/EPUB/HTML/scan conversion code was found.",
+      "No lexical, vector or hybrid search exists. Local browse_documents is a recency-ordered listing and rejects sort='relevance' and query (agent_tools.py:729-749). The agent instructions tell the model to page through the entire library 50 at a time (agent_tools.py:1611-1617). Locating content relies on an LLM reading document names, descriptions, tree summaries and pages, so every query costs LLM calls (README.md:49; local_chat.py). Relevance ranking exists only in the hosted Cloud tool, whose implementation is not in the repo.",
+      "Cloud dependence and opacity. OCR, block-level citations/bounding boxes, folders, metadata features, relevance ranking, the MCP server and the File System layer are Cloud-only (README.md:199-212; client.py:876-935; agent_tools.py:6-8). Using them uploads documents and queries to https://api.pageindex.ai with an API key (client.py:453; cloud_api.py:74-80). Server code, supported cloud file types and data retention are not in this repo, and VPC/on-prem deployment is by contacting the vendor (README.md:219). 4 of the 5 cookbook notebooks use the cloud (cookbook/pageindex-citation.ipynb:82-84, pageindex-multimodal.ipynb:84-86, pageindex-query-pricing-demo.ipynb:87-89, pageindex-vision-rag.ipynb:130).",
+      "'Local' mode is not offline. Page text goes to the configured LLM provider for summaries, tree expansion, document descriptions and every chat turn (utils.py:166-200; local_api.py:237-258; client.py:386-388). Default models gpt-5.6-luna / gpt-5.6-sol need an OpenAI-compatible key unless an api_base override is configured (utils.py:1255-1256; client.py:425-434). Importing pageindex.utils auto-loads the nearest .env into the process environment (utils.py:15-16).",
+      "Source-grounding limits. The local store keeps only extracted text and the tree, with no original file, source path or checksum (local_api.py:160-173; local_store.py:115-125). Page text is plain PyPDF2 output under a key named 'markdown' (local_api.py:155-156, 208-216). The tree comes from a different parser (pypdfium2), so page bounds are cross-checked ad hoc (local_api.py:191-206). Local citations are page-level, and get_citations() returns no page text (client.py:2437-2445). get_page_content truncates a response at about 95,000 characters (agent_tools.py:39-42, 1076-1112). Re-submitting a same-named file creates a renamed copy (_1 to _99) rather than updating (local_api.py:176-189).",
+      "Maturity and packaging. The classifier is 'Development Status :: 3 - Alpha' (pyproject.toml:9). The committed pyproject version is a placeholder (0.2.10) replaced from the tag only in the release workflow (pyproject.toml:3; publish.yml:86-89). The code carries compatibility shims for the 0.2.8 to 0.2.14 surfaces and a LiteLLM workaround for Python 3.10 (tests/test_package_surface.py:1-4, 100-115, 142-155; utils.py:36-50). 13 required dependencies, including litellm, openai, openai-agents and mcp, are installed even for local-only use (pyproject.toml:27-43). There is no lockfile, and the pymupdf needed by tree_optimize is undeclared (tree_optimize.py:136; requirements.txt:8).",
+      "Security and release hygiene. No SECURITY.md exists. CodeQL scans only GitHub Actions workflows, not the Python code (codeql.yml:25-29), and Dependabot covers only github-actions (dependabot.yml:3). publish.yml defines no checksum, signature or provenance step (publish.yml:77-105). The issue-triage workflow runs an LLM agent on text from any issue author (issue-dedupe.yml:49-57, allowed_non_write_users: \"*\"). Several workflows use floating action tags (codeql.yml:23-26; issue-dedupe.yml:34, 49) while tests.yml and publish.yml pin SHAs (publish.yml:45-46, 93, 99).",
+      "Platform coverage. CI runs only on ubuntu-latest (tests.yml:18; publish.yml:29); there are no macOS, Windows or WSL jobs or docs. Flash parsing uses 'spawn' worker processes, and a calling script without an `if __name__ == '__main__':` guard fails with an error (flash/parser_pdfium_parallel.py:163; local_api.py:77-82). Local-store locking uses fcntl and is best-effort on Windows (local_store.py:96-112)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "vectifyai/pageindex",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "pip (PyPI): `pip install -U pageindex`",
+          "citation": "README.md:79",
+          "holds": true,
+          "note": "README.md:79 is exactly `pip install -U pageindex`, in the Quickstart bash block. pyproject.toml:2 names the distribution `pageindex`, and publish.yml:92-93 uploads it to PyPI."
+        },
+        {
+          "field": "license",
+          "statement": "License is MIT (SPDX MIT), file LICENSE",
+          "citation": "LICENSE:1-21; pyproject.toml:6, 11",
+          "holds": true,
+          "note": "LICENSE:1 reads 'MIT License', followed by the standard MIT text ('Copyright (c) 2025 Vectify AI'). pyproject.toml:6 `license = \"MIT\"` and the classifier at :11 agree. No other LICENSE/COPYING/NOTICE file or conflicting SPDX or license header exists in the tree."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - CI runs the full test matrix on ubuntu-latest; README gives only platform-neutral pip install; no compiled extension of its own; runner architecture implicit",
+          "citation": ".github/workflows/tests.yml:18; .github/workflows/publish.yml:29; README.md:79; pyproject.toml:20-25",
+          "holds": true,
+          "note": "tests.yml:18 and publish.yml:29 are both `runs-on: ubuntu-latest`. The 5-leg matrix (py3.10/3.13 x with/without frameworks x pdfium 5, plus py3.10 pdfium<5) is at tests.yml:21-29. pyproject.toml:20-25 packages only the pure-Python `pageindex` package plus config.yaml and flash/data/*.json, and the repo has no C/C++/Cython/Rust sources. No workflow states the CPU architecture, as the dossier says. Caveat: CI tests the source checkout installed from requirements.txt, not the built wheel."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "Cloud only: hosted MCP server at https://api.pageindex.ai/mcp (read-only ?tools=read), Bearer key; the repo has only an MCP client and in-process tool servers, no standalone MCP server; the frozen cloud contract lists 5 tools; the live list is discovered at runtime",
+          "citation": "pageindex/integrations/claude_agent_sdk.py:20-28, 30-65; pageindex/agent_tools.py:6-8, 48-60, 235-236, 1490-1510, 1530-1545; pageindex/client.py:453; README.md:208; pageindex/mcp_bridge.py:1-13; pageindex/integrations/openai_agents.py:33-74; tests/data/cloud_mcp_contract.json:3-214",
+          "holds": true,
+          "note": "client.py:453 sets BASE_URL = \"https://api.pageindex.ai\". claude_agent_sdk.py:20-28 and agent_tools.py:1490-1510 build {BASE_URL}/mcp with ?tools=read by default and an `Authorization: Bearer` header. README.md:208 shows the MCP server row with Local '—' and Cloud '✓'. mcp_bridge.py:1 reads 'Minimal MCP client (streamable HTTP) for the PageIndex cloud MCP server'. openai_agents.py:33-74 and claude_agent_sdk.py:30-65 are in-process servers for agent frameworks. The contract file holds exactly browse_documents, get_document, get_document_structure, get_page_content and remove_document (keys at lines 4/54/90/133/176). The cited comments name search_documents, get_folder_structure and get_document_image, and 1530-1545 calls bridge.list_tools(). The package imports only types from `mcp` (openai_agents.py:36, anthropic_sdk.py:42). There is no FastMCP, mcp.server or stdio_server code and no console script. The package's only __main__ blocks (tree_optimize.py:1031, page_index_md.py:306) do not serve MCP."
+        },
+        {
+          "field": "claim_checks[2]",
+          "statement": "Local \"handles text-based PDFs\" with no OCR or image understanding (README.md:201, 205) - verified: yes",
+          "citation": "README.md:201, 205; pageindex/local_api.py:118-122, 155-156, 208-216; pageindex/flash/api.py:16, 19-21, 64-67, 166-173; pageindex/client.py:849-852",
+          "holds": true,
+          "note": "README.md:201 and :205 say what is quoted. local_api.py:118-122 rejects any non-.pdf file ('only PDF files are supported in local mode'), Markdown included. flash/api.py:166-169 is the 'no text layer ... run OCR before indexing it' refusal, which the local client applies at local_api.py:250-252. flash/api.py:19-21 and 64-67 reject encrypted PDFs; :16 sets FLAT_TREE_MAX_NODES=10, and :170-173 rejects documents with no structure. client.py:849-852 says no OCR model runs locally. local_api.py:155-156 and 208-216 store PyPDF2 extract_text under the 'markdown' key. client.py:901-935 make page and document images cloud-only. Non-blocking nits: (a) a fully image-only PDF is normally refused earlier, at local_api.py:132-135 ('PDF has no content. All pages are blank.'), because PyPDF2 finds no text, so local users rarely see the 'run OCR' message; (b) the parenthetical 'grep for docx|epub|pptx|xlsx|html found none' is not literally true: the search hits fixed text phrases in pageindex/flash/data/boilerplate_phrases.json and encoded image data in cookbook notebooks. None of these is format-handling code, so the conclusion stands."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

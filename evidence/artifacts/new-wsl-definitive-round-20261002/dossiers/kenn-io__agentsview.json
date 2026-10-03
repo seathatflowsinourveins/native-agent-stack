@@ -1,0 +1,344 @@
+{
+  "contender": "kenn-io/agentsview",
+  "revision": {
+    "contender": "kenn-io/agentsview",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "kenn-io/agentsview",
+        "tag": "v0.44.0",
+        "commit": "413a87f7bfbd67b2815b1119ac51abc1efbeeaba",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.44.0",
+    "commit": "413a87f7bfbd67b2815b1119ac51abc1efbeeaba",
+    "read_at": "2026-10-02T03:02:21+00:00"
+  },
+  "dossier": {
+    "contender": "kenn-io/agentsview",
+    "revision": {
+      "tag": "v0.44.0",
+      "commit": "413a87f7bfbd67b2815b1119ac51abc1efbeeaba",
+      "read_at": "2026-10-02T03:02:21+00:00"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "AgentsView is a local-first session archive and viewer for AI coding agents (PRODUCT.md:14-20; README.md:3-4,56-62). A Go daemon (CGO, single binary with an embedded Svelte SPA) discovers native agent session files on disk (Claude Code ~/.claude/projects, Codex ~/.codex/sessions, plus dozens of other agents), parses them into a local SQLite archive with FTS5, and serves a web UI, REST/SSE API, a 32-command CLI and a read-only MCP server for browsing, search, token/cost reports, activity reports and heuristic session-health scoring. Usage and cost are derived from token fields the agents write into their own transcripts (internal/parser/claude.go:2715-2723; internal/parser/codex.go:544-560) and priced from LiteLLM / OpenRouter / genai-prices catalogs with an embedded fallback. Optional read-only mirrors: PostgreSQL, ClickHouse, DuckDB (SQLite stays the archive). Optional features call external OpenAI-compatible endpoints (embeddings, generated insights, Recall extraction). Facts relevant to the stated needs, from the code: (1) OTLP collector / privacy filter: none - there is no OTLP receiver (no 4317/4318 listener, no /v1/metrics|logs|traces route; openapi.yaml:7389-22583 lists only /api/v1 routes); OTLP appears only in a parser for Visual Studio Copilot OpenTelemetry-JSONL trace files read from disk (internal/parser/visualstudio_copilot.go:56-64) and as indirect Go modules (go.mod:164-191). Its own privacy controls are a storage policy archive_content = full|transcripts|usage (docs/configuration.md:50-91), result_content_blocked_categories (docs/data.md:118), and a best-effort secret scanner with default redaction (internal/secrets/secrets.go:1-5; docs/commands.md:1605-1625). (2) Store for OTLP usage metrics: none; usage is stored in its own SQLite usage_events table (internal/db/schema.sql:262). (3) Store for OTLP events/logs: none; its SQLite holds messages, tool_calls, tool_result_events (internal/db/schema.sql:116,315,357). (4) Dashboards: its own embedded web UI over its own SQLite archive (and the read-only PG/ClickHouse/DuckDB mirrors), not over OTLP stores. (5) Traces/datasets/experiments for replaying a fixed workload: none; closest features are the Recall query-event ledger (internal/db/schema.sql:630-650), a build-tag-only lab endpoint excluded from the default binary (internal/server/recall_eval_ingest.go:1-45) and one-shot `capture run` usage results (docs/one-shot-capture.md:8-16). (6) Local model server: none; it is only a client of OpenAI-compatible endpoints, with Ollama and llama.cpp llama-server named as possible endpoints (docs/semantic-search.md:9,271-296,328-362); no GPU / CUDA / RTX 4090 handling.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Browse, search, and track costs across your AI coding agents. Your session archive stays on your machine unless you choose a feature that shares it.",
+          "citation": "README.md:3-4"
+        },
+        {
+          "claim": "On first run, agentsview discovers sessions from every supported agent on your machine, syncs them into a local SQLite database, and serves a web UI at http://127.0.0.1:8080. The daemon is the server: web UI, API, session sync, and file watchers share one process.",
+          "citation": "README.md:56-62"
+        },
+        {
+          "claim": "Supported agents table lists Claude Code (~/.claude/projects/) and Codex (~/.codex/sessions/) among dozens of agent session directories; sessions are read from agent-written files.",
+          "citation": "README.md:342-352"
+        },
+        {
+          "claim": "`agentsview usage` tracks token consumption and compute costs across all coding agents; reports read from the same local SQLite archive that powers the UI.",
+          "citation": "README.md:200-202"
+        },
+        {
+          "claim": "Automatic pricing via LiteLLM and OpenRouter rates (with offline fallback).",
+          "citation": "README.md:221"
+        },
+        {
+          "claim": "Usage 'Works standalone -- no server required, just run the command', while another passage says commands such as sync, usage, token-use, pg push, duckdb push and clickhouse push auto-start the daemon; a one-shot sync with no background server needs the daemon stopped and AGENTSVIEW_NO_DAEMON=1.",
+          "citation": "README.md:228; README.md:72-80"
+        },
+        {
+          "claim": "`agentsview capture run` handles one exact non-interactive `claude -p` or `codex exec --json` execution in CI, writes a separate versioned usage result, and starts no daemon, web server, or watcher.",
+          "citation": "README.md:265-269"
+        },
+        {
+          "claim": "Semantic search is opt-in and indexes session content with any OpenAI-compatible embeddings endpoint.",
+          "citation": "README.md:313-317"
+        },
+        {
+          "claim": "DuckDB is a mirror backend, not a replacement for SQLite; backend modes: SQLite primary local archive, PostgreSQL / ClickHouse optional remote backends pushed from SQLite and served read-only, DuckDB optional mirror file or Quack endpoint.",
+          "citation": "README.md:702-707; README.md:724-730"
+        },
+        {
+          "claim": "agentsview sends a limited anonymous `daemon_active` ping to PostHog when the server starts and every 24 hours (stable random install ID as DistinctId; application, version, commit, OS, CPU arch; $process_person_profile=false, $geoip_disable=true; no session/project/prompt/path/account/machine identity). Disable with AGENTSVIEW_TELEMETRY_ENABLED=0 or TELEMETRY_ENABLED=0; hard-disabled in Go test binaries.",
+          "citation": "README.md:747-754"
+        },
+        {
+          "claim": "All session data stays on your machine. The server binds to 127.0.0.1 by default. The update check is optional and can be disabled with --no-update-check.",
+          "citation": "README.md:756-758"
+        },
+        {
+          "claim": "agentsview binds to loopback and validates the request Host header to guard against DNS-rebinding attacks.",
+          "citation": "README.md:95-97"
+        },
+        {
+          "claim": "The container runs as root, so prefer a named volume for /data; compose example publishes the UI on 127.0.0.1 only and mounts Claude, Codex, Forge and OpenCode session roots read-only.",
+          "citation": "README.md:131-139"
+        },
+        {
+          "claim": "Development requires Go 1.27+ (CGO) and Node.js 24.11+.",
+          "citation": "README.md:774"
+        }
+      ],
+      "install": [
+        {
+          "method": "Install script (macOS and Linux)",
+          "command": "curl -fsSL https://agentsview.io/install.sh | bash",
+          "citation": "README.md:16-20"
+        },
+        {
+          "method": "Homebrew cask (macOS desktop app)",
+          "command": "brew install --cask agentsview",
+          "citation": "README.md:28-30; docs/quickstart.md:10-14"
+        },
+        {
+          "method": "Docker image from GHCR",
+          "command": "docker run --rm -p 127.0.0.1:8080:8080 -v agentsview-data:/data -v \"$HOME/.claude/projects:/agents/claude:ro\" -v \"$HOME/.forge:/agents/forge:ro\" -e CLAUDE_PROJECTS_DIR=/agents/claude -e FORGE_DIR=/agents/forge ghcr.io/kenn-io/agentsview:latest",
+          "citation": "README.md:32-42"
+        },
+        {
+          "method": "Docker Compose production example (mounts Claude, Codex, Forge, OpenCode roots read-only)",
+          "command": "docker compose -f docker-compose.prod.yaml up -d",
+          "citation": "README.md:125-129; docker-compose.prod.yaml:1-23"
+        },
+        {
+          "method": "PyPI wheels (pip / uvx)",
+          "command": "pip install agentsview   # or: uvx agentsview",
+          "citation": "docs/quickstart.md:32-40"
+        },
+        {
+          "method": "Build from source (Go 1.27+ with CGO, Node.js 24.11+)",
+          "command": "git clone https://github.com/kenn-io/agentsview.git && cd agentsview && make build && make install   # installs to ~/.local/bin",
+          "citation": "docs/quickstart.md:64-73; README.md:772-781"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - installer maps Linux/x86_64 to the linux_amd64 release tarball (scripts/install.sh:19-33,129-131); PyPI wheel tag manylinux_2_28_x86_64 (scripts/build_wheels.py:26-29); multi-arch GHCR image incl. linux/amd64 (docs/quickstart.md:109-110); Go tests run on Linux in CI (.github/workflows/ci.yml:184-185,236-240).",
+        "wsl2": "yes (indirect) - no WSL-specific install path; the Linux binary detects WSL (WSL_DISTRO_NAME or /proc/sys/fs/binfmt_misc/WSLInterop) and advertises the WSL eth0 address for bind-all hosts (cmd/agentsview/managed_caddy.go:54-85; docs/remote-access.md:54-56); README.md:95-98 names WSL2 among forwarded-access setups that need --public-url; docs/configuration.md:1003-1013 shows a Windows+WSL dirs example. No WSL CI job found in .github/workflows.",
+        "macos_arm64": "yes - installer maps Darwin/arm64 (scripts/install.sh:19-33); PyPI wheel tag macosx_11_0_arm64 (scripts/build_wheels.py:38-41); CI Go tests on macos-latest (.github/workflows/ci.yml:188-189) and on a self-hosted macOS ARM64 runner for FSEvents on main (.github/workflows/ci-macos-main.yml:25-44); desktop aarch64 bundle build (.github/workflows/desktop-macos-main.yml:33-38).",
+        "gpu": "no - AgentsView has no GPU/CUDA/RTX code path; it only makes HTTP calls to external OpenAI-compatible endpoints for optional embeddings, insights and Recall extraction (internal/vector/encoder.go:31,375-377; internal/insight/endpoint.go:47-109; internal/recall/extract/client.go:408). No NVIDIA/CUDA/4090 references except WebKitGTK GPU/EGL workarounds in the desktop wrapper (desktop/src-tauri/src/lib.rs:2029,2353-2354) and a docs comment about a remote GPU box serving embeddings (docs/semantic-search.md:127). A local server (Ollama, llama.cpp llama-server) is only documented as a possible endpoint (docs/semantic-search.md:9,271-296,328-362); Ollama CPU-fallback logic targets Apple Metal (docs/semantic-search.md:303-326)."
+      },
+      "integrations": {
+        "cli": "yes - cobra CLI `agentsview` with 32 top-level commands registered (serve, daemon, sync, usage, session, stats, activity, capture, mcp, recall, insight, embeddings, secrets, skills, doctor, pg, duckdb, clickhouse, raw-sync, update, openapi, ...) (cmd/agentsview/cli.go:79-140); reference in docs/commands.md.",
+        "mcp": "yes - `agentsview mcp` is a read-only MCP server over stdio (default) or StreamableHTTP (--http), built on github.com/modelcontextprotocol/go-sdk (go.mod:25); 7 tools: search_sessions, list_sessions, get_session_overview, get_messages, search_content, get_usage_summary, query_recall (registered only when the backend supports Recall); all annotated ReadOnlyHint; non-loopback HTTP requires a bearer token (internal/mcp/server.go:26-34,60-148,157-170; docs/mcp.md:6-10,59-67,205-230; docs/commands.md:1558-1601).",
+        "sdk_or_api": "HTTP API: yes - local REST API under /api/v1 built with Huma, OpenAPI 3.1 spec in openapi.yaml (paths at lines 7389-22583), SSE at /api/v1/events (openapi.yaml:12095), `agentsview openapi` command (cmd/agentsview/cli.go:140,313), plus a documented stable `agentsview session` JSON surface (docs/session-api.md:6-14,34-43). No OTLP/OpenTelemetry ingestion route exists in the spec. SDK: none published found; a generated Go client exists only under internal/apiclient (internal/apiclient/client.gen.go, generate.yaml) and a generated TypeScript client under frontend/src/lib/api/generated.",
+        "claude_code_or_codex": "yes - (1) reads Claude Code transcripts (~/.claude/projects; CLAUDE_PROJECTS_DIR / CLAUDE_CONFIG_DIR) and Codex rollouts (~/.codex/sessions and ~/.codex/archived_sessions; CODEX_SESSIONS_DIR / CODEX_HOME) as file sources (internal/parser/types.go:151-198), taking tokens from Claude `usage` fields and Codex `token_count` events (internal/parser/claude.go:2715-2723; internal/parser/codex.go:544-560); (2) `agentsview skills install` writes an `agentsview-finding-history` SKILL.md for Claude Code (~/.claude/skills) and Codex/.agents readers (~/.agents/skills) (internal/skills/skills.go:1-6,24-55; docs/commands.md:1644-1666); (3) `agentsview capture run -- claude -p ...` / `codex exec --json ...` records exact one-shot usage in CI without daemon or listening socket (docs/one-shot-capture.md:8-16; internal/capture/capture_no_socket_linux_test.go:18-62); (4) stdio MCP server is intended for Claude Code / Codex clients (docs/commands.md:1578-1580); (5) generated insights can shell out to the claude / codex CLIs (internal/insight/generate.go:36-44,113-126). No Claude Code hooks/plugin and no OTLP / OTEL_* configuration found."
+      },
+      "telemetry_and_network": "No account or login is required and no network service is required to run: pricing falls back to an embedded snapshot (docs/token-usage.md:344-346; internal/pricingrefresh/refresh.go:63-124); PRODUCT.md:19-20 states success means no external account. Default-on outbound traffic found in code: (a) PostHog `daemon_active` ping on server start and every 24 h (cmd/agentsview/main.go:45,275-284,615,1309-1332; internal/telemetry/telemetry.go:13-20,108-126); opt-out via AGENTSVIEW_TELEMETRY_ENABLED=0 or generic TELEMETRY_ENABLED=0 (internal/telemetry/telemetry.go:34-36; internal/telemetry/telemetry_test.go:13-44); disabled under Go tests (telemetry.go:39,71,97-99). The PostHog API key is embedded (telemetry.go:16); the reporter, endpoint host and the kit_posthog_disabled build tag live in external module go.kenn.io/kit/telemetry (go.mod:36), not in the working directory; the repo's e2e builds use -tags fts5,kit_posthog_disabled (.github/workflows/ci.yml:742-745; docs/agents/build.md:34-36). A random installation ID is written to ~/.agentsview/telemetry-install-id even when telemetry is disabled (docs/configuration.md:138-141). (b) Pricing refresh: the daemon starts a pricing-refresh job at startup and every 24 h (+5 min jitter) with no config/env off-switch found (cmd/agentsview/main.go:480-489; cmd/agentsview/pricing_schedule.go:12-36; no offline setting in internal/config); it fetches raw.githubusercontent.com (BerriAI/litellm and pydantic/genai-prices) and openrouter.ai/api/v1/models (internal/pricing/openrouter.go:48-55; internal/pricing/catalog/litellm.go:23-27; internal/pricing/catalog/genai.go:22; internal/pricing/catalog/openrouter.go:17); `--offline` exists only on usage / token-use / activity CLI commands (cmd/agentsview/cli.go:588,608,666). (c) Update check: the web UI calls /api/v1/update/check (frontend/src/lib/stores/sync.svelte.ts:218), which contacts github.com/kenn-io/agentsview/releases/latest unless disabled by disable_update_check, --no-update-check or AGENTSVIEW_DISABLE_UPDATE_CHECK (internal/server/huma_routes_metadata.go:184-197; internal/update/update.go:25-35,80-119; internal/config/config.go:784,2137,2232); `agentsview update` downloads release tarballs (cmd/agentsview/update.go:33-100); the desktop app uses the Tauri updater (docs/configuration.md:1696-1697). (d) Browser-side: the SPA index.html loads Google Fonts (frontend/index.html:7-12), allowed by the CSP (internal/server/server.go:895-896); CSP connect-src is deliberately widened to any http/https/ws/wss origin (internal/server/server.go:859-869). Opt-in egress that can carry session content: PostgreSQL/ClickHouse push, DuckDB Quack, hosted raw sync, SSH/HTTP remote sync, S3 sources, GitHub Gist publish, Cursor Admin API import, the [vector.embeddings] endpoint, the [insights] endpoint and the [recall.extract] endpoint (docs/configuration.md:1677-1689; docs/hosted-raw-sync.md:6-24; docs/token-usage.md:54-98; docs/semantic-search.md:25-62; docs/recall.md:55-82,159-214); insights/extraction endpoints must be HTTPS unless loopback or allow_http, and redirects are refused (internal/config/recall.go:351-376; internal/recall/extract/client.go:115-131; internal/insight/endpoint.go:47-109). Local listeners: HTTP server on 127.0.0.1:8080 by default (internal/config/config.go:1173-1174; internal/server/server.go:1223-1241) with Host-header allowlist, CSP and X-Frame-Options (internal/server/server.go:830-846,997-1020); optional loopback MCP HTTP (internal/mcp/server.go:157-170); no OTLP listener exists. Documentation lag: SECURITY.md:85-115 never mentions PostHog, the OpenRouter / genai-prices fetches or Google Fonts, and docs/configuration.md:1691-1698 lists only update checks and the ping as automatic outbound requests."
+    },
+    "code": {
+      "languages": [
+        "Go (backend, CGO, go 1.27.0)",
+        "TypeScript + Svelte 5 (frontend SPA, Vite+)",
+        "Rust (Tauri 2 desktop wrapper)",
+        "Shell and PowerShell (installers, build and test scripts)",
+        "Python (docs tooling, PyPI wheel builder)",
+        "SQL (SQLite / PostgreSQL / ClickHouse schemas)"
+      ],
+      "entry_points": [
+        {
+          "path": "cmd/agentsview/main.go",
+          "what": "Main binary; cobra root with 32 top-level commands registered in cmd/agentsview/cli.go:79-140; runServe (main.go:135) starts sync engine, watchers, pricing job, telemetry pings and the HTTP server."
+        },
+        {
+          "path": "internal/server/server.go",
+          "what": "HTTP/SSE server (ListenAndServe/Serve at lines 1223-1288) with Huma routes in internal/server/huma_routes_*.go; serves the embedded SPA from internal/web/embed.go (go:embed dist)."
+        },
+        {
+          "path": "internal/mcp/server.go",
+          "what": "`agentsview mcp` read-only MCP server (stdio or StreamableHTTP) exposing 7 tools."
+        },
+        {
+          "path": "cmd/agentsview/capture.go",
+          "what": "`agentsview capture run|report` one-shot CI capture of `claude -p` / `codex exec --json` usage via internal/capture (no daemon or listener)."
+        },
+        {
+          "path": "cmd/testfixture/main.go",
+          "what": "Fixture generator built for Playwright e2e (.github/workflows/ci.yml:742-743)."
+        },
+        {
+          "path": "cmd/perfsim/main.go",
+          "what": "Synthetic performance simulator (`make perf-sim`, Makefile:322-324); cmd/benchgate/main.go is the local benchmark comparison tool behind `make bench-gate`."
+        },
+        {
+          "path": "internal/pricing/cmd/litellm-snapshot/main.go",
+          "what": "Build-time tool that restores/validates the embedded LiteLLM fallback pricing snapshot from a pinned GitHub artifact commit and SHA-256 (Makefile:58-61; main.go:41-48)."
+        },
+        {
+          "path": "desktop/src-tauri/src/lib.rs",
+          "what": "Tauri 2 desktop wrapper that launches the Go binary as a sidecar (desktop/src-tauri/tauri.conf.json:35-37)."
+        }
+      ],
+      "architecture": "Single Go binary (cmd/agentsview) with the Svelte SPA (frontend/) embedded via internal/web, optionally wrapped by a Tauri desktop app (desktop/). Data flow: internal/parser (per-agent discovery and parsers; Registry in types.go:151, Claude in claude.go, Codex in codex.go) -> internal/sync (engine, fsnotify / macOS FSEvents watchers in internal/fsevents, periodic reconcile, S3 and remote sources via internal/remotesync and internal/ssh) -> internal/db (SQLite via mattn/go-sqlite3 with FTS5; schema internal/db/schema.sql: sessions, messages, tool_calls, tool_result_events, usage_events, secret_findings, model_pricing, recall_*) -> internal/service (shared operation layer) -> internal/server (Huma/OpenAPI REST + SSE, auth, CORS, CSP, Host check), CLI commands in cmd/agentsview and internal/mcp. Optional read-only mirrors: internal/postgres (pgx, pgvector), internal/clickhouse (tables incl. sessions, messages, usage_events: schema.go:142-457), internal/duckdb (+Quack), contracts in internal/storage and internal/backendcontract. Pricing: internal/pricing with catalog/ fetchers and embedded snapshots, refreshed by internal/pricingrefresh. Optional model clients: internal/vector (embeddings client + sqlite-vec via go.kenn.io/kit/vector), internal/recall and recall/extract (OpenAI-compatible chat with json_schema), internal/insight (agent CLIs or OpenAI-compatible chat). Privacy/safety: internal/secrets, archive_content policy (internal/config/config.go:670-710). Other: internal/capture, internal/skills, internal/telemetry (PostHog via go.kenn.io/kit/telemetry), internal/update (self-update), internal/artifact and internal/raw* (artifact exchange, hosted raw sync), internal/signals (session health). Daemon lifecycle and listeners use go.kenn.io/kit/daemon (internal/server/server.go:37,1229).",
+      "packaging_and_release": "Artifacts consumed by the installer and self-updater: GitHub Release tarballs agentsview_<ver>_<os>_<arch>.tar.gz (zip on Windows) plus a SHA256SUMS file (internal/update/update.go:93-106; scripts/install.sh:129-149). Documented distribution channels: GHCR multi-arch image built by Dockerfile (docs/quickstart.md:109-110), PyPI wheels built from the release archives by scripts/build_wheels.py (scripts/build_wheels.py:1-7), desktop .dmg/.exe/.AppImage and a Homebrew cask (docs/quickstart.md:10-20; README.md:28-30); the existence of the cask, PyPI and GHCR publications cannot be verified from this checkout. Release-build flags: CGO_ENABLED=1 go build -tags fts5 -ldflags '-s -w ...' -trimpath (Makefile:68-71, 648-671). Checksums: installer and updater verify SHA-256 against SHA256SUMS and refuse unverified binaries (scripts/install.sh:78-112; internal/update/update.go:137-140,214-231). Signatures/attestations: none found (no cosign/minisign/GPG/SLSA/attestation references in .github or Makefile); install.sh only ad-hoc codesigns the macOS binary locally (scripts/install.sh:165-167). Release workflow: none in this checkout - .github/workflows contains only ci.yml, ci-pr.yml, ci-macos-main.yml, cjk-fts.yml, desktop-artifacts.yml, desktop-artifacts-pr.yml, desktop-macos-main.yml, fuzz.yml, msys2-update-check.yml; the desktop CI builds set createUpdaterArtifacts=false (.github/actions/build-desktop-artifact/action.yml:98) and upload only workflow artifacts; desktop/src-tauri/tauri.conf.json:56-61 holds updater pubkey 'NOT_SET' and an endpoint under github.com/wesm/agentsview. Build-time network need: `make build` restores the pricing snapshot from the litellm-pricing-snapshot branch by pinned commit + SHA-256 (Makefile:58-61; internal/pricing/cmd/litellm-snapshot/main.go:41-48). Dockerfile builds frontend and Go stages and runs as root (Dockerfile:54-69).",
+      "tests_and_ci": "Go: testify; 1,105 *_test.go files across cmd/ and internal/ (incl. build-tagged suites pgtest, chtest, sshtest, s3test, duckdbtest, evalingest, benchdb: Makefile:318-461). Frontend: Vitest via `vp test run`, 201 *.test.ts files; Playwright e2e: 30 specs in frontend/e2e; shell: 4 scripts/*_test.sh + 2 desktop/scripts/test-*.sh; Python: scripts/build_wheels_test.py; Rust: `cargo test --lib` for the desktop crate (.github/workflows/ci.yml:591-592). CI (.github/workflows/ci.yml): lint (golangci-lint v2.13.1 + NilAway custom build, Huma API contract check; ci.yml:20-65, Makefile:13), frontend type-check / kit-ui check / tests on Node 24 and 25 (ci.yml:67-145), docs check + shell tests (ci.yml:147-175), Go tests with coverage on ubuntu/windows/macos (-tags fts5, -timeout=20m; ci.yml:177-284), split Windows SQLite and DuckDB jobs (ci.yml:286-514), race-detector job excluding internal/duckdb (ci.yml:516-551), integration tests against pgvector pg18, ClickHouse 25.8 and an SSH container (ci.yml:594-686), Playwright e2e (chromium + webkit) and DuckDB e2e (ci.yml:688-771). ci-pr.yml dispatches PRs to ci.yml@main; ci-macos-main.yml runs FSEvents tests on a self-hosted macOS ARM64 runner on main; cjk-fts.yml tests the CJK FTS sidecar; desktop-artifacts*.yml and desktop-macos-main.yml build desktop bundles with smoke tests; fuzz.yml runs 5 parser fuzz targets weekly (fuzz.yml:11-33); msys2-update-check.yml runs weekly. Third-party Actions are pinned by commit SHA (ci.yml:24) and workflows use contents: read (ci.yml:16-17). Benchmark ratio gates no longer block PRs; `make bench-gate` is local only (docs/internal/performance-gates.md:4,97). Renovate covers github-actions, gomod and npm with OSV alerts and a 7-day minimum release age (renovate.json:5-14).",
+      "dependencies": "go.mod: 41 direct and 159 indirect modules, go 1.27.0 (go.mod:3,5-47,49-209). Notable direct: github.com/mattn/go-sqlite3 and modernc.org/sqlite, duckdb/duckdb-go/v2, ClickHouse/clickhouse-go/v2, jackc/pgx/v5, minio/minio-go/v7, danielgtaylor/huma/v2, modelcontextprotocol/go-sdk, spf13/cobra, fsnotify, testcontainers-go; first-party go.kenn.io/kit (pseudo-version v0.25.1-0.20260918202731-04a175847323; provides daemon, vector and telemetry packages) and go.kenn.io/docbank v0.14.0. OpenTelemetry (otel, OTLP exporters), prometheus client, posthog-go, grpc and the AWS SDK appear only as indirect dependencies (go.mod:58-75,143-148,164-191,204). frontend/package.json: 13 dependencies + 17 devDependencies, Node >=24.11.0, @kenn-io/kit-ui pinned to a git commit (frontend/package.json:20-60). desktop/package.json: 1 devDependency (@tauri-apps/cli); desktop/src-tauri/Cargo.toml: 10 dependencies + 1 build-dependency with Cargo.lock; docs/pyproject.toml: 1 runtime (zensical==0.0.45) + 3 dev dependencies; docs/screenshots/package.json: 1 devDependency (@playwright/test).",
+      "security_policy": "SECURITY.md (repo root): descriptive threat model, trust boundaries, data-at-rest and data-in-transit lists, secrets subsystem and open questions; its Reporting section is a TODO placeholder with no private contact or confirmed private reporting channel (SECURITY.md:5-9,162-170)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Session archive stays on your machine / all session data stays on your machine; README names only a PostHog ping and an optional update check as automatic outbound traffic (README.md:3-4,747-758).",
+        "verified": "partial",
+        "evidence": "Default loopback bind verified (internal/config/config.go:1173-1174). No session content was found in the default-on outbound calls read: PostHog ping (cmd/agentsview/main.go:615,1309-1332), UI-triggered update check (frontend/src/lib/stores/sync.svelte.ts:218; internal/update/update.go:25-35). But additional default-on traffic exists that README does not list: daily pricing fetches from raw.githubusercontent.com and openrouter.ai with no daemon off-switch (cmd/agentsview/main.go:484-485; cmd/agentsview/pricing_schedule.go:12-36; internal/pricing/openrouter.go:48-55) and browser requests to Google Fonts (frontend/index.html:7-12). Session content leaves only through opt-in features (docs/configuration.md:1677-1689)."
+      },
+      {
+        "claim": "Anonymous PostHog daemon_active ping on start and every 24 h with only version, commit, OS, arch, install ID; opt-out env; hard-disabled in Go tests (README.md:747-754).",
+        "verified": "partial",
+        "evidence": "Verified in-repo: 24 h cadence and start ping (cmd/agentsview/main.go:45,615,1309-1332), DistinctID is the installation ID (internal/telemetry/telemetry.go:111-119), opt-out env handling and test-binary disable (telemetry.go:14-15,34-39,71,97-99), and a unit test asserting the sanitized property set ($process_person_profile=false, $geoip_disable=true, application, version, commit, goos, goarch, source=daemon; caller-supplied project/session keys dropped) (internal/telemetry/telemetry_test.go:56-97). Not checkable: the HTTP sender, PostHog host and wire payload live in external module go.kenn.io/kit/telemetry (go.mod:36), absent from the working directory."
+      },
+      {
+        "claim": "Automatic pricing via LiteLLM and OpenRouter rates (with offline fallback) (README.md:221).",
+        "verified": "partial",
+        "evidence": "Code differs from README/SECURITY.md (code preferred): the fetch orchestrator pulls three catalogs - pydantic genai-prices, LiteLLM and OpenRouter (internal/pricing/openrouter.go:48-55; internal/pricing/catalog/genai.go:22; litellm.go:23-27; openrouter.go:17) - while SECURITY.md:67,110-112 names only LiteLLM. Offline fallback is real: embedded snapshot seeded at startup (internal/pricingrefresh/refresh.go:63-124; cmd/agentsview/main.go:484). The daemon refresh job runs unconditionally every 24 h (cmd/agentsview/pricing_schedule.go:12-36); `--offline` exists only on CLI usage/token-use/activity commands (cmd/agentsview/cli.go:588,608,666)."
+      },
+      {
+        "claim": "Usage 'works standalone -- no server required, just run the command' (README.md:228) vs commands such as usage auto-start the daemon (README.md:72-80).",
+        "verified": "partial",
+        "evidence": "Code matches the second statement: `usage daily` resolves the archive backend with AutoStart: true (cmd/agentsview/usage.go:173-180), which ensures a transport and auto-starts a detached daemon unless AGENTSVIEW_NO_DAEMON=1 (cmd/agentsview/archive_query_backend.go:80-97,131-146; cmd/agentsview/transport.go:445-460). Only with --offline does it open the SQLite archive directly, read-only, without a daemon (archive_query_backend.go:118-128,173-184)."
+      },
+      {
+        "claim": "Claude Code (~/.claude/projects/) and Codex (~/.codex/sessions/) sessions are discovered from agent-written files (README.md:349,352); relevant to the question whether telemetry is received over OTLP.",
+        "verified": "yes",
+        "evidence": "Registry entries are FileBased: Claude DefaultDirs .claude/projects with env CLAUDE_PROJECTS_DIR / CLAUDE_CONFIG_DIR; Codex .codex/sessions and .codex/archived_sessions with CODEX_SESSIONS_DIR / CODEX_HOME (internal/parser/types.go:151-198). Token usage is read from Claude transcript usage fields and Codex token_count events (internal/parser/claude.go:2715-2723; internal/parser/codex.go:544-560). No OTLP receiver exists: OTLP is only parsed from Visual Studio Copilot trace files on disk (internal/parser/visualstudio_copilot.go:56-64; docs/internal/visual-studio-copilot-traces.md:3-8) and OTel modules are indirect dependencies (go.mod:164-191); openapi.yaml:7389-22583 has only /api/v1 routes."
+      },
+      {
+        "claim": "`capture run` starts no daemon, web server, or watcher (README.md:265-269).",
+        "verified": "yes",
+        "evidence": "The command loads only a bounded capture config and calls capture.Run, with no daemon/transport resolution (cmd/agentsview/capture.go:41-77; docs/one-shot-capture.md:36-37). A Linux test asserts no new TCP or Unix listening socket during a run (internal/capture/capture_no_socket_linux_test.go:18-62); that socket test is Linux-only."
+      },
+      {
+        "claim": "Semantic search is opt-in and works with any OpenAI-compatible embeddings endpoint (README.md:313-317).",
+        "verified": "yes",
+        "evidence": "Disabled by default and enabled via [vector] (docs/semantic-search.md:25-30); the encoder appends /embeddings to a configured base URL and posts an OpenAI-style body (internal/vector/encoder.go:31,375-377; docs/semantic-search.md:293-296). Ollama-specific recovery requires an Ollama /v1 endpoint (internal/vector/encoder.go:392-402). Insights and Recall extraction also use OpenAI-compatible /chat/completions endpoints when configured (internal/insight/endpoint.go:47-109; internal/recall/extract/client.go:382-408)."
+      },
+      {
+        "claim": "Binds to loopback and validates the Host header against DNS rebinding (README.md:95-97,756-757).",
+        "verified": "yes",
+        "evidence": "Defaults Host 127.0.0.1 and Port 8080 (internal/config/config.go:1173-1174; flags at 2183-2184); the listener binds cfg.Host:cfg.Port (internal/server/server.go:1223-1241); hostCheckMiddleware rejects unrecognised Host values (internal/server/server.go:997-1020); CSP and X-Frame-Options set on non-API responses (internal/server/server.go:830-846)."
+      },
+      {
+        "claim": "The update check is optional and can be disabled with --no-update-check (README.md:757-758).",
+        "verified": "yes",
+        "evidence": "The /api/v1/update/check handler returns early when DisableUpdateCheck is set (internal/server/huma_routes_metadata.go:184-192); settable by flag, env and config (internal/config/config.go:784,2137,2232,2367-2368). The request is made when the web UI calls the endpoint (frontend/src/lib/stores/sync.svelte.ts:218), not by the daemon at startup as SECURITY.md:113-115 says; the explicit `agentsview update` command always checks (cmd/agentsview/update.go:39)."
+      },
+      {
+        "claim": "SQLite stays the archive; PostgreSQL, ClickHouse and DuckDB are optional read-only mirrors pushed from SQLite (README.md:702-707,724-730).",
+        "verified": "yes",
+        "evidence": "Storage rule: SQLite is the persistent archive (docs/agents/storage.md:6-9). ClickHouse mirror tables copy the archive's own entities - sessions, messages, usage_events, tool_calls, secret_findings, model_pricing (internal/clickhouse/schema.go:142-457) - and docs state it is a remote copy (docs/clickhouse-sync.md:6-13). DuckDB and pgx drivers are direct dependencies (go.mod:13,19). None of these mirrors ingests OTLP data."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Synthetic simulator, SQLite archive of 10,000 sessions / 403,920 messages (macOS arm64, Go 1.27.0): daily usage query after an append",
+        "metric": "median duration (median allocation 152.34 MiB)",
+        "value": "435.70 ms",
+        "source": "docs/internal/performance-investigation.md:3-6,44-57 (document says these are local observations, not portable latency targets)",
+        "independent": false
+      },
+      {
+        "what": "Same simulator workload: common-term full-text search (deliberately common term)",
+        "metric": "median duration",
+        "value": "852.94 ms",
+        "source": "docs/internal/performance-investigation.md:48-62",
+        "independent": false
+      },
+      {
+        "what": "Same simulator workload: unchanged full reconciliation",
+        "metric": "median duration (median allocation 159.46 MiB)",
+        "value": "1,232.65 ms",
+        "source": "docs/internal/performance-investigation.md:48-57",
+        "independent": false
+      },
+      {
+        "what": "Same simulator workload: long-session append batch (two active sessions receive a new pair per iteration)",
+        "metric": "median duration (median allocation 33.97 MiB)",
+        "value": "90.64 ms",
+        "source": "docs/internal/performance-investigation.md:44-57",
+        "independent": false
+      },
+      {
+        "what": "OpenCode two-session child-edit batch at 10,000 sessions, before vs after a fix, matched comparison using a source overlay",
+        "metric": "batch duration",
+        "value": "2,491.26 ms to 120.17 ms (about 20.7x faster); doc states the original raw captures are gone and the figures are historical observations, not independently replayable",
+        "source": "docs/internal/performance-investigation.md:107-113,121-129",
+        "independent": false
+      },
+      {
+        "what": "SQLite sidebar stats on a local archive snapshot, before vs after optimisation",
+        "metric": "duration",
+        "value": "27.99 ms to 10.16 ms",
+        "source": "docs/internal/performance-investigation.md:10-16",
+        "independent": false
+      },
+      {
+        "what": "Semantic-search document unitisation: assistant messages collapsed into run documents before embedding",
+        "metric": "document count reduction",
+        "value": "about 1.1 million assistant messages to about 44k documents (about 25x fewer); corpus not identified",
+        "source": "docs/semantic-search.md:375-378",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope vs OTLP-style observation: the code has no OTLP/OpenTelemetry receiver, no metrics/log/trace store, no dataset/experiment/replay store and no model server; ingestion is file-based session parsing (internal/parser/types.go:151-198), OTLP appears only in a Visual Studio Copilot trace-file parser and as indirect Go modules (internal/parser/visualstudio_copilot.go:56-64; go.mod:164-191), and the OpenAPI surface has no OTLP routes (openapi.yaml:7389-22583). Usage coverage depends on what each agent writes to its transcripts and is described as 'opportunistic' (docs/token-usage.md:38-43). Local model use is only as a client of OpenAI-compatible endpoints with no GPU handling (docs/semantic-search.md:9; docs/recall.md:55-82).",
+      "Network/privacy: default-on outbound traffic beyond what README lists - PostHog daemon_active ping (opt-out; reporter code is in external module go.kenn.io/kit/telemetry and not auditable in this checkout), a daemon pricing refresh every 24 h from raw.githubusercontent.com and openrouter.ai with no daemon-level off-switch found (cmd/agentsview/main.go:484-485; cmd/agentsview/pricing_schedule.go:12-36), and browser requests to Google Fonts when the UI is opened (frontend/index.html:7-12). SECURITY.md:85-115 never mentions PostHog, OpenRouter, genai-prices or the fonts, and docs/configuration.md:1691-1698 lists only update checks and the ping.",
+      "Sensitive local data: the archive stores full transcripts, tool inputs/outputs and any pasted secrets in plaintext SQLite by default (archive_content defaults to full: internal/config/config.go:1176; SECURITY.md:69-78), with no encryption at rest. The transcripts/usage policies are storage policies, not redaction guarantees (docs/configuration.md:84-91) and the secret scanner is best-effort (SECURITY.md:133-145). When enabled, transcript-derived content is sent to the configured embeddings, insights and Recall-extraction endpoints (docs/recall.md:73-77,201-207; docs/semantic-search.md:69-79).",
+      "Security policy: SECURITY.md has no working private reporting contact - the Reporting section is a TODO placeholder (SECURITY.md:162-170); it calls itself a descriptive foundational document (SECURITY.md:5-9); the threat model excludes hostile same-user processes and multi-user hosts (SECURITY.md:39-53); CSP connect-src is deliberately widened as an accepted tradeoff (internal/server/server.go:859-869; SECURITY.md:127-130).",
+      "Release and supply chain: the workflow that builds and publishes release tarballs, SHA256SUMS, the GHCR image, the Homebrew cask and PyPI wheels is not in this checkout's .github/workflows; integrity checking is SHA-256 from the same GitHub release with no signature or attestation (scripts/install.sh:78-112; internal/update/update.go:137-140,214-231); the desktop updater config carries pubkey 'NOT_SET' and an endpoint under github.com/wesm/agentsview (desktop/src-tauri/tauri.conf.json:56-61); the Docker image runs as root (README.md:131-135; Dockerfile:54-69).",
+      "Build and dependency: building from source needs CGO, Go 1.27 and Node 24.11+ (go.mod:3; README.md:774), network access to fetch a pinned pricing snapshot from GitHub (Makefile:58-61; internal/pricing/cmd/litellm-snapshot/main.go:41-48), a pseudo-version of first-party go.kenn.io/kit (go.mod:36) and a git-commit-pinned @kenn-io/kit-ui (frontend/package.json:21); 159 indirect Go modules (go.mod:49-209). Renovate enables only github-actions, gomod and npm, so Cargo and Python manifests are not covered (renovate.json:5).",
+      "Maintenance pace and maturity: frequent releases (0.41.0 on 2026-08-16, 0.41.1 on 2026-08-18, 0.42.0 on 2026-09-01, 0.43.0 on 2026-09-14: docs/changelog.md:42,358,487,514); Recall is marked experimental and may need corpus rebuilds on upgrade (docs/recall.md:11-17); token-usage reporting is marked experimental (docs/token-usage.md:18-24); docs lag the tag - at the v0.44.0 commit the changelog still names 0.43.0 as latest and lists ClickHouse sync under Unreleased (docs/changelog.md:6-17); benchmark gates were removed from CI (docs/internal/performance-gates.md:4,97) and published timings are first-party local observations (docs/internal/performance-investigation.md:3-6,121-129).",
+      "Licensing: the project is MIT, copyright Kenn Software LLC (LICENSE:1-3). No NOTICE or third-party license inventory file was found in the checkout, and dependency licenses (DuckDB bindings, ClickHouse and AWS SDKs, the SQLite amalgamation via mattn/go-sqlite3: go.mod:7,13,23,58-75) were not audited here; the optional CJK sidecar ships its own license files (Makefile:99-130)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "kenn-io/agentsview",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Install script (macOS and Linux): curl -fsSL https://agentsview.io/install.sh | bash",
+          "citation": "README.md:16-20",
+          "holds": true,
+          "note": "README.md:16-20 has the '**macOS and Linux:**' heading and this exact command. The in-repo installer (scripts/install.sh:19-33) accepts Darwin/Linux on amd64/arm64 and verifies SHA-256 against SHA256SUMS (78-112, 142-146). Its header comment (line 3) points at raw.githubusercontent.com, not agentsview.io; the checkout cannot show that the agentsview.io URL serves the same file."
+        },
+        {
+          "field": "license",
+          "statement": "License is MIT (SPDX MIT), file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-21 is the standard MIT text, 'Copyright (c) 2026 Kenn Software LLC', matching the risks entry's LICENSE:1-3 attribution."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - installer maps Linux/x86_64 to the linux_amd64 release tarball; PyPI wheel tag manylinux_2_28_x86_64; multi-arch GHCR image incl. linux/amd64; Go tests run on Linux in CI",
+          "citation": "scripts/install.sh:19-33,129-131; scripts/build_wheels.py:26-29; docs/quickstart.md:109-110; .github/workflows/ci.yml:184-185,236-240",
+          "holds": true,
+          "note": "install.sh:20-22,29 maps Linux->linux and x86_64|amd64->amd64; 129-131 builds agentsview_<ver>_linux_amd64.tar.gz from the GitHub release. build_wheels.py:26-29 maps linux_amd64->manylinux_2_28_x86_64. quickstart.md:109-110 says linux/amd64 and linux/arm64 GHCR images. ci.yml:184-185 is the ubuntu-latest matrix entry (runner namespace-profile-linux-8cpu; its CPU architecture is not stated) and 236-240 runs go test -tags fts5 with CGO on Linux. Whether the GHCR image and wheels are actually published cannot be confirmed from the checkout, which has no release workflow."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "yes - reads Claude Code (~/.claude/projects) and Codex (~/.codex/sessions, ~/.codex/archived_sessions) transcripts as file sources, taking tokens from Claude usage fields and Codex token_count events; skills install for ~/.claude/skills and ~/.agents/skills; capture run for claude -p / codex exec --json without daemon or socket; stdio MCP intended for Claude Code/Codex; insights shell out to claude/codex CLIs; no Claude Code hooks/plugin and no OTLP/OTEL_* configuration",
+          "citation": "internal/parser/types.go:151-198; internal/parser/claude.go:2715-2723; internal/parser/codex.go:544-560; internal/skills/skills.go:1-6,24-55; docs/commands.md:1644-1666; docs/one-shot-capture.md:8-16; internal/capture/capture_no_socket_linux_test.go:18-62; docs/commands.md:1578-1580; internal/insight/generate.go:36-44,113-126",
+          "holds": true,
+          "note": "Each sub-claim checks out. Registry entries at types.go:152-162 (Claude: CLAUDE_PROJECTS_DIR, CLAUDE_CONFIG_DIR, .claude/projects, FileBased) and 183-198 (Codex: CODEX_SESSIONS_DIR, CODEX_HOME, .codex/sessions + .codex/archived_sessions, FileBased). claude.go reads message.usage input/cache/output tokens; the block is 2710-2729, so the cited 2715-2723 sits inside it. codex.go:544-545 dispatches token_count, and 557-560 reads info.last_token_usage. skills.go:28-29,39,52-55 and commands.md:1658-1661 cover the agentsview-finding-history SKILL.md paths. one-shot-capture.md:8-16 says no daemon, web server, watchers or socket for claude -p and codex exec --json; the Linux test at 18-62 asserts no new listener. commands.md:1578-1579 names Claude Desktop, Claude Code and Codex as stdio clients. generate.go:38-44 lists claude and codex; 113-126 dispatches to generateCodex/generateClaude after exec.LookPath (133). Repo-wide greps find no OTEL_ string and no hook/plugin markers (PreToolUse, PostToolUse, UserPromptSubmit, claude-plugin, \"hooks\":)."
+        },
+        {
+          "field": "claim_checks[4]",
+          "statement": "Claude Code (~/.claude/projects/) and Codex (~/.codex/sessions/) sessions are discovered from agent-written files; no OTLP receiver exists (OTLP only parsed from Visual Studio Copilot trace files on disk, OTel modules indirect, openapi.yaml:7389-22583 has only /api/v1 routes) - verified: yes",
+          "citation": "README.md:349,352; internal/parser/types.go:151-198; internal/parser/claude.go:2715-2723; internal/parser/codex.go:544-560; internal/parser/visualstudio_copilot.go:56-64; docs/internal/visual-studio-copilot-traces.md:3-8; go.mod:164-191; openapi.yaml:7389-22583",
+          "holds": true,
+          "note": "README.md:349 and 352 list the two directories, and the Registry entries are FileBased. visualstudio_copilot.go:56-64 detects *_VSGitHubCopilot_traces*.jsonl files on disk; the doc at 3-8 calls them OpenTelemetry-style trace JSONL. go.mod:164-191 marks every otel/otlp module // indirect. Repo-wide greps find no :4317/:4318 and no /v1/traces|metrics|logs. Outside go.mod/go.sum, 'otlp' appears only in comments in the VS Copilot parser and its test. The only non-test listeners are the main HTTP server (server.go:1229-1240) and MCP HTTP (mcp/server.go:223). Minor slip: the spec's paths begin at 7294 and include /_agentsview/startup (7295) and /api/ping (7316) outside the cited range. All 121 paths inside 7389-22583 are /api/v1, and neither extra path is OTLP, so the claim holds."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

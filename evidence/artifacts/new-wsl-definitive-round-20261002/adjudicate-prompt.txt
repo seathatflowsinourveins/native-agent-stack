@@ -1,0 +1,7 @@
+You adjudicate one slot on which two independent reviewers, A and B, named different defaults after their own adversarial critics. You do not know who A and B are, and their order carries no meaning.
+
+__CRITERIA__
+
+Read the slot's question and field (unit.json), the candidates' dossiers (dossiers/), the cloned sources (clones/) and the two returns (returns.json). Re-check at its source every fact on which either return turns. Then choose A or B: the default that the criteria, applied as written, support better on the evidence. Choose unsettled only when the evidence cannot separate them; then name the single measurement, runnable on the target host, that would. Not evidence: stars, downloads, popularity, current use, list order, or which reviewer argued more. Evidence is limited to your working directory and public sources, within at most 6 web searches.
+
+Slot: __SLOT__

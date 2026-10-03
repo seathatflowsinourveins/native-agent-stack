@@ -1,0 +1,293 @@
+{
+  "contender": "git/git",
+  "revision": {
+    "contender": "git/git",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "git/git",
+        "tag": null,
+        "commit": "c46c1e37724f0478939de636ab8ea5a89086d532",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": null,
+    "commit": "c46c1e37724f0478939de636ab8ea5a89086d532",
+    "read_at": "2026-10-02T03:02:14+00:00"
+  },
+  "dossier": {
+    "contender": "git/git",
+    "revision": {
+      "tag": null,
+      "commit": "c46c1e37724f0478939de636ab8ea5a89086d532",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "GPL-2.0-only",
+      "file": "COPYING"
+    },
+    "purpose": "Git (git/git), the distributed version control system, read for two built-in capabilities: `git worktree` (linked working trees sharing one repository: add/list/lock/unlock/move/remove/prune/repair; builtin/worktree.c, worktree.c) and `git diff` including `--no-index` (compare two filesystem paths with or without a repository; diff-no-index.c, builtin/diff.c) on the xdiff engine plus regex-based language drivers (userdiff.c). The 75-line README says nothing about worktrees, --no-index, GitHub/PR automation, structural diffs, MCP or agents; those facts come from Documentation/ and the code. Findings relevant to the needs: Git is the VCS base with native worktrees and line/word-level diffs; the tree has no GitHub API client, no PR/review/mention-triggered automation (its .github/workflows are Git's own CI plus an l10n lint that comments on PRs), no CI-status or merge feature in `git worktree`, and no parser-based or entity-level diff. The snapshot is a development revision after v2.56 (GIT-VERSION-GEN:3 fallback v2.56.GIT; in-progress release notes are Documentation/RelNotes/2.98.0.adoc). Method: static reading only (no shell available); nothing was built, run or tested.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Git is a fast, scalable, distributed revision control system with an unusually rich command set that provides both high-level operations and full access to internals.",
+          "citation": "README.md:7-9"
+        },
+        {
+          "claim": "Open source under the GNU GPL version 2; some parts are under different licenses compatible with GPLv2.",
+          "citation": "README.md:11-13"
+        },
+        {
+          "claim": "Originally written by Linus Torvalds with help of a group of hackers around the net.",
+          "citation": "README.md:13-14"
+        },
+        {
+          "claim": "Installation instructions are in the file INSTALL.",
+          "citation": "README.md:16"
+        },
+        {
+          "claim": "Docs: start with Documentation/gittutorial.adoc, then giteveryday.adoc, and Documentation/git-<commandname>.adoc per command; once installed, `man git-<commandname>` or `git help <commandname>`.",
+          "citation": "README.md:21-27"
+        },
+        {
+          "claim": "User discussion and development take place on the Git mailing list (git@vger.kernel.org): bug reports, feature requests, comments and patches go there.",
+          "citation": "README.md:33-37"
+        },
+        {
+          "claim": "Mailing-list archives are at lore.kernel.org/git and marc.info; subscribe via git+subscribe@vger.kernel.org.",
+          "citation": "README.md:43-46"
+        },
+        {
+          "claim": "Security-relevant issues are to be disclosed privately to git-security@googlegroups.com.",
+          "citation": "README.md:48-49"
+        },
+        {
+          "claim": "The maintainer's frequent 'What's cooking' reports list the status of development topics and are a good reference for project status, direction and remaining tasks.",
+          "citation": "README.md:51-54"
+        },
+        {
+          "claim": "Localization (l10n) of messages is coordinated via po/README.md.",
+          "citation": "README.md:39-41"
+        },
+        {
+          "claim": "CI status badges for the GitHub Actions 'CI' workflow and a GitLab pipeline on master.",
+          "citation": "README.md:1-2"
+        },
+        {
+          "claim": "Absence: the README does not mention git worktree, git diff --no-index, GitHub/PR automation, structural or syntax-aware diffs, MCP, AI agents, telemetry or supported platforms.",
+          "citation": "README.md:1-75"
+        }
+      ],
+      "install": [
+        {
+          "method": "GNU make from source (Linux/macOS; INSTALL has no macOS-specific section)",
+          "command": "make prefix=/usr all doc info   # then, as root: make prefix=/usr install install-doc install-html install-info   (plain `make` + `make install` installs under ~/bin)",
+          "citation": "INSTALL:4-9"
+        },
+        {
+          "method": "autoconf configure + make",
+          "command": "make configure ; ./configure --prefix=/usr ; make all doc ; (as root) make install install-doc install-html",
+          "citation": "INSTALL:20-26"
+        },
+        {
+          "method": "Meson + Ninja (documented in the meson.build header, not in INSTALL)",
+          "command": "meson setup build/ ; then inside build/: meson compile ; meson test ; meson install",
+          "citation": "meson.build:25-34,52,86"
+        },
+        {
+          "method": "Profile-feedback build (make)",
+          "command": "make prefix=/usr profile ; make prefix=/usr PROFILE=BUILD install   (faster training variant: make prefix=/usr profile-fast ; make prefix=/usr PROFILE=BUILD install)",
+          "citation": "INSTALL:28-44"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - Linux block in config.mak.uname:49-82; x86_64 Linux CI: .gitlab-ci.yml:15-20 (tag saas-linux-medium-amd64) and .github/workflows/main.yml:394-451 (containers on ubuntu-latest); Documentation/technical/build-systems.adoc:16-23 names Linux as continually tested; platform policy in Documentation/technical/platform-support.adoc:21-39.",
+        "wsl2": "unknown - no WSL2 install doc, build block or CI job in the tree. WSL appears only in release notes (Documentation/RelNotes/2.43.0.adoc:208-209, maintenance timers 'to work with WSL'; Documentation/RelNotes/2.14.6.adoc:36-39, CVE-2019-1353) and a comment at t/chainlint.pl:253. WSL2 would use the Linux code path, but the tree does not state support.",
+        "macos_arm64": "yes - Darwin block with an arm64 branch (config.mak.uname:130-199, 166-170); CI on an Apple M2 Pro runner tag (.gitlab-ci.yml:84-119, tag at :89) and a macos-14 pool (.github/workflows/main.yml:350-361; architecture of that label is not stated in the tree); universal macOS builds via RUST_TARGETS (Makefile:499-502).",
+        "gpu": "no - not applicable to a version control system; no CUDA/OpenCL/Metal/Vulkan/GPU code found outside po/."
+      },
+      "integrations": {
+        "cli": "The `git` binary is the product: `git worktree` (git.c:687 -> builtin/worktree.c:1512), `git diff` (git.c:571 -> builtin/diff.c:399; --no-index -> diff-no-index.c:354) and `git difftool` (git.c:576 -> builtin/difftool.c:717). Script-friendly output: `git worktree list --porcelain [-z]` (Documentation/git-worktree.adoc:259-269, 460-511); `git diff --raw/--numstat/--name-status/-z` and `--word-diff=porcelain` (Documentation/diff-options.adoc:149,231,305-330,447-453); `diff --no-index` exit codes 0/1 (t/t4053-diff-no-index.sh:19-22).",
+        "mcp": "none found - no 'Model Context Protocol' or MCP server references anywhere in the tree (all files searched).",
+        "sdk_or_api": "No supported SDK or HTTP API. Internal static library libgit.a (Makefile:941); proof-of-concept Rust FFI crates in contrib/ (contrib/libgit-rs/README.md:3; contrib/libgit-sys/README.md:3-4); the stable programmatic surface is the CLI above. Trace2 JSON events are diagnostic output (Documentation/technical/api-trace2.adoc:104-109). No GitHub API client exists in the C, shell, Perl or Python sources (GitHub appears there only as URLs in comments, e.g. builtin/push.c:790).",
+        "claude_code_or_codex": "none found for Claude Code or Codex (no CLAUDE.md; no matches for 'claude code' or 'codex'). Related: po/AGENTS.md:1-5 is an optional instruction file for 'AI agents' doing localization housekeeping (referenced at po/README.md:402-414), and Documentation/SubmittingPatches:571-597 sets an AI-use policy for contributions."
+      },
+      "telemetry_and_network": "No telemetry or phone-home code found. The only 'telemetry' hits are the optional Trace2 facility (trace2.h:5; Documentation/technical/api-trace2.adoc:3-5): inactive unless explicitly enabled, read only from system/global config and GIT_TRACE2* env (api-trace2.adoc:4-5,25-28); sinks are stderr, fds, files/directories or AF_UNIX sockets (Documentation/trace2-target-values.adoc:2-11; trace2/tr2_dst.c:199-285), no network sink. git fast-import writes local crash reports (Documentation/git-fast-import.adoc:1348-1352). Network is used by transport commands (ssh, and HTTP(S) via libcurl: INSTALL:117,132-139); `git worktree` and `git diff --no-index` operate on the local filesystem (builtin/worktree.c, diff-no-index.c), but in partial clones diff/checkout can lazily fetch missing objects from the promisor remote (Documentation/technical/partial-clone.adoc:125-134; t/t4067-diff-partial-clone.sh). Outbound identification: HTTP User-Agent 'git/<version>' (http.c:1255-1256; override via http.userAgent / GIT_HTTP_USER_AGENT, http.c:502-503,1475; build option meson_options.txt:34-35) and the protocol 'agent=' capability (send-pack.c:599, fetch-pack.c:418). ident.c:103-145 may resolve the local hostname via getaddrinfo when deriving a default identity. No account or hosted service is required; remote authentication uses credential helpers, including PAT/OAuth via third-party helpers (Documentation/gitcredentials.adoc:21,116-134). CI-only network use: coverity.yml uploads to scan.coverity.com when enabled (coverity.yml:22-31,160-167); l10n.yml installs git-po-helper from GitHub (l10n.yml:70-71)."
+    },
+    "code": {
+      "languages": [
+        "C (primary: 641 .c and 345 .h files)",
+        "POSIX shell (git-*.sh scripts, 1,061 test scripts t/t[0-9]{4}-*.sh, ci/*.sh)",
+        "Perl (git-send-email.perl, git-svn.perl, git-cvs*.perl, gitweb/gitweb.perl, perl/)",
+        "Python (git-p4.py)",
+        "Rust (optional; 11 .rs files in src/, contrib/libgit-rs, contrib/libgit-sys)",
+        "Tcl/Tk (git-gui/, gitk-git/; INSTALL:145-147)",
+        "AsciiDoc (Documentation/)",
+        "Make, Meson, CMake and autoconf build files"
+      ],
+      "entry_points": [
+        {
+          "path": "common-main.c:4",
+          "what": "main(): calls cmd_main() (common-main.c:9) for git and every helper program."
+        },
+        {
+          "path": "git.c:922",
+          "what": "cmd_main of the `git` binary: command-table dispatch, incl. { \"diff\", cmd_diff } at git.c:571 and { \"worktree\", cmd_worktree } at git.c:687."
+        },
+        {
+          "path": "builtin/worktree.c:1512",
+          "what": "cmd_worktree: subcommands add, prune, list, lock, unlock, move, remove, repair (OPT_SUBCOMMAND table at :1518-1528)."
+        },
+        {
+          "path": "builtin/diff.c:399",
+          "what": "cmd_diff: decides explicit/implicit --no-index (:446-477), otherwise index/tree/blob diffs."
+        },
+        {
+          "path": "diff-no-index.c:354",
+          "what": "diff_no_index(): filesystem-vs-filesystem diff; '-' reads stdin, directories recurse, pathspecs only when both paths are directories."
+        },
+        {
+          "path": "builtin/difftool.c:717",
+          "what": "cmd_difftool: launches external diff viewers (mergetools/, `-x <command>`)."
+        },
+        {
+          "path": "remote-curl.c:1552",
+          "what": "cmd_main of the HTTP(S) remote-transport helper program."
+        },
+        {
+          "path": "daemon.c:1258",
+          "what": "Further cmd_main programs: daemon.c:1258, http-backend.c:764, shell.c:161, imap-send.c:1804, http-fetch.c:98, http-push.c:1716, scalar.c:1016."
+        }
+      ],
+      "architecture": "Single C code base producing the `git` binary (130 builtin/*.c files) plus helper programs. Flow: common-main.c main -> git.c cmd_main (command table) -> builtin/*.c. Worktrees: CLI and validation in builtin/worktree.c (runs the post-checkout hook, :610-622; spawns `git branch` for new branches, :981-995; spawns `git status --porcelain` for the cleanliness check, :1390-1393); model/prune/repair logic in worktree.c; per-worktree admin dirs under $GIT_COMMON_DIR/worktrees/<id>/ (Documentation/git-worktree.adoc:363-393) with a per-worktree ref store (builtin/worktree.c:549-565). Diff: builtin/diff.c picks the mode -> diff-lib.c (index/working-tree comparison helpers) or diff-no-index.c (filesystem walk, stdin/pipe support) -> diffcore-*.c stages (rename, break, pickaxe, order; diff.c:7463 diffcore_std) -> diff.c (patch/stat/raw output, word diff, --color-moved, external diff, textconv; diff_flush at :7166) -> xdiff/ (LibXDiff-derived engine: Myers/minimal, patience, histogram in xdiffi.c, xpatience.c, xhistogram.c; hunk and funcname emission in xemit.c). Per-language regex drivers live in userdiff.c and are selected through the `diff` gitattribute (diff.c:2308-2321). Storage and refs: odb/*.c, object-file.c, packfile.c; refs/{files,packed,reftable}-backend.c and reftable/. Network: transport.c, http.c, remote-curl.c. Diagnostics: trace2/. Portability: compat/. Optional Rust staticlib `gitcore` from src/*.rs (Cargo.toml) and proof-of-concept bindings in contrib/libgit-{sys,rs}. Scripts: git-*.sh, *.perl, git-p4.py. GUIs: git-gui/, gitk-git/. Tests: t/.",
+      "packaging_and_release": "No release-publishing workflow exists among the five GitHub workflows, .gitlab-ci.yml or .cirrus.yml. Source tarball: `make dist` (git archive -> git-<ver>.tar.gz, adds `configure` and a `version` file; Makefile:3798-3826) or `meson dist` (meson.build:2354-2365); doc tarballs via `make dist-doc` (Makefile:3847-3850). Version string: `version` file in tarballs, else `git describe`, else DEF_VER (GIT-VERSION-GEN:40-61). Release train: feature releases vX.Y.0 every 8-10 weeks, maintenance vX.Y.Z; branches master/maint/next/seen (Documentation/howto/maintain-git.adoc:35-133). Release tags are signed by the maintainer's GPG key (Documentation/howto/coordinate-embargoed-releases.adoc:198-199). No checksums, signatures or provenance attestations are generated by any workflow, the Makefile or meson.build (searched, none found); upload-artifact is used only for CI test hand-off and failure dumps (.github/workflows/main.yml:152,186,237,273,299,334,378,480).",
+      "tests_and_ci": "Frameworks: (1) POSIX-shell TAP integration tests t/t[0-9]{4}-*.sh, 1,061 files, run by `make test`, `prove` or `meson test` (t/README:14-64; meson.build:50-81); (2) C unit tests on the vendored clar framework in t/unit-tests/ (28 u-*.c files incl. 8 reftable suites, plus lib/runner files; Makefile:4080); (3) perf suite t/perf/ (65 p*.sh incl. p4000-diff-algorithms, p4001-diff-no-index, p4002-diff-color-moved); (4) oss-fuzz/ fuzzers (9 fuzz-*.c, smoke-run in CI); (5) about 80 helper programs t/helper/test-*.c. Relevant suites: worktree t2400-t2407 (8 files, 225 test cases: add 91, prune 13, list 27, move 33, config 12, submodule 11, repair 26, heads 12); diff t4000-t4074 (75 files) incl. t4053-diff-no-index.sh (41 cases), t4018-diff-funcname.sh with 210 fixture files in t/t4018/, t4034-diff-words.sh with 60 fixture files for 20 languages in t/t4034/, t4051-diff-function-context.sh, t4020-diff-external.sh, t4030-diff-textconv.sh, t4065-diff-anchored.sh. CI: .github/workflows/main.yml (push + pull_request; jobs: config, Windows build/test in 10 slices, Windows+VS for the git-for-windows owner only, Windows+Meson, 4 macOS jobs on macos-14, fuzz smoke, 13 Linux container jobs incl. sha256, reftable, asan/ubsan, leaks, musl/Alpine, 32-bit, AlmaLinux 8, Debian 12, Fedora, breaking-changes, static analysis with Coccinelle/header/pot checks, Rust fmt/clippy/msrv, sparse, docs build); check-style.yml (git clang-format on PRs, continue-on-error); check-whitespace.yml (git log --check on PRs); coverity.yml (opt-in via repo variables); l10n.yml (git-po-helper for l10n repos/branches, comments on PRs). Also .gitlab-ci.yml (Linux, macOS, Windows, fuzz, static analysis, Rust, whitespace, style, docs) and .cirrus.yml (FreeBSD 14.3: gmake test unit-tests). Nothing was executed for this dossier.",
+      "dependencies": "Cargo.toml (root crate gitcore, staticlib): 0 dependencies (Cargo.toml:10-11). contrib/libgit-sys/Cargo.toml: 1 dependency (libz-sys) + 2 build-deps (autocfg, make-cmd), Cargo.lock lists 9 packages. contrib/libgit-rs/Cargo.toml: 1 dependency (libgit-sys, path) + 1 build-dep (autocfg), Cargo.lock lists 10 packages. meson.build performs 15 dependency() lookups over 14 distinct packages (zlib-ng/zlib, threads, intl, iconv, libpcre2-8, libcurl, expat, openssl, nettle, gcrypt, macOS frameworks; meson.build:991-1677), needs Meson >=0.61.0 (meson.build:224); only zlib is mandatory, the rest optional (INSTALL:110-162). subprojects/*.wrap: 5 fallback wraps (curl, expat, openssl, pcre2, zlib). .gitmodules: 1 submodule (sha1collisiondetection) with an in-tree copy in sha1dc/. Optional runtime tools: Perl >=5.26, Python 3 (git-p4), Tcl/Tk (gitk, git-gui), asciidoc/asciidoctor + xmlto for docs. No package.json, go.mod, pyproject.toml or requirements files.",
+      "security_policy": "SECURITY.md - private reports to git-security@googlegroups.com (SECURITY.md:3-6); no LTS versions, fixes target the latest maintenance track and merge upward (SECURITY.md:29-42)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Git is fast and scalable (README.md:7-9).",
+        "verified": "not_checkable",
+        "evidence": "The README gives no numbers. The tree has a perf harness (t/perf/: 65 p*.sh scripts incl. p4000-diff-algorithms.sh, p4001-diff-no-index.sh, p4002-diff-color-moved.sh; meson_options.txt:122-129) but publishes no results, only qualitative statements (INSTALL:34-37; Documentation/BreakingChanges.adoc:150-153). Nothing was run."
+      },
+      {
+        "claim": "A distributed system with full access to internals (README.md:7-9).",
+        "verified": "yes",
+        "evidence": "Distribution builtins exist (builtin/clone.c, fetch.c, push.c, pull.c); plumbing is exposed in the command table (git.c:572-575: diff-files, diff-index, diff-tree)."
+      },
+      {
+        "claim": "GPLv2 project with some parts under other GPLv2-compatible licenses (README.md:11-13).",
+        "verified": "yes",
+        "evidence": "COPYING:1-4,22-27 is GPL v2 only ('not v2.2 or v3.x'). Mixed parts: xdiff LGPL-2.1-or-later (xdiff/xdiff.h:5-9), reftable BSD-style (reftable/basics.c:2-6), sha1dc MIT (sha1dc/LICENSE.txt:1), clar ISC (t/unit-tests/clar/COPYING:1)."
+      },
+      {
+        "claim": "INSTALL is the place for installation instructions (README.md:16).",
+        "verified": "partial",
+        "evidence": "INSTALL:4-26 covers make and autoconf only; Meson is documented in meson.build:1-97, not INSTALL. INSTALL's dependency list (INSTALL:110-162) omits Rust/Cargo although Makefile:488-497,943-956 and meson_options.txt:84-85 enable Rust by default (Documentation/BreakingChanges.adoc:190-198: builds break by default if Rust is missing). INSTALL:137 says libcurl >= 7.61.0 while meson.build:1164 requires >= 7.21.3. The build files take precedence."
+      },
+      {
+        "claim": "Security issues go privately to git-security@googlegroups.com (README.md:48-49).",
+        "verified": "yes",
+        "evidence": "SECURITY.md:3-6 repeats the address; SECURITY.md:29-42 adds that there is no LTS and fixes go to the newest maintenance track."
+      },
+      {
+        "claim": "Development happens on the mailing list (README.md:33-37); GitHub is not the contribution channel (.github/CONTRIBUTING.md:3-9).",
+        "verified": "yes",
+        "evidence": ".github/CONTRIBUTING.md:3-9 and .github/PULL_REQUEST_TEMPLATE.md:1-5 say github.com is not used for contributions; GitGitGadget (external) turns PRs into mails (Documentation/MyFirstContribution.adoc:860-866). In-tree workflows are CI/lint only (main.yml, check-style.yml, check-whitespace.yml, coverity.yml, l10n.yml); the sole PR-commenting job is l10n.yml:94-111 (git-po-helper lint, not an agent, not mention-triggered)."
+      },
+      {
+        "claim": "`git diff --no-index` compares two filesystem paths, may omit the option outside a repo or when a path is outside the working tree, and implies --exit-code (Documentation/git-diff.adoc:34-45).",
+        "verified": "yes",
+        "evidence": "builtin/diff.c:446-477: explicit flag; implicit when outside a repo or when exactly two path arguments are given and either is outside the repo (the 'exactly two' restriction is not in the docs). diff-no-index.c:420 sets exit_with_status; t/t4053-diff-no-index.sh:19-22,46-50 assert exit codes 0/1."
+      },
+      {
+        "claim": "`git worktree list --porcelain` output is stable and scriptable (Documentation/git-worktree.adoc:259-263).",
+        "verified": "yes",
+        "evidence": "builtin/worktree.c:1010-1041 emits the documented keys (worktree, bare, HEAD, detached, branch, locked [reason], prunable [reason]); -z at :1139-1140; --verbose with --porcelain is rejected at :1148-1149; covered by t/t2402-worktree-list.sh (cases starting at :63,78,93,108,125,150). The promise of future stability is a policy statement and not checkable in code."
+      },
+      {
+        "claim": "Native worktree tooling can list worktrees with CI status and merge them (implied by the needs, not claimed by the docs).",
+        "verified": "no",
+        "evidence": "Only eight subcommands exist (builtin/worktree.c:1518-1528: add, prune, list, lock, unlock, move, remove, repair). list prints path, abbreviated HEAD, branch/detached/bare, locked, prunable (builtin/worktree.c:1010-1086); 'prunable' is purely metadata-based (worktree.c:937-1029). `remove` deletes only the worktree and its admin dir, not the branch (builtin/worktree.c:1463-1474). Merge and branch cleanup are separate commands: git merge, git merge-tree --write-tree (Documentation/git-merge-tree.adoc:6,24-25) and git branch --delete-merged, which skips branches checked out in any worktree (Documentation/git-branch.adoc:205-221)."
+      },
+      {
+        "claim": "Git offers syntax-aware diffs through built-in language drivers and word diff (Documentation/gitattributes.adoc:861-939; Documentation/diff-options.adoc:435-467).",
+        "verified": "partial",
+        "evidence": "The drivers are regexes (userdiff.c:36-44, 45-377): funcname patterns drive hunk headers, -W function context (diff.c:4039-4043) and -L :funcname (Documentation/line-range-format.adoc:25-32); word diff re-diffs regex-split words inside line-diff hunks (diff.c:2191-2263; diff-options.adoc:461-467). The code has 28 drivers while gitattributes.adoc:867-919 lists 26 (ini, userdiff.c:224, and r, userdiff.c:330, are undocumented); the code is authoritative. No parser, tree-sitter, entity-level or 'structural diff' code exists (no matches anywhere in the tree). External viewers plug in via diff.external/GIT_EXTERNAL_DIFF (diff.c:558-574), diff.<driver>.command (userdiff.c:491-494) and git difftool -x (Documentation/git-difftool.adoc:90-91)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Profile-feedback (PGO) build of Git versus a normal build",
+        "metric": "speed on CPU-intensive workloads",
+        "value": "unquantified: 'a few percent faster'",
+        "source": "INSTALL:34-37",
+        "independent": false
+      },
+      {
+        "what": "reftable versus files reference backend",
+        "metric": "writing many references at once",
+        "value": "unquantified: 'significantly outperforms ... by multiple orders of magnitude'",
+        "source": "Documentation/BreakingChanges.adoc:150-153",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope: nothing for GitHub automation. The tree has no GitHub API client, PR/check/review tooling or mention-triggered agent automation; GitHub appears in C/shell/Python only as comment URLs (builtin/push.c:790). The project does not use github.com for contributions (.github/CONTRIBUTING.md:3-9); its five workflows are Git's own CI and lint (.github/workflows/*.yml) and the only PR-commenting job is the l10n lint (l10n.yml:94-111).",
+      "Scope: `git worktree` has no CI-status, merge or branch-removal feature (builtin/worktree.c:1518-1528, 1463-1474). 'prunable' reflects missing or stale metadata only (worktree.c:937-1029); `remove` refuses dirty or locked worktrees, and worktrees with submodules without --force (builtin/worktree.c:1372-1409, 1450-1466).",
+      "Parallel-agent constraints: one worktree per branch unless forced (Documentation/git-worktree.adoc:180-185; builtin/worktree.c:485-486,901-904). Docs call multiple checkout 'still experimental', with incomplete submodule support and a recommendation against multiple checkouts of a superproject (git-worktree.adoc:540-544). worktree.useRelativePaths and extensions.worktreeConfig make a repository unreadable to older Git (Documentation/config/worktree.adoc:18-20; git-worktree.adoc:344-345). Repository config is shared across worktrees unless worktreeConfig is enabled (git-worktree.adoc:330-336). Orphaned admin files are pruned by git gc only after gc.worktreePruneExpire, default 3 months (Documentation/config/gc.adoc:107-111).",
+      "Diff scope: line-based diff with regex language drivers, no parser or entity-level diff (userdiff.c:36-44; no tree-sitter, 'entity-level' or 'structural diff' matches in the tree). Word diff 'may produce a larger diff than a dedicated word-diff tool' (Documentation/diff-options.adoc:461-467). By code reading (not executed), `git diff --no-index` exits 1 both for 'differences found' and for access errors: diff_no_index starts with ret = 1 and jumps to cleanup when queue_diff fails (diff-no-index.c:360,422-424; error text at :95), so scripts cannot tell the cases apart from the status alone. Pathspecs are rejected unless both paths are directories (diff-no-index.c:394-404).",
+      "Build and platform: Rust is compiled by default unless NO_RUST or -Drust=disabled (Makefile:488-497,943-956; meson_options.txt:84-85) and becomes mandatory in Git 3.0 (Documentation/BreakingChanges.adoc:174-217); INSTALL's dependency list does not mention Rust/Cargo or Meson (INSTALL:110-162); INSTALL and meson.build disagree on the libcurl minimum (INSTALL:137 vs meson.build:1164). WSL2 support is not stated anywhere in the tree.",
+      "Version churn: this is a development snapshot between releases. GIT-VERSION-GEN:3 falls back to v2.56.GIT and this shallow clone has no tags, so `git describe` cannot name the version (GIT-VERSION-GEN:45-58); the in-progress notes are Documentation/RelNotes/2.98.0.adoc, which calls it the 'antepenultimate release' before Git 3.0 (:4-5). Git 3.0 has no release date but plans default changes: sha256 object format, reftable ref storage, `main` branch name, safe.bareRepository=explicit (Documentation/BreakingChanges.adoc:82-241); breaking changes are guarded by WITH_BREAKING_CHANGES (:72-77).",
+      "Maintenance and security: no LTS; only the latest maintenance track is formally patched (SECURITY.md:31-42); a feature release every 8-10 weeks (Documentation/howto/maintain-git.adoc:111-115). No release workflow, checksums or attestations exist in .github/, .gitlab-ci.yml, .cirrus.yml, the Makefile or meson.build (searched); the only signature evidence is maintainer-signed tags (Documentation/howto/coordinate-embargoed-releases.adoc:198-199). contrib/ (diff-highlight, credential helpers, libgit-rs) is owner-maintained and not actively reviewed by the maintainer (contrib/README:10-21); libgit-rs and libgit-sys are proof-of-concept and their Cargo manifests carry no license field.",
+      "License and contribution policy: GPL-2.0-only, 'v2, not v2.2 or v3.x' (COPYING:2-4), with mixed-license components (xdiff LGPL-2.1+, reftable BSD-style, sha1dc MIT, clar ISC). Upstream contribution policy rejects 'anything that looks AI generated' (Documentation/SubmittingPatches:584-587) and takes patches by mailing list, GitGitGadget or b4 (SubmittingPatches:673; .github/CONTRIBUTING.md:3-9)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "git/git",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "GNU make from source: `make prefix=/usr all doc info`, then as root `make prefix=/usr install install-doc install-html install-info`; plain `make` + `make install` installs under ~/bin; INSTALL has no macOS-specific section.",
+          "citation": "INSTALL:4-9",
+          "holds": true,
+          "note": "INSTALL:4-5 says plain make/make install installs into ~/bin; INSTALL:8-9 has both prefix=/usr commands verbatim. A case-insensitive search of INSTALL for mac/darwin/apple/os x finds nothing, so 'no macOS-specific section' is right. 'Linux/macOS' is the dossier's own label; INSTALL names no platforms. Caveat the entry leaves out (the dossier covers it under risks and claim_checks): unless NO_RUST is set, the Makefile links the Rust library (Makefile:943, 1602-1604) and builds it with `cargo build` (Makefile:3031-3032), so this command needs Cargo by default."
+        },
+        {
+          "field": "license",
+          "statement": "spdx GPL-2.0-only, file COPYING",
+          "citation": "COPYING",
+          "holds": true,
+          "note": "COPYING:2-4: 'the only valid version of the GPL as far as this project is concerned is _this_ particular version of the license (ie v2, not v2.2 or v3.x or whatever), unless explicitly otherwise stated'. COPYING:22-23 starts the GNU GPL Version 2, June 1991 text. This agrees with README.md:11-13. The root also has LGPL-2.1, and some components carry their own license files (reftable/LICENSE, sha1dc/LICENSE.txt, t/unit-tests/clar/COPYING, contrib/subtree/COPYING). The dossier records the mixed-license parts elsewhere, so the top-level GPL-2.0-only identifier is correct."
+        },
+        {
+          "field": "readme.platforms.macos_arm64",
+          "statement": "yes - Darwin block with an arm64 branch (config.mak.uname:130-199, 166-170); CI on an Apple M2 Pro runner tag (.gitlab-ci.yml:84-119, tag at :89) and a macos-14 pool (.github/workflows/main.yml:350-361; architecture not stated in the tree); universal macOS builds via RUST_TARGETS (Makefile:499-502).",
+          "citation": "config.mak.uname:130-199,166-170; .gitlab-ci.yml:84-119,89; .github/workflows/main.yml:350-361; Makefile:499-502",
+          "holds": true,
+          "note": "config.mak.uname: the Darwin block is lines 130-199; lines 166-170 set HOMEBREW_PREFIX=/opt/homebrew when uname_M is arm64 (that is the only arm64-specific setting). .gitlab-ci.yml:84-119 is the test:osx job, tagged saas-macos-large-m2pro at :89, with matrix jobs osx-clang, osx-reftable and osx-meson. main.yml:350-361 runs osx-clang, osx-reftable, osx-gcc and osx-meson on pool macos-14; as the dossier says, the tree does not state that pool's architecture. Makefile:499-502 documents RUST_TARGETS with several targets producing a universal library with lipo (example: aarch64-apple-darwin x86_64-apple-darwin). I also opened every linux_x86_64 citation and all hold: config.mak.uname:49-82; .gitlab-ci.yml:15-20 (saas-linux-medium-amd64); main.yml:394-451 (container jobs, runs-on ubuntu-latest); build-systems.adoc:16-23; platform-support.adoc:21-39."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "The git binary is the product: git worktree (git.c:687 -> builtin/worktree.c:1512), git diff (git.c:571 -> builtin/diff.c:399; --no-index -> diff-no-index.c:354), git difftool (git.c:576 -> builtin/difftool.c:717); script-friendly output via worktree list --porcelain [-z], diff --raw/--numstat/--name-status/-z and --word-diff=porcelain; diff --no-index exit codes 0/1.",
+          "citation": "git.c:571,576,687; builtin/worktree.c:1512; builtin/diff.c:399; diff-no-index.c:354; builtin/difftool.c:717; Documentation/git-worktree.adoc:259-269,460-511; Documentation/diff-options.adoc:149,231,305-330,447-453; t/t4053-diff-no-index.sh:19-22",
+          "holds": true,
+          "note": "Every line number matches: git.c:571 {\"diff\", cmd_diff}, :576 {\"difftool\", cmd_difftool}, :687 {\"worktree\", cmd_worktree}. Definitions: cmd_worktree at builtin/worktree.c:1512, cmd_diff at builtin/diff.c:399, cmd_difftool at builtin/difftool.c:717, and diff_no_index at diff-no-index.c:354, which builtin/diff.c:516 calls. git-worktree.adoc:259-262 promises the --porcelain format stays stable across versions and config; :265-269 covers -z; :460-511 describes the format. diff-options.adoc: --raw at :149, --numstat at :231, -z at :305-319, --name-status at :327-330, and porcelain word diff at :447-453. t4053:19-22 runs with --exit-code and asserts exit 0 for identical files and 1 for differing files."
+        },
+        {
+          "field": "claim_checks[8]",
+          "statement": "Native worktree tooling can list worktrees with CI status and merge them (implied by the needs) - verified: no.",
+          "citation": "builtin/worktree.c:1518-1528,1010-1086,1463-1474; worktree.c:937-1029; Documentation/git-merge-tree.adoc:6,24-25; Documentation/git-branch.adoc:205-221",
+          "holds": true,
+          "note": "The 'no' is correct and every cited line matches. builtin/worktree.c:1518-1528 registers only add, prune, list, lock, unlock, move, remove and repair. show_worktree_porcelain and show_worktree (:1010-1086) print path, HEAD, bare/detached/branch, locked and prunable, and nothing about CI or merge state. should_prune_worktree (worktree.c:937-1029) checks only the admin dir, the locked file, the gitdir file, whether its target exists, and the index mtime against the expiry. remove_worktree deletes the work tree (:1467) and the admin dir (:1473) but not the branch. Neither builtin/worktree.c nor git-worktree.adoc mentions merge. git-merge-tree.adoc:6,24-25 (merge without touching the index or working tree) and git-branch.adoc:205-221 (--delete-merged, which skips any branch checked out in a worktree, :221) match the dossier."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

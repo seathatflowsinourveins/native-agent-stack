@@ -1,0 +1,327 @@
+{
+  "contender": "restic/restic",
+  "revision": {
+    "contender": "restic/restic",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "restic/restic",
+        "tag": "v0.19.1",
+        "commit": "6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.19.1",
+    "commit": "6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf",
+    "read_at": "2026-10-02T03:02:43+00:00"
+  },
+  "dossier": {
+    "contender": "restic/restic",
+    "revision": {
+      "tag": "v0.19.1",
+      "commit": "6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "BSD-2-Clause",
+      "file": "LICENSE"
+    },
+    "purpose": "restic is a Go command-line backup program: it saves snapshots of files/directories (or the output of a command or stdin) into an encrypted, deduplicated, compressed repository on local disk, SFTP, a REST server, S3-compatible storage, Swift, B2, Azure, GCS or an rclone remote, and can list, verify (check, restore --verify), restore, mount (FUSE) and dump (tar/zip) them (README.md:7,41-54; cmd/restic/main.go:77-112). Scope facts for the stated needs: (1) no subcommand installs language runtimes or CLI tools from a manifest; the whole subcommand set is repository/backup operations (cmd/restic/main.go:77-112; doc/manual_rest.rst:21-55), and restic appears in the docs only as something other tools (Mise, Homebrew, etc.) can install (doc/020_installation.rst:92-134); (2) encrypted + deduplicated + verifiable backup and restore of files and command/stdin streams is its core function, and restore only writes to an explicit --target directory (cmd/restic/cmd_restore.go:129-131); (3) no dotfile/config-management or credential-redaction feature exists: file selection is by user-supplied include/exclude patterns (doc/040_backup.rst:341-356), repository and backend credentials are supplied at run time via flags, environment variables, files or commands (internal/global/global.go:186-212; doc/075_scripting.rst:22-110), and restic has no config file of its own (only the cache directory is resolved, internal/backend/cache/dir.go:16-28).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "restic is a backup program that is fast, efficient and secure. It supports the three major operating systems (Linux, macOS, Windows) and a few smaller ones (FreeBSD, OpenBSD).",
+          "citation": "README.md:7"
+        },
+        {
+          "claim": "Quick start: `restic init --repo /tmp/backup`, then `restic --repo /tmp/backup backup ~/work` saves a snapshot; 'Next you can either use `restic restore` to restore files or use `restic mount` to mount the repository via fuse and browse the files from previous snapshots.'",
+          "citation": "README.md:18-37"
+        },
+        {
+          "claim": "Losing your password means that your data is irrecoverably lost.",
+          "citation": "README.md:22-23"
+        },
+        {
+          "claim": "Natively supported backends: local directory, sftp (via SSH), HTTP REST server (rest-server), Amazon S3 (or Minio), OpenStack Swift, Backblaze B2, Microsoft Azure Blob Storage, Google Cloud Storage, and many other services via rclone.",
+          "citation": "README.md:41-54"
+        },
+        {
+          "claim": "Easy: 'Restic should be easy to configure and use, so that, in the event of a data loss, you can just restore it. Likewise, restoring data should not be complicated.'",
+          "citation": "README.md:61-64"
+        },
+        {
+          "claim": "Fast: backing up should only be limited by network or hard disk bandwidth; 'Restoring backups should only transfer data that is needed for the files that are to be restored'.",
+          "citation": "README.md:66-70"
+        },
+        {
+          "claim": "Verifiable: 'Much more important than backup is restore, so restic enables you to easily verify that all data can be restored.'",
+          "citation": "README.md:72-73"
+        },
+        {
+          "claim": "Secure: 'Restic uses cryptography to guarantee confidentiality and integrity of your data. The location the backup data is stored is assumed not to be a trusted environment'.",
+          "citation": "README.md:75-79"
+        },
+        {
+          "claim": "Efficient: additional snapshots only take the storage of the actual increment; 'duplicate data should be de-duplicated before it is actually written to the storage back end'.",
+          "citation": "README.md:81-84"
+        },
+        {
+          "claim": "Reproducible builds: binaries released with each version starting at 0.6.1 are reproducible, i.e. a byte identical version can be rebuilt from the release source (instructions live in the separate restic/builder repository).",
+          "citation": "README.md:88-92"
+        },
+        {
+          "claim": "Restic is licensed under the BSD 2-Clause License (full text in LICENSE).",
+          "citation": "README.md:101-102"
+        },
+        {
+          "claim": "Backend integration tests for Google Cloud Storage and Microsoft Azure Blob Storage are sponsored by AppsCode.",
+          "citation": "README.md:106-107"
+        },
+        {
+          "claim": "Absence: the README says nothing about telemetry, MCP/agent integrations, installing language runtimes or CLI tools from a manifest, or dotfile/config management.",
+          "citation": "README.md:1-109"
+        }
+      ],
+      "install": [
+        {
+          "method": "Official release binaries (Linux/macOS/others); in-place update afterwards with self-update",
+          "command": "restic self-update   (first download is manual from https://github.com/restic/restic/releases/latest; verify SHA256SUMS with SHA256SUMS.asc, PGP key 0x91A6868BD3F7A907)",
+          "citation": "doc/020_installation.rst:204-251"
+        },
+        {
+          "method": "From source (Go >= 1.25)",
+          "command": "git clone https://github.com/restic/restic && cd restic && go run build.go",
+          "citation": "doc/020_installation.rst:307-322"
+        },
+        {
+          "method": "macOS/Linux package managers: Homebrew, MacPorts, pkgx",
+          "command": "brew install restic   |   sudo port install restic   |   pkgx install restic (Linux and macOS)",
+          "citation": "doc/020_installation.rst:95-111"
+        },
+        {
+          "method": "Mise (Linux/macOS/Windows)",
+          "command": "mise use -g restic@latest",
+          "citation": "doc/020_installation.rst:126-134"
+        },
+        {
+          "method": "Linux distribution packages",
+          "command": "apt-get install restic (Debian) | dnf install restic (Fedora) | pacman -S restic (Arch) | apk add restic (Alpine) | zypper install restic (openSUSE) | emerge restic (Gentoo) | dnf install epel-release && dnf install restic (RHEL/CentOS Stream) | eopkg install restic (Solus) | pkgs.restic in configuration.nix (Nix)",
+          "citation": "doc/020_installation.rst:35-180"
+        },
+        {
+          "method": "Docker image",
+          "command": "docker pull restic/restic   |   docker pull ghcr.io/restic/restic",
+          "citation": "doc/020_installation.rst:267-281"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - README.md:7 lists Linux; release build target linux/amd64 (helpers/build-release-binaries/main.go:252); official binaries are built on a Linux amd64 host (doc/developer_information.rst:14); CI Linux jobs run on ubuntu-latest (.github/workflows/tests.yml:34-50); Docker images include linux/amd64 (.github/workflows/docker.yml:69).",
+        "wsl2": "unknown - no mention of WSL/WSL2 anywhere in README, docs, workflows or code (repo-wide search). Linux builds are static CGO_ENABLED=0 binaries (helpers/build-release-binaries/main.go:126), but WSL2 use is neither documented nor tested.",
+        "macos_arm64": "yes - README.md:7 lists macOS; release targets include darwin/arm64 (helpers/build-release-binaries/main.go:249); install via Homebrew, MacPorts, pkgx, Mise (doc/020_installation.rst:92-134); CI has a macOS job on macOS-latest with FUSE tests disabled (.github/workflows/tests.yml:29-32), runner CPU architecture is not stated in the workflow (it downloads amd64 minio/rclone for macOS, tests.yml:75,83); `restic mount` on macOS needs FUSE-T or macFUSE (doc/050_restore.rst:205-209); no macOS code-signing/notarization exists in the repo (repo-wide search).",
+        "gpu": "no - not applicable; backup tool with no GPU/CUDA/Metal/OpenCL code or docs (repo-wide search); the only GPU mention is about terminal progress-bar refresh rate (CHANGELOG.md:521-527)."
+      },
+      "integrations": {
+        "cli": "Yes - single `restic` binary with cobra subcommands (cmd/restic/main.go:37-112; listing at doc/manual_rest.rst:21-55); machine-readable output via the global --json flag (internal/global/global.go:102) documented per command (doc/075_scripting.rst:173-936) with documented exit codes (doc/075_scripting.rst:141-171); `restic generate` writes man pages and bash/fish/zsh/powershell completions (doc/020_installation.rst:344-405). No built-in scheduler or profile/config file: docs point to systemd/cron/Task Scheduler or the third-party resticprofile (doc/040_backup.rst:760-768).",
+        "mcp": "none found - repo-wide case-insensitive search for 'MCP' and 'model context protocol' matched nothing.",
+        "sdk_or_api": "No importable SDK: all Go code is under cmd/ and internal/ (CONTRIBUTING.md:79-80). The only documented network API is the REST backend protocol that a storage server implements (doc/REST_backend.rst:5-30); the server itself is the separate restic/rest-server project (README.md:48). Other programmatic surfaces: FUSE mount (cmd/restic/cmd_mount.go:1) and `dump` to tar/zip (doc/050_restore.rst:228-306).",
+        "claude_code_or_codex": "none found - repo-wide case-insensitive search for claude, codex, anthropic, openai matched nothing."
+      },
+      "telemetry_and_network": "No telemetry, analytics or crash-reporting code found: repo-wide searches for telemetry/analytics/phone-home/crash-report terms matched nothing in restic's own code. The only hits are OpenTelemetry and GCP-monitoring modules listed as indirect dependencies of the Google Cloud Storage client (go.mod:58-60,93-101) which no restic source references; the gs backend builds its client from a caller-supplied HTTP client (internal/backend/gs/gs.go:56-87) and release builds use the disable_grpc_modules tag (build.go:58-60; helpers/build-release-binaries/main.go:109-111). Whether that library emits any metrics was NOT verified. `restic version` is local-only (cmd/restic/cmd_version.go:27-56) and nothing checks for updates automatically (only non-backend HTTP caller is internal/selfupdate/github.go). Network use: (a) the chosen repository backend - a local path needs none; sftp spawns `ssh` and rclone spawns `rclone` as subprocesses (internal/backend/sftp/sftp.go:66; internal/backend/rclone/backend.go:48); rest/s3/swift/b2/azure/gs use HTTP(S) through a transport that honors proxy environment variables, optional custom CA/client cert, --insecure-tls and a user-agent override (internal/backend/http_transport.go:73-154; internal/global/global.go:105-108,118); the S3 credential chain also probes AWS/Minio env vars and files (~/.aws/credentials, ~/.mc/config.json) and an EC2 IAM metadata HTTP endpoint (internal/backend/s3/s3.go:103-129); (b) `restic self-update`, compiled only with the selfupdate tag (in build.go default tags and release builds), queries https://api.github.com/repos/<owner>/<repo>/releases/latest, downloads release assets (optionally authenticated via $GITHUB_ACCESS_TOKEN) and verifies a PGP signature against an embedded public key (cmd/restic/cmd_self_update.go:1,30-34; internal/selfupdate/github.go:59-72; internal/selfupdate/verify.go:10-186). Accounts: restic has no service or account of its own; only the chosen backend's credentials are needed, read from environment variables or provider mechanisms at run time (internal/backend/azure/azure.go:83-126; internal/backend/gs/gs.go:65-77; doc/075_scripting.rst:55-110), and the repository password from a prompt, $RESTIC_PASSWORD, --password-file or --password-command (internal/global/global.go:186-212). sftp and rclone backends rely on the ssh and rclone configuration stores of the host (doc/030_preparing_a_new_repo.rst:139-171,646-651). The only persistent local state is the cache directory ($RESTIC_CACHE_DIR or os.UserCacheDir()/restic, mode 0700) holding repository files that stay encrypted (internal/backend/cache/dir.go:16-28; internal/backend/cache/cache.go:27; doc/manual_rest.rst:439-474; doc/design.rst:745-746). DEBUG_LOG writes a local debug file only when set (internal/debug/debug.go:39-54); a local pprof HTTP listener exists only in debug/profile builds (internal/global/global_debug.go:1,59,75-84)."
+    },
+    "code": {
+      "languages": [
+        "Go (all product code; go 1.25.8 per go.mod:3)",
+        "Shell (docker/entrypoint.sh, helpers/verify-release-binaries.sh)",
+        "reStructuredText/Sphinx with Python conf (doc/)",
+        "YAML (GitHub Actions, dependabot, Read the Docs)"
+      ],
+      "entry_points": [
+        {
+          "path": "cmd/restic/main.go",
+          "what": "`restic` binary: main() (main.go:162-245) builds the cobra root command and registers all subcommands (main.go:37-114); maps errors to exit codes 0/1/3/10/11/12/130 (main.go:221-239)."
+        },
+        {
+          "path": "build.go",
+          "what": "`go run build.go` build driver for ./cmd/restic; default tags selfupdate,disable_grpc_modules; minimum Go 1.25.0; builds with -trimpath (build.go:54-63,128); Makefile targets wrap it (Makefile:1-12)."
+        },
+        {
+          "path": "helpers/build-release-binaries/main.go",
+          "what": "Cross-compiles release binaries for the platform matrix and compresses them (bz2, zip for Windows) (main.go:97-142,167-193,247-257); also used by the CI cross_compile job and docker/Dockerfile.release."
+        },
+        {
+          "path": "helpers/prepare-release/main.go",
+          "what": "Release automation: changelog checks, version bump, signed git tag, source tarball, Docker-based builds, SHA256SUMS, gpg detached signatures, Docker image build commands (main.go:446-495)."
+        },
+        {
+          "path": "helpers/verify-release-binaries.sh",
+          "what": "Verifies a published release: PGP-checks SHA256SUMS, compares tarball to the git tag, rebuilds binaries in Docker, checks binaries inside the Docker Hub/GHCR images (verify-release-binaries.sh:1-137)."
+        },
+        {
+          "path": "docker/entrypoint.sh",
+          "what": "Container entrypoint wrapping restic in optional nice/ionice (entrypoint.sh:5-10); images built from docker/Dockerfile (source build) and docker/Dockerfile.release (release builder)."
+        },
+        {
+          "path": "doc/conf.py",
+          "what": "Sphinx documentation build (Read the Docs config .readthedocs.yaml:1-22); man pages doc/man/*.1 and shell completions are generated by `restic generate` (cmd/restic/cmd_generate.go; helpers/prepare-release/main.go:288-309)."
+        }
+      ],
+      "architecture": "One Go module (github.com/restic/restic, go.mod:1-5); all code is under cmd/ and internal/ (CONTRIBUTING.md:79-80), so nothing is importable as a library. cmd/restic: cobra CLI, one cmd_<name>.go per subcommand plus main.go. internal/global: global flags/env, password resolution, opening/creating repositories (internal/global/global.go). Layering, with a depguard rule forbidding backends from importing internal/restic and internal/repository (.golangci.yml:29-42): internal/backend (Backend interface Save/Load/Stat/List/Remove at internal/backend/backend.go:19-90; implementations azure, b2, gs, local, rclone, rest, s3, sftp, swift registered in internal/backend/all/all.go:16-28; wrappers cache, limiter, retry, sema, logger, dryrun; location parsing in internal/backend/location) -> internal/repository (compress + encrypt + pack files, index, prune, repair, locks, keys; subpackages index, pack, hashing) with internal/crypto (AES-256-CTR + Poly1305-AES, scrypt KDF) -> internal/data (snapshot/tree/node model, snapshot filters and retention policy) -> internal/archiver (backup: scanner, file_saver using restic/chunker, tree_saver) and internal/restorer (restore, VerifyFiles, hardlink index), plus internal/checker (check), internal/fs (OS-specific file access: xattrs, Windows VSS and security descriptors), internal/fuse (mount), internal/dump (tar/zip), internal/filter (include/exclude patterns), internal/selfupdate (GitHub release download + PGP verification), internal/ui/* (text/JSON progress), internal/feature (feature flags), internal/migrations (repo v1 to v2). Repository layout (config, data/, index/, keys/, locks/, snapshots/) is the same for local, sftp and other backends (doc/design.rst:85-117); the troubleshooting guide itself suggests copying repository files with rclone as a safety copy (doc/077_troubleshooting.rst:97-101) and `restic copy` moves snapshots between repositories with re-encryption (doc/045_working_with_repos.rst:202-248). About 450 Go files in internal/ and about 80 in cmd/restic/ (both including tests).",
+      "packaging_and_release": "Official artifacts are built by helpers/build-release-binaries/main.go inside the restic/builder Docker image, driven by helpers/prepare-release/main.go: per-platform binaries restic_<version>_<os>_<arch>.bz2 (.zip for Windows) for aix, darwin (amd64, arm64), dragonfly, freebsd, linux (386, amd64, arm, arm64, ppc64le, mips*, riscv64, s390x), netbsd, openbsd, solaris, windows; built with CGO_ENABLED=0, -ldflags '-s -w', tags selfupdate,disable_grpc_modules (helpers/build-release-binaries/main.go:97-142,167-193,247-257). Source tarball restic-<version>.tar.gz via git archive (helpers/prepare-release/main.go:349-354); SHA256SUMS via sha256sum (:391-415); detached PGP signatures SHA256SUMS.asc and restic-<version>.tar.gz.asc via `gpg --armor --detach-sign` (:417-421); signed git tag (:343-347). Verification: doc/020_installation.rst:214-224; `restic self-update` checks a PGP signature against an embedded key (internal/selfupdate/verify.go:174-186); reproduction procedure in doc/developer_information.rst:4-60 and helpers/verify-release-binaries.sh:1-137. Binary building, signing and upload run locally via prepare-release (needs local docker, buildx, gpg; it prints the follow-up `git push --tags` and Docker publish commands, helpers/prepare-release/main.go:490-494; doc/developer_information.rst:163-178); no workflow in .github/workflows builds or uploads release binaries, and the repo has no macOS code-signing/notarization step and no SBOM/sigstore attestation (repo-wide searches). Container images: ghcr.io/restic/restic is built and pushed by .github/workflows/docker.yml on tags v* and pushes to master for linux/386, amd64, arm, arm64 (docker.yml:3-9,62-72) with SLSA Level 3 provenance via slsa-github-generator (docker.yml:82-95; verification steps doc/developer_information.rst:116-141); Docker Hub restic/restic is published from commands printed by prepare-release (helpers/prepare-release/main.go:423-436); the image base is alpine:latest with unpinned apk packages (docker/Dockerfile.release:13,23). Version is in VERSION (0.19.1) and internal/global/global.go:38; release 0.19.1 is dated 2026-07-05 (CHANGELOG.md:45).",
+      "tests_and_ci": "Go standard `testing` with an in-repo helper package internal/test imported as rtest (doc/090_participating.rst:116-129; .golangci.yml:43-46), a mandatory shared backend conformance suite internal/backend/test (doc/090_participating.rst:151), google/go-cmp (go.mod:23), one fuzz test (internal/repository/fuzz_test.go) and tar.gz fixture repositories (cmd/restic/testdata/, internal/*/testdata/). About 212 _test.go files (176 under internal/, 36 under cmd/restic/, of which 20 are cmd_*_integration_test.go) with 743 top-level Test/Fuzz/Benchmark functions by regex count. CI: .github/workflows/tests.yml - job `test` matrix: Windows (Go 1.26), macOS (Go 1.26, FUSE tests off), Linux (Go 1.26; FUSE, cloud-backend tests, changelog check), Linux -race (Go 1.26), Linux (Go 1.25) (:20-50), each running `go run build.go`, an init+backup smoke test and `go test -cover ./...` (:135-153); cloud and server backends (S3, Azure, B2, GCS, Swift, rest-server, sftp, minio, rclone) with RESTIC_TEST_DISALLOW_SKIP forcing them to run, only where repository secrets exist (:155-196; internal/test/vars.go:47-57); `cross_compile` builds all release targets in 3 shards, with and without -tags debug (:207-236); `lint` runs golangci-lint v2.12 on pull requests only (gofmt, govet, staticcheck, errcheck, revive, depguard; .golangci.yml:1-95) plus a go mod tidy diff check (:238-270); `analyze` aggregates results (:272-285); `docker` builds docker/Dockerfile without pushing (:287-326). .github/workflows/codespell.yml runs codespell on pushes/PRs; .github/workflows/docker.yml publishes GHCR images and provenance on tags/master. CI downloads minio and rclone binaries and installs rest-server@master without pinning or checksums (tests.yml:67-94). Other OSes (BSDs, solaris, aix) are only cross-compiled in CI.",
+      "dependencies": "go.mod (go 1.25.8, toolchain go1.25.10; go.mod:3-5): 34 direct requirements (go.mod:11-46) and 59 indirect (go.mod:48-108); go.sum present, no vendor/ directory. Direct deps include spf13/cobra and pflag (CLI), cloud.google.com/go/storage and google.golang.org/api (GCS), Azure SDK (azcore, azidentity, azblob), minio-go/v7 (S3), ncw/swift/v2 (Swift), Backblaze/blazer (B2), pkg/sftp, anacrolix/fuse, restic/chunker, klauspost/compress (zstd), elithrar/simple-scrypt, golang.org/x/{crypto,net,oauth2,sync,sys,term,text,time}, pkg/xattr, Microsoft/go-winio and go-ole (Windows). The indirect set includes OpenTelemetry and GCP monitoring modules via the GCS client (go.mod:58-60,93-101). doc/requirements.txt: 2 unpinned Python packages (sphinx, sphinx_rtd_theme), docs only. 11 distinct GitHub Actions in .github/workflows (docker.yml pins most to commit SHAs; tests.yml mostly to major-version tags). Dependabot updates gomod and github-actions monthly (.github/dependabot.yml:1-17).",
+      "security_policy": "No SECURITY.md (none at repo root or under .github/). Policy text is in doc/090_participating.rst:231-246: possible critical security problems are to be emailed directly to the maintainer (alexander@bumpern.de), not filed as GitHub issues, with an optional PGP key (0x91A6868BD3F7A907)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Supports Linux, macOS, Windows plus FreeBSD and OpenBSD (README.md:7)",
+        "verified": "yes",
+        "evidence": "Release build matrix covers darwin/{amd64,arm64}, linux/{386,amd64,arm,arm64,ppc64le,mips*,riscv64,s390x}, windows/{386,amd64}, freebsd, openbsd and also aix, dragonfly, netbsd, solaris (helpers/build-release-binaries/main.go:247-257). CI runs tests only on Windows, macOS and Linux (.github/workflows/tests.yml:25-50); other OSes are cross-compiled only (tests.yml:207-236). `mount` is compiled only for darwin/freebsd/linux (cmd/restic/cmd_mount.go:1, cmd_mount_disabled.go:1) and extended attributes are no-ops on aix/dragonfly/openbsd (internal/fs/node_noxattr.go:1)."
+      },
+      {
+        "claim": "Quick start: init -> backup -> restore/mount works as shown (README.md:18-37)",
+        "verified": "partial",
+        "evidence": "The commands exist (cmd/restic/cmd_init.go, cmd_backup.go, cmd_restore.go, cmd_mount.go), but the README sample output is stale versus the code, so the code wins: README shows 'enter password for new backend' and 'created restic backend' (README.md:19,21) while the code prints 'enter password for new repository: ' (internal/global/global.go:475) and 'created restic repository %v at %s' (cmd/restic/cmd_init.go:90); README shows 'scanned 764 directories, 1816 files in 0:00' and 'duration: 0:29, 54.47MiB/s' (README.md:29-32) while current text output prints 'scan finished in ...' (verbose only) and 'processed N files, X in T' (internal/ui/backup/text.go:119,147). doc/040_backup.rst:24-38 matches the code."
+      },
+      {
+        "claim": "Secure: cryptography guarantees confidentiality and integrity; the storage location is untrusted (README.md:75-79)",
+        "verified": "yes",
+        "evidence": "Client-side AES-256 in CTR mode with a Poly1305-AES MAC over the ciphertext, MAC verified before decrypting (internal/crypto/crypto.go:15-26,243-323); blobs are compressed, encrypted and self-verified before upload (internal/repository/repository.go:378-446); the master key is unlocked by a scrypt-derived user key (internal/crypto/kdf.go:53-90; internal/repository/key.go:65-109). Limits stated by the project: key-file metadata (hostname, username, creation time) is not encrypted (internal/repository/key.go:28-31; doc/design.rst:742-746), and deletion or tampering at the storage location can only be detected, not prevented (doc/design.rst:726-729,795-803). The docs also quote an external review of the cryptography (doc/070_encryption.rst:18-22); that external page was not opened here."
+      },
+      {
+        "claim": "Efficient: duplicate data is de-duplicated before it is written (README.md:81-84)",
+        "verified": "yes",
+        "evidence": "Files are split by content-defined chunking with the repository's random chunker polynomial (internal/archiver/file_saver.go:250; internal/restic/config.go:42); a blob already in the index is not stored again (known = !r.idx.AddPending(...), saved only if !known, internal/repository/repository.go:1018-1026); blobs are zstd-compressed for repository v2 (internal/repository/repository.go:381-393). The 512 KiB-8 MiB chunk range with 1 MiB average is documented (doc/design.rst:705-706); the constants come from the external restic/chunker module, which was not opened."
+      },
+      {
+        "claim": "Verifiable: restic enables easily verifying that all data can be restored (README.md:72-73)",
+        "verified": "yes",
+        "evidence": "`check` verifies structure by default and can read and verify pack data with --read-data or --read-data-subset (cmd/restic/cmd_check.go:33-41,83-95; doc/045_working_with_repos.rst:482-552); `restore --verify` re-reads restored regular files and compares each chunk's SHA-256 with the stored blob ID (cmd/restic/cmd_restore.go:91,260-279; internal/restorer/restorer.go:620-680,766). Caveats: default `check` does not read pack contents (doc/045_working_with_repos.rst:482-487); --verify covers regular-file content only, not metadata (internal/restorer/restorer.go:646-648), cannot be combined with --dry-run (cmd/restic/cmd_restore.go:137-139), prints no verification line in --json mode (cmd/restic/cmd_restore.go:261-263,275-278), and is absent from the narrative restore doc (doc/050_restore.rst) though present in the man page (doc/man/restic-restore.1:118)."
+      },
+      {
+        "claim": "Files can be restored with `restic restore` or browsed with `restic mount` (README.md:35-37)",
+        "verified": "yes",
+        "evidence": "restore requires an explicit --target directory (cmd/restic/cmd_restore.go:129-131) and supports include/exclude, overwrite modes (default always), --delete, --sparse, xattr filters and --ownership-by-name on non-Windows (cmd/restic/cmd_restore.go:79-97; internal/restorer/restorer.go:55-60). mount is built only for darwin/freebsd/linux (cmd/restic/cmd_mount.go:1) and needs FUSE-T or macFUSE on macOS per docs (doc/050_restore.rst:205-209); CI skips FUSE tests on macOS (.github/workflows/tests.yml:29-32)."
+      },
+      {
+        "claim": "Natively supported backends: local, sftp, REST, S3, Swift, B2, Azure, GCS, plus rclone (README.md:41-54)",
+        "verified": "yes",
+        "evidence": "internal/backend/all/all.go:16-28 registers azure, b2, gs, local, rclone, rest, s3, sftp and swift. Beyond what the README lists, the S3 backend also resolves credentials from Minio env/config files and EC2 IAM (internal/backend/s3/s3.go:108-129)."
+      },
+      {
+        "claim": "Losing your password means that your data is irrecoverably lost (README.md:22-23)",
+        "verified": "yes",
+        "evidence": "The master key exists only encrypted under password-derived keys in keys/ files (internal/repository/key.go:65-109; doc/design.rst:327-388); several passwords can be added with `key add` (doc/070_encryption.rst:28-30) but all unlock the same master key (doc/design.rst:386-388,820-828); empty passwords are refused unless --insecure-no-password is passed (internal/global/global.go:228-246)."
+      },
+      {
+        "claim": "Released binaries are reproducible, i.e. byte-identical rebuilds are possible (README.md:88-92)",
+        "verified": "not_checkable",
+        "evidence": "No rebuild was performed here. The tooling exists: a fixed builder container and paths (doc/developer_information.rst:4-60), the release build flags (helpers/build-release-binaries/main.go:97-142) and a script that re-downloads a release, checks the PGP-signed SHA256SUMS and rebuilds in Docker (helpers/verify-release-binaries.sh:1-137). `go run build.go` is a separate path (build.go:60-62,128) and is not the documented reproduction route."
+      },
+      {
+        "claim": "Fast: backups limited only by network or disk bandwidth; restores transfer only needed data (README.md:66-70)",
+        "verified": "not_checkable",
+        "evidence": "No benchmarks or measurements appear in the README or docs, only illustrative sample outputs (doc/040_backup.rst:24-38) and changelog notes (CHANGELOG.md:1993-1996). The restorer is designed to minimise backend requests by fetching each needed pack once (internal/restorer/doc.go:1-23), which fits the 'only needed data' intent, but throughput claims cannot be checked from the repository."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Azure backend upload transaction cost (restic 0.19.0 change)",
+        "metric": "storage transactions per pack file / transaction cost",
+        "value": "2 -> 1 transaction per file up to 256 MiB; 'cutting typical transaction costs by about half'",
+        "source": "CHANGELOG.md:597-605",
+        "independent": false
+      },
+      {
+        "what": "prune memory use (restic 0.17.0)",
+        "metric": "memory versus previous release",
+        "value": "up to 60% less memory",
+        "source": "CHANGELOG.md:1993-1996",
+        "independent": false
+      },
+      {
+        "what": "in-memory index and GC tuning (restic 0.16.0)",
+        "metric": "memory versus previous release",
+        "value": "up to 25% less memory",
+        "source": "CHANGELOG.md:2752-2756",
+        "independent": false
+      },
+      {
+        "what": "prune memory use (restic 0.15.0)",
+        "metric": "memory versus previous release",
+        "value": "up to 30% less memory",
+        "source": "CHANGELOG.md:3466-3469",
+        "independent": false
+      },
+      {
+        "what": "README quick-start sample run (single run, hardware and dataset not stated; output format predates current code)",
+        "metric": "backup size and throughput",
+        "value": "1.582 GiB, 2580 items, 'duration: 0:29, 54.47MiB/s' (live display 54.732 MiB/s)",
+        "source": "README.md:25-33",
+        "independent": false
+      },
+      {
+        "what": "Docs sample: first backup then re-run of the same tree (illustrative, not a controlled benchmark)",
+        "metric": "processed versus added data and wall time",
+        "value": "1.720 GiB processed in 0:12 -> 1.200 GiB added (1.103 GiB stored); re-run: 0 B added in 0:03",
+        "source": "doc/040_backup.rst:24-38,119-140",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope mismatch for two of the three stated needs: restic has no feature to install runtimes/CLI tools from a manifest, manage dotfiles/config, or detect credentials - its subcommands are backup/repository operations only (cmd/restic/main.go:77-112; doc/manual_rest.rst:21-55). Keeping credentials out of a backup relies entirely on user-written excludes (doc/040_backup.rst:341-356); secrets that were already backed up stay in old snapshots until `rewrite --forget` (default `rewrite` keeps the originals) plus `prune` are run (cmd/restic/cmd_rewrite.go:38-44).",
+      "All repository passwords unlock one shared master key; a password change does not revoke a leaked key and rotating the master key requires `copy` into a new repository (doc/design.rst:386-388,820-828). Handing a recovery host the repository password therefore gives it access to every host's data in a shared repository (doc/design.rst:822-824). Key files expose hostname, username and creation time unencrypted (internal/repository/key.go:28-31).",
+      "Pre-1.0 versioning (0.19.1): backward compatibility is only guaranteed after 1.0.0 and breaking changes may occur without a major bump (doc/090_participating.rst:252-266). Repository format v2 needs restic >= 0.14.0 (doc/030_preparing_a_new_repo.rst:54-64); legacy index and S3-layout support were already removed (internal/feature/registry.go:20-21) and an alpha flag mentions a future repository format 3 (internal/feature/registry.go:22). Documented package-manager installs are unpinned (e.g. `mise use -g restic@latest`) and the docs warn that distro packages may be outdated (doc/020_installation.rst:20-21,134).",
+      "Governance and release process concentrate on single named parties: BDFL model with one decision maker (GOVERNANCE.md:5-17); releases are built, PGP-signed with a single key and published by running helpers/prepare-release locally, not by a CI workflow (helpers/prepare-release/main.go:417-421,490-494; doc/020_installation.rst:214-224); there is no SECURITY.md and vulnerability reports go to one email address (doc/090_participating.rst:231-246).",
+      "Two cryptographic dependencies are flagged as deprecated by the project's own linter config and kept because 'there's no easy way to replace these packages': golang.org/x/crypto/poly1305 (record MAC, internal/crypto/crypto.go:12) and golang.org/x/crypto/openpgp (self-update signature check, internal/selfupdate/verify.go:7) (.golangci.yml:73-77).",
+      "Platform assurance gaps: the macOS CI job skips FUSE tests and its runner architecture is not stated (it downloads amd64 minio/rclone, .github/workflows/tests.yml:29-32,75,83); non-Linux/macOS/Windows targets are cross-compiled only (tests.yml:207-236); WSL2 is not mentioned anywhere; cloud-backend tests run only when upstream secrets are available (tests.yml:155-196); CI pulls minio, rclone and rest-server without pinning (tests.yml:67-94); no macOS code-signing/notarization step exists in the repo.",
+      "Backup is file-level: a source-side snapshot option exists only on Windows (VSS) (cmd/restic/cmd_backup.go:150-152; doc/040_backup.rst:69-73); on Linux/macOS live application data is read as-is, with command output (`--stdin-from-command`) as the documented route for dumps (doc/040_backup.rst:679-703). Not saved: file creation time and inode flags on Unix (doc/040_backup.rst:673-677), atime unless --with-atime (doc/040_backup.rst:660-665); POSIX ACLs are restored by numeric ID only (cmd/restic/cmd_restore.go:40) and ownership by name needs --ownership-by-name, non-Windows only (cmd/restic/cmd_restore.go:94-96).",
+      "Restore defaults can surprise: existing files are overwritten by default (internal/restorer/restorer.go:55; doc/050_restore.rst:123-129), interrupted restores can leave gaps or partial state (internal/restorer/doc.go:19-23; doc/050_restore.rst:117-121), and `latest` resolves across all hosts unless --host/--path/--tag or $RESTIC_HOST is set (cmd/restic/find.go:29-49; doc/050_restore.rst:238-257). Restore emits no snapshot-ID or target receipt in JSON, only counters (internal/ui/restore/json.go:95-108,141-151), and restic keeps no local run records beyond the cache (internal/backend/cache/dir.go:16-28), so acceptance evidence has to be produced afresh per run."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "restic/restic",
+      "checks": [
+        {
+          "field": "readme.install[0] (Official release binaries + self-update)",
+          "statement": "Official binaries are downloaded manually from https://github.com/restic/restic/releases/latest and can be checked with SHA256SUMS plus SHA256SUMS.asc (PGP key 0x91A6868BD3F7A907). Afterwards they update in place with `restic self-update`.",
+          "citation": "doc/020_installation.rst:204-251",
+          "holds": true,
+          "note": "Lines 207-217 give the releases/latest URL, SHA256SUMS/SHA256SUMS.asc and key 0x91A6868BD3F7A907; lines 226-251 describe `restic self-update` (needs restic >= 0.9.3). The code agrees: release builds always set the selfupdate tag (helpers/build-release-binaries/main.go:111), the command is gated on it (cmd/restic/cmd_self_update.go:1), and DownloadLatestStableRelease queries restic/restic, GPG-verifies SHA256SUMS against SHA256SUMS.asc, then checks the asset's SHA-256 (internal/selfupdate/download.go:122-174)."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX BSD-2-Clause; full text in LICENSE.",
+          "citation": "LICENSE:1-25; README.md:101-102",
+          "holds": true,
+          "note": "LICENSE is headed 'BSD 2-Clause License' (Copyright (c) 2014 Alexander Neumann) and has exactly the two redistribution conditions plus the standard disclaimer. It differs from the SPDX template only by '*' bullets and 'All rights reserved', both ignorable under SPDX matching. README.md:101-102 says the same."
+        },
+        {
+          "field": "readme.platforms.macos_arm64",
+          "statement": "yes - README lists macOS; darwin/arm64 is a release target; installable via Homebrew, MacPorts, pkgx and Mise; macOS CI job on macOS-latest with FUSE tests off and no stated runner architecture (it downloads amd64 minio/rclone); `restic mount` on macOS needs FUSE-T or macFUSE; no macOS code-signing or notarization in the repo.",
+          "citation": "README.md:7; helpers/build-release-binaries/main.go:249; doc/020_installation.rst:92-134; .github/workflows/tests.yml:29-32,75,83; doc/050_restore.rst:205-209",
+          "holds": true,
+          "note": "main.go:249 is `\"darwin\": {\"amd64\", \"arm64\"}`. tests.yml:29-32 is the macOS job (os macOS-latest, test_fuse false); lines 75 and 83 fetch darwin-amd64 minio and osx-amd64 rclone, with no runner architecture given. 050_restore.rst:207-208 names FUSE-T and 'FUSE for macOS' (osxfuse.github.io, macFUSE's former name). A repo-wide search for notari/codesign/xcrun/notarytool/signtool matched nothing; a control search using the same glob (darwin) matched 32 files. The 'yes' rests on release targets and docs; no arm64 CI run is shown, as the dossier itself says."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "Single `restic` binary with cobra subcommands; global --json flag for machine-readable output, documented per command; documented exit codes; `restic generate` writes man pages and bash/fish/zsh/powershell completions; no built-in scheduler or profile/config file, and the docs point to systemd/cron/Task Scheduler or resticprofile.",
+          "citation": "cmd/restic/main.go:37-112; doc/manual_rest.rst:21-55; internal/global/global.go:102; doc/075_scripting.rst:141-171,173-936; doc/020_installation.rst:344-405; doc/040_backup.rst:760-768",
+          "holds": true,
+          "note": "main.go:37-112 builds the cobra root (AddCommand at 77-106, then the debug/mount/self-update registrations); manual_rest.rst:21-55 lists the same commands. global.go:102 defines --json. 075_scripting.rst:154-171 lists exit codes 0/1/2/3/10/11/12/130, matching main.go:221-239. The JSON section runs 173-936 with subsections from backup to version, and notes that not every command supports JSON (182-184). 020_installation.rst:344-405 covers `generate`. 040_backup.rst:763-768 says there is no built-in scheduling and names systemd/cron/Task Scheduler/resticprofile. The 'no config file' part is not in 760-768 itself, but global.go:91-136 reads options only from flags and environment variables."
+        },
+        {
+          "field": "claim_checks[4] (Verifiable, README.md:72-73)",
+          "statement": "verified yes: `check` verifies structure by default and reads pack data with --read-data/--read-data-subset; `restore --verify` re-reads restored regular files and compares each chunk's SHA-256 with its blob ID. Caveats: default check skips pack contents; --verify skips metadata, cannot be combined with --dry-run, prints no verification line under --json, and is missing from 050_restore.rst but present in the man page.",
+          "citation": "README.md:72-73; cmd/restic/cmd_check.go:33-41,83-95; doc/045_working_with_repos.rst:482-552; cmd/restic/cmd_restore.go:91,137-139,260-279; internal/restorer/restorer.go:620-680,646-648,766; doc/man/restic-restore.1:118",
+          "holds": true,
+          "note": "cmd_check.go:36-38 and the flags at 84-85 match; 045_working_with_repos.rst:482-485 confirms default check does not read pack files. cmd_restore.go:91 defines --verify, 137-139 rejects it with --dry-run, and both verify messages sit behind `!gopts.JSON` (261, 275). restorer.go:646-648 skips non-file nodes; line 766 compares blobID with restic.Hash(buf), which is sha256.Sum256 (internal/restic/id.go:12-13). The man page lists --verify at line 118, and doc/050_restore.rst never mentions the flag. Extra nuance: VerifyFiles also skips files whose content was not restored (restorer.go:649), which fits 're-reads restored regular files'."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

@@ -1,0 +1,294 @@
+{
+  "contender": "fastapi/fastapi",
+  "revision": {
+    "contender": "fastapi/fastapi",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "fastapi/fastapi",
+        "tag": "0.142.2",
+        "commit": "78c4324f0c56bc5282a459978779a9e532d19709",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "0.142.2",
+    "commit": "78c4324f0c56bc5282a459978779a9e532d19709",
+    "read_at": "2026-10-02T03:02:10+00:00"
+  },
+  "dossier": {
+    "contender": "fastapi/fastapi",
+    "revision": {
+      "tag": "0.142.2",
+      "commit": "78c4324f0c56bc5282a459978779a9e532d19709",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Python web framework (ASGI, built on Starlette and Pydantic v2) for building typed HTTP and WebSocket APIs. It generates an OpenAPI 3.1 schema plus Swagger UI and ReDoc pages from type hints. It ships as a library plus a `fastapi` command that is only a shim for the external `fastapi-cli` package. It is not a container or multi-service orchestrator: the repo has no Dockerfile or Compose file, the docs show a single-app Dockerfile, and they name Docker Compose, Kubernetes, Docker Swarm and Nomad as separate tools for running several containers (docs/en/docs/deployment/docker.md:16-31, 445, 587-595).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "FastAPI is a modern, fast (high-performance), web framework for building APIs with Python based on standard Python type hints.",
+          "citation": "README.md:30"
+        },
+        {
+          "claim": "Fast: very high performance, on par with NodeJS and Go (thanks to Starlette and Pydantic).",
+          "citation": "README.md:34"
+        },
+        {
+          "claim": "Robust: get production-ready code, with automatic interactive documentation.",
+          "citation": "README.md:40"
+        },
+        {
+          "claim": "Standards-based: based on (and fully compatible with) OpenAPI and JSON Schema.",
+          "citation": "README.md:41"
+        },
+        {
+          "claim": "FastAPI stands on Starlette (web parts) and Pydantic (data parts).",
+          "citation": "README.md:123-126"
+        },
+        {
+          "claim": "Install by first installing uv, then running uv add \"fastapi[standard]\" (quotes required); with pip, install fastapi[standard] inside a virtual environment.",
+          "citation": "README.md:130-144"
+        },
+        {
+          "claim": "`uv run fastapi dev` reads main.py, detects the app and starts Uvicorn with auto-reload for local development; `fastapi run` is the production command.",
+          "citation": "README.md:195-233"
+        },
+        {
+          "claim": "Automatic interactive API docs: Swagger UI at /docs and ReDoc at /redoc.",
+          "citation": "README.md:254-268"
+        },
+        {
+          "claim": "You can optionally deploy to FastAPI Cloud with one command (`uv run fastapi deploy`); if you are not logged in, your browser opens to complete authentication.",
+          "citation": "README.md:442-460"
+        },
+        {
+          "claim": "FastAPI Cloud is built by the same team and is the primary sponsor and funding provider for the FastAPI and friends open source projects.",
+          "citation": "README.md:466, 472"
+        },
+        {
+          "claim": "FastAPI is open source and based on standards; apps can be deployed to any cloud provider.",
+          "citation": "README.md:476-478"
+        },
+        {
+          "claim": "Independent TechEmpower benchmarks show FastAPI under Uvicorn as one of the fastest Python frameworks available, only below Starlette and Uvicorn.",
+          "citation": "README.md:482"
+        },
+        {
+          "claim": "The standard extra bundles email-validator, httpx, jinja2, python-multipart, uvicorn[standard] and fastapi-cli[standard] (which includes fastapi-cloud-cli); standard-no-fastapi-cloud-cli omits the cloud CLI. Licensed under MIT.",
+          "citation": "README.md:490-516, 534"
+        }
+      ],
+      "install": [
+        {
+          "method": "uv (README primary method)",
+          "command": "uv add \"fastapi[standard]\"",
+          "citation": "README.md:135"
+        },
+        {
+          "method": "uv project bootstrap (tutorial)",
+          "command": "uv init awesome-project --bare\ncd awesome-project\nuv add \"fastapi[standard]\"",
+          "citation": "docs/en/docs/tutorial/index.md:70-72"
+        },
+        {
+          "method": "pip inside a virtual environment",
+          "command": "pip install \"fastapi[standard]\"",
+          "citation": "docs/en/docs/tutorial/index.md:109"
+        },
+        {
+          "method": "uv, core only (no standard extras)",
+          "command": "uv add fastapi",
+          "citation": "README.md:512"
+        },
+        {
+          "method": "uv, standard extras without the FastAPI Cloud CLI",
+          "command": "uv add \"fastapi[standard-no-fastapi-cloud-cli]\"",
+          "citation": "README.md:516"
+        },
+        {
+          "method": "uv, all extras",
+          "command": "uv add \"fastapi[all]\"",
+          "citation": "docs/en/docs/advanced/settings.md:47"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes (inferred; README states no platform) - pure-Python package with the 'Operating System :: OS Independent' classifier (pyproject.toml:19); CI runs the test suite on ubuntu-latest for Python 3.13, 3.14 and 3.14t (.github/workflows/test.yml:73-98). The workflow does not state the CPU architecture.",
+        "wsl2": "unknown - no mention of WSL or Windows Subsystem in the README, docs, code or workflows (searched); there is no WSL CI job.",
+        "macos_arm64": "yes (inferred; README states no platform) - the CI matrix includes macos-latest (.github/workflows/test.yml:54, 63-67) and the package is OS independent (pyproject.toml:19). The workflow does not state the runner architecture. Windows is also in the CI matrix (test.yml:54).",
+        "gpu": "no - not applicable: no GPU or CUDA code or dependency in fastapi/ or pyproject.toml; the only docs mention is a generic lifespan example about releasing a GPU (docs/en/docs/advanced/events.md:37)."
+      },
+      "integrations": {
+        "cli": "yes - console script `fastapi` (pyproject.toml:130-131) maps to fastapi/cli.py:8-13, which only delegates to the external fastapi-cli package (pulled in by the standard extra, pyproject.toml:68) and otherwise raises RuntimeError with an install hint. `python -m fastapi` also works (fastapi/__main__.py:1-3). Documented commands: fastapi dev, fastapi run, fastapi deploy (README.md:195-235, 446-458; docs/en/docs/fastapi-cli.md:116-132). The CLI logic itself is not in this repo.",
+        "mcp": "none found - no MCP server or client in fastapi/. The only MCP mentions say SSE responses work over POST for MCP-style protocols (fastapi/sse.py:26-27; docs/en/docs/tutorial/server-sent-events.md:104-110; tests/test_sse.py:180).",
+        "sdk_or_api": "Python library API: from fastapi import FastAPI, APIRouter, Depends, Query and others (fastapi/__init__.py:7-25). Apps built with it expose an OpenAPI 3.1.0 JSON schema at /openapi.json plus /docs and /redoc by default (fastapi/applications.py:240, 440, 464, 942); client generation from the schema is documented in docs/en/docs/advanced/generate-clients.md. No FastAPI-provided client SDK; TestClient is re-exported from Starlette (fastapi/testclient.py:1). Telemetry API: FastAPI(telemetry={...}) and fastapi.telemetry.get_telemetry_data (fastapi/applications.py:67-79; fastapi/telemetry/__init__.py:1-3).",
+        "claude_code_or_codex": "Documented agent skill: fastapi/.agents/skills/fastapi/SKILL.md (plus six files in references/) is described as bundled with the package and is installed into an agent's skills folder with `uvx library-skills` (a third-party tool at library-skills.io, not in this repo). The docs say it is compatible with Codex, Claude Code, Cursor, GitHub Copilot, Gemini CLI, Pi and OpenCode, and that for Claude Code you select .claude/skills (docs/en/docs/tutorial/index.md:115-131). Not verified: whether the built wheel includes this dot-directory (no build was run). No CLAUDE.md, AGENTS.md, .claude/, .codex/ or .mcp.json exists in the tree (glob)."
+      },
+      "telemetry_and_network": "Package code: no analytics or phone-home and no HTTP client - fastapi/ imports no requests, httpx, urllib.request or socket (grep; only http.client.responses is used for status phrases, fastapi/openapi/utils.py:2, 508). OpenTelemetry is new in 0.142.0 (docs/en/docs/release-notes.md:24-26): opentelemetry-api>=1.44.0 is a hard dependency (pyproject.toml:50); tracing, metrics, logs and operation spans default to True (fastapi/applications.py:1033-1044) but instrumentation is bypassed unless a provider is configured (fastapi/applications.py:1210-1216; fastapi/telemetry/_asgi.py:257-259). Data leaves the process only if an OTLP endpoint env var is set (OTEL_EXPORTER_OTLP_ENDPOINT or per-signal *_ENDPOINT; http/protobuf only; OTEL_{TRACES,METRICS,LOGS}_EXPORTER=none or OTEL_SDK_DISABLED=true turn it off): fastapi/telemetry/_runtime.py:42-70, 94-98. With no endpoint nothing is exported (tests/test_telemetry/test_runtime.py:252-282). FastAPI(telemetry={'auto_configure': False}) stops FastAPI adding exporters (applications.py:1041; _runtime.py:94-98). Exporting needs opentelemetry-sdk and the OTLP HTTP exporter (extras opentelemetry, standard, all: pyproject.toml:61-67, 106-108); if missing, a warning is logged and startup continues (_runtime.py:128-131, 217-222; tests/test_telemetry/test_runtime.py:285-313). When enabled it records request spans including url.path and url.query (five signed-URL parameter names redacted: _asgi.py:44-52, 293-308), exception logs with message and stack trace (_api.py:60-65; docs/en/docs/advanced/opentelemetry.md:131) and validation-failure logs with route and error count only (opentelemetry.md:133). Env vars read by the package: the OTEL_* ones above plus OTEL_INSTRUMENTATION_HTTP_KNOWN_METHODS (_asgi.py:160), and FASTAPI_ENV (fastapi/routing.py:1931). Browser-side: the default /docs and /redoc pages load JS and CSS from cdn.jsdelivr.net, ReDoc fonts from fonts.googleapis.com and the favicon from fastapi.tiangolo.com (fastapi/openapi/docs.py:79, 92, 100, 236, 244, 275); self-hosting is documented (docs/en/docs/how-to/custom-docs-ui-assets.md:5, 61). Accounts: none needed for the library; `fastapi deploy` (external fastapi-cloud-cli) needs a FastAPI Cloud login (README.md:460; docs/en/docs/deployment/fastapicloud.md:19); OTLP backends may need API-key headers via OTEL_EXPORTER_OTLP_HEADERS (opentelemetry.md:57). Install-time network: PyPI via uv or pip; uv may download Python (docs/en/docs/tutorial/index.md:89). The docs website (not the package) loads a third-party Kapa AI widget (docs/en/docs/js/init_kapa_widget.js:3)."
+    },
+    "code": {
+      "languages": [
+        "Python",
+        "Markdown",
+        "YAML",
+        "Shell",
+        "JavaScript",
+        "CSS"
+      ],
+      "entry_points": [
+        {
+          "path": "pyproject.toml:130-131",
+          "what": "Console script fastapi = fastapi.cli:main"
+        },
+        {
+          "path": "fastapi/cli.py:8-13",
+          "what": "Shim: calls fastapi_cli.cli.main from the external fastapi-cli package, otherwise prints an install hint and raises RuntimeError"
+        },
+        {
+          "path": "fastapi/__main__.py:1-3",
+          "what": "python -m fastapi, same entry as the console script"
+        },
+        {
+          "path": "fastapi/__init__.py:7-25",
+          "what": "Library API: FastAPI, APIRouter, Depends, Query, Body, Request, Response, WebSocket and related names"
+        },
+        {
+          "path": "fastapi/applications.py:48",
+          "what": "class FastAPI(Starlette), the ASGI application object; __call__ at line 1196 is the ASGI entry point"
+        },
+        {
+          "path": "fastapi/telemetry/__init__.py:1-3",
+          "what": "Public telemetry API: TelemetryConfig, TelemetryData, get_telemetry_data"
+        },
+        {
+          "path": "fastapi/.agents/skills/fastapi/SKILL.md",
+          "what": "Bundled AI coding-agent skill (name and description frontmatter) with references/ files"
+        }
+      ],
+      "architecture": "ASGI framework layered on Starlette. fastapi/applications.py (class FastAPI(Starlette), line 48) builds the app, overrides the middleware stack (lines 1053-1104), registers the OpenAPI, Swagger and ReDoc routes in setup() (1141-1194) and implements the ASGI __call__ that also wires lifespan and telemetry (1196-1226). fastapi/routing.py holds APIRouter (2302), APIRoute (1159), APIWebSocketRoute (834), the request handler get_request_handler (385) which resolves dependencies, calls the endpoint and runs serialize_response (308), and the frontend() static-app routes (_FrontendRoute, 2090). fastapi/dependencies/utils.py builds and solves dependency graphs from type hints (get_dependant 271, solve_dependencies 586). fastapi/params.py and param_functions.py declare Query, Path, Body, Header, Cookie, Form, File, Depends and Security. fastapi/_compat/ adapts Pydantic v2 only (v2.py, shared.py). fastapi/openapi/ generates the OpenAPI 3.1 schema (get_openapi, utils.py:585), its models and the docs HTML. fastapi/security/ has API-key, HTTP, OAuth2 and OpenID-Connect helpers. fastapi/telemetry/ is the native OpenTelemetry layer: _api.py (config and data types), _asgi.py (request and WebSocket instrumentation plus exception middleware), _runtime.py (lifespan hook and env-driven OTLP exporter setup). Also fastapi/sse.py (Server-Sent Events), encoders.py, exceptions.py, background.py, concurrency.py, middleware/ and thin Starlette re-exports (staticfiles.py, testclient.py, templating.py, websockets.py). About 22.2k lines of Python in 50 files under fastapi/; routing.py (6,527 lines) and applications.py (4,837) dominate, largely parameter docstrings. No server is bundled: serving is done by Uvicorn through the external fastapi-cli. Other top-level directories: docs/ (English plus 12 translations), docs_src/ (464 tutorial .py files), tests/, scripts/.",
+      "packaging_and_release": "Build backend is pdm-backend (pyproject.toml:1-3); the version is read from fastapi/__init__.py:3 (pyproject.toml:206-208). Artifacts are an sdist (which also includes tests/, docs_src/ and scripts/ via source-includes, pyproject.toml:210-217) and a wheel; fastapi/py.typed is shipped. Release flow: the manual Prepare Release workflow_dispatch (patch, minor or major) opens a release PR (.github/workflows/prepare-release.yml:3-17, 47-80); a merged PR labelled release creates a draft GitHub release from the release notes with no assets attached (.github/workflows/create-draft-release.yml:12, 44-54); publishing that release triggers Publish, which runs `uv build` then `uv publish` with `id-token: write` and no stored secret in the file, so PyPI OIDC trusted publishing is implied but not stated (.github/workflows/publish.yml:3-6, 13-16, 34-37). No checksum, signature or attestation step exists in any workflow (grep of .github for attestation, sigstore, cosign, checksum, gpg, slsa, provenance found none); whether `uv publish` attaches PEP 740 attestations is uv behaviour not visible in this repo. test-redistribute.yml:26-45 builds the sdist, unpacks it, installs .[all] with the tests group, runs scripts/test.sh and builds a wheel from the sdist. Actions are pinned by commit SHA (e.g. test.yml:29) and linted with zizmor (.github/workflows/zizmor.yml; .pre-commit-config.yaml:102-108); Dependabot runs monthly with a 7-day cooldown (.github/dependabot.yml:4-33); dependency-file PRs from non-members are auto-closed (.github/workflows/guard-dependencies.yml:28-50). No workflow builds or pushes a container image (grep of .github for docker: no matches); the docs say the old tiangolo/uvicorn-gunicorn-fastapi image is deprecated (docs/en/docs/deployment/docker.md:569).",
+      "tests_and_ci": "pytest >=9 with strict config and markers, warnings treated as errors and a 20 s timeout (pyproject.toml:239-250), run via `pytest -n auto --dist loadgroup tests scripts/tests/` with pytest-xdist (scripts/test.sh:7); coverage over docs_src, tests and fastapi (pyproject.toml:252-274); also inline-snapshot, dirty-equals, anyio[trio]; compatibility tests against logfire, sentry-sdk and opentelemetry-instrumentation-fastapi (pyproject.toml:172-177). About 508 test_*.py files under tests/ (210 top-level, 252 in tests/test_tutorial/ exercising docs_src examples, roughly 46 in other subdirectories such as tests/test_telemetry (11), tests/test_request_params, tests/benchmarks (2) and tests/memory_benchmarks (3)) plus 10 under scripts/tests/. .github/workflows has 20 workflow files. Code-running ones: test.yml (matrix of windows-latest and macos-latest x Python 3.14 and 3.14t, plus includes for macOS 3.10 and Windows 3.12 with lowest-direct resolution and Pydantic 2.9.0, ubuntu 3.13, 3.14 and 3.14t, Starlette from PyPI and from git main, weekly Monday cron; `uv sync --no-dev --group tests --extra all` then scripts/test-cov.sh; CodSpeed speed and memory benchmarks; a regression-test job that runs PR-changed tests against the base revision; `coverage report --fail-under=100`: test.yml:3-10, 52-99, 126-148, 189-198, 200-269, 311); test-redistribute.yml (sdist round trip); pre-commit.yml (prek running ruff check and format, mypy strict on fastapi/, ty, typos, zizmor and doc/translation checks: .pre-commit-config.yaml:17-108); zizmor.yml; build-docs.yml, deploy-docs.yml and smokeshow.yml (docs build and coverage publishing); guard-dependencies.yml. The rest is project automation (issue-manager, label-approved, add-to-project, detect-conflicts, translate, notify-translations, sponsors, topic-repos, bump-pre-commit-hooks) and the release workflows. I did not run the tests.",
+      "dependencies": "Single manifest: pyproject.toml (no requirements*.txt, setup.py or other manifests found); lockfile uv.lock has 208 [[package]] entries and locks the whole dev environment including docs, test and translation groups, not what a consumer installs. Direct runtime dependencies: 6 (pyproject.toml:44-51): starlette>=0.46.0, pydantic>=2.9.0, typing-extensions>=4.8.0, typing-inspection>=0.4.2, annotated-doc>=0.0.2, opentelemetry-api>=1.44.0. Optional extras (pyproject.toml:60-128): opentelemetry 2 (opentelemetry-sdk, opentelemetry-exporter-otlp-proto-http); standard 11 (those two plus fastapi-cli[standard], fastar, httpx, jinja2, python-multipart, email-validator, uvicorn[standard], pydantic-settings, pydantic-extra-types); standard-no-fastapi-cloud-cli 10 (same but fastapi-cli[standard-no-fastapi-cloud-cli] and no fastar); all 12 (adds itsdangerous and pyyaml, no fastar). Dev-only dependency groups (pyproject.toml:133-204): tests 25 direct plus docs-tests, docs 13 direct plus docs-tests, docs-tests 3, github-actions 6, translations 3, dev 3 direct plus the tests, docs and translations groups. requires-python >=3.10 (pyproject.toml:12). Transitive dependencies of fastapi-cli, fastapi-cloud-cli and uvicorn were not examined (external).",
+      "security_policy": "none as a file: no SECURITY.md or security.md anywhere in the tree (glob). The only reporting guidance is the issue-template contact link 'Please report security vulnerabilities to security@tiangolo.com' (.github/ISSUE_TEMPLATE/config.yml:3-4). Any organisation-level policy outside this repository was not examined."
+    },
+    "claim_checks": [
+      {
+        "claim": "Typed web framework built on Starlette (web) and Pydantic (data) (README.md:30, 123-126)",
+        "verified": "yes",
+        "evidence": "class FastAPI(Starlette) at fastapi/applications.py:48; runtime dependencies starlette and pydantic>=2.9.0 (pyproject.toml:45-46); typed package: fastapi/py.typed is present and the 'Typing :: Typed' classifier is set (pyproject.toml:27); parameters are resolved from type hints in fastapi/dependencies/utils.py (get_dependant:271, solve_dependencies:586). Pydantic v2 only: fastapi/_compat/ contains only v2.py and shared.py."
+      },
+      {
+        "claim": "Install with uv add \"fastapi[standard]\" or pip install \"fastapi[standard]\" (README.md:130-144)",
+        "verified": "yes",
+        "evidence": "The standard extra is defined at pyproject.toml:65-84; the pip route is documented at docs/en/docs/tutorial/index.md:109. README gives no minimum Python version (only a dynamic badge, README.md:17-19); the code requires >=3.10 (pyproject.toml:12) with classifiers for 3.10-3.14 (pyproject.toml:36-40)."
+      },
+      {
+        "claim": "FastAPI depends on Pydantic and Starlette; standard = email-validator, httpx, jinja2, python-multipart, uvicorn, fastapi-cli; pydantic-settings and pydantic-extra-types are 'additional optional' (README.md:486-530)",
+        "verified": "partial",
+        "evidence": "Code differs from the README (code preferred): core dependencies are six, adding typing-extensions, typing-inspection, annotated-doc and opentelemetry-api (pyproject.toml:44-51). The standard extra also contains opentelemetry-sdk, opentelemetry-exporter-otlp-proto-http, fastar, pydantic-settings and pydantic-extra-types (pyproject.toml:65-84), so the README's 'additional optional' label for the last two is inaccurate for standard, and the README never mentions OpenTelemetry or fastar."
+      },
+      {
+        "claim": "uv add \"fastapi[standard-no-fastapi-cloud-cli]\" installs the standard dependencies without fastapi-cloud-cli (README.md:514-516)",
+        "verified": "partial",
+        "evidence": "The extra exists and delegates to fastapi-cli[standard-no-fastapi-cloud-cli] (pyproject.toml:86-89), but what that external extra contains cannot be checked here. The extra still includes the OpenTelemetry SDK and OTLP exporter (pyproject.toml:87-88)."
+      },
+      {
+        "claim": "`fastapi dev` reads main.py automatically, detects the app and starts Uvicorn with auto-reload (README.md:229-233)",
+        "verified": "not_checkable",
+        "evidence": "Only a shim lives here (fastapi/cli.py:1-13; console script pyproject.toml:130-131); behaviour is in the external fastapi-cli>=0.0.32 (pyproject.toml:68). tests/test_fastapi_cli.py:10-34 only checks the nonexistent-file error path and the missing-CLI RuntimeError. Docs add that fastapi dev binds 127.0.0.1 with reload and fastapi run binds 0.0.0.0 (docs/en/docs/fastapi-cli.md:120, 130)."
+      },
+      {
+        "claim": "Automatic interactive docs: Swagger UI at /docs, ReDoc at /redoc (README.md:254-268)",
+        "verified": "yes",
+        "evidence": "Defaults are /openapi.json, /docs and /redoc (fastapi/applications.py:240, 440, 464); routes are registered in setup() (applications.py:1141-1194). Caveat not in the README: the pages load JS and CSS from cdn.jsdelivr.net, ReDoc fonts from Google Fonts and the favicon from fastapi.tiangolo.com (fastapi/openapi/docs.py:79, 92, 100, 236, 244, 275); self-hosting is documented (docs/en/docs/how-to/custom-docs-ui-assets.md:5, 61)."
+      },
+      {
+        "claim": "Standards-based: based on and fully compatible with OpenAPI and JSON Schema (README.md:41)",
+        "verified": "partial",
+        "evidence": "Schema generation targets OpenAPI 3.1.0 by default (fastapi/applications.py:942; fastapi/openapi/utils.py:585-589) with Pydantic models for the spec in fastapi/openapi/models.py. 'Fully compatible' is not backed by a conformance suite in the repo; test files named tests/test_openapi_*.py exist (contents not reviewed)."
+      },
+      {
+        "claim": "Deploy to FastAPI Cloud with `uv run fastapi deploy`; the browser opens for login if needed (README.md:442-460)",
+        "verified": "not_checkable",
+        "evidence": "No deploy code in this repo: fastapi/cli.py only delegates to fastapi-cli, and fastapi-cloud-cli arrives through the standard extra (pyproject.toml:68; README.md:507-508). The README states a login is needed (README.md:460). FastAPI Cloud is the only provider-specific deploy path in the project; other clouds are left to their own guides (README.md:476-478)."
+      },
+      {
+        "claim": "Very high performance, on par with NodeJS and Go; one of the fastest Python frameworks (README.md:34, 480-484)",
+        "verified": "not_checkable",
+        "evidence": "No cross-framework or cross-language measurements are in the repo. It has a CodSpeed regression harness (tests/benchmarks and tests/memory_benchmarks, skipped unless --codspeed: tests/benchmarks/test_general_performance.py:11-15; run in CI at .github/workflows/test.yml:189-198) with no committed results. The TechEmpower link was not opened; docs/en/docs/benchmarks.md:3 repeats the ranking without figures."
+      },
+      {
+        "claim": "Ready for production (README.md:5, 40)",
+        "verified": "partial",
+        "evidence": "Version is 0.x (fastapi/__init__.py:3) and the classifier is 'Development Status :: 4 - Beta' (pyproject.toml:28). Docs say any 0.x version could have breaking changes and that breaking changes arrive in MINOR versions (docs/en/docs/deployment/versions.md:7, 41-57). CI enforces 100% coverage (.github/workflows/test.yml:311)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "TechEmpower Web Framework Benchmarks run cited by the README and docs: FastAPI under Uvicorn ranked below Starlette and Uvicorn and described as one of the fastest Python frameworks (measured by TechEmpower, which the README calls independent; the linked page was not opened)",
+        "metric": "qualitative ranking, query test",
+        "value": "no figures in the repo - ranking statement only",
+        "source": "README.md:482; docs/en/docs/benchmarks.md:3",
+        "independent": true
+      }
+    ],
+    "risks": [
+      "Pre-1.0 versioning: version 0.142.2 (fastapi/__init__.py:3) with the 'Development Status :: 4 - Beta' classifier (pyproject.toml:28); the docs say any 0.x release could have breaking changes, that breaking changes land in MINOR versions, and advise pinning (docs/en/docs/deployment/versions.md:7, 13, 41-57).",
+      "New, fast-moving OpenTelemetry layer: native OTel support was added in 0.142.0 (2026-09-29) and opentelemetry-api>=1.44.0 became a hard runtime dependency (docs/en/docs/release-notes.md:22-26; pyproject.toml:50). The pinned 0.142.2 (2026-09-30) is a fix so that failed automatic OTel configuration no longer blocks startup (release-notes.md:10-14). When an OTLP endpoint env var is set, FastAPI creates and installs global OTel providers and registers an atexit shutdown (fastapi/telemetry/_runtime.py:39, 157-171); the docs warn that independent telemetry configuration for mounted sub-applications is not guaranteed (docs/en/docs/advanced/opentelemetry.md:104-108).",
+      "Telemetry content sensitivity: when export is enabled, exception logs include messages and stack traces (fastapi/telemetry/_api.py:60-65; docs/en/docs/advanced/opentelemetry.md:131) and server spans record url.path and url.query, redacting only five signed-URL parameter names (fastapi/telemetry/_asgi.py:44-52, 293-308). Recording is on by default (fastapi/applications.py:1033-1044); export stays off unless an OTLP endpoint is configured (fastapi/telemetry/_runtime.py:42-70; tests/test_telemetry/test_runtime.py:252-282).",
+      "Interactive docs depend on third-party hosts in the browser by default: Swagger UI and ReDoc JS/CSS from cdn.jsdelivr.net, Google Fonts for ReDoc, favicon from fastapi.tiangolo.com (fastapi/openapi/docs.py:79, 92, 100, 236, 244, 275). Offline or local-network use needs self-hosted assets (docs/en/docs/how-to/custom-docs-ui-assets.md:5, 61) or disabling the docs URLs (fastapi/applications.py:218-226).",
+      "Scope: FastAPI is an application framework and contains no container, Compose or orchestration code; the repo has no Dockerfile or compose file (glob of the whole tree; grep of fastapi/, docs_src/, .github/, scripts/ and tests/). The docs show a single-app Dockerfile (docs/en/docs/deployment/docker.md:16-31, 159-181) and defer multi-container deployment to external tools: Docker, Docker Compose, Kubernetes, Docker Swarm, Nomad and cloud services (docker.md:445, 587-595). A Compose-based full-stack template is a separate repository described at docs/en/docs/project-generation.md:7, 21-27 (page read, repository not opened).",
+      "Key tooling is outside this repo: the `fastapi` command (dev, run, deploy) comes from fastapi-cli and `fastapi deploy` from fastapi-cloud-cli, both pulled in by the default fastapi[standard] extra (pyproject.toml:68; README.md:507-508); fastapi/cli.py is only a shim (cli.py:1-13). Deploying to FastAPI Cloud needs an account login (README.md:460); the opt-out extra is standard-no-fastapi-cloud-cli (pyproject.toml:86-89). The README names FastAPI Cloud, a commercial service, as the primary sponsor and funder of the project (README.md:472).",
+      "Network exposure default per the docs: `fastapi run` listens on 0.0.0.0 ('publicly accessible to anyone that can communicate with the machine') while `fastapi dev` listens on 127.0.0.1 with auto-reload (docs/en/docs/fastapi-cli.md:120, 130). The behaviour is implemented in the external fastapi-cli and was not verified here.",
+      "Release integrity evidence is thin in-repo: PyPI releases come from `uv build` and `uv publish` with OIDC permissions (.github/workflows/publish.yml:13-16, 34-37); no checksum, signature or attestation step appears in any workflow (grep of .github), and the draft GitHub release attaches no artifacts (.github/workflows/create-draft-release.yml:44-54). Whether PyPI-side provenance is produced is not visible from the repo. There is no SECURITY.md; the only reporting contact is .github/ISSUE_TEMPLATE/config.yml:3-4."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "fastapi/fastapi",
+      "checks": [
+        {
+          "field": "readme.install[0] (uv, README primary method)",
+          "statement": "Install with `uv add \"fastapi[standard]\"` - the README's primary install method (README.md:135).",
+          "citation": "README.md:130, 135; pyproject.toml:65-84",
+          "holds": true,
+          "note": "README.md:135 is exactly `$ uv add \"fastapi[standard]\"`, under 'First, install uv, and then add FastAPI to your project' (README.md:130), so it is the primary method. The `standard` extra it names is defined at pyproject.toml:65-84."
+        },
+        {
+          "field": "license",
+          "statement": "License is MIT (SPDX MIT), in file LICENSE.",
+          "citation": "LICENSE:1-21; pyproject.toml:10-11; README.md:534",
+          "holds": true,
+          "note": "LICENSE:1 reads 'The MIT License (MIT)' (Copyright (c) 2018 Sebastián Ramírez) with the standard MIT text. pyproject.toml:10-11 declares license = \"MIT\" and license-files = [\"LICENSE\"], and README.md:534 says MIT."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes (inferred; README states no platform) - pure-Python package with the 'Operating System :: OS Independent' classifier (pyproject.toml:19); CI runs the test suite on ubuntu-latest for Python 3.13, 3.14 and 3.14t (.github/workflows/test.yml:73-98). The workflow does not state the CPU architecture.",
+          "citation": "pyproject.toml:19; .github/workflows/test.yml:54, 73-100, 143-144; glob of fastapi/ for *.c, *.pyx, *.pxd, *.so, *.pyd, *.rs, *.cpp, *.h",
+          "holds": true,
+          "note": "pyproject.toml:19 is 'Operating System :: OS Independent'. A glob of fastapi/ for C, Cython, Rust and binary extension files found none, so the package is pure Python. test.yml:73-98 has five ubuntu-latest include entries (3.13 three times, 3.14, 3.14t). Because each sets os to a value not in the base matrix (test.yml:54), each becomes its own job, and every job runs scripts/test-cov.sh (test.yml:143-144). runs-on is ${{ matrix.os }} (test.yml:100) with no architecture, as the dossier says. The x86_64 part is inferred, and the dossier labels it as such. The README states no platform."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "yes - console script `fastapi` (pyproject.toml:130-131) maps to fastapi/cli.py:8-13, which only delegates to the external fastapi-cli package (pulled in by the standard extra, pyproject.toml:68) and otherwise raises RuntimeError with an install hint. `python -m fastapi` also works (fastapi/__main__.py:1-3). Documented commands: fastapi dev, fastapi run, fastapi deploy. The CLI logic itself is not in this repo.",
+          "citation": "pyproject.toml:68, 130-131; fastapi/cli.py:1-13; fastapi/__main__.py:1-3; README.md:195-235, 446-458; docs/en/docs/fastapi-cli.md:116-132",
+          "holds": true,
+          "note": "pyproject.toml:130-131 maps fastapi to fastapi.cli:main. fastapi/cli.py:1-5 imports fastapi_cli.cli.main or sets it to None. main() at cli.py:8-13 prints an install hint and raises RuntimeError when the import failed, otherwise calls it. That import is the only fastapi_cli reference in fastapi/ (grep), and there is no fastapi_cli directory in the tree (glob). fastapi-cli[standard] >=0.0.32 is in the standard extra (pyproject.toml:68). __main__.py:1-3 calls the same main(). The docs cover dev and run (README.md:202, 212, 229-233; fastapi-cli.md:116-132) and deploy (README.md:449)."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "Typed web framework built on Starlette (web) and Pydantic (data) (README.md:30, 123-126) - verified: yes (FastAPI subclasses Starlette, depends on starlette and pydantic>=2.9.0, ships py.typed, resolves parameters from type hints, Pydantic v2 only).",
+          "citation": "README.md:30, 123-126; fastapi/applications.py:48; pyproject.toml:27, 45-46; fastapi/py.typed; fastapi/dependencies/utils.py:271, 292, 586; fastapi/_compat/__init__.py:1-40; fastapi/_compat/shared.py:186-222; fastapi/utils.py:66-70; fastapi/encoders.py:341-345",
+          "holds": true,
+          "note": "class FastAPI(Starlette) is at applications.py:48. starlette>=0.46.0 and pydantic>=2.9.0 are at pyproject.toml:45-46. fastapi/py.typed exists and 'Typing :: Typed' is at pyproject.toml:27. get_dependant (utils.py:271) builds parameters from get_typed_signature (utils.py:292), and solve_dependencies is at utils.py:586. On Pydantic v2 only: _compat/ also holds an __init__.py that just re-exports from shared and v2, which is a wording nit. The pydantic.v1 helpers in shared.py:186-222 exist only to raise PydanticV1NotSupportedError (fastapi/utils.py:66-70; fastapi/encoders.py:341-345)."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

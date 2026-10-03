@@ -1,0 +1,283 @@
+{
+  "contender": "prometheus/alertmanager",
+  "revision": {
+    "contender": "prometheus/alertmanager",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "prometheus/alertmanager",
+        "tag": "v0.34.1",
+        "commit": "73c6bfe7393929211294c1954f30d8ed78e4d0ad",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.34.1",
+    "commit": "73c6bfe7393929211294c1954f30d8ed78e4d0ad",
+    "read_at": "2026-10-02T03:02:38+00:00"
+  },
+  "dossier": {
+    "contender": "prometheus/alertmanager",
+    "revision": {
+      "tag": "v0.34.1",
+      "commit": "73c6bfe7393929211294c1954f30d8ed78e4d0ad",
+      "read_at": "2026-10-02T03:02:38+00:00"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Prometheus Alertmanager is a Go service that receives alerts from clients such as Prometheus over an HTTP API (v2), then deduplicates, groups, routes, silences and inhibits them and sends notifications to configured receivers (18 integrations incl. email, PagerDuty, Slack, generic webhook) (README.md:6; docs/integrations.md:12-29). It ships the `alertmanager` server (embedded Elm web UI for alerts/silences/status, optional HA gossip clustering) and the `amtool` CLI (.promu.yml:7-12; ui/web.go:31). Relevant to the stated needs: no OTLP receiver, privacy filter, metrics/log/trace store, dataset/experiment store, dashboard/exploration tool over such stores, MCP server, Claude Code/Codex integration, or model-serving/GPU code was found in the tree (searches for otlp, mcp, claude, codex, gpu, llama, inference found nothing relevant; 'otlp' occurs only in tracing/tracing.go, go.mod and go.sum). The only OTLP code is an exporter for Alertmanager's own traces (tracing/tracing.go:177-216,242-314). Its own metrics are exposed in Prometheus exposition format at /metrics (httpserver/httpserver.go:29); an experimental, flag-gated event recorder writes its own events to file/webhook/Kafka/stdout (featurecontrol/featurecontrol.go:30; eventrecorder/recorder.go:14-22); its persisted state is only silence and notification-log snapshot files, alerts are not persisted (docs/high_availability.md:366-378). The tree also holds a jsonnet mixin with alert rules and a Grafana dashboard definition for monitoring Alertmanager's own metrics from a Prometheus datasource (doc/alertmanager-mixin/README.md:3-12; doc/alertmanager-mixin/dashboards/overview.libsonnet:13-17).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "'The Alertmanager handles alerts sent by client applications such as the Prometheus server. It takes care of deduplicating, grouping, and routing them to the correct receiver integrations such as email, PagerDuty, OpsGenie, or many other mechanisms thanks to the webhook receiver. It also takes care of silencing and inhibition of alerts.'",
+          "citation": "README.md:6"
+        },
+        {
+          "claim": "Precompiled binaries for released versions are on prometheus.io/download; 'Using the latest production release binary is the recommended way of installing Alertmanager.'",
+          "citation": "README.md:16-19"
+        },
+        {
+          "claim": "Docker images are available on Quay.io or Docker Hub; example run publishes 127.0.0.1:9093 and the UI/API is then at http://localhost:9093/.",
+          "citation": "README.md:23-29"
+        },
+        {
+          "claim": "'Building from source requires Go and Node.js (with npm)'; `make build` builds; `make build BINARIES=amtool` builds just one binary.",
+          "citation": "README.md:33-46"
+        },
+        {
+          "claim": "API v2 is 'fully generated via the OpenAPI project and Go Swagger with the exception of the HTTP handlers themselves'; spec is api/v2/openapi.yaml; 'Clients can be easily generated via any OpenAPI generator'.",
+          "citation": "README.md:181-187"
+        },
+        {
+          "claim": "APIv2 lives under /api/v2 (prefixed by --web.route-prefix when set); APIv1 was deprecated in 0.16.0 and removed as of 0.27.0.",
+          "citation": "README.md:189-192"
+        },
+        {
+          "claim": "`amtool` is a CLI for the Alertmanager API, 'bundled with all releases'; also installable with `go install github.com/prometheus/alertmanager/cmd/amtool@latest`; default config files $HOME/.config/amtool/config.yml or /etc/amtool/config.yml.",
+          "citation": "README.md:194-203; README.md:299"
+        },
+        {
+          "claim": "High availability is 'enabled by default'; both UDP and TCP are needed on the cluster port (0.15+).",
+          "citation": "README.md:338-342"
+        },
+        {
+          "claim": "HA is configured with `--cluster.*` flags (listen-address default 0.0.0.0:9094, peer, peer-timeout, gossip-interval, pushpull-interval, tcp-timeout, probe-*, reconnect-*, label); `--cluster.listen-address=` (empty) turns HA off.",
+          "citation": "README.md:344-365; README.md:394-396"
+        },
+        {
+          "claim": "Prometheus should be pointed at all Alertmanagers, not load-balanced, because every Alertmanager is expected to receive all alerts.",
+          "citation": "README.md:379-392"
+        },
+        {
+          "claim": "License: Apache License 2.0.",
+          "citation": "README.md:410"
+        },
+        {
+          "claim": "The README makes no statement about OTLP/OpenTelemetry, telemetry, local metric/log/trace storage, dashboards over stores, MCP, Claude Code/Codex, or model serving (README.md, docs/, AGENTS.md and CHANGELOG.md contain no match for otlp/opentelemetry/otel).",
+          "citation": "README.md:1-414"
+        }
+      ],
+      "install": [
+        {
+          "method": "Precompiled binaries (prometheus.io download page)",
+          "command": "Download the release archive for your OS/arch from https://prometheus.io/download/ (README gives no shell command; page not fetched for this dossier)",
+          "citation": "README.md:16-19"
+        },
+        {
+          "method": "Docker image (Quay.io; Docker Hub prom/alertmanager is also named)",
+          "command": "docker run --name alertmanager -d -p 127.0.0.1:9093:9093 quay.io/prometheus/alertmanager",
+          "citation": "README.md:23-29"
+        },
+        {
+          "method": "Build from source (requires Go and Node.js with npm)",
+          "command": "git clone https://github.com/prometheus/alertmanager.git && cd alertmanager && make build && ./alertmanager --config.file=<your_file>",
+          "citation": "README.md:33-41"
+        },
+        {
+          "method": "Build only amtool from source",
+          "command": "make build BINARIES=amtool",
+          "citation": "README.md:43-46"
+        },
+        {
+          "method": "amtool via go install",
+          "command": "go install github.com/prometheus/alertmanager/cmd/amtool@latest",
+          "citation": "README.md:198-203"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - linux/amd64 is cross-built on every PR (.github/workflows/ci.yml:54), 'linux' is in the promu crossbuild list (.promu.yml:34) and the Docker image is built for amd64 (Makefile:15; Dockerfile:1-3). The README itself names no OS/arch (README.md:16-19 only points to the download page).",
+        "wsl2": "unknown - no mention of WSL/WSL2 anywhere in the repo (searched). Only generic linux and windows/amd64 builds are defined (.promu.yml:34,37; .github/workflows/ci.yml:54).",
+        "macos_arm64": "yes (build target only) - darwin/arm64 is cross-built on every PR (.github/workflows/ci.yml:54) and 'darwin' is in .promu.yml:30. The README lists no macOS install steps; which darwin architectures ship in release archives is decided by the external promu/promci tooling (.github/workflows/release.yml:30-33), not visible in this repo.",
+        "gpu": "no - not applicable: no GPU/CUDA/inference code exists in the repo (searched gpu, cuda, nvidia, llama, gguf, onnx, inference: only random base64 inside PEM/diagram files). The service is CPU-only Go (go.mod:3)."
+      },
+      "integrations": {
+        "cli": "amtool: cmd/amtool/main.go:16-19 calls cli.Execute (cli/root.go:148-188). Subcommands alert, silence, check-config, cluster, config (README documents `config routes`, README.md:329-334) and template (cli/root.go:170-175; cli/routing.go:54). It talks to a running Alertmanager over HTTP API v2 via --alertmanager.url (cli/root.go:154) using the generated Go client (cli/root.go:92-128); config file $HOME/.config/amtool/config.yml or /etc/amtool/config.yml (cli/root.go:48). Server options: cmd/alertmanager/main.go:51-90.",
+        "mcp": "none found - no MCP server/client code or docs (searched 'mcp' and 'model context protocol' across the tree).",
+        "sdk_or_api": "HTTP API v2, OpenAPI 2.0 spec at api/v2/openapi.yaml (alerts, alerts/groups, silences, silence/{id}, receivers, status; openapi.yaml:3,18-224), mounted at <route-prefix>/api/v2/ (api/api.go:176-191); POST api/v2/alerts is the alert-ingest path (docs/alerts_api.md:19). Generated go-swagger Go client/models/server under api/v2/ (scripts/swagger.sh:12-14). Operational endpoints /metrics, POST /-/reload, /-/healthy, /-/ready, /debug/* (httpserver/httpserver.go:28-67; docs/management_api.md:9-37). Embeddable Go runtime: package app (app/app.go:14-18; New/Run/Start/Stop at app/app.go:56-90; app/options.go:52+). A generated ConnectRPC StatusService exists (proto/api/status/v3/status.proto:22-26; api/status/v3/statusv3connect/status.connect.go:95-100) but no non-generated Go code registers it (grep).",
+        "claude_code_or_codex": "none found - no Claude Code/Codex telemetry, hooks or OTLP-ingest integration (searched claude, codex, anthropic, openai). The only AI-agent artefact is AGENTS.md, contributor guidance for coding agents working on this repo (AGENTS.md:3); .coderabbit.yaml only tunes a PR-review bot."
+      },
+      "telemetry_and_network": "No telemetry, analytics, usage reporting or update check was found: searching all non-lock files for telemetry/analytics/sentry/update-check terms only hits OpenTelemetry imports (e.g. api/api.go:31, dispatch/dispatch.go:29-33). Non-test code makes no outbound HTTP calls except configured notifiers, cluster peer DNS lookups (cluster/cluster.go:744-760) and the exporters below. The embedded Elm UI has no external resource URLs in ui/app/index.html or vite.config.mjs, and the React UI only calls the Alertmanager API (ui/mantine-ui/src/data/api.ts:61). Inbound: HTTP on :9093 by default (cmd/alertmanager/main.go:63) serving /api/v2, /metrics, /-/reload, /-/healthy, /-/ready and pprof /debug/* without authentication unless the experimental --web.config.file TLS/basic-auth is used (httpserver/httpserver.go:19,28-67; docs/https.md:6-13); HA gossip is on by default at 0.0.0.0:9094 TCP+UDP (app/options.go:31; README.md:338-342) and unencrypted unless --cluster.tls-config is set (docs/high_availability.md:357; cmd/alertmanager/main.go:87). Outbound only where configured: notification receivers (default API base URLs for PagerDuty, OpsGenie, WeChat, VictorOps, Telegram, Webex, Rocket.Chat and Slack at config/config.go:750-757, contacted only if such a receiver is configured; User-Agent carries the Alertmanager version, notify/util.go:39-40); OTLP traces only when a `tracing:` block with `endpoint` exists (gRPC default, HTTP optional, default sampling fraction 0; tracing/tracing.go:108-121,242-314; tracing/config.go:72-92; docs/configuration.md:2105-2111) - Alertmanager is an OTLP client for its own spans and has no OTLP receiver; the event recorder (file/webhook/Kafka/stdout) only with --enable-feature=event-recorder plus an `event_recorder:` block (app/app.go:261-265; docs/configuration.md:2139-2141); amtool calls the --alertmanager.url API (cli/root.go:154). No account or hosted service is needed to run it; credentials are needed only for the chosen receivers. Build-time network: `make build` downloads promu v0.20.0 from GitHub releases via curl if missing (Makefile.common:58-59,391-396), runs `npm ci` for the UI (ui/app/Makefile:43-45) and downloads Go modules; release CI pushes images to Docker Hub, Quay and GHCR with secrets (.github/workflows/release.yml:43-49)."
+    },
+    "code": {
+      "languages": [
+        "Go (go 1.25.0)",
+        "Elm 0.19.1 (legacy embedded UI, ui/app)",
+        "TypeScript/React (new UI, ui/mantine-ui)",
+        "Protocol Buffers (5 .proto files)",
+        "Jsonnet (doc/alertmanager-mixin)",
+        "Make/shell"
+      ],
+      "entry_points": [
+        {
+          "path": "cmd/alertmanager/main.go",
+          "what": "Server binary `alertmanager`: kingpin flags (config.file, storage.path, data.retention, web.*, cluster.*, enable-feature), SIGHUP reload, calls app.Run (main.go:51-203)."
+        },
+        {
+          "path": "cmd/amtool/main.go",
+          "what": "CLI binary `amtool`: calls cli.Execute (cli/root.go:148-188); subcommands alert, silence, check-config, cluster, config, template."
+        },
+        {
+          "path": "app/app.go",
+          "what": "Embeddable runtime: New/Start/Stop/Run wire every subsystem (app/app.go:14-90, 181-536); options in app/options.go."
+        },
+        {
+          "path": "api/api.go",
+          "what": "Mounts HTTP API v2 at <route-prefix>/api/v2/ (handlers api/v2/api.go, spec api/v2/openapi.yaml); v1 paths answer HTTP 410 (api/v1_deprecation_router.go:48-65)."
+        },
+        {
+          "path": "httpserver/httpserver.go",
+          "what": "Operational endpoints: /metrics (Prometheus format), POST /-/reload, /-/healthy, /-/ready, /debug/* pprof (httpserver.go:28-67)."
+        },
+        {
+          "path": "tracing/tracing.go",
+          "what": "OTLP trace exporter manager (gRPC default or HTTP) for Alertmanager's own spans; active only when the `tracing:` config block is present."
+        },
+        {
+          "path": "eventrecorder/recorder.go",
+          "what": "Experimental event recorder fan-out to file (JSONL), webhook, Kafka and stdout outputs; active only with --enable-feature=event-recorder."
+        },
+        {
+          "path": "config/config.go",
+          "what": "Top-level YAML config (global, route, receivers, inhibit_rules, time_intervals, tracing, event_recorder) parsed with yaml.UnmarshalStrict (config.go:131,284-300)."
+        }
+      ],
+      "architecture": "Single Go module github.com/prometheus/alertmanager (go.mod:1). cmd/alertmanager/main.go only parses flags/signals and calls app.Run; app/ owns lifecycle and wiring (app/app.go:181-536): cluster peer, optional event recorder, nflog and silences snapshots under --storage.path (app/app.go:290,324), in-memory alert provider provider/mem (the only provider, AGENTS.md:32), API, tracing manager, and a config coordinator plus reloader that rebuilds routes/receivers/inhibitor/dispatcher on reload (app/reloader.go). Alert flow: HTTP API v2 (api/v2: go-swagger generated server/client/models plus hand-written handlers api/v2/api.go) -> provider/mem -> dispatch/ (routing tree, aggregation groups, Dispatcher, dispatch/dispatch.go:59,104,154) -> notify/ pipeline: gossip settle, inhibit mute, time-active/time-mute, silence mute, then per integration cluster-wait -> dedup (nflog) -> retry -> set-notifies (notify/notify.go:175-183,208-211), with one subpackage per integration (18, AGENTS.md:30). Other modules: cluster/ (hashicorp/memberlist gossip, cluster/cluster.go:222-257), silence/ and nflog/ (state replicated over gossip and snapshotted to disk), inhibit/, matcher/ and pkg/labels, template/, timeinterval/, config/, featurecontrol/ (--enable-feature flags, featurecontrol.go:23-41), tracing/ (OTLP trace export plus otelhttp middleware/transport, tracing/http.go:32-50), eventrecorder/ and kafka/ (experimental event outputs; Kafka is producer-side only, kafka/kafka.go:14-26), httpserver/, ui/ (embeds Elm assets from ui/app/dist, ui/web.go:31), cli/ (amtool), doc/alertmanager-mixin (alerts + Grafana dashboard for Alertmanager's own metrics). ui/mantine-ui is a separate React UI that ui/web.go does not embed and that no Makefile/Dockerfile references (only .github/workflows/ui-ci.yml and dependabot).",
+      "packaging_and_release": "Version: VERSION=0.34.1 (VERSION:1); tag v0.34.1 resolves to commit 73c6bfe7393929211294c1954f30d8ed78e4d0ad (.git/packed-refs:2-3); CHANGELOG.md:3 dates 0.34.1 as 2026-09-17; ~8-week release cadence with named shepherds (RELEASE.md:6-18). Build: promu (.promu.yml) builds `alertmanager` and `amtool` with the netgo tag and version ldflags (.promu.yml:7-22); the tarball adds examples/ha/alertmanager.yml, LICENSE, NOTICE (.promu.yml:23-27); crossbuild OS list darwin, dragonfly, freebsd, illumos, linux, netbsd, openbsd, windows (.promu.yml:28-37). Docker: Dockerfile on the floating quay.io/prometheus/busybox-<os>-<arch>:latest, runs as nobody, exposes 9093 (Dockerfile:3,17-18); archs amd64 armv7 arm64 ppc64le s390x (Makefile:15). Release workflow: tag v* -> reusable ci.yml -> 12-way prometheus/promci/build -> prometheus/promci/publish_release (pinned v0.9.0 SHA) with Docker Hub/Quay/GHCR logins and GITHUB_TOKEN (.github/workflows/release.yml:3-49); main-branch images via .github/workflows/publish.yml:27-40; release-branch builds via build-release-branch.yml:5-27. UI: compiled assets are not in git (CHANGELOG.md:69; ui/app/.gitignore:1) so `make build` needs Node (Makefile:29-30; .nvmrc v24.3.0); `make assets-tarball` writes alertmanager-web-ui-<VERSION>.tar.gz (Makefile:41-44) and CI saves it (ci.yml:27-30); prebuilt UI assets are provided in releases since 0.32.1 (CHANGELOG.md:64). Checksums/signatures/attestations: none defined in this repo's workflows, Makefiles, .promu.yml, Dockerfile or RELEASE.md (searched cosign, attest, sigstore, slsa, provenance, sha256sum, checksum, gpg); whether the external publish_release action emits any is not visible here. `make build` fetches promu via curl without checksum verification (Makefile.common:391-396). Go: go.mod says go 1.25.0 (go.mod:3) while promu/CI use Go 1.26 (.promu.yml:4; ci.yml:66).",
+      "tests_and_ci": "Nothing was built or executed for this dossier (read-only inspection). Go: 99 *_test.go files counted by glob (testify/require; depguard forbids testify/assert, .golangci.yml:13-18), including 22 Benchmark functions in 11 files, fuzz tests (config/config_fuzz_test.go, matcher/parse/fuzz_test.go; `make fuzz-config` is manual, Makefile:63-65, and no workflow runs fuzz), and acceptance tests that exec the built ./alertmanager and ./amtool binaries (test/with_api_v2/acceptance/*_test.go (7 files), test/cli/acceptance/cli_test.go; test/testutils/acceptance.go:376; test/cli/acceptance.go:37). Go tests also need prebuilt UI assets (ui/web.go:31; ci.yml:80-85). UI: 5 elm-test files (ui/app/tests/*.elm; ui/app/Makefile:56-66) and 2 Vitest files (ui/mantine-ui/src/components/LabelPill.test.tsx, src/pages/Alerts.page.test.tsx; package.json:18). CI = 10 GitHub Actions workflows (no CircleCI config exists although README.md:1 shows a CircleCI badge): ci.yml (PR + reusable: frontend build/test with `git diff --exit-code` over regenerated assets/API; promu cross-build for linux/amd64, windows/amd64, linux/arm64, darwin/amd64, darwin/arm64, linux/386; then `make` = common-all: style, license headers, golangci-lint v2.12.2, yamllint, go mod tidy drift, build, `go test ./...` with -race on amd64 hosts, inside golang-builder:1.26-base with two maildev service containers; ci.yml:7-88; Makefile.common:64,118-131); ui-ci.yml (Mantine UI typecheck/biome/vitest/build on ui/** or .nvmrc changes); govulncheck.yml (PR touching VERSION, push to main, daily cron); mixin.yml (jsonnet lint); release.yml, publish.yml, build-release-branch.yml (release/publish pipelines); container_description.yml, approve-workflows.yml, stale.yml (housekeeping).",
+      "dependencies": "Go (go.mod): 58 direct + 69 indirect requires, 127 total (go.mod:6-63, 67-135); go 1.25.0 (go.mod:3). Direct deps include prometheus client_golang/common/exporter-toolkit/sigv4, hashicorp/memberlist (gossip), go-openapi/* (API), kingpin, aws-sdk-go-v2 (SNS), twmb/franz-go (Kafka), emersion/go-smtp, telebot, connectrpc, grpc, protobuf and 8 OpenTelemetry modules (go.mod:49-56). internal/tools/go.mod: `tool` directive for buf, go-swagger, protoc-gen-go and protoc-gen-connect-go with 142 requires, all indirect (internal/tools/go.mod:5-10,13-154). Node/Elm: ui/app/package.json 2 deps + 7 devDeps (bootstrap 4.6.2, font-awesome 4.7.0, Elm tooling, vite; package.json:8-20) plus ui/app/elm.json 12 direct, 3 indirect and 1 test Elm package (elm.json:7-33); ui/mantine-ui/package.json 8 deps + 18 devDeps (package.json:20-49); template/package.json 1 devDep, juice (template/package.json:5-7). Jsonnet: doc/alertmanager-mixin/jsonnetfile.json 1 dep, grafonnet @ main. Lockfiles: go.sum, internal/tools/go.sum, three package-lock.json (ui/app, ui/mantine-ui, template). Dependabot runs monthly for gomod, docker, github-actions and ui/mantine-ui npm only, not ui/app or template (.github/dependabot.yml:6-48).",
+      "security_policy": "SECURITY.md exists and only points to the Prometheus-wide policy at https://prometheus.io/docs/operating/security/ (SECURITY.md:1-6; page not fetched). Related automation: govulncheck workflow (.github/workflows/govulncheck.yml:6-16), Dependabot (.github/dependabot.yml), GitHub Actions pinned to commit SHAs (e.g. ci.yml:11). No CodeQL or Scorecards workflow exists in the tree, although dependabot.yml:37-43 lists scorecards.yml and golangci-lint.yml as excluded workflow paths."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:6 - Alertmanager dedups, groups, routes, silences and inhibits alerts sent by clients such as Prometheus and sends them to receiver integrations.",
+        "verified": "yes",
+        "evidence": "Pipeline stages and per-integration packages exist: notify/notify.go:175-183,208-211 (gossip settle, inhibit, time-active/mute, silence, cluster-wait, dedup, retry, set-notifies); dispatch/dispatch.go:59,104,154 (Dispatcher); 18 integrations in docs/integrations.md:12-29 and AGENTS.md:30. The only alert-ingest path is the HTTP API v2 (api/v2/openapi.yaml:205-223 POST /alerts; api/api.go:176-191; docs/alerts_api.md:19); no OTLP receiver exists (grep 'otlp' matches only tracing/tracing.go, go.mod, go.sum)."
+      },
+      {
+        "claim": "README.md:181-192 - API v2 is generated from OpenAPI except the handlers; served under /api/v2 (with route prefix); APIv1 removed as of 0.27.0.",
+        "verified": "yes",
+        "evidence": "api/v2/openapi.yaml:3,18 (swagger 2.0, basePath /api/v2/); generated api/v2/{client,models,restapi} via scripts/swagger.sh:12-14 with hand-written handlers in api/v2/api.go; api/api.go:176-191 mounts <prefix>/api/v2/; api/v1_deprecation_router.go:48-65 answers v1 paths with HTTP 410 'deprecated in version 0.16.0 and removed as of version 0.27.0'."
+      },
+      {
+        "claim": "README.md:338-342 - HA clustering is enabled by default and needs both UDP and TCP.",
+        "verified": "yes",
+        "evidence": "cmd/alertmanager/main.go:72-73 defaults --cluster.listen-address to app.DefaultClusterAddr = 0.0.0.0:9094 (app/options.go:31); app/app.go:214-247 creates the memberlist peer whenever the bind address is non-empty; cluster/cluster.go:222-257 uses memberlist.DefaultLANConfig with a UDP buffer size; docs/high_availability.md:392 says TCP and UDP are both used (TCP only with TLS transport) and docs/high_availability.md:357 says cluster communication is unencrypted by default."
+      },
+      {
+        "claim": "README.md:344-365 - list of --cluster.* flags with their defaults.",
+        "verified": "partial",
+        "evidence": "Documented defaults match code (cmd/alertmanager/main.go:77-89; cluster/cluster.go:121-129: 15s, 15s, 200ms, 1m0s, 10s, 500ms, 1s, 10s, 6h). The README omits --cluster.peer-name (main.go:75), --cluster.tls-config (main.go:87), --cluster.allow-insecure-public-advertise-address-discovery (main.go:88) and gives no default for --cluster.settle-timeout, whose code default is 1m0s (main.go:84)."
+      },
+      {
+        "claim": "README.md:33 - building from source requires Go and Node.js (with npm).",
+        "verified": "yes",
+        "evidence": "ui/web.go:31 `//go:embed app/dist` needs ui/app/dist, which is git-ignored (ui/app/.gitignore:1) and no longer committed (CHANGELOG.md:69); Makefile:29-30 `build: ui-elm common-build` runs npm via ui/app/Makefile:43-45,84-91; .nvmrc pins Node v24.3.0. By Go embed semantics `go build ./cmd/alertmanager` alone would not be self-sufficient (static reasoning, not executed)."
+      },
+      {
+        "claim": "README.md:43-46 - `make build BINARIES=amtool` builds just one binary.",
+        "verified": "not_checkable",
+        "evidence": "BINARIES is not referenced by Makefile or Makefile.common; Makefile.common:237 passes $(PROMU_BINARIES), which is undefined in this repo, to the external promu tool, while .promu.yml:7-12 lists both binaries. Single-binary behaviour therefore depends on promu, which is not in the tree. AGENTS.md:55 repeats the claim."
+      },
+      {
+        "claim": "README.md:23-29 - Docker images are available on Quay.io or Docker Hub and the example run command works.",
+        "verified": "partial",
+        "evidence": "Dockerfile:3-23 defines a busybox-based image running as nobody, exposing 9093 with /etc/alertmanager/alertmanager.yml copied from examples/ha/alertmanager.yml (webhook to 127.0.0.1:5001) - consistent with the run command. Publication cannot be confirmed from this repo: .github/workflows/release.yml:42-49 logs in to Docker Hub, Quay.io and GHCR (GHCR not mentioned in the README) through the external prometheus/promci/publish_release action. Base image tag is floating :latest (Dockerfile:3)."
+      },
+      {
+        "claim": "README.md:194-203 - amtool is bundled with all releases and installable via `go install .../cmd/amtool@latest`.",
+        "verified": "yes",
+        "evidence": ".promu.yml:9-12 builds amtool and .promu.yml:23-27 packages it; Dockerfile:9 copies it into the image. cmd/amtool/main.go:16-19 imports only the cli package; the ui package (which needs the generated assets) is imported solely by app/app.go:50, which cli/ does not import (grep), so the embed requirement is not hit (static reasoning, not executed)."
+      },
+      {
+        "claim": "docs/configuration.md:183-184 and 2100-2128 - optional top-level tracing configuration (client_type, endpoint, sampling_fraction, insecure, tls_config, http_headers, compression default gzip, timeout).",
+        "verified": "partial",
+        "evidence": "Code differs from docs and wins: top-level key is `tracing` (config/config.go:294) but docs line 184 spells it `traciing`; docs list `http_headers` (docs/configuration.md:2120) while tracing/config.go:61 uses `headers`; docs say compression defaults to gzip (2124) but tracing/config.go:74-76 only defaults client_type=grpc and tracing/tracing.go:261-263,292-294 apply compression only when set; docs show endpoint default empty (2108) but a tracing block without endpoint is rejected (tracing/config.go:82-84). config/config.go:131 parses with yaml.UnmarshalStrict, so the doc spellings would be rejected as unknown fields (code inspection only). The docs never mention OTLP; code exports via OTLP gRPC (default) or HTTP (tracing/tracing.go:242-314) with default sampling fraction 0 (docs/configuration.md:2111; tracing/tracing.go:205-207)."
+      },
+      {
+        "claim": "docs/configuration.md:2130-2141 - the event recorder is gated behind --enable-feature=event-recorder and silently discards events when the flag is off.",
+        "verified": "yes",
+        "evidence": "featurecontrol/featurecontrol.go:30,164-166 define the flag ('Experimental event recorder enabled'); app/app.go:261-265 builds a Recorder only when ff.EnableEventRecorder(), otherwise the zero-value Recorder is used and eventrecorder/recorder.go:61-66,306-312 make it discard events. Outputs file/webhook/Kafka/stdout at eventrecorder/recorder.go:172-203; the bounded 8192-event queue drops events when full (recorder.go:42,327-332)."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Scope: no OTLP receiver/privacy filter, no metrics/log/trace/dataset store, no dashboard/exploration tool over such stores, no model-serving/GPU code and no Claude Code/Codex/MCP integration exists in the tree (searched otlp, mcp, claude, codex, gpu, llama/gguf/onnx). Its OTLP code only exports its own traces (tracing/tracing.go:177-216); own metrics are Prometheus-format only (httpserver/httpserver.go:29); persisted state is limited to silence and notification-log snapshots (docs/high_availability.md:366-378); both UIs query only the Alertmanager API (ui/mantine-ui/src/data/api.ts:61).",
+      "Maturity/maintenance: pre-1.0 (VERSION:1; config/config.go:290 'Remove before v1.0 release'); breaking changes ship in minor releases (CHANGELOG.md:9,41-44,69-71); the event recorder is experimental and flag-gated (featurecontrol/featurecontrol.go:166), HTTPS/basic auth is documented as experimental (docs/https.md:6-7), cluster TLS is flagged [EXPERIMENTAL] (cmd/alertmanager/main.go:87). Facts on activity: ~8-week release cadence through v0.34 (RELEASE.md:6-18), 0.34.1 dated 2026-09-17 (CHANGELOG.md:3), 8 listed maintainers (MAINTAINERS.md:1-8). The clone is shallow (.git/shallow), so commit/contributor history was not assessed.",
+      "Default exposure: the HTTP API, /metrics, POST /-/reload and pprof /debug/* are unauthenticated unless the experimental --web.config.file is configured (httpserver/httpserver.go:19,29,31,65-66; docs/https.md:6-13); the default listen is :9093 (cmd/alertmanager/main.go:63); HA gossip is on by default at 0.0.0.0:9094 TCP+UDP and unencrypted unless --cluster.tls-config is set (app/options.go:31; docs/high_availability.md:357).",
+      "Data sensitivity of optional outputs: event recorder payloads carry full alert labels/annotations and silence comment/created_by (eventrecorder/eventrecorderpb/eventrecorder.proto:100-125,260-291) to file/webhook/Kafka/stdout with no redaction option (only URL sanitising for logs, eventrecorder/webhook.go:269-291); Kafka uses PLAINTEXT unless tls_config is set (docs/configuration.md:2288-2289). OTLP trace spans carry alert names, fingerprints, group keys and label values (dispatch/dispatch.go:263-264,547; notify/retry_stage.go:64-66). Both features are off by default (tracing needs a `tracing:` block, sampling fraction 0; event recorder needs the feature flag).",
+      "Build/supply chain: building the server needs Node + npm because ui/app/dist is not committed (ui/web.go:31; ui/app/.gitignore:1; CHANGELOG.md:69); `make build` downloads promu via curl with no checksum check (Makefile.common:58-59,391-396) and the lint target pipes an install script to sh (Makefile.common:406-408); the Docker base image is a floating :latest tag (Dockerfile:3); the embedded legacy UI pins Bootstrap 4.6.2, which npm marks as deprecated/unsupported (ui/app/package.json:18; ui/app/package-lock.json:758-762).",
+      "Release integrity: this repo defines no checksum, signature, attestation or SBOM step (searched .github, Makefiles, .promu.yml, RELEASE.md, Dockerfile, scripts); artefact building and publishing are delegated to the external actions prometheus/promci/build and publish_release pinned at SHA 370e8c15 (.github/workflows/release.yml:30,42-49), whose contents are outside this repo and were not inspected.",
+      "Documentation drift (code wins): tracing docs vs code (docs/configuration.md:184,2120,2124 vs config/config.go:294 and tracing/config.go:61,74-76); README `make build BINARIES=amtool` has no visible implementation (README.md:45; Makefile.common:237); AGENTS.md:57,105 says `make apiv2` needs Docker but scripts/swagger.sh:13-14 uses `go tool`; README.md:1 and AGENTS.md:132 cite CircleCI but no .circleci config exists; go.mod says Go 1.25.0 (go.mod:3) while promu/CI build with 1.26 (.promu.yml:4; ci.yml:66); a generated ConnectRPC StatusService is never registered in non-generated code (api/status/v3/statusv3connect/status.connect.go:95-100).",
+      "Licensing: Apache-2.0 (LICENSE; README.md:410). NOTICE lists only Bootstrap (MIT) (NOTICE:10-13) although the embedded UI also bundles Font Awesome 4.7.0 licensed '(OFL-1.1 AND MIT)' (ui/app/package.json:19; ui/app/package-lock.json:1324-1328); licenses of the 127 Go modules (go.mod) are not enumerated anywhere in the repo."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "prometheus/alertmanager",
+      "checks": [
+        {
+          "field": "readme.install[2] (Build from source)",
+          "statement": "Build from source (requires Go and Node.js with npm): git clone https://github.com/prometheus/alertmanager.git && cd alertmanager && make build && ./alertmanager --config.file=<your_file>",
+          "citation": "README.md:33-41",
+          "holds": true,
+          "note": "README.md:33-40 matches word for word. `make build` = `ui-elm common-build` (Makefile:29-30). ui-elm runs `npm ci` + `npm run build` (ui/app/Makefile:43-45,84-91). common-build runs `promu build --prefix $(pwd)` (Makefile.common:82,235-237), so ./alertmanager is written to the repo root. The generated Elm sources ui/app/src/Data/*.elm are committed, so Docker isn't needed for this target. Implicit extras: make, plus curl/network to fetch promu if it's missing (Makefile.common:58-59,391-396)."
+        },
+        {
+          "field": "license",
+          "statement": "spdx Apache-2.0, file LICENSE",
+          "citation": "LICENSE; README.md:410",
+          "holds": true,
+          "note": "LICENSE:1-3 is the unmodified Apache License, Version 2.0 (January 2004), with the full terms and appendix (LICENSE:1-201). README.md:410 says 'Apache License 2.0, see LICENSE'. File headers (Makefile:1-12, ui/web.go:1-12) and api/v2/openapi.yaml:9-11 agree."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - linux/amd64 is cross-built on every PR (ci.yml:54), 'linux' is in the promu crossbuild list (.promu.yml:34) and the Docker image is built for amd64 (Makefile:15; Dockerfile:1-3); the README names no OS/arch (README.md:16-19).",
+          "citation": ".github/workflows/ci.yml:54; .promu.yml:34; Makefile:15; Dockerfile:1-3; README.md:16-19",
+          "holds": true,
+          "note": "ci.yml:3-5 triggers on pull_request with no path filter, and ci.yml:54 promu_opts contains '-p linux/amd64'. .promu.yml:34 is '- linux'. Makefile:15 DOCKER_ARCHS = amd64 armv7 arm64 ppc64le s390x. Dockerfile:1-3 defaults ARCH=amd64, OS=linux (busybox-linux-amd64 base). The full README names no OS or architecture; lines 16-19 only point to prometheus.io/download."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "none found - no Claude Code/Codex telemetry, hooks or OTLP-ingest integration (searched claude, codex, anthropic, openai); the only AI-agent artefact is AGENTS.md (AGENTS.md:3); .coderabbit.yaml only tunes a PR-review bot.",
+          "citation": "AGENTS.md:3; .coderabbit.yaml",
+          "holds": true,
+          "note": "A case-insensitive grep for claude|codex|anthropic|openai over the whole tree, hidden files included (confirmed: .github and .coderabbit.yaml are searched), returns 0 matches. No CLAUDE.md, .claude/, .cursor/, copilot-instructions or .mcp.json exists. AGENTS.md:3 reads 'Guidance for AI coding agents working in this repository.' .coderabbit.yaml:3-10 only switches off review extras (poem, summary, labels, reviewers). The OTLP code is client-side only: otlptrace exporter via otlptracegrpc/otlptracehttp.NewClient (tracing/tracing.go:28-30,183,242-308), with no receiver."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "README.md:6 - Alertmanager dedups, groups, routes, silences and inhibits alerts sent by clients such as Prometheus and sends them to receiver integrations (verified: yes); the only ingest path is HTTP API v2; no OTLP receiver exists.",
+          "citation": "README.md:6; notify/notify.go:175-183,208-211; dispatch/dispatch.go:59,104,154; docs/integrations.md:12-29; AGENTS.md:30; api/v2/openapi.yaml:205-223; api/api.go:176-191; docs/alerts_api.md:19",
+          "holds": true,
+          "note": "All cited lines match. notify.go:175-183 builds the settle -> inhibit -> time-active -> time-mute -> silence chain, and 208-211 builds cluster-wait -> dedup -> retry -> set-notifies. dispatch.go:59/104/154 are the Dispatcher type, NewDispatcher and Run. integrations.md:12-29 has 18 rows, and AGENTS.md:30 lists 18 packages. openapi.yaml:205-223 is `post` under `/alerts` (path at line 155). api.go:180-181 mounts apiPrefix+'/api/v2/'. alerts_api.md:19 says POST api/v2/alerts. The only non-test alerts.Put is api/v2/api.go:406 (postAlertsHandler), and app.Options has no provider injection. One evidence detail is wrong: grep 'otlp' also matches internal/tools/go.sum:278-281,290-291, not just tracing/tracing.go, go.mod and go.sum. The no-OTLP-receiver conclusion still holds."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "Non-blocking: in claim_checks[0].evidence (\"grep 'otlp' matches only tracing/tracing.go, go.mod, go.sum\") and in purpose (\"'otlp' occurs only in tracing/tracing.go, go.mod and go.sum\"), add internal/tools/go.sum (lines 278-281, 290-291: checksums for the otlptrace/otlptracehttp exporter and proto/otlp modules used by build tooling). The 'no OTLP receiver' conclusion is unchanged."
+      ]
+    }
+  ]
+}

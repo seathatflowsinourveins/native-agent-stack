@@ -1,0 +1,307 @@
+{
+  "contender": "superradcompany/microsandbox",
+  "revision": {
+    "contender": "superradcompany/microsandbox",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "superradcompany/microsandbox",
+        "tag": "v0.7.6",
+        "commit": "09df3d4b9d832adaede1fb9a198cfc660bfab8cd",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.7.6",
+    "commit": "09df3d4b9d832adaede1fb9a198cfc660bfab8cd",
+    "read_at": "2026-10-02T03:02:47+00:00"
+  },
+  "dossier": {
+    "contender": "superradcompany/microsandbox",
+    "revision": {
+      "tag": "v0.7.6",
+      "commit": "09df3d4b9d832adaede1fb9a198cfc660bfab8cd",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "microsandbox (Super Rad Company; Apache-2.0; the README labels it beta) runs workloads inside local microVMs booted from OCI images and driven by the `msb` CLI or SDKs (Rust, TypeScript, Python, Go, Ruby). The VMM is a libkrun fork (`msb_krun`): KVM on Linux, Hypervisor.framework on Apple Silicon macOS, WHP on Windows (preview). Each sandbox has its own guest kernel and rootfs, and commands run inside the guest, not as host processes. Boundary facts relevant to per-task restrictions: (1) Enforcement is the hypervisor plus host-side brokers: a user-space smoltcp network policy engine, a virtiofs mount broker with host-enforced read-only, and host-side secret substitution. No seccomp, landlock, macOS sandbox profile or host firewall (iptables/nft/pf) is used anywhere in crates/ or sdk/ (grep). (2) Filesystem policy is per-mount (bind, named volume, disk image, tmpfs, owned; ro/rw, noexec/nosuid/nodev, quota). The guest sees only its image plus explicit mounts, and no path-pattern allow/deny rule language was found. (3) The default network policy is NOT deny-all: the public internet is reachable, while private, loopback, link-local, cloud-metadata and host addresses are denied. Deny-by-default is opt-in (`--no-net`, `--net-default deny`, YAML `network.allow`, `NetworkPolicy::none()`). (4) Network policy and mounts are set at creation; docs/sandboxes/tuning.mdx:17-25 list no live change for network policy and put mounts outside `modify`. (5) Linux needs a usable /dev/kvm; WSL2 is neither documented nor tested; macOS needs Apple Silicon. An optional hosted 'cloud' backend (private beta) can be selected behind the same SDK.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Microsandbox runs untrusted workloads inside fast, local microVMs: AI agents, user code, plugins, CI jobs, dev environments, scrapers, and automation.",
+          "citation": "README.md:28"
+        },
+        {
+          "claim": "Hardware Isolation: Hardware-level isolation with tiny virtual machines.",
+          "citation": "README.md:32"
+        },
+        {
+          "claim": "Fork & Snapshot: fork live sandboxes; save running sandbox state and restore later (msb fork, msb snap create/restore).",
+          "citation": "README.md:33, README.md:140-152"
+        },
+        {
+          "claim": "Cross Platform: Runs on Linux, macOS, and Windows.",
+          "citation": "README.md:34"
+        },
+        {
+          "claim": "OCI Compatible: Runs standard container images from Docker Hub, GHCR, or any OCI registry.",
+          "citation": "README.md:35"
+        },
+        {
+          "claim": "Instant Startup: Average boot times under 100 milliseconds (footnote: boot time refers to guest boot on an M1 machine).",
+          "citation": "README.md:37, README.md:488"
+        },
+        {
+          "claim": "Embeddable: Spawn VMs right within your code. No setup server. No long-running daemon. Sandbox.builder(...).create() boots a microVM as a child process.",
+          "citation": "README.md:38, README.md:228"
+        },
+        {
+          "claim": "Secrets That Can't Leak: Unexploitable secret keys that never enter the VM.",
+          "citation": "README.md:39"
+        },
+        {
+          "claim": "Agent-Ready: agents can create their own sandboxes with the Agent Skills (works with Claude Code, Cursor, Codex, Gemini CLI, GitHub Copilot) and the MCP server (claude mcp add --transport stdio microsandbox -- npx -y microsandbox-mcp).",
+          "citation": "README.md:41, README.md:437-452"
+        },
+        {
+          "claim": "Requirements: macOS Apple Silicon; Linux with KVM enabled; Windows with WHP enabled.",
+          "citation": "README.md:107-111"
+        },
+        {
+          "claim": "Warning: Microsandbox is still beta software. Expect breaking changes, missing features, and rough edges.",
+          "citation": "README.md:113"
+        },
+        {
+          "claim": "Sandbox config example restricts the network to an allowlist (network.allow: api.github.com) with a named script; Ruby example shows allowed_hosts/allowed_ports and a host-bound secret.",
+          "citation": "README.md:171-194, README.md:303-333"
+        },
+        {
+          "claim": "The msb CLI provides a complete interface for managing sandboxes, snapshots, images, and volumes; `msb run python -- python3 -c ...` runs a command in a microVM.",
+          "citation": "README.md:119-125"
+        },
+        {
+          "claim": "First create() pulls the image if not cached; the Go example downloads the runtime to ~/.microsandbox/ on first run.",
+          "citation": "README.md:378, README.md:352"
+        }
+      ],
+      "install": [
+        {
+          "method": "Installer script (macOS / Linux)",
+          "command": "curl -fsSL https://install.microsandbox.dev | sh",
+          "citation": "README.md:49 (script source: scripts/install.sh:1-4; attached to releases by .github/workflows/release.yml:1076-1078)"
+        },
+        {
+          "method": "Homebrew",
+          "command": "brew install superradcompany/tap/microsandbox",
+          "citation": "README.md:62 (tap updated by .github/workflows/release.yml:1191-1204)"
+        },
+        {
+          "method": "npm global",
+          "command": "npm i -g microsandbox",
+          "citation": "README.md:66"
+        },
+        {
+          "method": "uv tool",
+          "command": "uv tool install microsandbox",
+          "citation": "README.md:70"
+        },
+        {
+          "method": "cargo (installs a wrapper that downloads the runtime on first run, then execs msb)",
+          "command": "cargo install microsandbox",
+          "citation": "README.md:74; sdk/rust/bin/main.rs:1-32"
+        },
+        {
+          "method": "npx (no install)",
+          "command": "npx microsandbox run debian",
+          "citation": "docs/getting-started/quickstart.mdx:10-12"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - README.md:110 (Linux: KVM enabled); microsandbox-linux-x86_64 bundle built in a digest-pinned manylinux_2_28 container (.github/workflows/release.yml:218-235, release-linux.yml:79-81, 108-129); the only live-VM CI lane runs on self-hosted-ubuntu-2404-x64 (.github/workflows/check.yml:1586-1590). Needs /dev/kvm readable+writable (sdk/rust/lib/setup/linux.rs:19,74-114) and glibc >= 2.28; musl-only hosts unsupported (scripts/install.sh:18,292-303; docs/troubleshooting/linux.mdx:7,31).",
+        "wsl2": "unknown - no README, docs, code or CI mention running microsandbox inside WSL2 as a Linux host. grep of docs/, sdk/, crates/, .github/ finds WSL only as a Windows-side build backend (DEVELOPMENT.md:25,73-81; scripts/dev-windows.ps1) and as a note that WSL2 enables a different Windows feature than the one microsandbox needs (docs/troubleshooting/windows.mdx:41; sdk/rust/lib/setup/windows.rs:109). The Linux path only probes that /dev/kvm exists and is R/W (sdk/rust/lib/setup/linux.rs:74-114), and docs say the outer environment must expose nested virtualization (docs/troubleshooting/linux.mdx:73,115). Whether WSL2 provides that was not testable here. Native Windows is a separate WHP-based preview (docs/troubleshooting/windows.mdx:7).",
+        "macos_arm64": "yes - Apple Silicon only (README.md:109; scripts/install.sh:236-239; docs/troubleshooting/macos.mdx:7,31; sdk/rust/lib/setup/macos.rs:19-32). darwin-aarch64 bundle (release.yml:256-273) is ad-hoc codesigned with com.apple.security.hypervisor and disable-library-validation entitlements (release-macos.yml:127-129; msb-entitlements.plist:5-8). Hosted macos-14 CI builds, checks and unit-tests but does not boot VMs (check-platform.yml:40-288; check.yml:489). Path containment on macOS uses the documented weaker O_NOFOLLOW fallback (docs/security/filesystem.mdx:42).",
+        "gpu": "no - not documented; the guest's device set is virtio console/net/fs/blk/rng with 'no host PCI devices' (docs/security/isolation.mdx:30-40); grep for gpu/virtio-gpu/vfio found no support."
+      },
+      "integrations": {
+        "cli": "`msb` (alias `microsandbox`): run, create, exec, stop, remove, list, fork, restore, snapshot, pull/image, volume, ssh, install, doctor, self update/downgrade, completion; --tree prints the command tree (crates/cli/bin/main.rs:25-54,81-181; README.md:117-218; installer links both names: scripts/install.sh:380-382). Network flags: --no-net, --net, --net-rule, --net-default[-egress|-ingress] (crates/cli/lib/commands/common.rs:360-465).",
+        "mcp": "Out-of-tree: separate repo superradcompany/microsandbox-mcp, git submodule `mcp/` (.gitmodules:17-19), published to npm as `microsandbox-mcp` by .github/workflows/release.yml:1469-1505. Install lines for Claude Code, Cursor, VS Code, Claude Desktop, Windsurf, OpenCode, Zed are in README.md:445-452 and docs/getting-started/agents.mdx:25-110. The submodule is not populated in this checkout, so its tool surface was not verified; CI rewrites its microsandbox dependency to file:../sdk/node-ts and runs its tests (.github/workflows/check.yml:851-898).",
+        "sdk_or_api": "SDKs wrapping the Rust SDK: Rust crate `microsandbox` (sdk/rust), npm `microsandbox` (NAPI, sdk/node-ts), PyPI `microsandbox` (PyO3, sdk/python), Go module github.com/superradcompany/microsandbox/sdk/go (cgo FFI, sdk/go/native), Ruby gem `microsandbox` (Magnus, sdk/ruby) (README.md:87-103,303-333; docs/sdk/overview.mdx:8-32). Local mode has no daemon or HTTP server: the SDK spawns the VM as a child process (docs/sdk/overview.mdx:8). Host-guest agent clients are published as Rust crates and @microsandbox/* npm packages (DEVELOPMENT.md:127-166). The REST API (api.microsandbox.dev, OpenAPI at docs/api-reference/openapi.json) is the hosted cloud control plane only, in private beta (docs/api-reference/overview.mdx:8-38).",
+        "claude_code_or_codex": "Agent Skills via `npx skills add superradcompany/skills` (README.md:437-443; submodule `skills/`, .gitmodules:20-22) and MCP via `claude mcp add` (README.md:449-452). docs/examples/agents/claude-code.mdx:18-30 and codex.mdx:19-31 run Claude Code / Codex CLI inside a microVM with the host project mounted `:rw` (alternative `--copy-dir` isolated copy plus patch export via `msb cp`: claude-code.mdx:50-52,88-104). No hook, plugin or command wrapper that confines a host-resident agent's individual shell calls was found in the repo docs."
+      },
+      "telemetry_and_network": "No product telemetry found: grep for telemetry/analytics/sentry/posthog/otlp in crates/ and sdk/ finds no usage-reporting code. The only PostHog reference is the documentation site's Mintlify config (docs/docs.json:491-496, host g.microsandbox.dev); sdk/go/progress.go:106 and sdk/node-ts/src/creation-progress.ts:7 are in-process creation-progress events. `msb-metrics` is an opt-in sidecar exporting OTLP/stdout to a user-chosen endpoint (docs/sandboxes/metrics.mdx:14; crates/metrics-collector/Cargo.toml:14-16). Network contacts initiated by the tooling: (1) installer: api.github.com latest-release lookup, then microsandbox-<target>.tar.gz and checksums.sha256 from GitHub Releases (scripts/install.sh:309-316,344-353); (2) `msb update`/`self update`/`downgrade`: api.github.com release plus asset digest (crates/cli/lib/commands/self_cmd.rs:3260-3336), user-invoked only, no background update check found; (3) SDKs, the `cargo install` wrapper and Go EnsureRuntime download the runtime bundle from GitHub Releases when absent (sdk/rust/lib/setup/runtime.rs:147-156; sdk/rust/bin/main.rs:14-32; README.md:352; crates/utils/lib/lib.rs:198-232); (4) first create() pulls the OCI image from Docker Hub/GHCR/any registry (README.md:35,378; docs/getting-started/quickstart.mdx:178), and offline use needs a pre-seeded runtime and images (docs/enterprise/offline-deployment.mdx:7-44); (5) cargo builds with the default `download-binaries` feature fetch official artifacts at build time (crates/filesystem/Cargo.toml:26-29; crates/filesystem/build.rs:153-154). Accounts: none for local mode (docs/getting-started/quickstart.mdx:48). The optional cloud backend (private beta, API key, api.microsandbox.dev) is used only when MSB_BACKEND=cloud or a cloud profile is selected (sdk/rust/lib/config/backend.rs:155-206; docs/cloud/overview.mdx:9). Sandboxes can reach the public internet by default (docs/networking/overview.mdx:12). API keys can be kept in the OS keyring via the default `keyring` feature (sdk/rust/Cargo.toml:51,136-150)."
+    },
+    "code": {
+      "languages": [
+        "Rust",
+        "TypeScript",
+        "Python",
+        "Go",
+        "Ruby",
+        "Shell",
+        "PowerShell",
+        "C (smoke-test helpers)"
+      ],
+      "entry_points": [
+        {
+          "path": "crates/cli/bin/main.rs",
+          "what": "`msb` CLI binary (clap); sets MSB_PATH, dispatches sandbox/image/volume/snapshot/doctor/self commands (main.rs:260-344)"
+        },
+        {
+          "path": "crates/cli/lib/machine_cmd.rs",
+          "what": "hidden `msb machine` per-sandbox VM process; builds and enters the microVM and never returns (bin/main.rs:83-85,305-326; DEVELOPMENT.md:11)"
+        },
+        {
+          "path": "crates/agentd/bin/main.rs",
+          "what": "in-guest `agentd` (PID 1, static musl) - init, mounts, exec sessions, filesystem/TCP services (crates/agentd/Cargo.toml:10-12; docs/security/isolation.mdx:44)"
+        },
+        {
+          "path": "crates/metrics-collector/bin/main.rs",
+          "what": "`msb-metrics` sidecar exporting sandbox metrics to stdout/OTLP (crates/metrics-collector/Cargo.toml:14-16)"
+        },
+        {
+          "path": "sdk/rust/bin/main.rs",
+          "what": "Cargo-installed `microsandbox` wrapper: ensure_runtime() then exec msb (sdk/rust/bin/main.rs:1-45)"
+        },
+        {
+          "path": "sdk/rust/lib/lib.rs",
+          "what": "public Rust SDK library (sdk/rust/Cargo.toml:10-12); language bindings in sdk/node-ts (NAPI), sdk/python (PyO3), sdk/go/native (C-ABI FFI), sdk/ruby/ext/microsandbox (Magnus)"
+        },
+        {
+          "path": "scripts/install.sh",
+          "what": "curl|sh installer for Linux/macOS (scripts/install.ps1 for Windows)"
+        }
+      ],
+      "architecture": "Rust workspace (edition 2024; Cargo.toml:1-57). crates/cli = `msb` (commands in lib/commands/*). sdk/rust = public SDK with a local backend (lib/backend/local: spawns `msb machine` as a child, SQLite catalog under MSB_HOME) and a cloud backend (lib/backend/cloud: HTTP/WebSocket to api.microsandbox.dev), plus lib/setup (doctor, runtime install). crates/runtime = VM runner (runner/vm.rs builds an msb_krun::VmBuilder microVM, runner/relay.rs agent relay, runner/control/* live-control socket, checkpoint/* snapshots). crates/network = host-side user-space stack on smoltcp: model/policy (ordered first-match allow/deny rules with groups public/private/loopback/link-local/metadata/multicast/host), engine/netstack + engine/tcp|udp|icmp|dns|tls|secrets|ports (policy evaluation, DNS interception/rebind protection/pinning, optional TLS interception, placeholder-to-secret substitution, published ports bound to 127.0.0.1 by default). crates/filesystem = virtiofs backends (passthroughfs/unix with host-enforced read-only, openat2 RESOLVE_BENEATH containment with O_NOFOLLOW fallback, stat virtualization, quotas; memfs; dualfs) plus the embedded agentd payload. crates/image = OCI pull/cache, ext4/EROFS/VMDK builders, snapshot/checkpoint stores. crates/db + crates/migration = SQLite catalog (sea-orm). crates/protocol + packages/*-client = CBOR-framed host-guest protocol over virtio-console (Rust and TypeScript clients). crates/metrics, metrics-collector, vsock, utils. The VMM is msb_krun 0.1.39 (libkrun fork, 11 crates in Cargo.lock) from crates.io; the guest kernel/firmware is the vendor/libkrunfw submodule (superradcompany/libkrunfw, not populated in this checkout). Isolation is the hypervisor VM boundary plus host-side brokers; the only no_new_privs/capability dropping is in-guest (crates/agentd/lib/session.rs:1313-1331). Cross-version contracts are catalogued in COMPATIBILITY.md.",
+      "packaging_and_release": "Tag-triggered (v*) .github/workflows/release.yml (PRs touching release files and manual dispatch run the build/validation graph; publishers are tag-only: release.yml:3-28). Platforms: linux-x86_64, linux-aarch64 (manylinux_2_28 containers, glibc baseline audited), darwin-aarch64, windows-x86_64, windows-aarch64 (release.yml:218-313). Release assets: microsandbox-<target>.tar.gz (msb + libkrunfw; release-linux.yml:395-396, release-macos.yml:356-357), msb-<target>, msb-metrics-<target>, libkrunfw-*, agentd-<arch>, Go FFI libs, install.sh/install.ps1, and checksums.sha256 produced by `sha256sum * > checksums.sha256` in the same job that creates the GitHub release (release.yml:1057-1115); rc/alpha/beta/dev tags are marked prerelease so /releases/latest is not promoted (release.yml:1103-1110). No cosign, GPG, SLSA or GitHub artifact-attestation step exists in .github (grep). macOS msb is ad-hoc signed only (`codesign --entitlements msb-entitlements.plist --force -s -`, release-macos.yml:127-129); no notarization step found. A `release-ready` gate validates the artifact manifest, glibc <= 2.28, the crates.io publish graph, and a production cloud smoke test that needs the MSB_API_KEY secret (release.yml:915-1046; DEVELOPMENT.md:317-338). Registries: npm with provenance (NPM_CONFIG_PROVENANCE=true, id-token: write; release.yml:1261-1400; DEVELOPMENT.md:309-313), except the separately published MCP package (release.yml:1469-1505); 18 crates to crates.io (release.yml:1510-1523; DEVELOPMENT.md:302); PyPI wheels via `uv publish` with OIDC trusted publishing (release.yml:1528-1555; yank.yml:3-9); Go SDK subdirectory tag sdk/go/vX.Y.Z with embedded FFI bundles (release.yml:1571-1630); multi-arch GHCR image ghcr.io/superradcompany/microsandbox (release.yml:1637-1745); Homebrew tap dispatch (1191-1204) and winget submission gated by a repo variable (1232-1256). Release profile: LTO, panic=abort, strip (Cargo.toml:59-63). Version bump via release-bump.yml (opens a PR); workflow actions are pinned by commit SHA.",
+      "tests_and_ci": "Frameworks: cargo test and cargo-nextest 0.9.143 (.config/nextest.toml:15-16); VM-booting Rust tests use `#[msb_test]`, which adds #[ignore] automatically because they need KVM/libkrun (crates/testing/macros/src/lib.rs:33-36); pytest (sdk/python/tests, 30 files); vitest (sdk/node-ts/tests, 25 files, plus at least 11 under packages/*/typescript/tests); `go test` (39 *_test.go files under sdk/go); Ruby test-unit (sdk/ruby/test, 2 files); Python/shell/PowerShell smoke suites (scripts/smoke/**, about 70 files); nightly cargo-fuzz of the snapshot-archive import walker, 10 min budget (.github/workflows/fuzz.yml:1-46). About 570 test-bearing files in total, of which 460 are Rust files containing #[test]/#[tokio::test]/#[msb_test]. Workflows in .github/workflows: check.yml (push to main/releases/**, PRs to main/mintlify/releases/**, manual: kernel/agentd/runtime builds, rustfmt/clippy/rustdoc, Windows compile+clippy+host-FS tests, Node/Python/Go/Ruby quality, previous-release DB-upgrade smoke, then KVM-requiring CLI smoke, Rust integration, Node/Python/Go SDK tests on self-hosted-ubuntu-2404-x64: check.yml:1508-1990), check-platform.yml (linux-aarch64 and macos-14: build, cargo check, SDK builds, unit tests; no VM boot), test-platform.yml (cargo test --workspace), fuzz.yml, release.yml + release-{linux,macos,windows}.yml, release-bump.yml, release-labels.yml, publish-runtime-commit.yml (manual: publish a GHCR image for a commit with a green Check run), sync-docs-openapi.yml, yank.yml. Pre-commit hooks run fmt/clippy/doc/build (.pre-commit-config.yaml). No cargo-audit, cargo-deny, CodeQL or scorecard step is wired in (deny.toml exists but nothing invokes it); Dependabot is weekly for cargo and github-actions only (.github/dependabot.yml:6-26).",
+      "dependencies": "Manifests: Cargo.toml (workspace; 102 [workspace.dependencies] pins = 20 internal + 82 external; Cargo.lock lists 862 packages, all registry sources, no git deps). Direct [dependencies] counts (including optional ones; excluding dev/build/target-specific): sdk/rust/Cargo.toml 54, crates/cli 39, crates/network 34, crates/runtime 32, crates/image 22, crates/agentd 12, crates/filesystem 11, crates/protocol 10, crates/db 8, crates/utils 4, crates/vsock 1 (+5 unix/windows-specific). sdk/node-ts/package.json: 1 runtime dependency (@microsandbox/types) + 5 optional per-platform packages + 4 dev; sdk/python/pyproject.toml: 0 runtime dependencies (bundles msb + libkrunfw) + 5 dev; sdk/go/go.mod: no requires; sdk/ruby/microsandbox.gemspec: 1 runtime (rb_sys) + 2 dev. VMM family msb_krun*/msb-imago comes from crates.io at =0.1.39 / 0.1.7 (Cargo.toml:99-100, 130; Cargo.lock:4375-4549). deny.toml defines a license allow-list (Apache-2.0, MIT, BSD, ISC, MPL-2.0, Zlib, ...) and registry/git source restrictions but is not run in CI.",
+      "security_policy": "SECURITY.md (repo root): private reporting via GitHub private vulnerability reporting or security@superrad.company (SECURITY.md:5-11); in scope are sandbox escape, isolation bypass, network-policy/egress-filter bypass, secret leakage, snapshot data leaks and supply-chain issues (23-41); targets: acknowledgment 3 business days, triage 7 days, critical fix 30 days, high fix 60 days (53-61); 90-day default embargo (69-73); advisories via GitHub and RustSec (65-67); no paid bug bounty (79). Threat model pages: docs/security/{overview,isolation,filesystem,network,secrets,hardening}.mdx."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:32 - Hardware-level isolation with tiny virtual machines",
+        "verified": "yes",
+        "evidence": "Each sandbox boots as a libkrun-derived microVM: crates/runtime/lib/runner/vm.rs:1-6,40,1872 use msb_krun::VmBuilder (pinned =0.1.39, Cargo.toml:99); hypervisor is KVM/Hypervisor.framework (docs/security/isolation.mdx:9-17). The host VMM process has no seccomp/landlock/macOS-sandbox confinement (grep of the repo finds none; no_new_privs exists only in-guest, crates/agentd/lib/session.rs:1313-1331), so the boundary is the hypervisor plus host-side device brokers (isolation.mdx:28-40). VMM and kernel sources are outside this checkout."
+      },
+      {
+        "claim": "Default network posture (docs/security/network.mdx:11-16, docs/networking/overview.mdx:10-12) and opt-in deny-by-default (--no-net, --net-default deny, YAML network.allow; README.md:171-181)",
+        "verified": "yes",
+        "evidence": "NetworkPolicy::default() = from_profiles([Public]) = default_egress Deny + allow-DNS-to-gateway + allow Public group, default_ingress Allow (crates/network/lib/model/policy/types.rs:310-346,823-827; crates/network/lib/model/config/types.rs:318-325; pinned by test sdk/rust/lib/sandbox/config.rs:2343-2357). So the public internet is reachable by default; this is not deny-all. --no-net sets Deny in both directions (crates/cli/lib/commands/common.rs:1002-1026; policy::none() types.rs:285-293); YAML `allow` makes default_egress Deny with only the listed rules (crates/cli/lib/sandbox_config.rs:1631-1659). Policy is evaluated in-process on the host (crates/network/lib/engine/netstack/poll.rs:411-416, tcp/proxy.rs:200, dns/forwarder.rs:819-822, icmp/relay.rs:176, ports/publisher.rs:639); no iptables/nft/pf/TUN use in crates/ (grep). Hostname allows need inspectable authority under strict mode (default true: config/types.rs:84-86,327), per docs/networking/overview.mdx:232-238."
+      },
+      {
+        "claim": "Filesystem restrictions are enforced host-side: read-only mounts cannot be written even by a privileged guest, and path containment uses openat2 RESOLVE_BENEATH on Linux 5.6+ with an O_NOFOLLOW fallback (docs/security/filesystem.mdx:40-46)",
+        "verified": "yes",
+        "evidence": "The virtiofs passthrough broker checks cfg.readonly() and returns EROFS on write-intent open, create, remove, setattr, xattr and special files (crates/filesystem/lib/backends/passthroughfs/unix/file_ops.rs:49-51; create_ops.rs:59,170,231,324,439; remove_ops.rs:37,163,240; metadata.rs:63; xattr_ops.rs:46,305; special.rs:101,241; tests/test_readonly.rs). openat2 is probed once and threaded into inode opens (shared/platform.rs:12-17,533-546,576,606; passthroughfs/unix/builder.rs:194-196; inode.rs:249-253,720-724) and the mount root is opened with RESOLVE_BENEATH|NO_SYMLINKS|NO_MAGICLINKS or a per-component O_NOFOLLOW walk (unix/mod.rs:1027-1124). Restrictions are per-mount only (VolumeMount::Bind/Named/Tmpfs/DiskImage/Owned + MountOptions, packages/microsandbox-types/rust/lib/domain.rs:394-485); no path-pattern allow/deny rules found (grep)."
+      },
+      {
+        "claim": "README.md:34,107-111 - Cross Platform: Linux, macOS, Windows; requirements Apple Silicon / KVM / WHP",
+        "verified": "partial",
+        "evidence": "Requirements match code: /dev/kvm R/W probe (sdk/rust/lib/setup/linux.rs:74-114), Apple-Silicon-only check (setup/macos.rs:19-32), WHP check (setup/windows.rs:178). Extra requirements the README omits: glibc >= 2.28 (scripts/install.sh:18,292-303), Linux >= 5.3 for pidfd-based stop/kill (COMPATIBILITY.md:163), Linux >= 5.6 for openat2 containment. Release bundles exist for 5 targets (release.yml:218-313) but Windows is 'preview' (docs/troubleshooting/windows.mdx:7), Intel macOS is rejected (install.sh:236-239), and CI boots VMs only on the self-hosted Linux x86_64 KVM pool (check.yml:489,1512,1590,1730,1870,1980); macOS, Linux-aarch64 and Windows lanes only build/check/unit-test (check-platform.yml:40-288; check.yml:486-492)."
+      },
+      {
+        "claim": "Need-specific: microsandbox works on Linux under WSL2 (no README claim exists)",
+        "verified": "not_checkable",
+        "evidence": "No mention of WSL2 as a host in README, docs, code or CI (see platforms.wsl2). The Linux path depends only on /dev/kvm being present and R/W (sdk/rust/lib/setup/linux.rs:19,74-114) and on the outer environment exposing nested virtualization (docs/troubleshooting/linux.mdx:73,115); `msb doctor` is the documented self-check (docs/troubleshooting/linux.mdx:35-39). Not testable in this read-only checkout."
+      },
+      {
+        "claim": "README.md:39 - Secrets That Can't Leak: unexploitable secret keys that never enter the VM",
+        "verified": "partial",
+        "evidence": "The guest env holds a placeholder; the host TLS proxy substitutes the real value only for allowed hosts after DNS-pin, SNI and authority checks (crates/network/lib/engine/secrets/handler.rs:1-4; docs/security/secrets.mdx:11-37). Limits stated by the project make 'unexploitable' too strong: the allowed endpoint receives the real credential and may echo it, substitution needs TLS interception with a CA the guest trusts, and raw values supplied through an SDK are persisted in the host-side sandbox configuration (secrets.mdx:34,45-56)."
+      },
+      {
+        "claim": "README.md:38,228 - Embeddable: no setup server, no long-running daemon",
+        "verified": "yes",
+        "evidence": "The VM runs as a per-sandbox child process via the hidden `msb machine` entry (crates/cli/bin/main.rs:83-85,305-326; DEVELOPMENT.md:11); stale-sandbox reaping is done by those host runtime processes, not a central daemon (main.rs:656-659); docs/sdk/overview.mdx:8. Detached sandboxes keep their per-sandbox host process alive after the caller exits (README.md:40; docs/sandboxes/lifecycle.mdx:231-255) and `msb-metrics` is a separate optional sidecar. Doc/code mismatch: docs/sdk/overview.mdx:8 and docs/getting-started/quickstart.mdx:48 say an API key switches the SDK to cloud, but code treats a bare MSB_API_KEY as credential only; cloud needs MSB_BACKEND=cloud or a cloud profile (sdk/rust/lib/config/backend.rs:155-206, comment at 204; sdk/rust/lib/backend/profile.rs:10-12; correct form at quickstart.mdx:186). The code wins; the enum doc comment sdk/rust/lib/backend/mod.rs:96 is stale."
+      },
+      {
+        "claim": "README.md:41,437-452 - Agent-Ready via Agent Skills and an MCP server",
+        "verified": "not_checkable",
+        "evidence": "Both live in submodules that are empty in this checkout (.gitmodules:17-22: mcp/ -> superradcompany/microsandbox-mcp, skills/ -> superradcompany/skills). The repo's own CI builds and tests the MCP server against sdk/node-ts (.github/workflows/check.yml:851-898) and release.yml:1469-1505 publishes it to npm, so it exists, but its tool list and behaviour could not be read."
+      },
+      {
+        "claim": "README.md:37,488 - Average boot times under 100 ms (guest boot on an M1)",
+        "verified": "not_checkable",
+        "evidence": "No benchmark results or timing harness output are in the repo. DEVELOPMENT.md:223-226 points to an external repository (superradcompany/microvm-benchmarks) that was not opened. A CI config comment says 'microVM boot is sub-second; full create/teardown ~9s' on the self-hosted KVM runner (.config/nextest.toml:12-14), which is not a measurement report."
+      },
+      {
+        "claim": "docs/security/overview.mdx:57-61 and filesystem.mdx:73-79 - image content is digest-verified but not signature-verified; registry is part of the trusted base",
+        "verified": "yes",
+        "evidence": "crates/image uses oci-client/oci-spec with layer digests (crates/image/Cargo.toml:24-25,31) and no cosign/Notary/attestation dependency appears in any manifest or in Cargo.lock-level direct deps; the project states the limitation itself (docs/security/filesystem.mdx:73-79)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Guest boot time (average) on an M1 machine",
+        "metric": "boot time",
+        "value": "under 100 ms (project claim; no raw data in repo)",
+        "source": "README.md:37,488",
+        "independent": false
+      },
+      {
+        "what": "microVM boot and full create/teardown on the project's shared self-hosted KVM CI runner",
+        "metric": "latency",
+        "value": "boot 'sub-second'; full create/teardown '~9s' (a code comment explaining a test timeout, not a measurement report)",
+        "source": ".config/nextest.toml:12-14",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Default network is not deny-all: the public internet is reachable and default_ingress is Allow for published ports; deny-by-default must be configured per sandbox via --no-net / --net-default deny / YAML network.allow (crates/network/lib/model/policy/types.rs:310-346,823-827; docs/security/network.mdx:11-16). Hostname allowlists are only enforceable for plaintext HTTP or TLS-intercepted traffic, and DNS-over-HTTPS and tunnels are acknowledged bypass surfaces (docs/networking/overview.mdx:232-238; docs/security/network.mdx:89-93).",
+      "Filesystem control is mount-granular, not path-rule based. Letting an agent edit host files means a writable bind mount (docs/examples/agents/claude-code.mdx:18-30). The default in-guest profile keeps root with CAP_SYS_ADMIN and no no_new_privs (crates/protocol/lib/lib.rs:112-118; docs/security/isolation.mdx:56-64). Containment on macOS and Linux < 5.6 uses the weaker O_NOFOLLOW fallback (docs/security/filesystem.mdx:42). Opt-in holes: shared writable volumes (filesystem.mdx:50-55), --vsock host sockets (docs/cli/sandbox-commands.mdx:138-144), the `host` network group (docs/networking/overview.mdx:444-454), trust_host_cas (crates/network/lib/model/config/types.rs:115-122).",
+      "Platform coverage for the stated need: WSL2 has no docs, code or CI (only a /dev/kvm probe, sdk/rust/lib/setup/linux.rs:74-114, and a note that nested virtualization must be exposed, docs/troubleshooting/linux.mdx:73,115). All VM-booting CI runs on one self-hosted Linux x86_64 KVM runner pool (.github/workflows/check.yml:1512,1590,1730,1870,1980); macOS, Linux-aarch64 and Windows get build/check/unit lanes only (check-platform.yml:40-288). macOS is Apple Silicon only (scripts/install.sh:236-239), Windows is preview (docs/troubleshooting/windows.mdx:7), Linux needs glibc >= 2.28 (install.sh:18).",
+      "Stability and maintenance: README says beta with breaking changes (README.md:113); the Go module retracts v0.6.5 which 'shipped breaking wire changes as a patch release' (sdk/go/go.mod:5-7); AGENTS.md:128 records an accepted v0.6.9<->v0.6.10 launch incompatibility and AGENTS.md:130 limits the compatibility horizon to v0.6.0+; the SDK and `msb` must be a matching pair (DEVELOPMENT.md:11) and 16 internal crates are pinned with exact =0.7.6 versions (Cargo.toml:82-97). CODEOWNERS names two users (.github/CODEOWNERS:2).",
+      "Supply chain: release assets are unsigned; checksums.sha256 is generated in the same workflow and uploaded next to the artifacts (.github/workflows/release.yml:1057-1115) and no cosign/GPG/SLSA/attestation step exists (grep of .github). The headline curl|sh installer always resolves 'latest' with no version pin (scripts/install.sh:309-316,344-367). The SDK/`cargo install` runtime download checks SHA-256 only if the caller supplies one and install verification only checks file presence (sdk/rust/lib/setup/runtime.rs:101,115,147-156,174-176; setup/verify.rs:12-30). macOS binaries are ad-hoc signed with disable-library-validation (release-macos.yml:127-129; msb-entitlements.plist:5-8). deny.toml exists but no workflow or hook runs cargo-deny/audit/CodeQL, and Dependabot covers only cargo and github-actions (.github/dependabot.yml:17-26); Cargo.lock has 862 packages.",
+      "Secrets: raw values supplied through an SDK are persisted in the host-side sandbox configuration and survive stop (docs/security/secrets.mdx:56); the allowed endpoint receives the real credential; substitution requires TLS interception with an auto-generated CA trusted inside the guest (secrets.mdx:34,45-50).",
+      "Backend routing: MSB_BACKEND=cloud, MSB_PROFILE or an active_profile makes the same CLI/SDK calls run on api.microsandbox.dev instead of the local host (sdk/rust/lib/config/backend.rs:155-206; docs/getting-started/quickstart.mdx:186), moving the boundary off-host. Docs at docs/sdk/overview.mdx:8 and quickstart.mdx:48 wrongly suggest an API key alone does this. `msb context` shows the active backend (crates/cli/lib/commands/context.rs:25-34). Cloud is private beta (docs/cloud/overview.mdx:9) and lacks local-only features such as host mounts and published ports.",
+      "Out-of-tree components were not reviewable here: the VMM (msb_krun 0.1.39 fork of libkrunfw's sibling libkrun, from crates.io, Cargo.lock:4405-4549), the guest kernel/firmware (vendor/libkrunfw submodule -> superradcompany/libkrunfw, .gitmodules:1-4), the MCP server and Agent Skills (submodules mcp/, skills/), and the benchmark repo (DEVELOPMENT.md:225-226). COMPATIBILITY.md:339-343 says runtime, agentd, msb_krun, firmware and kernel are one release unit. The licence terms of the bundled kernel/firmware could not be checked (the repository LICENSE is Apache-2.0)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "superradcompany/microsandbox",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Installer script (macOS / Linux): `curl -fsSL https://install.microsandbox.dev | sh`; script source scripts/install.sh:1-4; attached to releases by .github/workflows/release.yml:1076-1078",
+          "citation": "README.md:49; scripts/install.sh:1-4; .github/workflows/release.yml:1076-1078",
+          "holds": true,
+          "note": "Checkout commit is 09df3d4 = dossier revision. README.md:49 has the exact command, labelled macOS / Linux. scripts/install.sh:1-4 is the POSIX sh installer and its usage line is the same command; detect_platform (install.sh:220-242) accepts linux and darwin and rejects x86_64 macOS. release.yml:1076-1078 copies scripts/install.sh into release-artifacts, which `gh release create ... release-artifacts/*` uploads (1111-1115)."
+        },
+        {
+          "field": "license",
+          "statement": "License is Apache-2.0 (file LICENSE)",
+          "citation": "LICENSE:1-3,176-201; Cargo.toml:56",
+          "holds": true,
+          "note": "LICENSE is the unmodified Apache License 2.0 text with the standard appendix. The workspace Cargo.toml:56 declares license = \"Apache-2.0\", as do sdk/node-ts/package.json:38, sdk/python/pyproject.toml:9 and sdk/ruby/microsandbox.gemspec:13. sdk/ruby/LICENSE is also Apache 2.0, and README.md:470 agrees."
+        },
+        {
+          "field": "readme.platforms.wsl2",
+          "statement": "unknown - no README, docs, code or CI mention running microsandbox inside WSL2 as a Linux host; WSL appears only as a Windows-side build backend and in a note that WSL2 enables a different Windows feature; the Linux path only probes that /dev/kvm exists and is R/W; docs say the outer environment must expose nested virtualization; native Windows is a separate WHP-based preview",
+          "citation": "DEVELOPMENT.md:25,73-81; scripts/dev-windows.ps1; docs/troubleshooting/windows.mdx:7,41; sdk/rust/lib/setup/windows.rs:109; sdk/rust/lib/setup/linux.rs:74-114; docs/troubleshooting/linux.mdx:73,115",
+          "holds": true,
+          "note": "A repo-wide case-insensitive grep for 'wsl' (including .github/) finds no statement about running microsandbox inside WSL2 as a host. Every cited line says what the dossier says: DEVELOPMENT.md:25,73-81 and dev-windows.ps1 cover the WSL build backend, windows.mdx:41 and windows.rs:109 cover VirtualMachinePlatform vs HypervisorPlatform, linux.mdx:73,115 cover nested virtualization, and windows.mdx:7 says Windows support is preview. Minor imprecisions that do not change the conclusion: (a) the grep also hits crates/filesystem/lib/backends/passthroughfs/windows/mod.rs:678, a comment comparing the NTFS mode default to 'WSL DrvFs', plus justfile:142,216 (build backend), so 'only as' is not exhaustive; (b) the Linux doctor (diagnose(), host.rs:222-235) also checks /proc/cpuinfo for vmx/svm on x86_64 (linux.rs:53-72), not only /dev/kvm; (c) the closest adjacent guidance, docs/examples/docker/docker.mdx:47-53 (/dev/kvm is the authoritative check; Docker Desktop depends on nested virtualization in its Linux VM), is not cited."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Agent Skills via `npx skills add superradcompany/skills` (submodule skills/) and MCP via `claude mcp add`; docs run Claude Code / Codex CLI inside a microVM with the host project mounted :rw (alternative --copy-dir isolated copy plus patch export via msb cp); no hook, plugin or command wrapper confining a host-resident agent's individual shell calls in the repo docs",
+          "citation": "README.md:437-443,449-452; .gitmodules:20-22; docs/examples/agents/claude-code.mdx:18-30,50-52,88-104; docs/examples/agents/codex.mdx:19-31",
+          "holds": true,
+          "note": "All lines match. README.md:442 is `npx skills add superradcompany/skills` and README.md:451 is `claude mcp add --transport stdio microsandbox -- npx -y microsandbox-mcp`. .gitmodules:20-22 maps skills/ to superradcompany/skills. claude-code.mdx:18-30 and codex.mdx:19-31 are the `msb run ... --mount-dir ./my-project:/workspace:rw ... node:24-bookworm-slim` blocks. claude-code.mdx:50-52 is the --copy-dir tip and 88-104 the git diff -> msb cp -> git apply --check flow. A grep of docs/ for PreToolUse/hook/settings.json/command wrapper finds no host-side confinement hook. The only other Claude doc, examples/development/jetbrains-acp.mdx, runs the agent inside the sandbox via `msb exec --stream` and warns (line 71) that ACP fs/terminal requests can still execute on the host."
+        },
+        {
+          "field": "claim_checks[1]",
+          "statement": "Default network posture is not deny-all: the public internet (plus DNS to the gateway) is reachable; private, loopback, link-local, metadata and host addresses are denied; ingress only reaches published ports; deny-by-default is opt-in via --no-net, --net-default deny or YAML network.allow (verified: yes)",
+          "citation": "docs/security/network.mdx:11-16; docs/networking/overview.mdx:10-12; crates/network/lib/model/policy/types.rs:285-293,310-346,823-827; crates/network/lib/model/config/types.rs:84-86,318-327; sdk/rust/lib/sandbox/config.rs:2343-2357; crates/cli/lib/commands/common.rs:1002-1026; crates/cli/lib/sandbox_config.rs:1631-1659; README.md:171-181",
+          "holds": true,
+          "note": "NetworkPolicy::default() = from_profiles([Public]) (types.rs:823-827), which builds rules [allow_dns (egress to Host group, udp/tcp 53; types.rs:889-897), allow_egress(Public)] with default_egress Deny and default_ingress Allow (310-346). NetworkConfig::default uses that policy with strict: true (config/types.rs:318-327, 84-86), and the test at sdk/rust/lib/sandbox/config.rs:2343-2357 pins an unspecified policy to it. --no-net makes both defaults Deny (common.rs:1002-1026); `rules` holds only explicit --net-rule entries (931-935), so bare --no-net is deny-all (test common.rs:5302-5309). With a non-empty YAML allow list, default_egress is Deny and the rules are just the user's deny+allow entries (sandbox_config.rs:1643-1659). Engine evaluation sites exist at poll.rs:411-416, tcp/proxy.rs:200, dns/forwarder.rs:819-822, icmp/relay.rs:176 and ports/publisher.rs:639. grep of crates/ and sdk/ finds no iptables/nft/pfctl/TUN/seccomp/landlock (positive control: smoltcp matches). overview.mdx:232-238 documents strict hostname mode as on by default."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

@@ -1,0 +1,315 @@
+{
+  "contender": "bytedance/deer-flow",
+  "revision": {
+    "contender": "bytedance/deer-flow",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "bytedance/deer-flow",
+        "tag": "v2.1.0",
+        "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v2.1.0",
+    "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+    "read_at": "2026-10-02T03:02:02+00:00"
+  },
+  "dossier": {
+    "contender": "bytedance/deer-flow",
+    "revision": {
+      "tag": "v2.1.0",
+      "commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "DeerFlow 2.x (ByteDance / 'DeerFlow Authors') is an open-source 'super agent harness' built on LangGraph/LangChain. It is a FastAPI Gateway with an embedded lead-agent runtime, sub-agents, per-thread sandboxes (local, Docker 'AIO', Kubernetes provisioner, E2B, BoxLite, Tenki, OpenSandbox), Markdown skills, an MCP client, persistent memory, scheduled tasks and IM-channel bridges. It also ships a Next.js web UI, an embedded Python client (DeerFlowClient / create_deerflow_agent) and a `deerflow` TUI/headless CLI. It is a ground-up rewrite of the v1 Deep Research framework, which stays on the main-1.x branch (README.md:12,17). In 2.x, 'research' is implemented as skills plus a system-prompt citation convention rather than a dedicated research pipeline (skills/public/deep-research/SKILL.md; backend/packages/harness/deerflow/agents/lead_agent/prompt.py:686-747).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "DeerFlow ('Deep Exploration and Efficient Research Flow') is an open-source 'super agent harness' that orchestrates sub-agents, memory and sandboxes, powered by extensible skills.",
+          "citation": "README.md:12"
+        },
+        {
+          "claim": "2.0 is a ground-up rewrite sharing no code with v1; the original Deep Research framework is maintained on the main-1.x branch and active development moved to 2.0.",
+          "citation": "README.md:17"
+        },
+        {
+          "claim": "Built on LangGraph and LangChain; ships a filesystem, memory, skills, sandbox-aware execution and sub-agent planning. Core tools are web search, web fetch, web capture, file operations and bash, plus MCP servers and Python functions; built-in skills cover research, report generation, slides and more.",
+          "citation": "README.md:947; README.md:964; README.md:1075"
+        },
+        {
+          "claim": "Model-agnostic: 'works with any LLM that implements the OpenAI-compatible API'. The README strongly recommends Doubao-Seed-2.0-Code, DeepSeek v3.2 and Kimi 2.5. CLI-backed providers reuse Codex CLI (~/.codex/auth.json) and Claude Code OAuth logins.",
+          "citation": "README.md:1632; README.md:32; README.md:213-233"
+        },
+        {
+          "claim": "ACP agent entries (a Codex ACP adapter, MiniMax Code 'mcode') are invoked through the invoke_acp_agent tool in a per-thread ACP workspace, forwarding enabled MCP servers; keep auto_approve_permissions false for untrusted tasks.",
+          "citation": "README.md:234-251"
+        },
+        {
+          "claim": "With AioSandboxProvider shell execution runs inside isolated containers; with LocalSandboxProvider host bash is disabled by default because it is not a secure isolation boundary. Documented modes: local, Docker, Docker plus Kubernetes provisioner.",
+          "citation": "README.md:519-522; README.md:1477"
+        },
+        {
+          "claim": "Docker AIO sandboxes default to open egress; sandbox.network.mode can be 'isolated' or 'allowlist' (operator domains plus interactive approval; private, loopback and cloud-metadata addresses are never approvable).",
+          "citation": "README.md:1479-1488"
+        },
+        {
+          "claim": "Linux plus Docker is the recommended persistent-server target; macOS and Windows are 'development or evaluation environments'; the Windows local flow needs Git Bash and WSL 'is not guaranteed'.",
+          "citation": "README.md:280; README.md:382"
+        },
+        {
+          "claim": "database.backend sqlite or postgres is shared by the LangGraph checkpointer, Store and app data. Production defaults to one Gateway worker because active runs are owned in-process; multi-worker needs Postgres, the Redis stream bridge, run-ownership heartbeats and DB run events. Lease reconciliation marks runs from dead workers as errors.",
+          "citation": "README.md:345-348; README.md:361"
+        },
+        {
+          "claim": "DeerFlow can be embedded as a Python library (DeerFlowClient, same response schemas as the Gateway), and `deerflow` is a TUI/headless workbench (--print, --json, --continue, --resume).",
+          "citation": "README.md:1643; README.md:1686; README.md:1837-1847"
+        },
+        {
+          "claim": "The claude-to-deerflow skill lets Claude Code send research tasks to, and manage threads on, a running DeerFlow instance (default http://localhost:2026).",
+          "citation": "README.md:1278-1303"
+        },
+        {
+          "claim": "Sub-agents are spawned on demand with scoped context, tools and termination conditions (default 'isolated' context, optional 'snapshot'); '/goal <condition>' attaches a thread goal with a default cap of 8 hidden continuations; scheduled tasks (once/cron/interval) run as non-interactive runs.",
+          "citation": "README.md:1379; README.md:1341-1343; README.md:1325; README.md:1770-1784"
+        },
+        {
+          "claim": "Observability is opt-in: LangSmith and Langfuse trace all LLM calls, agent runs and tool executions; Monocle traces capture prompts, tool arguments and responses verbatim and its remote exporters (okahu, s3, blob, gcs) send them off-box.",
+          "citation": "README.md:849; README.md:862-873; README.md:899"
+        },
+        {
+          "claim": "Security notice: designed for a local trusted environment (127.0.0.1); the Docker stack publishes on 127.0.0.1 unless BIND_HOST is set; treat Gateway admin as equivalent to code execution on the host (stdio MCP servers).",
+          "citation": "README.md:1864; README.md:1881-1884; README.md:1869-1877"
+        }
+      ],
+      "install": [
+        {
+          "method": "Clone plus setup wizard (prerequisite for every path)",
+          "command": "git clone https://github.com/bytedance/deer-flow.git && cd deer-flow && make setup",
+          "citation": "README.md:118-131"
+        },
+        {
+          "method": "Docker development (hot reload; Linux/macOS)",
+          "command": "make docker-init && make docker-start",
+          "citation": "README.md:289-295"
+        },
+        {
+          "method": "Docker production (Linux recommended)",
+          "command": "make up",
+          "citation": "README.md:330-337"
+        },
+        {
+          "method": "Local development without Docker (needs Node 22+, pnpm, uv, nginx)",
+          "command": "make check && make install && make dev",
+          "citation": "README.md:389-418"
+        },
+        {
+          "method": "Kubernetes Helm chart from GHCR (OCI)",
+          "command": "helm install deer-flow oci://ghcr.io/<owner>/charts/deer-flow --version 2.1.0",
+          "citation": "RELEASING.md:92-94; deploy/helm/deer-flow/README.md:25-27"
+        },
+        {
+          "method": "Harness/TUI as a Python package (publication is not evidenced by any workflow in the repo)",
+          "command": "uv pip install 'deerflow-harness[tui]'",
+          "citation": "README.md:1838; backend/docs/TUI.md:15"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - README.md:280 names Linux plus Docker the recommended persistent-server target; CI and release builds run on ubuntu-latest (.github/workflows/backend-unit-tests.yml:50) and the backend/frontend/provisioner images are amd64-only (.github/workflows/nightly.yaml:10).",
+        "wsl2": "unknown - README.md:382 says WSL is 'not guaranteed' for the local flow (Git Bash recommended on Windows), while scripts/check.py:156 and scripts/doctor.py:228 tell Windows users to 'use WSL for local mode or use Docker mode'; there is no WSL job in CI.",
+        "macos_arm64": "yes (development/evaluation only) - README.md:280; macOS handling exists for Apple Container (config.example.yaml:1472-1476) and Claude OAuth export (README.md:252-256); the AIO image 1.11.0 is multi-arch (config.example.yaml:1485-1489). There is no macOS CI job in .github/workflows, published backend/frontend images are amd64-only (nightly.yaml:10), and Apple Container supports only network.mode open with an unhardened invocation (backend/docs/CONFIGURATION.md:922).",
+        "gpu": "no - DeerFlow itself needs no GPU (no CUDA/GPU code outside a browser-session comment); README.md:279 says to size any self-hosted LLM separately; local model servers are reached over HTTP (vLLM/Ollama/MindIE providers, backend/packages/harness/pyproject.toml:72)."
+      },
+      "integrations": {
+        "cli": "`deerflow` console script (deerflow = deerflow.tui.cli:main, backend/packages/harness/pyproject.toml:61-62): Textual TUI, headless --print / --json one-shots, --continue, --resume THREAD, --recursion-limit N, and `deerflow extensions ...` (backend/packages/harness/deerflow/tui/cli.py:55-84,225-230; README.md:1837-1847). Project lifecycle is driven by make targets (Makefile:65-219).",
+        "mcp": "MCP client only. Loads stdio/SSE/HTTP MCP servers from extensions_config.json (OAuth client_credentials/refresh_token for HTTP/SSE, stdio command allowlist npx/uvx) plus an optional durable submit/status/cancel task adapter (README.md:547-571; backend/docs/MCP_SERVER.md:1-15). No DeerFlow-as-MCP-server found: the only mcp import in non-test backend code is ClientSession (backend/packages/harness/deerflow/mcp/session_pool.py:51).",
+        "sdk_or_api": "Python SDK: deerflow.client.DeerFlowClient (embedded, synchronous chat()/stream() generators; backend/packages/harness/deerflow/client.py:145-248; README.md:1639-1686) and create_deerflow_agent(model: BaseChatModel, tools, features=RuntimeFeatures(...), checkpointer=..., subagent_runtime=...) (backend/packages/harness/deerflow/agents/factory.py:66-81; README.md:1385-1399). The lead_agent graph is also registered for LangGraph Server/Studio (backend/langgraph.json:8-10). HTTP: FastAPI Gateway on :8001 with LangGraph-compatible thread/run routes (POST /api/threads/{id}/runs, /runs/stream, /runs/wait, cancel, join; backend/app/gateway/routers/thread_runs.py:923-1215), exposed through nginx at /api/langgraph/*; OpenAPI at /docs is on by default (backend/app/gateway/config.py:11); cookie sessions or scoped personal access tokens dfp_... limited to thread/run routes (README.md:915-937; backend/app/gateway/auth/pat.py:22-33). Opt-in HMAC-verified GitHub webhook route /api/webhooks/github, mounted only when a secret is configured (backend/app/gateway/app.py:963-979). IM bridges (Feishu, Slack, Telegram, Discord, DingTalk, WeChat, WeCom, Buzz) use the same API (README.md:579-593).",
+        "claude_code_or_codex": "Claude Code -> DeerFlow: the claude-to-deerflow skill drives a running Gateway with curl against /api/langgraph/threads and /runs/stream (skills/public/claude-to-deerflow/SKILL.md:8-89; README.md:1276-1303, install: npx skills add https://github.com/bytedance/deer-flow --skill claude-to-deerflow). DeerFlow -> Claude/Codex: (a) model providers that reuse CLI logins, ClaudeChatModel (CLAUDE_CODE_OAUTH_TOKEN / ~/.claude/.credentials.json) and CodexChatModel (~/.codex/auth.json) (README.md:213-233); (b) the invoke_acp_agent tool spawning ACP adapters such as @zed-industries/claude-agent-acp, @zed-industries/codex-acp or mcode as host subprocesses (config.example.yaml:1815-1850; backend/packages/harness/deerflow/tools/builtins/invoke_acp_agent_tool.py:232-245). No use of the Claude Agent SDK, OpenAI Agents SDK or a Codex SDK was found (repo-wide grep)."
+      },
+      "telemetry_and_network": "No analytics, telemetry or update-check SDK was found in first-party backend, frontend or scripts (grep for common analytics SDKs returned nothing); telemetry of third-party dependencies such as langgraph-cli cannot be verified from this checkout. Tracing is opt-in and off by default: LangSmith (LANGSMITH_TRACING), Langfuse (LANGFUSE_TRACING), Monocle (MONOCLE_TRACING; default exporter 'file', remote okahu/s3/blob/gcs exporters send prompts, tool args and responses off-box) - backend/packages/harness/deerflow/config/tracing_config.py:143-170; README.md:847-905. The frontend calls api.github.com (star counter) only when GITHUB_OAUTH_TOKEN is set (frontend/src/app/github-stars/route.ts:13-19). Every Gateway response carries a local X-Trace-Id correlation header (README.md:795-798). Required network/accounts: an endpoint and credential for at least one LLM provider (README.md:258-263; .env.example); DeerFlow itself needs no vendor account. Gateway users are DeerFlow-local: the first admin is created through the public /api/v1/auth/initialize route (backend/app/gateway/auth_middleware.py:53-54; README.md:1886-1888) and auth can be bypassed with DEER_FLOW_AUTH_DISABLED=1 (backend/app/gateway/auth_disabled.py:11,30-45). Default tools call third parties: web_search = DuckDuckGo via ddgs (no key) and web_fetch = hosted Jina Reader at https://r.jina.ai/ (config.example.yaml:801-806,1058-1062; backend/packages/harness/deerflow/community/jina_ai/jina_client.py:30), so fetched URLs go to Jina; other providers (Tavily, Exa, Brave, Serper, Firecrawl, InfoQuest/BytePlus, ...) need their own keys (config.example.yaml:748-1130; README.md:36-42). Sandboxes: the default AIO image is pulled from enterprise-public-cn-beijing.cr.volces.com (backend/packages/harness/deerflow/community/aio_sandbox/aio_sandbox_provider.py:69), the network-policy sidecar from ghcr.io/bytedance/deer-flow-sandbox-network-proxy:latest (backend/packages/harness/deerflow/config/sandbox_config.py:33-37), E2B needs an E2B_API_KEY and cloud VMs (backend/packages/harness/deerflow/community/e2b_sandbox/e2b_sandbox_provider.py:374-376; .env.example:49-51), and the Codex provider posts to https://chatgpt.com/backend-api/codex/responses (backend/packages/harness/deerflow/models/openai_codex_provider.py:29,271). Build/install-time fetches: PyPI/npm registries, the nodesource apt key and @larksuite/cli in backend/Dockerfile:36-45; the Lark skill pack is downloaded from GitHub at install time (README.md:1018-1021). Ports: non-Docker launchers bind the Gateway on 0.0.0.0:8001 and nginx on all interfaces :2026 (scripts/serve.sh:498; docker/nginx/nginx.local.conf:55-56; backend/app/gateway/config.py:9-10), whereas the Docker stack publishes only nginx on ${BIND_HOST:-127.0.0.1}:2026 (docker/docker-compose.yaml:53-54) and bundles a Redis container (docker-compose.yaml:29-42)."
+    },
+    "code": {
+      "languages": [
+        "Python (>=3.12; backend, harness, scripts)",
+        "TypeScript/TSX (Next.js 16 + React 19 frontend)",
+        "Shell/Bash (scripts/, docker entrypoints)",
+        "YAML/Helm and Dockerfiles (deploy/, docker/, .github/)",
+        "Markdown skills with helper scripts (skills/public)"
+      ],
+      "entry_points": [
+        {
+          "path": "backend/app/gateway/app.py",
+          "what": "FastAPI Gateway ASGI app (uvicorn app.gateway.app:app, port 8001): REST plus LangGraph-compatible threads/runs/SSE API with the agent runtime embedded in the same process; started by backend/Makefile:10,20, scripts/serve.sh:498 and the Dockerfile CMD."
+        },
+        {
+          "path": "backend/packages/harness/deerflow/tui/cli.py",
+          "what": "`deerflow` console script (harness pyproject [project.scripts]): TUI, --print, --json, --continue, --resume, --recursion-limit, and `deerflow extensions ...`."
+        },
+        {
+          "path": "backend/packages/harness/deerflow/client.py",
+          "what": "DeerFlowClient embedded Python client: chat()/stream(), threads, goals, skills, MCP config, uploads, memory."
+        },
+        {
+          "path": "backend/packages/harness/deerflow/agents/factory.py",
+          "what": "create_deerflow_agent(model: BaseChatModel, tools, features, checkpointer, subagent_runtime) config-free SDK factory; make_lead_agent (agents/__init__.py) is the graph registered in backend/langgraph.json for langgraph dev/Studio."
+        },
+        {
+          "path": "Makefile",
+          "what": "Root orchestration (setup, doctor, check, install, dev, start, up, down, docker-*), delegating to scripts/serve.sh, scripts/deploy.sh and scripts/docker.sh."
+        },
+        {
+          "path": "docker/provisioner/app.py",
+          "what": "Optional sandbox provisioner service (port 8002) that creates one Kubernetes Pod plus Service per sandbox_id for AioSandboxProvider provisioner mode."
+        },
+        {
+          "path": "frontend/package.json",
+          "what": "Next.js workspace UI (pnpm 10.26.2; dev/build/start scripts, rstest unit tests, Playwright e2e); served behind nginx on :2026."
+        },
+        {
+          "path": "deploy/helm/deer-flow/Chart.yaml",
+          "what": "Helm chart (gateway, frontend, nginx, provisioner, optional Postgres/Redis) published to GHCR as an OCI artifact on v* tags."
+        }
+      ],
+      "architecture": "Monorepo. Backend (Python 3.12, uv workspace): backend/packages/harness/deerflow (publishable deerflow-harness, import deerflow.*, 565 .py files) holds the agent framework: agents/lead_agent (agent.py factory; prompt.py system prompt including the citation rules), agents/middlewares (49 modules: sandbox/thread-data, summarization, loop detection, token budget, skill tool-policy, tool receipts, ...), agents/memory/backends (deermem default, mem0, honcho, openviking, noop), subagents (executor, registry, built-in general-purpose and bash agents, durable batch runtime, capacity), sandbox (Sandbox interface, LocalSandboxProvider, bash/ls/read_file/write_file/str_replace/glob/grep tools in sandbox/tools.py), community (sandbox providers aio_sandbox, e2b_sandbox, boxlite, tenki, opensandbox; search/fetch/browser/RAG tool providers), models (factory.py, patched providers, CLI-token providers), mcp, skills, tools/builtins (task, invoke_acp_agent, present_files, ask_clarification), runtime (runs/manager.py RunManager with leases and orphan recovery, runs/worker.py, checkpointer, event stores, stream bridge, goal), persistence (SQLAlchemy + Alembic), config (pydantic sections for config.yaml), tracing, tui, client.py. backend/app (import app.*, 119 .py files) is the FastAPI Gateway (gateway/app.py, routers/, auth with local users/JWT/PAT/OIDC, CSRF, authz) and IM channels (channels/: Feishu, Slack, Telegram, Discord, DingTalk, WeChat, WeCom, Buzz, GitHub). backend/packages/extension-api is the dependency-free public extension contract. Runtime topology: nginx :2026 -> Gateway :8001 (LangGraph agent graph, sub-agent thread pools and run state live in the Gateway process; tool calls go to the configured sandbox) plus Next.js frontend :3000 (492 TS/TSX files), optional provisioner :8002 (Kubernetes sandbox pods) and Redis in the Docker stack. Skills are Markdown packages under skills/public (23) with optional scripts, loaded progressively; configuration lives in config.yaml and extensions_config.json.",
+      "packaging_and_release": "Tag-driven (v*) releases (RELEASING.md:3-8): .github/workflows/verify-versions.yml gates on backend/pyproject.toml, frontend/package.json and Chart.yaml matching the tag (scripts/verify_versions.sh). container.yaml builds and pushes ghcr.io/<owner>/deer-flow-{backend,frontend,provisioner} (tags: git tag, branch, sha, latest on the default branch; backend built with UV_EXTRAS=postgres, container.yaml:40-44,58-59) and adds GitHub build-provenance attestations via actions/attest-build-provenance (container.yaml:61-66,109-114,157-162); release images are amd64-only (nightly.yaml:10). chart.yaml lints/renders and then helm-pushes the chart to oci://ghcr.io/<owner>/charts with no attestation or signature step (chart.yaml:76-100). nightly.yaml publishes :nightly images and a nightly chart daily at 16:00 UTC (nightly.yaml:26-29). lark-cli-images.yaml and sandbox-network-proxy-image.yaml publish multi-arch (amd64+arm64) sandbox helper images with attestations; the proxy image is pushed as :latest and :sha-<sha> on every main push touching it (sandbox-network-proxy-image.yaml:62-78). No cosign, SBOM, checksum or GPG steps and no GitHub-Release, PyPI or npm publishing workflow exist under .github (grep); RELEASING.md:189-193 only suggests drafting a GitHub Release by hand. Publishing workflows pin actions by commit SHA (container.yaml:28-47). CHANGELOG dates: 2.1.0 on 2026-09-24, 2.0.0 on 2026-06-15 (CHANGELOG.md:8,3080).",
+      "tests_and_ci": "Backend: pytest (+pytest-asyncio, hypothesis, blockbuster for blocking-IO gates, pytest-split) with 738 test_*.py files under backend/tests (690 top-level, 47 in tests/blocking_io, 1 in tests/monocle); `make test` excludes live and blocking_io tests; `make test-live` (real DeerFlowClient/LLM calls, API cost) is manual (backend/Makefile:22-29,42-45; README.md:1903-1908). Frontend: rstest unit tests (202 *.test.ts(x) files under frontend/tests/unit) and Playwright e2e (52 *.spec.ts under frontend/tests/e2e*); root tests/skills has 4 test files. 16 workflow files in .github/workflows, all on ubuntu-latest only (no macOS/Windows matrix) and using no secret other than GITHUB_TOKEN (so no live-LLM job): backend-unit-tests.yml (4-way duration-sharded pytest with Postgres 17 and Redis 7 services plus a default-install collection job), backend-blocking-io-tests.yml, frontend-unit-tests.yml, e2e-tests.yml (Playwright against a mocked API), replay-e2e.yml (record/replay backend golden SSE test plus full-stack render, no API keys), lint-check.yml (ruff, uv.lock check, eslint/prettier/tsc, next build, AGENTS.md guidance check), sandbox-image-smoke.yml (live real-image Docker sandbox hardening smoke on PRs touching aio_sandbox), skill-review-ci.yml, chart.yaml (helm lint/template on PRs), triage.yml and label-sync.yml (labels), plus publishing/gating workflows (container, chart, nightly, lark-cli-images, sandbox-network-proxy-image, verify-versions).",
+      "dependencies": "backend/pyproject.toml (app + Gateway): 19 direct runtime deps (deerflow-harness, deerflow-extension-api, fastapi, httpx, starlette<2, uvicorn[standard], lark-oapi, slack-sdk, python-telegram-bot, e2b-code-interpreter, bcrypt, pyjwt, ...), 8 optional extras (postgres, redis, discord, buzz, monocle, ollama, browser, memory-zh), 11 dev-group deps. backend/packages/harness/pyproject.toml (deerflow-harness 2.1.0): 41 direct runtime deps (langchain>=1.3, langgraph>=1.2.9,<1.3, langgraph-api, langgraph-cli, langgraph-runtime-inmem, langchain-openai/anthropic/google-genai/deepseek, langchain-mcp-adapters, agent-client-protocol, agent-sandbox, kubernetes, e2b-code-interpreter, sqlalchemy+alembic+aiosqlite, duckdb, markitdown[all,xlsx], tavily/firecrawl/exa/ddgs, cryptography, ...) and 12 optional extras (tui, groundroute, ollama, postgres, redis, pymupdf, boxlite, tenki, opensandbox, monocle, browser, memory-zh). backend/packages/extension-api/pyproject.toml: 0 deps. examples/deerflow-extension-example/pyproject.toml: 4 deps (+3 dev). frontend/package.json: 81 dependencies + 22 devDependencies (next ^16.3.3, react ^19, @langchain/langgraph-sdk, ...; pnpm 10.26.2). Lockfiles: backend/uv.lock (250 locked packages; uv 0.11.1 pinned in CI and Docker) and frontend/pnpm-lock.yaml. Python >=3.12 (backend/.python-version), Node 22 (frontend/Dockerfile:10).",
+      "security_policy": "SECURITY.md (root): says there is no official release yet, only the latest version gets security updates (2.x on main, 1.x on main-1.x), and directs reporters to https://github.com/bytedance/deer-flow/security; no contact email, response SLA or disclosure timeline (SECURITY.md:1-13). Threat-model guidance lives in README.md:1860-1897 and backend/docs/CONFIGURATION.md:1127-1205 instead."
+    },
+    "claim_checks": [
+      {
+        "claim": "AioSandboxProvider runs shell in isolated containers; LocalSandboxProvider host bash is disabled by default (README.md:1477)",
+        "verified": "yes",
+        "evidence": "allow_host_bash defaults False (backend/packages/harness/deerflow/config/sandbox_config.py:178-181); the bash tool is filtered out unless allowed (deerflow/tools/tools.py:109-111; deerflow/sandbox/security.py:35-45). Docker AIO containers get --cap-drop=ALL plus 5 compat caps, no-new-privileges and 2g / 2 CPU / 512 PID limits (deerflow/community/aio_sandbox/local_backend.py:1700-1758, 231-233). Caveats from code/docs: seccomp=unconfined by default (local_backend.py:1743-1744), default egress open (sandbox_config.py:15-18), unauthenticated sandbox HTTP API (backend/docs/CONFIGURATION.md:904), and the make setup wizard defaults to the Local provider (scripts/wizard/steps/execution.py:26-30)."
+      },
+      {
+        "claim": "sandbox.network.mode isolated/allowlist restricts Docker AIO egress (README.md:1479-1488)",
+        "verified": "yes",
+        "evidence": "Default mode is 'open' (sandbox_config.py:15-18); restricted modes create a per-sandbox --internal bridge plus a proxy sidecar (aio_sandbox/local_backend.py:1050-1111; aio_sandbox/network_proxy.py), require Docker Engine 28+ and fail closed otherwise (local_backend.py:790-803); unavailable for provisioner mode and Apple Container (backend/docs/CONFIGURATION.md:878-880,922); proxy_image defaults to the mutable ghcr.io/bytedance/deer-flow-sandbox-network-proxy:latest (sandbox_config.py:33-37)."
+      },
+      {
+        "claim": "Deployment is loopback-only by default, 127.0.0.1 (README.md:1864, 1881-1884)",
+        "verified": "partial",
+        "evidence": "True for the Docker stack: nginx is published on ${BIND_HOST:-127.0.0.1}:${PORT:-2026} (docker/docker-compose.yaml:53-54). Not true for the non-Docker launchers: scripts/serve.sh:498 starts the Gateway with --host 0.0.0.0 (also backend/app/gateway/config.py:9 and backend/Makefile:10,20) and docker/nginx/nginx.local.conf:55-56 listens on 2026 and [::]:2026 without an address. AGENTS.md:40-48 describes those binds as container-internal."
+      },
+      {
+        "claim": "ACP agents (Codex/Claude Code adapters, mcode) run through invoke_acp_agent in a per-thread workspace, with permission requests denied unless auto_approve_permissions (README.md:234-251)",
+        "verified": "yes",
+        "evidence": "Config default auto_approve_permissions=False and timeout 1800 s (deerflow/config/acp_config.py:19-37); permission requests are cancelled unless auto-approve (deerflow/tools/builtins/invoke_acp_agent_tool.py:98-125). Beyond the README: every call spawns a fresh host subprocess via spawn_agent_process with cwd set to the per-thread acp-workspace and a new ACP session (invoke_acp_agent_tool.py:21-51,232-245), so it runs on the Gateway host/container, not inside the AIO sandbox, keeps no session across calls, and returns only concatenated agent_message_chunk text (:187-204,265-268). The tool exists only when acp_agents is configured (deerflow/tools/tools.py:188-201)."
+      },
+      {
+        "claim": "database.backend sqlite/postgres backs checkpointer/Store/app data and lease reconciliation marks dead-worker runs as errors (README.md:345-348, 361)",
+        "verified": "yes",
+        "evidence": "config.yaml loads default to backend sqlite at .deer-flow/data (deerflow/config/app_config.py:64-67,508-517) although the bare DatabaseConfig default is memory (config/database_config.py:143-146); get_checkpointer falls back to InMemorySaver when nothing persistent is selected (deerflow/runtime/checkpointer/provider.py:196-201). run_events.backend defaults to memory (config/run_events_config.py:22-25). Orphaned in-flight runs are recovered as errors ('Gateway restarted before this run reached a durable final state.' / 'Run lease expired') (deerflow/runtime/runs/manager.py:39-41,1861-1945); docs/task-continuity.md:99-103 states a stopped run is not resumed automatically, so resumption means a new run on the same thread_id/checkpoint."
+      },
+      {
+        "claim": "Model-agnostic: works with any OpenAI-compatible LLM; CLI-backed providers reuse Codex/Claude Code logins (README.md:1632, 213-233)",
+        "verified": "partial",
+        "evidence": "Models are arbitrary LangChain classes resolved by class path (deerflow/models/factory.py:208; config/model_config.py:21-26 extra=allow) with a free-string model id; the wizard ships OpenAI, OpenAI Responses, Anthropic, Gemini, DeepSeek, Ollama and others (scripts/wizard/providers.py:219-300). CodexChatModel POSTs to https://chatgpt.com/backend-api/codex/responses with ~/.codex/auth.json tokens and an 'originator: codex_cli_rs' header (models/openai_codex_provider.py:29,238-244,271); ClaudeChatModel reuses Claude Code OAuth tokens plus a hardcoded Claude Code billing header (models/claude_provider.py:37-41,98-111). The repo contains no reference to GPT-6.x or 'Sol' (grep), wizard model lists are GPT-5/Claude-4.x-era (providers.py:224,258), and no OpenAI Agents SDK, Codex SDK or Claude Agent SDK is used (grep), so compatibility with a newer model or endpoint is not evidenced."
+      },
+      {
+        "claim": "Built-in skills cover research and DeerFlow produces cited research (README.md:964; skill tree README.md:1246-1253)",
+        "verified": "partial",
+        "evidence": "Research skills exist (skills/public/deep-research, github-deep-research, systematic-literature-review with an arXiv API script, academic-paper-review, consulting-analysis) but they are Markdown methodologies, not a code pipeline. The [citation:Title](URL) plus Sources convention is a system-prompt instruction (deerflow/agents/lead_agent/prompt.py:686-747); deep-research/SKILL.md has no citation rule; the UI only regex-extracts those links (frontend/src/core/citations/sources.ts:15-25); tool-receipt verification covers executed tool calls only: 'execution evidence only, does not validate claim correctness' (deerflow/agents/middlewares/receipt_verification.py:16,56). Nothing in code checks that a cited URL was fetched or supports the claim. The README example skill tree (research/, report-generation/, slide-creation/, web-page/) does not match skills/public (deep-research, ppt-generation, ...)."
+      },
+      {
+        "claim": "DeerFlowClient gives in-process access with Gateway-identical schemas; multi-turn needs a checkpointer (README.md:1643, 1686)",
+        "verified": "yes",
+        "evidence": "deerflow/client.py:145-248 (sync chat()/stream() generators, threads, goals, skills, MCP, uploads); schema parity is tested by TestGatewayConformance (backend/tests/test_client.py:3540). Doc drift: the class docstring says calls are stateless without a checkpointer (client.py:151-154) but the code falls back to the configured checkpointer (client.py:471-477), i.e. sqlite for config.yaml deployments. subagent_enabled defaults to False (client.py:186). create_deerflow_agent(model: BaseChatModel, ...) is the config-free alternative (deerflow/agents/factory.py:66-81)."
+      },
+      {
+        "claim": "claude-to-deerflow lets Claude Code drive a running DeerFlow (README.md:1276-1303)",
+        "verified": "yes",
+        "evidence": "skills/public/claude-to-deerflow/SKILL.md:8-89 documents curl calls to /api/langgraph/threads and /threads/{id}/runs/stream with recursion_limit 1000 and flash/standard/pro/ultra modes; chat.sh and status.sh ship alongside. The direction is Claude Code -> DeerFlow over HTTP only; it does not make DeerFlow a Claude Code worker."
+      },
+      {
+        "claim": "`uv pip install 'deerflow-harness[tui]'` installs the harness/TUI (README.md:1838; backend/docs/TUI.md:15)",
+        "verified": "not_checkable",
+        "evidence": "backend/packages/harness/pyproject.toml defines the package, the tui extra and the deerflow script (lines 61-67, 103-108), but no workflow in .github/workflows builds or publishes to PyPI (grep for pypi/twine/uv publish returned nothing) and the package index cannot be queried from this checkout."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Sub-agent context hand-off: complete isolated handoff vs opt-in parent-context snapshot; 8 synthetic JSON/Python tasks, 51 checks, one model (qwen3.8-flash-next), single historical run 2026-09-12; project-authored, committed as a metadata-only export not generated by the packaged runner",
+        "metric": "mean parent+worker tokens; mean seconds; correct artifacts; normal completions; provider requests (isolated vs snapshot)",
+        "value": "13,196.1 vs 11,151.8 tokens (-15.5%); 33.73 s vs 20.14 s (-40.3%); correct artifacts 8/8 vs 8/8; normal completions 7/8 vs 7/8; requests 48 vs 42. The README itself says this is not evidence of general quality or production readiness.",
+        "source": "backend/scripts/benchmark/context_snapshot/README.md:82-97; backend/scripts/benchmark/context_snapshot/results/2026-09-12.summary.json:1-24",
+        "independent": false
+      },
+      {
+        "what": "DeerMem capacity-eviction policy (confidence-only vs hybrid-v1) at capacity 7: answers by deepseek-v4-flash over 40 LongMemEval-derived cases plus 5 synthetic correction cases; live run at revision 01f99d61 (2026-08-18)",
+        "metric": "QA accuracy (exact McNemar p) and offline support retention (confidence vs hybrid-v1)",
+        "value": "official 23/40 vs 35/40 (p=0.0018); synthetic 1/5 vs 5/5 (p=0.125); overall 24/45 vs 40/45 (p=0.0001); offline support retention 27/45 vs 45/45; confidence_control scenario 8/10 vs 7/10 (hybrid-v1 lower)",
+        "source": "backend/scripts/benchmark/deermem_eviction/README.md:109-113,154-170; backend/scripts/benchmark/deermem_eviction/results/pr4789-reproduction-v1/qa.summary.json",
+        "independent": false
+      },
+      {
+        "what": "Task-continuity replay prototype after forced context compaction (arms A-D; A = default summarization baseline, C vs D = keyword vs dense retrieval over the same compacted history); described as a historical prototype, not the shipped implementation, and explicitly not a measure of general coding-agent reliability",
+        "metric": "correct answers per arm on selected cases",
+        "value": "public history QA (42 selected, 2 operational failures): A 9, B 11, C 36, D 34; controlled tasks (24): A 17, B 18, C 23, D 22; known-goal variants (12): A 11, B 12, C 11, D 9",
+        "source": "docs/experiments/task-continuity-20260912/results/summary.json; docs/experiments/task-continuity-20260912/README.md:1-3,55-63; docs/task-continuity.md:105-112",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Model/SDK fit is not evidenced: the repo never mentions GPT-6.x or 'Sol'; OpenAI/Anthropic are reached through LangChain classes (langchain-openai>=1.2.1, langchain-anthropic>=1.4.1; backend/packages/harness/pyproject.toml:24,28) or custom CLI-token providers, not the OpenAI Agents SDK, a Codex SDK or the Claude Agent SDK (grep); wizard model lists are GPT-5/Claude-4.x-era (scripts/wizard/providers.py:224,258) and the README recommends Doubao/DeepSeek/Kimi (README.md:32). The only published measurements cover memory, hand-off and compaction; none measures coding or research quality, and docs/experiments/task-continuity-20260912/README.md:61 disclaims general coding-agent reliability.",
+      "Vendor-CLI credential reuse depends on undocumented vendor behavior: CodexChatModel calls the chatgpt.com/backend-api/codex endpoint with Codex CLI OAuth tokens and 'originator: codex_cli_rs' (deerflow/models/openai_codex_provider.py:29,243,271); ClaudeChatModel presents Claude Code OAuth tokens with oauth/claude-code beta flags and a hardcoded Claude Code billing header (cc_version=2.1.85.351; cc_entrypoint=cli) that needs an env override if it drifts (models/claude_provider.py:37-41; models/credential_loader.py:27). Compose used to bind-mount whole ~/.claude and ~/.codex and now needs opt-in overlays (backend/docs/CONFIGURATION.md:1163-1194).",
+      "Isolation is opt-in and wraps a non-isolated agent loop: the agent loop, sub-agent thread pools and run state live in the Gateway process (README.md:361; backend/README.md:94) and only tool calls reach the sandbox. make setup defaults to LocalSandboxProvider (scripts/wizard/steps/execution.py:26-30), which README.md:1477 calls not a secure isolation boundary. AIO containers ship seccomp=unconfined, open egress and an unauthenticated sandbox HTTP API by default (aio_sandbox/local_backend.py:1743-1744; config/sandbox_config.py:15-18; backend/docs/CONFIGURATION.md:904), and the default image is the mutable :latest tag from a Volcengine registry that config.example.yaml:1481-1489 says is frozen on an old pre-1.9.3 digest; its Dockerfile is not in the repo (CONFIGURATION.md:964). The Kubernetes provisioner disables TLS verification when K8S_API_SERVER is set (docker/provisioner/app.py:384-390; docker/docker-compose.yaml:191).",
+      "Host exposure: make up / docker-start in AIO mode append the overlay that mounts the host /var/run/docker.sock into the Gateway container, which the project calls root-equivalent host control (scripts/deploy.sh:373-394; docker/docker-compose.dood.yaml:9-13; backend/docs/CONFIGURATION.md:1141-1148). Non-Docker launchers bind the Gateway on 0.0.0.0:8001 and nginx on all interfaces (scripts/serve.sh:498; docker/nginx/nginx.local.conf:55-56). Gateway admin equals host code execution via stdio MCP (README.md:1869-1877); auth can be disabled with DEER_FLOW_AUTH_DISABLED=1 (backend/app/gateway/auth_disabled.py:11,30-45); the first admin is created through a public /api/v1/auth/initialize route (backend/app/gateway/auth_middleware.py:53-54; README.md:1886-1888). Guardrails, authorization and the lead-agent token budget are off by default (config/guardrails_config.py:21; config/authorization_config.py:29; config/token_budget_config.py:9).",
+      "Resume/durability gaps: orphaned runs are failed, not resumed (deerflow/runtime/runs/manager.py:39-41,1944; docs/task-continuity.md:99-103); run_events default to in-memory (config/run_events_config.py:22-25); production defaults to one Gateway worker because run tasks are owned in-process and multi-worker needs Postgres+Redis+heartbeats (README.md:361; docker/docker-compose.yaml:107); browser tools require GATEWAY_WORKERS=1 (README.md:1525); headless `deerflow --print/--json` returns exit code 0 whenever the call returns, without mapping agent errors (deerflow/tui/cli.py:262-285); ACP-delegated workers are stateless per call (tools/builtins/invoke_acp_agent_tool.py:232-268). No built-in repo checkout/worktree feature was found: code tasks rely on uploads, global sandbox.mounts, or the agent running git itself (backend/app/gateway/github/prompts.py:161-166; config.example.yaml:1442-1451).",
+      "Research evidence is prompt-level: citations ([citation:Title](URL)) are requested by the system prompt (deerflow/agents/lead_agent/prompt.py:686-747) but no code verifies that sources were fetched or support the claims; receipt verification is advisory and only for executed tool calls (agents/middlewares/receipt_verification.py:16,56). Defaults send queries to DuckDuckGo and page URLs to the hosted Jina Reader (config.example.yaml:801-806,1058-1062; community/jina_ai/jina_client.py:30). The v1 research graph is not part of 2.x (README.md:17); skills that run scripts (github_api.py, arxiv_search.py) need an executing sandbox, and bash is hidden under the default Local provider (tools/tools.py:109-111; skills/public/github-deep-research/SKILL.md:39-45).",
+      "Maintenance churn and large surface: v2.1.0 (2026-09-24) closed 772 PRs and lists breaking changes to gateway headers, skills layout, E2B capacity semantics and the memory API/config shape (CHANGELOG.md:8-70); config_version is 45 (config.example.yaml:23); DB schemas move by forward Alembic revisions with an offline recovery procedure for mismatched stamps (README.md:1701-1704; docs/database-forward-revision-recovery.md) and the memory v1->v2 migration is one-way (README.md:1626). SECURITY.md supports only the latest version and says there is no official release yet (SECURITY.md:5-8). The codebase is 565 harness plus 119 app Python files and 492 frontend TS(X) files for a runtime that also bundles UI, auth, IM channels and scheduling.",
+      "Release and supply-chain evidence is thin and docs drift: images are amd64-only (.github/workflows/nightly.yaml:10); build-provenance attestations exist for images (container.yaml:61-66) but not the Helm chart (chart.yaml:76-100); no signatures, SBOM, checksums, GitHub-Release, PyPI or npm publishing workflow exist, although README.md:1838 tells users to `uv pip install 'deerflow-harness[tui]'`. Builds fetch the nodesource apt key and @larksuite/cli (backend/Dockerfile:36-45) and the network-proxy image is published as mutable :latest on each main push (sandbox-network-proxy-image.yaml:62-72). Docs drift: SECURITY.md is cited for DooD/CLI-credential guidance it does not contain (scripts/deploy.sh:368,393; .env.example:110), backend/README.md:93 says a 15-minute sub-agent timeout whereas built-ins default to 1800 s (config/subagents_config.py:142-146), and README.md:1246-1253 lists skills that do not exist."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "bytedance/deer-flow",
+      "checks": [
+        {
+          "field": "readme.install[2] (Docker production, Linux recommended: `make up`)",
+          "statement": "Docker production install via `make up` (builds images and starts all production services), Linux recommended.",
+          "citation": "README.md:330-337; README.md:280; Makefile:214-215; scripts/deploy.sh:6,127-147,421-425",
+          "holds": true,
+          "note": "README.md:330-337 shows `make up  # Build images and start all production services`, `make down` and access at http://localhost:2026. Makefile:214-215 maps `up` to scripts/deploy.sh. The script's default path is build + start: `docker compose ... up --build -d --remove-orphans --wait --wait-timeout 180` (deploy.sh:421-425). It checks for config.yaml first (deploy.sh:127-147). README.md:280 backs the 'Linux recommended' label."
+        },
+        {
+          "field": "license",
+          "statement": "License is MIT (SPDX MIT), declared in the root LICENSE file.",
+          "citation": "LICENSE:1-22",
+          "holds": true,
+          "note": "LICENSE:1 reads 'MIT License', with copyright lines for Bytedance Ltd. (2025) and DeerFlow Authors (2025-2026) and the standard MIT grant. No license field in any pyproject.toml, package.json or Chart.yaml contradicts it. Caveat: skills/public/frontend-design/LICENSE.txt and skills/public/skill-creator/LICENSE.txt are Apache-2.0, so these two bundled skills have their own license. That does not contradict the project-level claim."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - Linux plus Docker is the recommended persistent-server target; CI and release builds run on ubuntu-latest; backend/frontend/provisioner images are amd64-only.",
+          "citation": "README.md:280; .github/workflows/backend-unit-tests.yml:50; .github/workflows/nightly.yaml:10; .github/workflows/container.yaml:17,70,118",
+          "holds": true,
+          "note": "README.md:280 matches verbatim. backend-unit-tests.yml:50 is `runs-on: ubuntu-latest`. The release jobs in container.yaml (lines 17, 70, 118) also run on ubuntu-latest, which the cited CI line alone does not show. nightly.yaml:10 says 'Images are amd64-only to match the release builds.' container.yaml's build-push-action steps set no `platforms:` and there is no QEMU/buildx setup step, so the images are native amd64 only."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Claude Code -> DeerFlow via the claude-to-deerflow skill (curl against /api/langgraph/threads and /runs/stream; installed with npx skills add); DeerFlow -> Claude/Codex via CLI-login model providers (ClaudeChatModel, CodexChatModel) and invoke_acp_agent spawning ACP adapters (claude-agent-acp, codex-acp, mcode) as host subprocesses; no Claude Agent SDK, OpenAI Agents SDK or Codex SDK used.",
+          "citation": "skills/public/claude-to-deerflow/SKILL.md:8-89; README.md:1276-1303; README.md:213-233; config.example.yaml:1815-1850; backend/packages/harness/deerflow/tools/builtins/invoke_acp_agent_tool.py:232-245",
+          "holds": true,
+          "note": "In SKILL.md, line 8 says 'running DeerFlow instance via its HTTP API', line 28 sets the default base `${DEERFLOW_URL}/api/langgraph`, line 56 POSTs .../threads and line 66 POSTs .../threads/<id>/runs/stream. README.md:1283 has the npx command; README.md:232-233 list ~/.codex/auth.json and CLAUDE_CODE_OAUTH_TOKEN / ~/.claude/.credentials.json. config.example.yaml has the adapters at 1823 (mcode), 1833 (@zed-industries/claude-agent-acp) and 1845 (@zed-industries/codex-acp). invoke_acp_agent_tool.py:233-245 calls spawn_agent_process(client, cmd, *args, env, cwd=<per-thread workspace>) and then new_session. A repo-wide grep for claude-agent-sdk, claude_code_sdk, openai-agents, 'from agents import' and codex-sdk found nothing. Wording nuance: the subprocesses are children of the Gateway process, so in the Docker stack they run inside the Gateway container (README.md:251), not on the Docker host."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "AioSandboxProvider runs shell in isolated containers; LocalSandboxProvider host bash is disabled by default (verified: yes, with hardening details and caveats).",
+          "citation": "README.md:1477; backend/packages/harness/deerflow/config/sandbox_config.py:15-18,178-181; backend/packages/harness/deerflow/tools/tools.py:109-111; backend/packages/harness/deerflow/sandbox/security.py:35-45; backend/packages/harness/deerflow/community/aio_sandbox/local_backend.py:231-233,1700-1758; backend/docs/CONFIGURATION.md:904; scripts/wizard/steps/execution.py:26-30",
+          "holds": true,
+          "note": "README.md:1477 matches. allow_host_bash defaults to False (sandbox_config.py:178-181). tools.py:109-111 drops host bash unless is_host_bash_allowed(), which returns allow_host_bash only for the Local provider (security.py:35-45). For the Docker runtime only (guard at local_backend.py:1685), lines 1714-1724 add --cap-drop=ALL plus CHOWN/FOWNER/SETUID/SETGID/DAC_OVERRIDE and no-new-privileges. Defaults of 2g / 2 CPUs / 512 PIDs (lines 231-233) are applied at 1753-1758. All caveats are confirmed: seccomp=unconfined by default (1743-1744); network mode defaults to 'open' (sandbox_config.py:15-18); CONFIGURATION.md:904 says the sandbox HTTP API 'has no authentication'; the wizard's execution-mode choice defaults to index 0, LocalSandboxProvider (execution.py:25-30)."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

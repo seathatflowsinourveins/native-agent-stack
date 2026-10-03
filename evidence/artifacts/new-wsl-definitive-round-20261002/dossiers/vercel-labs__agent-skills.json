@@ -1,0 +1,289 @@
+{
+  "contender": "vercel-labs/agent-skills",
+  "revision": {
+    "contender": "vercel-labs/agent-skills",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "vercel-labs/agent-skills",
+        "tag": "agent-skills-063bee94c3f4df8453406c830b0a7df0f2860278",
+        "commit": "063bee94c3f4df8453406c830b0a7df0f2860278",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "agent-skills-063bee94c3f4df8453406c830b0a7df0f2860278",
+    "commit": "063bee94c3f4df8453406c830b0a7df0f2860278",
+    "read_at": "2026-10-02T03:02:58+00:00"
+  },
+  "dossier": {
+    "contender": "vercel-labs/agent-skills",
+    "revision": {
+      "tag": "agent-skills-063bee94c3f4df8453406c830b0a7df0f2860278",
+      "commit": "063bee94c3f4df8453406c830b0a7df0f2860278",
+      "read_at": "2026-10-02T03:02:58+00:00"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": null
+    },
+    "purpose": "Vercel Labs' monorepo of nine Agent Skills (SKILL.md folders in the agentskills.io format) for AI coding agents, aimed at Vercel projects (AGENTS.md:7). Frontmatter names: vercel-optimize (script-driven Vercel cost/performance audit; needs the Vercel CLI, an authenticated linked project and Observability Plus); vercel-react-best-practices (70 rules); vercel-react-native-skills (36 rules); vercel-composition-patterns (8 rules); vercel-react-view-transitions; web-design-guidelines and writing-guidelines (39-line stubs that fetch their rules from other repos at run time); deploy-to-vercel and vercel-cli-with-tokens (Vercel deployment/CLI procedures). MIT is declared in README text, four SKILL.md frontmatters and two package.json files; no LICENSE file is committed.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "A collection of skills for AI coding agents; skills are packaged instructions and scripts that extend agent capabilities, following the Agent Skills (agentskills.io) format.",
+          "citation": "README.md:3-5"
+        },
+        {
+          "claim": "vercel-optimize audits a Vercel project for cost, performance, reliability, caching, function usage and billing; it collects Vercel metrics first, then investigates only the routes and files those metrics point to.",
+          "citation": "README.md:11-13"
+        },
+        {
+          "claim": "react-best-practices: React/Next.js performance guidelines from Vercel Engineering; 'Contains 40+ rules across 8 categories, prioritized by impact'.",
+          "citation": "README.md:25"
+        },
+        {
+          "claim": "web-design-guidelines audits code against '100+ rules'; writing-guidelines audits docs against '80+ rules'.",
+          "citation": "README.md:46, README.md:72"
+        },
+        {
+          "claim": "react-native-guidelines: 'Contains 16 rules across 7 sections'.",
+          "citation": "README.md:99"
+        },
+        {
+          "claim": "react-view-transitions (View Transition API guidance) and composition-patterns (compound components, state lifting) skills are provided.",
+          "citation": "README.md:118-158"
+        },
+        {
+          "claim": "vercel-deploy-claimable deploys apps to Vercel instantly, designed for claude.ai and Claude Desktop, with 'claimable' deployments; auto-detects 40+ frameworks; excludes node_modules and .git from uploads.",
+          "citation": "README.md:160-176"
+        },
+        {
+          "claim": "Install with: npx skills add vercel-labs/agent-skills",
+          "citation": "README.md:194-198"
+        },
+        {
+          "claim": "'Skills are automatically available once installed. The agent will use them when relevant tasks are detected.'",
+          "citation": "README.md:200-202"
+        },
+        {
+          "claim": "'Every change to a skill on main publishes an immutable GitHub release with an Agent Skills discovery index and one artifact per skill'; the same artifacts can be built locally with npm ci --ignore-scripts and node scripts/build-discovery-index.mjs <base-url>.",
+          "citation": "README.md:218-227"
+        },
+        {
+          "claim": "Each skill contains SKILL.md (instructions for the agent), optional scripts/ and optional references/.",
+          "citation": "README.md:229-235"
+        },
+        {
+          "claim": "License: MIT.",
+          "citation": "README.md:237-239"
+        },
+        {
+          "claim": "vercel-optimize trust model: metrics first; gates are deterministic JavaScript thresholds with no LLM deciding; citations are allow-listed and stripped if unknown or version-mismatched; project-config contradictions are rejected; cost is framed as magnitudes, not exact savings.",
+          "citation": "skills/vercel-optimize/README.md:77-83"
+        },
+        {
+          "claim": "vercel-optimize requires Node.js 20+, the Vercel CLI with metrics/usage/contract/api (v53+ floor), an authenticated and linked project, and Observability Plus for metric-backed route ranking; strongest for Next.js and SvelteKit, limited for Astro; Hono, Remix and unknown frameworks pause up front.",
+          "citation": "skills/vercel-optimize/README.md:19-28"
+        }
+      ],
+      "install": [
+        {
+          "method": "skills.sh CLI, repository-wide (bare command; the README does not say whether this installs all nine skills or prompts for a selection)",
+          "command": "npx skills add vercel-labs/agent-skills",
+          "citation": "README.md:196-198"
+        },
+        {
+          "method": "skills.sh CLI, single skill (documented for vercel-optimize; the contributor guide gives the same form as a template for any skill)",
+          "command": "npx skills add vercel-labs/agent-skills --skill vercel-optimize",
+          "citation": "skills/vercel-optimize/README.md:13-15 (template: AGENTS.md:94-96)"
+        },
+        {
+          "method": "skills.sh CLI with full URL and the SKILL.md frontmatter name, which differs from the directory name react-view-transitions",
+          "command": "npx skills add https://github.com/vercel-labs/agent-skills --skill vercel-react-view-transitions",
+          "citation": "skills/react-view-transitions/README.md:34-36"
+        },
+        {
+          "method": "Manual copy for Claude Code (personal skills directory)",
+          "command": "cp -r skills/{skill-name} ~/.claude/skills/",
+          "citation": "AGENTS.md:100-103"
+        },
+        {
+          "method": "Manual project install of vercel-optimize into .agents/skills, then reference its SKILL.md from the project AGENTS.md (cross-agent entry point)",
+          "command": "mkdir -p .agents/skills\ncp -R <agent-skills-repo>/skills/vercel-optimize .agents/skills/",
+          "citation": "skills/vercel-optimize/AGENTS.md:35-48"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes (implicit) - CI jobs run on ubuntu-latest (.github/workflows/agent-skills-discovery.yml:19,33; .github/workflows/react-best-practices-ci.yml:17). The README gives no platform matrix. Skill code is Markdown + Node ESM + bash; the vercel-optimize test suite is not run in CI.",
+        "wsl2": "unknown - WSL is not mentioned anywhere in the repo. Node reports platform 'linux' under WSL2, which would take the POSIX branch at skills/vercel-optimize/lib/vercel.mjs:25.",
+        "macos_arm64": "unknown - no macOS statement or CI job. Indirect only: skill scripts are POSIX-portable Node/bash (skills/deploy-to-vercel/resources/deploy.sh uses mktemp, tar, find, curl), .gitignore lists .DS_Store (.gitignore:1), and the committed skills/deploy-to-vercel/Archive.zip carries __MACOSX entries.",
+        "gpu": "no - not used; no model inference or GPU code (only rule text about GPU-accelerated animation, e.g. skills/react-native-skills/rules/animation-gpu-properties.md)."
+      },
+      "integrations": {
+        "cli": "No end-user CLI ships in this repo. Install/management is via the external `skills` CLI (`npx skills add ...`, README.md:197), whose source is not in this repo. Skill helpers are plain Node/bash CLIs run by the agent: skills/vercel-optimize/scripts/*.mjs (15; e.g. collect-signals.mjs [projectId] [--continue-without-observability] [--continue-unsupported-framework] at scripts/collect-signals.mjs:31-56; gate-investigations.mjs [--max-candidates N|all] or VERCEL_OPTIMIZE_MAX_CANDIDATES at scripts/gate-investigations.mjs:95-120), skills/deploy-to-vercel/resources/deploy.sh and deploy-codex.sh, and scripts/build-discovery-index.mjs <base-url> (README.md:224-227). The skills drive the external `vercel` CLI (v53+ enforced for vercel-optimize at skills/vercel-optimize/lib/vercel.mjs:90-113).",
+        "mcp": "none found (no MCP server or client code; searches for MCP, JSON-RPC and server frameworks returned nothing).",
+        "sdk_or_api": "none found as a library or HTTP API (no package declares bin/main/exports). Published machine-readable artifact: release index.json per Agent Skills discovery schema 0.2.0 (scripts/build-discovery-index.mjs:13,149-152). Skills reach Vercel REST endpoints only through `vercel api` (skills/vercel-optimize/lib/vercel.mjs:297,419,521,634); deploy-to-vercel posts to two Vercel-hosted deploy endpoints (skills/deploy-to-vercel/resources/deploy.sh:9; deploy-codex.sh:9).",
+        "claude_code_or_codex": "Claude Code: manual copy to ~/.claude/skills/ (AGENTS.md:100-103); deploy-to-vercel has a 'Claude Code / terminal-based agents' section referencing ~/.claude/skills/deploy-to-vercel/resources/deploy.sh (skills/deploy-to-vercel/SKILL.md:229-237); root AGENTS.md addresses Claude Code/Cursor/Copilot contributors (AGENTS.md:3). Codex: deploy-to-vercel has a Codex sandbox section, a dedicated resources/deploy-codex.sh and sandbox_permissions=require_escalated guidance (skills/deploy-to-vercel/SKILL.md:191-223,243-245,284-292); vercel-optimize ships a 'cross-agent entry point' AGENTS.md with an .agents/skills manual install (skills/vercel-optimize/AGENTS.md:3,35-48), and its briefs are tested to avoid Claude-Code-specific tool names because they ship to Claude Code, Codex CLI, Cursor and Copilot (packages/vercel-optimize-tests/test/investigation-brief.test.mjs:482-499). No Codex-specific install path is documented, and the README lists no supported agents. How hosts load skills per task is host behavior, not defined here (AGENTS.md:73 only asserts that name and description load at startup and the full SKILL.md loads on demand)."
+      },
+      "telemetry_and_network": "Telemetry: none found - no analytics/telemetry code or docs in this repo (searches for telemetry, analytics and tracking SDKs matched only rule text about third-party analytics libraries). Network, by skill: (1) vercel-optimize makes no direct HTTP calls; all network goes through the `vercel` CLI (whoami, metrics, usage, contract, api) and needs an authenticated Vercel account, a linked project and Observability Plus, which vercel-cli-with-tokens/SKILL.md:295 lists as a paid add-on (skills/vercel-optimize/SKILL.md:20-28; lib/vercel.mjs:296-306,400-421,496-541). (2) deploy-to-vercel uses the Vercel CLI, or an anonymous POST of a project tarball (excluding node_modules, .git, .env, .env.*) to https://claude-skills-deploy.vercel.com/api/deploy (deploy.sh:9,201-206,239) or https://codex-deploy-skills.vercel.sh/api/deploy (deploy-codex.sh:9), then curl-polls the preview URL up to 60 times (deploy.sh:261-293); no account is needed for that path (SKILL.md:164). (3) web-design-guidelines and writing-guidelines WebFetch rules from the main branch of two other GitHub repos on every review (SKILL.md:23-29 in each). (4) vercel-cli-with-tokens uses VERCEL_TOKEN (SKILL.md:13-66) and `stripe projects` commands (SKILL.md:280-287). (5) CI/release use GitHub Actions. (6) The install CLI `npx skills` is external; its network or telemetry behavior is not documented or inspectable in this repo. (7) The rule-only skills (react-best-practices, react-native-skills, composition-patterns, react-view-transitions) need no network or account."
+    },
+    "code": {
+      "languages": [
+        "Markdown (the bulk: SKILL.md, rules/*.md, references/*.md)",
+        "JavaScript (ESM .mjs, Node: skill scripts, lib, tests, release script)",
+        "TypeScript (packages/react-best-practices-build/src; skills/vercel-optimize/lib/gates/types.d.ts)",
+        "Bash (skills/deploy-to-vercel/resources/*.sh)",
+        "JSON",
+        "YAML (GitHub workflows)"
+      ],
+      "entry_points": [
+        {
+          "path": "skills/*/SKILL.md",
+          "what": "Nine skill definitions (frontmatter name + description, then body); discovered by agents or the external skills CLI. SKILL.md files are 39-353 lines."
+        },
+        {
+          "path": "skills/vercel-optimize/SKILL.md",
+          "what": "Agent entry for the audit pipeline (v1.2.0, SKILL.md:5); cross-agent pointer in skills/vercel-optimize/AGENTS.md."
+        },
+        {
+          "path": "skills/vercel-optimize/scripts/collect-signals.mjs",
+          "what": "First pipeline CLI: Vercel CLI version/auth/scope preflight, project config, usage, contract and metric queries; JSON on stdout, logs on stderr."
+        },
+        {
+          "path": "skills/vercel-optimize/scripts/gate-investigations.mjs",
+          "what": "Deterministic gate emitting {toLaunch, platform, gated}; the other 13 scripts (scan-codebase, merge-signals, budget-summary, deep-dive, reconcile-candidates, prepare-investigation-brief, collect-sub-agent-outputs, verify-and-regen, verify-finding, render-report, build-docs, check-docs-fresh, check-citations) are siblings in scripts/."
+        },
+        {
+          "path": "skills/deploy-to-vercel/resources/deploy.sh",
+          "what": "Anonymous tarball upload fallback (claude.ai variant); deploy-codex.sh is the same script with a different endpoint (line 9)."
+        },
+        {
+          "path": "scripts/build-discovery-index.mjs",
+          "what": "Builds dist/index.json plus one artifact per skill from git HEAD; run by the discovery workflow."
+        },
+        {
+          "path": "packages/react-best-practices-build/src/build.ts",
+          "what": "pnpm build / build-all: compiles rules/*.md into each skill's AGENTS.md; validate.ts, extract-tests.ts and migrate.ts are sibling entry points."
+        },
+        {
+          "path": "packages/vercel-optimize-tests/package.json",
+          "what": "test script: node --test test/*.test.mjs; also check-docs and check-citations scripts (lines 7-9)."
+        }
+      ],
+      "architecture": "Content plus small tooling. skills/<dir>/SKILL.md x9. (1) Rule skills: react-best-practices (rules/*.md x70, ~56 lines each; SKILL.md index 149 lines; compiled AGENTS.md 3,810 lines), react-native-skills (36 rules; AGENTS.md 2,897 lines), composition-patterns (8 rules; AGENTS.md 946 lines), react-view-transitions (SKILL.md 332 lines + 5 references/*.md; AGENTS.md 1,380 lines). The compiled AGENTS.md files are generated by packages/react-best-practices-build/src (build.ts, parser.ts, config.ts, validate.ts, extract-tests.ts, migrate.ts, types.ts); each SKILL.md points to individual rule files to read on demand and to AGENTS.md as the full dump. (2) Remote-rule stubs: web-design-guidelines and writing-guidelines (39-line SKILL.md that WebFetch rules from other repos). (3) Procedure skills: deploy-to-vercel (SKILL.md 296 lines + resources/deploy.sh, deploy-codex.sh) and vercel-cli-with-tokens (SKILL.md 353 lines only). (4) vercel-optimize: 15 Node scripts in scripts/ over 74 modules in lib/: vercel.mjs (Vercel CLI wrapper via execFile, scope resolution, stderr redaction, throttling), queries.mjs (metric registry, shared 14-day window), scanners/ (15 regex scanners), gates/ (15 gates, GATE_VERSION 1.8.0), investigation-brief.mjs + support-topics.mjs (per-candidate brief; at most 3 support topics and 2,400 characters, support-topics.mjs:16-17), extract-claims.mjs + verify-claim.mjs (mechanical claim checks), sanitizers/ (11 sanitizers plus citation stripping and missing-citation drop), render-report.mjs; references/ holds docs-library.json (99 URLs + 13 skill-rule refs), 42 support-topic files and 7 playbooks. Flow: collect-signals -> scan-codebase -> merge-signals -> gate-investigations -> budget-summary -> deep-dive -> reconcile-candidates -> prepare-investigation-brief -> host agent investigates (inline, or one sub-agent per brief when 3+ and the host supports it, SKILL.md:201-205) -> collect-sub-agent-outputs -> verify-and-regen -> render-report. The only LLM step is the host agent's per-candidate investigation. (5) scripts/build-discovery-index.mjs builds release artifacts.",
+      "packaging_and_release": "No npm/PyPI package: root package.json is private (package.json:3) and no manifest declares bin/main/exports. Distribution is the git repo (consumed by the external skills CLI) plus GitHub releases. .github/workflows/agent-skills-discovery.yml:36-49 creates release agent-skills-<sha> (draft, upload dist/* with --clobber, then publish as latest) on every push to main touching skills/**, scripts/build-discovery-index.mjs or the workflow itself; the tag in this review is that release tag. scripts/build-discovery-index.mjs:84-152 emits dist/index.json (schema https://schemas.agentskills.io/discovery/0.2.0/schema.json; per skill: name, description, type, url, sha256 digest) and one artifact per skills/ directory, named by SKILL.md frontmatter name: <name>.md for SKILL.md-only skills (web-design-guidelines, writing-guidelines, vercel-cli-with-tokens), otherwise a reproducible <name>.tar.gz (git commit-tree with fixed 2000-01-01 dates, git archive, gzip -n -9). No signatures, provenance attestations or separate checksum files (no attest/cosign/sigstore/id-token in .github); the only integrity data is the sha256 inside index.json, published in the same release. Also committed and undocumented: skills/{deploy-to-vercel,react-best-practices,react-view-transitions,vercel-cli-with-tokens,web-design-guidelines}.zip and the nested skills/deploy-to-vercel/Archive.zip, which sits inside the skill directory and therefore ships in the deploy-to-vercel tarball (build-discovery-index.mjs:84-113).",
+      "tests_and_ci": "Tests: packages/vercel-optimize-tests uses the Node built-in runner (node --test test/*.test.mjs, package.json:7): 66 *.test.mjs files in packages/vercel-optimize-tests/test/ plus about 50 sanitized CLI-output fixtures under test/fixtures/, and check-docs/check-citations scripts (package.json:8-9). The other eight skills have no tests. packages/react-best-practices-build has `pnpm validate` (rule-structure lint of react-best-practices only: src/validate.ts:10,76-77; src/config.ts:92-95) and `pnpm extract-tests` (writes test-cases.json; nothing in the repo consumes it). CI (.github/workflows, two files): (1) agent-skills-discovery.yml - on PR/push to main for skills/**, scripts/build-discovery-index.mjs or the workflow: validate job = npm ci --ignore-scripts + node scripts/build-discovery-index.mjs https://example.com/skills; publish job (push only) builds with the release URL and publishes the agent-skills-<sha> release. (2) react-best-practices-ci.yml - on PR/push for skills/react-best-practices/** or packages/react-best-practices-build/**: pnpm 10.24.0, Node 20, pnpm install, pnpm validate, pnpm build (no check that regenerated AGENTS.md equals the committed file). Neither workflow runs the 66 vercel-optimize tests, check-docs-fresh or check-citations.",
+      "dependencies": "Root package.json: 1 direct dependency (yaml 2.9.0, ISC; used only by scripts/build-discovery-index.mjs:11; package-lock.json pins it). packages/react-best-practices-build/package.json: 0 dependencies, 3 devDependencies (@types/node ^20.0.0, tsx ^4.7.0, typescript ^5.3.0; pnpm-lock.yaml lockfileVersion 6.0, 34 locked packages). packages/vercel-optimize-tests/package.json: 0 dependencies. Skill runtime code (skills/**/*.mjs) imports only node: built-ins and relative modules (searched), consistent with 'No runtime dependencies' (skills/vercel-optimize/CONTRIBUTING.md:33). External programs: Vercel CLI >= 53 (enforced, lib/vercel.mjs:90-113); optional rg with a JS fallback (lib/verify-claim.mjs:994-1018); Node 20+ is documented but not enforced (no engines field or runtime check); bash/curl/tar/find for the deploy scripts; git and gzip for build-discovery-index.mjs.",
+      "security_policy": "none - no SECURITY.md anywhere in the tree (also no CODEOWNERS or dependabot/renovate config); .github contains only the two workflow files."
+    },
+    "claim_checks": [
+      {
+        "claim": "vercel-optimize collects Vercel metrics first, then investigates only the routes and files those metrics point to (README.md:13).",
+        "verified": "partial",
+        "evidence": "Metrics-first ordering is in code: scripts/collect-signals.mjs (Vercel CLI preflight + metric queries) -> scripts/gate-investigations.mjs:28-56 (candidates carry files) -> lib/investigation-brief.mjs (one brief per candidate). The scope limit itself is only an instruction to the host agent ('Read ONLY the files listed', lib/investigation-brief.mjs:535; SKILL.md:215; references/doctrine.md:34-36); no tooling restricts file access. A script-driven static scan of the whole repo runs before gating (scripts/scan-codebase.mjs:22-60)."
+      },
+      {
+        "claim": "Gates are deterministic JavaScript thresholds; no LLM decides whether a metric qualifies (skills/vercel-optimize/README.md:80).",
+        "verified": "yes",
+        "evidence": "scripts/gate-investigations.mjs:2-5,28-37 runs 15 registered gate modules (lib/gates/index.mjs:20-37; GATE_VERSION 1.8.0 at :45) as pure functions over signals.json; no network or LLM calls found in lib/gates (searched); only the appliedAt timestamp varies (gate-investigations.mjs:77). Gate tests exist (packages/vercel-optimize-tests/test/gate*.test.mjs) but are not run in CI."
+      },
+      {
+        "claim": "Citations are allow-listed; unknown URLs and version-mismatched framework docs are stripped (skills/vercel-optimize/README.md:81).",
+        "verified": "yes",
+        "evidence": "lib/citations.mjs:107-139 (sanitizeCitations) and lib/sanitizers/index.mjs:51-59 strip unknown and version-mismatched citations; missing-citation drops last (:61-65); lib/extract-claims.mjs:26-38 always emits citation_in_library. Caveat: version-based stripping runs only when framework and frameworkVersion were parsed (sanitizers/index.mjs:51; extract-claims.mjs:30). Allow-list is references/docs-library.json: 99 URLs + 13 skill-rule refs, lastVerified 2026-05-26 (:4); scripts/check-citations.mjs is offline and does not fetch URLs (:2-3)."
+      },
+      {
+        "claim": "Every change to a skill on main publishes an immutable GitHub release with a discovery index and one artifact per skill (README.md:220-222).",
+        "verified": "partial",
+        "evidence": ".github/workflows/agent-skills-discovery.yml:8-15,38,42-49: a push to main touching skills/** builds dist/ and publishes release tag agent-skills-<sha>; scripts/build-discovery-index.mjs:119-152 emits index.json plus one artifact per skills/ directory with sha256 digests. 'Immutable' is not enforced by the workflow: gh release upload --clobber and gh release edit (:48-49) can overwrite, and there is no signing or attestation (no attest/cosign/sigstore in .github). Whether GitHub's immutable-releases setting is enabled cannot be seen from the tree."
+      },
+      {
+        "claim": "react-best-practices contains 40+ rules across 8 categories (README.md:25).",
+        "verified": "partial",
+        "evidence": "True only as a lower bound: skills/react-best-practices/rules has 70 rule files; SKILL.md:12 says 70; compiled AGENTS.md has 70 numbered rule headings. The README category list shows 7 (README.md:34-42); the 8th (advanced-*, SKILL.md:34,125-130) is missing there. skills/react-best-practices/metadata.json:5 and compiled AGENTS.md:17 also still say 40+."
+      },
+      {
+        "claim": "react-native-guidelines contains 16 rules across 7 sections (README.md:97-99).",
+        "verified": "no",
+        "evidence": "The skill directory is skills/react-native-skills with frontmatter name vercel-react-native-skills (SKILL.md:2) and 36 rule files in 8 categories (SKILL.md:33-42; skills/react-native-skills/README.md:19-96; compiled AGENTS.md has 36 numbered rule headings). Code and skill docs differ from the README; the code is authoritative."
+      },
+      {
+        "claim": "vercel-deploy-claimable: deploy to Vercel instantly from claude.ai/Claude Desktop, claimable deployments, auto-detects 40+ frameworks (README.md:160-176).",
+        "verified": "partial",
+        "evidence": "No skill with that name exists. The shipped skills are deploy-to-vercel v3.0.0 (SKILL.md:2-7) and vercel-cli-with-tokens, neither listed in the README. deploy-to-vercel prefers git-push/Vercel CLI flows and uses the anonymous upload only as a fallback (SKILL.md:53-166,191-223). The described mechanics do match resources/deploy.sh: 43 framework detectors (:36-158), excludes node_modules and .git plus .env and .env.* (:201-206), returns previewUrl/claimUrl (:249-250)."
+      },
+      {
+        "claim": "web-design-guidelines audits 100+ rules and writing-guidelines audits 80+ rules (README.md:46,72).",
+        "verified": "not_checkable",
+        "evidence": "Both SKILL.md files are 39-line stubs that WebFetch the rules at run time from raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md and .../vercel-labs/writing-guidelines/main/command.md (SKILL.md:23-29 in each). The rule content is not in this repo and is not pinned to a commit."
+      },
+      {
+        "claim": "Skills are automatically available once installed; the agent uses them when relevant tasks are detected (README.md:202); only name and description load at startup (AGENTS.md:73).",
+        "verified": "partial",
+        "evidence": "Repo-side structure matches: every SKILL.md has name + description with trigger phrases (e.g. skills/vercel-optimize/SKILL.md:2-3); the discovery build enforces kebab-case name <= 64 and description <= 1024 chars (scripts/build-discovery-index.mjs:56-62); all 9 SKILL.md are 39-353 lines (under the 500-line guideline, AGENTS.md:75) and detail sits in references/ or rules/ files read on demand. Whether Claude Code or Codex actually load per task is host behavior and not checkable here. The README's bare install command (README.md:197) does not say whether it installs all nine skills."
+      },
+      {
+        "claim": "Doc claim (not README): 'Static AST-grep scanners' (skills/vercel-optimize/references/doctrine.md:42) and the verifier 'shells out to grep + ast-grep via execFile' (references/verification.md:102).",
+        "verified": "no",
+        "evidence": "Scanners are regex modules (e.g. lib/scanners/force-dynamic.mjs:18-24); claim verification runs JS regexes in-process (lib/verify-claim.mjs:102-104; header :1 says 'fs + grep only'). The only child process is an optional rg file listing with a JS fallback (lib/verify-claim.mjs:994-1018); 'ast-grep' appears only inside a prompt string (lib/investigation-brief.mjs:536)."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Scope: every skill is Vercel/React-ecosystem specific (AGENTS.md:7). No skill is a security procedure; vercel-optimize explicitly excludes 'security advisories and credential rotation' and refers them to 'a security skill, not this one' (skills/vercel-optimize/references/doctrine.md:104). Security-adjacent content is limited to two react-best-practices rules tagged security (rules/server-auth-actions.md:5, rules/server-no-shared-module-state.md:5), cache/auth guardrails in vercel-optimize support topics, and token-handling steps in vercel-cli-with-tokens. vercel-optimize also needs a Vercel account, CLI v53+, a linked project and Observability Plus (a paid add-on per skills/vercel-cli-with-tokens/SKILL.md:295) and is for deployed Vercel projects only (skills/vercel-optimize/AGENTS.md:7; SKILL.md:20-28).",
+      "Licensing: README says MIT (README.md:237-239) but no LICENSE/COPYING file exists and no copyright holder is named anywhere in the tree. Only four SKILL.md frontmatters carry license: MIT (react-best-practices:4, composition-patterns:9, react-native-skills:8, react-view-transitions:4); vercel-optimize, deploy-to-vercel, vercel-cli-with-tokens, web-design-guidelines and writing-guidelines declare none. The rules fetched at run time by web-design-guidelines and writing-guidelines live in other repos whose licenses are not part of this tree.",
+      "Run-time remote instructions: web-design-guidelines and writing-guidelines tell the agent to WebFetch command.md from the main branch of two other repos on every review and apply it as rules and output format (skills/web-design-guidelines/SKILL.md:23-29; skills/writing-guidelines/SKILL.md:23-29). The content is unpinned, outside this repo's review and release process, and needs network access.",
+      "deploy-to-vercel data egress: the anonymous fallback uploads the project directory to Vercel-hosted endpoints (skills/deploy-to-vercel/resources/deploy.sh:9,239; deploy-codex.sh:9,239) and excludes only node_modules, .git, .env and .env.* (deploy.sh:201-206), so other secret files in the directory are included. The git-push path runs `git add .` (SKILL.md:65-69), and after a team is chosen the skill proceeds to vercel link (which creates a Vercel project) without separate confirmation (SKILL.md:35,111).",
+      "Secret handling: vercel-cli-with-tokens instructs commands whose output contains the token value (printenv VERCEL_TOKEN at SKILL.md:20; grep of .env at :28,42,78; printenv | grep -i vercel at :317-318), which puts secrets in the agent transcript, and includes billing-affecting stripe commands gated only by an 'ask the user' instruction (SKILL.md:282-287) plus hard-coded plan/pricing text that can go stale (:291-297). vercel-optimize writes the unredacted /v9/projects response, usage and contract data into signals.json in a mktemp directory (scripts/collect-signals.mjs:222,333); redaction covers only error text (lib/vercel.mjs:323,332,363-372) and SKILL.md has no cleanup step (SKILL.md:55-59).",
+      "Verification gap: CI runs only the discovery-index build and react-best-practices validate/build (.github/workflows/*.yml). The 66 vercel-optimize tests, check-docs-fresh and check-citations are not run in CI even though scripts/check-docs-fresh.mjs:2 calls itself a 'CI gate' and references/playbooks/README.md:53 says a validator 'runs in CI'. Rule validation covers only react-best-practices (src/config.ts:92-95); react-native-skills, composition-patterns and react-view-transitions have none, and no drift check exists for compiled AGENTS.md. Releases carry sha256 digests only (no signatures or attestations) and the workflow can overwrite assets (--clobber, agent-skills-discovery.yml:48); actions are pinned by tag, not SHA (checkout@v4, pnpm/action-setup@v2, setup-node@v4).",
+      "Documentation and packaging drift: README names nonexistent vercel-deploy-claimable and react-native-guidelines, omits deploy-to-vercel and vercel-cli-with-tokens, and has stale counts (40+ vs 70 rules, 16 vs 36 rules; README.md:25,99,160). Frontmatter names differ from directory names for four skills (vercel-react-best-practices, vercel-composition-patterns, vercel-react-native-skills, vercel-react-view-transitions), and react-view-transitions/README.md:35 uses the frontmatter name in --skill. Committed zips are undocumented and can be stale: skills/react-best-practices.zip has no entry for rules/bundle-analyzable-paths.md, which exists in source (SKILL.md:50); skills/deploy-to-vercel/Archive.zip is a nested macOS-made archive that ships in the release tarball.",
+      "Evidence and maintenance: no benchmark or eval results are published. test-cases.json is generated 'for LLM evaluation' (packages/react-best-practices-build/src/extract-tests.ts:3), has empty ruleId values (test-cases.json:3) and no consumer in the repo. Date markers: vercel-optimize/metadata.json:4 'May 2026', docs-library.json lastVerified 2026-05-26, react-best-practices/metadata.json 'January 2026' at version 1.0.0 despite 70 rules. This is a shallow clone (.git/shallow), so commit history and release cadence could not be assessed."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "vercel-labs/agent-skills",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "skills.sh CLI, repository-wide (bare command; the README does not say whether this installs all nine skills or prompts for a selection): npx skills add vercel-labs/agent-skills",
+          "citation": "README.md:196-198",
+          "holds": true,
+          "note": "README.md:196-198 is a bash fence holding exactly `npx skills add vercel-labs/agent-skills` (line 197). No flags or selection behavior are described anywhere in the README. The skills.sh attribution is supported by the badge at README.md:7 and AGENTS.md:92-96 ('Document skills.sh installation for public skills: npx skills add vercel-labs/agent-skills --skill {skill-name}'). HEAD is 063bee94c3f4df8453406c830b0a7df0f2860278, matching the dossier revision."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT with no license file (file: null); MIT is declared in README text, four SKILL.md frontmatters and two package.json files; no LICENSE file is committed.",
+          "citation": "README.md:237-239",
+          "holds": true,
+          "note": "README.md:237-239 reads '## License' / 'MIT'. No LICENSE/LICENCE/COPYING/NOTICE file exists anywhere in the tree. `license: MIT` appears in exactly four frontmatters (react-best-practices/SKILL.md:4, react-view-transitions/SKILL.md:4, composition-patterns/SKILL.md:9, react-native-skills/SKILL.md:8) and two package.json files (packages/react-best-practices-build/package.json:25, packages/vercel-optimize-tests/package.json:11). Root package.json has no license field. Non-blocking: skills/vercel-optimize/README.md:89-91 also says MIT, which the risks wording 'vercel-optimize ... declare none' (meant for frontmatter) could be read to contradict."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes (implicit) - CI jobs run on ubuntu-latest; the README gives no platform matrix; skill code is Markdown + Node ESM + bash; the vercel-optimize test suite is not run in CI.",
+          "citation": ".github/workflows/agent-skills-discovery.yml:19,33; .github/workflows/react-best-practices-ci.yml:17",
+          "holds": true,
+          "note": "All three cited lines are `runs-on: ubuntu-latest`. These two files are the only workflows. They run npm ci + scripts/build-discovery-index.mjs and pnpm install/validate/build; neither touches packages/vercel-optimize-tests. The README contains no OS or platform statement. skills/ contains .md, .mjs and two .sh files, plus JSON metadata, one lib/gates/types.d.ts and committed .zip files, so 'Markdown + Node ESM + bash' is a fair summary. 'Implicit' is the right qualifier because CI never runs the skill scripts themselves."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Claude Code: manual copy to ~/.claude/skills/ and a deploy-to-vercel Claude Code section. Codex: a sandbox section, deploy-codex.sh and sandbox_permissions=require_escalated guidance. vercel-optimize has a cross-agent AGENTS.md with an .agents/skills install, and its briefs are tested to avoid Claude-Code tool names. No Codex-specific install path; README lists no supported agents; AGENTS.md:73 only asserts on-demand loading.",
+          "citation": "AGENTS.md:3,73,100-103; skills/deploy-to-vercel/SKILL.md:191-223,229-237,243-245,284-292; skills/vercel-optimize/AGENTS.md:3,35-48; packages/vercel-optimize-tests/test/investigation-brief.test.mjs:482-499",
+          "holds": true,
+          "note": "Every cited range says what the dossier reports. AGENTS.md:102 has `cp -r skills/{skill-name} ~/.claude/skills/`. deploy-to-vercel SKILL.md: Claude Code section at 229-237 (path at 235); Codex sandbox at 191-223 (deploy-codex.sh at 210-216, require_escalated at 223 and 286); Codex note at 243-245; resources/deploy-codex.sh exists. vercel-optimize/AGENTS.md:3 says 'Cross-agent entry point'; 35-48 gives the .agents/skills copy plus an AGENTS.md snippet. The test comment at 483-484 names Claude Code, Codex CLI, Cursor and Copilot, with banned tool names at 496-498. A repo-wide search finds no ~/.codex or other Codex install path; the Codex section only uses skill_dir=\"<path-to-skill>\". AGENTS.md:73 matches. Caveat: README.md:162 says the misnamed vercel-deploy-claimable skill is 'designed for use with claude.ai and Claude Desktop'. That is a host mention, but not a supported-agent list."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "vercel-optimize collects Vercel metrics first, then investigates only the routes and files those metrics point to (README.md:13). Rated 'partial': metrics-first ordering is in the pipeline; the scope limit is only an instruction to the host agent and no tooling restricts file access; a whole-repo static scan runs before gating.",
+          "citation": "README.md:13; skills/vercel-optimize/scripts/collect-signals.mjs; scripts/gate-investigations.mjs:28-56; lib/investigation-brief.mjs:535; SKILL.md:215; references/doctrine.md:34-36; scripts/scan-codebase.mjs:22-60",
+          "holds": true,
+          "note": "README.md:13 matches the quote. collect-signals.mjs:2-3 describes the CLI probe, config, usage and metric queries. gate-investigations.mjs:28-56 runs the gate modules over signals.json and selects toLaunch. investigation-brief.mjs:535 ('Read ONLY the files listed...'), SKILL.md:215 and doctrine.md:34-36 are prompt or instruction text only. The verifier only checks that affectedFiles exist (extract-claims.mjs:41-42), not that they were in scope, so 'no tooling restricts file access' holds. scan-codebase.mjs:22-60 walks the repo (minus skip dirs) and runs every scanner, and SKILL.md:68-72 orders it before the gate. 'Partial' is the right rating. Non-blocking imprecision: the cited gate lines don't show candidates carrying files. Metric gates emit files: [] (lib/gates/slow-route.mjs:34, uncached-route.mjs:36), and each brief's file list comes from resolveFiles(candidate, signals) (scripts/prepare-investigation-brief.mjs:61), which maps the candidate route onto the scan's route inventory."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

@@ -1,0 +1,289 @@
+{
+  "contender": "ast-grep/ast-grep",
+  "revision": {
+    "contender": "ast-grep/ast-grep",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "ast-grep/ast-grep",
+        "tag": "0.45.3",
+        "commit": "979c143639e3588c31f563091e69398683ed34f0",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "0.45.3",
+    "commit": "979c143639e3588c31f563091e69398683ed34f0",
+    "read_at": "2026-10-02T03:01:55+00:00"
+  },
+  "dossier": {
+    "contender": "ast-grep/ast-grep",
+    "revision": {
+      "tag": "0.45.3",
+      "commit": "979c143639e3588c31f563091e69398683ed34f0",
+      "read_at": "2026-10-01"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "ast-grep (Rust; binary `ast-grep`, deprecated alias `sg`) parses source with tree-sitter and provides syntax-tree search (`run -p/-k`), YAML-rule linting with fixes (`scan`), rule tests (`test`), scaffolding (`new`) and pattern-based rewriting (`run -r`, written to disk only in an `-i` or `-U` session), plus Node.js, Python and WASM bindings (crates/cli/src/lib.rs:51-70; crates/cli/src/utils/args.rs:118-128). Two subcommands bear on code navigation: `outline` (added in 0.44.0, CHANGELOG.md:154) prints a syntactic index of top-level items, members, imports and exports with byte and line/column ranges and a signature line, from 14 bundled YAML rule files covering 15 languages (crates/outline/src/model.rs:87-118; crates/outline/src/default_rule.rs:7-35); `lsp` runs a stdio language server that publishes diagnostics, quick-fix/fix-all code actions and rule-note hovers computed only from the project's ast-grep YAML rules (crates/lsp/src/lib.rs:91-101). It is a syntax-level tool: the code has no definition/reference resolution, rename, LSP-client or MCP functionality (crates/outline/src/model.rs:5-7; no such handlers in crates/lsp), and no Claude Code or Codex integration exists in this repository. Findings come from static reading of the 0.45.3 tree (nothing was built or run); the documentation site (ast-grep.github.io) is outside the repo and was not read. Revision checked via .git/packed-refs:2 and .git/HEAD:1.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "ast-grep(sg) is a CLI tool for code structural search, lint, and rewriting.",
+          "citation": "README.md:19"
+        },
+        {
+          "claim": "It is an abstract-syntax-tree based tool that searches code by pattern, 'matching AST nodes instead of text'; patterns are written like ordinary code and match code with the same syntactical structure.",
+          "citation": "README.md:22-23"
+        },
+        {
+          "claim": "A dollar sign plus upper-case letters (for example $MATCH) is a wildcard that matches any single AST node.",
+          "citation": "README.md:24"
+        },
+        {
+          "claim": "The core is an algorithm to search and replace code based on the abstract syntax tree produced by tree-sitter; it supports lightweight static analysis and massive-scale code manipulation.",
+          "citation": "README.md:103-104"
+        },
+        {
+          "claim": "jQuery like API for AST traversal and manipulation.",
+          "citation": "README.md:111"
+        },
+        {
+          "claim": "YAML configuration to write new linting rules or code modification.",
+          "citation": "README.md:113"
+        },
+        {
+          "claim": "Written in a compiled language, with tree-sitter based parsing and utilizing multiple cores.",
+          "citation": "README.md:115"
+        },
+        {
+          "claim": "Installable from npm, pip, cargo, cargo-binstall, homebrew, scoop, mise or MacPorts.",
+          "citation": "README.md:34"
+        },
+        {
+          "claim": "Further documented methods: scoop (`scoop install main/ast-grep`), MacPorts (`sudo port install ast-grep`), `nix-shell -p ast-grep`, `mise use -g ast-grep`; for npm, 'pnpm approve-builds may be needed'.",
+          "citation": "README.md:38,47-62"
+        },
+        {
+          "claim": "Build from source with rustup and `cargo install --path ./crates/cli --locked`.",
+          "citation": "README.md:65-68"
+        },
+        {
+          "claim": "CLI form: `ast-grep --pattern 'var code = $PATTERN' --rewrite 'let code = new $PATTERN' --lang ts`; the examples also use -p, -l, -r and -i (interactive).",
+          "citation": "README.md:74-77,84,89"
+        }
+      ],
+      "install": [
+        {
+          "method": "npm (global)",
+          "command": "npm install --global @ast-grep/cli",
+          "citation": "README.md:37"
+        },
+        {
+          "method": "pip",
+          "command": "pip install ast-grep-cli",
+          "citation": "README.md:39"
+        },
+        {
+          "method": "Homebrew",
+          "command": "brew install ast-grep",
+          "citation": "README.md:40"
+        },
+        {
+          "method": "cargo (crates.io)",
+          "command": "cargo install ast-grep --locked",
+          "citation": "README.md:48"
+        },
+        {
+          "method": "cargo-binstall",
+          "command": "cargo binstall ast-grep",
+          "citation": "README.md:49"
+        },
+        {
+          "method": "from source (needs rustup; Rust 1.88.0+, Cargo.toml:20)",
+          "command": "cargo install --path ./crates/cli --locked",
+          "citation": "README.md:65-68"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - GitHub release zip for x86_64-unknown-linux-gnu (.github/workflows/release.yml:49-50,56-65); PyPI manylinux_2_28 wheel (.github/workflows/pypi.yml:130-153); npm package @ast-grep/cli-linux-x64-gnu (npm/package.json:39); the Rust test job runs on ubuntu-latest (.github/workflows/coverage.yaml:12,23). Limits: no musl CLI asset in the release matrix (release.yml:38-52) and the npm CLI launcher fails on musl (npm/postinstall.js:16,64-67).",
+        "wsl2": "unknown - no mention of WSL or WSL2 anywhere in the repository (case-insensitive search of README, code, manifests and workflows found nothing). A WSL2 distro would consume the Linux gnu artifacts above, but upstream makes no statement.",
+        "macos_arm64": "yes - release zip for aarch64-apple-darwin (release.yml:45-46); PyPI universal2 wheel with an `sg --help` smoke test (pypi.yml:72-91); npm package @ast-grep/cli-darwin-arm64 (npm/package.json:36); the NAPI binding is built and tested on macos-latest arm64 (napi.yml:42-45) and the Python binding is tested on macOS aarch64 (pyo3.yml:119-124). The core Rust test job (coverage.yaml) runs on Linux only.",
+        "gpu": "no - not applicable. CPU-only tree-sitter parsing; no GPU, CUDA, Metal, wgpu or OpenCL code, feature flag or dependency (searched source, manifests and Cargo.lock crate names)."
+      },
+      "integrations": {
+        "cli": "yes - `ast-grep` with subcommands run (default when -p/--pattern or -k/--kind leads the args), scan, test, new, lsp, outline, completions (crates/cli/src/lib.rs:51-70,92-104). Search: -p pattern with --selector/--strictness, or -k ESQuery-style kind selector (crates/cli/src/run.rs:61-95); input from paths or --stdin, honoring ignore files by default (crates/cli/src/utils/args.rs:20-63). Machine-readable output: --json=pretty|compact|stream for run/scan/outline, carrying text, ranges (byteOffset, line, column), file, language, metaVariables and replacement (crates/cli/src/utils/args.rs:139-154; crates/cli/src/print/json_print.rs:20-80,268-278); `scan --format github|sarif` (crates/cli/src/scan.rs:45-49); `scan` fails with exit code 1 when error-severity rules match (scan.rs:195-199; crates/cli/src/utils/error_context.rs:81) and needs sgconfig.yml unless --rule or --inline-rules is given (scan.rs:149-164). `outline` defaults to exported-item names for directory input and signatures plus member digests for single files, with --type, --match REGEX, --items, --view, --stdin with --lang, and custom --outline-rules (crates/cli/src/outline.rs:21-132; crates/cli/src/outline/options.rs:94-108). `sg` is a deprecated alias (crates/cli/src/bin/alias.rs:1-8).",
+        "mcp": "none found - no MCP server, client, config or documentation anywhere in the tree (case-insensitive search for 'mcp' and 'model context protocol' over all files returned no matches; README.md:1-124 does not mention it). extra_repositories is empty, so no companion repository was examined.",
+        "sdk_or_api": "yes - Node.js `@ast-grep/napi` (crates/napi/README.md:11; crates/napi/package.json:2), Python `ast-grep-py` (crates/pyo3/README.md:14-20; crates/pyo3/pyproject.toml:6), WASM `@ast-grep/wasm` (crates/wasm/README.md:3-13), and Rust library crates ast-grep-core, -config, -language, -dynamic, -lsp and -outline (Cargo.toml:24-29). The bindings expose find/findAll, tree traversal, relational matchers and replace/commitEdits (crates/napi/src/sg_node.rs:122-379; crates/pyo3/ast_grep_py/ast_grep_py.pyi:34-70). Language server over stdio via `ast-grep lsp` (crates/cli/src/lsp.rs:18-19). No HTTP API.",
+        "claude_code_or_codex": "none found - no Claude Code plugin, skill, hook, .mcp.json or .lsp.json and no Codex configuration in the tree (searches for claude, codex, anthropic, openai found no integration). The only agent-related file is .github/copilot-instructions.md, which is build/test guidance for GitHub Copilot working on this repo, not an integration. The `ast-grep lsp` server (crates/lsp/src/lib.rs:80-212) could be launched by any LSP-capable client, but the repo ships no client wiring and the server provides diagnostics, code actions and hover only (lib.rs:91-101)."
+      },
+      "telemetry_and_network": "No telemetry, analytics, update check or phone-home found, and no account, API key or hosted service is required. Evidence: (1) no HTTP/TLS/telemetry crate among the 282 packages in Cargo.lock (searched reqwest, hyper, ureq, curl, rustls, openssl, native-tls, h2, tungstenite, socket2, sentry, posthog, opentelemetry; only `mio` appears, via crossterm and signal-hook-mio, and tokio's lock entry has no mio or socket2 dependency: Cargo.lock:1911-1919); (2) a search of crates/ for telemetry, analytics, reqwest, hyper, ureq, curl, TcpStream, UdpSocket, std::net and tokio::net returned nothing; (3) every locked dependency comes from crates.io or workspace paths, with no git sources (Cargo.lock); (4) runtime I/O is local: files, stdin/stdout (the LSP server speaks stdio, crates/cli/src/lsp.rs:18-19), and the only subprocesses are $EDITOR for interactive edits (crates/cli/src/print/interactive_print.rs:391-392) and the `sg` forwarder (crates/cli/src/bin/alias.rs:25). URLs in crates/cli/src are documentation links printed in error text (crates/cli/src/utils/error_context.rs:9-23,343-352) and a yaml-language-server schema comment written into new rule files (crates/cli/src/new.rs:234); ast-grep does not fetch them. npm/postinstall.js makes no network call; it links the platform binary from an optionalDependency package (npm/postinstall.js:54-80). Network is needed only to install (npm, PyPI, crates.io, and GitHub Releases for cargo-binstall: crates/cli/Cargo.toml:62-67). Related local-execution surface: customLanguages in sgconfig.yml loads native shared libraries at startup (crates/dynamic/src/lib.rs:120-142)."
+    },
+    "code": {
+      "languages": [
+        "Rust (primary): 10 crates under crates/ plus xtask; 153 .rs files and about 43.8k lines under crates/; edition 2024, rust-version 1.88.0 (Cargo.toml:15,20)",
+        "TypeScript/JavaScript: crates/napi and crates/wasm bindings, typings and AVA specs (18 files, about 2.7k lines)",
+        "Python: crates/pyo3 package, .pyi stubs and pytest tests (8 files, about 0.7k lines)",
+        "YAML and JSON: bundled outline rules (crates/outline/src/default_rules/*.yml), CI workflows, schemas/*.json",
+        "Languages it parses (not implementation languages): 28 built-in via tree-sitter grammars, plus user-supplied grammars loaded as shared libraries (crates/language/src/lib.rs:259-288; crates/dynamic/src/custom_lang.rs:14-25)"
+      ],
+      "entry_points": [
+        {
+          "path": "crates/cli/src/main.rs",
+          "what": "`ast-grep` binary; calls execute_main() (main.rs:6-8), which dispatches through main_with_args in crates/cli/src/lib.rs:72-77,131-152"
+        },
+        {
+          "path": "crates/cli/src/lib.rs",
+          "what": "clap App and subcommands run (default when -p/-k is given), scan, test, new, lsp, outline, completions (lib.rs:51-70); sgconfig.yml is discovered before argument parsing (lib.rs:131-140)"
+        },
+        {
+          "path": "crates/cli/src/bin/alias.rs",
+          "what": "deprecated `sg` binary: prints a deprecation warning, then spawns `ast-grep` from PATH on Unix or runs the full CLI on Windows (alias.rs:1-33)"
+        },
+        {
+          "path": "crates/cli/src/lsp.rs",
+          "what": "`ast-grep lsp`: serves the tower-lsp backend over stdin/stdout; requires a valid sgconfig.yml (lsp.rs:11-41)"
+        },
+        {
+          "path": "crates/cli/src/outline.rs",
+          "what": "`ast-grep outline`: syntactic symbol/import/export/member index for paths or --stdin, text views or --json=pretty|compact|stream (outline.rs:21-155)"
+        },
+        {
+          "path": "crates/lsp/src/lib.rs",
+          "what": "language-server Backend (initialize, did_open, did_change, code_action, execute_command, hover) used by the CLI (lib.rs:37-212); also published as crate ast-grep-lsp (Cargo.toml:28)"
+        },
+        {
+          "path": "crates/napi/src/lib.rs",
+          "what": "Node.js binding entry: parse, parseAsync, kind, pattern, findInFiles, registerDynamicLanguage (lib.rs:68-124); siblings are crates/pyo3/src/lib.rs (Python module ast_grep_py, lib.rs:21-22) and crates/wasm/src/lib.rs (WASM)"
+        },
+        {
+          "path": "xtask/src/main.rs",
+          "what": "`cargo xtask schema` regenerates schemas/*.json; `cargo xtask <version>` bumps versions, updates the changelog, commits and tags (main.rs:10-39)"
+        }
+      ],
+      "architecture": "Cargo workspace of 10 crates plus xtask (Cargo.toml:1-7). crates/core (ast-grep-core): tree-sitter-backed document/node model (tree_sitter/mod.rs: StrDoc and a per-thread Parser cache), pattern compiler and matcher (matcher/pattern.rs, match_tree/), metavariables (meta_var.rs), replacers and templates (replacer/). crates/config (ast-grep-config): YAML rule model and engine (rule_config.rs, rule_core.rs, rule/ atomic, relational and composite rules, transform/, fixer.rs, combined.rs CombinedScan, rule_collection.rs). crates/language: SupportLang enum of 28 built-in languages, each behind an optional tree-sitter grammar crate in the default builtin-parser feature (lib.rs:259-288; Cargo.toml:48-84). crates/dynamic: custom tree-sitter grammars loaded as shared libraries via libloading (lib.rs:120-142). crates/outline: outline model (model.rs), YAML-driven extractors (extractor.rs, combined_extractor.rs, options.rs) and 14 bundled rule files (default_rules/*.yml, include_str! in default_rule.rs). crates/lsp: tower-lsp-server Backend converting rule matches into diagnostics, code actions and hovers (lib.rs, utils.rs). crates/cli: clap front end (lib.rs dispatch; run.rs, scan.rs, verify.rs, new.rs, outline.rs and outline/, lsp.rs, completions.rs), sgconfig.yml discovery and project config (config.rs), SgLang = built-in plus custom languages, globs and injections (lang/), printers (print/: colored, JSON, interactive, GitHub/SARIF, file names) and a producer-threads / single-consumer pipeline over the ignore crate's parallel walker (utils/worker.rs:12-56,118-150). crates/napi, crates/pyo3, crates/wasm: Node, Python and WASM bindings (publish = false; shipped through npm and PyPI). xtask: JSON schema generation (schemas/*.json) and release bumping. Runtime flow: parse args, discover sgconfig.yml upward from the current directory (registers custom languages, globs and injections), walk files in parallel, tree-sitter parse, pattern or rule match, then print or rewrite in place on accept or --update-all (crates/cli/src/print/interactive_print.rs:55-66).",
+      "packaging_and_release": "Artifacts: (a) GitHub Release zips named app-<target>.zip containing `ast-grep` and `sg` for 7 targets - Windows x86_64/i686/aarch64 (MSVC), macOS aarch64/x86_64, Linux x86_64/aarch64 glibc (.github/workflows/release.yml:35-70); (b) crates.io publish of the workspace crates on tag via katyo/publish-crates (release.yml:13-22); (c) npm `@ast-grep/cli` plus 7 platform packages published with `npm publish` using an NPM_TOKEN written to ~/.npmrc, with binaries re-downloaded from the latest GitHub release rather than passed from the build job (release.yml:71-116); (d) PyPI `ast-grep-cli` wheels (macOS x86_64 and universal2, Windows x64/x86/arm64, Linux manylinux_2_28 x86_64/aarch64) plus sdist, uploaded with `uv publish` in a job granted an OIDC id-token for trusted publishing (.github/workflows/pypi.yml:28-190); (e) PyPI `ast-grep-py` wheels for Python 3.10-3.14, uploaded with maturin-action and id-token (.github/workflows/pyo3.yml:32-167); (f) npm `@ast-grep/napi` built for 9 targets including musl and linux arm64 (.github/workflows/napi.yml:19-162) and `@ast-grep/wasm` (.github/workflows/wasm.yml:21-112). Triggers: tags matching [0-9]+.* and manual dispatch; the napi, pyo3, pypi and wasm workflows also run on a daily cron (napi.yml:6-13). cargo-binstall metadata points at the release zips (crates/cli/Cargo.toml:62-67). Version bump, changelog and tagging are scripted by `cargo xtask <version>` (xtask/src/main.rs:32-39). No checksum file, signature, SBOM or provenance attestation step is configured: a search of .github/ for attest, cosign, sigstore, slsa, sha256, checksum, gpg, provenance and sbom found nothing, and release.yml does not set the upload action's checksum input (any default applied by taiki-e/upload-rust-binary-action is not visible in this repo). Workflow `uses:` references are mutable tags or branches; a search for 40-hex commit pins found none. Renovate automerges patch/pin/digest updates (renovate.json:6-10). The release profile enables LTO (Cargo.toml:9-10).",
+      "tests_and_ci": "Frameworks: Rust built-in harness (#[test], #[tokio::test]) with assert_cmd, predicates and tempfile for CLI tests (crates/cli/Cargo.toml:57-60); wasm-bindgen-test (crates/wasm/Cargo.toml:32-33); AVA for Node specs (crates/napi/package.json:49,61; crates/wasm/package.json:24,35); pytest for Python (crates/pyo3/pyproject.toml:39-42). Static counts (tests were not run): 751 #[test]/#[tokio::test] attributes in 113 of 153 Rust files under crates/, 78 files with inline #[cfg(test)] modules, and about 25 dedicated test files - crates/cli/tests (4 test files plus common/; 61 tests), crates/lsp/tests/basic.rs (11 tests), crates/outline/tests (8 files plus common/ and a fixture), crates/wasm/tests/web.rs, crates/pyo3/tests (7 pytest files), crates/napi/__test__ (3 specs plus test.vue), crates/wasm/__test__ (1 spec). CI workflows in .github/workflows: coverage.yaml (push and PR to main; ubuntu-latest: `cargo llvm-cov --all-features --workspace` with Codecov upload, `cargo fmt --all -- --check`, `cargo clippy --all-targets --all-features --workspace --release --locked -- -D clippy::all`, NAPI lint; lines 1-63); napi.yml (9-target build matrix, `yarn test` on 4 targets, tag/manual/daily cron, no PR trigger); pyo3.yml (wheels for Python 3.10-3.14 on Linux, Windows and macOS, pytest on Linux x86_64, Windows and macOS aarch64; tag/manual/cron); pypi.yml (CLI wheels and sdist with `sg --help` smoke tests); wasm.yml (wasm-pack tests, AVA tests, package build); release.yml (tag-triggered publishing). Only coverage.yaml has a pull_request trigger and all its jobs run on ubuntu-latest (lines 6,12,32,53). CI uses stable Rust; no MSRV, cargo-audit or cargo-deny job was found.",
+      "dependencies": "Rust workspace: Cargo.toml (17 [workspace.dependencies]: 6 internal path crates plus 11 external) and per-crate manifests - crates/cli/Cargo.toml: 27 direct deps (6 internal, 21 external) plus 3 dev; crates/core: 4 (1 optional) plus 1 dev; crates/config: 9 plus 1 dev; crates/language: 31 (27 optional tree-sitter-* grammar crates including the renamed fork `tree-sitter-kotlin-sg`, plus ast-grep-core, ignore, serde, tree-sitter); crates/dynamic: 7 plus 1 dev (libloading, target-triple); crates/lsp: 7 plus 5 dev (tower-lsp-server 0.23.0); crates/outline: 6 plus 2 dev; crates/napi: 9 plus 1 build; crates/pyo3: 8 (pyo3 and pythonize optional); crates/wasm: 8 plus 1 dev; xtask: 7. Cargo.lock pins 282 packages, all from crates.io or workspace paths (no git sources, no [patch]); key versions: tree-sitter 0.27.0, tokio 1.53.1, clap 4.6.6, ignore 0.4.33, serde_yaml 0.9.34+deprecated, ls-types 0.0.6 (Cargo.lock:105,1009,1639,2015,2102). JS/Python manifests: npm/package.json (1 dependency, detect-libc, plus 7 optionalDependencies platform packages), crates/napi/package.json (0 runtime, 10 dev), crates/wasm/package.json (1 peer, web-tree-sitter, plus 4 dev), crates/pyo3/pyproject.toml (0 runtime, 1 optional test extra, pytest), pyproject.toml (maturin build backend only); lockfiles crates/napi/yarn.lock, crates/wasm/yarn.lock, crates/pyo3/uv.lock.",
+      "security_policy": "none - no SECURITY.md or equivalent at the repository root or in .github/ (file search found none); .github/ISSUE_TEMPLATE/config.yml only routes questions to the FAQ, StackOverflow, GitHub Discussions and Discord (lines 3-19). No cargo-deny or cargo-audit configuration was found."
+    },
+    "claim_checks": [
+      {
+        "claim": "ast-grep(sg) is a CLI tool for code structural search, lint, and rewriting (README.md:19).",
+        "verified": "yes",
+        "evidence": "Subcommands run (search/rewrite via -p/-k and -r), scan (YAML-rule lint with fixes), test (rule tests), new, lsp, outline, completions (crates/cli/src/lib.rs:51-70). Rewrites reach disk only in an interactive or --update-all session (crates/cli/src/utils/args.rs:118-128; crates/cli/src/print/interactive_print.rs:55-66)."
+      },
+      {
+        "claim": "The tool is named 'ast-grep(sg)' and `sg` is the short command (README.md:17,19).",
+        "verified": "partial",
+        "evidence": "The `sg` binary still ships but has been deprecated since 0.45.0: it prints 'WARNING: `sg` is deprecated. Use `ast-grep` instead.' on every run (crates/cli/src/bin/alias.rs:1-8,22-24), a test asserts the warning (crates/cli/tests/help_test.rs:8-24) and CHANGELOG.md:71 records the deprecation. The README does not mention it, so the code is ahead of the README."
+      },
+      {
+        "claim": "A dollar sign plus upper-case letters (e.g. $MATCH) matches any single AST node (README.md:24).",
+        "verified": "partial",
+        "evidence": "Names may also contain digits and underscore; $_ is an unnamed drop, $$$ and $$$A match multiple nodes, and $$A is a distinct form (crates/core/src/meta_var.rs:223-281). A single-dollar capture matches only named tree-sitter nodes; unnamed tokens need the double-dollar form (crates/core/src/match_tree/mod.rs:61-82), so 'any single AST node' is a simplification."
+      },
+      {
+        "claim": "The core algorithm searches and replaces code on the AST produced by tree-sitter (README.md:103).",
+        "verified": "yes",
+        "evidence": "crates/core/src/tree_sitter/mod.rs:62-112 (StrDoc wraps a tree_sitter::Tree parsed through a per-thread Parser cache, lines 33-60); replacement is exercised in crates/core/src/lib.rs:43-49 (replace 'var $A = $B' with 'let $A = $B')."
+      },
+      {
+        "claim": "jQuery like API for AST traversal and manipulation (README.md:111).",
+        "verified": "yes",
+        "evidence": "Present in the library bindings only, not in the CLI: Node SgNode has find/findAll, parent/children/next/prev/ancestors/field, matches/inside/has/precedes/follows and replace/commitEdits (crates/napi/src/sg_node.rs:122-379); the Python stubs list the same (crates/pyo3/ast_grep_py/ast_grep_py.pyi:34-70); the WASM README documents it (crates/wasm/README.md:140-206)."
+      },
+      {
+        "claim": "YAML configuration to write new linting rules or code modification (README.md:113).",
+        "verified": "yes",
+        "evidence": "Rules are deserialized from YAML with an optional fix (crates/config/src/lib.rs:34-49; example YAML with fix parsed in crates/lsp/tests/basic.rs:74-87; crates/lsp/src/utils.rs:33-37 consumes rule.fixer). `scan` loads rules from sgconfig.yml ruleDirs, --rule or --inline-rules (crates/cli/src/scan.rs:31-43,149-164; crates/cli/src/config.rs:184-241)."
+      },
+      {
+        "claim": "Written in a compiled language with tree-sitter parsing, utilizing multiple cores (README.md:115).",
+        "verified": "yes",
+        "evidence": "Rust 2024 workspace (Cargo.toml:15-16). Files are walked in parallel with the ignore crate and processed by producer threads feeding a single printer thread (crates/cli/src/utils/args.rs:56-74,98-100; crates/cli/src/utils/worker.rs:12-56,118-150); the automatic thread count is capped at 12 (args.rs:66-74). No benchmark in the tree substantiates speed; the changelog says benchmarks were moved out of the repo (CHANGELOG.md:129)."
+      },
+      {
+        "claim": "Install from npm, pip, cargo, cargo-binstall, homebrew, scoop, mise or MacPorts (README.md:34).",
+        "verified": "partial",
+        "evidence": "Repo-backed channels: npm @ast-grep/cli (npm/package.json:2,29-44), PyPI ast-grep-cli (pyproject.toml:6; .github/workflows/pypi.yml), crates.io `ast-grep` (crates/cli/Cargo.toml:2; release.yml:13-22) and cargo-binstall metadata pointing at the release zips (crates/cli/Cargo.toml:62-67; release.yml:56-65). Homebrew, scoop, MacPorts, mise and nix packaging live outside this repo (not checkable). Caveats the README omits: the npm CLI package does not support musl Linux (npm/postinstall.js:16,64-67) and release zips exist only for glibc Linux (release.yml:49-52)."
+      },
+      {
+        "claim": "Build from source with `cargo install --path ./crates/cli --locked` (README.md:65-68).",
+        "verified": "yes",
+        "evidence": "crates/cli/Cargo.toml:1-25 is package `ast-grep` with bins `ast-grep` and `sg`; Cargo.lock is committed (Cargo.lock:105-106), so --locked works; it needs Rust 1.88.0+ and edition 2024 (Cargo.toml:15,20), which the README does not state."
+      },
+      {
+        "claim": "README is silent on language-server features, MCP, symbol definitions/references and Claude Code/Codex (absence check over README.md:1-124).",
+        "verified": "yes",
+        "evidence": "Confirmed by a full read: none of these appear. The code is ahead of the README: `lsp` and `outline` subcommands exist (crates/cli/src/lib.rs:61-64) but are undocumented there. The LSP server supports only diagnostics, code actions (quickfix.ast-grep, source.fixAll.ast-grep), executeCommand ast-grep.applyAllFixes and hover (crates/lsp/src/lib.rs:53-55,91-101), with no definition, references or rename handlers; no MCP or Claude Code/Codex artifacts exist in the tree (no matches for mcp, claude, codex, anthropic)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Contributor-doc build/test wall-clock times (not a runtime, search or index benchmark; machine unspecified)",
+        "metric": "wall-clock time",
+        "value": "cargo check about 2m40s; cargo build (debug) about 42s; cargo build --release about 2m26s; cargo test about 48s (the doc says '94+ tests', stale against the 751 test attributes now in the tree)",
+        "source": ".github/copilot-instructions.md:13-16",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope gap for the stated navigation needs: ast-grep is a syntax-level (tree-sitter) tool. The repo has no MCP server or client and no Claude Code/Codex integration (case-insensitive searches for mcp, model context protocol, claude, codex and anthropic found nothing). `ast-grep lsp` advertises only full-text sync, code actions, one executeCommand and hover (crates/lsp/src/lib.rs:91-101) and has no definition, references, rename or symbol handlers (none in crates/lsp). Nothing launches or talks to other language servers; the only subprocesses are $EDITOR and the `sg` forwarder (crates/cli/src/print/interactive_print.rs:391-392; crates/cli/src/bin/alias.rs:25). The outline model states it does not build a semantic graph of references (crates/outline/src/model.rs:5-7), and no scope or type resolution code was found.",
+      "The bundled language server is rule-driven and project-bound: `ast-grep lsp` fails with the missing-project error (exit code 3) unless a valid sgconfig.yml is found (crates/cli/src/lsp.rs:17; crates/cli/src/utils/error_context.rs:83,279-283); diagnostics come only from the project's YAML rules (crates/lsp/src/lib.rs:276-313); only file:// URIs are handled (lib.rs:585-589); documents outside the first workspace folder or cwd are skipped (lib.rs:370-386); sync is full-document with a TODO for incremental (lib.rs:92-93) and every change re-parses the whole document (lib.rs:445-473). The CLI-level startup test is ignored (crates/cli/src/lsp.rs:47-52), although crates/lsp/tests/basic.rs has 11 tests.",
+      "The structural index (`outline`) is new and partial: added in 0.44.0 on 2026-06-21 (CHANGELOG.md:125-127,154) and still changing in 0.45.x (CHANGELOG.md:11-12,36); bundled extractor rules cover 15 of the 28 built-in languages (crates/outline/src/default_rules/*.yml versus crates/language/src/lib.rs:259-288), with none for Bash, CSS, Dart, Elixir, Haskell, HCL, HTML, JSON, Lua, Nix, Scala, Solidity or YAML. Entries carry name, kind, ranges and a template-derived or first-source-line signature, not the definition body (crates/outline/src/model.rs:87-118; crates/outline/src/extractor.rs:68-70), so exact source needs a second read by range. The outline JSON has no schema-version field (crates/cli/src/outline/extract.rs:30-36).",
+      "Native-code loading from project config: `customLanguages` in sgconfig.yml makes ast-grep load the named shared library and call its symbol at startup (crates/dynamic/src/lib.rs:120-142; crates/dynamic/src/custom_lang.rs:37-63). Config discovery walks from the current directory up to the filesystem root (crates/cli/src/config.rs:280-299) and runs before argument parsing, so any invocation, even --help, inside a tree containing such a file loads it (crates/cli/src/lib.rs:131-140; crates/cli/src/config.rs:98-114). Running ast-grep in an untrusted checkout can therefore execute code chosen by that checkout's config. The repo also ships prebuilt .so fixtures used by tests (fixtures/json-linux.so, fixtures/json-mac.so; crates/dynamic/src/lib.rs:284-291). There are 54 `unsafe` matches in 15 Rust files (largest: crates/wasm/src/sg_node.rs, crates/core/src/pinned.rs, crates/dynamic/src/lib.rs) and no forbid(unsafe_code).",
+      "Release and supply-chain controls are thin: no SECURITY.md or vulnerability-reporting policy; no checksum, signature, SBOM or provenance step in any workflow; workflow actions are referenced by mutable tags or branches, none by commit SHA; npm publishes use a long-lived NPM_TOKEN with plain `npm publish` and no --provenance (.github/workflows/release.yml:103-116), and the CLI npm packages are built from zips re-downloaded from the latest GitHub release (release.yml:80-85); Renovate automerges patch/pin/digest updates (renovate.json:6-10); no cargo-audit or cargo-deny job or config was found.",
+      "Pre-1.0 and fast-moving: five releases dated 2026-06-21 to 2026-08-23 (CHANGELOG.md:22,46,69,99,127); 0.44.0 lists three 'Breaking change' entries in library crates (CHANGELOG.md:164,166,169); the `sg` command was deprecated in 0.45.0 (CHANGELOG.md:71; crates/cli/src/bin/alias.rs:1-8); PyPI classifiers still say 'Development Status :: 3 - Alpha' (pyproject.toml:21). Manifests name a single author (Cargo.toml:14) and the README asks for sponsorship to free maintainer time (README.md:95-99). The 0.45.3 entry carries no release date (CHANGELOG.md:7-18). No search or outline performance benchmarks are published in this tree; the changelog says benchmarks were moved out of the repo (CHANGELOG.md:129).",
+      "Platform and CI gaps: no musl Linux CLI artifact (release zips are glibc only, release.yml:49-52) and the npm CLI launcher finds no package on musl and exits 1 (npm/postinstall.js:16,64-67), although the NAPI binding builds musl targets (napi.yml:39-41,50-52); WSL2 is not mentioned anywhere; on Unix `sg` only forwards to an `ast-grep` found on PATH (crates/cli/src/bin/alias.rs:19-33); pull requests run only the ubuntu-latest jobs in coverage.yaml (lines 6,12,32,53), while macOS/Windows and binding builds run on tags, manual dispatch or the daily cron (napi.yml:6-13, pyo3.yml:15-26, pypi.yml:3-14, wasm.yml:7-19); CI uses stable Rust and no job exercises the declared MSRV 1.88.0 (Cargo.toml:20; coverage.yaml:19).",
+      "Dependency notes: serde_yaml, used for all rule and config YAML parsing in crates/config, crates/cli and crates/outline, is locked at 0.9.34+deprecated (Cargo.lock:1639-1640; Cargo.toml:36); the LSP stack is pre-1.0 (tower-lsp-server 0.23.0 and ls-types 0.0.6: Cargo.lock:1009-1010,2015-2016); tree-sitter is 0.27.0 with 27 separately versioned grammar crates, one consumed through the renamed fork crate tree-sitter-kotlin-sg (crates/language/Cargo.toml:20-46; Cargo.lock:2255-2256). The project itself is MIT (LICENSE); licenses of transitive crates were not audited here and no deny.toml exists."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "ast-grep/ast-grep",
+      "checks": [
+        {
+          "field": "readme.install[0] (npm global)",
+          "statement": "npm (global): `npm install --global @ast-grep/cli`",
+          "citation": "README.md:37",
+          "holds": true,
+          "note": "README.md:37 is exactly this command, and line 38 adds that `pnpm approve-builds` may be needed. The package is named @ast-grep/cli (npm/package.json:2). Its postinstall links the native binary from one of 7 platform optionalDependencies (npm/package.json:32-40; npm/postinstall.js:54-80)."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1 reads 'MIT License', followed by the standard MIT grant (copyright 2022 Herrington Darkholme, LICENSE:3). The workspace manifest (Cargo.toml:16, license = \"MIT\") and npm/package.json:10 also declare MIT."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - GitHub release zip for x86_64-unknown-linux-gnu, PyPI manylinux_2_28 wheel, npm @ast-grep/cli-linux-x64-gnu, Rust test job on ubuntu-latest; limits: no musl CLI asset in the release matrix and the npm CLI launcher fails on musl",
+          "citation": ".github/workflows/release.yml:38-52,49-50,56-65; .github/workflows/pypi.yml:130-153; npm/package.json:39; .github/workflows/coverage.yaml:12,23; npm/postinstall.js:16,64-67",
+          "holds": true,
+          "note": "Every citation matches. release.yml:49-50 is the x86_64-unknown-linux-gnu target on ubuntu-22.04, and lines 56-65 zip `sg` and `ast-grep` into app-$target. The release matrix (38-52) has only glibc Linux targets. pypi.yml:130-153 builds the x86_64 wheel with manylinux \"2_28\" and runs `sg --help` on it (154-158). npm/package.json:39 lists @ast-grep/cli-linux-x64-gnu, which declares libc glibc (npm/platforms/linux-x64-gnu/package.json:10-12). coverage.yaml:12 is ubuntu-latest and line 23 runs `cargo llvm-cov --all-features --workspace`. On musl, postinstall.js:16 returns null and main() exits 1 with 'Failed to locate @ast-grep/cli native binary.' (64-67). Strictly that is the postinstall step, not the launcher, but the npm/ast-grep shim also exits 1 (npm/ast-grep:17-23)."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "`ast-grep` subcommands run (default with -p/-k), scan, test, new, lsp, outline, completions; -p with --selector/--strictness or -k ESQuery kind; paths or --stdin honoring ignore files; --json=pretty|compact|stream; scan --format github|sarif, exit 1 on error-severity matches, needs sgconfig.yml unless --rule/--inline-rules; outline defaults and flags; `sg` deprecated alias",
+          "citation": "crates/cli/src/lib.rs:51-70,92-104; crates/cli/src/run.rs:61-95; crates/cli/src/utils/args.rs:20-63,139-154; crates/cli/src/print/json_print.rs:20-80,268-278; crates/cli/src/scan.rs:45-49,149-164,195-199; crates/cli/src/utils/error_context.rs:81; crates/cli/src/outline.rs:21-132; crates/cli/src/outline/options.rs:94-108; crates/cli/src/bin/alias.rs:1-8",
+          "holds": true,
+          "note": "All verified. lib.rs:51-70 has the seven subcommands (Docs only in debug builds). run.rs:61-95: pattern, selector and strictness (both require the pattern), and kind ('ESQuery style'). args.rs:20-63: paths default to '.', plus --stdin and --no-ignore. args.rs:139-154 and json_print.rs:268-278: --json with Pretty/Stream/Compact, default pretty. json_print.rs:20-80 carries text, range (byteOffset, start/end line and column), file, language, metaVariables and replacement. cloud_print.rs:14-19 renames the formats to github and sarif. scan.rs:288-290 counts error-severity matches, and 195-199 turns them into DiagnosticError, exit 1 (error_context.rs:81). scan.rs:149-164 needs the project config unless --rule or --inline-rules is given (ProjectNotExist, config.rs:98-101). options.rs:94-108: directory input defaults to Exports+Names, otherwise Structure+Digest. outline.rs has --type, --match, --items, --view, --outline-rules, and --lang is required with --stdin (line 55). alias.rs:1-8 prints the deprecation warning. Minor imprecisions: the default `run` applies when any flag comes first and -p/-k appears anywhere (lib.rs:94-96), not only when -p/-k comes first. The listed JSON fields are the run/scan shape; outline JSON is {path, language, items[...]} without text, metaVariables or replacement (outline/extract.rs:30-36; crates/outline/src/model.rs:87-118)."
+        },
+        {
+          "field": "claim_checks[9]",
+          "statement": "README is silent on language-server features, MCP, symbol definitions/references and Claude Code/Codex (verified: yes); lsp/outline exist; the LSP server offers only diagnostics, code actions (quickfix.ast-grep, source.fixAll.ast-grep), executeCommand ast-grep.applyAllFixes and hover, with no definition/references/rename; no mcp/claude/codex/anthropic matches in the tree",
+          "citation": "README.md:1-124; crates/cli/src/lib.rs:61-64; crates/lsp/src/lib.rs:53-55,91-101",
+          "holds": true,
+          "note": "A case-insensitive search of README.md for language server, lsp, definition, reference, outline, mcp, claude and codex found nothing. lib.rs:61-64 holds the Lsp and Outline variants. crates/lsp/src/lib.rs:53-55 defines the three ids; 91-101 advertise full sync, code actions, executeCommand [ast-grep.applyAllFixes] and hover. The handlers (lib.rs:80-212) are only initialize, initialized, shutdown, did_*, code_action, execute_command and hover, with no definition, references, rename or symbol handlers. Searching the tree for mcp, model context protocol, claude, codex and anthropic (.github, .cargo and hidden files included; .git excluded) found nothing. Trivial: README.md has 123 lines, so the cited range 1-124 is one line too long."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

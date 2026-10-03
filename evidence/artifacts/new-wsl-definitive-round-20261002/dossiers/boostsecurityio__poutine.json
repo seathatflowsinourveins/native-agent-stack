@@ -1,0 +1,286 @@
+{
+  "contender": "boostsecurityio/poutine",
+  "revision": {
+    "contender": "boostsecurityio/poutine",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "boostsecurityio/poutine",
+        "tag": "v1.1.6",
+        "commit": "8918c66db19ecfd12b2f8379e445c3da4589e599",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v1.1.6",
+    "commit": "8918c66db19ecfd12b2f8379e445c3da4589e599",
+    "read_at": "2026-10-02T03:01:58+00:00"
+  },
+  "dossier": {
+    "contender": "boostsecurityio/poutine",
+    "revision": {
+      "tag": "v1.1.6",
+      "commit": "8918c66db19ecfd12b2f8379e445c3da4589e599",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Static security scanner (Go CLI with embedded OPA/Rego policies) for CI/CD pipeline definitions: GitHub Actions workflows and composite actions, GitLab CI, Azure Pipelines and Tekton Pipelines-as-Code. It parses pipeline YAML from a local checkout, one remote repo, a whole org, or stale branches, evaluates 13 built-in rules (injection, untrusted checkout then exec, default permissions on risky events, unpinnable or unverified actions, known-vulnerable actions and build platforms, self-hosted runners on PRs, etc.) and prints pretty, JSON or SARIF 2.1.0 output. It also runs as a stdio MCP server whose analyze_manifest tool targets agents that generate pipelines. Analysis is read-only: it does not modify repositories, generate SBOMs or attestations, or open PRs.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Created by BoostSecurity.io, poutine is a security scanner that detects misconfigurations and vulnerabilities in the build pipelines of a repository; it supports parsing CI workflows from GitHub Actions and Gitlab CI/CD.",
+          "citation": "README.md:13"
+        },
+        {
+          "claim": "When given an access token with read-level access, poutine can analyze all the repositories of an organization.",
+          "citation": "README.md:13"
+        },
+        {
+          "claim": "Supported platforms: GitHub Actions, Gitlab Pipelines, Azure DevOps, Pipelines As Code Tekton.",
+          "citation": "README.md:29-34"
+        },
+        {
+          "claim": "A list of the rules currently supported is in the documentation (docs/content/en/rules); the skip example names unpinnable_action, pr_runs_on_self_hosted and github_action_from_unverified_creator_used.",
+          "citation": "README.md:23,239-251"
+        },
+        {
+          "claim": "--format accepts pretty (default), json and sarif; the GitHub Actions example runs poutine-action then uploads results.sarif with github/codeql-action/upload-sarif under permissions security-events: write and contents: read.",
+          "citation": "README.md:54-73,109"
+        },
+        {
+          "claim": "--fail-on-violation exits with a non-zero code (10) when violations are found.",
+          "citation": "README.md:117"
+        },
+        {
+          "claim": "GitHub Action usage is boostsecurityio/poutine-action@main, with the comment 'We recommend to use a tagged version and pin it'.",
+          "citation": "README.md:66-68"
+        },
+        {
+          "claim": "Version-check telemetry: at most once every 24 hours; reports the poutine version, an anonymous instance identifier persisted in ~/.poutine/config.yaml and a count of CLI invocations since the last check; no source, repository or finding data is sent; disable with --disable-version-check, POUTINE_DISABLE_VERSION_CHECK=1 or disableVersionCheck: true in .poutine.yml.",
+          "citation": "README.md:118,123-129"
+        },
+        {
+          "claim": "Custom Rego rules (package rules.<name>, rule metadata, results set) can be loaded at runtime through the include directive of .poutine.yml or .github/poutine.yml.",
+          "citation": "README.md:131-206"
+        },
+        {
+          "claim": "Findings can be skipped via config (filters: job, level, path, rule, purl, osv_id) or --skip <rule> (rule name only, global).",
+          "citation": "README.md:208-268"
+        },
+        {
+          "claim": "poutine can be integrated with AI coding assistants such as Claude Code and Gemini through MCP to analyze repositories and validate CI/CD pipelines; details in MCP_INTEGRATION.md.",
+          "citation": "README.md:270-274"
+        },
+        {
+          "claim": "Badges at the top: OpenSSF Best Practices, OpenSSF Scorecard, and a SLSA 3 image badge linking to slsa.dev.",
+          "citation": "README.md:1-2,7"
+        },
+        {
+          "claim": "Install by downloading a release binary, Homebrew, or the Docker image ghcr.io/boostsecurityio/poutine:latest; a TODO comment notes that cosign verify instructions are not yet written.",
+          "citation": "README.md:40-52"
+        },
+        {
+          "claim": "Building from source requires Go 1.26+ and uses make build.",
+          "citation": "README.md:276-284"
+        }
+      ],
+      "install": [
+        {
+          "method": "Release binary (Linux, macOS)",
+          "command": "Download the latest release from https://github.com/boostsecurityio/poutine/releases and add the binary to your $PATH",
+          "citation": "README.md:40"
+        },
+        {
+          "method": "Homebrew (macOS/Linux)",
+          "command": "brew install poutine",
+          "citation": "README.md:44-47"
+        },
+        {
+          "method": "Docker",
+          "command": "docker run -e GH_TOKEN ghcr.io/boostsecurityio/poutine:latest",
+          "citation": "README.md:49-52"
+        },
+        {
+          "method": "GitHub Actions (CI usage)",
+          "command": "uses: boostsecurityio/poutine-action@main (then github/codeql-action/upload-sarif with sarif_file: results.sarif)",
+          "citation": "README.md:54-73"
+        },
+        {
+          "method": "From source (Go 1.26+)",
+          "command": "git clone https://github.com/boostsecurityio/poutine.git && cd poutine && make build",
+          "citation": "README.md:276-284"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - .goreleaser.yaml:9-17 builds linux/amd64 with CGO disabled; archive naming poutine_Linux_x86_64 (.goreleaser.yaml:56-65); container image linux/amd64 (.goreleaser.yaml:34-36); CI runs on ubuntu-latest (.github/workflows/build_test.yml:14).",
+        "wsl2": "unknown - WSL2 is not mentioned in README.md or any workflow; Linux amd64/arm64 binaries are built (.goreleaser.yaml:9-17) but no WSL-specific documentation or test was found.",
+        "macos_arm64": "yes - .goreleaser.yaml:12-16 builds darwin/arm64; README documents Homebrew (README.md:44-47); CI matrix includes macos-latest (.github/workflows/build_test.yml:14; runner architecture is not pinned in the workflow).",
+        "gpu": "no - not applicable: YAML parsing plus OPA/Rego evaluation in Go; no GPU code or GPU-related dependency in go.mod:5-27 and no GPU mention in README.md."
+      },
+      "integrations": {
+        "cli": "yes - poutine binary with subcommands analyze_local, analyze_repo, analyze_org, analyze_repo_stale_branches, mcp-server, version (cmd/analyzeLocal.go:15, cmd/analyzeRepo.go:14, cmd/analyzeOrg.go:14, cmd/analyzeRepoStaleBranches.go:16, cmd/mcp_server.go:39, cmd/version.go:11); usage in README.md:75-103. analyze_manifest exists only as an MCP tool, not as a CLI subcommand.",
+        "mcp": "yes - 'poutine mcp-server' serves JSON-RPC over stdio (server.ServeStdio, cmd/mcp_server.go:307) with 5 tools: analyze_org, analyze_repo, analyze_local, analyze_repo_stale_branches, analyze_manifest (cmd/mcp_server.go:92-285), all annotated read-only (cmd/mcp_server.go:116,144,178,196,281). Setup in MCP_INTEGRATION.md:19-49, tool list MCP_INTEGRATION.md:51-98. analyze_manifest takes YAML content for github-actions, gitlab-ci, azure-pipelines or tekton and needs no SCM token (cmd/mcp_server.go:537-587).",
+        "sdk_or_api": "No HTTP API or published SDK found. Go packages are importable as a library (opa.NewOpaWithEmbeddedRules is documented for 'library consumers', opa/opa.go:70-79; docs/content/en/structured-finding-metadata.md:8 addresses 'library users'). A Dagger module wraps the container image with AnalyzeLocal/AnalyzeRepo/AnalyzeOrg (dagger/main.go:80-135). The GitHub Action wrapper boostsecurityio/poutine-action lives in a separate repository (README.md:66-68) and was not inspected.",
+        "claude_code_or_codex": "Claude Code: documented via MCP - 'claude mcp add poutine poutine mcp-server' (MCP_INTEGRATION.md:21-25; README.md:270-274); Gemini CLI also documented (MCP_INTEGRATION.md:27-31). Codex: none found beyond a generic stdio MCP JSON snippet (MCP_INTEGRATION.md:33-47). The four .claude/skills/*/SKILL.md files are contributor workflow skills for developing poutine itself (format/lint, docs, snapshots, vuln-db update), not a user-facing integration."
+      },
+      "telemetry_and_network": "Telemetry (opt-out, on by default): every command except mcp-server and completion calls versioncheck.Run from PersistentPreRun (cmd/root.go:83-95,103-106,112-131). It sends a GET to https://version-check.cicd.fun/v1/check (versioncheck/versioncheck.go:37; override env POUTINE_VERSION_CHECK_URL, :22,114) with query parameters project=poutine, component=cli, version, instance_id (random UUID), start_count, starts_since_last_check, and ci=true when CI is truthy (versioncheck.go:259-274), plus User-Agent poutine/<version> (:153); 1.2 s timeout (:31). Throttled to once per 24 h (:30,131) EXCEPT when env CI is truthy: then no state is persisted, a fresh UUID is generated per run and the check is not throttled (:68-77). State file ~/.poutine/config.yaml (override POUTINE_CONFIG_DIR) written 0600 in a 0700 dir (versioncheck/config.go:25-34,58-70); it is written before the dev-version skip, so development builds also create it (versioncheck.go:78-84,123-125). Disable: --disable-version-check (cmd/root.go:189), POUTINE_DISABLE_VERSION_CHECK=1|true|yes|on (versioncheck.go:20,64,184-191), disableVersionCheck in config (models/config.go:32; cmd/root.go:118). Builds whose version is development/dev/unknown/SNAPSHOT do not send (versioncheck.go:123,202-209); 'make build' yields version 'development' (Makefile:6-7, poutine.go:8). No source, repo or finding data is in the request. Other network: analyze_repo, analyze_org and analyze_repo_stale_branches require an SCM token (--token or GH_TOKEN; providers/scm/scm.go:18-46) and call the GitHub REST /meta endpoint and GraphQL API (GitHub Enterprise or GitLab API via --scm-base-url) and fetch git objects over HTTPS with go-git into memory (providers/github/client.go:116-143,222-261,350-464; providers/gitops/gitops.go:109-232). Only GH_TOKEN is bound as an env var (cmd/analyzeRepo.go:49, cmd/analyzeOrg.go:58, cmd/analyzeRepoStaleBranches.go:62); GL_TOKEN appears only in help text and README examples. analyze_local needs no token or SCM network (providers/scm/scm.go:21-23) but still performs the version check unless disabled. The OPA engine is network-disabled: allow_net must be empty (opa/opa.go:272-274; opa/capabilities.json:2) and http.send is absent from the capability builtins. Advisory and reputation data are embedded (opa/rego/external/osv.rego, opa/rego/external/build_platform.rego, providers/pkgsupply/unpinnable_actions.txt with 6123 purls, providers/pkgsupply/static.go:11-33), so there is no remote reputation service. No account or sign-in beyond the SCM token."
+    },
+    "code": {
+      "languages": [
+        "Go",
+        "Rego (OPA)",
+        "YAML and Markdown (workflows, docs, Hugo site)"
+      ],
+      "entry_points": [
+        {
+          "path": "poutine.go",
+          "what": "package main: holds version/commit/date (set via ldflags) and calls cmd.Execute()"
+        },
+        {
+          "path": "cmd/root.go",
+          "what": "cobra root command: global flags (--config, --format, --scm, --scm-base-url, --skip, --allowed-rules, --fail-on-violation, --disable-version-check, --quiet, --verbose), formatter selection, exit codes (1 error, 2 interrupt, 10 violations), version-check hook; cmd/version.go adds the version subcommand"
+        },
+        {
+          "path": "cmd/analyzeLocal.go",
+          "what": "analyze_local: scans a checked-out directory on disk, no token or SCM client needed"
+        },
+        {
+          "path": "cmd/analyzeRepo.go",
+          "what": "analyze_repo org/repo [--ref]: remote single-repo scan (GitHub or GitLab)"
+        },
+        {
+          "path": "cmd/analyzeOrg.go",
+          "what": "analyze_org: scans all non-archived repos of an org/group with --threads (default 2) and --ignore-forks"
+        },
+        {
+          "path": "cmd/analyzeRepoStaleBranches.go",
+          "what": "analyze_repo_stale_branches: finds old pull_request_target workflows across branches; rejects --format sarif"
+        },
+        {
+          "path": "cmd/mcp_server.go",
+          "what": "mcp-server: stdio MCP server exposing analyze_org, analyze_repo, analyze_local, analyze_repo_stale_branches, analyze_manifest"
+        },
+        {
+          "path": "dagger/main.go",
+          "what": "Dagger module (AnalyzeLocal/AnalyzeRepo/AnalyzeOrg) that runs the ghcr.io/boostsecurityio/poutine image; default image pin is 0.13.0 (dagger/main.go:9)"
+        }
+      ],
+      "architecture": "Flow: cmd/ (cobra + viper config from .poutine.yml or .github/poutine.yml, cmd/root.go:194-241) builds an analyze.Analyzer (analyze/analyze.go) from an SCM client (providers/scm/scm.go dispatching to providers/github, providers/gitlab or providers/local), a git client and a formatter. Remote content is fetched with go-git v6 into memory: shallow, blobless fetch of the default branch, then only .yml/.yaml blobs are fetched (providers/gitops/gitops.go:109-232,592-622); analyze_local walks the working directory on disk and skips .git (scanner/inventory_scanner.go:34-60). scanner/parsers.go turns files into models.PackageInsights (models/*.go): GitHub workflows (only top-level .github/workflows/*.yml|yaml, parsers.go:66), action.yml metadata, GitLab CI (follows local includes), Azure Pipelines, Tekton PaC. scanner/inventory.go evaluates the embedded OPA/Rego bundle (opa/opa.go, opa/rego/**): poutine/inventory/*.rego derives dependency purls from uses: steps, job container images, reusable workflows and composite-action steps (build_dependencies and package_dependencies); opa/rego/rules/ holds 13 rule modules (confused_deputy_auto_merge, debug_enabled, default_permissions_on_risky_events, github_action_from_unverified_creator_used, if_always_true, injection, job_all_secrets, known_vulnerability_in_build_component, known_vulnerability_in_build_platform, pr_runs_on_self_hosted, unpinnable_action, untrusted_checkout_exec, unverified_script_exec), each with a docs page in docs/content/en/rules/; opa/rego/external/ holds static advisory data; poutine/queries/findings.rego applies skip config. Custom *.rego rules can be added via include paths or embedded FS (opa/opa.go:70-107,203-216). Results (results/results.go) go to formatters/{pretty,json,sarif,noop}; the JSON format is itself a Rego module (opa/rego/poutine/format/json.rego) and extra formats can be added in Rego (opa/rego/poutine/queries/format.rego). docs/content.go embeds rule docs for SARIF help text. versioncheck/ is the telemetry client; providers/pkgsupply embeds the unpinnable-action list.",
+      "packaging_and_release": "Release workflow runs GoReleaser v2.15.2 on tag pushes matching v0.N.N or v1.N.N (.github/workflows/release.yml:3-8,12,41-46) with permissions contents: write, packages: write, id-token: write (release.yml:19-22) and step-security/harden-runner in audit mode (release.yml:24-26). .goreleaser.yaml: go mod verify hook (:4-6); builds linux and darwin for amd64, arm64 and arm v7 with CGO_ENABLED=0, -trimpath and ldflags embedding version, commit, date and builtBy (:8-23); tar.gz archives named poutine_<Os>_<x86_64|arm64|armv7> (:56-69); ko-built images for linux/amd64 and linux/arm64 pushed to ghcr.io/boostsecurityio/poutine tagged <version> and latest on a digest-pinned cgr.dev/chainguard/git base (:25-36); cosign sign-blob over the checksum file producing a <file>.sigstore.json bundle (:45-54) and cosign sign of image manifests via docker_signs (:38-43); no key material is configured and id-token: write is granted, consistent with keyless signing. No sboms: section and no SLSA provenance or attest step exists in .goreleaser.yaml or any workflow (grep for slsa/provenance/attest matches only the README badge and test/rule data). README has a TODO for cosign verify instructions (README.md:42). No Homebrew block in .goreleaser.yaml (the Homebrew formula is maintained outside this repo). A Dockerfile builds a snapshot binary through goreleaser (Dockerfile:1-16).",
+      "tests_and_ci": "Frameworks: Go testing + testify (go.mod:22) + go-snaps snapshots (go.mod:7; test/snapshot/__snapshots__/snapshot_test.snap). 23 *_test.go files containing 104 Test/Benchmark functions (grep). Test locations: per-package tests (analyze/, cmd/, docs/, formatters/sarif/, models/, opa/, providers/gitops, providers/local, providers/pkgsupply, providers/scm/domain, scanner/, versioncheck/) with fixtures in scanner/testdata/ and opa/testdata/; test/snapshot/ scans the live messypoutine GitHub org and is skipped when GH_TOKEN is unset (test/snapshot/snapshot_test.go:23-29,91,111); bench/analyze/ is a benchmark harness (CPU/RSS/heap metrics, needs GH_TOKEN, microsoft org and messypoutine/gha-playground targets) with no published results; opa/populate_build_platform_vuln_database_test.go is build-tag gated and regenerates the vuln DB. No Rego-native tests. Makefile targets: test, lint, snapshot, update-snapshots, update-vulndb, bench-org, bench-repo (Makefile:9-43). CI, 8 workflows in .github/workflows: build_test.yml (go mod verify, go build, go test -v ./... on ubuntu-latest and macos-latest, GH_TOKEN from GITHUB_TOKEN, permissions contents: read); golangci-lint.yml (v2.11.4, only-new-issues; .golangci.yml enables 14 linters plus gofmt); codeql.yml (CodeQL for Go on push, PR and weekly cron, security-events: write); dependency-review.yml (actions/dependency-review-action on PRs); scorecards.yml (OpenSSF Scorecard with publish_results, SARIF uploaded to code scanning); pop.yml (poutine scans its own workflows via boostsecurityio/poutine-action@main and uploads results.sarif with github/codeql-action/upload-sarif); deploy-github-pages.yml (Hugo docs; downloads the Hugo .deb with wget and no checksum, lines 28-33); release.yml. Actions are pinned to commit SHAs with version comments except pop.yml:39 (@main). .github/dependabot.yml schedules monthly gomod and github-actions updates.",
+      "dependencies": "go.mod (go 1.26.0): 21 direct requires (go.mod:6-26: includes open-policy-agent/opa v1.15.1, go-git/go-git/v6 pseudo-version v6.0.0-20260331140939, mark3labs/mcp-go v0.46.0, google/go-github/v84, shurcooL/githubv4, gitlab.com/gitlab-org/api/client-go, spf13/cobra and viper, rs/zerolog, owenrumney/go-sarif/v2, package-url/packageurl-go, stretchr/testify, gkampitakis/go-snaps) and 87 indirect (go.mod:30-116). google/uuid is imported directly (versioncheck/versioncheck.go:15) but marked // indirect (go.mod:55). dagger/go.mod declares no requirements (dagger/go.mod:1-3). go.sum is present. No other package manifests found (no package.json, requirements, etc.). docs/themes/hugo-geekdoc v0.41.1 is a vendored Hugo theme under MIT (docs/themes/hugo-geekdoc/VERSION, LICENSE:1-3).",
+      "security_policy": "none - no SECURITY.md found at the repo root, .github/ or docs/; README.md:302 links a private advisory form for the messypoutine demo org, not for poutine itself. CONTRIBUTING.md:7 asks for DCO sign-off; .github/CODEOWNERS assigns everything to @boostsecurityio/security."
+    },
+    "claim_checks": [
+      {
+        "claim": "See the documentation for a list of rules currently supported (README.md:23); skip example references unpinnable_action (README.md:239-241).",
+        "verified": "yes",
+        "evidence": "13 rule modules in opa/rego/rules/ match 13 pages in docs/content/en/rules/. Scope for the permission/pinning needs: the only permissions rule, default_permissions_on_risky_events (level warning), fires for pull_request_target or issue_comment workflows lacking workflow- and job-level permissions (opa/rego/rules/default_permissions_on_risky_events.rego:18-49); it has no write-all or excess-scope check. The only pinning-related rule, unpinnable_action (level note), iterates github_actions_metadata (action.yml files) and flags unpinned or unpinnable dependencies of composite/docker actions (opa/rego/rules/unpinnable_action.rego:21-37; docs/content/en/rules/unpinnable_action.md:11); the unpinned_purl helper (opa/rego/poutine/utils.rego:5-20) is used only there, so no rule flags unpinned uses: refs in workflow files."
+      },
+      {
+        "claim": "Supports parsing CI workflows from GitHub Actions and Gitlab CI/CD; supported platforms also list Azure DevOps and Pipelines As Code Tekton (README.md:13,29-34).",
+        "verified": "yes",
+        "evidence": "Parsers exist for all four (scanner/parsers.go:60-264; scanner/inventory_scanner.go:21-32). Remote org/repo scanning only has GitHub and GitLab SCM clients (providers/scm/scm.go:25-46); Azure and Tekton files are scanned when found inside such repos or locally. Rule coverage differs per platform (the permissions and pinning-related rules are GitHub Actions only)."
+      },
+      {
+        "claim": "With a read-level access token poutine can analyze all repositories of an organization (README.md:13).",
+        "verified": "yes",
+        "evidence": "Remote access is GraphQL queries, a REST GET on /meta and git fetches (providers/github/client.go:116-143,350-464; providers/gitops/gitops.go:109-232). Grep found no GraphQL Mutate calls, no REST create/update/delete calls and no git push. Optional Issues:Read is tolerated as a partial failure (providers/github/client.go:377-387,488-493)."
+      },
+      {
+        "claim": "--format sarif and upload with github/codeql-action/upload-sarif (README.md:54-73,109).",
+        "verified": "yes",
+        "evidence": "formatters/sarif/sarif.go:32-175 writes SARIF 2.1.0 to stdout (cmd/root.go:263): tool driver name poutine with informationUri and semantic version (sarif.go:60-62), versionControlProvenance with revisionId (commit SHA), branch and repositoryUri when the repo URI is a valid git URL (sarif.go:84-94), rule help URLs under boostsecurityio.github.io (sarif.go:127), and partialFingerprints primaryLocationLineHash computed as sha256 of path+line+job+step+ruleId (sarif.go:141-149; results/results.go:41-47). poutine itself never calls a code-scanning API; upload is done by the separate github/codeql-action/upload-sarif step (.github/workflows/pop.yml:42-45). analyze_repo_stale_branches rejects sarif (cmd/analyzeRepoStaleBranches.go:29-31). One SARIF run is emitted per package (sarif.go:59-170). Logs and progress go to stderr (cmd/root.go:88; analyze/progress_bar_observer.go:30)."
+      },
+      {
+        "claim": "--fail-on-violation exits with code 10 when violations are found (README.md:117).",
+        "verified": "yes",
+        "evidence": "cmd/root.go:47,55-65,69-73,159-162,188; cmd/fail_on_violation_test.go:17-19. Any finding of any level (note, warning, error) counts as a violation; there is no severity threshold. Default is exit 0 with findings."
+      },
+      {
+        "claim": "Version check reports version, anonymous instance id and invocation count at most once per 24 h, sends no source/repo/finding data (README.md:123-129).",
+        "verified": "partial",
+        "evidence": "Opt-out mechanisms match (cmd/root.go:118,189; versioncheck/versioncheck.go:20,64; models/config.go:32) and no repo data is sent. But the request also carries project, component, cumulative start_count and ci=true plus a User-Agent (versioncheck.go:153,259-274), and when env CI is truthy state is not persisted, a fresh UUID is used and the 24 h throttle does not apply (versioncheck.go:68-77,131), so CI runs report every time. The check also runs for analyze_local and version (skipped only for mcp-server and completion, cmd/root.go:103-106). README does not mention the CI behavior."
+      },
+      {
+        "claim": "Custom Rego rules can be loaded at runtime via include paths in .poutine.yml (README.md:131-206).",
+        "verified": "yes",
+        "evidence": "opa/opa.go:114-123 collects include paths and opa/opa.go:203-216 loads *.rego from them; config discovery for .poutine.yml and .github/poutine.yml is in cmd/root.go:194-241. Custom rules run under the same capability list with allow_net required to be empty (opa/opa.go:266-275; opa/capabilities.json:2), so they cannot do network calls."
+      },
+      {
+        "claim": "MCP integration lets Claude Code and others analyze repos and validate pipelines; the server picks up GH_TOKEN (README.md:270-274; MCP_INTEGRATION.md:17,98).",
+        "verified": "partial",
+        "evidence": "5 stdio tools exist (cmd/mcp_server.go:92-302) and GH_TOKEN is bound through viper (cmd/analyzeRepo.go:49, cmd/analyzeOrg.go:58, cmd/analyzeRepoStaleBranches.go:62). However the server help text and error messages say 'GH_TOKEN/GL_TOKEN' (cmd/mcp_server.go:60,318) while GL_TOKEN is not bound anywhere in the code. MCP_INTEGRATION.md:98 says analyze_manifest is called automatically by assistants; that depends on the client honoring the tool description (cmd/mcp_server.go:203-266) and is not enforced by code (not checkable here)."
+      },
+      {
+        "claim": "SLSA 3 badge (README.md:7).",
+        "verified": "no",
+        "evidence": "The badge is a static image. The release workflow only runs GoReleaser with cosign signing of the checksum file and image manifests (.github/workflows/release.yml:19-22,35-48; .goreleaser.yaml:38-54); there is no slsa-github-generator, no actions/attest-build-provenance, no attestations: write permission and no SBOM step in any workflow (grep for slsa|provenance|attest|sbom matches only the README badge and rule/test data). Provenance produced outside this repository cannot be ruled out."
+      },
+      {
+        "claim": "Install via release page, Homebrew or docker run -e GH_TOKEN ghcr.io/boostsecurityio/poutine:latest (README.md:40-52).",
+        "verified": "partial",
+        "evidence": "Release archives and signed checksums are configured (.goreleaser.yaml:45-69) and the image is configured for ghcr.io/boostsecurityio/poutine with tags <version> and latest for linux/amd64 and linux/arm64 (.goreleaser.yaml:25-36); whether artifacts are actually published and signed is not checkable offline. No Homebrew configuration exists in this repo (formula maintained elsewhere, not checkable). The documented docker command has no subcommand or workspace mount, so it prints help; the Dockerfile sets WORKDIR /src and a git safe.directory (Dockerfile:10-16)."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Narrow policy coverage for the permission/pinning needs: the one permissions rule only fires for pull_request_target or issue_comment workflows with no workflow- or job-level permissions (opa/rego/rules/default_permissions_on_risky_events.rego:18-49); it has no write-all or excess-scope check, and utils.empty treats an empty permissions list like an undefined one (opa/rego/poutine/utils.rego:53-58), so behavior for a workflow-level 'permissions: {}' depends on job-level permissions (code read, not executed). The one pinning rule, unpinnable_action (level note), checks only action.yml metadata, not uses: refs in workflows (opa/rego/rules/unpinnable_action.rego:21-37). Org/repo default GITHUB_TOKEN settings are never read: the REST helpers exist but have no callers (providers/github/client.go:263-333).",
+      "Missing capabilities for several listed needs: output is pretty/json/sarif only, no CycloneDX or SPDX (cmd/root.go:258-269); the JSON packages section lists declared dependency purls from uses:, container images and reusable workflows, not a runtime inventory (opa/rego/poutine/format/json.rego:5-22; opa/rego/poutine/inventory/github_actions.rego:7-42); the tool is read-only, so it does not update pins or open PRs; there is no actionlint or shellcheck integration (grep) and workflow YAML that fails to parse or is not recognized is dropped with a debug-level log only (scanner/parsers.go:88-103; models/github_actions.go:209-211); only top-level .github/workflows/*.yml|yaml are matched (scanner/parsers.go:66).",
+      "Release integrity gaps: cosign signatures cover the checksum file and image manifests, but there is no SBOM or provenance step (.github/workflows/release.yml:19-22,35-48; .goreleaser.yaml:38-54) while the README shows a SLSA 3 badge (README.md:7); verification instructions are a TODO (README.md:42); ldflags embed a build date and no mod_timestamp is set (.goreleaser.yaml:21), and reproducibility is not documented; the README promotes the mutable :latest tag and @main action ref (README.md:51,67); release tag filter matches only v0.N.N and v1.N.N (release.yml:6-8).",
+      "Telemetry is on by default and phones home to version-check.cicd.fun on every command except mcp-server and completion, including offline-capable analyze_local; in CI (env CI truthy) it reports on every run with a fresh instance id, and it writes ~/.poutine/config.yaml even for development builds (versioncheck/versioncheck.go:37,63-101,259-274; cmd/root.go:83-95,103-106). Opt-out exists (flag, env var, config). Egress-restricted runners need the opt-out or an allowlist.",
+      "Findings depend on static embedded data that ages between releases: 19 GitHub Action advisories (latest published 2025-09-29, opa/rego/external/osv.rego:283), 705 build-platform advisories refreshed by a manual make target (opa/rego/external/build_platform.rego; Makefile:32-35; README.md:286-291), and 6123 unpinnable-action purls (providers/pkgsupply/unpinnable_actions.txt). known_vulnerability_in_build_component only matches numeric version tags, so SHA-pinned refs are not matched (opa/rego/rules/known_vulnerability_in_build_component.rego:19-27).",
+      "Gating and agent-access semantics: --fail-on-violation exits 10 on any finding regardless of level (cmd/root.go:55-65), so note-level rules also fail a job unless skipped. MCP tools take org/repo/path arguments chosen by the AI client and use the ambient GH_TOKEN, so reach equals token scope (cmd/mcp_server.go:316-343,420-427); help text advertises GL_TOKEN but only GH_TOKEN is bound (cmd/mcp_server.go:60; cmd/analyzeRepo.go:49).",
+      "Maintenance and documentation drift: CONTRIBUTING.md:15 says Go 1.24+ while go.mod:3 and README.md:278 say 1.26; Dagger module default pins poutine 0.13.0 and engine v0.11.6 (dagger/main.go:9; dagger.json:5); README pkg.go.dev badge uses a /v4 path while the module is github.com/boostsecurityio/poutine (README.md:5; go.mod:1); go-git is a v6 pseudo-version, not a tagged release (go.mod:8); google/uuid is marked indirect though imported directly (go.mod:55); MAINTAINERS.md lists two maintainers, both at BoostSecurity.io (MAINTAINERS.md:5-7); snapshot tests depend on the live messypoutine org and silently skip without GH_TOKEN (test/snapshot/snapshot_test.go:23-29,91).",
+      "Governance and licensing notes: no SECURITY.md in the repo; the GitHub Action wrapper (boostsecurityio/poutine-action) is a separate repository referenced at the mutable ref @main in the project's own workflow (.github/workflows/pop.yml:39) and was not inspected; LICENSE is the stock Apache-2.0 text with the appendix placeholder 'Copyright [yyyy] [name of copyright owner]' unfilled (LICENSE:189) and no per-file license headers in Go or Rego sources (grep); the vendored docs theme carries its own MIT license (docs/themes/hugo-geekdoc/LICENSE:1-3)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "boostsecurityio/poutine",
+      "checks": [
+        {
+          "field": "readme.install[0] (Release binary (Linux, macOS))",
+          "statement": "Download the latest release from https://github.com/boostsecurityio/poutine/releases and add the binary to your $PATH",
+          "citation": "README.md:40",
+          "holds": true,
+          "note": "README.md:40 says this nearly word for word. The cited line doesn't name an OS, but .goreleaser.yaml:11-17 builds only linux and darwin (amd64, arm64, armv7 via goarm :22-23), so the '(Linux, macOS)' label is accurate. No Windows build exists, although a Windows zip override sits at :67-69. release.yml:3-8,41-46 runs GoReleaser on v0.N.N/v1.N.N tag pushes, and the checkout is tag v1.1.6 = 8918c66 (.git/packed-refs:2). Whether the release page actually has the assets can't be checked offline."
+        },
+        {
+          "field": "license",
+          "statement": "spdx: Apache-2.0, file: LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-3 is the 'Apache License Version 2.0, January 2004' header, and the full stock terms run through :201. README.md:304-306 also says Apache License 2.0. The appendix placeholder 'Copyright [yyyy] [name of copyright owner]' at LICENSE:189 is left unfilled, as the dossier's risks note. The only other LICENSE file is under the vendored docs/themes/hugo-geekdoc."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - .goreleaser.yaml:9-17 builds linux/amd64 with CGO disabled; archive naming poutine_Linux_x86_64 (.goreleaser.yaml:56-65); container image linux/amd64 (.goreleaser.yaml:34-36); CI runs on ubuntu-latest (.github/workflows/build_test.yml:14).",
+          "citation": ".goreleaser.yaml:9-17,34-36,56-65; .github/workflows/build_test.yml:14",
+          "holds": true,
+          "note": "CGO_ENABLED=0 at :10, goos linux at :12, goarch amd64 at :15. With project_name poutine (:2), the name_template (:59-65) turns linux/amd64 into poutine_Linux_x86_64. ko platforms list linux/amd64 at :35. The build_test.yml:14 matrix is [ubuntu-latest, macos-latest], and go build and go test run on both (:31-34)."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "yes - 'poutine mcp-server' serves JSON-RPC over stdio (server.ServeStdio, cmd/mcp_server.go:307) with 5 tools: analyze_org, analyze_repo, analyze_local, analyze_repo_stale_branches, analyze_manifest (cmd/mcp_server.go:92-285), all annotated read-only (cmd/mcp_server.go:116,144,178,196,281). Setup in MCP_INTEGRATION.md:19-49, tool list MCP_INTEGRATION.md:51-98. analyze_manifest takes YAML content for github-actions, gitlab-ci, azure-pipelines or tekton and needs no SCM token (cmd/mcp_server.go:537-587).",
+          "citation": "cmd/mcp_server.go:92-285,307,537-587; MCP_INTEGRATION.md:19-49,51-98",
+          "holds": true,
+          "note": "Use 'mcp-server' at :39, server.ServeStdio(s) at :307. Five mcp.NewTool calls at :92/:123/:151/:185/:202, with WithReadOnlyHintAnnotation(true) at exactly :116, 144, 178, 196 and 281. The manifest_type enum lists the four types (:271-275), and analyze/analyze.go:599-612 maps all four to filenames, with parsers at :577-583. handleAnalyzeManifest (:537-587) has no token check, while the org, repo and stale-branch handlers do (:316-319, 371-374, 480-483). Its analyzer is built with nil SCM and git clients (:81). MCP_INTEGRATION.md:19-49 covers setup (Claude Code :21-25, Gemini :27-31, generic stdio JSON :33-47) and :51-98 the tool list."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "See the documentation for a list of rules currently supported (README.md:23); skip example references unpinnable_action (README.md:239-241). Verified yes: 13 rule modules match 13 docs pages; the only permissions rule, default_permissions_on_risky_events (warning), fires for pull_request_target/issue_comment workflows lacking workflow- and job-level permissions, with no write-all or excess-scope check; the only pinning-related rule, unpinnable_action (note), iterates action.yml metadata; unpinned_purl (utils.rego:5-20) is used only there, so no rule flags unpinned uses: refs in workflow files.",
+          "citation": "README.md:23,239-241; opa/rego/rules/default_permissions_on_risky_events.rego:18-49; opa/rego/rules/unpinnable_action.rego:21-37; opa/rego/poutine/utils.rego:5-20; docs/content/en/rules/unpinnable_action.md:11",
+          "holds": true,
+          "note": "README:23 links docs/content/en/rules, and README:240 is '- rule: unpinnable_action'. There are 13 .rego files in opa/rego/rules/ and 13 matching .md pages (plus img.png and img_1.png). default_permissions is level warning (:9) and only covers pull_request_target and issue_comment (:18-21). It fires when workflow and job permissions are empty (:33-34) or absent (:47-48), with no write-all check. In opa/rego, 'permissions' appears only in this rule and in advisory text. unpinnable_action is level note (:7) and iterates pkg.github_actions_metadata (:22). That list is filled only from (^|/)action.ya?ml files (scanner/parsers.go:20,50-52), and its deps are composite steps[].uses and docker:// images (opa/rego/poutine/inventory/github_actions.rego:29-42). A repo-wide grep finds utils.unpinned_purl called only at unpinnable_action.rego:29. In the rules dir, the only other 'pin' hit is the partner name 'hopinc' (github_action_from_unverified_creator_used.rego:15). Read from the code, not executed."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

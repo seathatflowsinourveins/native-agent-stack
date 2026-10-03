@@ -1,0 +1,307 @@
+{
+  "contender": "swe-agent/mini-swe-agent",
+  "revision": {
+    "contender": "swe-agent/mini-swe-agent",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "SWE-agent/mini-swe-agent",
+        "tag": "v2.4.6",
+        "commit": "a83fcae82d2a08f0ee0c688f9d137b3566c097f8",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v2.4.6",
+    "commit": "a83fcae82d2a08f0ee0c688f9d137b3566c097f8",
+    "read_at": "2026-10-02T03:02:47+00:00"
+  },
+  "dossier": {
+    "contender": "swe-agent/mini-swe-agent",
+    "revision": {
+      "tag": "v2.4.6",
+      "commit": "a83fcae82d2a08f0ee0c688f9d137b3566c097f8",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE.md"
+    },
+    "purpose": "Python library and CLI (PyPI package mini-swe-agent, Python >=3.10, version 2.4.6 per src/minisweagent/__init__.py:11) implementing a minimal LLM software-engineering agent: a linear message loop that queries a model (litellm by default; OpenRouter, Portkey and Requesty variants) and runs the model's bash commands, one independent subprocess per action, in a pluggable environment (local, docker/podman, singularity/apptainer, bubblewrap, SWE-ReX docker/Modal, ConTree). Also ships batch runners for SWE-bench and ProgramBench and a Textual trajectory browser. Per code and docs the only agent tool is bash; no planner, web-search/retrieval or citation component, server, MCP endpoint or vendor-SDK integration was found.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Warns that this is mini-swe-agent v2, points to a migration guide, and says the previous version lives on a separate v1 branch.",
+          "citation": "README.md:16-17"
+        },
+        {
+          "claim": "Minimal: 'just some 100 lines of python for the agent class' (plus a bit more for environment, model and run script) and 'no fancy dependencies!'",
+          "citation": "README.md:26-27"
+        },
+        {
+          "claim": "Performant: 'Scores >74% on the SWE-bench verified benchmark; starts much faster than Claude Code'.",
+          "citation": "README.md:28"
+        },
+        {
+          "claim": "Deployable: 'Supports local environments, docker/podman, singularity/apptainer, bublewrap, contree, and more'.",
+          "citation": "README.md:29"
+        },
+        {
+          "claim": "Compatible: 'Supports all models via litellm, openrouter, portkey, and more. Support for /completion and /response endpoints, interleaved thinking etc.'",
+          "citation": "README.md:30"
+        },
+        {
+          "claim": "Tested: a Codecov badge is shown (no figure in the README text).",
+          "citation": "README.md:32"
+        },
+        {
+          "claim": "'Does not have any tools other than bash - it doesn't even need to use the tool-calling interface of the LMs'; runs with 'literally any model'; sandboxes need nothing installed except bash.",
+          "citation": "README.md:42-44"
+        },
+        {
+          "claim": "'Has a completely linear history' - every step appends to the messages; 'no difference between the trajectory and the messages that you pass on to the LM'.",
+          "citation": "README.md:45-47"
+        },
+        {
+          "claim": "'Executes actions with subprocess.run' - each action is independent (no stateful shell session), which makes it trivial to swap in docker exec and to scale up.",
+          "citation": "README.md:48-50"
+        },
+        {
+          "claim": "Task-specific abilities such as opening a PR are left to the LM via the shell instead of being implemented as agent tools.",
+          "citation": "README.md:71-74"
+        },
+        {
+          "claim": "Positions mini-swe-agent as the default choice for a local CLI, simple control flow, 'faster, simpler & more stable sandboxing & benchmark evaluations', and FT/RL work.",
+          "citation": "README.md:85-91"
+        },
+        {
+          "claim": "Interfaces offered: CLI (mini), batch inference, trajectory browser, and Python bindings (snippet: DefaultAgent(LitellmModel(model_name=...), LocalEnvironment()); agent.run('Write a sudoku game')).",
+          "citation": "README.md:105-152 (snippet at README.md:142-148)"
+        },
+        {
+          "claim": "News item: 'mini-swe-agent beats Claude Code and Codex on DeepSWE' (links to a Datacurve blog).",
+          "citation": "README.md:8"
+        },
+        {
+          "claim": "The SWE-bench (bash only) leaderboard evaluates different LMs with mini as the fixed agent.",
+          "citation": "README.md:54"
+        }
+      ],
+      "install": [
+        {
+          "method": "uvx (isolated, run without installing)",
+          "command": "pip install uv && uvx mini-swe-agent",
+          "citation": "README.md:159"
+        },
+        {
+          "method": "pipx run (isolated, run without installing)",
+          "command": "pip install pipx && pipx ensurepath && pipx run mini-swe-agent",
+          "citation": "README.md:161"
+        },
+        {
+          "method": "pip into the current environment (CLI plus Python bindings)",
+          "command": "pip install mini-swe-agent",
+          "citation": "README.md:167-168; docs/quickstart.md:10"
+        },
+        {
+          "method": "From source (developer setup)",
+          "command": "git clone https://github.com/SWE-agent/mini-swe-agent.git && cd mini-swe-agent && pip install -e .",
+          "citation": "README.md:174-175; docs/quickstart.md:71-74"
+        },
+        {
+          "method": "uv tool install (persistent isolated install)",
+          "command": "uv tool install mini-swe-agent",
+          "citation": "docs/quickstart.md:35"
+        },
+        {
+          "method": "pipx install (persistent isolated install)",
+          "command": "pipx install mini-swe-agent",
+          "citation": "docs/quickstart.md:58"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - CI runs on ubuntu-latest with Python 3.11 and installs podman, bubblewrap and apptainer (.github/workflows/pytest.yaml:35-60); SWE-bench and ProgramBench container images are documented as x86 Linux (docs/usage/swebench.md:22-23; docs/usage/programbench.md:13-17).",
+        "wsl2": "unknown - WSL is not mentioned anywhere in the repository (case-insensitive search found no match) and CI has no Windows job (.github/workflows/pytest.yaml:35). Windows facts that do exist: bubblewrap 'is not supported on Windows' (src/minisweagent/environments/extra/bubblewrap.py:9-11) and a POSIX-only process-group test is skipped on 'nt' (tests/environments/test_local.py:137).",
+        "macos_arm64": "unknown - macOS is acknowledged in the default prompts (Darwin branch telling the model to use sed -i '': src/minisweagent/config/mini.yaml:69-73) and the FAQ says it should work on 'any system that has a bash shell or uses a container runtime' (docs/faq.md:7), but CI has no macOS job (.github/workflows/pytest.yaml:35), arm64/aarch64 is never mentioned, and SWE-bench images are x86-only (src/minisweagent/run/benchmarks/swebench.py:75; docs/usage/swebench.md:22-23).",
+        "gpu": "no - not used or required by the package (no GPU/CUDA/torch references in src or docs apart from the NVIDIA_NIM_API_KEY provider-key name at docs/models/quickstart.md:55); inference is remote via API or an externally run server such as vLLM (docs/models/local_models.md:150-169)."
+      },
+      "integrations": {
+        "cli": "yes - console scripts mini and mini-swe-agent (interactive agent, src/minisweagent/run/mini.py) and mini-extra / mini-e with subcommands config, inspect, swebench, swebench-single, programbench (pyproject.toml:89-93; src/minisweagent/run/utilities/mini_extra.py:13-19); python -m minisweagent (src/minisweagent/__main__.py:1-7). Unattended use needs -t TASK, -y, --exit-immediately and MSWEA_CONFIGURED set, otherwise it prompts (src/minisweagent/run/mini.py:55-68; src/minisweagent/run/utilities/config.py:62-66; tests/test_fire.py:49-65).",
+        "mcp": "none found - no MCP server or client code or docs (case-insensitive search for MCP / model context protocol across src, docs and README returned no match).",
+        "sdk_or_api": "Python library API only: DefaultAgent and InteractiveAgent, model and environment classes, factories get_model / get_environment / get_agent, and duck-typed Protocols (src/minisweagent/__init__.py:43-80; docs/usage/python_bindings.md:10-28; docs/advanced/cookbook.md:13-23; README.md:142-148). No HTTP API or server found. No integration with a vendor agent/harness SDK (OpenAI Agents SDK, Claude Agent SDK) found; models are reached via litellm, OpenRouter, Portkey or Requesty (src/minisweagent/models/__init__.py:78-89).",
+        "claude_code_or_codex": "none found - no Claude Code or Codex integration (hooks, plugin or wrapper). Both are mentioned only as comparison points (README.md:8, 28). CLAUDE.md contains only '@AGENTS.md' (CLAUDE.md:1); AGENTS.md is contributor guidance for assistants editing this repo (AGENTS.md:1-110)."
+      },
+      "telemetry_and_network": "No telemetry, analytics or phone-home code found in the package: a case-insensitive search for telemetry/analytics/sentry/posthog/mixpanel/opt-out etc. matched only the docs website's Google Analytics setting (mkdocs.yml:172-174), which belongs to the documentation site, not the package. Network use is functional: model calls go to the configured provider through litellm.completion / litellm.responses (src/minisweagent/models/litellm_model.py:66-71; src/minisweagent/models/litellm_response_model.py:42-47), direct requests.post to openrouter.ai (src/minisweagent/models/openrouter_model.py:60,78) and router.requesty.ai (src/minisweagent/models/requesty_model.py:64,83), or the Portkey SDK (src/minisweagent/models/portkey_model.py:89-97), retried up to 10 times by default (src/minisweagent/models/utils/retry.py:19-25). Benchmark runners download datasets from Hugging Face via the `datasets` dependency (src/minisweagent/run/benchmarks/swebench.py:222-226) and pull Docker images (swebench.py:68-76; src/minisweagent/environments/docker.py:91-97). Accounts/keys: a model-provider API key (set as env var or saved as plaintext in a .env file in the per-user config dir by `mini-extra config set`: src/minisweagent/run/utilities/config.py:78-87; src/minisweagent/__init__.py:26-36); optional Portkey/OpenRouter/Requesty keys; a Modal account for swerex_modal (src/minisweagent/config/benchmarks/swebench_modal.yaml:12-14); a ConTree token and base URL for the contree environment (docs/reference/environments/contree.md:25-29); an sb-cli token for the optional cloud SWE-bench evaluation (docs/usage/swebench.md:114-119). The startup banner prints a short-link URL but does not fetch it (src/minisweagent/__init__.py:30-35). Local files written: prompt history in the config dir (src/minisweagent/agents/utils/prompt_user.py:7) and the last trajectory to last_mini_run.traj.json (src/minisweagent/run/mini.py:23). Whether litellm itself fetches remote metadata at runtime is outside this repo and was not verified (docs only say litellm gets cost metadata from a JSON file on GitHub: docs/models/local_models.md:104)."
+    },
+    "code": {
+      "languages": [
+        "Python (src and tests)",
+        "YAML (agent and benchmark configs)",
+        "Markdown (MkDocs documentation)",
+        "JavaScript, CSS and TCSS (docs-site assets and inspector styling; minor)"
+      ],
+      "entry_points": [
+        {
+          "path": "src/minisweagent/run/mini.py",
+          "what": "`mini` / `mini-swe-agent` console scripts (pyproject.toml:90-91): typer CLI; defaults to InteractiveAgent in confirm mode, local environment and litellm model; writes the trajectory to last_mini_run.traj.json."
+        },
+        {
+          "path": "src/minisweagent/run/utilities/mini_extra.py",
+          "what": "`mini-extra` / `mini-e` (pyproject.toml:92-93): dispatcher to config (global .env manager), inspect, swebench, swebench-single and programbench subcommands."
+        },
+        {
+          "path": "src/minisweagent/__main__.py",
+          "what": "`python -m minisweagent`; runs the same typer app as `mini`."
+        },
+        {
+          "path": "src/minisweagent/run/hello_world.py",
+          "what": "Minimal script: DefaultAgent + LitellmModel + LocalEnvironment using config/default.yaml, whose agent section sets no step or cost limit (default.yaml:104-105)."
+        },
+        {
+          "path": "src/minisweagent/run/benchmarks/swebench.py",
+          "what": "Batch SWE-bench runner: ThreadPoolExecutor over instances (--workers), one environment per instance (docker by default), writes preds.json and per-instance .traj.json, skips instances already in preds.json."
+        },
+        {
+          "path": "src/minisweagent/run/benchmarks/swebench_single.py",
+          "what": "Single SWE-bench instance with the interactive agent (debugging); saves the trajectory to last_swebench_single_run.traj.json."
+        },
+        {
+          "path": "src/minisweagent/run/benchmarks/programbench.py",
+          "what": "Batch ProgramBench runner (requires the separate `programbench` package); per-step trajectory saving, submission.tar.gz per instance, skips completed instances."
+        },
+        {
+          "path": "src/minisweagent/run/utilities/inspector.py",
+          "what": "Textual TUI for browsing .traj.json files (`mini-extra inspect`)."
+        }
+      ],
+      "architecture": "Three duck-typed components (Protocols in src/minisweagent/__init__.py:43-80) wired together by a run script. Agent: src/minisweagent/agents/default.py (run() loops step() = query() -> model.query() -> env.execute() per parsed action -> model.format_observation_messages(); control flow via exceptions in src/minisweagent/exceptions.py; limits step_limit, cost_limit (default 3.0), wall_time_limit_seconds and max_consecutive_format_errors in AgentConfig at default.py:19-35; trajectory JSON written after every step when output_path is set, default.py:120-121,159-190) and agents/interactive.py (human/confirm/yolo modes, regex whitelist). Environment: src/minisweagent/environments/ (local.py with no isolation; docker.py driving the docker/podman CLI with `run -d ... sleep <container_timeout>` then `exec` per action; singularity.py; extra/bubblewrap.py, extra/contree.py, extra/swerex_docker.py, extra/swerex_modal.py; registry environments/__init__.py:8-16); each environment ends the run when command output starts with the line COMPLETE_TASK_AND_SUBMIT_FINAL_OUTPUT. Model: src/minisweagent/models/ (litellm_model.py default using one native bash tool from models/utils/actions_toolcall.py:11-27; litellm_textbased_model.py regex actions; litellm_response_model.py OpenAI Responses API, stateless; openrouter_*, portkey_*, requesty_model.py, test_models.py deterministic models, extra/roulette.py; helpers in models/utils/; registry models/__init__.py:78-89; process-global limits MSWEA_GLOBAL_COST_LIMIT / MSWEA_GLOBAL_CALL_LIMIT at models/__init__.py:13-42). Config: YAML specs merged with key=value overrides (src/minisweagent/config/__init__.py:12-61; config/mini.yaml, default.yaml, benchmarks/*.yaml). History is one append-only message list with no compaction; a context-window error is an abort exception (litellm_model.py:50-57). No server, database, queue or scheduler; parallelism is threads in the batch runners.",
+      "packaging_and_release": "Pure-Python setuptools package mini-swe-agent (pyproject.toml:1-3,98-106); version read from minisweagent.__version__ = 2.4.6 (src/minisweagent/__init__.py:11). .github/workflows/release.yaml: triggered by a published GitHub release or manual dispatch (L3-12); checks release tag equals __version__ (L28-49); builds sdist and wheel with `python -m build` (L58-59); `twine check` (L61-62); uploads with pypa/gh-action-pypi-publish@release/v1 using API-token secrets PYPI_API_TOKEN / TEST_PYPI_API_TOKEN (L64-77); then smoke-tests `pipx run`, `uvx` and `pip install` plus `mini --help` (L79-129). uv is installed in CI with `curl -LsSf https://astral.sh/uv/install.sh | sh` (L51-53). No checksum, signature, SBOM or provenance-attestation step, no permissions/id-token block, and no GitHub release asset upload appear in the workflow; no container image or binary is built. Docs are built with mkdocs-material and deployed with mike (.github/workflows/build-docs.yaml:46-55). Version bumps via .github/bump_version.py. Release notes are on GitHub Releases; no CHANGELOG file (docs/quickstart.md:104-106).",
+      "tests_and_ci": "pytest with pytest-asyncio (auto mode), pytest-xdist and pytest-cov, marker `slow` (pyproject.toml:273-278). 41 test_*.py files under tests/{agents,config,environments (+extra),models,run,utils} plus tests/test_init.py and tests/test_fire.py (conftest.py and two fixture-updater scripts excluded). Model calls are mocked or use deterministic models (src/minisweagent/models/test_models.py). Docker/podman/singularity tests auto-skip when the tool is missing (tests/conftest.py:43-64; tests/environments/test_docker.py:32-37; tests/environments/test_singularity.py:19,35). Live-API 'fire' tests in tests/test_fire.py run only with --run-fire (tests/tests/conftest.py:12-19 -> tests/conftest.py:12-19; tests/test_fire.py:34-38), which CI does not pass. Six workflows in .github/workflows/: pytest.yaml (push/PR on main and v2.0; ubuntu-latest, Python 3.11 only; installs podman, setuid bubblewrap, apptainer 1.3.4; `pip install -e '.[full]'`; runs `pytest -v --cov --cov-branch --cov-report=xml -n auto`; uploads to Codecov), pylint.yaml (`pylint minisweagent/ --errors-only`), build-docs.yaml (`mkdocs build --strict` plus mike deploy), check-links-pr.yaml, check-links-periodic.yaml (cron twice daily), release.yaml. Codecov: project target 50%, patch status informational (.github/.codecov.yml:7,12). Pre-commit: ruff lint/format, typos, prettier, detect-private-key (.pre-commit-config.yaml). No macOS/Windows jobs and no Python-version matrix. Dependabot covers GitHub Actions only (.github/dependabot.yml:1-7).",
+      "dependencies": "Manifest: pyproject.toml only; no lockfile, requirements or constraints file found. 14 direct runtime dependencies: pyyaml, requests, jinja2, pydantic>=2.0, litellm>=1.75.5 (excluding 1.82.7 and 1.82.8), tenacity, rich, python-dotenv, typer, platformdirs, textual, prompt_toolkit, datasets, openai (excluding 1.100.0 and 1.100.1) (pyproject.toml:33-48); requires Python >=3.10 (pyproject.toml:11). Optional extras (pyproject.toml:50-82): full (4 entries: dev, swe-rex>=1.4.0, modal, contree), modal (modal, boto3), contree (contree-sdk>=0.2.0), dev (14 entries including pytest, ruff, mkdocs-material, portkey-ai, swe-rex); PEP 735 dev group with 4 entries (pyproject.toml:280-286). portkey-ai is not a core dependency (src/minisweagent/models/portkey_model.py:25-30 raises ImportError without it); swe-rex is needed for the swerex_* environments; the separate programbench package is imported by the ProgramBench runner (src/minisweagent/run/benchmarks/programbench.py:135-136). External tools per environment: docker or podman, singularity/apptainer, bwrap.",
+      "security_policy": "docs/SECURITY.md (5 lines): report vulnerabilities by email to four named maintainers (docs/SECURITY.md:1-5); no supported-versions table, response-time commitment or private-advisory workflow is described."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:142-148 - Python bindings snippet: DefaultAgent(LitellmModel(model_name=...), LocalEnvironment()).run('Write a sudoku game') works as shown.",
+        "verified": "no",
+        "evidence": "By static reading (not executed): AgentConfig declares system_template and instance_template as required fields with no defaults (src/minisweagent/agents/default.py:22-24) and DefaultAgent.__init__ builds config_class(**kwargs) (default.py:39-41), so the snippet as written would fail pydantic validation. Every in-repo caller passes templates loaded from YAML (src/minisweagent/run/hello_world.py:32-36; tests/agents/test_default.py:60-66; tests/run/test_save.py:20). The docs repeat the template-less pattern (docs/usage/python_bindings.md:21-24; docs/advanced/cookbook.md:47-51)."
+      },
+      {
+        "claim": "README.md:42-44 - no tools other than bash; does not even need the LM tool-calling interface.",
+        "verified": "partial",
+        "evidence": "Only-bash holds: the sole tool is BASH_TOOL (src/minisweagent/models/utils/actions_toolcall.py:11-27; Responses variant actions_toolcall_response.py:11-25). But the v2 default is native tool calling: LitellmModel passes tools=[BASH_TOOL] (src/minisweagent/models/litellm_model.py:66-71) and rejects replies without a tool call (actions_toolcall.py:40-52); docs/advanced/v2_migration.md:11,84-93 says tool calling is now the default and text parsing is opt-in (litellm_textbased, mini_textbased.yaml). Code differs from README; code stated."
+      },
+      {
+        "claim": "README.md:48-50 - actions run as independent subprocesses; no stateful shell session.",
+        "verified": "yes",
+        "evidence": "LocalEnvironment starts a fresh shell per action in its own process group and kills the group on timeout (src/minisweagent/environments/local.py:72-92); DockerEnvironment issues one `docker exec` per action (src/minisweagent/environments/docker.py:107-124). Locally it uses subprocess.Popen rather than subprocess.run. Prompt text tells the model that directory and env changes do not persist (src/minisweagent/config/mini.yaml:39-40)."
+      },
+      {
+        "claim": "README.md:45-47 - completely linear history; the trajectory equals the messages sent to the LM.",
+        "verified": "partial",
+        "evidence": "Messages are an append-only list (src/minisweagent/agents/default.py:69-72) serialized wholesale (default.py:159-180). But model classes strip `extra`, reorder Anthropic thinking blocks and add cache-control markers (src/minisweagent/models/litellm_model.py:76-79; src/minisweagent/models/utils/cache_control.py:49-67), and the Responses model flattens response objects (litellm_response_model.py:29-38). No history compaction or summarization exists in src; ContextWindowExceededError is an abort exception (litellm_model.py:54), so a long run ends in an error exit (default.py:117-119)."
+      },
+      {
+        "claim": "README.md:29 - Deployable: local, docker/podman, singularity/apptainer, bubblewrap, contree.",
+        "verified": "yes",
+        "evidence": "All backends are registered (src/minisweagent/environments/__init__.py:8-16); podman works through the configurable executable (src/minisweagent/environments/docker.py:28; CI installs podman: .github/workflows/pytest.yaml:47-48). Caveats in code/docs: `mini` defaults to `local`, documented as 'No isolation' (src/minisweagent/run/mini.py:100; docs/advanced/environments.md:17); Docker defaults add only --rm (docker.py:30), with network, capability and resource limits only if run_args is set (only src/minisweagent/config/benchmarks/programbench.yaml:191-204 does so); bubblewrap is 'experimental' and Linux-only, and its defaults contain no --unshare-net or --clearenv (src/minisweagent/environments/extra/bubblewrap.py:6-10,38-65); contree needs a hosted ConTree token (docs/reference/environments/contree.md:25-29)."
+      },
+      {
+        "claim": "README.md:30 - supports all models via litellm/openrouter/portkey, /completion and /response endpoints, interleaved thinking.",
+        "verified": "partial",
+        "evidence": "Model classes: litellm, litellm_textbased, litellm_response, openrouter (+textbased/response), portkey (+response), requesty, deterministic (src/minisweagent/models/__init__.py:78-89); model_name goes to litellm unchanged (src/minisweagent/models/litellm_model.py:66-71), so 'all' means whatever litellm resolves. Cost tracking raises RuntimeError for models without price data unless cost_tracking=ignore_errors (litellm_model.py:108-126), in which case cost is 0 and cost_limit cannot trip (docs/advanced/global_configuration.md:70-75). 'Interleaved thinking' is only Anthropic thinking-block reordering (src/minisweagent/models/utils/anthropic_utils.py:11-28). No GPT-6.x model name appears anywhere in the repo; the newest OpenAI name is openai/gpt-5.4 (docs/models/quickstart.md:97-98; src/minisweagent/run/utilities/config.py:43). Docs say litellm_response uses previous_response_id (docs/reference/models/litellm_response_toolcall.md:17) but the code is stateless and re-sends full history (litellm_response_model.py:29-50; openrouter_response_model.py:34-36; portkey_response_model.py:48-49)."
+      },
+      {
+        "claim": "docs/models/quickstart.md:306 and docs/reference/models/overview.md:19-20 - RouletteModel / InterleavingModel mix several models randomly or in sequence (docs/index.md:217 cites a GPT-5 + Sonnet 4 blog post).",
+        "verified": "partial",
+        "evidence": "Classes exist and pick among sub-models randomly or by fixed sequence (src/minisweagent/models/extra/roulette.py:15-64); selection is not conditional on task or need. By static reading (not executed) they define no format_message or format_observation_messages (roulette.py:15-43), which DefaultAgent calls (src/minisweagent/agents/default.py:93-94,157) and the Model protocol requires (src/minisweagent/__init__.py:43-58); a repository-wide search for 'Roulette' hits only roulette.py and docs, so no test covers them. The linked blog post was not opened."
+      },
+      {
+        "claim": "docs/usage/swebench.md:144-147 - trajectories are only saved upon completion; re-running the script completes unfinished tasks (the closest documented resume behaviour).",
+        "verified": "partial",
+        "evidence": "Batch SWE-bench config sets no output_path (src/minisweagent/config/benchmarks/swebench.yaml:1-113), so the trajectory is written once per instance in `finally` (src/minisweagent/run/benchmarks/swebench.py:161-175) and finished instances are skipped via preds.json (swebench.py:229-232): instance-level re-run only. The agent itself saves after every step when output_path is set (src/minisweagent/agents/default.py:120-121), as ProgramBench does (programbench.py:92) and `mini` does by default (src/minisweagent/run/mini.py:23,82). Nothing loads a trajectory back into an agent: run() always starts from empty messages (default.py:91) and trajectories are read only by the inspector (src/minisweagent/run/utilities/inspector.py:162,305). No mid-task resume found."
+      },
+      {
+        "claim": "README.md:26-27 - about 100 lines for the agent class; no fancy dependencies.",
+        "verified": "partial",
+        "evidence": "src/minisweagent/agents/default.py is 190 lines including docstrings and blanks (default.py:1-190) and interactive.py another 209 (src/minisweagent/agents/interactive.py:1-209); the run loop itself is about 37 lines (default.py:88-124). pyproject.toml:33-48 lists 14 direct runtime dependencies including litellm, datasets, textual, openai and pydantic, with no lockfile."
+      },
+      {
+        "claim": "README.md:28 and README.md:8 - >74% on SWE-bench Verified; starts much faster than Claude Code; beats Claude Code and Codex on DeepSWE.",
+        "verified": "not_checkable",
+        "evidence": "The repo contains no benchmark result files, leaderboard data or startup-time measurements (tests/test_data/results.json is a one-instance test fixture for swe-agent__test-repo-1). The DeepSWE and Ramp pages linked at README.md:7-8 and the SWE-bench leaderboard (README.md:54) are external and were not opened, so no third-party figures are reported here."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "SWE-bench Verified resolve rate claimed for mini-swe-agent (model and configuration not stated in the README line)",
+        "metric": "claimed score, SWE-bench Verified",
+        "value": ">74%",
+        "source": "README.md:28; docs/index.md:35 (project statement; per-model numbers are on the SWE-bench bash-only leaderboard of the SWE-bench team, README.md:54, which was not opened)",
+        "independent": false
+      },
+      {
+        "what": "Gemini 3 Pro run with mini-swe-agent on SWE-bench Verified (news item dated Nov 19)",
+        "metric": "claimed score, SWE-bench Verified",
+        "value": "74%",
+        "source": "docs/index.md:216 (links to an x.com post under the handle KLieret, which matches maintainer Kilian Lieret in pyproject.toml:15; post not opened)",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "No mid-task resume: DefaultAgent.run() always restarts from an empty message list (src/minisweagent/agents/default.py:91) and nothing loads a saved trajectory back into an agent (trajectories are read only by the inspector, src/minisweagent/run/utilities/inspector.py:162,305). 'Resume' exists only as instance-level skipping in the batch runners (src/minisweagent/run/benchmarks/swebench.py:229-232 via preds.json; programbench.py:146-150 via submission.tar.gz), and SWE-bench batch trajectories are written only when an instance ends (swebench.py:161-175). An interrupted worker redoes its task from scratch; persistence is JSON files only (no database, queue or scheduler).",
+      "Isolation is opt-in and largely unhardened by default: `mini` runs commands on the host and hands them the whole host environment including API keys (src/minisweagent/run/mini.py:100; src/minisweagent/environments/local.py:29; docs/advanced/environments.md:17). Docker defaults are only --rm (src/minisweagent/environments/docker.py:30), so network, capabilities, CPU and memory are unrestricted unless run_args is overridden (only src/minisweagent/config/benchmarks/programbench.yaml:191-204 does); bubblewrap is experimental, Linux-only and has no --unshare-net or --clearenv in its defaults (src/minisweagent/environments/extra/bubblewrap.py:6-10,38-65). Docker cleanup relies on __del__ plus a background `docker stop`; otherwise containers live until `sleep <container_timeout>` (default 2h) ends (docker.py:34,88,153-161).",
+      "Tool access is one unrestricted bash tool (src/minisweagent/models/utils/actions_toolcall.py:11-27). The only built-in command gate is interactive confirm mode, whose whitelist_actions are regexes applied with re.match to the whole command string (src/minisweagent/agents/interactive.py:27,162-163); there is no built-in deny-list (a forbidden-pattern example exists only in docs/advanced/cookbook.md:225-287). Unattended bounds are step_limit (0 = unlimited in AgentConfig and mini.yaml), cost_limit (default 3.0), wall_time_limit_seconds (0 = unlimited) and a per-command timeout of 30 s (src/minisweagent/agents/default.py:26-31; src/minisweagent/config/mini.yaml:101-103; src/minisweagent/environments/local.py:16). `mini` prompts interactively on first run unless MSWEA_CONFIGURED is set (src/minisweagent/run/utilities/config.py:62-66).",
+      "Cost limits depend on litellm price metadata: a model litellm cannot price raises RuntimeError on the first call unless cost_tracking=ignore_errors, which makes every call cost 0 so cost_limit and MSWEA_GLOBAL_COST_LIMIT can never trip (call and step limits still work) (src/minisweagent/models/litellm_model.py:108-126; src/minisweagent/models/__init__.py:25-31; docs/advanced/global_configuration.md:70-75). 'GPT-6.1 Sol' is not mentioned anywhere in the repo (newest OpenAI model named: gpt-5.4, docs/models/quickstart.md:97-98), so using it needs a litellm-resolvable name or a custom registry JSON (docs/models/local_models.md:136-146) and a litellm release that supports its API (pyproject.toml:38 sets only a lower bound).",
+      "No vendor harness-SDK, MCP, Claude Code or Codex integration exists; models are reached only through litellm, OpenRouter, Portkey or Requesty calls (src/minisweagent/models/__init__.py:78-89), and the project's own Python classes are the only SDK surface (src/minisweagent/__init__.py:43-80), whose README example omits required template arguments (see claim_checks). Mixing GPT and Claude in one run is only random or round-robin via RouletteModel/InterleavingModel, which by static reading lack methods the v2 agent calls and have no tests (src/minisweagent/models/extra/roulette.py:15-64; src/minisweagent/agents/default.py:93,157).",
+      "No research or citation capability: the only agent tool is bash, no web-search, fetch, retrieval, source-tracking or citation output exists in src or docs (searches found nothing relevant), and the shipped prompts are coding-task oriented (src/minisweagent/config/mini.yaml:4-19). Any research would be ad-hoc shell commands, and network access is not restricted by default outside the ProgramBench config's --network none (src/minisweagent/config/benchmarks/programbench.yaml:191-194).",
+      "Platform and maturity: CI covers only ubuntu-latest with Python 3.11 (.github/workflows/pytest.yaml:35-44); there is no macOS, Windows or WSL2 evidence; the package classifier is 'Development Status :: 3 - Alpha' (pyproject.toml:23) and v2 was a breaking rewrite (docs/advanced/v2_migration.md:3-12). Docs drift from code: MSWEA_DEFAULT_RUN is documented (docs/advanced/global_configuration.md:131-137; docs/advanced/cookbook.md:28) but read nowhere in the code; docs/models/quickstart.md:151-155 names a litellm_response_toolcall class that is not in the registry (src/minisweagent/models/__init__.py:78-89); docs/models/quickstart.md:17 points to rotating Anthropic keys that v2 removed (docs/advanced/v2_migration.md:137). The shallow clone holds one commit, so commit cadence and maintainer activity could not be assessed.",
+      "Supply-chain and security posture: no lockfile, so installs resolve the newest litellm (pyproject.toml:38 sets a lower bound and skips versions 1.82.7 and 1.82.8, which its comment calls compromised); the release workflow publishes with a long-lived PyPI API-token secret, has no signing, checksum, SBOM or attestation step, and installs uv via curl | sh (.github/workflows/release.yaml:51-53,72-77); Dependabot covers GitHub Actions only (.github/dependabot.yml:4-7); API keys saved by `mini-extra config set` are stored as plaintext in a .env file in the user config dir (src/minisweagent/run/utilities/config.py:78-87); vulnerability reporting is an email list (docs/SECURITY.md:1-5)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "swe-agent/mini-swe-agent",
+      "checks": [
+        {
+          "field": "readme.install[2]",
+          "statement": "pip into the current environment (CLI plus Python bindings): `pip install mini-swe-agent`",
+          "citation": "README.md:167-168; docs/quickstart.md:10",
+          "holds": true,
+          "note": "README.md:166-169 shows `pip install mini-swe-agent` followed by `mini`. docs/quickstart.md:9-11 has the same command under the 'pip' tab. The distribution name matches pyproject.toml:7 (name = \"mini-swe-agent\"), with requires-python >=3.10 at pyproject.toml:11. Revision confirmed: .git/HEAD = a83fcae82d2a08f0ee0c688f9d137b3566c097f8 = refs/tags/v2.4.6, and __version__ = \"2.4.6\" at src/minisweagent/__init__.py:11."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, file LICENSE.md",
+          "citation": "LICENSE.md:1-21",
+          "holds": true,
+          "note": "LICENSE.md:1 reads 'MIT License', followed by 'Copyright (c) 2025 Kilian A. Lieret and Carlos E. Jimenez' and the standard MIT permission and warranty text. Consistent with pyproject.toml:12 (license = {file = \"LICENSE.md\"}) and the classifier 'License :: OSI Approved :: MIT License' at pyproject.toml:28."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - CI runs on ubuntu-latest with Python 3.11 and installs podman, bubblewrap and apptainer; SWE-bench and ProgramBench container images are documented as x86 Linux.",
+          "citation": ".github/workflows/pytest.yaml:35-60; docs/usage/swebench.md:22-23; docs/usage/programbench.md:13-17",
+          "holds": true,
+          "note": "pytest.yaml:35 is `runs-on: ubuntu-latest` and :44 is python-version '3.11'. :47-48 installs podman; :49-52 installs bubblewrap and sets setuid on bwrap; :53-60 installs apptainer_1.3.4_amd64.deb and symlinks singularity. The amd64 package confirms an x86_64 runner. swebench.md:22-23 says 'The docker containers for Linux assume an x86 Linux architecture'. programbench.md:13-16 gives the same warning for programbench/<instance>:task_cleanroom images."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "yes - console scripts mini and mini-swe-agent (interactive agent) and mini-extra / mini-e with subcommands config, inspect, swebench, swebench-single, programbench; python -m minisweagent. Unattended use needs -t TASK, -y, --exit-immediately and MSWEA_CONFIGURED set, otherwise it prompts.",
+          "citation": "pyproject.toml:89-93; src/minisweagent/run/utilities/mini_extra.py:13-19; src/minisweagent/__main__.py:1-7; src/minisweagent/run/mini.py:55-68; src/minisweagent/run/utilities/config.py:62-66; tests/test_fire.py:49-65",
+          "holds": true,
+          "note": "Scripts: pyproject.toml:90-93 maps mini and mini-swe-agent to minisweagent.run.mini:app, and mini-extra and mini-e to mini_extra:main. Subcommands: mini_extra.py:13-19 lists config, inspect (aliases i/inspector), swebench, swebench-single, programbench. python -m: __main__.py:4-7 imports and runs the same app. Default agent: mini.py:101 uses default_type='interactive'. Unattended flags: mini.py:60 (-t), :61 (-y), :65 (--exit-immediately); :68 calls configure_if_first_time, which runs the interactive setup() unless MSWEA_CONFIGURED is set (config.py:62-66). Without the flags it prompts: for the task (mini.py:94-96), for action confirmation (mode 'confirm', interactive.py:25 and mini.yaml:103) and on exit (confirm_exit=True, interactive.py:29). test_fire.py:51-62 runs `python -m minisweagent --exit-immediately -y --cost-limit 0.03 -t ...`. Nuances: task and mode can also come from -c config keys (run.task, agent.mode=yolo). A missing model name raises ValueError rather than prompting (src/minisweagent/models/__init__.py:75)."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "README.md:142-148 Python bindings snippet DefaultAgent(LitellmModel(model_name=...), LocalEnvironment()).run('Write a sudoku game') - verified: no, because AgentConfig requires system_template and instance_template and the snippet passes neither; in-repo callers pass YAML templates; docs repeat the template-less pattern.",
+          "citation": "README.md:142-148; src/minisweagent/agents/default.py:22-24,39-41; src/minisweagent/run/hello_world.py:32-36; tests/agents/test_default.py:60-66; tests/run/test_save.py:20; docs/usage/python_bindings.md:21-24; docs/advanced/cookbook.md:47-51",
+          "holds": true,
+          "note": "README.md:143-147 passes only the model and environment. default.py:22 and :24 declare `system_template: str` and `instance_template: str` with no defaults on a pydantic BaseModel. default.py:39-41 does `self.config = config_class(**kwargs)`, so empty kwargs fails validation. LitellmModel(model_name=...) and LocalEnvironment() construct fine (only model_name is required: litellm_model.py:27-46; local.py:13-16), so the failure is at the agent, as stated. Callers that supply the templates: hello_world.py:35 passes **default.yaml['agent']; test_default.py:60-66 is a fixture loading default.yaml's agent section; test_save.py:20 passes **default_config. python_bindings.md:21-24 and cookbook.md:47-50 (also :63-66) repeat the template-less call. Static reading only, as the dossier itself says; not executed."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

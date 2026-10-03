@@ -1,0 +1,295 @@
+{
+  "contender": "anthropics/claude-plugins-official",
+  "revision": {
+    "contender": "anthropics/claude-plugins-official",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "anthropics/claude-plugins-official",
+        "tag": null,
+        "commit": "ab024cdcfa7c",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": null,
+    "commit": "ab024cdcfa7c",
+    "read_at": "2026-10-02T03:01:55+00:00"
+  },
+  "dossier": {
+    "contender": "anthropics/claude-plugins-official",
+    "revision": {
+      "tag": null,
+      "commit": "ab024cdcfa7c",
+      "read_at": "2026-10-02T03:01:55+00:00"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Anthropic's official Claude Code plugin marketplace. It is a catalog (.claude-plugin/marketplace.json, owner Anthropic, 315 entries) plus the GitHub Actions that validate, policy-scan and SHA-bump those entries. 53 entries are in-tree (39 under plugins/, 14 under external_plugins/); 262 point at third-party git repos pinned by commit SHA. The repo holds no navigation, indexing or LSP-client code of its own. For the code-navigation needs it contains two things. (a) 12 config-only language-server plugins (TypeScript, Pyright, gopls, rust-analyzer, clangd, jdtls, Kotlin, SourceKit-LSP/Swift, csharp-ls, Intelephense/PHP, Lua, ruby-lsp), each declared as an inline `lspServers` block in its marketplace entry for Claude Code's native LSP support, plus a Shopify-maintained `liquid-lsp` pointer. (b) A `serena` plugin that is only a manifest plus an `.mcp.json` launching the Serena MCP server through uvx from GitHub; the server code is not in this repo. The marketplace is Claude Code-specific, and nothing in it mentions Codex.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "\"A curated directory of high-quality plugins for Claude Code.\"",
+          "citation": "README.md:3"
+        },
+        {
+          "claim": "Trust warning: \"Make sure you trust a plugin before installing, updating, or using it. Anthropic does not control what MCP servers, files, or other software are included in plugins and cannot verify that they will work as intended or that they won't change.\"",
+          "citation": "README.md:5"
+        },
+        {
+          "claim": "/plugins = \"Internal plugins developed and maintained by Anthropic\"; /external_plugins = \"Third-party plugins from partners and the community\".",
+          "citation": "README.md:9-10"
+        },
+        {
+          "claim": "Install: \"Plugins can be installed directly from this marketplace via Claude Code's plugin system\" with `/plugin install {plugin-name}@claude-plugins-official`, or by browsing `/plugin > Discover`.",
+          "citation": "README.md:14-18"
+        },
+        {
+          "claim": "\"External plugins must meet quality and security standards for approval\"; new plugins go through a submission form.",
+          "citation": "README.md:28"
+        },
+        {
+          "claim": "Standard plugin structure: `.claude-plugin/plugin.json` (required), `.mcp.json` (optional), commands/, agents/, skills/, README.md. No LSP configuration file or key is listed.",
+          "citation": "README.md:34-43"
+        },
+        {
+          "claim": "A marketplace entry's `name` is an immutable slug; renames go in the top-level `renames` map of marketplace.json so existing installs auto-migrate.",
+          "citation": "README.md:45-58; .claude-plugin/marketplace.json:9-19"
+        },
+        {
+          "claim": "A marketplace entry can declare content directly with `strict: false` plus an explicit `skills` array. The README documents this only for skills; the in-repo LSP entries use the same `strict: false` with an inline `lspServers` map.",
+          "citation": "README.md:62-89; .claude-plugin/marketplace.json:3958-3976"
+        },
+        {
+          "claim": "\"Please see each linked plugin for the relevant LICENSE file.\" (licensing is per plugin)",
+          "citation": "README.md:93"
+        },
+        {
+          "claim": "Serena entry: \"Semantic code analysis MCP server providing intelligent code understanding, refactoring suggestions, and codebase navigation through language server protocol integration.\" Tagged `community-managed`; plugin author Oraios. The entry gives no further detail on definitions, references or symbol-level edits.",
+          "citation": ".claude-plugin/marketplace.json:3536-3543; external_plugins/serena/.claude-plugin/plugin.json:3-6"
+        },
+        {
+          "claim": "typescript-lsp: \"TypeScript/JavaScript language server for Claude Code, providing code intelligence features like go-to-definition, find references, and error checking.\" This is the only README in the repo that names go-to-definition or find-references. A search of README.md, plugins/*-lsp/ and external_plugins/serena/ for \"symbol\" returns nothing.",
+          "citation": "plugins/typescript-lsp/README.md:3"
+        },
+        {
+          "claim": "Diagnostics-type wording in the LSP READMEs: clangd \"code intelligence, diagnostics, and formatting\"; csharp, lua and php \"code intelligence and diagnostics\"; pyright \"static type checking and code intelligence\". None says when diagnostics are produced (for example after an edit).",
+          "citation": "plugins/clangd-lsp/README.md:3; plugins/csharp-lsp/README.md:3; plugins/lua-lsp/README.md:3; plugins/php-lsp/README.md:3; plugins/pyright-lsp/README.md:3"
+        },
+        {
+          "claim": "Refactoring/analysis wording: gopls \"code intelligence, refactoring, and analysis\"; jdtls \"code intelligence and refactoring\"; kotlin \"code intelligence, refactoring, and analysis\"; rust-analyzer and ruby-lsp \"code intelligence and analysis\"; swift \"code intelligence\".",
+          "citation": "plugins/gopls-lsp/README.md:3; plugins/jdtls-lsp/README.md:3; plugins/kotlin-lsp/README.md:1; plugins/rust-analyzer-lsp/README.md:3; plugins/ruby-lsp/README.md:3; plugins/swift-lsp/README.md:3"
+        },
+        {
+          "claim": "Each LSP plugin tells the user to install the language-server binary separately (for example `npm install -g typescript-language-server typescript`); the plugin itself only wires the server into Claude Code.",
+          "citation": "plugins/typescript-lsp/README.md:8-14; plugins/pyright-lsp/README.md:8-26; plugins/gopls-lsp/README.md:8-16"
+        }
+      ],
+      "install": [
+        {
+          "method": "Claude Code plugin system (any entry, e.g. typescript-lsp, pyright-lsp, serena)",
+          "command": "/plugin install {plugin-name}@claude-plugins-official   (or browse /plugin > Discover)",
+          "citation": "README.md:16-18"
+        },
+        {
+          "method": "Serena MCP server: what the serena plugin runs. No separate install step or README is documented in this repo; it needs `uvx` (uv) on PATH, implied by the command.",
+          "command": "uvx --from git+https://github.com/oraios/serena serena start-mcp-server",
+          "citation": "external_plugins/serena/.mcp.json:3-4"
+        },
+        {
+          "method": "typescript-lsp prerequisite: install the language server (npm, platform-neutral; yarn variant also documented)",
+          "command": "npm install -g typescript-language-server typescript",
+          "citation": "plugins/typescript-lsp/README.md:13"
+        },
+        {
+          "method": "pyright-lsp prerequisite: install Pyright (npm; pip and pipx variants also documented)",
+          "command": "npm install -g pyright",
+          "citation": "plugins/pyright-lsp/README.md:13 (pip :19, pipx :25)"
+        },
+        {
+          "method": "gopls-lsp prerequisite: Go toolchain install; $GOPATH/bin must be on PATH",
+          "command": "go install golang.org/x/tools/gopls@latest",
+          "citation": "plugins/gopls-lsp/README.md:13-16"
+        },
+        {
+          "method": "rust-analyzer-lsp prerequisite (rustup; brew on macOS at :17, apt/pacman on Linux at :22-26 also documented)",
+          "command": "rustup component add rust-analyzer",
+          "citation": "plugins/rust-analyzer-lsp/README.md:11"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - Linux install paths are documented for the language servers (plugins/rust-analyzer-lsp/README.md:20-27 apt/pacman; plugins/clangd-lsp/README.md:16-26 apt/dnf/pacman; plugins/lua-lsp/README.md:15-25 snap/pacman/dnf; plugins/swift-lsp/README.md:18-19 swift.org; plugins/jdtls-lsp/README.md:15-26 AUR or manual wrapper). The plugin payloads are JSON and Markdown only (no native code). 'x86_64' is never named in the repo and the main README states no platform; CI runs on ubuntu-latest (.github/workflows/validate-plugins.yml:77). Caveat: kotlin-lsp documents only Homebrew (plugins/kotlin-lsp/README.md:11-13).",
+        "wsl2": "unknown - WSL2 is not mentioned for any LSP or Serena plugin. Windows appears only in plugins/clangd-lsp/README.md:28-32 (winget/LLVM releases). The only WSL string in the repo is a generic plugin-author checklist line 'Works on Windows (WSL)' in plugins/plugin-dev/skills/command-development/references/marketplace-considerations.md:737, which is not a support statement for these plugins.",
+        "macos_arm64": "yes - macOS (Homebrew) install paths are documented: plugins/clangd-lsp/README.md:10-14 (uses the /opt/homebrew prefix, the Homebrew default on Apple Silicon - inference), plugins/csharp-lsp/README.md:15-18, plugins/jdtls-lsp/README.md:10-13, plugins/kotlin-lsp/README.md:11-13, plugins/lua-lsp/README.md:10-13, plugins/rust-analyzer-lsp/README.md:15-18, plugins/swift-lsp/README.md:12-16. 'arm64' and 'Apple Silicon' are never named. Serena's uvx launcher is platform-neutral as written (external_plugins/serena/.mcp.json:3-4).",
+        "gpu": "no - GPU is neither used nor required by the LSP plugins or the Serena config. Searches of README.md, plugins/*-lsp/, external_plugins/serena/ and .github/ found no GPU terms. The only GPU mentions in the repo are unrelated third-party plugin descriptions (.claude-plugin/marketplace.json:217, :2683, :3922)."
+      },
+      "integrations": {
+        "cli": "No end-user CLI or binary ships in this repo. Install and browse go through Claude Code's slash commands `/plugin install {plugin-name}@claude-plugins-official` and `/plugin > Discover` (README.md:16-18). Maintainer-only helpers: .github/scripts/discover_bumps.py (argparse --plugin/--max/--dry-run, :88-92) and .github/scripts/validate-frontmatter.ts (bun script, :1-9).",
+        "mcp": "The repo is not itself an MCP server. The in-tree `serena` plugin registers a stdio MCP server by running `uvx --from git+https://github.com/oraios/serena serena start-mcp-server` (external_plugins/serena/.mcp.json:2-5, bare-map shape; both accepted shapes are described at .github/workflows/check-mcp-urls.yml:54-57). The server code is not in this repo. The 12 in-tree `*-lsp` plugins are not MCP: they use inline `lspServers` entries (`command`, optional `args`, `extensionToLanguage`, optional `startupTimeout`) in marketplace.json (e.g. :3959-3976) for Claude Code's native LSP support. Other in-tree MCP configs: context7, github, gitlab and linear (http), playwright and firebase (npx @latest), terraform (docker image 0.4.0), laravel-boost (php artisan), and discord/telegram/imessage/fakechat (bun `server.ts`).",
+        "sdk_or_api": "none found - no SDK or HTTP API is offered. The marketplace JSON schema is only referenced by URL (.claude-plugin/marketplace.json:2) and plugin docs by link (README.md:89, :97).",
+        "claude_code_or_codex": "Claude Code: yes - the repo is a Claude Code plugin marketplace (README.md:3, :14-18; .claude-plugin/marketplace.json:1-8), and the LSP READMEs describe themselves as 'for Claude Code' (e.g. plugins/typescript-lsp/README.md:3). Codex: none found - a case-insensitive search of the whole working tree for 'codex' returned no matches."
+      },
+      "telemetry_and_network": "The LSP and Serena payloads contain no telemetry code: the 12 plugins/*-lsp dirs hold only README.md and LICENSE, and their config just launches a local binary from PATH (marketplace.json lspServers, e.g. :3959-3976). Network and accounts. Installing any entry makes Claude Code fetch its source: 262 of 315 entries are git sources pinned by SHA (e.g. marketplace.json:28-34). The language servers must be installed separately (npm/pip/go/rustup/brew/apt per each README). Serena's `.mcp.json` runs `uvx --from git+https://github.com/oraios/serena ...`, which pulls from GitHub when launched and pins no tag or commit (external_plugins/serena/.mcp.json:3-4). The plugin dir has no README, so prerequisites such as uv are undocumented. No API key or account is required by the LSP or Serena plugin files. Telemetry elsewhere in the repo, not in the LSP or Serena plugins: code-modernization sends whole-number usage counts through Claude Code's own telemetry, with opt-outs CODE_MODERNIZATION_TELEMETRY=0 or DISABLE_TELEMETRY=1 (plugins/code-modernization/README.md:138-140, :183); claude-security reports usage counts the same way (plugins/claude-security/README.md:94-96); security-guidance sends diffs and file contents to a model endpoint, api.anthropic.com by default (plugins/security-guidance/README.md:85-94). Review policy for external entries treats undisclosed telemetry as a failure (.github/policy/prompt.md:98-103). CI-only network: scan-plugins.yml uses Anthropic Workload Identity Federation (:35, :201-207) and check-mcp-urls.yml curl-probes http/sse MCP URLs of in-tree plugins daily at 06:00 UTC (:17-26)."
+    },
+    "code": {
+      "languages": [
+        "JSON (marketplace.json and plugin manifests; the core of the repo)",
+        "Markdown (skills, commands, agents, READMEs)",
+        "Python (~70 files: plugin hooks and scripts, one CI helper)",
+        "TypeScript/TSX (~43 files: code-modernization hooks, 4 bun channel servers, one CI script)",
+        "JavaScript/MJS (~12 files, one vendored mermaid.min.js)",
+        "Shell (~20 files)",
+        "YAML (9 GitHub workflows)"
+      ],
+      "entry_points": [
+        {
+          "path": ".claude-plugin/marketplace.json",
+          "what": "Marketplace catalog read by Claude Code: 315 entries (53 local `./plugins|external_plugins/*` sources, 262 git `url`/`git-subdir` sources pinned by `sha`), `renames` map (:9-19), inline `lspServers` blocks for 12 language-server plugins."
+        },
+        {
+          "path": "external_plugins/serena/.mcp.json",
+          "what": "Stdio MCP launch config for Serena: `uvx --from git+https://github.com/oraios/serena serena start-mcp-server` (no ref, tag or commit; no project or context flags)."
+        },
+        {
+          "path": "external_plugins/serena/.claude-plugin/plugin.json",
+          "what": "Serena plugin manifest: name, description, author Oraios. No version, README or LICENSE alongside (the directory holds only this file and .mcp.json)."
+        },
+        {
+          "path": "plugins/typescript-lsp/ (and the 11 sibling plugins/*-lsp/)",
+          "what": "Doc-only plugin dirs (README.md + LICENSE). The language-server wiring is the `lspServers` block in the marketplace entry (typescript: .claude-plugin/marketplace.json:3959-3976)."
+        },
+        {
+          "path": ".github/workflows/validate-plugins.yml",
+          "what": "Required `validate` check: runs a SHA-pinned composite action from anthropics/claude-plugins-community against marketplace.json (SHA-pin invariant I5 is a hard error; I1 I3 I8 I11 warn-only), :83-90."
+        },
+        {
+          "path": ".github/workflows/scan-plugins.yml",
+          "what": "Required `scan` check: Claude-based policy review of changed object-source entries (prompt .github/policy/prompt.md, schema .github/policy/schema.json), verdict cache, Anthropic WIF auth."
+        },
+        {
+          "path": ".github/workflows/bump-plugin-shas.yml",
+          "what": "Nightly (07:23 UTC) job opening per-entry `bump/<slug>` PRs that advance external `sha` pins (cap 60 per run); related helper .github/scripts/discover_bumps.py."
+        },
+        {
+          "path": ".github/scripts/validate-frontmatter.ts",
+          "what": "bun script validating YAML frontmatter of agents/skills/commands .md files; run on PRs by validate-frontmatter.yml."
+        }
+      ],
+      "architecture": "Content-registry repo, not a library or service. There is no runtime code for code navigation. Key paths: (1) .claude-plugin/marketplace.json is the catalog: 53 local sources (39 `./plugins/*`, 14 `./external_plugins/*`) and 262 object sources (`git-subdir`/`url`, pinned `sha`, optional `ref`/`path`). (2) plugins/ has 40 dirs: 26 with .claude-plugin/plugin.json (plus plugins/example-plugin, which is not in the catalog), 12 doc-only `*-lsp` dirs, and `receipts` and `session-report` without plugin.json. (3) external_plugins/ has 14 dirs: asana, context7, discord, fakechat, firebase, github, gitlab, imessage, laravel-boost, linear, playwright, serena, telegram, terraform. (4) .github/ holds 9 workflows, 3 scripts, a policy prompt and schema, and bump-tracking.json. LSP mechanism: each `*-lsp` entry has `version: 1.0.0`, `strict: false` and `lspServers.<name> = {command, args?, extensionToLanguage, startupTimeout?}`. The servers are typescript-language-server --stdio (8 extensions), pyright-langserver --stdio (.py/.pyi), gopls (.go), rust-analyzer (.rs), clangd --background-index (9 C/C++ extensions), jdtls (.java, startupTimeout 120000), kotlin-lsp --stdio (.kt/.kts, 120000), sourcekit-lsp (.swift), csharp-ls (.cs), intelephense --stdio (.php), lua-language-server (.lua), ruby-lsp (.rb/.rake/.gemspec/.ru/.erb); marketplace.json:854-884, :1210-1229, :1711-1730, :1985-2005, :2035-2059, :2254-2273, :2848-2870, :3043-3066, :3286-3309, :3324-3343, :3839-3858, :3948-3977. Each serves one language; no entry in the repo aggregates several. `liquid-lsp` is a Shopify git-subdir pointer pinned at sha ae3e4cc... (:2162-2177) whose content is not in this repo. Serena is only a manifest plus a uvx launcher (server source is upstream and not read). Two other code-search entries are git pointers only: `sourcegraph` (:3697-3707) and `lumen` (:2274-2287, described as local semantic search via Go AST parsing and embeddings through Ollama or LM Studio over MCP). The four bun MCP servers (external_plugins/{discord,fakechat,imessage,telegram}/server.ts) are chat bridges, unrelated to code navigation.",
+      "packaging_and_release": "No packaged artifacts, releases, tags, checksums, signatures or attestations: no release workflow exists (a search of .github for attest/sigstore/cosign/checksum/sha256/release/publish found only createCommitOnBranch), and the clone has no tags (.git/packed-refs lists only refs/remotes/origin/main). Distribution = Claude Code reads marketplace.json and fetches sources: in-tree by relative path, external by git URL pinned to a commit `sha` (e.g. marketplace.json:28-34). Pins are advanced by bump-plugin-shas.yml (cron '23 7 * * *', per-entry PRs, max_bumps default 60, :28-36) using a composite action pinned at anthropics/claude-plugins-community@9247660a... (:64). Commits are created with GitHub's createCommitOnBranch so they are GitHub-signed to satisfy an org `required_signatures` ruleset (bump-plugin-shas.yml:62-63; revert-failed-bumps.yml:20-21). 14 slugs in .github/bump-tracking.json `releases-only` bump to the latest release-tag commit instead of HEAD (bump-plugin-shas.yml:71-75; .github/bump-tracking.json:2-17). The 12 LSP entries carry `version: 1.0.0` with no release process behind it; Serena has no version and an unpinned launcher (external_plugins/serena/.mcp.json:4).",
+      "tests_and_ci": "No test covers marketplace.json, the LSP entries or Serena. Unit tests exist only inside two unrelated plugins, about 14 test files: plugins/code-modernization/tests/*.test.ts (6 files + 4 TS fixtures), plugins/code-modernization/scripts/tests/test_*.py (7 files), and plugins/security-guidance/tests/test_repo_resolution.py plus conftest.py. None of the 9 workflows runs them (a search of .github for pytest/bun test/npm test/jest/vitest finds nothing). Workflows in .github/workflows/: validate-plugins.yml (required `validate`; PR path filters, push to main, workflow_dispatch; claude-plugins-community composite action pinned by SHA); validate-frontmatter.yml (bun runs validate-frontmatter.ts on changed agents/skills/commands .md; skips fork PRs, :15); validate-licenses.yml (every plugins/* dir needs a LICENSE containing Apache 2.0 text, except plugins/claude-security, :21-55); check-mcp-urls.yml (curl liveness of http/sse MCP URLs for in-tree plugins, PR and daily 06:00 UTC); scan-plugins.yml (required `scan`; Claude policy review of changed object-source entries with a 30-day verdict cache, plus an emit-verdict PR-comment job); bump-plugin-shas.yml (nightly SHA bumps); revert-failed-bumps.yml (drops policy-failing entries from the bump PR, max 3 passes); close-external-prs.yml and external-pr-scope-guard.yml (auto-close non-member PRs unless they only add entries from repos already live, :36-47). GitHub-owned actions are pinned by major tag (actions/checkout@v4 etc.); Anthropic composite actions and oven-sh/setup-bun are pinned by SHA. The composite actions' source lives in another repo and was not read.",
+      "dependencies": "No root manifest and no Python, Go or Rust manifests. Four package.json files, each with a bun.lock: external_plugins/discord (2 deps: @modelcontextprotocol/sdk, discord.js), external_plugins/fakechat (1 dep + 1 dev: @types/bun), external_plugins/imessage (2 deps: @modelcontextprotocol/sdk, zod; 1 dev), external_plugins/telegram (2 deps: @modelcontextprotocol/sdk, grammy). That is 7 direct runtime deps and 2 dev deps in total, none related to the LSP or Serena plugins. validate-frontmatter.yml installs `yaml` through bun at CI time (:23). plugins/security-guidance/hooks/ensure_agent_sdk.py pip-installs claude_agent_sdk into ~/.claude/security at SessionStart when missing (:2-9). LSP and Serena have no in-repo dependencies: the user installs the language servers, and Serena resolves from GitHub through uvx at launch.",
+      "security_policy": "none at repository level: no SECURITY.md at the root or under .github/, and no CODEOWNERS or dependabot/renovate config. The only SECURITY.md is plugins/claude-security/SECURITY.md, scoped to that plugin (private disclosure via Anthropic's responsible-disclosure program). README.md:5 carries a trust warning. External entries are screened by the policy prompt .github/policy/prompt.md and schema .github/policy/schema.json."
+    },
+    "claim_checks": [
+      {
+        "claim": "Install via `/plugin install {plugin-name}@claude-plugins-official` (README.md:16).",
+        "verified": "partial",
+        "evidence": "The marketplace `name` is `claude-plugins-official` (.claude-plugin/marketplace.json:3), and entries `serena` (:3536) and `typescript-lsp` (:3949) exist under those slugs, so the command form resolves to catalog entries. The install/loader logic is in Claude Code, not in this repo, so the behaviour itself cannot be checked here."
+      },
+      {
+        "claim": "/plugins holds internal Anthropic plugins and /external_plugins holds third-party ones (README.md:9-10).",
+        "verified": "partial",
+        "evidence": "39 catalog entries are `./plugins/*` and 14 are `./external_plugins/*` (e.g. marketplace.json:60, :298), but 262 of 315 entries are remote git sources in neither directory (e.g. :28-34). The 12 `*-lsp` entries list author Anthropic (e.g. :858-861), yet their dirs hold only README.md + LICENSE and delegate to third-party language servers. `serena` lives in external_plugins, is tagged `community-managed` (:3541-3543) and is authored by Oraios (external_plugins/serena/.claude-plugin/plugin.json:4-6)."
+      },
+      {
+        "claim": "Plugin structure: `.claude-plugin/plugin.json` is required; `.mcp.json` optional; no LSP file is listed (README.md:34-43).",
+        "verified": "partial",
+        "evidence": "Code differs from the README: 26 of 40 plugins/* dirs have .claude-plugin/plugin.json, but 14 do not (12 `*-lsp`, `receipts`, `session-report`). Those are defined by their marketplace entries; the LSP ones use `strict: false` with an inline `lspServers` map (e.g. marketplace.json:3958-3976). README.md:62 documents `strict: false` only for skills, and the `lspServers` key is never mentioned in the README."
+      },
+      {
+        "claim": "Serena provides \"intelligent code understanding, refactoring suggestions, and codebase navigation through language server protocol integration\" (marketplace.json:3537), as an MCP server.",
+        "verified": "not_checkable",
+        "evidence": "The repo holds only external_plugins/serena/.claude-plugin/plugin.json and .mcp.json, which launches `uvx --from git+https://github.com/oraios/serena serena start-mcp-server` (.mcp.json:3-4). Serena's source and README are upstream and were not read (outside the working directory). Nothing in this repo states or implements exact symbol definitions, references or symbol-level edits, which languages are covered, or whether the server works with any client other than Claude Code."
+      },
+      {
+        "claim": "typescript-lsp provides \"go-to-definition, find references, and error checking\" (plugins/typescript-lsp/README.md:3).",
+        "verified": "partial",
+        "evidence": "Config verifies only the wiring: the entry launches `typescript-language-server --stdio` for 8 extensions (marketplace.json:3959-3976). Which LSP requests (definition, references, diagnostics) reach the model is decided by Claude Code and the upstream server; no client code is in this repo, so the feature set cannot be verified here."
+      },
+      {
+        "claim": "LSP READMEs say they provide \"diagnostics\" (clangd, csharp, lua, php), \"error checking\" (typescript) or \"static type checking\" (pyright).",
+        "verified": "not_checkable",
+        "evidence": "The manifest entries only declare how to launch each server (command, args, extensionToLanguage, optional startupTimeout; e.g. marketplace.json:865-883) and say nothing about diagnostics. No file in the repo describes post-edit diagnostics for LSP plugins (searched for 'diagnostic', 'post-edit', 'publishDiagnostics'). The only post-edit type check described in the repo is hook-based: a PostToolUse `tsc --noEmit`/pyright recommendation in plugins/claude-code-setup/skills/claude-automation-recommender/references/hooks-patterns.md:59-75 and SKILL.md:123."
+      },
+      {
+        "claim": "Each LSP README tells the user to install the matching language-server binary.",
+        "verified": "yes",
+        "evidence": "The 12 manifest `command` values (clangd :867, csharp-ls :1223, gopls :1724, jdtls :1998, kotlin-lsp :2048, lua-language-server :2267, intelephense :2861, pyright-langserver :3056, ruby-lsp :3299, rust-analyzer :3337, sourcekit-lsp :3852, typescript-language-server :3961) match the tools the READMEs install. The plugin installs nothing; the binary must already be on PATH. Caveats: the pyright README says install `pyright` and never names `pyright-langserver` (the binary name inside that package is outside the repo); kotlin-lsp documents Homebrew only (plugins/kotlin-lsp/README.md:11-13); jdtls needs a manual wrapper script named `jdtls` off Arch (plugins/jdtls-lsp/README.md:23-26)."
+      },
+      {
+        "claim": "Anthropic \"does not control what MCP servers, files, or other software are included in plugins\" and cannot verify \"that they won't change\" (README.md:5).",
+        "verified": "yes",
+        "evidence": "Consistent with the code: 262 of 315 entries are third-party git sources (object `source`s in marketplace.json) re-pinned nightly by CI (.github/workflows/bump-plugin-shas.yml:28-31), so contents do change. Serena's launcher is not pinned at all (external_plugins/serena/.mcp.json:4)."
+      },
+      {
+        "claim": "\"External plugins must meet quality and security standards for approval\" (README.md:28).",
+        "verified": "partial",
+        "evidence": "CI enforces policy for object-source entries: a required Claude policy scan (.github/workflows/scan-plugins.yml:133-134, :144, :199-211; criteria .github/policy/prompt.md:98-125) and a validate check (validate-plugins.yml:83-90; its action source is in anthropics/claude-plugins-community and was not read). `external_plugins/serena` has a string source, so scan-plugins.yml's `select(.source | type == \"object\")` filter excludes it. check-mcp-urls.yml probes only http/sse URLs (:64) and Serena is stdio. validate-licenses.yml covers only plugins/** (:6, :30), so the license check does not apply to Serena."
+      },
+      {
+        "claim": "\"Please see each linked plugin for the relevant LICENSE file\" (README.md:93); root LICENSE is Apache-2.0.",
+        "verified": "partial",
+        "evidence": "LICENSE is the standard Apache 2.0 text (appendix left as the unfilled template, LICENSE:190). All 40 plugins/* dirs have a LICENSE, enforced by validate-licenses.yml:21-55; the 12 `*-lsp` LICENSEs contain Apache text. plugins/claude-security/LICENSE is proprietary ('All rights reserved', restricted to use with Anthropic products, LICENSE:3-23) and is exempted at validate-licenses.yml:24-27. Only 4 of 14 external_plugins dirs have a LICENSE (discord, fakechat, imessage, telegram); serena has none. Licenses of the 262 external git entries are not tracked here."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Scope: the repo has no code-navigation implementation. The 12 plugins/*-lsp dirs are README + LICENSE only (Glob plugins/*-lsp/**), and which LSP requests and diagnostics reach the model, and when, is decided by Claude Code and the upstream servers, none of it in this repo. 'Post-edit diagnostics' is not documented anywhere in the repo (README wording is only 'diagnostics', 'error checking' or 'type checking': plugins/clangd-lsp/README.md:3, plugins/typescript-lsp/README.md:3, plugins/pyright-lsp/README.md:3).",
+      "Granularity: language-server support is one plugin per language (12 in-tree, plus Shopify's liquid-lsp pointer, marketplace.json:2162-2177), not a single multi-language integration. Each needs its server installed separately and on PATH. Platform coverage is uneven: kotlin-lsp documents only Homebrew (plugins/kotlin-lsp/README.md:11-13); jdtls needs a manual wrapper script off Arch (plugins/jdtls-lsp/README.md:15-26); jdtls and kotlin set startupTimeout 120000 (marketplace.json:2002, :2056); clangd runs --background-index (:868-870).",
+      "Serena is only a launcher stub. The server is fetched from GitHub through uvx with no tag or commit (external_plugins/serena/.mcp.json:4), so behaviour can change with no change in this repo. The plugin dir has no README, LICENSE or version (Glob external_plugins/serena/**), it is tagged community-managed and authored by Oraios (marketplace.json:3541-3543; plugin.json:4-6), and its homepage points at the anthropics/claude-plugins-public mirror (marketplace.json:3540). Its source was not read for this dossier. The scan-plugins.yml policy scan skips string-source entries like this one (:133-134, :144).",
+      "Client coverage: Claude Code only. There is no Codex integration, doc or config anywhere in the repo (case-insensitive 'codex' search: zero matches). Serena's .mcp.json is a plain bare-map stdio config (external_plugins/serena/.mcp.json:2-5), and the repo documents no use by any other client.",
+      "Trust and churn: README.md:5 disclaims control over plugin contents. 262 of 315 entries are third-party git sources re-pinned nightly (cap 60 per run, bump-plugin-shas.yml:21-36), so pinned content moves continuously. The repo accepts contributions only from Anthropic members, except additions from repos already listed (close-external-prs.yml:36-62).",
+      "Licensing is mixed: root LICENSE is Apache-2.0 with an unfilled appendix (LICENSE:190), but README.md:93 defers to each plugin. plugins/claude-security/LICENSE is proprietary and restricts use with non-Anthropic products (LICENSE:17-23; exempted at validate-licenses.yml:24-27). external_plugins/serena ships no LICENSE, and the 262 external entries carry their own upstream licenses, not tracked here.",
+      "Process gaps: no repo-level security policy, CODEOWNERS or dependency-update config (only plugins/claude-security/SECURITY.md exists). The ~14 unit-test files are not run by any workflow, and nothing tests marketplace.json, the LSP entries or Serena. GitHub-owned actions are pinned by tag, not SHA (e.g. validate-plugins.yml:79). Required checks depend on composite actions in another repo, anthropics/claude-plugins-community (validate-plugins.yml:83; scan-plugins.yml:199), which was not read.",
+      "Documentation drift: in-tree entries' `homepage` points at the anthropics/claude-plugins-public mirror rather than this repo (marketplace.json:62, :299, :1130, :3540). The claude-code-setup LSP table lists 11 plugins and omits ruby-lsp (plugins/claude-code-setup/skills/claude-automation-recommender/references/plugins-reference.md:44-56 vs marketplace.json:3286-3309). The README's plugin-structure section never mentions `lspServers` (README.md:34-43)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "anthropics/claude-plugins-official",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Install any marketplace entry (e.g. typescript-lsp, pyright-lsp, serena) through Claude Code's plugin system with `/plugin install {plugin-name}@claude-plugins-official`, or browse `/plugin > Discover`.",
+          "citation": "README.md:16-18",
+          "holds": true,
+          "note": "README.md:16 gives the command verbatim and :18 gives the `/plugin > Discover` path. The suffix matches the marketplace `name` \"claude-plugins-official\" (.claude-plugin/marketplace.json:3, owner Anthropic at :5-8). The example slugs exist: pyright-lsp :3044, serena :3536, typescript-lsp :3949. The installer behaviour itself is implemented in Claude Code, not in this repo."
+        },
+        {
+          "field": "license",
+          "statement": "License is Apache-2.0 (file LICENSE).",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:2-3 reads 'Apache License Version 2.0, January 2004'. It carries the full terms through 'END OF TERMS AND CONDITIONS' (:177) and the standard appendix with unfilled placeholders (:190). This covers the root file only: README.md:93 defers to each plugin's own LICENSE, which the dossier already flags under risks (those per-plugin claims were not part of this check)."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes: Linux install paths are documented for the language servers (rust-analyzer apt/pacman, clangd apt/dnf/pacman, lua snap/pacman/dnf, swift swift.org, jdtls AUR or manual wrapper); payloads are JSON/Markdown only; 'x86_64' never named; main README states no platform; CI on ubuntu-latest; caveat kotlin-lsp documents only Homebrew.",
+          "citation": "plugins/rust-analyzer-lsp/README.md:20-27; plugins/clangd-lsp/README.md:16-26; plugins/lua-lsp/README.md:15-25; plugins/swift-lsp/README.md:18-19; plugins/jdtls-lsp/README.md:15-26; .github/workflows/validate-plugins.yml:77; plugins/kotlin-lsp/README.md:11-13",
+          "holds": true,
+          "note": "Every cited range matches exactly: apt/pacman, apt/dnf/pacman, snap/pacman/dnf, swift.org download, AUR `yay -S jdtls` plus 'Other distros: manual installation required', `runs-on: ubuntu-latest`, and `brew install JetBrains/utils/kotlin-lsp` as kotlin's only route. A case-insensitive repo-wide grep for x86_64|x86-64|amd64 finds no matches. plugins/*-lsp/ holds only README.md + LICENSE, and external_plugins/serena holds only plugin.json + .mcp.json, so there is no native code. README.md names no platform. The 'yes' is an inference, since no architecture is named, and the dossier says so."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "Repo is not itself an MCP server. serena registers a stdio MCP server via `uvx --from git+https://github.com/oraios/serena serena start-mcp-server` (bare-map shape; both shapes described in check-mcp-urls.yml); server code not in repo. The 12 *-lsp plugins use inline lspServers {command, args?, extensionToLanguage, startupTimeout?}. Other in-tree MCP configs: context7/github/gitlab/linear http, playwright/firebase npx @latest, terraform docker 0.4.0, laravel-boost php artisan, discord/telegram/imessage/fakechat bun server.ts.",
+          "citation": "external_plugins/serena/.mcp.json:2-5; .github/workflows/check-mcp-urls.yml:54-57; .claude-plugin/marketplace.json:3959-3976",
+          "holds": true,
+          "note": "serena/.mcp.json:2-5 is a bare map with command `uvx` and exactly the quoted args, with no ref or tag. check-mcp-urls.yml:54-57 describes the bare-map and `mcpServers`-wrapped shapes. marketplace.json:3959-3976 is the typescript lspServers block. `args` is optional (gopls :1722-1729 has none), and `startupTimeout` occurs only at :2002 (jdtls) and :2056 (kotlin). marketplace.json has no inline mcpServers. Each listed .mcp.json matches: context7, github, gitlab and linear are type http; playwright runs `npx @playwright/mcp@latest`; firebase runs `npx -y firebase-tools@latest mcp`; terraform runs `hashicorp/terraform-mcp-server:0.4.0`; laravel-boost runs `php artisan boost:mcp`; the four bun configs run `bun run ... start`, which package.json:8 defines as `bun server.ts`. Minor: plugins/example-plugin/.mcp.json (an http placeholder) is unlisted, but example-plugin is not in the catalog. asana ships no MCP config (it uses a manual `claude mcp add`, commands/asana-setup.md:27-30)."
+        },
+        {
+          "field": "claim_checks[6]",
+          "statement": "Verified yes: each LSP README tells the user to install the matching language-server binary; the 12 manifest `command` values (clangd :867 \u2026 typescript-language-server :3961) match; plugin installs nothing. Caveats: pyright README never names pyright-langserver; kotlin-lsp Homebrew only; jdtls needs a manual wrapper named `jdtls` off Arch.",
+          "citation": ".claude-plugin/marketplace.json:867,1223,1724,1998,2048,2267,2861,3056,3299,3337,3852,3961; plugins/kotlin-lsp/README.md:11-13; plugins/jdtls-lsp/README.md:23-26",
+          "holds": true,
+          "note": "All 12 `command` values sit at exactly the cited lines. Each of the 12 READMEs gives an install route for the matching tool: npm typescript-language-server, npm/pip/pipx pyright, go install gopls, dotnet tool csharp-ls, npm intelephense, gem ruby-lsp, rustup rust-analyzer, llvm/clangd packages, lua-language-server, the Swift toolchain (sourcekit-lsp on PATH), brew/AUR/manual jdtls, and brew kotlin-lsp. The pyright README names only `pyright` (:13, :19, :25). Minor wording: 'off Arch' overlooks the macOS `brew install jdtls` route (jdtls README:10-13). The README requires the wrapper only for Linux distros other than Arch (:20, :23-26). This does not change the verdict."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

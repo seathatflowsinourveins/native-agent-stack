@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "kind": "clean_room_configuration",
+  "recorded_at_utc": "2026-10-02T02:50:00Z",
+  "why": "The earlier blind runs carried the user's global instruction files: codex exec loads $CODEX_HOME/AGENTS.md (cross-family/instruction-probe.json in the clean-install selection folder) and workflow subagents receive the global CLAUDE.md. Both name candidates of this field. Every evidence-producing call of this round runs without them.",
+  "claude": {
+    "client": "Claude Code 2.1.287",
+    "flags": ["-p", "--no-session-persistence", "--safe-mode", "--restricted", "--strict-mcp-config", "--output-format", "json", "--model <model>", "--effort max", "--tools <stage tools>", "--allowedTools <stage tools>", "--json-schema <stage schema>"],
+    "flag_meaning": "--safe-mode disables CLAUDE.md, skills, plugins, hooks, MCP servers, custom agents and workflows (auth, model selection and built-in tools work normally); --restricted ignores user, project and local settings files and confines file tools to the working directories; --strict-mcp-config with no --mcp-config loads no MCP server.",
+    "tools": {"dossier writer": ["Read", "Grep", "Glob"], "dossier writer for a non-GitHub contender": ["Read", "Grep", "Glob", "WebFetch"], "verifier": "the writer's tools", "decider, critic, adjudicator": ["Read", "Grep", "Glob", "WebSearch", "WebFetch"]},
+    "models": {"dossier writer": "claude-sonnet-5-5", "verifier, decider, critic, adjudicator": "claude-opus-5-5"},
+    "probe": {
+      "prompt": "Two lines: a canary token in the context (a string starting with CANARY-) or NO-CANARY; the first heading of any user or project instruction text, or NO-INSTRUCTIONS.",
+      "working_directory": "a scratch directory holding a CLAUDE.md whose canary line carries CANARY-9K2W-CLAUDEMD",
+      "arms": [
+        {"arm": "default flags (positive control)", "returned": ["CANARY-9K2W-CLAUDEMD", "# Personal engineering defaults"]},
+        {"arm": "--safe-mode --restricted --strict-mcp-config --tools \"\"", "returned": ["NO-CANARY", "NO-INSTRUCTIONS"]}
+      ],
+      "result": "the clean-room flags load neither the project CLAUDE.md nor the user's global instructions"
+    }
+  },
+  "gpt": {
+    "client": "Codex CLI 0.159.3 (codex exec)",
+    "route": "OmniRoute on loopback port 20128 with the keyless placeholder key; request compression is off on that port",
+    "codex_home": "an isolated directory holding only config.toml: model_provider omniroute (base_url http://127.0.0.1:20128/v1, env_key OMNIROUTE_API_KEY, requires_openai_auth false, wire_api responses, supports_standalone_web_search true), features shell_snapshot false and standalone_web_search true; no AGENTS.md, no MCP servers",
+    "flags": ["exec", "--skip-git-repo-check", "--ephemeral", "-s read-only", "-C <unit directory>", "-m cx/gpt-6-astra", "-c model_reasoning_effort=\"max\"", "-c web_search=\"live\"", "--json", "--output-schema <stage schema>", "-o <last message>"],
+    "model_choice": "The gateway's live catalog does not list gpt-6.1-sol (a request for cx/gpt-6.1-sol returned 'Model gpt-6.1-sol is not available in the active live catalog for provider codex'). GPT-6 Astra at max, the routing contract's route for a single consequential judgment, runs every GPT role of this round.",
+    "probe": {
+      "arms": [
+        {"arm": "isolated home with an AGENTS.md holding a canary", "returned": "CANARY-7F3Q-AGENTSMD"},
+        {"arm": "isolated home without AGENTS.md (this round's configuration)", "returned": "NONE"}
+      ],
+      "web_search": "Through the gateway, search actions work and page opening does not ('Unsupported operation for /v1/alpha/search: open'); the GPT judges read the cloned sources and the dossiers locally instead of opening pages."
+    }
+  }
+}

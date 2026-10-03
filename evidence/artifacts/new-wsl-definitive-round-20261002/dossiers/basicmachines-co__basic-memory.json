@@ -1,0 +1,344 @@
+{
+  "contender": "basicmachines-co/basic-memory",
+  "revision": {
+    "contender": "basicmachines-co/basic-memory",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "basicmachines-co/basic-memory",
+        "tag": "v0.23.2",
+        "commit": "c0bd87c6d5a4a58034b1d6c8c5018e443b0bd048",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.23.2",
+    "commit": "c0bd87c6d5a4a58034b1d6c8c5018e443b0bd048",
+    "read_at": "2026-10-02T03:01:57+00:00"
+  },
+  "dossier": {
+    "contender": "basicmachines-co/basic-memory",
+    "revision": {
+      "tag": "v0.23.2",
+      "commit": "c0bd87c6d5a4a58034b1d6c8c5018e443b0bd048",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "AGPL-3.0-or-later",
+      "file": "LICENSE"
+    },
+    "purpose": "Local-first persistent memory for LLM agents: Markdown notes (frontmatter, typed observations, wikilink relations) indexed into a derived SQLite database (FTS plus sqlite-vec; Postgres optional) and served via an MCP server, a CLI (basic-memory / bm) and a FastAPI app. The repo also ships Claude Code and Codex plugins (session briefings, compaction checkpoints, decision capture, hook event trace), 15 shared SKILL.md files and Hermes/OpenClaw integrations; a paid hosted Cloud is optional.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Pick up where you left off in Claude, Codex, Cursor, ChatGPT or any MCP client; knowledge lives as Markdown files both the user and the AI can read, write and search.",
+          "citation": "README.md:34-37"
+        },
+        {
+          "claim": "Local-first (plain text on your disk) and two-way (AI and humans write the same files; sync keeps them in step); 'the source of truth is always your files'.",
+          "citation": "README.md:39-40, 495-496"
+        },
+        {
+          "claim": "Just files plus a local SQLite index. No servers required.",
+          "citation": "README.md:454"
+        },
+        {
+          "claim": "Semantic search with optional cross-encoder reranking; reranking is off by default (latency, first-run model download).",
+          "citation": "README.md:42-43, 406-411"
+        },
+        {
+          "claim": "Every tool is tagged with behavior hints (read-only, destructive, idempotent); What's New cites FastMCP 3.0 and the four MCP hint annotations.",
+          "citation": "README.md:45-47, 397-400"
+        },
+        {
+          "claim": "Cloud is optional, never required. Local: free forever (AGPL-3.0), all data on disk, 'Air-gapped friendly', requires Python via uv.",
+          "citation": "README.md:48, 78-81"
+        },
+        {
+          "claim": "Snapshots and backups are built in for Cloud and 'Roll your own' for Local; local cross-device sync is manual (Git, Syncthing).",
+          "citation": "README.md:164, 169"
+        },
+        {
+          "claim": "Works with Claude Code (claude mcp add) and Codex over stdio/https, among other MCP clients.",
+          "citation": "README.md:176-186"
+        },
+        {
+          "claim": "The repo is the canonical home for agent packages: core package, Claude Code plugin, shared skills, Hermes and OpenClaw plugins (Codex plugin not listed).",
+          "citation": "README.md:188-192"
+        },
+        {
+          "claim": "Claude Code plugin: session-start briefings, pre-compaction checkpoints, opt-in capture output style, /basic-memory:bm-setup, :remember, :share, :status; MCP server must be connected first ('a hard prerequisite').",
+          "citation": "README.md:209-225"
+        },
+        {
+          "claim": "Codex: add [mcp_servers.basic-memory] running uvx basic-memory mcp to ~/.codex/config.toml; Codex still requires approval for tools with a destructive annotation (writes, edits, deletes).",
+          "citation": "README.md:300-324"
+        },
+        {
+          "claim": "Auto-updates every 24 h by default (silent for uv tool and Homebrew installs, skipped for uvx); disable with auto_update false in ~/.basic-memory/config.json.",
+          "citation": "README.md:382-383, 593-606"
+        },
+        {
+          "claim": "Telemetry is minimal and anonymous (cloud promo impressions, login attempts/outcomes, promo opt-out) to Umami Cloud; no contents, titles, PII, IPs; BASIC_MEMORY_NO_PROMOS=1 disables promos and all telemetry.",
+          "citation": "README.md:608-627"
+        },
+        {
+          "claim": "CLI (project, config, status, doctor, tool, update, import) and MCP tools (write_note, read_note, edit_note, move_note, delete_note, search_notes, build_context, schema tools); output_format=json available.",
+          "citation": "README.md:543-591"
+        }
+      ],
+      "install": [
+        {
+          "method": "uv tool (requires uv; uv installer curl -LsSf https://astral.sh/uv/install.sh | sh per plugins/codex/README.md:94; pip install basic-memory also appears in docs/semantic-search.md:20)",
+          "command": "uv tool install basic-memory",
+          "citation": "README.md:81-85"
+        },
+        {
+          "method": "Claude Code MCP via uvx",
+          "command": "claude mcp add basic-memory -- uvx basic-memory mcp",
+          "citation": "README.md:290-294"
+        },
+        {
+          "method": "Codex CLI MCP via uvx (config file)",
+          "command": "[mcp_servers.basic-memory] command = \"uvx\" args = [\"basic-memory\", \"mcp\"]  (in ~/.codex/config.toml)",
+          "citation": "README.md:300-308"
+        },
+        {
+          "method": "Claude Code plugin (git marketplace)",
+          "command": "claude plugin marketplace add basicmachines-co/basic-memory --sparse .claude-plugin plugins/claude-code && claude plugin install basic-memory@basicmachines-co",
+          "citation": "README.md:219-223"
+        },
+        {
+          "method": "Codex plugin (local marketplace; run at a repo clone root)",
+          "command": "codex plugin marketplace add \"$(git rev-parse --show-toplevel)\" && codex plugin add codex@basic-memory",
+          "citation": "plugins/codex/README.md:101-108"
+        },
+        {
+          "method": "Docker image on ghcr.io",
+          "command": "docker run -d --name basic-memory-server -p 8000:8000 -v /path/to/your/obsidian-vault:/app/data:rw -v basic-memory-config:/app/.basic-memory:rw ghcr.io/basicmachines-co/basic-memory:latest",
+          "citation": "docs/Docker.md:12-20"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - docs/semantic-search.md:38 lists Linux x86_64 as supported; CI runs ubuntu-latest on Python 3.12/3.13/3.14 (.github/workflows/test.yml:102-109); image built for linux/amd64 and linux/arm64 (.github/workflows/docker.yml:56). Needs Python >=3.12 (pyproject.toml:6) and, for documented flows, uv (README.md:81).",
+        "wsl2": "unknown - WSL/WSL2 is not mentioned anywhere in the repo (README, docs, plugins, workflows, source searched). Linux and native Windows are CI-tested (test.yml:102-111); WSL2 itself is neither documented nor tested.",
+        "macos_arm64": "yes - docs/semantic-search.md:36 lists macOS ARM64 as supported; README gives macOS paths (README.md:272). CI on macOS is only the Milvus job on macos-latest (test.yml:421-424); the main matrix is Linux plus Windows. Intel macOS needs an onnxruntime<1.24 workaround (docs/semantic-search.md:37, 42-48).",
+        "gpu": "no - no GPU use, requirement or option is documented or configurable; local embeddings and reranking run on CPU via FastEmbed/ONNX Runtime (docs/semantic-search.md:135; src/basic_memory/repository/fastembed_provider.py:89-102). No CUDA/GPU mention found in README, docs, config_models.py or pyproject.toml."
+      },
+      "integrations": {
+        "cli": "Typer CLI basic-memory and bm (pyproject.toml:80-82). Groups registered in src/basic_memory/cli/main.py:18-38: project, config, status, doctor, db (reset/reindex), import (claude, chatgpt, memory-json), tool (CLI access to MCP tools, --json), inspect, schema, cloud, hook (session-start, pre-compact, stop, flush, status, install, remove), ci, update, man, workspace, orphans. Documented at README.md:563-591.",
+        "mcp": "basic-memory mcp: stdio default; --transport streamable-http|sse with --host (default 0.0.0.0), --port 8000; --project NAME constrains the server to one project and disables MCP project create/delete (cli/commands/mcp.py:26-35, 58-63; mcp/tools/project_management.py:587-606, 824-830). FastMCP 4.0.0b1 server at mcp/server.py:229-234. 21 registered tools (mcp/tools/__init__.py:37-61): write_note, read_note, edit_note, move_note, delete_note, read_content, view_note, search_notes, recent_activity, list_directory, build_context, list_memory_projects, list_workspaces, create_memory_project, delete_project, schema_infer/validate/diff, search, fetch, basic_memory_diagnostics. search/fetch refuse non-OpenAI clients (mcp/tools/chatgpt_tools.py:34,47,168,253). Prompts in mcp/prompts/. Server instructions tell the model to call recent_activity first and never write unprompted (mcp/server.py:216-227). MCP Registry manifest: server.json.",
+        "sdk_or_api": "No published SDK. In-repo FastAPI v2 app basic_memory.api.app:app (/v2/projects/{project_id}/..., api/app.py:126-139) is called in-process by MCP/CLI via an httpx ASGI client (AGENTS.md:111, 280); it has no auth middleware and README documents no launch command (SECURITY.md:68-69 calls it optional, localhost-intended). Python callers can import basic_memory.mcp.tools functions, as hooks do (cli/commands/hook.py:466, 1101). bm tool offers scriptable --json access (README.md:401-402).",
+        "claude_code_or_codex": "Both. Claude Code: MCP via claude mcp add (README.md:290-294) plus plugins/claude-code (SessionStart brief, PreCompact extractive checkpoint, skills bm-setup/orient/checkpoint/decide/remember/share/status/writing, opt-in output style, seed schemas; plugins/claude-code/README.md:17-67; no bundled .mcp.json). Codex: MCP via ~/.codex/config.toml (README.md:300-324) plus plugins/codex (bundled .mcp.json running uvx basic-memory mcp; SessionStart brief and post-compaction checkpoint prompt; immutable bm-checkpoint skill; hooks must be trusted in /hooks; plugins/codex/README.md:10-28, 101-119, 227-228). Without marketplaces, bm hook install --harness claude|codex writes hooks to ~/.claude/settings.json or ~/.codex/hooks.json (hook.py:1245-1253, 1372-1425). Config is separate per host: .claude/settings.json basicMemory block vs ~/.codex/basic-memory.json or .codex/basic-memory.json (plugins/codex/README.md:244-245; hook.py:240-367). Project says it works alongside Claude auto-memory/CLAUDE.md, not replacing them (plugins/claude-code/docs/why-combine-memory.md:10, 94)."
+      },
+      "telemetry_and_network": "MCP server and bm hook paths send no promo/analytics (promo.py:102-103; cli/app.py:61-82). Outbound by default code paths: (1) Anonymous Umami events (https://api-gateway.umami.dev/api/send, hard-coded site id; events promo shown/opt-out and cloud login started/success/sub-required; payload is event name, BM version, trigger) from interactive non-mcp CLI sessions; opt out with BASIC_MEMORY_NO_PROMOS=1|true|yes (cli/analytics.py:28-43, 56-114; promo.py:96-126; cloud/core_commands.py:80-99, 314). (2) Auto-update, default on, every 24 h: GET https://pypi.org/pypi/basic-memory/json then uv tool upgrade or brew upgrade for uv-tool/Homebrew installs; stdio basic-memory mcp runs it in a background thread; skipped for uvx; not governed by NO_PROMOS; disable with auto_update false (config_models.py:696-705; cli/auto_update.py:22, 119-130, 280-298, 399-417; cli/commands/mcp.py:85-99). (3) FastEmbed model downloads from HuggingFace on first semantic use; semantic search is on by default when deps import (docs/semantic-search.md:135, 181; config_models.py:64-69, 252-255); reranker off by default; OpenAI/LiteLLM providers are opt-in and send note text to those APIs (docs/semantic-search.md:118, 440-441). (4) Hooks run via uv run --script: first run fetches basic-memory from PyPI (Claude, >=0.23.2) or git+https://github.com/basicmachines-co/basic-memory@v0.23.2 (Codex) (plugins/*/hooks/session_start.py:5; plugin READMEs); hooks call git and, for coding checkpoints, gh pr view when present (hook.py:299-312, 841-875). (5) Logfire is a hard dependency but only configured when logfire_enabled (default false) and exports only if logfire_send_to_logfire is true (config_models.py:213-220; telemetry.py:33-55); behavior of unconfigured logfire.span calls is library-defined, not verified. (6) Cloud is optional and paid: WorkOS AuthKit plus cloud.basicmemory.com, rclone/WebDAV (config_models.py:664-679); MCP startup only reads a local token file (mcp/server.py:138-152); no account needed locally. (7) HTTP transports bind 0.0.0.0:8000 by default with no auth (cli/commands/mcp.py:28-32; mcp/server.py:229-234); stdio opens no ports (SECURITY.md:68-69). Local state: ~/.basic-memory/{config.json (0600), memory.db, inbox/, basic-memory.log, fastembed_cache/} (config_models.py:22-28, 72-110; hooks/inbox.py:32-47; README.md:640)."
+    },
+    "code": {
+      "languages": [
+        "Python >=3.12 (core, CLI, MCP server, FastAPI app, hooks, Hermes plugin, benchmarks)",
+        "TypeScript (OpenClaw plugin; Bun/tsc/Biome)",
+        "Markdown (notes, SKILL.md skills, Picoschema schemas)",
+        "JSON/YAML/TOML manifests",
+        "Bash and just recipes",
+        "HTML and Handlebars templates (MCP UI, prompts)"
+      ],
+      "entry_points": [
+        {
+          "path": "pyproject.toml:80-82",
+          "what": "Console scripts basic-memory and bm -> basic_memory.cli.main:app (Typer)"
+        },
+        {
+          "path": "src/basic_memory/cli/commands/mcp.py:26-128",
+          "what": "basic-memory mcp (stdio default; streamable-http/sse; --project constraint)"
+        },
+        {
+          "path": "src/basic_memory/mcp/server.py:229-234",
+          "what": "FastMCP server object plus lifespan (migrations, project reconcile, file watcher, shutdown drain)"
+        },
+        {
+          "path": "src/basic_memory/cli/commands/hook.py:1134-1508",
+          "what": "basic-memory hook session-start|pre-compact|stop|flush|install|remove|status --harness claude|codex"
+        },
+        {
+          "path": "plugins/claude-code/hooks/ (session_start.py, pre_compact.py, hooks.json)",
+          "what": "Claude Code hook launchers (PEP 723 uv scripts, fail-open)"
+        },
+        {
+          "path": "plugins/codex/ (.codex-plugin/plugin.json, .mcp.json, hooks/)",
+          "what": "Codex plugin manifest, MCP config (uvx basic-memory mcp) and hook launchers pinned to git tag v0.23.2"
+        },
+        {
+          "path": "src/basic_memory/api/app.py:93-141",
+          "what": "FastAPI v2 REST app (no launcher command found)"
+        },
+        {
+          "path": "Dockerfile:52",
+          "what": "Container CMD: basic-memory mcp --transport sse --host 0.0.0.0 --port 8000"
+        }
+      ],
+      "architecture": "Python package src/basic_memory with three entrypoints, each with a composition root (api/container.py, mcp/container.py, cli/container.py; docs/ARCHITECTURE.md:7-40): Typer CLI (cli/app.py, cli/commands/*), FastMCP server (mcp/server.py, tools in mcp/tools/, clients in mcp/clients/) and FastAPI v2 app (api/app.py, api/v2/routers/*); MCP tools call the API in-process via httpx ASGI (AGENTS.md:111, 280). Layers: schemas/ -> repository/ (async SQLAlchemy; sqlite_search_repository.py, postgres_search_repository.py, sqlite_vec_index.py, pgvector_index.py, milvus_index.py, fastembed_provider.py) -> services/ (entity_service.py, file_service.py, project_service.py, search_service.py, note_content_writes.py) -> indexing/ (accepted-note write/materialization runners, batch_indexer.py) with index/ as the local runtime (watch_service.py on watchfiles, note_content_materialization.py). DB is derived: memory.db in ~/.basic-memory (WAL; 28 Alembic migrations). Markdown parsing in markdown/ and picoschema/. Harness integration: hooks/ (envelope, inbox WAL, archive, adapters) plus cli/commands/hook.py and plugin shells in plugins/claude-code and plugins/codex. Also cli/commands/cloud/ (rclone, WebDAV, snapshots), ci/ (GitHub project-update capture), integrations/hermes, integrations/openclaw, skills/ (15 SKILL.md), benchmarks/ (separate uv project).",
+      "packaging_and_release": "Build: hatchling + uv-dynamic-versioning from git tags (pyproject.toml:84-86, 149-159); __version__ is bumped by just release vX.Y.Z (release PR, rebase-merge, tag; also bumps server.json, marketplaces, plugin manifests and the Codex hook git-tag pins: justfile:618-625, 644-760; AGENTS.md:355-387). release.yml on v* tags: uv build -> wheel and sdist attached to a GitHub Release (release.yml:32-52) -> pypa/gh-action-pypi-publish with password secrets.PYPI_TOKEN (release.yml:54-57; dev-release.yml:74-77 says that token no longer exists and stable releases attest via trusted publishing, so the effective mechanism is not determinable from the repo) -> OpenClaw npm publish with --provenance (release.yml:59-97) -> Homebrew tap formula bump using sha256 of the tag tarball (release.yml:99-165). No checksum file, signature, SBOM or attestation step appears in any workflow. dev-release.yml publishes X.Y.Z.devN to PyPI on every push to main via OIDC. docker.yml (v* tags): unsigned multi-arch (amd64, arm64) ghcr.io/basicmachines-co/basic-memory via Depot (docker.yml:50-59); Dockerfile copies unpinned uv:latest and runs uv sync --locked (Dockerfile:8, 30). publish-skills.yml pushes a rolling skills-latest asset; mcp-registry-publish.yml (manual) publishes server.json. Claude Code and Codex plugins ship as git source trees via marketplaces (.claude-plugin/marketplace.json; .agents/plugins/marketplace.json).",
+      "tests_and_ci": "pytest (strict asyncio, 120 s per-test timeout; pyproject.toml:88-114) with mock/xdist/testmon/split, testcontainers[postgres]; ruff plus ty typecheck in CI (justfile:490-492). Test files: tests/ about 362 test_*.py (incl. tests/hooks/, tests/cli/test_hook_command.py, tests/test_codex_plugin_package.py, tests/test_claude_plugin_hooks.py), test-int/ about 79 (MCP/CLI integration, semantic, read_cache, concurrency/lock-order), plugins/*/hooks 4 (in pytest testpaths but no CI recipe targets them: justfile:49, 61), integrations/hermes/tests 9, integrations/openclaw 22 Bun tests, benchmarks 20. 11 workflows in .github/workflows: test.yml (push-only, path-filtered; static checks; SQLite unit+integration on ubuntu py3.12/3.13/3.14 plus windows py3.12; Postgres unit (3 shards) and integration on py3.14 with a pgvector service; semantic suite; Milvus on ubuntu/macOS/windows), consolidated-packages.yml (static validation of Claude/Codex/skills/Hermes/OpenClaw packaging; no real Claude Code or Codex host is run), release, dev-release, docker, publish-skills, mcp-registry-publish, pr-title, claude, claude-code-review, claude-issue-triage. CI passes --no-cov and has no coverage gate although AGENTS.md:299 says 100%; test.yml:23 sets BASIC_MEMORY_TESTMON_FLAGS which nothing consumes. DCO sign-off required (AGENTS.md:86).",
+      "dependencies": "pyproject.toml: 43 direct runtime dependencies (lines 11-64; uvloop platform-conditional), including dev tools declared as runtime deps (pyright, pytest-aio, pytest-asyncio), heavy stacks (fastembed/onnxruntime, litellm<1.92, openai, logfire, sqlite-vec) and the exact beta pin fastmcp==4.0.0b1 (line 32; constraint fastmcp-slim==4.0.0b1 at line 153); extras milvus (pymilvus) and redis (1); dev group 20. Root uv.lock resolves 204 packages (fastmcp 4.0.0b1, mcp 2.0.0, fastembed 0.8.0, onnxruntime 1.27.0, litellm 1.91.3). benchmarks/pyproject.toml: 8 runtime + 4 dev (own uv.lock). integrations/openclaw/package.json: 2 runtime, 1 peer, 4 dev, bun.lock, postinstall script. integrations/hermes/requirements-dev.txt: 1. Hook scripts carry PEP 723 inline deps (basic-memory plus fastmcp pin).",
+      "security_policy": "SECURITY.md (root): supported versions 0.x.x; report privately to hello@basicmachines.co (no public issues), 72-hour response target; threat model (path validation, list-form subprocess args, MCP host config risk, single-user local scope, stdio default, REST API for localhost) and secure-config checklist (SECURITY.md:1-78). Stale: it says sync_service.py calls find via create_subprocess_exec (SECURITY.md:29-31) but no such module exists here; the only create_subprocess_exec is the optional external formatter (file_utils.py:263). A separate integrations/openclaw/SECURITY.md covers that plugin's auto-install of bm."
+    },
+    "claim_checks": [
+      {
+        "claim": "Local-first and two-way: files are the source of truth and sync keeps humans and AI in step (README.md:39-40, 495-496).",
+        "verified": "partial",
+        "evidence": "Notes are Markdown in project dirs (default ~/basic-memory, src/basic_memory/config_models.py:910-916); the index DB is derived and bm reset deletes only the index (cli/commands/db.py:211-214; db.py:233-236). A watchfiles watcher starts in the MCP lifespan (index/watch_service.py:17; mcp/server.py:177-179), index_changes defaults true (config_models.py:558-561) and startup runs recovery plus a project index (services/initialization.py:266-303), but only while a Basic Memory process runs. Nuance: local writes are accepted DB-first and the file is written afterward (mcp/server.py:194-200; services/initialization.py:58-67; docs/DOMAIN_MODEL.md:131-148 says authority depends on write phase)."
+      },
+      {
+        "claim": "Every tool is tagged with behavior hints (read-only, destructive, idempotent) (README.md:45-47, 397-400).",
+        "verified": "partial",
+        "evidence": "All 21 registered tools (mcp/tools/__init__.py:37-61) carry readOnlyHint and destructiveHint annotations (e.g. delete_note.py:188-193, write_note.py:61-67, read_note.py:66-67), but a grep of mcp/tools finds idempotentHint only in write_note.py:65 (False). README What's New also still says FastMCP 3.0 while pyproject.toml:32 pins fastmcp==4.0.0b1."
+      },
+      {
+        "claim": "Cloud is never required and the local install is 'Air-gapped friendly' (README.md:48, 80).",
+        "verified": "partial",
+        "evidence": "Cloud endpoints are only config defaults used at login (config_models.py:664-679); MCP startup reads a local token file only (mcp/server.py:138-152). But three defaults reach the network unless switched off: auto_update true -> PyPI check and uv/brew upgrade from stdio MCP sessions (config_models.py:696-705; cli/commands/mcp.py:85-99; auto_update.py:22, 119-130); semantic search on by default with a first-use FastEmbed model download (config_models.py:64-69, 252-255; docs/semantic-search.md:181); Umami events from interactive CLI (cli/analytics.py:28-29; promo.py:96-126). Each has an off switch (README.md:602-606; analytics.py:40-43; docs/semantic-search.md:30), so air-gapped use needs deliberate config plus a pre-seeded model cache (FASTEMBED_CACHE_PATH, config_models.py:91-110) and pre-fetched uv/PyPI installs."
+      },
+      {
+        "claim": "Telemetry is minimal, anonymous, limited to promo/login events, and BASIC_MEMORY_NO_PROMOS=1 disables all telemetry (README.md:608-627).",
+        "verified": "partial",
+        "evidence": "Event names and call sites match the README list (cli/analytics.py:56-60; cloud/core_commands.py:80, 94, 99, 314; promo.py:126); payload is event name, BM version, trigger (analytics.py:79-93); the env var disables sending (analytics.py:40-43). Caveats: NO_PROMOS appears only in analytics.py and promo.py, so auto-update checks and Logfire are separate switches; bm cloud promo --off itself sends an opt-out event unless the env var is set (core_commands.py:303-315); 'no IP addresses' is not verifiable from the repo because each event is a direct HTTPS POST from the user's host (analytics.py:95-109)."
+      },
+      {
+        "claim": "Auto-updates every 24 h, silently, for uv tool and Homebrew installs; skipped for uvx (README.md:382-383, 593-606).",
+        "verified": "yes",
+        "evidence": "auto_update defaults true and update_check_interval 86400 (config_models.py:696-705); install source detection (auto_update.py:68-79); uvx skipped (auto_update.py:280-288); upgrade runs uv tool upgrade basic-memory or brew upgrade basic-memory (auto_update.py:399-417); stdio MCP runs it silently in a daemon thread (cli/commands/mcp.py:85-99); unknown installs only get a notice (auto_update.py:365-377); config switch honored (auto_update.py:290-298)."
+      },
+      {
+        "claim": "Claude Code plugin gives session briefings and pre-compaction checkpoints; the MCP server is a hard prerequisite because hooks and skills call it (README.md:209-225).",
+        "verified": "partial",
+        "evidence": "Hooks exist as described: SessionStart and PreCompact (plugins/claude-code/hooks/hooks.json:4-27); bm hook builds a fenced brief and writes an extractive checkpoint note (cli/commands/hook.py:590-729, 893-1003, 1054-1121); skills and output style are present (plugins/claude-code/). Imprecise: the hooks import and call search_notes/write_note in-process through the uv-resolved package (hook.py:463-477, 1099-1105; plugins/claude-code/README.md:76-78, 83-88), so only the skills need the MCP tools connected; the plugin bundles no .mcp.json (the Codex plugin does)."
+      },
+      {
+        "claim": "Codex still requires approval for destructive-annotated Basic Memory tools (writes, edits, deletes) even with default_tools_approval_mode=approve (README.md:310-324).",
+        "verified": "partial",
+        "evidence": "Server side: write_note, edit_note, delete_note and delete_project advertise destructiveHint true (write_note.py:63-64; edit_note.py:354-357; delete_note.py:190-191; project_management.py:780-781); move_note and create_memory_project do not (move_note.py:355-356; project_management.py:547-548). Codex's approval behavior is host-defined and not checkable here. The Codex plugin bundles uvx basic-memory mcp without --project (plugins/codex/.mcp.json:3-9)."
+      },
+      {
+        "claim": "Official agent packages are the core package, Claude Code plugin, shared skills, Hermes and OpenClaw plugins (README.md:190-192).",
+        "verified": "no",
+        "evidence": "plugins/codex/ exists with manifest, hooks, skills, schemas and .mcp.json (plugins/codex/.codex-plugin/plugin.json:1-46), a marketplace entry (.agents/plugins/marketplace.json:6-19), a package-check-codex target (justfile:585, 597-599), a CI job (consolidated-packages.yml:47-58) and release version bumps (justfile:710-712). Root README omits it and only links its README in passing (README.md:323-324); AGENTS.md:68-79 also omits it; install steps are only in plugins/codex/README.md:101-108."
+      },
+      {
+        "claim": "Local snapshots and backups are 'Roll your own' (README.md:169) - i.e. the tool provides no local recovery.",
+        "verified": "yes",
+        "evidence": "delete_note is documented permanent and not undoable (mcp/tools/delete_note.py:264-266) and unlinks files (services/file_service.py:397-409); delete_project(delete_notes=True) and bm project remove --delete-notes rmtree the directory (services/project_service.py:410-416; cli/commands/project.py:871-876); snapshot and restore commands only call the Cloud API (cli/commands/cloud/snapshot.py:57-60; restore.py:69); no local export, trash, undelete or pre-migration DB backup exists (only a config.json.bak: config.py:129-134)."
+      },
+      {
+        "claim": "Hook lifecycle capture is on by default, inspectable (bm hook status), archivable locally (bm hook flush) and never becomes graph notes (plugins/claude-code/README.md:94-98; plugins/codex/README.md:186-190).",
+        "verified": "yes",
+        "evidence": "Capture defaults on and needs JSON true (cli/commands/hook.py:78, 423); envelopes are strict, immutable, bounded metadata, one owner-only JSON file per event under ~/.basic-memory/inbox (hooks/envelope.py:61-79; hooks/inbox.py:40-47, 73-90); status prints inbox depth, last flush, settings and versions (hook.py:1475-1508); flush only moves valid envelopes to processed/, prunes after 30 days and writes no notes (hook.py:1159-1181; hooks/archive.py:1-6, 58-97). Caveats: Claude's PreCompact separately writes a real note (hook.py:1079-1121), Codex relies on agent-authored checkpoints, and flush is manual."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "LongMemEval-S (stratified 60 questions) end-to-end QA, bm-local; answerer claude-haiku-4-5, judge claude-sonnet-4-6 (LLM judge, judge-human agreement not yet measured); same table also lists mem0-local 0.450, grep 0.333, full-context 0.217",
+        "metric": "QA accuracy",
+        "value": "0.583",
+        "source": "benchmarks/benchmarks/results/matrix-v2-summary.md:8-25, 47-52",
+        "independent": false
+      },
+      {
+        "what": "ConvoMem cs10 (274 questions) end-to-end QA, bm-local; same table lists mem0-local 0.464, grep 0.380, full-context 0.799",
+        "metric": "QA accuracy",
+        "value": "0.755",
+        "source": "benchmarks/benchmarks/results/matrix-v2-summary.md:47-52",
+        "independent": false
+      },
+      {
+        "what": "LongMemEval-60 retrieval, bm-local (project says retrieval is near-parity with mem0-local)",
+        "metric": "recall@5 / recall@10 / MRR / mean latency",
+        "value": "0.951 / 0.951 / 0.900 / 754 ms",
+        "source": "benchmarks/benchmarks/results/matrix-v2-summary.md:32-37",
+        "independent": false
+      },
+      {
+        "what": "ConvoMem-274 retrieval, bm-local",
+        "metric": "recall@5 / recall@10 / MRR / mean latency",
+        "value": "0.982 / 0.996 / 0.929 / 140 ms",
+        "source": "benchmarks/benchmarks/results/matrix-v2-summary.md:39",
+        "independent": false
+      },
+      {
+        "what": "LoCoMo q300 non-adversarial subset, Penfield-corrected key, BM product progression (main -> +FTS fix -> +FTS +dated title passthrough); doc marks LoCoMo as directional",
+        "metric": "QA accuracy (plus retrieval on this slice: recall@5 0.774, recall@10 0.875, MRR 0.697)",
+        "value": "0.439 -> 0.475 -> 0.641",
+        "source": "benchmarks/benchmarks/results/matrix-v2-summary.md:81-98",
+        "independent": false
+      },
+      {
+        "what": "LoCoMo multi_hop (63 questions): structured-augment vs flat transcript ingestion; internal finding with a stated confound and small n",
+        "metric": "recall@5 and QA accuracy, flat -> structured",
+        "value": "recall@5 0.778 -> 0.833; QA 0.556 -> 0.571",
+        "source": "benchmarks/benchmarks/results/structured-ingestion-findings.md:47-61, 73-76",
+        "independent": false
+      },
+      {
+        "what": "Illustrative example output block in the perf-benchmark docs (hardware and date not stated; not a stated result)",
+        "metric": "cold index of 300 notes; hybrid query latency",
+        "value": "26.13 notes/s (11.48 s, 4.83 MB SQLite); hybrid p50 2.94 ms, p95 5.88 ms over 32 queries",
+        "source": "test-int/BENCHMARKS.md:111-126",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "No local recovery for deleted or overwritten memory: delete_note is permanent and unlinks files; delete_project(delete_notes=True) and bm project remove --delete-notes rmtree the project dir; snapshots/restore exist only in the paid Cloud; no local export, trash, undelete or pre-migration backup (mcp/tools/delete_note.py:264-266; services/file_service.py:397-409; services/project_service.py:410-416; cli/commands/cloud/snapshot.py:57-60; README.md:169). write_note overwrite=True and edit_note replace content in place; only Codex bm-checkpoint is immutable (plugins/codex/skills/bm-checkpoint/SKILL.md:61-79); 'archive, never delete' is skill guidance, not enforcement (skills/memory-lifecycle/SKILL.md:8). Destructive tools are exposed to every connected client unless the server runs with --project, which the shipped Codex .mcp.json and README snippets do not use (plugins/codex/.mcp.json:3-9). Recovery depends on external backups or git of the notes dir.",
+      "Durability model is DB-first, not purely file-first: a local write is accepted into the DB and the Markdown file is written afterward by in-process workers, with a shutdown drain and a startup recovery pass (mcp/server.py:194-200; services/initialization.py:52-67; config_models.py:497-504; docs/DOMAIN_MODEL.md:140-148). SQLite runs WAL with synchronous=NORMAL, so an OS crash can lose the last transactions (config_models.py:510-518). Claude and Codex would each run their own basic-memory mcp process plus short-lived bm hook processes against one shared SQLite DB and note tree (WAL, 10 s busy timeout: db.py:228-232); maintainers fixed production deadlock clusters and duplicate observations in v0.23.0 with CAS/generation fences (AGENTS.md:168-176; CHANGELOG.md:174-177, 243-248), and the concurrent-write benchmark treats divergence as a possible result (benchmarks/README.md:159-175); no published results.",
+      "Capture defaults are on and unattended: hook lifecycle envelopes (cwd, session id, project hint, model) record for both hosts unless the JSON boolean false is set (cli/commands/hook.py:78, 423; hooks/inbox.py:50-52) and pile up in ~/.basic-memory/inbox until an operator runs bm hook flush (no automatic scheduling found; archive pruned after 30 days: hooks/inbox.py:37, 155-157). Claude's PreCompact auto-writes an extractive note into the primary project with clipped user text (opening request up to 300 chars, last 3 user turns up to 200) and no content redaction (hook.py:893-1003, 1079-1121; redaction.py covers config values only; the hook redaction subsystem and detect-secrets were removed: CHANGELOG.md:371-372). Checkpoint frontmatter records username, hostname and cwd (plugins/claude-code/skills/bm-checkpoint/SKILL.md:63-70).",
+      "Self-changing defaults: auto_update is on (24 h); a stdio MCP session starts a background uv tool upgrade / brew upgrade for uv-tool and Homebrew installs (config_models.py:696-705; cli/commands/mcp.py:85-99; auto_update.py:399-417) and every start runs Alembic migrations automatically (28 migration files; v0.23.0 notes five auto-run migrations incl. a data-repair step: CHANGELOG.md:83-86; services/initialization.py:131-146) with no DB or notes backup first. Version skew is possible: the Codex plugin's MCP server is floating uvx basic-memory mcp while its hooks pin git tag v0.23.2 (plugins/codex/.mcp.json:4-8; plugins/codex/hooks/session_start.py:5); Claude hooks float at >=0.23.2 from PyPI (plugins/claude-code/hooks/session_start.py:5).",
+      "Pre-1.0 churn and heavy runtime: 0.x with breaking changes in minor releases (CHANGELOG.md:88-123; 13 changelog-listed releases from 2026-03-10 to 2026-08-25); the MCP server depends on an exact beta, fastmcp==4.0.0b1, and MCP SDK v2 (pyproject.toml:18, 32, 153; CHANGELOG.md:121-123); hook scripts re-pin the beta so older uv can resolve it (plugins/*/hooks/*.py:6-10); litellm is capped <1.92 for Python 3.14 (pyproject.toml:50-52). 43 direct runtime deps plus a HuggingFace model download on first semantic use; hooks need uv and network on first run (PyPI for Claude, GitHub git+https for Codex) under 20-120 s hook timeouts with silent fail-open (plugins/codex/README.md:97-99; plugins/*/hooks/hooks.json). No cold-start timing is published.",
+      "Unauthenticated network surface if HTTP transports are used: basic-memory mcp --transport streamable-http|sse defaults to host 0.0.0.0:8000 (cli/commands/mcp.py:28-32); the FastMCP server and FastAPI app configure no authentication (mcp/server.py:229-234; api/app.py:93-141); the Docker image CMD serves SSE on 0.0.0.0:8000 and docs publish the port (Dockerfile:52; docs/Docker.md:14-20). SECURITY.md scopes the product to single-user local use, stdio by default, REST on localhost (SECURITY.md:64-78).",
+      "Licensing and governance: core is AGPL-3.0-or-later (pyproject.toml:7) though README says AGPL-3.0 (README.md:689); plugins, skills and OpenClaw are declared MIT (plugins/claude-code/README.md:218; plugins/codex/.codex-plugin/plugin.json:12; skills/README.md:135; integrations/openclaw/package.json:8) without a LICENSE file under plugins/ or skills/, while the Hermes plugin is AGPL-3.0-or-later (integrations/hermes/README.md:239). The CLA assigns copyright to Basic Machines LLC, which may relicense contributions under any terms (CLA.md:29-33). Single-vendor project with a paid cloud; the OSS CLI shows cloud promos in interactive sessions (cli/promo.py:36-45, 96-126).",
+      "Release and CI assurance gaps plus doc drift: no checksum, signature or provenance step for PyPI artifacts, GitHub release assets or the ghcr.io image (only the OpenClaw npm package uses --provenance: release.yml:44-57, 95; docker.yml:50-59); release.yml still passes secrets.PYPI_TOKEN while dev-release.yml says it no longer exists (release.yml:54-57; dev-release.yml:74-77); Actions are pinned to mutable tags; dependabot.yml has an empty package-ecosystem (.github/dependabot.yml:8); tests run on push only with no coverage gate and the plugin hook tests are not run by CI; plugin packaging is validated statically, not against real Claude Code or Codex (consolidated-packages.yml; plugins/*/justfile). Stale docs: SECURITY.md cites a non-existent sync_service.py (SECURITY.md:29-31); README says FastMCP 3.0 and 'v0.18 -> v0.20' (README.md:397, 404); Claude plugin docs say Basic Memory >=0.19.0 (plugins/claude-code/docs/getting-started.md:9) while the hook floor is 0.23.2."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "basicmachines-co/basic-memory",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "uv tool install basic-memory (requires uv; curl uv installer per plugins/codex/README.md:94; pip install basic-memory also in docs/semantic-search.md:20)",
+          "citation": "README.md:81-85",
+          "holds": true,
+          "note": "README.md:81 'Requires Python via uv' and README.md:84 'uv tool install basic-memory'. The package name and console scripts match (pyproject.toml:2, 80-82). The curl uv installer is at plugins/codex/README.md:94 and 'pip install basic-memory' at docs/semantic-search.md:20. Caveat not in the dossier: no minimum uv version is documented, but the core pins the beta fastmcp==4.0.0b1 (pyproject.toml:32). The project's own comments say older uv refuses pre-release transitive dependencies (tests/test_codex_plugin_package.py:394; scripts/validate_claude_plugin.py:140-142)."
+        },
+        {
+          "field": "license",
+          "statement": "spdx AGPL-3.0-or-later, file LICENSE",
+          "citation": "LICENSE:1-2; pyproject.toml:7",
+          "holds": true,
+          "note": "LICENSE is the unmodified GNU AGPL v3 text (lines 1-2). Its 'or any later version' wording at line 638 is only the how-to-apply template. The -or-later qualifier is declared in pyproject.toml:7 (license = 'AGPL-3.0-or-later'). The README says plain 'AGPL-3.0' (README.md:78, 168, 689). Sub-packages differ, as the dossier's risks already say: Codex plugin MIT (plugins/codex/.codex-plugin/plugin.json:12), OpenClaw MIT (integrations/openclaw/package.json:8), Hermes AGPL-3.0-or-later (integrations/hermes/README.md:239)."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - docs list Linux x86_64 as supported; CI runs ubuntu-latest on Python 3.12/3.13/3.14; Docker image built for linux/amd64 and linux/arm64; needs Python >=3.12 and uv",
+          "citation": "docs/semantic-search.md:38; .github/workflows/test.yml:102-109; .github/workflows/docker.yml:56; pyproject.toml:6; README.md:81",
+          "holds": true,
+          "note": "All citations match. The docs table row reads 'Linux x86_64 | Yes | Yes'. The unit matrix runs ubuntu-latest on 3.12/3.13/3.14, and the integration matrix repeats it at test.yml:165-170. docker.yml:56 builds 'linux/amd64,linux/arm64', and pyproject.toml:6 requires Python '>=3.12'. CI runs on push only, with a path filter (test.yml:7-12, 26-51). The macos_arm64 citations also match (docs/semantic-search.md:36-37, 42-48; README.md:272; test.yml:423-424)."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Both. Claude Code: claude mcp add plus plugins/claude-code (SessionStart brief, PreCompact checkpoint, bm-* skills, opt-in output style, seed schemas, no bundled .mcp.json). Codex: ~/.codex/config.toml plus plugins/codex (bundled .mcp.json running uvx basic-memory mcp, SessionStart brief and post-compaction checkpoint prompt, hooks trusted in /hooks). bm hook install writes ~/.claude/settings.json or ~/.codex/hooks.json. Config is kept separate per host. The plugin works alongside Claude auto-memory/CLAUDE.md.",
+          "citation": "README.md:290-294, 300-324; plugins/claude-code/README.md:17-67; plugins/codex/README.md:10-28, 101-119, 227-228, 244-245; src/basic_memory/cli/commands/hook.py:240-367, 1245-1253, 1372-1425; plugins/claude-code/docs/why-combine-memory.md:10, 94",
+          "holds": true,
+          "note": "'claude mcp add' is at README.md:293 and the Codex TOML at README.md:304-308. The Claude plugin has 8 bm-* skills, an output style and schemas; its plugin.json declares no mcpServers and there is no .mcp.json. plugins/codex/.mcp.json:2-9 runs 'uvx basic-memory mcp'. Codex SessionStart builds a brief and adds a checkpoint prompt only when the trigger is 'compact' (hook.py:1029-1051); Codex PreCompact writes nothing (hook.py:1073-1077). The hook config paths are at hook.py:1251-1253 and the per-host settings loaders at hook.py:240-271 and 326-367. Minor: why-combine-memory.md:10, 94 names only auto-memory/built-in memory; CLAUDE.md is named at plugins/claude-code/DESIGN.md:23."
+        },
+        {
+          "field": "claim_checks[2]",
+          "statement": "Cloud is never required and the local install is 'Air-gapped friendly' - verified: partial (auto-update, default-on semantic model download and Umami events reach the network unless switched off; each has an off switch)",
+          "citation": "README.md:48, 80; src/basic_memory/config_models.py:64-69, 91-110, 252-255, 664-679, 696-705; src/basic_memory/mcp/server.py:138-152; src/basic_memory/cli/commands/mcp.py:85-99; src/basic_memory/cli/auto_update.py:22, 119-130; src/basic_memory/cli/analytics.py:28-29, 40-43; src/basic_memory/cli/promo.py:96-126; docs/semantic-search.md:30, 181",
+          "holds": true,
+          "note": "Every citation matches. README.md:48 says cloud is 'never required' and README.md:80 says 'Air-gapped friendly'. Cloud endpoints are only field defaults (config_models.py:664-679), and server.py:138 notes 'local file check, no network call'. auto_update defaults to True with an 86400 s interval (config_models.py:696-705). stdio MCP starts a daemon auto-update thread (mcp.py:94-99) that fetches pypi.org (auto_update.py:22, 119-130). Semantic search is on whenever fastembed and sqlite_vec import (config_models.py:64-69, 252-255). The Umami host and site id are hard-coded (analytics.py:28-29) and gated by BASIC_MEMORY_NO_PROMOS (analytics.py:40-43). Precision point the dossier omits: the README's client configs use uvx, and auto-update returns SKIPPED for uvx before any network call (auto_update.py:280-288). The upgrade path applies to uv tool and Homebrew installs; other installs only get a PyPI check (auto_update.py:338, 365-377). Also, docs/semantic-search.md:181 is in the custom-model section, while docs/semantic-search.md:135 claims FastEmbed makes 'no network calls'."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

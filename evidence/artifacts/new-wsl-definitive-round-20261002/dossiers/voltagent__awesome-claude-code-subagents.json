@@ -1,0 +1,306 @@
+{
+  "contender": "voltagent/awesome-claude-code-subagents",
+  "revision": {
+    "contender": "voltagent/awesome-claude-code-subagents",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "voltagent/awesome-claude-code-subagents",
+        "tag": null,
+        "commit": "82b73821baa7a911d5b14cfb6da238b7f0db6b42",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": null,
+    "commit": "82b73821baa7a911d5b14cfb6da238b7f0db6b42",
+    "read_at": "2026-10-02T03:02:59+00:00"
+  },
+  "dossier": {
+    "contender": "voltagent/awesome-claude-code-subagents",
+    "revision": {
+      "tag": null,
+      "commit": "82b73821baa7a911d5b14cfb6da238b7f0db6b42",
+      "read_at": "2026-10-03"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Curated collection of 161 Claude Code subagent definitions. Each is a Markdown file with YAML frontmatter (name, description, tools, and usually model) in 10 category folders under categories/. It is distributed as 10 Claude Code plugins through a marketplace manifest, and also by manual copy or installer scripts. It is a subagent collection (CLAUDE.md:7), not a SKILL.md skills collection: no SKILL.md, AGENTS.md or Codex-format file exists in the repo. The security and engineering content is mostly keyword-bullet checklists (e.g. categories/04-quality-security/security-auditor.md, penetration-tester.md, code-reviewer.md; categories/03-infrastructure/security-engineer.md), plus a few shorter rewritten agents (ad-security-reviewer.md, auth-integration-engineer.md).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "\"The awesome collection of 161+ Claude Code subagents across 10 categories\" (badge also says 161).",
+          "citation": "README.md:9, README.md:17"
+        },
+        {
+          "claim": "The repo is \"the definitive collection of Claude Code subagents, specialized AI assistants designed for specific development tasks.\"",
+          "citation": "README.md:30"
+        },
+        {
+          "claim": "Contributions must stay \"vendor-neutral in their content\"; PRs whose primary purpose is to promote a product are not accepted; sponsorship is the supported way to surface a product.",
+          "citation": "README.md:32"
+        },
+        {
+          "claim": "Recommended install is as a Claude Code plugin: `claude plugin marketplace add VoltAgent/awesome-claude-code-subagents` then `claude plugin install <plugin-name>`; one plugin per category (e.g. voltagent-qa-sec for Quality & Security). voltagent-meta works best with other categories installed.",
+          "citation": "README.md:77-90, README.md:240"
+        },
+        {
+          "claim": "Manual install: clone, then copy desired agent files to ~/.claude/agents/ (global) or .claude/agents/ (project).",
+          "citation": "README.md:92-98"
+        },
+        {
+          "claim": "Interactive installer lets you \"browse categories, select agents, and install/uninstall them\"; standalone variant \"Downloads agents directly from GitHub without cloning the repository. Requires curl.\"",
+          "citation": "README.md:100-114"
+        },
+        {
+          "claim": "An agent-installer subagent can be curl-installed to ~/.claude/agents/ and used from Claude Code to find and install other agents.",
+          "citation": "README.md:116-120"
+        },
+        {
+          "claim": "Every subagent \"operates within its own isolated context space\" and has \"Granular Tool Permissions\"; isolated contexts give \"Memory Efficiency\".",
+          "citation": "README.md:393-403, README.md:407"
+        },
+        {
+          "claim": "\"Claude Code will automatically engage it when suitable, or you can explicitly request its help.\"",
+          "citation": "README.md:427"
+        },
+        {
+          "claim": "\"Smart Model Routing\": each subagent includes a `model` field; opus for security-auditor, architect-reviewer, fintech-engineer; sonnet for python-pro, backend-developer, devops-engineer; haiku for documentation-engineer, seo-specialist, build-engineer.",
+          "citation": "README.md:467-477"
+        },
+        {
+          "claim": "Tool assignment: read-only agents (reviewers, auditors) get `Read, Grep, Glob`; \"Each agent has minimal necessary permissions.\"",
+          "citation": "README.md:481-487"
+        },
+        {
+          "claim": "subagent-catalog is a \"Claude Code skill\" with /subagent-catalog:search, :fetch, :list, :invalidate; install with `cp -r tools/subagent-catalog ~/.claude/commands/`.",
+          "citation": "README.md:489-504"
+        },
+        {
+          "claim": "MIT licence; subagents are \"as is\"; \"We do not audit or guarantee the security or correctness of any subagent. Review before use.\"",
+          "citation": "README.md:520-526"
+        },
+        {
+          "claim": "Codex is mentioned only in sponsor copy (\"reach developers using AI coding agents like Claude Code, Codex, Gemini, and more\") and in link-reference definitions pointing to a separate repo, VoltAgent/awesome-codex-subagents.",
+          "citation": "README.md:129, README.md:529-530"
+        }
+      ],
+      "install": [
+        {
+          "method": "Claude Code plugin marketplace (per-category plugin)",
+          "command": "claude plugin marketplace add VoltAgent/awesome-claude-code-subagents\nclaude plugin install <plugin-name>   # e.g. voltagent-lang, voltagent-infra, voltagent-qa-sec",
+          "citation": "README.md:77-86"
+        },
+        {
+          "method": "Manual copy of agent files",
+          "command": "No command given. Clone the repo, then copy the desired agent .md files to ~/.claude/agents/ (global) or .claude/agents/ (project).",
+          "citation": "README.md:92-98"
+        },
+        {
+          "method": "Interactive installer from a clone",
+          "command": "git clone https://github.com/VoltAgent/awesome-claude-code-subagents.git\ncd awesome-claude-code-subagents\n./install-agents.sh",
+          "citation": "README.md:100-106"
+        },
+        {
+          "method": "Standalone installer (no clone, needs curl)",
+          "command": "curl -sO https://raw.githubusercontent.com/VoltAgent/awesome-claude-code-subagents/main/install-agents.sh\nchmod +x install-agents.sh\n./install-agents.sh",
+          "citation": "README.md:108-114"
+        },
+        {
+          "method": "agent-installer subagent",
+          "command": "curl -s https://raw.githubusercontent.com/VoltAgent/awesome-claude-code-subagents/main/categories/09-meta-orchestration/agent-installer.md -o ~/.claude/agents/agent-installer.md",
+          "citation": "README.md:116-120"
+        },
+        {
+          "method": "subagent-catalog slash commands (optional tool)",
+          "command": "cp -r tools/subagent-catalog ~/.claude/commands/",
+          "citation": "README.md:501-504"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes. Content is Markdown plus bash scripts, with no compiled code or arch-specific logic. Linux is documented for the catalog tool (tools/subagent-catalog/README.md:44 'Works on macOS and Linux'; install-agents.sh:241-242 comment 'compatible with macOS and Linux'). The only CI job runs on ubuntu-latest but checks only version bumps (.github/workflows/enforce-plugin-version-bump.yml:12); the scripts are not exercised in CI. x86_64 is not named anywhere.",
+        "wsl2": "unknown. WSL is not mentioned in the README, CONTRIBUTING.md, CLAUDE.md, install-agents.sh or tools/ (searched). The scripts are bash, but nothing in the repo states or tests WSL2 support.",
+        "macos_arm64": "yes. macOS is documented in general terms (tools/subagent-catalog/README.md:44; install-agents.sh:241-242, which says the awk usage is macOS/Linux compatible). There is no arch-specific code and arm64 is not named.",
+        "gpu": "no. Not applicable: the repo has no compute or inference code (Markdown and bash only)."
+      },
+      "integrations": {
+        "cli": "No project binary. install-agents.sh is an interactive bash menu with no flags or argument parsing (install-agents.sh:571-583). Plugin install uses Claude Code's own `claude plugin marketplace add` / `claude plugin install` (README.md:77-80).",
+        "mcp": "None found: the repo ships no MCP server. A few agents declare third-party MCP/computer tools in frontmatter: visual-asset-generator.md:4 (mcp__prompt-to-asset), scientific-literature-researcher.md:4 and :27-36 (BGPT remote MCP URL), ui-ux-tester.md:4 (chrome-mcp, computer-use), codebase-orchestrator.md:4 (airis-mcp-gateway, pied-piper, subagent-catalog:search/fetch).",
+        "sdk_or_api": "None found: no library, SDK or HTTP API. The scripts only consume GitHub's REST/raw endpoints (install-agents.sh:27-28; tools/subagent-catalog/config.sh:10).",
+        "claude_code_or_codex": "Claude Code: yes. Plugin marketplace .claude-plugin/marketplace.json:11-92 lists 10 category plugins. Agents can be copied into ~/.claude/agents or .claude/agents (README.md:92-120), and slash commands live in tools/subagent-catalog (README.md:489-504). Each plugin installs a whole category of 11-30 agents. Codex: none found. 'codex' appears only at README.md:129 (sponsor text) and README.md:529-530 (unused link references to the separate repo VoltAgent/awesome-codex-subagents, which was not read). There is no SKILL.md, AGENTS.md or .codex content anywhere."
+      },
+      "telemetry_and_network": "No telemetry or analytics code in install-agents.sh, tools/subagent-catalog/config.sh or the workflow (searched for telemetry|analytics|tracking|beacon; only unrelated README text matched). No account or API key is required. Network use happens on user action only. install-agents.sh remote mode calls https://api.github.com/repos/VoltAgent/awesome-claude-code-subagents/contents and https://raw.githubusercontent.com/VoltAgent/awesome-claude-code-subagents/main, unauthenticated (install-agents.sh:27-28, 55, 85, 110). subagent-catalog fetches README.md from raw.githubusercontent.com (config.sh:10, 40; 5 s connect / 30 s max) and caches it 12 h at ~/.claude/cache/subagent-catalog.md (config.sh:8-9). agent-installer.md:22-24 uses the same endpoints and notes the 60 req/h unauthenticated limit (:72). `claude plugin marketplace add VoltAgent/...` needs GitHub access (README.md:78). The README embeds remote images and a UTM-tagged sponsor link (README.md:2, 16-19, 38, 517), which are contacted only when the README is rendered or clicked. Individual agents add third-party network dependencies: BGPT remote MCP https://bgpt.pro/mcp/sse (scientific-literature-researcher.md:32), `npm install -g unslop` (content-quality-editor.md:18), `npm install -g prompt-to-asset` (visual-asset-generator.md:31), and `curl -fsSL .../ajhcs/healthcare-agents/main/install.sh | bash` (healthcare-admin.md:197)."
+    },
+    "code": {
+      "languages": [
+        "Markdown (161 agent files, 10 category READMEs, 4 slash-command files)",
+        "Bash (install-agents.sh 583 lines; tools/subagent-catalog/config.sh 94 lines)",
+        "YAML (1 GitHub Actions workflow)",
+        "JSON (.claude-plugin/marketplace.json + 10 plugin.json)"
+      ],
+      "entry_points": [
+        {
+          "path": "install-agents.sh",
+          "what": "Interactive bash installer/uninstaller for agent files. Local-copy or remote (GitHub API + raw) mode; installs to ~/.claude/agents or .claude/agents; no CLI flags; main at :571-583."
+        },
+        {
+          "path": ".claude-plugin/marketplace.json",
+          "what": "Claude Code marketplace manifest 'voltagent-subagents' listing 10 category plugins by relative source path (:11-92)."
+        },
+        {
+          "path": "categories/*/.claude-plugin/plugin.json",
+          "what": "Ten per-category plugin manifests: name, version, metadata and an explicit `agents` array of ./*.md. No hooks, mcpServers, commands or skills keys in any JSON file."
+        },
+        {
+          "path": "categories/<NN-category>/<agent>.md",
+          "what": "161 subagent definitions: YAML frontmatter (name, description, tools, model on 153 of them) plus prompt body. This is the unit Claude Code loads."
+        },
+        {
+          "path": "categories/09-meta-orchestration/agent-installer.md",
+          "what": "Subagent (tools: Bash, WebFetch, Read, Write, Glob; model: haiku) that lists, installs and uninstalls agents via GitHub API/raw URLs."
+        },
+        {
+          "path": "tools/subagent-catalog/ (search.md, fetch.md, list.md, invalidate.md, config.sh)",
+          "what": "Slash-command Markdown plus shared bash config. Fetches README.md from raw.githubusercontent.com and caches it 12 h at ~/.claude/cache/subagent-catalog.md."
+        },
+        {
+          "path": ".github/workflows/enforce-plugin-version-bump.yml",
+          "what": "The only CI workflow: PR check that category plugin versions are bumped and match marketplace.json."
+        }
+      ],
+      "architecture": "Content-only repository with no build step or runtime service. categories/01..10-*/ each hold agent Markdown files (frontmatter + prompt), a category README.md and .claude-plugin/plugin.json with an explicit agents array. .claude-plugin/marketplace.json aggregates the ten category plugins. Distribution paths: (1) Claude Code plugin marketplace, (2) manual copy into ~/.claude/agents or .claude/agents, (3) install-agents.sh (bash menu; local cp at :543 or remote curl at :104-115), (4) agent-installer.md, (5) tools/subagent-catalog slash commands. Agents reference each other only by name in prose ('Integration with other agents'); no code links them. 115 of 161 agent files tell the agent to 'Query context manager', and 130 have a '## Communication Protocol' JSON section; no code in the repo implements that exchange. Size: about 37.6k lines across the 161 agent files, typically 277-287 lines for the templated ones (e.g. security-auditor.md is 287 lines) and 52-98 lines for newer ones (ad-security-reviewer.md 56, gdpr-ccpa-compliance.md 98). The 17-agent quality-security category is about 3.9k lines. All 161 agents have `description:` and `tools:`; 153 have `model:` (haiku 19, sonnet 109, inherit 25, opus 0). CLAUDE.md and CONTRIBUTING.md define the contributor format.",
+      "packaging_and_release": "No build artifacts, release workflow, checksums, signatures or attestations. No tags are visible in this shallow checkout (.git/packed-refs lists only origin/main). Distribution is by git: the Claude Code marketplace points at ./categories/* sources in this repo (marketplace.json:11-92). Versions are hand-maintained per category plugin (1.0.1 to 1.1.1 across plugin.json files) while marketplace.json metadata.version is 1.0.4 (marketplace.json:8). CONTRIBUTING.md:46-56 requires a version bump whenever a category .md changes, and CI enforces it (.github/workflows/enforce-plugin-version-bump.yml:38-77). The installers and catalog tool download from the mutable `main` branch with no pinning or integrity check (install-agents.sh:28, 104-115; config.sh:10, 40).",
+      "tests_and_ci": "No test framework, test directories or test files: searched for test/tests/spec dirs and *.bats, *.test.*, *.spec.*, approximately 0 test files. One CI workflow, .github/workflows/enforce-plugin-version-bump.yml, on ubuntu-latest with actions/checkout@v4 (tag-pinned, not SHA-pinned). It triggers on pull_request touching categories/** or .claude-plugin/marketplace.json, and on workflow_dispatch (:3-8). It (1) fails if any .md under a category changed versus the base but that category's plugin.json version did not (:38-52), and (2) fails if a category plugin.json version differs from its marketplace.json entry (:54-77). It does not lint frontmatter, links, agent counts, plugin `agents` arrays or the shell scripts.",
+      "dependencies": "No dependency manifests (no package.json, pyproject/requirements, Cargo.toml, go.mod, Gemfile or lockfiles), so 0 declared direct dependencies. The shell scripts use bash, curl, awk, sed, grep, date (install-agents.sh; tools/subagent-catalog/config.sh). Some agent bodies tell users to install external tools (unslop and prompt-to-asset npm packages, a BGPT remote MCP, a healthcare-agents install script); none of these is declared as a dependency.",
+      "security_policy": "none. No SECURITY.md exists in the repo or .github/ (the only file there is workflows/enforce-plugin-version-bump.yml). README.md:524-526 gives an 'as is', no-audit disclaimer and says to open an issue for problems or removal requests."
+    },
+    "claim_checks": [
+      {
+        "claim": "161+ Claude Code subagents across 10 categories (README.md:9, :17)",
+        "verified": "yes",
+        "evidence": "161 files under categories/*/ have `name:`, `description:` and `tools:` frontmatter, across 10 category folders 01 to 10. Counts elsewhere drift: .claude-plugin/marketplace.json:9 says 158, and the plugin.json agents arrays total 160. categories/06-developer-experience/.claude-plugin/plugin.json:11-27 lists 15 of 16 files and omits docs-drift-editor.md, which README.md:289 lists."
+      },
+      {
+        "claim": "Install via `claude plugin marketplace add VoltAgent/awesome-claude-code-subagents` + `claude plugin install <plugin-name>` (README.md:77-86)",
+        "verified": "partial",
+        "evidence": "marketplace.json:11-92 defines 10 plugins whose names match the README's plugin names (voltagent-core-dev, -lang, -infra, -qa-sec, -data-ai, -dev-exp, -domains, -biz, -meta, -research); each source is a whole category folder. All plugin versions equal their plugin.json versions. I did not run the claude CLI. The install unit is a category (11-30 agents), with no per-agent plugin. The voltagent-dev-exp manifest omits docs-drift-editor (plugin.json:11-27)."
+      },
+      {
+        "claim": "Smart Model Routing: every subagent has a `model` field; opus for security-auditor, architect-reviewer, fintech-engineer (README.md:469-477)",
+        "verified": "partial",
+        "evidence": "153 of 161 agents have `model:` (haiku 19, sonnet 109, inherit 25, opus 0). The three named opus examples are `model: inherit` (categories/04-quality-security/security-auditor.md:5, architect-reviewer.md:5, categories/07-specialized-domains/fintech-engineer.md:5), so the README's opus row contradicts the code. The haiku and sonnet examples match. Eight agents have no `model:` line: gdpr-ccpa-compliance, hipaa-compliance, assumption-mapping, backlog-grooming, growth-loops, cohort-analysis, ab-test-analysis, first-principles-thinking."
+      },
+      {
+        "claim": "Read-only agents (reviewers, auditors) get `Read, Grep, Glob`; \"Each agent has minimal necessary permissions\" (README.md:481-487)",
+        "verified": "partial",
+        "evidence": "Only 2 of 161 agents have exactly `Read, Grep, Glob`: security-auditor.md:4 and compliance-auditor.md:4. The reviewers code-reviewer.md:4 and architect-reviewer.md:4 have `Read, Write, Edit, Bash, Glob, Grep`. 118 of 161 agents list Bash and 142 list Write or Edit. penetration-tester.md:4 has Bash."
+      },
+      {
+        "claim": "Interactive and standalone installers let you browse categories, select agents, install/uninstall; standalone needs only curl (README.md:100-114)",
+        "verified": "yes",
+        "evidence": "install-agents.sh:324-466 (multi-select per category), :469-568 (confirm, then cp/curl install or rm uninstall), :571-583 (main loop). With no local categories/ dir it switches to remote mode automatically (:119-126), and check_curl is at :45-50. Caveats: it is interactive only (no flags). Remote downloads come from the unpinned `main` branch with no checksum (:27-28, :104-115). 'Installed' is decided by filename (:249-253), so deselecting deletes any same-named file in the target dir (:551-556), including one the user wrote."
+      },
+      {
+        "claim": "subagent-catalog is a \"Claude Code skill\" with search/fetch/list/invalidate commands (README.md:489-504)",
+        "verified": "partial",
+        "evidence": "Command files tools/subagent-catalog/search.md, fetch.md, list.md, invalidate.md and config.sh exist, and the 12 h cache matches config.sh:8-9. They are slash-command Markdown installed under ~/.claude/commands (README.md:503), not SKILL.md skills (no SKILL.md exists in the repo). The tool only searches and fetches this catalog's README and agent files from raw.githubusercontent.com `main` (config.sh:10, 40; fetch.md:58-67). It does not load agents per task."
+      },
+      {
+        "claim": "Codex relevance: README mentions Codex and links an awesome-codex-subagents repo (README.md:129, :529-530)",
+        "verified": "no",
+        "evidence": "A case-insensitive search for 'codex' finds only README.md:129 (sponsor banner text) and :529-530 (unused link-reference definitions). No Codex config, AGENTS.md or SKILL.md exists, and no installer targets Codex directories. The separate repo was not read."
+      },
+      {
+        "claim": "Subagents \"stay vendor-neutral in their content\" (README.md:32)",
+        "verified": "partial",
+        "evidence": "At least four agents are built around specific third-party products or services. visual-asset-generator.md:3-7, 29-32 uses the prompt-to-asset MCP (npm install -g). scientific-literature-researcher.md:10, 27-36 uses the BGPT hosted MCP. content-quality-editor.md:3, 16-19 uses the unslop CLI. healthcare-admin.md:192-197 points to the external ajhcs/healthcare-agents repo with a curl|bash installer. README.md:353-367 also lists external projects, and sponsors appear at README.md:34-71. I did not audit all 161 agents."
+      },
+      {
+        "claim": "healthcare-admin is a \"specialist with 51 sub-agents\" (README.md:314)",
+        "verified": "partial",
+        "evidence": "healthcare-admin.md:8 and :194-197 say it is backed by 51 sub-agents from the external healthcare-agents repo, installed via an unpinned `curl -fsSL ...main/install.sh | bash`. Only the single healthcare-admin.md file (about 200 lines) is in this repo; the sub-agents are not."
+      },
+      {
+        "claim": "Each subagent runs in an isolated context window and Claude Code auto-engages it when suitable (README.md:393-403, :427)",
+        "verified": "not_checkable",
+        "evidence": "This is Claude Code runtime behaviour, which nothing in the repo implements, measures or enforces. The repo only supplies per-agent `description:` and `tools:` fields (present on all 161 agents) and no per-task loading logic beyond the plugin, installer and catalog mechanisms described above."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Claimed context-token reduction for airis-mcp-gateway, a separate MCP multiplexer project listed in the README's category 09. It is not part of this repo's code, and no method or data is given here.",
+        "metric": "context token usage reduction",
+        "value": "97% (aggregating 60+ tools behind 7 meta-tools)",
+        "source": "README.md:353",
+        "independent": false
+      },
+      {
+        "what": "Automated eval of the 51 sub-agents of the external healthcare-agents project referenced by the healthcare-admin agent. Scale and method are not given, and it is not a measurement of this collection.",
+        "metric": "number of sub-agents scoring 80+",
+        "value": "10 (of 51)",
+        "source": "categories/07-specialized-domains/healthcare-admin.md:194",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope: this is a subagent collection, not a SKILL.md skills collection. No SKILL.md, AGENTS.md or Codex-format file exists, and Codex appears only in sponsor text and unused link references (README.md:129, 529-530; the separate awesome-codex-subagents repo was not read). On its own it offers no Codex loading path and no per-task skill loader.",
+      "Activation granularity and size: the Claude Code install unit is a whole category plugin (10 plugins of 11-30 agents; .claude-plugin/marketplace.json:11-92). Narrower installs need manual copying or the installer scripts (README.md:92-120). Agent files are long: about 37.6k lines across 161 files, typically 277-287 lines each (e.g. categories/04-quality-security/security-auditor.md is 287 lines, and the 17-agent qa-sec category is about 3.9k lines), so concise canonical rules are not what most files provide.",
+      "Uneven content form: older templated agents are keyword-bullet checklists with a pseudo 'Communication Protocol' JSON and invented sample metrics (security-auditor.md:127-142, 196-208, 224-225; penetration-tester.md:127-142, 196-208, 224-225). 115 of 161 files say 'Query context manager', though no code implements that exchange and context-manager.md:12 says it only works with files. Only 12 files contain explicit no-fabrication language (mostly category 09, e.g. context-manager.md:10-15). Numbers inside agent files are illustrative, not measurements.",
+      "Broad tool grants: 118 of 161 agents list Bash and 142 list Write or Edit; only security-auditor.md:4 and compliance-auditor.md:4 are exactly Read, Grep, Glob (contrast README.md:482, 487). penetration-tester.md:4 has Bash and lists exploit development, evasion, persistence and 'cover track analysis' topics (:47-55, :97-105). Its authorization gating is prompt text only (:17-18, :148-170, :267-275). ui-ux-tester.md:4 declares chrome-mcp and computer-use. README.md:524 disclaims any security audit.",
+      "Unpinned, unverified supply chain: installers and the catalog download from the mutable `main` branch with no checksum or signature (install-agents.sh:27-28, 104-115; tools/subagent-catalog/config.sh:10, 40; README.md:110, 118). Agent bodies instruct third-party installs: `npm install -g unslop` (content-quality-editor.md:18), `npm install -g prompt-to-asset` (visual-asset-generator.md:31), `curl -fsSL https://raw.githubusercontent.com/ajhcs/healthcare-agents/main/install.sh | bash` (healthcare-admin.md:197), and a hosted MCP at https://bgpt.pro/mcp/sse (scientific-literature-researcher.md:32).",
+      "Metadata drift and no tests: README says 161 (README.md:9) but marketplace.json:9 says 158, and the manifests list 160 (voltagent-dev-exp omits docs-drift-editor: categories/06-developer-experience/.claude-plugin/plugin.json:11-27). The README model table contradicts frontmatter (README.md:473 vs security-auditor.md:5; 0 agents use opus; 8 lack `model:`). agent-installer.md:52-54 shows stale counts (11/22/14 vs actual 13/30/16). There are no tests; CI only checks version bumps (enforce-plugin-version-bump.yml:38-77). No evals or measurements of the collection itself are published; the only figures concern other projects (README.md:353; healthcare-admin.md:194).",
+      "Governance and maintenance: no SECURITY.md, CODEOWNERS, changelog, release process or artifacts, and no tags visible in the checkout. Versions are bumped by hand (CONTRIBUTING.md:46-56). Contributions are community-sourced and unaudited (README.md:524), and the README carries sponsor and promotional blocks (README.md:34-71) next to a vendor-neutral policy (README.md:32). .claude/settings.local.json is present in the checkout despite .gitignore:16 listing .claude/, and pre-approves Bash(python3:*), Bash(for:*) and Bash(git status:*) for anyone opening a clone in Claude Code (.claude/settings.local.json:4-8).",
+      "Licensing and attribution: LICENSE is MIT with only 'Copyright (c) 2025 VoltAgent' (LICENSE:3), while the README says the repo aggregates maintainer and community contributions (README.md:524). At least one agent is adapted from third-party work (ai-writing-auditor.md:65-70 credits conorbronsdon/avoid-ai-writing as MIT, plus brandonwise/humanizer). No NOTICE or third-party license text file exists in the repo, only the in-file credit."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "voltagent/awesome-claude-code-subagents",
+      "checks": [
+        {
+          "field": "readme.install[0] (Claude Code plugin marketplace, per-category plugin)",
+          "statement": "`claude plugin marketplace add VoltAgent/awesome-claude-code-subagents` then `claude plugin install <plugin-name>` (e.g. voltagent-lang, voltagent-infra, voltagent-qa-sec).",
+          "citation": "README.md:77-86",
+          "holds": true,
+          "note": "README.md:78-79 has both commands word for word and :84-85 shows voltagent-lang and voltagent-infra. voltagent-qa-sec is a real plugin name (README.md:240, .claude-plugin/marketplace.json:37). The root manifest .claude-plugin/marketplace.json:11-92 lists the 10 plugins, each source folder has .claude-plugin/plugin.json, and all 10 plugin.json versions match marketplace.json. The claude command itself was not run."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT; file LICENSE.",
+          "citation": "LICENSE:1-21",
+          "holds": true,
+          "note": "LICENSE:1 is 'MIT License', :3 is 'Copyright (c) 2025 VoltAgent', and :5-21 is the standard MIT grant and warranty disclaimer. README.md:522 and all 10 categories/*/.claude-plugin/plugin.json files (\"license\": \"MIT\" at :10) agree."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes. Markdown plus bash with no compiled or arch-specific code; Linux documented at tools/subagent-catalog/README.md:44 ('Works on macOS and Linux') and install-agents.sh:241-242; the only CI job runs on ubuntu-latest and checks only version bumps (.github/workflows/enforce-plugin-version-bump.yml:12); x86_64 is not named anywhere.",
+          "citation": "tools/subagent-catalog/README.md:44; install-agents.sh:241-242; .github/workflows/enforce-plugin-version-bump.yml:12",
+          "holds": true,
+          "note": "Substance holds. A glob for py/js/ts/go/rs/c/cpp/so/dylib/exe/jar/toml/lock/ps1/rb files finds none. A grep for x86|amd64|x64|arm64|aarch64|apple silicon finds nothing. install-agents.sh:242 reads '(compatible with macOS and Linux)'. Workflow :12 is 'runs-on: ubuntu-latest', and its steps (:38-77) only compare plugin versions and never run the scripts. One citation is off by one line: the quoted 'Works on macOS and Linux' is at tools/subagent-catalog/README.md:43, while :44 is 'Best practices: Follows Anthropic skill authoring guidelines'. I count this as a citation slip, not a wrong statement. The macos_arm64 entry cites the same wrong line."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Claude Code: yes. marketplace.json:11-92 lists 10 category plugins; agents can be copied to ~/.claude/agents or .claude/agents (README.md:92-120); slash commands live in tools/subagent-catalog (README.md:489-504); each plugin installs a whole category of 11-30 agents. Codex: none. 'codex' appears only at README.md:129 and :529-530 (unused link refs); no SKILL.md, AGENTS.md or .codex content anywhere.",
+          "citation": ".claude-plugin/marketplace.json:11-92; README.md:92-120; README.md:489-504; README.md:129; README.md:529-530",
+          "holds": true,
+          "note": "Verified. A case-insensitive grep for 'codex' matches only README.md:129, :529 and :530, and [codex-badge] and [codex-link] are never used. No SKILL.md, AGENTS.md or .codex exists (hidden folders are only .git, .claude, .claude-plugin and .github). tools/subagent-catalog holds search.md, fetch.md, list.md, invalidate.md and config.sh. The README sections at 92-98, 100-114 and 116-120 install into ~/.claude/agents or .claude/agents. Plugin agent lists hold 13/30/16/17/13/15/16/17/12/11 agents, so the 11-30 range holds. One loose phrase: voltagent-dev-exp is not a whole category, because its plugin.json:11-27 lists 15 of the folder's 16 files and omits docs-drift-editor.md. The dossier reports this omission elsewhere."
+        },
+        {
+          "field": "claim_checks[3] (read-only tool grants, verified: partial)",
+          "statement": "README says read-only agents (reviewers, auditors) get `Read, Grep, Glob` and each agent has minimal necessary permissions. Only 2 of 161 agents have exactly `Read, Grep, Glob` (security-auditor.md:4, compliance-auditor.md:4); code-reviewer.md:4 and architect-reviewer.md:4 have `Read, Write, Edit, Bash, Glob, Grep`; 118 of 161 list Bash and 142 list Write or Edit; penetration-tester.md:4 has Bash.",
+          "citation": "README.md:481-487; categories/04-quality-security/security-auditor.md:4, compliance-auditor.md:4, code-reviewer.md:4, architect-reviewer.md:4, penetration-tester.md:4",
+          "holds": true,
+          "note": "README.md:482 and :487 say what is quoted. I enumerated all 161 `tools:` lines (every agent file has one, always at line 4): 43 lack Bash, so 118 have it; 19 have neither Write nor Edit, so 142 have one of them; exactly two are 'Read, Grep, Glob' (security-auditor, compliance-auditor). The cited lines match word for word, including penetration-tester's 'Read, Grep, Glob, Bash'. 'partial' is a fair rating: the two auditors comply, but code-reviewer, architect-reviewer, ad-security-reviewer and ai-writing-auditor have write and Bash access."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "Non-blocking: in readme.platforms.linux_x86_64 and readme.platforms.macos_arm64, change the citation tools/subagent-catalog/README.md:44 to tools/subagent-catalog/README.md:43. Line 43 is '- **Cross-platform**: Works on macOS and Linux'; line 44 is the 'Best practices' bullet.",
+        "Non-blocking: in readme.integrations.claude_code_or_codex, replace 'Each plugin installs a whole category of 11-30 agents' with 'Each plugin installs one category's agent list of 11-30 agents (voltagent-dev-exp lists 15 of its 16 files and omits docs-drift-editor.md: categories/06-developer-experience/.claude-plugin/plugin.json:11-27)'."
+      ]
+    }
+  ]
+}

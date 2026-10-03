@@ -1,0 +1,334 @@
+{
+  "contender": "ggml-org/llama.cpp",
+  "revision": {
+    "contender": "ggml-org/llama.cpp",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "ggml-org/llama.cpp",
+        "tag": "v0.5.0",
+        "commit": "7fe450e19305b828c199d602c23a8337aaa1f03b",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.5.0",
+    "commit": "7fe450e19305b828c199d602c23a8337aaa1f03b",
+    "read_at": "2026-10-02T03:02:14+00:00"
+  },
+  "dossier": {
+    "contender": "ggml-org/llama.cpp",
+    "revision": {
+      "tag": "v0.5.0",
+      "commit": "7fe450e19305b828c199d602c23a8337aaa1f03b",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "llama.cpp is a C/C++ inference engine for LLMs and VLMs built on the ggml tensor library (README.md:7,54-66). It loads GGUF models and runs them on CPU and many GPU backends (CUDA, Metal, Vulkan, HIP, SYCL and others; README.md:68-88). It ships the libllama C API (include/llama.h), a unified `llama` binary plus separate tools (CLI, bench, quantize, perplexity, RPC server), and `llama-server`, a local HTTP server with OpenAI-compatible and Anthropic-compatible APIs, a built-in Web UI, an optional router mode for several models, and an opt-in Prometheus-text /metrics endpoint (tools/server/README.md:7-20,1122-1146). Needs coverage (facts only): this repo has no OTLP receiver or exporter, collector, privacy filter, metrics/events/logs store, dashboard, or trace/dataset/experiment store (grep for otlp, opentelemetry, telemetry over src, ggml, common, tools/server, docs and CMake finds nothing). Of the six needs, the only one it provides is a local model server (llama-server with a CUDA backend whose default arch list includes sm_89, the RTX 4090 architecture).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Tagline: 'LLM inference in C/C++'.",
+          "citation": "README.md:7"
+        },
+        {
+          "claim": "Quick-start options: visit llama.app, run with Docker, download pre-built binaries from the releases page, or build from source.",
+          "citation": "README.md:22-27"
+        },
+        {
+          "claim": "`llama cli -hf ggml-org/Qwen3.5-0.8B-GGUF` downloads and runs a model from Hugging Face; `llama serve -hf ...` launches an OpenAI-compatible API server.",
+          "citation": "README.md:31-37"
+        },
+        {
+          "claim": "Goal: LLM (and VLM) inference with minimal setup and state-of-the-art performance on a wide range of hardware, locally and in the cloud.",
+          "citation": "README.md:54-55"
+        },
+        {
+          "claim": "Plain C/C++ implementation without any dependencies.",
+          "citation": "README.md:57"
+        },
+        {
+          "claim": "Apple silicon is a first-class citizen, optimized via ARM NEON, Accelerate and Metal.",
+          "citation": "README.md:58"
+        },
+        {
+          "claim": "Custom CUDA kernels for NVIDIA GPUs (HIP for AMD GPUs, MUSA for Moore Threads); Vulkan and SYCL backend support.",
+          "citation": "README.md:62-63"
+        },
+        {
+          "claim": "CPU+GPU hybrid inference to partially accelerate models larger than the total VRAM capacity.",
+          "citation": "README.md:64"
+        },
+        {
+          "claim": "Server provides OpenAI-compatible chat completions, responses and embeddings routes, and Anthropic Messages API compatible chat completions.",
+          "citation": "tools/server/README.md:9-10"
+        },
+        {
+          "claim": "Server has monitoring endpoints; GET /metrics is a Prometheus-compatible exporter that is only accessible if --metrics is set.",
+          "citation": "tools/server/README.md:15,1122-1124"
+        },
+        {
+          "claim": "By default the server listens on 127.0.0.1:8080; /health is public (no API key check).",
+          "citation": "tools/server/README.md:445,472"
+        },
+        {
+          "claim": "MCP: the server can expose tools coming from MCP servers; only the stdio transport is supported; experimental, do not enable in untrusted environments.",
+          "citation": "tools/server/README.md:206-208,353-387"
+        },
+        {
+          "claim": "Router mode: launching llama-server without a model exposes an API to load/unload several models and routes each request by its model name (default: up to 4 models loaded).",
+          "citation": "tools/server/README.md:229,1651-1653,1771-1775"
+        },
+        {
+          "claim": "--offline: forces use of cache, prevents network access.",
+          "citation": "tools/server/README.md:110"
+        }
+      ],
+      "install": [
+        {
+          "method": "Homebrew (Linux, macOS)",
+          "command": "brew install llama.cpp",
+          "citation": "docs/install.md:46-50"
+        },
+        {
+          "method": "conda-forge / mamba / pixi (Linux, macOS; CUDA, Vulkan and Metal builds)",
+          "command": "conda install -c conda-forge llama.cpp",
+          "citation": "docs/install.md:11-34"
+        },
+        {
+          "method": "Nix (Linux, macOS)",
+          "command": "nix profile install nixpkgs#llama-cpp",
+          "citation": "docs/install.md:62-66"
+        },
+        {
+          "method": "Docker, GHCR CUDA server image (needs nvidia-container-toolkit)",
+          "command": "docker run -p 8080:8080 -v /path/to/models:/models --gpus all ghcr.io/ggml-org/llama.cpp:server-cuda -m models/7B/ggml-model.gguf -c 512 --host 0.0.0.0 --port 8080 --n-gpu-layers 99",
+          "citation": "tools/server/README.md:448-455; docs/docker.md:16-21,77"
+        },
+        {
+          "method": "Build from source with CUDA (CMake)",
+          "command": "git clone https://github.com/ggml-org/llama.cpp && cd llama.cpp && cmake -B build -DGGML_CUDA=ON && cmake --build build --config Release",
+          "citation": "docs/build.md:9-12,179-182"
+        },
+        {
+          "method": "llama.app installer and pre-built release archives (first and third items of the README quick start)",
+          "command": "No command in the README: it says 'Visit https://llama.app and follow the instructions' (page not opened) and 'Download pre-built binaries from the releases page'. Code-level installer command used only by `llama update`: curl -fsSL https://llama.app/install.sh | sh",
+          "citation": "README.md:24,26; app/llama.cpp:26-41"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - pre-built Ubuntu x64 CPU, Vulkan, CUDA 12.8 and CUDA 13.4 archives (.github/workflows/release.yml:1967-1973; CPU build on ubuntu-22.04 at :151-152, CUDA build in an ubuntu24.04 nvidia/cuda container at :326-343), Docker amd64 images (docs/docker.md:10-21), source build (docs/build.md:35-41); CI on ubuntu-22.04/24.04 (.github/workflows/build-cpu.yml:48-57).",
+        "wsl2": "unknown - no WSL2 instructions for the CUDA or CPU builds. The only WSL mentions are docs/backend/OPENCL.md:39 (OpenCL, 'Ubuntu 22.04 WSL2 with Intel 12700H') and docs/docker.md:177 (SYCL Docker: 'WSL support has not been verified yet'); no WSL CI job found. Windows-native CUDA 12.4/13.4 archives exist (release.yml:1989-1991).",
+        "macos_arm64": "yes - README.md:58 (Apple silicon first-class); Metal is on by default on Apple (ggml/CMakeLists.txt:95-96; docs/build.md:140-145); pre-built llama-<tag>-bin-macos-arm64.tar.gz built on macos-26 with embedded Metal library and deployment target 13.3 (release.yml:70-73,132,1961); installable via Homebrew, MacPorts (sudo port install llama.cpp), Nix, conda-forge (docs/install.md:3-9,54-58); CI: build-apple.yml (ctest -L main at :101) and self-hosted M-series Metal CI (ci-self-hosted-metal.yml:49).",
+        "gpu": "yes - NVIDIA CUDA backend (README.md:62,75; docs/build.md:155-182; ggml/src/ggml-cuda). RTX 4090 = compute capability 8.9 (docs/build.md:212); default arch list adds 89-real for CUDA >= 11.8 (ggml/src/ggml-cuda/CMakeLists.txt:34-38) and 'native' is used when GGML_NATIVE and CMake >= 3.24 (:27-28). GGML_CUDA is OFF by default, so a source build needs -DGGML_CUDA=ON (ggml/CMakeLists.txt:199). Pre-built Linux CUDA archives ship the CUDA runtime libs in separate cudart tarballs to extract next to the binaries (release.yml:429-448,1972-1973). -ngl defaults to auto and --fit defaults to on (common/common.h:473-481). CI evidence: build-only for 89-real (build-cuda-ubuntu.yml:73-81) and runtime tests on a T4 (ci-self-hosted-cuda.yml:48); no RTX 4090 runtime job found. Per-op CUDA support matrix: docs/ops/CUDA.csv (docs/ops.md:7)."
+      },
+      "integrations": {
+        "cli": "Unified `llama` binary with subcommands serve, cli, download, update (installer builds only), version, licenses, help; hidden: completion, bench, batched-bench, fit-params, quantize, perplexity (app/llama.cpp:64-78; app/CMakeLists.txt:3-4). Separate binaries: llama-server (tools/server/CMakeLists.txt:61-67), llama-cli (tools/cli/CMakeLists.txt:19-23) and the other tools under tools/ (tools/CMakeLists.txt:17-44), ggml-rpc-server only with GGML_RPC (tools/rpc/CMakeLists.txt:1). Python converters convert_hf_to_gguf.py etc. (pyproject.toml:28-32). Configuration via flags, LLAMA_ARG_* env vars (tools/server/README.md:304-335) and config.ini files at /etc/llama.cpp and ~/.config/llama.cpp (common/arg.cpp:716-735).",
+        "mcp": "llama-server is an MCP client/host, not an MCP server. With --mcp-servers-config or --mcp-servers-json (Cursor-style mcpServers JSON) it spawns stdio MCP servers, sends initialize, tools/list and tools/call JSON-RPC, and exposes tools as <server>_<tool> to the Web UI and GET /tools; experimental and off by default (tools/server/README.md:353-387; tools/server/server-mcp.h:19-125; server-mcp.cpp:255-326). No /mcp endpoint is registered (tools/server/server.cpp:244-374). The Web UI can also reach remote MCP servers from the browser, with an opt-in --ui-mcp-proxy CORS proxy (tools/server/README.md:203,385).",
+        "sdk_or_api": "C API include/llama.h (docs/build.md:3) plus C++ RAII wrappers include/llama-cpp.h (CMakeLists.txt:282-284). HTTP API from llama-server (tools/server/server.cpp:244-309): OpenAI-compatible /v1/chat/completions, /v1/completions, /v1/responses, /v1/embeddings, /v1/models, rerank, /v1/audio/transcriptions; Anthropic /v1/messages and /v1/messages/count_tokens; native /completion, /infill, /tokenize, /props, /slots, /metrics, /lora-adapters and router /models endpoints. Auth via Authorization: Bearer or X-Api-Key (tools/server/server-http.cpp:260-282). Python package gguf (gguf-py/pyproject.toml:1-10). Example apps for Swift and Android under examples/. No official HTTP client SDK found.",
+        "claude_code_or_codex": "No documented Claude Code or Codex integration (grep for claude, codex, ANTHROPIC_BASE_URL in docs and READMEs finds none; the only README mention is 'Prefilling of assistant messages similar to the Claude API', tools/server/README.md:17). Code-level compatibility only: Anthropic Messages /v1/messages and /v1/messages/count_tokens (tools/server/server.cpp:268,285) accepting x-api-key (server-http.cpp:272-276); a Claude-Code-specific shim that rewrites the cch= hash in an x-anthropic-billing-header system block so prefix caching still works (tools/server/server-chat.cpp:312-346, applied at :359,364; reference to PR 21793); an OpenAI Responses endpoint /v1/responses implemented by converting to chat completions (tools/server/README.md:1461-1501; server.cpp:264-265); tests tools/server/tests/unit/test_compat_anthropic.py (29 test functions) and test_compat_oai_responses.py. No repo text ties the Responses endpoint to Codex. The repo also ships contributor-facing CLAUDE.md/AGENTS.md and skills/ (add-new-model, code-review) for AI assistants working on the repo itself; these are not a runtime integration."
+      },
+      "telemetry_and_network": "No telemetry, analytics, crash-reporting or phone-home code found: grep for otlp, opentelemetry, telemetry, analytics, sentry over src, ggml, common, tools/server, tools/cli, app, docs and CMake finds nothing; the only hit is HF_HUB_DISABLE_TELEMETRY=1 in the example script examples/llama-eval/llama-eval.py:42. The Web UI has no analytics code and its version checks are same-origin (tools/ui/src/lib/stores/version.svelte.ts:40,52). No account is needed to run; HF_TOKEN / --hf-token is optional (tools/server/README.md:104). Network use is on demand: (1) model download via -hf/-hff/-mu/-dr or the *-default presets: default endpoint https://huggingface.co/ (override with MODEL_ENDPOINT or HF_ENDPOINT, common/common.cpp:1554-1567), Docker Hub registry (common/download.cpp:846,906), User-Agent llama-cpp/<build-info> (download.cpp:302-303,441-442); --offline / LLAMA_ARG_OFFLINE limits model downloads to the cache (common/arg.cpp:687,3928-3933; download.cpp:471-485). (2) The server fetches http(s) URLs found in chat-request media fields, not gated by --offline (tools/server/server-common.cpp:1088-1103). (3) Opt-in --ui-mcp-proxy/--agent expose a generic /cors-proxy (tools/server/server.cpp:337-344; server-cors-proxy.h:22-75). (4) `llama update` (installer builds only) runs curl -fsSL https://llama.app/install.sh | sh (app/llama.cpp:26-41). (5) Build time: default builds download prebuilt Web UI assets from https://huggingface.co/buckets/ggml-org/llama-ui (scripts/ui-assets.cmake:431-500; CMakeLists.txt:138) and optional options FetchContent BoringSSL/LibreSSL/CCCL (vendor/cpp-httplib/CMakeLists.txt:42-126; ggml/src/ggml-cuda/CMakeLists.txt:62-73). (6) The Web UI lazy-loads a HEIC decoder from cdn.jsdelivr.net when needed (tools/ui/src/lib/utils/heic-to-jpeg.ts:4-6) and keeps chats and settings in browser IndexedDB/localStorage (tools/ui/src/lib/services/database.service.ts:16; settings.service.ts:70). Local observability only: logs to stdout/stderr, --log-file, --log-jsonl (tools/server/README.md:106-107); --log-prompts-dir writes each prompt to a file (debug, off by default; common/arg.cpp:3891-3901; tools/server/server-context.cpp:4281-4282); per-response usage and timings, timings_per_token, return_progress (tools/server/README.md:593-595,1395-1437); /slots on by default and /metrics (Prometheus text, pull) off by default (common/common.h:671-673)."
+    },
+    "code": {
+      "languages": [
+        "C",
+        "C++ (C++17)",
+        "CUDA",
+        "Objective-C and Metal (Apple backend)",
+        "GLSL (Vulkan shaders)",
+        "Python (converters, gguf-py, server tests)",
+        "TypeScript and Svelte (Web UI)",
+        "CMake",
+        "Shell",
+        "Swift and Kotlin (example apps)"
+      ],
+      "entry_points": [
+        {
+          "path": "app/llama.cpp",
+          "what": "main() of the unified `llama` binary (CMake target llama-app, output name llama): dispatches serve, cli, download, update, version, licenses, help and hidden completion, bench, batched-bench, fit-params, quantize, perplexity (app/llama.cpp:64-78,129-148; app/CMakeLists.txt:3-4)."
+        },
+        {
+          "path": "tools/server/main.cpp",
+          "what": "llama-server executable; calls llama_server() in tools/server/server.cpp (route registration at :244-374; router mode in server-models.cpp)."
+        },
+        {
+          "path": "tools/cli/main.cpp",
+          "what": "llama-cli executable (cli.cpp, cli-client.cpp, cli-context.cpp); can connect to an existing server through the server_base parameter (common/common.h:663)."
+        },
+        {
+          "path": "include/llama.h",
+          "what": "Public C API of libllama (docs/build.md:3); C++ RAII wrappers in include/llama-cpp.h."
+        },
+        {
+          "path": "tools/llama-bench/llama-bench.cpp",
+          "what": "llama-bench: prompt-processing, text-generation and combined throughput benchmark with md/csv/json output (tools/llama-bench/README.md:85-100,193-214)."
+        },
+        {
+          "path": "tools/perplexity/perplexity.cpp",
+          "what": "llama-perplexity (perplexity and KL divergence); sibling tools/quantize provides llama-quantize."
+        },
+        {
+          "path": "tools/rpc/rpc-server.cpp",
+          "what": "ggml-rpc-server, built only with GGML_RPC (tools/rpc/CMakeLists.txt:1-4; tools/CMakeLists.txt:32-34)."
+        },
+        {
+          "path": "convert_hf_to_gguf.py",
+          "what": "Hugging Face to GGUF converter; also convert_lora_to_gguf.py and convert_llama_ggml_to_gguf.py, registered as console scripts in pyproject.toml:28-32."
+        }
+      ],
+      "architecture": "Layers: (1) ggml/ - tensor library and backends under ggml/src/ggml-{cpu,cuda,metal,vulkan,hip,musa,sycl,opencl,blas,rpc,cann,hexagon,openvino,virtgpu,...}; backends can be static or dynamic (GGML_BACKEND_DL, docs/build.md:845); ggml/src/ggml-cuda has about 68 top-level .cu files (flash-attention, mmq/mmvq, etc.) plus template-instances; per-backend op support CSVs in docs/ops/. (2) src/ - libllama: GGUF loading (llama-model-loader.cpp), per-architecture graph builders (src/models/*.cpp, about 155 files), KV cache and memory (llama-kv-cache*.cpp, llama-memory-*.cpp), sampler, grammar, vocab/tokenizer, chat templates; public API include/llama.h. (3) common/ - llama-common: argument parsing (arg.cpp), model download and HF cache (download.cpp, hf-cache.cpp), Jinja engine and chat parsing (jinja/, chat*.cpp), sampling, speculative decoding, memory fitting (fit.cpp), presets (preset.cpp), logging. (4) tools/ - server (server.cpp routes; server-http.cpp over cpp-httplib; server-context.cpp slots and continuous batching; server-models.cpp router mode that spawns child llama-server processes; server-chat.cpp OpenAI/Anthropic/Responses conversions; server-task.cpp including Prometheus text; server-mcp.cpp and server-tools.cpp MCP client and built-in tools; design notes in tools/server/README-dev.md:46-74), cli, mtmd (multimodal), llama-bench, quantize, perplexity, rpc, ui (Svelte Web UI embedded at build time). (5) app/ - unified llama binary linking the *-impl libraries. (6) gguf-py/ plus convert_*.py and conversion/ - Python GGUF tooling. Also examples/, tests/, scripts/, ci/, .devops/ (Dockerfiles, Nix, SRPM specs).",
+      "packaging_and_release": "Nightly: every master push touching C/C++/CMake/shader sources runs release.yml (release.yml:3-28), builds per-platform archives (macOS arm64/x64, Ubuntu x64/arm64/s390x CPU, Vulkan, CUDA 12.8 and 13.4 with separate cudart tarballs, ROCm, SYCL, OpenVINO, Windows including CUDA 12.4/13.4, Android, iOS XCFramework, UI tarball: release.yml:1961-2005), uses GGML_BACKEND_DL and GGML_CPU_ALL_VARIANTS on Linux (release.yml:199-207,402-411), tags b<commit-count> (.github/actions/get-tag-name/action.yml:15-18) and creates a GitHub prerelease (release.yml:1939-1946). All release/* archives get a GitHub build-provenance attestation through actions/attest@v4 (release.yml:1821-1824,1923-1927); no checksum or signature files are produced for them (the only sha256 file is dist.tar.gz.sha256 for the Web UI bundle on a Hugging Face bucket, ui-publish.yml:45-47). Versioned releases: manual make-release.yml runs scripts/make-release-checks.sh (successful release.yml run for the commit, ggml matches upstream, tag unused; :25-120), pushes an annotated vX.Y.Z tag, creates a non-prerelease GitHub release that links the nightly build and uploads nightly-tag.txt, and re-tags container images (make-release.yml:59-154). At this checkout v0.5.0 (packed-refs) and nightly tag b11146 (.git/refs/tags/b11146) point to the same commit. docs/release.md:38-55 describes the process differently (see claim_checks). Containers: ghcr.io/ggml-org/llama.cpp:{full,light,server}[-cuda|-cuda13|-rocm|-musa|-intel|-vulkan|-openvino|-s390x], rebuilt daily (docker.yml:19-21,86-101; CUDA 12.8.1 and 13.4.1) with image digests attested (docker.yml:549-568). PyPI: gguf from gguf-v* tags (gguf-publish.yml:13-44). Third-party channels: Homebrew, conda-forge, Nix, MacPorts, winget (docs/install.md). Building the tag from source yields version 0.5.0-dev unless -DLLAMA_BUILD_IS_DEV=OFF (CMakeLists.txt:14-21; docs/release.md:43-46).",
+      "tests_and_ci": "Roughly 190 test files. (a) tests/: 58 test-* files (52 .c/.cpp, 4 .sh, 2 .py) plus helpers; CTest labels main, python, model (tests/CMakeLists.txt:19-116,260,312-318); model-dependent tests download from huggingface.co (tests/CMakeLists.txt:288-297; cmake/download-models.cmake:9); test-backend-ops is built but not registered in CTest (tests/CMakeLists.txt:310) and is used to generate docs/ops/*.csv (docs/ops.md:7). (b) tools/server/tests: pytest, 27 unit/test_*.py files (incl. test_compat_anthropic, test_compat_oai_responses, test_metrics, test_router, test_security, test_mcp_servers) plus conftest.py, utils.py and 6 MCP fixture servers; run with tests.sh and tools/server/tests/requirements.txt. (c) gguf-py/tests: 3 files. (d) tools/ui/tests: about 100 files (vitest unit and client, Playwright e2e, Storybook stories and fixtures). CI: 58 files in .github/workflows (57 active plus bench.yml.disabled, whose first line says it was disabled because of workflow issues). build-*.yml cover cpu, CUDA ubuntu/windows, apple, vulkan, sycl, openvino, android, wasm, riscv, ibm, cann, snapdragon, sanitizers and cross builds (build-cpu.yml:123-127 runs ctest -L 'main|python'); ci-self-hosted-*.yml run ci/run.sh on self-hosted or Hugging Face job runners: CUDA on a T4 (ci-self-hosted-cuda.yml:47-77), Metal on M-series Macs, Vulkan on NVIDIA, KleidiAI, OpenVINO, WebGPU; ci/run.sh builds Debug and Release, runs ctest -L main|python, model-based tests and tensor-split tests (ci/run.sh:231-327); server.yml, server-self-hosted.yml (server pytest on CUDA T4, not on PRs, :104-174) and server-sanitize.yml; ui*.yml run npm check, lint, vitest, Playwright and Storybook tests; python-lint, python-type-check, python-check-requirements, code-style, editorconfig, check-vendor; release.yml, make-release.yml, docker.yml, ui-publish.yml, gguf-publish.yml, winget.yml for publishing. docs/docker.md:41 states GPU images are not tested by CI beyond being built.",
+      "dependencies": "No lockfile for C++. Vendored in vendor/: cpp-httplib, nlohmann json, stb_image, miniaudio, sheredom subprocess.h, plus hash code (sha1, sha256, xxhash, rotate-bits) (vendor/CMakeLists.txt:1-11; README.md:122-126); .gitmodules is empty. Optional or system: OpenSSL >= 3 (LLAMA_OPENSSL ON by default; the build continues without it, vendor/cpp-httplib/CMakeLists.txt:128-156), CUDA Toolkit for GGML_CUDA, NCCL optional (GGML_CUDA_NCCL ON, warns if missing, ggml/src/ggml-cuda/CMakeLists.txt:174-182). Build-time fetches: BoringSSL/LibreSSL via FetchContent (LLAMA_BUILD_BORINGSSL/LIBRESSL), CCCL v3.2.0 (GGML_CUDA_CUB_3DOT2), LLGuidance via cargo (LLAMA_LLGUIDANCE), prebuilt Web UI from a Hugging Face bucket. Python manifests: pyproject.toml (6 runtime deps: numpy, sentencepiece, transformers==4.57.6, protobuf, torch, gguf; pytest dev); gguf-py/pyproject.toml (4 deps: numpy, tqdm, pyyaml, requests; optional PySide6 gui extra; pytest dev); requirements.txt (includes 6 requirement files); requirements/*.txt (12 files, e.g. requirements-tool_bench.txt 10 packages, requirements-convert_legacy_llama.txt 5); tools/server/tests/requirements.txt (9); tools/server/bench/requirements.txt (2); tools/server/bench/speed-bench/requirements.txt (3). Web UI: tools/ui/package.json (0 runtime dependencies, 76 devDependencies, 3 overrides) with package-lock.json.",
+      "security_policy": "SECURITY.md exists. Private disclosure program disabled until further notice; fixes are to be sent as public PRs (SECURITY.md:15-16). Otherwise reports go through a private GitHub security advisory with a working proof of concept and a 90-day window; maintained by volunteers on a reasonable-effort basis (:18-22,37). In scope: src/, ggml/, gguf-py/, tools/server/* excluding the Web UI, experimental features, router/MCP and DoS bugs (:41-58). 'Using llama.cpp securely' guidance: sandbox untrusted models and inputs; do not use the RPC backend or llama-server on untrusted networks (:60-94). An AI-powered code scan is mentioned (:24-28)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Plain C/C++ implementation without any dependencies (README.md:57)",
+        "verified": "partial",
+        "evidence": "Core builds with CMake and system threads, but the repo vendors third-party code in vendor/ (cpp-httplib, nlohmann json, stb_image, miniaudio, subprocess.h, hash libs; vendor/CMakeLists.txt:1-11; README.md:122-126). HTTPS needs OpenSSL >= 3 (optional; build continues without it: vendor/cpp-httplib/CMakeLists.txt:128-156; docs/build.md:91). The CUDA backend needs the CUDA Toolkit (ggml/src/ggml-cuda/CMakeLists.txt:3-5,257). The server's Web UI is built with Node or downloaded at build time (scripts/ui-assets.cmake:1-7)."
+      },
+      {
+        "claim": "Custom CUDA kernels for NVIDIA GPUs, including RTX 4090 (README.md:62)",
+        "verified": "yes",
+        "evidence": "ggml/src/ggml-cuda has about 68 top-level .cu files plus template-instances. The default arch list adds 89-real (Ada; RTX 4090 = 8.9 per docs/build.md:212) for CUDA >= 11.8 (ggml/src/ggml-cuda/CMakeLists.txt:34-38) and uses 'native' when GGML_NATIVE and CMake >= 3.24 (:27-28). GGML_CUDA is OFF by default (ggml/CMakeLists.txt:199). CI is build-only for 89-real (.github/workflows/build-cuda-ubuntu.yml:73-81) with runtime tests on a T4 (ci-self-hosted-cuda.yml:48); no RTX 4090 runtime job found."
+      },
+      {
+        "claim": "Apple silicon is a first-class citizen via NEON, Accelerate and Metal (README.md:58)",
+        "verified": "yes",
+        "evidence": "GGML_METAL and GGML_BLAS (Accelerate) default ON on Apple (ggml/CMakeLists.txt:95-98); ggml/src/ggml-metal has 16 source files; release arm64 build embeds the Metal library (release.yml:70-73); ctest runs on macOS in build-apple.yml:101 and on self-hosted M-series Macs in ci-self-hosted-metal.yml:49."
+      },
+      {
+        "claim": "CPU+GPU hybrid inference for models larger than VRAM (README.md:64)",
+        "verified": "yes",
+        "evidence": "-ngl defaults to auto (common/arg.cpp:2785-2801; common/common.h:473), --fit defaults to true with minimum context 4096 and 1 GiB margin per device (common/common.h:476-481; arg.cpp:2864-2870), --n-cpu-moe and --cpu-moe keep MoE weights on the CPU (arg.cpp:2763), and CUDA unified memory is selectable with GGML_CUDA_ENABLE_UNIFIED_MEMORY=1 (docs/build.md:285-287)."
+      },
+      {
+        "claim": "`llama serve` launches an OpenAI-compatible API server; Anthropic Messages also supported (README.md:36; tools/server/README.md:9-10)",
+        "verified": "yes",
+        "evidence": "app/llama.cpp:65 maps serve to llama_server. Routes /v1/chat/completions, /v1/completions, /v1/responses, /v1/embeddings, /v1/models, /v1/messages and /v1/messages/count_tokens are registered at tools/server/server.cpp:256-285. Auth accepts Authorization Bearer or X-Api-Key (tools/server/server-http.cpp:271-282). tools/server/tests/unit/test_compat_anthropic.py has 29 test functions."
+      },
+      {
+        "claim": "Prometheus-compatible /metrics with the metric table in tools/server/README.md:1130-1146",
+        "verified": "partial",
+        "evidence": "Code differs from the README: to_metrics() also emits llamacpp:prompt_tokens_cached_total (absent from the table) and describes prompt_tokens_total as excluding cached tokens (tools/server/server-task.cpp:1523-1533). Gauges are averaged over the window between scrapes and reset on every scrape (server-context.cpp:4683-4685,4696), so several scrapers would interfere. The endpoint returns a not-supported error unless --metrics (server-context.cpp:4669-4672; common/common.h:673) and needs the API key when one is set, because only /health, /v1/health and UI assets are public (server-http.cpp:251-258). Format is Prometheus text 0.0.4, pull only; no OTLP."
+      },
+      {
+        "claim": "--offline forces use of cache and prevents network access (tools/server/README.md:110)",
+        "verified": "partial",
+        "evidence": "It gates model/file downloads (common/arg.cpp:687,3928-3933; common/download.cpp:471-485,734-736), but the server's remote media fetch calls common_remote_get_content without any offline check (tools/server/server-common.cpp:1079-1103; common/download.cpp:433-465), and the optional /cors-proxy is not gated either (tools/server/server-cors-proxy.h:22-75)."
+      },
+      {
+        "claim": "Server listens on 127.0.0.1:8080 and /health is public (tools/server/README.md:445,472)",
+        "verified": "yes",
+        "evidence": "Default host list is 127.0.0.1 (common/common.h:637); /health, /v1/health and embedded UI assets skip API-key checks (tools/server/server-http.cpp:251-258). Caveats: no API key and CORS origins '*' with credentials by default (common/common.h:641-644; server-http.cpp:332-334; warning at tools/server/server.cpp:327-329); the Docker server image sets LLAMA_ARG_HOST=0.0.0.0 (.devops/cuda.Dockerfile:125)."
+      },
+      {
+        "claim": "MCP support is stdio-only and experimental (tools/server/README.md:353-387)",
+        "verified": "yes",
+        "evidence": "llama-server acts as an MCP client: server-mcp.h:19-125 spawns child processes over stdio and server-mcp.cpp:255-326 sends initialize, tools/list and tools/call. It is inactive unless --mcp-servers-config or --mcp-servers-json is given, and no MCP server endpoint is registered in tools/server/server.cpp:244-374."
+      },
+      {
+        "claim": "Pre-built binaries on the releases page and llama.app (README.md:24,26); release process in docs/release.md:38-55",
+        "verified": "partial",
+        "evidence": "release.yml publishes per-push GitHub prereleases with tar.gz/zip archives for Linux, macOS and Windows, including Ubuntu x64 CUDA 12.8/13.4 and macOS arm64, and attests them (release.yml:10-28,1923-1927,1939-1946,1961-1977). docs/release.md says no GitHub Release object is created and releases are not published to GitHub releases (docs/release.md:38-39,49-50), but make-release.yml creates a non-prerelease GitHub release (make-release.yml:89-114); code wins. The docs also cite llama-install.sh (docs/release.md:53), which is not in the repo. llama.app is an external site that was not opened; app/llama.cpp:26-41 only shows `llama update` piping https://llama.app/install.sh to sh for installer-built binaries, and LLAMA_INSTALL_BUILD is not defined anywhere in this repo (not checkable)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "llama-bench example output: Qwen2 7B Q4_K - Medium (4.36 GiB, 7.62 B params), CUDA backend, ngl -1, with and without 512 tokens of prefilled context (-d 0,512); GPU model not stated",
+        "metric": "tokens/s (llama-bench, mean ± stddev)",
+        "value": "pp512 7340.20 ± 23.45; tg128 120.60 ± 0.59; pp512 @ d512 6425.91 ± 18.88; tg128 @ d512 116.71 ± 0.60",
+        "source": "tools/llama-bench/README.md:178-189",
+        "independent": false
+      },
+      {
+        "what": "llama-bench CSV sample row: build 5163, AMD Ryzen 7 7800X3D, NVIDIA GeForce RTX 4080, CUDA, Qwen2.5-7B-Instruct-Q4_K_M, n_batch 2048, n_ubatch 512, 512-token prompt, dated 2025-04-24",
+        "metric": "prompt-processing tokens/s (avg_ts ± stddev_ts)",
+        "value": "7285.68 ± 100.06",
+        "source": "tools/llama-bench/README.md:212-214",
+        "independent": false
+      },
+      {
+        "what": "llama-bench example output: llama 7B Q4_0 (3.56 GiB) and 13B Q4_0 (6.86 GiB), CUDA backend, ngl -1, text generation; GPU model not stated",
+        "metric": "tokens/s (tg)",
+        "value": "7B: tg128 132.19 ± 0.55, tg256 129.37 ± 0.54, tg512 123.83 ± 0.25; 13B: tg128 82.17 ± 0.31, tg256 80.74 ± 0.23, tg512 78.08 ± 0.07",
+        "source": "tools/llama-bench/README.md:104-117",
+        "independent": false
+      },
+      {
+        "what": "Docs troubleshooting example: NVIDIA A6000 48 GB, 7 physical CPU cores, 32 GB RAM, Wizard-Vicuna-30B q4_0, llama-cli -n 1000, effect of -t and -ngl",
+        "metric": "tokens/s",
+        "value": "-ngl 2000000 alone: below 0.1; -t 7: 1.7; -t 1 -ngl 2000000: 5.5; -t 7 -ngl 2000000: 8.7; -t 4 -ngl 2000000: 9.1",
+        "source": "docs/development/token_generation_performance_tips.md:22-40",
+        "independent": false
+      },
+      {
+        "what": "SYCL backend changelog (2025.2): llama-2-7b.Q4_0 before and after the MUL_MAT Q4_0 optimization on Intel GPUs (not NVIDIA)",
+        "metric": "tokens/s",
+        "value": "PVC 1550 39 to 73 (+87%); Flex 170 39 to 50 (+28%); Arc A770 42 to 55 (+30%); MTL 13 to 16 (+23%); ARL-H 14 to 17 (+21%)",
+        "source": "docs/backend/SYCL.md:69-77",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope: no OTLP, OpenTelemetry, collector, privacy filter, metrics/events/logs store, dashboard or trace/dataset/experiment store exists in this repo (grep over src, ggml, common, tools/server, docs, CMake). Observability is limited to logs (--log-file, --log-jsonl), per-response usage and timings, /slots, and an opt-in Prometheus-text /metrics that is off by default (common/common.h:671-673) and whose gauges reset on each scrape (tools/server/server-context.cpp:4683-4685). Qualification helpers are local tools only: tools/llama-bench, tools/perplexity, tools/server/bench/speed-bench, scripts/tool_bench.py (JSONL plus heatmap), examples/llama-eval (writes llama-eval-state.json).",
+      "Security defaults: no API key by default, and CORS reflects any Origin with credentials (common/common.h:641-644; tools/server/server-http.cpp:332-334); the server itself logs a warning for this (tools/server/server.cpp:327-329). /health and UI assets are unauthenticated (server-http.cpp:251-258) and the Docker server image binds 0.0.0.0 (.devops/cuda.Dockerfile:125). SECURITY.md:92 advises against llama-server and RPC on untrusted networks. Experimental --tools (including exec_shell_command and write_file), --mcp-servers-*, --agent and the open /cors-proxy are excluded from vulnerability handling (SECURITY.md:48-52; tools/server/README.md:203-208; server-cors-proxy.h:22-75).",
+      "Outbound fetch from request bodies: llama-server downloads any http(s) URL placed in image_url, input_audio or input_video fields (10 MB and 10 s limits, no allow-list), and --offline does not gate it (tools/server/server-common.cpp:1088-1103; common/arg.cpp:687), so a reachable server can be made to issue requests from the host.",
+      "Supply chain and network at build and run time: default builds download the prebuilt Web UI from the Hugging Face bucket ggml-org/llama-ui, falling back to 'latest', verified against a SHA-256 fetched from the same origin (scripts/ui-assets.cmake:431-500; CMakeLists.txt:138); optional FetchContent of BoringSSL, LibreSSL and CCCL (vendor/cpp-httplib/CMakeLists.txt:42-126; ggml/src/ggml-cuda/CMakeLists.txt:62-73); -hf pulls weights from huggingface.co by default, and an HF repo containing preset.ini switches the server to router mode with that preset (common/common.cpp:1554-1567; common/download.cpp:744-750; arg.cpp:677-683; server.cpp:524-527 warns 'Unknown presets may be unsafe'); `llama update` pipes curl output to sh (app/llama.cpp:26-41); the Web UI loads a HEIC decoder from cdn.jsdelivr.net (tools/ui/src/lib/utils/heic-to-jpeg.ts:6).",
+      "Release integrity and process: release archives have a GitHub attestation (release.yml:1923-1927) but no checksum or signature files; the v0.5.0 GitHub release carries no binaries of its own, they live in nightly tag b11146 at the same commit (scripts/make-release-desc.sh:62-74; .git/refs/tags/b11146); docs/release.md:38-55 contradicts make-release.yml:89-114 and references llama-install.sh, which is absent from the repo; building the tag from source gives 0.5.0-dev unless -DLLAMA_BUILD_IS_DEV=OFF (CMakeLists.txt:14-21); semver labelling is still a TODO (docs/release.md:24-25).",
+      "GPU validation and platform coverage: CUDA runtime CI runs on an NVIDIA T4 (ci-self-hosted-cuda.yml:48; server-self-hosted.yml:105, server tests not run on PRs at :161) and the only sm_89 job is build-only (build-cuda-ubuntu.yml:73-81); docs/docker.md:41 says GPU images are not tested beyond building. No RTX 4090 job or published RTX 4090 measurement was found in the repo. WSL2 has no CUDA documentation (only docs/backend/OPENCL.md:39 and docs/docker.md:177).",
+      "Interface churn: include/llama.h has 39 DEPRECATED( declarations and LLAMA_SESSION_VERSION 10 (include/llama.h:46); the server README lists removed flags (--draft-max, --draft-min, --spec-ngram-*, tools/server/README.md:284-288) and deprecated aliases (:2136); CMake options are being deprecated (CMakeLists.txt:186-195); router, MCP, built-in tools, --agent and tensor split mode are labelled experimental (tools/server/README.md:85,203-208). Scripts pinned to flags or saved state files may need changes between releases.",
+      "Maintenance and licensing: private vulnerability disclosure is disabled and the project is maintained by volunteers on a reasonable-effort basis (SECURITY.md:15-16,22); the server benchmark workflow is disabled (.github/workflows/bench.yml.disabled:1); AGENTS.md:51 bars fully autonomous agent contributions. Code is MIT (LICENSE, 'The ggml authors') and vendored libraries are MIT or public domain (README.md:122-126), but release binaries link OpenSSL or BoringSSL (release.yml:119,180) and the separate cudart tarballs redistribute NVIDIA libcudart, libcublas and libcublasLt (release.yml:439-442), which carry NVIDIA's terms rather than MIT."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "ggml-org/llama.cpp",
+      "checks": [
+        {
+          "field": "readme.install[4] (Build from source with CUDA, CMake)",
+          "statement": "git clone https://github.com/ggml-org/llama.cpp && cd llama.cpp && cmake -B build -DGGML_CUDA=ON && cmake --build build --config Release",
+          "citation": "docs/build.md:9-12,179-182",
+          "holds": true,
+          "note": "docs/build.md:10-11 give 'git clone https://github.com/ggml-org/llama.cpp' and 'cd llama.cpp'; :180-181 give 'cmake -B build -DGGML_CUDA=ON' and 'cmake --build build --config Release' under '## CUDA' (:155). The command matches the docs exactly."
+        },
+        {
+          "field": "license",
+          "statement": "spdx MIT, file LICENSE",
+          "citation": "LICENSE:1-21",
+          "holds": true,
+          "note": "LICENSE:1 'MIT License', :3 'Copyright (c) 2023-2026 The ggml authors', :5-21 standard MIT permission and warranty text. README.md:9 also carries an MIT badge."
+        },
+        {
+          "field": "readme.platforms.gpu",
+          "statement": "yes - NVIDIA CUDA backend; RTX 4090 = compute capability 8.9; default arch list adds 89-real for CUDA >= 11.8 and 'native' is used when GGML_NATIVE and CMake >= 3.24; GGML_CUDA OFF by default; Linux CUDA archives ship cudart tarballs; -ngl auto and --fit on; CI build-only for 89-real, runtime on a T4, no RTX 4090 runtime job; per-op matrix docs/ops/CUDA.csv",
+          "citation": "README.md:62,75; docs/build.md:155-182,212; ggml/src/ggml-cuda/CMakeLists.txt:27-28,34-38; ggml/CMakeLists.txt:199; .github/workflows/release.yml:429-448,1972-1973; common/common.h:473-481; .github/workflows/build-cuda-ubuntu.yml:73-81; .github/workflows/ci-self-hosted-cuda.yml:48; docs/ops.md:7",
+          "holds": true,
+          "note": "All sub-claims match: README.md:62 custom CUDA kernels and :75 'CUDA | Nvidia GPU'; build.md:212 'GeForce RTX 4090 8.9'; ggml-cuda/CMakeLists.txt:36-37 append 89-real 90-virtual for CUDA >= 11.8; ggml/CMakeLists.txt:199 GGML_CUDA OFF; release.yml:429-448 packs libcudart/libcublas/libcublasLt 'extract next to the binaries', and :1972-1973 list the Ubuntu x64 CUDA 12.8/13.4 archives with their library tarballs; common.h:473 n_gpu_layers=-1 (auto), :476 fit_params=true; build-cuda-ubuntu.yml:76 -DCMAKE_CUDA_ARCHITECTURES=89-real with no test step; ci-self-hosted-cuda.yml:48 runs-on hf-jobs-t4-small:cuda13; docs/ops/CUDA.csv exists and docs/ops.md:7 references it. Minor gap, not wrong: the 'native' branch at ggml-cuda/CMakeLists.txt:27 also requires CUDA Toolkit >= 11.6. GGML_NATIVE defaults ON unless cross-compiling or SOURCE_DATE_EPOCH is set (ggml/CMakeLists.txt:105-110,123), so a default build on a 4090 host uses 'native'."
+        },
+        {
+          "field": "readme.integrations.sdk_or_api",
+          "statement": "C API include/llama.h plus C++ RAII wrappers include/llama-cpp.h; llama-server HTTP API with OpenAI-compatible, Anthropic, native and router /models endpoints; auth via Authorization: Bearer or X-Api-Key; Python package gguf; Swift and Android example apps; no official HTTP client SDK",
+          "citation": "docs/build.md:3; CMakeLists.txt:282-284; include/llama-cpp.h:11-30; tools/server/server.cpp:244-309; tools/server/server-http.cpp:260-282; gguf-py/pyproject.toml:1-10",
+          "holds": true,
+          "note": "server.cpp registers router /models at :244-248, /metrics :253, /props :254, /v1/models :257, /completion :258, /v1/completions :260, /v1/chat/completions :262, /v1/responses :264, /v1/audio/transcriptions :266, /v1/messages :268, /infill :269, /v1/embeddings :272, rerank :273-276, /tokenize :277, /v1/messages/count_tokens :285, /lora-adapters :287-288, /slots :290-291. server-http.cpp:272-282 reads Authorization, falls back to X-Api-Key, and strips 'Bearer '. llama-cpp.h defines unique_ptr deleters for model, context, sampler and LoRA. gguf-py/pyproject.toml:2 name 'gguf'. examples/llama.swiftui and examples/llama.android exist. The only package manifests are gguf-py, root pyproject.toml, tools/ui and examples/batched.swift, so there is no HTTP client SDK."
+        },
+        {
+          "field": "claim_checks[1]",
+          "statement": "Custom CUDA kernels for NVIDIA GPUs, including RTX 4090 (README.md:62) - verified: yes",
+          "citation": "README.md:62; ggml/src/ggml-cuda/*.cu; docs/build.md:212; ggml/src/ggml-cuda/CMakeLists.txt:27-28,34-38; ggml/CMakeLists.txt:199; .github/workflows/build-cuda-ubuntu.yml:73-81; .github/workflows/ci-self-hosted-cuda.yml:48",
+          "holds": true,
+          "note": "README.md:62 says 'Custom CUDA kernels for running LLMs on NVIDIA GPUs' but does not name the 4090; the evidence correctly bases the 4090 part on build.md:212 and the 89-real target. There are exactly 68 top-level .cu files plus template-instances/. A grep of .github and ci finds '4090' only in an issue-template example (.github/ISSUE_TEMPLATE/011-bug-results.yml:57). CUDA runtime CI runs on T4 runners only (ci-self-hosted-cuda.yml:48; server-self-hosted.yml:105), so 'no RTX 4090 runtime job found' holds."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

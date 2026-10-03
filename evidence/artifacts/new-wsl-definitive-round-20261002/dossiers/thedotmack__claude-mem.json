@@ -1,0 +1,339 @@
+{
+  "contender": "thedotmack/claude-mem",
+  "revision": {
+    "contender": "thedotmack/claude-mem",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "thedotmack/claude-mem",
+        "tag": "v13.28.0",
+        "commit": "57c38303734482a596b3e2a052b969b30584be0d",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v13.28.0",
+    "commit": "57c38303734482a596b3e2a052b969b30584be0d",
+    "read_at": "2026-10-02T03:02:53+00:00"
+  },
+  "dossier": {
+    "contender": "thedotmack/claude-mem",
+    "revision": {
+      "tag": "v13.28.0",
+      "commit": "57c38303734482a596b3e2a052b969b30584be0d",
+      "read_at": "2026-10-02T03:02:53+00:00"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Local-first memory layer for coding agents, positioned for Claude Code (README.md:55). Host hooks capture prompts and tool inputs/outputs; a separate 'observer' LLM (default: Claude via the Agent SDK and a local `claude` CLI; alternatives: Gemini, OpenRouter or any OpenAI-compatible base URL, or the hosted cmem.ai gateway) compresses them into typed observations (bugfix/feature/refactor/change/discovery/decision, plugin/modes/code.json:7-42) and per-session summaries (investigated/learned/completed/next_steps, src/services/context/sections/SummaryRenderer.ts:17-47). These are stored in SQLite (~/.claude-mem/claude-mem.db) with an optional Chroma vector index, injected at SessionStart, and exposed through a stdio MCP server, a loopback HTTP worker API and a web viewer. A native Codex CLI hooks-plugin integration exists in code but is not mentioned in the README. Optional cmem.ai features (observer gateway, multi-device cloud sync) are account-bound hosted services (trial, then subscription per README.md:153).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Positioned as 'Persistent memory compression system built for Claude Code'; footer says 'Works with Claude Code'. The README never mentions Codex (Codex support is visible only in code/docs/manifests).",
+          "citation": "README.md:55, README.md:440"
+        },
+        {
+          "claim": "'Claude-Mem seamlessly preserves context across sessions by automatically capturing tool usage observations, generating semantic summaries, and making them available to future sessions.' 'Restart Claude Code. Context from previous sessions will automatically appear in new sessions.'",
+          "citation": "README.md:130, README.md:177"
+        },
+        {
+          "claim": "`npx claude-mem install` is the single-command install; the installer then asks for browser sign-in ('email magic link — no card required'), which provisions a memory key and unlocks the 'claude-mem observer' running off-plan, free for 30 days, falling back to the Anthropic plan unless subscribed; then choose provider (claude-mem observer, own OpenRouter/Gemini key, or Anthropic plan).",
+          "citation": "README.md:147-153"
+        },
+        {
+          "claim": "Sign-in can be skipped by passing an explicit `--provider` flag, setting `CLAUDE_MEM_ONLINE_OPTIN=false`, or running in CI/non-interactive shells.",
+          "citation": "README.md:155"
+        },
+        {
+          "claim": "Also installable from the Claude Code plugin marketplace (`/plugin marketplace add thedotmack/claude-mem`, `/plugin install claude-mem`); `npm install -g claude-mem` installs the 'SDK/library only' and does not register hooks or the worker.",
+          "citation": "README.md:169-179"
+        },
+        {
+          "claim": "Key features: persistent cross-session memory, progressive disclosure, mem-search skill, web viewer at the worker URL, `<private>` tags to exclude content from storage, context configuration, automatic operation, citations by observation ID.",
+          "citation": "README.md:191-201"
+        },
+        {
+          "claim": "Cloud Sync: 'Back up your memories to cmem.ai — no daemon, the worker syncs on write'.",
+          "citation": "README.md:214"
+        },
+        {
+          "claim": "Components: 5 lifecycle hooks (SessionStart, UserPromptSubmit, PostToolUse, Stop, SessionEnd; 6 scripts), cached dependency checker, Bun-managed worker with local HTTP API and viewer, SQLite DB, mem-search skill, Chroma hybrid semantic+keyword search.",
+          "citation": "README.md:242-249"
+        },
+        {
+          "claim": "'4 MCP tools' following a 3-layer workflow (search -> timeline -> get_observations); '~10x token savings by filtering before fetching details'.",
+          "citation": "README.md:257-276"
+        },
+        {
+          "claim": "Requirements: Node >=20.0.0, Claude Code (latest, plugin support), Bun and uv auto-installed if missing, bundled SQLite 3.",
+          "citation": "README.md:303-309"
+        },
+        {
+          "claim": "Settings live in ~/.claude-mem/settings.json (auto-created); workflow/language modes via CLAUDE_MEM_MODE, defined in plugin/modes/.",
+          "citation": "README.md:326, README.md:340-348"
+        },
+        {
+          "claim": "Stable releases ship from `main` and are published to npm; `core-dev` and `community-edge` are source-run branches.",
+          "citation": "README.md:294-299, README.md:404-407"
+        },
+        {
+          "claim": "Apache-2.0 license; open/commercial boundary documented in docs/license.md and docs/ip-boundary.md; ragtime/ is also Apache-2.0.",
+          "citation": "README.md:413-425"
+        },
+        {
+          "claim": "Lead quick-start is `npx claude-mem install --ide grok-bot`, with CMEM Pro hosted memory as the default and an 'awareness push' that appends dated lines to the bot's memory/log/YYYY-MM.md.",
+          "citation": "README.md:137-145"
+        }
+      ],
+      "install": [
+        {
+          "method": "npx installer (interactive; detects hosts and offers a multi-select)",
+          "command": "npx claude-mem install",
+          "citation": "README.md:150; docs/public/installation.mdx:26-32"
+        },
+        {
+          "method": "Claude Code plugin marketplace",
+          "command": "/plugin marketplace add thedotmack/claude-mem   then   /plugin install claude-mem",
+          "citation": "README.md:172-174"
+        },
+        {
+          "method": "Codex CLI via the same installer (not in the README; `--ide` takes one id per run; installer requires Codex >=0.128.0 on PATH)",
+          "command": "npx claude-mem install --ide codex-cli",
+          "citation": "src/npx-cli/index.ts:26,59-62; src/services/integrations/CodexCliInstaller.ts:28,527-529; docs/public/installation.mdx:20"
+        },
+        {
+          "method": "Non-interactive / headless provider selection",
+          "command": "npx claude-mem install --provider claude|gemini|openrouter|host   (optional: --no-auto-start, --disable-auto-memory)",
+          "citation": "src/npx-cli/index.ts:27-30"
+        },
+        {
+          "method": "Source checkout",
+          "command": "git clone https://github.com/thedotmack/claude-mem.git && cd claude-mem && npm install && npm run build && npm run worker:start",
+          "citation": "docs/public/installation.mdx:79-92"
+        },
+        {
+          "method": "OpenClaw gateway installer (pipe-to-shell)",
+          "command": "curl -fsSL https://install.cmem.ai/openclaw.sh | bash",
+          "citation": "README.md:186"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes — the CI build job runs on ubuntu-latest (.github/workflows/ci.yml:11) and docs say 'Works cross-platform on Windows, macOS, and Linux' (docs/public/installation.mdx:102); x86_64 is not named explicitly in anything read.",
+        "wsl2": "unknown — no WSL2 support statement in README or docs; code only detects WSL for telemetry (src/services/telemetry/common.ts:94-103) and notes the Windows-native path needs Git Bash with 'no WSL fallback' (src/npx-cli/utils/windows-git-bash-preflight.ts:6). No WSL-specific CI job or code path found.",
+        "macos_arm64": "yes (documented, not CI-tested) — docs/public/installation.mdx:102 lists macOS; macOS-specific code exists (Keychain read src/shared/oauth-token.ts:181-200; Codex.app bundle lookup src/services/integrations/CodexCliInstaller.ts:37-40,151-157); arm64 appears only in a comment about onnxruntime on 'macOS arm64 / Python 3.13' (src/services/sync/ChromaMcpManager.ts:49-53). No macOS job in .github/workflows/ci.yml or windows.yml.",
+        "gpu": "no — no GPU requirement or GPU-specific code found in src/; vector embeddings come from chroma-mcp's ONNX all-MiniLM-L6-v2 model via onnxruntime (src/services/sync/ChromaMcpManager.ts:47-65), and Chroma can be disabled with CLAUDE_MEM_CHROMA_ENABLED=false (src/shared/SettingsDefaultsManager.ts:250)."
+      },
+      "integrations": {
+        "cli": "yes — `claude-mem` bin (package.json:29-31) -> dist/npx-cli/index.js (src/npx-cli/index.ts). Commands: install/update/repair/uninstall, start/stop/restart/status/doctor, `search <query>`, `mcp`, `hook <platform> <event>`, `telemetry status|enable|disable`, `server ...`, `transcript watch`, `adopt`, `cleanup` (src/npx-cli/index.ts:23-57). No CLI command for deleting observations was found.",
+        "mcp": "yes — stdio MCP server 'mcp-search' declared in plugin/.mcp.json:2-10, launching plugin/scripts/mcp-server.cjs (source src/servers/mcp-server.ts). 20 tools are defined (mcp-server.ts:443-916); the worker runtime advertises 15 and hides 5 server-only observation_* tools (src/servers/mcp-tool-visibility.ts:4-29): important_workflow, search (optional platformSource filter, mcp-server.ts:484-501), timeline, get_observations, get_tool_uses, session_start_context, smart_search/smart_outline/smart_unfold, build/list/prime/query/rebuild/reprime_corpus. No MCP tool for saving or deleting memories exists in worker runtime (observation_add is server-runtime only, mcp-server.ts:616-632).",
+        "sdk_or_api": "HTTP API: yes — loopback worker (host 127.0.0.1, default port 37700+(uid%100): src/shared/SettingsDefaultsManager.ts:195-196; src/services/worker/README.md:7-9) with routes in src/services/worker/http/routes/, e.g. GET /api/search, GET /api/observations, DELETE /api/observation|summary|prompt/:id (DataRoutes.ts:122-124), POST /api/import (:131), POST /api/memory/save (MemoryRoutes.ts:26); the worker API has no request authentication (src/services/worker/http/middleware.ts:101-107). SDK: README.md:179 calls the npm package 'SDK/library only', but package.json exposes only a `bin` and a `./modes/*` export (package.json:29-34); no library entry point found. A separate beta 'server runtime' (Postgres + BullMQ/Redis, API-key auth, /v1 routes) exists in src/server/ (docs/server.md:1-5).",
+        "claude_code_or_codex": "Claude Code: yes — plugin (plugin/.claude-plugin/plugin.json; .claude-plugin/marketplace.json:9-15) with hooks in plugin/hooks/hooks.json: Setup, SessionStart (2 commands), UserPromptSubmit, PostToolUse, PreToolUse(Read), Stop, SessionEnd (hooks.json:4,17,36,48,62,76,89); PostToolUse/PreToolUse/Stop/SessionEnd are `async: true`. The installer writes ~/.claude/plugins/known_marketplaces.json (autoUpdate:true), installed_plugins.json and ~/.claude/settings.json enabledPlugins (src/npx-cli/commands/install.ts:186-232). Codex CLI: yes but undocumented in README — native hooks plugin (.codex-plugin/plugin.json:25-27; .agents/plugins/marketplace.json; plugin/hooks/codex-hooks.json: SessionStart, UserPromptSubmit, PreToolUse [Bash/MCP-read matcher, line 30], PostToolUse [.* matcher, sync, 120s timeout, lines 43-48], Stop). Installer requires Codex >=0.128.0, runs `codex plugin marketplace add` + `codex plugin add claude-mem@claude-mem-local`, sets [features] hooks=true and the plugin enabled in ~/.codex/config.toml, removes legacy AGENTS.md context, and tells the user to trust five hooks (src/services/integrations/CodexCliInstaller.ts:28,219-232,322-340,379-414,500-531). One worker and one DB (~/.claude-mem/claude-mem.db) serve both hosts, rows tagged platform_source (src/shared/platform-source.ts:7-19). SessionStart injection is filtered by platform (src/cli/handlers/context.ts:55-61; src/services/context/ObservationCompiler.ts:93; asserted in tests/cli/handlers/context-session-start.test.ts:60-66,82-85), so Codex sessions get Codex-origin context and Claude sessions Claude-origin, although .codex-plugin/plugin.json:31 describes injecting into 'Claude Code and Codex-compatible sessions'; MCP/HTTP search spans both unless platformSource is passed (tests/services/sqlite/search-platform-source-scoping.test.ts:89). Installing for any single IDE still registers and enables the Claude plugin (install.ts:2228-2265); `--ide` takes one id per run (docs/public/installation.mdx:20). Claude Code native auto-memory stays enabled unless `--disable-auto-memory` or the prompt choice (install.ts:259-301,2358-2361); the Codex installer touches no Codex memory setting beyond hooks/plugin flags."
+      },
+      "telemetry_and_network": "Telemetry is ON by default (opt-out) via PostHog: https://us.i.posthog.com with an embedded publishable key (src/services/telemetry/common.ts:19-21); default resolves to enabled (src/services/telemetry/consent.ts:43,62; CLI help 'on by default, opt-out', src/npx-cli/index.ts:44; docs/public/telemetry.mdx:10). Opt-outs: DO_NOT_TRACK, CLAUDE_MEM_TELEMETRY=0, `npx claude-mem telemetry disable` (consent.ts:45-63). Events carry whitelisted counts/enums plus a random install UUID; redacted error messages/stacks are sent as $exception and 'cannot be selectively deleted' once ingested; a one-time historical-activity backfill is sent; coarse geolocation is derived from the request IP at ingest (docs/public/telemetry.mdx:130,160-206). CLI and hooks also POST directly (src/services/telemetry/cli-telemetry.ts:75-85; src/cli/hook-command.ts:19). SECURITY.md:157 states 'Claude-mem does not collect telemetry' — contradicted by the code. Accounts/network: sign-in to cmem.ai (POST https://cmem.ai/api/installer/oauth/start, src/npx-cli/cmem-pro-costs.ts:43) is required whenever the provider is not `claude`/`host` (src/npx-cli/commands/install.ts:1961-1963,2384-2390); non-interactive installs that skip it still call that endpoint to print an optional link unless CI is set (install.ts:1842-1867). Cloud sync is off unless token + user id + hub URL are set and uploads observation narratives and full prompt text to https://sync.cmem.ai (docs/public/cloud-sync.mdx:36-40,102-110; src/shared/SettingsDefaultsManager.ts:25,260-263). Observer calls send prompts/tool I/O to the chosen provider: Anthropic by default, Gemini (src/services/worker/GeminiProvider.ts:17), OpenRouter or any OpenAI-compatible base URL (SettingsDefaultsManager.ts:210), or the cmem.ai gateway (docs/public/installation.mdx:40; SECURITY.md:159-163). The worker reads Claude Code's OAuth token from the OS credential store (src/shared/oauth-token.ts:24,181-200,330-358). Installer fetch-and-execute: bun.sh and astral.sh install scripts (src/npx-cli/install/setup-runtime.ts:184-243), claude.ai/install.sh if the user accepts (install.ts:575-578,629-648); chroma-mcp==0.2.6 is resolved from PyPI via uvx at runtime (src/services/sync/ChromaMcpManager.ts:45,622-626). The viewer page calls api.github.com (src/ui/viewer/components/GitHubStarsButton.tsx:26). Promo text linking cmem.ai/pro appears in the SessionStart banner and in the model-visible welcome hint for empty projects (src/cli/handlers/context.ts:143-145; src/services/worker/http/routes/SearchRoutes.ts:47-57,317-319). Worker binds 127.0.0.1 by default (SettingsDefaultsManager.ts:196)."
+    },
+    "code": {
+      "languages": [
+        "TypeScript (src/, tests/, scripts/; runs on Bun and Node)",
+        "TSX/React (web viewer, src/ui/viewer)",
+        "JavaScript/CJS (committed esbuild bundles plugin/scripts/*.cjs, plugin/ui/viewer-bundle.js, plugin/scripts/bun-runner.js)",
+        "Python (plugin/skills/agent-cost-report/scripts; chroma-mcp runs under uvx)",
+        "Shell (openclaw/install.sh)",
+        "TypeScript Cloudflare Worker (workers/sync-hub) and Bun service (services/sync-api) for the cloud-sync hub"
+      ],
+      "entry_points": [
+        {
+          "path": "package.json:29-31 -> dist/npx-cli/index.js (src/npx-cli/index.ts)",
+          "what": "`claude-mem` CLI: install/repair/uninstall, runtime control, search, mcp, hook dispatch, telemetry, server."
+        },
+        {
+          "path": "plugin/scripts/worker-service.cjs (src/services/worker-service.ts)",
+          "what": "Worker daemon run under Bun: loopback HTTP API, SSE/web viewer, session queue, observer providers, Chroma and cloud-sync management."
+        },
+        {
+          "path": "plugin/scripts/mcp-server.cjs (src/servers/mcp-server.ts)",
+          "what": "stdio MCP server declared in plugin/.mcp.json; proxies to the worker API."
+        },
+        {
+          "path": "plugin/hooks/hooks.json and plugin/hooks/codex-hooks.json (src/cli/hook-command.ts)",
+          "what": "Host hook definitions that run `node bun-runner.js worker-service.cjs hook <claude-code|codex> <event>`."
+        },
+        {
+          "path": "plugin/scripts/server-service.cjs (src/server/runtime/ServerService.ts)",
+          "what": "Beta 'server runtime' (Postgres + BullMQ/Redis, API-key auth) as an alternative to the worker."
+        },
+        {
+          "path": "plugin/scripts/transcript-watcher.cjs (src/services/transcripts/transcript-watcher-entry.ts)",
+          "what": "Transcript JSONL watcher; Codex transcript ingestion is off by default (CLAUDE_MEM_CODEX_TRANSCRIPT_INGESTION=false, src/shared/SettingsDefaultsManager.ts:236)."
+        },
+        {
+          "path": "scripts/export-memories.ts, scripts/import-memories.ts, scripts/check-pending-queue.ts",
+          "what": "Source-checkout-only helpers: JSON export/import through the worker API; pending-queue inspection/recovery."
+        }
+      ],
+      "architecture": "Hook layer: src/cli/hook-command.ts + adapters (src/cli/adapters/claude-code.ts, codex.ts, cursor.ts, ...) normalize host payloads; handlers (src/cli/handlers/context.ts, session-init.ts, observation.ts, file-context.ts, summarize.ts, session-end.ts) call the loopback worker (src/services/worker-service.ts; routes in src/services/worker/http/routes/*). Worker: SessionManager queues tool events (src/services/worker/http/shared.ts ingest strips <private> tags, writes pending_messages and the raw tool_uses table), observer providers (ClaudeProvider/GeminiProvider/OpenRouterProvider, selection in provider-dispatch.ts) emit observations/summaries (src/sdk/prompts.ts, parser.ts). Storage: SQLite via bun:sqlite (src/services/sqlite/SessionStore.ts; tables sdk_sessions, observations, session_summaries, user_prompts, pending_messages, tool_uses; FTS5 triggers), optional Chroma vectors via `uvx chroma-mcp` (src/services/sync/ChromaMcpManager.ts, ChromaSync.ts), optional CloudSync to sync.cmem.ai (src/services/sync/CloudSync.ts). Context assembly: src/services/context/*; search: src/services/worker/search/* (SQLite, Chroma, hybrid strategies). Other modules: src/supervisor/* (process registry), src/services/telemetry/*, src/services/integrations/* (Codex, Cursor, OpenCode, OpenClaw, Windsurf, Antigravity, Grok Bot, Telegram installers/notifiers), src/server/* and src/storage/{postgres,sqlite} (beta server runtime), src/ui/viewer (React viewer). Hub sources also live in-repo: workers/sync-hub, services/sync-api.",
+      "packaging_and_release": "npm package `claude-mem` v13.28.0 (package.json:2-3) built by scripts/build-hooks.js (esbuild -> plugin/scripts/*.cjs, dist/npx-cli/index.js, dist/bug-report, openclaw/dist, dist/opencode-plugin; scripts/build-hooks.js:66-88,651-743); `files` ships dist, plugin/*, .codex-plugin, openclaw (package.json:35-53) but not scripts/. The built plugin bundles are committed and are what plugin installs execute (.github/workflows/ci.yml:32-35). Release: `np` scripts (package.json:111-116); .github/workflows/npm-publish.yml (tag `v*`): `npm install --ignore-scripts`, `npm run build`, `npm run smoke:clean-room`, `npm publish` with NPM_TOKEN (lines 3-26). No provenance flag, id-token permission, checksum, signature or attestation step exists in any workflow (.github/workflows/*); CHANGELOG says 'npm publish is handled separately' for several releases (CHANGELOG.md:61-99) and has no 13.28.0 entry (head is 13.27.1, :7). Release flow description: docs/public/branches.mdx:82-86. install.cmem.ai/openclaw.sh is deployed to Vercel from openclaw/install.sh (.github/workflows/deploy-install-scripts.yml:17-29).",
+      "tests_and_ci": "Test runner: `bun test` (package.json:99). About 359 TypeScript test files: 346 `*.test.ts` under tests/ plus 8 in workers/sync-hub/test (vitest), 4 in services/sync-api/test, 1 in openclaw/src; plus 12 Python tests for the agent-cost-report skill (plugin/skills/agent-cost-report/scripts/tests/test_*.py, with mirrored copies in other plugin dirs per CHANGELOG.md:28). Codex-related tests include tests/integration/codex-cli-installer.test.ts, tests/cli/adapters/codex-file-context.test.ts, tests/transcripts/processor-codex-context.test.ts, tests/codex-transcript-watcher-windows.test.ts. CI (not executed by me): .github/workflows/ci.yml on ubuntu-latest — build job (version-consistency test, typecheck, build with bundle-size guard, `bun test tests`, `bun test openclaw`), chroma-recycle-gate (needs uv; Chroma lifecycle and worker-orphan tests), sync-hub (DO anti-pattern grep + vitest), sync-api (Postgres 16 tests + protocol matrix e2e), clean-room-deps smoke, server-runtime Docker e2e (Postgres + Valkey); .github/workflows/windows.yml on windows-2022 (build, selected bun tests, marketplace sync, Chroma lifecycle gates); npm-publish.yml; deploy-install-scripts.yml; issue automation (claude.yml @claude action, summary.yml, close-tracked-issues.yml, convert-feature-requests.yml). No macOS job.",
+      "dependencies": "Root package.json: 2 dependencies (better-auth, @better-auth/api-key; package.json:122-125) + 54 devDependencies (:130-185), most of which are esbuild-inlined into shipped bundles (note at :126: express, bullmq, ioredis, pg, react, posthog-node, zod, @modelcontextprotocol/sdk, @anthropic-ai/claude-agent-sdk, plus tree-sitter grammars). plugin/package.json: 26 runtime dependencies installed into the plugin cache (zod, shell-quote, tree-sitter-cli and 23 grammar packages; plugin/package.json:7-34). openclaw/package.json: 0 deps / 2 dev; services/sync-api/package.json: 1 dep (postgres) / 1 dev; workers/sync-hub/package.json: 0 deps / 8 dev. Out-of-manifest runtime needs: Bun >=1.1.31 and Node >=20.12.0 (package.json:54-57), uv + Python 3.13 with PyPI chroma-mcp==0.2.6 (src/services/sync/ChromaMcpManager.ts:45,622-626), and a Claude Code CLI for the default observer (src/shared/find-claude-executable.ts:473-477). plugin/bun.lock is committed; the root package-lock.json is gitignored (ci.yml:25-28).",
+      "security_policy": "SECURITY.md — only the latest release is supported (:5-10); report privately to alex@cmem.ai or via a GitHub private advisory (:14-22; acknowledgement within 48 hours); documents command-injection hardening, privacy tags and egress channels (:26-167). It also states 'Claude-mem does not collect telemetry' (:157, contradicted by code) and a default port of 37777 (:174, code uses 37700+uid%100). File metadata: last updated 2026-05-03, last audit 2025-12-16, next scheduled audit 2026-09-16 (:204-206), which is before the read date."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:130,177 — captured observations are 'available to future sessions' and context 'will automatically appear in new sessions'.",
+        "verified": "partial",
+        "evidence": "True within one host only. The SessionStart hook sends platformSource and the SQL filters `s.platform_source = ?` (src/cli/handlers/context.ts:55-61; src/services/context/ObservationCompiler.ts:93,123,153), asserted by tests/cli/handlers/context-session-start.test.ts:60-66,82-85; CHANGELOG.md:2463 says Claude and Codex sessions are 'fully isolated'. Automatic injection therefore does not carry Claude Code memory into Codex or vice versa; cross-host retrieval needs an explicit MCP/HTTP search without platformSource (tests/services/sqlite/search-platform-source-scoping.test.ts:89). Code wins over the README/manifest wording (.codex-plugin/plugin.json:31)."
+      },
+      {
+        "claim": "README.md:198 — `<private>` tags exclude sensitive content from storage.",
+        "verified": "yes",
+        "evidence": "src/utils/tag-stripping.ts:4-17 strips <private> and other tags; applied to tool input/response at ingest before the tool_uses write and the observer queue (src/services/worker/http/shared.ts:135-193) and to prompts (src/services/sqlite/prompt-storage.ts:8). Nuance: stripping happens inside the worker, not 'at the hook layer before data reaches the worker' as SECURITY.md:68 and docs/public/usage/private-tags.mdx:155-158 say; whole-prompt-private suppression fails open when the prompt row is missing (src/services/worker/validation/PrivacyCheckValidator.ts:31-38)."
+      },
+      {
+        "claim": "README.md:155 — set `CLAUDE_MEM_ONLINE_OPTIN=false` to skip sign-in.",
+        "verified": "no",
+        "evidence": "No match for ONLINE_OPTIN anywhere in src/; it survives only in README.md:155 and CHANGELOG.md:1368, and tests/npx-cli/install-trial-contract.test.ts:335 asserts the installer source does NOT contain it. The README is stale; the variable has no effect."
+      },
+      {
+        "claim": "README.md:155 — an explicit `--provider` flag, or CI/non-interactive shells, lets the installer complete without account interaction.",
+        "verified": "partial",
+        "evidence": "Login is skipped only for `--provider claude` and `--provider host` (src/npx-cli/commands/install.ts:1961-1963,2384-2398); `gemini` and `openrouter` still require the cmem.ai OAuth step (and, non-interactively, a preconfigured personal key: :2088-2103). Non-interactive runs without a flag default to claude (:2083-2085). Non-interactive installs that skipped sign-in still contact cmem.ai once to print an optional link unless CI is set (:1842-1867)."
+      },
+      {
+        "claim": "README.md:153 — sign-in is an 'email magic link — no card required'; off-plan memory is free for the first 30 days, then falls back to the Anthropic plan.",
+        "verified": "partial",
+        "evidence": "Code and docs describe GitHub/Google OAuth device pairing, not an emailed magic link (src/npx-cli/commands/install.ts:1332-1335; docs/public/installation.mdx:33; tests/npx-cli/install-trial-contract.test.ts:326-337 asserts no email path). Trial length is server-assigned (install.ts:1398-1417; docs/public/telemetry.mdx:75-76 lists 7/14/30-day arms) while client copy hard-codes 30 (src/shared/pro-promo.ts:40). The fallback to the Anthropic plan exists (src/services/worker/provider-dispatch.ts:8-14,29-37) but needs a `claude` CLI on the host (src/shared/find-claude-executable.ts:473-477)."
+      },
+      {
+        "claim": "README.md:214 — Cloud Sync lets you 'back up your memories to cmem.ai — no daemon, the worker syncs on write'.",
+        "verified": "partial",
+        "evidence": "Implemented (src/services/sync/CloudSync.ts; docs/public/cloud-sync.mdx:6-12) but it is multi-device replication, active only when token, user id and hub URL are all set (cloud-sync.mdx:102-110; src/shared/SettingsDefaultsManager.ts:260-263). It uploads observation narratives and full prompt text (cloud-sync.mdx:36-40). Deletes become tombstones for local-origin rows and are refused with 503 when the sync identity is unavailable (src/services/worker/http/routes/DataRoutes.ts:333-383). A new device pulls the hub log from zero (cloud-sync.mdx:65-70)."
+      },
+      {
+        "claim": "README.md:257-276 — '4 MCP tools' with a 3-layer workflow and '~10x token savings'.",
+        "verified": "partial",
+        "evidence": "src/servers/mcp-server.ts:443-916 defines 20 tools; the worker runtime advertises 15 (src/servers/mcp-tool-visibility.ts:4-29), including a 4th layer get_tool_uses (mcp-server.ts:572), smart_* code tools and corpus tools. The ~10x figure has no method in the README (see benchmarks). No write or delete tool is advertised in worker runtime."
+      },
+      {
+        "claim": "README.md:303-309 — Node >=20.0.0; Bun and uv auto-installed; SQLite bundled.",
+        "verified": "partial",
+        "evidence": "Auto-install is real: `curl -fsSL https://bun.sh/install | bash` and `curl -LsSf https://astral.sh/uv/install.sh | sh` (src/npx-cli/install/setup-runtime.ts:184-243). But package.json:54-57 requires node >=20.12.0 and bun >=1.1.31 (docs/public/installation.mdx:68 says Bun >=1.0). SQLite is bun:sqlite (docs/public/installation.mdx:71; src/services/infrastructure/ProcessManager.ts:18)."
+      },
+      {
+        "claim": "README.md:244 — '5 Lifecycle Hooks ... (6 hook scripts)'.",
+        "verified": "partial",
+        "evidence": "plugin/hooks/hooks.json defines 7 event keys (Setup:4, SessionStart:17 with 2 commands, UserPromptSubmit:36, PostToolUse:48, PreToolUse(Read):62, Stop:76, SessionEnd:89); plugin/hooks/codex-hooks.json defines 5 (SessionStart:3, UserPromptSubmit:16, PreToolUse:28, PostToolUse:41, Stop:54) and has no SessionEnd. In the Claude config PostToolUse/PreToolUse/Stop/SessionEnd are async (hooks.json:57,71,84,96); the Codex config sets no async flag."
+      },
+      {
+        "claim": "SECURITY.md:157 (project security policy, not README) — 'Claude-mem does not collect telemetry.'",
+        "verified": "no",
+        "evidence": "Code defaults telemetry to enabled: src/services/telemetry/consent.ts:43,62; PostHog host and key at src/services/telemetry/common.ts:19-21; CLI help 'on by default, opt-out' at src/npx-cli/index.ts:44; docs/public/telemetry.mdx:10. Code wins."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Smart Explore (tree-sitter MCP tools smart_search/outline/unfold) vs the standard Explore agent, cross-file discovery, 5 queries on claude-mem's own src/ (Claude Opus 4.6; Smart Explore counts are self-reported estimates, Explore counts from API total_tokens). Measures code-navigation tools, not memory capture or recall.",
+        "metric": "tokens per task, sum of 5 queries",
+        "value": "~14,216 vs 252,476 (17.8x lower)",
+        "source": "docs/public/smart-explore-benchmark.mdx:24-26,48-55",
+        "independent": false
+      },
+      {
+        "what": "Same benchmark — targeted reads of 5 known symbols (Smart Explore truncated none; Explore agent truncated 1 of 5).",
+        "metric": "tokens, sum of 5 reads",
+        "value": "~5,650 vs ~109,357 (19.4x lower)",
+        "source": "docs/public/smart-explore-benchmark.mdx:85-92",
+        "independent": false
+      },
+      {
+        "what": "Same benchmark — end-to-end search+unfold vs a single Explore query.",
+        "metric": "tokens",
+        "value": "~4,552 vs ~51,523 (11.3x) in the body; the executive-summary table states ~4,200 vs ~45,000 (10-12x)",
+        "source": "docs/public/smart-explore-benchmark.mdx:16,106-123",
+        "independent": false
+      },
+      {
+        "what": "Progressive-disclosure token cost of memory retrieval (search index vs full observation); no dataset or method given.",
+        "metric": "tokens per result",
+        "value": "~50-100 (index) vs ~500-1,000 (full); claimed '~10x token savings'",
+        "source": "README.md:261-270; plugin/skills/mem-search/SKILL.md:156-162",
+        "independent": false
+      },
+      {
+        "what": "File Read Gate illustrative example (reading worker-service.ts with vs without the prior-observation timeline). The doc says the gate blocks reads, but the code returns permissionDecision 'allow' with extra context (src/cli/handlers/file-context.ts:187-193).",
+        "metric": "tokens for one file read",
+        "value": "18,000 vs 970 (95% savings); timeline ~370 tokens; typical file read quoted at 5,000-50,000",
+        "source": "docs/public/file-read-gate.mdx:92-114",
+        "independent": false
+      },
+      {
+        "what": "Marketing figure: running memory off-plan (CMEM Pro/OpenRouter/Gemini) buys 'up to 100% more usage from your plan'; hard-coded constant, no method or data in the repo.",
+        "metric": "plan-usage gain",
+        "value": "'up to 100%' (PLAN_USAGE_GAIN_PERCENT = 100)",
+        "source": "README.md:153; src/shared/pro-promo.ts:47-54",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Cross-host memory is partitioned, not shared: SessionStart injection filters rows by platform_source (src/cli/handlers/context.ts:55-61; src/services/context/ObservationCompiler.ts:93; tests/cli/handlers/context-session-start.test.ts:60-66,82-85; CHANGELOG.md:2463), so sharing depends on the agent calling MCP `search` without platformSource. The project scope key is only the git-root basename (src/utils/project-name.ts:70,87), so same-named repos at different paths share a project. Codex captures never reach the raw tool_uses store because the Codex adapter passes no tool_use_id (src/cli/adapters/codex.ts:88-102; src/services/worker/http/shared.ts:151). Defaults leave Claude Code native auto-memory enabled (src/npx-cli/commands/install.ts:259-301,2358-2361), so two memory systems run side by side unless the user opts out. Decisions/learnings are LLM-generated observation types, not user-curated scoped records; there is no first-class handoff object beyond session summaries (next_steps) and POST /api/memory/save.",
+      "Deletion is HTTP-API-only: DELETE /api/observation|summary|prompt/:id hard-deletes local-origin rows (src/services/worker/http/routes/DataRoutes.ts:122-124,321-383); no delete control exists in the viewer source (src/ui/viewer), CLI or MCP tools, and none for sessions/projects. The path does not touch Chroma (no chroma_delete_* call anywhere in src/; ChromaSync.ts only uses create/add/update/get/query) or the raw tool_uses table, which has no FK and no delete function (src/services/sqlite/tool-uses.ts:164-196), so text can outlive a deleted observation in ~/.claude-mem/chroma and tool_uses (64 KB per field, tool-uses.ts:32). With cloud sync configured, the delete is a tombstone and returns 503 if the device identity is missing (DataRoutes.ts:358-376).",
+      "No built-in local backup/restore or retention policy found. Available: JSON export/import scripts that are not in the npm package (scripts/ absent from package.json:35-53), a manual pending-queue recovery tool with automatic recovery disabled (docs/public/usage/manual-recovery.mdx:12,23-51), and cloud sync. Docs overstate the tools: export is described as opening the DB read-only (docs/public/usage/export-import.mdx:197) but calls the running worker's /api/search (scripts/export-memories.ts:50-69); import is described as all-or-nothing (:196) but handleImport loops per record with no transaction (DataRoutes.ts:462-580; SessionStore.ts:3646-3704). Uninstall keeps ~/.claude-mem (src/npx-cli/commands/uninstall.ts:394-398). No expiry/retention settings exist (src/shared/SettingsDefaultsManager.ts:41-189).",
+      "Data egress and telemetry: prompts and tool inputs/outputs go to the observer provider (Anthropic by default; Gemini/OpenRouter/cmem.ai alternatives; SECURITY.md:159-163); fully local operation needs a local OpenAI-compatible endpoint via CLAUDE_MEM_OPENROUTER_BASE_URL (src/shared/SettingsDefaultsManager.ts:210). PostHog telemetry is on by default (src/services/telemetry/consent.ts:62; common.ts:19-21), including redacted error text and a one-time historical backfill (docs/public/telemetry.mdx:160-206), while SECURITY.md:157 says none is collected. Cloud sync, if enabled, uploads narratives and full prompts to sync.cmem.ai (docs/public/cloud-sync.mdx:36-40). <private> stripping occurs in the worker at ingest (src/services/worker/http/shared.ts:135-140), not at the hook as SECURITY.md:68 states.",
+      "Local security model: the worker HTTP API has no authentication and relies on the loopback bind (src/services/worker/http/middleware.ts:101-107; SettingsRoutes.ts:21,180-181). Origin-less local callers can POST /api/settings to change CLAUDE_MEM_PROVIDER, CLAUDE_MEM_OPENROUTER_BASE_URL and CLAUDE_MEM_WORKER_HOST (SettingsRoutes.ts:140-150,189-204,295-302); a non-loopback bind only logs a warning (src/services/worker-service.ts:483-491). The default port is 37700+(uid%100) (SettingsDefaultsManager.ts:195) although SECURITY.md:174 says 37777. The worker reads Claude Code's OAuth token from the Keychain/Credential Manager/libsecret (src/shared/oauth-token.ts:24,181-200,330-358). Hooks escalate to exit code 2 (the blocking-error code) after 3 consecutive unreachable-worker invocations (SettingsDefaultsManager.ts:239; src/shared/worker-utils.ts:915,1051-1061; hook-constants.ts:12-15).",
+      "Install/runtime footprint: pipe-to-shell fetches from bun.sh and astral.sh when Bun/uv are missing (src/npx-cli/install/setup-runtime.ts:184-243), optionally claude.ai/install.sh (src/npx-cli/commands/install.ts:575-578,629-648); chroma-mcp==0.2.6 is resolved from PyPI via uvx at runtime (src/services/sync/ChromaMcpManager.ts:45,622-626). Needs Node >=20.12 and Bun >=1.1.31 (package.json:54-57), uv/Python 3.13, and for the default provider a `claude` CLI on the host (src/shared/find-claude-executable.ts:473-477); a selected gemini/openrouter provider without a key silently falls through to claude (src/services/worker/provider-dispatch.ts:5-7). Any single-IDE install, including --ide codex-cli, still registers the Claude marketplace/plugin with autoUpdate:true and enables it in ~/.claude/settings.json (install.ts:189-197,2228-2265); Codex needs >=0.128.0 and edits ~/.codex/config.toml (CodexCliInstaller.ts:28,322-340). The node->bun->worker->uvx->uv->python chain has had orphan-process bugs (.github/workflows/ci.yml:63-67).",
+      "Release/maintenance: plugin installs execute committed minified bundles (.github/workflows/ci.yml:32-35); CI only checks that the version string is injected (tests/infrastructure/version-consistency.test.ts:77-84), not that bundles match a fresh build. npm-publish.yml runs `npm publish` with NPM_TOKEN and no provenance, signing, checksum or attestation step in any workflow (.github/workflows/npm-publish.yml:8-26); CHANGELOG repeatedly says 'npm publish is handled separately' (CHANGELOG.md:61-99) and has no 13.28.0 entry (head 13.27.1, :7). No macOS or WSL2 CI. The edge branches have 'no required gates or reviewers' (docs/public/branches.mdx:29-30). No root lockfile is committed (ci.yml:25-28). Release cadence is high (several patch releases per day-range, CHANGELOG.md:7-99).",
+      "Licensing/scope/evidence: Apache-2.0 open-core — hosted cloud, team sync, admin and enterprise features are reserved outside the repo (docs/license.md:19-24; docs/ip-boundary.md:21-40) while the CMEM Pro gateway and sync hub are proprietary hosted services (src/shared/cmem-gateway.ts:35; SettingsDefaultsManager.ts:25). The package bundles many unrelated integrations and funnel copy: promo lines in the SessionStart banner and the model-visible welcome hint (src/cli/handlers/context.ts:143-145; src/services/worker/http/routes/SearchRoutes.ts:47-57,317-319), Grok Bot/Telegram/CCS-Align defaults including hard-coded agent UUIDs (SettingsDefaultsManager.ts:295-312), and a README section on a third-party crypto token (README.md:444-448). Published measurements are self-reported, concern token cost rather than recall quality, and none is independent (docs/public/smart-explore-benchmark.mdx; README.md:270)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "thedotmack/claude-mem",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "npx installer (interactive; detects hosts and offers a multi-select): `npx claude-mem install`",
+          "citation": "README.md:150; docs/public/installation.mdx:26-32",
+          "holds": true,
+          "note": "README.md:150 shows the command. installation.mdx:26-32 describes the interactive installer, which detects installed IDEs and offers a multi-select. Code agrees: with a TTY and no --ide, src/npx-cli/commands/install.ts:2215-2216 calls promptForIDESelection. That runs detectInstalledIDEs (src/npx-cli/commands/ide-detection.ts:45-123; Codex CLI is detected via ~/.codex) and then p.multiselect (install.ts:673-678). A non-TTY run installs for claude-code only (install.ts:2217-2218)."
+        },
+        {
+          "field": "license",
+          "statement": "spdx Apache-2.0, file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE is the standard Apache License 2.0 text. package.json:19, plugin/.claude-plugin/plugin.json:9, .codex-plugin/plugin.json:11 and NOTICE:6 agree, and ragtime/LICENSE is also Apache-2.0. Not mentioned in the dossier: the in-repo claude-mem-cowork plugin (cowork/, listed in .claude-plugin/marketplace.json:16-21) declares PolyForm-Noncommercial-1.0.0 (cowork/.claude-plugin/plugin.json:10). It is outside the npm package (package.json:35-53) and outside the claude-mem plugin, so the main license is unaffected."
+        },
+        {
+          "field": "readme.platforms.macos_arm64",
+          "statement": "yes (documented, not CI-tested) — installation.mdx:102 lists macOS; macOS-specific code exists (Keychain read, Codex.app bundle lookup); 'arm64 appears only in a comment about onnxruntime'; no macOS job in ci.yml or windows.yml",
+          "citation": "docs/public/installation.mdx:102; src/shared/oauth-token.ts:181-200; src/services/integrations/CodexCliInstaller.ts:37-40,151-157; src/services/sync/ChromaMcpManager.ts:49-53; .github/workflows/ci.yml; .github/workflows/windows.yml",
+          "holds": true,
+          "note": "The rating holds and every cited line says what is claimed. installation.mdx:102 says 'Works cross-platform on Windows, macOS, and Linux'. oauth-token.ts:181-200 is readMacOsKeychain. CodexCliInstaller.ts:37-40 and 151-157 are the /Applications/{ChatGPT,Codex}.app lookup. ChromaMcpManager.ts:52 has the 'macOS arm64 / Python 3.13' comment. The workflows run only on ubuntu-latest and windows-2022. One supporting detail is inaccurate, but it understates support: arm64 does not appear 'only' in that comment. It also appears at src/npx-cli/commands/install.ts:62, src/npx-cli/commands/telemetry.ts:28, CHANGELOG.md:1473 and docs/public/telemetry.mdx:54. The Apple Silicon Homebrew path /opt/homebrew/bin is checked in code (src/npx-cli/install/setup-runtime.ts:73; src/shared/uvx-bin-dirs.ts:48; src/services/infrastructure/ProcessManager.ts:117; CHANGELOG.md:3962). The 'yes, documented, not CI-tested' conclusion is unaffected."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Claude Code plugin with hooks Setup, SessionStart (2 commands), UserPromptSubmit, PostToolUse, PreToolUse(Read), Stop and SessionEnd (four async), plus a native Codex hooks plugin (5 events) not mentioned in the README. The Codex installer needs Codex >=0.128.0, runs `codex plugin marketplace add` and `codex plugin add claude-mem@claude-mem-local`, sets [features] hooks=true and enables the plugin. One worker and one DB serve both hosts. SessionStart injection is filtered by platform_source. MCP/HTTP search spans both hosts unless platformSource is passed. Any --ide install also registers and enables the Claude plugin. Claude auto-memory is left enabled by default.",
+          "citation": "plugin/hooks/hooks.json:4,17,36,48,62,76,89; plugin/hooks/codex-hooks.json; .codex-plugin/plugin.json:25-27; src/services/integrations/CodexCliInstaller.ts:28,219-232,322-340,379-414,500-531; src/npx-cli/commands/install.ts:186-232,259-301,2228-2265,2358-2361; src/cli/handlers/context.ts:55-61; src/services/context/ObservationCompiler.ts:93; tests/cli/handlers/context-session-start.test.ts:60-66,82-85; tests/services/sqlite/search-platform-source-scoping.test.ts:89; docs/public/installation.mdx:20",
+          "holds": true,
+          "note": "All cited lines match. The hook events are at the cited lines, with async:true at hooks.json:57, 71, 84 and 96. codex-hooks.json has SessionStart:3, UserPromptSubmit:16, PreToolUse:28 (Bash/MCP-read matcher at :30), PostToolUse:41 (.* matcher, 120s timeout, no async) and Stop:54. In CodexCliInstaller.ts, line 28 sets the 0.128.0 minimum, lines 221 and 507 run the codex commands, lines 329 and 335 set the TOML flags, and line 524 tells the user to trust the five hooks. install.ts:2206-2207 takes a single --ide id, and 2228-2265 registers and enables the Claude plugin for any IDE. platformSource flows from context.ts through SearchRoutes.ts:289,347 and ContextBuilder.ts:328-333 to ObservationCompiler.ts:93,123,153, and the test asserts platformSource=codex and =claude. The README never mentions Codex. Omission, not a false statement: the PreToolUse file-context hook is not filtered by host (see claim_checks[0])."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "README.md:130,177 rated 'partial': 'True within one host only … Automatic injection therefore does not carry Claude Code memory into Codex or vice versa; cross-host retrieval needs an explicit MCP/HTTP search without platformSource.'",
+          "citation": "src/cli/handlers/context.ts:55-61; src/services/context/ObservationCompiler.ts:93,123,153; tests/cli/handlers/context-session-start.test.ts:60-66,82-85; CHANGELOG.md:2463; tests/services/sqlite/search-platform-source-scoping.test.ts:89; .codex-plugin/plugin.json:31",
+          "holds": false,
+          "note": "Every cited line says what the dossier reports, and SessionStart injection is per host. The conclusion is still contradicted by code. The PreToolUse file-context hook runs on Claude Read (hooks.json:62-71) and on Codex Bash/MCP-read (codex-hooks.json:28-30; file paths extracted at src/cli/adapters/codex.ts:71-76). It queries /api/observations/by-file with only path, projects and limit (src/cli/handlers/file-context.ts:235-247), and no client sends the x-platform-source header. The route treats platformSource as optional (src/services/worker/http/routes/DataRoutes.ts:185-188), and src/services/sqlite/observations/get.ts:41-45 filters only when it is supplied. So observation IDs and titles recorded by either host for a file come back as additionalContext when the other host reads that file (file-context.ts:187-193; codex.ts:119-121; asserted for Codex filePaths in tests/hooks/file-context.test.ts:270-294). This applies to files of at least 1,500 bytes that are unchanged since the newest observation (file-context.ts:15,204,263-270). 'Partial' is still the right rating, but 'within one host only' and 'does not carry … or vice versa' are wrong."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "claim_checks[0].evidence: replace 'True within one host only.' and 'Automatic injection therefore does not carry Claude Code memory into Codex or vice versa; cross-host retrieval needs an explicit MCP/HTTP search without platformSource' with: 'SessionStart injection is per host (src/cli/handlers/context.ts:55-61; src/services/context/ObservationCompiler.ts:93,123,153). The PreToolUse file-context hook is not filtered by host: it calls /api/observations/by-file without platformSource (src/cli/handlers/file-context.ts:235-247; src/services/worker/http/routes/DataRoutes.ts:185-188; src/services/sqlite/observations/get.ts:41-45). So observation IDs and titles recorded by either host for a file are returned as additionalContext when the other host reads that file (Claude Read; Codex Bash/MCP-read; files of at least 1,500 bytes, unchanged since the newest observation, file-context.ts:15,204,263-270). Full cross-host recall still needs MCP/HTTP search without platformSource.'",
+        "risks[0]: replace 'Cross-host memory is partitioned, not shared … so sharing depends on the agent calling MCP `search` without platformSource' with: 'Cross-host memory is only partly shared. The SessionStart summary is split by platform_source, but file-read timelines from the PreToolUse file-context hook cross hosts automatically (src/cli/handlers/file-context.ts:235-247; src/services/sqlite/observations/get.ts:41-45). Full recall needs MCP search without platformSource.'",
+        "Optional — readme.integrations.claude_code_or_codex: after 'MCP/HTTP search spans both unless platformSource is passed', add '; the PreToolUse file-context timeline is also not filtered by host (src/cli/handlers/file-context.ts:235-247)'.",
+        "Optional — readme.platforms.macos_arm64: replace 'arm64 appears only in a comment about onnxruntime on macOS arm64 / Python 3.13 (src/services/sync/ChromaMcpManager.ts:49-53)' with: 'no doc names arm64 as a supported platform. arm64 appears in the onnxruntime comment (src/services/sync/ChromaMcpManager.ts:49-53), src/npx-cli/commands/install.ts:62, src/npx-cli/commands/telemetry.ts:28 and CHANGELOG.md:1473. The Apple Silicon Homebrew path /opt/homebrew/bin is checked in src/npx-cli/install/setup-runtime.ts:73, src/shared/uvx-bin-dirs.ts:48 and src/services/infrastructure/ProcessManager.ts:117 (CHANGELOG.md:3962).'",
+        "Optional — license: add a note that cowork/ (plugin claude-mem-cowork, listed in .claude-plugin/marketplace.json:16-21) declares PolyForm-Noncommercial-1.0.0 (cowork/.claude-plugin/plugin.json:10). It is not shipped in the npm package (package.json:35-53) and is not covered by the Apache-2.0 license."
+      ]
+    }
+  ]
+}

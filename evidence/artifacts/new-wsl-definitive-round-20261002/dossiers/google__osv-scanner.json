@@ -1,0 +1,294 @@
+{
+  "contender": "google/osv-scanner",
+  "revision": {
+    "contender": "google/osv-scanner",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "google/osv-scanner",
+        "tag": "v2.6.0",
+        "commit": "e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v2.6.0",
+    "commit": "e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6",
+    "read_at": "2026-10-02T03:02:13+00:00"
+  },
+  "dossier": {
+    "contender": "google/osv-scanner",
+    "revision": {
+      "tag": "v2.6.0",
+      "commit": "e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Google's open-source dependency vulnerability scanner: a Go CLI (osv-scanner) and Go library (pkg/osvscanner) that extracts packages from source lockfiles/manifests, SPDX/CycloneDX SBOM files, git/vendored C/C++ code and container images (OS packages plus Go/Java/Node/Python/Rust artifacts), then matches them against OSV.dev (online API or a downloaded offline DB). Extraction and matching are delegated to the separate osv-scalibr library (go.mod:14; AGENTS.md:61-70). Optional features: Go/Rust call analysis, license checks, package-deprecation flags, guided remediation (fix; npm and Maven), an experimental MCP server. Output formats: table, vertical, markdown, html, json, sarif (2.1.0), gh-annotations, cyclonedx-1-4 to 1-7, spdx-2-3 (internal/reporter/format.go:10). Exit codes: 1 findings, 127 generic error, 128 no packages, 129 API failure, 130 invalid config (cmd/osv-scanner/internal/cmd/run.go:112-137). CI and supply-chain facts for the listed needs (workflow audit, provenance, SBOMs, code scanning, dependency PRs, linting) are in code.tests_and_ci and code.packaging_and_release.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "OSV-Scanner finds existing vulnerabilities affecting a project's dependencies; it is 'an officially supported frontend to the OSV database and CLI interface to OSV-Scalibr'.",
+          "citation": "README.md:15-16"
+        },
+        {
+          "claim": "Supports languages C/C++, Dart, Elixir, Go, Java, Javascript, PHP, Python, R, Ruby, Rust; many package managers; OS packages on Linux; container scanning; guided remediation; built on the OSV-Scalibr library.",
+          "citation": "README.md:18-26"
+        },
+        {
+          "claim": "Recommended install is a prebuilt binary from the releases page; alternatively go install github.com/google/osv-scanner/v2/cmd/osv-scanner@latest.",
+          "citation": "README.md:41-42"
+        },
+        {
+          "claim": "osv-scanner scan source -r <dir> recursively scans supported package files (README names package.json, go.mod, pom.xml); optional call analysis reduces false positives; vendored C/C++ code can be detected.",
+          "citation": "README.md:52-60"
+        },
+        {
+          "claim": "Container scanning is layer-aware; distro support Alpine/Debian/Ubuntu; language artifacts Go/Java/Node/Python; usage osv-scanner scan image my-image-name:tag.",
+          "citation": "README.md:66-83"
+        },
+        {
+          "claim": "License scanning uses deps.dev data; --licenses with an optional SPDX allowlist.",
+          "citation": "README.md:87-99"
+        },
+        {
+          "claim": "Offline scanning against a local OSV database; no network connection is required after the initial database download.",
+          "citation": "README.md:101-107"
+        },
+        {
+          "claim": "Guided remediation is experimental, supports npm package-lock.json (in-place), npm package.json (relock) and Maven pom.xml (override), and is risky on untrusted projects.",
+          "citation": "README.md:109-123"
+        },
+        {
+          "claim": "Privacy: OSV.dev API receives package names, versions, ecosystems and file hashes; deps.dev receives names, versions, ecosystems and 'No source code is transmitted'; Maven Central, npm and PyPI may be queried with native registry resolution; --offline disables network requests.",
+          "citation": "README.md:146-173"
+        },
+        {
+          "claim": "Badges advertise OpenSSF Scorecard, a 'Checks' workflow, Codecov coverage, SLSA 3 and GitHub releases.",
+          "citation": "README.md:9-13"
+        },
+        {
+          "claim": "Docs: 'SLSA3 compliant binaries for Linux, macOS, and Windows' are on the releases page.",
+          "citation": "docs/installation.md:9"
+        },
+        {
+          "claim": "Docs: each release has SLSA provenance (multiple.intoto.jsonl) verifiable with slsa-verifier verify-artifact.",
+          "citation": "docs/installation.md:93-102"
+        },
+        {
+          "claim": "Docs: two reusable GitHub workflows (PR diff scan; full or scheduled scan) upload SARIF to code scanning, referenced as google/osv-scanner-action/...@v2.6.0.",
+          "citation": "docs/github-action.md:20-58"
+        },
+        {
+          "claim": "Docs: SPDX 2.3 and CycloneDX (1.5, also 1.4) SBOM output via --format with --all-packages; SPDX carries no vulnerability data. The README itself does not mention SBOM output, the GitHub Action or MCP.",
+          "citation": "docs/output.md:427-563"
+        }
+      ],
+      "install": [
+        {
+          "method": "Prebuilt release binary (Linux, macOS, Windows; assets named osv-scanner_<os>_<arch>, checksums in osv-scanner_SHA256SUMS)",
+          "command": "download the asset for your platform from https://github.com/google/osv-scanner/releases (no install command is documented); optional provenance check: slsa-verifier verify-artifact ./osv-scanner_1.2.0_linux_amd64 --provenance-path multiple.intoto2.jsonl --source-uri github.com/google/osv-scanner --source-tag v1.2.0",
+          "citation": "README.md:41 ; docs/installation.md:9 ; docs/installation.md:93-102 ; .goreleaser.yml:183-190"
+        },
+        {
+          "method": "go install (build from source; go.mod requires Go 1.27.0 while docs say 1.26.2+)",
+          "command": "go install github.com/google/osv-scanner/v2/cmd/osv-scanner@latest",
+          "citation": "README.md:42 ; docs/installation.md:79-87 ; go.mod:3"
+        },
+        {
+          "method": "Homebrew (macOS; Linux not stated)",
+          "command": "brew install osv-scanner",
+          "citation": "docs/installation.md:31-37"
+        },
+        {
+          "method": "Arch Linux package",
+          "command": "pacman -S osv-scanner",
+          "citation": "docs/installation.md:39-45"
+        },
+        {
+          "method": "Alpine Linux package",
+          "command": "apk add osv-scanner",
+          "citation": "docs/installation.md:47-53"
+        },
+        {
+          "method": "Container image on GHCR",
+          "command": "docker pull ghcr.io/google/osv-scanner:latest ; docker run -v ${PWD}:/src ghcr.io/google/osv-scanner -L /src/go.mod",
+          "citation": "docs/usage.md:206-224"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - linux/amd64 release binary and Docker image are built (.goreleaser.yml:24-36,81-96); CI unit tests run on ubuntu-latest (.github/workflows/tests.yml:93). No 32-bit or arm (v7) builds (.goreleaser.yml:32-36).",
+        "wsl2": "unknown - WSL is not mentioned anywhere in README, docs, scripts or workflows (searched). The linux/amd64 and linux/arm64 binaries would be the applicable artifacts, but WSL2 is neither documented nor tested.",
+        "macos_arm64": "yes - darwin/arm64 release binary (.goreleaser.yml:24-36); CI matrix includes macos-latest (tests.yml:93; runner architecture not stated in the repo); Homebrew install documented (docs/installation.md:31-37).",
+        "gpu": "no - no GPU or CUDA usage or references anywhere in the repository (searched); not applicable to this tool."
+      },
+      "integrations": {
+        "cli": "yes - one osv-scanner binary: scan (default; subcommands source (default) and image), fix, hidden experimental update, experimental-mcp (cmd/osv-scanner/main.go:13-22; cmd/osv-scanner/internal/cmd/run.go:80-94; cmd/osv-scanner/scan/command.go:13-28; cmd/osv-scanner/update/command.go:25-30). Also osv-reporter (diffs two JSON results, emits SARIF/gh-annotations; not shipped as a release binary: docs/osv-reporter.md:29-38; cmd/osv-reporter/main.go:40-263), pre-commit hooks (.pre-commit-hooks.yaml:1-30; docs/usage.md:143-204) and Docker images (docs/usage.md:206-224). GitHub Actions reusable workflows are documented (docs/github-action.md:20-58) but live in the separate repo google/osv-scanner-action; the same-named files in this repo are deprecated stubs that fail immediately (.github/workflows/osv-scanner-reusable.yml:15,58-61).",
+        "mcp": "yes, experimental - osv-scanner experimental-mcp serves MCP over stdio by default, or HTTP/SSE with --sse <addr> (default localhost:8080); tools scan_vulnerable_dependencies (Go call analysis forced on), get_vulnerability_details, ignore_vulnerability; prompt scan_deps (cmd/osv-scanner/mcp/command.go:36-116,118-165,172-240). Added in v2.2.4 (CHANGELOG.md:226-230); not mentioned in README or docs/; the only integration test covers the SSE transport (cmd/osv-scanner/mcp/integration_test.go:18-112).",
+        "sdk_or_api": "Go library github.com/google/osv-scanner/v2/pkg/osvscanner (DoScan, DoContainerScan: pkg/osvscanner/osvscanner.go:118,169; docs/index.md:20-23). No HTTP API server other than the MCP SSE listener. Machine-readable outputs: JSON, SARIF 2.1.0, CycloneDX, SPDX (internal/reporter/format.go:10).",
+        "claude_code_or_codex": "none found for the product (no Claude Code plugin/skill, Codex config, .mcp.json or CLAUDE.md; searched). The repo has AGENTS.md (AGENTS.md:1-70) with contributor rules for AI agents (issue-first workflow, run ./scripts/run_lints.sh and make test), including an instruction addressed to AI agents that read it (AGENTS.md:5-6). The MCP code names gemini-cli as the client it targets (cmd/osv-scanner/mcp/command.go:72); .gemini/config.yaml configures Gemini code review (.gemini/config.yaml:1-11)."
+      },
+      "telemetry_and_network": "README 'Data Sources and Privacy' (README.md:146-173) lists the external services. OSV.dev API: package names, versions, ecosystems and file hashes, used for vulnerability queries and vendored C/C++ detection. deps.dev API (gRPC api.deps.dev:443, cmd/osv-scanner/fix/command.go:42): dependency resolution, container image metadata, licenses, deprecation; no source code. Maven Central, npm and PyPI only with native registry resolution. Code confirms: the osv.dev client is created unless --offline-vulnerabilities (pkg/osvscanner/osvscanner.go:513-530; scan.go:127-129); the offline DB comes from https://osv-vulnerabilities.storage.googleapis.com (scan.go:83; docs/offline-mode.md:65-84); Google auth is disabled for plugins (DisableGoogleAuth, scan.go:104,109); transitive resolution is on by default and removed by --no-resolve or --offline (scan.go:119-121; flags.go:14-19); every HTTP/gRPC request carries a User-Agent such as osv-scanner_scan-source/<version> (cmd/osv-scanner/scan/source/command.go:118; internal/scalibr/client_factories.go:45-75). Extra behaviour: scan image by name runs the local docker CLI (images, pull, save) while --archive avoids Docker (pkg/osvscanner/internal/imagehelpers/imagehelpers.go:54-98); Go call analysis runs the local go toolchain via govulncheck when present (internal/sourceanalysis/go.go:25-30,176-186); Rust call analysis compiles the project and runs build scripts (docs/scan-source.md:165-170); the vendored C/C++ extractor sends MD5 hashes, relative file paths and the directory name to OSV.dev (internal/scalibrextract/filesystem/vendored/vendored.go:152-207). No accounts, API keys or logins are required. No telemetry, analytics or phone-home code was found in the Go sources; the only hits are the docs site's Google Analytics id (docs/_config.yml:27) and golang.org/x/telemetry as an indirect module (go.mod:198) - I did not verify whether the govulncheck library (golang.org/x/vuln v1.6.0) activates Go telemetry counters. Listeners: --serve binds all interfaces on port 8000 (cmd/osv-scanner/internal/helper/misc.go:25-37); experimental-mcp --sse listens on the given address (mcp/command.go:89-104)."
+    },
+    "code": {
+      "languages": [
+        "Go (go 1.27.0, go.mod:3)",
+        "HTML/CSS/JavaScript (embedded HTML report, internal/output/html/)",
+        "Bash and Python helper scripts (scripts/), one Ruby generator script",
+        "GitHub Actions YAML and GoReleaser YAML",
+        "Ruby/Jekyll for docs (docs/Gemfile)",
+        "Protobuf (internal/scalibrextract/language/osv/osvscannerjson/proto/metadata.proto)"
+      ],
+      "entry_points": [
+        {
+          "path": "cmd/osv-scanner/main.go",
+          "what": "main binary; registers scan, fix, update and experimental-mcp through cmd.Run (cmd/osv-scanner/internal/cmd/run.go)"
+        },
+        {
+          "path": "cmd/osv-scanner/scan/source/command.go",
+          "what": "scan source (default subcommand): lockfiles, SBOM files, directories, git"
+        },
+        {
+          "path": "cmd/osv-scanner/scan/image/command.go",
+          "what": "scan image: container images via the docker CLI or an --archive tarball"
+        },
+        {
+          "path": "cmd/osv-scanner/mcp/command.go",
+          "what": "experimental-mcp server (stdio or --sse HTTP) built on modelcontextprotocol/go-sdk"
+        },
+        {
+          "path": "cmd/osv-scanner/fix/command.go",
+          "what": "guided remediation (fix); hidden experimental update in cmd/osv-scanner/update/command.go"
+        },
+        {
+          "path": "cmd/osv-reporter/main.go",
+          "what": "osv-reporter: diff two JSON results and print SARIF/gh-annotations; built only for the GitHub Action image"
+        },
+        {
+          "path": "pkg/osvscanner/osvscanner.go",
+          "what": "public Go API (DoScan, DoContainerScan)"
+        },
+        {
+          "path": ".pre-commit-hooks.yaml",
+          "what": "pre-commit hooks (golang build, or ghcr.io docker image pinned to v2.3.3)"
+        }
+      ],
+      "architecture": "Thin CLI over a library. cmd/osv-scanner/main.go calls cmd/osv-scanner/internal/cmd/run.go, which builds a urfave/cli v3 app (default command scan, default subcommand source) from the packages under cmd/osv-scanner/{scan,scan/source,scan/image,fix,update,mcp}; shared flags live in cmd/osv-scanner/internal/helper/flags.go. pkg/osvscanner (DoScan/DoContainerScan, scan.go getPlugins) assembles osv-scalibr plugins (presets in internal/scalibrplugin/presets.go: lockfile, sbom, directory and artifact extractors; enrichers for vuln matching via osv.dev or a local DB, licenses, transitive deps, base image; annotators) and runs the osv-scalibr scanner (github.com/google/osv-scalibr, go.mod:14). Local plugins: internal/scalibrextract/{filesystem/vendored, language/javascript/nodemodules, language/osv/osvscannerjson, vcs/gitrepo, vcs/gitcommitdirect}, internal/scalibrenricher/govulncheck/source, internal/scalibrannotator/filter. Results become pkg/models.VulnerabilityResults (pkg/osvscanner/vulnerability_result.go), are filtered by osv-scanner.toml (internal/config), grouped by alias (internal/grouper), optionally call-analysed (internal/sourceanalysis: govulncheck for Go, DWARF analysis for Rust), then rendered by internal/reporter and internal/output (table, vertical, markdown, HTML with embedded templates, JSON, SARIF, gh-annotations, CycloneDX 1.4-1.7 via internal/output/sbom, SPDX 2.3 via osv-scalibr's converter). internal/ci and cmd/osv-reporter implement result diffing for PR scans. internal/scalibr/client_factories.go supplies HTTP/gRPC clients (User-Agent, gRPC retry policy). Docs are a Jekyll site under docs/.",
+      "packaging_and_release": "GoReleaser v2 (.goreleaser.yml) driven by .github/workflows/goreleaser.yml on any pushed tag (goreleaser.yml:3-6). Builds use CGO_ENABLED=0, -trimpath, mod_timestamp set to the commit timestamp and ldflags -s -w (.goreleaser.yml:10-23): osv-scanner for linux/darwin/windows x amd64/arm64 (:24-36), plus osv-scanner-action and osv-reporter for linux amd64/arm64 used only inside the Action image (:37-77). Release assets are raw binaries named osv-scanner_<os>_<arch> (:183-187) with a sha256 checksum file osv-scanner_SHA256SUMS (:188-190); the GitHub release is created as a draft (:191-192). Provenance: a second job calls slsa-framework/slsa-github-generator generator_generic_slsa3.yml@v2.1.0 (tag ref, as the generator requires) with the base64 checksum file as subjects, id-token: write, upload-assets and draft-release true (goreleaser.yml:64-83); docs describe slsa-verifier checks (docs/installation.md:93-102). Container images ghcr.io/google/osv-scanner and ghcr.io/google/osv-scanner-action are built with buildx for amd64+arm64 and merged into manifests tagged <tag>, v<major>, latest and (only for vX.Y.Z tags) stable (.goreleaser.yml:79-181; goreleaser.yml:43-53). The published runtime image is the digest-pinned golang:1.27.1-alpine3.23 plus ca-certificates and git, has no USER directive (runs as root) and sets git safe.directory '*' (goreleaser.dockerfile:15-27). Nightly images ghcr.io/google/osv-scanner:nightly and osv-scanner-action:nightly are pushed Tue-Sat 00:00 UTC (goreleaser-nightly.yml:6; .goreleaser-nightly.yml:68-105). Not present (searched): cosign/sigstore signing, SBOM generation for release artifacts, provenance or attestations for container images, actions/attest-build-provenance. Reproduction guidance is goreleaser build at the tag with the same Go version (CONTRIBUTING.md:70-81), but the release workflow resolves Go through setup-go go-version-file plus check-latest: true (goreleaser.yml:29-34), so the exact toolchain patch is not recorded in the workflow.",
+      "tests_and_ci": "Tests: Go testing with go-snaps snapshots (26 .snap files), go-vcr v4 HTTP cassettes (29 YAML files; CI defaults to replay-only: cmd/osv-scanner/internal/testcmd/vcr.go:24-43) and go-cmp; 83 *_test.go files (13 are testmain_test.go setups; about 250 top-level Test/Benchmark funcs, 81 of them in the vendored internal/thirdparty/xml fork) next to the code, with testdata/ fixtures and image fixtures built from cmd/osv-scanner/scan/image/testdata/*.Dockerfile (all FROM lines digest-pinned). Acceptance tests needing docker/npm/maven/cargo are gated by TEST_ACCEPTANCE (internal/testutility/utility.go:75-90; scripts/run_tests.sh:5-7); make test defaults to -short (Makefile:7-58); CI runs go test ./... -coverpkg=./... -coverprofile (scripts/run_tests.sh:31-33) and uploads to Codecov with fail_ci_if_error (actions/internal/test-action/action.yml:26-35). 19 workflow files in .github/workflows: checks.yml (snapshot-clean script, filename regex lint, Prettier, go mod tidy -diff, golangci-lint v2.13.0 from .golangci-lint-version; .golangci.yaml uses default: all); tests.yml (path-filtered; builds image fixtures; tests on ubuntu/macos/windows; goreleaser --snapshot Docker smoke test; 'All Tests Passed' aggregate job); codeql-analysis.yml (CodeQL for Go); scorecards.yml (OpenSSF Scorecard with publish_results, SARIF upload); zizmor.yml (zizmorcore/zizmor-action on workflow changes and main pushes, config .github/zizmor.yml); osv-scanner-unified-action.yml (self-scan through google/osv-scanner-action reusable workflows at @nightly, weekly plus push plus PR); prerelease-check.yml (manual: OSV scan, links, prettier, tidy, lint, tests, go generate drift check); goreleaser.yml and goreleaser-nightly.yml; renovate-validator.yml; dependencies.yml, snapshots.yml and cassettes.yml (daily bots opening PRs via peter-evans/create-pull-request with PR_TOKEN_BOT as osv-robot); docs-deploy.yml (Jekyll to GitHub Pages from the docs branch); links.yml; staleness.yml; title.yml (semantic PR titles); two deprecated osv-scanner-reusable*.yml stubs. Supply-chain facts for the stated needs: (1) workflow permission/pinning audit = zizmor (zizmor.yml:24-27; .github/zizmor.yml ignores only cache-poisoning for checks.yml; one inline ignore for unpinned-uses at prerelease-check.yml:25); OpenSSF Scorecard also runs. (2) Workflow linter for syntax/expressions/action inputs/run scripts: none found - no actionlint, shellcheck or yamllint anywhere (searched); Prettier only formats YAML. (3) Code-scanning publishers: CodeQL analyze (codeql-analysis.yml:75-76, security-events: write at :32), github/codeql-action/upload-sarif for Scorecard (scorecards.yml:69-73), zizmor job holds security-events: write (zizmor.yml:15; upload mechanism lives in the external action), golangci-lint action does not upload SARIF (actions/internal/lint-action/action.yml:21-25). The CLI's own SARIF carries tool.driver osv-scanner plus version and primaryLocationLineHash fingerprints but no automationDetails or commit data (internal/output/sarif.go:253-398). (4) Provenance: slsa-github-generator only (see packaging). (5) SBOM generation: the CLI itself (scan source and scan image with --format spdx-2-3 or cyclonedx-1-x, --all-packages); the release pipeline generates none. (6) Dependency PRs: Renovate (renovate.json: config:recommended, .github/** grouped as 'workflows', minimumReleaseAge 7 days, osvVulnerabilityAlerts, lockFileMaintenance, osv-scalibr and x/vuln excluded; no dependabot config) plus the daily osv-scalibr bump bot (dependencies.yml:31-36); whether the Renovate app is actually installed is not checkable from the repo. (7) Permissions: 15 of 19 workflows set top-level permissions: {} with per-job grants; exceptions staleness.yml:3 (read-all), title.yml:25-26 (pull-requests: read) and the two deprecated stubs (contents: read plus security-events: write). Of 88 uses: lines, 78 are pinned to 40-hex SHAs with version comments, 6 are local composite actions and 4 are not SHA-pinned (goreleaser.yml:79 SLSA generator tag; osv-scanner-unified-action.yml:37,45 @nightly; prerelease-check.yml:25 @main). 25 of 27 checkouts set persist-credentials: false (exceptions codeql-analysis.yml:43 and docs-deploy.yml:33). Unpinned tooling: npx prettier@latest (scripts/run_formatters.sh:7,9), npx --yes --package renovate with node-version latest (renovate-validator.yml:28-34), goreleaser '~> v2' (goreleaser.yml:59).",
+      "dependencies": "go.mod (go 1.27.0, no toolchain line): 28 direct requirements (go.mod:5-34) and 178 indirect (go.mod:36-215); go.sum present. Direct deps include osv-scalibr v0.5.3-0.20260911142458-3090dbb7aaa2 (untagged pseudo-version, go.mod:14), modelcontextprotocol/go-sdk v1.7.0, cyclonedx-go v0.12.0, go-sarif v3.3.1, urfave/cli v3.11.0, grpc v1.83.2, golang.org/x/vuln v1.6.0, go-git v5.19.2, go-vcr v4.0.7, go-snaps v0.5.23; four direct pseudo-versions (osv-scalibr, ianlancetaylor/demangle, ossf/osv-schema bindings, osv.dev bindings) and one RC (go.yaml.in/yaml/v4 v4.0.0-rc.6). docs/Gemfile (plus Gemfile.lock): 12 unconditional gems and 4 platform-conditional ones (Jekyll 4.4, just-the-docs). No package.json or requirements file at the repo root; Prettier and the Renovate validator are fetched with npx at CI time (unpinned). GitHub Actions: 78 SHA-pinned external refs in workflows plus 2 in composite actions (golangci-lint-action, codecov-action). Dockerfiles pin base images by digest (Dockerfile:15,24; goreleaser.dockerfile:15; goreleaser-action.dockerfile:15; docs/docs.Dockerfile:2; scripts/test_env.dockerfile:1).",
+      "security_policy": "none - no SECURITY.md or other security-policy file (case-insensitive filename search for 'security' finds nothing; CONTRIBUTING.md has no vulnerability-reporting section). CONTRIBUTING.md:6-12 requires a Google CLA; :25-30 issue-first workflow; :165-169 Conventional Commits."
+    },
+    "claim_checks": [
+      {
+        "claim": "Binaries are 'SLSA3 compliant' and each release ships SLSA provenance (multiple.intoto.jsonl) verifiable with slsa-verifier (README.md:12; docs/installation.md:9,93-102).",
+        "verified": "partial",
+        "evidence": "Workflow side verified: .github/workflows/goreleaser.yml:72-83 calls slsa-framework/slsa-github-generator generator_generic_slsa3.yml@v2.1.0 with the base64 goreleaser checksum file as subjects (goreleaser.yml:64-71), id-token: write, upload-assets and draft-release true; checksum file defined at .goreleaser.yml:188-190. Not verifiable from the clone: that provenance assets were actually published for v2.6.0. Gaps: no provenance, signature or SBOM is configured for the container images (no cosign/attest/sboms entries), and the docs example uses multiple.intoto2.jsonl and v1.2.0 while the text says multiple.intoto.jsonl (docs/installation.md:95,101)."
+      },
+      {
+        "claim": "Container scanning is layer-aware with distro support Alpine, Debian, Ubuntu and language artifacts Go, Java, Node, Python (README.md:66-77).",
+        "verified": "yes",
+        "evidence": "internal/scalibrplugin/presets.go:146-170 enables apk, dpkg, chisel, homebrew and rpm OS extractors plus wheelegg, java archive, gobinary, nodemodules and cargo-auditable, so the README lists a subset (docs/supported_languages_and_lockfiles.md:30-42 also lists Chisel and Rust). Image scanning is in pkg/osvscanner/osvscanner.go:169-296. By-name scans shell out to the docker CLI (pkg/osvscanner/internal/imagehelpers/imagehelpers.go:77-90); --archive tarballs avoid Docker (osvscanner.go:214-216); only Linux images are handled (osvscanner.go:244)."
+      },
+      {
+        "claim": "Install via prebuilt binary or go install ...@latest (README.md:41-42; docs/installation.md:79-87).",
+        "verified": "partial",
+        "evidence": "Both paths exist (.goreleaser.yml:6-36,183-187; module path go.mod:1) but the required Go version is stated three ways: go.mod:3 says go 1.27.0, docs/installation.md:87 says 'Go 1.26.2+', CONTRIBUTING.md:51 says 'Go 1.21+'; go.mod is authoritative. README.md:48 also still says 'latest OSV-Scanner V2 beta' although internal/version/version.go:5 is 2.6.0."
+      },
+      {
+        "claim": "--offline disables network requests; scans run against a local database with no network after the initial download (README.md:101-107,152).",
+        "verified": "yes",
+        "evidence": "cmd/osv-scanner/internal/helper/flags.go:14-19,125-150 maps --offline to offline-vulnerabilities and no-resolve; helper/getters.go:45 sets PluginNetworkDisabled; pkg/osvscanner/scan.go:160-166 returns NetworkOffline unless --download-offline-databases; osvscanner.go:127-129 rejects downloads outside offline mode; DB host osv-vulnerabilities.storage.googleapis.com (scan.go:83). Caveats: --offline-vulnerabilities alone leaves other network features on (docs/offline-mode.md:55); image-by-name scans still call docker pull (imagehelpers.go:77-87); commit-level scanning is unsupported offline (docs/offline-mode.md:88-90)."
+      },
+      {
+        "claim": "Data sent is package names, versions, ecosystems and file hashes; no source code is transmitted (README.md:152,163).",
+        "verified": "partial",
+        "evidence": "No source is sent, but the list is incomplete: the default vendored C/C++ extractor sends MD5 hashes with relative file paths and the directory base name to OSV.dev determineversion (internal/scalibrextract/filesystem/vendored/vendored.go:152-207). It is in the default scan source presets (pkg/osvscanner/scan.go:192) and is disabled only when --offline-vulnerabilities removes the OSV client (scan.go:127-129). Requests also carry a User-Agent with the tool version (cmd/osv-scanner/scan/source/command.go:118; internal/scalibr/client_factories.go:45-75)."
+      },
+      {
+        "claim": "Call analysis can show whether a vulnerable function is actually used (README.md:58).",
+        "verified": "yes",
+        "evidence": "Go call analysis is on by default; Rust and jar are off (cmd/osv-scanner/internal/helper/callanalysis_parser.go:3-7). Go analysis runs govulncheck via golang.org/x/vuln/scan against a temporary OSV DB and is skipped silently when go is not on PATH (internal/sourceanalysis/go.go:25-30,139-198). Rust analysis builds the project and parses DWARF, executing dependency build scripts (internal/sourceanalysis/rust.go:31-40; docs/scan-source.md:165-170)."
+      },
+      {
+        "claim": "scan source -r finds supported package files 'such as package.json, go.mod, pom.xml' (README.md:56).",
+        "verified": "partial",
+        "evidence": "go.mod and pom.xml have extractors, but the default lockfile preset has no package.json extractor, only package-lock.json, pnpm-lock.yaml, yarn.lock and bun.lock (internal/scalibrplugin/presets.go:93-97; docs/supported_languages_and_lockfiles.md:56); package.json is used as a manifest only by fix (README.md:117-121). Docs advise preferring resolved lockfiles (docs/supported_languages_and_lockfiles.md:64-77). Source scans default to the lockfile, sbom and directory presets (pkg/osvscanner/scan.go:192). No GitHub Actions workflow extractor appears in the presets or in the supported-file docs; osv-scalibr plugins enabled via --experimental-plugins could not be checked from this repo."
+      },
+      {
+        "claim": "SBOM output: --format spdx-2-3 and cyclonedx-1-5 (also 1.4) with --all-packages for directories (docs/output.md:427-563); the README does not mention SBOM output.",
+        "verified": "partial",
+        "evidence": "Code supports cyclonedx-1-4, 1-5, 1-6, 1-7 and spdx-2-3 (internal/reporter/format.go:10), so the docs lag. CycloneDX is built only from PURLs for 12 language ecosystems (internal/utility/purl/purl.go:15-28,47-49): other ecosystems, including Debian/Alpine/RPM OS packages found in images, are dropped with a 'Failed to parse package URL' warning and the exit status is unaffected (internal/reporter/cyclonedx.go:17-25). BOMs hold only components (type library) and vulnerabilities, with no metadata, tool, serialNumber or timestamp (internal/output/sbom/cyclonedx_common.go:14-53; internal/output/__snapshots__/cyclonedx_test.snap). SPDX comes from osv-scalibr's converter with an empty config (internal/output/spdx.go:39-45), carries a creation date and a spdx.google UUID namespace (internal/testutility/jsonreplace.go:85-116) and has no vulnerability data (docs/output.md:433-437). SBOM-format tests exist only for scan source (cmd/osv-scanner/scan/source/command_test.go:237-300), none for scan image."
+      },
+      {
+        "claim": "--serve hosts the HTML report 'at localhost port 8000' (docs/output.md:145-149; docs/usage.md:93-99).",
+        "verified": "partial",
+        "evidence": "cmd/osv-scanner/internal/helper/misc.go:25-37 listens on ':' plus the port, i.e. all interfaces, while logging http://localhost:<port>/. The code is what runs."
+      },
+      {
+        "claim": "Two reusable GitHub workflows (PR diff scan; full or scheduled scan) upload SARIF to code scanning (docs/github-action.md:20-25,70-111).",
+        "verified": "not_checkable",
+        "evidence": "The documented workflows are referenced as google/osv-scanner-action/.github/workflows/osv-scanner-reusable(-pr).yml@v2.6.0 (docs/github-action.md:57,100), a separate repository not present in this clone. The same-named files here are deprecated stubs that print a deprecation note and run false (.github/workflows/osv-scanner-reusable.yml:15,58-61; osv-scanner-reusable-pr.yml:15,53-56). The CLI side is verifiable: SARIF 2.1.0 with one rule per vulnerability group, security-severity property and primaryLocationLineHash fingerprints (internal/output/sarif.go:253-398), and osv-reporter diffing (cmd/osv-reporter/main.go:118-156)."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Release attestation scope: SLSA3 provenance covers only the release binaries' checksum file (goreleaser.yml:64-83). No signing, SBOM or provenance is configured for the ghcr.io images (no cosign/attest/sboms entries in .goreleaser*.yml or workflows). The latest manifest has no skip_push condition, unlike stable (.goreleaser.yml:165-173), so any tag that triggers the workflow (pattern '*', goreleaser.yml:3-6), including semver pre-releases, would also move latest. The published image runs as root, ships the Go toolchain and sets git safe.directory '*' (goreleaser.dockerfile:15-27). The docs' verification example is inconsistent (docs/installation.md:95,101).",
+      "Hosted CI integration lives outside this revision: the reusable workflows the docs promote are in google/osv-scanner-action, while the in-repo osv-scanner-reusable*.yml are deprecated stubs that fail by design (osv-scanner-reusable.yml:15,58-61). This repo's own self-scan calls that repo at @nightly and @main (osv-scanner-unified-action.yml:37,45; prerelease-check.yml:25 with a zizmor ignore). The CLI's SARIF has no automationDetails/category or commit data (internal/output/sarif.go:256-257,370-385), so attribution to commit and tool depends on the uploading workflow, which cannot be audited here. The legacy Docker actions are also marked legacy (actions/scanner/action.yml:2).",
+      "Workflow hygiene gaps (verified): 4 of 88 uses: lines are not SHA-pinned (goreleaser.yml:79; osv-scanner-unified-action.yml:37,45; prerelease-check.yml:25); 2 of 27 checkouts keep credentials (codeql-analysis.yml:43; docs-deploy.yml:33); staleness.yml:3 uses permissions: read-all; CI downloads unpinned tools (npx prettier@latest in scripts/run_formatters.sh:7,9; npx --yes --package renovate with node latest in renovate-validator.yml:28-34); goreleaser is '~> v2' and Go is resolved with check-latest: true in the release job (goreleaser.yml:33,59). No workflow linter (actionlint/shellcheck) exists in the repo.",
+      "Dependency volatility and maintenance: core extraction, matching and SPDX conversion live in osv-scalibr, pinned to an untagged pseudo-version (go.mod:14) that a daily bot bumps to osv-scalibr HEAD (dependencies.yml:31-36) while Renovate is disabled for it (renovate.json:26-30) and x/vuln is ignored (renovate.json:33), so behaviour can shift with each bump. Four direct deps are pseudo-versions and one is an RC (go.mod:14,15,19,27,33); 178 indirect modules. Go requirement is stated three ways (go.mod:3 is 1.27.0; docs/installation.md:87 says 1.26.2+; CONTRIBUTING.md:51 says 1.21+). The pre-commit docker hook still pins ghcr.io/google/osv-scanner:v2.3.3 and docs show rev v2.3.3/v2.2.4 at v2.6.0 (.pre-commit-hooks.yaml:20; docs/usage.md:160-204).",
+      "SBOM limits: CycloneDX output drops every package whose ecosystem has no PURL mapping (the mapper covers 12 language ecosystems, no OS ecosystems), so container-image SBOMs lose Debian/Alpine/RPM packages with only a warning and exit code unchanged (internal/utility/purl/purl.go:15-28,47-49; internal/reporter/cyclonedx.go:17-25); BOMs have no metadata/tool/timestamp (internal/output/sbom/cyclonedx_common.go:14-53). SPDX is osv-scalibr's converter with empty config, a TODO for user configuration (internal/output/spdx.go:39-40), and omits vulnerabilities. --all-packages is required to list non-vulnerable packages (pkg/osvscanner/vulnerability_result.go:47,148). SBOM output is tested only for scan source (cmd/osv-scanner/scan/source/command_test.go:237-300), and spdx from osv-scanner.json input is a known-bad case (docs/supported_languages_and_lockfiles.md:162-166).",
+      "Network, privacy and runtime requirements: default scans call OSV.dev and deps.dev; vendored C/C++ dirs send MD5 hashes, relative paths and directory names (vendored.go:152-207); image-by-name needs the docker CLI (imagehelpers.go:77-90); default-on Go call analysis needs go on PATH and is silently skipped otherwise (sourceanalysis/go.go:25-30), so results differ between hosts; Rust call analysis runs dependency build scripts (docs/scan-source.md:165-170); fix and update can run package-manager scripts (README.md:111-112; cmd/osv-scanner/update/command.go:67). No telemetry code was found, but x/telemetry is an indirect module whose use by govulncheck was not verified (go.mod:198).",
+      "Local server modes: --serve binds all interfaces on :8000 although docs say localhost (cmd/osv-scanner/internal/helper/misc.go:30-31). The experimental MCP --sse server configures no authentication in this code (cmd/osv-scanner/mcp/command.go:89-104; the SDK's own defaults were not reviewed), accepts arbitrary filesystem paths from the client and forces Go call analysis on (command.go:118-132). Its ignore_glob_patterns input is advertised but never used (command.go:56 vs 118-129), and it is documented only in the changelog (CHANGELOG.md:230).",
+      "Docs and licensing hygiene: README says 'latest OSV-Scanner V2 beta' at v2.6.0 (README.md:48; internal/version/version.go:5); no SECURITY.md or vulnerability-reporting policy; image label org.opencontainers.image.licenses is 'Apache License 2.0' (not an SPDX id) for the main amd64 and nightly images but 'Apache-2.0' elsewhere (.goreleaser.yml:89,106; .goreleaser-nightly.yml:78,97); the vendored Go encoding/xml fork carries a BSD header referring to a LICENSE file that is absent from internal/thirdparty/xml (xml.go:1-3; only internal/thirdparty/ar/COPYING exists). Licenses of the 178 indirect modules were not reviewed."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "google/osv-scanner",
+      "checks": [
+        {
+          "field": "readme.install[0] (install method: prebuilt release binary)",
+          "statement": "Prebuilt release binary for Linux, macOS and Windows. Assets are named osv-scanner_<os>_<arch>, with checksums in osv-scanner_SHA256SUMS. You download the asset from the releases page; no install command is documented. Optional provenance check: slsa-verifier verify-artifact ./osv-scanner_1.2.0_linux_amd64 --provenance-path multiple.intoto2.jsonl --source-uri github.com/google/osv-scanner --source-tag v1.2.0",
+          "citation": "README.md:41 ; docs/installation.md:9 ; docs/installation.md:93-102 ; .goreleaser.yml:183-190 (also .goreleaser.yml:24-36)",
+          "holds": true,
+          "note": "README.md:41 calls a prebuilt binary the recommended method and links the releases page. docs/installation.md:9 lists Linux, macOS and Windows binaries and gives no command beyond downloading. .goreleaser.yml:24-36 builds windows/linux/darwin for amd64/arm64. :184-187 uploads raw binaries (formats: binary) named {{ .Binary }}_{{ .Os }}_{{ .Arch }}, for the osv-scanner build only. :189 names the checksum file {{ .ProjectName }}_SHA256SUMS. The slsa-verifier command matches docs/installation.md:101 word for word. Minor caveats, not errors: (1) project_name is not set, so 'osv-scanner_SHA256SUMS' assumes GoReleaser derives the name from the repo; (2) GoReleaser normally adds .exe to the Windows binary; (3) the quoted verifier example is a stale v1.2.0 one. Its versioned file name and multiple.intoto2.jsonl match neither the :185 template nor the docs' own text (docs/installation.md:95), so users have to adapt it. The dossier flags this in claim_checks[0]."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX Apache-2.0, declared in the file LICENSE",
+          "citation": "LICENSE:1-202",
+          "holds": true,
+          "note": "LICENSE is the unmodified Apache License, Version 2.0 text (header :2-4, terms :6-177, appendix :179-202), so Apache-2.0 is the correct SPDX id."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - a linux/amd64 release binary and Docker image are built; CI unit tests run on ubuntu-latest; there are no 32-bit or arm (v7) builds",
+          "citation": ".goreleaser.yml:24-36,81-96 ; .github/workflows/tests.yml:93",
+          "holds": true,
+          "note": ".goreleaser.yml:24-36 builds linux among goos and amd64 among goarch. '386' (:32-33) and 'arm' (:34-35) are commented out, so there are no 32-bit or armv7 builds. :81-96 builds ghcr.io/google/osv-scanner:{{ .Tag }}-amd64 with --platform=linux/amd64. tests.yml:93 matrix is [ubuntu-latest, macos-latest, windows-latest]. The tests.yml docker job also smoke-tests the linux/amd64 image (tests.yml:148-157)."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "One osv-scanner binary with scan (default; subcommands source, the default, and image), fix, a hidden experimental update and experimental-mcp. Also: osv-reporter (diffs two JSON results, emits SARIF/gh-annotations, not shipped as a release binary), pre-commit hooks and Docker images. The GitHub Actions reusable workflows are documented but live in google/osv-scanner-action; the same-named files in this repo are deprecated stubs that fail immediately.",
+          "citation": "cmd/osv-scanner/main.go:13-22 ; cmd/osv-scanner/internal/cmd/run.go:80-94 ; cmd/osv-scanner/scan/command.go:13-28 ; cmd/osv-scanner/update/command.go:25-30 ; docs/osv-reporter.md:29-38 ; cmd/osv-reporter/main.go:40-263 ; .pre-commit-hooks.yaml:1-30 ; docs/usage.md:143-204,206-224 ; docs/github-action.md:20-58 ; .github/workflows/osv-scanner-reusable.yml:15,58-61",
+          "holds": true,
+          "note": "main.go:15-20 registers scan, fix, update and mcp. run.go:87 sets DefaultCommand 'scan'. scan/command.go:13-17 makes source the default and lists source and image, applied by internal/cmd/helpers.go:100-130. update/command.go:27-29 has Hidden: true and '[EXPERIMENTAL]'. The mcp command is named 'experimental-mcp' (mcp/command.go:38). osv-reporter diffs --old/--new (main.go:118-156), defaults to sarif (:169) and prints gh-annotations (:208-212). docs/osv-reporter.md:31 says there are no prebuilt binaries, which matches .goreleaser.yml:186-187 releasing only the osv-scanner id. .pre-commit-hooks.yaml defines a golang hook and a docker_image hook. docs/usage.md:206-224 documents the GHCR image, whose ENTRYPOINT is /osv-scanner (goreleaser.dockerfile:27). docs/github-action.md:57 references google/osv-scanner-action/...@v2.6.0. osv-scanner-reusable.yml:15 is a legacy warning and :58-61 prints a deprecation notice then runs 'false'; the -pr.yml copy does the same at :15,53-56."
+        },
+        {
+          "field": "claim_checks[0] (SLSA3 provenance)",
+          "statement": "Binaries are 'SLSA3 compliant' and each release ships SLSA provenance verifiable with slsa-verifier. Rated partial: the release workflow calls generator_generic_slsa3.yml@v2.1.0 with the base64 checksum file as subjects, id-token: write, upload-assets and draft-release true. Publication for v2.6.0 can't be verified from the clone. No provenance, signature or SBOM is set up for container images. The docs example uses multiple.intoto2.jsonl and v1.2.0, while the docs text says multiple.intoto.jsonl.",
+          "citation": "README.md:12 ; docs/installation.md:9,93-102 ; .github/workflows/goreleaser.yml:64-83 ; .goreleaser.yml:188-190",
+          "holds": true,
+          "note": "README.md:12 shows the SLSA 3 badge and docs/installation.md:9,95 make the claims. goreleaser.yml:64-71 base64-encodes the Checksum artifact into the 'hashes' output. :72-83 is the provenance job, with id-token: write, contents: write, generator_generic_slsa3.yml@v2.1.0 by tag, base64-subjects, upload-assets: true and draft-release: true. The checksum template is at .goreleaser.yml:188-190. A search for cosign, sigstore, attest, sbom and signs across .goreleaser.yml, .goreleaser-nightly.yml and .github/ finds nothing, which confirms images have no signing or attestation. The docs' :95 vs :101 mismatch is confirmed. 'partial' is right, because whether the v2.6.0 release actually has the assets can't be checked from the clone."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

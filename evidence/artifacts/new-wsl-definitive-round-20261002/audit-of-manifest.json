@@ -1,0 +1,754 @@
+{
+  "schema_version": 1,
+  "kind": "definitive_round_audit_of_manifest",
+  "rule": "compare.py, amendment 2",
+  "manifest": {
+    "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+    "ref": "675bdd51c96af28aa98012d9e4ff772a77a38f3d",
+    "sha256": "894dff866e2e6f332d6927879ca89b81a7da67d066664122f163e23707c4205b"
+  },
+  "counts": {
+    "agree": 22,
+    "contest": 7,
+    "not_settled": 7,
+    "pin_conflict": 1,
+    "pin_agree": 1,
+    "cross_check": 1,
+    "nominates": 4
+  },
+  "rows": [
+    {
+      "unit_id": "ci-supply-chain",
+      "slot_id": "workflow-policy-audit",
+      "manifest_row": "zizmor",
+      "manifest_state": "definitive",
+      "manifest_pick": [
+        "zizmorcore/zizmor"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "zizmorcore/zizmor",
+      "verdict": "agree"
+    },
+    {
+      "unit_id": "ci-supply-chain",
+      "slot_id": "build-provenance",
+      "manifest_row": "attest",
+      "manifest_state": "definitive",
+      "manifest_pick": [
+        "actions/attest"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "actions/attest",
+      "verdict": "agree"
+    },
+    {
+      "unit_id": "ci-supply-chain",
+      "slot_id": "sbom-generation",
+      "manifest_row": "syft",
+      "manifest_state": "definitive",
+      "manifest_pick": [
+        "anchore/syft"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "anchore/syft",
+      "verdict": "agree"
+    },
+    {
+      "unit_id": "ci-supply-chain",
+      "slot_id": "dependency-updates",
+      "manifest_row": "dependabot",
+      "manifest_state": "resolved",
+      "manifest_pick": [
+        "dependabot/dependabot-core"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "dependabot/dependabot-core",
+      "verdict": "agree"
+    },
+    {
+      "unit_id": "ci-supply-chain",
+      "slot_id": "findings-publication",
+      "manifest_row": "codeql-sarif",
+      "manifest_state": "resolved",
+      "manifest_pick": [
+        "NONE"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "github/codeql-action",
+      "verdict": "contest"
+    },
+    {
+      "unit_id": "ci-supply-chain",
+      "slot_id": "workflow-correctness-lint",
+      "manifest_row": "actionlint-kjanat",
+      "manifest_state": "definitive",
+      "manifest_pick": [
+        "kjanat/actionlint"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "kjanat/actionlint",
+      "verdict": "agree"
+    },
+    {
+      "unit_id": "code-navigation",
+      "slot_id": "language-server-navigation",
+      "manifest_row": "serena",
+      "manifest_state": "definitive",
+      "manifest_pick": [
+        "oraios/serena"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "oraios/serena",
+      "verdict": "agree"
+    },
+    {
+      "unit_id": "code-navigation",
+      "slot_id": "client-native-lsp",
+      "manifest_row": "claude-plugins-official-code-intelligence-lsp-pl",
+      "manifest_state": "resolved",
+      "manifest_pick": [
+        "NONE"
+      ],
+      "round_status": "measurement",
+      "round_basis": "unsettled after adjudication",
+      "verdict": "not_settled",
+      "finalists": [
+        "anthropics/claude-plugins-official",
+        "NONE"
+      ],
+      "settling_measurement": "Run one paired experiment on the WSL2 Ubuntu x86_64 host, holding Claude Code, model, prompts, language-server versions, repository and Serena configuration fixed. Compare Serena alone against Serena plus the matching F08 native plugin. Use sealed definition/reference questions and edits that introduce and then repair compiler-confirmed errors; include a multi-step refactor with temporary intermediate errors. Exercise both Claude Code Edit/Write and Serena's editing tools. Capture exact native navigation answers, whether diagnostics reaching the agent reflect each edited revision and clear after repair, final compiler results, startup/index-update latency, known-source read cost, tokens and peak RAM. Do not require unsolicited delivery as an additional acceptance condition. Choose A if the enabled arm reliably supplies the requested native navigation and current post-edit diagnostics beyond the control. Choose B if, after confirming correct installation and a healthy server, that addition is absent or persistently stale."
+    },
+    {
+      "unit_id": "cross:gpt6-harnesses",
+      "slot_id": "gpt-gateway",
+      "manifest_row": "gpt-gateway",
+      "manifest_state": "pinned",
+      "manifest_pick": [
+        "diegosouzapw/omniroute"
+      ],
+      "round_status": "measurement",
+      "round_basis": "unsettled after adjudication",
+      "verdict": "not_settled",
+      "finalists": [
+        "diegosouzapw/omniroute",
+        "NONE"
+      ],
+      "settling_measurement": "Run one paired conformance evaluation on the specified WSL2 x86_64 host, with fixed client versions and the same verifiable tool-use tasks through native calls and OmniRoute v3.8.51's codex OAuth provider. Exercise Codex CLI, Codex SDK and an OpenAI-compatible worker across Astra/Sol/Luna and their supported efforts, including omitted effort and native Ultra configurations. Capture actual native requests first to establish which Lite header/metadata and parallel-tool combinations are supported; then compare their gateway upstream requests and task outcomes, including equivalent gateway suffix aliases. Keep compression off and Thinking Budget passthrough, with no model/effort override rules. Pool two native accounts, inject a first-account 429, and reconcile upstream completions against usage records during concurrent streaming: successful tokens must appear once, while a separate zero-token failure record is allowed. Record task success and paired latency. Choose B if the required lanes preserve supported native semantics and accounting while adding successful account failover; choose A if a supported native flow reproducibly loses requested semantics or the required failover, compression or accounting behavior fails."
+    },
+    {
+      "unit_id": "cross:runtime-workers",
+      "slot_id": "agent-runtime-worker",
+      "manifest_row": "agent-runtime-worker",
+      "manifest_state": "pinned",
+      "manifest_pick": [
+        "openhands/software-agent-sdk"
+      ],
+      "round_status": "user_pin_conflict",
+      "round_basis": "both families",
+      "round_pick": "openai/codex",
+      "verdict": "pin_conflict"
+    },
+    {
+      "unit_id": "cross:runtime-workers",
+      "slot_id": "deep-research-harness",
+      "manifest_row": "research-harnesses",
+      "manifest_state": "pinned",
+      "manifest_pick": [
+        "assafelovic/gpt-researcher",
+        "bytedance/deer-flow"
+      ],
+      "round_status": "definitive",
+      "round_basis": "adjudicated (four of four)",
+      "round_pick": "assafelovic/gpt-researcher",
+      "verdict": "pin_agree"
+    },
+    {
+      "unit_id": "cross:wsl-distro",
+      "slot_id": "base-distribution",
+      "manifest_row": "base-distribution",
+      "manifest_state": "definitive",
+      "manifest_pick": [
+        "page:ubuntu-26-04-1-lts-canonical-wsl-image"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "page:ubuntu-26-04-1-lts-canonical-wsl-image",
+      "verdict": "agree"
+    },
+    {
+      "unit_id": "document-retrieval",
+      "slot_id": "markdown-collection-retrieval",
+      "manifest_row": "tobi-qmd",
+      "manifest_state": "definitive",
+      "manifest_pick": [
+        "tobi/qmd"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "tobi/qmd",
+      "verdict": "agree"
+    },
+    {
+      "unit_id": "document-retrieval",
+      "slot_id": "document-ingestion",
+      "manifest_row": "mineru",
+      "manifest_state": "definitive",
+      "manifest_pick": [
+        "opendatalab/mineru"
+      ],
+      "round_status": "measurement",
+      "round_basis": "unsettled after adjudication",
+      "verdict": "not_settled",
+      "finalists": [
+        "docling-project/docling",
+        "opendatalab/mineru"
+      ],
+      "settling_measurement": "Measure the paired difference in format-macro-averaged, structure-aware extraction error between F05 and F07 on one sealed corpus of difficult PDFs, scans, Office formats, EPUB and HTML, on the stated WSL2 Ubuntu/RTX 4090 host. Pin the packet source commits, resolved dependencies and model hashes. Run Docling's standard conversion and MinerU's automatic Standard-for-PDF/Flash-for-native routing through each client's CLI access, exporting native JSON. Before examining outputs, fix independent reference annotations and one canonical serialization preserving text, reading order and table row/cell/span structure. Score normalized edit distance on that serialization, assign maximum error to missing conversions, installation failures or resource failures, and weight the five document families equally. Use randomized repeated runs and a paired, document-level bootstrap confidence interval for E(Docling)-E(MinerU). An interval wholly below zero selects Docling; wholly above zero selects MinerU; overlap retains unsettled. Do not introduce a latency veto or an arbitrary percentage-improvement threshold."
+    },
+    {
+      "unit_id": "durable-memory",
+      "slot_id": "memory-owner",
+      "manifest_row": "memory-owner",
+      "manifest_state": "measurement",
+      "manifest_pick": [
+        "NONE"
+      ],
+      "round_status": "definitive",
+      "round_basis": "adjudicated (four of four)",
+      "round_pick": "akitaonrails/ai-memory",
+      "verdict": "cross_check",
+      "matches": false
+    },
+    {
+      "unit_id": "git-github-automation",
+      "slot_id": "version-control",
+      "manifest_row": "git",
+      "manifest_state": "definitive",
+      "manifest_pick": [
+        "git/git"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "git/git",
+      "verdict": "agree"
+    },
+    {
+      "unit_id": "git-github-automation",
+      "slot_id": "github-cli",
+      "manifest_row": "gh-github-cli",
+      "manifest_state": "definitive",
+      "manifest_pick": [
+        "cli/cli"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "cli/cli",
+      "verdict": "agree"
+    },
+    {
+      "unit_id": "git-github-automation",
+      "slot_id": "worktree-manager",
+      "manifest_row": "worktrunk",
+      "manifest_state": "definitive",
+      "manifest_pick": [
+        "max-sixty/worktrunk"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "max-sixty/worktrunk",
+      "verdict": "agree"
+    },
+    {
+      "unit_id": "git-github-automation",
+      "slot_id": "review-structural-diff",
+      "manifest_row": "difftastic",
+      "manifest_state": "definitive",
+      "manifest_pick": [
+        "wilfred/difftastic"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "wilfred/difftastic",
+      "verdict": "agree"
+    },
+    {
+      "unit_id": "git-github-automation",
+      "slot_id": "github-side-agent-review",
+      "manifest_row": "claude-code-action",
+      "manifest_state": "resolved",
+      "manifest_pick": [
+        "NONE"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "anthropics/claude-code-action",
+      "verdict": "contest"
+    },
+    {
+      "unit_id": "git-github-automation",
+      "slot_id": "agent-structural-diff",
+      "manifest_row": "agent-structural-diff",
+      "manifest_state": "resolved",
+      "manifest_pick": [
+        "NONE"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "ataraxy-labs/sem",
+      "verdict": "contest"
+    },
+    {
+      "unit_id": "hosting-services",
+      "slot_id": "multi-service-definition",
+      "manifest_row": "docker-compose",
+      "manifest_state": "definitive",
+      "manifest_pick": [
+        "docker/compose"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "docker/compose",
+      "verdict": "agree"
+    },
+    {
+      "unit_id": "instructions-skills",
+      "slot_id": "task-scoped-skill-pack",
+      "manifest_row": "trail-of-bits-security-skills-trailofbits-skills",
+      "manifest_state": "definitive",
+      "manifest_pick": [
+        "trailofbits/skills"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "trailofbits/skills",
+      "verdict": "agree"
+    },
+    {
+      "unit_id": "isolation",
+      "slot_id": "enforced-command-boundary",
+      "manifest_row": "sandbox-runtime-srt",
+      "manifest_state": "definitive",
+      "manifest_pick": [
+        "anthropics/sandbox-runtime"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "anthropics/sandbox-runtime",
+      "verdict": "agree"
+    },
+    {
+      "unit_id": "observation-inference",
+      "slot_id": "telemetry-ingest",
+      "manifest_row": "otel-collector-contrib",
+      "manifest_state": "definitive",
+      "manifest_pick": [
+        "open-telemetry/opentelemetry-collector-contrib"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "open-telemetry/opentelemetry-collector-contrib",
+      "verdict": "agree"
+    },
+    {
+      "unit_id": "observation-inference",
+      "slot_id": "metrics-store",
+      "manifest_row": "prometheus",
+      "manifest_state": "resolved",
+      "manifest_pick": [
+        "prometheus/prometheus"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "prometheus/prometheus",
+      "verdict": "agree"
+    },
+    {
+      "unit_id": "observation-inference",
+      "slot_id": "events-store",
+      "manifest_row": "loki",
+      "manifest_state": "split",
+      "manifest_pick": [
+        "NONE"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "grafana/loki",
+      "verdict": "nominates",
+      "manifest_measurement": {
+        "returned": false,
+        "receipts": []
+      }
+    },
+    {
+      "unit_id": "observation-inference",
+      "slot_id": "dashboards",
+      "manifest_row": "grafana",
+      "manifest_state": "split",
+      "manifest_pick": [
+        "NONE"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "grafana/grafana",
+      "verdict": "nominates",
+      "manifest_measurement": {
+        "returned": false,
+        "receipts": []
+      }
+    },
+    {
+      "unit_id": "observation-inference",
+      "slot_id": "route-qualification",
+      "manifest_row": "phoenix",
+      "manifest_state": "resolved",
+      "manifest_pick": [
+        "NONE"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "arize-ai/phoenix",
+      "verdict": "contest"
+    },
+    {
+      "unit_id": "observation-inference",
+      "slot_id": "local-model-server",
+      "manifest_row": "local-model-server",
+      "manifest_state": "measurement",
+      "manifest_pick": [
+        "ollama/ollama"
+      ],
+      "round_status": "measurement",
+      "round_basis": "unsettled after adjudication",
+      "verdict": "not_settled",
+      "finalists": [
+        "ollama/ollama",
+        "NONE"
+      ],
+      "settling_measurement": null
+    },
+    {
+      "unit_id": "quality-evaluation",
+      "slot_id": "labeled-evaluation",
+      "manifest_row": "inspect-ai",
+      "manifest_state": "definitive",
+      "manifest_pick": [
+        "ukgovernmentbeis/inspect_ai"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "ukgovernmentbeis/inspect_ai",
+      "verdict": "agree"
+    },
+    {
+      "unit_id": "quality-evaluation",
+      "slot_id": "containerized-agent-e2e",
+      "manifest_row": "harbor-containerized-agent-e2e-runner",
+      "manifest_state": "definitive",
+      "manifest_pick": [
+        "harbor-framework/harbor"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "harbor-framework/harbor",
+      "verdict": "agree"
+    },
+    {
+      "unit_id": "quality-evaluation",
+      "slot_id": "ci-regression-gate",
+      "manifest_row": "promptfoo",
+      "manifest_state": "resolved",
+      "manifest_pick": [
+        "NONE"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "promptfoo/promptfoo",
+      "verdict": "contest"
+    },
+    {
+      "unit_id": "recovery-portability",
+      "slot_id": "toolchain-reproduction",
+      "manifest_row": "mise",
+      "manifest_state": "definitive",
+      "manifest_pick": [
+        "jdx/mise"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "jdx/mise",
+      "verdict": "agree"
+    },
+    {
+      "unit_id": "recovery-portability",
+      "slot_id": "state-backup",
+      "manifest_row": "restic",
+      "manifest_state": "definitive",
+      "manifest_pick": [
+        "restic/restic"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "restic/restic",
+      "verdict": "agree"
+    },
+    {
+      "unit_id": "recovery-portability",
+      "slot_id": "dotfiles-reproduction",
+      "manifest_row": "chezmoi",
+      "manifest_state": "resolved",
+      "manifest_pick": [
+        "NONE"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "twpayne/chezmoi",
+      "verdict": "contest"
+    },
+    {
+      "unit_id": "scheduling-supervision",
+      "slot_id": "workflow-engine",
+      "manifest_row": "dagu",
+      "manifest_state": "definitive",
+      "manifest_pick": [
+        "dagucloud/dagu"
+      ],
+      "round_status": "measurement",
+      "round_basis": "unsettled after adjudication",
+      "verdict": "not_settled",
+      "finalists": [
+        "prefecthq/prefect",
+        "dagucloud/dagu"
+      ],
+      "settling_measurement": null
+    },
+    {
+      "unit_id": "secrets-credentials",
+      "slot_id": "secret-scanner",
+      "manifest_row": "betterleaks",
+      "manifest_state": "definitive",
+      "manifest_pick": [
+        "betterleaks/betterleaks"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "betterleaks/betterleaks",
+      "verdict": "agree"
+    },
+    {
+      "unit_id": "secrets-credentials",
+      "slot_id": "credential-verification",
+      "manifest_row": "trufflehog",
+      "manifest_state": "resolved",
+      "manifest_pick": [
+        "NONE"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "trufflesecurity/trufflehog",
+      "verdict": "contest"
+    },
+    {
+      "unit_id": "semantic-rag",
+      "slot_id": "semantic-code-search",
+      "manifest_row": "code-search",
+      "manifest_state": "split",
+      "manifest_pick": [
+        "NONE"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "giancarloerra/socraticode",
+      "verdict": "nominates",
+      "manifest_measurement": {
+        "returned": false,
+        "receipts": []
+      }
+    },
+    {
+      "unit_id": "token-efficiency",
+      "slot_id": "usage-meter",
+      "manifest_row": "ccusage",
+      "manifest_state": "resolved",
+      "manifest_pick": [
+        "NONE"
+      ],
+      "round_status": "measurement",
+      "round_basis": "unsettled after adjudication",
+      "verdict": "not_settled",
+      "finalists": [
+        "lockedinlabs-ai/agent-console",
+        "ccusage/ccusage"
+      ],
+      "settling_measurement": "Run one paired full-log reconciliation benchmark on WSL2 Ubuntu x86_64 using F06 v0.4.1 and F07 v20.0.26 against the same frozen Claude Code and Codex corpus. Include completed tasks, logged failures and retries, streamed revisions, copied and archived sessions, forks, Claude advisor iterations, Codex per-response-only compaction, last_token_usage-only records and missing cache fields. Independently annotate unique provider responses, all four token classes, recoverable aggregate totals and genuinely unavailable fields; preserve the original logs and exclude artifact-size estimates. Compare F06 through its normal store and authenticated /api/console endpoint, not --summary, with F07\u2019s agent-specific --json --offline reports. Use identical UTC windows and sufficient retention, wait for ingestion to finish, and isolate each agent\u2019s corpus where necessary. Measure incorrectly reported or omitted known tokens by agent and class, plus false claims that unavailable quantities are known. Apply the same reconciliation rule to both; neither challenger nor incumbent must be flawless."
+    },
+    {
+      "unit_id": "web-research",
+      "slot_id": "page-text-extraction",
+      "manifest_row": "trafilatura",
+      "manifest_state": "resolved",
+      "manifest_pick": [
+        "NONE"
+      ],
+      "round_status": "measurement",
+      "round_basis": "unsettled after adjudication",
+      "verdict": "not_settled",
+      "finalists": [
+        "adbar/trafilatura",
+        "NONE"
+      ],
+      "settling_measurement": null
+    },
+    {
+      "unit_id": "web-research",
+      "slot_id": "browser-interaction",
+      "manifest_row": "playwright-cli",
+      "manifest_state": "split",
+      "manifest_pick": [
+        "NONE"
+      ],
+      "round_status": "definitive",
+      "round_basis": "both families",
+      "round_pick": "vercel-labs/agent-browser",
+      "verdict": "nominates",
+      "manifest_measurement": {
+        "returned": false,
+        "receipts": []
+      }
+    }
+  ],
+  "not_covered": [
+    {
+      "layer_id": "workers",
+      "slot_id": "agent-messaging",
+      "state": "split",
+      "default": "Not installed until the deciding measurement returns"
+    },
+    {
+      "layer_id": "observation-inference",
+      "slot_id": "alerting",
+      "state": "resolved",
+      "default": "Alertmanager"
+    },
+    {
+      "layer_id": "agent-sdks",
+      "slot_id": "claude-agent-sdk",
+      "state": "definitive",
+      "default": "Claude Agent SDK"
+    },
+    {
+      "layer_id": "native-clients",
+      "slot_id": "claude-code",
+      "state": "definitive",
+      "default": "Claude Code"
+    },
+    {
+      "layer_id": "native-clients",
+      "slot_id": "codex",
+      "state": "definitive",
+      "default": "Codex"
+    },
+    {
+      "layer_id": "agent-sdks",
+      "slot_id": "codex-sdk-and-codex-exec-app-server",
+      "state": "definitive",
+      "default": "Codex SDK and codex exec/app-server"
+    },
+    {
+      "layer_id": "hosting-services",
+      "slot_id": "container-engine",
+      "state": "definitive",
+      "default": "Docker Engine / Moby"
+    },
+    {
+      "layer_id": "token-efficiency",
+      "slot_id": "context-supply",
+      "state": "definitive",
+      "default": "No context-supply layer: the usage meter only"
+    },
+    {
+      "layer_id": "cross:convergence-practice",
+      "slot_id": "convergence-validators",
+      "state": "pinned",
+      "default": "Convergence practice and its validators"
+    },
+    {
+      "layer_id": "cross:credential-practice",
+      "slot_id": "credential-guard",
+      "state": "pinned",
+      "default": "Command and secret-path guard (K4)"
+    },
+    {
+      "layer_id": "semantic-rag",
+      "slot_id": "embedding-model",
+      "state": "split",
+      "default": "Not installed until the deciding measurement returns"
+    },
+    {
+      "layer_id": "instructions-skills",
+      "slot_id": "engineering-process-skills",
+      "state": "resolved",
+      "default": "mattpocock/skills (selected skills, not the bundle)"
+    },
+    {
+      "layer_id": "hosting-services",
+      "slot_id": "gpu-container-runtime",
+      "state": "resolved",
+      "default": "Not installed: no settled owner runs GPU work in a container (the model server and the document parser install natively); NVIDIA Container Toolkit, picked by both blind GPT orders, passes every gate and becomes the default the moment one does"
+    },
+    {
+      "layer_id": "isolation",
+      "slot_id": "isolation-container-boundary",
+      "state": "definitive",
+      "default": "No additional component: rootless containers on the container engine that the hosting layer installs"
+    },
+    {
+      "layer_id": "observation-inference",
+      "slot_id": "local-generation-model",
+      "state": "split",
+      "default": "Not installed until the deciding measurement returns"
+    },
+    {
+      "layer_id": "mcp-surfaces",
+      "slot_id": "mcp-inspector",
+      "state": "definitive",
+      "default": "MCP Inspector"
+    },
+    {
+      "layer_id": "mcp-surfaces",
+      "slot_id": "mcporter",
+      "state": "definitive",
+      "default": "mcporter"
+    },
+    {
+      "layer_id": "semantic-rag",
+      "slot_id": "reranker-model",
+      "state": "resolved",
+      "default": "Not installed: no installed retrieval owner can call an external reranker: QMD reranks in-process with its bundled model, the research harness exposes no reranker setting and the model server has no rerank endpoint; both blind GPT orders picked BGE rerankers and NeMo Retriever"
+    },
+    {
+      "layer_id": "observation-inference",
+      "slot_id": "session-analytics",
+      "state": "resolved",
+      "default": "Not installed: both agents write full local transcripts, have session pickers and usage commands and export per-session telemetry; agentsview (picked by both blind GPT orders) is the named challenger, decided by a measurement on a fixed question set"
+    },
+    {
+      "layer_id": "code-navigation",
+      "slot_id": "structural-search",
+      "state": "resolved",
+      "default": "ast-grep"
+    },
+    {
+      "layer_id": "web-research",
+      "slot_id": "web-search-provider",
+      "state": "resolved",
+      "default": "Not installed: both research harnesses ship a keyless search provider as a declared dependency; SearXNG (picked by both blind GPT orders with two MCP bridges) is the named challenger, decided by a measurement on 30 frozen queries"
+    }
+  ]
+}

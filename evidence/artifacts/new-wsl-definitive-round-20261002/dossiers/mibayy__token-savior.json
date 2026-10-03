@@ -1,0 +1,349 @@
+{
+  "contender": "mibayy/token-savior",
+  "revision": {
+    "contender": "mibayy/token-savior",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "mibayy/token-savior",
+        "tag": "v4.21.0",
+        "commit": "1e5984b452c5b98e6376a7250b3213f5c3500626",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v4.21.0",
+    "commit": "1e5984b452c5b98e6376a7250b3213f5c3500626",
+    "read_at": "2026-10-02T03:02:23+00:00"
+  },
+  "dossier": {
+    "contender": "mibayy/token-savior",
+    "revision": {
+      "tag": "v4.21.0",
+      "commit": "1e5984b452c5b98e6376a7250b3213f5c3500626",
+      "read_at": "2026-10-02T03:02:23+00:00"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Python MCP server (stdio) plus a `ts` CLI/daemon. It builds an in-memory structural index of local project roots (symbols, imports, a name-based dependency graph) and serves it through 69 MCP tools: symbol lookup and source retrieval, dependents/impact, symbol-scoped edits (replace, insert, edit-lines, move, add-field), audits (dead code, breaking changes, config), git/test helpers, and a local SQLite persistent-memory engine. It also ships hook bundles (Claude Code, Codex, Gemini, Cursor, OpenClaw) that compact Bash output. Definitions, references and edits come from its own annotators (Python ast, tree-sitter for Java/Ruby, regex/brace-counting for the other languages). Grep found no language-server client and no post-edit diagnostics feature in the repo.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Headline: 'One MCP server. One profile. 97.9% on tsbench at -80% tokens. Structural code navigation, persistent memory, and Bash output compaction for AI coding agents.'",
+          "citation": "README.md:7-8"
+        },
+        {
+          "claim": "96-task benchmark (Claude Opus 4.7, May 2026): plain Claude Code 141/180 (78.3%), 17,221 active tokens/task, 110.6 s/task vs Token Savior 188/192 (97.9%), 3,395 tokens (-80%), 18.9 s (-83%); reproduces with the 'optimized' profile.",
+          "citation": "README.md:21-29"
+        },
+        {
+          "claim": "Quick start: pip install token-savior-recall[mcp], then add an MCP entry whose command is the venv's token-savior binary with env WORKSPACE_ROOTS, TOKEN_SAVIOR_CLIENT and TOKEN_SAVIOR_PROFILE=optimized.",
+          "citation": "README.md:47-66"
+        },
+        {
+          "claim": "TOKEN_SAVIOR_PROFILE=optimized bundles tiny_plus (15 hot tools), thin inputSchema (-44% manifest), capture sandbox disabled, memory hooks gated for cross-project safety.",
+          "citation": "README.md:68-76"
+        },
+        {
+          "claim": "'It indexes your codebase by symbol -- functions, classes, imports, call graph -- so the model navigates by pointer instead of by cat. Measured reduction: 97% fewer chars injected across 170+ real sessions.'",
+          "citation": "README.md:168-170"
+        },
+        {
+          "claim": "Persistent memory engine: SQLite WAL + FTS5 + vector embeddings, ranked by Bayesian validity and ROI, re-injected as a compact delta at the start of the next session.",
+          "citation": "README.md:172-175"
+        },
+        {
+          "claim": "Profile table: optimized 15 tools (~1.5 KT, recommended), auto adaptive, tiny 6, lean 51, compact-only 1, full 68 (~6 KT).",
+          "citation": "README.md:182-193"
+        },
+        {
+          "claim": "Layers Token Savior owns that adjacent tools do not: the PreToolUse Bash rewriter, structural editing that keeps the index in sync, and the audit tools (detect_breaking_changes, find_dead_code, analyze_config).",
+          "citation": "README.md:211-214"
+        },
+        {
+          "claim": "On overlap with other tools, the README lists serena (symbol-graph navigation) as a direct overlap with find_symbol / get_dependents and advises running Token Savior as compact-only if serena is the navigator; running both is 'usually fine once you disable the half you already have'.",
+          "citation": "README.md:199-207"
+        },
+        {
+          "claim": "Token-savings table: find_symbol('send_message') 41M chars -> 67 chars (-99.9%); get_function_source('compile') 4.5K chars; get_change_impact('LLMClient') 16K chars ('impossible' without it); 96-task tsbench -80% active tokens.",
+          "citation": "README.md:223-229"
+        },
+        {
+          "claim": "`ts init --agent {claude,cursor,gemini,codex,openclaw}` deep-merges hook config (PostToolUse + PreToolUse), is idempotent, prints a diff and backs up settings.json; Bash compaction (34 compactors) and command rewriting (10 rules) are opt-in via TS_BASH_COMPACT=1 / TS_BASH_REWRITE=1.",
+          "citation": "README.md:80-95,144-157"
+        },
+        {
+          "claim": "`ts` CLI serves non-MCP agents (Cursor, Aider, Continue, scripts, CI) with a subset of tools; on Claude Code, prefer the MCP server ('measured cheaper than CLI on Opus 4.7').",
+          "citation": "README.md:298-312"
+        },
+        {
+          "claim": "Suite size: 1898 passed, 2 skipped on main. CI green on Python 3.11 / 3.12 / 3.13.",
+          "citation": "README.md:265-266"
+        },
+        {
+          "claim": "License: MIT.",
+          "citation": "README.md:400-402"
+        }
+      ],
+      "install": [
+        {
+          "method": "pip (PyPI)",
+          "command": "pip install \"token-savior-recall[mcp]\"",
+          "citation": "README.md:48,238"
+        },
+        {
+          "method": "pip with optional hybrid vector search",
+          "command": "pip install \"token-savior-recall[mcp,memory-vector]\"",
+          "citation": "README.md:240"
+        },
+        {
+          "method": "uvx (no venv, no clone)",
+          "command": "uvx token-savior-recall",
+          "citation": "README.md:246"
+        },
+        {
+          "method": "Register the server with Claude Code",
+          "command": "claude mcp add token-savior -- /path/to/venv/bin/token-savior",
+          "citation": "README.md:252"
+        },
+        {
+          "method": "From source (development)",
+          "command": "git clone https://github.com/Mibayy/token-savior && cd token-savior && python3 -m venv .venv && .venv/bin/pip install -e \".[mcp,dev]\"",
+          "citation": "README.md:258-261"
+        },
+        {
+          "method": "From source for agents (llms-install.md)",
+          "command": "git clone https://github.com/Mibayy/token-savior && cd token-savior && python3 -m venv ~/.local/token-savior-venv && ~/.local/token-savior-venv/bin/pip install -e \".[mcp]\"",
+          "citation": "llms-install.md:3-8"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - CI runs lint plus the full pytest suite on ubuntu-latest for Python 3.11/3.12/3.13 (.github/workflows/ci.yml:11-14,80,83). The README itself names no OS, and the workflow does not state the runner architecture.",
+        "wsl2": "unknown - no mention of WSL in the README, docs, CHANGELOG or code (repo-wide grep for 'wsl' returned nothing). It would run as a Linux userland but nothing documents or tests it.",
+        "macos_arm64": "unknown - not documented and not in CI (ci.yml:11). The shell hooks call GNU 'stat -c' with '|| echo 0' fallbacks (hooks/memory-session-start.sh:30,64; hooks/preflight.sh:26). The watcher docstring names FSEvents as a backend (src/token_savior/watcher.py:7), and uv.lock lists macOS arm64 wheels for tree-sitter (uv.lock:1279), but neither is a support statement.",
+        "gpu": "no - not required or used. The only ML component is the optional CPU fastembed/onnxruntime embedding stack (pyproject.toml:48; src/token_savior/memory/embeddings.py:3-7). Repo grep for cuda/gpu found no references."
+      },
+      "integrations": {
+        "cli": "`ts` (token_savior.cli:main, pyproject.toml:51): use, get, search, ctx, structure, files, find-dead-code, breaking, git-status, replace, move, add-field, projects, gain, daemon start/stop/status/warm, init (src/token_savior/cli.py:414-480; README.md:298-309). Also `token-savior-dashboard` (pyproject.toml:53). By code reading, `ts move` sends arguments the MCP tool rejects (cli.py:591 vs tool_schemas.py:179-184).",
+        "mcp": "Yes - stdio MCP server `token-savior` built on the python `mcp` SDK (pyproject.toml:52; src/token_savior/server.py:1380-1446). It exposes 69 tools (tests/test_tool_schemas.py:87) filtered by TOKEN_SAVIOR_PROFILE (server.py:431-452), ships readOnly/destructive/idempotent hints (src/token_savior/tool_annotations.py:24-114) and serves memory observations as ts://obs/{id} resources (server.py:1415-1431).",
+        "sdk_or_api": "none documented. Internal only: a Unix-socket JSON daemon for the CLI (cli.py:96-117,247-336), a local HTTP dashboard (dashboard.py:15-16,978), an optional 127.0.0.1 memory viewer (memory/viewer.py:90), and docs/mcp_toolset.example.json for Anthropic API mcp_toolset use.",
+        "claude_code_or_codex": "Claude Code: MCP JSON config (README.md:51-66), `claude mcp add` (README.md:252), `ts init --agent claude` merges four hook bundles (tool-capture, bash-rewriter, memory engine, discipline guard) into ~/.claude/settings.json (README.md:89-95; src/token_savior/cli_init/agent_paths.py:148-154), and CLAUDE.md carries tool-routing rules (CLAUDE.md:21-38). Codex: `ts init --agent codex` writes ~/.codex/hooks.json from tool-capture-codex.json, memory-codex.json and discipline-guard-codex.json (agent_paths.py:49-52,157-158); AGENTS.md exists (AGENTS.md:1-8); llms-install.md shows a `.mcp.json` sample with TOKEN_SAVIOR_CLIENT=codex (llms-install.md:12-28). The README gives no Codex MCP registration snippet. No Claude Code plugin/marketplace manifest and no language-server (LSP) integration were found."
+      },
+      "telemetry_and_network": "No phone-home and no account requirement found. Telemetry is local: per-tool call counters in ~/.local/share/token-savior, overridable via TOKEN_SAVIOR_STATS_DIR (src/token_savior/telemetry.py:1-35,63; server.py:633-645). A local SQLite memory DB (db_core.py:22-44), once the memory hooks are installed, stores observations, user prompts (prompt_archive defaults to True; hooks/memory-userprompt.sh:218-271; memory_schema.sql:235) and sandboxed tool outputs (memory_schema.sql:321). `ts_discover` reads local ~/.claude/projects/*.jsonl transcripts (discover/transcript_scanner.py:47-54,166-172). Outbound network exists only in opt-in paths: the Anthropic Messages API when TS_AUTO_EXTRACT=1 and TS_API_KEY are set (memory/auto_extract.py:18-21,84-105; README.md:375); the Telegram Bot API when TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID are set (memory/notifications.py:15-61; README.md:378); and a first-use download of the nomic-embed-text-v1.5-Q model by fastembed for the optional memory-vector extra (memory/embeddings.py:31,57-74; ci.yml:45-46 says about 130 MB). ts_search falls back to substring scoring without it (server_handlers/tool_search.py:196-203,252-269). Local-only HTTP: the dashboard on 127.0.0.1:8921 (dashboard.py:15-16,978) and the optional viewer when TS_VIEWER_PORT is set (memory/viewer.py:90); their HTML pulls Google Fonts and unpkg htmx in the browser (dashboard.py:380-382; viewer.py:176). tool_annotations.py:85-88 declares that no tool reaches the network. The CLI daemon socket is chmod 0600 under a per-user path (cli.py:52-66,268-276)."
+    },
+    "code": {
+      "languages": [
+        "Python (src/token_savior, about 44k non-blank lines in 166 files)",
+        "Bash (hooks/*.sh)",
+        "JavaScript (Node worker src/token_savior/code_mode/worker.mjs)",
+        "JSON (hook bundles) and HTML (docs/index.html site)"
+      ],
+      "entry_points": [
+        {
+          "path": "src/token_savior/server.py:1380-1446",
+          "what": "MCP stdio server: main()/main_sync(); console script `token-savior` (pyproject.toml:52); also runnable as `python -m token_savior.server`."
+        },
+        {
+          "path": "src/token_savior/cli.py:401-605",
+          "what": "`ts` CLI (pyproject.toml:51): project, read, search, edit, daemon (`_daemon-serve` Unix-socket loop) and gain subcommands; routes `ts init` to cli_init."
+        },
+        {
+          "path": "src/token_savior/cli_init/__init__.py:233-386",
+          "what": "`ts init --agent {claude,cursor,gemini,codex,openclaw}`: merges the bundled hooks/*.json into the agent's settings file with diff, backup and dedup."
+        },
+        {
+          "path": "src/token_savior/dashboard.py:15-16,978",
+          "what": "`token-savior-dashboard` local HTTP stats dashboard (127.0.0.1:8921 by default)."
+        },
+        {
+          "path": "hooks/",
+          "what": "Hook scripts installed by `ts init`: memory-*.sh (session start/stop, user prompt, pre/post tool, precompact), tool_capture_hook.py, bash_rewriter_hook.py, ts_discipline_guard.py, rules-enforce.sh, preflight.sh, plus an OpenClaw pack in hooks/openclaw/."
+        },
+        {
+          "path": "src/token_savior/code_mode/worker.mjs",
+          "what": "Node worker that runs `ts_execute` scripts in a vm context and proxies tool calls back to Python."
+        },
+        {
+          "path": "benchmarks/run_benchmarks.py",
+          "what": "`token-savior-bench` console script (pyproject.toml:54); the wheel's packages list covers only src/token_savior (pyproject.toml:60-61)."
+        },
+        {
+          "path": "bin/ts",
+          "what": "Legacy source-checkout copy of the CLI, not packaged; still binds /tmp/ts.sock (bin/ts:51,231)."
+        }
+      ],
+      "architecture": "Python package src/token_savior. Server: server.py builds the manifest from tool_schemas.py (69 tools), filters it by TOKEN_SAVIOR_PROFILE (server.py:431-452) and dispatches through four handler tables in server_handlers/ (META, MEMORY, SLOT, QFN; server_handlers/__init__.py:60-93), one call at a time under a global lock in a worker thread (server.py:1284-1333). Index: project_indexer.py walks files (defaults: 500 KB per file, 10,000 files, .gitignore plus vendor/build excludes; :201-244). annotator.py picks a per-language annotator by extension (python_annotator.py = ast; java_annotator.py and ruby_annotator.py = tree-sitter; typescript_, go_, rust_, csharp_, c_, php_, shell_annotator.py = regex plus brace_matcher.py; json/yaml/toml/ini/xml/hcl/dockerfile/prisma/gradle/env/conf/text annotators; generic_annotator.py = line-only fallback; annotator.py:28-137). It then builds a symbol table (first-found wins on duplicate names), an import graph and a name-based global/reverse dependency graph (project_indexer.py:717-747,1155-1307). query_api.py (3,154 lines) answers find_symbol, get_*_source, get_dependents, get_change_impact, get_full_context and search_codebase from that in-memory index. slot_manager.py keeps one index per root, refreshed by a watchfiles watcher or mtime polling (watcher.py), with a JSON cache `.token-savior-cache.json` in the project root (cache_ops.py:43). Edits: edit_ops.py plus server_handlers/edit.py splice by indexed line range and re-index the file; edit_verifier.py and workflow_ops.py (static EditSafety certificate, edit-then-run-impacted-tests) remain in the tree but are not registered as MCP tools (tests/test_tool_schemas.py:68-74). Other modules: memory/, memory_db.py and db_core.py (SQLite WAL + FTS5, optional sqlite-vec/fastembed), compactors/ and bash_rewriter/ (Bash output and command hooks), cli_init/ (hook installer), code_mode/ (Node vm worker), impacted_tests.py, breaking_changes.py, dead_code.py, config_analyzer.py (audits). Each MCP client spawns its own server process with its own in-memory index; edit handlers re-index the target file before writing to catch external changes (server_handlers/edit.py:16-43). No language-server client module exists.",
+      "packaging_and_release": "Build backend hatchling (pyproject.toml:1-3). PyPI distribution name is token-savior-recall. The wheel packages only src/token_savior and force-includes hooks/ as token_savior/hooks (pyproject.toml:60-67). Release flow: when a GitHub Release is published, .github/workflows/publish.yml builds sdist and wheel with `python -m build` (:24-25), uploads dist/* to the release with `gh release upload` (:27-30) and uploads to PyPI with twine using a PYPI_API_TOKEN secret (:32-36). No checksum, signature, SLSA/Sigstore attestation, SBOM or trusted-publishing (OIDC) step appears in any workflow, and actions are pinned to major tags rather than SHAs. server.json (MCP registry manifest) still reports 4.19.0 (server.json:9,14) while pyproject.toml:7 says 4.21.0. CHANGELOG says 4.19.1 to 4.19.3 were yanked (CHANGELOG.md:63-65). The v4.21.0 entry is dated 2026-07-28 (CHANGELOG.md:3). A Pages workflow publishes docs/ (pages.yml).",
+      "tests_and_ci": "pytest>=8,<9 (pyproject.toml:46,69-74); 180 test files (168 tests/test_*.py plus 12 tests/maison/test_*.py), with 2,358 `def test_` functions by grep (parametrization adds more). tests/maison/ exercises every tool, and a coverage test fails if a tool in TOOL_SCHEMAS is never exercised (CHANGELOG.md:132-136). CHANGELOG cites 2,728 tests (CHANGELOG.md:138) and a ci.yml comment cites 2,822 passed / 5 skipped with the memory-vector extra (ci.yml:36-37). CI (.github/workflows/ci.yml): ubuntu-latest only, Python 3.11/3.12/3.13, `pip install -e .[dev,mcp,memory-vector]`, cached and pre-warmed fastembed model, `ruff check .` (ruff pinned to 0.16.0), `pytest tests/ -v`. benchmark.yml runs benchmarks/run_benchmarks.py on release or dispatch and uploads results. retrieval-benches.yml runs tests/benchmarks/{code,library}_retrieval when memory/query/library paths change and gates them with scripts/check_bench_gates.py. pages.yml runs scripts/site_sync.py --check, then deploys Pages. No macOS or Windows job. mypy strict is configured (pyproject.toml:105-107) but is neither in the dev extra nor run in CI.",
+      "dependencies": "pyproject.toml is the only manifest. It has 6 direct runtime dependencies: mcp>=1.25,<2; PyYAML>=6,<7; tree-sitter>=0.25,<0.26; tree-sitter-java>=0.23,<0.24; tree-sitter-ruby>=0.23,<0.24; watchfiles>=0.20,<2 (pyproject.toml:27-34). Extras: mcp (1, redundant), dev (3: build, pytest, ruff==0.16.0), benchmark (1: aiohttp), memory-vector (3: sqlite-vec, fastembed, onnxruntime) (pyproject.toml:36-48). Node.js is an undeclared optional runtime need for ts_execute (TS_CODE_MODE_NODE; code_mode/sandbox.py:29). uv.lock exists (50 packages) but is stale: it records token-savior-recall 2.0.0 and omits mcp, watchfiles and tree-sitter-ruby from the base dependencies (uv.lock:1237-1244).",
+      "security_policy": "none - no SECURITY.md or other security policy file, and .github/ contains only workflows. CHANGELOG v4.10.0 states that main's history was rewritten to purge a leaked credential (CHANGELOG.md:671-675)."
+    },
+    "claim_checks": [
+      {
+        "claim": "It indexes your codebase by symbol -- functions, classes, imports, call graph -- so the model navigates by pointer (README.md:168-170).",
+        "verified": "partial",
+        "evidence": "Index and symbol tools exist (src/token_savior/annotator.py:28-97, project_indexer.py:717-747, query_api.py:1281-1323). It is a home-built index, not language-server data. Python uses stdlib ast and a name-only graph that records Name ids and the root of attribute chains (python_annotator.py:182-221). Java/Ruby use tree-sitter. TS/JS, Go, Rust, C#, C, PHP and shell use regex plus brace counting (typescript_annotator.py:1-8 says 'This is NOT a full TypeScript parser'; utils/dependency_graph.py:1-10). Cross-file edges come from word-boundary regex over bodies for imported names (project_indexer.py:1218-1287). get_dependents returns dependent symbols (definition file/line), not call-site positions, and a method query is widened to its class and sibling methods (query_api.py:1452-1486,3331-3344). Duplicate names resolve first-found-wins (project_indexer.py:721)."
+      },
+      {
+        "claim": "Needs-driven check (the README makes no such claim): symbol definitions, references, edits or post-edit diagnostics are backed by language servers.",
+        "verified": "no",
+        "evidence": "Repo-wide searches for language server / LSP / pyright / pylsp / tsserver / gopls / clangd / jedi / textDocument / publishDiagnostics found nothing (the only 'pyright' hit is the word 'Copyright' in LICENSE:3,12,18). No LSP library is in pyproject.toml:27-48. The only 'diagnostics' code is a Biome output compactor (compactors/biome.py:1). Post-edit feedback is limited to an '[EDIT IMPACT]' note listing callers and impacted tests (server.py:813-864,1078-1082); the EditSafety / edit-then-test workflow in workflow_ops.py has no MCP tool (tests/test_tool_schemas.py:68-74)."
+      },
+      {
+        "claim": "Structural editing that keeps the index in sync (README.md:211-214; server.py:33-35).",
+        "verified": "yes",
+        "evidence": "Edit handlers re-index the target file before editing (server_handlers/edit.py:16-43) and after a successful write (edit.py:46-130). edit_ops.py splices by indexed line range with a root-containment check (edit_ops.py:11-63,130-214,217-248,344-380,436-565). replace_symbol_source keeps decorators/attributes (edit_ops.py:45-47,66-110). Caveats: move_symbol rewrites imports by regex only for .py/.ts/.tsx/.js/.jsx (edit_ops.py:568-649); add_field_to_model supports only .prisma/.py/.ts/.tsx (edit_ops.py:390-404); no rename tool is exposed (tests/test_tool_schemas.py:68-74)."
+      },
+      {
+        "claim": "TOKEN_SAVIOR_PROFILE=optimized exposes 15 hot tools, with the rest hidden behind ts_search; it bundles capture sandbox disabled and memory hooks gated (README.md:68-76,184-186; CLAUDE.md:15-19).",
+        "verified": "partial",
+        "evidence": "The 15-tool set is confirmed (server.py:337-361,445). The hidden tools are not discoverable through ts_search: _handle_ts_search scores only the advertised TOOLS (server.py:1160-1168; server_handlers/tool_search.py:255), and hidden tools run only if called by exact name (server.py:235-238). Not advertised under optimized: get_dependents, get_dependencies, get_change_impact, get_edit_context, get_class_source, insert_near_symbol, edit_lines_in_symbol, move_symbol; CLAUDE.md still routes to insert_near_symbol, move_symbol and find_import_cycles (CLAUDE.md:30-33). The code does not set TS_CAPTURE_DISABLED or TS_MEMORY_DISABLE for optimized (server.py:441-445,484-506), which matches README.md:332 but not the bundle bullets at README.md:68-74."
+      },
+      {
+        "claim": "Navigation returns the symbol's source directly ('get_function_source(\"compile\") ... 4.5K chars ... direct', README.md:226) - 'exact source' retrieval.",
+        "verified": "partial",
+        "evidence": "Level 0 returns the full body (query_api.py:1164-1182). But when `level` is omitted, the handlers pick a level from a Thompson-sampling bandit persisted in the memory DB (server_handlers/code_nav.py:361-368; memory/lattice.py:71-109; it returns 0 only while all priors are untouched or on error), so signature, summary or name-only views (query_api.py:1217-1246) can be returned. Repeat reads of an unchanged symbol can return an 'unchanged' stub (code_nav.py:160-275). Classes over 300 lines default to a level-2 summary (query_api.py:1198-1210). get_full_context defaults to mode=compact: 80-line source head and dependents as names only (tool_schemas.py:463-467; code_nav.py:633-655). Passing level=0, force_full or mode=full returns the raw text."
+      },
+      {
+        "claim": "Benchmark table: plain 141/180 (78.3%), 17,221 tokens, 110.6 s vs with Token Savior 188/192 (97.9%), 3,395 tokens, 18.9 s (README.md:21-29).",
+        "verified": "partial",
+        "evidence": "The plain-arm numbers equal the 90-task April run in docs/matrix.json (opus-base: 141/180, mean active 17,221.3, wall 9,954.2 s over 90 tasks = 110.6 s; matrix.json:4811-4819,5277-5279). The with-TS arm (188/192, 3,395 tokens, 18.9 s) comes from a later 96-task run in the external tsbench repo (README.md:16-17), not in this checkout, so the two columns use different task counts (180 vs 192 max points) and the TS arm cannot be checked here. The same April matrix reports the TS arm at 180/180 with 803,531 active tokens (about 8,928 per task; matrix.json:5271-5280)."
+      },
+      {
+        "claim": "Inventories: 34 compactors, 10 rewrite rules, 68 tools in the full profile, 1898 passing tests (README.md:86,106,191,265).",
+        "verified": "no",
+        "evidence": "The compactor registry has 42 entries (compactors/__init__.py:62-118), and the README's own catalog table lists 42. TOOL_SCHEMAS has 69 entries (tests/test_tool_schemas.py:87; CHANGELOG.md:7-8; llms-install.md:14) vs 68 in the README. The suite is 180 test files with at least 2,358 test functions, and CHANGELOG.md:138 cites 2,728 tests vs the README's 1898. The 10 rewrite rules are correct (bash_rewriter/rules.py:277-333)."
+      },
+      {
+        "claim": "`ts init` deep-merges the Token Savior hook config (PostToolUse + PreToolUse), preserves existing hooks, prints a diff and backs up settings.json (README.md:154-157).",
+        "verified": "partial",
+        "evidence": "Diff, UTC-stamped backup and idempotence are confirmed (cli_init/__init__.py:86-90,305-309,339-369). But for Claude the merge covers four bundles (agent_paths.py:148-154): tool-capture (PostToolUse), bash-rewriter (PreToolUse), the memory engine (SessionStart, UserPromptSubmit, PreToolUse, PostToolUse, PreCompact, Stop, SessionEnd; hooks/memory-hooks-config.json:5-85) and the discipline guard (PreToolUse; inert unless TS_DISCIPLINE_GUARD=1; hooks/ts_discipline_guard.py:41-43,325-328). Bash compaction and rewriting stay off unless TS_BASH_COMPACT=1 / TS_BASH_REWRITE=1 (hooks/bash_rewriter_hook.py:67-69)."
+      },
+      {
+        "claim": "uvx token-savior-recall runs the server with no venv and no clone (README.md:243-247).",
+        "verified": "partial",
+        "evidence": "Not executed. pyproject console scripts are ts, token-savior, token-savior-dashboard and token-savior-bench (pyproject.toml:50-54); none is named token-savior-recall, the executable name uvx looks for by default (uv behaviour, not verified here). The documented one-liner may need `--from token-savior-recall token-savior`."
+      },
+      {
+        "claim": "The `ts` CLI exposes a subset of tools via shell, daemon socket default /tmp/ts.sock (README.md:298-309,339).",
+        "verified": "partial",
+        "evidence": "Subcommands exist (cli.py:414-480). By code reading (not executed), `ts move` sends symbol_name/destination_file (cli.py:591), but move_symbol requires symbol/target_file (tool_schemas.py:173-185; server_handlers/edit.py:112-113) and has no alias entry (server.py:937-952), so it returns a 'requires' error. The packaged CLI's socket default is $XDG_RUNTIME_DIR/ts.sock or ~/.config/ts/ts.sock (cli.py:52-66), not /tmp/ts.sock; only the legacy bin/ts still uses /tmp/ts.sock (bin/ts:51)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "tsbench: 96 coding tasks, Claude Opus 4.7, plain Claude Code vs Token Savior ('optimized' profile) - accuracy",
+        "metric": "score / max points",
+        "value": "plain 141/180 (78.3%) vs with Token Savior 188/192 (97.9%); site adds '96 tasks (90 paired), 25 wins, 65 ties, 0 losses'",
+        "source": "README.md:21-29; docs/index.html:7,398",
+        "independent": false
+      },
+      {
+        "what": "Same tsbench run - cost per task",
+        "metric": "active tokens per task; wall seconds per task",
+        "value": "17,221 -> 3,395 (-80%); 110.6 s -> 18.9 s (-83%)",
+        "source": "README.md:25-28",
+        "independent": false
+      },
+      {
+        "what": "tsbench 90-task paired matrix generated 2026-04-21 (Opus 4.7 and Sonnet 4.6), plain vs Token Savior",
+        "metric": "score, total active tokens, total wall seconds",
+        "value": "Opus: 141/180 -> 180/180; active tokens 1,549,915 -> 803,531 (-48.2%); wall 9,954.2 s -> 2,103.9 s (-78.9%). Sonnet: 158/180 -> 180/180; active 1,378,925 -> 770,672 (-44.1%); wall 4,167.1 s -> 2,724.3 s (-34.6%)",
+        "source": "docs/matrix.json:2-3,5260-5308",
+        "independent": false
+      },
+      {
+        "what": "tsbench-90 profile comparison (Opus 4.7, Claude Code 2.1.119), v2.9.0 release notes",
+        "metric": "score and mean active tokens per profile",
+        "value": "tiny (6 tools) 91.7% / 3,805; tiny_plus (10 tools at that time) 97.2% / 6,550; ultra 98.3% / 10,260; lean 99.4% / 11,302",
+        "source": "CHANGELOG.md:1160-1167",
+        "independent": false
+      },
+      {
+        "what": "README per-operation and per-session character savings (self-reported; raw data not in the repo)",
+        "metric": "characters returned vs plain read; chars injected across sessions",
+        "value": "find_symbol('send_message') 41M chars -> 67 chars (-99.9%); get_function_source('compile') 4.5K chars; get_change_impact('LLMClient') 16K chars; '97% fewer chars injected across 170+ real sessions'",
+        "source": "README.md:168-170,223-227",
+        "independent": false
+      },
+      {
+        "what": "In-repo code-retrieval bench: 30 handcrafted queries over this repo's own src (1,054 symbols), keyword vs semantic search_codebase",
+        "metric": "MRR@10 / Recall@3 / Recall@10",
+        "value": "2026-05-17 00:12 run: keyword 0.3811 / 0.5 / 0.5333, semantic 0.7081 / 0.7667 / 0.8667. 2026-05-17 00:25 run: semantic 0.4759 / 0.5333 / 0.7333. The CI gate requires semantic MRR@10 >= 0.65, R@3 >= 0.70, R@10 >= 0.80",
+        "source": "tests/benchmarks/code_retrieval/results/20260517-001256.md:12-13; tests/benchmarks/code_retrieval/results/20260517-002528.md:12-13; scripts/check_bench_gates.py:29-32",
+        "independent": false
+      },
+      {
+        "what": "In-repo library-retrieval bench: 15 queries over json/pathlib/re via library_api.py (its MCP tools were removed from TOOL_SCHEMAS)",
+        "metric": "MRR@10 / Recall@3 / Recall@10 (cold pass)",
+        "value": "0.8444 / 0.9667 / 1.0",
+        "source": "tests/benchmarks/library_retrieval/results/20260423-095736.md:10; tests/test_tool_schemas.py:68-74",
+        "independent": false
+      },
+      {
+        "what": "Tool-output compaction (outside code navigation): capture-sandbox scenarios and a 7-day Bash bench",
+        "metric": "bytes or tokens saved",
+        "value": "benchmarks/tool_capture_results.json: 228,815 raw bytes -> 9,480 agent bytes (95.9%); README: about 30K -> 9.6K tokens/week (about 20.4K/week saved)",
+        "source": "benchmarks/tool_capture_results.json:74-76; README.md:229",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Not language-server based: definitions, references and edits rest on a heuristic index. TS/JS, Go, Rust, C#, C, PHP and shell are regex plus brace counting (src/token_savior/typescript_annotator.py:1-8; utils/dependency_graph.py:1-10); Python edges are name-based (python_annotator.py:182-221); get_dependents lists dependent symbols, not call sites, and widens a method to its class and siblings (query_api.py:1452-1486,3331-3344); get_change_impact 'confidence' is just 0.6^(depth-1) (query_api.py:1859); duplicate names are first-found-wins (project_indexer.py:721). No rename tool is exposed (tests/test_tool_schemas.py:68-74) and no compile/type/lint diagnostics run after an edit - only an '[EDIT IMPACT]' note with callers and impacted tests (server.py:813-864).",
+      "Default responses are not always the exact full text: with no `level`, get_function_source/get_class_source draw an abstraction level from a bandit persisted in the memory DB (server_handlers/code_nav.py:361-368; memory/lattice.py:71-109), so signature/summary/name-only views (query_api.py:1217-1246) can come back; repeat reads may return an 'unchanged' stub (code_nav.py:160-275); classes over 300 lines default to a summary (query_api.py:1198-1210); get_full_context defaults to an 80-line source head with dependents as names only (tool_schemas.py:463-467). Callers must pass level=0, force_full or mode=full.",
+      "The recommended `optimized` profile advertises only 15 tools (server.py:337-361,445). get_dependents, get_dependencies, get_change_impact, get_edit_context, get_class_source, insert_near_symbol, edit_lines_in_symbol and move_symbol are not in that manifest, and ts_search scores only advertised tools (server.py:1160-1168; server_handlers/tool_search.py:255), while CLAUDE.md routes to insert_near_symbol, move_symbol and find_import_cycles (CLAUDE.md:30-33). With TOKEN_SAVIOR_PROFILE unset the default is `full`, all 69 tools (server.py:144,458).",
+      "Claude Code footprint: `ts init --agent claude` edits ~/.claude/settings.json to add shell hooks on SessionStart, UserPromptSubmit, PreToolUse, PostToolUse, PreCompact, Stop and SessionEnd (hooks/memory-hooks-config.json:5-85; cli_init/agent_paths.py:148-154). Unless TS_MEMORY_DISABLE=1 they write user prompts (prompt_archive defaults to True; hooks/memory-userprompt.sh:218-271) and sandboxed tool outputs (memory_schema.sql:235,321) to ~/.local/share/token-savior/memory.db. Opt-in hooks: the Bash rewriter returns permissionDecision 'allow' with rewritten commands (hooks/bash_rewriter_hook.py:101-109); the discipline guard can deny native Read/Edit/Write/Grep on indexed source (hooks/ts_discipline_guard.py:41-43,346-359). A `.token-savior-cache.json` index file is written into every project root (cache_ops.py:43,54).",
+      "`ts_execute` runs model-supplied JavaScript in a long-lived Node worker whose `vm` context is seeded with the worker's own Object/Array/Promise/Error/etc. (src/token_savior/code_mode/worker.mjs:78-106). The subprocess inherits the full parent environment (code_mode/sandbox.py:131-138) and a grep of code_mode/ found no OS-level confinement. It is classed destructive (tool_annotations.py:58-68), exposed in full/auto/code_mode profiles, and removable with TS_CODE_MODE_DISABLE=1 (server.py:544-545). run_project_action and run_impacted_tests also run project commands via subprocess (project_actions.py:232-240; impacted_tests.py:171).",
+      "Documentation and packaging drift: README says 68 tools / 34 compactors / 1898 tests vs 69 / 42 / at least 2,728 in code and CHANGELOG (README.md:106,191,265; tests/test_tool_schemas.py:87; compactors/__init__.py:62-118; CHANGELOG.md:138). README's TS_SOCK default is /tmp/ts.sock vs the packaged CLI's per-user path (README.md:339; cli.py:52-66), while bin/ts still binds /tmp/ts.sock (bin/ts:51,231). `ts move` passes arguments the tool rejects (cli.py:591; tool_schemas.py:179-184). server.json says 4.19.0 (server.json:9,14) and uv.lock records 2.0.0 (uv.lock:1237-1238) vs 4.21.0 (pyproject.toml:7). The token-savior-bench script targets a module outside the wheel's packages (pyproject.toml:54,60-61). mypy strict is configured but never run (pyproject.toml:105-107).",
+      "Platform coverage beyond Linux is undocumented and untested: the README names no OS; CI is ubuntu-latest only (.github/workflows/ci.yml:11); shell hooks use GNU `stat -c` with `|| echo 0` fallbacks (hooks/memory-session-start.sh:30,64); the CLI daemon needs AF_UNIX sockets (src/token_savior/cli.py:131,268); CHANGELOG records Windows stderr problems (CHANGELOG.md:694-696). The optional embedding features need a first-use model download of about 130 MB via fastembed (ci.yml:45-46; memory/embeddings.py:31).",
+      "Process signals: the authors field lists one name (pyproject.toml:12-14); there is no SECURITY.md or dependabot config (.github/ holds workflows only); PyPI publishing uses a long-lived PYPI_API_TOKEN secret with no signing or attestation step (.github/workflows/publish.yml:32-36). CHANGELOG records a history rewrite to purge a leaked credential (CHANGELOG.md:671-675) and 'four hurried patch releases the same night' with 4.19.1 to 4.19.3 yanked (CHANGELOG.md:63-65). The latest stored in-repo retrieval result (semantic MRR@10 0.4759) sits below the repo's own CI gate of 0.65 (tests/benchmarks/code_retrieval/results/20260517-002528.md:13; scripts/check_bench_gates.py:29). The headline benchmarks are the author's own and live in an external repo (README.md:16-17,29)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "mibayy/token-savior",
+      "checks": [
+        {
+          "field": "readme.install[0] (pip (PyPI))",
+          "statement": "pip install \"token-savior-recall[mcp]\"",
+          "citation": "README.md:48,238",
+          "holds": true,
+          "note": "README.md:48 and README.md:238 both carry the exact command. pyproject.toml:6 names the distribution token-savior-recall and pyproject.toml:40 defines the mcp extra. Per the comment at pyproject.toml:37-39 and the base dependency at :28, mcp is now a base dependency, so the extra is kept only for compatibility. The command was not executed against PyPI."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, file LICENSE",
+          "citation": "LICENSE:1-21",
+          "holds": true,
+          "note": "LICENSE:1 reads 'MIT License', followed by the standard MIT grant and warranty text with 'Copyright (c) 2025 Mibayy' (LICENSE:3). Consistent with pyproject.toml:11 (license = {text = \"MIT\"}) and README.md:400-402."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - CI runs lint plus the full pytest suite on ubuntu-latest for Python 3.11/3.12/3.13; the README names no OS and the workflow does not state the runner architecture.",
+          "citation": ".github/workflows/ci.yml:11-14,80,83",
+          "holds": true,
+          "note": "ci.yml:11 'runs-on: ubuntu-latest'; :14 matrix [\"3.11\",\"3.12\",\"3.13\"]; :43 pip install -e \".[dev,mcp,memory-vector]\"; :80 'ruff check .'; :83 'pytest tests/ -v'. A grep of README.md for OS and architecture terms finds only 'Unix socket' for TS_SOCK (README.md:339), which describes a socket type rather than a supported OS. The workflow pins no architecture, so x86_64 is an inference from the ubuntu-latest runner, as the dossier itself states."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "Stdio MCP server `token-savior` on the python mcp SDK, exposing 69 tools filtered by TOKEN_SAVIOR_PROFILE, with readOnly/destructive/idempotent hints and ts://obs/{id} resources.",
+          "citation": "pyproject.toml:52; src/token_savior/server.py:1380-1446,431-452,1415-1431; tests/test_tool_schemas.py:87; src/token_savior/tool_annotations.py:24-114",
+          "holds": true,
+          "note": "pyproject.toml:52 maps token-savior to token_savior.server:main_sync. server.py:1410 imports mcp.server.stdio.stdio_server and server_state.py:41-42 builds mcp.server.Server('token-savior-recall'). TOOL_SCHEMAS has exactly 69 entries (counted at tool_schemas.py:31-1251; the test asserts 69 at test_tool_schemas.py:87). TOOLS is built from it at server.py:228-229 and filtered by the profile table at server.py:431-452, applied at :458-479. annotations_for (tool_annotations.py:91-105) emits readOnly/destructive/idempotent/openWorld hints, which list_tools attaches at server.py:588-600. Resources are registered at server.py:1415-1431 with the 'ts://obs/' prefix (server_handlers/resources.py:16)."
+        },
+        {
+          "field": "claim_checks[1] (needs-driven: language-server-backed definitions/references/edits/diagnostics)",
+          "statement": "verified: no - no language-server client or LSP dependency; post-edit feedback is limited to an '[EDIT IMPACT]' callers/impacted-tests note; the EditSafety / edit-then-test workflow in workflow_ops.py has no MCP tool.",
+          "citation": "LICENSE:3,12,18; pyproject.toml:27-48; compactors/biome.py:1; server.py:813-864,1078-1082; tests/test_tool_schemas.py:68-74",
+          "holds": true,
+          "note": "A repo-wide case-insensitive grep for language server, lsp, pyright, pylsp, tsserver, gopls, clangd, jedi, textDocument, publishDiagnostics, rust-analyzer and multilspy hits only 'Copyright' at LICENSE:3,12,18. No LSP package is in pyproject.toml:27-48. A grep for 'diagnostic' finds only compactors/biome.py as diagnostics code; the other hits are comments. _edit_impact_notice (server.py:813-864) returns only callers and impacted tests, appended at :1078-1082. workflow_ops.py (EditSafety at :37) is imported nowhere in src/, and neither of its functions is in TOOL_SCHEMAS."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

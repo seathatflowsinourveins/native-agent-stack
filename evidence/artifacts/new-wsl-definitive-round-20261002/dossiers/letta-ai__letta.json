@@ -1,0 +1,284 @@
+{
+  "contender": "letta-ai/letta",
+  "revision": {
+    "contender": "letta-ai/letta",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "letta-ai/letta",
+        "tag": "0.16.8",
+        "commit": "1131535716e8a31c9a437f8695e25ac98f203a24",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "0.16.8",
+    "commit": "1131535716e8a31c9a437f8695e25ac98f203a24",
+    "read_at": "2026-10-02T03:02:22+00:00"
+  },
+  "dossier": {
+    "contender": "letta-ai/letta",
+    "revision": {
+      "tag": "0.16.8",
+      "commit": "1131535716e8a31c9a437f8695e25ac98f203a24",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Letta (formerly MemGPT) at 0.16.8 is, in this repository, a Python/FastAPI server plus REST API for stateful LLM agents with persistent, agent-editable memory (core memory blocks, archival passages, message history, optional git-backed memory repos), stored in PostgreSQL+pgvector through SQLAlchemy/Alembic. The README's headline CLI (Letta Code, npm @letta-ai/letta-code) lives in a separate repository that is not part of this revision; the `letta` console script defined here only launches the server.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Letta (formerly MemGPT): 'Build AI with advanced memory that can learn and self-improve over time.'",
+          "citation": "README.md:1-3"
+        },
+        {
+          "claim": "Two products are named: Letta Code ('run agents locally in your terminal') and the Letta API ('build agents into your applications').",
+          "citation": "README.md:5-6"
+        },
+        {
+          "claim": "The CLI requires Node.js 18+ and is installed with `npm install -g @letta-ai/letta-code`; the link points to a separate repo (github.com/letta-ai/letta-code).",
+          "citation": "README.md:10-12"
+        },
+        {
+          "claim": "'Run `letta` in your terminal to launch an agent with memory running on your local computer.'",
+          "citation": "README.md:13"
+        },
+        {
+          "claim": "'When running the CLI tool, your agent help you code and do any task you can do on your computer.' (sic)",
+          "citation": "README.md:15"
+        },
+        {
+          "claim": "Letta Code supports skills and subagents and 'bundles pre-built skills/subagents for advanced memory and continual learning'.",
+          "citation": "README.md:17"
+        },
+        {
+          "claim": "Letta is 'fully model-agnostic'; Opus 4.5 and GPT-5.2 are recommended; a model leaderboard (leaderboard.letta.com) is cited for rankings.",
+          "citation": "README.md:17"
+        },
+        {
+          "claim": "Letta has 'a full-featured agents API, and a Python and Typescript SDK'.",
+          "citation": "README.md:22"
+        },
+        {
+          "claim": "SDK installs: `npm install @letta-ai/letta-client` and `pip install letta-client`.",
+          "citation": "README.md:26-34"
+        },
+        {
+          "claim": "The Hello World example 'requires a Letta API key' from app.letta.com; agents are created with memory_blocks (human, persona) and tools web_search/fetch_webpage.",
+          "citation": "README.md:38-63"
+        },
+        {
+          "claim": "By using Letta and related services (such as the Letta endpoint or hosted service) users agree to the privacy policy and terms of service.",
+          "citation": "README.md:122"
+        }
+      ],
+      "install": [
+        {
+          "method": "npm global (Letta Code CLI; separate repo; needs Node.js 18+)",
+          "command": "npm install -g @letta-ai/letta-code",
+          "citation": "README.md:10-12"
+        },
+        {
+          "method": "npm (TypeScript SDK)",
+          "command": "npm install @letta-ai/letta-client",
+          "citation": "README.md:26-29"
+        },
+        {
+          "method": "pip (Python SDK)",
+          "command": "pip install letta-client",
+          "citation": "README.md:31-34"
+        },
+        {
+          "method": "From source with uv: self-hosted Letta server. Needs your own PostgreSQL with pgvector, LETTA_PG_URI exported, and the Alembic migration run by hand",
+          "command": "uv sync --all-extras  (then)  uv run alembic upgrade head  (then)  uv run letta server",
+          "citation": "CONTRIBUTING.md:28-86"
+        },
+        {
+          "method": "Docker Compose from the repo checkout (labelled WIP dev setup; compose.yaml itself uses image letta/letta:latest plus a pgvector database)",
+          "command": "docker compose -f compose.yaml -f development.compose.yml up",
+          "citation": "CONTRIBUTING.md:178-183; compose.yaml:1-65"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - Docker image is built for linux/amd64 (.github/workflows/docker-image.yml:34); CI runs on ubuntu-latest and self-hosted runners (e.g. .github/workflows/docker-integration-tests.yaml:11, reusable-test-workflow.yml:38); Python >=3.11,<3.14 (pyproject.toml:10). A native (non-Docker) run needs a local PostgreSQL+pgvector (CONTRIBUTING.md:30).",
+        "wsl2": "unknown - no mention of WSL anywhere in the repo (searched); nothing documents or tests it.",
+        "macos_arm64": "unknown - no explicit support statement and no macOS CI job (every workflow runner is ubuntu-latest or self-hosted). Indirect signs only: CONTRIBUTING.md:36-37 gives a 'Mac/Linux' Postgres step; uv.lock contains macosx arm64 wheel tags; the Docker image is also built for linux/arm64 (docker-image.yml:34). A native run still needs PostgreSQL+pgvector.",
+        "gpu": "no - not required. The server has no local model inference: LLM/embedding calls are HTTP to providers or to user-run Ollama/vLLM/SGLang/LM Studio endpoints (letta/server/server.py:216-372; letta/settings.py:204-241; letta/local_llm/llamacpp/api.py only posts JSON to a server). Only the project's Ollama CI job asks for a GPU runner (.github/workflows/test-ollama.yml:38)."
+      },
+      "integrations": {
+        "cli": "Letta Code (npm @letta-ai/letta-code) is the README's CLI; it lives in a separate repo and cannot be read here (README.md:12-13). This repo's own console script `letta` (pyproject.toml:84-85 -> letta/main.py:5-16 -> letta/cli/cli.py:17-42) starts the REST server (`letta server`; options --host/--port/--debug/--reload/--secure/--localhttps; `--type websocket` raises NotImplementedError). Both packages use the command name `letta`.",
+        "mcp": "No MCP server found in this repo. Letta acts as an MCP client: the /v1/mcp-servers router (letta/server/rest_api/routers/v1/mcp_servers.py:31-72) registers external MCP servers so agents can call their tools; stdio transport is disabled by default (letta/settings.py:45-54). The README does not mention MCP.",
+        "sdk_or_api": "REST API (FastAPI), default port 8283, prefix /v1 (letta/server/constants.py:6; letta/constants.py:33; letta/server/rest_api/routers/v1/__init__.py:34-68); OpenAPI spec in fern/openapi.json. Memory-related routes: blocks (routers/v1/blocks.py:27-263), per-agent core-memory / archival-memory / messages / export / import (routers/v1/agents.py:295-531, 1206-1576), archives, conversations, passages search. Python `letta-client` and TypeScript `@letta-ai/letta-client` SDKs (README.md:26-34) are separate packages generated with Fern (.github/workflows/fern-sdk-python-publish.yml:34-44, fern-sdk-typescript-publish.yml:34-44); letta-client>=1.7.12 is also a dependency (pyproject.toml:46).",
+        "claude_code_or_codex": "Claude Code: server-side proxy route POST /v1/anthropic/v1/messages (letta/server/rest_api/routers/v1/anthropic.py:32-50), excluded from OpenAPI (include_in_schema=False) and documented only in a docstring (set ANTHROPIC_BASE_URL in Claude Code settings.json). It appends the agent's memory blocks to the system prompt (proxy_helpers.py:260-330), forwards to https://api.anthropic.com (anthropic.py:28,135-137) and persists, per request, the last user message text plus the assistant text to an agent named claude-code-<first 8 chars of user id>, or the agent in the x-letta-agent-id header (anthropic.py:62-64,103-111; proxy_helpers.py:453-566; rest_api/utils.py:798-877). Tool calls/results are not captured; the Authorization header is not forwarded (proxy_helpers.py:125-136; API key comes from x-api-key / anthropic-api-key or the server's ANTHROPIC_API_KEY, 143-153). Codex: none found - no proxy, hook, skill, plugin or config for Codex (grep for 'codex' hits only model names and one comment at letta/services/summarizer/thresholds.py:37). No .claude/, SKILL.md, hooks or MCP config files ship in the tree, and no code reads or writes CLAUDE.md, AGENTS.md, ~/.claude or ~/.codex (.gitignore:8-9 merely ignores CLAUDE.md/AGENTS.md). The README mentions neither Claude Code nor Codex."
+      },
+      "telemetry_and_network": "README: only a legal notice that using hosted services implies accepting the privacy policy/ToS (README.md:122); its API examples need a Letta API key from app.letta.com (README.md:38). PRIVACY.md:6-8 says anonymous click/crash telemetry is collected and can be disabled with `telemetry_disabled = True` in a config file, but no such setting or analytics client exists in letta/ (searched telemetry_disabled, posthog, segment, mixpanel, amplitude); the YAML config only maps keys to env vars (letta/config_file.py:42-46,195-211). Outbound telemetry in code is opt-in: Sentry only if SENTRY_DSN is set (letta/server/rest_api/utils.py:46; app.py:300-308), Datadog only if LETTA_TELEMETRY_ENABLE_DATADOG (settings.py:538; app.py:310-408), OTLP only if LETTA_OTEL_EXPORTER_OTLP_ENDPOINT (app.py:819-833). The Docker image runs an OTEL collector whose default config writes only to a local file (letta/server/startup.sh:79-91; otel/otel-collector-config-file.yaml:14-30); ClickHouse/Signoz exports need env credentials. Raw LLM request/response per step are stored in the local database by default (settings.py:382,387,571-574; services/telemetry_manager.py:21-33). Accounts/network: no Letta account is needed to run the server (default org/user created at startup: server.py:374-378; user_manager.py:113-135), but agent creation needs a model handle, so an LLM provider key or reachable local model endpoint is required (server.py:537-541). The Letta-hosted provider 'letta-free' (https://inference.letta.com/v1/ constants.py:8; https://embeddings.letta.com/ schemas/providers/letta.py:11) is always registered (server.py:216). Startup downloads NLTK punkt_tab data and only warns on failure (app.py:197-207). CORS allows https://app.letta.com and the startup banner links to the hosted ADE (app.py:795,915,954-957); the injected Claude Code memory prompt links to https://app.letta.com/agents/<id> (proxy_helpers.py:216-218); proxied Claude Code traffic goes to api.anthropic.com. Other optional outbound: step-complete webhook (WEBHOOK_SETUP.md:39-60) and Turbopuffer/Pinecone/E2B/Modal/Tavily/Exa/Mistral when keys are set (settings.py:22-31,425-446). Letta Code's own network behavior is not visible in this repo."
+    },
+    "code": {
+      "languages": [
+        "Python (>=3.11,<3.14; .python-version 3.12; nearly all of letta/, tests/, alembic/)",
+        "TypeScript (3 small files in sandbox/resources/server/ for the Node tool-sandbox server)",
+        "Shell (letta/server/startup.sh, otel/start-otel-collector.sh, scripts/)",
+        "SQL (init.sql) and YAML/Dockerfile/GitHub Actions (compose files, Dockerfile, 31 workflows)"
+      ],
+      "entry_points": [
+        {
+          "path": "pyproject.toml:84-85",
+          "what": "console script `letta = letta.main:app` (Typer app)"
+        },
+        {
+          "path": "letta/main.py:5-16",
+          "what": "Typer app; the `server` subcommand is also what runs when no subcommand is given"
+        },
+        {
+          "path": "letta/cli/cli.py:17-42",
+          "what": "`server` command: --type rest|websocket (websocket raises NotImplementedError), --port (default 8283), --host (default localhost), --debug, --reload, --secure, --localhttps"
+        },
+        {
+          "path": "letta/server/rest_api/app.py:878-987",
+          "what": "ASGI app letta.server.rest_api.app:app built by create_application(); start_server() runs uvicorn (or granian if enabled)"
+        },
+        {
+          "path": "letta/server/startup.sh:1-104",
+          "what": "Docker CMD: starts internal Redis/PostgreSQL unless LETTA_REDIS_HOST / LETTA_PG_URI are set, runs `alembic upgrade head`, starts the OTEL collector, then `letta server --host 0.0.0.0 --port 8283`"
+        },
+        {
+          "path": "Dockerfile:42-101",
+          "what": "runtime image from pgvector/pgvector:0.8.1-pg15 plus Redis, Node 22 and otelcol-contrib 0.96.0; EXPOSE 8283 5432 6379 4317 4318"
+        },
+        {
+          "path": "alembic.ini; alembic/env.py:17-26",
+          "what": "schema migrations (167 files in alembic/versions); Postgres via sync pg8000 URI, SQLite branch when no PG settings are present"
+        },
+        {
+          "path": "letta/server/rest_api/routers/v1/anthropic.py:32",
+          "what": "POST /v1/anthropic/v1/messages - Claude Code memory-injection and capture proxy"
+        }
+      ],
+      "architecture": "One FastAPI process (letta/server/rest_api/app.py) wires a SyncServer (letta/server/server.py) that owns 20+ service managers (letta/services/*_manager.py: agent, block, passage, archive, message, conversation, tool, mcp, provider, run, step, job, group, identity, ...). About 32 routers live in letta/server/rest_api/routers/v1/. Persistence: SQLAlchemy async ORM (letta/orm/, ~50 modules) over PostgreSQL+pgvector via asyncpg (letta/server/db.py), schema via Alembic; Redis is optional (letta/data_sources/redis_client.py falls back to a noop client). Agent loops are in letta/agents/ (agent_loop.py picks LettaAgentV3 for letta_v1_agent/sleeptime_agent, V2 for memgpt types); letta/groups/sleeptime_multi_agent_v3.py and _v4.py run a background memory-curation agent every N turns (default 5, server.py:784). Memory model: core memory blocks (letta/orm/block.py, letta/schemas/block.py; default 100000-char limit, constants.py:435) edited by the LLM through the `memory` tool (letta/functions/function_sets/base.py:10-68) plus core_memory_*, archival_memory_insert/search and conversation_search; archival passages/archives with optional embeddings (text-search fallback, tests/test_embedding_optional.py:1-6); messages in the DB. Optional git-backed memory (letta/services/block_manager_git.py; letta/services/memory_repo/: git CLI against repos kept under ~/.letta/memfs/repository/<org>/<agent>/repo.git by LocalStorageBackend, blocks stored as <label>.md with frontmatter) is enabled per agent by the `git-memory-enabled` tag and only when LETTA_MEMFS_SERVICE_URL is set (server.py:426-441). LLM clients for 15+ providers in letta/llm_api/ and provider schemas in letta/schemas/providers/. Tool execution: letta/services/tool_executor/ and letta/services/tool_sandbox/ (local subprocess by default; E2B or Modal if configured); MCP client in letta/services/mcp/. Observability: letta/otel/, letta/monitoring/, optional Sentry/Datadog. Background jobs: letta/jobs/ (APScheduler with leader election). Agent import/export (.af JSON) in letta/services/agent_serialization_manager.py and letta/schemas/agent_file.py. Also sandbox/ (Modal executor, TypeScript tool server), fern/ (OpenAPI spec), otel/ (collector configs).",
+      "packaging_and_release": "Python package `letta` built with hatchling; the wheel target lists only the `letta` package (pyproject.toml:163-168), so alembic/, alembic.ini, sandbox/, otel/ and init.sql are not declared for the wheel (I did not build it to confirm). .github/workflows/poetry-publish.yml (named uv-publish): on GitHub release published or manual dispatch, `uv build` then `uv publish` with the PYPI_TOKEN secret (lines 2-33). .github/workflows/poetry-publish-nightly.yml: daily cron plus release/manual, renames the package to `letta-nightly` with a .devYYYYMMDDHHMMSS version (lines 2-8,45-64). .github/workflows/docker-image.yml: on release, builds linux/amd64+arm64 and pushes letta/letta and memgpt/letta tagged <version> and latest to Docker Hub (lines 3-40). SDKs are generated and published through Fern from fern/openapi.json (fern-sdk-python-publish.yml, fern-sdk-typescript-publish.yml; PYPI_TOKEN, NPM_TOKEN, FERN_TOKEN). No checksum, signature, SBOM, provenance-attestation or OIDC trusted-publishing step exists in any workflow (searched cosign/sigstore/attest/provenance/sbom/checksum/id-token); registry credentials are long-lived secrets. Build inputs are partly unpinned: uv installed with `curl ... | sh` (poetry-publish.yml:22-25), ghcr.io/astral-sh/uv:latest (Dockerfile:31), NodeSource `curl | bash` (Dockerfile:62), OTEL collector tarball downloaded without a checksum (Dockerfile:65-69); base image is pinned by tag and uv.lock is used with --frozen (Dockerfile:2,39). Release tags look like 0.16.8. Actual release assets and dates cannot be seen from this shallow clone.",
+      "tests_and_ci": "pytest with pytest-asyncio (auto mode), pytest-order, pytest-mock, pytest-json-report (tests/pytest.ini; pyproject.toml:118-129,229-230). About 130 test modules: 93 tests/**/test_*.py (managers/ 21, mcp_tests/ 3, performance_tests/ 3, adapters/ 1, top-level ~65), 30 tests/integration_test_*.py, 5 tests/sdk/*_test.py, plus tests/mcp_test.py, tests/locust_test.py and 2 *_test.py inside letta/services/; 166 .py files under tests/ overall. Memory-relevant: tests/test_memory.py, tests/managers/test_block_manager.py (checkpoint/undo/redo at service level), test_passage_manager.py, test_archive_manager.py, tests/test_agent_serialization*.py, tests/test_embedding_optional.py, tests/test_git_http_post_push_sync.py and tests/integration_test_git_http_post_push_sync.py (its tests skip unless LETTA_MEMFS_SERVICE_URL is set, line 71). 31 workflow files in .github/workflows: core-unit-test.yml (23 pytest suites incl. managers/, sdk/, mcp_tests/ against pgvector:pg17 + Redis services), core-integration-tests.yml (8 integration suites), send-message-integration-tests.yml (5 provider configs), core-unit-sqlite-test.yaml, alembic-validation.yml and migration-test.yml (alembic upgrade head / check on Postgres and SQLite), docker-integration-tests.yaml (compose up, then tests/test_client.py), core-lint.yml (ruff check/format, semantic PR title; pyright runs with continue-on-error), test-pip-install.yml (pip install on 3.11-3.13, no tests run), model-sweep.yaml (manual provider/model scan), test-ollama/test-lmstudio/test-vllm, fern-check and fern-* preview/publish, issue-guard.yml (AI-policy issue gate), plus issue housekeeping. Test jobs run on self-hosted runners and inject vendor API-key secrets (reusable-test-workflow.yml:38,307-318,345-402) and reference a path absent from this tree (libs/config-core-deploy, line 336). Pre-commit has ruff, ty and trufflehog (.pre-commit-config.yaml).",
+      "dependencies": "pyproject.toml: 69 direct core dependencies (lines 11-82) and 13 optional extras with 49 entries (lines 87-161): postgres 5, redis 1, pinecone 1, sqlite 2, experimental 2, server 3, bedrock 2, dev 10, cloud-tool-sandbox 1, modal 1, external-tools 6, desktop 14, profiling 1. fastapi and uvicorn==0.29.0 are declared only in the server/desktop extras (105-109,142-158); asyncpg only in the postgres extra (89-95) although letta/server/db.py needs it. Notable core entries: sentry-sdk[fastapi]==2.19.1 (38), opentelemetry-* exact pins (48-52), ddtrace/datadog (74,77), clickhouse-connect (78), temporalio (63), grpcio/grpcio-tools (41-42), llama-index (43-44), and black/ruff/ty as runtime dependencies (16,69,70). uv.lock (committed, revision 3, requires-python >=3.11,<3.14) resolves 344 packages; Docker installs with `uv sync --frozen --no-dev --all-extras` (Dockerfile:39). Node: sandbox/resources/server/package.json (2 dependencies: typescript, @types/node) with its lock file, and a stray root package-lock.json (name 'core') with no package.json.",
+      "security_policy": "SECURITY.md: report by email to support@letta.com, not through public issues; acknowledgement within 48 hours and a fix/mitigation timeline within 7 days; security fixes are applied to the latest release only (SECURITY.md:3-14)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Run `letta` in your terminal to launch an agent with memory running on your local computer, after `npm install -g @letta-ai/letta-code` (README.md:12-13).",
+        "verified": "not_checkable",
+        "evidence": "Code differs from the README's wording for this repo: the CLI is in the separate letta-ai/letta-code repo, not in this tree. Here the `letta` console script (pyproject.toml:84-85 -> letta/main.py:5-16 -> letta/cli/cli.py:17-39) only launches the REST server, so two packages define the same command name. What the npm CLI stores, and whether it runs a local server or a hosted backend, cannot be read from this revision."
+      },
+      {
+        "claim": "Letta has a full-featured agents API, and a Python and Typescript SDK (README.md:22).",
+        "verified": "partial",
+        "evidence": "The API is real and broad: about 32 routers mounted under /v1 (letta/server/rest_api/routers/v1/__init__.py:34-68), with ~50 routes in agents.py alone. SDK source is not in this repo; the SDKs are generated by Fern from fern/openapi.json (.github/workflows/fern-sdk-python-publish.yml:34-44, fern-sdk-typescript-publish.yml:34-44); letta-client>=1.7.12 is a dependency (pyproject.toml:46)."
+      },
+      {
+        "claim": "Letta is fully model-agnostic (README.md:17).",
+        "verified": "yes",
+        "evidence": "SyncServer registers providers for OpenAI, Anthropic, Google AI/Vertex, Azure, Bedrock, Groq, Together, DeepSeek, xAI, MiniMax, Baseten, Z.ai, OpenRouter, Ollama, vLLM, SGLang and LM Studio from env settings (letta/server/server.py:216-372; letta/settings.py:132-241); agent creation needs an explicit model handle or LETTA_DEFAULT_LLM_HANDLE (server.py:537-541). Caveat: the auto-created Claude Code agent hard-codes anthropic/claude-sonnet-4-5-20250929 and openai/text-embedding-ada-002 (proxy_helpers.py:548-552)."
+      },
+      {
+        "claim": "Letta Code bundles pre-built skills/subagents for advanced memory and continual learning (README.md:17).",
+        "verified": "not_checkable",
+        "evidence": "Skills and subagents belong to the separate letta-code repo. Only plumbing exists here: memory-repo paths skills/<name>/SKILL.md map to block label skills/<name> (letta/services/memory_repo/path_mapping.py:11-29) and agent files can carry SkillSchema entries (letta/schemas/agent_file.py:370-389); no SKILL.md files ship in this tree."
+      },
+      {
+        "claim": "Build AI with advanced memory that can learn and self-improve over time (README.md:3).",
+        "verified": "partial",
+        "evidence": "Memory mechanisms exist and persist in Postgres: core blocks edited by the LLM via the memory tool (letta/functions/function_sets/base.py:10-68), archival passages (base.py:164-243), and a background sleeptime agent that updates blocks every 5th turn by default (server.py:756-789; letta/groups/sleeptime_multi_agent_v4.py:131-168). Learning/self-improvement is not measured anywhere in the repo (no memory-quality eval found). Durability caveats: deletes of blocks, agents and passages are hard deletes (letta/services/block_manager.py:275-286; agent_manager.py:1334; passage_manager.py:778); block checkpoint/undo/redo exist only as service methods with no REST route (routers/v1/blocks.py:27-263) and no non-test caller (block_manager.py:842-1041)."
+      },
+      {
+        "claim": "The Hello World example requires a Letta API key (README.md:38,45).",
+        "verified": "partial",
+        "evidence": "True for the hosted API. The self-hosted server needs no Letta key: it creates a default org/user (letta/server/server.py:374-378; letta/services/user_manager.py:113-135) and its only built-in auth is an optional shared password (app.py:797-799; middleware/check_password.py:23-27); repo tests point the SDK at a local base_url (tests/test_embedding_optional.py:35-43)."
+      },
+      {
+        "claim": "PRIVACY.md (linked from README.md:122): anonymous telemetry is collected and can be disabled with `telemetry_disabled = True` in the config file (PRIVACY.md:6-8).",
+        "verified": "no",
+        "evidence": "Code differs from the doc: `telemetry_disabled` appears only in PRIVACY.md; no analytics client or such setting exists in letta/ (searched telemetry_disabled, posthog, segment, mixpanel, amplitude), and the YAML config only maps keys to LETTA_*/provider/tool/DD_* env vars (letta/config_file.py:42-46,195-211). Outbound telemetry in code is opt-in only: Sentry (rest_api/utils.py:46; app.py:300-308), Datadog (app.py:310-408), OTLP (app.py:819-833)."
+      },
+      {
+        "claim": "Claude Code can use Letta as a proxy by setting ANTHROPIC_BASE_URL (route docstring, not stated in the README).",
+        "verified": "partial",
+        "evidence": "The route exists and does inject memory and persist captures (letta/server/rest_api/routers/v1/anthropic.py:32-198; proxy_helpers.py:260-330; rest_api/utils.py:798-877). Limits seen in code: text only, last user message per request (anthropic.py:62-64; proxy_helpers.py:45-93); Authorization header not forwarded (proxy_helpers.py:125-136); the auto-created agent needs Anthropic and OpenAI providers (proxy_helpers.py:548-552) and a sleeptime agent is created only when an embedding config exists (server.py:757-759); route is hidden from OpenAPI (anthropic.py:32). I read the code only and did not run it."
+      },
+      {
+        "claim": "Opus 4.5 and GPT-5.2 are recommended; see the model leaderboard for rankings (README.md:17).",
+        "verified": "not_checkable",
+        "evidence": "The leaderboard is an external site (leaderboard.letta.com) that was not fetched; no rankings exist in the repo. The only in-repo measurement is a provider/model compatibility scan dated 2025-06-20 (.github/scripts/model-sweep/supported-models.mdx:3,12)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Project-run provider/model compatibility scan (basic send-message, token streaming, multimodal, context window per model); not a memory-quality measure and stale relative to 0.16.8",
+        "metric": "tests run / models / providers covered",
+        "value": "2464 tests against 154 models across 7 providers, dated 2025-06-20 (file generated 2025-06-20T16:40:44); per-model pass/warn/fail marks in the file",
+        "source": ".github/scripts/model-sweep/supported-models.mdx:3,12-24",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope/ownership: the README's headline CLI (Letta Code, npm @letta-ai/letta-code) is a separate repo outside this revision (README.md:12), so its storage, backend and Claude/Codex behavior are unverified here. This repo is the Python server/API; its `letta` console script starts a server (pyproject.toml:84-85; letta/cli/cli.py:17-39) while the README tells users to run `letta` for the npm CLI (README.md:13) - the same command name comes from two packages.",
+      "Integrations: no Codex integration of any kind was found (no proxy, hook, skill, plugin or config; grep for 'codex' hits only model names and one comment). The only Claude Code path is an undocumented, OpenAPI-hidden proxy that persists text only (last user message plus assistant text), skips tool calls/results, drops the Authorization header, and uses one agent per Letta user unless x-letta-agent-id is sent (letta/server/rest_api/routers/v1/anthropic.py:32,62-64,103-111; proxy_helpers.py:125-153,484-490; rest_api/utils.py:798-848). /v1/chat/completions chats with a Letta agent (model must be an agent id, streaming only), not with a model provider (routers/v1/chat_completions.py:62-66,112-116). No MCP server exists in the repo.",
+      "Memory is LLM-authored and token-costing: blocks are changed by the agent's memory tool (create/str_replace/insert/delete/rename, letta/functions/function_sets/base.py:10-68) and by a background sleeptime agent that reuses the main agent's model every 5th turn (server.py:770,784; groups/sleeptime_multi_agent_v4.py:144-145), created only when an embedding config exists (server.py:757-759). Memory units are free-text blocks with label/description/value/limit/metadata/read_only/tags/project_id (letta/schemas/block.py:13-44,77); no typed decision or handoff record was found. Org-wide message search needs Turbopuffer plus OpenAI embeddings and its route says 'cloud-only' (routers/v1/agents.py:2037; services/message_manager.py:1296-1303).",
+      "Deletion and recovery: deletes are hard (services/block_manager.py:275-286; agent_manager.py:1334; passage_manager.py:778); block history rows cascade-delete with the block (letta/orm/block_history.py:40-44) and normal update paths never write them (checkpoint_block_async has no non-test caller; no REST route for undo/redo); agent-file (.af) export has no archival passages or archives (letta/schemas/agent_file.py:431-445) and import recreates agents instead of restoring in place (routers/v1/agents.py:464-525). Git-backed memory history is opt-in per agent (git-memory-enabled tag), is constructed only when LETTA_MEMFS_SERVICE_URL is set, has service-only history readers, the /v1/git smart-HTTP route returns 501 without that URL and proxies to an external memfs service otherwise, and the cloud memfs_client.py is absent from this tree (server.py:426-441; services/block_manager_git.py:27,508-560; routers/v1/git_http.py:262-273; memory_repo/memfs_client_base.py:7-9). Requesting that tag without git memory configured strips the tag yet still prefixes block labels with system/ (server.py:602-645). No backup tooling exists in the repo.",
+      "Infrastructure weight: the server needs PostgreSQL with pgvector (CONTRIBUTING.md:30; settings.py:471-478 defaults to postgresql+pg8000://letta:letta@localhost:5432/letta; server/db.py:20-58 builds only an asyncpg engine). No code path creating a SQLite engine was found even though a `sqlite` extra, SQLite CI jobs and SQLITE branches exist (pyproject.toml:98; core-unit-sqlite-test.yaml; settings.py:491-493). The schema is created only by Alembic run by the operator (no create_all in letta/; CONTRIBUTING.md:75-79; Docker startup.sh:54-62) and the Alembic files sit outside the wheel's package list (pyproject.toml:167-168). The Docker image bundles Postgres 15, Redis, Node 22 and an OTEL collector in one container (Dockerfile:42-72). 69 core dependencies and 344 locked packages, with exact pins such as sentry-sdk==2.19.1 and uvicorn==0.29.0 (pyproject.toml:38,108; uv.lock). macOS arm64 and WSL2 have no explicit support statement.",
+      "Security defaults: no authentication unless --secure / LETTA_SERVER_SECURE adds one shared password, printed to stdout and compared by header equality (app.py:166-172,797-799; middleware/check_password.py:23-27); the acting user is chosen by a caller-supplied `user_id` header (routers dependencies.py:39,57-61). Docker startup binds REST to 0.0.0.0 and an internal Redis to 0.0.0.0 without auth (startup.sh:4,28,74); compose.yaml publishes Postgres on host port 5432 with default credentials letta/letta (compose.yaml:10-17). Agent-registered Python tools run as a subprocess of the server's own interpreter with the server's full environment, including provider API keys, unless E2B or Modal is configured (services/tool_sandbox/local_sandbox.py:114-145; base.py:487; settings.py:59-71). Provider/MCP secrets are stored in plaintext unless LETTA_ENCRYPTION_KEY is set (letta/schemas/secret.py:55-67). Stdio MCP is off by default (settings.py:45-54). SECURITY.md covers the latest release only (SECURITY.md:14).",
+      "Telemetry, network and legal notices: PRIVACY.md describes click/crash telemetry with an opt-out key that does not exist in code (PRIVACY.md:6-8). The code has no phone-home, but registers the Letta-hosted 'letta-free' provider by default, downloads NLTK data at startup, links to hosted app.letta.com (CORS, banner, injected Claude Code prompt), stores raw per-step LLM request/response (including injected memory) in the local DB by default, and logs captured-message previews at INFO in the proxy (server.py:216; app.py:197-207,795,915; proxy_helpers.py:216-218; settings.py:387; anthropic.py:159-166). README.md:122 and TERMS.md:4 tie use of 'Letta and related Letta services' to ToS/privacy acceptance and the repo does not say how that applies to self-hosted use; LICENSE is Apache-2.0 (LICENSE:176-180) while pyproject.toml:8 says only 'Apache License'.",
+      "Maintenance and process: this tree is an export of the apps/core directory of a monorepo (project.json:5; WEBHOOK_SETUP.md:183-194); every push to main notifies letta-ai/letta-cloud (.github/workflows/notify-on-update.yaml:17-29; letta-code-sync.yml:13-19) and CI references a path absent here (libs/config-core-deploy, reusable-test-workflow.yml:336) plus self-hosted runners and vendor API-key secrets (reusable-test-workflow.yml:38,307-318,359-399), so outside reproduction of CI is limited. Some docs are stale (WEBHOOK_SETUP.md:122 runs `python -m letta.server`, which has no __main__ module; letta/__init__.py:8 fallback version 0.16.7 vs 0.16.8). Schema churn is high: 167 Alembic revision files. Issues without AI-disclosure checkboxes and a verification phrase are auto-closed and locked (.github/workflows/issue-guard.yml:81-166; AI_POLICY.md:27-34). Releases carry no signatures, checksums or attestations and use long-lived registry tokens (see packaging_and_release)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "letta-ai/letta",
+      "checks": [
+        {
+          "field": "readme.install[3] (From source with uv)",
+          "statement": "Self-hosted server from source: needs your own PostgreSQL with pgvector, LETTA_PG_URI exported and the Alembic migration run by hand; `uv sync --all-extras` then `uv run alembic upgrade head` then `uv run letta server`.",
+          "citation": "CONTRIBUTING.md:28-86",
+          "holds": true,
+          "note": "Every step is in the cited range: PostgreSQL plus the pgvector extension (CONTRIBUTING.md:30,57), `export LETTA_PG_URI` (61), `uv sync --all-extras` (72), `uv run alembic upgrade head` (78), `uv run letta server` (85). The code agrees. The only engine is asyncpg on settings.letta_pg_uri (letta/server/db.py:21,58), with default postgresql+pg8000://letta:letta@localhost:5432/letta (letta/settings.py:478). Alembic migrates Postgres only when a PG URI is set and otherwise writes a local SQLite file (alembic/env.py:17-26), so the export matters. `letta server` resolves through pyproject.toml:84-85 and letta/main.py:8. Side note, not a dossier error: CONTRIBUTING.md:112 wrongly says the database is set up automatically on first run."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX Apache-2.0, file LICENSE.",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-176 is the standard Apache License 2.0 text. Lines 178-190 add 'Copyright 2023, Letta authors' and 'Licensed under the Apache License, Version 2.0'. It is the only license file in the tree (no NOTICE or COPYING; vendored dirs checked). pyproject.toml:8 says only 'Apache License' with no version, which the dossier already notes in its risks."
+        },
+        {
+          "field": "platforms.linux_x86_64",
+          "statement": "yes - Docker image built for linux/amd64; CI on ubuntu-latest and self-hosted runners; Python >=3.11,<3.14; a native run needs a local PostgreSQL+pgvector.",
+          "citation": ".github/workflows/docker-image.yml:34; .github/workflows/docker-integration-tests.yaml:11; .github/workflows/reusable-test-workflow.yml:38; pyproject.toml:10; CONTRIBUTING.md:30",
+          "holds": true,
+          "note": "Each citation checks out: `platforms: linux/amd64,linux/arm64` (docker-image.yml:34), `runs-on: ubuntu-latest` (docker-integration-tests.yaml:11), default runner `[\"self-hosted\", \"small\"]` (reusable-test-workflow.yml:38), `requires-python = \"<3.14,>=3.11\"` (pyproject.toml:10), PostgreSQL required (CONTRIBUTING.md:30). No SQLite engine exists in letta/, so the Postgres requirement is real. The image build runs only on release or manual dispatch (docker-image.yml:3-6). The self-hosted runners' architecture cannot be seen from the repo."
+        },
+        {
+          "field": "integrations.claude_code_or_codex",
+          "statement": "Claude Code: hidden proxy POST /v1/anthropic/v1/messages that appends memory blocks to the system prompt, forwards to api.anthropic.com and persists last-user/assistant text to claude-code-<8 chars> or the x-letta-agent-id agent. Codex: none found (grep for 'codex' hits only model names and one comment at letta/services/summarizer/thresholds.py:37). No .claude/, SKILL.md, hooks or MCP config; README mentions neither.",
+          "citation": "letta/server/rest_api/routers/v1/anthropic.py:28,32-50,62-64,103-111,135-137; proxy_helpers.py:125-136,143-153,260-330,453-566; rest_api/utils.py:798-877; .gitignore:8-9",
+          "holds": false,
+          "note": "Most of the Anthropic-proxy detail is correct: router prefix /anthropic mounted under API_PREFIX (anthropic.py:26,32; app.py:853), include_in_schema=False, docstring-only ANTHROPIC_BASE_URL, the api.anthropic.com target, last user message only, x-letta-agent-id, claude-code-<str(actor.id)[:8]> (proxy_helpers.py:484-490), text-only persistence with tool_calls=None (utils.py:824-848), Authorization stripped (125-136), and the key fallback (143-153). The .gitignore, no-.claude/SKILL.md and README sub-claims also hold. Three things do not hold as written. (1) The Codex sentence is false. Grep for 'codex' also hits a working `chatgpt_oauth` provider: it posts to https://chatgpt.com/backend-api/codex/responses using the 'Codex CLI / Letta Code' public OAuth client_id (letta/schemas/providers/chatgpt_oauth.py:1,23-29,106-136) with header 'OpenAI-Originator: codex' (letta/llm_api/chatgpt_oauth_client.py:89-169). It is wired in at enums.py:59, llm_client.py:132-135 and provider_manager.py:1063-1067. Grep also hits a 'codex-style' patch mode in the memory tool (function_sets/base.py:461; tool_executor/core_tool_executor.py:410,539) and a codex-cli comment (context_window_calculator/token_counter.py:90). (2) A second Claude Code proxy is omitted: POST /v1/zai/v1/messages, also hidden from the schema, forwards to https://api.z.ai/api/anthropic with the same inject/capture helpers (routers/v1/zai.py:9-50; mounted at routers/v1/__init__.py:32,36). (3) 'appends' is only half right: memory is appended when `system` is a list but prepended when it is a string (proxy_helpers.py:302-307)."
+        },
+        {
+          "field": "claim_checks[4] (README.md:3 'advanced memory that can learn and self-improve')",
+          "statement": "partial: memory mechanisms exist (memory tool, archival passages, background sleeptime agent every 5th turn by default), but learning is not measured; deletes are hard; block checkpoint/undo/redo exist only as service methods with no REST route and no non-test caller.",
+          "citation": "letta/functions/function_sets/base.py:10-68,164-243; letta/server/server.py:756-789; letta/groups/sleeptime_multi_agent_v4.py:131-168; letta/services/block_manager.py:275-286,842-1041; agent_manager.py:1334; passage_manager.py:778; routers/v1/blocks.py:27-263",
+          "holds": true,
+          "note": "All citations match. The memory tool supports create/str_replace/insert/delete/rename (base.py:10-68), and archival insert/search are at base.py:164-243. The sleeptime group is created with sleeptime_agent_frequency=5 and is skipped when there is no embedding config (server.py:757-759,784); it runs every N turns (v4:140-168). Hard deletes are at block_manager.py:286, agent_manager.py:1334 and passage_manager.py:778. checkpoint/undo/redo are defined at block_manager.py:842/952/1004 and called only from tests/. The blocks routes (lines 27-263) have no such endpoint, and I found no memory-quality eval. Nuance: sleeptime is opt-in per agent (enable_sleeptime defaults to None, letta/schemas/agent.py:143-146); 'by default' applies only to the 5-turn frequency."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "Verdict is pass (4 of 5 hold; install, license and platform are correct). The repairs below fix the one failing statement, integrations.claude_code_or_codex.",
+        "In integrations.claude_code_or_codex, replace \"Codex: none found - no proxy, hook, skill, plugin or config for Codex (grep for 'codex' hits only model names and one comment at letta/services/summarizer/thresholds.py:37)\" with: \"Codex: no proxy, hook, skill, plugin or config lets the Codex CLI use Letta memory. The server does ship a `chatgpt_oauth` model provider that sends agent LLM calls to https://chatgpt.com/backend-api/codex/responses using ChatGPT Plus/Pro OAuth tokens supplied by a client such as Letta Code. It reuses the Codex CLI's public OAuth client_id and sends 'OpenAI-Originator: codex' (letta/schemas/providers/chatgpt_oauth.py:1,23-29,106-136; letta/llm_api/chatgpt_oauth_client.py:89-169; letta/llm_api/llm_client.py:132-135). The memory tool also has a 'codex-style' multi-block patch mode (letta/functions/function_sets/base.py:461; letta/services/tool_executor/core_tool_executor.py:410,539).\"",
+        "In integrations.claude_code_or_codex, add the second Claude Code proxy: \"A second hidden route, POST /v1/zai/v1/messages, forwards Claude Code traffic to https://api.z.ai/api/anthropic with the same memory injection and capture helpers. It sends the key as a Bearer token (letta/server/rest_api/routers/v1/zai.py:9-50,71; mounted at letta/server/rest_api/routers/v1/__init__.py:32,36).\" Optionally also note the catch-all /v1/anthropic/v1/{path} route, which forwards without capture (anthropic.py:269-340).",
+        "In integrations.claude_code_or_codex, change \"It appends the agent's memory blocks to the system prompt (proxy_helpers.py:260-330)\" to \"It adds the agent's memory blocks to the system prompt: as a final text block when `system` is a list, prepended when it is a string (proxy_helpers.py:299-310)\".",
+        "Make the same corrections elsewhere. In risks[1], replace \"no Codex integration of any kind was found (no proxy, hook, skill, plugin or config; grep for 'codex' hits only model names and one comment)\" and change \"The only Claude Code path is an undocumented, OpenAPI-hidden proxy\" to name both the /v1/anthropic and /v1/zai proxies. In telemetry_and_network's optional outbound list, add https://chatgpt.com/backend-api/codex/responses and https://auth.openai.com/oauth/token (chatgpt_oauth.py:23-24,212; used when a chatgpt_oauth provider is configured) and https://api.z.ai/api/anthropic (zai.py:28)."
+      ]
+    }
+  ]
+}

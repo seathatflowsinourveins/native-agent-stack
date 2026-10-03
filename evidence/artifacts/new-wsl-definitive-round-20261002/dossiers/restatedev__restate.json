@@ -1,0 +1,291 @@
+{
+  "contender": "restatedev/restate",
+  "revision": {
+    "contender": "restatedev/restate",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "restatedev/restate",
+        "tag": "v1.7.13",
+        "commit": "5ab87a6b5eabb70d5ba09738e281edc69b6ae10e",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v1.7.13",
+    "commit": "5ab87a6b5eabb70d5ba09738e281edc69b6ae10e",
+    "read_at": "2026-10-02T03:02:43+00:00"
+  },
+  "dossier": {
+    "contender": "restatedev/restate",
+    "revision": {
+      "tag": "v1.7.13",
+      "commit": "5ab87a6b5eabb70d5ba09738e281edc69b6ae10e",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "BUSL-1.1",
+      "file": "LICENSE"
+    },
+    "purpose": "Restate is a durable-execution server written in Rust. Application handlers are written with a Restate SDK (TypeScript, Java/Kotlin, Python, Go or Rust, each in its own repo) and run as separate HTTP/2 or AWS Lambda endpoints that the server calls; the server journals each invocation, retries it with backoff, and persists keyed K/V state, timers, promises and invocation history in embedded RocksDB-based stores. A single restate-server process runs every role by default (HTTP ingress :8080, Admin REST API plus web UI :9070, node gRPC/metrics :5122, worker, log server, Raft metadata server), and the release also ships a `restate` CLI and `restatectl`. Scheduling in this repo is limited to one-shot delayed sends and in-handler durable sleeps; the server contains no cron/recurring trigger, no declarative DAG format, and no code path that launches or supervises external commands or process trees (evidence in code.architecture, claim_checks and risks).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Restate is the simplest way to build resilient applications; it 'provides a distributed durable version of your everyday building blocks'.",
+          "citation": "README.md:17-19"
+        },
+        {
+          "claim": "Listed use cases: Durable AI Agents, Workflows-as-Code, Microservice Orchestration, Event Processing, Async Tasks, and agents/stateful actors/state machines.",
+          "citation": "README.md:21-26"
+        },
+        {
+          "claim": "Supported SDKs: TypeScript, Java and Kotlin, Python, Go, Rust (each linked as a separate repository).",
+          "citation": "README.md:35-41"
+        },
+        {
+          "claim": "'We offer pre-built binaries of the CLI and the server for MacOS and Linux.'",
+          "citation": "README.md:45"
+        },
+        {
+          "claim": "Binaries can also be downloaded from the GitHub release page or the restate.dev download page.",
+          "citation": "README.md:84"
+        },
+        {
+          "claim": "Reliable Execution: 'Restate guarantees code runs to completion. Failures result in retries that use the Durable Execution mechanism to recover partial progress and prevent re-executing completed steps.'",
+          "citation": "README.md:98"
+        },
+        {
+          "claim": "Reliable Communication: 'Services communicate with exactly-once semantics: whether it's request-response, one-way messages, or scheduled tasks ... no losses or duplicates can happen.'",
+          "citation": "README.md:99"
+        },
+        {
+          "claim": "Durable Promises and Timers: promises/futures and timers (sleep, webhooks, timers) are resilient to failures and recoverable 'across failures, processes, and time'.",
+          "citation": "README.md:100"
+        },
+        {
+          "claim": "Consistent State: isolated K/V state per entity, persisted together with execution progress.",
+          "citation": "README.md:101"
+        },
+        {
+          "claim": "Suspending User Code: long-running code suspends when awaiting a Promise/Future and resumes when it is resolved.",
+          "citation": "README.md:102"
+        },
+        {
+          "claim": "Observability & Introspection: 'Restate includes a UI and CLI to inspect the state of your application across services and invocations. Restate automatically generates Open Telemetry traces for the interactions between handlers.'",
+          "citation": "README.md:103"
+        },
+        {
+          "claim": "Restate follows Semantic Versioning; 'You can safely upgrade from a Restate x.y to x.(y+1) release without performing any manual data migration, as Restate performs an automatic data migration for you.'",
+          "citation": "README.md:115-117"
+        },
+        {
+          "claim": "Run via docker: docker run --rm -p 8080:8080 -p 9070:9070 -p 9071:9071 --add-host=host.docker.internal:host-gateway docker.restate.dev/restatedev/restate:latest",
+          "citation": "README.md:61-65"
+        }
+      ],
+      "install": [
+        {
+          "method": "Homebrew (server; macOS and Linux)",
+          "command": "brew install restatedev/tap/restate-server",
+          "citation": "README.md:51-54"
+        },
+        {
+          "method": "npx (server, runs without installing)",
+          "command": "npx @restatedev/restate-server",
+          "citation": "README.md:56-59"
+        },
+        {
+          "method": "Docker (server)",
+          "command": "docker run --rm -p 8080:8080 -p 9070:9070 -p 9071:9071 --add-host=host.docker.internal:host-gateway docker.restate.dev/restatedev/restate:latest",
+          "citation": "README.md:61-65"
+        },
+        {
+          "method": "Homebrew (CLI; macOS and Linux)",
+          "command": "brew install restatedev/tap/restate",
+          "citation": "README.md:69-72"
+        },
+        {
+          "method": "npm global install (CLI)",
+          "command": "npm install --global @restatedev/restate",
+          "citation": "README.md:74-77"
+        },
+        {
+          "method": "Build from source (needs Rust 1.96.1, clang, cmake, OpenSSL, protoc >= 3.15, just)",
+          "command": "just build --bin restate-server [--release]",
+          "citation": "docs/dev/local-development.md:7-51"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - release target x86_64-unknown-linux-musl (dist-workspace.toml:17), Docker image for linux/amd64 (docs/dev/build-and-ci.md:28), npm package @restatedev/restate-linux-x64 (docs/dev/build-and-ci.md:274-278); CI tests run only on a Linux x64 runner (.github/workflows/ci.yml:44).",
+        "wsl2": "unknown - WSL is not mentioned anywhere in the repo (searched 'wsl'); a WSL2 Linux userland would use the Linux artifacts, but WSL2 is neither documented nor tested upstream.",
+        "macos_arm64": "yes - release target aarch64-apple-darwin, signed and notarized (dist-workspace.toml:17,19; .github/workflows/notarize.yml:40-55), Homebrew install (README.md:53); CI has no macOS runner (.github/workflows/ci.yml:44), although the justfile has macOS-specific test-feature handling (justfile:56-67).",
+        "gpu": "no - nothing in the repo uses or mentions GPUs (searched gpu/cuda/metal); the workload is CPU plus RocksDB."
+      },
+      "integrations": {
+        "cli": "`restate` CLI (cli/src/app.rs:22-106): services, deployments, invocations (list/describe/cancel/kill/purge/restart-as-new/resume/pause; cli/src/commands/invocations/mod.rs:28-45), sql (--json/--jsonl/--watch; cli/src/commands/sql.rs:40-46, the only command with JSON output flags), state, kafka clusters/subscriptions, vqueues, rules, config, cloud, and dev/up (embedded restate-lite with a temp data dir that opens a browser; cli/src/commands/dev.rs:42-145). Global flags include --yes (auto-confirm; defaults to true when CI is set), --table-style, --time-format, --connect-timeout, --request-timeout (crates/cli-util/src/opts.rs:68-153). `restatectl` cluster admin tool: provision, status, nodes, partitions, logs, snapshots, config, metadata, sql, storage (tools/restatectl/src/app.rs:51-91). `restate-server` flags: --config-file/RESTATE_CONFIG, --dump-config, --production, --no-logo, --metadata-migration-mode (server/src/main.rs:59-93), with RESTATE_* env overrides (crates/types/src/config_loader.rs:116-121). `restate-doctor` offline diagnostics (tools/restate-doctor/Cargo.toml:5).",
+        "mcp": "none found - searching the whole repo for 'mcp' and 'model context protocol' returned no matches.",
+        "sdk_or_api": "SDKs for TypeScript, Java/Kotlin, Python, Go and Rust live in separate repos (README.md:35-41). Server APIs in this repo: (1) HTTP ingress :8080 with call/send, ?delay=, Idempotency-Key, attach/output/lookup (crates/ingress-http/src/handler/service_handler.rs:52-55,292-338; release-notes/v1.7.0.md:343-384); (2) Admin REST API :9070 with OpenAPI at /openapi covering deployments, services, invocations (PATCH /invocations/{id}/cancel|kill|pause|resume|purge|restart-as-new), Kafka clusters/subscriptions and rules (crates/admin/src/rest_api/mod.rs:96-138,188-191; crates/admin/src/rest_api/invocations.rs:140-143,188-191,554-556); (3) SQL over HTTP, POST /query (crates/admin/src/rest_api/query.rs:104-107); (4) gRPC control/fabric on :5122 used by restatectl (crates/types/src/net/address.rs:70-102); (5) Prometheus /metrics (crates/node/src/network_server/service.rs:47-48); (6) the runtime-to-SDK service protocol definitions (service-protocol/dev/restate/service/protocol.proto:12); (7) in-process embedding via the restate-lite crate, which is publish = false (lite/src/lib.rs:85-316; lite/Cargo.toml:10).",
+        "claude_code_or_codex": "none found as a product integration. The repo only carries AGENTS.md, instructions for AI coding assistants working on the Restate codebase itself (AGENTS.md:4-6,37-55), .gitignore entries for .claude/.opencode/.codex (.gitignore:24-31), and a CLA-bot allowlist entry for a 'claude' user (.github/workflows/cla.yml:35)."
+      },
+      "telemetry_and_network": "The README says nothing about telemetry; the following comes from code and dev docs. Telemetry is ON by default and opt-out: restate-server starts a telemetry task that GETs https://restate.gateway.scarf.sh/restate-server/?target=<triple>&version=<ver>&debug=<bool>&uptime=<hours>&session=<random ULID> immediately at start and every 24 h (server/src/telemetry.rs:22-23,38-51,77-95; started at server/src/main.rs:262-264). The admin role also pings https://restate.gateway.scarf.sh/sdk-registration/?sdk=..&version=.. on every deployment registration (crates/admin/src/schema_registry_integration/mod.rs:61-118). Both are disabled by `disable-telemetry = true` or DO_NOT_TRACK=1/true/yes (crates/types/src/config/common.rs:646-650; crates/types/src/config_loader.rs:142-146; crates/node/src/roles/admin.rs:111-117); the embedded restate-lite behind `restate dev` hard-sets it off (lite/src/lib.rs:178) and the repo's own cluster test runner sets DO_NOT_TRACK (crates/local-cluster-runner/src/node/mod.rs:294). NOT covered by that switch: restate-server and `restate dev` query the GitHub Releases API (octocrab) to log a new-version notice (server/src/build_info.rs:49-84; server/src/main.rs:215-220; cli/src/commands/dev.rs:139-140). Distribution is also routed through Scarf: Homebrew formula URLs and release-note archive links are rewritten to restate.gateway.scarf.sh (.github/workflows/homebrew.yml:50-51; .github/workflows/release-notes.yml:65-76) and the npm launchers depend on @scarf/scarf (npm/restate-server/package.json:24-29; docs/dev/build-and-ci.md:326-332). No account or external service is required to self-host: state is local RocksDB under ./restate-data (crates/types/src/config/common.rs:49,420-424) with a replicated log of replication 1 (crates/types/src/config/bifrost.rs:152; crates/types/src/config/common.rs:1091). Optional outbound connections: user service endpoints over HTTP/2 or AWS Lambda, with optional GCP ID tokens (crates/service-client/src/lib.rs:169-233), Kafka, S3/Azure/GCS object stores (Cargo.toml:208), etcd/DynamoDB/object-store metadata backends (crates/admin/Cargo.toml:16-21), and an OTLP endpoint only if tracing-endpoint is set (crates/tracing-instrumentation/src/lib.rs:204-211,290-293). Restate Cloud CLI commands are an optional default-on feature (cli/Cargo.toml:21; cli/src/app.rs:99-102). Inbound: ports 8080/9070/5122 bind on [::] by default with unix sockets also enabled (crates/types/src/net/address.rs:165-172; crates/types/src/config/common.rs:62-72,164-172; release-notes/v1.7.0.md:212-232); no authentication layer exists on the admin or ingress stacks (crates/admin/src/service.rs:129-217; crates/ingress-http/src/server.rs:141-194), the ingress applies CorsLayer::very_permissive() (crates/ingress-http/src/server.rs:191), and /metrics plus /debug/pprof|heap routes are served on the node port (crates/node/src/network_server/service.rs:47-70; server/src/main.rs:53-54)."
+    },
+    "code": {
+      "languages": [
+        "Rust (edition 2024, toolchain 1.96.1) - all 71 Cargo workspace members (Cargo.toml:1-21,36,38; rust-toolchain.toml:2)",
+        "TypeScript - npm launcher wrappers (npm/restate-server/src/index.ts, npm/restate/src/index.ts, npm/restatectl/src/index.ts) and an AWS CDK load-test sandbox (scripts/loadtest-environment)",
+        "Protocol Buffers - gRPC, WAL and service-protocol definitions (e.g. service-protocol/dev/restate/service/protocol.proto, crates/*/protobuf)",
+        "Shell, Dockerfile, YAML/Helm - CI, release and packaging (.github/workflows, docker/, charts/restate-helm)"
+      ],
+      "entry_points": [
+        {
+          "path": "server/src/main.rs",
+          "what": "`restate-server` binary: loads config (TOML + RESTATE_* env, --production), binds listeners, starts telemetry and restate_node::Node, handles SIGINT/SIGTERM graceful shutdown, SIGHUP compaction, SIGUSR1 config dump (main at line 97; args 59-93; loop 279-308; server/src/signal.rs:19-99)."
+        },
+        {
+          "path": "cli/src/app.rs",
+          "what": "`restate` CLI (bin declared at cli/Cargo.toml:110-112; commands at cli/src/app.rs:50-106). Release builds enable the dev-cmd feature, so the binary embeds restate-lite for `restate dev`/`up` (cli/Cargo.toml:15-18,23)."
+        },
+        {
+          "path": "tools/restatectl/src/app.rs",
+          "what": "`restatectl` cluster administration CLI over the :5122 gRPC port (provision, status, nodes, partitions, logs, snapshots, metadata, sql, storage; app.rs:31-91)."
+        },
+        {
+          "path": "lite/src/lib.rs",
+          "what": "`restate_lite::Restate::create` embeds a single-node server in-process (1 partition, local loglet, unix sockets by default, telemetry off, 512 MiB default memory budget; lib.rs:74-83,154-269); example at lite/examples/restate-lite.rs."
+        },
+        {
+          "path": "crates/node/src/lib.rs",
+          "what": "`Node::create`/`start` composes the roles (admin, worker, ingress, log-server, metadata server) in one process (lib.rs:141-157; roles in crates/node/src/roles/)."
+        },
+        {
+          "path": "crates/admin/src/rest_api/mod.rs",
+          "what": "Admin REST API router with OpenAPI at /openapi (mod.rs:80-193); web UI router in crates/admin/src/web_ui.rs:54-60 (serves assets from the external restate-web-ui crate)."
+        },
+        {
+          "path": "crates/ingress-http/src/server.rs",
+          "what": "HTTP ingress server (layers at server.rs:141-194); request handling incl. ?delay= and Idempotency-Key in crates/ingress-http/src/handler/service_handler.rs:52-55,292-338."
+        },
+        {
+          "path": "tools/restate-doctor/Cargo.toml",
+          "what": "`restate-doctor` binary (src/main.rs): diagnostic and analysis tool for partition-store and log-store (Cargo.toml:5,77-79)."
+        }
+      ],
+      "architecture": "Cargo workspace of 71 member crates (Cargo.toml:1-21). `restate-server` is a thin main that loads configuration from crates/types and starts restate_node::Node (crates/node), which runs the roles in `roles` (default all five: crates/types/src/nodes_config.rs:132-146; crates/types/src/config/common.rs:344-350,1077). Worker = partition processors (crates/worker: a command state machine over the replicated log 'Bifrost' in crates/bifrost with local/memory/replicated loglets, applying to RocksDB tables in crates/partition-store) plus the invoker (crates/invoker-impl) that drives user code through the Restate service protocol V1-V7 (crates/types/src/service_protocol.rs:16-24; crates/service-protocol-v4; service-protocol/) via crates/service-client over HTTP/2 or AWS Lambda (crates/service-client/src/lib.rs:169-233); durable timers are rows in the timer table (crates/worker/src/partition/state_machine/entries/sleep_command.rs:27-43; crates/timer). HttpIngress = crates/ingress-http (Kafka triggers in crates/ingress-kafka). Admin = crates/admin: REST API, cluster controller, deployment/schema registry, web UI embedded from git dependency restate-web-ui v1.0.25 (crates/admin/Cargo.toml:42; Cargo.lock:9207-9215), and SQL over invocation/journal/state tables through Apache DataFusion (crates/storage-query-datafusion). LogServer = crates/log-server; MetadataServer = crates/metadata-server (Raft via a restatedev raft-rs fork; crates/metadata-server/OVERVIEW.md:9-11). Concurrency rules live in crates/vqueues and crates/limiter behind the experimental `vqueues` flag. Execution model for supervision: the server never launches or supervises OS processes for user work - user code runs elsewhere and is reached by HTTP/2 or Lambda calls; the only process-spawn sites in the tree are the CLI/restatectl `lambda` subcommand re-executing its own binary (crates/cli-util/src/lambda.rs:61-72), launching $EDITOR (cli/src/cli_env.rs:235-237) and the test cluster runner (crates/local-cluster-runner/src/node/mod.rs:285-306); searches for cron, recurring/schedule and DAG found nothing in application code (the only 'cron' matches are CI schedules). Bounds that do exist: node invoker concurrency limit default 1000 (crates/types/src/config/worker.rs:632), invoker memory pool default 1.5 GiB (release-notes/v1.7.0.md:518), inactivity timeout 60 s then abort timeout 600 s (crates/types/src/config/worker.rs:329-331,625-626), retry policy 500 ms initial, factor 2.0, 60 s cap, 70 attempts, then pause (crates/types/src/config/invocation.rs:201-242,213-223). Run history: SQL tables sys_invocation (view), sys_invocation_status, sys_invocation_state, sys_journal, sys_journal_events, sys_inbox, sys_promise, state and others, with created/running/completed timestamps, retry_count, next_retry_at and last_failure (crates/storage-query-datafusion/src/invocation_status/schema.rs:17-148; invocation_state/schema.rs:17-82; journal/schema.rs:19-73; table_docs.rs:255-272), visible in the UI and via `restate invocations list|describe` and `restate sql --json` (cli/src/commands/invocations/mod.rs:28-45; cli/src/commands/sql.rs:40-46; cli/src/commands/invocations/list.rs:62-98). Completed-invocation journals are kept 24 h by default and then purged by a background cleaner (crates/types/src/config/invocation.rs:26-34,130-134; crates/worker/src/partition/cleaner.rs:81-117). Cancellation: cancel appends a cancel signal to the journal of running/suspended/paused invocations (cooperative, HTTP 202) and terminates inboxed/scheduled ones directly (crates/worker/src/partition/state_machine/lifecycle/cancel.rs:65-92); kill is forceful (crates/admin/src/rest_api/invocations.rs:135-139); pause/resume/purge/restart-as-new also exist (crates/admin/src/rest_api/mod.rs:114-122). Durability defaults: WAL on and fsync on per batch for log storage (crates/types/src/config/log_server.rs:445-446; crates/types/src/config/bifrost.rs:306,310).",
+      "packaging_and_release": "Release automation is cargo-dist 0.30.3 (dist-workspace.toml:7) with a generated .github/workflows/release.yml triggered by version tags (release.yml:41-45): plan, per-target builds, custom CI (re-runs ci.yml; release.yml:211-226), Docker build with Polar Signals debug-symbol upload (docker-build-release.yml:15-23; docs/dev/build-and-ci.md:334-345), global artifacts/checksums, macOS notarization (notarize.yml:40-55), GitHub Release creation (release.yml:297-364), then Homebrew, Docker push, npm and release-notes publish jobs and finally Helm (release.yml:366-453; dist-workspace.toml:31-38). Artifacts: tar.xz archives of restate-server, restate-cli (binary `restate`) and restatectl for aarch64/x86_64 macOS and aarch64/x86_64 Linux-musl, each with a .sha256 checksum file listed in the release notes (dist-workspace.toml:17; .github/workflows/release-notes.yml:63-76); a NOTICE file generated at build time by `just notice-file` is bundled (dist-workspace.toml:23; justfile:208-209). macOS binaries are code-signed and notarized (dist-workspace.toml:19; notarize.yml:51-55). Integrity: GitHub attestations are explicitly disabled (dist-workspace.toml:11) and the workflows contain no cosign/sigstore/provenance steps (searched .github). Docker: multi-arch images (linux/amd64, linux/arm64) pushed to ghcr.io/restatedev/restate and docker.io/restatedev/restate, runtime base debian:trixie-slim (.github/workflows/docker.yml:238-240,288; docker/Dockerfile:125-140), weekly base-image refresh (docker-refresh.yml:18-22) and a separate alpine-based CLI image (docker-push-release.yml:138-152). npm: launcher packages @restatedev/restate, @restatedev/restate-server, @restatedev/restatectl plus per-platform binary packages (linux/darwin x x64/arm64), published with npm trusted publishing (id-token: write, empty NODE_AUTH_TOKEN; npm.yml:20,26-45,101,106). Homebrew tap restatedev/homebrew-tap with Scarf-rewritten URLs (dist-workspace.toml:13-15; homebrew.yml:50-51). Helm chart pushed as an OCI artifact to ghcr.io/restatedev/restate-helm (helm.yml:42-50). Workspace crates are publish = false (server/Cargo.toml:10; cli/Cargo.toml:11), so nothing is distributed through crates.io. release-notes/ holds consolidated notes for v1.6.0 through v1.7.13. Doc/code difference: docs/dev/release.md:45-46 says the workflow prepares a draft release, but release.yml:354-364 runs `gh release create` without --draft (only --prerelease for prerelease versions).",
+      "tests_and_ci": "Tests run with cargo-nextest (AGENTS.md:6; justfile:167-170; CI installs nextest 0.9.98, ci.yml:81-84; per-test slow-timeout 60 s with termination after 3 periods, .config/nextest.toml:2; RUST_TEST_THREADS=1, .cargo/config.toml:2). Macros/frameworks in use: #[test], #[tokio::test], #[restate_core::test] (e.g. crates/worker/src/partition/state_machine/tests/delayed_send.rs:20), test_log, rstest, googletest, plus Criterion benches (benchmarks/README.md:3-14). By my ripgrep count about 270 .rs files contain test attributes (1,395 attribute occurrences) and 38 .rs files sit under dedicated tests/ directories; server/tests/*.rs start real multi-node clusters of the built binary through crates/local-cluster-runner (server/tests/cluster.rs:47-70; crates/local-cluster-runner/src/node/mod.rs:285-306). CI (.github/workflows/ci.yml): hakari workspace-hack check (18-33); build-and-test on a single Linux x64 runner with a 45-minute timeout: `cargo update -w --locked`, `just lint` (fmt --check, clippy -D warnings, cargo-deny; justfile:118-128), `just test` (all features on Linux; justfile:56-57,167-170) and `just doctest` (34-112); Docker image build (124-131); SDK integration suites for Java, Python, Go, TypeScript and Rust plus protocol-v7 and vqueue variants, delegated to workflows in sibling repos at @main (133-261); e2e via restatedev/e2e@main (263-302); experimental-feature variants with continue-on-error (148-167, 304-354); Jepsen only on main in non-fork runs (356-402) plus a nightly dispatch (jepsen-nightly-dispatch.yml:3-16). Other workflows: deps.yml (cargo-deny; the advisories job is continue-on-error, deps.yml:17-34), hack-clippy.yml (nightly `cargo hack clippy --each-feature`, 6-65), cla.yml, docker-refresh.yml, helm.yml and the release chain. There is no macOS or Windows test runner. docs/dev/release-testing.md:13-55 lists further external suites (Jepsen, e2e-verification-runner, long-lived load tests) that live in other repositories.",
+      "dependencies": "Manifests: 72 Cargo.toml files - a virtual root (Cargo.toml) plus 71 workspace members (54 under crates/ including 3 derive crates, cli, server, lite, benchmarks, 4 under util/, 8 under tools/, workspace-hack). Root [workspace.dependencies] holds 213 entries = 59 path crates + restate-workspace-hack + 153 external (Cargo.toml:44-300, counted from the manifest). Direct dependency counts by my count: server/Cargo.toml 28 [dependencies] (+1 target-specific jemalloc, 22 dev, 1 build); cli/Cargo.toml 64 (2 optional: restate-lite, mock-service-endpoint; 1 dev, 1 build); lite/Cargo.toml 19 (3 dev, 1 build); tools/restatectl/Cargo.toml 46 (7 optional; 3 dev, 1 build); tools/restate-doctor/Cargo.toml 46. Cargo.lock pins 1,005 packages (counted [[package]] entries) and CI enforces `cargo update -w --locked` (ci.yml:92). Native build requirements: clang, cmake, OpenSSL, protoc >= 3.15, plus vendored krb5/sasl2/librdkafka builds with cross-compilation shims (docs/dev/local-development.md:11-19,172-218; Cargo.toml:305-309; crates/ingress-kafka/Cargo.toml:43). Five git-sourced dependencies from github.com/restatedev: rust-rocksdb, rust-sasl, raft-rs, rust-rdkafka and restate-web-ui-crate (Cargo.toml:235-238,309; crates/metadata-server/Cargo.toml:40-41; crates/ingress-kafka/Cargo.toml:43; crates/admin/Cargo.toml:42); deny.toml allows only the restatedev GitHub org and arrow-rs as git sources (deny.toml:119-129). npm: three launcher packages (npm/restate/package.json, npm/restate-server/package.json, npm/restatectl/package.json); restate-server has 1 runtime dependency (@scarf/scarf), 4 optional platform-binary packages and 5 devDependencies (npm/restate-server/package.json:24-42), and the other two have matching dependency lines (npm/restate/package.json:25,31-35; npm/restatectl/package.json:25,31-35).",
+      "security_policy": "none - no SECURITY.md or vulnerability-disclosure text exists in the tree (glob **/SECURITY* and greps for vulnerability/disclosure/security@ found nothing); the README only points to GitHub issues for problems (README.md:91). Related controls: cargo-deny for licenses/advisories/sources with 8 ignored RUSTSEC ids (deny.toml:7-25) and a non-blocking advisories CI job (.github/workflows/deps.yml:20)."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:98 - 'Restate guarantees code runs to completion. Failures result in retries that use the Durable Execution mechanism to recover partial progress and prevent re-executing completed steps.'",
+        "verified": "partial",
+        "evidence": "Code qualifies the unconditional wording: the default invocation retry policy is exponential backoff from 500 ms (factor 2.0, max interval 60 s) with 70 max attempts, after which the default action is to pause the invocation; unlimited attempts and kill-on-exhaustion are opt-in (crates/types/src/config/invocation.rs:171-180,201-242,213-223). Journaling of side-effect results exists (RunCommand/ProposeRunCompletion handled in crates/invoker-impl/src/invocation_task/service_protocol_runner_v4.rs:999-1034,1109-1114), so completed steps are not re-run. Whether work 'runs to completion' therefore depends on the configured retry policy and on manual resume of paused invocations."
+      },
+      {
+        "claim": "README.md:99 - 'Services communicate with exactly-once semantics ... Restate reliably delivers messages and uses Durable Execution to ensure no losses or duplicates can happen.'",
+        "verified": "partial",
+        "evidence": "Mechanisms are present: producer/epoch sequence-number dedup of commands (crates/worker/src/partition/processor/dedup.rs:19-24), Idempotency-Key handling at the ingress (crates/ingress-http/src/handler/service_handler.rs:52,311-313) and server-generated idempotency keys for ingress calls on new clusters (release-notes/v1.7.0.md:615-627). The end-to-end 'no losses or duplicates' guarantee cannot be established by reading code alone: the v1.7.0 notes record a fixed bug where awakeable/signal deliveries could be silently lost during partition leadership transitions (release-notes/v1.7.0.md:892-896), and SDK-side semantics live in other repos."
+      },
+      {
+        "claim": "README.md:99-100 - 'scheduled tasks' and durable timers (sleep, timers) are supported.",
+        "verified": "partial",
+        "evidence": "One-shot only. The ingress accepts ?delay= on /send requests and rejects it on calls (crates/ingress-http/src/handler/service_handler.rs:292-338,437-455; crates/ingress-http/src/handler/error.rs:96-98); delayed invocations become durable timers (crates/worker/src/partition/state_machine/tests/delayed_send.rs:20-80) and SDK sleeps register timers in the timer table (crates/worker/src/partition/state_machine/entries/sleep_command.rs:27-43). No cron expression, recurring-schedule or interval-trigger feature exists anywhere in application code (the only 'cron' matches are CI schedules under .github/workflows), so recurrence is not provided by the server itself."
+      },
+      {
+        "claim": "README.md:22 - 'Workflows-as-Code' is a supported use case.",
+        "verified": "yes",
+        "evidence": "Workflow is a distinct service type with its own handler types, next to Service and VirtualObject (crates/types/src/invocation/mod.rs:48-52,90-94), and workflow IDs are first-class in introspection (target_service_key is 'the key of the virtual object or the workflow ID', crates/storage-query-datafusion/src/invocation_status/schema.rs:45-46). Workflows are SDK handlers called over HTTP/2 or Lambda (crates/service-client/src/lib.rs:169-233); the server has no declarative DAG/task-graph format and no path that launches external commands (spawn sites only at crates/cli-util/src/lambda.rs:61, cli/src/cli_env.rs:235, crates/local-cluster-runner/src/node/mod.rs:286)."
+      },
+      {
+        "claim": "README.md:103 - 'Restate includes a UI and CLI to inspect the state of your application ... Restate automatically generates Open Telemetry traces for the interactions between handlers.'",
+        "verified": "partial",
+        "evidence": "UI: yes - served from the admin port at /ui and enabled by default (crates/admin/src/web_ui.rs:54-60; crates/admin/src/service.rs:178-184; crates/types/src/config/admin.rs:68-69,134), but its assets come from the separate git dependency restate-web-ui v1.0.25 (crates/admin/Cargo.toml:42; Cargo.lock:9207-9215), so UI code and any UI-side network calls are not inspectable in this checkout. CLI: yes (cli/src/commands/invocations/mod.rs:28-45; cli/src/commands/sql.rs:40-46). OpenTelemetry: the code differs from 'automatically' - tracing is only initialised when tracing-endpoint / tracing-runtime-endpoint / tracing-services-endpoint or tracing-json-path is set, and all default to None (crates/tracing-instrumentation/src/lib.rs:204-211,290-293; crates/types/src/config/common.rs:1457,1508-1518)."
+      },
+      {
+        "claim": "README.md:45 - 'We offer pre-built binaries of the CLI and the server for MacOS and Linux.'",
+        "verified": "yes",
+        "evidence": "cargo-dist targets are aarch64-apple-darwin, x86_64-apple-darwin, aarch64-unknown-linux-musl and x86_64-unknown-linux-musl for restate-server, restate (CLI) and restatectl (dist-workspace.toml:17; server/Cargo.toml:14-15; cli/Cargo.toml:15-18; tools/restatectl/Cargo.toml:13-15; .github/workflows/release-notes.yml:65-76). Linux archives are static musl builds only, and there is no Windows target (deny.toml:89-92)."
+      },
+      {
+        "claim": "README.md:115-117 - upgrading from x.y to x.(y+1) needs no manual data migration.",
+        "verified": "partial",
+        "evidence": "Data compatibility is enforced by a cluster marker whose minimum forward and backward compatible versions are both 1.6.0 for this release (crates/types/src/cluster_marker.rs:36-39), and the workspace version is 1.7.13 (Cargo.toml:35). The claim does not cover configuration: v1.7.0 removed or renamed config keys that operators had to edit by hand (release-notes/v1.7.0.md:57-265), and several opt-in flags are one-way, blocking rollback (crates/types/src/config/common.rs:789-830; release-notes/v1.7.0.md:462)."
+      },
+      {
+        "claim": "README.md:61-65 - docker run ... -p 9071:9071 ... docker.restate.dev/restatedev/restate:latest",
+        "verified": "partial",
+        "evidence": "Code differs from the command: the registry host docker.restate.dev is not defined anywhere in this repo (referenced only at README.md:64, .github/workflows/release-notes.yml:41-42 and charts/restate-helm/values.yaml:7), while the release workflows push to ghcr.io/restatedev/restate and docker.io/restatedev/restate (.github/workflows/docker.yml:238-240; docs/dev/build-and-ci.md:34). Port 9071 is not a default listener in v1.7.13 - defaults are 8080 ingress, 9070 admin, 5122 control/fabric and 6669 tokio-console (crates/types/src/net/address.rs:40-109); 9071 appears only in README.md:63 and a legacy 1.1.0 load-test config (scripts/loadtest-environment/config/restate-1.1.0.toml:87). The command also does not publish 5122, which restatectl needs (tools/restatectl/src/app.rs:33-36)."
+      },
+      {
+        "claim": "README.md:35-41 - Restate supports SDKs for TypeScript, Java/Kotlin, Python, Go and Rust.",
+        "verified": "not_checkable",
+        "evidence": "The SDKs live in separate repositories and user-facing docs live outside this tree (docs.restate.dev; restatedev/docs-restate per docs/dev/release.md:3-9), so SDK-side semantics (ctx.run, cancellation delivery, per-handler retry overrides) cannot be verified here. In-repo evidence is only the protocol contract: new deployments must support service protocol V5-V7, in-flight invocations V1-V7, and V7 is opt-in (crates/types/src/service_protocol.rs:16-24,50-72; service-protocol/dev/restate/service/protocol.proto:12)."
+      },
+      {
+        "claim": "README.md:102 - long-running code suspends when awaiting a Promise/Future and resumes when it is resolved.",
+        "verified": "yes",
+        "evidence": "Suspension is a first-class lifecycle command (crates/worker/src/partition/state_machine/lifecycle/suspend.rs:32-51); the invoker's inactivity timeout (default 60 s) asks a stalled invocation to suspend and the abort timeout (default 600 s) aborts it if it does not comply (crates/types/src/config/worker.rs:329-331,344-363,625-626); suspended status and what it awaits are queryable (crates/storage-query-datafusion/src/invocation_status/schema.rs:138-147)."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Execution-model gap for 'scheduled DAGs over existing commands': Restate runs SDK-written handlers that it calls over HTTP/2 or AWS Lambda (README.md:35-41; crates/service-client/src/lib.rs:169-233). The server has no code path that launches or supervises external commands or process trees (only spawn sites: crates/cli-util/src/lambda.rs:61, cli/src/cli_env.rs:235, crates/local-cluster-runner/src/node/mod.rs:286), no DAG definition format, and no cron/recurring trigger (greps found none; scheduling is one-shot ?delay= on /send, crates/ingress-http/src/handler/service_handler.rs:292-338). Nothing in this repo provides running an existing command or a cron-style schedule without user-written SDK code and an outside trigger.",
+      "License: BUSL-1.1 is not an OSI open-source license until the Change Date (4 years after each version's release, then Apache-2.0); the Additional Use Grant bars offering a 'Public Restate Platform Service' (a managed service where third parties register their own deployments) but permits internal and production use (LICENSE:8-40,62-76). Metadata is inconsistent: the Admin OpenAPI declares license MIT (crates/admin/src/rest_api/mod.rs:48-51) and the npm packages declare 'BSL' (npm/restate-server/package.json:15). Contributions require a CLA granting Restate a perpetual sublicensable copyright and patent license (docs/dev/cla.md:20-25; .github/workflows/cla.yml:29-30).",
+      "Default network exposure without inbound authentication: admin API :9070 and HTTP ingress :8080 bind to [::] (all interfaces, dual-stack) with TCP and unix-socket listeners both on by default (crates/types/src/net/address.rs:165-172; crates/types/src/config/common.rs:62-72,164-172; release-notes/v1.7.0.md:212-232). The admin and ingress middleware stacks contain no authentication layer (crates/admin/src/service.rs:129-217; crates/ingress-http/src/server.rs:141-194), the ingress uses CorsLayer::very_permissive() (crates/ingress-http/src/server.rs:191), and POST /deployments makes the server call whatever HTTP/Lambda endpoint it is given (crates/admin/src/rest_api/deployments.rs:38-41). Narrowing exposure is a configuration task via the listener options (bind-ip / bind-address / listen-mode).",
+      "Telemetry and phone-home are on by default: a 24-hourly Scarf ping plus a ping per deployment registration (server/src/telemetry.rs:22-23,77-95; crates/admin/src/schema_registry_integration/mod.rs:61-118). Disabling needs disable-telemetry or DO_NOT_TRACK (crates/types/src/config_loader.rs:142-146), and the GitHub latest-release lookup in restate-server and `restate dev` is not covered by that switch (server/src/main.rs:215-220; server/src/build_info.rs:49-60; cli/src/commands/dev.rs:139-140). Homebrew and archive downloads are routed through the Scarf gateway and the npm launchers depend on @scarf/scarf (.github/workflows/homebrew.yml:50-51; npm/restate-server/package.json:24-29).",
+      "Concurrency limits depend on the experimental `vqueues` flag, documented in code as 'Current in heavy development, do not enable this feature unless you are a contributor' (crates/types/src/config/common.rs:778-780), although the v1.7.0 notes present it as Flow Control and restrict it to fresh clusters (release-notes/v1.7.0.md:323-341,421-426); v1.7.13 fixed replica state divergence that occurred with vqueues enabled (release-notes/v1.7.13.md:43-52), and with vqueues pause aborts the running attempt with no graceful drain (release-notes/v1.7.0.md:444-446). Protocol v7 and the scoped-table migrations are one-way (crates/types/src/config/common.rs:789-830). Without vqueues the built-in bound is the node-level invoker limit, default 1000 (crates/types/src/config/worker.rs:632).",
+      "Run-history and cancellation limits: completed-invocation journals are retained 24 h by default and then purged by the cleaner (crates/types/src/config/invocation.rs:26-34,130-134; crates/worker/src/partition/cleaner.rs:81-117), and the config doc itself advises disabling default journal retention in production in favour of per-service SDK settings (crates/types/src/config/invocation.rs:30-31). Cancel on a running invocation is cooperative (a cancel signal appended to the journal, HTTP 202; crates/worker/src/partition/state_machine/lifecycle/cancel.rs:65-74), and kill 'does not guarantee consistency for virtual object instance state, in-flight invocations to other services, or other side effects' (crates/admin/src/rest_api/invocations.rs:135-139). `restart-as-new` does not work on workflows yet (cli/src/commands/invocations/mod.rs:39).",
+      "Platform and footprint: the server is Unix-only (tokio::signal::unix in server/src/signal.rs:14; Windows is not a target, deny.toml:89-92); CI tests run only on a Linux x64 runner (.github/workflows/ci.yml:44); release archives are musl Linux and macOS only (dist-workspace.toml:17) while the Docker image is glibc debian:trixie-slim (docker/Dockerfile:125); WSL2 is undocumented and the repo ships no systemd/launchd unit files (greps: no matches). Default sizing targets servers: 24 partitions, 2 GiB RocksDB memory budget (crates/types/src/config/common.rs:1090,1110), 1.5 GiB invoker pool (release-notes/v1.7.0.md:518), all five roles in one process (crates/types/src/config/common.rs:1077). `restate dev` is labelled not for production and deletes its temp data dir on exit unless --retain (cli/src/commands/dev.rs:76-82,121-131).",
+      "Supply-chain and maintenance: single-vendor project (LICENSE:5); builds depend on restatedev-org forks pinned by git revision - rust-rocksdb, rust-sasl, raft-rs, rust-rdkafka - plus the web-UI crate (Cargo.toml:235-238,309; crates/metadata-server/Cargo.toml:40-41; crates/ingress-kafka/Cargo.toml:43; crates/admin/Cargo.toml:42). deny.toml ignores 8 RUSTSEC advisories, including unmaintained paste, fxhash, bincode, proc-macro-error2 and smartstring, a protobuf stack-overflow and two quick-xml DoS issues (deny.toml:7-25), and the advisories CI job is non-blocking (.github/workflows/deps.yml:20). Release integrity is checksums plus macOS notarization only: GitHub attestations are disabled (dist-workspace.toml:11), no cosign/provenance step exists in .github, and release.yml installs cargo-dist through a curl-to-sh pipe (.github/workflows/release.yml:67). There is no security policy file, and user-facing docs live outside this repo."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "restatedev/restate",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Homebrew (server; macOS and Linux): brew install restatedev/tap/restate-server",
+          "citation": "README.md:51-54",
+          "holds": true,
+          "note": "README.md:53 has the exact command. The formula name defaults to the package name restate-server (server/Cargo.toml:2,14-15; no formula override, unlike cli/Cargo.toml:17). The tap is restatedev/homebrew-tap (dist-workspace.toml:13-15). The formula is built for darwin and linux-musl targets (dist-workspace.toml:17) and published from an Ubuntu linuxbrew job (.github/workflows/homebrew.yml:19,47). 'macOS and Linux' comes from README.md:45, not lines 51-54. Prereleases are not pushed to the tap (homebrew.yml:60-63)."
+        },
+        {
+          "field": "license",
+          "statement": "spdx BUSL-1.1, file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1 reads 'Business Source License 1.1', and the workspace manifest declares license = \"BUSL-1.1\" (Cargo.toml:39). The Additional Use Grant bars a 'Public Restate Platform Service' (LICENSE:8-36). Change Date is 4 years after release; Change License is Apache-2.0 (LICENSE:38-40)."
+        },
+        {
+          "field": "readme.platforms.macos_arm64",
+          "statement": "yes - release target aarch64-apple-darwin, signed and notarized; Homebrew install; CI has no macOS runner; justfile has macOS-specific test-feature handling",
+          "citation": "dist-workspace.toml:17,19; .github/workflows/notarize.yml:40-55; README.md:53; .github/workflows/ci.yml:44; justfile:56-67",
+          "holds": true,
+          "note": "aarch64-apple-darwin is in targets (dist-workspace.toml:17) and macos-sign = true (:19). notarize.yml:40-55 runs xcrun notarytool submit for a matrix that includes aarch64-apple-darwin (:23-25). README.md:53 has the brew command. Every runs-on in ci.yml is an Ubuntu runner (lines 20, 44, 265, 306, 358); macOS runners appear only in the release build (release.yml:134-159). Small wording point: justfile:56-67 handles non-Linux hosts in general, and the comment at :38-39 gives macOS as the example."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "`restate` CLI ... sql (--json/--jsonl/--watch; cli/src/commands/sql.rs:40-46, the only command with JSON output flags) ... global flags --yes (true when CI set), --table-style, --time-format, --connect-timeout, --request-timeout; restatectl subcommands; restate-server flags; RESTATE_* env; restate-doctor",
+          "citation": "cli/src/app.rs:22-106; cli/src/commands/invocations/mod.rs:28-45; cli/src/commands/sql.rs:40-46; cli/src/commands/dev.rs:42-145; crates/cli-util/src/opts.rs:68-153; tools/restatectl/src/app.rs:51-91; server/src/main.rs:59-93; crates/types/src/config_loader.rs:116-121; tools/restate-doctor/Cargo.toml:5",
+          "holds": false,
+          "note": "Most details match: the subcommands (app.rs:50-106), invocations list/describe/cancel/kill/purge/restart-as-new/resume/pause (mod.rs:28-45), sql --json/--jsonl (sql.rs:40-46), dev/up with restate-lite, a tempdir and a browser launch (dev.rs:44,90,117), --yes auto-confirming under CI (opts.rs:79-84; crates/cli-util/src/context.rs:212), the four timeout/style flags (opts.rs:68-101), the restatectl subcommands, the restate-server flags, RESTATE_* env overrides and restate-doctor. Two details are wrong. (a) There is no --watch flag. Watch declares only #[clap(short, global = true)], so the flag is -w, with -n for the interval (crates/cli-util/src/ui/watcher.rs:29-34), and '--watch' appears nowhere in the repo. (b) sql is not the only command with JSON output: `restate state get --plain/-p` is documented as 'Only print the retrieved state as a JSON' (cli/src/commands/state/get.rs:29-31,51-53)."
+        },
+        {
+          "field": "claim_checks[2]",
+          "statement": "README.md:99-100 'scheduled tasks' and durable timers: partial, one-shot only. ?delay= is accepted on /send and rejected on calls; delayed sends and sleeps become timers; no cron/recurring feature exists in application code",
+          "citation": "crates/ingress-http/src/handler/service_handler.rs:292-338,437-455; crates/ingress-http/src/handler/error.rs:96-98; crates/worker/src/partition/state_machine/tests/delayed_send.rs:20-80; crates/worker/src/partition/state_machine/entries/sleep_command.rs:27-43",
+          "holds": true,
+          "note": "parse_delay reads a single delay value (service_handler.rs:437-455). A Call with a delay returns UnsupportedDelay (:317-321; message at error.rs:95-98). A Send sets execution_time = now + delay once (:329-331). The test shows a delayed send registering a timer and invoking when it fires (delayed_send.rs:41-83), and SleepCommand calls register_timer (sleep_command.rs:33-40). A repo-wide case-insensitive search for cron/crontab/recurring/recurrence matched only four CI schedule lines (docker-tools.yml:10, jepsen-nightly-dispatch.yml:5, docker-refresh.yml:21, hack-clippy.yml:8)."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "readme.integrations.cli: replace '--watch' with '-w'. Watch mode is a short-only flag, and '-n <secs>' sets the refresh interval (crates/cli-util/src/ui/watcher.rs:29-34).",
+        "readme.integrations.cli: delete 'the only command with JSON output flags' and note that `restate state get --plain/-p` also prints state as JSON (cli/src/commands/state/get.rs:29-31,51-53)."
+      ]
+    }
+  ]
+}

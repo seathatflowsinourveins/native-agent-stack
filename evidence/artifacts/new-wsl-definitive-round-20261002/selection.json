@@ -1,0 +1,2051 @@
+{
+  "schema_version": 1,
+  "kind": "definitive_round_selection",
+  "decision_rule": "decision-rule.txt",
+  "counts": {
+    "definitive": 35,
+    "measurement": 7,
+    "user_pin_conflict": 1
+  },
+  "units": [
+    {
+      "unit_id": "ci-supply-chain",
+      "field": [
+        {
+          "key": "F01",
+          "name": "zizmor",
+          "contender": "zizmorcore/zizmor"
+        },
+        {
+          "key": "F02",
+          "name": "actionlint (kjanat)",
+          "contender": "kjanat/actionlint"
+        },
+        {
+          "key": "F03",
+          "name": "osv-scanner",
+          "contender": "google/osv-scanner"
+        },
+        {
+          "key": "F04",
+          "name": "attest",
+          "contender": "actions/attest"
+        },
+        {
+          "key": "F05",
+          "name": "codeql-sarif",
+          "contender": "github/codeql-action"
+        },
+        {
+          "key": "F06",
+          "name": "Syft",
+          "contender": "anchore/syft"
+        },
+        {
+          "key": "F07",
+          "name": "gitleaks",
+          "contender": "gitleaks/gitleaks"
+        },
+        {
+          "key": "F08",
+          "name": "Trivy",
+          "contender": "aquasecurity/trivy"
+        },
+        {
+          "key": "F09",
+          "name": "poutine",
+          "contender": "boostsecurityio/poutine"
+        },
+        {
+          "key": "F10",
+          "name": "Dependabot",
+          "contender": "dependabot/dependabot-core"
+        },
+        {
+          "key": "F11",
+          "name": "actionlint (rhysd)",
+          "contender": "rhysd/actionlint"
+        },
+        {
+          "key": "F12",
+          "name": "Grype",
+          "contender": "anchore/grype"
+        }
+      ],
+      "slots": [
+        {
+          "slot_id": "workflow-policy-audit",
+          "question": "Which single tool audits GitHub Actions workflows for permission and pinning policy?",
+          "picks": {
+            "claude": "F01",
+            "gpt": "F01"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F01",
+            "contender": "zizmorcore/zizmor"
+          }
+        },
+        {
+          "slot_id": "build-provenance",
+          "question": "Which single mechanism produces signed build-provenance or SBOM attestations for hosted outputs?",
+          "picks": {
+            "claude": "F04",
+            "gpt": "F04"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F04",
+            "contender": "actions/attest"
+          }
+        },
+        {
+          "slot_id": "sbom-generation",
+          "question": "Which single tool generates SBOMs (CycloneDX or SPDX) for container images and directories?",
+          "picks": {
+            "claude": "F06",
+            "gpt": "F06"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F06",
+            "contender": "anchore/syft"
+          }
+        },
+        {
+          "slot_id": "dependency-updates",
+          "question": "Which single tool keeps pinned dependencies, including action references, current through pull requests?",
+          "picks": {
+            "claude": "F10",
+            "gpt": "F10"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F10",
+            "contender": "dependabot/dependabot-core"
+          }
+        },
+        {
+          "slot_id": "findings-publication",
+          "question": "Which single mechanism publishes static-analysis findings as code-scanning alerts tied to commit and tool, or none?",
+          "picks": {
+            "claude": "F05",
+            "gpt": "F05"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F05",
+            "contender": "github/codeql-action"
+          }
+        },
+        {
+          "slot_id": "workflow-correctness-lint",
+          "question": "Which single linter checks workflow syntax, expressions, action inputs and outputs, and run: scripts?",
+          "picks": {
+            "claude": "F02",
+            "gpt": "F02"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F02",
+            "contender": "kjanat/actionlint"
+          }
+        }
+      ]
+    },
+    {
+      "unit_id": "code-navigation",
+      "field": [
+        {
+          "key": "F01",
+          "name": "Serena",
+          "contender": "oraios/serena"
+        },
+        {
+          "key": "F02",
+          "name": "token-savior",
+          "contender": "mibayy/token-savior"
+        },
+        {
+          "key": "F03",
+          "name": "codebase-memory-mcp",
+          "contender": "deusdata/codebase-memory-mcp"
+        },
+        {
+          "key": "F04",
+          "name": "jCodeMunch",
+          "contender": "jgravelle/jcodemunch-mcp"
+        },
+        {
+          "key": "F05",
+          "name": "scip, zoekt and universal-ctags",
+          "contender": "scip-code/scip"
+        },
+        {
+          "key": "F06",
+          "name": "ast-grep",
+          "contender": "ast-grep/ast-grep"
+        },
+        {
+          "key": "F07",
+          "name": "gitnexus",
+          "contender": "abhigyanpatwari/gitnexus"
+        },
+        {
+          "key": "F08",
+          "name": "claude-plugins-official",
+          "contender": "anthropics/claude-plugins-official"
+        },
+        {
+          "key": "F09",
+          "name": "CodeGraph",
+          "contender": "colbymchenry/codegraph"
+        },
+        {
+          "key": "F10",
+          "name": "Glean",
+          "contender": "facebookincubator/glean"
+        }
+      ],
+      "slots": [
+        {
+          "slot_id": "language-server-navigation",
+          "question": "Which single tool gives both clients exact symbol definitions, references and symbol-level edits from language servers (for example over MCP)?",
+          "picks": {
+            "claude": "F01",
+            "gpt": "F01"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F01",
+            "contender": "oraios/serena"
+          }
+        },
+        {
+          "slot_id": "client-native-lsp",
+          "question": "Which single integration adds native language-server navigation and post-edit diagnostics inside Claude Code itself, or none beyond the language-server navigation slot?",
+          "picks": {
+            "claude": "F08",
+            "gpt": "NONE"
+          },
+          "agreement": "differ",
+          "adjudications": [
+            {
+              "family": "claude",
+              "order": "AB",
+              "return_a_family": "claude",
+              "resolved_default": "F08",
+              "choice": "A"
+            },
+            {
+              "family": "claude",
+              "order": "BA",
+              "return_a_family": "gpt",
+              "resolved_default": "F08",
+              "choice": "B"
+            },
+            {
+              "family": "gpt",
+              "order": "AB",
+              "return_a_family": "claude",
+              "resolved_default": null,
+              "choice": "unsettled"
+            },
+            {
+              "family": "gpt",
+              "order": "BA",
+              "return_a_family": "gpt",
+              "resolved_default": null,
+              "choice": "unsettled"
+            }
+          ],
+          "outcome": {
+            "status": "measurement",
+            "basis": "unsettled after adjudication",
+            "finalists": [
+              "F08",
+              "NONE"
+            ],
+            "settling_measurement": "Run one paired experiment on the WSL2 Ubuntu x86_64 host, holding Claude Code, model, prompts, language-server versions, repository and Serena configuration fixed. Compare Serena alone against Serena plus the matching F08 native plugin. Use sealed definition/reference questions and edits that introduce and then repair compiler-confirmed errors; include a multi-step refactor with temporary intermediate errors. Exercise both Claude Code Edit/Write and Serena's editing tools. Capture exact native navigation answers, whether diagnostics reaching the agent reflect each edited revision and clear after repair, final compiler results, startup/index-update latency, known-source read cost, tokens and peak RAM. Do not require unsolicited delivery as an additional acceptance condition. Choose A if the enabled arm reliably supplies the requested native navigation and current post-edit diagnostics beyond the control. Choose B if, after confirming correct installation and a healthy server, that addition is absent or persistently stale."
+          }
+        }
+      ]
+    },
+    {
+      "unit_id": "cross:gpt6-harnesses",
+      "field": [
+        {
+          "key": "F01",
+          "name": "OmniRoute",
+          "contender": "diegosouzapw/omniroute"
+        },
+        {
+          "key": "F02",
+          "name": "Bifrost",
+          "contender": "maximhq/bifrost"
+        },
+        {
+          "key": "F03",
+          "name": "LiteLLM",
+          "contender": "berriai/litellm"
+        },
+        {
+          "key": "F04",
+          "name": "agentgateway",
+          "contender": "agentgateway/agentgateway"
+        },
+        {
+          "key": "F05",
+          "name": "Portkey AI Gateway",
+          "contender": "portkey-ai/gateway"
+        },
+        {
+          "key": "F06",
+          "name": "claude-code-router",
+          "contender": "musistudio/claude-code-router"
+        }
+      ],
+      "slots": [
+        {
+          "slot_id": "gpt-gateway",
+          "question": "Which single gateway routes GPT-6-family calls from Codex and SDK workers (account pooling, routing, usage observation, request compression off unless chosen), or none (the native clients call the provider directly)?",
+          "picks": {
+            "claude": "F01",
+            "gpt": "NONE"
+          },
+          "agreement": "differ",
+          "adjudications": [
+            {
+              "family": "claude",
+              "order": "AB",
+              "return_a_family": "claude",
+              "resolved_default": "NONE",
+              "choice": "B"
+            },
+            {
+              "family": "claude",
+              "order": "BA",
+              "return_a_family": "gpt",
+              "resolved_default": "NONE",
+              "choice": "A"
+            },
+            {
+              "family": "gpt",
+              "order": "AB",
+              "return_a_family": "claude",
+              "resolved_default": "NONE",
+              "choice": "B"
+            },
+            {
+              "family": "gpt",
+              "order": "BA",
+              "return_a_family": "gpt",
+              "resolved_default": null,
+              "choice": "unsettled"
+            }
+          ],
+          "outcome": {
+            "status": "measurement",
+            "basis": "unsettled after adjudication",
+            "finalists": [
+              "F01",
+              "NONE"
+            ],
+            "settling_measurement": "Run one paired conformance evaluation on the specified WSL2 x86_64 host, with fixed client versions and the same verifiable tool-use tasks through native calls and OmniRoute v3.8.51's codex OAuth provider. Exercise Codex CLI, Codex SDK and an OpenAI-compatible worker across Astra/Sol/Luna and their supported efforts, including omitted effort and native Ultra configurations. Capture actual native requests first to establish which Lite header/metadata and parallel-tool combinations are supported; then compare their gateway upstream requests and task outcomes, including equivalent gateway suffix aliases. Keep compression off and Thinking Budget passthrough, with no model/effort override rules. Pool two native accounts, inject a first-account 429, and reconcile upstream completions against usage records during concurrent streaming: successful tokens must appear once, while a separate zero-token failure record is allowed. Record task success and paired latency. Choose B if the required lanes preserve supported native semantics and accounting while adding successful account failover; choose A if a supported native flow reproducibly loses requested semantics or the required failover, compression or accounting behavior fails."
+          }
+        }
+      ]
+    },
+    {
+      "unit_id": "cross:runtime-workers",
+      "field": [
+        {
+          "key": "F01",
+          "name": "Claude Agent SDK",
+          "contender": "anthropics/claude-agent-sdk-python"
+        },
+        {
+          "key": "F02",
+          "name": "OpenHands software-agent-sdk",
+          "contender": "openhands/software-agent-sdk"
+        },
+        {
+          "key": "F03",
+          "name": "mini-swe-agent",
+          "contender": "swe-agent/mini-swe-agent"
+        },
+        {
+          "key": "F04",
+          "name": "DeerFlow",
+          "contender": "bytedance/deer-flow"
+        },
+        {
+          "key": "F05",
+          "name": "LangGraph",
+          "contender": "langchain-ai/langgraph"
+        },
+        {
+          "key": "F06",
+          "name": "GPT Researcher",
+          "contender": "assafelovic/gpt-researcher"
+        },
+        {
+          "key": "F07",
+          "name": "Microsoft Agent Framework",
+          "contender": "microsoft/agent-framework"
+        },
+        {
+          "key": "F08",
+          "name": "Codex SDK and codex exec",
+          "contender": "openai/codex"
+        },
+        {
+          "key": "F09",
+          "name": "Deep Agents",
+          "contender": "langchain-ai/deepagents"
+        },
+        {
+          "key": "F10",
+          "name": "OpenResearch",
+          "contender": "alphaxiv/openresearch"
+        },
+        {
+          "key": "F11",
+          "name": "OpenAI Agents SDK",
+          "contender": "openai/openai-agents-python"
+        }
+      ],
+      "slots": [
+        {
+          "slot_id": "agent-runtime-worker",
+          "question": "Which single runtime worker runs autonomous coding and research tasks in an isolated sandbox, driven by GPT-6.1 Sol through its harness SDK, or none (the native clients' own workers suffice)?",
+          "picks": {
+            "claude": "F08",
+            "gpt": "F08"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "user_pin_conflict",
+            "basis": "both families",
+            "default": "F08",
+            "contender": "openai/codex",
+            "user_pin": "openhands/software-agent-sdk"
+          }
+        },
+        {
+          "slot_id": "deep-research-harness",
+          "question": "Which single deep-research harness gathers cited evidence for evaluation work, or none?",
+          "picks": {
+            "claude": "F06",
+            "gpt": "NONE"
+          },
+          "agreement": "differ",
+          "adjudications": [
+            {
+              "family": "claude",
+              "order": "AB",
+              "return_a_family": "claude",
+              "resolved_default": "F06",
+              "choice": "A"
+            },
+            {
+              "family": "claude",
+              "order": "BA",
+              "return_a_family": "gpt",
+              "resolved_default": "F06",
+              "choice": "B"
+            },
+            {
+              "family": "gpt",
+              "order": "AB",
+              "return_a_family": "claude",
+              "resolved_default": "F06",
+              "choice": "A"
+            },
+            {
+              "family": "gpt",
+              "order": "BA",
+              "return_a_family": "gpt",
+              "resolved_default": "F06",
+              "choice": "B"
+            }
+          ],
+          "outcome": {
+            "status": "definitive",
+            "basis": "adjudicated (four of four)",
+            "default": "F06",
+            "contender": "assafelovic/gpt-researcher"
+          }
+        }
+      ]
+    },
+    {
+      "unit_id": "cross:wsl-distro",
+      "field": [
+        {
+          "key": "F01",
+          "name": "Ubuntu 24.04.5 LTS (Canonical WSL image)",
+          "contender": "page:ubuntu-24-04-5-lts-canonical-wsl-image"
+        },
+        {
+          "key": "F02",
+          "name": "Ubuntu 26.04.1 LTS (Canonical WSL image)",
+          "contender": "page:ubuntu-26-04-1-lts-canonical-wsl-image"
+        },
+        {
+          "key": "F03",
+          "name": "Debian 13 (WSL distribution)",
+          "contender": "page:debian-13-wsl-distribution"
+        },
+        {
+          "key": "F04",
+          "name": "Arch Linux (WSL distribution)",
+          "contender": "page:arch-linux-wsl-distribution"
+        },
+        {
+          "key": "F05",
+          "name": "Fedora (WSL distribution)",
+          "contender": "page:fedora-wsl-distribution"
+        }
+      ],
+      "slots": [
+        {
+          "slot_id": "base-distribution",
+          "question": "Which single base distribution image is installed on the new WSL2 host?",
+          "picks": {
+            "claude": "F02",
+            "gpt": "F02"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F02",
+            "contender": "page:ubuntu-26-04-1-lts-canonical-wsl-image"
+          }
+        }
+      ]
+    },
+    {
+      "unit_id": "document-retrieval",
+      "field": [
+        {
+          "key": "F01",
+          "name": "pageindex",
+          "contender": "vectifyai/pageindex"
+        },
+        {
+          "key": "F02",
+          "name": "MarkItDown",
+          "contender": "microsoft/markitdown"
+        },
+        {
+          "key": "F03",
+          "name": "docs-mcp-server",
+          "contender": "arabold/docs-mcp-server"
+        },
+        {
+          "key": "F04",
+          "name": "Poppler",
+          "contender": "tsdgeos/poppler_mirror"
+        },
+        {
+          "key": "F05",
+          "name": "Docling",
+          "contender": "docling-project/docling"
+        },
+        {
+          "key": "F06",
+          "name": "Context Hub",
+          "contender": "andrewyng/context-hub"
+        },
+        {
+          "key": "F07",
+          "name": "MinerU",
+          "contender": "opendatalab/mineru"
+        },
+        {
+          "key": "F08",
+          "name": "tobi/qmd",
+          "contender": "tobi/qmd"
+        },
+        {
+          "key": "F09",
+          "name": "LlamaIndex",
+          "contender": "run-llama/llama_index"
+        }
+      ],
+      "slots": [
+        {
+          "slot_id": "markdown-collection-retrieval",
+          "question": "Which single tool searches controlled Markdown collections (lexical, vector or hybrid) and reads the original bodies back, for both clients?",
+          "picks": {
+            "claude": "F08",
+            "gpt": "F08"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F08",
+            "contender": "tobi/qmd"
+          }
+        },
+        {
+          "slot_id": "document-ingestion",
+          "question": "Which single tool converts difficult-layout documents (PDF, scans, Office formats, EPUB, HTML) into Markdown or JSON for ingestion, or none?",
+          "picks": {
+            "claude": "F07",
+            "gpt": null
+          },
+          "agreement": "differ",
+          "adjudications": [
+            {
+              "family": "claude",
+              "order": "AB",
+              "return_a_family": "claude",
+              "resolved_default": "F07",
+              "choice": "A"
+            },
+            {
+              "family": "claude",
+              "order": "BA",
+              "return_a_family": "gpt",
+              "resolved_default": "F07",
+              "choice": "B"
+            },
+            {
+              "family": "gpt",
+              "order": "AB",
+              "return_a_family": "claude",
+              "resolved_default": null,
+              "choice": "unsettled"
+            },
+            {
+              "family": "gpt",
+              "order": "BA",
+              "return_a_family": "gpt",
+              "resolved_default": null,
+              "choice": "unsettled"
+            }
+          ],
+          "outcome": {
+            "status": "measurement",
+            "basis": "unsettled after adjudication",
+            "finalists": [
+              "F05",
+              "F07"
+            ],
+            "settling_measurement": "Measure the paired difference in format-macro-averaged, structure-aware extraction error between F05 and F07 on one sealed corpus of difficult PDFs, scans, Office formats, EPUB and HTML, on the stated WSL2 Ubuntu/RTX 4090 host. Pin the packet source commits, resolved dependencies and model hashes. Run Docling's standard conversion and MinerU's automatic Standard-for-PDF/Flash-for-native routing through each client's CLI access, exporting native JSON. Before examining outputs, fix independent reference annotations and one canonical serialization preserving text, reading order and table row/cell/span structure. Score normalized edit distance on that serialization, assign maximum error to missing conversions, installation failures or resource failures, and weight the five document families equally. Use randomized repeated runs and a paired, document-level bootstrap confidence interval for E(Docling)-E(MinerU). An interval wholly below zero selects Docling; wholly above zero selects MinerU; overlap retains unsettled. Do not introduce a latency veto or an arbitrary percentage-improvement threshold."
+          }
+        }
+      ]
+    },
+    {
+      "unit_id": "durable-memory",
+      "field": [
+        {
+          "key": "F01",
+          "name": "OpenViking",
+          "contender": "volcengine/openviking"
+        },
+        {
+          "key": "F02",
+          "name": "Cognee",
+          "contender": "topoteretes/cognee"
+        },
+        {
+          "key": "F03",
+          "name": "agentmemory (rohitg00)",
+          "contender": "rohitg00/agentmemory"
+        },
+        {
+          "key": "F04",
+          "name": "Claude-mem",
+          "contender": "thedotmack/claude-mem"
+        },
+        {
+          "key": "F05",
+          "name": "Graphiti",
+          "contender": "getzep/graphiti"
+        },
+        {
+          "key": "F06",
+          "name": "MemPalace",
+          "contender": "mempalace/mempalace"
+        },
+        {
+          "key": "F07",
+          "name": "Supermemory",
+          "contender": "supermemoryai/supermemory"
+        },
+        {
+          "key": "F08",
+          "name": "memos",
+          "contender": "memtensor/memos"
+        },
+        {
+          "key": "F09",
+          "name": "Basic Memory",
+          "contender": "basicmachines-co/basic-memory"
+        },
+        {
+          "key": "F10",
+          "name": "Letta Code",
+          "contender": "letta-ai/letta-code"
+        },
+        {
+          "key": "F11",
+          "name": "langmem",
+          "contender": "langchain-ai/langmem"
+        },
+        {
+          "key": "F12",
+          "name": "Mem0",
+          "contender": "mem0ai/mem0"
+        },
+        {
+          "key": "F13",
+          "name": "Hindsight",
+          "contender": "vectorize-io/hindsight"
+        },
+        {
+          "key": "F14",
+          "name": "ai-memory",
+          "contender": "akitaonrails/ai-memory"
+        },
+        {
+          "key": "F15",
+          "name": "agent-memory (tigerless-labs)",
+          "contender": "tigerless-labs/agent-memory"
+        },
+        {
+          "key": "F16",
+          "name": "deja-vu",
+          "contender": "vshulcz/deja-vu"
+        },
+        {
+          "key": "F17",
+          "name": "letta",
+          "contender": "letta-ai/letta"
+        }
+      ],
+      "slots": [
+        {
+          "slot_id": "memory-owner",
+          "question": "Which single system owns durable memory for both Claude Code and Codex on the new host? Exactly one is installed.",
+          "picks": {
+            "claude": null,
+            "gpt": "F14"
+          },
+          "agreement": "differ",
+          "adjudications": [
+            {
+              "family": "claude",
+              "order": "AB",
+              "return_a_family": "claude",
+              "resolved_default": "F14",
+              "choice": "B"
+            },
+            {
+              "family": "claude",
+              "order": "BA",
+              "return_a_family": "gpt",
+              "resolved_default": "F14",
+              "choice": "A"
+            },
+            {
+              "family": "gpt",
+              "order": "AB",
+              "return_a_family": "claude",
+              "resolved_default": "F14",
+              "choice": "B"
+            },
+            {
+              "family": "gpt",
+              "order": "BA",
+              "return_a_family": "gpt",
+              "resolved_default": "F14",
+              "choice": "A"
+            }
+          ],
+          "outcome": {
+            "status": "definitive",
+            "basis": "adjudicated (four of four)",
+            "default": "F14",
+            "contender": "akitaonrails/ai-memory"
+          }
+        }
+      ]
+    },
+    {
+      "unit_id": "git-github-automation",
+      "field": [
+        {
+          "key": "F01",
+          "name": "codex-for-claude",
+          "contender": "openai/codex-plugin-cc"
+        },
+        {
+          "key": "F02",
+          "name": "claude-code-action",
+          "contender": "anthropics/claude-code-action"
+        },
+        {
+          "key": "F03",
+          "name": "Difftastic",
+          "contender": "wilfred/difftastic"
+        },
+        {
+          "key": "F04",
+          "name": "worktrunk",
+          "contender": "max-sixty/worktrunk"
+        },
+        {
+          "key": "F05",
+          "name": "ataraxy-labs/sem",
+          "contender": "ataraxy-labs/sem"
+        },
+        {
+          "key": "F06",
+          "name": "cli/cli",
+          "contender": "cli/cli"
+        },
+        {
+          "key": "F07",
+          "name": "native git worktree and git diff --no-index",
+          "contender": "git/git"
+        }
+      ],
+      "slots": [
+        {
+          "slot_id": "version-control",
+          "question": "Which single version control system is the base, with native worktrees and diffs?",
+          "picks": {
+            "claude": "F07",
+            "gpt": "F07"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F07",
+            "contender": "git/git"
+          }
+        },
+        {
+          "slot_id": "github-cli",
+          "question": "Which single tool lets agents automate GitHub from the host (pull requests, checks, reviews, API)?",
+          "picks": {
+            "claude": "F06",
+            "gpt": "F06"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F06",
+            "contender": "cli/cli"
+          }
+        },
+        {
+          "slot_id": "worktree-manager",
+          "question": "Which single tool manages worktrees for agents working in parallel (create, list with CI status, merge, clean up), or none beyond native git?",
+          "picks": {
+            "claude": "F04",
+            "gpt": "F04"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F04",
+            "contender": "max-sixty/worktrunk"
+          }
+        },
+        {
+          "slot_id": "review-structural-diff",
+          "question": "Which single tool gives structural, syntax-aware diffs for human review, or none?",
+          "picks": {
+            "claude": "F03",
+            "gpt": "F03"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F03",
+            "contender": "wilfred/difftastic"
+          }
+        },
+        {
+          "slot_id": "github-side-agent-review",
+          "question": "Which single automation runs agent pull-request review and mention-triggered tasks on the GitHub side, or none?",
+          "picks": {
+            "claude": "F02",
+            "gpt": "F02"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F02",
+            "contender": "anthropics/claude-code-action"
+          }
+        },
+        {
+          "slot_id": "agent-structural-diff",
+          "question": "Which single tool gives agents entity-level structural diffs, or none (line diffs suffice)?",
+          "picks": {
+            "claude": "F05",
+            "gpt": "F05"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F05",
+            "contender": "ataraxy-labs/sem"
+          }
+        }
+      ]
+    },
+    {
+      "unit_id": "hosting-services",
+      "field": [
+        {
+          "key": "F01",
+          "name": "Podman / Quadlet",
+          "contender": "podman-container-tools/podman"
+        },
+        {
+          "key": "F02",
+          "name": "PostgreSQL",
+          "contender": "postgres/postgres"
+        },
+        {
+          "key": "F03",
+          "name": "Docker Engine / Moby",
+          "contender": "moby/moby"
+        },
+        {
+          "key": "F04",
+          "name": "microsoft/wsl",
+          "contender": "microsoft/wsl"
+        },
+        {
+          "key": "F05",
+          "name": "Dev Containers CLI",
+          "contender": "devcontainers/cli"
+        },
+        {
+          "key": "F06",
+          "name": "nextjs",
+          "contender": "vercel/next.js"
+        },
+        {
+          "key": "F07",
+          "name": "FastAPI",
+          "contender": "fastapi/fastapi"
+        },
+        {
+          "key": "F08",
+          "name": "React",
+          "contender": "react/react"
+        },
+        {
+          "key": "F09",
+          "name": "Dockerized IB Gateway",
+          "contender": "gnzsnz/ib-gateway-docker"
+        },
+        {
+          "key": "F10",
+          "name": "BentoML",
+          "contender": "bentoml/bentoml"
+        },
+        {
+          "key": "F11",
+          "name": "Modal",
+          "contender": "modal-labs/modal-client"
+        },
+        {
+          "key": "F12",
+          "name": "Docker Compose",
+          "contender": "docker/compose"
+        }
+      ],
+      "slots": [
+        {
+          "slot_id": "multi-service-definition",
+          "question": "Which single tool defines and runs a multi-service application (the app plus supporting services, volumes and networks) on the container engine?",
+          "picks": {
+            "claude": "F12",
+            "gpt": "F12"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F12",
+            "contender": "docker/compose"
+          }
+        }
+      ]
+    },
+    {
+      "unit_id": "instructions-skills",
+      "field": [
+        {
+          "key": "F01",
+          "name": "VoltAgent subagent collection",
+          "contender": "voltagent/awesome-claude-code-subagents"
+        },
+        {
+          "key": "F02",
+          "name": "Trail of Bits skills",
+          "contender": "trailofbits/skills"
+        },
+        {
+          "key": "F03",
+          "name": "Claude Code Templates",
+          "contender": "davila7/claude-code-templates"
+        },
+        {
+          "key": "F04",
+          "name": "Anthropic webapp-testing skill",
+          "contender": "anthropics/skills"
+        },
+        {
+          "key": "F05",
+          "name": "skills (mattpocock)",
+          "contender": "mattpocock/skills"
+        },
+        {
+          "key": "F06",
+          "name": "skills-ref",
+          "contender": "agentskills/agentskills"
+        },
+        {
+          "key": "F07",
+          "name": "skill:typesafe-ai (typesafe-ai)",
+          "contender": "typesafe-ai/skills"
+        },
+        {
+          "key": "F08",
+          "name": "skill:openai-curated (openai)",
+          "contender": "openai/skills"
+        },
+        {
+          "key": "F09",
+          "name": "Vercel agent-skills",
+          "contender": "vercel-labs/agent-skills"
+        },
+        {
+          "key": "F10",
+          "name": "affaan-m/ecc",
+          "contender": "affaan-m/ecc"
+        },
+        {
+          "key": "F11",
+          "name": "Shan Claude best practice",
+          "contender": "shanraisshan/claude-code-best-practice"
+        }
+      ],
+      "slots": [
+        {
+          "slot_id": "task-scoped-skill-pack",
+          "question": "Which single third-party skills collection supplies task-scoped engineering and security procedures that Claude Code and Codex load per task (not the whole catalog), or none?",
+          "picks": {
+            "claude": "F02",
+            "gpt": "F02"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F02",
+            "contender": "trailofbits/skills"
+          }
+        }
+      ]
+    },
+    {
+      "unit_id": "isolation",
+      "field": [
+        {
+          "key": "F01",
+          "name": "boxlite",
+          "contender": "boxlite-ai/boxlite"
+        },
+        {
+          "key": "F02",
+          "name": "Docker Engine / Moby",
+          "contender": "moby/moby"
+        },
+        {
+          "key": "F03",
+          "name": "gVisor",
+          "contender": "google/gvisor"
+        },
+        {
+          "key": "F04",
+          "name": "microsandbox",
+          "contender": "superradcompany/microsandbox"
+        },
+        {
+          "key": "F05",
+          "name": "e2b-dev/e2b",
+          "contender": "e2b-dev/e2b"
+        },
+        {
+          "key": "F06",
+          "name": "Apple Container",
+          "contender": "apple/container"
+        },
+        {
+          "key": "F07",
+          "name": "sandbox-runtime",
+          "contender": "anthropics/sandbox-runtime"
+        },
+        {
+          "key": "F08",
+          "name": "Worktrunk",
+          "contender": "max-sixty/worktrunk"
+        },
+        {
+          "key": "F09",
+          "name": "Podman / Quadlet",
+          "contender": "podman-container-tools/podman"
+        }
+      ],
+      "slots": [
+        {
+          "slot_id": "enforced-command-boundary",
+          "question": "Which single tool is the default enforced boundary for agent commands that need restrictions: OS-level filesystem read and write rules and deny-by-default network, on Linux under WSL2 (and macOS)?",
+          "picks": {
+            "claude": "F07",
+            "gpt": "F07"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F07",
+            "contender": "anthropics/sandbox-runtime"
+          }
+        }
+      ]
+    },
+    {
+      "unit_id": "observation-inference",
+      "field": [
+        {
+          "key": "F01",
+          "name": "OTel Collector Contrib",
+          "contender": "open-telemetry/opentelemetry-collector-contrib"
+        },
+        {
+          "key": "F02",
+          "name": "AgentsView",
+          "contender": "kenn-io/agentsview"
+        },
+        {
+          "key": "F03",
+          "name": "vllm",
+          "contender": "vllm-project/vllm"
+        },
+        {
+          "key": "F04",
+          "name": "Loki",
+          "contender": "grafana/loki"
+        },
+        {
+          "key": "F05",
+          "name": "Phoenix",
+          "contender": "arize-ai/phoenix"
+        },
+        {
+          "key": "F06",
+          "name": "Alertmanager",
+          "contender": "prometheus/alertmanager"
+        },
+        {
+          "key": "F07",
+          "name": "Claude HUD",
+          "contender": "jarrodwatts/claude-hud"
+        },
+        {
+          "key": "F08",
+          "name": "ollama",
+          "contender": "ollama/ollama"
+        },
+        {
+          "key": "F09",
+          "name": "llama.cpp optional inference",
+          "contender": "ggml-org/llama.cpp"
+        },
+        {
+          "key": "F10",
+          "name": "ntfy",
+          "contender": "binwiederhier/ntfy"
+        },
+        {
+          "key": "F11",
+          "name": "Prometheus",
+          "contender": "prometheus/prometheus"
+        },
+        {
+          "key": "F12",
+          "name": "OpenLIT",
+          "contender": "openlit/openlit"
+        },
+        {
+          "key": "F13",
+          "name": "otel-tui",
+          "contender": "ymtdzzz/otel-tui"
+        },
+        {
+          "key": "F14",
+          "name": "Grafana",
+          "contender": "grafana/grafana"
+        },
+        {
+          "key": "F15",
+          "name": "SGLang",
+          "contender": "sgl-project/sglang"
+        }
+      ],
+      "slots": [
+        {
+          "slot_id": "telemetry-ingest",
+          "question": "Which single collector is the local OTLP ingestion point and privacy filter for Claude Code and Codex telemetry?",
+          "picks": {
+            "claude": "F01",
+            "gpt": "F01"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F01",
+            "contender": "open-telemetry/opentelemetry-collector-contrib"
+          }
+        },
+        {
+          "slot_id": "metrics-store",
+          "question": "Which single store keeps the native usage metrics received over OTLP for local queries, or none?",
+          "picks": {
+            "claude": "F11",
+            "gpt": "F11"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F11",
+            "contender": "prometheus/prometheus"
+          }
+        },
+        {
+          "slot_id": "events-store",
+          "question": "Which single store keeps the native events and logs received over OTLP for local queries, or none?",
+          "picks": {
+            "claude": "F04",
+            "gpt": "F04"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F04",
+            "contender": "grafana/loki"
+          }
+        },
+        {
+          "slot_id": "dashboards",
+          "question": "Which single tool provides local dashboards and exploration over the metrics and events stores, or none?",
+          "picks": {
+            "claude": "F14",
+            "gpt": "F14"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F14",
+            "contender": "grafana/grafana"
+          }
+        },
+        {
+          "slot_id": "route-qualification",
+          "question": "Which single tool stores traces, datasets and experiments to qualify model routes by replaying a fixed workload, or none?",
+          "picks": {
+            "claude": "F05",
+            "gpt": "F05"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F05",
+            "contender": "arize-ai/phoenix"
+          }
+        },
+        {
+          "slot_id": "local-model-server",
+          "question": "Which single local model server provides optional local inference on the RTX 4090 host, or none?",
+          "picks": {
+            "claude": "F08",
+            "gpt": "NONE"
+          },
+          "agreement": "differ",
+          "adjudications": [
+            {
+              "family": "claude",
+              "order": "AB",
+              "return_a_family": "claude",
+              "resolved_default": "NONE",
+              "choice": "B"
+            },
+            {
+              "family": "claude",
+              "order": "BA",
+              "return_a_family": "gpt",
+              "resolved_default": "F08",
+              "choice": "B"
+            },
+            {
+              "family": "gpt",
+              "order": "AB",
+              "return_a_family": "claude",
+              "resolved_default": "NONE",
+              "choice": "B"
+            },
+            {
+              "family": "gpt",
+              "order": "BA",
+              "return_a_family": "gpt",
+              "resolved_default": "NONE",
+              "choice": "A"
+            }
+          ],
+          "outcome": {
+            "status": "measurement",
+            "basis": "unsettled after adjudication",
+            "finalists": [
+              "F08",
+              "NONE"
+            ],
+            "settling_measurement": null
+          }
+        }
+      ]
+    },
+    {
+      "unit_id": "quality-evaluation",
+      "field": [
+        {
+          "key": "F01",
+          "name": "TypeSafe semantic skill",
+          "contender": "typesafe-ai/skills"
+        },
+        {
+          "key": "F02",
+          "name": "Inspect AI",
+          "contender": "ukgovernmentbeis/inspect_ai"
+        },
+        {
+          "key": "F03",
+          "name": "Playwright",
+          "contender": "microsoft/playwright"
+        },
+        {
+          "key": "F04",
+          "name": "Difftastic",
+          "contender": "wilfred/difftastic"
+        },
+        {
+          "key": "F05",
+          "name": "ShellCheck",
+          "contender": "koalaman/shellcheck"
+        },
+        {
+          "key": "F06",
+          "name": "Promptfoo",
+          "contender": "promptfoo/promptfoo"
+        },
+        {
+          "key": "F07",
+          "name": "MCP Inspector",
+          "contender": "modelcontextprotocol/inspector"
+        },
+        {
+          "key": "F08",
+          "name": "MLflow",
+          "contender": "mlflow/mlflow"
+        },
+        {
+          "key": "F09",
+          "name": "Harbor (containerized agent E2E runner)",
+          "contender": "harbor-framework/harbor"
+        },
+        {
+          "key": "F10",
+          "name": "Official OpenAI CI and security skills",
+          "contender": "openai/skills"
+        }
+      ],
+      "slots": [
+        {
+          "slot_id": "labeled-evaluation",
+          "question": "Which single framework runs labeled-case evaluations with several scorers whose values are kept per sample?",
+          "picks": {
+            "claude": "F02",
+            "gpt": "F02"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F02",
+            "contender": "ukgovernmentbeis/inspect_ai"
+          }
+        },
+        {
+          "slot_id": "containerized-agent-e2e",
+          "question": "Which single runner executes containerized end-to-end task suites for the real Claude Code and Codex CLIs, each trial graded by a verifier?",
+          "picks": {
+            "claude": "F09",
+            "gpt": "F09"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F09",
+            "contender": "harbor-framework/harbor"
+          }
+        },
+        {
+          "slot_id": "ci-regression-gate",
+          "question": "Which single tool is the declarative CI regression gate for prompts, skills and agents, or none?",
+          "picks": {
+            "claude": "F06",
+            "gpt": "F06"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F06",
+            "contender": "promptfoo/promptfoo"
+          }
+        }
+      ]
+    },
+    {
+      "unit_id": "recovery-portability",
+      "field": [
+        {
+          "key": "F01",
+          "name": "chezmoi",
+          "contender": "twpayne/chezmoi"
+        },
+        {
+          "key": "F02",
+          "name": "Determinate Nix installer",
+          "contender": "determinatesystems/nix-installer"
+        },
+        {
+          "key": "F03",
+          "name": "astral-sh/uv",
+          "contender": "astral-sh/uv"
+        },
+        {
+          "key": "F04",
+          "name": "Restic",
+          "contender": "restic/restic"
+        },
+        {
+          "key": "F05",
+          "name": "Litestream",
+          "contender": "benbjohnson/litestream"
+        },
+        {
+          "key": "F06",
+          "name": "Devbox",
+          "contender": "jetify-com/devbox"
+        },
+        {
+          "key": "F07",
+          "name": "mise",
+          "contender": "jdx/mise"
+        }
+      ],
+      "slots": [
+        {
+          "slot_id": "toolchain-reproduction",
+          "question": "Which single tool installs the pinned language runtimes and CLI tools from a committed manifest on Linux x86_64 and macOS arm64?",
+          "picks": {
+            "claude": "F07",
+            "gpt": "F07"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F07",
+            "contender": "jdx/mise"
+          }
+        },
+        {
+          "slot_id": "state-backup",
+          "question": "Which single tool makes encrypted, deduplicated, verifiable backups of application state and restores them?",
+          "picks": {
+            "claude": "F04",
+            "gpt": "F04"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F04",
+            "contender": "restic/restic"
+          }
+        },
+        {
+          "slot_id": "dotfiles-reproduction",
+          "question": "Which single tool reproduces configuration and dotfiles while keeping credentials out of the transferred state, or none?",
+          "picks": {
+            "claude": "F01",
+            "gpt": "F01"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F01",
+            "contender": "twpayne/chezmoi"
+          }
+        }
+      ]
+    },
+    {
+      "unit_id": "scheduling-supervision",
+      "field": [
+        {
+          "key": "F01",
+          "name": "Restate",
+          "contender": "restatedev/restate"
+        },
+        {
+          "key": "F02",
+          "name": "Prefect",
+          "contender": "prefecthq/prefect"
+        },
+        {
+          "key": "F03",
+          "name": "Temporal",
+          "contender": "temporalio/temporal"
+        },
+        {
+          "key": "F04",
+          "name": "Dagster",
+          "contender": "dagster-io/dagster"
+        },
+        {
+          "key": "F05",
+          "name": "pg_durable",
+          "contender": "microsoft/pg_durable"
+        },
+        {
+          "key": "F06",
+          "name": "systemd",
+          "contender": "systemd/systemd"
+        },
+        {
+          "key": "F07",
+          "name": "conductor",
+          "contender": "conductor-oss/conductor"
+        },
+        {
+          "key": "F08",
+          "name": "Dagu",
+          "contender": "dagucloud/dagu"
+        }
+      ],
+      "slots": [
+        {
+          "slot_id": "workflow-engine",
+          "question": "Which single local workflow engine runs scheduled DAGs over existing commands with run history, retries and a UI, or none beyond the init system's timers?",
+          "picks": {
+            "claude": "F08",
+            "gpt": "F02"
+          },
+          "agreement": "differ",
+          "adjudications": [
+            {
+              "family": "claude",
+              "order": "AB",
+              "return_a_family": "claude",
+              "resolved_default": "F08",
+              "choice": "A"
+            },
+            {
+              "family": "claude",
+              "order": "BA",
+              "return_a_family": "gpt",
+              "resolved_default": "F08",
+              "choice": "B"
+            },
+            {
+              "family": "gpt",
+              "order": "AB",
+              "return_a_family": "claude",
+              "resolved_default": "F02",
+              "choice": "B"
+            },
+            {
+              "family": "gpt",
+              "order": "BA",
+              "return_a_family": "gpt",
+              "resolved_default": "F02",
+              "choice": "A"
+            }
+          ],
+          "outcome": {
+            "status": "measurement",
+            "basis": "unsettled after adjudication",
+            "finalists": [
+              "F02",
+              "F08"
+            ],
+            "settling_measurement": null
+          }
+        }
+      ]
+    },
+    {
+      "unit_id": "secrets-credentials",
+      "field": [
+        {
+          "key": "F01",
+          "name": "betterleaks",
+          "contender": "betterleaks/betterleaks"
+        },
+        {
+          "key": "F02",
+          "name": "trufflehog",
+          "contender": "trufflesecurity/trufflehog"
+        },
+        {
+          "key": "F03",
+          "name": "OpenBao",
+          "contender": "openbao/openbao"
+        },
+        {
+          "key": "F04",
+          "name": "ggshield",
+          "contender": "gitguardian/ggshield"
+        },
+        {
+          "key": "F05",
+          "name": "gitleaks",
+          "contender": "gitleaks/gitleaks"
+        },
+        {
+          "key": "F06",
+          "name": "noseyparker",
+          "contender": "praetorian-inc/noseyparker"
+        }
+      ],
+      "slots": [
+        {
+          "slot_id": "secret-scanner",
+          "question": "Which single tool is the main local and CI secret scanner (staged changes before each commit, history, directories)?",
+          "picks": {
+            "claude": "F01",
+            "gpt": "F01"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F01",
+            "contender": "betterleaks/betterleaks"
+          }
+        },
+        {
+          "slot_id": "credential-verification",
+          "question": "Which single tool complements the secret scanner by verifying found credentials against provider APIs, or none?",
+          "picks": {
+            "claude": "F02",
+            "gpt": "F02"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F02",
+            "contender": "trufflesecurity/trufflehog"
+          }
+        }
+      ]
+    },
+    {
+      "unit_id": "semantic-rag",
+      "field": [
+        {
+          "key": "F01",
+          "name": "next-plaid",
+          "contender": "lightonai/next-plaid"
+        },
+        {
+          "key": "F02",
+          "name": "Haystack",
+          "contender": "deepset-ai/haystack"
+        },
+        {
+          "key": "F03",
+          "name": "vLLM",
+          "contender": "vllm-project/vllm"
+        },
+        {
+          "key": "F04",
+          "name": "nvidia/Nemotron-3-Embed-1B-BF16 (embedding model)",
+          "contender": "page:nvidia-nemotron-3-embed-1b-bf16-embedding-model"
+        },
+        {
+          "key": "F05",
+          "name": "pgvector",
+          "contender": "pgvector/pgvector"
+        },
+        {
+          "key": "F06",
+          "name": "huggingface-hub-native",
+          "contender": "huggingface/huggingface_hub"
+        },
+        {
+          "key": "F07",
+          "name": "semble",
+          "contender": "minishlab/semble"
+        },
+        {
+          "key": "F08",
+          "name": "Qdrant",
+          "contender": "qdrant/qdrant"
+        },
+        {
+          "key": "F09",
+          "name": "code-memory",
+          "contender": "kapillamba4/code-memory"
+        },
+        {
+          "key": "F10",
+          "name": "LanceDB",
+          "contender": "lancedb/lancedb"
+        },
+        {
+          "key": "F11",
+          "name": "ollama",
+          "contender": "ollama/ollama"
+        },
+        {
+          "key": "F12",
+          "name": "SocratiCode",
+          "contender": "giancarloerra/socraticode"
+        }
+      ],
+      "slots": [
+        {
+          "slot_id": "semantic-code-search",
+          "question": "Which single system provides semantic code search over the project repositories (an embedding index and its queries) for both clients, or none?",
+          "picks": {
+            "claude": "F12",
+            "gpt": "F12"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F12",
+            "contender": "giancarloerra/socraticode"
+          }
+        }
+      ]
+    },
+    {
+      "unit_id": "token-efficiency",
+      "field": [
+        {
+          "key": "F01",
+          "name": "Context Mode",
+          "contender": "mksglu/context-mode"
+        },
+        {
+          "key": "F02",
+          "name": "Claude Token Efficient",
+          "contender": "drona23/claude-token-efficient"
+        },
+        {
+          "key": "F03",
+          "name": "Headroom",
+          "contender": "headroomlabs-ai/headroom"
+        },
+        {
+          "key": "F04",
+          "name": "rtk-ai/rtk",
+          "contender": "rtk-ai/rtk"
+        },
+        {
+          "key": "F05",
+          "name": "Repomix",
+          "contender": "yamadashy/repomix"
+        },
+        {
+          "key": "F06",
+          "name": "agent-console",
+          "contender": "lockedinlabs-ai/agent-console"
+        },
+        {
+          "key": "F07",
+          "name": "ccusage",
+          "contender": "ccusage/ccusage"
+        },
+        {
+          "key": "F08",
+          "name": "paritok-4b-v1",
+          "contender": "paritok-official/paritok-4b-v1"
+        },
+        {
+          "key": "F09",
+          "name": "sqz",
+          "contender": "ojuschugh1/sqz"
+        },
+        {
+          "key": "F10",
+          "name": "TOON",
+          "contender": "toon-format/toon"
+        }
+      ],
+      "slots": [
+        {
+          "slot_id": "usage-meter",
+          "question": "Which single tool measures provider usage from the local logs Claude Code and Codex write (input, output, cache-creation and cache-read tokens), or none?",
+          "picks": {
+            "claude": "F07",
+            "gpt": "F06"
+          },
+          "agreement": "differ",
+          "adjudications": [
+            {
+              "family": "claude",
+              "order": "AB",
+              "return_a_family": "claude",
+              "resolved_default": "F07",
+              "choice": "A"
+            },
+            {
+              "family": "claude",
+              "order": "BA",
+              "return_a_family": "gpt",
+              "resolved_default": "F07",
+              "choice": "B"
+            },
+            {
+              "family": "gpt",
+              "order": "AB",
+              "return_a_family": "claude",
+              "resolved_default": null,
+              "choice": "unsettled"
+            },
+            {
+              "family": "gpt",
+              "order": "BA",
+              "return_a_family": "gpt",
+              "resolved_default": null,
+              "choice": "unsettled"
+            }
+          ],
+          "outcome": {
+            "status": "measurement",
+            "basis": "unsettled after adjudication",
+            "finalists": [
+              "F06",
+              "F07"
+            ],
+            "settling_measurement": "Run one paired full-log reconciliation benchmark on WSL2 Ubuntu x86_64 using F06 v0.4.1 and F07 v20.0.26 against the same frozen Claude Code and Codex corpus. Include completed tasks, logged failures and retries, streamed revisions, copied and archived sessions, forks, Claude advisor iterations, Codex per-response-only compaction, last_token_usage-only records and missing cache fields. Independently annotate unique provider responses, all four token classes, recoverable aggregate totals and genuinely unavailable fields; preserve the original logs and exclude artifact-size estimates. Compare F06 through its normal store and authenticated /api/console endpoint, not --summary, with F07’s agent-specific --json --offline reports. Use identical UTC windows and sufficient retention, wait for ingestion to finish, and isolate each agent’s corpus where necessary. Measure incorrectly reported or omitted known tokens by agent and class, plus false claims that unavailable quantities are known. Apply the same reconciliation rule to both; neither challenger nor incumbent must be flawless."
+          }
+        }
+      ]
+    },
+    {
+      "unit_id": "web-research",
+      "field": [
+        {
+          "key": "F01",
+          "name": "Tavily CLI",
+          "contender": "tavily-ai/tavily-cli"
+        },
+        {
+          "key": "F02",
+          "name": "OpenResearch",
+          "contender": "alphaxiv/openresearch"
+        },
+        {
+          "key": "F03",
+          "name": "Browser Use",
+          "contender": "browser-use/browser-use"
+        },
+        {
+          "key": "F04",
+          "name": "trafilatura",
+          "contender": "adbar/trafilatura"
+        },
+        {
+          "key": "F05",
+          "name": "Playwright CLI",
+          "contender": "microsoft/playwright-cli"
+        },
+        {
+          "key": "F06",
+          "name": "Crawl4AI",
+          "contender": "unclecode/crawl4ai"
+        },
+        {
+          "key": "F07",
+          "name": "Cua Driver",
+          "contender": "trycua/cua"
+        },
+        {
+          "key": "F08",
+          "name": "Firecrawl MCP",
+          "contender": "firecrawl/firecrawl-mcp-server"
+        },
+        {
+          "key": "F09",
+          "name": "agent-browser",
+          "contender": "vercel-labs/agent-browser"
+        },
+        {
+          "key": "F10",
+          "name": "exa-mcp-server",
+          "contender": "exa-labs/exa-mcp-server"
+        }
+      ],
+      "slots": [
+        {
+          "slot_id": "page-text-extraction",
+          "question": "Which single tool fetches chosen URLs and extracts the main text with metadata (CLI or API) for bounded, attributable retrieval, or none?",
+          "picks": {
+            "claude": "F04",
+            "gpt": "NONE"
+          },
+          "agreement": "differ",
+          "adjudications": [
+            {
+              "family": "claude",
+              "order": "AB",
+              "return_a_family": "claude",
+              "resolved_default": "F04",
+              "choice": "A"
+            },
+            {
+              "family": "claude",
+              "order": "BA",
+              "return_a_family": "gpt",
+              "resolved_default": "F04",
+              "choice": "B"
+            },
+            {
+              "family": "gpt",
+              "order": "AB",
+              "return_a_family": "claude",
+              "resolved_default": "NONE",
+              "choice": "B"
+            },
+            {
+              "family": "gpt",
+              "order": "BA",
+              "return_a_family": "gpt",
+              "resolved_default": "NONE",
+              "choice": "A"
+            }
+          ],
+          "outcome": {
+            "status": "measurement",
+            "basis": "unsettled after adjudication",
+            "finalists": [
+              "F04",
+              "NONE"
+            ],
+            "settling_measurement": null
+          }
+        },
+        {
+          "slot_id": "browser-interaction",
+          "question": "Which single tool gives agents bounded interaction with JavaScript-rendered pages (forms, sign-in flows, tabs, screenshots, PDF) as shell-callable steps?",
+          "picks": {
+            "claude": "F09",
+            "gpt": "F09"
+          },
+          "agreement": "agree",
+          "adjudications": [],
+          "outcome": {
+            "status": "definitive",
+            "basis": "both families",
+            "default": "F09",
+            "contender": "vercel-labs/agent-browser"
+          }
+        }
+      ]
+    }
+  ]
+}

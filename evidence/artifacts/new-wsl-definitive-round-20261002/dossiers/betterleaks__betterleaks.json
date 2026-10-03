@@ -1,0 +1,279 @@
+{
+  "contender": "betterleaks/betterleaks",
+  "revision": {
+    "contender": "betterleaks/betterleaks",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "betterleaks/betterleaks",
+        "tag": "v1.9.0",
+        "commit": "81aff7a638638aae3a659845d089043e1d8fe9ac",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v1.9.0",
+    "commit": "81aff7a638638aae3a659845d089043e1d8fe9ac",
+    "read_at": "2026-10-02T03:01:57+00:00"
+  },
+  "dossier": {
+    "contender": "betterleaks/betterleaks",
+    "revision": {
+      "tag": "v1.9.0",
+      "commit": "81aff7a638638aae3a659845d089043e1d8fe9ac",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Betterleaks is a single-binary Go command-line secrets scanner (README.md:7 says the Gitleaks authors maintain it). It scans git history, staged or working-tree diffs, directories, stdin and remote sources (GitHub, GitLab, Hugging Face, S3). It ships 463 default regex rules plus Expr prefilters and filters. It can optionally verify detected credentials against provider APIs, via the --validation scan flag or the validate subcommand; 218 of the 463 default rules carry a validate expression (grep counts in config/betterleaks.toml). This revision is v1.9.0, described by the README as a v1 'maintenance' release line (README.md:27,46). All findings below come from static reading; no code or tests were executed.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Betterleaks is a configurable, fast, and thorough secrets scanner, maintained by the folks who made Gitleaks, including the original author.",
+          "citation": "README.md:7"
+        },
+        {
+          "claim": "Expr-based filtering: contextual rule filters evaluate fragment attributes (git author, commit message, file path) and finding data to reduce false positives; positioned as a more expressive replacement for Gitleaks' [[allowlist]].",
+          "citation": "README.md:17"
+        },
+        {
+          "claim": "Secrets Validation: validates whether a detected secret is active by making asynchronous HTTP requests from within the rule definition using Expr.",
+          "citation": "README.md:18"
+        },
+        {
+          "claim": "Token Efficiency filtering: filters natural-language false positives using BPE tokenization to measure how rare or non-human a string is.",
+          "citation": "README.md:19"
+        },
+        {
+          "claim": "Fast scans via sane default parallelization settings, ahocorasick keyword filters, and re2.",
+          "citation": "README.md:20"
+        },
+        {
+          "claim": "New sources: GitHub, GitLab, Hugging Face, S3 and more.",
+          "citation": "README.md:21"
+        },
+        {
+          "claim": "Portability: runs on any modern OS/Arch; the small binary can be integrated in any system.",
+          "citation": "README.md:22"
+        },
+        {
+          "claim": "Install paths are labelled v1 maintenance releases: a versioned Homebrew cask that installs the command betterleaks-v1, and a Docker :v1 tag; archive and source builds provide the plain betterleaks command.",
+          "citation": "README.md:27-29,46-49"
+        },
+        {
+          "claim": "Usage covers `betterleaks git <repo>` (history, optional --git-workers), `betterleaks dir <path>`, github/gitlab/huggingface(hf)/s3 sources, `stdin`, and `validate --rule-id <id>` to revalidate a known credential without running detection.",
+          "citation": "README.md:53-91"
+        },
+        {
+          "claim": "Prefilters run before any regex matching and only see the attributes map; filters run after a regex match and also see candidate finding data; validate runs post-match as an async check.",
+          "citation": "README.md:97,137-152"
+        },
+        {
+          "claim": "CEL-shaped configs from earlier versions are still accepted for compatibility, but new configs should use Expr.",
+          "citation": "README.md:97"
+        },
+        {
+          "claim": "For production use, maintain your own config instead of extending the upstream default config directly, so the rule set stays stable across upgrades.",
+          "citation": "README.md:160"
+        }
+      ],
+      "install": [
+        {
+          "method": "Homebrew cask (v1 maintenance line; installs the command as betterleaks-v1; README does not state which OS it targets)",
+          "command": "brew install --cask betterleaks/tap/betterleaks@1",
+          "citation": "README.md:27-29"
+        },
+        {
+          "method": "Fedora Linux package manager (distro packaging, not produced by this repo's release config)",
+          "command": "sudo dnf install betterleaks",
+          "citation": "README.md:31-32"
+        },
+        {
+          "method": "Container image (v1 line tag)",
+          "command": "docker pull ghcr.io/betterleaks/betterleaks:v1",
+          "citation": "README.md:34-35"
+        },
+        {
+          "method": "Go toolchain (unpinned @latest; builds without version ldflags)",
+          "command": "go install github.com/betterleaks/betterleaks@latest",
+          "citation": "README.md:37-38"
+        },
+        {
+          "method": "Build from source on the v1.x branch",
+          "command": "git clone --branch v1.x https://github.com/betterleaks/betterleaks\ncd betterleaks\nmake build",
+          "citation": "README.md:40-43"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - .goreleaser.yml:12-17 builds linux/amd64 (archive suffix x64 per :27-33) and a linux/amd64 image (:53-55); CI runs on ubuntu-latest (.github/workflows/test.yml:15).",
+        "wsl2": "unknown - WSL/WSL2 is not mentioned in the README, docs or CI (the only 'wsl' hit is a Go linter name at .golangci.yaml:51). Linux binaries are published, but WSL2 itself is neither documented nor tested.",
+        "macos_arm64": "yes (built, not CI-tested) - .goreleaser.yml:11-17 builds darwin/arm64 and :64-81 ships a Homebrew cask; but .github/workflows/test.yml:15 runs only ubuntu-latest and windows-latest.",
+        "gpu": "no - no GPU, CUDA, Metal or OpenCL references anywhere in the repo; scanning is CPU-only (RE2 regex, Aho-Corasick, embedded BPE tokenizer: cmd/root.go:105, detect/tiktokenloader.go:13)."
+      },
+      "integrations": {
+        "cli": "yes - cobra CLI `betterleaks` with subcommands git, dir (aliases file, directory: cmd/directory.go:24), stdin, github, gitlab, huggingface (hf), s3, validate, config check|show|path, version (cmd/*.go); hidden deprecated detect and protect remain (cmd/detect.go:44-49, cmd/protect.go:21-26). Reports: json, csv, junit, sarif, template (cmd/root.go:513-530); --report-path - writes to stdout; --baseline-path and --exit-code (default 1) exist (cmd/root.go:82-86). Staged scanning: `git --pre-commit --staged` (cmd/git.go:28-29,80-92; docs/scanning.md:11). .pre-commit-hooks.yaml defines three hooks (betterleaks via language golang, betterleaks-docker, betterleaks-system), all running `betterleaks git --pre-commit --redact --staged --verbose` with pass_filenames false (.pre-commit-hooks.yaml:1-20); the README does not document pre-commit usage. A legacy git-hook helper is scripts/pre-commit.py:27.",
+        "mcp": "none found - no MCP server code or config in the repo (grep for 'mcp' and 'model context protocol' found nothing).",
+        "sdk_or_api": "No HTTP/network API or server. Go packages (detect, config, sources, report) are importable under module github.com/betterleaks/betterleaks (go.mod:1; detect/detect.go:242-346 NewDetectorContext, :497 Run), but the README documents no library API and several Detector fields are marked deprecated for removal in v2 (detect/detect.go:167-237). The only listener in the code is the opt-in localhost pprof server (cmd/diagnostics.go:158-169).",
+        "claude_code_or_codex": "none found - no CLAUDE.md, AGENTS.md, .claude/.codex directories, skills, hooks or plugins; '.claude' appears only as a .gitignore entry (.gitignore:10); 'anthropic' appears only as detection rules for Anthropic API keys (cmd/generate/config/main.go:103-104)."
+      },
+      "telemetry_and_network": "No telemetry, analytics, crash-reporting, update-check or phone-home code found: greps over non-rule code matched only rule descriptions and vendor-API validators, and no project-owned hostname appears in Go code (only doc links at README.md:8,11,162). No account or registration is required. Default scans are offline apart from the local git binary run with config isolation (sources/git.go:39-68,121,228); the default rule config, BPE tokenizer data and word list are embedded (config/config.go:22, detect/tiktokenloader.go:13, internal/words/words.go:11), so nothing is downloaded at run time. extend.url is declared (config/config.go:154) but never read, so configs are not fetched remotely. Network happens only when requested: (1) live validation, OFF by default (cmd/root.go:112), sends the detected secret to the endpoint named in the rule's validate expression (e.g. AWS STS https://sts.amazonaws.com/ at internal/exprruntime/bindings_aws.go:16; oauth2.googleapis.com at bindings_gcp.go:22; login.microsoftonline.com at bindings_azure.go:113); the validate subcommand does the same for a supplied credential (cmd/validate.go:47-143); controls are a 10s timeout, 10 workers, optional per-origin request cap and RPS limits (cmd/root.go:114-120) and an in-memory cache (internal/validate/cache.go:13-93); validators may read env vars only if allowlisted (internal/exprruntime/runtime.go:588-614). (2) Remote-source subcommands call GitHub, GitLab, Hugging Face or S3 with tokens from flags or env GITHUB_TOKEN, GITLAB_TOKEN, HUGGINGFACE_TOKEN/HF_TOKEN, AWS_* (cmd/github.go:17,71; cmd/gitlab.go:69; cmd/huggingface.go:65-68; sources/s3.go:161-167); s3:// does a region-probe HEAD request (sources/s3.go:661). (3) --diagnostics http starts pprof on localhost:6060 (cmd/diagnostics.go:164). (4) make build runs git fetch --tags (Makefile:4)."
+    },
+    "code": {
+      "languages": [
+        "Go (go 1.25.0, toolchain go1.25.12: go.mod:3-5)",
+        "TOML (generated default rule config: config/betterleaks.toml)",
+        "Python (helper scripts: scripts/pre-commit.py, compare_reports.py, count_rules.py)",
+        "Shell (scripts/profile.sh)"
+      ],
+      "entry_points": [
+        {
+          "path": "main.go",
+          "what": "Binary entry point: installs a SIGINT handler then calls cmd.Execute() (main.go:11-24)."
+        },
+        {
+          "path": "cmd/root.go",
+          "what": "Cobra root command and global flags; config resolution (--config, then env BETTERLEAKS_CONFIG or _TOML and GITLEAKS_* fallbacks, then .betterleaks.toml/.gitleaks.toml in the target, then embedded default); Detector construction; report writing and exit codes (cmd/root.go:38-129,179-250,343-542,571-647)."
+        },
+        {
+          "path": "cmd/git.go",
+          "what": "`betterleaks git`: history via git log -p; --pre-commit (working-tree diff); --staged (index diff); --git-workers, --log-opts, --platform (cmd/git.go:25-154; sources/git.go:107-262)."
+        },
+        {
+          "path": "cmd/directory.go",
+          "what": "`betterleaks dir|file|directory`: scans one or more filesystem paths (cmd/directory.go:22-105)."
+        },
+        {
+          "path": "cmd/validate.go",
+          "what": "`betterleaks validate --rule-id`: validates a known credential without detection; supports --list, --component, --capture, --simple and JSONL output (cmd/validate.go:30-143)."
+        },
+        {
+          "path": "cmd/stdin.go, cmd/github.go, cmd/gitlab.go, cmd/huggingface.go, cmd/s3.go",
+          "what": "stdin scan and remote-source subcommands, each wiring a sources/* implementation to the shared detector."
+        },
+        {
+          "path": ".pre-commit-hooks.yaml",
+          "what": "Hook definitions betterleaks, betterleaks-docker, betterleaks-system, all running `git --pre-commit --redact --staged --verbose` (lines 1-20)."
+        },
+        {
+          "path": "cmd/generate/config/main.go",
+          "what": "Generator that renders 463 rule constructors from cmd/generate/config/rules/*.go into config/betterleaks.toml (Makefile:35-36; CONTRIBUTING.md:125-131)."
+        }
+      ],
+      "architecture": "One Go module (go.mod:1), one binary, about 459 .go files. cmd/ builds a Detector from config plus a Source. sources/ yields Fragments: git.go shells out to `git log -p -U0 --full-history --all --diff-filter=tuxdb` or `git diff -U0 --no-ext-diff [--staged] .` and parses with gitleaks/go-gitdiff, scanning added lines only (sources/git.go:121-122,228-231,487); parallel_git.go; files.go and file.go walk directories with fastwalk and unpack archives via mholt/archives; stdin.go; github.go, gitlab.go, huggingface.go, s3.go and scm/clone.go for remote sources. detect/detect.go applies an Aho-Corasick keyword prefilter, RE2 rule matching (regexp/ with betterleaks/go-re2 by default or stdlib), recursive decoding (detect/codec: base64, hex, percent, unicode), multipart component rules, Expr prefilter and filter evaluation, baseline/ignore and inline-allow handling, and optional submission to the validation pool. config/ parses TOML (extend by path or useDefault, depth limit 2; legacy allowlists translated to Expr in translate_filters.go) and embeds the generated default config. internal/exprruntime is the Expr runtime (filter, prefilter and validation bindings: http, aws, gcp, azure, env, crypto, json, time; CEL-compat rewrite; request limits). internal/validate is the worker pool plus singleflight cache. internal/httpclient provides retry and host-scoped-auth transports. report/ writes json, csv, junit, sarif, template and pretty output plus credential reports for validate. Deprecated Gitleaks-compat surfaces remain (hidden detect/protect commands, detect/deprecated.go).",
+      "packaging_and_release": "GoReleaser v2 (.goreleaser.yml) run by .github/workflows/release.yml on pushes of tags v1.* (release.yml:3-6) on ubuntu-latest. Builds CGO_ENABLED=0 binaries for darwin/linux/windows x amd64/arm64 with -s -w and version ldflags (.goreleaser.yml:5-19); tar.gz archives (zip on Windows) named betterleaks_<ver>_<os>_<x64|arm64> (:21-33); checksums.txt (:35-36); cosign keyless sign-blob of the checksum file producing checksums.txt.sigstore.json (:83-93; cosign v3.0.6 installed at release.yml:44-47; id-token: write at release.yml:8-11); multi-arch (linux/amd64, linux/arm64) image ghcr.io/betterleaks/betterleaks tagged with the tag and, for non-prereleases, v1 (:46-62) via goreleaser.Dockerfile, with images signed by cosign (:95-103); Homebrew cask betterleaks@1 pushed to betterleaks/homebrew-tap, binary renamed betterleaks-v1, post-install strips the com.apple.quarantine attribute on macOS (:64-81); GitHub release prerelease auto, make_latest false (:105-107). Third-party actions are pinned by commit SHA (release.yml:18-53); goreleaser itself is pinned only as '~> v2' (release.yml:55). No SBOM, provenance/attestation, macOS notarization or rpm/deb (nfpms) stanza was found in the config, and the README gives no signature-verification steps. The release workflow does not run tests or depend on test.yml.",
+      "tests_and_ci": "Go testing with testify v1.11.1 (go.mod:25) and gotestsum in CI. 55 _test.go files with 319 top-level Test/Benchmark funcs in 54 of them (grep count), across cmd/, config/, detect/, internal/exprruntime, internal/validate, internal/httpclient, internal/sigv4, report/, sources/, regexp/; fixtures under testdata/ (about 215 files: repos with dotGit dirs, archives, configs, expected reports). Git and staged scanning are tested in detect/detect_test.go (TestFromGit :2069, TestFromGitStaged :2546), not in sources/git_test.go, which is entirely commented out as flaky (sources/git_test.go:3-4). TestFromGit and the symlink test are skipped on Windows (detect/detect_test.go:2071-2073, 3311). Eight Benchmark funcs exist (allowlist micro-benchmarks) with no recorded results. CI: .github/workflows/test.yml on push and pull_request, matrix ubuntu-latest + windows-latest (no macOS), Go 1.25: go build ./...; `go run . config check config/betterleaks.toml` with the RE2 engine and with --regex-engine stdlib; gotestsum `go test -json ./... --race`. The generated-config drift check is commented out (test.yml:45-46); no lint, vuln-scan or self-scan job (Makefile has a lint target using .golangci.yaml; the repo's own .betterleaks.toml and 945-line .betterleaksignore are not exercised by CI). No tests were run for this dossier.",
+      "dependencies": "go.mod lists 62 requires: 22 direct and 40 indirect (go.mod:7-76); go.sum present; no vendor dir; no other manifests. Notable direct deps: expr-lang/expr v1.17.8 (expression engine), spf13/cobra v1.10.1, gitleaks/go-gitdiff v0.9.1, betterleaks/go-re2 v1.11.0-betterleaks.3 (project-owned RE2 fork; tetratelabs/wazero and wasilibs/wazero-helpers are indirect deps at go.mod:54,56), rrethy/ahocorasick v1.0.0, pkoukk/tiktoken-go v0.1.8, mholt/archives (pseudo-version v0.1.6-0.20260429171216-ef71b7a32fae), google/go-github/v72, shurcooL/githubv4 (pseudo-version), rs/zerolog v1.33.0, charlievieth/fastwalk v1.0.14. Runtime also needs a git binary on PATH for git scans (sources/git.go:121,228).",
+      "security_policy": ".github/SECURITY.md: report privately by email to 'zach @ aikido.dev', no public disclosure (lines 3-6); supported versions: latest release only, older releases unsupported (lines 14-22). No CODEOWNERS, dependabot or issue templates in .github (only CODE_OF_CONDUCT, CONTRIBUTING, SECURITY and two workflows)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Secrets Validation: async HTTP validation from within the rule definition using Expr (README.md:18).",
+        "verified": "yes",
+        "evidence": "Worker pool and singleflight cache (internal/validate/pool.go:45-65, cache.go:13-93); Expr http.get/post bindings (internal/exprruntime/bindings_http.go:14-61); wired at detect/detect.go:312-343 and 565-579; disabled by default (cmd/root.go:112); 218 of 463 default rules define validate (config/betterleaks.toml). Doc nuance: docs/config.md:165-166 says duplicate secrets trigger one request, but error results are not cached and --validation-debug bypasses the cache (cache.go:79; pool.go:218-220)."
+      },
+      {
+        "claim": "Prefilters run before any regex matching and see only attributes; filters run post-match with finding data (README.md:97).",
+        "verified": "partial",
+        "evidence": "Prefilter is exposed as Detector.SkipFunc and called by sources before reading content (detect/detect.go:436-452; sources/files.go:117-127); filters run after the regex match (detect/detect.go:1061-1089); evaluation errors fail open (fragment scanned, finding kept). But sources/git.go:418-443 evaluates the prefilter only when a commit PatchHeader exists, so staged or working-tree diffs may skip it (inferred from code; not verified by execution)."
+      },
+      {
+        "claim": "Fast scans via sane default parallelization, ahocorasick keyword filters and re2 (README.md:20).",
+        "verified": "partial",
+        "evidence": "RE2 is the default engine (cmd/root.go:105,164-165; regexp/re2/re2.go:6-14); Aho-Corasick keyword prefilter (detect/detect.go:268); semaphore of 40 (detect/detect.go:269). Git-history parallelism is opt-in: --git-workers defaults to 0, a single process (cmd/git.go:31). The repo holds no timing or throughput results; only 8 allowlist micro-benchmarks (config/allowlist_test.go:286-392; cmd/generate/config/base/config_test.go:140,209) and scripts/profile.sh, which only generates profiles."
+      },
+      {
+        "claim": "Runs on any modern OS/Arch (README.md:22).",
+        "verified": "partial",
+        "evidence": "Release matrix is only darwin/linux/windows x amd64/arm64, CGO disabled (.goreleaser.yml:9-17); CI covers ubuntu and windows only (.github/workflows/test.yml:15); two tests are skipped on Windows (detect/detect_test.go:2071-2073, 3311); no WSL, BSD or other targets are mentioned."
+      },
+      {
+        "claim": "Homebrew cask betterleaks@1 installs betterleaks-v1, and the Docker :v1 tag is published by v1 maintenance releases (README.md:27-29,46-49).",
+        "verified": "yes",
+        "evidence": ".goreleaser.yml:64-81 (cask betterleaks@1 in betterleaks/homebrew-tap, binary target betterleaks-v1); :46-52 (ghcr.io/betterleaks/betterleaks tags '{{ .Tag }}' and v1 unless prerelease); release.yml:3-6 (tags v1.*). Note .pre-commit-hooks.yaml:11 references :latest, which this release config does not tag."
+      },
+      {
+        "claim": "Fedora install: sudo dnf install betterleaks (README.md:31-32).",
+        "verified": "not_checkable",
+        "evidence": "Distro packaging lives outside this repo; the goreleaser config has no nfpms/rpm output (.goreleaser.yml:1-107)."
+      },
+      {
+        "claim": "Token Efficiency filtering uses BPE tokenization (README.md:19).",
+        "verified": "yes",
+        "evidence": "cl100k_base BPE data is embedded and loaded offline (detect/tiktokenloader.go:13-59; detect/detect.go:348-361); exposed as filter.tokenRatio and filter.failsTokenEfficiency (internal/exprruntime/bindings_filter.go:22-29,155-160); documented at docs/config.md:96-115."
+      },
+      {
+        "claim": "Scans Git history and directories (README.md:53-57) plus sources like GitHub, GitLab, Hugging Face, S3 (README.md:21); docs/scanning.md:11 adds staged/pre-commit scanning.",
+        "verified": "yes",
+        "evidence": "History: `git log -p -U0 --full-history --all --diff-filter=tuxdb` (sources/git.go:121-122); staged: `git diff -U0 --no-ext-diff --staged .` (sources/git.go:225-262; cmd/git.go:80-92); only added lines are scanned and deleted files skipped (sources/git.go:401,487); dir: cmd/directory.go:22-105, sources/files.go:33-152; staged test at detect/detect_test.go:2546-2614; remote subcommands cmd/github.go, gitlab.go, huggingface.go, s3.go with sources/github.go, gitlab.go, huggingface.go, s3.go."
+      },
+      {
+        "claim": "go install github.com/betterleaks/betterleaks@latest (README.md:37-38).",
+        "verified": "partial",
+        "evidence": "Module path and root main.go make the command valid (go.mod:1; main.go:11-19), but go install passes no ldflags, so version.Version stays 'dev' (version/version.go:4-5; no debug.ReadBuildInfo fallback found) and min-version checks are skipped for dev builds (config/config.go:425-457). The Makefile and goreleaser inject the version (Makefile:4-5; .goreleaser.yml:19)."
+      },
+      {
+        "claim": "Maintained by the folks who made Gitleaks, including the original author (README.md:7).",
+        "verified": "not_checkable",
+        "evidence": "Authorship cannot be verified from code; the shallow clone has a single commit (.git/logs/HEAD:1). Consistent signals only: LICENSE copyright holder 'Zachary Rice' (LICENSE:3); security contact at aikido.dev (.github/SECURITY.md:6); Gitleaks-compat shims (version/version.go:7-9; cmd/root.go:202,272-290; detect/detect.go:57) and a gitleaks/go-gitdiff dependency (go.mod:11)."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Maintenance/support of the v1 line: README calls v1.x 'maintenance releases' (README.md:27,46); SECURITY.md supports 'latest release only' (.github/SECURITY.md:14-22); goreleaser sets make_latest false for these releases (.goreleaser.yml:105-107) and release.yml only triggers on v1.* tags (lines 3-6). Whether v1.9.0 keeps receiving security fixes once another release is 'latest' is not stated in the repo. .github has no dependabot, CODEOWNERS or issue templates.",
+      "Validation sends real credentials to third parties: with --validation or the validate subcommand, secrets go to endpoints defined by rule validate expressions. The generic http.get/post binding has no destination allowlist (internal/exprruntime/bindings_http.go:29-61), so any loaded or extended config can send findings to arbitrary URLs; request caps and RPS limits default to unlimited (cmd/root.go:116-120). The GCP validator exchanges service-account JSON for a real OAuth token (bindings_gcp.go:22,101; docs/scanning.md:659-661 mentions 'newly issued tokens'), and docs/config.md:369-427 shows an LLM-validation pattern that posts obfuscated context to a third-party API. README.md:160 itself advises maintaining your own config.",
+      "Suppression and exclusion behaviour: any line containing the substring betterleaks[:]allow or gitleaks:allow suppresses a finding, not only comments (detect/detect.go:57,964; detect/utils.go:237-243) unless --ignore-gitleaks-allow is set (cmd/root.go:93). The default prefilter skips vendor/, node_modules/, lockfiles, image/font/office/pdf/exe extensions and any path containing gitleaks.toml (config/betterleaks.toml:23-50). Files detected as application/* MIME are skipped as binary (sources/file.go:299-315), symlinks are skipped unless --follow-symlinks (sources/files.go:95-99), and dir has no .gitignore handling (no gitignore code found), so ignored files such as .env are scanned unless prefiltered. aws-access-token reports only when a 40-character secret-key component sits within 5 lines (config/betterleaks.toml:846-881).",
+      "Unverified inference on the staged/pre-commit path: the path prefilter is applied in the git source only inside `if gitdiffFile.PatchHeader != nil` (sources/git.go:418-443), and the staged test expects empty commit, author, date and message (detect/detect_test.go:2569-2574), which suggests git diff output has no PatchHeader. If so, the default path exclusions (config/betterleaks.toml:23-50) would not apply to git --staged or --pre-commit scans, so they would behave differently from dir and history scans. The staged test config defines no prefilter (testdata/config/simple.toml), so this is untested. Separately, the pathspec '.' in git diff (sources/git.go:228-231) is relative to the scanned directory, so running from a subdirectory limits the staged scan to that subtree (standard git semantics; not executed).",
+      "Secrets in output and logs: Finding.Secret and Match are written to reports and verbose output unless --redact is passed (default 0 = off: cmd/root.go:94-95; report/finding.go:26-29,170-174); the shipped pre-commit hooks pass --redact (.pre-commit-hooks.yaml:4). Debug and trace logging print raw secrets regardless of --redact (detect/detect.go:642-665 carries the secret as a log field; also :965-968, :1069-1071). Scan-time --validation-debug records request URLs and request/response bodies (up to 2000 characters) in finding metadata, with only auth/token/key/secret/cookie-named headers redacted (internal/exprruntime/bindings_http.go:63-112; cmd/root.go:122).",
+      "CI gating semantics: leaks and scan errors both exit 1 by default (cmd/root.go:82,640-646), so --exit-code must be changed to tell them apart. With --validation-status, only findings with the listed statuses count toward the exit code, and rules without validate drop out unless 'none' is listed (cmd/root.go:588; detect/deprecated.go:221-239). Unreadable files and directories and over-depth archives are skipped with warnings, not errors (sources/files.go:39-65,168-175; sources/file.go:109-126). No decompressed-size cap was found for archive scanning (sources/file.go:127-135) and --max-target-megabytes defaults to 0 = unlimited (cmd/root.go:92; sources/files.go:85). The optional scripts/pre-commit.py blocks only on exit code 1, so a missing binary (127) or a flag error (126) lets the commit pass (scripts/pre-commit.py:27-34).",
+      "Packaging and supply-chain gaps: only the checksum file and container images are cosign-signed, with no SBOM, provenance attestation or macOS notarization in the config and no verification steps in the README (.goreleaser.yml:83-103); the Homebrew cask strips the macOS quarantine attribute after install (:76-81); the release workflow is not gated on tests (release.yml:14-59). Root Dockerfile builds with golang:1.24 while go.mod requires go 1.25.0 (Dockerfile:1; go.mod:3-5); the pre-commit docker hook uses :latest, which release config does not tag (.pre-commit-hooks.yaml:11; .goreleaser.yml:49-51); the image runs as root (no USER) with git safe.directory '*' (goreleaser.Dockerfile:6-7). go.mod pins pseudo-versions for mholt/archives and githubv4 and a project-owned go-re2 fork not present in this repo (go.mod:18,23,64). Dependency licenses were not audited.",
+      "Test and platform coverage gaps: no macOS CI runner (.github/workflows/test.yml:15); two tests skipped on Windows (detect/detect_test.go:2071-2073, 3311); sources/git_test.go is fully commented out as flaky (sources/git_test.go:3-4); the generated-config drift check is commented out (.github/workflows/test.yml:45-46), so config/betterleaks.toml can diverge from cmd/generate/config/rules/*.go; CI runs no self-scan or lint. WSL2 is undocumented and untested."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "betterleaks/betterleaks",
+      "checks": [
+        {
+          "field": "readme.install[0] (Homebrew cask)",
+          "statement": "Homebrew cask (v1 maintenance line; installs the command as betterleaks-v1; README does not state which OS it targets): brew install --cask betterleaks/tap/betterleaks@1",
+          "citation": "README.md:27-29",
+          "holds": true,
+          "note": "README.md:27-29 reads '# Homebrew (v1 maintenance releases)', 'brew install --cask betterleaks/tap/betterleaks@1', '# The versioned cask installs the command betterleaks-v1.' The README names no OS. Corroborated by .goreleaser.yml:64-75: cask betterleaks@1 pushed to betterleaks/homebrew-tap, binary linked as target betterleaks-v1 (:68); release.yml:3-6 triggers on v1.* tags. Read statically; the cask was not installed."
+        },
+        {
+          "field": "license",
+          "statement": "spdx MIT, file LICENSE",
+          "citation": "LICENSE:1-21",
+          "holds": true,
+          "note": "Standard MIT License text, 'Copyright (c) 2026 Zachary Rice'. A glob for LICENSE/LICENCE/COPYING/NOTICE finds only this one file in the tree. Dependency licenses were not audited (as the dossier also says)."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - .goreleaser.yml:12-17 builds linux/amd64 (archive suffix x64 per :27-33) and a linux/amd64 image (:53-55); CI runs on ubuntu-latest (.github/workflows/test.yml:15).",
+          "citation": ".goreleaser.yml:12-17,27-33,53-55; .github/workflows/test.yml:15",
+          "holds": true,
+          "note": "goos lists linux (:13) and goarch lists amd64 (:16) with CGO_ENABLED=0 (:10); name_template maps amd64 to x64 (:31); dockers_v2 platforms include linux/amd64 (:54); test.yml:15 matrix is [ubuntu-latest, windows-latest]. Verified from config only; the published artifacts were not downloaded."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "cobra CLI betterleaks with subcommands git, dir (aliases file, directory), stdin, github, gitlab, huggingface (hf), s3, validate, config check|show|path, version; hidden deprecated detect/protect; reports json, csv, junit, sarif, template; --report-path - writes to stdout; --baseline-path and --exit-code (default 1); staged scanning via git --pre-commit --staged; .pre-commit-hooks.yaml defines three hooks all running betterleaks git --pre-commit --redact --staged --verbose with pass_filenames false; README does not document pre-commit; legacy helper scripts/pre-commit.py:27.",
+          "citation": "cmd/*.go; cmd/directory.go:24; cmd/detect.go:44-49; cmd/protect.go:21-26; cmd/root.go:82-86,513-530; cmd/git.go:28-29,80-92; docs/scanning.md:11; .pre-commit-hooks.yaml:1-20; scripts/pre-commit.py:27",
+          "holds": true,
+          "note": "All cited lines match. AddCommand registrations exist for git, dir, stdin, github, gitlab, huggingface (Aliases hf at huggingface.go:28), s3, validate, config (check/show/path at config.go:24) and version. detect and protect are Hidden: true (detect.go:48, protect.go:25). The report switch is at root.go:513-530; StdoutReportPath is '-' (report/report.go:11); exit-code defaults to 1 (root.go:82); baseline-path is at :86. The staged flags (git.go:28-29) feed NewGitDiffCmdContext (:80-92). The Docker hook entry is the image plus args, and goreleaser.Dockerfile:7 sets ENTRYPOINT [\"betterleaks\"], so 'all running betterleaks git ...' is accurate. README has no pre-commit mention; scripts/pre-commit.py:27 runs 'betterleaks git --pre-commit --staged -v'."
+        },
+        {
+          "field": "claim_checks[7] (git history / directories / staged / remote sources)",
+          "statement": "Scans Git history and directories (README.md:53-57) plus sources like GitHub, GitLab, Hugging Face, S3 (README.md:21); docs/scanning.md:11 adds staged/pre-commit scanning. verified: yes",
+          "citation": "sources/git.go:121-122,225-262,401,487; cmd/git.go:80-92; cmd/directory.go:22-105; sources/files.go:33-152; detect/detect_test.go:2546-2614; cmd/github.go, gitlab.go, huggingface.go, s3.go with sources/*",
+          "holds": true,
+          "note": "History uses 'git -C <src> log -p -U0 --full-history --all --diff-filter=tuxdb' (git.go:121-122). Diff mode uses 'git diff -U0 --no-ext-diff [--staged] .' (:228-231). Deleted files are skipped (:401) and only OpAdd lines become fragments (:487). Directory walking is fastwalk-based (files.go:33-152). TestFromGitStaged is at detect_test.go:2546-2614. Each remote source implements Fragments (github.go:233, gitlab.go:213, huggingface.go:131, s3.go:175). Static reading only, tests not run. The prefilter is evaluated only when PatchHeader != nil (git.go:418-443), which matches the dossier's own staged-path risk note."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

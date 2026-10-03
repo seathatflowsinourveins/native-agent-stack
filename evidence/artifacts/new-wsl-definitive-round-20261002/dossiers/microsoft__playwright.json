@@ -1,0 +1,303 @@
+{
+  "contender": "microsoft/playwright",
+  "revision": {
+    "contender": "microsoft/playwright",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "microsoft/playwright",
+        "tag": "v1.63.0",
+        "commit": "1b025d7e20a026371cd5f98ba0cdce48892737c8",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v1.63.0",
+    "commit": "1b025d7e20a026371cd5f98ba0cdce48892737c8",
+    "read_at": "2026-10-02T03:02:26+00:00"
+  },
+  "dossier": {
+    "contender": "microsoft/playwright",
+    "revision": {
+      "tag": "v1.63.0",
+      "commit": "1b025d7e20a026371cd5f98ba0cdce48892737c8",
+      "read_at": "2026-10-02T03:02:26+00:00"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Playwright (microsoft/playwright, v1.63.0, Apache-2.0) is a TypeScript npm-workspaces monorepo for browser automation and end-to-end web testing: a Node.js library/driver that drives Chromium, Firefox and WebKit through one API, the @playwright/test runner (reporters, HTML report, trace viewer), and agent-facing tooling (an MCP server, a playwright-cli client with installable skills, init-agents/init-skills generators) (README.md:7,25; package.json:54-56; packages/playwright/src/program.ts:161-202; packages/playwright-core/src/cli/program.ts:240-253).\n\nFacts relevant to the three stated needs (whole tree searched at this revision, excluding browser_patches and node_modules):\n(1) Labeled-case evaluation with several scorers kept per sample: none found. Grep for scorer/grader/graded/verifier/golden set/promptfoo/inspect_ai/braintrust/deepeval/langsmith finds no evaluation code; the only 'scorer'/'score' hits are selector-ranking code (packages/injected/src/layoutSelectorUtils.ts:64-69, packages/injected/src/selectorGenerator.ts), and 'trial' is the click `trial` option (docs/src/api/params.md:168-171). What the test runner keeps per test and per retry: status, duration, errors, steps, tags, annotations {type, description}, attachments (packages/playwright/src/reporters/json.ts:176-223; tests/config/parquetReporter.ts:69-122). `expect.soft` allows several non-fatal assertions in one test (docs/src/test-assertions-js.md:121-149). No scorer API was found.\n(2) Runner for the real Claude Code and Codex CLIs with verifier-graded trials: none found. No spawn/exec of `claude` or `codex`, no `claude -p`, `codex exec` or `@openai/codex` anywhere (grep). `init-agents --loop=claude|codex` only writes agent-definition files (packages/playwright/src/agents/generateAgents.ts:38-150); its tests assert only those files (tests/mcp/init-agents.spec.ts:77-123); MCP tests drive the server with the MCP SDK's own client over stdio (tests/mcp/fixtures.ts:22-23,130-154). No container-based task-suite runner was found.\n(3) Declarative CI regression gate for prompts, skills or agents: none found. The repo's own CI uses an LLM only in two GitHub Copilot CLI triage workflows (`--model claude-opus-4.8`) that post a draft comment when the output file is non-empty (.github/workflows/triage.yml:37-69; .github/workflows/pr-ci-triage.yml:42-74). The .claude/skills/* files are maintainer skills (e.g. .claude/skills/playwright-triage/SKILL.md); nothing under .github/workflows checks them.\nThe project's own gating for browser behaviour is `playwright test`: exit code 0 only when the run status is 'passed', else 1 (130 when interrupted) (packages/playwright/src/cli/testActions.ts:66-107), with options such as --forbid-only, --fail-on-flaky-tests, --max-failures, --last-failed, --only-changed, --shard (packages/playwright/src/program.ts:208-248).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Playwright is a framework for web automation and testing; it drives Chromium, Firefox, and WebKit with a single API in tests, in scripts, and as a tool for AI agents.",
+          "citation": "README.md:7"
+        },
+        {
+          "claim": "Playwright Test is a full-featured end-to-end test runner with full browser isolation, auto-waiting and web-first assertions.",
+          "citation": "README.md:25"
+        },
+        {
+          "claim": "Tests run in parallel across all configured browsers, headless by default; each test gets a fresh browser context.",
+          "citation": "README.md:63,105"
+        },
+        {
+          "claim": "Tracing captures execution traces, screenshots and videos on failure and can be inspected in the Trace Viewer (`trace: 'on-first-retry'`, `npx playwright show-trace trace.zip`).",
+          "citation": "README.md:88-101"
+        },
+        {
+          "claim": "Playwright CLI is a command-line interface for coding agents (Claude Code, Copilot) and is more token-efficient than MCP because commands avoid loading large tool schemas and accessibility trees into the model context.",
+          "citation": "README.md:16,113"
+        },
+        {
+          "claim": "`playwright-cli install --skills` installs skills for richer agent integration.",
+          "citation": "README.md:121-125"
+        },
+        {
+          "claim": "`playwright-cli show` opens a dashboard with live screencast previews of all running browser sessions; a session can be zoomed and remote-controlled.",
+          "citation": "README.md:147-151"
+        },
+        {
+          "claim": "The Playwright MCP server gives AI agents browser control through structured accessibility snapshots, with no vision models or screenshots required; element refs such as e5/e10 are used to act deterministically.",
+          "citation": "README.md:161,196-206"
+        },
+        {
+          "claim": "For Claude Code: `claude mcp add playwright npx @playwright/mcp@latest`; the standard mcpServers config works with VS Code, Cursor, Claude Desktop, Windsurf and other MCP clients.",
+          "citation": "README.md:165-185"
+        },
+        {
+          "claim": "MCP tools cover navigation, form filling, screenshots, network mocking, storage management, and more.",
+          "citation": "README.md:206"
+        },
+        {
+          "claim": "As a library (`npm i playwright`) it supports screenshots, PDF generation, device emulation and network interception without a test runner.",
+          "citation": "README.md:212-273"
+        },
+        {
+          "claim": "Cross-browser table: Chromium 153.0.8010.12, WebKit 26.6, Firefox 155.0 on Linux, macOS and Windows; headless and headed on all platforms; Chromium uses Chrome for Testing by default.",
+          "citation": "README.md:295-303"
+        },
+        {
+          "claim": "Playwright is also available for Python, .NET and Java.",
+          "citation": "README.md:307"
+        },
+        {
+          "claim": "The MCP server, the CLI for coding agents and the VS Code extension are linked as separate GitHub repositories (playwright-mcp, playwright-cli, playwright-vscode).",
+          "citation": "README.md:113,161,313-315"
+        }
+      ],
+      "install": [
+        {
+          "method": "npm: scaffold a Playwright Test project (README does not distinguish Linux/macOS)",
+          "command": "npm init playwright@latest",
+          "citation": "README.md:15,30"
+        },
+        {
+          "method": "npm: add Playwright Test manually, then download browsers; the docs add `npx playwright install --with-deps` to install Linux OS libraries",
+          "command": "npm i -D @playwright/test   (then)   npx playwright install",
+          "citation": "README.md:36-37; docs/src/browsers.md:119-122"
+        },
+        {
+          "method": "npm global: Playwright CLI for coding agents, with optional skills install",
+          "command": "npm i -g @playwright/cli@latest   (optionally then)   playwright-cli install --skills",
+          "citation": "README.md:16,118,124"
+        },
+        {
+          "method": "npx: Playwright MCP server; Claude Code registration",
+          "command": "npx @playwright/mcp@latest   |   claude mcp add playwright npx @playwright/mcp@latest",
+          "citation": "README.md:17,172,185"
+        },
+        {
+          "method": "npm: Playwright library",
+          "command": "npm i playwright",
+          "citation": "README.md:18,219"
+        },
+        {
+          "method": "Docker image (Linux; Ubuntu 24.04 'noble' tag, also -jammy and -resolute; %%VERSION%% is a docs placeholder for the release version)",
+          "command": "docker pull mcr.microsoft.com/playwright:v%%VERSION%%-noble",
+          "citation": "docs/src/docker.md:21,216-219"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes. README table marks Chromium/WebKit/Firefox on Linux (README.md:297-301); docs list Debian 12/13 and Ubuntu 22.04/24.04/26.04, x86-64 or arm64 (docs/src/intro-js.md:308) and say Ubuntu 20.04 is dropped in 1.63 (docs/src/release-notes-js.md:119); registry has x64 downloads for those distros (packages/playwright-core/src/server/registry/index.ts:134-136,144,146,204-206,239-241,249,251); CI runs ubuntu-22.04 (.github/workflows/tests_primary.yml:40) and amd64 Docker images (.github/workflows/tests_docker.yml:16-34). Other distros fall back to ubuntu24.04 builds flagged 'not officially supported' (packages/utils/hostPlatform.ts:122; packages/playwright-core/src/server/registry/index.ts:1101-1102).",
+        "wsl2": "yes (WSL is listed; WSL version not stated). docs/src/intro-js.md:306 lists 'Windows Subsystem for Linux (WSL)'; README.md is silent; the test suite has a 'webkit-wsl' channel (tests/config/browserTest.ts:78) but no WSL job was found in .github/workflows.",
+        "macos_arm64": "yes. Docs require macOS 14+ (docs/src/intro-js.md:307); registry has mac14/mac15/mac26 -arm64 builds for Chromium, Firefox and WebKit (packages/playwright-core/src/server/registry/index.ts:158,160,162,228,230,232,263,265,267); Apple CPUs are detected as -arm64 (packages/utils/hostPlatform.ts:67-71); CI uses macos-15-xlarge (Arm64) and macos-14-xlarge, but PR runs of that workflow are label-gated (.github/workflows/tests_secondary.yml:9,25,30-35). WebKit on macOS 14 uses a frozen older revision 2251 (packages/playwright-core/browsers.json:29-32).",
+        "gpu": "no (not required). No GPU requirement appears in README or docs; Chromium is launched with --enable-unsafe-swiftshader, a software-GL fallback (packages/playwright-core/src/server/chromium/chromium.ts:377-378); Linux CI uses an xvfb-run virtual display (.github/actions/run-test/action.yml:69-70). No GPU-acceleration feature was found."
+      },
+      "integrations": {
+        "cli": "yes. `playwright` bin (packages/playwright/cli.js -> src/program.ts: test, show-report, merge-reports, clear-cache, init-agents, init-skills, hidden test-server and run-test-mcp-server) and `playwright-core` bin (packages/playwright-core/cli.js) with core commands open, codegen, install, uninstall, install-deps, screenshot, pdf, show-trace, trace, cli, mcp (packages/playwright-core/src/cli/program.ts:37-254; packages/playwright/src/program.ts:40-257). The playwright-cli client code is packages/playwright-core/src/tools/cli-client/program.ts (run in-repo as `npx playwright cli` or `npm run playwright-cli`, package.json:51); README names the standalone @playwright/cli package from a separate repo (README.md:113-118,155).",
+        "mcp": "yes. MCP server in this repo: `npx playwright mcp` (packages/playwright-core/src/cli/program.ts:251-253; packages/playwright-core/src/tools/mcp/program.ts:33-163), stdio by default and HTTP/SSE with --port (packages/playwright-core/src/tools/utils/mcp/http.ts:38-100). A second MCP server exposes the test runner: hidden `run-test-mcp-server` (packages/playwright/src/program.ts:140-159; tools test_list, test_run, test_debug, planner_*, generator_* in packages/playwright/src/mcp/test/). README directs users to the separate @playwright/mcp package (README.md:161,172,208).",
+        "sdk_or_api": "yes. Node.js/TypeScript library API (`playwright`, `playwright-core`, `@playwright/test`; README.md:212-273; packages/*/package.json exports) with public types generated from docs/src (CONTRIBUTING.md:40). Other-language bindings talk to a Node driver over stdio (`run-driver`) or WebSocket (`run-server`, `launch-server`) (packages/playwright-core/src/cli/program.ts:172-205; packages/playwright-core/src/cli/driver.ts:30-95). MCP HTTP/SSE transport as above.",
+        "claude_code_or_codex": "Claude Code: documented. `claude mcp add playwright npx @playwright/mcp@latest` (README.md:185; docs/src/getting-started-mcp.md:53-57); `npx playwright init-agents --loop=claude` writes .claude/agents/*.md and .mcp.json (docs/src/test-agents-js.md:38-40; packages/playwright/src/agents/generateAgents.ts:38-62; tests/mcp/init-agents.spec.ts:77-92); skills via `playwright-cli install --skills` into .claude/skills (docs/src/getting-started-cli.md:39-49; packages/playwright-core/src/tools/utils/installSkills.ts:25-41) or `npx playwright init-skills` (packages/playwright/src/program.ts:187-202; tests/mcp/init-agents.spec.ts:125-142); CLI help prints the skill path when env CLAUDECODE or COPILOT_CLI is set (packages/playwright-core/src/tools/cli-client/program.ts:108-111). Codex: `npx playwright init-agents --loop=codex` writes .codex/agents/*.toml with sandbox_mode and an MCP server entry (docs/src/test-agents-js.md:42-44; generateAgents.ts:94-150; tests/mcp/init-agents.spec.ts:94-123); Codex is listed among MCP clients that accept the standard config (docs/src/getting-started-mcp.md:65). `--loop agents` installs skills to .agents/skills, not stated to be Codex-specific (installSkills.ts:28; program.ts:190-192). In every case Playwright generates configuration or serves tools; no code launches either CLI (grep)."
+      },
+      "telemetry_and_network": "README.md is silent on telemetry. No telemetry/analytics/usage-reporting code was found: grep over packages/ for telemetry|analytics|appinsights returns only a Firefox pref string (packages/playwright-core/src/server/bidi/third_party/firefoxPrefs.ts:129); that BiDi Firefox pref set disables health-report and data upload (firefoxPrefs.ts:123-133); Chromium launch switches include --disable-background-networking, --disable-component-update, --metrics-recording-only, --disable-sync (packages/playwright-core/src/server/chromium/chromiumSwitches.ts:53-96). Required network: `npx playwright install` downloads browser archives over HTTPS from cdn.playwright.dev and playwright.download.prss.microsoft.com (packages/playwright-core/src/server/registry/index.ts:47-51,117-126); the request User-Agent carries Playwright version, CPU arch, OS id/version, Node version and a CI/1 flag (packages/playwright-core/src/server/userAgent.ts:36-65; packages/playwright-core/src/server/registry/oopDownloadBrowserMain.ts:55-60). Overrides: PLAYWRIGHT_DOWNLOAD_HOST and per-browser hosts (registry/index.ts:1082-1095), PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD (registry/index.ts:1335-1339). Otherwise network use is whatever the automated pages and the user's LLM client do. Accounts: README/getting-started docs require no account or API key; CI-side Azure/GitHub secrets are maintainer-only (.github/actions/run-test/action.yml:83-95). Optional hosted viewer: trace.playwright.dev is linked from the trace-viewer UI (packages/trace-viewer/src/ui/workbenchLoader.tsx:214) and deployed by publish_release.yml:49-83. Local services: MCP HTTP binds localhost by default (packages/utils/network.ts:239-245) and `run-server` defaults to localhost (packages/utils/wsServer.ts:64-69). `playwright-cli`/MCP output under .playwright-cli/ may contain credentials; the CLI patches .gitignore with that warning (packages/playwright-core/src/tools/cli-daemon/program.ts:115-129)."
+    },
+    "code": {
+      "languages": [
+        "TypeScript (primary, packages/**/src)",
+        "JavaScript (CLI shims, utils/*.js, Firefox juggler patch in browser_patches/firefox)",
+        "TSX/React and CSS (html-reporter, trace-viewer, recorder, dashboard, web, extension UIs)",
+        "YAML (protocol spec, GitHub/Azure workflows)",
+        "Markdown (docs/src, agent and skill definitions)",
+        "Shell (docker, publish and emulator scripts under utils/)",
+        "C (libwebp WASM wrapper, utils/libwebp-wasm/webp_wasm.c)"
+      ],
+      "entry_points": [
+        {
+          "path": "packages/playwright/cli.js",
+          "what": "`playwright` binary; loads lib/program (src/program.ts): test, show-report, merge-reports, clear-cache, init-agents, init-skills, hidden test-server and run-test-mcp-server."
+        },
+        {
+          "path": "packages/playwright-core/cli.js",
+          "what": "`playwright-core` binary; decorates a commander program with core commands (src/cli/program.ts): open, codegen, install, uninstall, install-deps, screenshot, pdf, show-trace, trace, cli, mcp, hidden run-driver/run-server/launch-server."
+        },
+        {
+          "path": "packages/playwright-core/src/tools/mcp/program.ts",
+          "what": "`playwright mcp` command: Playwright MCP server (stdio, or HTTP/SSE with --port); options include --caps, --extension, --cdp-endpoint, --secrets, --allowed-hosts."
+        },
+        {
+          "path": "packages/playwright/src/program.ts",
+          "what": "Lines 140-159: hidden `run-test-mcp-server` (MCP server over the test runner); lines 161-202: init-agents and init-skills commands."
+        },
+        {
+          "path": "packages/playwright-core/src/tools/cli-client/program.ts",
+          "what": "`playwright-cli` client (sessions registry, talks to the daemon in tools/cli-daemon/); run as `npx playwright cli` or `npm run playwright-cli`."
+        },
+        {
+          "path": "packages/playwright-core/src/cli/driver.ts",
+          "what": "runDriver (stdio protocol for non-Node language bindings), runServer (WebSocket server), launchBrowserServer."
+        },
+        {
+          "path": "packages/playwright/src/agents/generateAgents.ts",
+          "what": "init-agents generators for Claude Code, Codex, Copilot, OpenCode and VS Code, built from the planner/generator/healer .agent.md files in the same directory."
+        },
+        {
+          "path": "packages/playwright-core/src/tools/trace/traceCli.ts",
+          "what": "`playwright trace` subcommands (open, actions, action, requests, console, errors, snapshot, screenshot, attachments, install-skill) for inspecting trace.zip from the command line."
+        }
+      ],
+      "architecture": "npm-workspaces monorepo (package.json:54-56); TypeScript compiled and bundled by esbuild into per-package lib/ (utils/build/build.js:643-713; .claude/skills/playwright-dev/vendor.md:9-64). Client/server split over an RPC protocol (.claude/skills/playwright-dev/library.md:1-90): protocol spec packages/protocol/spec/*.yml generates validators/channels (packages/protocol/src); client API objects in packages/playwright-core/src/client/; browser automation in packages/playwright-core/src/server/ with engine backends chromium/, firefox/, webkit/, bidi/, android/, electron/, dispatchers in server/dispatchers/, browser download and registry in server/registry/, remote WebSocket server in src/remote/; shared code in packages/isomorphic/ and packages/utils/; in-page scripts in packages/injected/. Test runner in packages/playwright/src/{runner,worker,common,matchers,reporters,transform,plugins,cli}/ (built-in reporters list, line, dot, json, junit, null, github, html, blob, perfetto: packages/playwright/src/common/config.ts:292). Agent/MCP tooling in packages/playwright-core/src/tools/{backend (capability-gated browser_* tools), mcp, cli-client, cli-daemon, dashboard, trace, skills (SKILL.md files), utils}; test-agent definitions and generators in packages/playwright/src/agents/; test-runner MCP in packages/playwright/src/mcp/test/. UIs: packages/{html-reporter,trace-viewer,recorder,web,dashboard,extension}. Import boundaries enforced by 51 DEPS.list files under packages/ via utils/check_deps.js (CLAUDE.md:86-91; `npm run lint`, package.json:38). Browser-engine patches live in browser_patches/{firefox,webkit,winldd}; public API types are generated from docs/src (CLAUDE.md:31).",
+      "packaging_and_release": "Artifacts: 10 public npm packages: playwright, playwright-core, @playwright/test, playwright-chromium/-firefox/-webkit, @playwright/browser-chromium/-firefox/-webkit (utils/workspace.js:144-197; @playwright/client is private, packages/playwright-client/package.json:3), built by `npm run build`; Docker images pushed to playwright.azurecr.io/public/playwright for Ubuntu jammy/noble/resolute x amd64/arm64 (utils/docker/publish_docker.sh:29-150; docs/src/docker.md:21 pulls from mcr.microsoft.com); trace viewer deployed to trace.playwright.dev (.github/workflows/publish_release.yml:49-83); Chrome extension uploaded to the Chrome Web Store (.github/workflows/publish_extension.yml:1-76); browser binaries served from cdn.playwright.dev (registry/index.ts:47-51). Release flow: .github/workflows/publish_release.yml publishes @next (daily cron or manual, alpha versions), @beta (pushes to release-*) and @latest (GitHub release published) using npm OIDC login (`id-token: write`, lines 5-10,18-20,30-47) through utils/publish_all_packages.sh (`npm publish --access=public ... --tag`, line 80). A manual Azure pipeline .azure-pipelines/publish.yml packs with `npm pack` and releases through the EsrpRelease@11 task with signcertname 'ESRP-Release-Sign' (lines 125-169); .azure-pipelines/publish-docker.yml builds and pushes Docker images on v* tags. Version consistency is checked by `utils/workspace.js --ensure-consistent` (workspace.js:80-139,212-220). Integrity: no checksum files, cosign/sigstore signatures, SBOM or explicit npm `--provenance` flag were found in .github, .azure-pipelines or utils (grep); the Docker build sets BUILDX_NO_DEFAULT_ATTESTATIONS=1 (utils/docker/build.sh:45-46); images get an oras 'lifecycle end-of-life' artifact, which is not a signature (publish_docker.sh:70-77). Published packages ship per-bundle *.LICENSE sidecars (packages/playwright-core/.npmignore:7-8; packages/playwright-core/ThirdPartyNotices.txt:5-11).",
+      "tests_and_ci": "Frameworks: the repo dogfoods Playwright Test (package.json:19-35). Spec-file counts (files containing test code): tests/page 134 (page+server fixtures), tests/library 156, tests/playwright-test 98 (run with a pinned prior @playwright/test via `npm run ttest`, package.json:30; tests/playwright-test/stable-test-runner/package.json:4), tests/mcp 95 (MCP SDK client over stdio, tests/mcp/fixtures.ts:22-23), tests/installation 21, tests/extension 6, tests/android 5, tests/electron 4, tests/stress 2; tests/bidi and tests/webview have configs/expectations but no spec files of their own; plus 10 spec files under packages/ (html-reporter, web, skill templates). About 525 spec files under tests/ in total (a regex count of about 10.7k `test(`/`it(` lines is only an upper bound because tests/playwright-test embeds test sources in strings). CI reporters: dot, json, blob, parquet-to-DuckDB (tests/library/playwright.config.ts:46-55); CI sets retries 3 and forbidOnly for library and installation suites (tests/library/playwright.config.ts:68-69; tests/installation/playwright.config.ts:42,45). Workflows (.github/workflows, 19 YAML files): tests_primary.yml 'tests 1' (library tests per browser on ubuntu-22.04 Node 20, plus chromium on Node 22/24 and ubuntu arm64; `ttest` sharded on ubuntu/macOS/windows Node 20-26; html-reporter/web component tests; playwright-vscode extension tests; install tests; clock tests; PRs skip docs/tools/mcp/bidi/extension paths, lines 8-20); tests_secondary.yml 'tests 2' (macOS, Windows, driver, tracing, Chrome/Edge channels, Android emulator, Electron, install tests on Node 20/24/26; PR runs only when labeled CQ1, lines 9,25); tests_mcp.yml (`npm run test-mcp` on ubuntu/macOS/windows x chrome/chromium/firefox/webkit/msedge); tests_bidi.yml (nightly plus bidi PRs); tests_docker.yml/_changes/_release (jammy/noble/resolute x amd64/arm64, `@smoke` tests inside containers); tests_extension.yml (macOS); tests_webview_simulator.yml (iOS simulator, 4 shards); infra.yml (`npm run lint` = eslint, tsc, doclint, check-deps, generate_channels, generate_types, lint-tests, test-types, lint-packages; clean-tree check; non-blocking `npm audit` with continue-on-error; snippet lint for Python/.NET/Java); create_test_report.yml (merge blob reports, PR comment and commit status, Copilot-based CI triage on failures); update_test_results_db.yml (DuckDB ingest every 3 hours); publish/roll/triage/copilot-setup workflows. Also 4 composite actions (.github/actions) and 2 Azure pipelines (.azure-pipelines).",
+      "dependencies": "Root package.json: no `dependencies`, 109 pinned `devDependencies` (package.json:57-166), vendored/bundled into lib/ at build time (utils/build/build.js:675-713; .claude/skills/playwright-dev/vendor.md:9-35). Published packages: playwright-core 0 dependencies (packages/playwright-core/package.json); playwright 1 (playwright-core); @playwright/test 1 (playwright); playwright-chromium, -firefox, -webkit 1 each (playwright-core); @playwright/browser-chromium, -firefox, -webkit 1 each (playwright-core). Private workspace packages: dashboard 10 (@browser-logos/*), web 4 (codemirror, @xterm/xterm, @xterm/addon-fit, yaml), recorder 1 (yaml), trace-viewer 1 (yaml), playwright-client 1, html-reporter 0, extension 0. Other manifests: tests/playwright-test/stable-test-runner/package.json 1 (@playwright/test ^1.63.0-alpha-2026-08-24); utils/flakiness-dashboard/package.json 2 (@azure/identity, @azure/storage-blob). Lockfile: root package-lock.json, lockfileVersion 3 enforced (utils/workspace.js:216-219). Dependabot weekly for npm and github-actions with a 7-day cooldown (.github/dependabot.yml:1-21); workflow actions are pinned by commit SHA (e.g. .github/workflows/tests_primary.yml:57). Engines: node >=20 (package.json:11-13).",
+      "security_policy": "SECURITY.md (Microsoft MSRC template): report privately via https://msrc.microsoft.com/create-report or secure@microsoft.com, not via public issues; coordinated vulnerability disclosure (SECURITY.md:9-39)."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:7 - drives Chromium, Firefox and WebKit with a single API in tests, scripts and as a tool for AI agents.",
+        "verified": "yes",
+        "evidence": "Engine backends exist in packages/playwright-core/src/server/chromium/chromium.ts, firefox/firefox.ts, webkit/webkit.ts; test runner command in packages/playwright/src/program.ts:40-78; agent tooling in packages/playwright-core/src/tools/mcp/program.ts:33-163, tools/cli-client/program.ts and packages/playwright/src/program.ts:161-202."
+      },
+      {
+        "claim": "README.md:63,105 - tests run in parallel across configured browsers, headless by default, each test with a fresh browser context.",
+        "verified": "partial",
+        "evidence": "Headless defaults to true (packages/playwright/src/index.ts:213) and the `context` fixture creates a context per test unless reuse mode is on (index.ts:469-480); default workers are 50% of cores (packages/playwright/src/common/config.ts:110). Code/docs differ from the 'parallel by default' wording: only test files run in parallel by default, tests inside one file run in order in one worker unless fullyParallel (docs/src/test-parallel-js.md:8; --fully-parallel default false at packages/playwright/src/program.ts:215)."
+      },
+      {
+        "claim": "README.md:88-101 - tracing captures traces, screenshots and videos on failure, viewable with show-trace.",
+        "verified": "yes",
+        "evidence": "Trace modes include retain-on-failure and on-first-retry (packages/playwright/src/program.ts:204); video retention logic (packages/playwright/src/index.ts:542-566) and screenshot on-failure modes (index.ts:624-672); `show-trace` command (packages/playwright-core/src/cli/program.ts:207-236). It is opt-in: trace, screenshot and video default to 'off' (index.ts:81-82,219). An agent-facing `playwright trace` CLI also exists (packages/playwright-core/src/tools/trace/traceCli.ts:35-147)."
+      },
+      {
+        "claim": "README.md:113 - Playwright CLI is more token-efficient than MCP.",
+        "verified": "not_checkable",
+        "evidence": "No measurement, benchmark or token count exists in the repo (grep: the claim appears only as prose at README.md:113 and docs/src/getting-started-cli.md:8,12). Design evidence only: CLI output references a snapshot file under .playwright-cli/ instead of inlining it (docs/src/getting-started-cli.md:85-93; packages/playwright-core/src/tools/skills/playwright-cli/SKILL.md:277), whereas MCP tools return the snapshot (docs/src/getting-started-mcp.md:81)."
+      },
+      {
+        "claim": "README.md:124 - `playwright-cli install --skills` installs agent skills.",
+        "verified": "yes",
+        "evidence": "Handled in packages/playwright-core/src/tools/cli-client/program.ts:204-208,330 and tools/cli-daemon/program.ts:47-48,89-109; skills playwright-cli, playwright-component-testing, playwright-trace are copied to .claude/skills or .agents/skills (packages/playwright-core/src/tools/utils/installSkills.ts:25-41). The standalone @playwright/cli package is published from a different repo (README.md:113,155) and was not inspected; the same code runs here as `npx playwright cli` (packages/playwright-core/src/cli/program.ts:240-249)."
+      },
+      {
+        "claim": "README.md:147-151 - `playwright-cli show` opens a dashboard with live screencast previews and remote control.",
+        "verified": "partial",
+        "evidence": "The `show` command (with --port, --host, --annotate, --kill) is declared at packages/playwright-core/src/tools/cli-daemon/commands.ts:1034-1048 and the dashboard server is packages/playwright-core/src/tools/dashboard/dashboardApp.ts; live screencast and remote-control behaviour was not executed or read in detail."
+      },
+      {
+        "claim": "README.md:161 - MCP agents use accessibility snapshots; no vision models or screenshots required.",
+        "verified": "yes",
+        "evidence": "Default tool list contains browser_snapshot and ref-based actions (tests/mcp/capabilities.spec.ts:19-47); coordinate/vision tools are opt-in via --caps=vision (capabilities.spec.ts:58-67; packages/playwright-core/src/tools/backend/mouse.ts capability 'vision')."
+      },
+      {
+        "claim": "README.md:206 - tools cover navigation, form filling, screenshots, network mocking, storage management and more.",
+        "verified": "partial",
+        "evidence": "Code differs from the README wording: network mocking (browser_route, capability 'network', packages/playwright-core/src/tools/backend/route.ts:24-30) and storage-state tools (capability 'storage') are not in the default tool list (tests/mcp/capabilities.spec.ts:19-47); tests enable them with mcpCaps ['network'] (tests/mcp/route.spec.ts:19-21) and show 'Tool \"browser_storage_state\" not found' otherwise (tests/mcp/storage.spec.ts:21-41). The --caps help text lists only vision, pdf, devtools (packages/playwright-core/src/tools/mcp/program.ts:41) although the capability type also has network, storage, testing, config (packages/playwright-core/src/tools/mcp/config.d.ts:19-31)."
+      },
+      {
+        "claim": "README.md:185 - `claude mcp add playwright npx @playwright/mcp@latest` registers the Playwright MCP server in Claude Code.",
+        "verified": "not_checkable",
+        "evidence": "@playwright/mcp is not a package of this workspace (public package list at utils/workspace.js:144-197; README.md:161,208 link to a separate repo), and `claude mcp add` was not exercised. The MCP implementation itself is in this repo (packages/playwright-core/src/tools/mcp/program.ts:33-163; .claude/skills/playwright-triage/SKILL.md:27) and is runnable as `npx playwright mcp` (packages/playwright-core/src/cli/program.ts:251-253)."
+      },
+      {
+        "claim": "README.md:295-303 - all three browsers supported on Linux, macOS and Windows; Chromium is Chrome for Testing.",
+        "verified": "yes",
+        "evidence": "Registry download paths exist for all three browsers on Ubuntu 22.04/24.04/26.04 and Debian 12/13 (x64 and arm64), macOS 14/15/26 (x64 and arm64) and Windows, and are undefined for older Ubuntu/Debian/macOS (packages/playwright-core/src/server/registry/index.ts:129-269); Chromium comes from Chrome for Testing URLs (index.ts:117-126; packages/playwright-core/browsers.json:9); README badge versions match browsers.json:8,22,33. README gives no OS versions or CPU architectures (docs/src/intro-js.md:303-308 does), and WebKit on macOS 14 is a frozen older revision with a warning (browsers.json:29-32; registry/index.ts:1103-1109)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Vendored libwebp-to-WASM codec (screenshot/video WebP encode/decode); unrelated to testing, evaluation or agent performance",
+        "metric": "encode / decode time, photo 1920x1080, quality 80",
+        "value": "SIMD build: encode ~370 ms, decode ~75 ms; scalar build: encode ~720 ms, decode ~75 ms (~2x faster encode with SIMD)",
+        "source": "utils/libwebp-wasm/README.md:58-66",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope: at this revision the repo contains no evaluation harness (no scorers, datasets or per-sample score storage), no runner for the real Claude Code/Codex CLIs, and no CI gate for prompts/skills/agents (grep, see purpose). Its agent features are config generators (packages/playwright/src/agents/generateAgents.ts:38-150), an MCP server and CLI/skills tooling (packages/playwright-core/src/tools/); its own CI LLM use is two Copilot-CLI triage workflows that only check for a non-empty draft (.github/workflows/triage.yml:65-69).",
+      "Security (MCP): `browser_run_code_unsafe` is described as 'RCE-equivalent' (packages/playwright-core/src/tools/backend/runCode.ts:30-37) yet sits in capability 'core', so it is in the default tool list (packages/playwright-core/src/tools/backend/tools.ts:79-80; tests/mcp/capabilities.spec.ts:19-47); docs say 'only enable it for trusted MCP clients' (docs/src/getting-started-mcp.md:106) but no option to disable it appears in the `mcp` flags (packages/playwright-core/src/tools/mcp/program.ts:35-82). The HTTP/SSE transport has no authentication, only a localhost bind and Host-header allow-list against DNS rebinding (packages/playwright-core/src/tools/utils/mcp/http.ts:61-83), and --host 0.0.0.0 is allowed (mcp/program.ts:55). --allowed-origins/--blocked-origins are documented as not a security boundary (mcp/program.ts:36,38) and --secrets as 'a convenience and not a security feature' (packages/playwright-core/src/tools/mcp/config.d.ts:149-154). File access is restricted to the workspace by default (mcp/program.ts:37).",
+      "Security (browsers): Chromium is launched with --no-sandbox unless chromiumSandbox is true (packages/playwright-core/src/server/chromium/chromium.ts:389-390; docs/src/api/params.md:1150-1152). The Chrome extension requests debugger, tabs, activeTab, tabGroups and <all_urls> host permissions (packages/extension/manifest.json:6-14) and lets an MCP client reuse the user's logged-in profile (packages/extension/README.md:5,45-72). CLI/MCP artifacts under .playwright-cli/ may contain credentials (packages/playwright-core/src/tools/cli-daemon/program.ts:124).",
+      "Integrity/supply chain: downloaded browser archives are checked only by byte count (and only when not chunked), with no hash or signature verification (packages/playwright-core/src/server/registry/oopDownloadBrowserMain.ts:84-92); no checksum, signature, SBOM or explicit npm provenance flag was found in the release workflows (.github/workflows/publish_release.yml:30-47; utils/publish_all_packages.sh:80), and Docker builds disable buildx default attestations (utils/docker/build.sh:45-46). Browser binaries are separate third-party artifacts from the project CDN (registry/index.ts:47-51), not covered by the repo LICENSE.",
+      "Agent-feature stability and failure masking: the generated healer agent is instructed to edit failing tests until they pass and to mark them test.fixme() when confident the test is correct (packages/playwright/src/agents/playwright-test-healer.agent.md:36-55; docs/src/test-agents-js.md:213), which converts failures into passes or skips. The `--run-agents` option is declared (packages/playwright/src/program.ts:234) but no other reference to it exists in the repo. Agent definitions must be regenerated on each Playwright upgrade (docs/src/test-agents-js.md:30-32) and the Copilot spec hardcodes a model name (generateAgents.ts:266).",
+      "Platform/version drift: docs say Node.js 'latest 22.x, 24.x or 26.x' (docs/src/intro-js.md:305) while package.json engines is >=20 (package.json:11-13) and CI still runs Node 20 (.github/workflows/tests_primary.yml:41). Official platforms are macOS 14+, Ubuntu 22.04/24.04/26.04, Debian 12/13 (docs/src/intro-js.md:303-308); Ubuntu 20.04 was dropped in 1.63 (docs/src/release-notes-js.md:119); other Linux distros get fallback builds flagged unsupported (packages/utils/hostPlatform.ts:122); WSL is listed without a version (intro-js.md:306); WebKit on macOS 14 is frozen at an older revision (packages/playwright-core/browsers.json:29-32).",
+      "Dependency and CI hygiene: 109 pinned devDependencies bundled at build time (package.json:57-166); `npm audit` in CI is non-blocking (.github/workflows/infra.yml:33-35); the test-runner suite depends on a pinned alpha of @playwright/test (tests/playwright-test/stable-test-runner/package.json:4); PR runs of the macOS/Windows/Android/Electron workflow happen only with the CQ1 label (.github/workflows/tests_secondary.yml:9,25); create_test_report.yml waits on a workflow named 'tests others' that no workflow defines (.github/workflows/create_test_report.yml:4). CONTRIBUTING.md states PRs without a linked, approved issue, or low-quality agent-generated PRs, are closed (CONTRIBUTING.md:5-16).",
+      "Licensing: repository is Apache-2.0 (LICENSE; package.json:17) with code derived from Puppeteer, also Apache-2.0 (NOTICE:4-5) and 'Portions Copyright 2017 Google Inc.' (LICENSE:190). Bundled npm dependencies keep their own licenses in per-bundle *.LICENSE sidecars (packages/playwright-core/ThirdPartyNotices.txt:5-11; .claude/skills/playwright-dev/vendor.md:73-80); third-party code also sits under packages/playwright-core/src/server/bidi/third_party/ (own LICENSE) and packages/web/src/third_party/vscode/ (LICENSE.txt). Licenses of the downloaded browser builds are not in this repo."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "microsoft/playwright",
+      "checks": [
+        {
+          "field": "readme.install[1]",
+          "statement": "npm: add Playwright Test manually, then download browsers: `npm i -D @playwright/test` then `npx playwright install`; the docs add `npx playwright install --with-deps` to install Linux OS libraries.",
+          "citation": "README.md:36-37; docs/src/browsers.md:119-122",
+          "holds": true,
+          "note": "README.md:36-37 contains exactly `npm i -D @playwright/test` / `npx playwright install`. The `install` command and its `--with-deps` option ('install system dependencies for browsers') are defined at packages/playwright-core/src/cli/program.ts:76-78. browsers.md:119-122 says combining install-deps with install installs 'the browsers and OS dependencies' in one command and shows `npx playwright install --with-deps chromium`. Minor narrowing: the cited docs say 'OS dependencies', not Linux. In code, install-deps installs distro packages on Linux, runs install_media_pack.ps1 for Chromium on Windows, and does nothing on macOS (packages/playwright-core/src/server/registry/index.ts:928-931; registry/dependencies.ts:78-92). 'Linux OS libraries' is accurate for Linux and does not misstate the commands."
+        },
+        {
+          "field": "license",
+          "statement": "License is Apache-2.0, file LICENSE.",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-2 is the Apache License, Version 2.0, with appendix 'Portions Copyright (c) Microsoft Corporation. / Portions Copyright 2017 Google Inc.' (LICENSE:189-190). The root package.json:17 and every packages/*/package.json (e.g. playwright:51, playwright-core:16, playwright-test:16, browser packages:16) declare \"Apache-2.0\". NOTICE:4-5 credits Puppeteer-derived code, also Apache 2.0."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes: README marks all three browsers on Linux; docs list Debian 12/13 and Ubuntu 22.04/24.04/26.04 x86-64/arm64; Ubuntu 20.04 dropped in 1.63; registry has x64 downloads; CI runs ubuntu-22.04 and amd64 Docker images; other distros fall back to ubuntu24.04 builds flagged not officially supported.",
+          "citation": "README.md:297-301; docs/src/intro-js.md:308; docs/src/release-notes-js.md:119; packages/playwright-core/src/server/registry/index.ts:134-136,144,146,204-206,239-241,249,251; .github/workflows/tests_primary.yml:40; .github/workflows/tests_docker.yml:16-34; packages/utils/hostPlatform.ts:122; registry/index.ts:1101-1102",
+          "holds": true,
+          "note": "Every citation matches. README.md:299-301 tick Linux for Chromium, WebKit and Firefox. intro-js.md:308 reads 'Debian 12 / 13, Ubuntu 22.04 / 24.04 / 26.04 (x86-64 or arm64)'. release-notes-js.md:119 reads 'Ubuntu 20.04 is not supported anymore' under '## Version 1.63' (line 9). index.ts:134-136,144,146 (chromium), 204-206 (firefox) and 239-241,249,251 (webkit) are x64 entries; firefox debian x64 entries also exist at 214,216 but are uncited, and firefox ubuntu26.04-x64 reuses the 24.04 build (line 206). tests_primary.yml:40 is `os: [ubuntu-22.04]`. tests_docker.yml:16-34 lists jammy/noble/resolute in amd64 and arm64. hostPlatform.ts:122 returns ubuntu24.04 with isOfficiallySupportedPlatform:false, and index.ts:1101-1102 logs 'BEWARE: your OS is not officially supported by Playwright; downloading fallback build'."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Claude Code documented via `claude mcp add`, `init-agents --loop=claude` (.claude/agents/*.md + .mcp.json), skills into .claude/skills, CLI help prints skill path under CLAUDECODE/COPILOT_CLI; Codex via `init-agents --loop=codex` (.codex/agents/*.toml with sandbox_mode and MCP server entry) and listed as MCP client; no code launches either CLI.",
+          "citation": "README.md:185; docs/src/getting-started-mcp.md:53-57,65; docs/src/test-agents-js.md:38-44; packages/playwright/src/agents/generateAgents.ts:38-62,94-150; tests/mcp/init-agents.spec.ts:77-142; docs/src/getting-started-cli.md:39-49; packages/playwright-core/src/tools/utils/installSkills.ts:25-41; packages/playwright/src/program.ts:187-202; packages/playwright-core/src/tools/cli-client/program.ts:108-111",
+          "holds": true,
+          "note": "Holds as written. README.md:185 and getting-started-mcp.md:55-57 give `claude mcp add playwright npx @playwright/mcp@latest`; getting-started-mcp.md:65 lists Codex. test-agents-js.md:38-44 shows --loop=claude/codex. generateAgents.ts:46-59 writes .claude/agents/<name>.md and .mcp.json (playwright-test -> npx playwright run-test-mcp-server); :102-146 writes .codex/agents/<snake_name>.toml with sandbox_mode and [mcp_servers.playwright-test]. init-agents.spec.ts:77-92 asserts .mcp.json, :94-123 the toml fields, :125-142 init-skills into .claude/skills and .agents/skills. installSkills.ts:25-41 copies three skills to .<claude|agents>/skills. program.ts:187-202 defines init-skills with --loop claude|agents (190-192). cli-client/program.ts:109-110 adds the skill path when CLAUDECODE or COPILOT_CLI is set. My grep for spawn/exec of claude/codex, `claude -p`, `codex exec` and `@openai/codex` (excluding browser_patches and node_modules) returns nothing. Other mentions in packages/ are option values, generated paths, a docs-URL comment, a Copilot model string (generateAgents.ts:266) and env-name detection (packages/utils/env.ts:60-70)."
+        },
+        {
+          "field": "claim_checks[9]",
+          "statement": "README.md:295-303 - all three browsers supported on Linux, macOS and Windows; Chromium is Chrome for Testing (verified: yes).",
+          "citation": "README.md:295-303; packages/playwright-core/src/server/registry/index.ts:117-126,129-269,1103-1109; packages/playwright-core/browsers.json:8,9,22,29-33",
+          "holds": true,
+          "note": "index.ts:129-269 has entries for chromium, chromium-headless-shell, firefox and webkit on ubuntu22.04/24.04/26.04 and debian12/13 (x64+arm64), mac14/15/26 (x64+arm64) and win64, and undefined for ubuntu18.04/20.04, debian11 and mac10.13-mac13. Chromium uses cftUrl 'builds/cft/<browserVersion>/...' (index.ts:117-126), and browsers.json:9 has title 'Chrome for Testing'. README badges and table (README.md:3,299-301) match browsers.json:8 (153.0.8010.12), :22 (155.0) and :33 (26.6). browsers.json:29-32 sets the webkit revisionOverrides mac14/mac14-arm64 to 2251, which sets hasRevisionOverride (index.ts:460-466) and triggers the 'frozen ... browser' warning at index.ts:1103-1109. README gives no OS versions or CPU architectures; intro-js.md:303-308 does."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

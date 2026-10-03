@@ -1,0 +1,290 @@
+{
+  "contender": "cli/cli",
+  "revision": {
+    "contender": "cli/cli",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "cli/cli",
+        "tag": "v2.102.0",
+        "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v2.102.0",
+    "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+    "read_at": "2026-10-02T03:02:00+00:00"
+  },
+  "dossier": {
+    "contender": "cli/cli",
+    "revision": {
+      "tag": "v2.102.0",
+      "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "GitHub's official command-line client (`gh`, Go module github.com/cli/cli/v2). It calls the GitHub REST and GraphQL APIs on GitHub.com, GitHub Enterprise Cloud and GitHub Enterprise Server, and shells out to the local `git` binary for repository operations. Command groups registered in pkg/cmd/root/root.go:134-179 include pr, issue, repo, run, workflow, release, api (authenticated REST/GraphQL passthrough), auth, attestation, codespace and extension, plus preview agent-oriented commands (agent-task, skill, copilot). It is a GitHub client, not a version control system. No MCP server, worktree list/management command or structural-diff engine was found in the source.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "\"GitHub CLI, or the gh CLI, is GitHub on the command line. It brings pull requests, issues, and other GitHub concepts to the terminal next to where you are already working with `git` and your code.\"",
+          "citation": "README.md:3"
+        },
+        {
+          "claim": "Supported for users on GitHub.com, GitHub Enterprise Cloud and supported GitHub Enterprise Server versions, with support for macOS, Windows and Linux.",
+          "citation": "README.md:10"
+        },
+        {
+          "claim": "Usage instructions are in the online manual (https://cli.github.com/manual/); installation options are listed in the README.",
+          "citation": "README.md:14"
+        },
+        {
+          "claim": "An agent skill is available for driving `gh` from coding agents; install with `gh skill install cli/cli gh --scope user` and update with `gh skill update gh`.",
+          "citation": "README.md:16-26"
+        },
+        {
+          "claim": "The PGP signing key rotation for the Linux package repositories is effective September 5, 2026; users with install/update problems should see the public announcement (cli/cli issue 13118).",
+          "citation": "README.md:5-6"
+        },
+        {
+          "claim": "macOS install options: Homebrew, and precompiled binaries from the releases page.",
+          "citation": "README.md:37-42"
+        },
+        {
+          "claim": "Linux install options: Debian/Raspberry Pi/Ubuntu apt repo, RPM repos (Amazon Linux, CentOS, Fedora, openSUSE, RHEL, SUSE), and precompiled binaries.",
+          "citation": "README.md:44-50"
+        },
+        {
+          "claim": "Build from source is documented in docs/install_source.md.",
+          "citation": "README.md:59-61"
+        },
+        {
+          "claim": "GitHub-hosted Actions runners have the GitHub CLI pre-installed and updated weekly; a specific version must be installed by the workflow using the instructions above.",
+          "citation": "README.md:73-79"
+        },
+        {
+          "claim": "Starting with v2.93.0, releases of `gh` are published as immutable releases.",
+          "citation": "README.md:83"
+        },
+        {
+          "claim": "Since v2.50.0, `gh` produces signed Build Provenance Attestations (cryptographic paper trail to repo, git revision and build instructions) that rely on Public Good Sigstore for PKI.",
+          "citation": "README.md:85"
+        },
+        {
+          "claim": "Release verification: `gh at verify -R cli/cli <archive>` when gh is installed, or Sigstore `cosign verify-blob-attestation` with the downloaded attestation bundle.",
+          "citation": "README.md:87-113"
+        },
+        {
+          "claim": "`gh` is a standalone tool, whereas the older unofficial `hub` behaved as a proxy to `git`.",
+          "citation": "README.md:115-120"
+        }
+      ],
+      "install": [
+        {
+          "method": "Linux (Debian, Ubuntu, Raspberry Pi): official apt repository",
+          "command": "(type -p wget >/dev/null || (sudo apt update && sudo apt install wget -y)) \\\n\t&& sudo mkdir -p -m 755 /etc/apt/keyrings \\\n\t&& out=$(mktemp) && wget -nv -O$out https://cli.github.com/packages/githubcli-archive-keyring.gpg \\\n\t&& cat $out | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \\\n\t&& sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \\\n\t&& sudo mkdir -p -m 755 /etc/apt/sources.list.d \\\n\t&& echo \"deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main\" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \\\n\t&& sudo apt update \\\n\t&& sudo apt install gh -y",
+          "citation": "docs/install_linux.md:45-55 (linked from README.md:46)"
+        },
+        {
+          "method": "Linux (Fedora, RHEL, CentOS, etc.): official RPM repository via DNF5",
+          "command": "sudo dnf install dnf5-plugins\nsudo dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo\nsudo dnf install gh",
+          "citation": "docs/install_linux.md:100-104"
+        },
+        {
+          "method": "Linux: official RPM repository via DNF4 (yum and zypper variants are documented at docs/install_linux.md:135-139 and 151-155)",
+          "command": "sudo dnf install 'dnf-command(config-manager)'\nsudo dnf config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo\nsudo dnf install gh",
+          "citation": "docs/install_linux.md:119-123"
+        },
+        {
+          "method": "macOS and Linux: Homebrew",
+          "command": "brew install gh",
+          "citation": "docs/install_macos.md:13-15; docs/install_linux.md:172-174"
+        },
+        {
+          "method": "Linux and macOS: precompiled binaries from the GitHub releases page, optionally verified with gh attestation",
+          "command": "download an archive from https://github.com/cli/cli/releases/latest, then optionally: gh at verify -R cli/cli gh_2.62.0_macOS_arm64.zip (README example)",
+          "citation": "docs/install_linux.md:182-184; docs/install_macos.md:23-25; README.md:92,122"
+        },
+        {
+          "method": "Build from source on a Unix-like system (needs Go)",
+          "command": "git clone https://github.com/cli/cli.git gh-cli && cd gh-cli && make install   # or: make install prefix=/path/to/gh",
+          "citation": "docs/install_source.md:11-28"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - linux/amd64 tar.gz, .deb and .rpm are built (.goreleaser.yml:34-47, 64-71, 88-113); docs/install_linux.md:184 lists 386, amd64, arm64 and armv6 binaries. Linux release builds use CGO_ENABLED=0 (.goreleaser.yml:37-38).",
+        "wsl2": "unknown - no WSL2-specific documentation or support statement was found in docs or code (a search for WSL only hit issue text inside .github/workflows/scripts/spam-detection/eval-prompts.yml). Plain Linux binaries and packages are published (docs/install_linux.md:184).",
+        "macos_arm64": "yes - darwin/arm64 is built (.goreleaser.yml:19-21); archive named gh_<ver>_macOS_arm64.zip (.goreleaser.yml:74; README.md:92); universal pkg built with lipo (script/pkgmacos:61-70); Homebrew (docs/install_macos.md:13-15).",
+        "gpu": "no - not applicable: a command-line client with no GPU code (the only matches are test fixtures: api/queries_repo_test.go:1258, pkg/cmd/pr/checks/checks_test.go:733)."
+      },
+      "integrations": {
+        "cli": "yes - the `gh` binary (cmd/gh/main.go:9-12 -> internal/ghcmd/cmd.go:51). Subcommands are registered at pkg/cmd/root/root.go:134-179. `gh pr` has list, create, status, view, diff, checkout, checks, review, merge, update-branch, ready, comment, close, reopen, revert, edit, lock, unlock (pkg/cmd/pr/pr.go:50-72). `gh run` has list/view/watch/rerun/cancel/download/delete (pkg/cmd/run/). `gh api` is an authenticated REST/GraphQL passthrough with --paginate/--jq/--template (pkg/cmd/api/api.go:80-140). Scripting aids: --json/--jq/--template (e.g. pkg/cmd/pr/checks/checks.go:123), exit codes 0/1/2/4/8 (internal/ghcmd/cmd.go:43-49), GH_TOKEN auth and GH_PROMPT_DISABLED (pkg/cmd/root/help_topic.go:45-47, 111).",
+        "mcp": "none found - no MCP server in the Go source. .github/mcp.json:1-19 only configures `gh aw mcp-server` (the separate github/gh-aw extension, listed as an official extension at pkg/extensions/official.go:26) for the repo's own agent workflows; the compiled workflow .github/workflows/issue-triage.lock.yml:65-67 references ghcr.io/github/github-mcp-server and gh-aw-mcpg container images.",
+        "sdk_or_api": "No supported SDK in this repo. HTTP/GraphQL access is via `gh api` (pkg/cmd/api/api.go:80-140); an optional `api_host` gateway redirect is documented (docs/api-host.md:3-18). Extensions (`gh extension`, pkg/cmd/extension/) call back into gh via GH_PATH (pkg/cmd/root/help_topic.go:113-115); the Go helper library is the separate cli/go-gh module (go.mod:21). No documented SDK or stability policy for this repo's Go packages was found (docs/project-layout.md:3-16 describes layout only).",
+        "claude_code_or_codex": "Yes, partial. (1) Agent skills shipped in the repo: skills/gh/SKILL.md (frontmatter :1-4) and skills/gh-skill/SKILL.md, installable with `gh skill install cli/cli gh --scope user` (README.md:16-26). `gh skill install --agent` can target Claude Code (.claude/skills) and Codex (.agents/skills) (internal/skills/registry/registry.go:57-74; pkg/cmd/skills/install/install.go:240-244); the default agent is github-copilot (install.go:105). (2) Runtime agent detection from env vars: Claude Code via CLAUDECODE/CLAUDE_CODE and Codex via CODEX_SANDBOX/CODEX_CI/CODEX_THREAD_ID (internal/agents/detect.go:77-79, 127-137). When detected, gh appends `Agent/<name>` to its User-Agent (api/http_client.go:56-59), records it as telemetry dimension `agent` (internal/ghcmd/cmd.go:76), disables the spinner (cmd.go:381-382) and prints full help on usage errors (cmd.go:214, 275-300). (3) Contributor guidance for agents: AGENTS.md (CLAUDE.md:1 is just `@AGENTS.md`). No Claude Code plugin/hook or Codex-specific integration beyond these was found."
+      },
+      "telemetry_and_network": "README.md says nothing about telemetry. It is documented in `gh help telemetry` (pkg/cmd/root/help_topic.go:135-143, which points to https://cli.github.com/telemetry; that page was not opened) and in `gh help environment` (help_topic.go:124-128). Code: telemetry is ENABLED by default (config key `telemetry`, default `enabled`: internal/config/config.go:790-798). Opt out with GH_TELEMETRY=false/0/no/off/disabled, DO_NOT_TRACK=1|true, or the config value; GH_TELEMETRY=log prints the payload to stderr instead of sending (internal/telemetry/telemetry.go:90-145, 172-199). In enabled mode only 1% of invocations are sent by default (GH_TELEMETRY_SAMPLE_RATE overrides: internal/ghcmd/cmd.go:115-118), but `gh skill`, `gh copilot` and attachment uploads force 100% (pkg/cmd/skills/skills.go:48-51; pkg/cmd/copilot/copilot.go:85; internal/attachments/telemetry.go:20). It is disabled when the user looks like a GHES user (GH_ENTERPRISE_TOKEN, enterprise GH_HOST, or any enterprise host in config: internal/ghcmd/cmd.go:481-494) and when config fails to load (cmd.go:87-89). Events are sent by a detached hidden child process `gh send-telemetry` (pkg/cmd/send-telemetry/send_telemetry.go:35-37; internal/telemetry/telemetry.go:423-488) as protobuf/Twirp to https://cafe.github.com (override GH_TELEMETRY_ENDPOINT_URL; send_telemetry.go:21, 54, 85), 2s timeout, app name `github-cli` (send_telemetry.go:77-79, 99). Recorded: `command_invocation` events with the command path and flag NAMES only, not values (pkg/cmdutil/telemetry.go:24-54); skill events (skill_install, skill_list, skill_preview, skill_search_install, skill_upstream_redirect: pkg/cmd/skills/); attachment_invocation (internal/attachments/telemetry.go:22). Common dimensions: persistent random device_id UUID in the state dir, invocation_id, os, architecture, version, is_tty, agent, ci, github_actions, accessibility/color/spinner flags, sample_rate, timestamp (internal/telemetry/telemetry.go:29-88, 228-233; internal/ghcmd/cmd.go:73-83). Other network/account needs: almost every command needs a GitHub account/token (auth check pkg/cmd/root/root.go:83-93; GH_TOKEN or `gh auth login` OAuth device/web flow with GitHub's OAuth app, internal/authflow/flow.go:22-45; tokens kept in the system keyring via zalando/go-keyring, go.mod:59) and calls api.github.com or the GHES host (pkg/cmd/api/http.go:22-36). Update check: once per 24h against https://api.github.com/repos/cli/cli/releases/latest, skipped for GH_NO_UPDATE_NOTIFIER, CODESPACES, CI or non-TTY (internal/update/update.go:82-123). It only runs in builds with the `updateable` build tag, which the comment says is set by the Homebrew formula (internal/ghcmd/update_enabled.go:5-18). No file in this repo sets that tag (.goreleaser.yml has no tags/flags; grep for `updateable` hits only the two tag files), so GoReleaser release binaries compile with updaterEnabled = '' and skip the check (internal/ghcmd/update_disabled.go:6; internal/ghcmd/cmd.go:318). `gh agent-task` discovers the Copilot API URL via GraphQL viewer.copilotEndpoints, requires an OAuth device-flow token and is rejected on enterprise hosts (pkg/cmd/agent-task/shared/capi.go:47-68; pkg/cmd/agent-task/agent_task.go:69-102). `gh copilot` downloads the Copilot CLI if absent (pkg/cmd/copilot/copilot.go:52-60, 146-150). `gh skill` fetches skills from GitHub repos (pkg/cmd/skills/install/install.go:112-119)."
+    },
+    "code": {
+      "languages": [
+        "Go (main module, go 1.27.0)",
+        "Shell and PowerShell (script/, test/integration/)",
+        "JavaScript/Node (.github/ tooling only)",
+        "CodeQL QL (.github/codeql/queries)",
+        "WiX/XML (build/windows, build/macOS)",
+        "Markdown (SKILL.md files and gh-aw agentic workflow sources)"
+      ],
+      "entry_points": [
+        {
+          "path": "cmd/gh/main.go",
+          "what": "The `gh` binary; a thin main that calls ghcmd.Main() and exits with its code (lines 9-12)."
+        },
+        {
+          "path": "internal/ghcmd/cmd.go",
+          "what": "Main(): loads config, builds IOStreams, telemetry service and update check, constructs the root command, maps errors to exit codes 0/1/2/4/8 (lines 43-262)."
+        },
+        {
+          "path": "pkg/cmd/root/root.go",
+          "what": "NewCmdRoot: registers all command groups, extensions, aliases and official-extension stubs (lines 64-263)."
+        },
+        {
+          "path": "pkg/cmd/pr/pr.go",
+          "what": "`gh pr` command group (list, create, status, view, diff, checkout, checks, review, merge, update-branch, ready, comment, close, reopen, revert, edit, lock, unlock; lines 27-75)."
+        },
+        {
+          "path": "pkg/cmd/api/api.go",
+          "what": "`gh api`: authenticated REST/GraphQL request command (line 68 onward)."
+        },
+        {
+          "path": "pkg/cmd/send-telemetry/send_telemetry.go",
+          "what": "Hidden `gh send-telemetry` subcommand that posts the telemetry payload to the telemetry endpoint (lines 29-110)."
+        },
+        {
+          "path": "cmd/gen-docs/main.go",
+          "what": "Generator for manual pages and website docs, used by the Makefile and the release workflow (Makefile:30-32, 64-71; deployment.yml:80-83)."
+        },
+        {
+          "path": "skills/gh/SKILL.md",
+          "what": "Agent skill describing how agents should invoke gh (JSON output, pagination, repo targeting, worktree flags, gh api fallback)."
+        }
+      ],
+      "architecture": "Single Go module (go.mod:1) built on spf13/cobra. cmd/gh/main.go calls internal/ghcmd.Main, which loads config (internal/config), builds IOStreams (pkg/iostreams), the telemetry service (internal/telemetry), the command Factory (pkg/cmd/factory) and the root command (pkg/cmd/root/root.go:64). Each command lives in pkg/cmd/<command>/<subcommand>/ (docs/project-layout.md:20-27). GitHub access goes through api/ (GraphQL via shurcooL/githubv4 plus REST, api/http_client.go) on top of cli/go-gh, with host/endpoint selection, an optional api_host gateway (docs/api-host.md) and GHES feature detection (internal/featuredetection, used at pkg/cmd/pr/checks/checks.go:12,174-181).\n\nVCS base: gh is not a VCS. package git/ shells out to the `git` binary found on PATH (git/client.go:959-975); the .deb/.rpm declare a `git` dependency (.goreleaser.yml:94-95); go.mod has no embedded Git library. Worktrees are handled by invoking `git worktree add`, `list --porcelain`, `remove` and `prune` (git/client.go:267-301; pkg/cmd/pr/shared/worktree.go:43-59).\n\nWorktree features: `gh pr checkout <pr> --worktree <path>` and `gh issue develop <n> --checkout --worktree <path>` create or reuse a linked worktree (pkg/cmd/pr/checkout/checkout.go:107-125, 199-340; pkg/cmd/issue/develop/develop.go:133-140, 158). The path is rejected if it is a symlink, a non-directory, non-empty, inside another repo, the current worktree, or inside another worktree (pkg/cmd/pr/shared/worktree.go:61-150). `gh pr merge --delete-branch` removes the head branch's linked worktree with plain `git worktree remove` (no --force) and prunes stale worktree metadata (pkg/cmd/pr/merge/merge.go:417-425, 494-501). `gh repo sync` refuses a branch checked out in another worktree (pkg/cmd/repo/sync/sync.go:262-270). No `gh worktree` command exists (pkg/cmd/root/root.go:134-179) and nothing lists worktrees together with CI status.\n\nGitHub automation: CI state comes from `gh pr checks` (GraphQL statusCheckRollup; --watch, --fail-fast, --required, --json with a `bucket` field, exit code 8 when pending; pkg/cmd/pr/checks/checks.go:21-33, 61-75, 117-123, 257-311) and `gh run list/view/watch`. `gh pr status` shows CI and review summaries (pkg/cmd/pr/status/status.go:54-61). `gh pr view --json` exposes fields including files, reviews, latestReviews, reviewDecision, reviewRequests, mergeable, mergeStateStatus and statusCheckRollup (api/query_builder.go:353-381). `gh pr review` posts a top-level review (approve/request-changes/comment plus body) through the GraphQL addPullRequestReview mutation, with no inline comments (pkg/cmd/pr/review/review.go:139-143; api/queries_pr_review.go:24-27, 249-274).\n\nDiffs: `gh pr diff` fetches GitHub's unified diff/patch (Accept: application/vnd.github.v3.diff or .patch) and only adds line-prefix colouring, --name-only and glob --exclude (pkg/cmd/pr/diff/diff.go:117-122, 212-236, 247-317). No syntax-aware or entity-level diff code was found; the only tree-sitter reference is the dev-tool lockfile .github/skills/cli-exercise/scripts/package-lock.json:93, unrelated to gh.\n\nGitHub-side agent automation: gh ships no reusable Action/workflow for agent PR review or @mention-triggered tasks. cli/cli's own workflows use gh-aw agentic workflows (engine: copilot) for issue triage (.github/workflows/issue-triage.md:1-9, 47; triggers issues.opened and workflow_dispatch, issue-triage.lock.yml:70-86) and an hourly advisory Dependabot-PR triager that only comments (dependabot-triage.md:1-9, 37-44, 64), plus reusable triage workflows from desktop/gh-cli-and-desktop-shared-workflows (triage-issues.yml, triage-pull-requests.yml). The only comment-style trigger is `issue_comment` for a no-response closer (triage-scheduled-tasks.yml:3-13). `gh agent-task create/list/view` (preview) starts and inspects GitHub Copilot coding-agent tasks (pkg/cmd/agent-task/agent_task.go:18-67; create/create.go:59-110). A code-review skill for cli/cli PRs lives at .github/skills/code-review/SKILL.md:1-8.\n\nOther modules: internal/skills/* (skill discovery, install, lockfile, agent-host registry), internal/agents (agent detection), pkg/cmd/attestation (sigstore-go based verification), internal/codespaces, pkg/cmd/extension and pkg/extensions (extension manager; official extension stubs aw, stack, webhook: pkg/extensions/official.go:25-29), internal/barista/observability (telemetry protobuf/Twirp client), internal/update, acceptance/ (testscript live tests).",
+      "packaging_and_release": "Releases are built by .github/workflows/deployment.yml: manual workflow_dispatch with inputs tag_name/environment/platforms/release/dry_run, dry_run defaulting to true (lines 13-35), maintainer approval required (docs/releasing.md:13-14). It uses a pinned GoReleaser v2.13.1 (deployment.yml:63-69) driven by .goreleaser.yml and script/release. Artifacts: Linux tar.gz for 386/arm/amd64/arm64 (.goreleaser.yml:34-47, 64-71); macOS zip for amd64/arm64 plus a universal .pkg (.goreleaser.yml:72-79; script/pkgmacos:59-119; deployment.yml:177-189); Windows zip plus MSI for 386/amd64/arm64 (deployment.yml:200-317; build/windows/); .deb and .rpm via nfpms (.goreleaser.yml:88-113). Integrity: SHA-256 checksum file gh_<ver>_checksums.txt (deployment.yml:430-434); GitHub build-provenance attestations via actions/attest@v4.2.2 over dist/gh_* for production, non-dry-run releases only (deployment.yml:390-395; verification flow README.md:87-113); RPMs signed with rpmsign using key 7F38BBB5... (deployment.yml:385-389; script/rpmmacros:1); apt repo signed via reprepro `SignWith` (script/distributions); rpm repomd.xml detached-signed (deployment.yml:404); GPG keys come from *_2026 secrets (deployment.yml:372-384); macOS binaries codesigned and zip archives notarized with notarytool (script/sign:24-28; deployment.yml:108-176); macOS pkg signed with `productbuild --sign` only if APPLE_DEVELOPER_INSTALLER_ID is set (script/pkgmacos:104-111); Windows binaries and MSI signed with Azure Code Signing (deployment.yml:220-309). All assets are attached in one `gh release create` call (deployment.yml:423-446). README says releases are immutable from v2.93.0 (README.md:83; a repository setting, not checkable from code). Homebrew is bumped by homebrew-core autobump (docs/releasing.md:28); apt/rpm repos and manual pages are published to github/cli.github.com (deployment.yml:338-361, 447-465). Third-party actions are pinned by commit SHA (deployment.yml:58-64). Source build: `make` or `go run script/build.go` (Makefile:13-24).",
+      "tests_and_ci": "Go `testing` with testify (use require for errors; docs/testing.md:55-58), gock and an in-repo httpmock registry (docs/testing.md:74-94; go.mod:54, 67). About 386 `_test.go` files in the main module (310 under pkg/; 76 in api/, git/, internal/, acceptance/, cmd/, context/, script/), plus 26 in the separate .github/skills/cli-exercise/tool module (412 repo-wide). 147 live acceptance scripts (acceptance/testdata/**/*.txtar, build tag `acceptance`, testscript; they create real GitHub resources: acceptance/README.md:3-9, AGENTS.md:51-54). 7 attestation integration shell scripts (test/integration/attestation-cmd/). Two Go benchmark functions exist (internal/docs/man_test.go:305; internal/docs/markdown_test.go:119). CI (.github/workflows/): go.yml (push to trunk and PRs; `go test -race -tags=integration ./...` and `go build ./cmd/gh` on ubuntu/windows/macos, plus attestation integration scripts); lint.yml (go mod tidy -diff, go fix -diff, golangci-lint per .golangci.yml, license-generation check, govulncheck); codeql.yml (Go with custom queries in .github/codeql/queries, plus Actions; weekly and on PRs); govulncheck.yml (daily, SARIF upload); acceptance.yml (manual dispatch only, environment gh-acceptance-testing); bump-go.yml (daily Go toolchain bump); deployment.yml (release); triage-issues.yml, triage-pull-requests.yml, triage-scheduled-tasks.yml (reusable triage workflows); issue-triage.md/.lock.yml and dependabot-triage.md/.lock.yml (gh-aw agentic workflows); agentics-maintenance.yml; copilot-setup-steps.yml.",
+      "dependencies": "go.mod: 61 direct and 118 indirect requirements (179 total); `go 1.27.0`, `toolchain go1.27.1` (go.mod:3-5, 7-190); no vendor/ directory. Notable direct deps: spf13/cobra (go.mod:52), cli/go-gh (:21), shurcooL/githubv4 (:49), sigstore-go (:51), go-tuf (:55), twirp (:56), grpc (:65), zalando/go-keyring (:59), charm bubbletea/huh (:9-10), testify (:54), gock (:67). Other manifests: .github/skills/cli-exercise/tool/go.mod (4 direct, 2 indirect); .github/skills/cli-exercise/scripts/package.json (1 dependency, tuistory 0.11.0, with package-lock.json); .github/codeql/tests/unsanitized-response-to-terminal/go.mod (2 direct, test fixture module). Dependabot runs daily for gomod (major bumps ignored) and github-actions (.github/dependabot.yml:1-24). Third-party licenses are embedded per GOOS/GOARCH at build via go-licenses (docs/license-compliance.md:7).",
+      "security_policy": ".github/SECURITY.md: report vulnerabilities first through GitHub's HackerOne bug bounty (SECURITY.md:3); other security concerns via the repo's private GitHub Security Advisory flow (:8); no public issues/PRs/discussions for vulnerabilities (:10); dependency-CVE reports must show reachability evidence (govulncheck call chain or PoC) or will be closed (:12). Supporting automation: daily govulncheck (.github/workflows/govulncheck.yml:3-33), CodeQL with custom queries (.github/workflows/codeql.yml; .github/codeql/queries/), Dependabot, and commit-SHA-pinned actions."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:10 - supported on GitHub.com, GitHub Enterprise Cloud and supported GHES versions, on macOS, Windows and Linux.",
+        "verified": "partial",
+        "evidence": "Release builds exist for darwin, linux and windows (.goreleaser.yml:19-61). GHES handling is feature detection (pkg/cmd/pr/checks/checks.go:12, 174-181); the supported GHES version window is not defined in code (.experiments/tech-debt-burndown/memory.md:35-37 says it 'is not discoverable from the repo'). Some features exclude enterprise hosts: `gh agent-task` (pkg/cmd/agent-task/agent_task.go:83-85) and telemetry (internal/ghcmd/cmd.go:481-494)."
+      },
+      {
+        "claim": "README.md:16-26 - an agent skill for driving gh is installable with `gh skill install cli/cli gh --scope user` and updatable with `gh skill update gh`.",
+        "verified": "yes",
+        "evidence": "skills/gh/SKILL.md exists (name: gh, lines 1-4). `gh skill` registers install/list/preview/publish/search/update (pkg/cmd/skills/skills.go:54-59); install has --scope project|user (pkg/cmd/skills/install/install.go:242); update is shown with names and --all (pkg/cmd/skills/skills.go:42-43)."
+      },
+      {
+        "claim": "skills/gh/SKILL.md:206-212 (the skill the README points to) - `gh pr checkout <n> --worktree <path>` and `gh issue develop <n> --checkout --worktree <path>` check out into a git worktree (--worktree requires --checkout, cannot be blank, cannot combine with --list).",
+        "verified": "yes",
+        "evidence": "pkg/cmd/pr/checkout/checkout.go:66-68 (blank check), :107 (flag), :118-125 (target resolution), :199-340 (worktree add/reuse commands); pkg/cmd/issue/develop/develop.go:100-101, 133-140 (requires --checkout, excludes --list), :158 (flag), :387-398."
+      },
+      {
+        "claim": "skills/gh/SKILL.md:185-194 - review-thread (inline) PR comments are not exposed by the typed commands; use `gh api repos/{owner}/{repo}/pulls/{n}/comments`.",
+        "verified": "yes",
+        "evidence": "PullRequestReviewInput has only Body and State (api/queries_pr_review.go:24-27) and AddReview sends only event and body (:249-274); `gh pr review` flags are --approve/--request-changes/--comment/--body/--body-file (pkg/cmd/pr/review/review.go:139-143)."
+      },
+      {
+        "claim": "`gh help telemetry` says gh collects telemetry and links to https://cli.github.com/telemetry (pkg/cmd/root/help_topic.go:135-143); the README does not mention it.",
+        "verified": "yes",
+        "evidence": "Telemetry code exists and is on by default (internal/config/config.go:790-798; internal/ghcmd/cmd.go:85-129; pkg/cmd/send-telemetry/send_telemetry.go:21). README.md has no telemetry statement (whole file read). The linked web page was not opened (outside the permitted scope)."
+      },
+      {
+        "claim": "README.md:83 - releases are immutable releases starting with v2.93.0.",
+        "verified": "not_checkable",
+        "evidence": "Immutability is a GitHub repository/release setting that is not represented in the tree. The release job creates the release and uploads all assets in one `gh release create` call (.github/workflows/deployment.yml:423-446), which is compatible with that claim but does not prove it."
+      },
+      {
+        "claim": "README.md:85 - since v2.50.0 gh produces signed build provenance attestations relying on Public Good Sigstore.",
+        "verified": "partial",
+        "evidence": "deployment.yml:390-395 attests dist/gh_* with actions/attest, only when environment == production and not a dry run. The version in which this started and the Public Good Sigstore trust root are properties of GitHub's attestation service and are not visible here. `gh attestation verify` is implemented with sigstore-go/go-tuf (go.mod:51, 55; pkg/cmd/attestation/)."
+      },
+      {
+        "claim": "README.md:92 - `gh at verify -R cli/cli <archive>` verifies a downloaded release.",
+        "verified": "yes",
+        "evidence": "The attestation command has alias `at` (pkg/cmd/attestation/attestation.go:16-18) and is registered at pkg/cmd/root/root.go:140."
+      },
+      {
+        "claim": "docs/install_source.md:3 and .github/CONTRIBUTING.md:27 - building requires Go 1.26+.",
+        "verified": "no",
+        "evidence": "go.mod:3-5 declares `go 1.27.0` and `toolchain go1.27.1`, and CI builds with go-version-file: go.mod (.github/workflows/go.yml:26). The code requires Go 1.27.0; the docs are out of date."
+      },
+      {
+        "claim": "docs/install_macos.md:27-28 - macOS installer .pkg files are unsigned.",
+        "verified": "partial",
+        "evidence": "The production release workflow builds the universal pkg with APPLE_DEVELOPER_INSTALLER_ID (deployment.yml:182-189) and script/pkgmacos:104-111 runs `productbuild --sign` when that variable is set, so the doc note looks stale. The step is titled 'Build & notarize' but script/pkgmacos has no notarytool call (notarization is only for zip archives, script/sign:24-26). Whether released pkgs are actually signed depends on production secrets/vars not visible in the tree."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Worktree scope: gh only offers `--worktree <path>` on `gh pr checkout` and `gh issue develop --checkout`, plus worktree cleanup inside `gh pr merge --delete-branch`. There is no `gh worktree` command and nothing that lists worktrees with CI status or orchestrates parallel worktrees (pkg/cmd/root/root.go:134-179; pkg/cmd/pr/checkout/checkout.go:107; pkg/cmd/issue/develop/develop.go:158). Cleanup uses non-forced `git worktree remove` and skips deletion when the branch is checked out in the current or main worktree (pkg/cmd/pr/merge/merge.go:431-437, 486-501); `gh repo sync` refuses branches checked out in another worktree (pkg/cmd/repo/sync/sync.go:262-270).",
+      "Diff scope: `gh pr diff` returns GitHub's line-based unified diff/patch with line-prefix colouring, --name-only and glob --exclude only (pkg/cmd/pr/diff/diff.go:117-122, 212-236, 299-317). No syntax-aware or entity-level diff exists in the source.",
+      "Review/automation scope: `gh pr review` can only submit a top-level review with no inline comments (api/queries_pr_review.go:24-27); inline review comments need raw `gh api` calls (skills/gh/SKILL.md:185-194). gh ships no reusable GitHub Action/workflow or MCP server for agent PR review or @mention-triggered tasks. cli/cli's own gh-aw workflows are repo-specific (.github/workflows/issue-triage.md:1-9; dependabot-triage.md:1-9). `gh agent-task` is a preview command that needs an OAuth device-flow token and is rejected on enterprise hosts (pkg/cmd/agent-task/agent_task.go:22-26, 69-102).",
+      "Telemetry is on by default (internal/config/config.go:790-798). It sends the command path and flag names, OS/arch, gh version, detected agent name and a persistent device UUID to https://cafe.github.com for 1% of invocations, and for 100% of `gh skill`, `gh copilot` and attachment-upload invocations, unless opted out via GH_TELEMETRY, DO_NOT_TRACK or config (internal/ghcmd/cmd.go:73-129; pkg/cmd/send-telemetry/send_telemetry.go:21; internal/telemetry/telemetry.go:29-145). Detected AI-agent names are also appended to the User-Agent sent to GitHub (api/http_client.go:56-59).",
+      "Unstable surface: `gh agent-task`, `gh skill` and `gh copilot` are documented as preview and subject to change without notice (pkg/cmd/agent-task/agent_task.go:22-26; pkg/cmd/skills/skills.go:20-25; pkg/cmd/copilot/copilot.go:51-55). `gh discussion` and `gh repo read-file/read-dir` are also described as preview (skills/gh/SKILL.md:137-138, 162-165).",
+      "Platform and security scope: needs the `git` binary on PATH (git/client.go:959-975) and is GitHub-only, with GHES gating by feature detection (pkg/cmd/pr/checks/checks.go:174-181). No read-only or allowlist mode was found, so a process holding GH_TOKEN can run any command the token permits, e.g. `gh api` (pkg/cmd/api/api.go:83-86) and `gh repo delete` (pkg/cmd/repo/delete/delete.go:40). Source builds need Go 1.27.0 (go.mod:3-5) although docs say 1.26+ (docs/install_source.md:3; .github/CONTRIBUTING.md:27).",
+      "Distribution: per the README the Linux apt/rpm signing-key rotation took effect 2026-09-05 and may cause install/update problems (README.md:5-6; keys come from *_2026 secrets, .github/workflows/deployment.yml:372-384). Community Debian/Ubuntu packages 2.45.x/2.46.x are called broken and snap is discouraged (docs/install_linux.md:258-259, 478-485). The macOS pkg-signing statement in docs looks stale (docs/install_macos.md:27-28 vs deployment.yml:182-189).",
+      "Maintenance/contribution policy and licensing: external PRs are accepted only for issues labelled `help wanted` with acceptance criteria (.github/CONTRIBUTING.md:5, 17-22), and AGENTS.md tells agents not to prepare unsolicited upstream PRs (AGENTS.md:7-33). The project is MIT (LICENSE), but its 179 Go module requirements (go.mod:7-190) carry their own licenses, embedded at build via go-licenses (docs/license-compliance.md:7); these were not individually audited here."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "cli/cli",
+      "checks": [
+        {
+          "field": "readme.install[0] (Linux apt repository)",
+          "statement": "Linux (Debian, Ubuntu, Raspberry Pi) official apt repository: the wget keyring command chain into /etc/apt/keyrings, the github-cli.list sources entry, then `sudo apt install gh -y`.",
+          "citation": "docs/install_linux.md:45-55 (linked from README.md:46)",
+          "holds": true,
+          "note": "The command is identical, character for character, to docs/install_linux.md:46-54. Lines 45 and 55 are the code fences. The docs call these packages official and maintainer-supported (install_linux.md:3, 35-41). README.md:46 links to docs/install_linux.md#debian. Revision confirmed: .git/HEAD is fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd and packed-refs maps refs/tags/v2.102.0 to the same commit."
+        },
+        {
+          "field": "license",
+          "statement": "License is SPDX MIT, in the file LICENSE.",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1 reads 'MIT License', followed by 'Copyright (c) 2019 GitHub Inc.' and the standard MIT text (lines 5-21). This matches the package metadata `license: MIT` at .goreleaser.yml:90."
+        },
+        {
+          "field": "platforms.macos_arm64",
+          "statement": "yes - darwin/arm64 is built; the archive is named gh_<ver>_macOS_arm64.zip; a universal pkg is built with lipo; Homebrew is available.",
+          "citation": ".goreleaser.yml:19-21, 74; README.md:92; script/pkgmacos:61-70; docs/install_macos.md:13-15",
+          "holds": true,
+          "note": ".goreleaser.yml:19-21 has id macos, goos [darwin], goarch [amd64, arm64]. Line 74 holds the name template gh_{{.Version}}_macOS_{{.Arch}} and line 76 sets the zip format. README.md:92 uses gh_2.62.0_macOS_arm64.zip. script/pkgmacos:61-62 selects the arm64/amd64 binaries, :70 runs `lipo -create` and :119 writes gh_<tag>_macOS_universal.pkg. docs/install_macos.md:13-15 has `brew install gh`. The release workflow runs both steps (deployment.yml:167 `script/release --platform macos`, :181/:189 `script/pkgmacos`). I also checked the linux_x86_64 entry and it holds (.goreleaser.yml:34-38, 64-71, 88-113; install_linux.md:184)."
+        },
+        {
+          "field": "integrations.claude_code_or_codex",
+          "statement": "Yes, partial: agent skills ship in the repo and `gh skill install --agent` can target Claude Code (.claude/skills) and Codex (.agents/skills), with github-copilot as the default. Claude Code is detected via CLAUDECODE/CLAUDE_CODE and Codex via CODEX_SANDBOX/CODEX_CI/CODEX_THREAD_ID. When an agent is detected, gh appends Agent/<name> to the User-Agent, records an `agent` telemetry dimension, disables the spinner and prints full help on usage errors. CLAUDE.md is just @AGENTS.md.",
+          "citation": "skills/gh/SKILL.md:1-4; internal/skills/registry/registry.go:57-74; pkg/cmd/skills/install/install.go:105, 240-244; internal/agents/detect.go:77-79, 127-137; api/http_client.go:56-59; internal/ghcmd/cmd.go:76, 214, 275-300, 381-382; CLAUDE.md:1",
+          "holds": true,
+          "note": "Every sub-citation matches. registry.go:57-62 maps claude-code to .claude/skills and :69-74 maps codex to .agents/skills. install.go:240 is the --agent enum and :242 is --scope project|user. detect.go:77 checks the three CODEX_* variables and :133 checks CLAUDECODE/CLAUDE_CODE. http_client.go:56-59 builds 'GitHub CLI <v> Agent/<name>', and pkg/cmd/factory/default.go:200,218 pass the detected agent into it. cmd.go:76 sets the 'agent' dimension, :381-382 disables the spinner, and :214 with :292-297 writes full help for flag and unknown-command errors. CLAUDE.md:1 is '@AGENTS.md'; AGENTS.md and skills/gh-skill/SKILL.md exist; `skill` is registered at root.go:153. Nuances that do not contradict the statement: install.go:105 says github-copilot is the default 'when running non-interactively', and in interactive mode it is the prompt's default label (install.go:925-941). CLAUDE_CODE_IS_COWORK is checked first and reports 'cowork' (detect.go:127-129). GH_SPINNER_DISABLED overrides the agent rule (cmd.go:376-380). No .claude/, .codex/ or plugin.json was found, so the 'nothing beyond these' negative is consistent."
+        },
+        {
+          "field": "claim_checks[2] (skills/gh/SKILL.md:206-212 worktree)",
+          "statement": "`gh pr checkout <n> --worktree <path>` and `gh issue develop <n> --checkout --worktree <path>` check out into a git worktree; --worktree requires --checkout, cannot be blank and cannot be combined with --list. Dossier verdict: yes.",
+          "citation": "skills/gh/SKILL.md:206-212; pkg/cmd/pr/checkout/checkout.go:66-68, 107, 118-125, 199-340; pkg/cmd/issue/develop/develop.go:100-101, 133-140, 158, 387-398",
+          "holds": true,
+          "note": "SKILL.md:206-212 states exactly this. checkout.go:66-68 returns '--worktree cannot be blank', :107 defines the --worktree flag, :118-125 calls shared.ResolveWorktreeTarget, and :199-340 builds the worktree add/reuse/detach git commands (e.g. :279 `worktree add -- <path> <branch>`, :338 `worktree add --detach`). develop.go:100-101 has the blank check, :133-135 the mutual exclusion with --list, :136-138 '--worktree requires --checkout', :158 the flag and :387-398 the WorktreeCheckoutCommands path. The dossier's 'yes' is correct."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

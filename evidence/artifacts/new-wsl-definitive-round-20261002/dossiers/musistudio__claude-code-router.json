@@ -1,0 +1,300 @@
+{
+  "contender": "musistudio/claude-code-router",
+  "revision": {
+    "contender": "musistudio/claude-code-router",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "musistudio/claude-code-router",
+        "tag": "v3.1.1",
+        "commit": "471e715c20cfa855c681f6d31dc652164d4fa654",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v3.1.1",
+    "commit": "471e715c20cfa855c681f6d31dc652164d4fa654",
+    "read_at": "2026-10-02T03:02:28+00:00"
+  },
+  "dossier": {
+    "contender": "musistudio/claude-code-router",
+    "revision": {
+      "tag": "v3.1.1",
+      "commit": "471e715c20cfa855c681f6d31dc652164d4fa654",
+      "read_at": "2026-10-02T03:02:28+00:00"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Claude Code Router (CCR) is a local multi-protocol model gateway plus control plane (Electron desktop app, npm `ccr` CLI with a browser UI, Docker image) for coding agents such as Claude Code, Codex, OpenCode, Grok CLI, Kimi CLI, Kilo, Pi, ZCode and WorkBuddy. It exposes one local endpoint (default http://127.0.0.1:3456) that speaks OpenAI Responses/Chat Completions, Anthropic Messages and Gemini, and applies provider and credential selection, routing rules, fallbacks, client API keys with limits, and usage/request-log recording before forwarding to upstream providers (README.md:62-72, 245-254). Findings come from a static read of the checkout at v3.1.1; nothing was built or run. The transport/routing engine is an external npm package (@the-next-ai/ai-gateway 1.0.21, package-lock.json:2144-2147) that is not in this checkout, so behaviour inside it is not verifiable here.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "CCR is 'a local model gateway and control plane for coding agents' that gives Claude Code, Codex, Grok CLI, Kimi CLI, Kilo Code, OpenCode, Pi, ZCode, WorkBuddy and 'compatible API clients' one stable local endpoint.",
+          "citation": "README.md:62"
+        },
+        {
+          "claim": "Use CCR to 'keep requests running with retries, credential pools, key rotation, and ordered fallback models.'",
+          "citation": "README.md:68"
+        },
+        {
+          "claim": "Use CCR to 'see what actually happened through request logs, resolved routes, latency, token usage, cost estimates, and account status.'",
+          "citation": "README.md:70"
+        },
+        {
+          "claim": "CCR supports OpenAI Chat / Responses, Anthropic Messages, Gemini Generate Content / Interactions, OpenRouter, DeepSeek, SiliconFlow, Moonshot, Kimi Code, Mistral, Z.AI, Bailian, and custom compatible providers.",
+          "citation": "README.md:72"
+        },
+        {
+          "claim": "Codex (CLI & APP) is a supported agent; in Agent Config you choose Codex, select a model and apply the profile.",
+          "citation": "README.md:88-94, 208"
+        },
+        {
+          "claim": "Open Server and click Start; the local model gateway listens on http://127.0.0.1:3456 by default.",
+          "citation": "README.md:207"
+        },
+        {
+          "claim": "The npm CLI requires Node.js 22 or newer and starts the same gateway plus a browser management UI without Electron (npm install -g @musistudio/claude-code-router; ccr ui; UI on 127.0.0.1:3458, gateway on 3456).",
+          "citation": "README.md:213-222"
+        },
+        {
+          "claim": "Docker exposes the management UI and gateway routes through http://127.0.0.1:3458 by default (npm run docker:compose:up); the script prepares a local plugin-capable ai-gateway runtime when ../../next-ai/gateway exists; read the Docker guide before exposing CCR remotely.",
+          "citation": "README.md:224-230"
+        },
+        {
+          "claim": "Core capabilities - Providers: presets and custom endpoints, protocol probing, model discovery, connectivity checks, local login import where supported, single keys and credential pools.",
+          "citation": "README.md:259"
+        },
+        {
+          "claim": "Core capabilities - Models & routing: conditions on headers and bodies, prefixes, rewrites, retries, ordered fallbacks.",
+          "citation": "README.md:262"
+        },
+        {
+          "claim": "Core capabilities - Access & quotas: separate CCR client keys with expiration and local request, token and image limits.",
+          "citation": "README.md:264"
+        },
+        {
+          "claim": "Core capabilities - Observability: request and response details, resolved provider/model/credential, status, latency, tokens, estimated cost, tool calls, agent traces.",
+          "citation": "README.md:265"
+        },
+        {
+          "claim": "Windows app packaging must run on Windows x64 because better-sqlite3 ships a native Electron module; the release workflow builds macOS on macOS runners and Windows on windows-latest when a v* tag is pushed.",
+          "citation": "README.md:241"
+        },
+        {
+          "claim": "The project is licensed under the MIT License.",
+          "citation": "README.md:565-567"
+        }
+      ],
+      "install": [
+        {
+          "method": "Linux desktop app (AppImage from GitHub Releases)",
+          "command": "Download Claude-Code-Router_<version>.AppImage; README link: https://github.com/musistudio/claude-code-router/releases/download/v3.1.0/Claude-Code-Router_3.1.0.AppImage",
+          "citation": "README.md:179; docs/src/content/docs/en/guides/install.md:20-23"
+        },
+        {
+          "method": "npm CLI (Linux and macOS, Node.js >= 22)",
+          "command": "npm install -g @musistudio/claude-code-router && ccr ui",
+          "citation": "README.md:217-220; docs/src/content/docs/en/guides/cli.md:23-26, 44-46"
+        },
+        {
+          "method": "Docker (built locally from a source checkout)",
+          "command": "npm run docker:compose:up (alternative in install docs: docker compose up -d --build)",
+          "citation": "README.md:226-228; docs/src/content/docs/en/guides/install.md:43; docs/src/content/docs/en/guides/docker.md:43-46"
+        },
+        {
+          "method": "macOS Apple Silicon desktop app (DMG)",
+          "command": "Download https://github.com/musistudio/claude-code-router/releases/download/v3.1.0/Claude-Code-Router_3.1.0-mac-Apple-Silicon-arm64.dmg",
+          "citation": "README.md:186"
+        },
+        {
+          "method": "macOS Intel desktop app (DMG)",
+          "command": "Download https://github.com/musistudio/claude-code-router/releases/download/v3.1.0/Claude-Code-Router_3.1.0-mac-Intel-x64.dmg",
+          "citation": "README.md:193"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - AppImage (electron-builder.json:64-68, built on ubuntu-latest in .github/workflows/release.yml:210-248, linked at README.md:179); npm CLI on Node >= 22 (packages/cli/package.json:31-33; docs/src/content/docs/en/guides/install.md:27-36); Docker image defined for linux/amd64 and linux/arm64 (.github/workflows/docker-release.yml:74), documented as a local build (README.md:226-230).",
+        "wsl2": "unknown - no CCR doc, workflow or source file mentions WSL; the only hits are inside generated Claude Code option text (packages/ui/src/generated/claude-code-config-options.json). The npm CLI is plain Node.js plus the native better-sqlite3 module, so it is not excluded, but WSL support is not stated.",
+        "macos_arm64": "yes - Apple Silicon DMG linked at README.md:186; release workflow builds it on macos-14 arm64 (.github/workflows/release.yml:48-53); CI artifacts are ad-hoc signed and not notarized (release.yml:89-96; build/electron-builder.local.cjs:9-15); npm CLI also documented for macOS (docs/src/content/docs/en/guides/install.md:61-65).",
+        "gpu": "no - nothing in the source uses a GPU (network gateway and UI, no local inference); the only GPU mention is tests/e2e/electron-cdp.spec.ts:272 passing --disable-gpu to the Electron test app."
+      },
+      "integrations": {
+        "cli": "Yes. `ccr` (bin in packages/cli/package.json:22-24, entry packages/cli/src/cli.ts:74-114): ccr start|ui|stop|serve|web and `ccr <profile> [cli|app] [-- agent args]` (docs/src/content/docs/en/guides/cli.md:64-73, 126-153). The desktop app installs a related `ccr-app` launcher (cli.md:8-17). A private `ccr-core-server` bin (packages/core/package.json:7-9) is what the Docker image runs under PM2 (docker/pm2.config.cjs:16-19).",
+        "mcp": "Optional and mostly off by default. The gateway serves MCP paths on its own port: context-archive MCP (only when context archive or per-profile managed compact is on), media-tools MCP (mediaTools.enabled=false), network-capture MCP (proxy.captureNetwork=false), browser-automation MCP (desktop only) - packages/core/src/gateway/http/request-handler.ts:139-210; defaults at packages/core/src/config/default-config.ts:93-118, 194-212, 223-234. ToolHub/Fusion stdio MCP helpers are bundled (build/esbuild.config.mjs:309-325) and written into Codex config only when enabled (packages/core/src/profiles/service.ts:588-603). CCR can also consume external MCP servers (packages/core/src/gateway/core-runtime/config-compiler.ts:108-127). No MCP server for routing control found.",
+        "sdk_or_api": "HTTP API, no SDK. Gateway: POST /v1/responses, /v1/chat/completions, /v1/messages (+ /v1/messages/count_tokens), Gemini generateContent/interactions, GET /v1/models, GET /health, authenticated with a CCR client key (packages/core/src/routing/protocol-endpoints.ts:3-21; packages/core/src/gateway/http/request-handler.ts:229-287; packages/core/src/gateway/auth/api-key-authorizer.ts:20-51). Management RPC at /api/ccr/rpc with a separate token (packages/core/src/web/management-server.ts:127, 137, 197; docs/src/content/docs/en/guides/cli.md:62). The published CLI package exposes only the `ccr` binary (packages/cli/package.json:21-36). No client SDK and no documented Codex SDK usage found in docs/src/content/docs/en; generic OpenAI-compatible clients are told to set their Base URL to the gateway (docs/src/content/docs/en/guides/cli.md:60; docker.md:58; configuration/server.md:25).",
+        "claude_code_or_codex": "Both. Codex: an Agent Config profile writes ~/.codex/config.toml (or an isolated CCR profile dir) with model_provider, model, model_catalog_json and a [model_providers.<id>] block with base_url=<gateway>/v1, experimental_bearer_token and wire_api=\"responses\" (packages/core/src/profiles/service.ts:561-655, 1093-1160); the CLI is launched via `ccr \"<profile>\"` through a generated wrapper that runs the real codex and passes user args through (profiles/service.ts:2660-2720; packages/core/src/agents/codex/cli-middleware-runtime.ts:446-459, 528-544; docs/src/content/docs/en/configuration/agents/codex.md:25-66). CCR can also import the local ChatGPT/Codex login (packages/core/src/agents/local-providers/codex.ts:241-287). Claude Code: profile writes ANTHROPIC_BASE_URL/token env into the Claude settings or an isolated profile (packages/core/src/profiles/service.ts:435, 2534; docs/src/content/docs/en/guides/agent-profile.md:16-25)."
+      },
+      "telemetry_and_network": "No first-party telemetry/analytics SDK found: a case-insensitive search for telemetry/analytics/sentry/posthog/mixpanel etc. over non-generated source, docs and workflows hit only generated Claude Code option text, a local stub that answers POST /v1/design/telemetry with {ok:true} in the bundled claude-design plugin (packages/electron/bundled-plugins/claude-design/index.cjs:9895-9897), and the argument `--analytics-default-enabled` that CCR's Codex wrapper passes to `codex app-server` when the surface is not cli (packages/core/src/agents/codex/cli-middleware-runtime.ts:297-301). Outbound traffic besides user-configured providers: (a) Codex login import uses https://chatgpt.com/backend-api/codex, https://chatgpt.com/backend-api/wham/* (quota/credit/profile usage; default refresh 5 min, minimum 30 s) and https://auth.openai.com/oauth/token with the Codex CLI client id (packages/core/src/agents/local-providers/codex.ts:36-38, 318-351; packages/core/src/providers/account-service.ts:105-116; packages/core/src/providers/probe.ts:99-103); (b) cost estimation fetches LiteLLM (raw.githubusercontent.com), models.dev and OpenRouter price catalogs, 24 h TTL, 5 s timeout (packages/core/src/models/pricing-service.ts:44-48, 241-252); (c) desktop auto-update via electron-updater against GitHub Releases with a silent startup check, overridable by CCR_UPDATE_FEED_URL (packages/electron/src/main/update-service.ts:179-200, 263-272; electron-builder.json:11-18) - the npm CLI and Docker image have no updater; (d) plugin marketplace JSON from raw.githubusercontent.com/musistudio/ccr-extensions, overridable by CCR_PLUGIN_MARKETPLACE_URL, modules cached and SHA-256 verified only when the manifest supplies a hash (packages/core/src/plugins/marketplace.ts:14, 53-55, 228-265); (e) provider icon detection via Google's favicon service t0.gstatic.com and the provider's own site (packages/core/src/providers/icons.ts:10, 77-97); (f) optional web-search backends (Brave, Bing, Google CSE, Serper, SerpAPI, Tavily, Exa) only when Fusion web search is configured (packages/core/src/gateway/features/hosted-web-search/discovery.ts:545-653). Accounts: no CCR-hosted account; the gateway needs locally created CCR client keys (api-key-authorizer.ts:20-51 returns 403 until a key exists); upstream credentials and OAuth tokens are stored locally under ~/.claude-code-router (docs/src/content/docs/en/guides/cli.md:162-187; install.md:59-67). Request logs, agent analysis, MITM proxy, network capture, media tools, ToolHub and context archive are off by default (packages/core/src/config/default-config.ts:93-126, 194-212, 223-234), but usage events are always written locally to usage.sqlite (packages/core/src/gateway/request/pipeline.ts:256-258, 346; packages/core/src/usage/store.ts:141-220)."
+    },
+    "code": {
+      "languages": [
+        "TypeScript (about 300 first-party files: 202 in packages/core/src, 78 TS/TSX in packages/ui/src, 20 in packages/electron/src, 1 in packages/cli/src)",
+        "JavaScript (Node ESM/CJS build scripts in build/, scripts/, tests *.mjs, bundled plugins index.cjs, docker/pm2.config.cjs)",
+        "TSX/React (UI)",
+        "Astro + Markdown (docs site in docs/)",
+        "Shell (docker/entrypoint.sh)"
+      ],
+      "entry_points": [
+        {
+          "path": "packages/cli/src/cli.ts",
+          "what": "`ccr` binary (bin dist/main/cli.js, packages/cli/package.json:21-24): start/ui/stop/serve/web and profile launch (main at cli.ts:74-114)."
+        },
+        {
+          "path": "packages/core/src/entrypoints/server.ts",
+          "what": "`ccr-core-server`: starts the management server and gateway; run under PM2 behind Nginx in Docker (docker/pm2.config.cjs:14-35)."
+        },
+        {
+          "path": "packages/core/src/web/management-server.ts",
+          "what": "Token-authenticated management HTTP/RPC server and UI host (token from CCR_WEB_AUTH_TOKEN or 32 random bytes, line 137; /api/ccr/rpc line 197)."
+        },
+        {
+          "path": "packages/core/src/gateway/http/request-handler.ts",
+          "what": "Public gateway HTTP handler on 127.0.0.1:3456: /health, /v1/models, MCP paths, client-key auth, then proxyRequest (lines 54-288)."
+        },
+        {
+          "path": "packages/core/src/gateway/request/pipeline.ts",
+          "what": "GatewayRequestPipeline.proxyRequest: header normalisation, routing, Codex/web-search/context-archive transforms, upstream fetch with fallback, usage and request-log capture (lines 114-1196)."
+        },
+        {
+          "path": "packages/core/src/gateway/core-runtime/gateway-bootstrap.ts",
+          "what": "Child-process bootstrap that receives the compiled config over IPC and loads the bundled @the-next-ai/ai-gateway runtime (spawned by supervisor.ts:52-102)."
+        },
+        {
+          "path": "packages/electron/src/main/main.ts",
+          "what": "Electron desktop main process (root package.json:22 main = packages/electron/dist/main/main.js): tray, auto-update, built-in browser, bundled plugins."
+        },
+        {
+          "path": "docker/pm2.config.cjs",
+          "what": "Docker runtime: PM2 runs ccr-server (packages/core/dist/main/server.js) and nginx; image defined in Dockerfile:29-77."
+        }
+      ],
+      "architecture": "npm-workspaces monorepo (package.json:23-25) with packages/cli, core, electron, ui. packages/core holds the runtime: (1) gateway/http/request-handler.ts + gateway/request/pipeline.ts form the public gateway on :3456 - header normalisation, route decision (gateway/claude-code-router-plugin.ts with routing/* model registry, rewrite, policy engine, Node route scripts), compat bridges in gateway/features/* (codex-patch-bridge, codex-multi-agent-bridge, hosted-web-search, context-archive-continuation, model-discovery), upstream attempts with retry/fallback and API-key credential selection (gateway/upstream/executor.ts, providers/credential-pool.ts), usage capture (usage/store.ts -> usage.sqlite) and request logs (observability/*); (2) gateway/core-runtime/* compiles app config into the config of the external @the-next-ai/ai-gateway runtime (config-compiler.ts), spawns it as a child process on core port 3457 over IPC (supervisor.ts, gateway-bootstrap.ts) and loads CCR plugins into it (router-plugin.ts, local-agent-auth-provider-hook.ts, upstream-header-sanitizer.ts); router features are only wired if the bundled runtime contains markers requestTransforms/routeResolvers/httpRoutes (supervisor.ts:239-279; config-compiler.ts:184-203); (3) agents/* and profiles/* write per-agent config and generated launch wrappers (Codex config.toml, Claude settings, OpenCode, Kimi, etc.) and agents/local-providers/* import local logins (Codex auth.json, Claude Code OAuth, Grok, Kimi, OpenCode, ZCode); (4) providers/* (presets, probes, account usage), config/* and storage/* (SQLite: config.sqlite, usage.sqlite, request-logs.sqlite, api-keys.sqlite), mcp/* (ToolHub, Fusion vision/search, media tools), proxy/* (optional MITM proxy), plugins/* (marketplace, gateway plugins). packages/ui is the React/BaseUI renderer served by the CLI web server, Nginx (Docker) or Electron; packages/electron is the desktop shell. packages/core/models.json is a generated catalog (generatedAt 2026-09-10, 4631 models from LiteLLM, models.dev, OpenRouter; scripts/generate-models-json.mjs) and is the only place GPT-6 names appear (e.g. openai/gpt-6-astra at models.json:542153, plus -fast 543625, -pro 543760, :batch 544221, -pro:batch 544077).",
+      "packaging_and_release": "Artifacts: Electron installers built with electron-builder - macOS DMG+ZIP (arm64, x64), Windows NSIS x64, Linux AppImage (electron-builder.json:42-68) - uploaded to GitHub Releases by .github/workflows/release.yml on `v*` tag push (release.yml:3-6): a model-catalog job regenerates packages/core/models.json (16-38); macOS builds on macos-14 and macos-15-intel use the local config (identity '-', notarize false), i.e. ad-hoc signed and not notarized (89-96; build/electron-builder.local.cjs:9-15); merged latest-mac.yml and assets are uploaded with gh (107-170); Windows (172-208) and Linux (210-248) jobs run electron-builder --publish always with only GH_TOKEN in env (no signing secrets); tag-vs-package.json version check (79-87). A signed+notarized macOS path exists only as the manual script build:app:mac:release (package.json:42; build/macos-release-preflight.mjs). npm package @musistudio/claude-code-router (packages/cli/package.json: bin ccr, files dist/LICENSE/README*, prepack/prepublishOnly at 38-39) is not published by any workflow (no npm publish step in the three workflows). Docker: manual docker-release.yml builds linux/amd64+arm64 and pushes musistudio/claude-code-router:{version,major.minor,latest} to Docker Hub (docker-release.yml:3-13, 63-84); default inputs are stale (3.0.21 vs package.json 3.1.1); docs only document building the image locally. No checksum files, signatures, SBOM or provenance attestations in any workflow (searches for attest/provenance/sbom/cosign/sha256/checksum/gpg under .github returned nothing). Integrity data is limited to electron-builder update metadata (latest*.yml, blockmaps); build/verify-update-metadata.cjs only checks that referenced files exist (19-31).",
+      "tests_and_ci": "Test runner: Node's built-in `node --test` over esbuild-bundled test files (build/test.mjs, build/run-tests.mjs:11-17); core tests fall back to the Electron runtime if better-sqlite3 cannot load under Node (run-tests.mjs:76-85); UI component tests are .tsx run under Node; Playwright e2e (playwright.config.ts, chromium, tests/e2e/*.spec.ts); Docker smoke test tests/system/docker-smoke.mjs; architecture tests (tests/architecture/*.test.mjs, packages/core/test/architecture). Approximate count: 164 test/spec files = 128 in packages/core/test, 21 in packages/ui/test, 8 in packages/electron/test, 1 in packages/cli/test, 6 under tests/ (2 architecture + 4 e2e), plus 1 docker smoke script. CI: only three workflows - release.yml (tag push: model catalog, mac/win/linux packaging, publish), docker-release.yml (manual dispatch: multi-arch build and push) and docs.yml (push to main touching docs/**: Astro build and GitHub Pages deploy). None runs npm test, typecheck, lint or Playwright, and none triggers on pull_request. package.json scripts bench:context-archive*/bench:claude-compact-real reference a benchmarks/ directory that is not present in this checkout (package.json:51-54).",
+      "dependencies": "Manifests and direct dependency counts: package.json (root, private workspace) 8 dependencies + 26 devDependencies (lines 78-115; includes @the-next-ai/ai-gateway ^1.0.21, @the-next-ai/bot-gateway-sdk ^0.1.0, better-sqlite3 ^12.11.1, electron-updater, node-forge, openai ^6.27.0, pm2, undici); packages/cli/package.json 5 dependencies; packages/core/package.json 6 dependencies (the cli five + pm2); packages/electron/package.json 1 dependency (better-sqlite3) + 1 devDependency (electron-updater); packages/ui/package.json 14 dependencies; docs/package.json 10 dependencies + 5 devDependencies (astro 7.0.0); cdn/package.json 0. Lockfiles at root: package-lock.json (resolves @the-next-ai/ai-gateway 1.0.21, MIT, depending on diff, fastify, glob, openai, undici ^6, ws - package-lock.json:2144-2156) and an additional pnpm-lock.yaml; docs/package-lock.json. Native module: better-sqlite3. The external ai-gateway is bundled into dist/main/next-ai-gateway.js (build/esbuild.config.mjs:94-146, 309-344) and can be overridden by CCR_GATEWAY_* env vars or a sibling ../../next-ai/gateway checkout. Node >= 22 (package.json:26-28).",
+      "security_policy": "none - no SECURITY.md or equivalent anywhere in the tree (case-insensitive file-name search found nothing). Only deployment-hardening guidance exists: packages/cli/README.md:132-142 and docker/README.md:81-105."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:62,72 - one stable local endpoint for Codex and compatible API clients, supporting OpenAI Responses/Chat.",
+        "verified": "yes",
+        "evidence": "Gateway defaults to 127.0.0.1:3456 (packages/core/src/config/default-config.ts:30-33, 104-110) and serves Responses, Chat Completions, Messages and Gemini paths (packages/core/src/routing/protocol-endpoints.ts:3-21), /v1/models and /health (gateway/http/request-handler.ts:229-248) behind a client key (gateway/auth/api-key-authorizer.ts:20-51). Native Responses-to-Responses bodies are forwarded without stripping (gateway/upstream/executor.ts:820-822), so `reasoning`/`reasoning_effort` are not touched on that path; only `thinking` and `reasoning_split` are stripped for chat/converted targets (executor.ts:830-839). GPT-6 names exist only in the generated catalog packages/core/models.json (e.g. line 542153), not in source or docs; the documented reasoning profiles cover gpt-5.x only (packages/core/src/agents/codex/model-catalog.ts:466-554) and levels for catalog models are derived from the *ReasoningEffort flags (packages/core/src/providers/model-catalog.ts:308-329). The core transport is the external ai-gateway, not verifiable here."
+      },
+      {
+        "claim": "README.md:39,90-94,208 - Codex CLI and app are supported through Agent Config profiles.",
+        "verified": "yes",
+        "evidence": "applyCodexProfile writes model_provider/model/model_catalog_json and [model_providers.<id>] with base_url=<gateway>/v1, experimental_bearer_token and wire_api=\"responses\" (packages/core/src/profiles/service.ts:561-655, 1093-1160). The launch wrapper runs the real codex with --profile / -c model_provider and passes user args through, adding no --model or reasoning flags (packages/core/src/agents/codex/cli-middleware-runtime.ts:528-544, 446-459; middleware default cliMiddleware=true at config/default-config.ts:142, 175). No Codex SDK code path or doc found."
+      },
+      {
+        "claim": "README.md:68 - retries, credential pools, key rotation and ordered fallback models.",
+        "verified": "partial",
+        "evidence": "An API-key pool with priority, weight, local limits, 60 s cooldown after 401/403/429/5xx and spillover exists (packages/core/src/gateway/upstream/executor.ts:999-1060; providers/credential-pool.ts:16-65; providers/runtime-topology.ts:96-104). ProviderCredentialConfig carries API-key fields only (packages/core/src/contracts/app.ts:256-268). The imported ChatGPT/Codex login is a single account read from <HOME>/.codex/auth.json (agents/local-providers/codex.ts:297-316), and at config-compile time every local codex-oauth plugin has its stored tokens overwritten with that file's tokens (gateway/core-runtime/config-compiler.ts:532-566); no multi-account OAuth pool found. Fallback defaults to off (default-config.ts:44-48); modes are retry and model-chain (docs/src/content/docs/en/configuration/routing.md:476-497)."
+      },
+      {
+        "claim": "README.md:259 - local login import where supported.",
+        "verified": "yes",
+        "evidence": "Codex import reads the ChatGPT login and creates a `Codex API` provider at https://chatgpt.com/backend-api/codex with protocol openai_responses, placeholder key ccr-local-agent-login and a codexOauth plugin (agents/local-providers/codex.ts:36, 241-287; agents/local-providers/shared.ts:27); docs: configuration/providers.md:25-36. The auth file is read under HOME, not CODEX_HOME (codex.ts:297-298, 854-856). Token injection/refresh for the codexOauth plugin happens in the external ai-gateway (only claude-code, grok and kimi hooks live in this repo: gateway/core-runtime/local-agent-auth-provider-hook.ts:100-115)."
+      },
+      {
+        "claim": "README.md:262 - routing with conditions, prefixes, rewrites, retries, fallbacks; (docs) Codex built-in route.",
+        "verified": "partial",
+        "evidence": "Rules, rewrites and fallbacks exist (gateway/claude-code-router-plugin.ts:355-417; docs routing.md:64-526). Recognised client models win over the built-in route (policy order at claude-code-router-plugin.ts:395-406), but the default-on built-in Codex route (default-config.ts:36-43; per-profile Enhanced route defaults to on, packages/ui/src/pages<private> replaces an unrecognised requested model with the Codex profile's model when the request uses that profile's key and the User-Agent contains 'codex' (claude-code-router-plugin.ts:599-628, 671-685; packages/core/test/unit/gateway/router-builtins.test.mjs:840-889); enhancedRoute=false disables it (891-922) and ordinary client keys are unaffected (924-944). The apply_patch and multi-agent bridges skip any model whose name contains 'gpt' (gateway/features/codex-patch-bridge.ts:276-283; codex-multi-agent-bridge.ts:200-206). Reasoning effort is forced to 'low' only on the Fusion hosted-web-search path (gateway/features/hosted-web-search/request-transform.ts:184-193), which requires a configured Fusion web-search tool (11-43; none by default, default-config.ts:235)."
+      },
+      {
+        "claim": "README.md:70,265 - request logs, resolved routes, latency, token usage, cost estimates, account status.",
+        "verified": "partial",
+        "evidence": "Usage events (tokens, cost, client, provider, model, credential id) are always written locally to usage.sqlite (gateway/request/pipeline.ts:256-258, 346; gateway/http/io.ts:363-365; usage/store.ts:141-220; config/constants.ts:33). Request logs are off by default (default-config.ts:120-126; gating at pipeline.ts:289-300), kept for the current day only (docs configuration/observability.md:27) and store reasoning_tokens but no reasoning-effort field (observability/request-log-store.ts:1434; usage/store.ts:176-197). Cost estimates need custom pricing or a runtime fetch of public price catalogs (models/pricing-service.ts:44-48, 241-252). Codex account usage polls chatgpt.com wham endpoints (codex.ts:318-351)."
+      },
+      {
+        "claim": "README.md:264 - separate CCR client keys with expiration and local request, token and image limits.",
+        "verified": "yes",
+        "evidence": "authorize() rejects missing, invalid and expired keys and returns 403 until a key exists (gateway/auth/api-key-authorizer.ts:20-51); per-key request/token/image window limits return 429 (117-162); docs configuration/api-keys.md:21-46."
+      },
+      {
+        "claim": "docs configuration/agents/codex.md:52 - 'CCR managed compact' lets CCR manage context compaction for the profile (relevant to request compression off unless chosen).",
+        "verified": "partial",
+        "evidence": "managedCompact and contextArchive.enabled default to false (default-config.ts:93-103, 134, 148, 163, 183) and archive/MCP/continuation logic is gated on them (gateway/context-archive.ts:354-387). No general prompt/request compression and no HTTP gzip/zstd of request bodies exists in the source (searches of packages/core/src). However Codex-initiated compaction requests (path ending /responses/compact or an input item of type compaction_trigger) are rewritten even with the archive off, for any provider: tools and parallel_tool_calls dropped, a summary instruction appended, response converted to a compaction item (gateway/request/pipeline.ts:670-700; gateway/features/context-archive-continuation.ts:44-86; gateway/context-archive/protocol.ts:267-284; test packages/core/test/unit/gateway/codex-patch-bridge.test.mjs:96-130)."
+      },
+      {
+        "claim": "README.md:224-230 - Docker exposes UI and gateway at http://127.0.0.1:3458 by default.",
+        "verified": "partial",
+        "evidence": "Compose publishes `3458:8080`, which binds every host interface (docker-compose.yml:7-9; docker/README.md:42-47; docs guides/docker.md:71-80), not only 127.0.0.1. Nginx fronts the UI and gateway (docker/README.md:9-27). The script depends on an optional sibling checkout ../../next-ai/gateway that is absent here (docker/README.md:40; docker/local-ai-gateway/README.md:1-7); the image is documented as a local build, although docker-release.yml pushes musistudio/claude-code-router to Docker Hub (docker-release.yml:69-81)."
+      },
+      {
+        "claim": "README.md:172-193, 213-222, 241 - release downloads, npm CLI and release workflow.",
+        "verified": "partial",
+        "evidence": "CLI manifest matches the claim (packages/cli/package.json:21-33; packages/core/src/entrypoints/server.ts:98-111 documents port 3458), but no workflow publishes the npm package, so registry content is not checkable. README download URLs name v3.1.0 assets while the checked-out version is 3.1.1 (package.json:3). release.yml builds macOS arm64/x64, Windows x64 and a Linux AppImage on a v* tag (release.yml:40-62, 172-248); the README sentence omits Linux. macOS CI artifacts are ad-hoc signed (release.yml:89-96)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Maintainers' review micro-benchmark of the SQLite usage_events migration in open PR #1788 (not a gateway/product benchmark; PR was recommended for deferral)",
+        "metric": "wall-clock migration time vs history rows, in-memory SQLite on the reviewer's machine",
+        "value": "50,000 rows: 211 ms; 100,000 rows: 795 ms; 200,000 rows: 3,395 ms (query plan SCAN usage_events)",
+        "source": "docs/issue-reviews/2026-09-14.md:61-69",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Account pooling is narrower than the README wording suggests: the native ChatGPT/Codex login path supports one local login read from <HOME>/.codex/auth.json (CODEX_HOME not consulted) and compile-time code overwrites stored OAuth tokens of every local codex-oauth plugin with that file (packages/core/src/agents/local-providers/codex.ts:297-316, 854-856; packages/core/src/gateway/core-runtime/config-compiler.ts:532-566); the credential pool is API-key only (packages/core/src/providers/runtime-topology.ts:96-104; contracts/app.ts:256-268). Codex OAuth token handling runs in the external ai-gateway and is not verifiable here. The Codex path uses chatgpt.com/backend-api endpoints rather than api.openai.com and reuses the Codex CLI OAuth client id (codex.ts:36-38, 318-351; providers/probe.ts:99-103).",
+      "Requested-model and request-shape fidelity is not unconditional: the default-on built-in Codex route substitutes the Codex profile's model for an unrecognised requested model (claude-code-router-plugin.ts:599-628, 671-685; test router-builtins.test.mjs:840-889; disable with per-profile Enhanced route off); Codex compaction requests are rewritten regardless of any setting (gateway/request/pipeline.ts:670-700; features/context-archive-continuation.ts:44-86); requests to the ChatGPT Codex backend have max_output_tokens and stop removed (config-compiler.ts:866-875); the Fusion web-search path forces reasoning effort to low when configured (hosted-web-search/request-transform.ts:184-193). Bridge eligibility keys on the substring 'gpt' in the model name (codex-patch-bridge.ts:276-283).",
+      "Observability defaults and gaps: request logs are off by default and kept for the current day only (default-config.ts:120-126; docs configuration/observability.md:27); reasoning effort is not stored as a field in usage or request-log tables (usage/store.ts:176-197; observability/request-log-store.ts:1434); cost estimates depend on fetching three public catalogs at runtime (models/pricing-service.ts:44-48, 241-252). No gateway overhead/latency measurements are published; benchmark scripts exist (packages/core/benchmark/*.mjs, build/benchmark-request-logs.mjs) but no results.",
+      "GPT-6 coverage is catalog-only: gpt-6 strings appear only in the generated packages/core/models.json (generatedAt 2026-09-10; openai/gpt-6-astra at line 542153), not in source or docs, and the documented reasoning profiles list gpt-5.x families only (packages/core/src/agents/codex/model-catalog.ts:466-554). The project's own review notes unresolved defects in Responses reasoning-history conversion across protocols (docs/issue-reviews/2026-09-14.md:15-33, 97).",
+      "Maintenance and CI: no workflow runs tests, typecheck or lint and none triggers on pull_request (.github/workflows/release.yml, docker-release.yml, docs.yml); docker-release.yml default inputs are 3.0.21 while the version is 3.1.1 (docker-release.yml:3-13); package.json bench scripts point to a missing benchmarks/ directory (package.json:51-54); README download links name v3.1.0 (README.md:172-193).",
+      "Packaging and supply chain: the core engine @the-next-ai/ai-gateway 1.0.21 is a separate package whose source is not in this repo (package-lock.json:2144-2147), and router features only activate if the bundled runtime contains required markers (packages/core/src/gateway/core-runtime/supervisor.ts:239-279; config-compiler.ts:184-203); Docker docs rely on an optional sibling ../../next-ai/gateway checkout (docker/README.md:40). Workflows publish no checksums, signatures, SBOM or provenance; macOS CI builds are ad-hoc signed and not notarized (release.yml:89-96); the Windows job passes no signing secrets (release.yml:205-208); the npm package is not published by any workflow; two lockfiles (package-lock.json and pnpm-lock.yaml) coexist.",
+      "Security posture: no SECURITY.md or vulnerability-reporting policy; the repo compose file publishes 3458:8080 on all host interfaces (docker-compose.yml:9) and the management token travels in a URL query parameter (docs guides/cli.md:98); provider credentials and OAuth tokens sit in local SQLite files and backups (docs guides/docker.md:187); Node route-script rules and plugins can read env, files and network (docs routing.md:88-113, 410); marketplace plugin modules load from GitHub raw and are hash-checked only if the manifest includes a hash (packages/core/src/plugins/marketplace.ts:228-265); optional MITM proxy mode installs a CA (docs configuration/server.md:41-56; off by default, default-config.ts:194-212).",
+      "Scope and licensing: far broader than a gateway (Electron app, tray, IM-bot relay AgentClaw, browser automation, media tools, Fusion, MITM proxy; about 300 first-party TS/TSX files and a Codex middleware script over 7,300 lines, packages/core/src/agents/codex/cli-middleware-runtime.ts:7311). Bundled claude-design/claude-ship plugins load Anthropic-product frontends from the maintainer's Cloudflare Pages host (packages/electron/bundled-plugins/claude-design/README.md:13-15; packages/core/src/contracts/app.ts:860); the repo states no provenance or licence for those assets or for the third-party datasets behind models.json (scripts/generate-models-json.mjs:17-27) beyond the root MIT LICENSE (copyright 2025 musistudio)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "musistudio/claude-code-router",
+      "checks": [
+        {
+          "field": "readme.install[1]",
+          "statement": "npm CLI (Linux and macOS, Node.js >= 22): `npm install -g @musistudio/claude-code-router && ccr ui`",
+          "citation": "README.md:217-220; docs/src/content/docs/en/guides/cli.md:23-26, 44-46",
+          "holds": true,
+          "note": "README.md:215-220 and cli.md:21-27, 44-46 give exactly these commands with the Node 22+ requirement. Package name, `ccr` bin and engines >=22 match packages/cli/package.json:2, 22-24, 31-33. `ui` is a real subcommand (packages/cli/src/cli.ts:84-91). The docs also list a Windows data dir for the CLI (install.md:64), so the 'Linux and macOS' label is narrower than documented but not wrong. Registry availability can't be checked from the checkout: no workflow under .github runs npm publish."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, file LICENSE; README.md:565-567 says the project is licensed under the MIT License",
+          "citation": "LICENSE:1-21; README.md:565-567",
+          "holds": true,
+          "note": "LICENSE is the standard MIT text, 'Copyright (c) 2025 musistudio'. README.md:567 links it. Root package.json:5 and packages/cli/package.json:4 declare MIT. The npm package's own packages/cli/LICENSE is also MIT."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - AppImage built on ubuntu-latest and linked at README.md:179; npm CLI on Node >= 22; Docker image defined for linux/amd64 and linux/arm64, documented as a local build",
+          "citation": "electron-builder.json:64-68; .github/workflows/release.yml:210-248; README.md:179; packages/cli/package.json:31-33; docs/src/content/docs/en/guides/install.md:27-36; .github/workflows/docker-release.yml:74; README.md:226-230",
+          "holds": true,
+          "note": "The Linux target is AppImage with no arch override (electron-builder.json:64-68). The Linux job runs `electron-builder --linux AppImage --publish always` on ubuntu-latest (x64) on v* tags (release.yml:3-6, 210-248). README.md:179 links the AppImage, but it names the v3.1.0 asset while the checkout is 3.1.1 (packages/cli/package.json:3); the dossier notes this elsewhere. CLI engines >=22 and install.md:27-36 confirmed. docker-release.yml:74 builds linux/amd64,linux/arm64 on manual dispatch only. README.md:226-230 documents only a local compose build."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Both. Codex: profile writes ~/.codex/config.toml (or an isolated CCR profile dir) with model_provider, model, model_catalog_json and [model_providers.<id>] base_url=<gateway>/v1, experimental_bearer_token, wire_api=\"responses\"; CLI launched via `ccr \"<profile>\"` through a generated wrapper that runs the real codex and passes user args through; local ChatGPT/Codex login import. Claude Code: profile writes ANTHROPIC_BASE_URL/token env into the Claude settings or an isolated profile.",
+          "citation": "packages/core/src/profiles/service.ts:435, 561-655, 1093-1160, 2534, 2660-2720; packages/core/src/agents/codex/cli-middleware-runtime.ts:446-459, 528-544; docs/src/content/docs/en/configuration/agents/codex.md:25-66; packages/core/src/agents/local-providers/codex.ts:241-287; docs/src/content/docs/en/guides/agent-profile.md:16-25",
+          "holds": true,
+          "note": "Holds in substance. All Codex details match: TOML keys at service.ts:1135-1155; config path at 1065-1077 and 4157; the wrapper exports CODEX_HOME/CCR_REAL_CODEX_CLI_PATH (2699-2720), with cliMiddleware defaulting to true (default-config.ts:142, 175); user args are appended after --profile/-c model_provider (cli-middleware-runtime.ts:528-544) and the real CLI is spawned (446-459); docs at codex.md:25-66; login import at codex.ts:241-287. Claude Code gets ANTHROPIC_BASE_URL at service.ts:435 and 2534 (settings env, or the isolated CLAUDE_CONFIG_DIR). One sub-detail is inaccurate: by default the token is not written as env. The default auth mode is api-key-helper (agents/claude-code/auth-mode.ts:10-18), which sets settings.apiKeyHelper to a script that prints the key (service.ts:456, 1264-1269, 1494-1499). ANTHROPIC_AUTH_TOKEN/ANTHROPIC_API_KEY are deleted from env and unset by the wrapper (95-108, 440-442, 1578). Only opt-in WIF mode adds ANTHROPIC_IDENTITY_TOKEN_FILE (1524-1530). agent-profile.md:16-25 only covers the UI steps."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "README.md:62,72 - one stable local endpoint for Codex and compatible API clients, supporting OpenAI Responses/Chat (verified: yes)",
+          "citation": "README.md:62, 72; packages/core/src/config/default-config.ts:30-33, 104-110; packages/core/src/routing/protocol-endpoints.ts:3-21; packages/core/src/gateway/http/request-handler.ts:229-248; packages/core/src/gateway/auth/api-key-authorizer.ts:20-51; packages/core/src/gateway/upstream/executor.ts:820-839; packages/core/models.json:542153; packages/core/src/agents/codex/model-catalog.ts:466-554; packages/core/src/providers/model-catalog.ts:308-329",
+          "holds": true,
+          "note": "README.md:62 and :72 say what is quoted. The gateway defaults to 127.0.0.1:3456 (default-config.ts:32-33, 104-110) and maps the Messages, Chat Completions, Responses and Gemini generateContent/interactions paths (protocol-endpoints.ts:3-21). Model requests pass through authorize(): 403 until a key exists, 401 for missing/invalid/expired (api-key-authorizer.ts:20-51). Responses-to-Responses bodies are returned unchanged (executor.ts:820-822); otherwise only thinking/reasoning_split are stripped (830-839). 'gpt-6' occurs only in packages/core/models.json (line 542153 = openai/gpt-6-astra). The documented OpenAI profiles are gpt-5.3 to 5.6 (model-catalog.ts:478-503). Evidence imprecisions that don't change the conclusion: (a) GET /health is answered before authorize() (request-handler.ts:229-237 vs 256; supervisor.ts:958-963 only checks gateway.enabled), so it is not behind a client key; (b) request-handler.ts:229-248 only lists GET /v1/models (line 242); it is actually served by gateway/features/model-discovery.ts:23-26 after auth; (c) catalog reasoning levels come first from metadata.reasoningOptions and only fall back to the *ReasoningEffort flags (providers/model-catalog.ts:312-327)."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "Non-blocking (verdict is pass) - readme.integrations.claude_code_or_codex: replace 'profile writes ANTHROPIC_BASE_URL/token env into the Claude settings or an isolated profile' with 'profile writes ANTHROPIC_BASE_URL into the Claude settings env (or an isolated CLAUDE_CONFIG_DIR) and, in the default api-key-helper mode, supplies the CCR client key through a generated apiKeyHelper script (packages/core/src/agents/claude-code/auth-mode.ts:10-18; packages/core/src/profiles/service.ts:456, 1264-1269, 1464-1499); ANTHROPIC_AUTH_TOKEN/ANTHROPIC_API_KEY are removed from settings env and unset by the wrapper (service.ts:95-108, 440-442, 1578); the opt-in WIF mode sets ANTHROPIC_IDENTITY_TOKEN_FILE instead (service.ts:1524-1530)'.",
+        "Non-blocking - claim_checks[0] evidence and readme.integrations.sdk_or_api: state that GET /health is served without a client key (packages/core/src/gateway/http/request-handler.ts:229-237 runs before authorize() at :256). Cite packages/core/src/gateway/features/model-discovery.ts:23-26 for GET /v1/models instead of request-handler.ts:229-248, which only lists it at :242.",
+        "Non-blocking - claim_checks[0] evidence: change 'levels for catalog models are derived from the *ReasoningEffort flags' to 'levels come from metadata.reasoningOptions effort values, falling back to the *ReasoningEffort capability flags (packages/core/src/providers/model-catalog.ts:312-327)'."
+      ]
+    }
+  ]
+}

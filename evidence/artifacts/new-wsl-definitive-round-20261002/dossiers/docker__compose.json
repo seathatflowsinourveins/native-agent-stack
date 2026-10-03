@@ -1,0 +1,276 @@
+{
+  "contender": "docker/compose",
+  "revision": {
+    "contender": "docker/compose",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "docker/compose",
+        "tag": "v5.5.1",
+        "commit": "5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v5.5.1",
+    "commit": "5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de",
+    "read_at": "2026-10-02T03:02:04+00:00"
+  },
+  "dossier": {
+    "contender": "docker/compose",
+    "revision": {
+      "tag": "v5.5.1",
+      "commit": "5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Docker Compose v5 is a Go command-line tool that reads Compose-spec files (via compose-spec/compose-go v2, go.mod:11) and builds/pulls images, then creates, starts, stops and removes the containers, networks and volumes of a multi-service application on a Docker Engine API endpoint. Every resource is tagged with com.docker.compose.* labels so a project can be found again (pkg/api/labels.go:25-70). It ships as a Docker CLI plugin (`docker compose`), as a standalone `docker-compose` binary (cmd/main.go:37-86), and as an importable Go SDK (github.com/docker/compose/v5/pkg/api and pkg/compose; docs/sdk.md). It contains no container runtime of its own: it needs a reachable Docker Engine (local socket or a Docker context) and, for BuildKit builds, the buildx plugin (pkg/compose/build_bake.go:55-74).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Docker Compose is a tool for running multi-container applications on Docker defined using the Compose file format (compose-spec.io).",
+          "citation": "README.md:19-20"
+        },
+        {
+          "claim": "A Compose file is used to define how one or more containers that make up your application are configured.",
+          "citation": "README.md:21-22"
+        },
+        {
+          "claim": "Once you have a Compose file, you can create and start your application with a single command: `docker compose up`.",
+          "citation": "README.md:23-24"
+        },
+        {
+          "claim": "Quick start is a three-step process: (1) define the app's environment with a Dockerfile 'so it can be reproduced anywhere'; (2) define the services in compose.yaml 'so they can be run together in an isolated environment'; (3) run `docker compose up` and Compose 'will start and run your entire app'.",
+          "citation": "README.md:58-64"
+        },
+        {
+          "claim": "Example Compose file: a `web` service (build: ., ports 5000:5000, bind volume .:/code) plus a `redis` service from image redis.",
+          "citation": "README.md:66-78"
+        },
+        {
+          "claim": "Docker Compose is included in Docker Desktop for Windows and macOS.",
+          "citation": "README.md:36-38"
+        },
+        {
+          "claim": "Linux: download Docker Compose binaries from the GitHub release page, rename the relevant binary to `docker-compose` and copy it to $HOME/.docker/cli-plugins, or into one of four system-wide cli-plugins directories (/usr/local/lib|libexec/docker/cli-plugins, /usr/lib|libexec/docker/cli-plugins); may need `chmod +x`.",
+          "citation": "README.md:42-52"
+        },
+        {
+          "claim": "Docker Swarm relied on the legacy compose file format, did not adopt the Compose specification, and after acquisition by Mirantis is not maintained by Docker Inc.",
+          "citation": "README.md:26-30"
+        },
+        {
+          "claim": "The Python version of Compose is available under the `v1` branch.",
+          "citation": "README.md:89-92"
+        },
+        {
+          "claim": "Badges: GitHub release, pkg.go.dev docs for github.com/docker/compose/v5, CI status, Codecov, OpenSSF Scorecard.",
+          "citation": "README.md:12-16"
+        },
+        {
+          "claim": "Contributions and bug reports go through CONTRIBUTING.md and the GitHub issue tracker.",
+          "citation": "README.md:80-87"
+        }
+      ],
+      "install": [
+        {
+          "method": "Docker Desktop (Windows and macOS)",
+          "command": "No command: install Docker Desktop, which bundles Compose (https://www.docker.com/products/docker-desktop/).",
+          "citation": "README.md:36-38"
+        },
+        {
+          "method": "Linux, per-user: release binary as Docker CLI plugin",
+          "command": "Download the binary for your OS/arch from https://github.com/docker/compose/releases, rename it to `docker-compose`, copy it to `$HOME/.docker/cli-plugins`, and `chmod +x` if needed (README gives this as prose; no literal shell command is given).",
+          "citation": "README.md:42-45, 52"
+        },
+        {
+          "method": "Linux, system-wide: release binary as Docker CLI plugin",
+          "command": "Copy the renamed `docker-compose` binary into one of: `/usr/local/lib/docker/cli-plugins` OR `/usr/local/libexec/docker/cli-plugins`; `/usr/lib/docker/cli-plugins` OR `/usr/libexec/docker/cli-plugins`.",
+          "citation": "README.md:47-50"
+        },
+        {
+          "method": "Build from source (BUILDING.md lists Linux, macOS and Windows prerequisites: Docker, make, Go per go.mod)",
+          "command": "make   (writes the plugin binary to ./bin/build/docker-compose)",
+          "citation": "BUILDING.md:4-26; Makefile:61-63"
+        },
+        {
+          "method": "Build and install as CLI plugin from source (Makefile target; not described in README or BUILDING.md)",
+          "command": "make install   (runs `docker buildx bake binary`, then copies the binary to ~/.docker/cli-plugins/docker-compose)",
+          "citation": "Makefile:65-76"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - README documents Linux release binaries (README.md:40-52); release matrix includes linux/amd64 (docker-bake.hcl:121) published as docker-compose-linux-x86_64 (Dockerfile:204-214); CI e2e runs on ubuntu-latest against Docker Engine 29 and 28 (.github/workflows/ci.yml:167-201).",
+        "wsl2": "unknown - no mention of WSL or WSL2 in README, docs, Go code, Makefile, Dockerfile or workflows (case-insensitive search returned no matches). A Linux binary would be the relevant artifact, but WSL2 is neither documented nor tested.",
+        "macos_arm64": "yes - release matrix includes darwin/arm64 (docker-bake.hcl:117-118); darwin is cross-built with osxcross, CGO and the `fsnotify` build tag (Dockerfile:30-31, 104-107); README says Compose is included in Docker Desktop for macOS (README.md:36-38). CI build, unit-test and e2e jobs run only on Linux runners (ci.yml:26, 140, 168), so darwin binaries are cross-compiled but not executed in CI.",
+        "gpu": "yes (pass-through only) - `gpus:` and deploy.resources.reservations.devices are translated into engine DeviceRequests, and CDI device names use driver 'cdi' (pkg/compose/create.go:768-798, 835-843). Availability depends on the host engine/runtime, which Compose does not install or check; no GPU tests exist (search of *_test.go for gpu/nvidia/DeviceRequest: no matches)."
+      },
+      "integrations": {
+        "cli": "yes - Docker CLI plugin `docker compose` (cmd/main.go:37-79, plugin.Run with metadata Vendor 'Docker Inc.') and standalone `docker-compose` (cmd/main.go:81-86; flag translation in cmd/compatibility/convert.go:55-108); CI tests both modes (ci.yml:176-191). 35 documented subcommands (docs/reference/compose.md:11-49) plus hidden `alpha` and `hooks` (cmd/compose/alpha.go:26; cmd/compose/hooks.go:164). Machine-readable output: `--progress json` (cmd/compose/compose.go:722-725, 769-775) and `version --format json` (cmd/compose/version.go:64-66).",
+        "mcp": "none found - case-insensitive search of Go, Markdown, YAML, JSON, HCL and go.mod for 'MCP' / 'Model Context Protocol' returned no matches. (The `docker model` plugin used for `models:` in pkg/compose/model.go:81-105 is the Docker Model Runner, not MCP.)",
+        "sdk_or_api": "Go SDK, no HTTP/daemon API. Module github.com/docker/compose/v5 (go.mod:1); the `api.Compose` interface (pkg/api/api.go:94-165) is obtained with `compose.NewComposeService(dockerCli, opts...)` (pkg/compose/compose.go:65), documented in docs/sdk.md:1-162; the doc's Go snippets are checked against compiled examples by docs/examples/sdk/sdk_md_test.go:28-57. docs/sdk.md contains no API-stability statement. Also an inbound extension protocol: `provider:` services run an external binary implementing `compose up|down|stop|metadata` and speaking JSON lines on stdout (docs/extension.md:13-61, 142-215; pkg/compose/plugins.go:42-61, 192-208).",
+        "claude_code_or_codex": "none found as a product integration - no CLAUDE.md, .claude/, .codex/ or .mcp.json. Contributor-facing only: AGENTS.md:1-60 gives AI coding agents build/test/lint/DCO sign-off rules and requires an AI_AGENT_DISCLOSURE.md file on agent-prepared PRs (AGENTS.md:44-60), enforced by .github/workflows/ai-disclosure-gate.yml:16-25; CI also runs an AI PR-review action (.github/workflows/pr-review.yml:21)."
+      },
+      "telemetry_and_network": "README is silent on telemetry, network requirements and accounts (README.md read in full). Code/docs findings: (1) TELEMETRY: no analytics, usage-ping or update-check code found (case-insensitive search of all Go files for analytics|segment|telemetry|phone home|check for update matched only OpenTelemetry imports). OpenTelemetry tracing is initialised on every plugin command (cmd/main.go:54-56; cmd/cmdtrace/cmd_span.go:49-68) but exports only if (a) any OTEL_*ENDPOINT environment variable is set, giving an OTLP/gRPC client (internal/tracing/tracing.go:121-143), or (b) the active Docker context metadata has an `otel` entry with OTEL_EXPORTER_OTLP_ENDPOINT (Docker Desktop path), dialled only over a unix socket or named pipe (internal/tracing/docker_context.go:37-77, 81-113; internal/memnet/conn.go:26-34). With neither, the exporter list is empty (internal/tracing/tracing.go:66-110) and no spans leave the process. When enabled, spans carry project name/dir/compose-file paths, volume/network/secret/config names, service names and images, container ids/names, a project hash (internal/tracing/attributes.go:66-160) and CLI flag names (not values) (cmd/cmdtrace/cmd_span.go:60-63). No dedicated opt-out variable exists (search for DO_NOT_TRACK / COMPOSE telemetry switches found none). (2) REQUIRED NETWORK SERVICES: only a Docker Engine API endpoint (local socket by default; remote engines via Docker context/host handled by docker/cli; standalone mode forwards --host/--context/--tls* in cmd/compatibility/convert.go:44-53). Image pulls/pushes go through the engine to registries using credentials from the Docker CLI config (pkg/compose/pull.go:295-315; pkg/compose/push.go:94-100); default registry constants point at Docker Hub (internal/registry/registry.go:28-41). (3) OPTIONAL OUTBOUND FETCHES: git remotes via the local `git` binary (pkg/remote/git.go:172-228) and `oci://` Compose artifacts via containerd's resolver with Docker CLI credentials (pkg/remote/oci.go:116-186; internal/oci/resolver.go:45-75). Both are enabled by default (pkg/remote/git.go:41-52; pkg/remote/oci.go:73-82) and the CLI has no offline flag (flags at cmd/compose/compose.go:224-237; Offline is set only during shell completion, cmd/compose/completion.go:42, 90). `docker compose bridge` uses transformer images such as docker/compose-bridge-kubernetes (pkg/bridge/transformers.go:32-45). (4) DOCKER DESKTOP: when the engine advertises label com.docker.desktop.address, Compose talks to Desktop over a local socket (feature flags, logs hints: internal/desktop/client.go:38-41, 143-176; cmd/compose/hooks.go:93-95) and routes OCI registry traffic through Desktop's HTTP proxy socket, deliberately ignoring the local NO_PROXY (internal/desktop/proxy.go:90-153). (5) ACCOUNTS: Compose has no account or login of its own; credentials come from the Docker CLI config and credential helpers, and `use_api_socket` copies all of them into the container (pkg/compose/apiSocket.go:48-62, 85-88). (6) LOCAL STATE WRITTEN: remote-file cache at $XDG_CACHE_HOME/docker-compose or ~/.cache/docker-compose (~/Library/Caches/docker-compose on macOS) (pkg/remote/cache.go:24-36; cache_unix.go:30-36; cache_darwin.go:28-34); provider metadata at <docker config dir>/compose/providers/<type>.json (pkg/compose/plugins.go:273-277); per-project watch pidfile lock (cmd/compose/watch.go:96-103; internal/locker/runtime_unix.go:31-43). (7) DRY RUN is not offline: it no-ops mutations but still reads real engine state and performs registry manifest lookups with real credentials (pkg/dryrun/dryrunclient.go:78-95, 234-260)."
+    },
+    "code": {
+      "languages": [
+        "Go - 332 .go files; go.mod minimum 1.26.3 (go.mod:3), pinned toolchain 1.26.8 (.go-version:1; Dockerfile:18)",
+        "HCL - docker-bake.hcl build definitions",
+        "Dockerfile and Makefile - build/test/lint/docs/release glue",
+        "YAML - GitHub Actions workflows (.github/workflows/*.yml), generated CLI reference (docs/reference/*.yaml), e2e fixtures",
+        "Markdown docs; one shell-script test fixture (pkg/e2e/testdata/TestStdoutStderr/log_to_stderr.sh)"
+      ],
+      "entry_points": [
+        {
+          "path": "cmd/main.go",
+          "what": "main(): detects standalone mode (plugin.RunningStandalone) and rewrites args via cmd/compatibility, then pluginMain() registers the `compose` Docker CLI plugin through docker/cli plugin.Run and wires tracing and prompt (cmd/main.go:37-86). Binary name docker-compose (Makefile:63)."
+        },
+        {
+          "path": "cmd/compose/compose.go",
+          "what": "RootCommand (line 437): cobra root `compose` with global flags (-f, -p, --profile, --env-file, --project-directory, --dry-run, --progress, --parallel, --ansi) and 36 registered subcommands (lines 515-552)."
+        },
+        {
+          "path": "cmd/compose/up.go",
+          "what": "upCommand (line 113) -> runUp (line 230) -> pkg/compose/up.go:44 Up: the `docker compose up` path (images, create, start, attach)."
+        },
+        {
+          "path": "cmd/compose/hooks.go",
+          "what": "Hidden Docker CLI 'hooks' command (added at cmd/main.go:47) that returns Docker Desktop Logs-view hints after `compose up -d` / `logs`; talks only to the local Desktop socket (cmd/compose/hooks.go:35-97)."
+        },
+        {
+          "path": "pkg/compose/compose.go",
+          "what": "NewComposeService(dockerCli, opts...) (line 65): SDK constructor returning api.Compose (pkg/api/api.go:94)."
+        },
+        {
+          "path": "docs/examples/sdk/main.go",
+          "what": "Compiled SDK example mirrored in docs/sdk.md (verified by docs/examples/sdk/sdk_md_test.go:37-57)."
+        },
+        {
+          "path": "docs/examples/provider.go",
+          "what": "Example provider-extension binary (built by `make example-provider`, Makefile:92-94; protocol in docs/extension.md)."
+        },
+        {
+          "path": "docs/yaml/main/generate.go",
+          "what": "Reference-docs generator producing docs/reference/*.md and *.yaml (Dockerfile:155-160, 162-192)."
+        }
+      ],
+      "architecture": "Single Go module producing one static binary that is both a Docker CLI plugin (`docker compose`) and a standalone `docker-compose` (CGO off except darwin: Dockerfile:48, 106). Layers: (1) cmd/ - main.go wraps docker/cli plugin.Run and, when standalone, rewrites args through cmd/compatibility; cmd/compose/*.go are the cobra commands (RootCommand registers 36: cmd/compose/compose.go:515-552) and ProjectOptions (cmd/compose/compose.go:140-418), which resolves project name, compose files (-f / COMPOSE_FILE, default compose.yaml discovery in the working dir and parents), env files (OS environment wins over --env-file/.env, compose.go:388-389) and profiles; cmd/display and cmd/formatter render progress/logs (tty|plain|json|quiet); cmd/prompt asks confirmations; cmd/cmdtrace + internal/tracing add OpenTelemetry spans. (2) pkg/api - the public `Compose` interface, option structs, `com.docker.compose.*` label constants and event types (pkg/api/api.go:94-165; labels.go:25-70). (3) pkg/compose - the implementation over the Docker Engine API client from docker/cli (pkg/compose/compose.go:65, 233-235): loader.go (compose-go load plus git/OCI remote loaders in pkg/remote); build.go + build_bake.go (shells out to `docker buildx bake`) or build_classic.go (engine ImageBuild); pull.go/push.go; create.go -> observed_state.go (label-filtered snapshot of containers/networks/volumes) -> reconcile.go (desired vs observed) -> plan.go (DAG of atomic operations, one engine call each) -> executor*.go (parallel DAG walk) (pkg/compose/create.go:68-137; plan.go:30-56; executor.go:68-120); start.go and service_containers.go (depends_on waiting at :162-222); up.go (attach, log printing, monitor.go); down.go/stop.go/remove.go/kill.go; watch.go + pkg/watch (file sync/rebuild); plugins.go (provider services); model.go (`docker model` plugin); pre_start.go/hook.go (lifecycle hooks); secrets.go (secrets/configs copied into containers); publish.go + internal/oci (publish Compose artifacts to OCI registries after a sensitive-data scan); generate.go (Compose project from existing containers). (4) Supporting: pkg/dryrun (APIClient wrapper that no-ops mutations), pkg/bridge (compose -> Kubernetes/Helm via transformer images), internal/desktop (Docker Desktop local-socket client and proxy), internal/registry (credential lookup), internal/sync (tar-based file sync), pkg/mocks (generated gomock mocks).",
+      "packaging_and_release": "Artifacts: static binaries for 11 OS/arch targets (darwin amd64/arm64; linux amd64, arm/v6, arm/v7, arm64, ppc64le, riscv64, s390x; windows amd64/arm64) built with `docker buildx bake release` (docker-bake.hcl:116-137), named docker-compose-<os>-<arch>[variant][.exe] with x86_64/aarch64 arch names (Dockerfile:204-214); version injected via -ldflags -X internal.Version from `git describe` (Makefile:16-18). CI (.github/workflows/ci.yml): the `binary` job calls the reusable workflow docker/github-builder bake.yml pinned to commit a492c6d0 (v1.16.0) with sbom: true, sign: true on non-PR events and `id-token: write` for GitHub OIDC (ci.yml:48-62); `binary-finalize` renames per-binary `.provenance.json`, `.sbom.json` (SPDX) and `.sigstore.json` (Sigstore provenance bundle), writes `checksums.txt` (SHA-256) and one `<binary>.sha256` per binary (ci.yml:64-119). The `release` job, on `v*` tag pushes, uploads bin/release/* to a DRAFT GitHub release with generated notes and overwrite_files: false (ci.yml:343-380). merge.yml publishes multi-arch images docker/compose-bin (tags: git tag, edge) and docker/compose-desktop-module (pushed only on v* tags) with SBOM and OIDC attestations (merge.yml:18-79; Dockerfile:194-230). Linux distro packages are built outside this repo by docker/docker-ce-packaging using `make build DESTDIR=...` (Makefile:48-53). Signing/attestation logic lives in the external reusable workflow, whose contents were not inspected. Docs differ from code: BUILDING.md:87-95 says to 'run the release GitHub Actions workflow' and that it creates the tag, but no separate release workflow exists - releases come from ci.yml on `v*` tag pushes (ci.yml:10-15, 343-345), as a draft. No CHANGELOG file; release notes are generated by GitHub (ci.yml:375).",
+      "tests_and_ci": "Frameworks: Go `testing` with gotest.tools/v3 (assert, icmd, golden files via -test.update-golden: BUILDING.md:39) and go.uber.org/mock gomock (generated mocks in pkg/mocks, regeneration validated in CI: Makefile:96-105, Dockerfile:77-94); goleak is a dependency (go.mod:52). Approx. 127 `_test.go` files with 629 top-level Test functions (regex `^func Test`): 50 files / 210 functions in pkg/e2e (build tag `e2e`, needs a live Docker daemon: BUILDING.md:45; new tests use a declarative Scenario DSL: pkg/e2e/SCENARIO.md:1-70, AGENTS.md:13-20) and 77 files / 419 functions of unit tests across cmd/, pkg/{api,bridge,compose,remote,utils,watch}, internal/ and docs/examples/sdk (mock the engine API; no daemon needed: AGENTS.md:7-8). Run via `make test` (-> `docker buildx bake test`, Dockerfile:121-132) and `make e2e-compose` / `make e2e-compose-standalone` (Makefile:78-84, 20 min timeout). Workflows (.github/workflows): ci.yml - `validate` matrix (golangci-lint v2.13.2, go.mod tidy check, license headers, docs regeneration check, mocks check: ci.yml:25-46; Dockerfile:18-21, 64-94, 110-119, 138-192), `test` (unit tests + coverage: ci.yml:139-165), `e2e` matrix of 6 (plugin and standalone x Docker Engine 29 with graphdriver and containerd image store, plus Engine 28 graphdriver) on ubuntu-latest with Docker installed from test.docker.com and docker-model-plugin (ci.yml:167-301), `coverage` merge to Codecov (ci.yml:303-341), `binary`, `bin-image-test`, `release`. Others: merge.yml (image publishing), docs-upstream.yml (validates reference YAML against docker/docs), scorecards.yml (OpenSSF Scorecard, weekly + on main), zizmor.yml (workflow static analysis, pedantic persona), ai-disclosure-gate.yml, pr-review.yml + pr-review-trigger.yml (AI PR review), stale.yml. Dependabot: gomod and github-actions daily (.github/dependabot.yml:1-38). No govulncheck/gosec/Trivy/CodeQL-analysis workflow; the golangci-lint set has no gosec (.golangci.yml:13-33).",
+      "dependencies": "go.mod (module github.com/docker/compose/v5, go 1.26.3) + go.sum; the only module in the repo; no vendor/ directory. 54 direct requirements (go.mod:6-59), 75 indirect (go.mod:63-137), 2 excluded versions (go.mod:140-147). Core: compose-spec/compose-go/v2 v2.15.0 (:11), docker/cli v29.7.2+incompatible (:18), moby/moby/client v0.5.1 and api v1.55.0 (:32-33), moby/buildkit v0.33.0 (:30), containerd/v2 v2.3.4 (:13), spf13/cobra v1.10.2 (:42), OpenTelemetry SDK/OTLP v1.46.0 (:46-51), grpc v1.83.2 (:57), DefangLabs/secret-detector (:7, used by `publish` secret scanning), AlecAivazis/survey/v2 (:6, prompts). Test-only: gotest.tools/v3 (:58), go.uber.org/mock (:53), goleak (:52). Runtime external executables not in go.mod: `docker buildx` plugin >= 0.17.0 for the BuildKit path, `git` for git remotes, `docker model` plugin for `models:`, any provider binary.",
+      "security_policy": ".github/SECURITY.md - report privately to security@docker.com, not as a public issue (SECURITY.md:6-9); acknowledgement within 72 hours (:11-12); draft GitHub security advisory for confirmed issues (:20-23); no paid bounty (:35-36); only the current release and `main` are maintained, Compose v1 is EOL (:38-43). CONTRIBUTING.md:28-39 repeats the private-reporting rule."
+    },
+    "claim_checks": [
+      {
+        "claim": "Docker Compose is a tool for running multi-container applications on Docker defined using the Compose file format (README.md:19-20).",
+        "verified": "yes",
+        "evidence": "Root command is described as 'Define and run multi-container applications with Docker' (cmd/compose/compose.go:449). Files are loaded with compose-spec/compose-go v2 (go.mod:11; pkg/compose/loader.go:56) and applied to a Docker Engine through the moby API client, one engine call per plan node (pkg/compose/compose.go:233-235; pkg/compose/plan.go:30-56; pkg/compose/executor_ops.go:40-145)."
+      },
+      {
+        "claim": "You can create and start your application with a single command, `docker compose up` (README.md:23-24).",
+        "verified": "yes",
+        "evidence": "`up` ensures images (build/pull), models, networks, volumes, then reconciles and executes a plan, then starts services (pkg/compose/create.go:68-137; pkg/compose/up.go:44-52; cmd/compose/up.go:113-147, 254-270), with depends_on ordering (pkg/compose/service_containers.go:162-222). It requires a reachable Docker Engine; there is no embedded runtime."
+      },
+      {
+        "claim": "Services defined in compose.yaml 'can be run together in an isolated environment' (README.md:61-62).",
+        "verified": "partial",
+        "evidence": "Isolation is by naming, labels and networks, not a sandbox. Resources carry com.docker.compose.project/service labels (pkg/api/labels.go:25-29) and are found by project-label filter (pkg/compose/filters.go:33-35); containers are named <project>-<service>-<n> (pkg/compose/service_containers.go:135-137); services join a project-scoped 'default' network (pkg/compose/create.go:640, 657-686; names like test_default in pkg/compose/executor_test.go:72); `down` removes only that project's non-external networks/volumes (pkg/compose/down.go:148-161, 206-220). Host exposure remains configurable: published ports and host bind mounts (README.md:73-75) and `use_api_socket`, which mounts the Docker socket (pkg/compose/apiSocket.go:69-73)."
+      },
+      {
+        "claim": "A Dockerfile defines the app's environment 'so it can be reproduced anywhere' (README.md:59-60).",
+        "verified": "partial",
+        "evidence": "Builds go through `docker buildx bake` when BuildKit and buildx >= 0.17.0 are present, else a classic engine build without multi-arch/secrets/ssh/additional contexts (pkg/compose/build.go:99-106; pkg/compose/build_bake.go:55-74; pkg/compose/api_versions.go:65-66; pkg/compose/build_classic.go:235-247). Compose does not lock inputs by default: image tags float unless pinned; `config --resolve-image-digests` / `--lock-image-digests` can pin (cmd/compose/config.go:154-155). `up` recreates containers only on config-hash or image divergence (docs/reference/compose_up.md:15-17; pkg/compose/reconcile.go:348-352). Engine and buildx versions are environmental inputs."
+      },
+      {
+        "claim": "README example (build: ., ports 5000:5000, bind volume .:/code, image redis) is supported (README.md:66-78).",
+        "verified": "yes",
+        "evidence": "build -> pkg/compose/build.go:79-106; ports -> engine ExposedPorts/PortBindings (pkg/compose/create.go:321, 405); bind mount -> mount.BindOptions (pkg/compose/create.go:1407-1424); image pull -> pkg/compose/pull.go:295-315."
+      },
+      {
+        "claim": "Docker Compose is included in Docker Desktop for Windows and macOS (README.md:36-38).",
+        "verified": "partial",
+        "evidence": "Bundling happens in Docker Desktop and cannot be checked from this repo. The repo does build and publish a Docker Desktop module image docker/compose-desktop-module containing the plugin for darwin/windows/linux (Dockerfile:219-230; docker-bake.hcl:156-168; .github/workflows/merge.yml:56-79; desktop-module/module-metadata.json:1-9) and contains Desktop-specific code (internal/desktop/client.go:38-41; internal/desktop/proxy.go:41-54)."
+      },
+      {
+        "claim": "Linux install: download release binary, rename to docker-compose, copy into a cli-plugins directory (README.md:42-52).",
+        "verified": "partial",
+        "evidence": "Code differs from README in detail: release assets are named docker-compose-<os>-<arch> (Dockerfile:204-214), so the rename step is needed, and are attached to a draft GitHub release (ci.yml:343-380). Plugin lookup directories are implemented by docker/cli's plugin manager (external dependency, go.mod:18), so the four system-wide paths cannot be verified in this repo. The binary also runs standalone as `docker-compose` (cmd/main.go:81-86), which README does not mention; `make install` copies to ~/.docker/cli-plugins (Makefile:73-76)."
+      },
+      {
+        "claim": "Docker Swarm is not maintained by Docker Inc. and lacks recent Compose syntax (README.md:26-30).",
+        "verified": "not_checkable",
+        "evidence": "Statement about third-party maintenance status; no code evidence either way. Code treats Swarm only as a special case when resolving external overlay networks (pkg/compose/create.go:1516-1526; pkg/compose/compose.go:486-500)."
+      },
+      {
+        "claim": "The Python version of Compose is available under the `v1` branch (README.md:89-92).",
+        "verified": "not_checkable",
+        "evidence": "The working copy is a shallow clone containing only tag v5.5.1 (.git/packed-refs:1-3), so the v1 branch cannot be inspected. .github/SECURITY.md:40-43 states Compose v1 reached EOL and is unsupported."
+      },
+      {
+        "claim": "Badges: Go package docs for github.com/docker/compose/v5, CI, Codecov, OpenSSF Scorecard (README.md:12-16).",
+        "verified": "yes",
+        "evidence": "Module path is github.com/docker/compose/v5 (go.mod:1); ci workflow exists (.github/workflows/ci.yml:1); Codecov upload (ci.yml:338-341; codecov.yml:1-21); Scorecard workflow (.github/workflows/scorecards.yml:1-66). Badge values are served externally and are not in the repo."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Scope is one Docker Engine endpoint, not a scheduler: all operations use a single engine API client chosen by the Docker CLI context (pkg/compose/compose.go:233-235; standalone mode forwards --host/--context/--tls* flags: cmd/compatibility/convert.go:44-53). README says Swarm does not use the Compose spec and is not maintained by Docker Inc. (README.md:26-30); code only special-cases Swarm when resolving external overlay networks (pkg/compose/create.go:1516-1526). No code or doc mentions Podman, nerdctl or other engines (case-insensitive search), so non-Docker engines are unaddressed.",
+      "Compatibility matrix is narrower than the build matrix and README states no minimum versions. Features are gated on negotiated Docker Engine API 1.44 / 1.48 / 1.49 (pkg/compose/api_versions.go:21-51; pkg/compose/create.go:631-634, 668, 1033-1040; pkg/compose/service_containers.go:417); BuildKit builds need buildx >= 0.17.0 (api_versions.go:63-67; build_bake.go:478-495) with a reduced-feature classic fallback (build_bake.go:64-74; build_classic.go:235-247); `models:` needs the Docker Model plugin (pkg/compose/model.go:81-88). CI runs only Linux runners and Docker Engine 28 and 29 (ci.yml:167-201); darwin, windows, arm, ppc64le, riscv64 and s390x binaries are cross-compiled but not executed in CI, WSL2 is not mentioned anywhere, and there are no GPU tests.",
+      "Credential and code-execution surface: `use_api_socket: true` bind-mounts /var/run/docker.sock into the service and writes every credential returned by the Docker CLI config into the container at /run/secrets/docker/config.json (pkg/compose/apiSocket.go:48-62, 65-90). `provider:` services run any executable resolvable as a Docker CLI plugin or on PATH, with the project environment (pkg/compose/plugins.go:192-208; pkg/compose/shellout.go:37-49), and cache provider metadata under the Docker config dir (plugins.go:273-277). Builds, git remotes and models shell out to `docker buildx`, `git` and `docker model` (pkg/compose/build_bake.go:172-182; pkg/remote/git.go:174, 200-221; pkg/compose/model.go:118).",
+      "Remote Compose sources are on by default although their toggles are named COMPOSE_EXPERIMENTAL_GIT_REMOTE / COMPOSE_EXPERIMENTAL_OCI_REMOTE (pkg/remote/git.go:41-52; pkg/remote/oci.go:42-82). The CLI has no offline flag (cmd/compose/compose.go:224-237; Offline is set only during shell completion: cmd/compose/completion.go:42, 90). Mitigation present: for a remote main file, `up`/`run` list interpolation variables and ask for confirmation unless --yes (cmd/compose/options.go:123-176, 263-290). Fetched content is cached under ~/.cache/docker-compose (pkg/remote/cache.go:24-36).",
+      "State and scope defaults to know: (a) `--yes` auto-confirms every prompt, including 'Volume ... exists but doesn't match configuration in compose file. Recreate (data will be lost)?', whose default is false (cmd/compose/up.go:284-286; pkg/compose/compose.go:184-189; pkg/compose/reconcile.go:353-396); in a non-TTY without --yes the answer comes from stdin and empty means no (cmd/prompt/prompt.go:96-102; pkg/utils/stringutils.go:25-32). (b) Without -f, Compose searches the working directory and its parents for compose.yaml/docker-compose.yaml and defaults the project name to the directory basename (docs/reference/compose.md:115-116, 181-195; cmd/compose/compose.go:407-408), which decides which labelled resources are touched (pkg/compose/filters.go:33-35). (c) `down -v` deletes non-external named volumes, while anonymous volumes are not removed by default (pkg/compose/down.go:133-135, 148-161; docs/reference/compose_down.md:12-16). (d) `--dry-run` no-ops mutations but still reads real engine state and does registry lookups with real credentials (pkg/dryrun/dryrunclient.go:78-95, 234-260).",
+      "Telemetry hook exists though inert by default: tracing is initialised on every plugin command (cmd/main.go:54-56) and, if an OTEL_*ENDPOINT variable is set, exports spans over OTLP/gRPC to that endpoint (internal/tracing/tracing.go:121-143). Spans can include project name/directory, compose file paths, service images, volume/network/secret/config names and a project hash (internal/tracing/attributes.go:66-139). Docker Desktop's context metadata can also enable export over a local socket (internal/tracing/docker_context.go:37-77). No dedicated opt-out variable exists.",
+      "Maintenance and process: only the current release and `main` are maintained, no long-term-support branches (.github/SECURITY.md:38-43). No CHANGELOG or MAINTAINERS file in the repo; release notes are generated at release time (ci.yml:375) and maintainer rules live in an external repo (CONTRIBUTING.md:254-260). Stale-issue bot closes issues 30 days after a 150-day stale mark, exempting kind/feature and kind/enhancement (.github/workflows/stale.yml:24-27). pkg/e2e/SCENARIO.md:3-4 states coding agents write most of the production code; CI runs an AI PR reviewer (pr-review.yml:21) and gates agent-prepared PRs on removal of AI_AGENT_DISCLOSURE.md (ai-disclosure-gate.yml:16-25). docs/sdk.md makes no API-stability statement.",
+      "Supply chain and licensing: test/lint tooling is fetched unpinned (`go run gotest.tools/gotestsum@latest`: Makefile:80, 84 and Dockerfile:131; `gofumpt@latest`: Makefile:131); the e2e job installs Docker by running get-docker.sh from test.docker.com (ci.yml:213-219); docs validation calls a reusable workflow at docker/docs@main (docs-upstream.yml:41); release signing/provenance is delegated to the external docker/github-builder workflow (ci.yml:49), not inspected. No workflow runs govulncheck, gosec, Trivy or CodeQL analysis, and .golangci.yml has no gosec (13-33). Licensing: repo is Apache-2.0 (LICENSE); six files embed code adapted from MIT-licensed adrg/xdg with attribution only in comments (pkg/remote/cache_darwin.go:24-25, cache_unix.go:26-27, cache_windows.go:26-27; internal/locker/runtime_darwin.go:24-25, runtime_unix.go:27-28, runtime_windows.go:26-27); NOTICE has only Docker attribution (NOTICE:1-4); there is no vendor/ or third-party license inventory, so licenses of the 54 direct dependencies (go.mod:6-59) were not audited."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "docker/compose",
+      "checks": [
+        {
+          "field": "readme.install[1] (Linux, per-user: release binary as Docker CLI plugin)",
+          "statement": "Download the binary for your OS/arch from https://github.com/docker/compose/releases, rename it to `docker-compose`, copy it to `$HOME/.docker/cli-plugins`, and `chmod +x` if needed (README gives this as prose; no literal shell command is given).",
+          "citation": "README.md:42-45, 52",
+          "holds": true,
+          "note": "README.md:42-43 points to the GitHub release page. :45 says 'Rename the relevant binary for your OS to `docker-compose` and copy it to `$HOME/.docker/cli-plugins`'. :52 says it 'might require making the downloaded file executable with `chmod +x`'. The instructions are prose only, as the dossier says. The rename step matches the release asset naming docker-compose-${TARGETOS}-${TARGETARCH} (Dockerfile:212-214)."
+        },
+        {
+          "field": "license",
+          "statement": "spdx: Apache-2.0, file: LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:2-4 reads 'Apache License / Version 2.0, January 2004'. The terms end with 'END OF TERMS AND CONDITIONS' at :177, followed by the standard appendix at :179-202. The text is unmodified Apache-2.0. The revision was also confirmed: .git/packed-refs:2-3 peels tag v5.5.1 to 5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de, and .git/HEAD is the same commit."
+        },
+        {
+          "field": "platforms.linux_x86_64",
+          "statement": "yes - README documents Linux release binaries (README.md:40-52); release matrix includes linux/amd64 (docker-bake.hcl:121) published as docker-compose-linux-x86_64 (Dockerfile:204-214); CI e2e runs on ubuntu-latest against Docker Engine 29 and 28 (.github/workflows/ci.yml:167-201).",
+          "citation": "README.md:40-52; docker-bake.hcl:121; Dockerfile:204-214; .github/workflows/ci.yml:167-201",
+          "holds": true,
+          "note": "README.md:40-52 is the '### Linux' install section. docker-bake.hcl:121 is \"linux/amd64\" in target binary-cross (:116-131), which target release inherits (:133-137). Dockerfile:212 maps amd64 to x86_64, and :214 writes docker-compose-${TARGETOS}-${TARGETARCH}${TARGETVARIANT}, which gives docker-compose-linux-x86_64. ci.yml:168 sets the e2e job to runs-on: ubuntu-latest. The matrix at :176-201 covers engine 29 (graphdriver and containerd stores) and engine 28 (graphdriver), each in plugin and standalone mode."
+        },
+        {
+          "field": "integrations.cli",
+          "statement": "yes - Docker CLI plugin `docker compose` (cmd/main.go:37-79, plugin.Run with metadata Vendor 'Docker Inc.') and standalone `docker-compose` (cmd/main.go:81-86; flag translation in cmd/compatibility/convert.go:55-108); CI tests both modes (ci.yml:176-191). 35 documented subcommands (docs/reference/compose.md:11-49) plus hidden `alpha` and `hooks` (cmd/compose/alpha.go:26; cmd/compose/hooks.go:164). Machine-readable output: `--progress json` (cmd/compose/compose.go:722-725, 769-775) and `version --format json` (cmd/compose/version.go:64-66).",
+          "citation": "cmd/main.go:37-86; cmd/compatibility/convert.go:55-108; .github/workflows/ci.yml:176-191; docs/reference/compose.md:11-49; cmd/compose/alpha.go:26; cmd/compose/hooks.go:164; cmd/compose/compose.go:722-725, 769-775; cmd/compose/version.go:64-66",
+          "holds": true,
+          "note": "main.go:38 calls plugin.Run, and :72-76 sets metadata.Metadata{Vendor: \"Docker Inc.\"}. main.go:82-83 handles standalone mode: when plugin.RunningStandalone() is true, it rewrites args with compatibility.Convert (convert.go:55-108). ci.yml:176-191 has both mode: plugin and mode: standalone entries. compose.md has 35 table rows at :15-49. alpha.go:26 and hooks.go:164 are both 'Hidden: true'. alpha is registered in RootCommand (compose.go:549), and hooks is added at main.go:47. compose.go:722-725 selects display.JSON for ModeJSON, and :769-775 lists json among the progress modes. version.go:64-66 prints {\"version\":...} for --format json."
+        },
+        {
+          "field": "claim_checks[1]",
+          "statement": "You can create and start your application with a single command, `docker compose up` (README.md:23-24). verified: yes. Evidence: up ensures images (build/pull), models, networks, volumes, then reconciles and executes a plan, then starts services, with depends_on ordering; requires a reachable Docker Engine.",
+          "citation": "README.md:23-24; pkg/compose/create.go:68-137; pkg/compose/up.go:44-52; cmd/compose/up.go:113-147, 254-270; pkg/compose/service_containers.go:162-222",
+          "holds": true,
+          "note": "README.md:23-24 contains the quoted sentence. In pkg/compose/create.go, :83 is ensureImagesExists, :88 ensureModels, :93-103 networks and volumes, :111 collectObservedState, :127 reconcile and :136 executePlan. pkg/compose/up.go:46 calls s.create, then :51 calls s.start; when attaching, startup happens in runInteractiveUp at :66. cmd/compose/up.go:113-147 is upCommand, which leads to runUp, and :254-270 assembles BuildOptions unless --no-build is set. service_containers.go:162-195 is waitDependencies, and :200-222 polls each depends_on condition (running_or_healthy, service_healthy, service_completed_successfully). The 'yes' verdict holds."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

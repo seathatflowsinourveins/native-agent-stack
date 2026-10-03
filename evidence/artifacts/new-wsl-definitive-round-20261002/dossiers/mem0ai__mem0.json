@@ -1,0 +1,388 @@
+{
+  "contender": "mem0ai/mem0",
+  "revision": {
+    "contender": "mem0ai/mem0",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "mem0ai/mem0",
+        "tag": "ts-v3.3.1",
+        "commit": "94c3fe9f238f3dbf29c9ce98643bd71eb13077cd",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "ts-v3.3.1",
+    "commit": "94c3fe9f238f3dbf29c9ce98643bd71eb13077cd",
+    "read_at": "2026-10-02T03:02:23+00:00"
+  },
+  "dossier": {
+    "contender": "mem0ai/mem0",
+    "revision": {
+      "tag": "ts-v3.3.1",
+      "commit": "94c3fe9f238f3dbf29c9ce98643bd71eb13077cd",
+      "read_at": "2026-10-02T03:02:23+00:00"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Mem0 ('mem-zero') is an Apache-2.0 polyglot monorepo for a memory layer for AI agents: a Python SDK (mem0ai 2.2.1: local Memory/AsyncMemory doing LLM fact extraction -> embeddings -> vector store + SQLite history, plus a hosted-platform MemoryClient), a TypeScript SDK (mem0ai 3.3.1: hosted client and mem0ai/oss), a self-hosted FastAPI + pgvector server with a Next.js dashboard, Python and Node 'mem0' CLIs (hosted platform only), and agent integrations. These include first-party native Claude Code and Codex plugins: hooks capture session text into a local SQLite file, a detached worker sends redacted batches to the hosted Mem0 Platform for server-side extraction, a local stdio MCP server exposes one read-only search_memories tool, and six memory skills ship with each. Method: static read of this checkout at the pinned commit; nothing was executed and no web pages were fetched.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Mem0 enhances AI assistants and agents with an intelligent memory layer: it remembers user preferences, adapts to individual needs and continuously learns over time.",
+          "citation": "README.md:73"
+        },
+        {
+          "claim": "Multi-Level Memory retains User, Session and Agent state; developer-friendly API, cross-platform SDKs and a fully managed service option.",
+          "citation": "README.md:77-79"
+        },
+        {
+          "claim": "Three deployment modes: Library (pip install mem0ai, for testing/prototyping), Self-Hosted Server (docker compose up; dashboard yes; auth and API keys yes; advanced features 'Teasers'), Cloud Platform (zero-ops; all features).",
+          "citation": "README.md:109-117"
+        },
+        {
+          "claim": "Self-hosted auth is on by default; set ADMIN_API_KEY, register an admin through the wizard, or use AUTH_DISABLED=true for local dev only.",
+          "citation": "README.md:140"
+        },
+        {
+          "claim": "Self-hosted server: 'cd server && make bootstrap' starts the stack, creates an admin and issues the first API key; 'docker compose up -d' serves the dashboard at http://localhost:3000.",
+          "citation": "README.md:142-148"
+        },
+        {
+          "claim": "Mem0 requires an LLM (default gpt-5-mini from OpenAI) and uses text-embedding-3-small as the default embedder; hybrid search recommends a Qwen-class embedding model.",
+          "citation": "README.md:196-198"
+        },
+        {
+          "claim": "'New Memory Algorithm (April 2026)': LoCoMo 92.5 (old 71.4), LongMemEval 94.4 (old 67.8), BEAM 1M 64.1, BEAM 10M 48.6, at about 6.7-7.0K tokens and 0.88-1.09 s p50 latency, single-pass retrieval at a top_200 budget.",
+          "citation": "README.md:45-54"
+        },
+        {
+          "claim": "The scores reflect Mem0's managed platform, which includes proprietary optimizations not available in the open-source SDK; open-source users should expect directionally similar but not identical numbers.",
+          "citation": "README.md:54"
+        },
+        {
+          "claim": "Single-pass ADD-only extraction (one LLM call, no UPDATE/DELETE; memories accumulate, nothing is overwritten); agent-generated facts are first-class; entity linking; multi-signal retrieval (semantic + BM25 + entity); temporal reasoning.",
+          "citation": "README.md:56-61"
+        },
+        {
+          "claim": "The evaluation framework (mem0ai/memory-benchmarks) is open-sourced so anyone can reproduce the numbers.",
+          "citation": "README.md:63"
+        },
+        {
+          "claim": "AI agents can mint a working Mem0 API key in under five seconds with no email, dashboard or OTP ('mem0 init --agent --agent-caller claude-code'); a human can later claim the account with 'mem0 init --email', keeping the key and memories.",
+          "citation": "README.md:89-107"
+        },
+        {
+          "claim": "CLI ('npm install -g @mem0/cli' or 'pip install mem0-cli') manages memories from the terminal: mem0 init, mem0 add, mem0 search.",
+          "citation": "README.md:158-170"
+        },
+        {
+          "claim": "Agent Skills teach Claude Code, Codex, Cursor, Windsurf, OpenCode and OpenClaw to build with Mem0: reference skills (mem0, mem0-cli, mem0-vercel-ai-sdk) and pipeline skills (mem0-integrate, mem0-test-integration, mem0-oss-to-platform), installed with 'npx skills add'.",
+          "citation": "README.md:172-192"
+        },
+        {
+          "claim": "License: Apache 2.0.",
+          "citation": "README.md:267-269"
+        }
+      ],
+      "install": [
+        {
+          "method": "Claude Code plugin (marketplace, user scope)",
+          "command": "export MEM0_API_KEY='your-mem0-api-key'\nclaude plugin marketplace add mem0ai/mem0\nclaude plugin install mem0@mem0-plugins --scope user --config api_key=\"$MEM0_API_KEY\"\nunset MEM0_API_KEY",
+          "citation": "integrations/claude-code-plugin/README.md:17-22 (same in docs/integrations/claude-code.mdx:22-27)"
+        },
+        {
+          "method": "Codex plugin (marketplace)",
+          "command": "echo 'export MEM0_API_KEY=\"m0-your-api-key\"' >> ~/.zshrc && source ~/.zshrc   # bash: ~/.bashrc\ncodex plugin marketplace add mem0ai/mem0\ncodex plugin add mem0@mem0-plugins",
+          "citation": "docs/integrations/codex.mdx:26-35,44-54"
+        },
+        {
+          "method": "Python library (pip)",
+          "command": "pip install mem0ai   # optional hybrid search: pip install mem0ai[nlp] && python -m spacy download en_core_web_sm",
+          "citation": "README.md:121-130"
+        },
+        {
+          "method": "TypeScript library (npm)",
+          "command": "npm install mem0ai",
+          "citation": "README.md:134-136"
+        },
+        {
+          "method": "CLI (npm or pip/pipx; hosted platform only)",
+          "command": "npm install -g @mem0/cli   # or: pip install mem0-cli   (pipx install mem0-cli is recommended)",
+          "citation": "README.md:163; cli/python/README.md:13-25"
+        },
+        {
+          "method": "Self-hosted server (Docker)",
+          "command": "cd server && cp .env.example .env   # set POSTGRES_PASSWORD and OPENAI_API_KEY\ncd server && make bootstrap   # or: cd server && docker compose up -d",
+          "citation": "README.md:142-148; server/README.md:13-33"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - pure Python/TypeScript packages (Python >=3.10: pyproject.toml:15; Node >=18: mem0-ts/package.json:271-273); every SDK, CLI and plugin test job runs on ubuntu-latest (e.g. .github/workflows/ci.yml:68-71, .github/workflows/agent-plugins-python-checks.yml:30-34); the one exception is the docs llms.txt coverage job, which runs on ubuntu-24.04-arm (.github/workflows/docs-llms-txt-check.yml:20, called from .github/workflows/ci-gate.yml:236). The README states no platform matrix.",
+        "wsl2": "unknown - no WSL2 statement for the SDKs, CLIs or plugins; WSL appears only for scripts/oss-to-platform-migrate.sh:1085 and examples/nemoclaw/setup-mem0-nemoclaw.sh:14,60-94. WSL2 reports as Linux so the Linux path would apply (inference, not documented).",
+        "macos_arm64": "unknown - no macOS/arm64 statement in the README or plugin docs and no macOS CI runner; cli/python/README.md:25 mentions macOS Homebrew Python (PEP 668) and a plugin unit test covers a 'darwin' detach branch (integrations/claude-code-plugin/tests/test_memory_core.py:1506).",
+        "gpu": "no - no GPU requirement or feature in the README; default LLM and embedder are hosted OpenAI APIs (mem0/llms/openai.py:40, mem0/embeddings/openai.py:15); optional local-model extras (sentence-transformers, transformers, fastembed) are in pyproject.toml:67-77 but GPU is never mentioned."
+      },
+      "integrations": {
+        "cli": "Yes. 'mem0' CLI in two implementations: Python mem0-cli 0.2.13 (cli/python/pyproject.toml:7,41-42) and Node @mem0/cli 0.2.14 (cli/node/package.json:3,6-8); commands init/add/search/list/get/update/delete/import/config/entity/event/status (cli/README.md:49-62). Hosted Platform backend only: get_backend returns PlatformBackend (cli/python/src/mem0_cli/backend/base.py:127-131) even though cli/python/AGENTS.md:42 and the [oss] extra mention an OSS mode; base URL https://api.mem0.ai, override MEM0_BASE_URL (cli/python/src/mem0_cli/config.py:22,124-126). Each native plugin also ships core/memory_cli.py (status, doctor, pause, resume, forget) driven by the /mem0:* skills (integrations/agent-plugin-core/python/memory_cli.py:61-81).",
+        "mcp": "Yes, two kinds. (1) Hosted remote MCP at https://mcp.mem0.ai/mcp with 11 tools (add_memory, search_memories, get_memories, get_memory, update_memory, delete_memory, delete_all_memories, delete_entities, list_entities, list_events, get_event_status), browser OAuth or bearer API key (docs/platform/mem0-mcp.mdx:26-32,44-78; Codex direct setup docs/integrations/codex.mdx:66-82). (2) Plugin-local stdio server core/mcp_server.py exposing one read-only tool search_memories (query, top_k, category, scope repo|dir|mine, run_id) - integrations/agent-plugin-core/python/mcp_server.py:21-68,173-190, registered by integrations/claude-code-plugin/.mcp.json:2-10 and integrations/codex-plugin/.mcp.json:2-18. No MCP server for the self-hosted/OSS stack was found.",
+        "sdk_or_api": "Python mem0ai 2.2.1: Memory/AsyncMemory (local OSS) and MemoryClient/AsyncMemoryClient (hosted, default https://api.mem0.ai) with add/search/get/get_all/update/delete/delete_all/history (mem0/__init__.py:5-6; mem0/client/main.py:244; mem0/AGENTS.md:68-90); hosted-only extras include batch_delete, delete_users, create_memory_export/get_memory_export (mem0/client/main.py:599,719,745-784). TypeScript mem0ai 3.3.1: hosted client at 'mem0ai', OSS at 'mem0ai/oss' (mem0-ts/package.json:3,18-29; mem0-ts/tsup.config.ts:54-71). HTTP: hosted Platform REST (e.g. /v3/memories/add/, /v3/memories/search/, /v1/memories/{id}/, /v1/event/{id}/: integrations/agent-plugin-core/python/memory_core.py:1915-1918,1995-1996,2333-2336,2556-2561) and a self-hosted FastAPI REST server (POST/GET /memories, POST /search, GET /memories/{id}/history, DELETE /memories, /entities, /api-keys, OpenAPI at /docs) with JWT or X-API-Key auth (server/main.py:146-172,367-554; server/auth.py:104-105,144-175).",
+        "claude_code_or_codex": "Yes - first-party native plugins, although the root README never mentions plugins, marketplaces or MCP (grep finds none; it only lists SDK-knowledge Agent Skills, README.md:172-192). Claude Code: integrations/claude-code-plugin (marketplace .claude-plugin/marketplace.json:10-17; plugin v0.3.3; hooks SessionStart, UserPromptSubmit, PostToolUse, PostToolUseFailure, Stop, PreCompact, SessionEnd plus Sonnet 'sidekick' subagent hooks: hooks/hooks.json:4-109; local MCP .mcp.json; six skills; sidekick agent with Bash/Edit/Write/WebFetch/WebSearch tools: agents/sidekick.md:3-7). Codex: integrations/codex-plugin (marketplaces .codex-plugin/marketplace.json:6-19 and .agents/plugins/marketplace.json:6-19; hooks SessionStart, UserPromptSubmit, PostToolUse, SubagentStart, SubagentStop, Stop, PreCompact, SessionEnd: hooks/hooks.json:3-62; .mcp.json; six skills; no README, docs/integrations/codex.mdx). Both are generated from the shared stdlib-only Python core integrations/agent-plugin-core (README.md:3-28 there) and need a hosted Mem0 Platform API key. Also: 'npx skills add' reference/pipeline skills (README.md:172-192); the hosted MCP wired directly into either host (docs/platform/mem0-mcp.mdx:98-133; do not combine with the Codex plugin, docs/integrations/codex.mdx:62-64); a hook-less portable MCP+skills package (integrations/mem0-agent-plugin; integrations/agent-plugin-core/README.md:32). No first-party Claude Code/Codex integration targets the self-hosted/OSS server."
+      },
+      "telemetry_and_network": "Telemetry is ON by default in every surface and uses one hard-coded PostHog project key (host https://us.i.posthog.com); opt-out is MEM0_TELEMETRY=false (0/no/off). (1) Python OSS Memory: sends mem0.init/add/search/get/update/delete/delete_all/history/reset events with collection name, vector-store/LLM/embedder class names, OS/CPU info, memory_id and unsalted md5 of user/agent/run ids; hot-path events sampled at 10% (MEM0_TELEMETRY_SAMPLE_RATE), lifecycle events 100%; distinct id is a random UUID in ~/.mem0/config.json (mem0/memory/telemetry.py:14-23,32,53-55,91-120,206-214; mem0/memory/utils.py:235-250; mem0/memory/setup.py:56-75). It also fetches notice config JSON from raw.githubusercontent.com/mem0ai/mem0/main (cached 1 h, bundled fallback is all-disabled) that can print text to stderr (mem0/memory/notices.py:22-26,62-87; mem0/memory/oss_notices_config.json), and with telemetry on creates an extra 'mem0migrations' vector-store collection (mem0/memory/main.py:516-542). (2) Hosted MemoryClient: GET /v1/ping/ at construction to validate the key and learn the account email, which becomes the telemetry distinct id (mem0/client/main.py:244-292; mem0/memory/telemetry.py:223-241). (3) Claude Code/Codex plugins: hooks append events to a local spool; a detached process posts batches to https://us.i.posthog.com/batch/ under the Mem0 account email resolved via /v1/ping/ (the plugin README says 'not anonymous'); properties pass a key denylist; a session-start ping still fires while capture is paused (integrations/agent-plugin-core/python/telemetry.py:1-18,55-77,94-100,774-786; integrations/claude-code-plugin/README.md:145-161; skills/pause/SKILL.md:9-11). (4) CLI: PostHog plus /v1/ping/ email lookup (cli/python/src/mem0_cli/telemetry.py:22-70; telemetry_sender.py:66-84); TS SDK uses the same key with 10% sampling for OSS (mem0-ts/src/client/telemetry.ts:11-16; mem0-ts/src/oss/src/utils/telemetry.ts:14-30,116); self-hosted server sends at most two events (server/telemetry.py:1-28,79-105). Required services/accounts: plugins, CLI and MemoryClient need a Mem0 Platform account and API key (m0-...) and reach https://api.mem0.ai (override MEM0_API_URL / MEM0_BASE_URL / host); add, search, delete and event polling all go there and extraction happens server-side (integrations/agent-plugin-core/python/memory_core.py:31,1995-2021,2131-2136). 'mem0 init --agent' creates an unowned platform account without email, limited to 5/day/IP (cli/python/src/mem0_cli/commands/agent_mode_cmd.py:52-125; docs/platform/agent-signup.mdx:91-102). Hosted MCP is https://mcp.mem0.ai/mcp (docs/platform/mem0-mcp.mdx:26-32). OSS library and server need an LLM and embedder provider (OpenAI by default: mem0/llms/openai.py:40; mem0/embeddings/openai.py:15; server/main.py:115-137) and, with mem0ai[nlp], auto-download the spaCy model en_core_web_sm at runtime (mem0/utils/spacy_models.py:21-41). Every CLI config save also rewrites an existing MEM0_API_KEY in ~/.claude/settings.json and ~/.zshrc/.bashrc/.bash_profile (cli/python/src/mem0_cli/config.py:182-193; cli/python/src/mem0_cli/plugin_sync.py:17-55)."
+    },
+    "code": {
+      "languages": [
+        "Python",
+        "TypeScript",
+        "JavaScript",
+        "Shell",
+        "MDX (docs)"
+      ],
+      "entry_points": [
+        {
+          "path": "mem0/__init__.py",
+          "what": "Python SDK exports Memory and AsyncMemory (local OSS, mem0/memory/main.py) and MemoryClient and AsyncMemoryClient (hosted, mem0/client/main.py) (lines 5-6)."
+        },
+        {
+          "path": "mem0-ts/tsup.config.ts",
+          "what": "TypeScript SDK build entries: src/client/index.ts (package 'mem0ai') and src/oss/src/index.ts (package 'mem0ai/oss'); package.json 'tsup.entry' src/index.ts is stale (no such file)."
+        },
+        {
+          "path": "server/main.py",
+          "what": "FastAPI app run as 'uvicorn main:app' (server/Dockerfile:15): /memories, /search, /memories/{id}/history, /reset, plus auth, api-keys, entities, requests routers."
+        },
+        {
+          "path": "cli/python/pyproject.toml",
+          "what": "'mem0' console script -> mem0_cli.app:main (lines 41-42); Node CLI bin 'mem0' -> dist/index.js (cli/node/package.json:6-8)."
+        },
+        {
+          "path": "integrations/claude-code-plugin/adapters/claude/hook.py",
+          "what": "Claude Code hook entry (called from hooks/hooks.json); delegates to shared core/hook_runner.py and parses the Claude transcript (adapters/claude/transcript.py)."
+        },
+        {
+          "path": "integrations/codex-plugin/hooks/adapter.py",
+          "what": "Codex hook entry (called from hooks/hooks.json); registers subagent-start/stop and Codex post-tool handlers on the shared hook_runner."
+        },
+        {
+          "path": "integrations/agent-plugin-core/python/mcp_server.py",
+          "what": "Shared stdio MCP server (copied to each plugin's core/) exposing only the read-only search_memories tool."
+        },
+        {
+          "path": "integrations/agent-plugin-core/python/memory_cli.py",
+          "what": "Plugin control CLI (status, doctor, pause, resume, forget) run by the /mem0:* skills; flush_worker.py in the same directory is the detached uploader."
+        }
+      ],
+      "architecture": "Polyglot monorepo (AGENTS.md:8,39-55). Python core: mem0/memory/main.py (Memory/AsyncMemory: add = search up to 10 similar memories + last-10-message window -> one LLM extraction call -> batch embed -> md5 dedup -> vector-store insert + SQLite history row; search = semantic + BM25 + entity boosts via mem0/utils/scoring.py and entity_extraction.py), mem0/memory/storage.py (SQLite history and messages tables), mem0/client/main.py (hosted MemoryClient over httpx), provider packages mem0/{llms,embeddings,vector_stores,reranker,configs} (default OpenAI LLM/embedder and local Qdrant at /tmp/qdrant), mem0/memory/{telemetry,notices}.py. mem0-ts/src/{client,oss} mirrors this in TypeScript. server/: FastAPI wrapper around Memory with Postgres/pgvector, SQLAlchemy/alembic for users, API keys and request logs, JWT/X-API-Key auth (auth.py) and a Next.js dashboard (server/dashboard) whose export/categories/analytics/webhooks pages are locked teasers. CLIs: cli/python and cli/node (platform backend only). Agent plugins: integrations/agent-plugin-core/python is the single source of a stdlib-only runtime - hook_runner.py (hook orchestration), memory_core.py (repo/scope resolution, SQLite EvidenceStore evidence.sqlite3, redaction, flush/search/forget against the Platform API), flush_worker.py, mcp_server.py, memory_cli.py, telemetry.py - and build/build.py generates committed per-host copies into integrations/{claude-code,codex,cursor,kimi,antigravity}-plugin/core and skills from skills/*.tmpl; thin adapters translate native hook payloads. Data flow: hooks -> local SQLite -> (every 5 exchanges, 5-minute idle, pre-compact, session end) detached worker -> POST /v3/memories/add/ (agent_id = hashed repo id, user_id, app_id = repo, run_id = session, infer=true, 5 custom categories) -> poll /v1/event/{id}/; recall = one search on the first prompt (top 5) plus the search_memories tool. Each host keeps its own local data dir and pause flag; only the remote Mem0 store is shared.",
+      "packaging_and_release": "Artifacts: PyPI mem0ai (hatch wheel+sdist; wheel contains only mem0/**/*.py and oss_notices_config.json: pyproject.toml:92-105), npm mem0ai (tsup CJS+ESM, dist only: mem0-ts/package.json:30-32; tsup.config.ts:54-71), PyPI mem0-cli, npm @mem0/cli and other integration packages. A GitHub Release triggers .github/workflows/release.yml, which routes by tag prefix (ts-v*, v*, cli-v*, cli-node-v*, ...) to a workflow_dispatch publisher (release.yml:40-71; .github/AGENTS.md:51-74). Publishing uses OIDC trusted publishing with no stored tokens (.github/AGENTS.md:69): npm via 'npm publish --provenance' (.github/workflows/ts-sdk-cd.yml:52-59, cli-node-cd.yml:57-59); PyPI via pypa/gh-action-pypi-publish@release/v1 with id-token: write (cd.yml:25-59, cli-python-cd.yml:44-47), with no explicit attestation, checksum or signature step. No workflow publishes the Claude Code/Codex plugin bundles (they are committed generated directories installed from the repo through .claude-plugin/marketplace.json, .codex-plugin/marketplace.json and .agents/plugins/marketplace.json, which pin no tag or SHA; release.yml has no prefix for them) or any Docker image (the server is built locally from server/Dockerfile and docker-compose.yaml). This commit carries tags ts-v3.3.1 and v2.2.1 (.git/packed-refs:2; .git/refs/tags/v2.2.1:1).",
+      "tests_and_ci": "Frameworks: pytest (+pytest-mock, pytest-asyncio) for the Python SDK, CLI and plugin runtime; jest for mem0-ts; vitest for cli/node and several TS integrations; node:test for integrations/agent-plugin-core/typescript. Approx. files: tests/ = 101 test_*.py (~1,934 test functions); mem0-ts/src = 103 *.test.ts (unit plus integration tests that need a MEM0_API_KEY secret: ts-sdk-ci.yml:113-146); cli/python/tests = 12; cli/node/tests = 10; integrations/agent-plugin-core/tests = 6 py (+6 TS); integrations/claude-code-plugin/tests = 4 files (~200 test functions, including tests/integration/test_live_scoping.py which needs a live key and is excluded from CI: agent-plugins-python-checks.yml:97); integrations/codex-plugin/tests = 1 file / 5 tests; .github/scripts = 3 *.test.js. CI: 34 workflow files; ci-gate.yml aggregates path-filtered reusable workflows into one required 'CI Gate' check (.github/AGENTS.md:7-34): ci.yml (ruff + 'make test' on Python 3.10/3.11/3.12), ts-sdk-ci.yml (prettier, build, jest, export check on Node 20/22, plus integration job), cli-python-ci.yml, cli-node-ci.yml, agent-plugins-python-checks.yml (compileall, ruff, build.py --check drift check of generated bundles, pytest on 3.10-3.12), per-integration checks, docs llms.txt and GitHub-script tests. All jobs run on ubuntu-latest except check-llms-txt, which runs on ubuntu-24.04-arm (.github/workflows/docs-llms-txt-check.yml:20). No filter in ci-gate.yml covers server/ (lines 59-142), so edits confined to server/ trigger no job; server tests live in tests/test_server_*.py and test_api_keys_router.py. Pre-commit runs ruff and isort (.pre-commit-config.yaml).",
+      "dependencies": "Python SDK pyproject.toml: 8 core deps (qdrant-client, pydantic, openai, httpx, posthog, pytz, sqlalchemy, protobuf: lines 16-25) plus optional groups nlp 1, vector-stores 24, llms 8, extras 9, test 3, dev 3 (lines 27-87); mem0/client/main.py:10 imports requests, which is not declared. TS SDK mem0-ts/package.json: 4 deps (axios, openai, uuid, zod), 41 peerDependencies (nearly all optional provider SDKs), 17 devDependencies, 37 pnpm overrides pinning transitive security floors, pnpm-lock.yaml present. Python CLI: 3 deps (typer, rich, httpx) + optional oss (mem0ai) + 3 dev (cli/python/pyproject.toml:27-39). Node CLI: 5 deps (commander, chalk, cli-table3, ora, boxen), 7 dev (cli/node/package.json:32-47). Server server/requirements.txt: 17 requirement lines incl. mem0ai>=0.1.48 (unpinned), fastapi, uvicorn, psycopg, sqlalchemy, alembic, passlib, python-jose, posthog, slowapi; dashboard server/dashboard/package.json: 51 deps, 15 dev. Claude Code/Codex plugin runtime (integrations/agent-plugin-core/python/*.py and the generated core/ copies): 0 third-party runtime dependencies (stdlib only; needs python3 >=3.10 and git); dev-only requirements-dev.txt has 3 (jsonschema, pytest, skills-ref==0.1.1). A root poetry.lock exists although pyproject.toml is hatchling-based.",
+      "security_policy": "SECURITY.md (repo root): report privately via a GitHub private security advisory or support@mem0.ai (subject 'SECURITY: Mem0 vulnerability report'); acknowledgement within 72 hours; coordinated disclosure; fixes target the latest published version of each package; AI-generated reports must be reproduced first (SECURITY.md:6-34,36-41,50-54)."
+    },
+    "claim_checks": [
+      {
+        "claim": "[docs/changelog/highlights.mdx:45] The shared Mem0 editor plugins (Claude Code, Cursor, Codex, ...) run on the same scripts, skills and memory bank, so context written in one editor is available in the others.",
+        "verified": "yes",
+        "evidence": "Both native plugins are generated from one core (integrations/agent-plugin-core/README.md:3-28). Writes use agent_id = hashed repo identity, user_id, app_id = repo name, run_id = session (integrations/agent-plugin-core/python/memory_core.py:335-339,1990-2021); the host name is only metadata.source and headers and the search filters contain no host key (memory_core.py:251-261), so a memory written from one host is returned to the other when API key, resolved user_id and repo remote match (the committed core/ copies in claude-code-plugin and codex-plugin have identical line numbers). Caveats: user_id comes from a Claude plugin option or env vars/$USER and the Codex manifest has no option (memory_core.py:470-478; .claude-plugin/plugin.json:20-25); each host keeps its own evidence.sqlite3, pause flag and pending queue (memory_core.py:481-490); no cross-host test was found (Codex has 5 offline tests: integrations/codex-plugin/tests/test_codex.py)."
+      },
+      {
+        "claim": "[docs/integrations/codex.mdx:6; integrations/claude-code-plugin/README.md:9-13] The plugins connect to Mem0's cloud memory layer and need a Mem0 Platform API key (m0-...).",
+        "verified": "yes",
+        "evidence": "DEFAULT_API_URL is https://api.mem0.ai; add, search, delete, event polling and the /v1/ping/ telemetry lookup all call it (memory_core.py:31,1995-1996,2333-2336,2556-2561; telemetry.py:774-786). With no key, flush returns 'local-only' and search returns nothing (memory_core.py:1965-1968,2288-2289). The Claude manifest marks api_key required (integrations/claude-code-plugin/.claude-plugin/plugin.json:12-19). MEM0_API_URL can repoint it, but the self-hosted server has no /v1, /v2, /v3 or event routes, its create model has no app_id or custom-category fields, and it authenticates with X-API-Key/Bearer rather than 'Authorization: Token' (server/main.py:180-189,367-554; server/auth.py:104-105; memory_core.py:1818-1823)."
+      },
+      {
+        "claim": "[integrations/claude-code-plugin/README.md:99] /mem0:forget deletes your memories for this repo; shared project memory stays unless --include-project-memory is passed.",
+        "verified": "yes",
+        "evidence": "memory_cli.py:123-146 refuses without --yes, calls forget_remote_repo only with --remote, then clears local rows; forget_remote_repo lists the user's memory ids (and, on request, the shared project ids, current and legacy) and deletes each via DELETE /v1/memories/{id}/ (memory_core.py:2499-2602). Limits: listing is capped at 50 pages x 100 ids per filter per run and partial failures are reported, not retried (memory_core.py:71-72,2519-2553,2593-2602); local forget deletes rows from six SQLite tables only, not pending/, logs, the telemetry spool or the cached api-key (memory_core.py:1208-1224); the skill requires user confirmation and is not model-invocable (skills/forget/SKILL.md:4,14-26; tests integrations/claude-code-plugin/tests/test_memory_core.py:3946-4027). No restore/undelete path was found."
+      },
+      {
+        "claim": "[integrations/claude-code-plugin/README.md:143] Values that look like credentials are redacted before anything is sent.",
+        "verified": "partial",
+        "evidence": "Redaction is regex matching only: authorization/api_key/password/token assignments, sk-/m0-/AKIA/ghp_/xox tokens, PEM private keys and JSON-shaped secret fields (memory_core.py:140-179); it is applied to prompts, answers, tool previews and extraction messages (memory_core.py:1291,1560,1692-1694) and tested (claude-code-plugin/tests/test_memory_core.py:886-914,4554,4634). A secret that matches no pattern (for example a bare password in prose) is stored locally and sent, because prompts and answers are otherwise kept in full with no length cutoff (integrations/claude-code-plugin/README.md:60)."
+      },
+      {
+        "claim": "[integrations/claude-code-plugin/README.md:149-155] Telemetry events are not anonymous (sent under the Mem0 account email) and never include prompts, memory text, queries, file paths, repository names or API keys; opt out with MEM0_TELEMETRY=false.",
+        "verified": "yes",
+        "evidence": "With a key the distinct id is the account email from GET /v1/ping/ (integrations/agent-plugin-core/python/telemetry.py:774-786,802-861); events go to a local spool and are batched to https://us.i.posthog.com/batch/ with a hard-coded project key (telemetry.py:94-96,477-533). Property keys such as query, prompt, text, memory, path, cwd, userid, agentid, runid, repoid, appid and filters are dropped and strings redacted (telemetry.py:55-77,246-260); repo/session ids are salted hashes (telemetry.py:224-243). MEM0_TELEMETRY=false/0/no/off disables it (telemetry.py:115-122). A session-start ping still fires while capture is paused (hook_runner.py:305-310; skills/pause/SKILL.md:9-11). The guarantee is a denylist, not an allowlist."
+      },
+      {
+        "claim": "[docs/integrations/codex.mdx:138-153] The Codex plugin registers lifecycle hooks (SessionStart, UserPromptSubmit, PostToolUse, SubagentStart/Stop, Stop, PreCompact, SessionEnd) that capture and flush memory.",
+        "verified": "not_checkable",
+        "evidence": "The manifest registers those 8 events with python3 commands and 3 s timeouts (integrations/codex-plugin/hooks/hooks.json:3-62) and tests assert event names and payload handling with synthetic payloads (integrations/codex-plugin/tests/test_codex.py:16-35,96-107), but whether the Codex runtime actually emits each event (notably SubagentStart, PreCompact, SessionEnd) cannot be shown from this repository. The project states offline conformance does not establish that hosts load the plugin (integrations/agent-plugin-core/README.md:124-126) and that hooks do not apply in Codex Cloud (docs/integrations/codex.mdx:109)."
+      },
+      {
+        "claim": "[integrations/claude-code-plugin/README.md:136] Sessions waiting to be sent to Mem0 are kept in pending/ and retried after interruption.",
+        "verified": "partial",
+        "evidence": "Recovery exists: handoff JSON files are relaunched (up to 5 per session start) and stale .running files return to .json (integrations/agent-plugin-core/python/hook_runner.py:36-38,131-155; flush_worker.py:77-96); queued extraction events are polled up to 120 s and resumed (memory_core.py:1904-1939,2025-2110); a corrupt evidence DB is quarantined and recreated (memory_core.py:577-591). Bounds: a packet is marked 'gave-up' after 5 attempts and its events are not re-sent (memory_core.py:70,809-823), and handoffs older than 7 days are deleted (hook_runner.py:37,147-149). Nothing recovers memories deleted on the platform."
+      },
+      {
+        "claim": "[README.md:56-61] New algorithm: single-pass ADD-only extraction, entity linking, multi-signal retrieval (semantic + BM25 + entity) and temporal reasoning.",
+        "verified": "partial",
+        "evidence": "OSS Memory.add makes one LLM extraction call and inserts new records without update/delete decisions (mem0/memory/main.py:942-971,1017-1063), though the add() docstring still says the LLM decides add/update/delete (main.py:790-791) and explicit update()/delete() remain (main.py:1883-1902). Search fuses semantic, keyword (BM25) and entity boosts (main.py:1642-1700; mem0/utils/scoring.py:1-8). Temporal reasoning is platform-only: timestamp and reference_date raise ValueError in OSS (main.py:817-818,1446-1447), and README.md:54 itself says the scores come from the managed platform with optimizations not in the OSS SDK."
+      },
+      {
+        "claim": "[README.md:109-117,140] Self-hosted server: auth and API keys on by default, dashboard included, advanced features are 'teasers'.",
+        "verified": "yes",
+        "evidence": "JWT_SECRET is required unless AUTH_DISABLED, which defaults false (server/main.py:90-98; server/auth.py:15-20,144-175); API keys are bcrypt-hashed m0sk_ tokens (server/auth.py:38-48). Dashboard export, categories, analytics and webhooks pages render LockedPage ('available in Mem0 Cloud and Enterprise'): server/dashboard/src/app/(root)/dashboard/export/page.tsx:56-64; server/dashboard/src/components/self-hosted/locked-page.tsx:43-45."
+      },
+      {
+        "claim": "[integrations/claude-code-plugin/README.md:7; docs/integrations/claude-code.mdx:8; docs/integrations/codex.mdx:8] Current plugin version is 0.3.1; Codex MCP docs describe 'codex mcp add --url' and a .codex-mcp.json sideload.",
+        "verified": "no",
+        "evidence": "Code and manifests say 0.3.3 (integrations/agent-plugin-core/python/memory_core.py:32; integrations/claude-code-plugin/.claude-plugin/plugin.json:3; integrations/codex-plugin/.codex-plugin/plugin.json:3; .claude-plugin/marketplace.json:15; docs/changelog/sdk.mdx:2436,2517). The Codex plugin registers MCP via .mcp.json and hooks via its own manifest, not .codex-mcp.json or an opt-in installer (integrations/codex-plugin/.codex-plugin/plugin.json:10-12), and the docs disagree on whether 'codex mcp add' accepts HTTP URLs (docs/integrations/codex.mdx:71 vs docs/platform/mem0-mcp.mdx:117-130). Trust the code over these pages."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "LoCoMo, new memory algorithm on the managed platform, top_200 retrieval budget (previous algorithm 71.4)",
+        "metric": "overall score; mean tokens per query; p50 latency",
+        "value": "92.5; 6,956 tokens (README rounds to 7.0K); 0.88 s",
+        "source": "README.md:47-49; docs/core-concepts/memory-evaluation.mdx:71-79,129-134",
+        "independent": false
+      },
+      {
+        "what": "LongMemEval, same setup (previous algorithm 67.8)",
+        "metric": "overall score; mean tokens per query; p50 latency",
+        "value": "94.4; 6,787 tokens; 1.09 s",
+        "source": "README.md:50; docs/core-concepts/memory-evaluation.mdx:87-97,132",
+        "independent": false
+      },
+      {
+        "what": "BEAM at 1M tokens, same setup",
+        "metric": "overall score; mean tokens per query; p50 latency",
+        "value": "64.1; 6,719 tokens; 1.00 s",
+        "source": "README.md:51; docs/core-concepts/memory-evaluation.mdx:105-119,133",
+        "independent": false
+      },
+      {
+        "what": "BEAM at 10M tokens, same setup",
+        "metric": "overall score; mean tokens per query; p50 latency",
+        "value": "48.6; 6,914 tokens; 1.05 s",
+        "source": "README.md:52; docs/core-concepts/memory-evaluation.mdx:105-119,134",
+        "independent": false
+      },
+      {
+        "what": "Older numbers still in the migration docs (inconsistent with README)",
+        "metric": "LoCoMo / LongMemEval overall; extraction latency p50",
+        "value": "91.6 (+20.2) / 93.4 (+25.6); ~2.0 s -> ~1.0 s",
+        "source": "docs/migration/platform-v2-to-v3.mdx:14,296-298; docs/migration/oss-v2-to-v3.mdx:23",
+        "independent": false
+      },
+      {
+        "what": "Token efficiency versus full-context approaches",
+        "metric": "mean tokens per retrieval call",
+        "value": "under 7,000 for Mem0 versus 25,000+ for full-context approaches (project statement, no per-system table)",
+        "source": "docs/core-concepts/memory-evaluation.mdx:12",
+        "independent": false
+      },
+      {
+        "what": "Older headline claims in LLM.md (from the 2025 paper era)",
+        "metric": "accuracy vs OpenAI Memory on LOCOMO; speed and token use vs full-context",
+        "value": "+26% accuracy; 91% faster; 90% lower token usage",
+        "source": "LLM.md:8-10",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Hosted-platform dependency: the only first-party Claude Code/Codex memory path sends redacted conversation text to https://api.mem0.ai for server-side LLM extraction and needs a Mem0 account key; without a key the plugins only keep a local capture DB and recall returns nothing (integrations/agent-plugin-core/python/memory_core.py:31,1965-1968,1995-2021,2288-2289; docs/integrations/codex.mdx:6,16-18). The self-hosted server cannot substitute (no /v1-/v3 or event routes, no app_id or custom-category fields, different auth header: server/main.py:180-189,367-554; server/auth.py:104-105). Hosted-service terms are not in this repo; the Apache-2.0 LICENSE covers repo code only.",
+      "Privacy and telemetry: telemetry is on by default in every surface with a hard-coded PostHog key; plugin events are linked to the Mem0 account email and a session-start ping continues while capture is paused (integrations/agent-plugin-core/python/telemetry.py:94-122,774-786; integrations/claude-code-plugin/skills/pause/SKILL.md:9-11). OSS Memory sends unsalted md5 of user/agent/run ids and fetches notice text from raw.githubusercontent.com (mem0/memory/utils.py:235-250; mem0/memory/notices.py:22-26,62-69). Redaction is regex-only (memory_core.py:140-179); the API key is cached in plaintext at ${CLAUDE_PLUGIN_DATA}/api-key (mode 0600) and in ~/.mem0/config.json, and CLI config saves rewrite an existing MEM0_API_KEY in ~/.claude/settings.json and shell rc files (integrations/claude-code-plugin/README.md:134; memory_core.py:397-427; cli/python/src/mem0_cli/config.py:177-193; plugin_sync.py:17-55).",
+      "Deletion and recovery are thin: no restore/undelete path was found. Remote forget deletes one ID at a time, capped at 5,000 ids per filter per run (memory_core.py:71-72,2519-2602); local forget clears six SQLite tables only (memory_core.py:1208-1224); local evidence.sqlite3 has no retention other than forget; flush packets give up after 5 attempts and handoffs older than 7 days are deleted (memory_core.py:70,809-823; hook_runner.py:37,147-149). OSS delete() is a hard delete that leaves a history row with the old text and reset() drops the history tables (mem0/memory/main.py:2114-2174; mem0/memory/storage.py:326-339). The self-hosted dashboard export page is a locked teaser and the only documented backup/restore is a one-off pg_dumpall upgrade procedure (server/dashboard/src/app/(root)/dashboard/export/page.tsx:56-64; server/README.md:163-272; docs/open-source/setup.mdx:205).",
+      "Scope fit: stored memories are LLM-extracted facts, not verbatim decision or handoff records. Extraction instructions skip proposed-but-unaccepted changes and 'test results, documentation updates, release notes, or temporary state' (memory_core.py:74-82); there are five fixed categories and none for handoffs (memory_core.py:90-121); recall injects at most 5 memories once per session on a first prompt of 20+ characters with a 2 s timeout, later recall only via search_memories (default top_k 3, 4,000 characters) (hook_runner.py:62-94; memory_core.py:2306-2314). Pause, forget and capture state are per host data dir, not shared between Claude Code and Codex (memory_core.py:481-490,1183-1206). Repo identity comes from git remote.origin.url with a 0.5 s timeout and falls back to a path-based local: namespace (memory_core.py:189-200,356-374).",
+      "Host coupling and test depth: Claude capture parses Claude Code's transcript JSONL and needs a Claude Code version with SubagentStart/SubagentStop/PostToolUseFailure hooks (integrations/claude-code-plugin/adapters/claude/transcript.py:39-120; integrations/claude-code-plugin/README.md:12); Codex relies on payload fields such as exit_code and last_assistant_message and has no manifest option for the API key, so MEM0_API_KEY must be in Codex's environment (integrations/codex-plugin/hooks/adapter.py:42-55; integrations/codex-plugin/.codex-plugin/plugin.json:1-13; docs/integrations/codex.mdx:24-36). Conformance is offline only (integrations/agent-plugin-core/README.md:126), Codex has 5 tests, and the live scoping tests are excluded from CI (.github/workflows/agent-plugins-python-checks.yml:97). The Claude plugin also bundles a Sonnet 'sidekick' agent with Bash/Edit/Write/WebFetch/WebSearch tools, which is scope beyond memory (integrations/claude-code-plugin/agents/sidekick.md:3-7).",
+      "Packaging and supply chain: plugins install from the repo's marketplace manifests with no tag or SHA pin and no workflow publishes, checksums or signs them (.claude-plugin/marketplace.json:10-17; .github/workflows/release.yml:40-56). PyPI publishing uses floating pypa/gh-action-pypi-publish@release/v1, actions/checkout@v2 and no explicit attestation setting (.github/workflows/cd.yml:28,33,57). The server image is built locally, requirements pin mem0ai>=0.1.48 only, and the compose command reinstalls the latest PyPI mem0ai at every container start (server/requirements.txt:4; server/docker-compose.yaml:20-21); compose publishes API 8888, dashboard 3000 and Postgres 8432 on host ports (server/docker-compose.yaml:9,50,55).",
+      "Maintenance and documentation drift: fast release cadence (Python SDK 2.0.19 -> 2.2.1 between 2026-08-24 and 2026-09-25; plugin 0.3.1 -> 0.3.3 in 15 days; the 0.2.x -> 0.3 plugin update was breaking) (docs/changelog/sdk.mdx:10-59,2436-2471; integrations/claude-code-plugin/README.md:181-191). Docs lag code: plugin docs say 0.3.1 versus 0.3.3; Codex MCP pages conflict (docs/platform/mem0-mcp.mdx:117,123-130 vs docs/integrations/codex.mdx:66-82); mem0/AGENTS.md:33-55,103-105 lists graph providers and 30 vector stores while mem0/graphs/ is absent and VectorStoreConfig has 25 providers (mem0/vector_stores/configs.py:13-39); LLM.md:38 shows a search(user_id=...) call the code rejects (mem0/memory/main.py:1449-1450). Contributions require a signed CLA and a linked issue labeled 'accepted' (AGENTS.md:12-13).",
+      "OSS-path and benchmark caveats: the default local Qdrant path is /tmp/qdrant while history.db defaults to ~/.mem0, and an OpenAI key is needed by default (mem0/configs/vector_stores/qdrant.py:16; mem0/vector_stores/configs.py:64-65; mem0/configs/base.py:42-45; mem0/llms/openai.py:40; mem0/embeddings/openai.py:15). All benchmark figures are project-reported on the managed platform with proprietary optimizations, the memory-benchmarks submodule is not present in this checkout, and README and migration docs disagree (92.5/94.4 vs 91.6/93.4) (README.md:54,63; .gitmodules:1-4; docs/migration/platform-v2-to-v3.mdx:296-298)."
+    ]
+  },
+  "repaired": true,
+  "verification": [
+    {
+      "contender": "mem0ai/mem0",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Claude Code plugin (marketplace, user scope): export MEM0_API_KEY='your-mem0-api-key'; claude plugin marketplace add mem0ai/mem0; claude plugin install mem0@mem0-plugins --scope user --config api_key=\"$MEM0_API_KEY\"; unset MEM0_API_KEY",
+          "citation": "integrations/claude-code-plugin/README.md:17-22; docs/integrations/claude-code.mdx:22-27",
+          "holds": true,
+          "note": "Both blocks match the dossier word for word. The names exist in the repo: the root marketplace is \"mem0-plugins\" with plugin \"mem0\" sourced from ./integrations/claude-code-plugin (.claude-plugin/marketplace.json:2,10-17), and api_key is a required, sensitive userConfig option (integrations/claude-code-plugin/.claude-plugin/plugin.json:12-19). Stated prerequisites are Python 3.10+, Git and an m0- Platform key (README.md:9-13)."
+        },
+        {
+          "field": "license",
+          "statement": "spdx Apache-2.0, file LICENSE",
+          "citation": "LICENSE:1-3,189-201",
+          "holds": true,
+          "note": "LICENSE is the Apache License 2.0 text with a 2023 Taranjeet Singh boilerplate notice. pyproject.toml:13-14 declares license \"Apache-2.0\" with license-files [\"LICENSE\"], README.md:267-269 says Apache 2.0, and the Claude plugin manifest says Apache-2.0 (integrations/claude-code-plugin/.claude-plugin/plugin.json:10)."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - pure Python/TypeScript packages (Python >=3.10: pyproject.toml:15; Node >=18: mem0-ts/package.json:271-273); every CI job runs on ubuntu-latest (e.g. .github/workflows/ci.yml:68-71, .github/workflows/agent-plugins-python-checks.yml:30-34). The README states no platform matrix.",
+          "citation": "pyproject.toml:15; mem0-ts/package.json:271-273; .github/workflows/ci.yml:68-71; .github/workflows/agent-plugins-python-checks.yml:30-34",
+          "holds": false,
+          "note": "The cited lines are right: requires-python \">=3.10,<4.0\", engines.node \">=18\", and both example jobs use ubuntu-latest with a Python 3.10/3.11/3.12 matrix. The README has no OS or architecture mention. The universal clause is false: job check-llms-txt runs on ubuntu-24.04-arm (.github/workflows/docs-llms-txt-check.yml:20), and the required CI gate calls it (.github/workflows/ci-gate.yml:236). The other 55 runs-on entries in the 34 workflow files are ubuntu-latest. The \"yes\" for Linux x86_64 still stands, because every SDK, CLI and plugin test job is ubuntu-latest. Only the \"every CI job\" wording is wrong."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Yes - first-party native Claude Code and Codex plugins (marketplaces, hooks, local .mcp.json, six skills each, Claude-only Sonnet sidekick), generated from the shared stdlib-only Python core and needing a hosted Mem0 Platform key. The root README never mentions plugins, marketplaces or MCP, and no first-party Claude Code/Codex integration targets the self-hosted/OSS server.",
+          "citation": ".claude-plugin/marketplace.json:10-17; integrations/claude-code-plugin/hooks/hooks.json:4-109; integrations/claude-code-plugin/agents/sidekick.md:3-7; .codex-plugin/marketplace.json:6-19; .agents/plugins/marketplace.json:6-19; integrations/codex-plugin/hooks/hooks.json:3-62; integrations/agent-plugin-core/README.md:3-28,32; docs/platform/mem0-mcp.mdx:98-133; docs/integrations/codex.mdx:62-64; README.md:172-192",
+          "holds": true,
+          "note": "Every cited range matches. Claude plugin: v0.3.3 (plugin.json:3); SessionStart, UserPromptSubmit, PostToolUse, PostToolUseFailure, Stop, PreCompact and SessionEnd, plus SubagentStart/Stop matched to ^mem0:sidekick$; .mcp.json:2-10 runs python3 core/mcp_server.py; sidekick.md:4,6 sets model sonnet, and its tools include Bash, Edit, Write, WebFetch and WebSearch. Codex: both marketplaces point to ./integrations/codex-plugin, and hooks.json lists exactly the 8 named events. There is no README under integrations/codex-plugin. Each plugin has the same six skills: forget, pause, remember, resume, search and status. agent-plugin-core/python imports only stdlib modules. A case-insensitive grep of README.md for plugin|marketplace|mcp finds nothing. There is no openmemory/ directory and no MCP code in server/ or mem0-ts/src; @modelcontextprotocol/sdk appears only as a pnpm override (mem0-ts/package.json:304)."
+        },
+        {
+          "field": "claim_checks[1]",
+          "statement": "[docs/integrations/codex.mdx:6; integrations/claude-code-plugin/README.md:9-13] The plugins connect to Mem0's cloud memory layer and need a Mem0 Platform API key (m0-...). Verified: yes; the self-hosted server cannot substitute.",
+          "citation": "docs/integrations/codex.mdx:6; integrations/claude-code-plugin/README.md:9-13; integrations/agent-plugin-core/python/memory_core.py:31,1818-1823,1965-1968,1995-1996,2288-2289,2333-2336,2556-2561; integrations/agent-plugin-core/python/telemetry.py:774-786; integrations/claude-code-plugin/.claude-plugin/plugin.json:12-19; server/main.py:180-189; server/auth.py:104-105",
+          "holds": true,
+          "note": "codex.mdx:6 says the plugin connects \"to Mem0's cloud memory layer\", and README.md:13 requires an m0- Platform key. DEFAULT_API_URL is https://api.mem0.ai (memory_core.py:31). From that base: add is /v3/memories/add/ (:1996), search /v3/memories/search/ (:2335), delete /v1/memories/{id}/ (:2558), event polling /v1/event/{id}/ (:1916) and the ping /v1/ping/ (telemetry.py:776). Without a key, flush returns local-only (:1965-1968) and search returns empty (:2288-2289). MEM0_API_URL can repoint the base, but the server cannot serve these calls: its routes are /memories, /search, /configure, /auth, /api-keys, /entities and /requests, with no /v1 or /v3. MemoryCreate (server/main.py:180-189) has no app_id or custom_categories. The server authenticates with HTTPBearer or X-API-Key (auth.py:104-105,144-175), while the plugin sends Authorization: Token (memory_core.py:1819)."
+        }
+      ],
+      "verdict": "fail",
+      "repairs": [
+        "readme.platforms.linux_x86_64: replace \"every CI job runs on ubuntu-latest (e.g. .github/workflows/ci.yml:68-71, .github/workflows/agent-plugins-python-checks.yml:30-34)\" with \"every SDK, CLI and plugin test job runs on ubuntu-latest (e.g. .github/workflows/ci.yml:68-71, .github/workflows/agent-plugins-python-checks.yml:30-34); the one exception is the docs llms.txt coverage job, which runs on ubuntu-24.04-arm (.github/workflows/docs-llms-txt-check.yml:20, called from .github/workflows/ci-gate.yml:236)\". Keep the \"yes\" answer unchanged.",
+        "code.tests_and_ci: replace \"All jobs run on ubuntu-latest.\" with \"All jobs run on ubuntu-latest except check-llms-txt, which runs on ubuntu-24.04-arm (.github/workflows/docs-llms-txt-check.yml:20).\" This repeats the same error; it is not one of the five checked statements."
+      ]
+    },
+    {
+      "contender": "mem0ai/mem0",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Claude Code plugin (marketplace, user scope): export MEM0_API_KEY=...; claude plugin marketplace add mem0ai/mem0; claude plugin install mem0@mem0-plugins --scope user --config api_key=\"$MEM0_API_KEY\"; unset MEM0_API_KEY",
+          "citation": "integrations/claude-code-plugin/README.md:17-22; docs/integrations/claude-code.mdx:22-27",
+          "holds": true,
+          "note": "Commands match verbatim at both locations. The names resolve in-repo: .claude-plugin/marketplace.json:2,10-16 declares marketplace 'mem0-plugins' containing plugin 'mem0' (source ./integrations/claude-code-plugin, version 0.3.3), and integrations/claude-code-plugin/.claude-plugin/plugin.json:12-19 defines the required, sensitive userConfig 'api_key' that --config sets. As the dossier's risks already say, the marketplace tracks the repo rather than a pinned tag or SHA."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX Apache-2.0, file LICENSE",
+          "citation": "LICENSE:1-2,189-201; README.md:267-269",
+          "holds": true,
+          "note": "LICENSE is the full Apache License 2.0 text (Copyright 2023 Taranjeet Singh). README.md:269 says 'Apache 2.0'; pyproject.toml:13-14 declares license = \"Apache-2.0\", license-files = [\"LICENSE\"]; both plugin manifests declare Apache-2.0 (claude-code-plugin/.claude-plugin/plugin.json:10, codex-plugin/.codex-plugin/plugin.json:8). Non-blocking: integrations/n8n-nodes-mem0/LICENSE is MIT and integrations/hermes-plugin-mem0/LICENSE appends an MIT section (line 216), so not every subpackage is Apache-2.0. The root license and the assessed SDK/plugin packages are."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - pure Python/TypeScript packages (Python >=3.10, Node >=18); every SDK, CLI and plugin test job runs on ubuntu-latest; the only exception is the docs llms.txt job on ubuntu-24.04-arm, called from ci-gate.yml; README states no platform matrix",
+          "citation": "pyproject.toml:15; mem0-ts/package.json:271-273; .github/workflows/ci.yml:68-71; .github/workflows/agent-plugins-python-checks.yml:30-34; .github/workflows/docs-llms-txt-check.yml:20; .github/workflows/ci-gate.yml:236",
+          "holds": true,
+          "note": "pyproject.toml:15 requires-python = \">=3.10,<4.0\"; mem0-ts/package.json:271-273 engines node \">=18\". ci.yml:68-71 and agent-plugins-python-checks.yml:30-34 run on ubuntu-latest with Python 3.10/3.11/3.12. A grep of every runs-on in .github/workflows shows ubuntu-latest in all jobs except docs-llms-txt-check.yml:20 (ubuntu-24.04-arm), which ci-gate.yml:236 calls. README.md has no OS/platform matrix."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Yes - first-party native Claude Code and Codex plugins (marketplaces, lifecycle hooks, local .mcp.json, six skills each, Claude-only Sonnet sidekick with Bash/Edit/Write/WebFetch/WebSearch), generated from the stdlib-only shared core integrations/agent-plugin-core and needing a hosted Mem0 Platform key; root README never mentions plugins, marketplaces or MCP; hosted MCP can be wired directly; hook-less portable package exists",
+          "citation": ".claude-plugin/marketplace.json:10-17; integrations/claude-code-plugin/hooks/hooks.json:4-109; integrations/claude-code-plugin/agents/sidekick.md:3-7; .codex-plugin/marketplace.json:6-19; .agents/plugins/marketplace.json:6-19; integrations/codex-plugin/hooks/hooks.json:3-62; integrations/agent-plugin-core/README.md:3-28,32; docs/platform/mem0-mcp.mdx:98-133; docs/integrations/codex.mdx:62-64",
+          "holds": true,
+          "note": "Claude Code: hooks.json registers SessionStart, UserPromptSubmit, PostToolUse, PostToolUseFailure, SubagentStart/SubagentStop (matcher ^mem0:sidekick$), Stop, PreCompact and SessionEnd; plugin.json:3 and marketplace.json:15 give 0.3.3; sidekick.md sets model sonnet (line 4) and lists Bash/Edit/Write/WebFetch/WebSearch among its tools (line 6). Codex: hooks.json has exactly the 8 listed events, the two marketplace files are identical, and integrations/codex-plugin has no README. Each plugin ships exactly six skills (forget, pause, remember, resume, search, status). agent-plugin-core/README.md:3,24 says the per-host core/ and skills/ directories are generated from the shared core. Imports in agent-plugin-core/python/*.py are stdlib plus sibling modules only. A case-insensitive grep of README.md for plugin|marketplace|mcp finds no matches. mem0-mcp.mdx:98-133 covers Claude Code and Codex hosted-MCP setup, and codex.mdx:62-64 warns not to combine it with the plugin. integrations/mem0-agent-plugin exists (plugin.json, mcp.json), and README.md:32 there says it has no hooks."
+        },
+        {
+          "field": "claim_checks[1]",
+          "statement": "[docs/integrations/codex.mdx:6; integrations/claude-code-plugin/README.md:9-13] The plugins connect to Mem0's cloud memory layer and need a Mem0 Platform API key (m0-...) - verified: yes",
+          "citation": "docs/integrations/codex.mdx:6; integrations/claude-code-plugin/README.md:9-13; integrations/agent-plugin-core/python/memory_core.py:31,1818-1823,1965-1968,1995-1996,2288-2289,2333-2336,2556-2561; integrations/agent-plugin-core/python/telemetry.py:774-786; server/main.py:180-189,367-554; server/auth.py:104-105",
+          "holds": true,
+          "note": "Both source lines say what the claim says. memory_core.py:31 sets DEFAULT_API_URL = https://api.mem0.ai (overridable by MEM0_API_URL). Flush POSTs to /v3/memories/add/ (1996), search to /v3/memories/search/ (2335) and forget DELETEs /v1/memories/{id}/ (2558), all using 'Authorization: Token <key>' (1819); telemetry.py:776 calls /v1/ping/. With no key, flush returns local-only (1965-1968) and search returns empty (2288-2289). The self-hosted server exposes only /memories, /search, /reset, /configure plus the /auth, /api-keys, /entities and /requests routers (no /v1-/v3 or event routes). Its MemoryCreate (main.py:180-189) has no app_id or custom_categories field, and auth is HTTPBearer or X-API-Key (auth.py:104-105). Minor citation gap, not a falsehood: event polling (/v1/event/{id}/) is at memory_core.py:1916, outside the lines this check cites."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

@@ -209,6 +209,17 @@ REMOVE_GLOBS = (
     "tests/test_catalogs.py",
     "tests/test_new_host_grand_list.py",
     "tests/test_handbook_summary.py",
+    # The clean-room definitive round of 2026-10-02 (records that name each slot's picks, the user's pins, the manifest
+    # rows they map to and the comparison with the manifest): every top-level file of its folder (records, scripts,
+    # prompts and README), its decision record and the comparison's test. The per-candidate dossiers under dossiers/
+    # stay; they name no pick. (A pattern matches every directory above a path, so the file types are listed to leave
+    # dossiers/ out.)
+    "evidence/artifacts/new-wsl-definitive-round-*/*.json",
+    "evidence/artifacts/new-wsl-definitive-round-*/*.py",
+    "evidence/artifacts/new-wsl-definitive-round-*/*.txt",
+    "evidence/artifacts/new-wsl-definitive-round-*/*.md",
+    "docs/decisions/2026-10-03-definitive-round-audit.md",
+    "tests/test_definitive_round_compare.py",
 )
 
 # The closed-vocabulary enum labels found under selection/decision/disposition/

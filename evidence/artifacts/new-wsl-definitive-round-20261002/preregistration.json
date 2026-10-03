@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "kind": "definitive_round_preregistration",
+  "recorded_at_utc": "2026-10-02T03:04:22+00:00",
+  "criteria_identical_to": "evidence/artifacts/new-wsl-definitive-defaults-20261001/criteria.txt",
+  "frozen": [
+    {
+      "file": "criteria.txt",
+      "sha256": "f7e74c20e8763169122fc32b6566856fe7e352cc1e688dd8faa3a425c37d2f4f"
+    },
+    {
+      "file": "units.json",
+      "sha256": "17ff807e97cb22f72fab6cde0cfd7a4acf2ae857b6516d2cd15ff37eeba64cfd"
+    },
+    {
+      "file": "contenders.json",
+      "sha256": "891cf1d8b76c33466a89acb043689eecd3f142106dc6989ebd11476cd3979a74"
+    },
+    {
+      "file": "build_units.py",
+      "sha256": "88ba4c99c063a50be140d301ae83cecbef24872ecf1552203b43752fc0606535"
+    },
+    {
+      "file": "dossier-prompt.txt",
+      "sha256": "42d9e97cc70f2bc8dc16c9823c342872a591c86771199d2c76ad1b482777afb0"
+    },
+    {
+      "file": "dossier-schema.json",
+      "sha256": "8e932f1b961970137aaa23be059864a5c81648f9dad360ebba79826404efb235"
+    },
+    {
+      "file": "verify-prompt.txt",
+      "sha256": "f9248448b4d0f17b5722cdf6a20ba0de422da521b845f1eae927de7d609fee23"
+    },
+    {
+      "file": "verify-schema.json",
+      "sha256": "80692572a3e567701d8e694494e2946571b29fe8e434de78e6a6ab64462950a0"
+    },
+    {
+      "file": "decide-prompt.txt",
+      "sha256": "d729c168ff735071af3c0381b34f4f2ceae2baaeb5fe10b6bd61543841e069de"
+    },
+    {
+      "file": "decide-schema.json",
+      "sha256": "de889c65b0be6d486e0e5d63ab839002c60dadee05cf0ace38fc7896eec47c3e"
+    },
+    {
+      "file": "critic-prompt.txt",
+      "sha256": "16e06e3a8f97c4b5ad2d1416ad16ef273e8d3364e86fb35a2b4d99abdd993985"
+    },
+    {
+      "file": "critic-schema.json",
+      "sha256": "957f3d327814f0eccafabee9e55d0693d6e0496e52fc8e1eef658446ea9fc954"
+    },
+    {
+      "file": "adjudicate-prompt.txt",
+      "sha256": "eb8fc95dace2a239ecfe530935735ef9a56417cbe0c6816316406d36a92a937d"
+    },
+    {
+      "file": "adjudicate-schema.json",
+      "sha256": "b873311444854b4ed4dbd6a911103a484406a9603b7992ace775033f430b09c0"
+    },
+    {
+      "file": "decision-rule.txt",
+      "sha256": "51f49237ba79cdc87357e8b6a83346f33773810315812c2ca29fa32584a11824"
+    },
+    {
+      "file": "clean-room.json",
+      "sha256": "b832db0cbe4afc7ed8714e441b46e58e54d9132ab971dc1a75f3bd80fe832d3e"
+    },
+    {
+      "file": "run_round.py",
+      "sha256": "7b3ce50e4b7b420b6c0cfdad3f729e47f0050914a50270f9a89b98b3666ced9b"
+    }
+  ],
+  "upstream_inputs": [
+    {
+      "file": "evidence/artifacts/new-wsl-definitive-defaults-20261001/criteria.txt",
+      "sha256": "f7e74c20e8763169122fc32b6566856fe7e352cc1e688dd8faa3a425c37d2f4f"
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
+      "sha256": "d2a4f0e015fbc8d9257994a6f1e5ab9d4eb910fc99bd6ed23954343b45ca85d2"
+    },
+    {
+      "file": "evidence/artifacts/upstream-audit-20261002/observations.json",
+      "sha256": "5c16434972e319ba14a26cc254b9c57692c91417ab9927c542a4b03677f82d4b"
+    }
+  ]
+}

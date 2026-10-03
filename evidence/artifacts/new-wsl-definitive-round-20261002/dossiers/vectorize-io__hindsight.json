@@ -1,0 +1,291 @@
+{
+  "contender": "vectorize-io/hindsight",
+  "revision": {
+    "contender": "vectorize-io/hindsight",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "vectorize-io/hindsight",
+        "tag": "v0.10.2",
+        "commit": "5fc4ce20917b916240cef27c212c387a177f115b",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.10.2",
+    "commit": "5fc4ce20917b916240cef27c212c387a177f115b",
+    "read_at": "2026-10-02T03:03:06+00:00"
+  },
+  "dossier": {
+    "contender": "vectorize-io/hindsight",
+    "revision": {
+      "tag": "v0.10.2",
+      "commit": "5fc4ce20917b916240cef27c212c387a177f115b",
+      "read_at": "2026-10-03"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Open-source agent-memory server (Vectorize, v0.10.2): Python/FastAPI over PostgreSQL+pgvector (embedded pg0 by default; Oracle 23ai optional). An LLM extracts facts and entities on retain; recall and reflect are served over REST, a built-in MCP endpoint and SDKs (README.md:24,303,399; hindsight-api-slim/pyproject.toml:177-181). A separate npm package, @vectorize-io/hindsight-coding-agents 0.7.0, merges hooks plus a stdio MCP server into Claude Code, Codex CLI and 17 other agents; by default all wired agents share one bank per git repo (hindsight-integrations/coding-agents/README.md:3-7,898-899; src/core/bank.ts:53). Memory lives in Hindsight Cloud (the default), a self-hosted server, or a local hindsight-embed daemon (coding-agents/README.md:380-401). The older per-agent Claude Code and Codex plugins in the same repo are marked superseded (hindsight-docs/docs-integrations/claude-code.md:9-14).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Coding agents: a per-repo bank built automatically from git history and past sessions, injected at session start, plus curated knowledge pages. 'npx @vectorize-io/hindsight-coding-agents install all' wires every detected agent; 'Ingestion is automatic - there is no setup command'. Top-level README lists 13 agents incl. Claude Code and Codex CLI (package README lists 19).",
+          "citation": "README.md:250-259; hindsight-integrations/coding-agents/README.md:3-7"
+        },
+        {
+          "claim": "Claude Code gets 3 hooks in ~/.claude/settings.json, MCP via 'claude mcp add' (user scope) and a companion skill. Codex gets 3 hooks in ~/.codex/hooks.json plus [mcp_servers] in config.toml (needs codex_hooks = true).",
+          "citation": "hindsight-integrations/coding-agents/README.md:58,66"
+        },
+        {
+          "claim": "Default bank template coding-agent::{gitProject} is harness-neutral: Claude Code, Codex and opencode share one memory per repo.",
+          "citation": "hindsight-integrations/coding-agents/README.md:539,898-899"
+        },
+        {
+          "claim": "install is idempotent, preserves existing config, backs up touched files as <file>.hindsight-backup; uninstall removes only its own entries; autoUpdate (default on) re-stages a newer runtime from npm daily.",
+          "citation": "hindsight-integrations/coding-agents/README.md:298-301,574"
+        },
+        {
+          "claim": "Three server modes chosen once: cloud (default, needs an API token), self-hosted, daemon (local hindsight-embed on 127.0.0.1:9077; needs uv and an LLM key; macOS also needs a Rust toolchain).",
+          "citation": "hindsight-integrations/coding-agents/README.md:380-419"
+        },
+        {
+          "claim": "Scoping is one file, ~/.hindsight/coding-agent.json: optInOnly/optInPaths, banks.<id> overrides (disabled, rename), mapPathToBank, paths.<prefix>; no repo-carried config by design.",
+          "citation": "hindsight-integrations/coding-agents/README.md:444-452,489-516,805-878"
+        },
+        {
+          "claim": "Every document carries provenance tags source:, harness:<id>, knowledge:<kind> plus configurable retainTags and retainMetadata.",
+          "citation": "hindsight-integrations/coding-agents/README.md:901-929"
+        },
+        {
+          "claim": "Reset = delete the bank on the server: 'The bank is the only state this integration keeps ... no client-side files to clean up'.",
+          "citation": "hindsight-integrations/coding-agents/README.md:1088-1092"
+        },
+        {
+          "claim": "Every server ships a built-in MCP endpoint per bank at /mcp/{bank_id}/, enabled by default.",
+          "citation": "README.md:261-269"
+        },
+        {
+          "claim": "Memory Defense is an opt-in per-bank scan of retain content for secrets/PII (45 patterns) that redacts or blocks. Banks are isolated: 'no cross-bank leakage'.",
+          "citation": "README.md:364,369"
+        },
+        {
+          "claim": "State of the art on LongMemEval (94.6% in the chart), 'independently reproduced' by Virginia Tech and The Washington Post collaborators; other scores self-reported by vendors.",
+          "citation": "README.md:44-50"
+        }
+      ],
+      "install": [
+        {
+          "method": "npx installer for coding agents (current Claude Code and Codex path)",
+          "command": "npx @vectorize-io/hindsight-coding-agents install all   # or: install claude-code | install codex ; also: uninstall all | update | stats",
+          "citation": "README.md:254-257; hindsight-integrations/coding-agents/README.md:23-29,54-63"
+        },
+        {
+          "method": "same installer, local daemon mode (no account; needs uv and an LLM key)",
+          "command": "npx @vectorize-io/hindsight-coding-agents install claude-code --server daemon",
+          "citation": "hindsight-integrations/coding-agents/README.md:391"
+        },
+        {
+          "method": "Docker (API 8888, control plane 9999, embedded Postgres volume)",
+          "command": "docker run -it --pull always --name hindsight --restart unless-stopped -p 8888:8888 -p 9999:9999 -e HINDSIGHT_API_LLM_API_KEY=$OPENAI_API_KEY -v hindsight-data:<private> ghcr.io/vectorize-io/hindsight:latest",
+          "citation": "README.md:71-77"
+        },
+        {
+          "method": "pip, bare-metal server",
+          "command": "pip install hindsight-api ; export HINDSIGHT_API_LLM_API_KEY=sk-xxx ; hindsight-api",
+          "citation": "README.md:98-101"
+        },
+        {
+          "method": "Rust CLI binary",
+          "command": "curl -fsSL https://hindsight.vectorize.io/get-cli | bash",
+          "citation": "README.md:127"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - README.md:170 (Linux x86_64/ARM64: Docker, pip, pg0); hindsight-docs/docs/developer/installation.md:15 'fully supported, recommended for production'; release builds linux/amd64+arm64 images and CLI (.github/workflows/release.yml:301-316,492); CI on ubuntu-latest (.github/workflows/test.yml:1856).",
+        "wsl2": "unknown - docs cover Linux, macOS and native Windows only (hindsight-docs/docs/developer/installation.md:9-20); no WSL2 statement or CI for Hindsight itself (only a Hermes-specific guide: hindsight-docs/guides/2026-06-02-comparison-hermes-on-windows-vs-wsl2-for-persistent-memory.md).",
+        "macos_arm64": "yes - README.md:171; installation.md:16. Caveats: litellm pinned <1.92 on darwin because newer releases ship no macOS wheels (hindsight-api-slim/pyproject.toml:78-88); coding-agents daemon mode on macOS needs a current Rust toolchain (hindsight-integrations/coding-agents/README.md:412-416); no macOS test job in CI (macos-latest only builds the CLI, release.yml:305-312).",
+        "gpu": "yes, optional - default is CPU local models (BAAI/bge-small-en-v1.5 embedder, MiniLM cross-encoder; hindsight-api-slim/hindsight_api/config.py:1211-1212,1273-1275). NVIDIA CUDA only via a self-built image recipe, none published (installation.md:126-138); MLX reranker on darwin/arm64 via the local-ml extra (pyproject.toml:142-143)."
+      },
+      "integrations": {
+        "cli": "yes - Rust 'hindsight' binary (hindsight-cli/Cargo.toml:9-11; README.md:127); hindsight-api, hindsight-worker, hindsight-local-mcp, hindsight-admin (hindsight-api-slim/pyproject.toml:177-181; admin backup/restore/export-bank/import-bank/repair-bank/rename-bank at hindsight_api/admin/cli.py:491-1416); hindsight-embed (hindsight-embed/pyproject.toml:18); hindsight-coding-agents (hindsight-integrations/coding-agents/package.json:14).",
+        "mcp": "yes - built-in HTTP MCP at /mcp/{bank_id}/, enabled by default and unauthenticated unless an API-key tenant extension is set (README.md:261-269; hindsight-docs/docs/developer/mcp-server.md:11-37; config.py:1517); 39 tools incl. delete_document, delete_bank, clear_memories, invalidate_memory (hindsight_api/mcp_tools.py:43-85). Separate stdio server in coding-agents with 8 hindsight_* tools: sync_status, diagnose, search/list/read knowledge pages, reflect, capture_initiative, ingest_document (src/core/knowledge-tools.ts:131-328; src/mcp-server.ts).",
+        "sdk_or_api": "yes - REST under /v1/default/banks/{bank_id}/... (hindsight_api/api/http.py; spec hindsight-docs/static/openapi.json); clients: Python hindsight-client 0.10.2 (hindsight-clients/python/pyproject.toml:2-3), TypeScript, Go, Rust (README.md:123-127); embedded Python hindsight-all (README.md:177-199).",
+        "claude_code_or_codex": "yes - current path is @vectorize-io/hindsight-coding-agents. Claude Code: 3 hooks (SessionStart 30s, UserPromptSubmit 30s, Stop 60s) in ~/.claude/settings.json, 'claude mcp add --scope user hindsight', skill in ~/.claude/skills. Codex: 3 hooks in ~/.codex/hooks.json, [mcp_servers.hindsight] in ~/.codex/config.toml, [features] hooks = true, skill in ~/.agents/skills (src/installer.ts:568-626,648-710; src/harness/hook-lifecycle.ts:238-270; src/core/skill-dirs.ts:19-21). Legacy per-agent plugins (hindsight-memory, Codex scripts) still exist but are marked DEPRECATED (hindsight-docs/docs-integrations/claude-code.md:9-14, codex.md:9-14). Server LLM providers claude-code and openai-codex reuse a subscription login (README.md:82)."
+      },
+      "telemetry_and_network": "No product telemetry or phone-home found in server code: a case-insensitive grep of hindsight-api-slim/hindsight_api for telemetry/analytics/posthog/sentry/mixpanel hits only OpenTelemetry, and engine/providers/github_copilot_llm.py:455 sets enable_session_telemetry=False. OTLP tracing is off by default (config.py:1956); /metrics is served locally (api/http.py:4962-4971,5565). LLM request tracing is ON by default and stores full prompts and outputs in the local DB for 1 day (config.py:1984-1987; hindsight-docs/docs/developer/configuration.mdx:2549-2551); audit log is OFF by default, retention keep-forever (config.py:1974-1976). Required network: an LLM provider for extraction (default provider openai, config.py:1091); local embeddings/reranker download Hugging Face models on first use (config.py:1211-1212,1273-1275). coding-agents: with no explicit server it defaults to Hindsight Cloud https://api.hindsight.vectorize.io, which needs an account token (src/core/config.ts:584-597; src/installer.ts:1055-1078); it sends session transcripts and commit messages (diffs if gitIngest=full) to the configured server (coding-agents/README.md:571,575). Auto-update (default on) runs npm view daily at session start and spawns a detached 'npx -y @vectorize-io/hindsight-coding-agents@<ver> update' (src/core/auto-update.ts:58-61,293,410-418). Daemon mode fetches hindsight-api via uvx from PyPI (src/core/daemon.ts:1-38). A cold repo triggers a headless claude -p or codex exec survey under the user's own agent account (src/core/survey.ts:201-259). The docs site loads Umami only if UMAMI_URL is set at build (hindsight-docs/docusaurus.config.ts:5-6,82-88); the README embeds a tracking pixel (README.md:442)."
+    },
+    "code": {
+      "languages": [
+        "Python",
+        "TypeScript",
+        "Rust",
+        "Go (generated client)"
+      ],
+      "entry_points": [
+        {
+          "path": "hindsight-api-slim/hindsight_api/main.py:276",
+          "what": "hindsight-api server CLI; pyproject.toml:177-181 also exposes hindsight-worker, hindsight-local-mcp and hindsight-admin (admin/cli.py)"
+        },
+        {
+          "path": "hindsight-embed/hindsight_embed/cli.py",
+          "what": "hindsight-embed CLI and local daemon/profile manager (pyproject.toml:18)"
+        },
+        {
+          "path": "hindsight-cli/src/main.rs",
+          "what": "Rust CLI binary hindsight: bank, memory, document, entity, tag, operation, mental-model, directive, webhook, audit, fs subcommands (Cargo.toml:9-11)"
+        },
+        {
+          "path": "hindsight-integrations/coding-agents/src/installer.ts",
+          "what": "bin hindsight-coding-agents: install|uninstall|update|stats; merges hooks and MCP into each agent config (package.json:14)"
+        },
+        {
+          "path": "hindsight-integrations/coding-agents/src/harness/hook-lifecycle.ts",
+          "what": "SessionStart/UserPromptSubmit/Stop hook specs per agent; claude-code at 238-258, codex at 258-270"
+        },
+        {
+          "path": "hindsight-integrations/coding-agents/src/mcp-server.ts",
+          "what": "stdio MCP server exposing 8 hindsight_* tools; requires HINDSIGHT_MCP_HARNESS (lines 52-73)"
+        }
+      ],
+      "architecture": "Monorepo (CLAUDE.md:107-123). Server hindsight-api-slim/hindsight_api: engine/memory_engine.py orchestrates retain/recall/reflect; engine/retain/ (fact_extraction.py, orchestrator.py), engine/search/ (retrieval, fusion, reranking), engine/consolidation/, engine/llm_wrapper.py + providers/ (30 provider ids, config.py:1094-1125), engine/embeddings.py, engine/cross_encoder.py, engine/memories/pg/writes.py (Postgres store with a reversible curation archive for invalidated facts), engine/transfer/ (bank export/import/clone ZIPs), engine/audit.py, engine/llm_trace.py; api/http.py (FastAPI REST, 10k+ lines) and api/mcp.py + mcp_tools.py (39 MCP tools); extensions/ (API-key tenant auth, operation validators, memory_defense.py); config.py (env -> tenant -> bank config); pg0.py; alembic/versions (110 files, auto-run at startup, config.py:1785). Agent layer hindsight-integrations/coding-agents/src: installer.ts, harness/hook-lifecycle.ts, core/config.ts, core/bank.ts (bank per git repo, worktree-aware, repo basename only), core/session-start.ts + seed.ts + survey.ts + history.ts, core/retain-hook.ts + transcript*.ts, core/inject.ts, core/knowledge-tools.ts, core/daemon.ts, core/auto-update.ts. Memory content lives only in the bank; the client keeps config, logs and temp caches.",
+      "packaging_and_release": "Python: six wheels/sdists (client, api-slim, api, all, all-slim, embed) built with uv and published to PyPI via trusted publishing on v* tags, with wheel license checks (.github/workflows/release.yml:9-120). npm: TS client, hindsight-all-npm and control plane published with NPM_TOKEN, no --provenance (release.yml:136-294). Rust CLI binaries for linux/darwin amd64+arm64 attached to the GitHub release with LICENSE and THIRD_PARTY_LICENSES.txt; no checksum or signature files (release.yml:296-374,621-649); get-cli installs the latest binary unverified (hindsight-docs/static/get-cli:101-141). Docker images (full and -slim; linux/amd64+arm64) are pushed to ghcr.io, cosign-signed keyless and verified in the job (release.yml:376-519; sign-images.yml; verify command in hindsight-docs/docs/developer/installation.md:163-171); Helm chart to GHCR OCI (release.yml:521-552); GitHub release created as draft then published (release.yml:651-668). Integrations release on integrations/<name>/v* tags; TypeScript ones including coding-agents use 'npm publish --provenance' (release-integration.yml:184-203). Versions: core 0.10.2; coding-agents 0.7.0; Claude Code plugin 0.7.5.",
+      "tests_and_ci": "pytest (api-slim: 596 test_*.py files; hindsight-system-tests: 64 blackbox files through the published client against a stub LLM, no credentials), vitest (coding-agents: 79 *.test.ts, 2 real-agent e2e files excluded from npm test per package.json:85; control plane), cargo test (CLI); legacy claude-code plugin 10 test files, codex 5. 10 workflow files in .github/workflows. test.yml ('CI': pull_request to main + manual, about 100 path-filtered jobs): test-api in 3 shards excluding real-LLM markers and gated on repo secrets (1849-1955), test-system blackbox (3518-3562), test-coding-agents = tsc + npm test + build (546-580), claude-code and codex plugin pytest (582-606, 762-786), embed (+windows), Rust CLI, Oracle, clients, Helm, docs, OpenAPI/generated-file/unused-code checks. Others: release.yml, release-integration.yml, release-tool.yml, sign-images.yml, security-scan.yml (daily Trivy HIGH/CRITICAL on images), perf-test.yml and windows-smoke.yml (daily), deploy-docs.yml, triage-labels.yml. No macOS test job; the Docker real-agent e2e for coding-agents (HINDSIGHT_HARNESS_E2E=1) is not referenced by any workflow.",
+      "dependencies": "Python (uv workspace, uv.lock, >=3.11): hindsight-api-slim/pyproject.toml has 54 requirement lines (litellm twice with platform markers) incl. asyncpg, sqlalchemy, alembic, fastapi, fastmcp, openai, anthropic, google-genai, cohere, litellm, boto3, claude-agent-sdk, github-copilot-sdk, opentelemetry-*; extras local-ml (9), local-llm (2), local-onnx (5), embedded-db (pg0-embedded), oracle, test. hindsight-api 1; hindsight-all 3; hindsight-all-slim 3; hindsight-embed 2 (aiohttp, rich); hindsight-client 7. Node: coding-agents/package.json has 0 runtime dependencies (bundled by tsup; 12 devDependencies, 6 overrides); control plane 42 dependencies + 11 dev. Rust: hindsight-cli/Cargo.toml 18 direct dependencies; its Cargo.lock is gitignored (hindsight-cli/.gitignore:3). Committed lockfiles: uv.lock, package-lock.json, deno.lock.",
+      "security_policy": "SECURITY.md: report privately via GitHub Security Advisory; response within 48 hours; only the latest version is supported; coordinated disclosure (SECURITY.md:5-19,39)."
+    },
+    "claim_checks": [
+      {
+        "claim": "install all wires every detected agent natively, incl. Claude Code and Codex (README.md:255-259; coding-agents/README.md:58,66)",
+        "verified": "partial",
+        "evidence": "Claude Code: yes - merges 3 hooks into ~/.claude/settings.json, runs claude mcp remove/add --scope user, installs the skill (hindsight-integrations/coding-agents/src/installer.ts:568-626). Codex: writes hooks.json and [mcp_servers.hindsight], but adds [features] hooks = true only when no [features] table exists; otherwise it just logs 'add hooks = true' and hooks stay off until hand-edited (installer.ts:667-677). README says codex_hooks = true; the code writes hooks = true and accepts either (installer.ts:667-676) - code wins."
+      },
+      {
+        "claim": "Default bank coding-agent::{gitProject} is shared by Claude Code, Codex and opencode (coding-agents/README.md:898-899)",
+        "verified": "yes",
+        "evidence": "src/core/bank.ts:53 sets the template; the MCP server must be given HINDSIGHT_MCP_HARNESS and mirrors hook bank resolution (src/mcp-server.ts:1-14,52-73). Nuance: {gitProject} is only the main-worktree directory basename (bank.ts:176-196), so same-named repos at different paths share a bank unless mapPathToBank or banks overrides are set; outside git it uses the session start directory name."
+      },
+      {
+        "claim": "Automatic ingestion and injection with documented defaults (README.md:259; coding-agents/README.md:533-575)",
+        "verified": "partial",
+        "evidence": "Behavior matches: SessionStart always fires the background deepen engine when the server is reachable (src/core/session-start.ts:228-235); autoSeed, codebaseSurvey and retainSessions default true and gitIngest 'message' (src/core/config.ts:616,651-659). Two README defaults are stale: pageRefreshEveryTurns documented 10, code 1 (config.ts:642-646); pageSearchLimit documented 3, code 10 (src/core/hindsight.ts:236-244)."
+      },
+      {
+        "claim": "Reset = delete the bank; the bank is the only state; no client-side files to clean up (coding-agents/README.md:1088-1092)",
+        "verified": "partial",
+        "evidence": "DELETE /v1/default/banks/{bank_id} exists and is irreversible (hindsight_api/api/http.py:8455-8481). Memory content lives only in the bank, but the client also keeps ~/.hindsight/coding-agent.json (src/core/config.ts:41-42), the staged runtime ~/.hindsight/coding-agents (auto-update.ts:84-86), logs/diag/usage in ~/.hindsight/coding-agents-logs (log.ts:28; README:1033-1075) and per-session temp caches (session-cache.ts:25,145)."
+      },
+      {
+        "claim": "Memory Defense: opt-in per bank, 45 patterns, redact or block (README.md:369)",
+        "verified": "partial",
+        "evidence": "Present and default-off (hindsight-docs/docs/developer/memory-defense/index.md:7,45-47; engine/retain/orchestrator.py:110-137). The code has 46 patterns, incl. an undocumented hindsight_key (extensions/memory_defense.py:167-236). The plugin never configures it (no memory_defense reference under hindsight-integrations/coding-agents) and a policy only affects future retains (index.md:15)."
+      },
+      {
+        "claim": "Banks are isolated: no cross-bank leakage (README.md:364)",
+        "verified": "partial",
+        "evidence": "hindsight-system-tests/tests/test_80_bank_isolation.py:1-17,35-70 runs two banks with colliding document ids and checks read/count/update/delete; it runs in credential-free CI (.github/workflows/test.yml:3518-3562). The docstring cites a prior cross-bank bug (#3429). I did not audit every query."
+      },
+      {
+        "claim": "Built-in MCP endpoint per bank, enabled by default (README.md:261-269)",
+        "verified": "yes",
+        "evidence": "config.py:1517 DEFAULT_MCP_ENABLED=True; api/mcp.py:491-518 picks the bank from the path (scoped tools) or X-Bank-Id (multi-bank). Open by default (hindsight-docs/docs/developer/mcp-server.md:30). Destructive tools (delete_bank, clear_memories, delete_document) are exposed unless HINDSIGHT_API_MCP_ENABLED_TOOLS narrows them (mcp_tools.py:564-573; config.py:680)."
+      },
+      {
+        "claim": "Admin CLI for migrations, bank repair and stuck operations (README.md:402)",
+        "verified": "yes",
+        "evidence": "hindsight-admin also has whole-DB backup/restore as a zip (restore truncates all tables in one transaction; --yes skips the prompt; hindsight_api/admin/cli.py:404-468,491-546) plus export-bank, import-bank, rename-bank, repair-bank (cli.py:820,1213,1354,1416). HTTP bank export/import/clone ZIPs are enabled by default and re-embed on import (api/http.py:8830-9099; config.py:1707-1708)."
+      },
+      {
+        "claim": "LongMemEval state of the art, independently reproduced by Virginia Tech and The Washington Post (README.md:44-50)",
+        "verified": "not_checkable",
+        "evidence": "The chart (hindsight-docs/static/img/hindsight-benchmarks.png) shows Hindsight 94.6, SuperMemory 85.92, Zep 71.2, GPT-4o 60.2. The only other in-repo source is the project's own blog (94.6% on its AMB harness, v0.4.19); no third-party artifact for the reproductions exists in the repo."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "LongMemEval overall, README chart (dated January 2026)",
+        "metric": "accuracy %",
+        "value": "Hindsight 94.6; SuperMemory 85.92; Zep 71.2; GPT-4o 60.2. README says the Hindsight data was independently reproduced by Virginia Tech and The Washington Post; other scores are self-reported by vendors",
+        "source": "README.md:44-50; hindsight-docs/static/img/hindsight-benchmarks.png",
+        "independent": false
+      },
+      {
+        "what": "Agent Memory Benchmark (AMB) re-run of Hindsight v0.4.19, single-query mode, project harness",
+        "metric": "accuracy %",
+        "value": "LoComo 92.0; LongMemEval 94.6; LifeBench 71.5; PersonaMem 86.6",
+        "source": "hindsight-docs/blog/2026-03-23-agent-memory-benchmark.mdx:92-99",
+        "independent": false
+      },
+      {
+        "what": "BEAM at 10M tokens",
+        "metric": "score %",
+        "value": "Hindsight 64.1; Honcho 40.6; LIGHT (Llama-4-Maverick) 26.6; RAG (Llama-4-Maverick) 24.9",
+        "source": "hindsight-docs/blog/2026-04-02-beam-sota.md:48-53",
+        "independent": false
+      },
+      {
+        "what": "Project-built coding-agent suite (61 bug-fix tasks in boltons; deciding context seeded into the bank), memory on vs off, mean of 3 runs",
+        "metric": "corrections per task; cost; wall time per task",
+        "value": "Claude Code (Claude Sonnet 5) 0.85 -> 0.36 (-57%), cost -24%, 84.7s -> 75.1s; opencode (Gemini 3.5 Flash) 1.20 -> 0.80, cost -13%; Codex CLI (GPT-5.4 mini) 1.34 -> 0.47 (-65%), cost -52%, 53.6s -> 48.6s; solve rate 99-100% in both arms; an earlier per-prompt recall design scored 1.06 vs 0.97 with no memory",
+        "source": "hindsight-docs/blog/2026-08-06-hindsight-0-9-0.md:41-57,75-83",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Data egress default: absent --server the installer only logs that it is defaulting to Hindsight Cloud (hindsight-integrations/coding-agents/src/installer.ts:1055-1060) and the runtime resolves cloud mode to https://api.hindsight.vectorize.io (src/core/config.ts:584-597). The configured server receives session transcripts, commit messages (diffs if gitIngest=full) and survey findings (coding-agents/README.md:571,575).",
+      "No secret/PII scrubbing by default: Memory Defense is a per-bank server policy, default off, never set by the plugin, and affects future retains only (hindsight-docs/docs/developer/memory-defense/index.md:7,15,45-47); LLM request tracing is on by default and keeps full prompts and outputs for 1 day (hindsight-api-slim/hindsight_api/config.py:1984-1987); the audit log is off by default (config.py:1974).",
+      "Deletes are hard and recovery is operator-driven: document, bank and clear-memories deletes are stated as not undoable (api/http.py:7942-7947,8459-8460,10278); only per-fact invalidation is reversible (engine/memories/pg/writes.py:416-526). Recovery needs an export or backup taken earlier (transfer ZIPs, http.py:8830-9018; hindsight-admin restore truncates all tables, admin/cli.py:433-438); the OSS server has no scheduled backup. After a bank delete the next session re-seeds from git and re-surveys (coding-agents/README.md:1090-1092).",
+      "Exposure defaults: the server binds 0.0.0.0:8888 (config.py:1500-1501; daemon mode forces 127.0.0.1, main.py:128-136); MCP is on and documented as open until an API-key tenant extension is configured (hindsight-docs/docs/developer/mcp-server.md:30-37; extensions/tenant.py:56-66); the control plane is open unless HINDSIGHT_CP_ACCESS_KEY is set (installation.md:286-288).",
+      "Moving target for Claude Code and Codex: the per-agent plugins are superseded, no longer developed and print a deprecation notice every session (hindsight-integrations/claude-code/scripts/lib/upgrade_notice.py:21-35); the new installer does not remove them, so both can run and recall/retain twice into different banks (coding-agents/src/core/legacy.ts:30-36; coding-agents/README.md:348-352). The replacement (0.7.0) auto-updates its runtime daily by default (src/core/auto-update.ts:1-36; config.ts:683). Its package.json declares no license and the directory has no LICENSE file, while the repo is MIT (LICENSE:1-21) and hindsight-control-plane/package.json:32 says ISC.",
+      "Platform and footprint: macOS daemon mode needs a Rust toolchain and litellm is pinned <1.92 on darwin (hindsight-api-slim/pyproject.toml:78-88); Intel Macs get the slim bundle only (installation.md:17); WSL2 is undocumented; the full image is about 9 GB and needs 1.5-2 GB RAM (installation.md:57,119); daemon mode needs uv plus an LLM key. Large dependency tree with a yanked-litellm supply-chain note (pyproject.toml:70-72).",
+      "Release and CI gaps: CLI binaries ship without checksums or signatures and get-cli does not verify them (.github/workflows/release.yml:621-649; hindsight-docs/static/get-cli:101-141); core npm publishes lack --provenance (release.yml:157-172); legacy get-codex fetches hook scripts from the main branch at install time (hindsight-docs/static/get-codex:67,196-199); the CLI Cargo.lock is gitignored. CI never runs the real-agent e2e for Claude Code/Codex, and test-api needs secrets so fork PRs only get the stub-backed suite (test.yml:1851-1855,3520-3523).",
+      "Capture fidelity and cost: facts are LLM-extracted (retainExtractionMode default concise, coding-agents/src/core/config.ts:618-620); the first prompt triggers a reflect synthesis injected into context (20 s timeout, config.ts:483) and the code records an earlier incident of reflect fusing unrelated history into a confabulated imperative narrative (src/core/inject.ts:3-9); pages refresh hourly by default and a cold repo runs a headless survey (Claude capped at USD 2, config.ts:654-656). Daemon mode falls back to the Claude Code CLI provider, which its docs limit to personal local use (src/core/daemon.ts:147-149; hindsight-docs/docs/developer/models.mdx:545-546). No handoff feature was found by grep; closest are session write-back, hindsight_capture_initiative and hindsight_ingest_document."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "vectorize-io/hindsight",
+      "checks": [
+        {
+          "field": "readme.install[0] (npx installer for coding agents)",
+          "statement": "npx @vectorize-io/hindsight-coding-agents install all   # or: install claude-code | install codex ; also: uninstall all | update | stats",
+          "citation": "README.md:254-257; hindsight-integrations/coding-agents/README.md:23-29,54-63",
+          "holds": true,
+          "note": "README.md:255-256 show 'install all' (every detected agent, wired natively) and 'install claude-code'; coding-agents/README.md:24-28 add 'uninstall all', 'update', 'stats'; :55 and :63 show 'install claude-code' and 'install codex'. package.json:2-3,14 confirm name @vectorize-io/hindsight-coding-agents, version 0.7.0, bin hindsight-coding-agents -> dist/installer.js."
+        },
+        {
+          "field": "license",
+          "statement": "spdx MIT, file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1 'MIT License', :3 'Copyright (c) 2025 Vectorize AI, Inc.', :5-21 standard MIT grant and disclaimer. Side confirmation of the dossier's risk note: coding-agents/package.json has no license field."
+        },
+        {
+          "field": "readme.platforms.macos_arm64",
+          "statement": "yes - README.md:171; installation.md:16. Caveats: litellm pinned <1.92 on darwin because newer releases ship no macOS wheels (pyproject.toml:78-88); coding-agents daemon mode on macOS needs a current Rust toolchain (coding-agents/README.md:412-416); no macOS test job in CI (macos-latest only builds the CLI, release.yml:305-312).",
+          "citation": "README.md:171; hindsight-docs/docs/developer/installation.md:16; hindsight-api-slim/pyproject.toml:78-88; hindsight-integrations/coding-agents/README.md:412-416; .github/workflows/release.yml:305-312",
+          "holds": true,
+          "note": "README.md:171 marks Docker, pip and pg0 supported for macOS Apple Silicon; installation.md:16 says 'Fully supported'. pyproject.toml:79-88 has 'litellm>=1.91.3,<1.92; sys_platform == darwin' because releases >=1.92.0 publish no macOS wheels. coding-agents/README.md:412-416 states the Rust need, and the code enforces it: daemon.ts:75-87,337-345 refuses daemon mode on darwin without cargo. A grep of .github/workflows for macos/darwin hits only release.yml (Rust CLI matrix 305-312, asset steps 603-641), so there is no macOS test job. Tension: pyproject.toml:84 says the pin exists 'so a plain uvx hindsight-api works on a stock Mac', so the Rust gate may be stale, but the statement matches current code behaviour."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Current path is @vectorize-io/hindsight-coding-agents. Claude Code: 3 hooks (SessionStart 30s, UserPromptSubmit 30s, Stop 60s) in ~/.claude/settings.json, 'claude mcp add --scope user hindsight', skill in ~/.claude/skills. Codex: 3 hooks in ~/.codex/hooks.json, [mcp_servers.hindsight] in ~/.codex/config.toml, [features] hooks = true, skill in ~/.agents/skills. Legacy per-agent plugins marked DEPRECATED. claude-code and openai-codex providers reuse a subscription login.",
+          "citation": "hindsight-integrations/coding-agents/src/installer.ts:568-626,648-710; src/harness/hook-lifecycle.ts:238-270; src/core/skill-dirs.ts:19-21; hindsight-docs/docs-integrations/claude-code.md:9-14, codex.md:9-14; README.md:82",
+          "holds": true,
+          "note": "hook-lifecycle.ts:241-243 and 261-263 give SessionStart 30, UserPromptSubmit 30, Stop 60 for both, emitted via mergeHarnessHooks (installer.ts:261-290). installer.ts:572-576 writes ~/.claude/settings.json; 588-601 runs 'claude mcp remove' then 'claude mcp add --scope user hindsight --env HINDSIGHT_MCP_HARNESS=claude-code'. 652-657 writes ~/.codex/hooks.json; 644-646 and 663-685 write [mcp_servers.hindsight] and '[features] hooks = true' into ~/.codex/config.toml. skill-dirs.ts:19,21 give .claude/skills and .agents/skills. The cited docs (lines 9-14) say 'Superseded ... no longer developed'; the literal 'DEPRECATED' is in claude-code/scripts/lib/upgrade_notice.py:22 and codex/scripts/lib/upgrade_notice.py:22, and the 'hindsight-memory' name is at claude-code/.claude-plugin/plugin.json:2. README.md:82 lists openai-codex (ChatGPT Plus/Pro) and claude-code (Claude Pro/Max) as needing no API key."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "install all wires every detected agent natively, incl. Claude Code and Codex - verified: partial (Claude Code fully wired; Codex adds [features] hooks = true only when no [features] table exists, else only logs; README says codex_hooks, code writes hooks and accepts either)",
+          "citation": "hindsight-integrations/coding-agents/src/installer.ts:568-626,667-677; README.md:255-259; coding-agents/README.md:58,66",
+          "holds": true,
+          "note": "installer.ts:2143-2144: 'all' = INSTALLERS.filter(i => i.detect(ctx)). The Claude Code evidence matches 568-626. Codex: 669-676 appends '[features]\\nhooks = true' only when no line matches ^\\s*(codex_hooks|hooks)\\s*=; when a [features] table exists it only logs 'add `hooks = true` under your existing [features] section' (671-673). README.md:66 says codex_hooks = true; the code writes hooks = true and accepts either (667-669). The 'partial' verdict is justified. The regex also treats an existing 'hooks = false' (or a hooks key in any table) as enabled, which strengthens the caveat. 'Hooks stay off until hand-edited' relies on README:66; Codex's own default is outside the repo."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

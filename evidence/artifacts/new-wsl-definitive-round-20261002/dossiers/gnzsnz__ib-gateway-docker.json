@@ -1,0 +1,292 @@
+{
+  "contender": "gnzsnz/ib-gateway-docker",
+  "revision": {
+    "contender": "gnzsnz/ib-gateway-docker",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "gnzsnz/ib-gateway-docker",
+        "tag": "ibgateway-latest@10.51.1b",
+        "commit": "8a22deaa6cab86f9ad5c86ff4f0d6efbef718f10",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "ibgateway-latest@10.51.1b",
+    "commit": "8a22deaa6cab86f9ad5c86ff4f0d6efbef718f10",
+    "read_at": "2026-10-02T03:02:12+00:00"
+  },
+  "dossier": {
+    "contender": "gnzsnz/ib-gateway-docker",
+    "revision": {
+      "tag": "ibgateway-latest@10.51.1b",
+      "commit": "8a22deaa6cab86f9ad5c86ff4f0d6efbef718f10",
+      "read_at": "2026-10-02T03:02:12+00:00"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Packaging repo (Dockerfile templates, Bash entrypoints, config templates, Compose samples) that runs Interactive Brokers' IB Gateway, and a desktop-based tws-rdesktop image, unattended in a container. IBC automates the login dialogs, Xvfb provides a virtual display, and socat (or an outbound SSH tunnel) republishes the IB TWS API socket. Images are built per release channel (stable/latest) and published to GHCR and Docker Hub for linux/amd64 and linux/arm64. The documented way to define and run it is Docker Compose: docker-compose.yml (service ib-gateway) and tws-docker-compose.yml (service tws), started with `docker compose up` (README.md:165-167, 597). Each Compose file defines a single service; supporting services (Jupyter Quant, SSH bastion) are only referenced in the README (README.md:428-441), not defined in the repo.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "A docker image to run Interactive Brokers Gateway and TWS without any human interaction on a docker container",
+          "citation": "README.md:9-10"
+        },
+        {
+          "claim": "Includes IB Gateway (stable or latest), TWS (from 10.26.1h), IBC (simulates user input), Xvfb virtual framebuffer, optional x11vnc, xrdp/xfce for TWS, and socat to relay the API port because IB Gateway restricts connections to the container's 127.0.0.1",
+          "citation": "README.md:12-25"
+        },
+        {
+          "claim": "Optional remote SSH tunnel (ssh client only, the container does not run sshd) for the IB API and VNC; available from 10.19.2g-stable / 10.25.1o-latest",
+          "citation": "README.md:26-28, 422-426"
+        },
+        {
+          "claim": "Supports parallel execution of live and paper trading mode (TRADING_MODE=both)",
+          "citation": "README.md:29, 184-187"
+        },
+        {
+          "claim": "Secrets support: if a _FILE variable is defined, that file supplies the credential (docker secrets)",
+          "citation": "README.md:30, 518-520"
+        },
+        {
+          "claim": "aarch64 support (Raspberry Pi, M1/M2/M3) using IBKR's linux-arm installer; `docker compose up` pulls the matching architecture; the TWS arm image 'might have unexpected bugs'",
+          "citation": "README.md:31, 580-600"
+        },
+        {
+          "claim": "Images ib-gateway and tws-rdesktop in channels latest (10.51.1a) and stable (10.50.1e) with IBC 3.24.2; tags are the channel name, major.minor and the full version",
+          "citation": "README.md:36-48"
+        },
+        {
+          "claim": "Define services in a docker-compose.yml (or add ib-gateway to an existing one) plus a .env file, then start with `docker compose up`",
+          "citation": "README.md:52-55, 163-167"
+        },
+        {
+          "claim": "Sample compose exposes the API and VNC ports only on 127.0.0.1 of the docker host; removing '127.0.0.1:' exposes them to the host network (not recommended)",
+          "citation": "README.md:110-113, 245-247, 387-397"
+        },
+        {
+          "claim": "The IB API is an unencrypted, unauthenticated raw TCP socket; for remote use add TLS or an SSH tunnel; other services on the same docker network can reach it by hostname ib-gateway",
+          "citation": "README.md:371-381, 399-414"
+        },
+        {
+          "claim": "The image does not contain or store credentials; they are provided as environment variables at startup and the host must protect them",
+          "citation": "README.md:513-516"
+        },
+        {
+          "claim": "State: set TWS_SETTINGS_PATH plus a volume to preserve settings across containers; CUSTOM_CONFIG=yes lets you mount your own jts.ini and config.ini",
+          "citation": "README.md:270-272, 303-327"
+        },
+        {
+          "claim": "The Dockerfile fetches the IB Gateway installer from this project's GitHub releases, not IB's site, so a specific version can be rebuilt",
+          "citation": "README.md:604-613"
+        },
+        {
+          "claim": "Custom start-up scripts can run before X (START_SCRIPTS), after X (X_SCRIPTS) and after IBC (IBC_SCRIPTS) from a mounted directory",
+          "citation": "README.md:329-365"
+        }
+      ],
+      "install": [
+        {
+          "method": "Prepare the env file for Compose (Linux; README says to start from .env-dist)",
+          "command": "cp .env-dist .env",
+          "citation": "README.md:117; CONTRIBUTING.md:69"
+        },
+        {
+          "method": "Docker Compose, ib-gateway image (pre-built image from ghcr.io; compose also contains a build section)",
+          "command": "docker compose up",
+          "citation": "README.md:165-167"
+        },
+        {
+          "method": "Docker Compose, TWS desktop image (same command pulls the arm64 variant on aarch64 hosts)",
+          "command": "docker compose -f tws-docker-compose.yml up",
+          "citation": "README.md:596-598"
+        },
+        {
+          "method": "Pull published images directly",
+          "command": "docker pull ghcr.io/gnzsnz/ib-gateway:stable   # or :latest; tws-rdesktop likewise: docker pull ghcr.io/gnzsnz/tws-rdesktop:stable",
+          "citation": ".github/ISSUE_TEMPLATE/bug_report.md:20-27"
+        },
+        {
+          "method": "Build from source with Compose (README tells you to edit the Dockerfile first; those steps are stale, see claim_checks)",
+          "command": "git clone https://github.com/gnzsnz/ib-gateway-docker && docker-compose up --build",
+          "citation": "README.md:633-635, 663"
+        },
+        {
+          "method": "Contributor local build of the sample compose file",
+          "command": "docker-compose -f docker-compose.yml build --pull",
+          "citation": "CONTRIBUTING.md:75"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - Dockerfile.template:28-34 selects the x64 installer unless `uname -m` is aarch64; ubuntu:24.04 base (Dockerfile.template:9,63); CI and publish build linux/amd64 (.github/workflows/build.yml:54; .github/workflows/publish.yml:70,99).",
+        "wsl2": "unknown - README, CONTRIBUTING and the workflows never mention WSL or Windows (grep; the only hit is a generic 'OS: [e.g. Windows]' prompt at .github/ISSUE_TEMPLATE/bug_report.md:66). It is a Linux container, so behaviour depends on the user's Docker engine, which upstream does not document.",
+        "macos_arm64": "yes (container only, as claimed by the README) - README.md:31 and 580-600 state aarch64 support for M1/M2/M3 and that `docker compose up` pulls the matching image; Dockerfile.template:28-33 picks the arm installer; publish.yml:70,99 publishes linux/arm64. No native macOS build or macOS-specific instruction exists. CI builds arm64 under QEMU (build.yml:27-30,54) but never runs it; README.md:583-585 warns the TWS image 'might have unexpected bugs'.",
+        "gpu": "no - not applicable: IB Gateway runs headless on Xvfb (README.md:17-18) with software rendering; only the TWS compose maps /dev/dri for desktop rendering (tws-docker-compose.yml:5-6; README.md:259); no CUDA or compute use found."
+      },
+      "integrations": {
+        "cli": "No project CLI. Operated through `docker compose up` (README.md:165-167) and `docker exec ... pkill -x socat|ssh` for troubleshooting (README.md:560-578). Maintainer-only script `update.sh <channel> <version>` regenerates stable/ and latest/ (update.sh:6-32). IBC's command server is disabled by default (CommandServerPort=0, image-files/config/ibc/config.ini.tmpl:826).",
+        "mcp": "none found (grep for mcp, claude, codex, agents.md, anthropic, openai, llm across the tree outside .git returned no matches).",
+        "sdk_or_api": "No SDK or HTTP API. The service exposes IBKR's TWS API as a raw, unencrypted TCP socket: gateway live 4001 / paper 4002 inside the container, republished by socat on 4003/4004 (README.md:231-236; image-files/scripts/common.sh:93-103); TWS 7496/7497 republished on 7498/7499 (README.md:239-243; common.sh:109-119); VNC 5900 (README.md:235); RDP 3389 for TWS (README.md:243). Clients are third-party, e.g. ib_insync (README.md:438).",
+        "claude_code_or_codex": "none found (same grep as mcp; no CLAUDE.md, AGENTS.md or .claude/ files in the tree)."
+      },
+      "telemetry_and_network": "No telemetry, analytics or phone-home code found: the runtime scripts contain no curl/wget or outbound calls beyond starting Xvfb, x11vnc, socat, ssh and IBC (image-files/scripts/run.sh:48-91; common.sh:143-265; tws-scripts/*.sh). Required accounts/network at runtime: an Interactive Brokers account (TWS_USERID / TWS_PASSWORD, docker-compose.yml:11-12; README.md:181-182) and outbound connectivity from the proprietary IB Gateway/IBC to IBKR servers (not inspectable in this repo); the shipped jts.ini template sets UseSSL=true and s3store=true (image-files/config/ibgateway/jts.ini.tmpl:10-11), and the IBC template says 'Store settings on server' keeps a copy of TWS settings on IB's servers and does not apply to Gateway (config.ini.tmpl:270-285, value left empty). Inbound listeners in the container: socat on 4003/4004 (7498/7499 for TWS) on all interfaces (image-files/scripts/run_socat.sh:12), x11vnc on 5900 only when a VNC password is set (run.sh:57-69), xrdp 3389 in the TWS image (README.md:243). Optional outbound: ssh client to the user-supplied SSH_USER_TUNNEL host when SSH_TUNNEL is yes/both (common.sh:151-160,214-248; run_ssh.sh:13). Build-time network: Ubuntu apt mirrors (Dockerfile.template:23-27,86-95), this repo's GitHub release assets (Dockerfile.template:15,34-39), the IBC release at github.com/IbcAlpha/IBC (Dockerfile.template:17-18,47), and ghcr.io/gnzsnz/ib-gateway plus lscr.io/linuxserver/rdesktop base images (Dockerfile.tws.template:11,19). Maintainer CI: daily polling of download2.interactivebrokers.com (detect-releases.yml:26,51) and IBC releases (detect-ibc-release.yml:37); publishing to ghcr.io and Docker Hub with DOCKERHUB_USERNAME/DOCKERHUB_TOKEN secrets (publish.yml:36-47)."
+    },
+    "code": {
+      "languages": [
+        "Bash",
+        "Dockerfile",
+        "YAML",
+        "INI (IBC and jts.ini config templates)"
+      ],
+      "entry_points": [
+        {
+          "path": "docker-compose.yml",
+          "what": "Compose project 'algo-trader' with one service, ib-gateway (build ./latest, image ghcr.io/gnzsnz/ib-gateway:latest, restart: always, ports bound to 127.0.0.1); run with `docker compose up`."
+        },
+        {
+          "path": "tws-docker-compose.yml",
+          "what": "Compose file with one service, tws (build ./latest, Dockerfile.tws; /dev/dri, shm_size 1gb, seccomp:unconfined, bind ./config:/config, named volume tws_tmp, ports 127.0.0.1:7496/7497/3370)."
+        },
+        {
+          "path": "Dockerfile.template",
+          "what": "Two-stage ubuntu:24.04 build of the ib-gateway image; rendered by update.sh into stable/Dockerfile and latest/Dockerfile (the actual build contexts); CMD is <private> (line 109)."
+        },
+        {
+          "path": "image-files/scripts/run.sh",
+          "what": "Container entrypoint for ib-gateway: start scripts, Xvfb, ssh-agent, optional x11vnc, config rendering, socat/ssh forwarding, IBC launch (`ibcstart.sh -g`), live+paper dual mode, SIGTERM trap."
+        },
+        {
+          "path": "image-files/scripts/common.sh",
+          "what": "Shared functions: apply_settings (envsubst of config templates), file_env/unset_env (_FILE secrets), set_ports, set_java_heap, port_forwarding, setup_ssh/start_ssh, start_socat, run_scripts."
+        },
+        {
+          "path": "image-files/tws-scripts/start_session.sh",
+          "what": "s6 custom service for the TWS image (installed as /custom-services.d/start_session.sh): sets the abc user password, opens an xrdp session, then execs tws-scripts/run_tws.sh as abc."
+        },
+        {
+          "path": "update.sh",
+          "what": "Maintainer script `./update.sh <stable|latest> <version>`: copies image-files/ into the channel directory and renders Dockerfile.template / Dockerfile.tws.template with envsubst (update.sh:20-32)."
+        },
+        {
+          "path": ".github/workflows/publish.yml",
+          "what": "Release pipeline: on pushed tags v*, builds and pushes ib-gateway and tws-rdesktop multi-arch images to ghcr.io and Docker Hub."
+        }
+      ],
+      "architecture": "Packaging repo, no application code. image-files/ is the source of truth (CONTRIBUTING.md:29-35): scripts/ (run.sh, common.sh, run_socat.sh, run_ssh.sh), tws-scripts/ (start_session.sh, run_tws.sh) and config templates (config/ibc/config.ini.tmpl, 960 lines; config/ibgateway/jts.ini.tmpl). update.sh copies image-files/ into stable/ or latest/ and renders the Dockerfile templates; the committed per-channel directories are the Docker build contexts (docker-compose.yml:6; publish.yml:71). Non-empty line counts of every script/config file are identical in image-files/, latest/ and stable/ (grep count). ib-gateway image: setup stage downloads the IB Gateway installer from this repo's release assets (sha256-checked) and the IBC 3.24.2 zip and installs them under /root/Jts and /root/ibc; final stage adds socat, xvfb, x11vnc, ssh client and GTK/X libraries, creates non-root user ibgateway (uid/gid 1000) with passwordless sudo, CMD run.sh (Dockerfile.template:9-109). run.sh order: START_SCRIPTS, Xvfb :1, setup_ssh, Java heap, x11vnc, X_SCRIPTS, then start_process = set_ports -> apply_settings (envsubst config.ini.tmpl/jts.ini.tmpl, common.sh:4-39) -> port_forwarding (socat 4003/4004 -> 127.0.0.1:4001/4002, or `ssh -R` tunnel) -> IBC ibcstart.sh -g launching IB Gateway -> IBC_SCRIPTS -> wait with SIGTERM trap (run.sh:93-194); TRADING_MODE=both runs live then paper after sleep 15 (run.sh:135-185). tws-rdesktop image: FROM lscr.io/linuxserver/rdesktop:ubuntu-xfce, copies Jts and ibc from the ib-gateway image, runs run_tws.sh under xrdp as user abc (Dockerfile.tws.template:11,19,54-59). Neither Dockerfile defines HEALTHCHECK, EXPOSE, VOLUME or ENTRYPOINT (grep), and no 'health' string exists anywhere in the repo.",
+      "packaging_and_release": "Artifacts are container images only: ghcr.io/gnzsnz/ib-gateway, gnzsnz/ib-gateway (Docker Hub), ghcr.io/gnzsnz/tws-rdesktop, gnzsnz/tws-rdesktop (publish.yml:57-59, 86-88), linux/amd64 + linux/arm64 (publish.yml:70,99). Release trigger is a pushed git tag matching v* (publish.yml:3-6); the channel is the second dash-separated field of the tag name (publish.yml:22); docker/metadata-action type=match patterns yield mutable tags <major.minor> and <channel> plus the full version (publish.yml:62-65, flavor latest=false). IB installers are released separately: detect-releases.yml runs daily at 06:00 UTC (L3-5), reads IB's version.json (L26), downloads x64 and arm installers from download2.interactivebrokers.com, writes a .sha256 with sha256sum (L48-55), creates GitHub release ibgateway-<channel>@<version> with those assets (L62-65), runs update.sh and opens a PR (L67-118). Integrity: sha256 of the installer is checked at image build (Dockerfile.template:39-40) but the checksum comes from the same release; the IBC zip has no checksum (Dockerfile.template:47-49). Signatures/attestations: none configured; grep of .github for cosign, attest, sbom, provenance, sigstore, gpg found no matches.",
+      "tests_and_ci": "No test framework and no test files (approx. 0; glob for test*/tests/*_test.*/*.bats and a grep of the workflows found none). Five workflows in .github/workflows: on-push-n-pr.yml (push to any branch except update-*-to-* and IBC-update*, PRs to master, manual; matrix stable/latest calling build.yml); build.yml (reusable: QEMU+Buildx, builds ib-gateway for linux/amd64+arm64 without pushing, builds TWS for amd64 only using a local ib-gateway image handoff, GHA cache; never starts a container); publish.yml (on v* tags: multi-arch build+push to GHCR and Docker Hub); detect-releases.yml and detect-ibc-release.yml (daily cron jobs that open PRs for new IB Gateway / IBC versions). Lint tooling exists only as .pre-commit-config.yaml (trailing-whitespace, end-of-file-fixer, check-yaml, check-added-large-files, shebang/executable checks, shellcheck, shfmt, hadolint, markdownlint, dotenv-linter) and is not invoked by any workflow (grep). .github/dependabot.yml tracks docker in /stable and /latest daily and github-actions weekly.",
+      "dependencies": "No language package manifests (glob found no package.json, requirements.txt, pyproject.toml, go.mod, Cargo.toml, Gemfile, pom.xml, lock files). Declared dependencies: Dockerfile.template - 1 base image (ubuntu:24.04, two stages), 2 version-pinned downloads (IB Gateway installer per channel, IBC 3.24.2 zip), apt packages 3 (setup stage) + 36 (runtime stage), unpinned (hadolint DL3008 ignored, line 8); Dockerfile.tws.template - 2 base images (ghcr.io/gnzsnz/ib-gateway:${IB_VERSION}, lscr.io/linuxserver/rdesktop:ubuntu-xfce) + 40 apt packages; .github/workflows/*.yml - 6 third-party actions pinned by major tag (actions/checkout@v7, docker/setup-buildx-action@v4, docker/setup-qemu-action@v4, docker/metadata-action@v6, docker/build-push-action@v7, docker/login-action@v4) plus 1 local reusable workflow; .pre-commit-config.yaml - 5 hook repositories. Not in the repo: Docker Engine with Compose, the proprietary IB Gateway/TWS binaries, an IBKR account.",
+      "security_policy": "none - no SECURITY.md anywhere (glob for SECURITY*/security* found nothing; .github/ holds only ISSUE_TEMPLATE/, dependabot.yml and workflows/). README.md:367-509 has user-facing 'Security Considerations' guidance, which is not a vulnerability-reporting policy."
+    },
+    "claim_checks": [
+      {
+        "claim": "Compose is how the service is defined and run: create docker-compose.yml and .env, then `docker compose up` (README.md:163-167, 597).",
+        "verified": "yes",
+        "evidence": "docker-compose.yml:1-57 and tws-docker-compose.yml:1-69 are Compose-format files (top-level `name: algo-trader`, `services:`), run with `docker compose up` / `docker compose -f tws-docker-compose.yml up` (README.md:166,597). Upstream support also requires `docker compose config` and `docker compose logs` output (.github/ISSUE_TEMPLATE/bug_report.md:29-34,51,60). No Swarm, Kubernetes, Helm or Podman references in README, CONTRIBUTING, .github or the compose files (grep). Scope of what the files define: docker-compose.yml has one service (ib-gateway), no networks/secrets/healthcheck/depends_on/env_file keys, and its volumes are commented out (L48-53); tws-docker-compose.yml has one service (tws), bind mount ./config:/config and named volume tws_tmp (L56-58, 68-69). Variables come from .env through ${VAR} interpolation (docker-compose.yml:11-47). Docs mix `docker compose` (README.md:166,594,597) and legacy `docker-compose` (README.md:663; CONTRIBUTING.md:65,75)."
+      },
+      {
+        "claim": "Sample compose exposes API/VNC ports only on 127.0.0.1 of the docker host (README.md:245-247, 376-377).",
+        "verified": "yes",
+        "evidence": "docker-compose.yml:54-57 binds 127.0.0.1:4001->4003, 127.0.0.1:4002->4004, 127.0.0.1:5900; tws-docker-compose.yml:63-66 binds 127.0.0.1:7496, 7497 and 3370. Caveat in code: socat inside the container listens on all interfaces (image-files/scripts/run_socat.sh:12) while jts.ini only trusts 127.0.0.1 (image-files/config/ibgateway/jts.ini.tmpl:3), so any container on the same Docker network can reach the 4003/4004 (7498/7499) trading ports; README.md:399-401 acknowledges this for its `trader` network example."
+      },
+      {
+        "claim": "Runs IB Gateway and TWS 'without any human interaction' (README.md:9-10).",
+        "verified": "partial",
+        "evidence": "IBC logs in and answers dialogs from env-rendered config (image-files/scripts/run.sh:82-86; image-files/config/ibc/config.ini.tmpl:83-88). But the IBC template says IBKR Mobile second-factor approval is still required and can time out (config.ini.tmpl:118-122), that auto-restart avoids 2FA only after the initial login (config.ini.tmpl:564-575), and that the weekly Sunday cold restart should be timed so the user can handle 2FA alerts on live accounts (config.ini.tmpl:624-631). Compose defaults TWOFA_TIMEOUT_ACTION to exit (docker-compose.yml:21) together with `restart: always` (docker-compose.yml:4); README.md:191,195 documents these options. There is no HEALTHCHECK anywhere in the repo (grep for 'health' found nothing)."
+      },
+      {
+        "claim": "No credentials are stored in the image; they come from env vars, with Docker secrets via _FILE (README.md:513-520).",
+        "verified": "partial",
+        "evidence": "Nothing is baked into the image (Dockerfile.template has no credential), but at start apply_settings renders IbLoginId/IbPassword into ${IBC_INI} inside the container with chmod 600 (image-files/scripts/common.sh:9-14; config.ini.tmpl:83-88), and unset_env only unsets a variable when its _FILE variant was used (common.sh:63-71), so a password passed as TWS_PASSWORD stays in the container environment. _FILE support is real: file_env (common.sh:45-61) is applied to TWS_PASSWORD (common.sh:9), VNC_SERVER_PASSWORD (run.sh:61), SSH_PASSPHRASE (common.sh:181), PASSWD (image-files/tws-scripts/start_session.sh:13) and TWS_PASSWORD_PAPER (image-files/tws-scripts/run_tws.sh:141; ib-gateway path run.sh:166-171); there is no _FILE variant for TWS_USERID. Neither sample compose file passes any *_FILE variable (docker-compose.yml:10-47; tws-docker-compose.yml:16-55); the README's embedded example adds only TWS_PASSWORD_FILE (README.md:70) and its secrets example sets the others directly (README.md:529-547)."
+      },
+      {
+        "claim": "Parallel live and paper trading in one container (README.md:29, 184-187).",
+        "verified": "yes",
+        "evidence": "image-files/scripts/run.sh:135-185: TRADING_MODE=both starts live first with `_live`-suffixed IBC ini and settings path, then paper (TWS_USERID_PAPER plus TWS_PASSWORD_PAPER or its _FILE) after `sleep 15`; image-files/tws-scripts/run_tws.sh:116-171 does the same for TWS. Ports follow the mode: gateway live 4001/4003, paper 4002/4004; TWS live 7496/7498, paper 7497/7499 (common.sh:89-129). docker-compose.yml:14-15 passes the paper credentials but not TWS_PASSWORD_PAPER_FILE; the README's embedded compose example omits TWS_USERID_PAPER, TWS_PASSWORD_PAPER and the *_FILE variables (README.md:67-103), so `both` needs them added to environment:."
+      },
+      {
+        "claim": "Settings persist via TWS_SETTINGS_PATH plus a volume; TIME_ZONE is applied only when jts.ini does not exist (README.md:202-203, 303-327).",
+        "verified": "yes",
+        "evidence": "image-files/scripts/common.sh:16-35 creates $TWS_SETTINGS_PATH with plain `mkdir` (no -p) if missing and renders jts.ini from the template only if the file is absent. By default state stays in the container's writable layer: docker-compose.yml:48-53 has every volume commented out, whereas tws-docker-compose.yml:57-58 mounts ./config:/config and tws_tmp:/tmp. .gitignore:1-8 ignores /.env, tws_settings/, ssh/, /config/, /*_password.txt and /init-scripts/*."
+      },
+      {
+        "claim": "The Dockerfile pulls the installer from this project's releases so a specific version can be rebuilt; build-from-source steps in README.md:604-663.",
+        "verified": "partial",
+        "evidence": "Installer part matches code: Dockerfile.template:33-40 downloads ibgateway-<ver>-standalone-linux-<x64|arm>.sh and its .sha256 from releases/download/ibgateway-<channel>%40<ver>/ and runs sha256sum --check; the assets are created by .github/workflows/detect-releases.yml:48-65. Reproducibility is only partial: ubuntu:24.04 is not digest-pinned and `apt-get upgrade -y` runs at build (Dockerfile.template:9,63,87), the IBC 3.24.2 zip is fetched without a checksum (Dockerfile.template:47-49), and the .sha256 is generated by the workflow that uploads the installer (detect-releases.yml:54). The README's build steps are stale versus code (code wins): they point to a root `Dockerfile` (README.md:605,621) and a gh-pages raw URL for x64 only (README.md:622-625,642-646), but the tree has no root Dockerfile (generated Dockerfiles live in stable/ and latest/, rendered from Dockerfile.template by update.sh:20-32) and the real URL is the release-asset URL with arch selection (Dockerfile.template:28-39)."
+      },
+      {
+        "claim": "Supported-tags table: latest 10.51.1a, stable 10.50.1e, IBC 3.24.2 (README.md:42-45).",
+        "verified": "partial",
+        "evidence": "Matches the tree: latest/Dockerfile:11 = 10.51.1a, stable/Dockerfile:11 = 10.50.1e, Dockerfile.template:13 = IBC 3.24.2; image tags derive from git tags v<version>-<channel> via metadata-action (publish.yml:62-65). But the revision under review is tag ibgateway-latest@10.51.1b (.git/packed-refs:2), whose tree still pins 10.51.1a. That tag form is created by detect-releases.yml:62, which runs before update.sh (L69) and the PR step (L118) (inference: the tag marks the installer-asset release made before the version-bump PR), and it does not match publish.yml's v* trigger (publish.yml:3-6), so no image build is tied to this tag."
+      },
+      {
+        "claim": "TWS (from 10.26.1h) is provided as the tws-rdesktop image (README.md:15, 249-251).",
+        "verified": "not_checkable",
+        "evidence": "Dockerfile.tws.template builds on lscr.io/linuxserver/rdesktop:ubuntu-xfce (L19) and starts an xrdp session then run_tws.sh as user abc (image-files/tws-scripts/start_session.sh:32,45), but it copies <private> and <private> out of the ib-gateway image (Dockerfile.tws.template:11,55-56). No workflow or Dockerfile downloads a TWS installer: only ibgateway-*-standalone-linux-* installers are fetched (detect-releases.yml:48-55); TWS URLs appear only as README links and the version.json lookup (detect-releases.yml:26). JAVA_HEAP_SIZE edits ibgateway.vmoptions under ${TWS_PATH}/ibgateway/<ver> (common.sh:134-136) and run_tws.sh calls ibcstart.sh without -g (run_tws.sh:49-53, versus run.sh:82). Whether the copied tree runs TWS cannot be determined from this repo (IBKR binaries and IBC are not in it); README.md:582-585 itself says the official arm installer is for ib-gateway and the TWS image 'might have unexpected bugs'."
+      },
+      {
+        "claim": "SSH tunnel variables SSH_ALIVE_COUNT, SSH_REMOTE_PORT and SSH_VNC_PORT behave as in the configuration table (README.md:211,214,217).",
+        "verified": "partial",
+        "evidence": "Code wins where they differ. SSH_ALIVE_COUNT: README says default not defined, code defaults to 3 (image-files/scripts/common.sh:172). SSH_REMOTE_PORT / SSH_VNC_PORT: README describes them as the remote port, but run_ssh.sh:13 builds `ssh -R 127.0.0.1:${API_PORT}:localhost:${SSH_REMOTE_PORT}` and common.sh:234 builds `-R 127.0.0.1:5900:localhost:$SSH_VNC_PORT`; by ssh -R argument order the first port is the remote listening port and host:port is the local target, so only values equal to the API port / 5900 forward to a listening local port (inference from ssh syntax, not executed). Confirmed as documented: ssh client only, no sshd (Dockerfile.template:89; run_ssh.sh:13), automatic tunnel restart after SSH_RESTART seconds, default 5 (run_ssh.sh:14), ServerAliveInterval default 20 (common.sh:171)."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Proprietary payload with self-asserted integrity: the images wrap IBKR's closed-source IB Gateway installer, re-hosted as release assets of this repo (detect-releases.yml:48-65) and executed as root at build (Dockerfile.template:38-42). The only integrity check is a .sha256 generated by the same workflow and stored in the same release (detect-releases.yml:54; Dockerfile.template:39-40); the IBC zip is unzipped with no checksum (Dockerfile.template:47-49). No file in the repo states IBKR's licence terms for redistributing the installers (grep of README, CONTRIBUTING, Dockerfile templates, .github).",
+      "Licence metadata conflict: LICENSE and the README badge say MIT (LICENSE:1; README.md:3), but both image Dockerfiles label org.opencontainers.image.licenses as 'Apache License Version 2.0' (Dockerfile.template:114; Dockerfile.tws.template:69; latest/Dockerfile:114; stable/Dockerfile:114; latest/Dockerfile.tws:69).",
+      "Unattended operation is conditional: IBKR 2FA and the weekly cold restart can need a human (config.ini.tmpl:118-122, 564-575, 624-631). Compose default TWOFA_TIMEOUT_ACTION=exit with restart: always (docker-compose.yml:4,21) means an unanswered prompt ends the process and Docker restarts it, i.e. a new login attempt (inference). No HEALTHCHECK exists in the Dockerfiles or Compose files (grep), so Compose cannot tell 'container running' from 'logged in'.",
+      "Credential surface: the password is rendered in plain text into IBC config.ini inside the container (chmod 600) (common.sh:9-14) and stays in the environment unless a _FILE variable was used (common.sh:63-71); the VNC password is passed on the x11vnc command line (run.sh:64-65); the runtime user has passwordless sudo (Dockerfile.template:101); the TWS desktop user abc gets password 'abc' unless PASSWD is set (image-files/tws-scripts/start_session.sh:13-16; README.md:221); .env-dist ships placeholder passwords (.env-dist:8-9,66); there is no _FILE option for TWS_USERID.",
+      "Deployment scope is controlled only by Compose port/network settings: the IB API is unencrypted and unauthenticated (README.md:371-374), socat listens on all container interfaces (image-files/scripts/run_socat.sh:12) so any container on the same network reaches live/paper trading ports, and removing the 127.0.0.1 prefix exposes them to the host network (README.md:247, 389-397; docker-compose.yml:54-57). The TWS compose also sets seccomp:unconfined and maps /dev/dri (tws-docker-compose.yml:5-9).",
+      "Reproducibility and supply chain: floating inputs (ubuntu:24.04 tag, apt-get upgrade -y at build, unpinned apt packages with DL3008 ignored, lscr.io/linuxserver/rdesktop:ubuntu-xfce) (Dockerfile.template:8-9,63,87; Dockerfile.tws.template:8,19); the sample compose uses the mutable image tag ghcr.io/gnzsnz/ib-gateway:latest (docker-compose.yml:9) and published tags <channel> and <major.minor> are mutable (publish.yml:62-65); GitHub Actions are pinned by major tag, not commit SHA (build.yml:22-50); no signing, SBOM or provenance step in the workflows (grep of .github).",
+      "Assurance and docs drift: roughly 0 test files; CI only builds images and never starts a container (build.yml; no docker run / compose up in any workflow) and does not run the pre-commit linters, although the bug template says the sample compose files 'are tested' (bug_report.md:29-31). README build-from-source steps and SSH variable defaults differ from the code (see claim_checks 7 and 10); the revision tag ibgateway-latest@10.51.1b points at a tree pinning 10.51.1a (.git/packed-refs:2; latest/Dockerfile:11). Upstream support is limited to the container itself, not IBKR or IBC problems (bug_report.md:80-82).",
+      "Platform and scope limits: Linux containers only, no WSL2/Windows/native macOS instructions (README.md:31, 580-600 mention only aarch64 images); arm64 images are built under QEMU and never executed in CI (build.yml:27-30,54; publish.yml:28-31), and the README warns the TWS arm image 'might have unexpected bugs' (README.md:583-585). How TWS binaries get into tws-rdesktop is not visible in the tree (Dockerfile.tws.template:11,55-56; claim_checks 9). Each Compose file defines a single service; supporting services such as Jupyter Quant or an SSH bastion are only mentioned in prose (README.md:428-441)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "gnzsnz/ib-gateway-docker",
+      "checks": [
+        {
+          "field": "readme.install[1]",
+          "statement": "Docker Compose, ib-gateway image (pre-built image from ghcr.io; compose also contains a build section): `docker compose up`",
+          "citation": "README.md:165-167",
+          "holds": true,
+          "note": "README.md:163-166: 'Once `docker-compose.yml` and `.env` are in place you can start the container with: docker compose up'. The sample docker-compose.yml:5-9 has both a build section (context ./latest) and image ghcr.io/gnzsnz/ib-gateway:latest; restart: always (L4); ports bound to 127.0.0.1 (L54-57). Minor: the README's embedded compose example uses ./stable and the :stable image (README.md:62-66), while the repo's file uses latest. HEAD = 8a22deaa…, tag ibgateway-latest@10.51.1b (.git/packed-refs:2) matches the dossier revision."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-21 is the verbatim MIT License ('Copyright (c) 2022 Emanuel Fernandes, 2023 gnzsnz'); README.md:3 shows an MIT badge. The OCI image labels say 'Apache License Version 2.0' (Dockerfile.template:114; Dockerfile.tws.template:69; latest/ and stable/ Dockerfile:114 and Dockerfile.tws:69). The dossier already discloses this conflict in risks, and it does not change the repo licence."
+        },
+        {
+          "field": "platforms.linux_x86_64",
+          "statement": "yes - Dockerfile.template:28-34 selects the x64 installer unless `uname -m` is aarch64; ubuntu:24.04 base (Dockerfile.template:9,63); CI and publish build linux/amd64 (build.yml:54; publish.yml:70,99).",
+          "citation": "Dockerfile.template:9,28-34,63; .github/workflows/build.yml:54; .github/workflows/publish.yml:70,99",
+          "holds": true,
+          "note": "Dockerfile.template:28-32 sets ARCH=arm only if uname -m is aarch64, else x64; L33-34 build the installer filename and release URL from ARCH. L9 'FROM ubuntu:24.04 AS setup', L63 'FROM ubuntu:24.04'. build.yml:54, publish.yml:70 (ib-gateway) and publish.yml:99 (tws-rdesktop) all read 'platforms: linux/amd64,linux/arm64'. The rendered build contexts keep the same logic (latest/Dockerfile and stable/Dockerfile lines 9, 28-31, 63)."
+        },
+        {
+          "field": "integrations.sdk_or_api",
+          "statement": "No SDK or HTTP API; IBKR TWS API as a raw unencrypted TCP socket: gateway live 4001/paper 4002 republished by socat on 4003/4004; TWS 7496/7497 on 7498/7499; VNC 5900; RDP 3389 for TWS; clients are third-party, e.g. ib_insync.",
+          "citation": "README.md:231-236, 239-243, 438; image-files/scripts/common.sh:93-103, 109-119",
+          "holds": true,
+          "note": "README.md:233-235: 4003 live via socat from internal 4001, 4004 paper from 4002, 5900 VNC. README.md:241-243: 7498 from 7496, 7499 from 7497, 3389 RDP. common.sh:94-103 sets API_PORT/SOCAT_PORT to 4002/4004 (paper) and 4001/4003 (live) for gateway; common.sh:110-119 sets 7497/7499 (paper) and 7496/7498 (live) for TWS. run_socat.sh:12 relays SOCAT_PORT to 127.0.0.1:API_PORT. README.md:438 names ib_insync; README.md:371-372 calls the API an unencrypted, unauthenticated raw TCP socket. A grep for HTTP/REST/Client Portal/web API found nothing; the tree contains only Bash, Dockerfiles, YAML and INI templates."
+        },
+        {
+          "field": "claim_checks[2]",
+          "statement": "Runs IB Gateway and TWS 'without any human interaction' (README.md:9-10) - verified: partial (IBC automates login, but IBKR 2FA, weekly cold restart, TWOFA_TIMEOUT_ACTION=exit with restart: always, and no HEALTHCHECK).",
+          "citation": "README.md:9-10; image-files/scripts/run.sh:82-86; image-files/config/ibc/config.ini.tmpl:83-88,118-122,564-575,624-631; docker-compose.yml:4,21; README.md:191,195",
+          "holds": true,
+          "note": "README.md:9-10 quote is exact. run.sh:82-86 launches ibcstart.sh -g with --ibc-ini and --on2fatimeout; config.ini.tmpl:83 and 88 render IbLoginId/IbPassword from env. config.ini.tmpl:571-573: auto-restart avoids 2FA 'after the initial login'; 630-631: for a live account the cold-restart time 'should be convenient for you to handle 2FA alerts'. docker-compose.yml:4 'restart: always', :21 TWOFA_TIMEOUT_ACTION default exit; README.md:191 and 195 document both options. A grep for 'health'/HEALTHCHECK across the tree outside .git found nothing. Wording nit: config.ini.tmpl:118-122 is conditional ('If you use the IBKR Mobile app for second factor authentication, and you fail to complete the process before the time limit…'), so 'still required' is a paraphrase, not a quote. The 'partial' verdict is still supported."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

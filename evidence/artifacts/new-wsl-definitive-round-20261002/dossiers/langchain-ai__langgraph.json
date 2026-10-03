@@ -1,0 +1,291 @@
+{
+  "contender": "langchain-ai/langgraph",
+  "revision": {
+    "contender": "langchain-ai/langgraph",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "langchain-ai/langgraph",
+        "tag": "cli==0.4.32.dev0",
+        "commit": "24c33568881173119347bf3a5016e91f0dbf777b",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "cli==0.4.32.dev0",
+    "commit": "24c33568881173119347bf3a5016e91f0dbf777b",
+    "read_at": "2026-10-02T03:02:19+00:00"
+  },
+  "dossier": {
+    "contender": "langchain-ai/langgraph",
+    "revision": {
+      "tag": "cli==0.4.32.dev0",
+      "commit": "24c33568881173119347bf3a5016e91f0dbf777b",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "LangGraph (langchain-ai/langgraph) is an MIT-licensed Python monorepo that implements a low-level, Pregel/bulk-synchronous graph runtime for long-running stateful LLM agents. It offers StateGraph and @entrypoint/@task authoring APIs, checkpointer persistence (in-memory, SQLite, Postgres) with interrupts, resume and time-travel, a long-term key-value/vector store, a prebuilt ToolNode, a Python SDK plus RemoteGraph client for the separate closed-source LangGraph Server, and a Docker-oriented CLI (new/dev/up/build/dockerfile/validate/deploy). It is model-provider-neutral (models enter via langchain-core). The repo contains no sandbox or process isolation, no OpenAI/Anthropic harness-SDK adapter, no Claude Code/Codex integration, no reference to GPT-6.x, and no research harness; Deep Agents (planning/subagents/filesystem) is a separate package that the README links to but the repo does not include.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Tagline and scope: 'Low-level orchestration framework for building stateful agents'; LangGraph is 'a low-level orchestration framework for building, managing, and deploying long-running, stateful agents'.",
+          "citation": "README.md:12,24"
+        },
+        {
+          "claim": "Pointer to Deep Agents: 'If you're looking to quickly build agents, check out Deep Agents — a higher-level package built on LangGraph for agents that can plan, use subagents, and leverage file systems for complex tasks.'",
+          "citation": "README.md:30-31 (also README.md:54)"
+        },
+        {
+          "claim": "Durable execution: 'Build agents that persist through failures and can run for extended periods, automatically resuming from exactly where they left off.'",
+          "citation": "README.md:39"
+        },
+        {
+          "claim": "Human-in-the-loop: 'inspecting and modifying agent state at any point during execution.'",
+          "citation": "README.md:40"
+        },
+        {
+          "claim": "Comprehensive memory: 'both short-term working memory for ongoing reasoning and long-term persistent memory across sessions.'",
+          "citation": "README.md:41"
+        },
+        {
+          "claim": "Debugging with LangSmith: 'visualization tools that trace execution paths, capture state transitions, and provide detailed runtime metrics.'",
+          "citation": "README.md:42"
+        },
+        {
+          "claim": "Production-ready deployment: 'scalable infrastructure designed to handle the unique challenges of stateful, long-running workflows'; LangSmith Deployment is 'a purpose-built deployment platform'.",
+          "citation": "README.md:43,57"
+        },
+        {
+          "claim": "LangSmith is positioned for agent evals and observability ('Debug poor-performing LLM app runs, evaluate agent trajectories, gain visibility in production').",
+          "citation": "README.md:56"
+        },
+        {
+          "claim": "'While LangGraph can be used standalone, it also integrates seamlessly with any LangChain product'; it is 'built by LangChain Inc ... but can be used without LangChain'.",
+          "citation": "README.md:50,82"
+        },
+        {
+          "claim": "The JS/TS equivalent is a separate project (LangGraph.js).",
+          "citation": "README.md:33"
+        },
+        {
+          "claim": "Checkpointers 'save graph state at every superstep, enabling human-in-the-loop, memory between interactions, durable execution'; when a node fails mid-superstep, writes from nodes that completed are stored so they are not re-run on resume.",
+          "citation": "libs/checkpoint/README.md:19,57-59"
+        },
+        {
+          "claim": "Security note: 'By default the serializer allows any Python type found in checkpoint data'; new applications should set LANGGRAPH_STRICT_MSGPACK=true or pass allowed_msgpack_modules.",
+          "citation": "libs/checkpoint/README.md:54-55 (repeated at libs/checkpoint-postgres/README.md:29-30 and libs/checkpoint-sqlite/README.md:27-28)"
+        },
+        {
+          "claim": "The Python SDK connects to a running LangGraph API server to manage assistants and threads and stream runs; 'You will need a running LangGraph API server.'",
+          "citation": "libs/sdk-py/README.md:19-21"
+        },
+        {
+          "claim": "The CLI is 'the official command-line interface for LangGraph' to 'create, develop, build, and run LangGraph applications locally or in Docker'.",
+          "citation": "libs/cli/README.md:19"
+        }
+      ],
+      "install": [
+        {
+          "method": "pip (root README quick install)",
+          "command": "pip install -U langgraph",
+          "citation": "README.md:26-28"
+        },
+        {
+          "method": "uv (core library README)",
+          "command": "uv add langgraph",
+          "citation": "libs/langgraph/README.md:14-18"
+        },
+        {
+          "method": "uv, CLI",
+          "command": "uv add langgraph-cli",
+          "citation": "libs/cli/README.md:13-15"
+        },
+        {
+          "method": "uv, CLI with the in-memory dev-server extra (Python >=3.11; pulls langgraph-api and langgraph-runtime-inmem, which are not in this repo)",
+          "command": "uv add \"langgraph-cli[inmem]\"",
+          "citation": "libs/cli/README.md:27-29 (pip form 'pip install -U \"langgraph-cli[inmem]\"' at libs/cli/langgraph_cli/cli.py:807-808; extra defined at libs/cli/pyproject.toml:24-28)"
+        },
+        {
+          "method": "uv, Python SDK for the LangGraph Server API",
+          "command": "uv add langgraph-sdk",
+          "citation": "libs/sdk-py/README.md:13-15"
+        },
+        {
+          "method": "uv, Postgres checkpointer (SQLite equivalent: 'uv add langgraph-checkpoint-sqlite', libs/checkpoint-sqlite/README.md:13-15)",
+          "command": "uv add langgraph-checkpoint-postgres",
+          "citation": "libs/checkpoint-postgres/README.md:13-15"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - every CI test/lint/release job runs on ubuntu-latest (.github/workflows/_test.yml:16, .github/workflows/_test_langgraph.yml:11, .github/workflows/release.yml:19); packages are hatchling-built with no compiled-extension sources under libs/ (libs/langgraph/pyproject.toml:1-3,133-134); the Docker deploy path targets linux/amd64 (libs/cli/langgraph_cli/deploy.py:100).",
+        "wsl2": "unknown - no mention of WSL anywhere in the repo (searched) and no Windows runner in CI; the CLI has a win32 signal-handling branch (libs/cli/langgraph_cli/exec.py:70-77), which is not a support statement.",
+        "macos_arm64": "unknown - no macOS or ARM runner in any workflow and no support statement; the CLI has non-x86_64 handling that requires Docker Buildx to cross-build linux/amd64 images (libs/cli/langgraph_cli/docker.py:80-94; libs/cli/langgraph_cli/deploy.py:1163-1170); macOS appears only as a .DS_Store entry in the generated .dockerignore (libs/cli/langgraph_cli/cli.py:516).",
+        "gpu": "no - no GPU/CUDA/torch code or docs under libs/ (searched gpu|cuda|nvidia|torch: no matches); the framework orchestrates calls to user-chosen models and does not run inference itself."
+      },
+      "integrations": {
+        "cli": "yes - `langgraph` console script (libs/cli/pyproject.toml:36-37; also `python -m langgraph_cli`, libs/cli/langgraph_cli/__main__.py:1-4) with commands new, dev, up, build, dockerfile, validate (libs/cli/langgraph_cli/cli.py:276,412,529,758,871,918) and a [Beta] deploy group: deploy, deploy list, deploy revisions list, deploy delete, deploy logs (libs/cli/langgraph_cli/deploy.py:2153-2183,2380,2433,2468,2558). dev, up and deploy depend on components outside this repo (see telemetry_and_network).",
+        "mcp": "none in this repo's code - no MCP server or client implementation. The closed-source LangGraph Server exposes /mcp (and /a2a) routes by default, switchable with `http.disable_mcp` / `http.disable_a2a` in langgraph.json (libs/cli/langgraph_cli/schemas.py:471-480); docs redirect for 'server-mcp' at docs/redirects.json:168. MCP appears only in docstring examples where user code connects to MCP servers (libs/sdk-py/langgraph_sdk/runtime.py:194-220) and in a prebuilt test that passes a provider-native {'type': 'mcp', ...} tool dict (libs/prebuilt/tests/test_react_agent.py:313-327).",
+        "sdk_or_api": "yes - Python library API: StateGraph/compile (libs/langgraph/langgraph/graph/state.py:131,1177), @task/@entrypoint (libs/langgraph/langgraph/func/__init__.py:132,262), Pregel (libs/langgraph/langgraph/pregel/main.py:450), RemoteGraph (libs/langgraph/langgraph/pregel/remote.py:118). Python SDK for the LangGraph Server REST/SSE/WebSocket API: get_client (async) and get_sync_client with assistants, threads, runs (create/wait/stream/join/cancel), crons and store clients (libs/sdk-py/langgraph_sdk/__init__.py:1-15; libs/sdk-py/langgraph_sdk/_async/client.py:29-176; libs/sdk-py/langgraph_sdk/_async/runs.py:56-1156) plus thread-centric streaming (libs/sdk-py/README.md:59-88). The HTTP server itself is not in this repo; the JS SDK moved to langchain-ai/langgraphjs (libs/sdk-js/README.md:7).",
+        "claude_code_or_codex": "none found - searches for 'claude code', codex, CLAUDE.md, .claude/, .cursor/, .codex/, .mcp.json, SKILL.md and for OpenAI-Agents-SDK / Claude-Agent-SDK names returned no matches. The only agent-facing file is AGENTS.md, contributor instructions for agents editing this repo (AGENTS.md:1-27, plus an optional 'Corridor' security-analysis hook at AGENTS.md:5-11); it is not an integration."
+      },
+      "telemetry_and_network": "CLI TELEMETRY (on by default): eight CLI entry points are wrapped by @log_command - up, build, dockerfile, dev, validate, new, the deploy group callback (so deploy subcommands pass through it) and deploy logs (libs/cli/langgraph_cli/cli.py:277,418,549,762,872,919; libs/cli/langgraph_cli/deploy.py:2168,2565). Unless LANGGRAPH_CLI_NO_ANALYTICS is exactly '1', each call starts a background thread that POSTs JSON {os, os_version, python_version, cli_version, cli_command, params} to https://kzrlppojinpcyyaipxnb.supabase.co/rest/v1/logs with a hard-coded public anon key (libs/cli/langgraph_cli/analytics.py:20-26,65-105; libs/cli/langgraph_cli/constants.py:5-6). params are anonymised flags (whether config/port/docker_compose/debugger_port/postgres_uri were set; values of recreate/pull/watch/wait/verbose) plus an optional `source` tag from LANGGRAPH_CLI_ANALYTICS_SOURCE for deploy (analytics.py:29-62). The opt-out variable is not mentioned in any README or doc (only analytics.py:89 and a test conftest). urlopen has no explicit timeout, runs in a non-daemon thread, and only URLError is caught (analytics.py:80-83,101-102).\n\nACCOUNTS / SERVICES: `langgraph up` states that local dev requires LANGSMITH_API_KEY 'with access to LangSmith Deployment' and production requires LANGGRAPH_CLOUD_LICENSE_KEY (cli.py:296-299); it starts a compose stack of redis:6, pgvector/pgvector:pg16 and the langchain/langgraph-api image (docker.py:219-299; config.py:1554-1563) and prints a smith.langchain.com Studio link (cli.py:340-355). `langgraph dev` needs the separate langgraph-api and langgraph-runtime-inmem packages (not in this repo; libs/cli/pyproject.toml:24-28), opens a browser by default (--no-browser), defaults --studio-url to https://smith.langchain.com and offers a Cloudflare --tunnel (cli.py:691-727). `langgraph deploy` ([Beta]) requires a LangSmith API key (prompts if missing), calls https://api.host.langchain.com, uploads .env values as deployment secrets, uploads a source tarball to a signed storage URL or pushes an image to a registry, and reports `tracked_packages` (currently only google-adk) (deploy.py:732-744,1070-1097,1263-1324,1792-1830,2155-2158,2270; host_backend.py:12-13; dependency_tracking.py:15-17). The source archive excludes only a fixed directory list plus .gitignore/.dockerignore patterns, so .env is excluded only if ignored (libs/cli/langgraph_cli/_ignore.py:8-56; archive.py:105). `langgraph new` downloads unpinned main.zip archives from github.com/langchain-ai (templates.py:10-25,104-107). A PyPI JSON lookup happens only when a compatible api_version range is configured (config.py:230-247,276).\n\nLIBRARIES: libs/langgraph, libs/prebuilt and libs/checkpoint contain no analytics code and import no HTTP/socket clients except a lazy httpx/requests import used to classify retryable errors (libs/langgraph/langgraph/_internal/_retry.py:1-10). LangSmith tracing is delegated to langchain-core/langsmith (external packages); this repo only adds `ls_integration` metadata, tags and TracePolicy (libs/langgraph/langgraph/pregel/main.py:2790-2791; types.py:541-576), so whether tracing is enabled depends on those packages' environment settings (not verified here). RemoteGraph defaults distributed_tracing=False (pregel/remote.py:144). The SDK sends x-api-key taken from LANGGRAPH_API_KEY / LANGSMITH_API_KEY / LANGCHAIN_API_KEY and refuses cross-origin reconnect Location headers (libs/sdk-py/langgraph_sdk/_shared/utilities.py:26-69,167-194). Persistence backends need only user-supplied SQLite/Postgres/Redis; no account is required by the library code itself."
+    },
+    "code": {
+      "languages": [
+        "Python (>=3.10; all shipped packages)",
+        "TypeScript/JavaScript (CLI example projects only: libs/cli/js-examples, libs/cli/js-monorepo-example)",
+        "Jupyter notebooks (archival stubs only: examples/)"
+      ],
+      "entry_points": [
+        {
+          "path": "libs/cli/pyproject.toml:36-37 -> libs/cli/langgraph_cli/cli.py:230-237",
+          "what": "`langgraph` console script (click group `cli`): new, dev, up, build, dockerfile, validate, deploy (+ deploy list/revisions list/delete/logs); also `python -m langgraph_cli` (libs/cli/langgraph_cli/__main__.py:1-4)"
+        },
+        {
+          "path": "libs/langgraph/langgraph/graph/state.py:131,1177",
+          "what": "StateGraph builder and .compile(checkpointer, store, cache, interrupt_before/after) -> CompiledStateGraph (Graph API); node defaults via set_node_defaults (retry/cache/error_handler/timeout, state.py:272-335)"
+        },
+        {
+          "path": "libs/langgraph/langgraph/func/__init__.py:132,262",
+          "what": "Functional API: @task and @entrypoint"
+        },
+        {
+          "path": "libs/langgraph/langgraph/pregel/main.py:450",
+          "what": "Pregel runtime: invoke/ainvoke/stream/astream/astream_events, get_state/get_state_history/update_state/bulk_update_state (main.py:1392,1480,2515,1590)"
+        },
+        {
+          "path": "libs/langgraph/langgraph/pregel/remote.py:118",
+          "what": "RemoteGraph: client for a LangGraph Server; usable as a node in another graph"
+        },
+        {
+          "path": "libs/sdk-py/langgraph_sdk/__init__.py:1-15",
+          "what": "get_client / get_sync_client (assistants, threads, runs, crons, store), Auth, Encryption"
+        },
+        {
+          "path": "libs/prebuilt/langgraph/prebuilt/__init__.py:1-23",
+          "what": "ToolNode, ValidationNode, create_react_agent (deprecated), InjectedState/InjectedStore/ToolRuntime, tools_condition"
+        },
+        {
+          "path": "external (not in this repo): langgraph_api.cli.run_server / langgraph_api.server:app",
+          "what": "Server main used by `langgraph dev` (libs/cli/langgraph_cli/cli.py:791) and by the SDK's in-process transport (libs/sdk-py/langgraph_sdk/_async/client.py:117); described as a closed-source server runtime (.github/THREAT_MODEL.md:25)"
+        }
+      ],
+      "architecture": "Monorepo of 8 Python packages under libs/ with editable path sources between them (libs/langgraph/pyproject.toml:83-89; dependency map at AGENTS.md:41-61).\n- libs/langgraph/langgraph: graph/state.py (StateGraph builder), func/ (functional API), pregel/ (runtime: main.py Pregel; _loop.py sync/async super-step loop with checkpoint load, put_writes and resume logic; _algo.py task planning and apply_writes; _runner.py + _executor.py task execution on a thread pool or asyncio; _retry.py; remote.py RemoteGraph), channels/ (LastValue, Topic, BinaryOperatorAggregate, EphemeralValue, NamedBarrierValue, DeltaChannel ...), types.py (Command, Send, interrupt, RetryPolicy, TimeoutPolicy, CachePolicy, Durability), runtime.py (Runtime, RunControl), stream/ (v3 event streaming).\n- libs/checkpoint/langgraph: checkpoint/base (BaseCheckpointSaver), checkpoint/memory (InMemorySaver), checkpoint/serde (JsonPlusSerializer msgpack/json, SAFE_MSGPACK_TYPES allowlist, EncryptedSerializer), store/ (BaseStore, InMemoryStore, TTL and vector IndexConfig), cache/ (memory, redis). libs/checkpoint-sqlite and libs/checkpoint-postgres add SqliteSaver/AsyncSqliteSaver/SqliteStore and PostgresSaver/AsyncPostgresSaver/PostgresStore; libs/checkpoint-conformance is a conformance suite for checkpointers.\n- libs/prebuilt/langgraph/prebuilt: tool_node.py (ToolNode: tools are looked up by registered name and unknown names return an error ToolMessage, :1268-1279; wrap_tool_call interceptors, :202-277), chat_agent_executor.py (create_react_agent, deprecated), tool_validator.py, interrupt.py (Agent Inbox schemas).\n- libs/sdk-py/langgraph_sdk: _async/_sync httpx clients, stream/ (SSE/WebSocket thread streaming), auth/ and encryption/ (server-side hook frameworks), runtime.py, schema.py.\n- libs/cli/langgraph_cli: cli.py, deploy.py, docker.py (compose: redis + pgvector postgres + langgraph-api), config.py (langgraph.json validation and Dockerfile generation), host_backend.py (control-plane HTTP client), analytics.py, templates.py, archive.py.\nExecution model: nodes and tools run in the caller's process (thread pool for sync, asyncio tasks for async: pregel/_executor.py:40-76,122-169). There is no sandbox, subprocess, container or resource-limit code in libs/langgraph or libs/prebuilt (searches for sandbox/subprocess/docker/exec/eval: no matches) and the threat model treats user node code as trusted (.github/THREAT_MODEL.md:427). Isolation exists only as per-thread_id checkpoint namespaces and, via the CLI, container packaging of the closed-source server image. Bounded-execution controls present: recursion_limit (default 10007, env LANGGRAPH_DEFAULT_RECURSION_LIMIT; _internal/_config.py:32), max_concurrency (async executor semaphore, pregel/_executor.py:135-138), RetryPolicy, TimeoutPolicy (async nodes only; _internal/_timeout.py:8-11), interrupt_before/after and interrupt() (needs a checkpointer; types.py:908-909), RunControl cooperative drain (runtime.py:79-104). Provider models plug in through langchain-core BaseChatModel objects or '<provider>:<model>' strings resolved by the separate `langchain` package's init_chat_model (prebuilt/chat_agent_executor.py:563-580); provider-native dict tools are bound to the model and bypass ToolNode (chat_agent_executor.py:559-561). Documentation is hosted on docs.langchain.com; docs/ in the repo holds only redirect tooling and llms.txt (docs/llms.txt:1-49), and the examples/ notebooks are archival stubs (examples/README.md:3).",
+      "packaging_and_release": "Eight hatchling-built Python packages; manifest versions at this revision: langgraph 1.2.12, langgraph-prebuilt 1.1.0, langgraph-checkpoint 4.2.0, langgraph-checkpoint-postgres 3.1.2, langgraph-checkpoint-sqlite 3.1.1, langgraph-sdk 0.4.5 (dynamic, libs/sdk-py/langgraph_sdk/__init__.py:6), langgraph-cli 0.4.32.dev0 (dynamic, libs/cli/langgraph_cli/__init__.py:1), langgraph-checkpoint-conformance 0.0.2 (publication on PyPI not verified here). No compiled-extension sources found under libs/. Release workflow .github/workflows/release.yml is manual (workflow_dispatch with a working-directory input, :3-9): `uv build` in a build job kept separate from publishing (:18-57) -> TestPyPI publish via _test_release.yml (:142-152; _test_release.yml:64-97) -> pre-release job that installs from TestPyPI and runs `make test` (:154-243) -> PyPI publish with pypa/gh-action-pypi-publish using OIDC trusted publishing (id-token: write), print-hash: true and `attestations: false` (:245-287) -> GitHub Release via ncipollo/release-action with dist/* attached and tag `<pkg>==<version>` (core package uses the bare version) (:59-81,289-331). Searching .github found no checksum files, signatures, SBOM or provenance steps other than the `attestations: false` lines. Third-party actions are pinned by commit SHA; Dependabot (monthly: GitHub Actions, uv, npm; .github/dependabot.yml) and a weekly `uv lock --upgrade` PR workflow (.github/workflows/uv_lock_ugprade.yml:3-8) handle updates; uv.lock is committed for all 8 libs. Docker images (langchain/langgraph-api etc.) and the server are neither built nor released from this repo.",
+      "tests_and_ci": "pytest throughout (pytest-asyncio, syrupy snapshots, pytest-xdist, pytest-repeat; pyperf for benchmarks); ruff + ty for lint/type-check (Makefiles). About 154 test_*.py files in this shallow, blob-limited clone: libs/langgraph/tests 51, libs/sdk-py/tests 58 (19 in tests/integration need a running server and are excluded by default, libs/sdk-py/pyproject.toml:55), libs/cli/tests 14, libs/prebuilt/tests 10, libs/checkpoint-sqlite/tests 8, libs/checkpoint/tests 6, libs/checkpoint-postgres/tests 6, libs/checkpoint-conformance/tests 1; plus 11 server integration scripts in libs/sdk-py/integration/scripts. Workflows (.github/workflows): ci.yml (push to main, PR, manual; path-filtered; lint on 8 libs, test on 7 libs, test-langgraph, check-sdk-methods, check-schema for CLI schema drift, CLI Docker integration test, sdk-py integration test, aggregate ci_success: ci.yml:25-198); _test.yml and _test_langgraph.yml run `uv sync --frozen --group test` then `make test` / `make test_parallel` on Python 3.10-3.14 on ubuntu-latest and fail if tests dirty the working tree (core also reruns tests/test_pregel*.py with LANGGRAPH_STRICT_MSGPACK=true on 3.13: _test_langgraph.yml:44-53); core test_parallel starts Postgres+Redis via docker compose and a `langgraph dev` server (libs/langgraph/Makefile:40-83); Postgres saver tests run against PG 15 and 16 (libs/checkpoint-postgres/Makefile:17-34); _lint.yml (Python 3.12 only); _integration_test.yml builds Docker images from libs/cli examples with `langgraph build` on Python 3.10 and 3.14 and runs them only if a LANGSMITH_API_KEY secret exists; _sdk_integration_test.yml (docker compose stack, skipped without the secret, e.g. fork PRs: :46-50); bench.yml/baseline.yml (pyperf micro-benchmarks in libs/langgraph/bench compared against main, reported as annotations only); release.yml/_test_release.yml; uv_lock_ugprade.yml; deploy-redirects.yml; pr_lint.yml; triage workflows (require_issue_link.yml, tag-external-issues.yml, tag-external-prs.yml, reopen_on_assignment.yml). All jobs use ubuntu-latest; no macOS/Windows/ARM runners and no CodeQL or other security-scanning workflow. The check-sdk-methods job parses libs/sdk-py/langgraph_sdk/client.py for class definitions (.github/scripts/check_sdk_methods.py:7,36-65), but that file now only re-exports classes (no `class` statements), so the job passes vacuously at this revision; sync/async parity is covered by libs/sdk-py/tests/test_api_parity.py. Classifiers list Python 3.10-3.13 (libs/langgraph/pyproject.toml:21-24) while CI also tests 3.14.",
+      "dependencies": "Direct runtime dependencies per manifest: libs/langgraph/pyproject.toml:26-33 -> 6 (langchain-core>=1.4.7,<2; langgraph-checkpoint>=4.1.0,<5; langgraph-sdk>=0.4.2,<0.5; langgraph-prebuilt>=1.1.0,<1.2; xxhash; pydantic>=2.7.4); libs/prebuilt/pyproject.toml:26-29 -> 2 (langgraph-checkpoint, langchain-core); libs/checkpoint/pyproject.toml:14-17 -> 2 (langchain-core, ormsgpack); libs/checkpoint-postgres/pyproject.toml:14-19 -> 4 (langgraph-checkpoint, orjson, psycopg, psycopg-pool); libs/checkpoint-sqlite/pyproject.toml:14-18 -> 3 (langgraph-checkpoint, aiosqlite, sqlite-vec); libs/checkpoint-conformance/pyproject.toml:13-15 -> 1 (langgraph-checkpoint); libs/sdk-py/pyproject.toml:14-20 -> 5 (httpx, orjson, langchain-protocol, langchain-core, websockets); libs/cli/pyproject.toml:14-21 -> 6 (click, httpx, langgraph-sdk [py>=3.11], pathspec, python-dotenv, tomli [py<3.11]) plus an optional `inmem` extra of 2 (langgraph-api, langgraph-runtime-inmem; py>=3.11; :24-28). Dev dependency groups (not shipped): langgraph test 23 / lint 3 (+jupyter in dev), prebuilt test 11 / lint 3, checkpoint test 9 / lint 3, checkpoint-postgres test 8 / lint 3, checkpoint-sqlite test 7 / lint 3, conformance test 2 / lint 2, sdk-py test 4 / lint 4, cli test 5 / lint 3. uv.lock is committed for all 8 libs. Transitively, langchain-core pulls langsmith, which pulls requests (libs/langgraph/uv.lock:1406-1413,1938-1952); langgraph-api and langgraph-runtime-inmem are external to the repo. Example/fixture manifests (libs/cli/examples/**, libs/cli/uv-examples/**, libs/cli/python-monorepo-example, libs/cli/js-examples/package.json) are not product dependencies.",
+      "security_policy": "none - no SECURITY.md or similar file exists anywhere in the tree (globs for SECURITY*/security* found nothing). .github/THREAT_MODEL.md (auto-generated 2026-03-28 for commit 0ba22143, 'experimental ... not an authoritative security reference', :3-5) tells reporters to use GitHub Security Advisories (:7) and lists five published advisories, three of them CWE-502 deserialization (:458-466)."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:39 - Durable execution: agents 'persist through failures ... automatically resuming from exactly where they left off'.",
+        "verified": "partial",
+        "evidence": "Persistence is real: checkpointers save state per superstep (libs/checkpoint/README.md:19) with durability modes sync/async/exit, default 'async' (libs/langgraph/langgraph/types.py:98-104; pregel/main.py:2705-2711), and per-task pending writes are stored so completed siblings are not re-run (libs/checkpoint/README.md:57-59; pregel/_loop.py:415-508, skipped when durability='exit' at :466). But resumption is not automatic: it needs a prior checkpoint and the caller re-invoking with the same thread_id and None/Command input (pregel/_loop.py:848-872); there is no supervisor or restart logic in the library; an interrupted node re-executes from its start (types.py:900-902); `durability` has no effect without a checkpointer (pregel/main.py:2802-2805). The SDK exposes background runs, join/cancel and stream_resumable (libs/sdk-py/langgraph_sdk/_async/runs.py:83,943,1060), but server-side execution and recovery are outside this repo and were not checked."
+      },
+      {
+        "claim": "README.md:40 - Human-in-the-loop: 'inspecting and modifying agent state at any point during execution'.",
+        "verified": "yes",
+        "evidence": "interrupt() pauses a node, surfaces a value and resumes via Command(resume=...); it requires a checkpointer (libs/langgraph/langgraph/types.py:887-1029, esp. 900-909). interrupt_before/interrupt_after exist on compile and stream (libs/langgraph/langgraph/graph/state.py:1183-1184; pregel/main.py:2664-2665). State is read and edited with get_state, get_state_history, update_state and bulk_update_state (pregel/main.py:1392,1480,2515,1590); update_state applies values 'as if they came from node as_node' and bulk_update_state raises without a checkpointer (main.py:1595-1617,2522-2526). Edits happen at checkpoint/superstep boundaries, not mid-node."
+      },
+      {
+        "claim": "README.md:41 - Comprehensive memory: short-term working memory plus long-term persistent memory across sessions.",
+        "verified": "yes",
+        "evidence": "Short-term: checkpointers InMemorySaver (libs/checkpoint/langgraph/checkpoint/memory/__init__.py:33), SqliteSaver/AsyncSqliteSaver (libs/checkpoint-sqlite/langgraph/checkpoint/sqlite/__init__.py:45; aio.py:38), PostgresSaver/AsyncPostgresSaver (libs/checkpoint-postgres/langgraph/checkpoint/postgres/__init__.py:40; aio.py:40). Long-term: BaseStore with get/search/put/delete/list_namespaces, TTLConfig and vector IndexConfig (libs/checkpoint/langgraph/store/base/__init__.py:545,578,708), implemented by InMemoryStore (store/memory/__init__.py:136), PostgresStore (libs/checkpoint-postgres/langgraph/store/postgres/base.py:667) and SqliteStore (libs/checkpoint-sqlite/langgraph/store/sqlite/base.py:787). Caveats in docstrings: InMemorySaver is for debugging/testing only (memory/__init__.py:40-44); SqliteSaver is for lightweight use and 'does not scale to multiple threads' (sqlite/__init__.py:48-53); stored state is unencrypted by default (.github/THREAT_MODEL.md:131-132)."
+      },
+      {
+        "claim": "README.md:42 - Debugging with LangSmith: 'visualization tools that trace execution paths, capture state transitions, and provide detailed runtime metrics'.",
+        "verified": "partial",
+        "evidence": "Only tracing hooks are in this repo: `ls_integration: langgraph` metadata (libs/langgraph/langgraph/pregel/main.py:2790-2791), TracePolicy/omit_payload (types.py:541-576), tracing-context propagation via langsmith.run_helpers (_internal/_runnable.py:91-114) and a hidden-tag constant (constants.py:26). The visualization, runtime metrics and Studio UI belong to the hosted LangSmith product and are not in the repo (the CLI only prints a smith.langchain.com Studio link, libs/cli/langgraph_cli/cli.py:340-355)."
+      },
+      {
+        "claim": "README.md:43,57 - Production-ready deployment on 'scalable infrastructure' / 'a purpose-built deployment platform'.",
+        "verified": "partial",
+        "evidence": "The repo supplies CLI packaging only: docker-compose generation with redis + pgvector postgres + langgraph-api (libs/cli/langgraph_cli/docker.py:190-301) and Dockerfile generation (config.py). The server runtime is the separate langchain/langgraph-api image (config.py:1554-1563), described as closed-source (.github/THREAT_MODEL.md:25); its base image is the 'licensed' variant that needs LANGSMITH_API_KEY or LANGGRAPH_CLOUD_LICENSE_KEY (libs/sdk-py/integration/Dockerfile:3-14; cli.py:296-299). `langgraph deploy` is labelled '[Beta]' and targets the hosted LangSmith control plane (deploy.py:2155-2158; host_backend.py:12). Scalability is not checkable from this repo."
+      },
+      {
+        "claim": "README.md:31,54 - Deep Agents is a higher-level package 'for agents that can plan, use subagents, and leverage file systems'.",
+        "verified": "not_checkable",
+        "evidence": "No deepagents source exists in this repo; it appears only in the README, as a test dependency (libs/sdk-py/integration/Dockerfile:18-23) and in a fixture graph that uses scripted fake models (libs/sdk-py/integration/graph/deep_agent.py:1-21), and as a `langgraph new` template downloaded from a separate GitHub repo (libs/cli/langgraph_cli/templates.py:11-15). The package's capabilities (planning, subagents, filesystem, any sandboxing) could not be checked here."
+      },
+      {
+        "claim": "README.md:82 - LangGraph 'can be used without LangChain'.",
+        "verified": "partial",
+        "evidence": "True for the `langchain` package, false for langchain-core: libs/langgraph/pyproject.toml:27 requires langchain-core>=1.4.7,<2 and langchain_core is imported on 83 lines across 32 files of libs/langgraph/langgraph (e.g. pregel/main.py, graph/state.py, types.py). langchain-core pulls langsmith, which pulls requests (libs/langgraph/uv.lock:1406-1413,1938-1952). The `langchain` package is imported only lazily (string model ids via init_chat_model, libs/prebuilt/langgraph/prebuilt/chat_agent_executor.py:569-580; embeddings in stores, e.g. libs/checkpoint/langgraph/store/memory/__init__.py:146)."
+      },
+      {
+        "claim": "libs/checkpoint/README.md:54-55 - 'By default the serializer allows any Python type found in checkpoint data'; strict mode is opt-in.",
+        "verified": "yes",
+        "evidence": "JsonPlusSerializer sets allowed_msgpack_modules=True (permissive, warn-only) unless LANGGRAPH_STRICT_MSGPACK is true or an allowlist is passed (libs/checkpoint/langgraph/checkpoint/serde/jsonplus.py:107-114; serde/_msgpack.py:12-16). The module docstring says that without strict mode 'any Python callable stored in checkpoint data will be imported and executed on load' (_msgpack.py:3-5). Pickle fallback is off by default (jsonplus.py:100). CI reruns only the core pregel tests in strict mode, on Python 3.13 (.github/workflows/_test_langgraph.yml:48-53)."
+      },
+      {
+        "claim": "libs/sdk-py/README.md:21,30-33 - the SDK 'will automatically point at http://localhost:8123' for a local langgraph-cli server (quick start uses async get_client()).",
+        "verified": "partial",
+        "evidence": "Code differs from the README. Async get_client() with no url builds an in-process ASGI transport against base URL http://api that only works inside the Agent server (libs/sdk-py/langgraph_sdk/_async/client.py:41-46,109-126). Only get_sync_client() defaults to http://localhost:8123 (libs/sdk-py/langgraph_sdk/_sync/client.py:72-73). `langgraph dev` listens on 2024 by default while 8123 is `langgraph up`'s default (libs/cli/langgraph_cli/cli.py:668-673; constants.py:2). Prefer the code: pass url= explicitly."
+      },
+      {
+        "claim": "libs/prebuilt/README.md:19,28-58 - langgraph-prebuilt includes `create_react_agent`, shown as the primary agent example.",
+        "verified": "partial",
+        "evidence": "The function exists but is decorated @deprecated ('create_react_agent has been moved to langchain.agents ... use create_agent') and its docstring warns of the deprecation (libs/prebuilt/langgraph/prebuilt/chat_agent_executor.py:274-277,311-317); the README does not mention this. ToolNode's docstring likewise sends standard ReAct agents to langchain.agents.create_agent (libs/prebuilt/langgraph/prebuilt/tool_node.py:633-635). Code differs from README; prefer the code."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "No sandbox or isolation in the project. Nodes and tools run in the caller's process (thread pool / asyncio: libs/langgraph/langgraph/pregel/_executor.py:40-76,122-169); searches of libs/langgraph and libs/prebuilt found no sandbox/subprocess/docker/exec/eval code; the threat model treats user node code as trusted and prompt-injection-driven tool execution as out of scope (.github/THREAT_MODEL.md:421-427); node timeouts work only for async nodes because sync code 'cannot be safely cancelled in-process' (libs/langgraph/langgraph/_internal/_timeout.py:8-11); thread_id is the only state-isolation key and there is no in-library auth (THREAT_MODEL.md:423). Any isolated-worker requirement would have to be met outside this repo.",
+      "No model-harness, coding-agent or research capability in the repo. There is no reference to GPT-6.x/'Sol' and no OpenAI Agents SDK, Claude Agent SDK, Claude Code or Codex integration (searches: no matches); models enter only as langchain-core chat models or '<provider>:<model>' strings that need the separate `langchain` package (libs/prebuilt/langgraph/prebuilt/chat_agent_executor.py:563-580). Deep Agents is a separate package (README.md:31). The only research-with-citations code is the example graph libs/cli/examples/graphs/storm.py (Tavily search + gpt-4o; citations are LLM-reported URLs filtered to retrieved ones, storm.py:277-289,312-353), and the notebooks under examples/ are archival stubs (examples/README.md:3).",
+      "Resume semantics are caller-driven, and the interrupted or failed node re-runs from its start. Resuming needs a checkpoint plus re-invocation with the same thread_id and None/Command input (libs/langgraph/langgraph/pregel/_loop.py:848-872), so side-effecting tools must be idempotent (types.py:900-902). Durability defaults to 'async' and 'exit' persists only when the graph exits (pregel/main.py:2705-2711; _loop.py:466). InMemorySaver is debug/test only (libs/checkpoint/langgraph/checkpoint/memory/__init__.py:40-44), SqliteSaver 'does not scale to multiple threads' (libs/checkpoint-sqlite/langgraph/checkpoint/sqlite/__init__.py:48-53), and checkpoint retention is unbounded by default (.github/THREAT_MODEL.md:396).",
+      "Licensing/commercial boundary: the MIT repo does not contain the server runtime. `langgraph up`, `langgraph dev`, `langgraph deploy` and the SDK's in-process mode depend on langgraph-api images/packages described as closed-source (.github/THREAT_MODEL.md:25); the base image is the 'licensed' variant needing LANGSMITH_API_KEY or LANGGRAPH_CLOUD_LICENSE_KEY at runtime (libs/sdk-py/integration/Dockerfile:3-14; libs/cli/langgraph_cli/cli.py:296-299); distributed mode uses langchain/langgraph-orchestrator-licensed (config.py:1747-1748). All 8 manifests declare MIT, but libs/checkpoint-conformance ships no LICENSE file of its own (libs/checkpoint-conformance/pyproject.toml:12).",
+      "Default-on CLI telemetry with an undocumented opt-out. Eight CLI entry points post OS, Python and CLI versions, command name and anonymised flags to a third-party Supabase endpoint unless LANGGRAPH_CLI_NO_ANALYTICS is exactly '1' (libs/cli/langgraph_cli/analytics.py:65-105; constants.py:5-6); the variable appears in no README or doc, the call has no explicit timeout and runs in a non-daemon thread (analytics.py:81,101-102). `langgraph deploy` additionally uploads .env values as secrets and a source tarball that excludes .env only if it is gitignored/dockerignored (libs/cli/langgraph_cli/deploy.py:732-744,2270; _ignore.py:8-56).",
+      "Deserialization and encryption weaknesses in persistence. Checkpoint deserialization is permissive by default, so write access to the checkpoint DB can mean code execution unless LANGGRAPH_STRICT_MSGPACK=true (libs/checkpoint/langgraph/checkpoint/serde/_msgpack.py:1-16; jsonplus.py:107-114). EncryptedSerializer accepts payloads without a cipher suffix undecrypted (encrypted.py:29-30) and checks the cipher with `assert` (encrypted.py:72). The threat model lists five published advisories, three of them CWE-502 (.github/THREAT_MODEL.md:458-466).",
+      "Local-dev and supply-chain defaults in the CLI. The generated compose publishes Postgres on host port 5433 with postgres:postgres credentials (libs/cli/langgraph_cli/docker.py:15-17,233-240); `langgraph new` downloads unpinned main.zip template archives with no checksum or signature check and uses extractall (libs/cli/langgraph_cli/templates.py:10-25,104-107; threat-model T6 'Unverified', .github/THREAT_MODEL.md:324); langgraph.json may inject arbitrary dockerfile_lines and git+https dependencies (libs/cli/langgraph_cli/schemas.py:674-695), with only build/install commands filtered for shell metacharacters (config.py:72-78).",
+      "Maintenance, platform and release provenance. API churn: create_react_agent is deprecated in favour of langchain.agents.create_agent (libs/prebuilt/langgraph/prebuilt/chat_agent_executor.py:274-277), checkpoint_during is replaced by durability (pregel/main.py:2725-2735), `langgraph deploy` is '[Beta]' and --agent-id 'private beta' (libs/cli/langgraph_cli/deploy.py:2155-2158,2229), the SDK is 0.x and pinned <0.5.0 by core (libs/sdk-py/langgraph_sdk/__init__.py:6; libs/langgraph/pyproject.toml:29), and this revision is a CLI dev-cycle start (libs/cli/langgraph_cli/__init__.py:1). The auto-generated threat model is partly stale (its T9 redirect/API-key leak is mitigated in code at libs/sdk-py/langgraph_sdk/_shared/utilities.py:167-194; .github/THREAT_MODEL.md:5,327). CI runs only on ubuntu-latest (no macOS/WSL/Windows/ARM) and the check-sdk-methods job is vacuous (.github/scripts/check_sdk_methods.py:7,36-65). Releases are manual with PyPI attestations disabled and no checksum/signature artifacts (.github/workflows/release.yml:3-9,286-287), `langgraph dev` needs Python >=3.11 (libs/cli/pyproject.toml:24-28), and there is no SECURITY.md."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "langchain-ai/langgraph",
+      "checks": [
+        {
+          "field": "readme.install[0] (pip, root README quick install)",
+          "statement": "pip install -U langgraph",
+          "citation": "README.md:26-28",
+          "holds": true,
+          "note": "README.md:26-28 is a bash code fence containing exactly `pip install -U langgraph`; the distribution name matches libs/langgraph/pyproject.toml:6 (name = \"langgraph\")."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, file LICENSE",
+          "citation": "LICENSE:1-21",
+          "holds": true,
+          "note": "Root LICENSE is the standard MIT License text, 'Copyright (c) 2024 LangChain, Inc.'. All 8 libs/*/pyproject.toml declare license = \"MIT\" at line 12. Only libs/checkpoint-conformance has no license-files entry and no LICENSE of its own, which the dossier's risks section already says."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - every CI test/lint/release job runs on ubuntu-latest; packages are hatchling-built with no compiled-extension sources under libs/; the Docker deploy path targets linux/amd64",
+          "citation": ".github/workflows/_test.yml:16, .github/workflows/_test_langgraph.yml:11, .github/workflows/release.yml:19; libs/langgraph/pyproject.toml:1-3,133-134; libs/cli/langgraph_cli/deploy.py:100",
+          "holds": true,
+          "note": "All three cited workflow lines are `runs-on: ubuntu-latest`, and all 26 runs-on lines under .github are ubuntu-latest (no macOS, Windows or ARM label). pyproject.toml:1-3 sets the hatchling build backend; :133-134 is the hatch wheel target packages=[\"langgraph\"]. Globs under libs/ for .c/.h/.cpp/.pyx/.pxd/.rs/.go sources and for setup.py/Cargo.toml/CMakeLists.txt/meson.build/build.rs found nothing. deploy.py:100 is `_DEPLOYMENT_PLATFORM = \"linux/amd64\"`."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "yes - `langgraph` console script (also python -m langgraph_cli) with commands new, dev, up, build, dockerfile, validate and a [Beta] deploy group: deploy, deploy list, deploy revisions list, deploy delete, deploy logs; dev, up and deploy depend on components outside this repo",
+          "citation": "libs/cli/pyproject.toml:36-37; libs/cli/langgraph_cli/__main__.py:1-4; libs/cli/langgraph_cli/cli.py:276,412,529,758,871,918; libs/cli/langgraph_cli/deploy.py:2153-2183,2380,2433,2468,2558",
+          "holds": true,
+          "note": "[project.scripts] langgraph = \"langgraph_cli.cli:cli\" (pyproject:36-37); __main__.py:1-4 imports and calls cli(). The cited cli.py lines are the @cli.command decorators for up (276), build (412), dockerfile (529), dev (758), validate (871) and new (918). The dossier lists the names in a different order from the line numbers, but the set matches. deploy.py:2153-2183 is the click group with help '[Beta] Build and deploy a LangGraph image to LangSmith Deployment', added to the CLI at cli.py:237 (cli.add_command(deploy)). 2380 is deploy list; 2433 is revisions list (group 'revisions' at 2416); 2468 is delete; 2558 is logs. Outside-repo dependence: the inmem extra pulls langgraph-api and langgraph-runtime-inmem (pyproject:24-28), and up's --base-image defaults to langchain/langgraph-api (cli.py:267)."
+        },
+        {
+          "field": "claim_checks[0] (README.md:39 durable execution, verified: partial)",
+          "statement": "Durable execution ('persist through failures ... automatically resuming from exactly where they left off') is partial. Per-superstep checkpoints and pending writes are real, with durability sync/async/exit defaulting to async. Resumption is caller-driven, an interrupted node re-runs from its start, and durability has no effect without a checkpointer.",
+          "citation": "README.md:39; libs/checkpoint/README.md:19,57-59; libs/langgraph/langgraph/types.py:98-104,900-902; libs/langgraph/langgraph/pregel/main.py:2705-2711,2802-2805; libs/langgraph/langgraph/pregel/_loop.py:415-508,466,848-872; libs/sdk-py/langgraph_sdk/_async/runs.py:83,943,1060",
+          "holds": true,
+          "note": "Every citation matches. README.md:39 has the quoted wording. Checkpoint README:19 says state is saved at every superstep, and :57-59 says completed nodes' pending writes are stored so they are not re-run. types.py:98-104 is Durability = Literal['sync','async','exit']. The :2705 docstring says the default is \"async\", and the code agrees (main.py:2603). put_writes (_loop.py:415-508) skips persistence when durability == 'exit' (:466). _loop.py:851-872 requires a prior checkpoint plus None or Command input; the code also accepts same-run_id re-entry (e.g. stream reconnect, :858,866-870), which the dossier omits, but that is still caller-driven. types.py:902: 'The graph resumes from the start of the node, **re-executing** all logic.' main.py:2802-2805 warns '`durability` has no effect when no checkpointer is present.' runs.py:83 is the stream_resumable parameter, 943 is cancel and 1060 is join. A grep of libs/langgraph for supervisor/watchdog/restart/auto-resume found only node-timeout watchdogs (pregel/_retry.py:417-517), no restart logic."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

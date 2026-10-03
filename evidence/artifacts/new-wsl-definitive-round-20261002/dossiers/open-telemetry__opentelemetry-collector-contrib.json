@@ -1,0 +1,291 @@
+{
+  "contender": "open-telemetry/opentelemetry-collector-contrib",
+  "revision": {
+    "contender": "open-telemetry/opentelemetry-collector-contrib",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "open-telemetry/opentelemetry-collector-contrib",
+        "tag": "v0.162.0",
+        "commit": "ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.162.0",
+    "commit": "ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+    "read_at": "2026-10-02T03:02:40+00:00"
+  },
+  "dossier": {
+    "contender": "open-telemetry/opentelemetry-collector-contrib",
+    "revision": {
+      "tag": "v0.162.0",
+      "commit": "ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Go multi-module monorepo (~350 go.mod files; tag v0.162.0, stable-base v1.1.0) of OpenTelemetry Collector components that are not in the core collector repo: 113 receivers, 47 exporters, 38 processors, 14 connectors, 31 extension directories, shared pkg/ and internal/ libraries, a few CLIs (telemetrygen, opampsupervisor, golden) and a testbed (README.md:40; versions.yaml:4-358). It is a component library; official collector binaries/images are built in a different repo (README.md:42; cmd/otelcontribcol/builder-config.yaml:1-7). Facts against the six questions: (1) OTLP ingest + privacy filter: the OTLP receiver is a core module, not in this repo (builder-config.yaml:154). In-repo filtering pieces are the redaction processor (alpha logs/metrics, beta traces), filter (alpha), transform/attributes/resource (beta). Nothing is specific to Claude Code or Codex; the only GenAI-aware component is a traces-only alpha attribute normalizer for OpenInference/OpenLLMetry spans. (2)/(3) Metrics and events/logs stores: none bundled. Exporters either write local files (file exporter, alpha) or target external servers (ClickHouse, Prometheus remote write, InfluxDB, Elasticsearch, OpenSearch, Doris, ...). The Prometheus exporter is an in-memory scrape endpoint. (4) Dashboards: none; only a docker-compose example wiring collector -> ClickHouse -> Grafana (logs and traces pipelines only) and a placeholder remote-tap web page. (5) Trace/dataset/experiment store with fixed-workload replay: none (telemetrygen, golden and testbed are test utilities). (6) Local model server / GPU inference: none.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Scope: this is a repository for OpenTelemetry Collector components 'that are not suitable for the core repository of the collector'.",
+          "citation": "README.md:40"
+        },
+        {
+          "claim": "The official core and contrib distributions are available as part of the opentelemetry-collector-releases repository; some components here are in the 'core' distribution (e.g. Jaeger and Prometheus), most only in 'contrib'.",
+          "citation": "README.md:42"
+        },
+        {
+          "claim": "Users are encouraged to build their own custom distributions with the OpenTelemetry Collector Builder, using components from the core repo, this repo, and possibly third-party or internal repos.",
+          "citation": "README.md:42"
+        },
+        {
+          "claim": "Each component has its own support levels, and the stability level is per signal (e.g. Stable for traces but Alpha for metrics and Development for logs).",
+          "citation": "README.md:44"
+        },
+        {
+          "claim": "Stability levels follow the definitions from the core OpenTelemetry Collector repository.",
+          "citation": "README.md:48"
+        },
+        {
+          "claim": "Some features are hidden behind feature gates that can themselves be at different lifecycle stages.",
+          "citation": "README.md:50-52"
+        },
+        {
+          "claim": "Components are supported by the contrib maintainers group or by specific vendors; actual support will likely be provided by individual contributors, typically a code owner.",
+          "citation": "README.md:56-60"
+        },
+        {
+          "claim": "Maintainers may at any time downgrade specific components if they are deemed unmaintained or pose a risk to the repository and/or binary distribution.",
+          "citation": "README.md:58"
+        },
+        {
+          "claim": "Project status badge reads 'beta'.",
+          "citation": "README.md:23"
+        },
+        {
+          "claim": "Governance: 13 listed maintainers; promotion is blocked if more than 25% of maintainers would share an employer.",
+          "citation": "README.md:66-80, 140-142"
+        },
+        {
+          "claim": "The README has no install, configuration or usage section: 'Getting Started' links to https://opentelemetry.io/docs/collector/getting-started/ and 'Security' links to the core repo's security-best-practices document.",
+          "citation": "README.md:5, README.md:32"
+        }
+      ],
+      "install": [
+        {
+          "method": "Build the contrib collector from source (contributor workflow; the manifest describes the result as a 'testing only' binary)",
+          "command": "make otelcontribcol && ./bin/otelcontribcol_<os>_<arch> --config otel-config.yaml",
+          "citation": "CONTRIBUTING.md:13-25; cmd/otelcontribcol/builder-config.yaml:12"
+        },
+        {
+          "method": "Run the official contrib image from GHCR (shown in the telemetrygen README as the receiving collector)",
+          "command": "docker run -p 4317:4317 -v $(pwd)/config.yaml:/etc/otelcol-contrib/config.yaml ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.149.0",
+          "citation": "cmd/telemetrygen/README.md:66"
+        },
+        {
+          "method": "Run the official contrib image from Docker Hub with a writable volume (shown in the file exporter README)",
+          "command": "docker run -v \"./file-exporter:/file-exporter:rwz\" -v \"otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml\" otel/opentelemetry-collector-contrib:latest",
+          "citation": "exporter/fileexporter/README.md:44"
+        },
+        {
+          "method": "go install telemetrygen (synthetic OTLP generator only, not the collector)",
+          "command": "go install github.com/open-telemetry/opentelemetry-collector-contrib/cmd/telemetrygen@latest",
+          "citation": "cmd/telemetrygen/README.md:20"
+        },
+        {
+          "method": "Build the telemetrygen Docker image locally",
+          "command": "make docker-telemetrygen",
+          "citation": "cmd/telemetrygen/README.md:30; Makefile:407-412"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - CI unit and integration tests run on ubuntu-24.04 (.github/workflows/build-and-test.yml:309,443); linux/amd64 binaries are built in CI (build-and-test.yml:575-577,618-620); the local-build image is scratch-based (cmd/otelcontribcol/Dockerfile:1-14).",
+        "wsl2": "unknown - no WSL/WSL2 mention in docs or workflows (a search matched only unrelated linter dependency names at internal/tools/go.mod:72-73); Linux binaries are built but WSL2 is neither documented nor tested.",
+        "macos_arm64": "yes (build; partial tests) - darwin/arm64 is cross-compiled in CI on ubuntu runners (build-and-test.yml:609-614), but not on ordinary PRs (build-and-test.yml:568,602). macOS test runs cover only the cgo group (receiver/hostmetricsreceiver, Makefile:57) on macos-14/macos-15 with test binaries built for GOTESTARCH=amd64, and only on push/merge-group or PRs labelled 'Run Darwin' (.github/workflows/build-and-test-darwin.yaml:31-33,48,59-61,77-78). The components read here (redaction, filter, file/ClickHouse exporters, mcp, remote tap, genai normalizer) declare no unsupported_platforms in metadata.yaml.",
+        "gpu": "no - not applicable: telemetry collector with no GPU/CUDA/inference code. Searches for nvidia|cuda|ollama|llama.cpp|vllm|langfuse|mlflow found only incidental matches in long test-data lines (confmap/provider/aesprovider/provider_test.go:23,42); the only 'gpu' text is a hardware-metric entity mapping at exporter/bmchelixexporter/README.md:121."
+      },
+      "integrations": {
+        "cli": "Collector binary built from cmd/otelcontribcol: ./bin/otelcontribcol_<os>_<arch> --config otel-config.yaml (CONTRIBUTING.md:19-25; image CMD ['--config','/etc/otel/config.yaml'], cmd/otelcontribcol/Dockerfile:14). Auxiliary CLIs: telemetrygen (traces|metrics|logs with --otlp-insecure/--duration/--rate/--batch flags, cmd/telemetrygen/README.md:79-120), opampsupervisor (--config, cmd/opampsupervisor/main.go:29), golden (cmd/golden/main.go:44-45).",
+        "mcp": "extension/mcp (stability development, listed in no distribution: extension/mcp/README.md:5-6). Streamable-HTTP MCP server named 'otel-mcp-server' (extension/mcp/extension.go:42-58), default endpoint localhost:8080 (extension/mcp/factory.go:27-36). Eight tools - get-versions, components, readme, changelog, component-schema, component-schema-validation, component-deprecated-fields, rag - all about collector docs/config schema (extension/mcp/README.md:24-37; extension/mcp/internal/mcp/tools/tools.go:31-40); none query telemetry flowing through or stored by a collector.",
+        "sdk_or_api": "No SDK or HTTP API of its own (component library). Go modules are importable (module list at versions.yaml:12-358; developer-facing API changes are in CHANGELOG-API.md, CHANGELOG.md:5-6). Runtime interfaces come from components: OTLP gRPC/HTTP via the core otlpreceiver (cmd/otelcontribcol/builder-config.yaml:154; usage in cmd/telemetrygen/README.md:41-45 and exporter/fileexporter/README.md:169-174), Prometheus scrape endpoint /metrics (exporter/prometheusexporter/README.md:22), WebSocket tap (processor/remotetapprocessor/README.md:16-34), health_check/zpages/pprof extensions (exporter/clickhouseexporter/example/otel-collector-config.yml:45-49), OpAMP (cmd/opampsupervisor).",
+        "claude_code_or_codex": "none found - searching the tree for claude|codex matches only AGENTS.md:50 ('Assisted-by: Claude Opus 4.5', a contributor-policy example) and test model-name strings 'claude-sonnet-4' in processor/genainormalizerprocessor/processor_test.go:596,709,800 and processor_benchmark_test.go:362-452. CLAUDE.md:1 only contains '@AGENTS.md' (policy for AI-assisted PRs, not an integration)."
+      },
+      "telemetry_and_network": "No usage-reporting or phone-home code or documentation found (searched .md/.go for phone-home, usage statistics, analytics: only unrelated vendor text such as exporter/tinybirdexporter/README.md and receiver/snowflakereceiver/README.md). The README names no required account or hosted service; behaviour is determined by the components configured in a pipeline. Component-specific network use: fileexporter writes local files only (exporter/fileexporter/README.md:20); prometheusexporter listens on a configured endpoint (exporter/prometheusexporter/README.md:22); clickhouseexporter connects to a configured ClickHouse endpoint (exporter/clickhouseexporter/README.md:343-348) and its Grafana example installs Grafana plugins at container start via GF_INSTALL_PLUGINS (example/docker-compose.yml:51-52); the remote-tap processor listens on localhost:12001 (processor/remotetapprocessor/config.go:13) and the remote-tap extension on 127.0.0.1:11000 (extension/remotetapextension/config.go:22); the mcp extension listens on localhost:8080 (extension/mcp/factory.go:29-32) and builds its tools from an external module whose network behaviour was not inspected (extension/mcp/internal/mcp/tools/tools.go:15,26). The OTLP receiver defaults and the collector's own internal telemetry are defined in core modules outside this tree and could not be verified. CI-only network: Docker Hub/GHCR pushes and Codecov/FOSSA uploads (build-and-test.yml:432-434,714-722; fossa.yml:20-23)."
+    },
+    "code": {
+      "languages": [
+        "Go",
+        "Shell",
+        "JavaScript",
+        "YAML",
+        "Makefile"
+      ],
+      "entry_points": [
+        {
+          "path": "cmd/otelcontribcol/builder-config.yaml",
+          "what": "OpenTelemetry Collector Builder manifest (~263 components) from which make genotelcontribcol / make otelcontribcol generate and build the contrib collector (bin/otelcontribcol_<os>_<arch>, run with --config). Header says it is not used for any official binary and the result is 'testing only'; main.go is generated at build time and not committed (builder-config.yaml:1-14; Makefile:474-483; CONTRIBUTING.md:13-25)."
+        },
+        {
+          "path": "cmd/telemetrygen/main.go",
+          "what": "telemetrygen CLI: synthetic OTLP traces/metrics/logs generator (main.go:7-9 calls Execute(); cmd/telemetrygen/README.md:13); built with make telemetrygen (Makefile:507-511)."
+        },
+        {
+          "path": "cmd/opampsupervisor/main.go",
+          "what": "OpAMP supervisor: --config flag loads a supervisor config and runs supervisor.NewSupervisor (main.go:22-50); built with make opampsupervisor (Makefile:518-522)."
+        },
+        {
+          "path": "cmd/golden/main.go",
+          "what": "Golden tester: starts a core otlpreceiver for metrics, feeds an internal consumer that compares received data, exits with error on mismatch or timeout (main.go:44-121); alpha, metrics (cmd/golden/README.md:6)."
+        },
+        {
+          "path": "processor/redactionprocessor/factory.go",
+          "what": "Representative component entry point: NewFactory registers traces, logs and metrics processors with per-signal stability (factory.go:21-29); logic in processor.go, config in config.go."
+        },
+        {
+          "path": "exporter/fileexporter/factory.go",
+          "what": "File exporter factory for traces/metrics/logs/profiles; writes JSON-lines or length-prefixed proto files with optional rotation/zstd (factory.go:57-77,175-201)."
+        },
+        {
+          "path": "exporter/clickhouseexporter/factory.go",
+          "what": "ClickHouse exporter factory for logs/traces/metrics/profiles with defaults in config.go:117-137 (create_schema true, async_insert true, default otel_* table names)."
+        },
+        {
+          "path": "extension/mcp/extension.go",
+          "what": "MCP server extension: builds the server, registers the eight doc/schema tools and serves streamable HTTP (extension.go:39-78)."
+        }
+      ],
+      "architecture": "Go multi-module monorepo (~350 go.mod; root go.mod has no requires and says it is not used for any official binary, go.mod:1-18; go 1.26.0). One module per component under receiver/ (113), exporter/ (47), processor/ (38), connector/ (14), extension/ (31 dirs incl. encoding/, observer/, storage/), plus confmap/provider/, config/configdbauth, scraper/zookeeperscraper, shared libraries in pkg/ (pkg/ottl = OTTL language and functions used by filter/transform; pkg/stanza = log operators; pkg/translator/*; pkg/golden and pkg/pdatatest = test helpers) and internal/. A component = metadata.yaml (status, per-signal stability, codeowners; mdatagen generates the README status table and internal/metadata) + factory.go + config.go + implementation, e.g. processor/redactionprocessor/{factory,config,processor}.go with internal/db and internal/url sanitizers. Binaries are assembled by the Collector Builder from cmd/otelcontribcol/builder-config.yaml (~263 entries: 111 receivers, 49 exporters, 47 extensions, 34 processors, 13 connectors, 9 confmap providers; exporter entries still pin v0.159.0 but make genotelcontribcol appends replace directives to in-tree modules, builder-config.yaml:70-114,290-293; Makefile:474-477). Core-repo modules supply the OTLP receiver, debug/otlp/otlphttp exporters, batch and memory_limiter processors and zpages (builder-config.yaml:17,66-69,117-118,153-154). Ingest-filter-export path available from these parts: otlp receiver (core) -> processors [redaction | filter | transform | attributes | resource | gen_ai_normalizer] -> exporters. Filtering primitives: redaction = allow-list/blocked-key/blocked-value/hash (md5, sha1, sha3, hmac-sha256, hmac-sha512) over resource, scope, span, span-event, log-record and datapoint attributes plus log bodies (processor/redactionprocessor/README.md:4-7,170-173; processor.go:115-331); filter drops spans/span events/metrics/datapoints/logs when any OTTL condition matches (processor/filterprocessor/README.md:4,29-31,54-59; alpha t/m/l, README.md:9); transform (beta t/m/l, README.md:5-7) runs OTTL, whose functions in pkg/ottl/ottlfuncs include delete_key, delete_matching_keys, keep_keys, keep_matching_keys, replace_pattern/replace_all_patterns/replace_match/replace_all_matches, SHA1/SHA256/SHA512/MD5/FNV, truncate_all, limit; attributes processor actions insert/update/upsert/delete/hash(SHA1)/extract/convert (processor/attributesprocessor/README.md:26-37; beta). Sinks and per-signal stability from metadata.yaml: file alpha traces/metrics/logs (exporter/fileexporter/metadata.yaml:7-8); clickhouse beta traces+logs, alpha metrics (clickhouseexporter/metadata.yaml:7-9); influxdb beta all three (:7); prometheus beta metrics, scrape endpoint with 5m expiry (prometheusexporter/metadata.yaml:7; README.md:29); prometheusremotewrite beta metrics (:8); elasticsearch beta traces+logs, development metrics (:7-8); opensearch alpha traces+logs, development metrics (:7-8); doris alpha all three (:8); tinybird alpha all three (:7); cassandra alpha traces+logs, no metrics (:7); awss3 alpha all three (:7); azuredataexplorer beta all three (:7). By name these target external databases/services; only the ClickHouse README was read to confirm an external server endpoint (exporter/clickhouseexporter/README.md:343-348). Receivers otlpjsonfile re-reads whole OTLP JSON files that fileexporter wrote (receiver/otlpjsonfilereceiver/README.md:24-25; exporter/fileexporter/README.md:22). No storage, query, dashboard, experiment/dataset or model-serving module exists in the tree. Other dirs: testbed/ (load, correctness, stability tests), examples/ (couchbase, kubernetes, nomad, logline-filtering, secure-tracing, fault-tolerant-logs-collection), .github/workflows (CI).",
+      "packaging_and_release": "No official release artifacts are built in this repo: builder-config.yaml:1-7 and go.mod:3-9 say official binaries come from opentelemetry-collector-releases (not opened). In-repo release flow: manual workflow 'Automation - Prepare Release' (.github/workflows/prepare-release.yml:1-69) runs .github/workflows/scripts/release-prepare-release.sh (:44-116), which bumps versions.yaml module sets (contrib-base v0.162.0, stable-base v1.1.0, versions.yaml:4-11), updates builder configs and the changelog and opens a '[chore] Prepare release' PR; per-module tags (e.g. processor/redactionprocessor/v0.162.0) and the root tag v0.162.0 all peel to commit ae8c507 (.git/packed-refs:436-437,696-697); Makefile has a push-tags target using multimod (Makefile:281-287). On tag push, build-and-test.yml publish-stable creates a GitHub release with generated notes only (build-and-test.yml:724-787, gh release create at :782); publish-dev builds the scratch-based image (cmd/otelcontribcol/Dockerfile:1-14, base image pinned by digest) and pushes otel/opentelemetry-collector-contrib-dev:<sha> and :latest to Docker Hub (build-and-test.yml:689-723); cross-compile builds otelcontribcollite for 14 OS/arch targets (linux 386/amd64/arm/arm64/ppc64le/riscv64/s390x, darwin amd64/arm64, windows 386/amd64/arm64, aix ppc64, solaris amd64) and uploads them only as CI artifacts (build-and-test.yml:601-668). telemetrygen and golden multi-arch images are pushed to ghcr.io/open-telemetry/opentelemetry-collector-contrib/{telemetrygen,golden} with dev/latest/<tag> tags (.github/workflows/telemetrygen.yml:58-137; golden.yml:49-132). Makefile has deb/rpm package targets via fpm in Docker (Makefile:628-633). No checksum, signature, SBOM or provenance-attestation step exists in this repo's workflows: a search of .github for cosign|sigstore|slsa|attest|checksum|sbom|syft|gpg found only unrelated text (.github/ISSUE_TEMPLATE/component-graduation.md:54-59, pull_request_template.md:15) and a cache-key sha256sum (build-and-test.yml:466). GitHub Actions are pinned to commit SHAs (e.g. build-and-test.yml:30).",
+      "tests_and_ci": "Go testing + testify + goleak per module (e.g. processor/redactionprocessor/go.mod:8,20), run by gotestsum with -race -timeout 900s -parallel 4 and --rerun-fails=1 (Makefile.Common:21,40-44,97,123-124). About 3,800 _test.go files (receiver 1,355; processor 618; pkg 566; exporter 501; extension 342; internal 221; connector ~100; cmd 42; testbed 22; scraper 9; confmap 8; config 2); the redaction processor has 11 test files (processor_test.go, processor_spanname_test.go, config/factory tests, db and url internals). Every component also has generated lifecycle tests (generated_component_test.go). Integration tests use -tags=integration with Docker (Makefile.Common:45-50,188-191; build-and-test.yml:436-474) plus sudo tests for cgroupruntime/icmpcheck (:476-501). testbed/ holds load tests (testbed/tests: log, metric, trace, filter_processor, transform_processor...), testbed/correctnesstests and testbed/stabilitytests; stability tests are disabled (Makefile:118-122). Workflows (.github/workflows): build-and-test.yml (scoped CI via compute-ci-scope.sh; golangci-lint on linux+windows; govulncheck per group; codegen/hygiene checks; unit tests on ubuntu-24.04 with Go stable and oldstable; separate no-race pass; integration; correctness traces/metrics; build-examples; 14-target cross-compile; publish jobs; flaky-test issue generation), build-and-test-arm.yml (ubuntu-24.04-arm unit tests), build-and-test-darwin.yaml (cgo group on macOS), load-tests.yml (twice-daily testbed benchmarks on a 64-CPU bare-metal runner, results pushed to a benchmarks branch, :9,:31,:137-145), codeql-analysis.yml (Go), scorecard.yml, fossa.yml, zizmor.yml; also present but not opened: build-and-test-windows.yml, e2e-tests.yml, e2e-tests-windows.yml, golden.yml, shellcheck.yaml, prometheus-compliance-tests.yml, changelog.yml, check-links.yaml.",
+      "dependencies": "Root go.mod (go.mod:1-18) declares no requirements, only 'go 1.26.0' and retract directives; dependencies are per module across ~350 go.mod files. Direct-requirement counts (lines without '// indirect', test deps included): processor/redactionprocessor/go.mod 16 (+39 indirect; includes github.com/DataDog/datadog-agent/pkg/obfuscate and github.com/grafana/clusterurl, go.mod:6-7); processor/filterprocessor/go.mod 29 (+46); processor/transformprocessor/go.mod 29; processor/attributesprocessor/go.mod 16; processor/genainormalizerprocessor/go.mod 14; processor/remotetapprocessor/go.mod 18; exporter/fileexporter/go.mod 24 (+44; github.com/DeRuina/timberjack for rotation, go.mod:6); exporter/clickhouseexporter/go.mod 23 (+90); exporter/prometheusexporter/go.mod 31; exporter/prometheusremotewriteexporter/go.mod 38; extension/mcp/go.mod 13 (+64; github.com/modelcontextprotocol/go-sdk v1.8.0 and github.com/pavolloffay/opentelemetry-mcp-server/modules/collectorschema pinned to pseudo-version v0.0.0-20260505095018-a097481abafe, go.mod:6-7; github.com/philippgille/chromem-go indirect, go.mod:44); extension/remotetapextension/go.mod 10; cmd/telemetrygen/go.mod 24; cmd/golden/go.mod 15; cmd/opampsupervisor/go.mod 37. Components depend on core collector modules at v1.68.0 / v0.162.0 (e.g. processor/redactionprocessor/go.mod:9-18). cmd/otelcontribcol has no committed go.mod (generated, excluded from ALL_MODS: Makefile:62-63).",
+      "security_policy": "none - no SECURITY.md in the repository (.github/SECURITY.md does not exist; no SECURITY* file found anywhere); README.md:32 only links to the core repo's security-best-practices document and CONTRIBUTING.md:3-5 defers to core guidelines. CI-side scanning exists: govulncheck (.github/workflows/build-and-test.yml:202-240), CodeQL (codeql-analysis.yml), OpenSSF Scorecard (scorecard.yml), FOSSA (fossa.yml), zizmor (zizmor.yml)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Official core/contrib distributions come from the separate opentelemetry-collector-releases repo, and users can build custom distributions with the OpenTelemetry Collector Builder (README.md:42).",
+        "verified": "partial",
+        "evidence": "In-repo statements agree: cmd/otelcontribcol/builder-config.yaml:1-7 ('NOT used to build any official binary'), go.mod:3-9, and builder-config.yaml:12 ('testing only'); the repo itself drives the builder (Makefile:474-483, $(BUILDER) --skip-compilation) and its manifest pulls the OTLP receiver and debug/otlp/otlphttp exporters from core modules (builder-config.yaml:66-69,117-118,153-154). cmd/otelcontribcol contains only builder-config.yaml, Dockerfile, metadata.yaml and .gitignore (no main.go). The releases repo and the builder are outside this tree and were not opened, so the official-artifact half is not checkable here."
+      },
+      {
+        "claim": "Stability is tracked per component and per signal (README.md:44).",
+        "verified": "yes",
+        "evidence": "processor/redactionprocessor/metadata.yaml:12-14 (beta traces; alpha logs, metrics) and factory.go:25-27 registers each signal with its own stability constant; exporter/fileexporter/metadata.yaml:7-8 (alpha traces/metrics/logs, development profiles) and factory.go:61-64; exporter/clickhouseexporter/README.md:5-7 (development profiles, alpha metrics, beta traces/logs)."
+      },
+      {
+        "claim": "Redaction processor deletes span, log and metric datapoint attributes not on the allow-list and masks values matching the block-list; non-allowed attributes are removed before value checks (processor/redactionprocessor/README.md:4-7).",
+        "verified": "yes",
+        "evidence": "processor.go:334-388 processAttrs flags non-allowed keys (shouldRedactKey, :525-532) and skips value checks for them, then removes them (:380-382); blocked values become '****' or a hash (:391-409). The code also covers resource and scope attributes (:145,150,177,182,293,298), span events (:159) and log bodies including nested maps/slices (:186,191-288), which the one-line summary does not state. Default config is the zero value (factory.go:31-33), so with no allowed_keys every non-summary attribute, resource attributes included, is removed (README.md:63-66). Only string values are scanned unless redact_all_types is set (processor.go:357-360). HMAC hashing needs a key of at least 32 bytes (sha256) / 64 bytes (sha512) (config.go:127-147)."
+      },
+      {
+        "claim": "For log records whose body is a map, the processor appends audit attributes into the body map itself (processor/redactionprocessor/README.md:213-216).",
+        "verified": "no",
+        "evidence": "Code differs from README (code preferred): processLogBody receives log.Attributes() (processor.go:186) and addMetaAttrs writes the redaction.body.* keys into that attribute map (processor.go:238-241), for every body type, not into the body map. Also, for non-map/slice bodies an allowed-value match records 'body' and returns, a known TODO tracked as issue 50417 (processor.go:223-229)."
+      },
+      {
+        "claim": "GenAI normalizer rewrites attributes on spans from non-OTel GenAI instrumentation into OTel GenAI semantic conventions and applies only to span attributes (processor/genainormalizerprocessor/README.md:15,45-56).",
+        "verified": "yes",
+        "evidence": "factory.go:22 registers a traces processor only; processor.go:82-102 iterates span attributes only (:91); built-in sources are only openinference and openllmetry (README.md:19-22) and the default config has no sources (factory.go:28-32). Stability is alpha for traces only (README.md:5). No logs/metrics support and no Claude Code/Codex mapping; 'claude-sonnet-4' appears only as a test value (processor_test.go:596,709,800)."
+      },
+      {
+        "claim": "MCP extension 'runs the OpenTelemetry MCP server which enables LLM to efficiently use OpenTelemetry stack' (extension/mcp/README.md:14).",
+        "verified": "partial",
+        "evidence": "extension.go:42-58 starts an MCP server over streamable HTTP; internal/mcp/tools/tools.go:31-40 registers eight tools (versions, components, readme, changelog, component schema, schema validation, deprecated fields, RAG) backed by github.com/pavolloffay/opentelemetry-mcp-server/modules/collectorschema (tools.go:15; go.mod:7), i.e. collector docs and config schema; none read telemetry from pipelines or stores. Stability development, no distribution (README.md:5-6). Default endpoint is localhost:8080 (factory.go:29-32) while the README example uses 0.0.0.0:8080 (README.md:21). Start() fails if GetLatestVersion errors (tools.go:26-29; extension.go:47-50); whether that call uses the network depends on the external module, which was not opened."
+      },
+      {
+        "claim": "File exporter writes telemetry to files on disk with rotation and compression; rotation is only enabled when 'rotation:' is specified (exporter/fileexporter/README.md:20-34,88-90).",
+        "verified": "yes",
+        "evidence": "config.go:184-206 Unmarshal sets Rotation=nil unless 'rotation' is configured (the default struct sets it, factory.go:68-77); JSON is the default and proto optional (config.go:46-48); zstd only (config.go:132-134); append plus rotation is rejected (config.go:126-128). Facts not prominent in the README: files are created with mode 0644 and file mode is not configurable (factory.go:45,186,198); with no rotation and append false the file is truncated at start (config.go:35-39; factory.go:179-184). Alpha for traces/metrics/logs (metadata.yaml:7-8)."
+      },
+      {
+        "claim": "ClickHouse exporter creates the database/tables by default and works with Grafana for visualisation (exporter/clickhouseexporter/README.md:53-62,361,446-449).",
+        "verified": "partial",
+        "evidence": "Defaults confirmed in config.go:117-137 (CreateSchema true, AsyncInsert true, TTL 0, tables otel_logs/otel_traces/otel_metrics_*); endpoint is required (config.go:113). The example stack (example/docker-compose.yml:7-90) runs collector + ClickHouse + Grafana with provisioned ClickHouse datasources (datasource.yaml:4-18), but its collector config defines only logs and traces pipelines (otel-collector-config.yml:50-60), so metrics are not exercised, and Grafana runs with anonymous Admin and no login form (grafana.ini:1-7). ClickHouse is an external server, not bundled (README.md:21,343-348)."
+      },
+      {
+        "claim": "Remote tap extension 'allows users of the collectors to visualize data going through pipelines' (extension/remotetapextension/README.md:14-16).",
+        "verified": "no",
+        "evidence": "extension.go:27-37 only serves static files from an embedded directory; the sole embedded page is a placeholder '<h1>TODO</h1>' (http/index.html:12); the embed directive is 'go:embed http/*' (extension.go:18) while the handler serves fs.Sub(httpFS, 'html') (extension.go:28), a path mismatch as read (not executed). Only generated lifecycle tests exist in that directory. Default endpoint 127.0.0.1:11000 (config.go:22). The related processor does stream sampled batches as JSON over WebSocket (processor/remotetapprocessor/processor.go:104-141; defaults localhost:12001 and 1 message/s, config.go:13,34), matching its README (README.md:16-34), but it is a live tee, not a store or dashboard."
+      },
+      {
+        "claim": "Filter and transform processor READMEs say CPU/memory results at 10,000 items/second are publicly available on the project's benchmarks page (processor/filterprocessor/README.md:441-453; processor/transformprocessor/README.md:1152-1162).",
+        "verified": "not_checkable",
+        "evidence": ".github/workflows/load-tests.yml:107-145 runs the testbed (cron at :9) and publishes benchmarks.json to the 'benchmarks' branch under docs/benchmarks/loadtests via benchmark-action, so the publication mechanism exists; the published pages/numbers are not in this checkout and the URL was not opened, so no values are reported."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "ClickHouse server capacity for log ingestion (single instance with 32 CPU cores / 128 GB RAM; no workload or methodology given)",
+        "metric": "logs per day; compression ratio; compressed on-disk size",
+        "value": "~20 TB (20 billion) logs/day; compression ratio 7~11; 1.8~2.85 TB compressed on disk",
+        "source": "exporter/clickhouseexporter/README.md:318-320",
+        "independent": false
+      },
+      {
+        "what": "Collector pipeline otlp receiver -> clickhouse (tcp) exporter with sending_queue batching enabled (hardware and workload not specified)",
+        "metric": "log entries processed per second per CPU core",
+        "value": "~40k/s per CPU core",
+        "source": "exporter/clickhouseexporter/README.md:322-323",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope: no Claude Code/Codex-specific support. The only GenAI-aware component is processor/genainormalizerprocessor - alpha, traces only, built-in mappings for OpenInference/OpenLLMetry only (README.md:5,19-22; factory.go:22). Searching the tree for claude|codex finds only a contributor-policy example (AGENTS.md:50) and test model-name strings (processor_test.go:596). Any allow-lists or redaction patterns for those tools' metrics/events/logs would have to be authored from outside this repo; none are shipped or tested here.",
+      "Scope: no store, dashboard, experiment/dataset store or model server in the repo - exporters only. The only server-less sink is fileexporter (alpha; JSON-lines/proto files with no query layer; README says there is 'no guarantee' field names stay stable, exporter/fileexporter/README.md:34) and the Prometheus exporter is an in-memory scrape endpoint with 5m expiry (exporter/prometheusexporter/README.md:16,29). Queryable stores need an external server (ClickHouse: exporter/clickhouseexporter/README.md:21,343-348); its metrics support is alpha (README.md:6) and the bundled Grafana example covers logs/traces only (example/otel-collector-config.yml:50-60). No GPU/LLM-serving code exists (see platforms.gpu).",
+      "Security/maturity of the privacy filter: the redaction processor is alpha for logs and metrics, beta for traces (processor/redactionprocessor/README.md:11-12) and its README calls it 'one line of defence rather than the only compliance measure' (README.md:47-49). Behaviours to configure around: zero-value config removes all attributes including resource/scope attributes (factory.go:31-33; processor.go:145,177,293); non-string values are not scanned unless redact_all_types (processor.go:357-360); documented audit attributes for log bodies land in record attributes, not the body (processor.go:238-241 vs README.md:213-216); open TODO on allowed-value handling for non-map bodies (processor.go:223-229). Filter processor is alpha (README.md:9); transform, attributes and resource are beta (their READMEs, lines 5-7).",
+      "Security/data handling in fileexporter: output files are created with mode 0644 and file mode is not configurable (exporter/fileexporter/factory.go:45,186,198), so even redacted telemetry is readable by other local users unless the directory is restricted; with no rotation and append false the file is truncated at start (config.go:35-39; factory.go:179-184); the official container image is built on scratch with no writable filesystem by default (README.md:36).",
+      "Network exposure in examples and docs: the ClickHouse example binds OTLP gRPC to 0.0.0.0:4317 (exporter/clickhouseexporter/example/otel-collector-config.yml:7; also cmd/telemetrygen/README.md:45), runs Grafana with anonymous Admin and no login form (example/grafana.ini:1-7), uses ClickHouse default/default credentials (example/docker-compose.yml:42-43) and allows an unsigned Grafana plugin (docker-compose.yml:52). Remote-tap and MCP READMEs show 0.0.0.0 endpoints (processor/remotetapprocessor/README.md:41; extension/mcp/README.md:21) while code defaults are loopback (remotetapprocessor/config.go:13; mcp/factory.go:29-32). The core OTLP receiver's own default bind is defined outside this tree and was not verified.",
+      "Packaging/supply chain: official release artifacts are not built or signed from this repo (cmd/otelcontribcol/builder-config.yaml:1-7; go.mod:3-9; releases repo not opened). This repo's workflows prepare release PRs/tags, create a notes-only GitHub release (build-and-test.yml:780-786), push a dev image to Docker Hub (:704-722) and telemetrygen/golden images to GHCR (telemetrygen.yml:88-136); no checksum, signature, SBOM or attestation step was found in .github. make otelcontribcol yields a 'testing only' binary (builder-config.yaml:12). The mcp extension depends on an individual maintainer's module pinned to a pseudo-version (extension/mcp/go.mod:7).",
+      "Platform coverage is uneven: CI tests run on ubuntu-24.04 (amd64) and ubuntu-24.04-arm (build-and-test.yml:309,443; build-and-test-arm.yml:59); macOS runs only the cgo group (receiver/hostmetricsreceiver) with test binaries built for GOTESTARCH=amd64, on macos-14, and only on push/merge-group or PRs labelled 'Run Darwin' (build-and-test-darwin.yaml:33,59-61,77-78; Makefile:57); darwin/arm64 is otherwise only cross-compiled and not on ordinary PRs (build-and-test.yml:568,602,612-614). WSL2 is not mentioned anywhere. Building from source needs Go 1.26.0 (go.mod:11).",
+      "Maintenance and process: all modules except processor/k8sattributesprocessor are v0.x (versions.yaml:4-11); the v1.1.0/v0.162.0 changelog section lists 15 breaking changes, including removed feature gates and config fields (CHANGELOG.md:12-75); one component is flagged unmaintained (receiver/simpleprometheusreceiver/metadata.yaml:11) and others deprecated (exporter/signalfxexporter/metadata.yaml:8; receiver/signalfxreceiver/metadata.yaml:7); support is largely by individual code owners (README.md:60) and several relevant components seek more owners (exporter/fileexporter/README.md:10; receiver/otlpjsonfilereceiver/README.md:17; extension/remotetapextension/README.md:9). There is no SECURITY.md, so vulnerability-reporting instructions are not in this tree."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "open-telemetry/opentelemetry-collector-contrib",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Build the contrib collector from source (contributor workflow; manifest describes the result as a 'testing only' binary): make otelcontribcol && ./bin/otelcontribcol_<os>_<arch> --config otel-config.yaml",
+          "citation": "CONTRIBUTING.md:13-25; cmd/otelcontribcol/builder-config.yaml:12",
+          "holds": true,
+          "note": "CONTRIBUTING.md:13-25 gives exactly `make otelcontribcol` and then `./bin/otelcontribcol_<os>_<arch> --config otel-config.yaml`, with ./bin/otelcontribcol_linux_amd64 as the example at :25. builder-config.yaml:12 reads 'Local OpenTelemetry Collector Contrib binary, testing only.' and :1-7 say the file is not used for any official binary. Makefile:474-483 confirms the output path bin/otelcontribcol_$(GOOS)_$(GOARCH)$(EXTENSION) with CGO_ENABLED=0. The builder is resolved through `go tool` (Makefile.Common:88), so no separate install is needed. The two Docker install commands also match their cited lines word for word (cmd/telemetrygen/README.md:66; exporter/fileexporter/README.md:44)."
+        },
+        {
+          "field": "license",
+          "statement": "License is Apache-2.0, in file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-3 reads 'Apache License, Version 2.0, January 2004' and the file is the full Apache 2.0 text through the appendix (:1-201). Source files carry 'SPDX-License-Identifier: Apache-2.0' (e.g. processor/redactionprocessor/factory.go:2)."
+        },
+        {
+          "field": "readme.platforms.macos_arm64",
+          "statement": "yes (build; partial tests). darwin/arm64 is cross-compiled in CI on ubuntu runners, but not on ordinary PRs. macOS test runs cover only the cgo group (receiver/hostmetricsreceiver) on macos-14/macos-15 with test binaries built for GOTESTARCH=amd64, and only on push/merge-group or 'Run Darwin'-labelled PRs. The components read declare no unsupported_platforms.",
+          "citation": ".github/workflows/build-and-test.yml:568,602,609-614; Makefile:57; .github/workflows/build-and-test-darwin.yaml:31-33,48,59-61,77-78",
+          "holds": true,
+          "note": "Cross-compile: build-and-test.yml:612-614 builds darwin/arm64 on ubuntu-24.04 in the `cross-compile` job. That job is gated to non-PR events or 'ci:full' PRs (:602). Ordinary PRs get only `cross-compile-pr`, which builds linux amd64/arm64 (:568,575-580). Test scope: Makefile:57 sets CGO_MODS := ./receiver/hostmetricsreceiver, which `for-cgo-target` uses (Makefile:374-375). The darwin workflow runs only on push, merge_group or the 'Run Darwin' label (:33,44,72,96). GOTESTARCH: amd64 (:60-61) feeds GOARCH=$(GOTESTARCH) in Makefile.Common:176. None of the 8 named components' metadata.yaml declares unsupported_platforms. Minor imprecision, not material: test binaries are built on macos-14 and macos-15 (:48), but only the macos-14 artifact is uploaded (:65) and run (:77), so tests execute on macos-14 only, as the risks section correctly says. Because the test binaries are amd64, CI never runs a native darwin/arm64 test binary; 'partial tests' means that. The dossier states the GOTESTARCH=amd64 detail itself."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "none found. Searching the tree for claude|codex matches only AGENTS.md:50 ('Assisted-by: Claude Opus 4.5') and the test model-name string 'claude-sonnet-4' in the genainormalizerprocessor tests. CLAUDE.md:1 contains only '@AGENTS.md'.",
+          "citation": "AGENTS.md:50; processor/genainormalizerprocessor/processor_test.go:596,709,800; processor/genainormalizerprocessor/processor_benchmark_test.go:362-452; CLAUDE.md:1",
+          "holds": true,
+          "note": "AGENTS.md:50 is a commit-trailer example inside an AI-contribution policy. CLAUDE.md is the single line '@AGENTS.md'. 'claude-sonnet-4' test values appear at processor_test.go:596,611,709,716,800,808 and processor_benchmark_test.go:362,429,430,449,452. A case-insensitive whole-word search for claude|codex returns exactly these three files. A plain substring search also hits 21 identifiers named decodeXRayTraceID/decodeXRaySpanID in receiver/awsxrayreceiver/internal/translator/translator{,_test}.go; these contain 'codeX' by accident and are not references to Codex. A further search for anthropic|openai finds only a naming example (genainormalizerprocessor/README.md:165, 'custom.anthropic') and test strings (processor_test.go:597,612; processor_benchmark_test.go:363). No Claude Code or Codex integration exists."
+        },
+        {
+          "field": "claim_checks[2]",
+          "statement": "The redaction processor deletes span, log and metric datapoint attributes not on the allow-list and masks values matching the block-list; non-allowed attributes are removed before value checks (verified: yes).",
+          "citation": "processor/redactionprocessor/README.md:4-7; processor.go:334-409,525-532; factory.go:31-33; config.go:127-147",
+          "holds": true,
+          "note": "README.md:4-7 states this word for word. In processAttrs (processor.go:334-388), a key that shouldRedactKey flags (:525-532; any key not in allowList unless allow_all_keys is set) is queued and skipped with `continue` before any value check (:353-355), then removed (:380-382). Remaining string values are matched against blocked_values (:445-451) and replaced with '****' or a hash (:391-409). The evidence details also check out: resource and scope attributes (:145,150,177,182,293,298), span events (:159), log-body maps and slices (:186,191-288), zero-value default config (factory.go:31-33, so with no allowed_keys every attribute is dropped, per README.md:63-66), non-string values scanned only with redact_all_types (:357-360), and HMAC keys of at least 32/64 bytes (config.go:135-143). One unstated nuance: ignored_keys and ignored_key_patterns skip both checks (:349-351), as documented at README.md:72-80."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

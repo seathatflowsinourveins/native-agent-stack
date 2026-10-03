@@ -1,0 +1,317 @@
+{
+  "contender": "tsdgeos/poppler_mirror",
+  "revision": {
+    "contender": "tsdgeos/poppler_mirror",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "tsdgeos/poppler_mirror",
+        "tag": null,
+        "commit": "03e8c2c9696c3f556f9ad7fbe9e5177907d625ef",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": null,
+    "commit": "03e8c2c9696c3f556f9ad7fbe9e5177907d625ef",
+    "read_at": "2026-10-02T03:02:54+00:00"
+  },
+  "dossier": {
+    "contender": "tsdgeos/poppler_mirror",
+    "revision": {
+      "tag": null,
+      "commit": "03e8c2c9696c3f556f9ad7fbe9e5177907d625ef",
+      "read_at": "2026-10-03"
+    },
+    "license": {
+      "spdx": "GPL-2.0-only OR GPL-3.0-only",
+      "file": "COPYING (GPLv2 text); COPYING3 (GPLv3 text)"
+    },
+    "purpose": "Poppler is a C++ PDF parsing/rendering library forked from Xpdf (README.md:4-7, 76-99). It ships wrapper libraries (C++, GLib/GObject, Qt5, Qt6) and 13 command-line utilities: pdftotext, pdftohtml, pdftoppm, pdftocairo, pdfimages, pdfinfo, pdffonts, pdfdetach, pdfattach, pdfseparate, pdfunite, pdfsig, pdftops (utils/CMakeLists.txt:16-176). Facts relevant to the stated needs: (1) Input is PDF only. PDFDocFactory registers local-file, file-descriptor and (if libcurl is on) http(s) builders (poppler/PDFDocFactory.cc:41-45). (2) Text-oriented outputs are plain text, HTML-wrapped text, XHTML word/line/block bounding boxes, TSV (utils/pdftotext.cc:110-145, 547-677) and pdftohtml HTML or pdf2xml XML (utils/pdf2xml.dtd:2-49). pdfinfo -struct-text prints tagged-PDF structure with text (utils/pdfinfo.cc:282-341). (3) There is no Markdown or JSON writer anywhere in the tree (case-insensitive grep for 'markdown' matches nothing; 'json' matches only .gitlab-ci.yml). There is no OCR (utils/pdftotext.1:151-154 says unrecoverable encodings cannot be extracted 'short of OCR'), no Office/EPUB/HTML reader, no collection indexing or lexical/vector/hybrid search, no MCP server, and no Claude Code/Codex integration. (4) Text search exists only as per-page substring matching on an already-loaded PDF (poppler/TextOutputDev.h:602-630; cpp/poppler-page.h:174; qt6/src/poppler-qt6.h:781; glib/poppler-page.h:78-80). The checkout is a depth-1 clone of the GitHub mirror tsdgeos/poppler_mirror (.git/config:9-12) of gitlab.freedesktop.org/poppler/poppler (README.md:16-20), at development version 26.09.90 (CMakeLists.txt:43-49), with no tags (.git/packed-refs:2).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "\"This is Poppler, a library for rendering PDF files, and examining or modifying their structure.\"",
+          "citation": "README.md:4-5"
+        },
+        {
+          "claim": "Poppler originally came from the XPDF sources; README-XPDF is the original xpdf-3.03 README.",
+          "citation": "README.md:5-7"
+        },
+        {
+          "claim": "\"Poppler is licensed under the GPL, not the LGPL, so programs which call Poppler must be licensed under the GPL as well.\"",
+          "citation": "README.md:9-12"
+        },
+        {
+          "claim": "Source is maintained as a Git repository on gitlab.freedesktop.org; fork and submit merge requests there.",
+          "citation": "README.md:16-20"
+        },
+        {
+          "claim": "Bugs go to the GitLab issue tracker; attach a (minimized) example PDF; the tracker and its attachments are public.",
+          "citation": "README.md:22-34"
+        },
+        {
+          "claim": "\"Poppler is highly sensitive to security bugs, since it deals mainly with untrusted files downloaded from the Internet.\" Report crashes or Valgrind/asan/ubsan/msan findings at the issue tracker.",
+          "citation": "README.md:36-43"
+        },
+        {
+          "claim": "Stable public APIs live in cpp (C++), glib (C/GObject, Cairo) and qt5 (Qt5).",
+          "citation": "README.md:45-60"
+        },
+        {
+          "claim": "poppler/ is an \"UNSTABLE, INTERNAL C++ API\"; \"If you use this API, you are on your own\"; it may change at any time, even among minor versions.",
+          "citation": "README.md:62-69"
+        },
+        {
+          "claim": "Purpose of the fork: PDF rendering as a shared library to centralize security maintenance, and replacing parts of xpdf with fontconfig and cairo.",
+          "citation": "README.md:76-99"
+        },
+        {
+          "claim": "xpdf, and thus poppler, is GPL not LGPL; commercial licensing from Glyph & Cog covers xpdf in closed-source products, \"not poppler itself\".",
+          "citation": "README.md:101-107"
+        },
+        {
+          "claim": "README-XPDF: the Xpdf project includes a PDF text extractor (pdftotext), a PDF-to-PostScript converter (pdftops) and utilities pdfinfo, pdffonts, pdfdetach, pdftoppm, pdfimages.",
+          "citation": "README-XPDF:20-24, 120-137"
+        },
+        {
+          "claim": "README-XPDF: the non-X components (pdftops, pdftotext, pdfinfo, pdffonts, pdfdetach, pdftoppm, pdfimages) can also be compiled on Windows and Mac OSX.",
+          "citation": "README-XPDF:75-77"
+        },
+        {
+          "claim": "INSTALL: build with mkdir build; cd build; cmake ..; make; make install; optional features are toggled with -D<FEATURE>=<ON|OFF>.",
+          "citation": "INSTALL:7-11, 43-47"
+        },
+        {
+          "claim": "README.contributors: patches must be licensable under GPLv2 and later; clang-format is mandatory (clang-format 21 on CI).",
+          "citation": "README.contributors:3-8, 22-37"
+        }
+      ],
+      "install": [
+        {
+          "method": "Source build with CMake (the only install method documented upstream in README/INSTALL, generic Unix; no prebuilt binaries or package-manager commands are documented)",
+          "command": "mkdir build; cd build; cmake ..; make; make install",
+          "citation": "INSTALL:7-11"
+        },
+        {
+          "method": "Source build with explicit prefix and build type",
+          "command": "cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=release",
+          "citation": "INSTALL:14-16"
+        },
+        {
+          "method": "Configure-time feature toggles (INSTALL's own example; option list via egrep '^ *(option|set.*STRING)' CMakeLists.txt)",
+          "command": "cmake .. -DENABLE_LIBCURL=ON -DBUILD_GTK_TESTS=OFF",
+          "citation": "INSTALL:43-51"
+        },
+        {
+          "method": "macOS dependencies via Homebrew (upstream CI recipe, not user documentation)",
+          "command": "brew install ninja boost cmake glib qt6 gpgme; brew install poppler --only-dependencies",
+          "citation": ".github/workflows/cmake.yml:27-28"
+        },
+        {
+          "method": "macOS configure/build/test (upstream CI recipe, not user documentation)",
+          "command": "cmake -DENABLE_QT5=OFF -DCMAKE_CXX_FLAGS=\"-Werror -Wno-deprecated-declarations\" -B build -G Ninja -DFONT_CONFIGURATION=generic -DENABLE_GPGME=OFF -DBUILD_SHARED_LIBS=OFF -DTESTDATADIR=<testfiles>; ninja; ctest --output-on-failure",
+          "citation": ".github/workflows/cmake.yml:41-50"
+        },
+        {
+          "method": "Debian/Ubuntu build dependencies (upstream CI recipe, not user documentation)",
+          "command": "apt-get build-dep --yes --no-install-recommends poppler",
+          "citation": ".gitlab-ci.yml:13"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes (OS-level; CPU architecture is not named in any CI file). Linux is the main CI target: Debian unstable and Ubuntu 24.04 containers build and run ctest (.gitlab-ci.yml:1, 40-51, 88-115); README-XPDF:67 says it is developed and tested on Linux. The only architecture-specific code is an i386 inline-asm fast path with a portable fallback (splash/SplashMath.h:38-80).",
+        "wsl2": "unknown. No mention of WSL or 'Windows Subsystem' anywhere in the repo (grep); a native Linux CMake build would be the applicable path but is neither documented nor CI-tested.",
+        "macos_arm64": "yes (OS-level; arm64 is not named). The macOS CI job builds with Homebrew deps and runs ctest on macos-15, macos-26 and xcode-27 runners using -DFONT_CONFIGURATION=generic -DENABLE_GPGME=OFF -DBUILD_SHARED_LIBS=OFF -DENABLE_QT5=OFF (.github/workflows/cmake.yml:10-14, 36-50). .gitlab-ci.yml:57 calls macOS 15 the minimum supported version. The workflow never names an architecture; arm64 is inferred from the portable code (splash/SplashMath.h:38-80), not stated.",
+        "gpu": "no. No GPU code or requirement: rendering is the CPU Splash rasterizer (splash/*.cc, poppler/SplashOutputDev.cc) or Cairo (poppler/CairoOutputDev.cc). Grep for CUDA/OpenCL/Vulkan/OpenGL/Metal/GPU finds only unrelated cairo_glyph identifiers."
+      },
+      "integrations": {
+        "cli": "yes. 13 utilities are built by default (ENABLE_UTILS ON, CMakeLists.txt:70, 856-858; utils/CMakeLists.txt:16-176; pdftocairo needs Cairo, pdfsig needs a signature backend). pdftotext and pdftohtml accept '-' for stdin (utils/pdftotext.cc:284-286; utils/pdftohtml.cc:215-218); pdftotext writes plain text to stdout with '-' (poppler/TextOutputDev.cc:5662) and pdftohtml has -stdout (utils/pdftohtml.cc:120). pdftotext exit codes are 0/1/2/3/99 (utils/pdftotext.1:155-171). Man pages: utils/*.1.",
+        "mcp": "none found. Grep for MCP / model context protocol across the repo returns nothing.",
+        "sdk_or_api": "Libraries: libpoppler (internal, unstable C++ API; poppler/, CMakeLists.txt:639); poppler-cpp (stable C++; cpp/CMakeLists.txt:26; page::search, page::text, page::text_list at cpp/poppler-page.h:174-213); poppler-glib (C/GObject plus optional GObject Introspection; glib/CMakeLists.txt:91; poppler_page_get_text/find_text at glib/poppler-page.h:78-86; CMakeLists.txt:73, 257-261); poppler-qt5 and poppler-qt6 (qt5/src, qt6/src; Page::text/search/textList at qt6/src/poppler-qt6.h:709-796). pkg-config files are installed (CMakeLists.txt:875-892). No HTTP/RPC server and no Python/JS bindings in the repo.",
+        "claude_code_or_codex": "none found. Grep for claude/codex/anthropic/openai/LLM returns nothing."
+      },
+      "telemetry_and_network": "No telemetry, analytics, crash-reporting or phone-home code found (case-insensitive grep for telemetry/analytics/phone home/usage statistics/crash report matches nothing). No account, API key or hosted service is required to build or run. Network use is limited to: (a) libcurl fetch of the input PDF when a CLI input argument starts with http:// or https:// (poppler/CurlPDFDocBuilder.cc:39-42), registered by poppler/PDFDocFactory.cc:43-45 when ENABLE_LIBCURL is on (default ON, CMakeLists.txt:81). 11 of the 13 utilities create documents through PDFDocFactory (e.g. utils/pdftotext.cc:288, utils/pdftohtml.cc:220, utils/pdfinfo.cc:1021; pdfseparate and pdfunite do not), and the C++/GLib/Qt wrappers do not use it. libcurl options set are only URL/HEADER/NOBODY/RANGE and write callbacks (poppler/CurlCachedFile.cc:48-54, 84-87). (b) Signature validation (pdfsig and library APIs) performs online OCSP revocation checks by default (utils/pdfsig.cc:219, 239; poppler/NSSCryptoSignBackend.cc:1099-1104) and AIA certificate fetching only with -aia (utils/pdfsig.cc:231, 241). (c) Build/CI-time downloads only (test data from freedesktop.org git, tarballs via wget; .gitlab-ci.yml:23-24, 46, 149, 163; .github/workflows/cmake.yml:34; appveyor.yml:16-17) and a GitLab pages trigger (.gitlab-ci.yml:254-263). Local reads: the poppler-data directory (poppler/GlobalParams.cc:478-501), the NSS certificate DB under HOME/XDG_CONFIG_HOME/APPDATA/MOZ_LEGACY_HOME (poppler/NSSCryptoSignBackend.cc:681-689, 764) and env POPPLER_SIGNATURE_BACKEND (poppler/CryptoSignBackend.cc:89). No JavaScript engine dependency and no system()/popen()/exec calls were found in poppler/, goo/ or utils/; JavaScript actions are only parsed and listed (poppler/JSInfo.cc:57-60; utils/pdfinfo.cc:101, 838)."
+    },
+    "code": {
+      "languages": [
+        "C++23 (CMakeLists.txt:51-53)",
+        "C17 (CMakeLists.txt:54-55; generated font-width tables poppler/*Widths.pregenerated.c, glib demos/tests)",
+        "CMake",
+        "Python 3 (regtest/, poppler/gen-unicode-tables.py, gtkdoc.py)",
+        "POSIX shell (CI and OSS-Fuzz helpers)"
+      ],
+      "entry_points": [
+        {
+          "path": "utils/pdftotext.cc",
+          "what": "main() at :182. PDF to plain text (default reading order, -layout, -raw), -htmlmeta, -bbox/-bbox-layout XHTML with page/flow/block/line/word boxes, -tsv; -opw/-upw passwords; stdin via '-'."
+        },
+        {
+          "path": "utils/pdftohtml.cc",
+          "what": "main() at :152. PDF to HTML or pdf2xml XML (-xml; DTD in utils/pdf2xml.dtd) with positioned text, fontspecs, extracted images and outline; -hidden includes invisible text."
+        },
+        {
+          "path": "utils/pdfinfo.cc",
+          "what": "Metadata, page boxes, JS, URLs; -struct and -struct-text dump the tagged-PDF logical structure (:282-341, :1064-1071)."
+        },
+        {
+          "path": "utils/pdftoppm.cc, utils/pdftocairo.cc, utils/pdfimages.cc",
+          "what": "Page rasterization (PNG/JPEG/TIFF), Cairo export (PS/EPS/PDF/SVG), embedded-image extraction/listing."
+        },
+        {
+          "path": "utils/pdfsig.cc, pdfattach.cc, pdfdetach.cc, pdfseparate.cc, pdfunite.cc, pdffonts.cc, pdftops.cc",
+          "what": "Signing/verification, attachments, split/merge, font listing, PostScript conversion."
+        },
+        {
+          "path": "poppler/PDFDoc.h",
+          "what": "libpoppler core (unstable internal C++ API): PDFDoc, TextOutputDev, SplashOutputDev; saveAs/saveWithoutChangesAs/saveCompleteRewrite at :310-316, :382."
+        },
+        {
+          "path": "cpp/poppler-page.h",
+          "what": "Stable C++ API (poppler-cpp, cpp/CMakeLists.txt:26): page::search, page::text, page::text_list."
+        },
+        {
+          "path": "glib/CMakeLists.txt, qt5/src/CMakeLists.txt, qt6/src/CMakeLists.txt",
+          "what": "Stable GLib/GObject (poppler-glib) and Qt5/Qt6 wrapper libraries (glib/poppler-page.h, qt6/src/poppler-qt6.h)."
+        }
+      ],
+      "architecture": "CMake build (CMakeLists.txt) producing libpoppler from ~98 .cc/.c files in poppler/: parsing (Lexer, Parser, XRef, Object, Stream plus filter decoders DCTStream, JPEG2000Stream, JBIG2Stream, BrotliStream); document model (PDFDoc, Catalog, Page, Outline, Annot, Form, StructTreeRoot/StructElement); a content-stream interpreter (Gfx.cc, GfxState.cc, GfxFont.cc) that drives pluggable OutputDev backends: TextOutputDev.cc (text with flow/block/line/word layout analysis, find-text, word lists), SplashOutputDev.cc (CPU raster via splash/), PSOutputDev.cc, BBoxOutputDev.cc, MarkedContentOutputDev.cc. CairoOutputDev.cc is compiled into pdftocairo, poppler-glib and test tools, not into libpoppler (utils/CMakeLists.txt:34-36; glib/CMakeLists.txt:87-88). Supporting dirs: goo/ (strings, files, PNG/JPEG/TIFF/NetPBM writers), fofi/ (TrueType/Type1 parsers), splash/ (software rasterizer). Signatures: CryptoSignBackend.cc with NSS and GPGME backends. I/O: PDFDocFactory.cc selects LocalPDFDocBuilder, FDPDFDocBuilder or CurlPDFDocBuilder. Front-ends: utils/ (CLIs), cpp/, glib/, qt5/, qt6/. Pages without a recoverable Unicode mapping rely on data files read at runtime from the separate poppler-data package (poppler/GlobalParams.cc:478-501). Invisible text (render mode 3) is flagged but kept by TextOutputDev (poppler/TextOutputDev.cc:426) and skipped by Splash (poppler/SplashOutputDev.cc:2128-2132).",
+      "packaging_and_release": "Releases are monthly YY.MM.0 versions recorded in NEWS (NEWS:1-207); the checkout is 26.09.90 (CMakeLists.txt:43-49), a post-26.09.0 development snapshot, with no git tags in the clone (.git/packed-refs:2). The only release mechanism in the repo is the CMake `dist` target: git archive + git-log ChangeLog + glib docs + xz -9 into poppler-<version>.tar.xz (CMakeLists.txt:938-946). There is no release workflow, and nothing in the repo generates checksums, signatures, SBOMs or attestations (grep for sha256/cosign/attest/gpg --sign finds none). Shared-library SOVERSIONs: libpoppler 164 (CMakeLists.txt:629), poppler-cpp 3 (cpp/CMakeLists.txt:28), poppler-glib 8 (glib/CMakeLists.txt:93), poppler-qt5 1 (qt5/src/CMakeLists.txt:37), poppler-qt6 3 (qt6/src/CMakeLists.txt:37). .pc files and man pages are installed (CMakeLists.txt:875-892; utils/CMakeLists.txt). API docs (Doxygen for cpp/qt5/qt6, gtk-doc for glib) are built as GitLab CI artifacts and a website pipeline is triggered by curl (.gitlab-ci.yml:199-263). No PyPI/npm/crates/container artifacts.",
+      "tests_and_ci": "Frameworks: Qt Test unit tests registered with CTest in qt5/tests and qt6/tests (qt6: 34 check_*.cpp; qt6/tests/CMakeLists.txt:50-97); GLib C tests (glib/tests/check_text.c, check_bb.c; glib/tests/CMakeLists.txt:3-41); CTest cases for image embedding, NSS signing/validation and font subsetting (test/CMakeLists.txt:60-312); libFuzzer harnesses (cpp/tests/fuzzing 5, glib/tests/fuzzing 7, qt6/tests/fuzzing 6) built only with the ECM fuzzer sanitizer (CMakeLists.txt:34-41) plus OSS-Fuzz build scripts (test/ossfuzz/build_fuzzers.sh); a Python 3 regression harness regtest/ (poppler-regtest create-refs/run-tests/create-report comparing pdftotext/splash/cairo/ps/info outputs by md5/diff; regtest/README.md:1-27); and a simple render-timing tool (test/perf-test.cc:9-11). Approximately 122 C/C++ test sources (qt5 39, qt6 51, cpp 8, glib 10, test/ 14) plus ~24 Python harness files. Test PDFs are NOT in this repo: a separate poppler/test repository is required (CMakeLists.txt:104-121). CI: GitLab CI .gitlab-ci.yml runs a clang-format-21 check; a Debian-unstable build with ENABLE_UNSTABLE_API_ABI_HEADERS, public-header verification and ctest; clang19/libc++ with CMake 3.28; clang22 with a custom goostring-format-checker plugin and clang-tidy; Ubuntu 24.04 gcc, clang/libc++, non-default-options and static builds plus a pkg-config consumer test; mingw64 on Fedora; clazy; Android Qt6; doc jobs; and a website trigger (.gitlab-ci.yml:31-263). GitHub Actions .github/workflows/cmake.yml builds and runs ctest on macOS 15/26/xcode-27 with -Werror and builds (no tests) on FreeBSD (:10-64). AppVeyor appveyor.yml builds and tests Windows mingw and MSVC2022 via KDE Craft (:21-34). No SAST, dependency-scan or sanitizer job appears in the CI files; sanitizers are documented via ECM flags (INSTALL:96-108) and used by OSS-Fuzz scripts.",
+      "dependencies": "No language-package manifests exist (glob found no requirements.txt, pyproject, package.json, Cargo.toml, go.mod, conan, vcpkg, meson or autotools files). The only manifest is the top-level CMakeLists.txt plus cmake/modules/Find*.cmake and ConfigureChecks.cmake. Direct library dependencies there: 4 hard in the default config (Freetype >=2.13, Fontconfig >=2.15 on non-Windows/Android, zlib, Iconv for poppler-cpp; CMakeLists.txt:170-172, 287, 306); 12 more that are default-ON and abort configure if missing unless disabled (HarfBuzz+subset, NSS3 >=3.98, Gpgmepp >=1.19, libtiff >=4.5, brotli >=1.1, libjpeg, OpenJPEG >=2, LittleCMS2 >=2.14, libcurl >=8.5, Boost >=1.83 headers, Qt5 >=5.15 Core/Gui/Xml/Widgets/Test, Qt6 >=6.4 Core/Gui/Widgets/Test; CMakeLists.txt:177-191, 194-226, 235-242, 308-319); and 4 auto-detected optional (libpng, Cairo >=1.18, GLib >=2.80 with GTK3, GObject-Introspection >=1.80; CMakeLists.txt:193, 233, 251-264). Roughly 20 library dependencies in total. Tooling: gperf/sed (optional), ECM >=5.115 (optional, sanitizers), gettext/Intl (optional), Python3 + gtk-doc (docs only), poppler-data (optional runtime data; CMakeLists.txt:361-372). Boost is used header-only (splash/SplashXPathScanner.h:29). Python helpers use only the standard library plus an optional PIL import (regtest/backends/__init__.py). Minimum toolchain: CMake >=3.28, C++23, C17 (CMakeLists.txt:1, 51-55).",
+      "security_policy": "none. No SECURITY.md or equivalent policy file (glob for *security* finds only poppler/SecurityHandler.*, which is PDF-encryption code). README.md:36-43 only says to report crashes or sanitizer findings at the public GitLab issue tracker (README.md:22-34 notes the tracker and attachments are public)."
+    },
+    "claim_checks": [
+      {
+        "claim": "A library for rendering PDF files, and examining or modifying their structure (README.md:4-5).",
+        "verified": "yes",
+        "evidence": "Rendering: SplashOutputDev (poppler/SplashOutputDev.cc) and Cairo output (poppler/CairoOutputDev.cc). Examination: PDFDoc/Catalog/XRef and pdfinfo. Modification: PDFDoc::saveAs/saveWithoutChangesAs/saveCompleteRewrite (poppler/PDFDoc.h:310-316, 382), pdfsig -add-signature/-sign (utils/pdfsig.cc:249-251), pdfattach/pdfseparate/pdfunite (utils/CMakeLists.txt:63-70, 160-176)."
+      },
+      {
+        "claim": "Poppler is licensed under the GPL, not the LGPL (README.md:9-12, 101-103).",
+        "verified": "yes",
+        "evidence": "COPYING is the GPLv2 text and COPYING3 the GPLv3 text (COPYING:1-2; COPYING3:1-2). Poppler-side headers say 'GPL version 2 or later' (poppler/PDFDoc.cc:13-14) and new files 'GPLv2 or later' (poppler/CurlPDFDocBuilder.cc:5), while xpdf-origin code is 'GPL v2 or v3 ... NOT any later version' (README-XPDF:35-46). No SPDX tags exist except in a vendored LLVM header (cpp/tests/fuzzing/FuzzedDataProvider.h). Small third-party snippets carry other licenses: LGPL (goo/glibc_strtok_r.cc:6-38), MIT-style (poppler/UTF.cc:139-157), MPLv2 note (poppler/NSSCryptoSignBackend.cc:1200)."
+      },
+      {
+        "claim": "Stable APIs are cpp, glib and qt5 (README.md:45-60).",
+        "verified": "partial",
+        "evidence": "Code also builds a Qt6 wrapper by default (CMakeLists.txt:76, 868-870; qt6/src/CMakeLists.txt:35-37, SOVERSION 3) with its own tests (qt6/tests/CMakeLists.txt:38-97) and NEWS entries (NEWS:54-58), but README lists only qt5. The README is out of date; the code is authoritative. Wrapper SOVERSIONs: cpp 3, glib 8, qt5 1, qt6 3 (cpp/CMakeLists.txt:28; glib/CMakeLists.txt:93; qt5/src/CMakeLists.txt:37)."
+      },
+      {
+        "claim": "poppler/ is an unstable internal C++ API that may change at any time (README.md:62-69).",
+        "verified": "yes",
+        "evidence": "Internal headers are installed only when ENABLE_UNSTABLE_API_ABI_HEADERS=ON (default OFF; CMakeLists.txt:67, 671-672); symbol visibility is hidden by default (CMakeLists.txt:57-59); libpoppler SOVERSION is 164 (CMakeLists.txt:629). Even the 'stable' cpp wrapper removed deprecated API in a monthly release (NEWS:145-146)."
+      },
+      {
+        "claim": "Poppler is highly sensitive to security bugs; report crashes at the public tracker (README.md:36-43).",
+        "verified": "partial",
+        "evidence": "Fuzz harnesses exist (cpp/tests/fuzzing/, glib/tests/fuzzing/, qt6/tests/fuzzing/; test/ossfuzz/build_fuzzers.sh:235-300) and most releases list 'Fix crashes in malformed documents' (NEWS:6, 43, 65, 73, 126, 140); NEWS:1792, 1800 record oss-fuzz-found security fixes. But there is no SECURITY policy file or private disclosure channel (glob), only the public tracker."
+      },
+      {
+        "claim": "The fork replaces xpdf components with fontconfig and cairo (README.md:90-99).",
+        "verified": "yes",
+        "evidence": "Fontconfig is the default and required font backend on non-Windows/Android (CMakeLists.txt:127-129, 171-172). Cairo is detected for pdftocairo and poppler-glib but is optional (CMakeLists.txt:233; utils/CMakeLists.txt:29-52; glib/CMakeLists.txt:87-88)."
+      },
+      {
+        "claim": "README-XPDF: Xpdf includes a text extractor, pdftops, pdfinfo, pdffonts, pdfdetach, pdftoppm, pdfimages; 'To generate a plain text file, run pdftotext' (README-XPDF:20-24, 120-137).",
+        "verified": "partial",
+        "evidence": "All of these tools are built (utils/CMakeLists.txt:16-27, 54-61, 73-99, 125-145) and pdftotext derives file.txt from file.pdf (utils/pdftotext.cc:302-316). README-XPDF is the 2011 xpdf-3.03 text: no xpdf viewer exists in this tree (glob for *xpdf* finds nothing); README-XPDF:142-143 says utilities read an xpdfrc, but NEWS:4689 says 'xpdfrc is no longer used for anything' and GlobalParams reads none (poppler/GlobalParams.cc:423-476). utils/pdftotext.1:5 still says 'version 3.03'. The code wins."
+      },
+      {
+        "claim": "Non-X xpdf tools also compile on Windows and Mac OSX (README-XPDF:75-77).",
+        "verified": "yes",
+        "evidence": "CI builds macOS (.github/workflows/cmake.yml:10-50), FreeBSD (:52-64), Windows via AppVeyor mingw/MSVC2022 (appveyor.yml:30-34), mingw64 on Fedora and Android (.gitlab-ci.yml:117-126, 140-197)."
+      },
+      {
+        "claim": "Poppler provides PDF rendering functionality as a shared library (README.md:78-88).",
+        "verified": "yes",
+        "evidence": "BUILD_SHARED_LIBS defaults ON (CMakeLists.txt:87); libpoppler is versioned with SOVERSION 164 (CMakeLists.txt:629-652); static builds are also CI-tested (.gitlab-ci.yml:110-115)."
+      },
+      {
+        "claim": "Absence check for the stated needs (README claims none of these): Markdown/JSON output, OCR of scans, Office/EPUB/HTML input, collection search.",
+        "verified": "yes",
+        "evidence": "Absence confirmed. Grep for 'markdown' (case-insensitive) matches nothing; 'json' matches only .gitlab-ci.yml:80-81 (compile_commands.json handling). OCR appears only as a limitation (utils/pdftotext.1:151-154) and as glyphless-font handling (poppler/TextOutputDev.cc:4592). Inputs are PDF only (poppler/PDFDocFactory.cc:41-45). epub/docx/xlsx/pptx matches are only LibreOffice comments (poppler/NSSCryptoSignBackend.cc:1117, 1200). Text search is per-page (poppler/TextOutputDev.h:602-630)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Splash rasterizer speed-up on some files (release-note statement, v0.67.0; no hardware or method given; rendering, not text extraction)",
+        "metric": "rendering time relative to previous release",
+        "value": "20% faster",
+        "source": "NEWS:1793",
+        "independent": false
+      },
+      {
+        "what": "Splash rasterizer speed-up on some files (release-note statement, v0.66.0; no hardware or method given)",
+        "metric": "rendering time relative to previous release",
+        "value": "20% faster",
+        "source": "NEWS:1801",
+        "independent": false
+      },
+      {
+        "what": "ObjectStream caching when opening some files (release-note statement, v0.14.1; no hardware or method given)",
+        "metric": "document open time relative to previous release",
+        "value": "ten times faster (Bug #26759)",
+        "source": "NEWS:3808",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope gap for document-to-Markdown/JSON ingestion and collection search: input is PDF only (poppler/PDFDocFactory.cc:41-45); outputs are text/HTML/XHTML-bbox/TSV/XML/images/PS/PDF/SVG (utils/pdftotext.cc:110-145; utils/pdftocairo.cc:157-175; utils/pdf2xml.dtd:2-49). The tree has no Markdown or JSON writer, no OCR, no Office/EPUB/HTML reader, no indexing or lexical/vector/hybrid search, and no MCP or Claude Code/Codex integration (repo-wide greps). Anything beyond per-page text, word/line/block boxes and tagged-PDF structure (utils/pdfinfo.cc:282-341, 1064-1071) would have to be built around it.",
+      "Scans and text fidelity: PDFs without a text layer yield no text (utils/pdftotext.1:151-154, 'short of OCR'). pdftotext keeps invisible OCR-layer text (poppler/TextOutputDev.cc:426 only flags render mode 3; poppler/Gfx.cc:3908 does not filter it) while pdftohtml drops it unless -hidden (utils/HtmlOutputDev.cc:1263). Default pdftotext re-flows text in reading order and removes end-of-line hyphens (utils/pdftotext.1:53-56, 67-83; utils/pdftotext.cc:255-256), so output can differ from the source characters (-layout/-raw avoid this). The TSV 'conf' column is a constant (100 for words, -1 for structure rows; utils/pdftotext.cc:587-588), not a recognition confidence. No text-extraction accuracy or throughput measurements are published in the repo (only the historical NEWS statements listed under benchmarks).",
+      "Document permission bits are not enforced by default in pdftotext: the okToCopy() check is compiled only if ENFORCE_PERMISSIONS is defined (utils/pdftotext.cc:294-300), and no build file defines it (repo-wide grep finds only #ifdef uses in utils/pdftotext.cc, pdftops.cc, pdfimages.cc, pdftocairo.cc). pdftohtml enforces the check unless -nodrm is given (utils/pdftohtml.cc:226-233), and -opw bypasses restrictions (utils/pdftotext.1:132-134). A pipeline that must honor copy restrictions needs its own check.",
+      "Network side effects are on by default: with ENABLE_LIBCURL=ON (CMakeLists.txt:81), 11 of the 13 utilities fetch any http:// or https:// input argument (poppler/PDFDocFactory.cc:43-45; poppler/CurlPDFDocBuilder.cc:39-42). Only URL/HEADER/NOBODY/RANGE and write callbacks are set, so there is no timeout, redirect-following or protocol/host restriction (poppler/CurlCachedFile.cc:48-54, 84-87). pdfsig and signature validation do online OCSP checks by default (utils/pdfsig.cc:219, 239; poppler/NSSCryptoSignBackend.cc:1099-1104). Build with -DENABLE_LIBCURL=OFF to remove URL fetching (INSTALL:43-47).",
+      "Security surface and disclosure: a C++ parser for untrusted binary input (README.md:38-39 itself says 'highly sensitive to security bugs'); most NEWS release entries still list 'Fix crashes in malformed documents' (NEWS:6, 43, 65, 73, 126, 140). Disclosure is only via the public GitLab tracker (README.md:22-34, 41-43) with no SECURITY policy file. ENABLE_ZLIB_UNCOMPRESS (default OFF) is flagged in the build as 'not totally safe' (CMakeLists.txt:86, 926-928). Encoding data (nameToUnicode, cidToUnicode, unicodeMap, cMap) is loaded from a separate poppler-data directory and a missing directory is silently ignored (poppler/GlobalParams.cc:478-501, error code swallowed at :482; default path ${prefix}/share/poppler, CMakeLists.txt:361-372).",
+      "Licensing: strong copyleft. README says programs which call Poppler must be GPL (README.md:9-12, 101-103). The effective terms are GPL-2.0-only OR GPL-3.0-only because xpdf-derived code is 'v2 or v3, not any later version' (README-XPDF:35-46), while newer files say 'GPLv2 or later' (poppler/CurlPDFDocBuilder.cc:5). There are no SPDX tags. Embedded third-party snippets are under LGPL (goo/glibc_strtok_r.cc:6-38), MIT-style (poppler/UTF.cc:139-157) and MPLv2 (poppler/NSSCryptoSignBackend.cc:1200). Commercial relicensing is offered only for xpdf, 'not poppler itself' (README.md:103-107).",
+      "Build burden and API churn: CMake >=3.28, C++23 and dependency floors set to Ubuntu 24.04 (CMakeLists.txt:1, 51, 153-168; NEWS:83). A default 'cmake ..' aborts if any of NSS3, Gpgmepp, libtiff, brotli, HarfBuzz, libjpeg, OpenJPEG, LCMS2, libcurl, Boost, Qt5 (Core/Gui/Xml/Widgets/Test) or Qt6 (Core/Gui/Widgets/Test) is missing unless explicitly disabled (CMakeLists.txt:177-191, 194-226, 235-242, 308-319), and INSTALL does not say so (INSTALL:7-16). Test PDFs live in a separate repo (CMakeLists.txt:104-121). Upstream documents no prebuilt binaries or package-manager install. WSL2 is undocumented. macOS CI uses FONT_CONFIGURATION=generic, which also disables HarfBuzz font subsetting (.github/workflows/cmake.yml:41; CMakeLists.txt:147-150). Monthly releases still remove deprecated API (NEWS:38, 145-146).",
+      "Provenance and release integrity: this checkout is a depth-1 clone of a GitHub mirror (.git/config:9-12; .git/shallow:1) of the GitLab project, at a development version 26.09.90 rather than a tagged release (CMakeLists.txt:43-49). The repo has no release workflow and produces no checksums, signatures or attestations (only the `dist` git-archive target, CMakeLists.txt:938-946). CI fetches some build inputs by plain wget or git:// without checksum verification (.gitlab-ci.yml:149, 163; do-the-gnupg-2.4-dance.sh:32-35; .github/workflows/cmake.yml:34). The README is partly stale: it omits Qt6 (README.md:45-60) and README-XPDF is the 2011 xpdf text."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "tsdgeos/poppler_mirror",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Source build with CMake is the only install method documented upstream (README/INSTALL); no prebuilt binaries or package-manager commands are documented. Command: mkdir build; cd build; cmake ..; make; make install",
+          "citation": "INSTALL:7-11",
+          "holds": true,
+          "note": "INSTALL:7-11 has exactly these five lines. The rest of INSTALL covers only CMake -D options (:14-54), cross-compiling with a CMake toolchain file (:57-75) and debug/sanitizer builds (:78-108). README.md gives no install steps, and neither file mentions binaries or package managers. INSTALL doesn't say that a default 'cmake ..' stops with a fatal error if soft-mandatory deps are missing, e.g. Boost (CMakeLists.txt:240) or OpenJPEG (CMakeLists.txt:312). The dossier's risks section already covers this."
+        },
+        {
+          "field": "license",
+          "statement": "spdx: GPL-2.0-only OR GPL-3.0-only; file: COPYING (GPLv2 text); COPYING3 (GPLv3 text)",
+          "citation": "COPYING:1-2; COPYING3:1-2; README-XPDF:35-46",
+          "holds": true,
+          "note": "COPYING:1-2 = 'GNU GENERAL PUBLIC LICENSE Version 2, June 1991'; COPYING3:1-2 = 'Version 3, 29 June 2007'; no other license files exist. README-XPDF:35-46 allows GPL v2 only, v3 only, or v2 or v3, and rules out 'any later version'. Poppler changes are 'GPL version 2 or later' (poppler/PDFDoc.cc:13-14; poppler/CurlPDFDocBuilder.cc:5). A grep turned up no GPLv3-only or GPLv2-only source file, so the combined effective expression is right. The only SPDX tag is Apache-2.0 WITH LLVM-exception in the test-only cpp/tests/fuzzing/FuzzedDataProvider.h. README.md:9-12 says only 'GPL' with no version."
+        },
+        {
+          "field": "readme.platforms.macos_arm64",
+          "statement": "yes (OS-level; arm64 not named): macOS CI builds with Homebrew deps and runs ctest on macos-15, macos-26 and xcode-27 with -DFONT_CONFIGURATION=generic -DENABLE_GPGME=OFF -DBUILD_SHARED_LIBS=OFF -DENABLE_QT5=OFF; macOS 15 is the minimum supported version; arm64 is inferred from portable code, not stated",
+          "citation": ".github/workflows/cmake.yml:10-14, 36-50; .gitlab-ci.yml:57; splash/SplashMath.h:38-80",
+          "holds": true,
+          "note": "The matrix at cmake.yml:14 is [macos-15, macos-26, xcode-27]. Homebrew installs are at :27-28, configure at :41 has exactly the cited flags, and :46/:50 run ninja and ctest --output-on-failure. .gitlab-ci.yml:57 says macos 15 is 'the minimum macos version we support'. No architecture is named. A grep for __aarch64__/__arm__/NEON/__x86_64__/SSE/AVX finds nothing, and the only arch-specific code is the i386 asm in SplashMath.h, with a portable #else at :74-79. The dossier's labeled arm64 inference is therefore consistent. The evidence is a CI recipe, not user documentation."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "13 utilities built by default (ENABLE_UTILS ON; pdftocairo needs Cairo, pdfsig needs a signature backend); pdftotext and pdftohtml accept '-' for stdin; pdftotext writes plain text to stdout with '-'; pdftohtml has -stdout; pdftotext exit codes 0/1/2/3/99; man pages utils/*.1",
+          "citation": "CMakeLists.txt:70, 856-858; utils/CMakeLists.txt:16-176; utils/pdftotext.cc:284-286; utils/pdftohtml.cc:215-218, 120; poppler/TextOutputDev.cc:5662; utils/pdftotext.1:155-171",
+          "holds": true,
+          "note": "ENABLE_UTILS is ON at CMakeLists.txt:70, and :856-858 adds utils/. utils/CMakeLists.txt adds 13 executables: pdftocairo inside if(HAVE_CAIRO) at :29-52, and pdfsig inside if(ENABLE_SIGNATURES) at :107-122. ENABLE_SIGNATURES is set only when NSS3 or GPGME is enabled (CMakeLists.txt:337-353). '-' maps to fd://0 at pdftotext.cc:284-286 and pdftohtml.cc:215-218, and TextOutputDev.cc:5662-5663 sends '-' output to stdout. pdftohtml.cc:120 is -stdout. pdftotext.1:155-171 lists 0/1/2/3/99, and 13 utils/*.1 man pages exist. Not mentioned in the dossier: with stdin input, pdftotext requires an explicit output filename (pdftotext.cc:305-307), so stdin-to-stdout is 'pdftotext - -'."
+        },
+        {
+          "field": "claim_checks[9]",
+          "statement": "Absence check (verified: yes): no Markdown/JSON output, no OCR of scans, no Office/EPUB/HTML input, no collection search; evidence includes 'epub/docx/xlsx/pptx matches are only LibreOffice comments (poppler/NSSCryptoSignBackend.cc:1117, 1200)'",
+          "citation": ".gitlab-ci.yml:80-81; utils/pdftotext.1:151-154; poppler/TextOutputDev.cc:4592; poppler/PDFDocFactory.cc:41-45; poppler/NSSCryptoSignBackend.cc:1117, 1200; poppler/TextOutputDev.h:602-630",
+          "holds": true,
+          "note": "I re-ran the greps and the conclusion holds. A case-insensitive grep for 'markdown' returns 0 hits. 'json' hits only .gitlab-ci.yml:80-81, the jq on compile_commands.json. OCR appears only at pdftotext.1:153, plus the 'Tesseract' glyphless-font shortcut at TextOutputDev.cc:4592. PDFDocFactory.cc:41-45 registers only the Local, FD and Curl PDF builders. findText at TextOutputDev.h:602-630 is a member of class TextPage (:557), so search runs per page. There is no sqlite/xapian/lucene/bm25/faiss anywhere. One evidence detail is wrong: a case-insensitive grep for epub|docx|xlsx|pptx returns zero hits. NSSCryptoSignBackend.cc:1117 and :1200 are LibreOffice comments that match only 'office'. The verdict 'yes' is unaffected."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "Non-blocking (verdict unaffected): in claim_checks[9].evidence, replace 'epub/docx/xlsx/pptx matches are only LibreOffice comments (poppler/NSSCryptoSignBackend.cc:1117, 1200)' with 'epub/docx/xlsx/pptx match nothing; the only office-related hits are LibreOffice comments (poppler/NSSCryptoSignBackend.cc:1117, 1200)'."
+      ]
+    }
+  ]
+}

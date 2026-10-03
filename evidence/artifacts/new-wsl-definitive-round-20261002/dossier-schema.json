@@ -1,0 +1,38 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contender", "revision", "license", "purpose", "readme", "code", "claim_checks", "benchmarks", "risks"],
+  "properties": {
+    "contender": {"type": "string"},
+    "revision": {"type": "object", "additionalProperties": false, "required": ["tag", "commit", "read_at"],
+                 "properties": {"tag": {"type": ["string", "null"]}, "commit": {"type": ["string", "null"]}, "read_at": {"type": "string"}}},
+    "license": {"type": "object", "additionalProperties": false, "required": ["spdx", "file"],
+                "properties": {"spdx": {"type": ["string", "null"]}, "file": {"type": ["string", "null"]}}},
+    "purpose": {"type": "string"},
+    "readme": {"type": "object", "additionalProperties": false,
+               "required": ["claims", "install", "platforms", "integrations", "telemetry_and_network"],
+               "properties": {
+                 "claims": {"type": "array", "maxItems": 14, "items": {"type": "object", "additionalProperties": false, "required": ["claim", "citation"], "properties": {"claim": {"type": "string"}, "citation": {"type": "string"}}}},
+                 "install": {"type": "array", "maxItems": 6, "items": {"type": "object", "additionalProperties": false, "required": ["method", "command", "citation"], "properties": {"method": {"type": "string"}, "command": {"type": "string"}, "citation": {"type": "string"}}}},
+                 "platforms": {"type": "object", "additionalProperties": false, "required": ["linux_x86_64", "wsl2", "macos_arm64", "gpu"],
+                               "properties": {"linux_x86_64": {"type": "string"}, "wsl2": {"type": "string"}, "macos_arm64": {"type": "string"}, "gpu": {"type": "string"}}},
+                 "integrations": {"type": "object", "additionalProperties": false, "required": ["cli", "mcp", "sdk_or_api", "claude_code_or_codex"],
+                                  "properties": {"cli": {"type": "string"}, "mcp": {"type": "string"}, "sdk_or_api": {"type": "string"}, "claude_code_or_codex": {"type": "string"}}},
+                 "telemetry_and_network": {"type": "string"}}},
+    "code": {"type": "object", "additionalProperties": false,
+             "required": ["languages", "entry_points", "architecture", "packaging_and_release", "tests_and_ci", "dependencies", "security_policy"],
+             "properties": {
+               "languages": {"type": "array", "items": {"type": "string"}},
+               "entry_points": {"type": "array", "maxItems": 8, "items": {"type": "object", "additionalProperties": false, "required": ["path", "what"], "properties": {"path": {"type": "string"}, "what": {"type": "string"}}}},
+               "architecture": {"type": "string"},
+               "packaging_and_release": {"type": "string"},
+               "tests_and_ci": {"type": "string"},
+               "dependencies": {"type": "string"},
+               "security_policy": {"type": "string"}}},
+    "claim_checks": {"type": "array", "maxItems": 10, "items": {"type": "object", "additionalProperties": false, "required": ["claim", "verified", "evidence"],
+                     "properties": {"claim": {"type": "string"}, "verified": {"type": "string", "enum": ["yes", "partial", "no", "not_checkable"]}, "evidence": {"type": "string"}}}},
+    "benchmarks": {"type": "array", "maxItems": 8, "items": {"type": "object", "additionalProperties": false, "required": ["what", "metric", "value", "source", "independent"],
+                   "properties": {"what": {"type": "string"}, "metric": {"type": "string"}, "value": {"type": "string"}, "source": {"type": "string"}, "independent": {"type": "boolean"}}}},
+    "risks": {"type": "array", "maxItems": 8, "items": {"type": "string"}}
+  }
+}

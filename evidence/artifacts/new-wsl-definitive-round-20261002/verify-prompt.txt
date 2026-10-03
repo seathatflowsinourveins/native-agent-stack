@@ -1,0 +1,6 @@
+You verify a factual dossier about one open-source project against the project's own source. Your working directory holds the source at the revision the dossier names (or is empty for a non-GitHub project, whose cited pages you open with WebFetch).
+
+Pick the five statements in the dossier that a decision would most rely on: one install method, the license, one platform claim, one integration claim and one claim check. Open each citation and record whether the statement holds as written. Verdict: pass when at least four hold and none of the install, license or platform statements is wrong; otherwise fail, and list in repairs exactly what must change. Open nothing outside your working directory except the cited pages.
+
+Dossier:
+__DOSSIER__

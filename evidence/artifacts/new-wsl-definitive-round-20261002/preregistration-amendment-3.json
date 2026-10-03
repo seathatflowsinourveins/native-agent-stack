@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "kind": "definitive_round_preregistration_amendment",
+  "amendment": 3,
+  "recorded_at_utc": "2026-10-03T05:06:40+00:00",
+  "before_any": "packet, decision, critic or adjudication of the round (no packet or decision exists)",
+  "why": "Usage-limit stops of the Claude client (2026-10-02 at about 19:46Z and 22:03Z, 2026-10-03 at about 02:26Z and 05:00Z) ended the verifier attempts of 13 dossiers after their writers had finished; run_round.py saved those dossiers with no verification result, and a rerun skips a saved record. reverify.py re-runs exactly the frozen verification loop on them instead of rewriting the dossiers.",
+  "reverify": {
+    "file": "reverify.py",
+    "sha256": "3021460e6bd76dac66d58e50730b21534b1bfdb43019d9d6448346242d5fb538",
+    "rule": "Same verify prompt, model (claude-opus-5-5 at max), tools, schema and timeout as run_round.dossier_one. A dossier not yet repaired gets the full loop (verification, at most one writer repair with the same repair prompt, a second verification). A dossier already repaired once (2 of the 13) gets only the lost second verification and no further repair, so no dossier is repaired twice. Earlier attempts stay in the record under verification_lost.",
+    "contenders": [
+      "colbymchenry/codegraph",
+      "deepset-ai/haystack",
+      "dependabot/dependabot-core",
+      "giancarloerra/socraticode",
+      "git/git",
+      "github/codeql-action",
+      "gitleaks/gitleaks",
+      "jarrodwatts/claude-hud",
+      "moby/moby",
+      "modal-labs/modal-client",
+      "oraios/serena",
+      "portkey-ai/gateway",
+      "postgres/postgres"
+    ]
+  },
+  "added": [
+    {
+      "file": "reverify.py",
+      "sha256": "3021460e6bd76dac66d58e50730b21534b1bfdb43019d9d6448346242d5fb538"
+    }
+  ],
+  "run_notes": [
+    "Dossier stage: 176 of 177 dossiers exist. yamadashy/repomix's writer failed at the 05:00Z limit; its record was deleted (deleted-null-records.jsonl in the private run directory) and the frozen runner redoes it after the reset.",
+    "Orchestration wrappers outside this folder start the frozen runner after a usage reset, stop it when three or more records fail within ten seconds (a limit failure takes about a second, a judged call many minutes), and delete records that carry no result so the frozen runner redoes them; each deletion is logged with its attempts in the private run directory. They change no prompt, model, tool, schema or decision.",
+    "Final verification verdicts before this pass: pass 162, fail 1 (after its one repair), none 13."
+  ]
+}

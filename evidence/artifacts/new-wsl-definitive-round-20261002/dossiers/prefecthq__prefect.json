@@ -1,0 +1,296 @@
+{
+  "contender": "prefecthq/prefect",
+  "revision": {
+    "contender": "prefecthq/prefect",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "PrefectHQ/prefect",
+        "tag": "3.8.7",
+        "commit": "4f52bc6d0dd8186ca63bdd0552c5e21f05b483b2",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "3.8.7",
+    "commit": "4f52bc6d0dd8186ca63bdd0552c5e21f05b483b2",
+    "read_at": "2026-10-02T03:02:41+00:00"
+  },
+  "dossier": {
+    "contender": "prefecthq/prefect",
+    "revision": {
+      "tag": "3.8.7",
+      "commit": "4f52bc6d0dd8186ca63bdd0552c5e21f05b483b2",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Prefect is a Python workflow-orchestration framework. Python functions decorated with @flow/@task run in an in-process engine that reports state to a REST API server (FastAPI + SQLAlchemy/Alembic; SQLite by default, PostgreSQL optional). The server has a web UI, a server-side scheduler (cron/interval/RRule) and run history. A `prefect` CLI and runner/worker processes execute each flow run as a subprocess (src/prefect/runner/, src/prefect/workers/process.py). For the stated need, `prefect shell watch|serve` (src/prefect/cli/shell.py) wraps one shell command string as a flow, optionally on a cron schedule, and a separate `prefect-shell` integration package (src/integrations/prefect-shell) offers ShellOperation. This dossier comes from a static read of the source and docs at the pinned revision; nothing was installed or executed, so runtime behaviour is inferred from code.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Prefect is a workflow orchestration framework for building data pipelines in Python; 'the simplest way to elevate a script into a production workflow'; resilient pipelines that 'recover from unexpected changes'.",
+          "citation": "README.md:54-56"
+        },
+        {
+          "claim": "Features named: scheduling, caching, retries and event-based automations.",
+          "citation": "README.md:58"
+        },
+        {
+          "claim": "Workflow activity is tracked and can be monitored with a self-hosted Prefect server instance or a managed Prefect Cloud dashboard.",
+          "citation": "README.md:60"
+        },
+        {
+          "claim": "Flows can handle retries, dependencies and complex branching logic.",
+          "citation": "README.md:62-63"
+        },
+        {
+          "claim": "Requires Python 3.10+; install with `pip install -U prefect` or `uv add prefect`.",
+          "citation": "README.md:69-77"
+        },
+        {
+          "claim": "`prefect server start` starts a server whose UI is at http://localhost:4200.",
+          "citation": "README.md:104-108"
+        },
+        {
+          "claim": "To run on a schedule, turn the flow into a deployment: `.serve(name=..., cron='* * * * *', parameters=...)`.",
+          "citation": "README.md:110-119"
+        },
+        {
+          "claim": "'You now have a process running locally that is looking for scheduled deployments'; runs can also be started manually from the UI or CLI and in response to events.",
+          "citation": "README.md:121-122"
+        },
+        {
+          "claim": "Agent setup guides connect an agent to Prefect 'through plugins or MCP' and the CLI; an agent-readable index (llms.txt) is provided (external prefect.io pages, not in this repo).",
+          "citation": "README.md:132-134"
+        },
+        {
+          "claim": "Prefect Cloud is the managed alternative (marketing figure: over 200 million data tasks automated monthly).",
+          "citation": "README.md:136-140"
+        },
+        {
+          "claim": "`prefect-client` is a lighter-weight client-side package for Cloud or a remote server, 'ideal for use in ephemeral execution environments'.",
+          "citation": "README.md:142-145"
+        }
+      ],
+      "install": [
+        {
+          "method": "pip (Python >=3.10)",
+          "command": "pip install -U prefect",
+          "citation": "README.md:71-73; docs/snippets/installation.mdx:5-7"
+        },
+        {
+          "method": "uv, add to a project",
+          "command": "uv add prefect",
+          "citation": "README.md:75-77; docs/snippets/installation.mdx:13-14"
+        },
+        {
+          "method": "uv, into an existing virtual environment",
+          "command": "uv pip install prefect",
+          "citation": "docs/snippets/installation.mdx:10-11"
+        },
+        {
+          "method": "uvx, run the server without installing",
+          "command": "uvx prefect server start",
+          "citation": "docs/v3/get-started/install.mdx:73-77"
+        },
+        {
+          "method": "Docker image (server)",
+          "command": "docker run -d -p 4200:4200 prefecthq/prefect:3-latest -- prefect server start --host 0.0.0.0",
+          "citation": "docs/v3/get-started/install.mdx:81-85"
+        },
+        {
+          "method": "pip, client-only package (omits CLI and server components)",
+          "command": "pip install -U prefect-client",
+          "citation": "docs/v3/get-started/install.mdx:101-112"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - the main CI suite runs on ubuntu-latest for Python 3.10-3.14 x SQLite/PostgreSQL 14 (.github/workflows/python-tests.yaml:55,89-172) and Docker images are built for linux/amd64 and linux/arm64 (.github/workflows/docker-images.yaml:128). The workflow files do not state the runner CPU architecture.",
+        "wsl2": "unknown - no WSL/WSL2 mention anywhere in the repository (searched all files except lockfiles). POSIX process-group code paths would apply under Linux, but WSL2 is neither documented nor tested.",
+        "macos_arm64": "yes, but not CI-covered - docs/v3/get-started/install.mdx:35 shows sample `prefect version` output with `OS/Arch: darwin/arm64`, and uv.lock:3664 lists a macosx_11_0_arm64 wheel for the compiled dependency orjson. No workflow in .github/ uses a macOS runner.",
+        "gpu": "no - Prefect neither requires nor uses a GPU (no GPU/CUDA reference in src/prefect). The docs only show limiting concurrency of user-defined GPU tasks with global concurrency limits (docs/v3/examples/per-worker-task-concurrency.mdx:16-36,104,146)."
+      },
+      "integrations": {
+        "cli": "Yes. `prefect` console script -> prefect.cli:app (pyproject.toml:133-134), a cyclopts app registering 30 commands from 29 lazily imported modules, including server, deploy, deployment, flow-run (ls/inspect/logs/watch/cancel/retry/delete/execute), worker, work-pool, shell (watch/serve), automation, api, config, profile (src/prefect/cli/_app.py:146-338; src/prefect/cli/flow_run.py:136,187,323,343,365,539,714,749).",
+        "mcp": "None in this repository (a search for 'mcp' finds only docs, README and an example). The MCP server is a separate project (PrefectHQ/prefect-mcp-server), run locally via `uvx --from prefect-mcp prefect-mcp-server`; it is documented as beta, read-only plus a docs proxy, inheriting the active Prefect profile credentials. A hosted connector requires a Prefect Cloud workspace (docs/v3/how-to-guides/ai/use-prefect-mcp-server.mdx:8-26,38-75).",
+        "sdk_or_api": "Python SDK (`from prefect import flow, task`; Flow.serve at src/prefect/flows.py:1027; get_client at src/prefect/client/orchestration/__init__.py:245-278) and an HTTP REST API served by the FastAPI server under /api with interactive docs at /docs (src/prefect/cli/_server_utils.py:55-74). `prefect api` calls it from the CLI (src/prefect/cli/_app.py:309-313). Cancellation can be requested through CLI, UI, Python client or REST (docs/v3/advanced/cancel-workflows.mdx:77-131).",
+        "claude_code_or_codex": "Documented but external to this repo: Claude Code via `/plugin marketplace add prefecthq/prefect-mcp-server` + `/plugin install prefect` (hosted read-only MCP, Prefect Cloud OAuth) or `claude mcp add prefect -- uvx --from prefect-mcp prefect-mcp-server`; Codex CLI via `codex mcp add prefect -- uvx --from prefect-mcp prefect-mcp-server` (docs/v3/how-to-guides/ai/use-prefect-mcp-server.mdx:117-153,191-217). The repo's own .claude/ directory is contributor tooling (SessionStart hook and docs/backlog skills: .claude/settings.json:1-15; AGENTS.md:164-171), not a user-facing integration. README points to agent setup guides on prefect.io/agents (README.md:134); that page was not fetched."
+      },
+      "telemetry_and_network": "README is silent on telemetry (read in full). Code and docs say: (1) Server heartbeat is ON by default (`server.analytics_enabled=True`, src/prefect/settings/models/server/root.py:45-51). A docket perpetual service POSTs platform, CPU architecture, Python version/implementation, Prefect and API versions, a random session id and start timestamp to https://sens-o-matic.prefect.io/ every 600 s, including in ephemeral-server mode (src/prefect/server/services/telemetry.py:64-115). Disable with PREFECT_SERVER_ANALYTICS_ENABLED=false or `prefect server start --analytics-off` (src/prefect/cli/server.py:82-89); `--no-services` and `--workers>1` also force it off (cli/server.py:173-186). The server code checks only that setting, not DO_NOT_TRACK. (2) SDK telemetry uses an Amplitude client that is inert unless a build-time key is injected (src/prefect/_internal/analytics/client.py:16-21,52-54). The release workflow injects secrets.AMPLITUDE_API_KEY (tools/write_build_info.py:11-23; .github/workflows/python-package.yaml:53-56), so a source checkout sends nothing. Five once-only milestone events (first_sdk_import, first_flow_defined, first_flow_run, first_deployment_created, first_schedule_created) are emitted only from interactive terminals, are skipped when DO_NOT_TRACK is 1/true/yes or a CI environment is detected, and are sent only if the server's analytics setting is true. An anonymous UUID device id is kept in ~/.prefect/.sdk_telemetry/ (src/prefect/_internal/analytics/events.py:8-14; enabled.py:10-33; service.py:97-110,156-179; milestones.py:151-177; device_id.py:15-55). Integration packages may emit events through emit_integration_event (emit.py:51-90). (3) UI v2 can send Amplitude events when built with VITE_AMPLITUDE_API_KEY and server analytics enabled (ui-v2/src/analytics/index.ts:6-52; ui-v2/src/analytics/analytics-provider.tsx:37; python-package.yaml:43-47). (4) Docs list optional egress hosts api2.amplitude.com and sens-o-matic.prefect.io and say a self-hosted server needs no Prefect-hosted endpoint for core operation (docs/v3/advanced/configure-network-access.mdx:32-69; docs/v3/concepts/telemetry.mdx:10-97). Docs inconsistency: telemetry.mdx:66-76 presents DO_NOT_TRACK as a general opt-out, while configure-network-access.mdx:34-37,68-69 scopes it to the client and requires the server setting for the heartbeat; the setting description mentions 'count of flow runs' but the payload contains none (root.py:45-51 vs telemetry.py:85-100). Required services and accounts: none for a local SQLite server (docket url defaults to memory://, messaging and lease storage default to in-memory: src/prefect/settings/models/server/docket.py:23-33, events.py:124-144, concurrency.py:15). The default client profile is `ephemeral` (src/prefect/settings/profiles.toml:4-7), which starts a loopback uvicorn subprocess on a random port 8000-8999 with the UI disabled that lives only as long as the client process (src/prefect/server/api/server.py:1065-1190). That ephemeral server runs only services flagged run_in_ephemeral, and the scheduler is not flagged (src/prefect/server/services/scheduler.py:212-214; perpetual_services.py:77-102), so scheduled runs need `prefect server start` (127.0.0.1:4200: settings/models/server/api.py:24-32) or Prefect Cloud (account; api.prefect.cloud, app.prefect.cloud, auth.workos.com: configure-network-access.mdx:19-23). Prefect Cloud, the hosted MCP connector and remote code storage (GitHub, S3 and similar) are optional."
+    },
+    "code": {
+      "languages": [
+        "Python (>=3.10,<3.15): src/prefect, tests/, 18 integration packages under src/integrations/",
+        "TypeScript/React: ui-v2/ (default web UI, Vite)",
+        "TypeScript/Vue: ui/ (legacy web UI)",
+        "TLA+: formal/tla/deployment-concurrency",
+        "Dockerfile, shell (scripts/entrypoint.sh), GitHub Actions YAML, Jinja2 templates (src/prefect/_sdk/templates)"
+      ],
+      "entry_points": [
+        {
+          "path": "pyproject.toml:133-134; src/prefect/cli/_app.py:146-168; src/prefect/__main__.py:1-4",
+          "what": "`prefect` console script (prefect.cli:app), a cyclopts CLI with lazily imported command modules; also `python -m prefect`."
+        },
+        {
+          "path": "src/prefect/cli/server.py:45-253; src/prefect/cli/_server_utils.py:268-373",
+          "what": "`prefect server start [--background]` runs uvicorn on prefect.server.api.server:create_app (API, UI, scheduler and other services in one process; SQLite default). Also `server stop`, `server services start|stop`, `server database upgrade|reset`."
+        },
+        {
+          "path": "src/prefect/cli/shell.py:111-245",
+          "what": "`prefect shell watch` (run one command once, tracked as a flow run) and `prefect shell serve` (deployment with optional --cron-schedule, polled by a Runner)."
+        },
+        {
+          "path": "src/prefect/flows.py:1027-1179",
+          "what": "Flow.serve(): creates a deployment and starts a Runner polling loop in the calling process (module-level serve() at flows.py:3048)."
+        },
+        {
+          "path": "src/prefect/runner/runner.py:182-710",
+          "what": "Runner facade (ScheduledRunPoller, ProcessManager, CancellationManager, ControlChannel) used by serve and workers; spawns one subprocess per flow run."
+        },
+        {
+          "path": "src/prefect/workers/process.py:134-220",
+          "what": "ProcessWorker (`prefect worker start --pool X --type process`) executes work-pool flow runs as subprocesses."
+        },
+        {
+          "path": "src/prefect/AGENTS.md:13; src/prefect/runner/_starter_engine.py:75-77",
+          "what": "Subprocess entrypoints `python -m prefect.engine` / `python -m prefect.flow_engine <entrypoint>` that execute a single flow run (reads PREFECT__FLOW_RUN_ID)."
+        },
+        {
+          "path": "src/prefect/runner/_workspace_supervisor.py:197-212",
+          "what": "`python -m prefect.runner._workspace_supervisor`: managed supervisor that prepares the workspace and execs the engine inside a POSIX process group or a Windows kill-on-close Job Object."
+        }
+      ],
+      "architecture": "One Python distribution (`prefect`, hatchling + versioningit) containing: (a) SDK/engine: src/prefect/flows.py, tasks.py, flow_engine.py, task_engine.py, task_runners.py (thread/process pool), transactions.py (commit/rollback hooks, isolation levels), cache_policies.py, results.py (persistence off by default: settings/models/results.py:26-29), states.py. Flow state transitions are proposed to the server and accepted or rejected by its orchestration rules; task state transitions are local (AGENTS.md:104-108). (b) client: src/prefect/client/ (httpx, pydantic schemas incl. Cron/Interval/RRule schedules in client/schemas/schedules.py; cron is IANA-timezone aware with DST handling, lines 120-135). (c) server: src/prefect/server/api/server.py (FastAPI app factory, optional HTTP Basic auth, serves UI bundles), server/models and server/orchestration/core_policy.py (state machine incl. RetryFailedFlows), server/database (SQLAlchemy 2 async + Alembic; sqlite+aiosqlite at ~/.prefect/prefect.db by default, settings/models/_defaults.py:76-77), server/services/ (scheduler, late_runs, foreman, cancellation_cleanup, repossessor, pause_expirations, cleanup_reconciler, db_vacuum, task_run_recorder, telemetry) scheduled as perpetual tasks on a pydocket Docket inside the API process (in-memory by default, Redis optional), and server/events (events, automations, triggers). Scheduled runs carry an idempotency key (server/models/deployments.py:883-884). (d) execution: src/prefect/runner/ (Runner facade over ScheduledRunPoller, FlowRunExecutor, ProcessManager [SIGTERM then SIGKILL after a 30 s grace], CancellationManager, ControlChannel [authenticated loopback TCP channel carrying cancel intent to the child before the kill], StateProposer, workspace supervisor) and src/prefect/workers/ (ProcessWorker; other worker types live in integration packages). (e) CLI: src/prefect/cli/ (29 modules). (f) UIs: ui-v2/ (React, default per settings/models/server/ui.py:22-25) and ui/ (Vue, legacy), built into src/prefect/server/ui* at release time (not present in the source tree). (g) 18 separately versioned integration packages in src/integrations/ (e.g. prefect-shell, prefect-docker, prefect-kubernetes) loaded via the `prefect.collections` entry point. (h) client/ holds the build config for the `prefect-client` subset package. Local scheduled-work process model: one long-lived server process (API + scheduler + UI + DB) plus one long-lived runner (`serve` / `prefect shell serve`) or worker that polls every 10 s (settings/models/runner.py:58-61) and spawns a subprocess per run up to a concurrency cap (default 5 for Runner(): settings/models/runner.py:53-56; unlimited for Flow.serve(): flows.py:1052,1128).",
+      "packaging_and_release": "Artifacts: PyPI `prefect` (sdist + wheel; `.devN` pre-releases are wheel only) built with both UI bundles required (.github/workflows/python-package.yaml:43-63; hatch_build.py:16-61); PyPI `prefect-client` (client/pyproject.toml; .github/workflows/prefect-client-publish.yaml:1-41); 18 integration packages published on tags `prefect-<name>-<version>` (integration-package-release.yaml:3-117); DockerHub images prefecthq/prefect and prefecthq/prefect-client for Python 3.10-3.14, flavors default/-conda/-kubernetes, linux/amd64 + linux/arm64 (docker-images.yaml:22-141; the Dockerfile entrypoint is `tini -g`, Dockerfile:214); a Helm chart release workflow (helm-chart-release.yaml:1-6). Cadence: nightly dev pre-release when .py files or dependency manifests changed (nightly-release.yaml:3-6,54-64) and a weekly patch release kicked off on Thursdays by a Devin.ai playbook that drafts the release-notes PR and then creates the GitHub release (kickoff-release.yaml:3-17); publishing triggers on a GitHub release being published (python-package.yaml:3-6). PyPI publishing uses OIDC trusted publishing (`id-token: write`, pypa/gh-action-pypi-publish@release/v1, GitHub environments prod/pre-release; python-package.yaml:71-97). No checksum, signature, SBOM or explicit attestation step is configured in any workflow (grep of .github/workflows); Docker builds set `provenance: false` (docker-images.yaml:139); the only sha256 check is for the TLA+ tools download (tla-plus.yaml:50-58). Dependencies are locked in uv.lock (364 packages) and CI installs with `uv sync --locked`. Version comes from git tags via versioningit; builds without .git fall back to 3.6.24+nogit (pyproject.toml:233-246).",
+      "tests_and_ci": "pytest with asyncio_mode=auto, 90 s per-test timeout, filterwarnings=error, plus xdist/split/flakefinder/env plugins (pyproject.toml:139-195,273-341). tests/ mirrors src/prefect: about 472 test files and about 11.6k test functions (regex count at this revision); tests/runner has 23 files / 637 tests (e.g. test__process_manager.py, test__cancellation_manager.py, test__starter_engine.py, test_runner.py); integration packages carry their own tests (171 files / about 3.5k tests under src/integrations); integration-tests/ holds 25 end-to-end scripts run against a live server (e.g. test_serve_a_flow.py, test_nested_cancellation.py, test_flow_retries.py, test_runner_resilience.py); ui-v2 has Vitest unit tests (349 files / about 2.9k it/test calls) and 25 Playwright e2e specs; a TLA+ model of deployment concurrency (formal/tla/deployment-concurrency, .github/workflows/tla-plus.yaml). CI has 44 workflow files. Key ones: python-tests.yaml (Ubuntu; Python 3.10-3.14 x SQLite/PostgreSQL 14; 15-min job timeout; an 18-group duration-balanced canonical lane on 3.12/PG14; docker-service tests; typesafety tests); windows-tests.yaml (only `-m windows` tests plus tests/test_futures.py, Python 3.10-3.12; 3.14 excluded because asyncpg does not compile); static-analysis.yaml (pre-commit with ruff/codespell/mypy/uv-lock, and pyright); integration-tests.yaml (end-to-end flows against running servers, prefect-client compatibility, SQLite 3.24.0 and 3.31.1); api-compatibility-tests.yaml (OSS vs Prefect Cloud OpenAPI via the compat-tests git submodule, .gitmodules:1-3); k8s-integration-tests.yaml; codeql-analysis.yml (PRs + weekly cron); ui-tests.yml, ui-v2-checks.yml, ui-v2-e2e-tests.yml; codspeed-benchmarks.yaml and benchmarks.yaml (import time, flow/task call overhead); proxy-test.yaml; markdown-tests.yaml. AI-agent automation also exists: claude.yml (runs anthropics/claude-code-action on @claude mentions with read-only permissions) and kickoff-release.yaml (Devin API); devin-fix-flaky-tests.yaml and agents-md-update.yml exist but were not opened. No tests were run for this dossier.",
+      "dependencies": "pyproject.toml: 57 direct runtime dependencies (14 server-side: aiosqlite, alembic, apprise, asyncpg, click, cryptography, dateparser, docker, jinja2, jinja2-humanize-extension, pytz, readchar, sqlalchemy[asyncio], cyclopts; 43 shared client-side incl. fastapi, pydantic v2, httpx[http2], uvicorn, websockets, anyio, cloudpickle, orjson, pendulum/whenever by Python version, rich, pydocket, pluggy, amplitude-analytics, opentelemetry-api, prometheus-client) (pyproject.toml:26-87); 21 optional extras with 26 entries (otel x6, bundles, buildx, aws, azure, gcp, docker, kubernetes, shell, dask, ray, bitbucket, github, gitlab, databricks, dbt, snowflake, sqlalchemy, redis, email, slack: pyproject.toml:94-131); dependency groups dev (47 entries), perf, cli-bench, markdown-docs, type-checking, benchmark (pyproject.toml:139-228). client/pyproject.toml: 42 runtime deps plus a `notifications` extra (apprise) (client/pyproject.toml:26-77). ui-v2/package.json: 75 runtime + 49 dev deps, node >=22.13 <25 (ui-v2/package.json:6-8,28-155). ui/package.json (legacy Vue): 12 runtime + 9 dev (ui/package.json:12-36). src/integrations/*/pyproject.toml: 18 packages (prefect-shell has 1 runtime dep, prefect>=3.6.17, and 14 dev deps: src/integrations/prefect-shell/pyproject.toml:25,28-44). Vendored code: src/prefect/_vendor/croniter/ (two .py files, no license file alongside).",
+      "security_policy": "SECURITY.md: supported versions 3.x and 2.x (1.x and 0.x unsupported); private reporting through GitHub security advisories (https://github.com/PrefectHQ/prefect/security/advisories/new), no public issues; scope is the Python SDK, self-hosted server/API and web UI in this repo; out of scope are third-party dependency vulnerabilities and issues that require prior server-side access or control of the server configuration; process is triage, private fix branch, CVE via GitHub advisory when warranted, advisory plus patched release, reporter credit (SECURITY.md:1-33)."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:58 - scheduling, caching, retries and event-based automations are built in.",
+        "verified": "yes",
+        "evidence": "Schedules: Cron/Interval/RRule models (src/prefect/client/schemas/schedules.py:66,120,188; cron is timezone/DST aware, lines 120-135) turned into runs by the server scheduler service (src/prefect/server/services/scheduler.py:212-285). Caching: cache policies, DEFAULT = INPUTS + TASK_SOURCE + RUN_ID (src/prefect/cache_policies.py:410-416); results are not persisted unless enabled (settings/models/results.py:26-29). Retries: flow retries/retry_delay_seconds (src/prefect/flows.py:211-212, default 0 via settings/models/flows.py:29-38); task retries, retry_jitter_factor, retry_condition_fn, timeout_seconds (src/prefect/tasks.py:146,160,406,412,420); applied server-side by RetryFailedFlows (src/prefect/server/orchestration/core_policy.py:1067-1150). Automations/triggers: `triggers=` on serve (flows.py:1044) and Automation API usage (docs/v3/advanced/detect-zombie-flows.mdx:41-75)."
+      },
+      {
+        "claim": "README.md:60 - activity is tracked and can be monitored with a self-hosted Prefect server.",
+        "verified": "yes",
+        "evidence": "The server DB persists run history, logs, deployments, events and automations (docs/v3/concepts/server.mdx:17-31). Default store is sqlite+aiosqlite at ~/.prefect/prefect.db (src/prefect/settings/models/_defaults.py:76-77,108-114; docs/v3/how-to-guides/self-hosted/server-cli.mdx:38-40). UI v2 is the default UI (src/prefect/settings/models/server/ui.py:22-25). Caveat: UI bundles are build artifacts - no src/prefect/server/ui* exists in the source tree (the CLI prints 'dashboard is not built' for dev checkouts, src/prefect/cli/_server_utils.py:82-100) and are built at release (python-package.yaml:43-47; hatch_build.py:16-61)."
+      },
+      {
+        "claim": "README.md:104-108 - `prefect server start` serves the UI at http://localhost:4200.",
+        "verified": "yes",
+        "evidence": "Command at src/prefect/cli/server.py:45-253; defaults host 127.0.0.1, port 4200 (src/prefect/settings/models/server/api.py:24-32); docs/v3/how-to-guides/self-hosted/server-cli.mdx:12-22 give http://127.0.0.1:4200."
+      },
+      {
+        "claim": "README.md:110-122 - changing the last line to `.serve(name, cron, parameters)` leaves a local process looking for scheduled deployments.",
+        "verified": "partial",
+        "evidence": "Flow.serve accepts name/cron/parameters and starts a Runner (src/prefect/flows.py:1027-1055,1128-1175); the poller queries every 10 s (src/prefect/settings/models/runner.py:58-61; src/prefect/runner/_scheduled_run_poller.py:211-238). Caveats found in code: the scheduler service that creates the runs is not run by the ephemeral subprocess server (src/prefect/server/services/scheduler.py:212-214; src/prefect/server/services/perpetual_services.py:77-102; src/prefect/server/api/server.py:930-951), and the default profile is `ephemeral` (src/prefect/settings/profiles.toml:4-7). A persistent server and a configured PREFECT_API_URL are therefore needed; the README snippet omits the API-URL step (the server prints it, cli/_server_utils.py:68-70, and prompts only in interactive terminals, cli/server.py:167-171). Stopping the process pauses the schedule by default (flows.py:1050; docs/v3/how-to-guides/deployment_infra/run-flows-in-local-processes.mdx:46-66,103-108)."
+      },
+      {
+        "claim": "README.md:122 - workflows can be run manually from the UI or CLI and in response to events.",
+        "verified": "yes",
+        "evidence": "serve prints `prefect deployment run '<flow>/<deployment>'` and the UI deployment URL (src/prefect/flows.py:1148-1158); docs show ad-hoc and cancel from the UI (docs/v3/how-to-guides/deployment_infra/run-flows-in-local-processes.mdx:146-150); `triggers=` is accepted by serve (flows.py:1044,1069)."
+      },
+      {
+        "claim": "README.md:54-56,62-63 - resilient pipelines that recover from unexpected changes; flows handle retries, dependencies and branching.",
+        "verified": "partial",
+        "evidence": "Retries are applied only on Running->Failed and re-run in-process (src/prefect/server/orchestration/core_policy.py:1076-1077,1136); a child that exits non-zero is proposed as Crashed by the runner (src/prefect/runner/_flow_run_executor.py:185-207) and is not retried by that rule. Lost-host detection needs heartbeats (default 180 s, src/prefect/settings/models/flows.py:16-27) plus an automation that self-hosters must create (managed version is Cloud-only): docs/v3/advanced/detect-zombie-flows.mdx:8-15,37-75. SIGTERM to a serve/Runner process cancels in-flight runs with 'Runner is shutting down.' (src/prefect/runner/runner.py:591-598,688-706; src/prefect/runner/_cancellation_manager.py:222-242). Dependencies are expressed in Python via futures and `wait_for` (src/prefect/tasks.py:1235-1281); no declarative multi-command DAG format was found, and `prefect shell` takes a single command string (src/prefect/cli/shell.py:157-175)."
+      },
+      {
+        "claim": "README.md:69 - Prefect requires Python 3.10+.",
+        "verified": "yes",
+        "evidence": "requires-python >=3.10,<3.15 and classifiers 3.10-3.14 (pyproject.toml:10,13-25); CI matrix 3.10-3.14 (.github/workflows/python-tests.yaml:167-172)."
+      },
+      {
+        "claim": "README.md:132-134 - an agent can be connected to Prefect 'through plugins or MCP'.",
+        "verified": "partial",
+        "evidence": "No MCP or plugin code exists in this repository (search for 'mcp'). The MCP server is a separate repo (PrefectHQ/prefect-mcp-server) run with uvx, beta, read-only, with a hosted option that needs Prefect Cloud (docs/v3/how-to-guides/ai/use-prefect-mcp-server.mdx:8-26,38-75,117-153,191-217). The README links to external prefect.io pages that were not fetched."
+      },
+      {
+        "claim": "README.md:142-145 - prefect-client is a lighter-weight client-side option for ephemeral environments.",
+        "verified": "yes",
+        "evidence": "client/pyproject.toml:26-70 lists 42 runtime deps vs 57 in pyproject.toml:26-87; docs say it 'omits all CLI and server components' (docs/v3/get-started/install.mdx:101-106); CI verifies the CLI is absent after installing it (.github/workflows/integration-tests.yaml:145-172,182-186). It still depends on amplitude-analytics (client/pyproject.toml:28)."
+      },
+      {
+        "claim": "CLI reference (docs, not README) - `prefect shell serve --concurrency-limit` sets 'Max concurrent flow runs' (docs/v3/api-ref/cli/shell.mdx:139-141); relevant to README.md:58 'automate any data process'.",
+        "verified": "no",
+        "evidence": "The option is parsed and validated (>=1) but never passed on: serve() builds the deployment with to_deployment(name, parameters, entrypoint_type, schedules, tags) and `Runner(name=flow_name)` (src/prefect/cli/shell.py:192-205,213-230). tests/cli/test_shell.py:38-81 passes `--concurrency-limit 5` but asserts only tags and schedule. The effective cap is the Runner default PREFECT_RUNNER_PROCESS_LIMIT=5 (src/prefect/settings/models/runner.py:53-56; tests/runner/test_runner.py:335), whereas Flow.serve(limit=None) passes None, which means unlimited (src/prefect/flows.py:1052,1128; src/prefect/runner/_limit_manager.py:12-14; tests/runner/test_runner.py:345-346). Static reading only; not executed."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Prefect 3.0 vs earlier versions: runtime overhead of massively parallel workflows on Dask/Ray (docs give no method, hardware or baseline)",
+        "metric": "runtime overhead reduction",
+        "value": "up to 98% 'in some benchmark cases'",
+        "source": "docs/v3/get-started/whats-new-prefect-3.mdx:49",
+        "independent": false
+      },
+      {
+        "what": "Server database vacuum for orphaned logs/artifacts after a query change (PR #20868)",
+        "metric": "vacuum cycle time on large databases",
+        "value": "~3.6 s -> ~0.5 s",
+        "source": "docs/v3/release-notes/oss/version-3-6.mdx:447",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Process-tree bounding is path-dependent. `prefect shell serve|watch` runs the command with subprocess.Popen(shell=True) and no new session or process group (src/prefect/cli/shell.py:63-76). A Runner-supervised run is stopped by signalling only the flow-run PID (default _SingleProcessTerminationScope, src/prefect/runner/_process_manager.py:137-157); the starters chosen at src/prefect/runner/runner.py:1762-1790 do not enable isolate_process_group (src/prefect/runner/_starter_engine.py:53,86-88). Group-wide SIGTERM->SIGKILL (POSIX) or a kill-on-close Job Object (Windows) applies only on the ProcessWorker generated-command path (src/prefect/runner/_workspace_starter.py:237-248; src/prefect/workers/process.py:181-196, not when an explicit command is configured, lines 167-180) and in prefect-shell's ShellOperation (src/integrations/prefect-shell/prefect_shell/commands.py:32-105,537-559), not its shell_run_command task (commands.py:182-184); ShellOperation's tree-kill is a no-op on Windows (commands.py:58-59). Whether grandchildren survive a cancel on the serve path was not tested here.",
+      "Stop/restart is cancel-and-pause, not resume. SIGTERM to a serve/Runner process calls stop() -> cancel_all('Runner is shutting down.') (src/prefect/runner/runner.py:591-598,688-706; src/prefect/runner/_cancellation_manager.py:222-242) and pause_on_shutdown=True pauses the deployments (runner.py:190,1208-1217,1821-1822; docs/v3/how-to-guides/deployment_infra/run-flows-in-local-processes.mdx:46-66). Occurrences that fall while the server is down are never created (the scheduler generates from `now`, src/prefect/server/services/scheduler.py:182-195), but already-created overdue runs are fetched with no lower time bound and executed when a runner returns (src/prefect/server/api/deployments.py:633-650); the late-runs service only relabels them Late (src/prefect/server/services/late_runs.py:53-87).",
+      "Failure-detection and retry gaps. `retries` apply only to Running->Failed transitions and retry in-process (src/prefect/server/orchestration/core_policy.py:1067-1077,1136); a killed or lost process ends as Crashed (src/prefect/runner/_flow_run_executor.py:185-207). Heartbeats (default 180 s, src/prefect/settings/models/flows.py:16-27) only feed an automation that self-hosted users must create (docs/v3/advanced/detect-zombie-flows.mdx:8-15,37-75); without it a run on a dead host stays Running. `prefect shell` exposes no retries, timeout or result persistence: run_shell_process is a plain @flow (src/prefect/cli/shell.py:39-46,148-154,216), so these need a Python wrapper flow.",
+      "Concurrency caps differ by entry point and one documented flag is inert: Flow.serve() defaults to unlimited concurrent runs (limit=None, src/prefect/flows.py:1052,1128; tests/runner/test_runner.py:345-346) while Runner() and `prefect shell serve` default to 5 (src/prefect/settings/models/runner.py:53-56; src/prefect/cli/shell.py:230); `prefect shell serve --concurrency-limit` is validated but never applied (src/prefect/cli/shell.py:192-230; docs/v3/api-ref/cli/shell.mdx:139-141).",
+      "Telemetry and egress are on by default with split opt-outs: a server heartbeat to sens-o-matic.prefect.io every 600 s (default True, also in ephemeral mode: src/prefect/server/services/telemetry.py:64-115; src/prefect/settings/models/server/root.py:45-51) and, in release builds, Amplitude SDK events keyed by a build-time secret (tools/write_build_info.py:11-23; .github/workflows/python-package.yaml:53-56). The server code honours only PREFECT_SERVER_ANALYTICS_ENABLED, not DO_NOT_TRACK (telemetry.py:64-68; src/prefect/_internal/analytics/enabled.py:10-33), while docs/v3/concepts/telemetry.mdx:66-76 presents either as a general opt-out; an offline setup must disable both.",
+      "Security defaults for a local server: no authentication unless PREFECT_SERVER_API_AUTH_STRING is set (HTTP Basic, src/prefect/server/api/server.py:519-556), though the bind address defaults to 127.0.0.1 (src/prefect/settings/models/server/api.py:24-27). With no PREFECT_SERVER_ENCRYPTION_KEY, the Fernet key protecting block secrets is generated and stored in the same database (src/prefect/server/utilities/encryption.py:16-37). SECURITY.md excludes reports that require prior server-side access or control of server configuration (SECURITY.md:20-23).",
+      "Operational footprint: scheduled work needs a persistent `prefect server start` (the ephemeral server has no scheduler) plus a serve/worker process; `--background` is a bare Popen with a PID file and no restart supervision (src/prefect/cli/_server_utils.py:268-319), and the repo's systemd guide covers only worker and serve processes (docs/v3/advanced/daemonize-processes.mdx:11-16,96-177). SQLite is the default and multi-worker mode requires PostgreSQL + Redis (docs/v3/how-to-guides/self-hosted/server-cli.mdx:102-107). Flow-run history grows unbounded by default: DB vacuum defaults to events only, flow-run vacuum is opt-in (90-day retention) and events are kept 7 days (src/prefect/settings/models/server/services.py:96-102,144-148; settings/models/server/events.py:92-100). New clients can be incompatible with old servers (docs/v3/concepts/server.mdx:11-15). Install pulls 57 direct runtime dependencies including the full server stack (pyproject.toml:26-87).",
+      "Maintenance process and platform coverage: 25 of the 40 entries in the 3.8.7 release notes are attributed to devin-ai-integration[bot] (docs/v3/release-notes/oss/version-3-8.mdx:11-65); weekly releases are kicked off by a Devin.ai playbook (.github/workflows/kickoff-release.yaml:3-9) plus nightly dev pre-releases (.github/workflows/nightly-release.yaml:3-6); 3.8.6 shipped 2026-09-14 and 3.8.7 2026-09-25 (version-3-8.mdx:7,75); legacy Runner methods are deprecated pending removal (src/prefect/runner/AGENTS.md:38-48). The full test matrix runs on Linux only, Windows runs a marked subset on Python 3.10-3.12 (.github/workflows/windows-tests.yaml:36-82), there is no macOS runner and WSL2 is unmentioned. Releases configure no signatures, checksums or attestations (python-package.yaml:71-97; docker-images.yaml:139). The vendored croniter has no license file alongside it (src/prefect/_vendor/croniter/)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "prefecthq/prefect",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "pip (Python >=3.10): `pip install -U prefect`",
+          "citation": "README.md:71-73; docs/snippets/installation.mdx:5-7",
+          "holds": true,
+          "note": "README.md:72 and docs/snippets/installation.mdx:6 both read `pip install -U prefect`. The Python floor matches README.md:69 ('Prefect requires Python 3.10+') and pyproject.toml:10 (requires-python = \">=3.10,<3.15\")."
+        },
+        {
+          "field": "license",
+          "statement": "spdx Apache-2.0, file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-2 is the Apache License, Version 2.0 text, with 'Copyright 2019- Prefect Technologies, Inc.' at line 189. pyproject.toml:11 declares license = { text = \"Apache-2.0\" } and line 17 carries the 'License :: OSI Approved :: Apache Software License' classifier."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - the main CI suite runs on ubuntu-latest for Python 3.10-3.14 x SQLite/PostgreSQL 14 and Docker images are built for linux/amd64 and linux/arm64; the workflow files do not state the runner CPU architecture.",
+          "citation": ".github/workflows/python-tests.yaml:55,89-172; .github/workflows/docker-images.yaml:128",
+          "holds": true,
+          "note": "python-tests.yaml:55 is `runs-on: ubuntu-latest`. Lines 164-172 give the matrix database postgres:14/sqlite x python 3.10-3.14. Lines 173+ exclude some cells, including 3.12/PG14, which moves to the canonical lane. All 8 jobs in the file use ubuntu-latest. docker-images.yaml:128 is `platforms: linux/amd64,linux/arm64`. No workflow states a runner CPU architecture, as the dossier says."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "`prefect` console script -> prefect.cli:app, a cyclopts app registering 30 commands from 29 lazily imported modules, including server, deploy, deployment, flow-run (ls/inspect/logs/watch/cancel/retry/delete/execute), worker, work-pool, shell (watch/serve), automation, api, config, profile.",
+          "citation": "pyproject.toml:133-134; src/prefect/cli/_app.py:146-338; src/prefect/cli/flow_run.py:136,187,323,343,365,539,714,749",
+          "holds": true,
+          "note": "pyproject.toml:134 is `prefect = \"prefect.cli:app\"`, and cli/__init__.py:4 re-exports _app.app, a cyclopts app (_app.py:7,14). _app.py:177-338 registers 30 commands as lazy string paths from 29 distinct modules: prefect.cli.deploy supplies both deploy and init, and the comment at line 175 says 'all 29 command modules'. All named commands are present, and `api` is at 309-313. flow_run.py defines inspect at 136, ls 187, delete 323, cancel 343, retry 365, logs 539, watch 714 and execute 749, which are exactly the 8 @flow_run_app.command entries. shell.py:111,157 register watch and serve."
+        },
+        {
+          "field": "claim_checks[9]",
+          "statement": "CLI reference documents `prefect shell serve --concurrency-limit` as 'Max concurrent flow runs' - verified: no. The option is parsed and validated (>=1) but never passed on; the effective cap is the Runner default PREFECT_RUNNER_PROCESS_LIMIT=5, whereas Flow.serve(limit=None) means unlimited.",
+          "citation": "docs/v3/api-ref/cli/shell.mdx:139-141; src/prefect/cli/shell.py:192-205,213-230; tests/cli/test_shell.py:38-81; src/prefect/settings/models/runner.py:53-56; tests/runner/test_runner.py:335; src/prefect/flows.py:1052,1128; src/prefect/runner/_limit_manager.py:12-14; tests/runner/test_runner.py:345-346",
+          "holds": true,
+          "note": "shell.mdx:139-141 documents the flag. shell.py:192-195 declares it and 204-205 rejects values below 1. After that, concurrency_limit is never read: to_deployment (218-228) receives only name, parameters, entrypoint_type, schedules and tags, and 230 calls Runner(name=flow_name). runner.py:250-253 then sets limit = settings.runner.process_limit, which defaults to 5 (settings/models/runner.py:53-56; test_runner.py:335). flows.py:1052 defaults limit=None and 1128 passes it to Runner; _limit_manager.py:12-14 treats None as unlimited, as test_runner.py:345-346 confirms. Minor imprecision with no effect on the result: test_shell.py:38-81 also asserts the deployment name (line 76), not only tags and schedule. It never checks concurrency, so the finding stands."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

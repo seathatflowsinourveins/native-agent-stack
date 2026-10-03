@@ -1,0 +1,343 @@
+{
+  "contender": "trailofbits/skills",
+  "revision": {
+    "contender": "trailofbits/skills",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "trailofbits/skills",
+        "tag": null,
+        "commit": "82fe8226252622fa807643bdca1710901198553a",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": null,
+    "commit": "82fe8226252622fa807643bdca1710901198553a",
+    "read_at": "2026-10-02T03:02:53+00:00"
+  },
+  "dossier": {
+    "contender": "trailofbits/skills",
+    "revision": {
+      "tag": null,
+      "commit": "82fe8226252622fa807643bdca1710901198553a",
+      "read_at": "2026-10-02T03:02:53+00:00"
+    },
+    "license": {
+      "spdx": "CC-BY-SA-4.0",
+      "file": "LICENSE"
+    },
+    "purpose": "A Claude Code plugin marketplace from Trail of Bits that the README says Codex can also load through its Claude-marketplace compatibility. It distributes 44 independently installable plugins holding 83 SKILL.md skills, plus 8 slash commands, 30 subagents, 11 dynamic workflows, hooks in 3 plugins and one MCP config. Most content is security auditing and testing procedure; a smaller Development group covers Python and C++ tooling rules, devcontainers, git/GitHub housekeeping and review aids. It is Markdown-first with Python, Bash and JavaScript helpers, and ships no standalone binary, server or API.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Describes itself as a Claude Code plugin marketplace from Trail of Bits 'providing skills to enhance AI-assisted security analysis, testing, and development workflows'.",
+          "citation": "README.md:3"
+        },
+        {
+          "claim": "'Codex can load this marketplace through its Claude marketplace compatibility.'",
+          "citation": "README.md:3"
+        },
+        {
+          "claim": "Claude Code: `/plugin marketplace add trailofbits/skills`, then browse and install plugins through `/plugin menu`.",
+          "citation": "README.md:9-19"
+        },
+        {
+          "claim": "Codex 'supports Claude plugin marketplaces directly', so no Codex-specific sidecar metadata is needed. Install flow: `codex plugin marketplace add trailofbits/skills`, `codex plugin list`, `codex plugin add <plugin-name>@trailofbits`.",
+          "citation": "README.md:21-31"
+        },
+        {
+          "claim": "ChatGPT workspace imports use `.claude-plugin/marketplace.json`; skills that ship `agents/openai.yaml` must also set `interface.display_name` and `interface.short_description` there.",
+          "citation": "README.md:33-39"
+        },
+        {
+          "claim": "Local development: from the parent directory run `/plugins marketplace add ./skills`.",
+          "citation": "README.md:41-48"
+        },
+        {
+          "claim": "Catalog is nine category tables (Smart Contract Security, Code Auditing, Malware Analysis, Verification, Reverse Engineering, Mobile Security, Development, Team Management, Tooling); 44 plugin rows by count.",
+          "citation": "README.md:50-139"
+        },
+        {
+          "claim": "Security procedures are listed under Code Auditing (18 rows, e.g. differential-review, sharp-edges, insecure-defaults, fp-check, variant-analysis, static-analysis, c-review, rust-review, supply-chain-risk-auditor), Verification (7 rows) and the smart-contract, malware, reverse-engineering and mobile tables.",
+          "citation": "README.md:52-110"
+        },
+        {
+          "claim": "Engineering-workflow plugins sit under Development (12 rows): modern-python ('uv, ruff, and pytest'), modern-cpp ('C++20/23/26 with compiler hardening and safe idioms'), devcontainer-setup, gh-cli, git-cleanup, goal-prompt, github-triage, open-sourcing, review-walkthrough, second-opinion, code-improver, let-fate-decide.",
+          "citation": "README.md:112-127"
+        },
+        {
+          "claim": "Contributors run `make check` before pushing; it 'runs most of CI locally' (AGENTS.md lists what it does not cover).",
+          "citation": "README.md:154-156"
+        },
+        {
+          "claim": "License: Creative Commons Attribution-ShareAlike 4.0 International.",
+          "citation": "README.md:158-160"
+        },
+        {
+          "claim": "Links related Trail of Bits repos (claude-code-config, codex-config, skills-curated, claude-code-devcontainer, dropkit, coop); not opened for this dossier.",
+          "citation": "README.md:5"
+        },
+        {
+          "claim": "README is silent on per-task or lazy skill loading, token cost, supported OS/arch, telemetry, and versioning or release policy; it gives only install commands and plugin tables.",
+          "citation": "README.md:1-160"
+        }
+      ],
+      "install": [
+        {
+          "method": "Claude Code: add marketplace",
+          "command": "/plugin marketplace add trailofbits/skills",
+          "citation": "README.md:12"
+        },
+        {
+          "method": "Claude Code: browse and install individual plugins",
+          "command": "/plugin menu",
+          "citation": "README.md:18"
+        },
+        {
+          "method": "Claude Code: install one plugin by name (plugin READMEs)",
+          "command": "/plugin install second-opinion@trailofbits   (also documented: /plugin install trailofbits/skills/plugins/modern-python)",
+          "citation": "plugins/second-opinion/README.md:24-25; plugins/modern-python/README.md:67"
+        },
+        {
+          "method": "Codex: add marketplace, list, install one plugin",
+          "command": "codex plugin marketplace add trailofbits/skills ; codex plugin list ; codex plugin add <plugin-name>@trailofbits",
+          "citation": "README.md:28-30"
+        },
+        {
+          "method": "Claude Code from a local checkout, run from the parent directory",
+          "command": "/plugins marketplace add ./skills",
+          "citation": "README.md:47"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - every CI job runs on ubuntu-latest (.github/workflows/validate.yml:19; lint.yml:19,31,78,184). The architecture is not stated and the README has no platform section.",
+        "wsl2": "unknown - no WSL or Windows support statement for the marketplace, only a path-style note (AGENTS.md:141); no Windows or WSL CI job.",
+        "macos_arm64": "unknown - README has no platform section and CI has no macOS job. macOS is evidenced as a maintainer platform (AGENTS.md:275,356-357; .github/scripts/validate_plugin_metadata.py:324-326; plugins/review-walkthrough/evals/README.md:82-84) and some plugins document brew prerequisites (plugins/yara-authoring/README.md:22-23; plugins/firebase-apk-scanner/README.md:52-54); locked wheels include macosx arm64 (plugins/yara-authoring/skills/yara-rule-authoring/scripts/uv.lock:10). arm64 support itself is never stated.",
+        "gpu": "no - nothing in the marketplace uses or requires a GPU; searches of README, AGENTS.md, Makefile, workflows, plugin READMEs and SKILL.md files found no GPU, CUDA or ROCm requirement."
+      },
+      "integrations": {
+        "cli": "No marketplace-level CLI; install uses the Claude Code and Codex CLIs (README.md:12,28-30). Helper CLIs live inside plugins: the `ct-analyzer` console script (plugins/constant-time-analysis/pyproject.toml:35-36; README.md:27-33 `uv tool install .`), `uv run collect.py` / `render.py` for supply-chain-risk-auditor (plugins/supply-chain-risk-auditor/README.md:35-39), shell tools such as firebase-apk-scanner/scanner.sh and burp-search.sh, and maintainer scripts under .github/scripts plus `make check`.",
+        "mcp": "No MCP server is implemented here. One plugin, zeroize-audit, ships `.mcp.json` registering third-party Serena over stdio via `uvx --from git+https://github.com/oraios/serena ... --project-from-cwd` (plugins/zeroize-audit/.mcp.json:3-17). CI asserts loaded MCP servers equal `.mcp.json` (.github/scripts/check_claude_loadability.py:170-183; check_codex_loadability.py:246-260). second-opinion removed its automatic Codex MCP registration in 1.8.1 (plugins/second-opinion/README.md:56-61).",
+        "sdk_or_api": "none found - no published package, SDK or HTTP API; the only packaged Python project is ct-analyzer (hatchling config in plugins/constant-time-analysis/pyproject.toml:1-5,49-62) and no workflow publishes it.",
+        "claude_code_or_codex": "Claude Code is primary: marketplace plus 83 skills, 8 commands, 30 subagents, 11 dynamic workflows run via the `Workflow` tool, and hooks in 3 plugins (README.md:3,12; AGENTS.md:70-101). Codex: installable through Claude-marketplace compatibility (README.md:21-31); 74 of 83 skills carry agents/openai.yaml (some with `$skill` default prompts, e.g. plugins/review-walkthrough/skills/review-walkthrough/agents/openai.yaml:4); two skills resolve `${CODEX_PLUGIN_ROOT}` (plugins/rust-review/skills/rust-review/SKILL.md:48; plugins/semgrep-rule-variant-creator/skills/semgrep-rule-variant-creator/SKILL.md:37); code-improver says Codex is unsupported for its loop (plugins/code-improver/README.md:75-77); goal-prompt targets both clients (plugins/goal-prompt/skills/goal-prompt/SKILL.md:3)."
+      },
+      "telemetry_and_network": "No telemetry, analytics or phone-home code found: a grep for telemetry and analytics terms hit only fixtures and prose, and the static-analysis skill tells the agent to pass `--metrics=off` to every semgrep call (plugins/static-analysis/skills/semgrep/SKILL.md:23; plugins/static-analysis/workflows/semgrep-scan.js:246). No account, API key or hosted service is needed to install or load; clients fetch the GitHub repo (README.md:12,28). Network use is per plugin and task-triggered: second-opinion sends the selected diff to the user's authenticated Codex/Antigravity/Gemini CLI (plugins/second-opinion/README.md:9-15,46-50); supply-chain-risk-auditor queries api.osv.dev, registry.npmjs.org, api.npmjs.org, pypi.org, proxy.golang.org, api.deps.dev, api.github.com (using `gh auth token`) and api.scorecard.dev, with a 6-hour temp-dir cache and `--offline` (plugins/supply-chain-risk-auditor/skills/supply-chain-risk-auditor/scripts/sources.py:304,353,376,396,440,461,517-559,614; README.md:41-44); firebase-apk-scanner makes live POST/DELETE calls to target Firebase endpoints (plugins/firebase-apk-scanner/skills/firebase-apk-scanner/scanner.sh:516-550,755-778); testing-handbook-skills may clone github.com/trailofbits/testing-handbook (plugins/testing-handbook-skills/README.md:219-221); semgrep-rule-creator, semgrep-rule-variant-creator and dwarf-expert allow WebFetch (SKILL.md:4,4,5); zeroize-audit's MCP is fetched via unpinned `uvx --from git+...` (plugins/zeroize-audit/.mcp.json:6-9); skills tell users to run curl|sh installers (plugins/modern-python/skills/modern-python/references/uv-commands.md:11). Repo CI, not user-facing, uses an org ANTHROPIC_API_KEY for PR reviews (.github/workflows/claude-review.yml:3-6)."
+    },
+    "code": {
+      "languages": [
+        "Markdown",
+        "Python",
+        "Bash",
+        "JavaScript (ESM)",
+        "YAML/JSON/TOML"
+      ],
+      "entry_points": [
+        {
+          "path": ".claude-plugin/marketplace.json",
+          "what": "Marketplace catalog named 'trailofbits': 44 entries, each `source: ./plugins/<name>`, no ref or sha pin."
+        },
+        {
+          "path": "plugins/<name>/.claude-plugin/plugin.json",
+          "what": "Per-plugin manifest (name, version, description, author only)."
+        },
+        {
+          "path": "plugins/*/skills/*/SKILL.md",
+          "what": "83 skills with name/description/allowed-tools frontmatter; 74 also have agents/openai.yaml for Codex/ChatGPT."
+        },
+        {
+          "path": "plugins/*/commands/*.md and plugins/*/workflows/*.js",
+          "what": "8 slash commands and 11 Claude Code dynamic workflows invoked as /<plugin>:<name> through the Workflow tool."
+        },
+        {
+          "path": "plugins/{fp-check,gh-cli,modern-python}/hooks/hooks.json",
+          "what": "The only hook definitions (Stop/SubagentStop prompt hooks; SessionStart/PreToolUse/SessionEnd command hooks); plugins/zeroize-audit/.mcp.json is the only MCP config."
+        },
+        {
+          "path": "plugins/constant-time-analysis/pyproject.toml:35-36",
+          "what": "`ct-analyzer` console script (ct_analyzer.analyzer:main), the only packaged CLI."
+        },
+        {
+          "path": "Makefile; .github/scripts/validate_plugin_metadata.py",
+          "what": "Maintainer entry points: `make check` and the 2,138-line structural validator with --self-test."
+        },
+        {
+          "path": ".github/scripts/check_claude_loadability.py; check_codex_loadability.py",
+          "what": "CI scripts that drive the real Claude Code and Codex CLIs to install and load every plugin."
+        }
+      ],
+      "architecture": "Content repository organised as a Claude Code plugin marketplace. `.claude-plugin/marketplace.json` lists 44 plugins. Each `plugins/<name>/` has `.claude-plugin/plugin.json`, a README and any of: `skills/<skill>/SKILL.md` (83 total; 37 plugins have exactly one; multi-skill plugins are testing-handbook-skills 15, trailmark 14, building-secure-contracts 11, code-improver 3, static-analysis 3) with references/, scripts/, workflows/, assets/ and agents/openai.yaml; `commands/*.md` (8); `agents/*.md` (30 subagents, 11 in zeroize-audit); `workflows/*.js` (11); `hooks/hooks.json` (3 plugins); `.mcp.json` (zeroize-audit). git-cleanup and insecure-defaults ship commands and workflows but no SKILL.md. Helpers are stdlib-first Python run with `uv run` (PEP 723), Bash and Node ES modules; larger ones are plugins/constant-time-analysis/ct_analyzer/, plugins/c-review/scripts/, plugins/supply-chain-risk-auditor/skills/supply-chain-risk-auditor/scripts/{collect,sources,render,model}.py, plugins/static-analysis codeql/semgrep scripts and plugins/zeroize-audit/skills/zeroize-audit/tools/. Quality gate: .github/scripts/validate_plugin_metadata.py cross-checks manifests, marketplace, README, CODEOWNERS, frontmatter, hardcoded paths, legacy-python commands and README component coverage; two loadability scripts run the real CLIs.",
+      "packaging_and_release": "No release workflow (only lint.yml, validate.yml, claude-review.yml) and no build artifacts, checksums, signatures or attestations. This clone is shallow (.git/shallow) with no tag refs (.git/packed-refs lists only origin/main), so release history could not be inspected. Distribution is the git repo itself: every marketplace entry has `source: ./plugins/<name>` with no ref/sha (.claude-plugin/marketplace.json:11-450), so clients follow the default branch; marketplace metadata.version is a static 1.0.0 (:8). Per-plugin semver must match between plugin.json and marketplace.json (validate_plugin_metadata.py:410-415) and must increase for PRs touching the plugin unless labelled no-version-bump (validate_plugin_metadata.py:941-979; validate.yml:103-131; AGENTS.md:279-282); this runs only on PRs. The only packageable artifact is ct-analyzer (constant-time-analysis/pyproject.toml:1-5,49-62; `uv tool install .`), and nothing publishes it. Third-party GitHub Actions are pinned to commit SHAs (validate.yml:21; lint.yml:21-27).",
+      "tests_and_ci": "Frameworks: pytest (53 test_*.py/*_test.py files, one of them an eval fixture; run per directory with --import-mode=importlib, lint.yml:162-180); bats (11 files: gh-cli 6, modern-python 5); Node (5 *.test.mjs files with a one-assertion guard, lint.yml:208-225); 9 shell regression suites tests/**/run_*.sh; a headless-Chrome check for review-walkthrough (lint.yml:226-230); validator self-tests (validate_plugin_metadata.py --self-test, 113-assertion floor at :167; validate_skill_interfaces.py unittest, 8-case floor). About 78 test files plus Node and shell harnesses. Eval suites (`claude plugin eval`, early access, paid) exist for at least 13 plugins and are not run in CI (Makefile:181-183); the `eval-self-tests` target runs only in `make check` and no workflow step matches it, despite the Makefile header (:1-7) saying each target mirrors a CI job. Workflows: lint.yml (pre-commit: ruff 0.14.13, shellcheck, shfmt, check-yaml/json/toml, detect-private-key, actionlint, zizmor, local validators; bats job also runs the shell suites; Python tests; JS tests), validate.yml (SKILL.md frontmatter check, personal-email check, metadata validator with version-increment check on PRs, then installs @anthropic-ai/claude-code@latest and @openai/codex@0.146.0 and runs both loadability checks), claude-review.yml (automated Claude review of same-repo, non-draft, non-bot PRs). All run on ubuntu-latest.",
+      "dependencies": "No root manifest. 12 shipped pyproject.toml; declared runtime deps: culture-index scripts 4 (opencv-python-headless, numpy, pdf2image, pytesseract), testing-handbook-skills/scripts 1 (pyyaml), trailmark slicing-code-context/scripts 1 (trailmark>=0.5,<0.6, plus dev pytest and ruff), yara-authoring scripts 1 (yara-x>=0.10.0); the other 8 declare none (constant-time-analysis, c-review, rust-review, let-fate-decide, post-patch-validation, review-walkthrough, codeql scripts, supply-chain scripts). 50 Python scripts carry PEP 723 headers; non-empty inline deps include tree-sitter==0.26.0, tree-sitter-c==0.24.2, tree-sitter-cpp==0.23.4 (c-review/scripts/enumerate_units.py:9), pyyaml, yara-x, trailmark, cryptography (an example) and pytest. 7 committed uv.lock files; Dependabot (weekly, 7-day cooldown) watches 5 uv directories plus GitHub Actions, while PEP 723 deps are manual (.github/dependabot.yml:22-24,30-75). Tool prerequisites (semgrep, CodeQL, clang/LLVM, gh, jq, uvx, PyPI trailmark) are documented only in plugin READMEs and SKILL.md files. Other manifests are eval fixtures and the devcontainer Dockerfile resource. CI-only pins: pre-commit hook revs and @openai/codex 0.146.0; Claude Code CLI @latest and pip pytest/pyyaml/semgrep are unpinned (validate.yml:141-146; lint.yml:108).",
+      "security_policy": "none - no SECURITY.md or security policy file anywhere in the tree (glob for SECURITY* found nothing). CI hygiene only: actionlint and zizmor and detect-private-key in pre-commit (.pre-commit-config.yaml:32,36-44), `permissions: contents: read` and `persist-credentials: false` in validate.yml and lint.yml."
+    },
+    "claim_checks": [
+      {
+        "claim": "Codex can load this marketplace through its Claude marketplace compatibility (README.md:3).",
+        "verified": "partial",
+        "evidence": "CI starts `codex app-server` (CLI pinned 0.146.0, validate.yml:151-161) with `plugins` and `plugin_hooks` features enabled (check_codex_loadability.py:129-132,146-157), calls plugin/list and plugin/read per plugin, and requires loaded skill count == SKILL.md count and MCP servers == .mcp.json (:211-260). It never runs `codex plugin add` and never exercises hooks, commands, agents or dynamic workflows. README's Codex steps do not mention enabling those features. plugins/code-improver/README.md:75-77 says its loop is unavailable on Codex."
+      },
+      {
+        "claim": "Codex install commands `codex plugin marketplace add trailofbits/skills`, `codex plugin list`, `codex plugin add <plugin-name>@trailofbits` (README.md:28-30).",
+        "verified": "not_checkable",
+        "evidence": "The CLI syntax belongs to Codex and CI uses app-server JSON-RPC instead (check_codex_loadability.py:211-241). The `@trailofbits` suffix matches the marketplace name (.claude-plugin/marketplace.json:2)."
+      },
+      {
+        "claim": "Claude Code: add the marketplace, then install plugins individually (README.md:12,18).",
+        "verified": "partial",
+        "evidence": "CI runs CLI equivalents on a local checkout: `claude plugin marketplace add`, then `plugin list --available` shows the plugins as available, then each is installed with `claude plugin install <name>@trailofbits` (check_claude_loadability.py:136-159). So adding the marketplace does not install the catalog and per-plugin install works. The GitHub-shorthand source and `/plugin menu` are not exercised, and CI uses Claude Code @latest (validate.yml:141-146). README.md:47 writes `/plugins`, the only such form in the repo."
+      },
+      {
+        "claim": "No Codex-specific sidecar metadata is needed (README.md:23).",
+        "verified": "partial",
+        "evidence": "No .codex/, .opencode/, .agents/ or .codex-plugin/ exists and the validator fails the build if one appears (validate_plugin_metadata.py:70-75,811-829). But 74 of 83 skills ship agents/openai.yaml, an OpenAI-specific per-skill file checked by validate_skill_interfaces.py:37-40 and CI (lint.yml:109-112)."
+      },
+      {
+        "claim": "building-secure-contracts has 'vulnerability scanners for 6 blockchains and 5 development guideline assistants' (README.md:56).",
+        "verified": "yes",
+        "evidence": "plugins/building-secure-contracts/skills holds 11 SKILL.md: six *-vulnerability-scanner (algorand, cairo, cosmos, solana, substrate, ton) and five others (audit-prep-assistant, code-maturity-assessor, guidelines-advisor, secure-workflow-guide, token-integration-analyzer). It is one plugin, so installing it exposes all 11."
+      },
+      {
+        "claim": "Authoring guidance 'Keep SKILL.md under 500 lines' (AGENTS.md:213, linked from README.md:154).",
+        "verified": "partial",
+        "evidence": "7 of 83 skills exceed it, all in testing-handbook-skills: libfuzzer 793, aflpp 644, libafl 623, harness-writing 612, coverage-analysis 604, wycheproof 531, constant-time-testing 505 lines. The validator only warns (validate_plugin_metadata.py:77,985-993,1149-1150). The 83 files total about 24,332 lines (average about 293)."
+      },
+      {
+        "claim": "Skills trigger per task from their descriptions (AGENTS.md:180-184; plugins/audit-context-building/README.md:20-22).",
+        "verified": "partial",
+        "evidence": "Every SKILL.md must have name and description (validate.yml:34-83) and the validator checks only that the frontmatter parses (validate_plugin_metadata.py:494-530); AGENTS.md:320-325 says no tool checks that a description triggers. Project evals: variant-analysis recorded zero skill invocations in 40+ runs on inline prompts and 2/3, 3/3 on file-backed prompts (plugins/variant-analysis/evals/README.md:78-90); audit-context-building's routes-to-workflow scored 1.00 but also scored 1.00 with `Workflow` removed from allowed-tools (plugins/audit-context-building/README.md:117-121). Only 3 skills and 1 command set disable-model-invocation."
+      },
+      {
+        "claim": "fp-check hook 'Blocks the agent from stopping until all bugs have completed all 5 phases, gate reviews, and verdicts' (plugins/fp-check/README.md:40-41).",
+        "verified": "partial",
+        "evidence": "hooks.json registers prompt-type Stop (:4-15) and SubagentStop (:16-27) hooks with matcher `*` and a 30 s timeout. The Stop prompt says to answer ok:true when the conversation is not about fp-check (:10). So once the plugin is enabled the hook fires on every stop in every session, and blocks only fp-check conversations."
+      },
+      {
+        "claim": "modern-python 'SessionStart hook prepends PATH shims' (plugins/modern-python/README.md:40); gh-cli hooks 'pass through' when gh is missing (plugins/gh-cli/README.md:77).",
+        "verified": "partial",
+        "evidence": "Shims are installed only when uv or gh is on PATH and CLAUDE_ENV_FILE is set (plugins/modern-python/hooks/setup-shims.sh:11-17; plugins/gh-cli/hooks/setup-shims.sh:8-17). gh-cli hooks require jq (intercept-github-curl.sh:8; intercept-github-fetch.sh:14; cleanup-clones.sh:8) and exit 0 silently without it, but the README lists only gh as a prerequisite (plugins/gh-cli/README.md:74-77)."
+      },
+      {
+        "claim": "License is CC BY-SA 4.0 (README.md:158-160).",
+        "verified": "yes",
+        "evidence": "LICENSE:1,57-62 is the CC BY-SA 4.0 legal code. Gaps: no plugin.json declares a license; plugins/entry-point-analyzer/README.md:78 says 'See LICENSE.txt' but no such file exists (only the root LICENSE); plugins/testing-handbook-skills/README.md:231 says only 'See repository license'."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "variant-analysis skill ablation (7 triage-panel cases x 3 runs x 2 arms, sonnet judge)",
+        "metric": "without-plugin score per case",
+        "value": "1.00 on every case, so the delta can only go down; the project calls it a precision-regression guard, not an uplift measure. Full eval run costs about $6.53 and 36 minutes.",
+        "source": "plugins/variant-analysis/evals/README.md:73-76,105-108",
+        "independent": false
+      },
+      {
+        "what": "variant-analysis skill trigger behaviour in the same suite plus a cold follow-up (9 runs)",
+        "metric": "skill invocation rate",
+        "value": "0 invocations in 40+ runs on inline-panel cases; cold run 2/3 (conversational, files on disk), 3/3 (description trigger language), 0/3 (inline panel). When something fired on a real codebase it was usually /variant-analysis:variants (4 of 5 firing runs) rather than the skill (1 of 9).",
+        "source": "plugins/variant-analysis/evals/README.md:78-103",
+        "independent": false
+      },
+      {
+        "what": "goal-prompt ablation, 3 cases x 2 runs per arm, 2026-08-14",
+        "metric": "score delta vs no-plugin baseline",
+        "value": "plugin arm passed every grader in every run; baseline passed no case; deltas +0.60, +0.71, +0.75, mean +0.69",
+        "source": "plugins/goal-prompt/evals/README.md:34-38",
+        "independent": false
+      },
+      {
+        "what": "yara-authoring ablation (3 cases), with a skill-content deletion test",
+        "metric": "score delta vs baseline",
+        "value": "+0.52 (02), +0.33 (05), +0.67 (06). With guidance deleted: case 02 0.94 to 0.97, case 05 1.00 to 1.00, case 06 1.00 to 0.60. The project concludes uplift in 02 and 05 comes from the skill being loaded, not from its content.",
+        "source": "plugins/yara-authoring/evals/README.md:43-66",
+        "independent": false
+      },
+      {
+        "what": "code-improver evals (5 original cases, 3 runs per arm, 2026-08, sonnet judge), run on the predecessor plugin",
+        "metric": "median run score",
+        "value": "1.00 on all five cases versus 0.00-0.71 for two older versions; the README says the re-run for the renamed plugin 'has not been run yet'",
+        "source": "plugins/code-improver/evals/README.md:149-166",
+        "independent": false
+      },
+      {
+        "what": "audit-context-building evals",
+        "metric": "cost and with/without comparison",
+        "value": "plugin arm uses roughly twice the turns of a bare agent; routes-to-workflow 1.00 over 3 runs with no with-vs-without arm run; a capable model scores 1.00 on the Solidity and Ghidra cases with no plugin",
+        "source": "plugins/audit-context-building/README.md:117-141",
+        "independent": false
+      },
+      {
+        "what": "c-review (C/C++ review plugin), project-reported arm comparisons from an internal harness that is not in the repo",
+        "metric": "recall vs token cost",
+        "value": "undirected generic fan-out matched the class-partitioned pipeline on recall at about 40% of its cost; a single `taxonomy` agent at 198K tokens matched or beat c-review v1 at 1.07M; per-agent cost 76,124 to 78,242 tokens while agent count went 14 to 34",
+        "source": "plugins/c-review/AGENTS.md:15-16,266-269,274-276,305-308",
+        "independent": false
+      },
+      {
+        "what": "review-walkthrough model eval, 2026-09-14",
+        "metric": "passing model-eval result",
+        "value": "none claimed for this revision; the macOS eval sandbox denied shell writes so the run never reached the renderer",
+        "source": "plugins/review-walkthrough/evals/README.md:82-87",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Per-task scoping is client behaviour, not something the repo provides or measures. The install unit is the plugin: 37 of 44 plugins ship one skill, but testing-handbook-skills (15 skills), trailmark (14) and building-secure-contracts (11) expose all of theirs together. Only 3 skills and 1 command disable model invocation (plugins/github-triage/skills/github-triage/SKILL.md:4; plugins/firebase-apk-scanner/skills/firebase-apk-scanner/SKILL.md:6; plugins/review-walkthrough/skills/review-walkthrough/SKILL.md:4; plugins/git-cleanup/commands/git-cleanup.md:4). No tool checks that descriptions trigger (AGENTS.md:320-325), and the one published trigger measurement shows zero invocations in 40+ runs on its inline cases (plugins/variant-analysis/evals/README.md:78-81). The catalog also holds non-engineering plugins (let-fate-decide, culture-index; README.md:122,133).",
+      "Always-on components are not task-scoped: fp-check's prompt-type Stop/SubagentStop hooks fire on every stop while enabled (plugins/fp-check/hooks/hooks.json:4-27); gh-cli's PreToolUse hooks run on every Bash call and on WebFetch/MCP fetch-like tools (plugins/gh-cli/hooks/hooks.json:24-42); modern-python's PATH shims sit in front of python/pip/pipx/uv for every subprocess and already broke tooling once (plugins/modern-python/README.md:40-42, issue #207).",
+      "Codex support is narrower than README.md:3 reads. CI checks only skill counts and MCP server names via Codex app-server (check_codex_loadability.py:211-260) on a pinned Codex CLI 0.146.0 (validate.yml:151-161) that is bumped by hand (dependabot.yml:24-26), while second-opinion docs were checked against 0.154.0 (plugins/second-opinion/skills/second-opinion/references/codex-invocation.md:10) and an upstream Codex change already broke its MCP entry (plugins/second-opinion/README.md:56-61). Hooks, commands, agents and workflows are not exercised under Codex; 8 skills list the Claude Code `Workflow` tool (e.g. plugins/audit-context-building/skills/audit-context-building/SKILL.md:4); code-improver says its loop is unavailable on Codex (plugins/code-improver/README.md:75-77); hooks reference CLAUDE_PLUGIN_ROOT and CLAUDE_ENV_FILE (plugins/gh-cli/hooks/hooks.json:10; plugins/modern-python/hooks/setup-shims.sh:14-17). Only review-walkthrough sets Codex allow_implicit_invocation: false (.../review-walkthrough/agents/openai.yaml:6-7); github-triage and firebase-apk-scanner opt out only in Claude frontmatter and their openai.yaml files have no policy block.",
+      "Licensing: content is CC BY-SA 4.0 (LICENSE; README.md:160), a share-alike content license rather than a software license, so adapted skill text carries share-alike terms. No plugin.json declares a license; plugins/entry-point-analyzer/README.md:78 points to a LICENSE.txt that does not exist; testing-handbook-skills says only 'See repository license' (README.md:231) while describing itself as skills from the Testing Handbook (.claude-plugin/marketplace.json:210).",
+      "No release or provenance process: no release workflow, tags (none in this shallow clone), checksums, signatures, attestations or SECURITY.md. Marketplace entries carry no ref/sha (.claude-plugin/marketplace.json:11-450), so installs follow the default branch, and version bumps are enforced only on PRs (validate.yml:103-131). CODEOWNERS spreads 44 plugins over 27 handles (CODEOWNERS:2-48) and 10 plugins are still 0.x (e.g. trailmark 0.11.4 at marketplace.json:218, zeroize-audit 0.3.3 at :337).",
+      "Unpinned third-party code runs at use time: zeroize-audit's .mcp.json launches `uvx --from git+https://github.com/oraios/serena` with no ref (plugins/zeroize-audit/.mcp.json:3-17), and skills tell the agent or user to run curl|sh installers and `go install ...@latest` (plugins/modern-python/skills/modern-python/references/uv-commands.md:11; security-setup.md:19,37; plugins/devcontainer-setup/skills/devcontainer-setup/resources/Dockerfile:76,90).",
+      "Scope breadth and side effects, each opt-in per plugin but in the same marketplace: firebase-apk-scanner performs live sign-up and Firestore writes against target projects (plugins/firebase-apk-scanner/skills/firebase-apk-scanner/scanner.sh:516-550,755-778); devcontainer-setup writes defaultMode bypassPermissions into Claude settings and defines a claude-yolo alias (plugins/devcontainer-setup/skills/devcontainer-setup/resources/post_install.py:93-112; .zshrc:35); github-triage performs irreversible merges, closes and comments (plugins/github-triage/skills/github-triage/SKILL.md:26-29).",
+      "Content size and doc drift: 83 SKILL.md total about 24,332 lines (average about 293), 7 over the repo's own 500-line guideline (libfuzzer 793), 34 single-line descriptions of 401+ characters. Tool prerequisites live only in READMEs (trailmark needs PyPI `trailmark`, plugins/trailmark/README.md:43-50; gh-cli README omits jq). AGENTS.md's 'Rationalizations to Reject' rule for security skills appears in 45 of 83 skills and is not machine-enforced (AGENTS.md:202-209). Eval evidence is project-run only and mostly shows saturated or non-firing cases (plugins/variant-analysis/evals/README.md:71-103)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "trailofbits/skills",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Claude Code: add marketplace — `/plugin marketplace add trailofbits/skills`",
+          "citation": "README.md:9-13; .claude-plugin/marketplace.json:2,19 (44 \"source\" entries)",
+          "holds": true,
+          "note": "README.md:12 shows exactly this command under 'Claude Code Marketplace'. The repo root has .claude-plugin/marketplace.json, named 'trailofbits' (:2), with 44 `source: ./plugins/<name>` entries, which matches the `<plugin>@trailofbits` install suffix. Checked by reading, not by running the command."
+        },
+        {
+          "field": "license",
+          "statement": "License is CC-BY-SA-4.0, file LICENSE",
+          "citation": "LICENSE:1,57-58,384,427; README.md:158-160",
+          "holds": true,
+          "note": "LICENSE reads as the full CC BY-SA 4.0 legal code: title at :1, Public License heading at :57-58, Section 8 at :384, closing 'Creative Commons may be contacted at creativecommons.org.' at :427. README.md:160 says the same. It is the only license file in the tree (glob for LICENSE*/COPYING*/NOTICE*). No plugin.json or pyproject.toml declares a different license; the only `license` hits are example snippets in reference docs (open-sourcing licensing.md:55, modern-python pyproject.md:15)."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes — every CI job runs on ubuntu-latest; the architecture is not stated and the README has no platform section",
+          "citation": ".github/workflows/validate.yml:19; .github/workflows/lint.yml:19,31,78,184; .github/workflows/claude-review.yml:52; README.md:1-160",
+          "holds": true,
+          "note": "All five cited lines are `runs-on: ubuntu-latest`. The uncited claude-review.yml:52 job is also ubuntu-latest, so 'every CI job' is true. No workflow names a runner architecture or uses a matrix. The aarch64 packages at lint.yml:121-141 are a cross-compile toolchain for constant-time-analysis tests, not a runner. The README sections are Installation, Available Plugins, Trophy Case, Contributing and License, with no platform section."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Claude Code primary (83 skills, 8 commands, 30 subagents, 11 dynamic workflows, hooks in 3 plugins); Codex via Claude-marketplace compatibility; 74 of 83 skills carry agents/openai.yaml; two skills resolve ${CODEX_PLUGIN_ROOT}; code-improver loop unsupported on Codex; goal-prompt targets both clients",
+          "citation": "README.md:3,12,21-31; AGENTS.md:70-101; plugins/review-walkthrough/skills/review-walkthrough/agents/openai.yaml:4; plugins/rust-review/skills/rust-review/SKILL.md:48; plugins/semgrep-rule-variant-creator/skills/semgrep-rule-variant-creator/SKILL.md:37; plugins/code-improver/README.md:75-77; plugins/goal-prompt/skills/goal-prompt/SKILL.md:3; plugins/code-improver/skills/{code-improver/SKILL.md:43,skill-improver/SKILL.md:39,pr-improver/SKILL.md:42}",
+          "holds": false,
+          "note": "Every part checks except one count. Globs give 83 plugins/*/skills/*/SKILL.md, 8 commands/*.md, 30 agents/*.md (11 in zeroize-audit), 11 workflows/*.js and 3 hooks.json (fp-check, gh-cli, modern-python). openai.yaml is in 74 of 83 skills; the 9 without are c-review, code-improver x3, modern-cpp, open-sourcing, rust-review, vulnerability-triage-brocards and writing-lean-proofs. openai.yaml:4 is `default_prompt: \"Use $review-walkthrough ...\"`, and code-improver README:75-77, goal-prompt SKILL.md:3 and README:21-31 all match. WRONG: 'two skills resolve ${CODEX_PLUGIN_ROOT}'. Five do. Besides the two cited, code-improver/SKILL.md:43, skill-improver/SKILL.md:39 and pr-improver/SKILL.md:42 each run `ls -d -- \"${CODEX_PLUGIN_ROOT}/workflows/improve.js\"` as step 2 of the same plugin-root resolution. static-analysis/workflows/codeql-build.js:30 also uses it, but that file is a workflow, not a skill."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "Codex can load this marketplace through its Claude marketplace compatibility (README.md:3) — verified: partial (CI drives codex app-server 0.146.0 with plugins/plugin_hooks enabled, calls plugin/list and plugin/read, requires skill count == SKILL.md count and MCP == .mcp.json; never runs `codex plugin add` or exercises hooks/commands/agents/workflows)",
+          "citation": ".github/workflows/validate.yml:151-161; .github/scripts/check_codex_loadability.py:129-132,146-157,211-260; README.md:21-31; plugins/code-improver/README.md:75-77",
+          "holds": true,
+          "note": "validate.yml:153 pins CODEX_CLI_VERSION 0.146.0 and :161 runs the script. Lines 129-132 write `[features] plugins = true / plugin_hooks = true`; 146-157 launch `codex app-server --listen stdio:// --enable plugins --enable plugin_hooks`. :211 calls plugin/list once for a local marketplace. :234-241 call plugin/read per plugin. :252-260 fail on skill-count or MCP-set mismatch. Nothing else is compared, and no `plugin add` appears. README.md:21-31 mentions no feature flags. 'partial' is a fair grade. Nuance: plugin/list is called once, not per plugin, and it loads the checkout as a local marketplace, not the GitHub shorthand."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "In readme.integrations.claude_code_or_codex, replace \"two skills resolve `${CODEX_PLUGIN_ROOT}` (plugins/rust-review/skills/rust-review/SKILL.md:48; plugins/semgrep-rule-variant-creator/skills/semgrep-rule-variant-creator/SKILL.md:37)\" with \"five skills resolve `${CODEX_PLUGIN_ROOT}` (plugins/rust-review/skills/rust-review/SKILL.md:48; plugins/semgrep-rule-variant-creator/skills/semgrep-rule-variant-creator/SKILL.md:37; plugins/code-improver/skills/code-improver/SKILL.md:43; plugins/code-improver/skills/skill-improver/SKILL.md:39; plugins/code-improver/skills/pr-improver/SKILL.md:42)\"."
+      ]
+    }
+  ]
+}

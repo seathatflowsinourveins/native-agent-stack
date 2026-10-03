@@ -1,0 +1,342 @@
+{
+  "contender": "tigerless-labs/agent-memory",
+  "revision": {
+    "contender": "tigerless-labs/agent-memory",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "tigerless-labs/agent-memory",
+        "tag": null,
+        "commit": "6613670d1194c2a8f77e3942ebeeaa653f4bed11",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": null,
+    "commit": "6613670d1194c2a8f77e3942ebeeaa653f4bed11",
+    "read_at": "2026-10-02T03:02:50+00:00"
+  },
+  "dossier": {
+    "contender": "tigerless-labs/agent-memory",
+    "revision": {
+      "tag": null,
+      "commit": "6613670d1194c2a8f77e3942ebeeaa653f4bed11",
+      "read_at": "2026-10-03"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Local-first long-term memory runtime for AI agents by Tigerless Labs (MIT, version 0.1.0). One directory of Markdown memory files (one file per validity interval, typed, at <type>/<group>/<name>.md) is the source of truth, with a rebuildable SQLite FTS5 (BM25) index. Session transcripts are captured at host hook boundaries (Claude Code, Codex CLI, Muse Code), archived append-only, and distilled in the background into typed memories by calling the host's own CLI (claude -p / codex exec) as the reasoner. A separate sleep-time 'Manage' pass consolidates and soft-deletes under per-kind caps. Interfaces: CLI `mem`, hook entry `mem-hook`, stdio MCP server `mem-mcp`, an agent skill file, and a Python library. Python 3.12+, stdlib-only core, installed from a git checkout with uv. All facts below come from static reading of the checkout; nothing was executed.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Markdown files in one store are the single source of truth; the SQLite index beside them is a cache that can be deleted at any time; Claude Code, Codex CLI, Muse Code and anything that can run a shell command share that store.",
+          "citation": "README.md:16-20"
+        },
+        {
+          "claim": "Retrieval is local and ranked and answers with paths, not pasted text; writes fire at conversation boundaries rather than depending on the agent; a sleep-time pass consolidates and forgets by value 'on its own clock'; none of it needs an API key.",
+          "citation": "README.md:22-25"
+        },
+        {
+          "claim": "Three read tracks: deterministic MEMORY.md injection at session start; BM25 over an FTS5 index (optional vector plugin fused by RRF); and the plain directory tree readable with ls/grep.",
+          "citation": "README.md:61-65"
+        },
+        {
+          "claim": "Distillation is triggered at boundaries and runs without holding up the task; the full trace is copied first, so 'missed by the distiller' never means 'lost by the system'.",
+          "citation": "README.md:66-68"
+        },
+        {
+          "claim": "`rm -rf .index/ && mem rebuild` loses zero knowledge, 'enforced by a test'; memory stays greppable, git-able and portable off the system.",
+          "citation": "README.md:69-71"
+        },
+        {
+          "claim": "Manage layer: an unattended pass may add and update; deletion only ever arrives as a proposal you confirm; supersede leaves the chain intact and `recall --as-of` answers as of a date, 'so updating never destroys'.",
+          "citation": "README.md:72-75"
+        },
+        {
+          "claim": "No LLM client inside the library: zero keys to install and no billing surface; judgement is borrowed from the host agent's own CLI, which keeps every write visible in your transcript.",
+          "citation": "README.md:76-77"
+        },
+        {
+          "claim": "One memory is one file with valid_from and optional invalid_at; replaced and deleted files stay in the store for `recall --as-of` and trace; `mem delete` ends current validity; Core checks file scope, relationships, provenance and concurrent writes.",
+          "citation": "README.md:96-98, 108-113"
+        },
+        {
+          "claim": "The store defaults to ~/agent-memory-store; export AGENT_MEMORY_STORE everywhere your agents run, not just in this shell.",
+          "citation": "README.md:163-164"
+        },
+        {
+          "claim": "`mem setup --host claude-code|codex|muse-code` probes the host, appends mem-hook by absolute path, installs the skill and leaves other settings alone; SessionStart injects, Stop and SessionEnd distil, PreCompact evicts; distillation reasons through the same host's CLI in the background on the existing login (or a configured model endpoint); Codex asks you to trust new hooks once.",
+          "citation": "README.md:178-187"
+        },
+        {
+          "claim": "`mem-mcp` exposes nine tools (memory_recall, read, trace, record, correct, supersede, merge, delete, feedback); the CLI is the wider surface and `context`, `sleep` and the proposal ledger have no MCP tool yet.",
+          "citation": "README.md:187-191"
+        },
+        {
+          "claim": "Requires Python 3.12+ and uv; there is no PyPI release, so install from a checkout with `uv sync --all-packages`, which builds mem, mem-mcp and mem-hook into .venv/bin.",
+          "citation": "README.md:141-155"
+        },
+        {
+          "claim": "`mem sleep --reason host` consolidates (T0 applies, T1 files a proposal); Manage borrows reasoning from the host CLI, writes a dream report per pass and 'cannot delete anything unattended'.",
+          "citation": "README.md:262-271"
+        },
+        {
+          "claim": "Self-reported results: LongMemEval-S arms (agent-memory 52.9% vs MemCore 35.8% vs no memory 5.8%); all 9 ordered writer/reader pairs across Claude Code, Codex CLI and Hermes pass; the protocol, ledger and raw run records live in docs/experiments.md and experiments/ 'in the working tree', shipped 'with the source, not with git history'.",
+          "citation": "README.md:117-137"
+        }
+      ],
+      "install": [
+        {
+          "method": "Source checkout + uv workspace sync (the only documented method; README gives no OS-specific variants and says there is no PyPI release)",
+          "command": "git clone https://github.com/tigerless-labs/agent-memory.git\ncd agent-memory\nuv sync --all-packages",
+          "citation": "README.md:141-148"
+        },
+        {
+          "method": "Put the built console scripts (mem, mem-mcp, mem-hook) on PATH",
+          "command": "export PATH=\"$PWD/.venv/bin:$PATH\"",
+          "citation": "README.md:150-155"
+        },
+        {
+          "method": "Run from inside the checkout without changing PATH",
+          "command": "uv run mem",
+          "citation": "README.md:150-151"
+        },
+        {
+          "method": "Create the store (default ~/agent-memory-store; override with AGENT_MEMORY_STORE)",
+          "command": "mem init",
+          "citation": "README.md:159-164"
+        },
+        {
+          "method": "Wire lifecycle hooks and the skill into a host",
+          "command": "mem setup --host claude-code   # or: --host codex / muse-code",
+          "citation": "README.md:178-187"
+        },
+        {
+          "method": "Optional local vector index (also set vector_enabled = true under [index] in the store's config.toml)",
+          "command": "uv sync --extra vector",
+          "citation": "README.md:283-287"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - CI runs lint, mypy and the full pytest suite on ubuntu-latest with Python 3.12 (.github/workflows/ci.yml:10-23); the workflow does not state the CPU architecture and the README has no platform section.",
+        "wsl2": "unknown - not mentioned in README, docs or CI. The code is POSIX-only (fcntl in packages/core/src/agent_memory/core/locking.py:7; SIGALRM/setitimer in packages/adapters/src/agent_memory/adapters/hook_entry.py:211-216), so it would need a Linux userland, but that is untested upstream.",
+        "macos_arm64": "unknown - no macOS CI job (.github/workflows/ci.yml:10 is ubuntu-latest only) and no macOS documentation; the code uses only POSIX calls that macOS provides (locking.py:7, hook_entry.py:211-216) and path conventions like ~/agent-memory-store (config.py:15).",
+        "gpu": "no - not used or required. Default retrieval is SQLite FTS5 BM25 (packages/core/src/agent_memory/core/search_index.py:1,87-126); the optional vector index calls FastEmbed/ONNX without selecting any execution provider (embeddings.py:17-26)."
+      },
+      "integrations": {
+        "cli": "yes - `mem` (packages/cli/pyproject.toml:9-10; packages/cli/src/agent_memory/cli/main.py:57-238) with 23 subcommands: init, record (incl. --batch JSONL), recall, context, read, correct, supersede, merge, distill, trace, delete, migrate, feedback, rebuild, inspect, export, import, sleep, proposals, gc, decide, skill, setup. Global --store/--agent/--json. recall/context take --scope <path-prefix> and --as-of (main.py:93-105; --scope is not documented in the README). Other console scripts: mem-hook (packages/adapters/pyproject.toml:9-10) and mem-exp (packages/harness/pyproject.toml:9-10).",
+        "mcp": "yes - `mem-mcp`, a hand-written stdio JSON-RPC server with no MCP SDK dependency (packages/mcp/pyproject.toml:9-10; packages/mcp/src/agent_memory/mcp/server.py:1,16-24,58-80), protocol version 2025-06-18, methods initialize / tools/list / tools/call only. Nine tools: memory_recall, read, record, correct, supersede, delete, trace, merge, feedback (packages/mcp/src/agent_memory/mcp/tools.py:9-17). No MCP tool for context, sleep, proposals, gc, export/import or rebuild. `mem setup` does not register the MCP server with any host (setup.py:93-121; README.md:209-210). Store comes from AGENT_MEMORY_STORE or the default path (server.py:52-55). Only MemoryStoreError and KeyError become JSON-RPC errors; a malformed JSON line is not caught in serve() (server.py:34-49).",
+        "sdk_or_api": "Python library only: importable packages agent_memory.core (Store, Recall, Manage), agent_memory.executor and agent_memory.adapters inside the uv workspace (packages/*/src). No HTTP/REST server found. No PyPI release (README.md:141-142), so no installable SDK outside a checkout.",
+        "claude_code_or_codex": "yes - `mem setup --host claude-code|codex` (README.md:178-187; packages/adapters/src/agent_memory/adapters/setup.py:21-34,93-121) merges a `mem-hook --host <host>` command (absolute path of the venv's mem-hook, setup.py:124-131) into ~/.claude/settings.json (events SessionStart, Stop, SessionEnd, PreCompact) or ~/.codex/hooks.json (SessionStart, Stop, PreCompact; no SessionEnd) (moments.py:14-25), and writes the skill to ~/.claude/skills/agent-memory/SKILL.md or ~/.codex/skills/agent-memory/SKILL.md (setup.py:120,140-144; tests/unit/test_write_triggers.py:270-282). SessionStart injects a byte-prefix of MEMORY.md (8192 bytes by default) as additionalContext (hook_entry.py:103-121; injection.py:12-22; config.py:85). Stop/SessionEnd/PreCompact archive the new transcript lines and launch a detached `mem distill --session <id> --reason-host <host>` (hook_entry.py:124-167). That distillation runs `claude -p` (default model claude-haiku-4-5-20251001) or `codex exec` (default model gpt-5.6-sol) headless (packages/executor/src/agent_memory/executor/hosts.py:33-39,145-198). Setup does not touch any other Claude Code or Codex configuration, and there is no uninstall command (setup.py has install only). Upstream TODO says the Codex dialect including the hook trust review is covered by unit tests only (docs/TODO.md:31-32)."
+      },
+      "telemetry_and_network": "No telemetry, analytics or phone-home code found in packages/: the only network-capable code is urllib in packages/executor/src/agent_memory/executor/reasoners.py:18-19,74-86 and a Vertex URL constant in credentials.py:23-25. packages/core/src/agent_memory/core/observation.py writes bounded evidence only to a local directory named by AGENT_MEMORY_OBSERVATION_DIR and is silent otherwise (observation.py:1-5,19,57-61). Network and accounts that do exist: (1) default distillation runs the host's own CLI (`claude -p` / `codex exec`) in a detached background process, so conversation text (batches up to 24000 chars, config.py:115) goes to that host vendor's model on the user's existing login; no agent-memory account or key (README.md:182-187; hosts.py:145-198; hook_entry.py:145-167). (2) Opt-in `[executor] reasoner = \"endpoint\"` POSTs the prompt to an OpenAI-shaped /chat/completions URL using GEMINI_BASE_URL/GEMINI_API_KEY, or a Vertex token minted with `gcloud auth print-access-token` (reasoners.py:60-86; credentials.py:39-81); config defaults name project 'tigerless-seo', location 'global' and model 'google/gemini-3.7-flash' (config.py:136-139). (3) The optional vector index downloads its embedding model on first use (README.md:285-287; embeddings.py:17-26). The default read path (BM25 recall) makes no network calls (README.md:39-40; recall.py:83-133)."
+    },
+    "code": {
+      "languages": [
+        "Python"
+      ],
+      "entry_points": [
+        {
+          "path": "packages/cli/src/agent_memory/cli/main.py:38",
+          "what": "`mem` console script (packages/cli/pyproject.toml:9-10): argparse CLI, 23 subcommands, each a thin call into core/executor/adapters"
+        },
+        {
+          "path": "packages/adapters/src/agent_memory/adapters/hook_entry.py:234",
+          "what": "`mem-hook` console script (packages/adapters/pyproject.toml:9-10): reads host hook JSON on stdin, injects or captures+launches distillation, always exits 0"
+        },
+        {
+          "path": "packages/mcp/src/agent_memory/mcp/server.py:52",
+          "what": "`mem-mcp` console script (packages/mcp/pyproject.toml:9-10): stdio JSON-RPC MCP server with 9 memory_* tools"
+        },
+        {
+          "path": "packages/harness/src/agent_memory/harness/main.py:69",
+          "what": "`mem-exp` console script (packages/harness/pyproject.toml:9-10): experiment harness (prepare/run/report subcommands seen at main.py:86,99,225)"
+        },
+        {
+          "path": "packages/core/src/agent_memory/core/store.py:91",
+          "what": "Store: the single write path (record, correct, delete, supersede, merge, gc, read, rebuild_index) used by CLI, MCP, hooks' executor and Manage"
+        },
+        {
+          "path": "packages/executor/src/agent_memory/executor/distiller.py:17",
+          "what": "Reasoner factory: host-CLI reasoner by default, HTTP endpoint reasoner when executor.reasoner = 'endpoint'"
+        },
+        {
+          "path": "packages/core/src/agent_memory/core/manage.py:114",
+          "what": "Manage: sleep-time consolidation, proposals, decide(); invoked only by `mem sleep` / `mem decide` / `mem proposals` (cli/main.py:457-500)"
+        },
+        {
+          "path": "skills/agent-memory/SKILL.md",
+          "what": "Repo copy of the agent skill; `mem setup` writes the text rendered by packages/core/src/agent_memory/core/prompts.py:259-335"
+        }
+      ],
+      "architecture": "uv workspace (pyproject.toml:28-29): virtual root + 6 packages, ~70 Python files (core 42, harness 15, adapters 6, executor 4, mcp 2, cli 1), namespace package agent_memory.*. packages/core (stdlib only): store.py single write path under an fcntl.flock writer lock (locking.py); record.py/frontmatter.py/schema.py/placement.py (one Markdown file per memory; 9 factory types profile, preference, entity, event, decision, procedure, fact, experience, reference in schema.py:125-190; custom types are TOML files in <store>/schemas/; no 'handoff' type); paths.py (store layout: MEMORY.md, config.toml, schemas/, <type>/<group>/<name>.md, archive/{sessions,provenance}, dream-reports/ incl. decisions.md ledger, .index/index.db, .state/{store.lock,watermarks,pending,hooks.log}); archive.py+sessions.py+watermark.py (append-only numbered JSONL copies of transcript messages {index,role,text,at}; per-session consumed/distilled marks); indexer.py/database.py/search_index.py/chunking.py (SQLite FTS5 projection; the usage access_log table lives in the same DB); recall.py/context.py/trace.py (read paths; --scope path prefix, --as-of; trace reads only cited message ranges); injection.py/memory_md.py (SessionStart payload from MEMORY.md); distill.py/agentic.py/reconcile.py/prompts.py/triggers.py/pending.py (boundary distillation: up to 3 negotiation rounds with the executor, library validates handles/provenance and writes); manage.py/ledger.py/reasoning.py (T0 rule-based edits, T1 proposals ruled by an optional reasoner under per-kind caps, dream reports, optional git commit if the store is already a repo); portability.py (export/import JSON), migrate.py, vector_index.py/embeddings.py (optional FastEmbed), observation.py (harness-only evidence). packages/executor: hosts.py (headless claude/codex/hermes/muse CLI dialects, 3 attempts, 300 s timeout), reasoners.py (HostReasoner via CLI; EndpointReasoner via urllib), credentials.py (gcloud-minted Vertex token), distiller.py. packages/adapters: hook_entry.py, moments.py (host event -> inject/pause/evict), capture.py, transcript.py (Claude-style JSONL; Codex rollout restricted to response_item message user/assistant), muse_session.py, setup.py. packages/cli/main.py, packages/mcp (server.py, tools.py), packages/harness (LongMemEval/LoCoMo experiments, interop matrix, MemCore comparison arm in systems.py). Inspectable capture artefacts are plain files: archive/sessions/<session>.jsonl, archive/provenance/<name>/*.md, .state/watermarks/<session>.json, .state/hooks.log (hook errors only), dream-reports/*.md; background executor stdout/stderr is discarded (hook_entry.py:157-164).",
+      "packaging_and_release": "Every package and the root are version 0.1.0 with a hatchling wheel build (packages/*/pyproject.toml build-system), but nothing publishes them: the only workflow is .github/workflows/ci.yml (lint/type/test); no release or publish workflow, no PyPI release (README.md:141-142), no checksums, signatures or provenance attestations found; no tag is recorded for this revision, and the clone fetched only refs/heads/main (.git/config), so upstream tags, if any, are not visible here. uv.lock (revision 3) pins versions with sha256 hashes for third-party packages and records workspace members as editable installs (uv.lock:25,36,51,65,76,93), so the checkout directory is the installation and hook commands embed the absolute path of its venv's mem-hook (setup.py:124-131).",
+      "tests_and_ci": "pytest>=8 + pytest-cov; ruff (E,F,I,UP,B,SIM, line length 100) and mypy over packages/ (pyproject.toml:39-59). tests/: unit (34 files), system (13), redteam (1) = 48 test_*.py files with about 527 `def test_` functions (grep count; parametrization adds cases), plus conftest.py and a Muse session fixture. Tests use fixtures and fakes (FrozenClock, stub hosts, a bash stand-in for the memcore binary: tests/conftest.py:58-69); the only live-host test (Muse) is skipped unless AGENT_MEMORY_LIVE_MUSE=1 and muse is installed (tests/system/test_muse_preflight.py:28-30); nothing runs a real claude or codex binary. Markers: redteam (tests/redteam/test_poisoning.py: poisoning payloads, path traversal, captured-reasoner caps) and stress (declared at pyproject.toml:41-44, no test uses it). CI: one workflow, .github/workflows/ci.yml, on push to main and every pull_request; job `check` on ubuntu-latest: actions/checkout@v4, astral-sh/setup-uv@v5 (cache), `uv python install 3.12`, `uv sync --all-packages`, `uv run ruff check .`, `uv run mypy`, `uv run pytest -q --cov=agent_memory --cov-report=term-missing --cov-fail-under=85`. Single OS and Python version; actions pinned by tag, not SHA. A plan doc reports 597 passing tests and 93.15% coverage at an earlier commit (docs/plans/batch-write-failure-recovery.md:48-50); I did not run the suite.",
+      "dependencies": "Direct dependencies by manifest: pyproject.toml (root, virtual): 3 runtime (agent-memory-core, -cli, -adapters, all workspace-internal), 4 optional extras (mcp, executor, harness, vector, each pointing at an internal package), 4 dev (pytest>=8.0, pytest-cov>=5.0, ruff>=0.6, mypy>=1.11); packages/core/pyproject.toml: 0 runtime, 1 optional (vector: fastembed>=0.7,<1); packages/cli: 2 (core, executor); packages/adapters: 1 (core); packages/executor: 1 (core); packages/harness: 3 (core, cli, executor); packages/mcp: 1 (core). Net: zero third-party runtime dependencies in the default install (enforced by tests/unit/test_packaging.py:28-48); the only third-party import in packages/ is a lazy fastembed import (core/embeddings.py:20). uv.lock lists 49 packages (7 workspace + 42 third-party), all reachable only through the optional fastembed extra (locked 0.8.0: huggingface-hub, loguru, mmh3, numpy, onnxruntime, pillow, py-rust-stemmers, requests, tokenizers, tqdm; uv.lock:488-502) or the dev group.",
+      "security_policy": "none - no SECURITY.md, CODEOWNERS, CHANGELOG or CONTRIBUTING file anywhere in the repository, and .github contains only workflows/ci.yml. CLAUDE.md:119-128 states internal security principles (fail-safe, flock, red-team tests) but gives no vulnerability-reporting channel; the README only links the GitHub issue tracker (README.md:5)."
+    },
+    "claim_checks": [
+      {
+        "claim": "`rm -rf .index/ && mem rebuild` loses zero knowledge, enforced by a test (README.md:69-71)",
+        "verified": "partial",
+        "evidence": "Rebuild drops index.db and re-projects every Markdown file (packages/core/src/agent_memory/core/indexer.py:91-93; database.py:118-119); tests assert identical recall sets after deleting the index (tests/unit/test_indexer.py:29-43; tests/system/test_cli.py:136-149), and the decision ledger is plain markdown that survives (core/ledger.py:1-6,48). But the usage access_log table is in the same SQLite file (database.py:82-90) and is lost on rebuild; Manage uses it for weight settling and delete proposals (manage.py:335-352,609-623) and no test covers it. Watermarks, pending queue and lock live in .state/ and are not rebuildable (paths.py:54-72)."
+      },
+      {
+        "claim": "Writes fire at conversation boundaries: SessionStart injects, Stop and SessionEnd distil, PreCompact evicts; the full trace is copied first (README.md:66-68, 182-187)",
+        "verified": "partial",
+        "evidence": "Claude Code maps all four events (packages/adapters/src/agent_memory/adapters/moments.py:15-20); Codex only SessionStart, Stop and PreCompact (moments.py:21-25). Boundary events archive the new transcript lines first (adapters/capture.py:31-44) and, when write.distill_on_boundary is true (config.py:124), launch a detached `mem distill` (hook_entry.py:124-167); Stop and SessionEnd share the same pause moment (moments.py:17-18). The hook-to-executor path is covered by unit tests with fake events (tests/unit/test_write_triggers.py:109-133,194-219,239-267); upstream TODO says the Codex dialect incl. the hook trust review is covered by unit tests only (docs/TODO.md:31-32) and CI runs no real claude/codex (.github/workflows/ci.yml:8-23). Raw text is retained in archive/sessions even if distillation fails, but nothing re-queues it (see core/distill.py:86-87; core/pending.py:49 has no callers)."
+      },
+      {
+        "claim": "`mem setup` probes the host, appends mem-hook by absolute path, installs the skill and leaves the rest of the settings alone (README.md:182-186)",
+        "verified": "partial",
+        "evidence": "The probe exists only for muse-code (packages/adapters/src/agent_memory/adapters/setup.py:66-90). install() merges hook entries (replacing any existing entry mentioning mem-hook) and writes the skill (setup.py:93-121,175-176); the command uses the venv's absolute mem-hook path (setup.py:124-131). Foreign keys survive (tests/unit/test_write_triggers.py:170-181) but the whole file is re-serialized with sorted keys and 2-space indent (setup.py:117). For Claude Code/Codex the hook command pins only --host, not the store; the store comes from AGENT_MEMORY_STORE in the hook's environment or the default path (setup.py:124-131; hook_entry.py:74-78; config.py:220-222)."
+      },
+      {
+        "claim": "No LLM client inside the library; zero keys, no billing surface; judgement borrowed from the host CLI, which keeps every write visible in your transcript (README.md:76-77)",
+        "verified": "partial",
+        "evidence": "Core declares no runtime dependencies and tests forbid model-client packages (packages/core/pyproject.toml:7; tests/unit/test_packaging.py:28-48); the default path needs no key and shells out to `claude -p` / `codex exec` (executor/hosts.py:145-198; reasoners.py:34-57). But this is background LLM usage on the user's own host login at each boundary (README.md:185-186), and the executor package, which includes a urllib endpoint client (reasoners.py:60-86), is a dependency of the CLI (packages/cli/pyproject.toml:7). Writes are not visibly in the interactive transcript: the executor is a detached process with stdout/stderr discarded (hook_entry.py:157-164), the Codex dialect uses --ephemeral (hosts.py:187), and a persisted per-run trace is listed as future work (docs/TODO.md:25-28)."
+      },
+      {
+        "claim": "Manage runs 'on its own clock'; deletion only ever arrives as a proposal you confirm; cannot delete anything unattended (README.md:72-75, 262-271)",
+        "verified": "partial",
+        "evidence": "Only the `mem sleep` CLI invokes Manage (packages/cli/src/agent_memory/cli/main.py:457-461); no hook, scheduler or daemon launches it (grep of packages/), so cadence depends on a manual run or the user's own cron. Unless `--reason none` is passed, a reasoner rules on proposals (main.py:196-202,464-475) and its accepted verdicts, including delete, are applied immediately as soft-deletes (invalid_at set, file kept) up to per-kind caps (core/manage.py:159-188,312-314; config.py:100-103); CLAUDE.md:43-46 likewise says T1 is decided by the library executor. T1 stays a proposal only when no reasoner runs (manage.py:167-168). Physical removal is only `mem gc` (core/store.py:455-465; tests/unit/test_manage.py:417-425), absent from MCP and Manage, but with no confirmation or actor authentication (docs/plans/memory-management-audit.md:28,54-60; docs/TODO.md:15-16)."
+      },
+      {
+        "claim": "Retrieval is local; nothing in the read path calls a model or crosses a network (README.md:39-40)",
+        "verified": "yes",
+        "evidence": "Recall is FTS5 BM25 x weight x recency with no network or model import (packages/core/src/agent_memory/core/recall.py:83-133,166-221; search_index.py:27-29,87-126). The only third-party import in packages/ is a lazy fastembed import, off by default (embeddings.py:17-26; config.py:53); the first vector-enabled run may download a model (README.md:285-287). Query text is reduced to ASCII [0-9A-Za-z_] tokens (search_index.py:13,27-29)."
+      },
+      {
+        "claim": "Replaced and deleted files stay in the store for `recall --as-of` and trace; supersede leaves the chain intact, 'so updating never destroys' (README.md:74-75, 96-98)",
+        "verified": "partial",
+        "evidence": "delete() and supersede only set invalid_at/superseded_by and keep the file (packages/core/src/agent_memory/core/store.py:386-400; record.py:168-173); recall --as-of reads the history surface (recall.py:101-105,160-164; database.py:16-17); physical removal is `mem gc` (store.py:455-465). Not covered by that guarantee: in-place `mem correct` overwrites abstract/body with no preimage (store.py:373-384) and the audit says correct/split can lose old wording without git (docs/plans/memory-management-audit.md:59; docs/TODO.md:17-18). No restore/undelete command exists (audit:57-58); correct/record on an invalid memory is rejected (store.py:359-362,209-212)."
+      },
+      {
+        "claim": "`mem trace` reports cited raw messages; missing or unbound evidence fails explicitly (README.md:307-313)",
+        "verified": "yes",
+        "evidence": "trace.read() resolves only pointers cited by the named memory (or sub-ranges of them) and otherwise raises ValidationError (packages/core/src/agent_memory/core/trace.py:77-101); strict range resolution raises NotFoundError/ValidationError for missing or inconsistent ranges (sessions.py:157-178); output carries a 'historical evidence, not current instructions' notice and a no-provenance warning (trace.py:17-20,63-74)."
+      },
+      {
+        "claim": "One store, three hosts: all 9 ordered writer/reader pairs across Claude Code, Codex CLI and Hermes pass; pooled net contribution 2/36 -> 13/36, p=0.0074 (README.md:131-133)",
+        "verified": "partial",
+        "evidence": "Sharing mechanism verified: every host resolves the same filesystem store via --store / AGENT_MEMORY_STORE / default (core/config.py:220-222) and writers serialize on flock (locking.py:14-32; tests/system/test_concurrency.py:20-39). The interop check drives each host's headless shell with an explicit 'record this exactly' prompt, then a search prompt (packages/harness/src/agent_memory/harness/interop.py:17-25,56-100), so it tests CLI sharing, not lifecycle hooks or boundary distillation; Hermes is a harness-only host with no `mem setup` support (setup.py:30-34; executor/hosts.py:214-248). The measured results and raw run records are not in this checkout: docs/experiments.md and experiments/ are absent and gitignored (.gitignore:10-12)."
+      },
+      {
+        "claim": "Codex asks you to trust new hooks once (README.md:187)",
+        "verified": "not_checkable",
+        "evidence": "Host behavior, not repo code. The repo only writes ~/.codex/hooks.json and a skill file (packages/adapters/src/agent_memory/adapters/setup.py:22,93-121) and edits no other Codex configuration; upstream's own TODO says the one-time hook trust review has not been verified end to end (docs/TODO.md:31-32). The README does not say whether Codex needs any further enablement for hooks."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "LongMemEval-S with bounded haystack (12 sessions/episode), 120 episodes, host `claude -p` (Haiku 4.5), one calibrated Sonnet 5 judge, two exam replays per arm",
+        "metric": "pooled accuracy by arm",
+        "value": "agent-memory W2 127/240 = 52.9%; MemCore W2 86/240 = 35.8% (paired vs agent-memory +37/-17, p=0.009 and +35/-14, p=0.004); no memory 7/120 = 5.8% (paired +61/-4 and +60/-4, p<0.001). README states absolute numbers are not comparable to published LongMemEval scores.",
+        "source": "README.md:117-129",
+        "independent": false
+      },
+      {
+        "what": "Cross-host interop: 9 ordered writer/reader pairs across Claude Code, Codex CLI and Hermes (memory written through one host's shell found through another's)",
+        "metric": "pairs passing; pooled net contribution over no memory",
+        "value": "9/9 pass; net contribution 2/36 -> 13/36, p=0.0074",
+        "source": "README.md:131-133 (raw records not present in the checkout: .gitignore:10-12)",
+        "independent": false
+      },
+      {
+        "what": "Optional vector fusion vs BM25-only on a fixed 120-query retrieval acceptance set",
+        "metric": "Recall@5",
+        "value": "79.0% -> 86.6% (+7.6 percentage points)",
+        "source": "README.md:296-299",
+        "independent": false
+      },
+      {
+        "what": "Same fixed 120-query set, vector fusion vs BM25-only",
+        "metric": "median retrieval latency",
+        "value": "5.1 ms -> 139.2 ms",
+        "source": "README.md:298-300",
+        "independent": false
+      },
+      {
+        "what": "Fixed-context answer replays with vs without vector fusion",
+        "metric": "answers correct",
+        "value": "17/24 vs 18/24; expanded set 28/36 vs 27/36 (README says no end-to-end accuracy improvement is established)",
+        "source": "README.md:300-303",
+        "independent": false
+      },
+      {
+        "what": "Boundary distillation through the host CLI (Haiku)",
+        "metric": "wall-clock time per boundary",
+        "value": "80-100 s (three negotiation rounds, one cold process each)",
+        "source": "docs/TODO.md:29-30",
+        "independent": false
+      },
+      {
+        "what": "Agent-driven retrieval vs fixed-policy read of the same store (stated as rationale for `mem context`)",
+        "metric": "answer swing between identical replays",
+        "value": "about seven per hundred; scores 'well below' the same store read on a fixed policy (no further numbers given)",
+        "source": "packages/core/src/agent_memory/core/context.py:3-7",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Codex is the least-verified path. Upstream says the Codex dialect, including the one-time hook trust review, is 'covered by unit tests only' (docs/TODO.md:31-32). CI runs no real claude or codex binary (.github/workflows/ci.yml:8-23), and the only live-host test (Muse) is skipped unless AGENT_MEMORY_LIVE_MUSE=1 (tests/system/test_muse_preflight.py:28-30). Codex gets no SessionEnd hook (packages/adapters/src/agent_memory/adapters/moments.py:21-25), and its default reasoner model id 'gpt-5.6-sol' is hard-coded (packages/executor/src/agent_memory/executor/hosts.py:36).",
+      "Capture and distillation failures are silent and not retried. A failed or missing host CLI returns '' (packages/executor/src/agent_memory/executor/reasoners.py:41-48; tests/unit/test_reasoners.py:36-38), negotiate() treats it as no operations (tests/unit/test_agentic.py:117-129), and distill() still advances the distilled watermark (packages/core/src/agent_memory/core/distill.py:86-87). Nothing re-queues those messages: Pending.request_redistill has no callers (core/pending.py:49). They stay in archive/sessions but are never re-distilled automatically. The hook always exits 0, discards executor stdout/stderr (adapters/hook_entry.py:83-87,157-164) and cannot log at all if Store() fails to construct, e.g. a bad config.toml (hook_entry.py:61-62,75-78,223-225). `mem sleep` / `mem distill` run without --reason-host default to executor.host='claude-code' (core/config.py:134; cli/main.py:464-475).",
+      "Deletion and recovery are thin. No restore/undelete command, guaranteed snapshots, RBAC or actor authentication (docs/plans/memory-management-audit.md:54-60). `mem gc` unlinks invalid files with no confirmation and is reachable by any agent with a shell (packages/core/src/agent_memory/core/store.py:455-465; docs/TODO.md:15-16). In-place correct/split can lose old wording outside git (audit:59; docs/TODO.md:17-18,21). Git commits happen only if the store is already a git repo: `mem init` creates neither a repo nor a .gitignore (store.py:114-120; core/manage.py:670-695; tests/unit/test_manage.py:428-447), so a hand-made repo would also commit .index/ and .state/. `mem export` carries only memory and archive .md/.jsonl files, not config.toml, schemas/, .state/ or the dream-reports ledger, and `import` overwrites same-path files without validation or conflict checks (core/portability.py:41-67). No command purges raw transcript copies (core/archive.py:1), so removing captured text from archive/ is manual.",
+      "Scope and handoff model is thin. No 'handoff' concept or type exists anywhere in the repo (factory types: packages/core/src/agent_memory/core/schema.py:125-190). Scope is a path-prefix filter that the project itself calls 'not authorization' (core/recall.py:155-158; docs/plans/memory-management-audit.md:38). `project` defaults to 'default' and is chosen by the distilling model or caller, never derived from cwd or repo (core/config.py:38; core/placement.py:44-47). SessionStart injects the same global MEMORY.md prefix (8192 bytes / 120 lines, weight >= 0.75) for every project (core/injection.py:12-22; memory_md.py:10-31; config.py:57-61,81,85). By reading, the sort keeps older entries first at equal weight (memory_md.py:16-17), so on a large store the newest equal-weight memories drop out of the injected index (no test found). BM25 query tokens are ASCII-only (core/search_index.py:13,27-29).",
+      "Single-owner and native-memory coexistence is not handled by the tool. Setup writes only hooks plus a skill file (packages/adapters/src/agent_memory/adapters/setup.py:93-121) and never disables, reads, migrates or syncs Claude Code or Codex native memory; the README's native-memory separation note covers Muse only (README.md:232-233); the only native-memory switches are inside the headless reasoner invocations (executor/hosts.py:152,188). There is no uninstall command. For Claude Code and Codex the hook command does not pin the store path (setup.py:124-131), so a host launched without AGENT_MEMORY_STORE would write to ~/agent-memory-store while shells use another path (README.md:163-164).",
+      "Background cost, privacy and concurrency. Each Stop/SessionEnd/PreCompact that adds transcript lines spawns a detached `mem distill` that runs the host CLI (up to 3 negotiation rounds, 3 attempts per call, 300 s timeout) on the user's own login (packages/adapters/src/agent_memory/adapters/hook_entry.py:124-167; executor/hosts.py:61-68,364-391; core/config.py:124,127); upstream measures 80-100 s per boundary (docs/TODO.md:29-30). Raw transcript text is copied verbatim into archive/sessions (adapters/capture.py:31-44; core/sessions.py:111-127) and batches up to 24000 chars go to the host vendor's model (config.py:115; prompts.py:177-207). Transcript extraction takes any text/content/summary field with no block-type filter (adapters/transcript.py:8,65-74), and the only secret-redaction regex is in the harness evidence module (core/observation.py:32-38). store_lock is not taken around capture, watermark updates or distillation (it appears only in store.py and ledger.py), so overlapping runs for one session are not serialized.",
+      "Platform and packaging constraints. POSIX-only (fcntl in packages/core/src/agent_memory/core/locking.py:7 and observation.py:11; SIGALRM/setitimer in adapters/hook_entry.py:211-216), so no native Windows. CI is a single ubuntu-latest job on Python 3.12 (.github/workflows/ci.yml:10-16); macOS and WSL2 are undocumented. Install is a source checkout with editable workspace packages (README.md:141-155; uv.lock:25,36,51) and hook commands embed the venv's absolute path (setup.py:124-131), so moving or deleting the checkout breaks hooks. No PyPI release, tag, release workflow, checksums or attestations, and no SECURITY.md.",
+      "Maturity and auditability. Version 0.1.0 (pyproject.toml:3). The evidence behind the README benchmarks (docs/experiments.md, experiments/) and docs/testing.md are gitignored and absent from this checkout, so published numbers cannot be audited here (.gitignore:10-12; README.md:135-137; CLAUDE.md:18-20); every benchmark is self-reported, and the MemCore comparator is driven by the project's own harness (packages/harness/src/agent_memory/harness/systems.py:205-296). Plan docs can lag the code: the audit says feedback weight is not persisted (docs/plans/memory-management-audit.md:25) but Store.feedback persists it (packages/core/src/agent_memory/core/store.py:542-550). Endpoint-mode defaults name a vendor GCP project id 'tigerless-seo' (core/config.py:138; executor/credentials.py:42-54; executor/distiller.py:17-26)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "tigerless-labs/agent-memory",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Source checkout + uv workspace sync is the only documented install method and the README says there is no PyPI release: git clone https://github.com/tigerless-labs/agent-memory.git; cd agent-memory; uv sync --all-packages.",
+          "citation": "README.md:141-148",
+          "holds": true,
+          "note": "README.md:141-142 requires Python 3.12+ and uv and says there is no PyPI release yet; lines 144-148 are exactly the three commands. The manifests agree: uv workspace members packages/* (pyproject.toml:28-29), requires-python >=3.12 in every pyproject, and console scripts mem / mem-hook / mem-mcp at packages/{cli,adapters,mcp}/pyproject.toml:9-10, so --all-packages produces the three binaries README.md:150 names. The only other install text is the optional vector extra (README.md:283-284). Static read only; not executed."
+        },
+        {
+          "field": "license",
+          "statement": "License is MIT (SPDX MIT), in file LICENSE.",
+          "citation": "LICENSE:1-21",
+          "holds": true,
+          "note": "LICENSE is the unmodified MIT text, 'Copyright (c) 2026 Tigerless Labs'. Root pyproject.toml:6-7 declares license = \"MIT\" and license-files = [\"LICENSE\"]; all six packages/*/pyproject.toml:6 declare license = \"MIT\"; README.md:340-342 links MIT."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - CI runs lint, mypy and the full pytest suite on ubuntu-latest with Python 3.12; the workflow does not state the CPU architecture and the README has no platform section.",
+          "citation": ".github/workflows/ci.yml:10-23",
+          "holds": true,
+          "note": "ci.yml:10 runs-on: ubuntu-latest (single job, no matrix, no arch key); :16 uv python install 3.12; :17 uv sync --all-packages; :19 ruff check; :21 mypy; :23 pytest -q --cov=agent_memory --cov-fail-under=85 over testpaths=tests (pyproject.toml:40) with no marker filter. No README heading covers platforms or OSes. The 'yes' rests on CI alone, as the statement itself says."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "yes - `mem setup --host claude-code|codex` merges an absolute-path `mem-hook --host <host>` into ~/.claude/settings.json (SessionStart, Stop, SessionEnd, PreCompact) or ~/.codex/hooks.json (no SessionEnd) and writes the skill to <host dir>/skills/agent-memory/SKILL.md; SessionStart injects an 8192-byte MEMORY.md prefix as additionalContext; boundary events archive new lines and launch a detached `mem distill --session <id> --reason-host <host>` that runs `claude -p` (claude-haiku-4-5-20251001) or `codex exec` (gpt-5.6-sol); no uninstall command; Codex covered by unit tests only.",
+          "citation": "README.md:178-187; packages/adapters/src/agent_memory/adapters/setup.py:21-34,93-131,140-144; moments.py:14-25; tests/unit/test_write_triggers.py:270-282; hook_entry.py:103-167; injection.py:12-22; config.py:85; packages/executor/src/agent_memory/executor/hosts.py:33-39,145-198; docs/TODO.md:31-32",
+          "holds": true,
+          "note": "Every sub-claim matches. setup.py:21-22 gives the two settings paths. hook_command (setup.py:124-131) = <dir of sys.executable>/mem-hook --host <host>; --store is pinned only for muse-code (127-130). Event sets are at moments.py:15-25. The skill goes to target.parent/skills/agent-memory/SKILL.md (setup.py:27,120,140-144), and test_write_triggers.py:270-282 asserts the absolute hook path and the skill file. _inject returns hookSpecificOutput.additionalContext for both hosts (hook_entry.py:107-113); MEMORY.md is cut at the last newline under injection_budget_bytes=8192 (injection.py:17-22; config.py:85). _boundary archives the increment (capture.py:31-44). With distill_on_boundary=True (config.py:124) it Popens executor.command='mem distill' (config.py:141) plus --session/--reason-host, with stdio to DEVNULL and start_new_session (hook_entry.py:145-167). HostReasoner.for_host takes the default models from BINARIES (reasoners.py:50-57; hosts.py:33-36); claude -p is at hosts.py:145-159 and codex exec at 181-198. 'uninstall' appears nowhere in the repo (grep). docs/TODO.md:31-32 matches."
+        },
+        {
+          "field": "claim_checks[4]",
+          "statement": "Manage 'on its own clock' / 'cannot delete anything unattended' is verified: partial. Nothing schedules Manage. Unless --reason none is passed, a reasoner rules on proposals, and accepted verdicts (including delete) are applied immediately as soft-deletes up to per-kind caps. Physical removal happens only through `mem gc`, with no confirmation or actor authentication.",
+          "citation": "packages/cli/src/agent_memory/cli/main.py:196-202,457-475; packages/core/src/agent_memory/core/manage.py:159-188,312-314; config.py:100-103; CLAUDE.md:43-46; core/store.py:455-465; tests/unit/test_manage.py:417-425; docs/plans/memory-management-audit.md:28,54-60; docs/TODO.md:15-16",
+          "holds": true,
+          "note": "The 'partial' verdict and its main evidence are confirmed. _reasoner returns None only for --reason none (main.py:464-466); otherwise distiller() returns a HostReasoner by default (distiller.py:17-19). The chain _review -> decide -> _apply -> _delete -> Store.delete -> record.invalidate sets invalid_at and keeps the file (manage.py:174-187,312-314; store.py:386-397; record.py:168-173; test_manage.py:400-402). max_deletes_per_sleep=3 (config.py:103). No hook or daemon calls Manage.sleep, and `mem gc` has no confirmation prompt (main.py:210-213,478-479). Two sentences claim more than the code shows. (a) 'Only the mem sleep CLI invokes Manage': `mem-exp sleep-stores` also runs Manage.sleep on a copied store (harness/main.py:189-210,615-628), and mem proposals/decide construct Manage (main.py:483,500). (b) 'T1 stays a proposal only when no reasoner runs': proposals also stay open when the reasoner returns no verdict (a failed host call returns '', reasoners.py:41-48), or when they are withheld over the cap or refused by the write path (manage.py:146-151,178-185). Neither changes the verdict."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "Non-blocking, claim_checks[4] evidence: replace 'Only the `mem sleep` CLI invokes Manage (packages/cli/src/agent_memory/cli/main.py:457-461)' with 'Only manual commands run the sleep pass: `mem sleep` (cli/main.py:457-461) and the experiment harness `mem-exp sleep-stores`, which sleeps a copied store tree (packages/harness/src/agent_memory/harness/main.py:615-628); `mem proposals` / `mem decide` construct Manage without sleeping (cli/main.py:483,500)'. Also add harness/main.py:628 to the code.entry_points Manage line, which currently says 'invoked only by mem sleep / mem decide / mem proposals'.",
+        "Non-blocking, claim_checks[4] evidence: replace 'T1 stays a proposal only when no reasoner runs (manage.py:167-168)' with 'T1 stays an open proposal when no reasoner runs (manage.py:167-168), when the reasoner returns no verdict for it (a failed host call yields an empty reply, packages/executor/src/agent_memory/executor/reasoners.py:41-48), or when it is withheld over the per-kind cap or refused by the write path (manage.py:178-185)'."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,348 @@
+{
+  "contender": "toon-format/toon",
+  "revision": {
+    "contender": "toon-format/toon",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "toon-format/toon",
+        "tag": "v4.1.1",
+        "commit": "a9e6d97eca931379824f3b6a1ba8fbfbda7d3c53",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v4.1.1",
+    "commit": "a9e6d97eca931379824f3b6a1ba8fbfbda7d3c53",
+    "read_at": "2026-10-02T03:02:52+00:00"
+  },
+  "dossier": {
+    "contender": "toon-format/toon",
+    "revision": {
+      "tag": "v4.1.1",
+      "commit": "a9e6d97eca931379824f3b6a1ba8fbfbda7d3c53",
+      "read_at": "2026-10-03"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "TOON (Token-Oriented Object Notation) is a compact, indentation-based text encoding of the JSON data model meant to reduce LLM prompt tokens (README.md:11-15). This repo (toon-format/toon) is the TypeScript reference implementation: library @toon-format/toon (encode/decode, line and event streaming), CLI @toon-format/cli (`toon`: JSON<->TOON, `--stats` token estimates), a VitePress docs site with a client-side playground, and a private benchmark harness (token counts; LLM retrieval accuracy). The format spec lives in a separate repo (SPEC.md:3). For the stated need 'which single tool measures provider usage from the local logs Claude Code and Codex write (input, output, cache-creation, cache-read tokens)': none. This project contains no such tool; it only estimates or tokenizes text size (packages/cli/src/conversion.ts:47-59; benchmarks/src/utils.ts:29-31).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "TOON is 'a compact, human-readable encoding of the JSON data model that minimizes tokens and makes structure easy for models to follow'.",
+          "citation": "README.md:11"
+        },
+        {
+          "claim": "Sweet spot is uniform objects (in arrays or keyed by ID) at 'CSV-like compactness'; 'For deeply nested or non-uniform data, JSON may be more efficient.'",
+          "citation": "README.md:13"
+        },
+        {
+          "claim": "Use JSON programmatically and encode as TOON for LLM input: 'a drop-in, lossless representation of the JSON you already have'; 'deterministic, lossless round-trips'.",
+          "citation": "README.md:15,147"
+        },
+        {
+          "claim": "'The TOON format is stable, but also an idea in progress. Nothing's set in stone.'",
+          "citation": "README.md:17-18"
+        },
+        {
+          "claim": "`cat data.json | npx @toon-format/cli --stats` prints the TOON plus what the conversion saved, e.g. 'Token estimates: ~117 (JSON) -> ~66 (TOON)' and 'Saved ~51 tokens (-43.6%)'.",
+          "citation": "README.md:131-142"
+        },
+        {
+          "claim": "'Matches JSON's retrieval accuracy while using 42.6% fewer tokens' (TOON 72.2% vs JSON 71.4% accuracy).",
+          "citation": "README.md:146,225"
+        },
+        {
+          "claim": "Explicit [N] lengths and {fields} lists give models 'a clear schema to follow, improving parsing reliability'; structural-validation accuracy TOON 100% vs JSON 50%.",
+          "citation": "README.md:148,295"
+        },
+        {
+          "claim": "'When Not to Use TOON': deeply nested or non-uniform data (compact JSON often wins), semi-uniform arrays (savings shrink), purely tabular data (CSV is smaller; TOON has ~5-10% overhead), latency-critical use (measure TTFT and total time yourself).",
+          "citation": "README.md:153-162"
+        },
+        {
+          "claim": "Token counts use gpt-tokenizer o200k_base (GPT-5 tokenizer); other providers tokenize differently but 'relative differences between formats hold directionally'; savings are computed against 2-space-indented JSON; 'Actual savings vary by model and tokenizer'.",
+          "citation": "README.md:443,454,554"
+        },
+        {
+          "claim": "Benchmark design: 244 questions x 6 formats x 4 models (claude-haiku-4-5-20251001, gemini-3.6-flash, gpt-5.4-nano, grok-4.5) = 5,856 LLM calls; reasoning disabled; temperature unset; Wilson 95% intervals reported.",
+          "citation": "README.md:175,282,441-446"
+        },
+        {
+          "claim": "Streaming: `encodeLines` is 'memory-efficient streaming for large data'; `decodeFromLines()` and `decodeStream()` are the streaming decode APIs; an encode `replacer` can drop sensitive fields.",
+          "citation": "README.md:727-755"
+        },
+        {
+          "claim": "CLI auto-detects encode/decode from file extension, supports stdin/stdout, and offers comma/tab/pipe delimiters that 'trade readability for fewer tokens'.",
+          "citation": "README.md:762"
+        },
+        {
+          "claim": "'Full-line # comments are stripped on decode'; 'Tab delimiters buy further token savings'; wrap data in ```toon code blocks for prompts.",
+          "citation": "README.md:787"
+        },
+        {
+          "claim": "Ecosystem: Tooner is an MCP proxy that converts JSON tool responses to TOON (third-party); implementations in other languages exist (separate repos); media type text/toon (provisional), .toon extension, UTF-8; MIT license.",
+          "citation": "README.md:797,820-828,836"
+        }
+      ],
+      "install": [
+        {
+          "method": "npm (library @toon-format/toon)",
+          "command": "npm install @toon-format/toon",
+          "citation": "README.md:693-694"
+        },
+        {
+          "method": "pnpm (library)",
+          "command": "pnpm add @toon-format/toon",
+          "citation": "README.md:696-697"
+        },
+        {
+          "method": "yarn (library)",
+          "command": "yarn add @toon-format/toon",
+          "citation": "README.md:699-700"
+        },
+        {
+          "method": "npm global (CLI @toon-format/cli, provides the `toon` binary)",
+          "command": "npm install -g @toon-format/cli",
+          "citation": "README.md:705-707; packages/cli/README.md:9-11"
+        },
+        {
+          "method": "npx, no install (CLI)",
+          "command": "npx @toon-format/cli [options] [input]",
+          "citation": "packages/cli/README.md:20-24; README.md:134"
+        },
+        {
+          "method": "pnpm or yarn global (CLI)",
+          "command": "pnpm add -g @toon-format/cli   |   yarn global add @toon-format/cli",
+          "citation": "packages/cli/README.md:13-17"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - pure TypeScript/ESM packages with no native addons (packages/toon/package.json:26-35; packages/cli/package.json:18-31); CI runs on the Linux runner `ubuntu-slim` with Node 24 (.github/workflows/ci.yml:20,31-34). CPU architecture is not stated in the repo; no OS-specific install steps, `engines` field or minimum Node version is documented.",
+        "wsl2": "unknown - no WSL or Windows mention in README, docs or CI; the only CI job is a single Linux job (.github/workflows/ci.yml:20).",
+        "macos_arm64": "unknown - no macOS/arm64 mention and no macOS CI job (.github/workflows/ci.yml:20); manifests declare no `os`/`cpu` restriction and the sources contain no native code (packages/toon/package.json, packages/cli/package.json).",
+        "gpu": "no - not used or required; CPU-only text encoder/decoder (no GPU/CUDA references in packages/ or docs/; the library declares no dependencies: packages/toon/package.json:40-42)."
+      },
+      "integrations": {
+        "cli": "yes - `toon` binary from @toon-format/cli: encode JSON->TOON / decode TOON->JSON from files or stdin/stdout, with --delimiter, --indent, --stats, --no-strict, --verbose (packages/cli/src/index.ts:15-102; packages/cli/package.json:25-27; README.md:760-783; packages/cli/README.md:61-70).",
+        "mcp": "none found in this repo (no MCP server code). The README and docs list a third-party 'Tooner' MCP proxy that converts JSON tool responses to TOON (README.md:797; docs/ecosystem/tools-and-playgrounds.md:51-55); that separate repo was not examined.",
+        "sdk_or_api": "yes - TypeScript/JavaScript ESM library @toon-format/toon exporting encode, encodeLines, decode, decodeFromLines, decodeStreamSync, decodeStream, rawString, escapeString, ToonDecodeError, DELIMITERS/DEFAULT_DELIMITER (packages/toon/src/index.ts:10-29,55-199; docs/reference/api.md). No HTTP API. Other-language implementations are separate repos (docs/ecosystem/implementations.md:11-23).",
+        "claude_code_or_codex": "none found - no Claude Code/Codex plugin, hook, skill, slash command or log parser in this repo. A search for claude/codex/.jsonl/cache_read/cache_creation/input_tokens/output_tokens hit only repo descriptions inside benchmarks/data/github-repos.json. The only Claude reference in code is the benchmark model id claude-haiku-4-5-20251001 called through the Anthropic API (benchmarks/src/evaluate.ts:4,24). docs/guide/llm-prompts.md is generic prompting guidance."
+      },
+      "telemetry_and_network": "No telemetry, analytics or phone-home code found. Library and CLI sources (packages/toon/src, packages/cli/src) contain no network calls (grep for fetch/http/XMLHttpRequest/WebSocket in packages/ found only URLs in package metadata, a comment and test strings) and no env-var, home-directory or directory-scanning reads (grep for process.env/homedir/readdir/glob found none). CLI I/O is local files and stdin/stdout, with diagnostics on stderr (packages/cli/src/utils.ts:28-33,80-105; packages/cli/src/log.ts:3); `--stats` runs locally via the `tokenx` estimator (packages/cli/src/conversion.ts:7,47-48). No account or API key is needed to use the library or CLI. Runtime behavior of the third-party ansis/citty/tokenx packages was not inspected (no node_modules in the clone). Network and accounts appear only in dev tooling: the accuracy benchmark calls OpenAI, Anthropic, Google and xAI through the Vercel AI SDK and needs OPENAI_API_KEY, ANTHROPIC_API_KEY, GOOGLE_GENERATIVE_AI_API_KEY, XAI_API_KEY (benchmarks/.env.example:1-5; benchmarks/src/evaluate.ts:4-8,23-28); `fetch-github-repos` calls api.github.com and ungh.cc (benchmarks/scripts/fetch-github-repos.ts:36-65); docs are deployed to Cloudflare with CLOUDFLARE_API_TOKEN (.github/workflows/deploy.yml:55-58; docs/wrangler.toml:1-10); npm publishing runs in a GitHub Actions job with id-token: write (.github/workflows/release.yml:17-19,49-50). The docs playground is client-side: state lives in the URL hash, the tokenizer is imported in the browser, and there are no fetch calls (docs/.vitepress/theme/components/PlaygroundLayout.vue:147-152,170-182,237-239,266-268); docs search is local (docs/.vitepress/config.ts:98-100)."
+    },
+    "code": {
+      "languages": [
+        "TypeScript",
+        "JavaScript (CLI bin shim)",
+        "Vue (docs playground)"
+      ],
+      "entry_points": [
+        {
+          "path": "packages/cli/bin/toon.mjs",
+          "what": "`toon` executable declared in packages/cli/package.json:25-27; shim that does import('../dist/index.mjs')."
+        },
+        {
+          "path": "packages/cli/src/entry.ts",
+          "what": "CLI main: runMain(mainCommand) via citty; tsdown entry that builds to dist/index.mjs (packages/cli/tsdown.config.ts:5-7)."
+        },
+        {
+          "path": "packages/cli/src/index.ts",
+          "what": "mainCommand definition: positional input, -o, -e, -d, --delimiter, --indent, --strict/--no-strict, --stats, --verbose; dispatches to encode or decode."
+        },
+        {
+          "path": "packages/cli/src/conversion.ts",
+          "what": "encodeToToon (JSON.parse then encode/encodeLines; --stats estimates tokens with tokenx) and decodeToJson (streaming decode to JSON text)."
+        },
+        {
+          "path": "packages/toon/src/index.ts",
+          "what": "Library entry (package exports '.' -> dist/index.mjs): encode, encodeLines, decode, decodeFromLines, decodeStreamSync, decodeStream, rawString, escapeString, ToonDecodeError."
+        },
+        {
+          "path": "benchmarks/scripts/token-efficiency-benchmark.ts",
+          "what": "Token-count benchmark runner (benchmarks/package.json:7); gpt-tokenizer counts per format; no API calls."
+        },
+        {
+          "path": "benchmarks/scripts/accuracy-benchmark.ts",
+          "what": "LLM retrieval-accuracy benchmark runner (benchmarks/package.json:8); needs provider API keys; writes benchmarks/results/."
+        },
+        {
+          "path": "docs/.vitepress/config.ts",
+          "what": "VitePress docs site (including the playground component), deployed to Cloudflare via wrangler (docs/wrangler.toml)."
+        }
+      ],
+      "architecture": "pnpm monorepo (pnpm-workspace.yaml:9-12): packages/toon (library), packages/cli (CLI), benchmarks (private), docs (private VitePress). Library: packages/toon/src/index.ts is the public API. Encode path: encode/normalize.ts (unknown -> JSON value: toJSON, Date, BigInt, Set/Map, -0, non-finite -> null, lone-surrogate rejection) -> encode/replacer.ts -> encode/encoders.ts (generator emitting lines in inline, tabular `key[N]{fields}:`, keyed-tabular `key[N:]{fields}:` or list form) with encode/tabular.ts (uniformity detection incl. nested field groups), encode/primitives.ts (quoting, headers) and encode/raw-string.ts. Decode path: decode/scanner.ts (indentation, BOM/CRLF, full-line '#' comments, tab rules) -> decode/line-reader.ts (one rule tree driven by sync or async sources) -> decode/decoders.ts (emits JsonStreamEvent) using decode/parser.ts (header and token parsing), decode/validation.ts (strict-mode count and blank-line checks) and decode/errors.ts (ToonDecodeError with line/source) -> decode/event-builder.ts (events -> value). shared/* holds escaping, literal checks and own-property helpers that are __proto__-safe. CLI: packages/cli/src/{entry,index,conversion,utils,errors,format-error,json-from-events,log}.ts using citty (args), ansis (color), tokenx (estimates); it imports library code by relative path (../../toon/src/index.ts), not as a package dependency. Build: tsdown per package. Benchmarks (benchmarks/src, benchmarks/scripts): faker-seeded generated datasets plus a real top-100 GitHub-repos JSON (benchmarks/src/datasets.ts:3,5-6,311-315), six format encoders (JSON, JSON compact, YAML, XML, CSV, TOON: benchmarks/src/formats.ts:29-72), question generators, LLM evaluation via the Vercel AI SDK (src/evaluate.ts), report generation (src/report.ts); results are committed under benchmarks/results/ and embedded into README/docs through automd:file markers (README.md:173,458; docs/guide/benchmarks.md:19,304).",
+      "packaging_and_release": "Published to npm as two ESM-only packages, @toon-format/toon (files: dist; exports -> dist/index.mjs + .d.mts) and @toon-format/cli (files: bin, dist; bin `toon` -> bin/toon.mjs), both at 4.1.1 (packages/toon/package.json:4,26-35; packages/cli/package.json:4,18-31). Version bump via `bumpp -r` (package.json:17). .github/workflows/release.yml fires on `v*` tags (lines 3-6) on `ubuntu-slim` with `id-token: write` and `contents: write` (17-19): `npx changelogithub` creates the GitHub release notes (38-41), then `pnpm install --frozen-lockfile` (43-44), `pnpm run build` (46-47), and `npm install -g npm@latest && pnpm -r publish --access public --no-git-checks` (49-50). No release binaries, checksums, signatures, SBOM or explicit provenance/attestation step appear in the repo (grep of .github for provenance/attest/cosign/sigstore/checksum/sha256/gpg/slsa: no match), so whether npm provenance is attached cannot be determined from the repo. The v4.1.1 ref is an annotated tag object that peels to the release commit (.git/packed-refs:2-3); tag signature not inspected. Docs are deployed separately to Cloudflare by .github/workflows/deploy.yml (wrangler deploy on pushes to main touching docs/** etc.).",
+      "tests_and_ci": "Vitest (^4.1.10: package.json:30; no vitest/vite config files, defaults used) driven per package via `test` scripts (packages/toon/package.json:38; packages/cli/package.json:35; benchmarks/package.json:6). 16 test files: packages/toon/test (10: decode, decode-errors, decode-security, decodeStream, encode, encode-security, encodeLines, normalization, raw-string, replacer), packages/cli/test (5: cli, cli-process, errors, format-error, json-from-events), benchmarks/test (1: utils). About 250 literal it()/describe() call sites, plus fixture-driven cases generated at run time from the @toon-format/spec conformance fixtures (packages/toon/test/utils.ts:15-19; packages/toon/test/decode.test.ts:9-24; packages/toon/test/encode.test.ts:9-19). CLI tests run in-process and as a child process (packages/cli/test/utils.ts:85-157). CI: .github/workflows/ci.yml on push/PR to main, one job on `ubuntu-slim`, Node 24, 10-minute timeout, running `pnpm install --frozen-lockfile`, `pnpm run lint` (ESLint, @antfu/eslint-config), `pnpm run test:types` (`tsc --noEmit`) and `pnpm run test` (`pnpm -r test`); no OS or Node matrix, no coverage step. .github/workflows/pr-title.yml lints PR titles with commitlint (conventional commits, lowercase subject); deploy.yml builds and deploys the docs; release.yml publishes on tags. The LLM accuracy benchmark (needs API keys) and the benchmarks `verify` scripts (benchmarks/package.json:9-11) are not run by CI.",
+      "dependencies": "No runtime `dependencies` in any manifest. Direct devDependency counts: package.json (root, private): 11; packages/toon/package.json: 1 (@toon-format/spec, used for conformance fixtures); packages/cli/package.json: 3 (ansis, citty, tokenx); benchmarks/package.json (private): 16 (incl. @ai-sdk/anthropic, google, openai, xai, provider; ai; gpt-tokenizer; @faker-js/faker; yaml; fast-xml-parser; csv-stringify; unstorage; ofetch; p-map; p-queue; @clack/prompts); docs/package.json (private): 9 (incl. vitepress, vitepress-plugin-llms, unocss, gpt-tokenizer, yaml). Lockfile pnpm-lock.yaml (lockfileVersion 9.0); packageManager pnpm@11.17.0 (package.json:6). pnpm-workspace.yaml sets `trustPolicy: no-downgrade` and limits dependency build scripts to @parcel/watcher and esbuild (lines 4-16). The CLI imports the library by relative source path rather than declaring it as a dependency (packages/cli/src/index.ts:2,6).",
+      "security_policy": "none - no SECURITY.md (glob for SECURITY*, CONTRIBUTING*, CODEOWNERS, CHANGELOG* matched nothing). Spec section 15 'Security Considerations' is in the separate spec repo (docs/reference/spec.md:79-80). Library hardening is tested instead: own-property handling that is __proto__-safe (packages/toon/src/shared/object-utils.ts:3-33; packages/toon/test/decode-security.test.ts; packages/toon/test/encode-security.test.ts) and strict-mode decoding by default (docs/reference/api.md:614-629)."
+    },
+    "claim_checks": [
+      {
+        "claim": "'Matches JSON's retrieval accuracy while using 42.6% fewer tokens' (README.md:146,225)",
+        "verified": "partial",
+        "evidence": "Arithmetic reproduces: 1 - 2,474/4,308 = 42.6% (README.md:215,218), and the code computes it as 1 - toon/json-pretty over per-dataset mean token counts of primer + encoded data (benchmarks/src/report.ts:25-44,222,246). But (a) the baseline is pretty-printed JSON; against JSON compact the same table gives 2,474 vs 2,892 tokens (README.md:215-216; derived ~14.5% fewer, my arithmetic); (b) accuracy 72.2% vs 71.4% sits inside the +/-2.8 Wilson intervals, which the README says are not statistically meaningful when they overlap (README.md:282); (c) the token counts are gpt-tokenizer counts of the prompt text, not provider-billed usage."
+      },
+      {
+        "claim": "'deterministic, lossless round-trips' / 'drop-in, lossless representation of the JSON you already have' (README.md:15,147)",
+        "verified": "partial",
+        "evidence": "The encoder is a deterministic line generator (packages/toon/src/encode/encoders.ts:10-33) and decode(encode(x)) is tested (packages/toon/test/decode.test.ts:52-89; packages/toon/test/encode-security.test.ts:8-61). The docs qualify it as lossless 'after normalization' (docs/guide/getting-started.md:219; docs/reference/api.md:53-68,693-710): -0 -> 0, NaN/Infinity/undefined/function/symbol -> null, Date -> ISO string, BigInt beyond 2^53 -> quoted string (packages/toon/src/encode/normalize.ts:43-91). Numbers follow IEEE-754 doubles with silent rounding of large integers (docs/reference/api.md:343); JS reorders integer-like keys (docs/reference/api.md:635); lone surrogates make encode throw (normalize.ts:94-117). The CLI encodes via JSON.parse (packages/cli/src/conversion.ts:25), so the original JSON text formatting and number lexemes are not preserved. The repo has no mechanism to store or restore originals."
+      },
+      {
+        "claim": "CLI `--stats` prints token estimates and savings, e.g. '~117 (JSON) -> ~66 (TOON)', '-43.6%' (README.md:131-142)",
+        "verified": "partial",
+        "evidence": "The mechanism is verified: packages/cli/src/conversion.ts:47-59 calls tokenx `estimateTokenCount` on the raw input text (`jsonContent`, so the baseline depends on the input file's formatting) and on the TOON output, then prints 'Token estimates: ~A (JSON) -> ~B (TOON)' and 'Saved ~N tokens (-P%)'. docs/cli/index.md:145 calls them 'accurate token counts' while the same page and the code call them estimates (docs/cli/index.md:157,176; conversion.ts:58); this differs from the o200k_base tokenizer used by the benchmarks (benchmarks/src/utils.ts:2,29-31). cli.test.ts:272-289 only asserts that the text appears on stderr and stdout stays clean. tokenx internals were not inspected (no node_modules) and the example numbers were not re-run. It is not a provider-usage measurement: nothing reads provider responses or Claude Code/Codex logs."
+      },
+      {
+        "claim": "Explicit [N] lengths and {fields} lists improve parsing reliability and let strict mode detect truncation (README.md:148,295)",
+        "verified": "partial",
+        "evidence": "Deterministic side verified: strict mode (default true, packages/toon/src/index.ts:215) throws on count mismatches via assertExpectedCount (packages/toon/src/decode/validation.ts:8-21), used for inline arrays, tabular rows, keyed entries and list items (packages/toon/src/decode/decoders.ts:328,397,405,447,459,515); fixtures 'validation-errors' run in decode.test.ts:20. The LLM-reliability evidence is a small vendor-run sample: 5 YES/NO questions x 4 models = 20 evaluations per format (benchmarks/src/questions/structural-validation.ts:23-42; README.md:295,362-415). XML and CSV score 0/4 on the valid control and 4/4 on every corrupted variant (README.md:370-371,377-379,388-390,399-402,410-412), a pattern consistent with a constant NO answer."
+      },
+      {
+        "claim": "'When Not to Use TOON': CSV is smaller on purely tabular data (~5-10% overhead); compact JSON often wins on nested/semi-uniform data (README.md:153-162)",
+        "verified": "yes",
+        "evidence": "Published outputs agree: flat track TOON is +6.0%, +8.7%, +2.6% vs CSV, total +5.9% (README.md:521,530,539,547); mixed track TOON is larger than JSON compact by +5.6% (orders), +19.9% (event logs), +6.7% (nested config), total +1.6% (README.md:469,477,485,508). The sign convention follows packages/benchmarks code: savingsPercent < 0 prints '+' (benchmarks/scripts/token-efficiency-benchmark.ts:47-56)."
+      },
+      {
+        "claim": "Token counts use gpt-tokenizer o200k_base; 'relative differences between formats hold directionally' across providers (README.md:443,454,554)",
+        "verified": "not_checkable",
+        "evidence": "The code calls the package default `encode` from gpt-tokenizer and does not name an encoding (benchmarks/src/utils.ts:2,29-31); 'o200k_base' rests on the gpt-tokenizer ^3.4.0 default (benchmarks/package.json:25), whose source was not inspected. Report counts use primer + encoded data text (benchmarks/src/report.ts:25-44). Provider-reported inputTokens/outputTokens are stored per call (benchmarks/src/evaluate.ts:91-92; benchmarks/results/accuracy/models/*) but the reports do not use them and no in-repo comparison between tokenizer counts and provider counts exists; the stored records contain no cache-related fields."
+      },
+      {
+        "claim": "'Total evaluations: 244 questions x 6 formats x 4 models = 5,856 LLM calls' (README.md:446)",
+        "verified": "no",
+        "evidence": "Code differs from the README: the task generator skips CSV for datasets that do not support CSV (benchmarks/scripts/accuracy-benchmark.ts:25-39, skip at 31-32), and the README itself shows CSV answering only 109 of 244 questions per model (README.md:228,254,236-241 '/436'). Calls issued = 4 x (244 x 5 + 109) = 5,316, not 5,856; the README figure is a formula that over-counts by 540 (benchmarks/src/report.ts:291-292,324)."
+      },
+      {
+        "claim": "encodeLines/CLI give 'memory-efficient streaming'; 'Peak memory usage scales with data depth, not total size' (README.md:727-738; docs/cli/index.md:117-142)",
+        "verified": "partial",
+        "evidence": "Output side and decode side stream: encodeLines is a generator (packages/toon/src/index.ts:109-118; encoders.ts), and decode reads lines and emits events to a JSON text stream (packages/cli/src/utils.ts:80-105; conversion.ts:72-95,97-127). But CLI encode reads the whole input and JSON.parses it (conversion.ts:21-25; utils.ts:28-33), and encodeLines first builds a fully normalized copy of the input (index.ts:110; normalize.ts:10-92), so peak memory scales with input size on encode, contrary to docs/cli/index.md:142. `--stats` also builds the full TOON string (conversion.ts:38; acknowledged at docs/cli/index.md:144-146)."
+      },
+      {
+        "claim": "'Tab delimiters buy further token savings' (README.md:787; docs/reference/api.md:714)",
+        "verified": "not_checkable",
+        "evidence": "No in-repo benchmark varies the delimiter: the benchmark TOON format calls encodeToon(data) with the default comma (benchmarks/src/formats.ts:44-50) and grep of benchmarks/ finds 'delimiter' only in the primer text (formats.ts:47). The option itself exists (packages/cli/src/index.ts:37-41; packages/toon/src/index.ts:201-210). The docs word it as 'often' more efficient (docs/cli/index.md:217)."
+      },
+      {
+        "claim": "'Full-line # comments are stripped on decode' (README.md:787)",
+        "verified": "yes",
+        "evidence": "packages/toon/src/decode/scanner.ts:54-59 drops lines whose first non-space character is '#' before blank-line tracking and validation (not when a tab is in the indentation, line 57); conformance fixtures 'comments' run in packages/toon/test/decode.test.ts:23. Encoders never emit comments: strings starting with '#' are quoted (packages/toon/src/shared/validation.ts:79-81) and rawString rejects comment-like lines (packages/toon/src/encode/raw-string.ts:4-6,19-21). Consequence: hand-written comments are dropped on decode."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Retrieval accuracy, all datasets (CSV excluded), 244 questions x 4 models (claude-haiku-4-5-20251001, gemini-3.6-flash, gpt-5.4-nano, grok-4.5), reasoning disabled",
+        "metric": "accuracy % (Wilson 95% interval)",
+        "value": "TOON 72.2% +/-2.8; JSON (pretty) 71.4% +/-2.8; XML 70.7% +/-2.9; YAML 70.1% +/-2.9; JSON compact 69.0% +/-2.9",
+        "source": "README.md:215-219,282 (benchmarks/results/retrieval-accuracy.md:41-45)",
+        "independent": false
+      },
+      {
+        "what": "Mean prompt tokens per dataset in the accuracy benchmark (primer + encoded data, gpt-tokenizer)",
+        "metric": "tokens (mean over datasets)",
+        "value": "TOON 2,474; JSON compact 2,892; YAML 3,487; JSON pretty 4,308; XML 4,909 -> TOON 42.6% fewer than JSON pretty (about 14.5% fewer than JSON compact, derived)",
+        "source": "README.md:215-225; computed in benchmarks/src/report.ts:25-44,246",
+        "independent": false
+      },
+      {
+        "what": "Token efficiency, mixed-structure track (nested/semi-uniform datasets; gpt-tokenizer, no LLM calls)",
+        "metric": "total tokens, TOON vs other formats",
+        "value": "TOON 264,734 tokens; vs JSON -32.7%; vs JSON compact +1.6% (TOON larger); vs YAML -15.7%; vs XML -40.9%. Per dataset vs JSON compact: orders +5.6%, event logs +19.9%, nested config +6.7%, feature flags -32.8%, contacts -42.9%",
+        "source": "README.md:465-510 (benchmarks/results/token-efficiency.md:1-52)",
+        "independent": false
+      },
+      {
+        "what": "Token efficiency, flat-only track (fully tabular datasets; gpt-tokenizer, no LLM calls)",
+        "metric": "total tokens, TOON vs other formats",
+        "value": "TOON 68,030 tokens; CSV 64,247 (TOON +5.9% vs CSV); TOON vs JSON -58.7%, vs JSON compact -35.2%, vs YAML -48.2%, vs XML -64.3%",
+        "source": "README.md:518-551",
+        "independent": false
+      },
+      {
+        "what": "Accuracy on flat datasets only (109 questions x 4 models = 436 evaluations per format)",
+        "metric": "accuracy % (Wilson 95% interval) and avg tokens",
+        "value": "TOON 63.1% +/-4.5 (1,994 tok); CSV 62.2% +/-4.5 (1,851); JSON pretty 60.3% +/-4.6 (3,950); XML 60.1% +/-4.6 (4,516); YAML 59.9% +/-4.6 (3,270); JSON compact 58.0% +/-4.6 (2,718)",
+        "source": "README.md:234-241",
+        "independent": false
+      },
+      {
+        "what": "Per-model accuracy over 244 questions, TOON vs JSON (pretty)",
+        "metric": "accuracy %",
+        "value": "claude-haiku-4-5: 65.6% vs 63.5%; gemini-3.6-flash: 69.3% vs 68.4%; gpt-5.4-nano: 57.0% vs 57.4% (XML highest at 59.4%); grok-4.5: 97.1% vs 96.3%",
+        "source": "README.md:248-278",
+        "independent": false
+      },
+      {
+        "what": "Accuracy by question type, TOON vs JSON (pretty)",
+        "metric": "accuracy %",
+        "value": "Field retrieval 97.8 vs 99.2; Aggregation 48.4 vs 48.4; Filtering 38.0 vs 41.1; Structure awareness 90.3 vs 84.0; Structural validation 100.0 vs 50.0 (5 questions x 4 models = 20 evaluations per format)",
+        "source": "README.md:289-295; benchmarks/src/questions/structural-validation.ts:23-42",
+        "independent": false
+      },
+      {
+        "what": "CLI `--stats` illustrative examples (tokenx estimates on single inputs, not benchmark runs)",
+        "metric": "estimated tokens, JSON input text vs TOON output",
+        "value": "Weather example ~117 -> ~66 (-43.6%); docs example ~15,145 -> ~8,745 (-42.3%)",
+        "source": "README.md:137-142; docs/cli/index.md:171-178",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope: nothing here measures provider usage or reads Claude Code/Codex logs, and no input/output/cache-creation/cache-read token accounting exists. A repo search for .claude/codex/.jsonl/cache_read/input_tokens hit only repo descriptions in benchmarks/data/github-repos.json. Reductions are reported as estimator or tokenizer counts: CLI `--stats` uses tokenx over the raw input text (packages/cli/src/conversion.ts:47-59) and the benchmarks use gpt-tokenizer counts of primer + data (benchmarks/src/report.ts:25-44). Per-call provider inputTokens/outputTokens are stored (benchmarks/src/evaluate.ts:91-92) but unused in the reports and carry no cache fields.",
+      "Evidence quality: every published figure comes from the project's own harness; no third-party replication is cited, and docs/reference/efficiency-formalization.md is an analytical byte-count model, not a measurement. The runs use 4 small/fast models with reasoning disabled (benchmarks/src/evaluate.ts:23-28,70; README.md:441-446) and mostly generated, faker-seeded datasets plus one real GitHub-repos set (benchmarks/src/datasets.ts:3,5-6). Accuracy gaps vs JSON sit inside the reported intervals (README.md:215-225,282). The 42.6% headline is against pretty-printed JSON; TOON is +1.6% larger than compact JSON on the mixed-structure total, +19.9% on semi-uniform logs and +5.9% vs CSV on flat data (README.md:477,508,547). No latency figures are published (README.md:160-162). The README's 5,856-call total overstates the 5,316 calls the code issues (benchmarks/scripts/accuracy-benchmark.ts:25-39).",
+      "Recoverability caveats: round-trip is lossless only for the JSON data model after normalization (-0 -> 0; NaN/Infinity/undefined/function/symbol -> null; Date -> ISO string; BigInt > 2^53 -> string: packages/toon/src/encode/normalize.ts:43-91). Numbers are IEEE-754 doubles with silent rounding (docs/reference/api.md:343), JS reorders integer-like keys (docs/reference/api.md:635), lone surrogates throw on encode (normalize.ts:94-117), and comments are dropped on decode (packages/toon/src/decode/scanner.ts:54-59). The CLI runs JSON.parse before encoding (packages/cli/src/conversion.ts:25), so original text formatting is not recoverable. The repo contains no mechanism for storing, hashing or restoring originals.",
+      "Scale: CLI encode reads the whole input, JSON.parses it and normalizes a full copy before streaming output (packages/cli/src/conversion.ts:21-25; packages/toon/src/index.ts:110), so memory grows with input size, contrary to docs/cli/index.md:142; `--stats` also builds the whole TOON string (conversion.ts:38).",
+      "Platform: CI covers one OS and one Node version (ubuntu-slim, Node 24: .github/workflows/ci.yml:20,31-34). Neither published manifest sets `engines`, `os` or `cpu`, no minimum Node version is documented, and there is no macOS/Windows/WSL mention. Output is ESM-only (packages/toon/package.json:26-31). CLI tests execute src/entry.ts directly with node (packages/cli/test/utils.ts:15,144-147; packages/cli/package.json:33).",
+      "Maintenance and stability: the format is self-described as 'stable, but also an idea in progress' (README.md:17-18). The spec and conformance fixtures live in a separate repo/package consumed at test time (SPEC.md:3; packages/toon/package.json:40-42; packages/toon/test/utils.ts:15-19) and that package's license was not examined here. Several other official-language ports are listed as 'In Development' (docs/ecosystem/implementations.md:15-17). Single named copyright holder (LICENSE:3). Dev toolchain is on very recent majors (TypeScript ^6.0.3, Vite ^8.1.5, ESLint ^10.8.0, pnpm@11.17.0: package.json:6,19-30).",
+      "Release and supply chain: no SECURITY.md, CONTRIBUTING or CODEOWNERS. The release job (contents: write, id-token: write) runs unpinned `npx changelogithub` and `npm install -g npm@latest` before `pnpm -r publish --no-git-checks` (.github/workflows/release.yml:17-19,38-50). GitHub Actions are pinned by major tag, not commit SHA (ci.yml:24-41; release.yml:23-36). No checksums, signatures or explicit provenance step exist in the repo. Mitigations present: pnpm trustPolicy no-downgrade and restricted build scripts (pnpm-workspace.yaml:4-16), --frozen-lockfile installs (ci.yml:49), persist-credentials: false in CI (ci.yml:25-27).",
+      "Integration scope: no MCP server, HTTP API, Claude Code/Codex plugin, hook or skill, and no non-TypeScript SDK in this repo. The MCP proxy named in the README (Tooner) is a separate third-party project that was not examined (README.md:797; docs/ecosystem/tools-and-playgrounds.md:51-55)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "toon-format/toon",
+      "checks": [
+        {
+          "field": "readme.install[3] (npm global, CLI)",
+          "statement": "`npm install -g @toon-format/cli` installs the CLI package @toon-format/cli, which provides the `toon` binary.",
+          "citation": "README.md:705-707; packages/cli/README.md:9-11; packages/cli/package.json:25-31; packages/cli/bin/toon.mjs:1-2",
+          "holds": true,
+          "note": "The exact command is at README.md:706 and packages/cli/README.md:11. The manifest maps bin `toon` to bin/toon.mjs (package.json:25-27) and ships bin + dist (28-31). The shim is `#!/usr/bin/env node` plus import('../dist/index.mjs'). The package README's usage line is `toon [options] [input]` (packages/cli/README.md:29). The install command itself was not executed."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT; file LICENSE.",
+          "citation": "LICENSE:1-21; packages/toon/package.json:8; packages/cli/package.json:8; README.md:9,836",
+          "holds": true,
+          "note": "LICENSE:1 reads 'MIT License', followed by the standard MIT grant and warranty text (lines 5-21), copyright 2025-PRESENT Johann Schopplich (line 3). Both published manifests declare \"license\": \"MIT\", and the README badge and License section link to the same file."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - pure TypeScript/ESM packages with no native addons; CI runs on the Linux runner `ubuntu-slim` with Node 24; CPU architecture not stated; no OS-specific install steps, `engines` field or minimum Node version documented.",
+          "citation": "packages/toon/package.json:26-35; packages/cli/package.json:18-31; .github/workflows/ci.yml:20,31-34",
+          "holds": true,
+          "note": "ci.yml:20 is `runs-on: ubuntu-slim` and lines 31-34 run setup-node with node-version 24. Both manifests are `type: module` and export dist/index.mjs. A repo-wide grep (lockfile excluded) finds no engines/os/cpu field and no binding.gyp, node-gyp, prebuild or napi. It also finds no x86/x64/arm64/aarch64 mention and no stated Node version requirement. The 'yes' is an inference from pure-JS packages plus Linux CI, and the dossier says the architecture is unstated."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "none found - no Claude Code/Codex plugin, hook, skill, slash command or log parser; the only Claude reference in code is the benchmark model id claude-haiku-4-5-20251001 called through the Anthropic API (benchmarks/src/evaluate.ts:4,24); docs/guide/llm-prompts.md is generic prompting guidance.",
+          "citation": "benchmarks/src/evaluate.ts:4,24; benchmarks/data/github-repos.json:227,331,344,760,812,981,1059; docs/guide/llm-prompts.md:1-40",
+          "holds": true,
+          "note": "The repo has no .claude/.codex directories, plugin manifests, CLAUDE.md/AGENTS.md/SKILL.md, or hook/command/log-parser code. The hook/plugin grep hits are unrelated: commitlint, vitepress-plugin-llms, and the replacer and toJSON hooks. '.jsonl', 'cache_read', 'cache_creation', 'input_tokens' and 'output_tokens' match nothing anywhere, and 'codex' matches only github-repos.json descriptions. evaluate.ts:4 imports @ai-sdk/anthropic and :24 holds the model id. Non-material wording nit: 'claude' also matches that model id outside code (README.md:248,441; benchmarks/README.md:94; docs/guide/benchmarks.md:94,287; benchmarks/results/), so 'hit only repo descriptions' is loose. The dossier's next sentence covers the code hit."
+        },
+        {
+          "field": "claim_checks[2] (CLI --stats)",
+          "statement": "verified: partial - --stats calls tokenx estimateTokenCount on the raw input text and the TOON output, then prints 'Token estimates: ~A (JSON) -> ~B (TOON)' and 'Saved ~N tokens (-P%)'. docs/cli/index.md:145 says 'accurate token counts' while :157,176 and the code say estimates. This differs from the benchmarks' gpt-tokenizer o200k_base. cli.test.ts:272-289 only checks stderr text and clean stdout. tokenx was not inspected and the example numbers were not re-run. It is not a provider-usage measurement.",
+          "citation": "README.md:131-142; packages/cli/src/conversion.ts:7,21,47-59; docs/cli/index.md:145,157,176; benchmarks/src/utils.ts:2,24,29-31; packages/cli/test/cli.test.ts:272-289",
+          "holds": true,
+          "note": "conversion.ts:47-48 estimate jsonContent (raw input read at line 21) and toonOutput. Lines 58-59 print the two quoted lines through log.info and log.success. README.md:134 shows the npx --stats command and :140-141 the example output, which is internally consistent (117-66=51; 51/117=43.6%). The docs wording mismatch is confirmed. utils.ts imports encode from gpt-tokenizer, with an o200k_base comment at :24. The test asserts exact stdout plus /Token estimates:/ and /Saved.*tokens/ on stderr. No node_modules is present, so tokenx cannot be inspected. Nothing in the CLI reads provider responses or Claude Code/Codex logs. 'partial' is a fair grade."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

@@ -1,0 +1,333 @@
+{
+  "contender": "openai/skills",
+  "revision": {
+    "contender": "openai/skills",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "openai/skills",
+        "tag": null,
+        "commit": "49f948faa9258a0c61caceaf225e179651397431",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": null,
+    "commit": "49f948faa9258a0c61caceaf225e179651397431",
+    "read_at": "2026-10-02T03:02:30+00:00"
+  },
+  "dossier": {
+    "contender": "openai/skills",
+    "revision": {
+      "tag": null,
+      "commit": "49f948faa9258a0c61caceaf225e179651397431",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIXED per skill, no repo-level license: Apache-2.0 x31, MIT x5 (notion-* x4, vercel-deploy), LicenseRef-Figma-Developer-Terms x8 (figma* skills)",
+      "file": "skills/<.system|.curated>/<skill>/LICENSE.txt (per skill; 6 of the 8 Figma skills use LICENSE.TXT (figma-code-connect-components, figma-create-design-system-rules, figma-create-new-file, figma-generate-design, figma-generate-library, figma-use); skills/.curated/figma/LICENSE.txt and skills/.curated/figma-implement-design/LICENSE.txt use lowercase LICENSE.txt; the 2 playwright skills add NOTICE.txt); no repo-root LICENSE file"
+    },
+    "purpose": "OpenAI's catalog of Agent Skills for Codex; the README says the repository is deprecated in favour of github.com/openai/plugins (README.md:2). At commit 49f948f it holds 44 skill folders: 5 in skills/.system (imagegen, openai-docs, plugin-creator, skill-creator, skill-installer) and 39 in skills/.curated. Each skill is a SKILL.md (YAML name + description frontmatter, Markdown procedure) plus agents/openai.yaml (Codex UI and MCP-dependency metadata) and optional scripts/, references/, assets/. Engineering and security content: security-best-practices (Python, JS/TS, Go reference files), security-threat-model, security-ownership-map (git-history ownership and bus-factor scripts), gh-fix-ci, gh-address-comments, yeet, cli-creator, define-goal, playwright and playwright-interactive, screenshot, pdf, jupyter-notebook, aspnet-core, winui-app, sentry. The rest are deploy skills (vercel, netlify, cloudflare, render), connector skills (8 figma*, 4 notion-*, linear) and OpenAI-product skills (openai-docs, chatgpt-apps, imagegen, speech, transcribe, migrate-to-codex). It is content (Markdown plus helper scripts), not a framework. It contains no evaluation runner or scorer framework, no containerized Claude Code/Codex end-to-end runner, and no CI regression gate. The only evaluation artifacts are 8 manual-run JSON scenarios under four Notion skills.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "'This repository is deprecated. For current Codex skill and plugin examples, use the OpenAI Plugins repository' (github.com/openai/plugins); to add your own skills follow the Build plugins guide, which covers creating a skill-only plugin.",
+          "citation": "README.md:2"
+        },
+        {
+          "claim": "'Agent Skills are folders of instructions, scripts, and resources that AI agents can discover and use to perform at specific tasks. Write once, use everywhere.'",
+          "citation": "README.md:6"
+        },
+        {
+          "claim": "'Codex uses skills to help package capabilities that teams and individuals can use to complete specific tasks in a repeatable way. This repository catalogs skills for use and distribution with Codex.'",
+          "citation": "README.md:8"
+        },
+        {
+          "claim": "Links to Codex skills docs and to the 'Agent Skills open standard' (agentskills.io).",
+          "citation": "README.md:10-13"
+        },
+        {
+          "claim": "'Skills in .system are automatically installed in the latest version of Codex.'",
+          "citation": "README.md:17"
+        },
+        {
+          "claim": "'To install curated or experimental skills, you can use the $skill-installer inside Codex.'",
+          "citation": "README.md:19"
+        },
+        {
+          "claim": "Curated skills can be installed by name (defaults to skills/.curated), e.g. '$skill-installer gh-address-comments'.",
+          "citation": "README.md:21-25"
+        },
+        {
+          "claim": "Experimental skills are installed by naming the folder (create-plan from .experimental) or by giving the GitHub directory URL https://github.com/openai/skills/tree/main/skills/.experimental/create-plan.",
+          "citation": "README.md:27-37"
+        },
+        {
+          "claim": "'After installing a skill, restart Codex to pick up new skills.'",
+          "citation": "README.md:39"
+        },
+        {
+          "claim": "'The license of an individual skill can be found directly inside the skill's directory inside the LICENSE.txt file.'",
+          "citation": "README.md:43"
+        },
+        {
+          "claim": "Security contact: 'Have you discovered a vulnerability or have concerns about model output? Please e-mail security@openai.com'.",
+          "citation": "contributing.md:9-11"
+        },
+        {
+          "claim": "The README (43 lines) is silent on Claude Code, evaluation or testing, CI, supported operating systems, telemetry and benchmarks.",
+          "citation": "README.md:1-43"
+        }
+      ],
+      "install": [
+        {
+          "method": "Codex built-in $skill-installer, curated skill by name (OS-neutral; run inside Codex)",
+          "command": "$skill-installer gh-address-comments",
+          "citation": "README.md:21-25"
+        },
+        {
+          "method": "Codex $skill-installer, experimental skill by folder (README example; skills/.experimental does not exist at this commit)",
+          "command": "$skill-installer install the create-plan skill from the .experimental folder",
+          "citation": "README.md:27-31"
+        },
+        {
+          "method": "Codex $skill-installer, GitHub directory URL",
+          "command": "$skill-installer install https://github.com/openai/skills/tree/main/skills/.experimental/create-plan",
+          "citation": "README.md:33-37"
+        },
+        {
+          "method": "Helper script, repo + path (python3 and network needed; git only for fallback)",
+          "command": "scripts/install-skill-from-github.py --repo <owner>/<repo> --path <path/to/skill> [<path/to/skill> ...]",
+          "citation": "skills/.system/skill-installer/SKILL.md:39"
+        },
+        {
+          "method": "Helper script, GitHub URL",
+          "command": "scripts/install-skill-from-github.py --url https://github.com/<owner>/<repo>/tree/<ref>/<path>",
+          "citation": "skills/.system/skill-installer/SKILL.md:40"
+        },
+        {
+          "method": "Helper script, list installable skills (default skills/.curated)",
+          "command": "scripts/list-skills.py --path skills/.experimental",
+          "citation": "skills/.system/skill-installer/SKILL.md:36-38"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "unknown - README names no OS or architecture. Code evidence only: the installer is stdlib Python 3 plus optional git with no OS gating (skills/.system/skill-installer/scripts/install-skill-from-github.py:4-17,128-161); some skills document Linux steps (skills/.curated/pdf/SKILL.md:44 apt-get; skills/.curated/screenshot/SKILL.md:133-146).",
+        "wsl2": "unknown - no statement for the repo; only skills/.curated/linear/SKILL.md:35-37 gives a Windows/WSL workaround for the Linear MCP.",
+        "macos_arm64": "unknown - no statement for the repo; core scripts are OS-neutral and macOS-specific helpers exist only in the screenshot skill (skills/.curated/screenshot/SKILL.md:21-23,79-91 and its .swift scripts).",
+        "gpu": "no - not applicable: no local-model, CUDA or torch code in skills/ (searched SKILL.md, scripts and agents yaml); image, speech and transcription skills call the OpenAI API (skills/.system/imagegen/scripts/image_gen.py:335, skills/.curated/speech/scripts/text_to_speech.py:137, skills/.curated/transcribe/scripts/transcribe_diarize.py:128)."
+      },
+      "integrations": {
+        "cli": "No installable binary or package. Agent-invoked helper scripts only: skills/.system/skill-installer/scripts/install-skill-from-github.py (--repo/--url/--path/--ref/--dest/--name/--method, :247-266) and list-skills.py (:68-83); skill-creator/scripts/{init_skill,generate_openai_yaml,quick_validate}.py; plugin-creator/scripts/create_basic_plugin.py; migrate-to-codex/scripts/migrate-to-codex.py (--scan-only/--plan/--doctor/--dry-run/--validate-target, SKILL.md:90-114); security-ownership-map/scripts/{run_ownership_map,query_ownership,community_maintainers}.py; gh-fix-ci/scripts/inspect_pr_checks.py (--repo/--pr/--json, :78-93).",
+        "mcp": "No MCP server is shipped; the only server code is a scaffold generator for users' ChatGPT apps (skills/.curated/chatgpt-apps/scripts/scaffold_node_ext_apps.mjs:432,481). Skills declare remote MCP dependencies in agents/openai.yaml (format in skills/.system/skill-creator/references/openai_yaml.md:16-23): Figma https://mcp.figma.com/mcp (skills/.curated/figma/agents/openai.yaml:8-14, same in the other 7 figma* skills), Notion https://mcp.notion.com/mcp (notion-*/agents/openai.yaml:14), Linear https://mcp.linear.app/mcp (linear/agents/openai.yaml:14), Render https://mcp.render.com/mcp (render-deploy/agents/openai.yaml:14), OpenAI docs https://developers.openai.com/mcp (openai-docs/agents/openai.yaml:14, chatgpt-apps/agents/openai.yaml:11). The three security skills, gh-fix-ci, gh-address-comments and yeet declare no MCP dependency (e.g. skills/.curated/security-threat-model/agents/openai.yaml:1-4).",
+        "sdk_or_api": "None found: no library, service or package manifest (no package.json, pyproject.toml, requirements*.txt, setup.py, Cargo.toml or go.mod). Scripts consume external APIs: GitHub REST and codeload (skills/.system/skill-installer/scripts/github_utils.py:20-21; install-skill-from-github.py:81) and the OpenAI API via the openai Python SDK (image_gen.py:335; text_to_speech.py:137; transcribe_diarize.py:128).",
+        "claude_code_or_codex": "Codex: yes. The $skill-installer flow (README.md:19-39), install target $CODEX_HOME/skills defaulting to ~/.codex/skills (skills/.system/skill-installer/SKILL.md:48; install-skill-from-github.py:45-46,243-244), Codex-specific agents/openai.yaml (skill-creator/references/openai_yaml.md:3,16-23), and a project-scope layout of .agents/skills/ and .codex/ (migrate-to-codex/SKILL.md:37,45; references/differences.md:28). Claude Code: no documented install, loading or compatibility statement. It appears only as (a) the migration source of migrate-to-codex (.claude/skills, commands, agents, CLAUDE.md, .mcp.json converted to Codex files; SKILL.md:10,34-39; scripts/migrate/skills.py:3-5), (b) a CLAUDE.md rule-file target in figma-create-design-system-rules/SKILL.md:16,174, and (c) a 'claude mcp add' snippet for Render MCP (render-deploy/SKILL.md:142-156). The installer has a --dest option (install-skill-from-github.py:257) but no doc ties it to Claude Code."
+      },
+      "telemetry_and_network": "No telemetry, analytics or phone-home code found: every outbound HTTP use in skills/**/scripts was enumerated and none is analytics. Network use is per skill and explicit. (1) skill-installer calls api.github.com for listing, codeload.github.com zip download, and git clone fallback over HTTPS then SSH (github_utils.py:21; install-skill-from-github.py:81,128-161,187-206); requests carry User-Agent codex-skill-install or codex-skill-list (github_utils.py:11; install-skill-from-github.py:56; list-skills.py:31) and attach GITHUB_TOKEN or GH_TOKEN as an Authorization header when set (github_utils.py:12-14); SKILL.md says the scripts need network and sandbox escalation (skill-installer/SKILL.md:34). (2) openai-docs helper fetches https://developers.openai.com/codex/codex-manual.md with User-Agent codex-openai-docs, checks an x-content-sha256 header and caches under a temp dir (skills/.system/openai-docs/scripts/fetch-codex-manual.mjs:19-24,34,461-469); resolve-latest-model-info.js fetches the latest-model guide (:7-8,39-40). (3) vercel-deploy fallback uploads a project tarball without authentication to https://codex-deploy-skills.vercel.sh/api/deploy (skills/.curated/vercel-deploy/scripts/deploy.sh:9,239). (4) playwright wrapper runs 'npx --yes --package @playwright/cli' (playwright/scripts/playwright_cli.sh:19), so it hits the npm registry. Accounts and credentials needed per skill: OPENAI_API_KEY (imagegen CLI fallback, imagegen/SKILL.md:15; speech/SKILL.md:3; transcribe), gh auth (gh-fix-ci/SKILL.md:14; gh-address-comments/SKILL.md:12; yeet/SKILL.md:8-9), Sentry login or token (sentry/SKILL.md:11,19-20), Render API key or OAuth (render-deploy/SKILL.md:121,203), Netlify and Cloudflare OAuth (netlify-deploy/SKILL.md:35,58; cloudflare-deploy/SKILL.md:24), Notion and Linear MCP OAuth via 'codex mcp login' (notion-knowledge-capture/SKILL.md:25-26; linear/SKILL.md:30-31), Figma MCP. security-best-practices, security-threat-model and security-ownership-map need no account (ownership-map needs Python and networkx); security-best-practices only optionally suggests searching online (security-best-practices/SKILL.md:24)."
+    },
+    "code": {
+      "languages": [
+        "Markdown (majority of the ~780 files under skills/: SKILL.md and references)",
+        "Python 3 (42 files)",
+        "JavaScript/Node ESM (14 files plus 1 .d.ts)",
+        "Bash (4)",
+        "Swift (3)",
+        "PowerShell (1)",
+        "YAML (44 agents/openai.yaml plus a few config files) and JSON (8 evaluation cases)"
+      ],
+      "entry_points": [
+        {
+          "path": "skills/<.system|.curated>/<name>/SKILL.md",
+          "what": "44 skill entry points. YAML name + description are what Codex matches for triggering; the body loads after the trigger and resources on demand (skills/.system/skill-creator/SKILL.md:71-72,127-133)."
+        },
+        {
+          "path": "skills/.system/skill-installer/scripts/install-skill-from-github.py",
+          "what": "Installer CLI, main() at :269. Zip download of the ref (default main) with git sparse-checkout fallback, copies one skill dir into $CODEX_HOME/skills, aborts if the destination exists."
+        },
+        {
+          "path": "skills/.system/skill-installer/scripts/list-skills.py",
+          "what": "Lists skill directories via the GitHub contents API (defaults openai/skills, skills/.curated, ref main; :14-16), main() at :86."
+        },
+        {
+          "path": "skills/.system/skill-creator/scripts/",
+          "what": "init_skill.py (main :333), generate_openai_yaml.py (main :189) and quick_validate.py (frontmatter linter, allowed keys name/description/license/allowed-tools/metadata at :40; needs PyYAML)."
+        },
+        {
+          "path": "skills/.system/plugin-creator/scripts/create_basic_plugin.py",
+          "what": "Scaffolds a Codex plugin (.codex-plugin/plugin.json) and marketplace.json entries; main() at :243."
+        },
+        {
+          "path": "skills/.curated/migrate-to-codex/scripts/migrate-to-codex.py",
+          "what": "Wrapper around scripts/cli.py main() (:730): one-way conversion of Claude Code config (.claude/, CLAUDE.md, .mcp.json) into Codex AGENTS.md, .agents/skills, .codex/config.toml, hooks and agents."
+        },
+        {
+          "path": "skills/.curated/security-ownership-map/scripts/run_ownership_map.py",
+          "what": "Runner (main :133) for build_ownership_map.py; builds people-to-file ownership, bus-factor and co-change graphs from git history; query_ownership.py (:447) and community_maintainers.py (:378) read the output. Needs networkx."
+        },
+        {
+          "path": "skills/.curated/gh-fix-ci/scripts/inspect_pr_checks.py",
+          "what": "main() at :96; uses the gh CLI to list failing PR checks and pull GitHub Actions log snippets; per SKILL.md:64 it exits non-zero while failures remain."
+        }
+      ],
+      "architecture": "Content repository with no shared library code. Layout: skills/.system/<skill>/ (5 skills) and skills/.curated/<skill>/ (39 skills); 780 files under skills/ (739 curated, 41 system). Each skill dir has SKILL.md, agents/openai.yaml (interface block, optional dependencies.tools MCP entries, optional policy.allow_implicit_invocation, set only in chatgpt-apps/agents/openai.yaml:12-13) and LICENSE, plus optional scripts/, references/, assets/, and evaluations/ (4 Notion skills only). Loading model per skill-creator/SKILL.md:71-72,127-133: only name and description are read to decide triggering, the body loads after trigger, bundled references load as needed. Selective loading is spelled out for the security skills: security-best-practices picks reference files by language and framework using the <language>-<framework>-<stack>-security.md naming (SKILL.md:18,37), and security-threat-model says 'Only load the reference files you need' (SKILL.md:81). Key modules: skill-installer (github_utils.py, install-skill-from-github.py with path-traversal-checked unzip at :105-112, list-skills.py); skill-creator (init_skill.py, generate_openai_yaml.py, quick_validate.py); plugin-creator (create_basic_plugin.py); migrate-to-codex (scripts/cli.py coordinator, scripts/migrate/{instructions,skills,agents,mcps,hooks,plugins,settings,codex_config,common}.py, scripts/utils/{scan,util}.py); security-ownership-map/scripts (4 Python files, 2,183 lines); security-best-practices/references (10 files, 8,957 lines: python-django/fastapi/flask, javascript express/nextjs/react/vue/jquery/general-frontend, golang-general-backend); security-threat-model/references (prompt-template.md, security-controls-and-assets.md). Skill bodies total 8,294 lines across 44 SKILL.md files.",
+      "packaging_and_release": "None. No package manifests, no .github/ directory or release workflow, no checksums, signatures or attestations in the tree. Tags cannot be judged from this shallow clone (.git/packed-refs lists only origin/main, .git/shallow holds only 49f948f). Distribution is the GitHub repo itself: the installer downloads https://codeload.github.com/<owner>/<repo>/zip/<ref> with default ref 'main' (skills/.system/skill-installer/scripts/install-skill-from-github.py:18,80-96) or falls back to git clone --depth 1 --sparse (:128-161), then copies one skill dir (:172-176). The only hash check anywhere is the SHA-256 header verification of the Codex manual in openai-docs (fetch-codex-manual.mjs:23,34,461-469), not a release attestation.",
+      "tests_and_ci": "No tests and no CI. 0 test files or test directories; no .github/ and no other CI or tooling config (searched for .github, .gitlab-ci.yml, .circleci, tox.ini, pytest.ini, conftest.py, jest or vitest config, Makefile, Dockerfile, pre-commit, CODEOWNERS, SECURITY.md, CHANGELOG: none found), so 0 workflow files. Quality-related artifacts are limited to: (1) skills/.curated/notion-{knowledge-capture,meeting-intelligence,research-documentation,spec-to-implementation}/evaluations/: 4 directories, 8 JSON scenarios (name, skills, query, context, expected_behavior, success_criteria; e.g. conversation-to-wiki.json:1-30) and 4 READMEs prescribing a manual run across 'Haiku, Sonnet, and Opus' (evaluations/README.md:38-45) with no runner, scorer, per-sample storage or CI; (2) skill-creator/scripts/quick_validate.py frontmatter linter, run by hand; (3) migrate-to-codex --validate-target (SKILL.md:107-112); (4) test-mode env hooks in screenshot/scripts/take_screenshot.py:21-24 with no tests shipped; (5) openai-docs SKILL.md mentions 'copied local eval workdirs' (skills/.curated/openai-docs/SKILL.md:48; skills/.system/openai-docs/SKILL.md:54) but no harness is included. Skills that give verification procedure guidance only as prose: define-goal/SKILL.md:29-34,82-85, chatgpt-apps/references/repo-contract-and-validation.md:47-93 (validation ladder and 'say which validation level was reached and what was not run'), yeet/SKILL.md:109.",
+      "dependencies": "No manifests: no package.json, pyproject.toml, requirements*.txt, setup.py, Cargo.toml, go.mod or lockfiles, so 0 declared direct dependencies. Third-party imports found in scripts: PyYAML (skill-creator/scripts/quick_validate.py:10, generate_openai_yaml.py:14); networkx (security-ownership-map/scripts/build_ownership_map.py:830-831,919, run_ownership_map.py:137, SKILL.md:14-20 'pip install networkx'); openai (imagegen/scripts/image_gen.py:335,343, speech/scripts/text_to_speech.py:137, transcribe/scripts/transcribe_diarize.py:128); Pillow (hatch-pet/scripts/*.py, image_gen.py:268); stdlib tomllib, hence Python 3.11+ (migrate-to-codex/scripts/migrate/agents.py:11, codex_config.py:11). Doc-level installs: reportlab, pdfplumber, pypdf and poppler (pdf/SKILL.md:32-44); jupyterlab and ipykernel (jupyter-notebook/SKILL.md:95); playwright (playwright-interactive/SKILL.md:30); @playwright/cli via npx (playwright_cli.sh:19); plus gh, sentry, render, wrangler and netlify CLIs.",
+      "security_policy": "No SECURITY.md. contributing.md:9-11 says to e-mail security@openai.com for vulnerabilities or model-output concerns."
+    },
+    "claim_checks": [
+      {
+        "claim": "Agent Skills 'Write once, use everywhere' (README.md:6)",
+        "verified": "partial",
+        "evidence": "All 44 skill dirs share the SKILL.md layout with name/description frontmatter, and no skill uses frontmatter keys outside name, description and metadata (skills/.system/skill-creator/scripts/quick_validate.py:40 lists the allowed keys). But distribution and runtime are Codex-specific: installer default destination is $CODEX_HOME/skills (skills/.system/skill-installer/scripts/install-skill-from-github.py:45-46,243-244); agents/openai.yaml is described as 'product-specific config' (skills/.system/skill-creator/references/openai_yaml.md:3); 21 of 44 SKILL.md files contain Codex-only strings such as js_repl, sandbox_permissions=require_escalated, CODEX_HOME, $skill-installer or .codex/ (e.g. skills/.curated/gh-address-comments/SKILL.md:12, playwright/SKILL.md:37-41, playwright-interactive/SKILL.md:3). The three security skills, gh-fix-ci and yeet contain none of those strings. No Claude Code install or loading path is documented; Claude Code is only a migration source (migrate-to-codex/SKILL.md:10, references/differences.md:5)."
+      },
+      {
+        "claim": "Skills in .system are automatically installed in the latest version of Codex (README.md:17)",
+        "verified": "not_checkable",
+        "evidence": "The behaviour lives in the Codex client, not in this repo. The repo only contains the 5 skills under skills/.system, and skills/.system/skill-installer/SKILL.md:57 repeats the statement."
+      },
+      {
+        "claim": "Curated skills can be installed by name, defaulting to skills/.curated (README.md:21-25)",
+        "verified": "partial",
+        "evidence": "install-skill-from-github.py has no by-name lookup: it requires --repo plus --path, or --url (lines 222-233). Only list-skills.py defaults to skills/.curated (list-skills.py:15). By-name install is agent-mediated through the instructions in skill-installer/SKILL.md:13-15."
+      },
+      {
+        "claim": "Experimental skills such as create-plan live in the .experimental folder and can be installed from it (README.md:27-37)",
+        "verified": "no",
+        "evidence": "skills/.experimental/ does not exist at commit 49f948f; only skills/.curated and skills/.system are present (glob of skills/.experimental/** returned nothing). gh-fix-ci/SKILL.md:12,54 also depends on a create-plan skill that is not in the tree."
+      },
+      {
+        "claim": "After installing a skill, restart Codex to pick it up (README.md:39)",
+        "verified": "partial",
+        "evidence": "skills/.system/skill-installer/SKILL.md:30 says the skill 'will be available on their next turn'. The installer code only copies the directory (install-skill-from-github.py:172-176) and contains no restart logic, so the two docs disagree and the loader is not in this repo."
+      },
+      {
+        "claim": "Each skill's license is in its LICENSE.txt (README.md:43)",
+        "verified": "partial",
+        "evidence": "All 44 skills ship a license file, but names and terms differ. Apache-2.0 x31 (29 keep the unfilled 'Copyright [yyyy] [name of copyright owner]' appendix, e.g. skills/.system/skill-creator/LICENSE.txt:190; playwright and playwright-interactive name Microsoft at LICENSE.txt:189, with playwright/NOTICE.txt:1-14 crediting microsoft/playwright-cli). MIT x5 (notion-knowledge-capture/LICENSE.txt:1-7 'Copyright 2025 Notion Labs, Inc.'; vercel-deploy/LICENSE.txt:1-3). Figma Developer Terms x8, proprietary, 'currently offered as a Beta feature' that Figma 'may modify, suspend, or discontinue ... at any time' (skills/.curated/figma/LICENSE.txt:1-2; the file is LICENSE.TXT in 6 of the 8 (figma and figma-implement-design use LICENSE.txt))."
+      },
+      {
+        "claim": "Progressive disclosure: only name and description stay in context, the body loads on trigger, resources load as needed (skills/.system/skill-creator/SKILL.md:71-72,127-133)",
+        "verified": "partial",
+        "evidence": "The loader is in Codex and not checkable here. In-repo structure follows the model: security-best-practices loads only matching reference files from its 10 (SKILL.md:18,37), security-threat-model says 'Only load the reference files you need' (SKILL.md:81), and the security skills' descriptions restrict triggering to explicit user requests (security-best-practices/SKILL.md:3, security-threat-model/SKILL.md:3, security-ownership-map/SKILL.md:3). Only chatgpt-apps sets policy.allow_implicit_invocation (agents/openai.yaml:12-13); the other 43 set no invocation policy."
+      },
+      {
+        "claim": "Keep the SKILL.md body under 500 lines (skills/.system/skill-creator/SKILL.md:137)",
+        "verified": "partial",
+        "evidence": "41 of 44 SKILL.md files are under 500 lines (largest of those: render-deploy 479). Exceptions by line count: skills/.curated/playwright-interactive/SKILL.md 693, hatch-pet/SKILL.md 539, figma-create-design-system-rules/SKILL.md 537."
+      },
+      {
+        "claim": "security-best-practices covers python, javascript/typescript and go via per-language reference files (skills/.curated/security-best-practices/SKILL.md:3,18)",
+        "verified": "yes",
+        "evidence": "10 reference files exist (8,957 lines): python-django, python-fastapi, python-flask; javascript-express, javascript-typescript-nextjs, -react, -vue, javascript-jquery, javascript-general-web-frontend; golang-general-backend (Go has a general backend file only). No other languages are covered."
+      },
+      {
+        "claim": "Evaluation scenarios exist for testing the skill across different Codex models (skills/.curated/notion-knowledge-capture/evaluations/README.md:3,38-45, same in the other three Notion skills)",
+        "verified": "partial",
+        "evidence": "Scenarios exist (8 JSON files with query, expected_behavior and success_criteria, e.g. conversation-to-wiki.json:4-29) but the procedure is manual only: enable the skill, submit the query, check the behaviours, test with Haiku, Sonnet and Opus. No runner, scorer or per-sample result store exists. The case files name skills that do not exist ('knowledge-capture' at conversation-to-wiki.json:3 vs the real name notion-knowledge-capture in SKILL.md:2; 'task-manager' at notion-meeting-intelligence/evaluations/status-meeting-prep.json:3), and the READMEs say 'Codex models' while listing Claude model names (evaluations/README.md:12)."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Maintenance: the README declares the repository deprecated in favour of github.com/openai/plugins (README.md:2), and it still documents a skills/.experimental folder that does not exist at this commit (README.md:27-37), so the documented tree and the real tree already diverge.",
+      "Codex-only design with no documented Claude Code path: install target is $CODEX_HOME/skills (install-skill-from-github.py:45-46,243-244), agents/openai.yaml is a Codex-specific schema (skill-creator/references/openai_yaml.md:3), and 21 of 44 SKILL.md files contain Codex-only strings (skills/.curated/gh-address-comments/SKILL.md:12; playwright/SKILL.md:37-41; playwright-interactive/SKILL.md:3). Claude Code appears only as a migration source (migrate-to-codex/SKILL.md:10). Whether Claude Code loads these skills per task is not stated anywhere in the repo.",
+      "No quality gate in the repo: no tests, no CI workflows (.github absent), no lint or pre-commit config, no release automation and no SECURITY.md. The only evaluation artifacts are 8 manual-run JSON scenarios with no runner or scorer (notion-*/evaluations/README.md:38-45) that name skills which do not exist (conversation-to-wiki.json:3; status-meeting-prep.json:3). The repo provides no labeled-case scorer framework, no containerized Claude Code/Codex end-to-end runner and no declarative CI regression gate.",
+      "Unpinned and unverified distribution: the installer downloads the default-branch archive (DEFAULT_REF 'main', install-skill-from-github.py:18,80-96) with no commit pin, checksum or signature, and refuses to overwrite an existing skill directory (:290-291), so there is no in-tool update path. Runtime fetches are also unpinned: 'npx --yes --package @playwright/cli' (playwright/scripts/playwright_cli.sh:19) and 'npm install -g @playwright/cli@latest' (playwright/SKILL.md:28).",
+      "Data egress: the no-auth fallback of vercel-deploy tars the project, excluding only node_modules, .git, .env and .env.*, and POSTs it to https://codex-deploy-skills.vercel.sh/api/deploy (skills/.curated/vercel-deploy/scripts/deploy.sh:9,201-206,239). Its SKILL.md does not warn that source is uploaded to a third party (vercel-deploy/SKILL.md:33-52).",
+      "Mixed licensing with no repo-level license: 8 Figma skills fall under proprietary Figma Developer Terms offered as a revocable Beta (skills/.curated/figma/LICENSE.txt:1-2); 5 are MIT (notion-* x4, vercel-deploy); 31 are Apache-2.0, 29 of them with the unfilled copyright appendix (e.g. skills/.system/skill-creator/LICENSE.txt:190); the playwright skills derive from microsoft/playwright-cli (playwright/NOTICE.txt:1-14); license file names are inconsistent (LICENSE.TXT x6, in 6 of the 8 Figma skills).",
+      "Content drift and dangling references: skills/.curated/openai-docs and skills/.system/openai-docs share the name 'openai-docs' but differ (the system copy adds an API Key Setup section, SKILL.md:11-15, that references an openai-platform-api-key skill absent from the repo); gh-fix-ci depends on a create-plan skill absent from the tree (SKILL.md:12,54); security-ownership-map/SKILL.md:37,48,60,71 give script paths 'skills/skills/security-ownership-map/...' that match neither the repo layout (skills/.curated/...) nor the installed layout; README.md:39 says restart Codex after install while skill-installer/SKILL.md:30 says next turn; migrate-to-codex/references/differences.md:7 states docs were last checked 2026-04-20.",
+      "Narrow, explicit-only security coverage and undeclared dependencies: security-best-practices covers only Python, JS/TS and Go (SKILL.md:3; Go has only a general-backend file), and the descriptions of all three security skills say to trigger only on explicit user request (SKILL.md:3 of each), so they do not activate implicitly. Helper scripts import third-party packages with no manifest or lockfile (PyYAML: skill-creator/scripts/quick_validate.py:10; networkx: security-ownership-map/scripts/build_ownership_map.py:830; openai: image_gen.py:335; Pillow: hatch-pet/scripts/*.py), and migrate-to-codex needs Python 3.11+ for tomllib (migrate/agents.py:11)."
+    ]
+  },
+  "repaired": true,
+  "verification": [
+    {
+      "contender": "openai/skills",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Codex built-in $skill-installer, curated skill by name (OS-neutral; run inside Codex): `$skill-installer gh-address-comments`",
+          "citation": "README.md:21-25",
+          "holds": true,
+          "note": "README.md:21 reads 'Curated skills can be installed by name (defaults to `skills/.curated`)' and :23-25 shows `$skill-installer gh-address-comments`; :19 says to use it 'inside Codex'. skills/.curated/gh-address-comments exists at 49f948f (.git/shallow and packed-refs both show 49f948faa925...). By-name resolution is done by the agent following skill-installer/SKILL.md:14; the script itself needs --repo+--path or --url (install-skill-from-github.py:222-233), as the dossier's own claim check notes."
+        },
+        {
+          "field": "license",
+          "statement": "MIXED per skill, no repo-level license: Apache-2.0 x31, MIT x5 (notion-* x4, vercel-deploy), LicenseRef-Figma-Developer-Terms x8; file skills/<.system|.curated>/<skill>/LICENSE.txt, 'the 8 Figma skills use LICENSE.TXT', the 2 playwright skills add NOTICE.txt; no repo-root LICENSE file",
+          "citation": "skills/.curated/*/LICENSE.{txt,TXT}; skills/.system/*/LICENSE.txt; skills/.curated/figma/LICENSE.txt:1-2; .git/index",
+          "holds": false,
+          "note": "Terms and counts are correct: 31 files are 'Apache License Version 2.0, January 2004'; 5 are MIT (notion-knowledge-capture/LICENSE.txt:1-7 Notion Labs, vercel-deploy/LICENSE.txt:1-3, plus the 3 other notion-*); 8 point to the Figma Developer Terms (figma/LICENSE.txt:1-2). NOTICE.txt exists only in playwright and playwright-interactive. The repo root holds only .gitignore, README.md, contributing.md and skills/. The file-name claim is wrong: the git index records LICENSE.TXT for only 6 Figma skills (figma-code-connect-components, figma-create-design-system-rules, figma-create-new-file, figma-generate-design, figma-generate-library, figma-use). skills/.curated/figma/LICENSE.txt and skills/.curated/figma-implement-design/LICENSE.txt are lowercase .txt."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "unknown - README names no OS or architecture; installer is stdlib Python 3 plus optional git with no OS gating (install-skill-from-github.py:4-17,128-161); some skills document Linux steps (pdf/SKILL.md:44 apt-get; screenshot/SKILL.md:133-146)",
+          "citation": "README.md:1-43; skills/.system/skill-installer/scripts/install-skill-from-github.py:4-17,128-161; skills/.curated/pdf/SKILL.md:44; skills/.curated/screenshot/SKILL.md:133-146",
+          "holds": true,
+          "note": "README contains no OS or architecture statement. Installer imports at :4-17 are stdlib plus the local github_utils, which itself imports only os and urllib.request (github_utils.py:6-7). git runs only in _git_sparse_checkout (:128-161), reached with --method git or as the auto fallback on HTTP 401/403/404 (:195). No sys.platform, os.name or platform check exists anywhere in skills/.system/skill-installer. pdf/SKILL.md:44 is 'sudo apt-get install -y poppler-utils'. screenshot/SKILL.md:133-146 is 'Linux prerequisites and selection logic' (scrot, gnome-screenshot, ImageMagick import)."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Codex: yes ($skill-installer flow, $CODEX_HOME/skills default ~/.codex/skills, Codex-specific agents/openai.yaml, .agents/skills and .codex/ layout). Claude Code: no documented install, loading or compatibility statement; appears only as the migrate-to-codex source, a CLAUDE.md rule-file target in figma-create-design-system-rules, and a 'claude mcp add' snippet for Render MCP; the installer's --dest (:257) is not tied to Claude Code by any doc.",
+          "citation": "README.md:19-39; skills/.system/skill-installer/SKILL.md:48; install-skill-from-github.py:45-46,243-244,257; skills/.system/skill-creator/references/openai_yaml.md:3,16-23; skills/.curated/migrate-to-codex/SKILL.md:10,34-39,45; migrate-to-codex/references/differences.md:28; migrate-to-codex/scripts/migrate/skills.py:3-5; figma-create-design-system-rules/SKILL.md:16,174; render-deploy/SKILL.md:142-156",
+          "holds": true,
+          "note": "Every cited line matches: openai_yaml.md:3 'extended, product-specific config'; SKILL.md:48 '$CODEX_HOME/skills/<skill-name> (defaults to ~/.codex/skills)'; migrate SKILL.md:37 '.agents/skills/'; skills.py:3-5 '.claude/skills -> .agents/skills'; figma rules tables at :16 and :174 list 'Claude Code | CLAUDE.md'; render-deploy:153 'claude mcp add --transport http render ...'; installer :257 adds --dest. A case-insensitive 'claude' search outside .git finds only migrate-to-codex, these figma and render lines, a figma-implement-design/SKILL.md:18 pointer to CLAUDE.md/AGENTS.md rules (which routes to figma-create-design-system-rules) and Anthropic model names in cloudflare-deploy references. None is a Claude Code install, loading or compatibility statement."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "'Write once, use everywhere' (README.md:6) verified partial: all 44 skills share the SKILL.md layout and use no frontmatter keys beyond name, description and metadata (quick_validate.py:40), but distribution and runtime are Codex-specific; 21 of 44 SKILL.md files contain Codex-only strings such as js_repl, sandbox_permissions=require_escalated, CODEX_HOME, $skill-installer or .codex/; the three security skills, gh-fix-ci and yeet contain none; Claude Code is only a migration source.",
+          "citation": "README.md:6; skills/.system/skill-creator/scripts/quick_validate.py:40; install-skill-from-github.py:45-46,243-244; skill-creator/references/openai_yaml.md:3; skills/.curated/gh-address-comments/SKILL.md:12; playwright/SKILL.md:37-41; playwright-interactive/SKILL.md:3; migrate-to-codex/SKILL.md:10; references/differences.md:5",
+          "holds": true,
+          "note": "All 44 SKILL.md files open with frontmatter whose only top-level keys are name and description, plus metadata in 8 of them (lines 2-4). quick_validate.py:40 allows name, description, license, allowed-tools and metadata. Examples confirmed: gh-address-comments:12 sandbox_permissions=require_escalated, playwright:37-41 CODEX_HOME, playwright-interactive:3 js_repl; differences.md:5 says 'Claude Code to Codex migration only'. The count depends on one string the dossier does not name: the five listed strings match 16 files, and adding 'codex mcp' (4 notion-* skills and linear) gives exactly 21, which 'such as' permits. security-threat-model, security-ownership-map, gh-fix-ci and yeet match none of these strings; security-best-practices only says 'reviewed by codex' in prose (:86)."
+        }
+      ],
+      "verdict": "fail",
+      "repairs": [
+        "license.file: replace 'the 8 Figma skills use LICENSE.TXT' with '6 of the 8 Figma skills use LICENSE.TXT (figma-code-connect-components, figma-create-design-system-rules, figma-create-new-file, figma-generate-design, figma-generate-library, figma-use); skills/.curated/figma/LICENSE.txt and skills/.curated/figma-implement-design/LICENSE.txt use lowercase LICENSE.txt'.",
+        "claim_checks[5] (README.md:43 license claim) evidence: change 'the file is LICENSE.TXT in 7 of the 8' to 'the file is LICENSE.TXT in 6 of the 8 (figma and figma-implement-design use LICENSE.txt)', so it states the same corrected fact.",
+        "risks[5]: change 'license file names are inconsistent (LICENSE.TXT x8)' to 'license file names are inconsistent (LICENSE.TXT x6, in 6 of the 8 Figma skills)'."
+      ]
+    },
+    {
+      "contender": "openai/skills",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Codex built-in $skill-installer, curated skill by name (OS-neutral; run inside Codex): `$skill-installer gh-address-comments`",
+          "citation": "README.md:19,21-25; skills/.curated/gh-address-comments/ (exists); skills/.system/skill-installer/SKILL.md:14",
+          "holds": true,
+          "note": "README.md:21-25 gives exactly this command and says curated skills install by name, defaulting to skills/.curated; README.md:19 says to use $skill-installer inside Codex; skills/.curated/gh-address-comments exists at this commit. 'OS-neutral' is the dossier's own inference (the README names no OS; the installer is stdlib Python) and nothing contradicts it. The by-name lookup is agent-driven (skill-installer/SKILL.md:14), which the dossier already flags in its claim checks."
+        },
+        {
+          "field": "license",
+          "statement": "MIXED per skill, no repo-level license: Apache-2.0 x31, MIT x5 (notion-* x4, vercel-deploy), LicenseRef-Figma-Developer-Terms x8 (figma* skills); 6 of the 8 Figma skills use LICENSE.TXT, figma and figma-implement-design use LICENSE.txt; the 2 playwright skills add NOTICE.txt; no repo-root LICENSE file",
+          "citation": "skills/<.system|.curated>/<skill>/LICENSE.txt|LICENSE.TXT (44 files); skills/.curated/figma/LICENSE.txt:1-2; skills/.curated/notion-knowledge-capture/LICENSE.txt:1-7; skills/.curated/vercel-deploy/LICENSE.txt:1; skills/.curated/playwright{,-interactive}/NOTICE.txt",
+          "holds": true,
+          "note": "44 license files, one per skill dir. 31 contain 'Version 2.0, January 2004' (Apache-2.0); 5 are MIT (4 notion-* with 'Copyright 2025 Notion Labs, Inc.' plus the MIT grant text, and vercel-deploy 'MIT License'); 8 figma* say use is governed by the Figma Developer Terms, offered as a Beta Figma may discontinue. Casing matches: LICENSE.TXT in figma-code-connect-components, -create-design-system-rules, -create-new-file, -generate-design, -generate-library and figma-use; LICENSE.txt in figma and figma-implement-design. NOTICE.txt exists only in the two playwright skills. The repo root has only README.md, contributing.md and .gitignore, so there is no root LICENSE."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "unknown - README names no OS or architecture. Code evidence only: the installer is stdlib Python 3 plus optional git with no OS gating; some skills document Linux steps (pdf apt-get; screenshot Linux section)",
+          "citation": "README.md:1-43; skills/.system/skill-installer/scripts/install-skill-from-github.py:4-17,128-161,187-206; skills/.system/skill-installer/scripts/github_utils.py:6-7; skills/.curated/pdf/SKILL.md:44; skills/.curated/screenshot/SKILL.md:133-146",
+          "holds": true,
+          "note": "README names no OS or architecture. The installer imports only stdlib modules (argparse, dataclasses, os, shutil, subprocess, sys, tempfile, urllib, zipfile) plus the local github_utils, which itself uses only os and urllib.request. git runs only in the sparse-checkout fallback (:128-161), reached from _prepare_repo (:199-205) after an HTTP 401/403/404 on download. There are no platform checks. pdf/SKILL.md:44 is 'sudo apt-get install -y poppler-utils'; screenshot/SKILL.md:133-146 is 'Linux prerequisites and selection logic' (scrot, gnome-screenshot, ImageMagick import). The 'unknown' rating is correct."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Codex: yes ($skill-installer flow, $CODEX_HOME/skills defaulting to ~/.codex/skills, Codex-specific agents/openai.yaml, .agents/skills/ and .codex/ layout). Claude Code: no documented install, loading or compatibility statement; appears only as (a) migrate-to-codex source, (b) CLAUDE.md rule-file target in figma-create-design-system-rules, (c) 'claude mcp add' snippet in render-deploy; --dest exists but no doc ties it to Claude Code",
+          "citation": "README.md:19-39; skills/.system/skill-installer/SKILL.md:48; skills/.system/skill-installer/scripts/install-skill-from-github.py:45-46,243-244,257; skills/.system/skill-creator/references/openai_yaml.md:3,16-23; skills/.curated/migrate-to-codex/SKILL.md:10,34-39,45; skills/.curated/migrate-to-codex/references/differences.md:28; skills/.curated/migrate-to-codex/scripts/migrate/skills.py:3-5; skills/.curated/figma-create-design-system-rules/SKILL.md:16,174; skills/.curated/render-deploy/SKILL.md:142-156",
+          "holds": true,
+          "note": "Every cited line matches: _codex_home reads CODEX_HOME with default ~/.codex (:45-46); _default_dest is <codex_home>/skills (:243-244); --dest is 'Destination skills directory' (:257); openai_yaml.md:3 calls the file 'product-specific config'; migrate-to-codex converts .claude/skills to .agents/skills (differences.md:28; skills.py:3-5); figma-create-design-system-rules maps Claude Code to CLAUDE.md (:16,174); render-deploy:142-156 gives 'claude mcp add --transport http render ...'. A case-insensitive grep for 'claude' outside migrate-to-codex finds only these, figma-implement-design/SKILL.md:18 (a CLAUDE.md pointer that redirects to the rules skill, the same use as (b) but not listed), and cloudflare-deploy references that name Claude models or the Claude-Web crawler. Nothing documents installing or loading these skills in Claude Code. Optional precision, not required: add figma-implement-design/SKILL.md:18 under (b)."
+        },
+        {
+          "field": "claim_checks[9]",
+          "statement": "Evaluation scenarios exist for testing the skill across different Codex models, verified: partial (8 JSON scenarios with query/expected_behavior/success_criteria; manual-only procedure; no runner, scorer or result store; case files name nonexistent skills 'knowledge-capture' and 'task-manager'; READMEs say 'Codex models' but list Haiku, Sonnet and Opus)",
+          "citation": "skills/.curated/notion-knowledge-capture/evaluations/README.md:3,12,38-45; skills/.curated/notion-knowledge-capture/evaluations/conversation-to-wiki.json:3,4-29; skills/.curated/notion-knowledge-capture/SKILL.md:2; skills/.curated/notion-meeting-intelligence/evaluations/status-meeting-prep.json:3",
+          "holds": true,
+          "note": "There are 8 JSON files (2 in each of the 4 notion-* evaluations/ dirs) plus 4 READMEs. README.md:3 says 'across different Codex models' while :12 and :45 name Haiku, Sonnet and Opus. Lines 38-45 are a manual 6-step procedure; the other three READMEs say the same (e.g. meeting-intelligence README.md:3,12,44-49). No .py/.js/.mjs/.sh/.ps1/.swift/.yaml/.toml file references evaluations/, expected_behavior or success_criteria, and the notion-* skills have no scripts/, so there is no runner or scorer. conversation-to-wiki.json:3 names 'knowledge-capture' and status-meeting-prep.json:3 names 'task-manager', but no SKILL.md declares either name; the real name is notion-knowledge-capture (SKILL.md:2). The 'partial' rating is correct."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

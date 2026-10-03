@@ -1,0 +1,280 @@
+{
+  "contender": "postgres/postgres",
+  "revision": {
+    "contender": "postgres/postgres",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "postgres/postgres",
+        "tag": null,
+        "commit": "50d6e533e4d9a0f70d798c534254007c83c0d428",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": null,
+    "commit": "50d6e533e4d9a0f70d798c534254007c83c0d428",
+    "read_at": "2026-10-02T03:02:45+00:00"
+  },
+  "dossier": {
+    "contender": "postgres/postgres",
+    "revision": {
+      "tag": null,
+      "commit": "50d6e533e4d9a0f70d798c534254007c83c0d428",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "PostgreSQL",
+      "file": "COPYRIGHT"
+    },
+    "purpose": "PostgreSQL is an object-relational SQL database management system (README.md:7-10). This checkout is the unreleased master branch labelled 20devel (meson.build:11, configure.ac:20, src/tools/version_stamp.pl:28); there is no tag at this commit and the release notes are a placeholder (doc/src/sgml/release-20.sgml:9-13). It ships the `postgres` server (one OS process per client connection, doc/src/sgml/protocol.sgml:27-31), the libpq C client library, the ecpg embedded-SQL preprocessor, 22 program directories under src/bin (psql, initdb, pg_ctl, pg_dump, pg_basebackup, pg_upgrade, pgbench and others), server-side languages (PL/pgSQL, PL/Perl, PL/Python, PL/Tcl) and about 60 contrib extension modules. Container scope: the repository contains no Dockerfile, Containerfile, Compose file, Kubernetes manifest or container documentation (file search, plus a case-insensitive text search for docker/podman/kubernetes with zero hits), so the project does not itself define or run multi-service container applications. The server is a single daemon with one data directory, started with `postgres` or `pg_ctl` (doc/src/sgml/runtime.sgml:338-403).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "\"This directory contains the source code distribution of the PostgreSQL database management system.\"",
+          "citation": "README.md:4-5"
+        },
+        {
+          "claim": "\"PostgreSQL is an advanced object-relational database management system that supports an extended subset of the SQL standard, including transactions, foreign keys, subqueries, triggers, user-defined types and functions. This distribution also contains C language bindings.\"",
+          "citation": "README.md:7-10"
+        },
+        {
+          "claim": "Copyright and license information is in the file COPYRIGHT.",
+          "citation": "README.md:12"
+        },
+        {
+          "claim": "General documentation is at https://www.postgresql.org/docs/devel/ (the 'devel' docs), and build-from-source information is at https://www.postgresql.org/docs/devel/installation.html.",
+          "citation": "README.md:14-17"
+        },
+        {
+          "claim": "The latest version and related software can be obtained at https://www.postgresql.org/download/; more information at https://www.postgresql.org/.",
+          "citation": "README.md:19-21"
+        },
+        {
+          "claim": "The README is 22 lines and contains no install commands, platform list, container/Docker/Compose instructions, telemetry statement, MCP or agent integration, or security statement; those facts come only from doc/src/sgml and the code.",
+          "citation": "README.md:1-22"
+        }
+      ],
+      "install": [
+        {
+          "method": "Binary packages from the OS/vendor (docs call this the recommended route for users)",
+          "command": "none given in the repo; the docs say to follow the per-platform instructions at https://www.postgresql.org/download/",
+          "citation": "doc/src/sgml/install-binaries.sgml:10-22"
+        },
+        {
+          "method": "Source build with autoconf + GNU make (Linux/macOS/other Unix), upstream 'Short Version'",
+          "command": "./configure\nmake\nsu\nmake install\nadduser postgres\nmkdir -p /usr/local/pgsql/data\nchown postgres /usr/local/pgsql/data\nsu - postgres\n/usr/local/pgsql/bin/initdb -D /usr/local/pgsql/data\n/usr/local/pgsql/bin/pg_ctl -D /usr/local/pgsql/data -l logfile start\n/usr/local/pgsql/bin/createdb test\n/usr/local/pgsql/bin/psql test",
+          "citation": "doc/src/sgml/installation.sgml:395-408"
+        },
+        {
+          "method": "Source build with Meson + Ninja, upstream 'Short Version' (docs call Meson 'currently experimental' on non-Windows platforms)",
+          "command": "meson setup build --prefix=/usr/local/pgsql\ncd build\nninja\nsu\nninja install\nadduser postgres\nmkdir -p /usr/local/pgsql/data\nchown postgres /usr/local/pgsql/data\nsu - postgres\n/usr/local/pgsql/bin/initdb -D /usr/local/pgsql/data\n/usr/local/pgsql/bin/pg_ctl -D /usr/local/pgsql/data -l logfile start\n/usr/local/pgsql/bin/createdb test\n/usr/local/pgsql/bin/psql test",
+          "citation": "doc/src/sgml/installation.sgml:2011-2025 (experimental note at 57-62)"
+        },
+        {
+          "method": "Source release tarball (from https://www.postgresql.org/ftp/source/), then one of the two builds above",
+          "command": "tar xf postgresql-<version>.tar.bz2",
+          "citation": "doc/src/sgml/installation.sgml:366-375"
+        },
+        {
+          "method": "Git clone of the official mirror",
+          "command": "git clone https://git.postgresql.org/git/postgresql.git",
+          "citation": "doc/src/sgml/sourcerepo.sgml:47-49"
+        },
+        {
+          "method": "macOS source-build prerequisite (Apple command line tools)",
+          "command": "xcode-select --install",
+          "citation": "doc/src/sgml/installation.sgml:3646-3652"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - docs say PostgreSQL can be expected to work on current Linux and on x86 CPUs (doc/src/sgml/installation.sgml:3446-3455); CI builds and tests on ubuntu-24.04 runners inside Debian Trixie containers, with x86_64 library paths in the Linux jobs (.github/workflows/pg-ci.yml:120-127, 441-449, 604); platform template at src/template/linux:1-16.",
+        "wsl2": "unknown - WSL2 is not documented anywhere in the README or docs. The only mention is a code comment that systems without sync_file_range() 'such as Windows WSL' get a single WARNING and the call is then skipped (src/backend/storage/file/fd.c:569-585). Documented and CI-tested Windows builds are native Visual Studio and MinGW (doc/src/sgml/installation.sgml:3712-3722, 3800-3822; .github/workflows/pg-ci.yml:840-1145).",
+        "macos_arm64": "yes (general statements only) - docs list macOS among OSes the project 'can be expected to work on' and ARM among CPU architectures (doc/src/sgml/installation.sgml:3446-3455); CI has a 'macOS - Meson' job on runner macos-15 (.github/workflows/pg-ci.yml:683-690); aarch64-specific build logic exists (configure.ac:2194, 2337; meson.build:2559, 2704). The pair macOS+arm64 is not named explicitly and the workflow does not state the runner architecture; 'supported' status is defined by an external build farm (installation.sgml:3431-3443) that cannot be checked from this tree.",
+        "gpu": "no - the server core is CPU-only. The only GPU mention is a comment that an extension's custom-scan provider 'might provide GPU acceleration' (src/include/nodes/pathnodes.h:2227-2229); a repo-wide search for GPU/CUDA/OpenCL finds only that file."
+      },
+      "integrations": {
+        "cli": "yes - `postgres` server (src/backend/main/main.c:70), initdb (src/bin/initdb/initdb.c:3167), pg_ctl (src/bin/pg_ctl/pg_ctl.c:2206; initialize/start/stop/restart/reload/status/promote/logrotate/kill, doc/src/sgml/ref/pg_ctl-ref.sgml:19-138), psql (src/bin/psql/startup.c:127), pg_dump (src/bin/pg_dump/pg_dump.c:419), pg_upgrade (src/bin/pg_upgrade/pg_upgrade.c:90), pgbench (src/bin/pgbench/pgbench.c:6738), and createdb/dropdb/createuser/dropuser/clusterdb/reindexdb/pg_isready/vacuumdb (src/bin/scripts/meson.build:9-17, 43-45).",
+        "mcp": "none found - no occurrence of 'Model Context Protocol' or 'MCP server' in source, docs, scripts or build files (case-insensitive repo-wide search).",
+        "sdk_or_api": "C only in-tree: libpq client library (src/interfaces/libpq/meson.build:3-19, soname 5 at :79-81; documented in the Client Interfaces part, doc/src/sgml/postgres.sgml:190-193), ecpg embedded SQL (postgres.sgml:192), and a documented frontend/backend wire protocol, version 3.2 (doc/src/sgml/protocol.sgml:12-25; src/include/libpq/pqcomm.h:94-95) over TCP (customary port 5432) or Unix-domain sockets. Server-side extension APIs (SPI, background workers, logical decoding, archive modules, OAuth validators) are documented at postgres.sgml:227-232. No HTTP/REST API in the server; drivers for other languages are external projects (postgres.sgml:181-183).",
+        "claude_code_or_codex": "none found - no AGENTS.md, CLAUDE.md, .claude/, .codex/ or .mcp.json files; a case-insensitive search of source, docs and scripts for 'claude', 'codex' and 'copilot' returned nothing."
+      },
+      "telemetry_and_network": "No telemetry or phone-home code found: a repo-wide case-insensitive search for telemetry / phone home / usage report / crash report in source, docs and scripts found no such feature (only unrelated comments, e.g. src/backend/main/main.c:324 about Windows crash reporting). The server has no HTTP client (no libcurl use under src/backend). The only HTTP-client code is the optional client-side module src/interfaces/libpq-oauth/oauth-curl.c (curl_easy_init at :1783; URLs set at :2161 discovery, :2443 device authorization, :2531 token). libpq loads it only when OAuth is configured and the server requests a bearer token (src/interfaces/libpq-oauth/README:6-9; doc/src/sgml/libpq.sgml:10138-10145); it needs libcurl >= 7.61.0 (meson.build:996) and is not supported on Windows (libpq.sgml:10175-10180). Default server network surface: TCP port 5432 on localhost only (src/backend/utils/misc/guc_parameters.dat:1596-1601, 2390-2396; postgresql.conf.sample:62-66) plus a Unix socket under /tmp on non-Windows (src/include/pg_config_manual.h:197-198); the pg_hba.conf template has only local and loopback entries, and remote access needs listen_addresses plus extra host records (src/backend/libpq/pg_hba.conf.sample:103-122). No external service or account is required to build or run; database roles live inside the cluster, and the bootstrap superuser defaults to the OS user running initdb (doc/src/sgml/ref/initdb.sgml:384-391). Build-time network use is limited to opt-in developer targets that wget Unicode data from unicode.org (src/common/unicode/meson.build:7-21, build_by_default false; src/Makefile.global.in:369). CI, not the product, depends on GitHub Actions, ghcr.io images from an external repo (.github/workflows/pg-ci.yml:123-127) and MacPorts (pg-ci.yml:761-784)."
+    },
+    "code": {
+      "languages": [
+        "C (server, libpq, client tools, PLs, contrib)",
+        "C++ (optional LLVM JIT glue in src/backend/jit/llvm/*.cpp; test module test_cplusplusext)",
+        "Perl (build/generation scripts and the TAP test framework in src/test/perl/PostgreSQL/Test/*.pm; 321 t/*.pl tests)",
+        "Flex/Bison grammars (25 .y/.l files, e.g. src/backend/parser/gram.y and scan.l)",
+        "SQL (pg_regress inputs and expected outputs)",
+        "Python (a few helpers such as src/tools/ci/gha_ccache_decide.py and the oauth_server.py test helper; plus PL/Python in src/pl/plpython)",
+        "Build definitions: autoconf/m4 + GNU make (configure.ac, GNUmakefile.in) and Meson (meson.build, meson_options.txt)",
+        "DocBook SGML/XML docs (doc/src/sgml)",
+        "PowerShell and shell (CI helpers under src/tools/ci)"
+      ],
+      "entry_points": [
+        {
+          "path": "src/backend/main/main.c:70",
+          "what": "main() of the `postgres` server binary. Refuses to run as root (main.c:194-195, 443-453) and dispatches to PostmasterMain (src/backend/postmaster/postmaster.c:496), PostgresSingleUserMain (src/backend/tcop/postgres.c:4221), BootstrapModeMain (src/backend/bootstrap/bootstrap.c:237) or describe-config (main.c:204-229)."
+        },
+        {
+          "path": "src/bin/initdb/initdb.c:3167",
+          "what": "initdb: creates the database cluster / data directory. Defaults to 'trust' authentication if no method is given (initdb.c:2580-2587); refuses a non-empty directory (initdb.c:2935-2947)."
+        },
+        {
+          "path": "src/bin/pg_ctl/pg_ctl.c:2206",
+          "what": "pg_ctl: initdb/start/stop/restart/reload/status/promote/logrotate/kill, plus register/unregister on Windows (doc/src/sgml/ref/pg_ctl-ref.sgml:19-138)."
+        },
+        {
+          "path": "src/bin/psql/startup.c:127",
+          "what": "psql interactive terminal."
+        },
+        {
+          "path": "src/bin/pg_dump/pg_dump.c:419",
+          "what": "pg_dump logical backup (siblings pg_restore, pg_dumpall; physical backup in src/bin/pg_basebackup; major-version upgrade in src/bin/pg_upgrade/pg_upgrade.c:90; benchmarking in src/bin/pgbench/pgbench.c:6738)."
+        },
+        {
+          "path": "src/bin/scripts/meson.build:9-17,43-45",
+          "what": "Wrapper programs createdb, dropdb, createuser, dropuser, clusterdb, reindexdb, pg_isready and vacuumdb."
+        },
+        {
+          "path": "src/interfaces/libpq/meson.build:3-19",
+          "what": "libpq C client library (shared library soname 5; headers libpq-fe.h and libpq-events.h installed at :135-138)."
+        },
+        {
+          "path": "meson.build:9-29 and configure.ac:20",
+          "what": "Build entry points: Meson project('postgresql', version 20devel) with options in meson_options.txt, and autoconf (AC_INIT plus top-level GNUmakefile.in)."
+        }
+      ],
+      "architecture": "One C code base with two parallel build systems. (1) Server in src/backend/: main/main.c dispatches to the postmaster supervisor (postmaster/postmaster.c), which starts one backend process per client connection (tcop/postgres.c PostgresMain at :4364; doc/src/sgml/protocol.sgml:27-31). Query pipeline: parser/ (gram.y, scan.l) -> rewrite/ -> optimizer/ -> executor/, with commands/ (DDL/utility) and catalog/ (system catalogs). Storage and durability: access/ (heap, nbtree, gin, gist, spgist, hash, brin; transam/xlog.c is the WAL) and storage/ (buffer manager, file/fd.c, aio/ with io_uring, worker and sync methods, ipc, lmgr). Also replication/ (walsender, logical replication, libpqwalreceiver, pgoutput), libpq/ (server-side protocol, hba.c, auth.c, auth-oauth.c, be-secure-openssl.c), utils/ (adt data types, cache, misc/guc configuration, mmgr memory contexts), optional LLVM JIT in jit/llvm (C++), bootstrap/, statistics/, tsearch/ and partitioning/. (2) Shared code: src/common, src/port, src/fe_utils, src/timezone; headers in src/include. (3) Clients: src/bin/* (22 program directories), src/interfaces/libpq (C client library), src/interfaces/libpq-oauth (optional libcurl OAuth device-flow module, delay-loaded by libpq) and src/interfaces/ecpg. (4) Server-side languages: src/pl/plpgsql, plperl, plpython, tcl. (5) Extensions: contrib/ (about 60 modules, each with its own meson.build) and src/test/modules (about 60 test-only modules). (6) Docs: doc/src/sgml. Runtime state is a single data directory per server instance (the 'database cluster', doc/src/sgml/runtime.sgml:85-96) holding the data, WAL under pg_wal (src/bin/initdb/initdb.c:2956-2963), postmaster.pid (runtime.sgml:541-548) and, by default, postgresql.conf and pg_hba.conf (src/backend/utils/misc/postgresql.conf.sample:39-49).",
+      "packaging_and_release": "No release workflow, signing or attestation exists in this repo: the only workflow is the opt-in CI (.github/workflows/pg-ci.yml), which is not a release job. Source tarballs come from `make dist` or `ninja pgdist`, which run `git archive` to create postgresql-<version>.tar.gz and .tar.bz2 (GNUmakefile.in:87-111; meson.build:4181-4233; Meson's own `dist` is deliberately disabled at meson.build:4235-4240). Searches of the build files, workflows and install docs for sha256/gpg/sigstore/cosign/provenance/attestation found nothing, so no checksum, signature, SBOM or provenance is generated here. The release procedure is a manual maintainer checklist (src/tools/RELEASE_CHANGES:4-6 and onward; version stamping via src/tools/version_stamp.pl:12-21). Binary packages for Linux/macOS/Windows come from OS vendors or the website installer (doc/src/sgml/install-binaries.sgml:10-22; doc/src/sgml/installation.sgml:3808-3815); their build and signing processes are not in this tree. Library versioning: libpq soname 5 (src/interfaces/libpq/meson.build:79-81).",
+      "tests_and_ci": "Frameworks: pg_regress SQL regression tests (src/test/regress; 241 files in src/test/regress/sql, 593 sql/*.sql across the tree including contrib and test modules), the isolation tester (175 specs/*.spec; src/test/isolation), Perl TAP tests using PostgreSQL::Test::Cluster and IPC::Run (321 t/*.pl across src/bin, contrib, src/test and src/interfaces; framework in src/test/perl; requires IPC::Run and --enable-tap-tests / -Dtap_tests, doc/src/sgml/regress.sgml:957-963) and about 60 test-only modules under src/test/modules. Optional suites are enabled with PG_TEST_EXTRA (kerberos, ldap, ssl, libpq_encryption, load_balance, oauth; regress.sgml:266-276; pg-ci.yml:70). Approximate total: about 1,090 test input files (321 TAP + 593 SQL + 175 isolation). Run with `make check` / `make check-world` or `meson test` (regress.sgml:44, 156; installation.sgml:2134); tests start temporary servers and cannot run as root (regress.sgml:61-66). A separate external Build Farm also tests supported branches (src/tools/ci/README:4-10) and is not defined here. CI: a single workflow, .github/workflows/pg-ci.yml, triggered on push (:11-12) and active only if the repository variable PG_CI_ENABLED=1 (:162-164, 194; src/tools/ci/README:36-43). Jobs: SanityCheck (meson, minimal deps, cube/regress + pg_ctl/001_start_stop; :254-408); Linux - Autoconf (`make check-world`, UBSan + alignment sanitizer, assertions, TAP; :441-525); Linux - Meson 32-bit (UBSan, io_uring, plus a test against an already running instance; :538-619); Linux - Meson 64-bit (ASan, LLVM; :630-674); macOS - Meson (macos-15, MacPorts dependencies; :683-831); Windows - Visual Studio (windows-2022, two test slices; :840-1027); Windows - MinGW (:1031-1145); CompilerWarnings (gcc, clang and mingw cross builds with -Werror, docs build, headerscheck/cpluspluscheck; :1158-1276). Linux jobs run in Debian Trixie containers from ghcr.io/anarazel/pg-vm-images (:123-127) with --privileged --pid=host --ipc=host (:282-283); workflow permissions are contents: read (:20-21).",
+      "dependencies": "No language package manifests or lockfiles: no package.json, Cargo.toml, go.mod, requirements*.txt, pyproject.toml, CMakeLists.txt, vcpkg/conan files, subprojects/*.wrap or .gitmodules were found, so nothing is vendored via a package manager. Dependencies are declared in meson.build + meson_options.txt and in configure.ac. Required to build: a C11 compiler (meson.build:623-645; configure.ac:363-384), GNU make >= 3.81 or Meson >= 0.57.2 with Ninja, Perl >= 5.14, Flex, Bison >= 2.3 (doc/src/sgml/installation.sgml:40, 57-70, 74-122; meson.build:18, 400-403), Python 3 for Meson builds (meson.build:401), and tar with gzip or bzip2. Optional third-party libraries: the 'External dependencies' block of meson_options.txt (lines 74-166) has 30 options, about 25 of which select a library or tool (ICU >= 55, readline/libedit, zlib, OpenSSL >= 1.1.1, LZ4, Zstandard >= 1.4.0, libcurl >= 7.61.0, libxml2, libxslt, LLVM >= 14, liburing, libnuma, MIT Kerberos/GSSAPI, OpenLDAP, PAM, libselinux, libsystemd, Perl/Python/Tcl for the PLs, gettext, UUID libraries, Bonjour, BSD Auth, DTrace and DocBook tooling). Autoconf equivalents are the --with-*/--enable-* options (configure.ac:883-1230, 1437). ICU, readline and zlib are on by default in autoconf (configure.ac:883, 1010, 1188). The TAP tests need the Perl module IPC::Run (regress.sgml:957). Libraries are found through pkg-config or find_library; nothing is downloaded during the default build.",
+      "security_policy": ".github/SECURITY.md:1-2 is a two-line pointer to https://www.postgresql.org/support/security/ (page not fetched; no policy text is in the repo). .github/CODE_OF_CONDUCT.md:1-2 and .github/CONTRIBUTING.md:1-2 are likewise pointers to postgresql.org."
+    },
+    "claim_checks": [
+      {
+        "claim": "README: supports an extended subset of SQL including transactions, foreign keys, subqueries, triggers, user-defined types and functions (README.md:7-10).",
+        "verified": "yes",
+        "evidence": "Regression inputs exercising each construct exist: src/test/regress/sql/transactions.sql:5 (BEGIN), foreign_key.sql:73 (FOREIGN KEY), subselect.sql:5 (IN (SELECT ...)), triggers.sql:117 (CREATE TRIGGER), create_type.sql:35 (CREATE TYPE), create_function_sql.sql:23 (CREATE FUNCTION); the SQL grammar is src/backend/parser/gram.y. Only the existence of the tests was checked, not whether they pass."
+      },
+      {
+        "claim": "README: the distribution also contains C language bindings (README.md:10).",
+        "verified": "yes",
+        "evidence": "libpq C client library sources are listed in src/interfaces/libpq/meson.build:3-19 with headers installed at :135-138; the embedded-SQL C interface ecpg is part of the documented Client Interfaces (doc/src/sgml/postgres.sgml:190-193)."
+      },
+      {
+        "claim": "README: copyright and license information is in COPYRIGHT (README.md:12).",
+        "verified": "yes",
+        "evidence": "COPYRIGHT:8-11 grants permission to use, copy, modify and distribute for any purpose without fee provided the notice and two paragraphs are kept (PostgreSQL License); meson.build:12 declares license: 'PostgreSQL'. COPYRIGHT:13-23 disclaims damages and any obligation of maintenance or support."
+      },
+      {
+        "claim": "README: docs at postgresql.org/docs/devel and downloads at postgresql.org/download (README.md:14-21).",
+        "verified": "not_checkable",
+        "evidence": "The URLs were not fetched (out of scope). In-tree equivalents exist: doc/src/sgml/installation.sgml:3-16 (source install chapter) and doc/src/sgml/install-binaries.sgml:18-23 (points to the same download page). The 'devel' docs describe unreleased code: doc/src/sgml/release-20.sgml:9-13 is a placeholder."
+      },
+      {
+        "claim": "Docs (runtime.sgml:163-166): initdb refuses to run if the data directory already contains files.",
+        "verified": "yes",
+        "evidence": "src/bin/initdb/initdb.c:2935-2947 logs 'directory ... exists but is not empty' and calls exit(1); the WAL directory has the same check (initdb.c:3008-3017). An existing empty directory is accepted and chmod'ed to the cluster mode (initdb.c:2920-2933)."
+      },
+      {
+        "claim": "Docs (runtime.sgml:30-39, 424-426): the server must not run as root.",
+        "verified": "yes",
+        "evidence": "src/backend/main/main.c:194-195 calls check_root(), and main.c:443-453 prints '\"root\" execution of the PostgreSQL server is not permitted' and exits with status 1 when geteuid() == 0."
+      },
+      {
+        "claim": "Docs (runtime.sgml:191-210): the default client authentication setup lets any local user connect and become superuser unless a password / scram-sha-256 is configured.",
+        "verified": "yes",
+        "evidence": "src/bin/initdb/initdb.c:2580-2587 sets the method to 'trust' when none is specified, and initdb.c:209-214 and :1515 write a CAUTION about local trust into pg_hba.conf; the template src/backend/libpq/pg_hba.conf.sample:110-122 contains only local and loopback entries."
+      },
+      {
+        "claim": "Sample config (postgresql.conf.sample:62-67): the server listens on localhost, port 5432, with max_connections 100 by default.",
+        "verified": "yes",
+        "evidence": "src/backend/utils/misc/guc_parameters.dat:1596-1601 (listen_addresses boot_val 'localhost'), :2390-2396 (port boot_val DEF_PGPORT, which defaults to 5432 at configure.ac:152-163 and meson_options.txt:33-35), :1987-1993 (max_connections 100)."
+      },
+      {
+        "claim": "Docs (installation.sgml:57-62): Meson is 'currently experimental' on platforms other than Windows.",
+        "verified": "partial",
+        "evidence": "The upstream CI builds and tests with Meson on Linux 32/64-bit, macOS and Windows (.github/workflows/pg-ci.yml:538-831, 840-1145) and uses autoconf for one Linux job (:441-525) and the compiler-warnings job (:1158-1276), so the doc text appears to lag CI practice. CI practice is preferred here over the doc wording."
+      },
+      {
+        "claim": "Need-driven check (README makes no such claim): the project provides a tool that defines and runs a multi-service containerised application (services, volumes, networks).",
+        "verified": "no",
+        "evidence": "No Dockerfile/Containerfile/compose*.y(a)ml/devcontainer files exist (file search), and a case-insensitive search of the whole tree finds no occurrence of 'docker', 'podman' or 'kubernetes'. The only container reference is CI pulling Debian images from an external repo (.github/workflows/pg-ci.yml:123-127). The runtime docs say packagers handle start-up (doc/src/sgml/runtime.sgml:347-355) and describe manual start via postgres/pg_ctl (runtime.sgml:358-403)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Postgres95 1.0.x versus POSTGRES 4.2 on the Wisconsin Benchmark (historical 1990s release comparison stated in the project's own history chapter; not about this revision)",
+        "metric": "relative speed",
+        "value": "about 30-50% faster",
+        "source": "doc/src/sgml/history.sgml:113-115",
+        "independent": false
+      },
+      {
+        "what": "ILLUSTRATIVE sample output in the pgbench reference page (builtin TPC-B-like script, scaling factor 10, 10 clients, 1 thread, 1000 transactions per client; hardware, OS and version are not stated, so this is not a reported benchmark of this revision). Apart from these two documentation items, no performance results were found in the repo (search of doc/src/sgml for benchmark/tps), and no third-party benchmarks were gathered.",
+        "metric": "tps (without initial connection time) and average latency",
+        "value": "896.967014 tps; 11.013 ms average latency",
+        "source": "doc/src/sgml/ref/pgbench.sgml:53-67",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Version, maintenance and licence status: the revision is the unreleased master branch (20devel, no tag), release notes are a placeholder ('This is just a placeholder for now', date 2026-??-??) and README links point at /docs/devel/, so behaviour and defaults can still change before a release (meson.build:11; doc/src/sgml/release-20.sgml:9-13; README.md:14-17). No support-window or versioning-policy text was found in doc/src/sgml; EOL handling appears only as a maintainer checklist (src/tools/RELEASE_CHANGES:153-166). The permissive PostgreSQL License disclaims any maintenance or support obligation (COPYRIGHT:19-23).",
+      "Scope gap for the stated hosting need: the repo has no Dockerfile, Compose file, Kubernetes manifest or container docs, and nothing that defines or runs multi-service applications; text search for docker/podman/kubernetes finds nothing. Any container use depends on images and tooling outside this tree; only CI references containers (.github/workflows/pg-ci.yml:123-127, images from an external repo).",
+      "Insecure-by-default bootstrap: initdb without -A/--auth selects 'trust' for local and loopback host connections (src/bin/initdb/initdb.c:2580-2587, warning text :209-214), and the bootstrap superuser has no password unless --pwfile or -W is used (doc/src/sgml/runtime.sgml:191-210; doc/src/sgml/ref/initdb.sgml:384-391). listen_addresses defaults to localhost only (src/backend/utils/misc/guc_parameters.dat:1596-1601), so access from other hosts or containers needs explicit listen_addresses plus pg_hba.conf changes (src/backend/libpq/pg_hba.conf.sample:103-106).",
+      "State and volume constraints: the server refuses to run as root (src/backend/main/main.c:443-453); the data directory must belong to an unprivileged user with 0700/0600 modes (doc/src/sgml/runtime.sgml:30-39, 179-189); initdb chmods an existing empty directory, rejects a non-empty one and warns about mount points (src/bin/initdb/initdb.c:2920-2947), and docs advise against using a volume's top-level mount point as the data directory (runtime.sgml:250-261). Major releases can change the on-disk format, so a data volume is not drop-in across major versions (dump/restore, pg_upgrade or replication; minor releases only swap executables) (runtime.sgml:1663-1680), and a cluster cannot switch to an incompatible collation library, e.g. after an OS change (runtime.sgml:234-241).",
+      "Operational semantics: one OS process per client connection (doc/src/sgml/protocol.sgml:27-31) with max_connections=100 by default (guc_parameters.dat:1987-1993); needs shared memory and semaphores (runtime.sgml:699-720). SIGTERM is a 'smart' shutdown that waits for all sessions to end, SIGINT is fast, SIGQUIT is immediate and forces WAL recovery on the next start, and SIGKILL is discouraged because shared memory and semaphores are not released (runtime.sgml:1553-1623).",
+      "Supply-chain and provenance gaps in-repo: no release workflow, checksums, signatures, SBOM or attestations are produced here (tarballs are plain `git archive`: GNUmakefile.in:107-111, meson.build:4200-4233). CI is opt-in per repository (.github/workflows/pg-ci.yml:162-164, 194), references GitHub Actions by mutable major-version tags (actions/checkout@v6 :292, actions/cache@v5 :306, actions/upload-artifact@v7 :419), pulls ':latest' Debian containers from a third-party GHCR namespace (:123-127) and runs them with --privileged --pid=host --ipc=host (:282-283). .github/SECURITY.md:1-2 is only a link to postgresql.org, so no vulnerability-handling text is in the repo. Official binary build and signing happen outside this tree and were not checked.",
+      "Build-system and documentation drift: two parallel build systems (autoconf/make and Meson) must be kept in sync; the install doc still calls Meson 'currently experimental' off Windows (doc/src/sgml/installation.sgml:57-62) while CI exercises Meson on Linux, macOS and Windows (pg-ci.yml:538-831, 840-1145). Source builds need Perl, Flex and Bison, plus Python for Meson (meson.build:400-403), and on macOS System Integrity Protection breaks `make check` unless `make install` is run first (installation.sgml:3701-3708).",
+      "Platform evidence gaps: WSL2 is not documented (only a code comment that WSL lacks sync_file_range(), handled with a one-time WARNING, src/backend/storage/file/fd.c:569-585); macOS+arm64 is not named explicitly (only generic macOS and ARM statements, doc/src/sgml/installation.sgml:3446-3455; CI runner label macos-15, pg-ci.yml:690); platform 'support' is defined by an external build farm (installation.sgml:3431-3443); the built-in OAuth device flow is unsupported on Windows (doc/src/sgml/libpq.sgml:10175-10180); there is no GPU support in the core (src/include/nodes/pathnodes.h:2227-2229)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "postgres/postgres",
+      "checks": [
+        {
+          "field": "readme.install[1]",
+          "statement": "Source build with autoconf + GNU make (Linux/macOS/other Unix), upstream 'Short Version': ./configure; make; su; make install; adduser postgres; mkdir -p /usr/local/pgsql/data; chown postgres /usr/local/pgsql/data; su - postgres; /usr/local/pgsql/bin/initdb -D /usr/local/pgsql/data; /usr/local/pgsql/bin/pg_ctl -D /usr/local/pgsql/data -l logfile start; /usr/local/pgsql/bin/createdb test; /usr/local/pgsql/bin/psql test",
+          "citation": "doc/src/sgml/installation.sgml:395-408",
+          "holds": true,
+          "note": "The <synopsis> at 395-408, under 'Building and Installation with Autoconf and Make' > 'Short Version' (388-392), matches all 12 commands verbatim (396-407). The Unix scoping is consistent with the docs: GNU make >= 3.81 is required (40-41), and Meson is the only Visual Studio route on Windows and 'currently experimental' elsewhere (57-62). This revision is untagged 20devel, so a source build from a git checkout is the only way to run it. The tarball step at 366-375 applies to released versions only."
+        },
+        {
+          "field": "license",
+          "statement": "License is SPDX 'PostgreSQL', declared in the file COPYRIGHT.",
+          "citation": "COPYRIGHT (corroborated by meson.build:12)",
+          "holds": true,
+          "note": "COPYRIGHT:1-23 is the standard PostgreSQL License text: copyright 1996-2026 PGDG and 1994 UC Regents (4-6), permission grant on condition the notice is kept (8-11), damages disclaimer (13-17), warranty and maintenance disclaimer (19-23). meson.build:12 declares license: 'PostgreSQL', a valid SPDX ID. For context only: src/backend/regex/COPYRIGHT keeps separate permissive Henry Spencer and Tcl notices for the vendored regex engine (6-30, 40-79), with PostgreSQL's changes under the project license (83-84). That file is the only other COPYRIGHT/LICENSE/COPYING file in the tree."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - docs say PostgreSQL can be expected to work on current Linux and on x86 CPUs; CI builds and tests on ubuntu-24.04 runners inside Debian Trixie containers, with x86_64 library paths in the Linux jobs; platform template at src/template/linux.",
+          "citation": "doc/src/sgml/installation.sgml:3446-3455; .github/workflows/pg-ci.yml:120-127, 441-449, 604; src/template/linux:1-16",
+          "holds": true,
+          "note": "installation.sgml:3446-3450 lists x86, including 64-bit variants, and 3452-3455 lists Linux. pg-ci.yml:120-121 pins ubuntu-24.04, and 123-127 points to Debian Trixie images at ghcr.io/anarazel/pg-vm-images. 441-449 shows the 'Linux - Autoconf' job on that runner and container. 604 sets LD_LIBRARY_PATH to lib/x86_64-linux-gnu. src/template/linux is the 16-line Linux template. Precision caveat: 604 is the only x86_64 path, and it sits in the 'Linux - Meson (32-bit)' job (538-552, gcc -m32), whose comment calls it 'a meson oddity' (602-603). 'x86_64 library paths in the Linux jobs' overgeneralises one line. The native 64-bit evidence is the linux-meson-64 job (630-637). 'Supported' status still rests on the external build farm (3431-3443). The headline 'yes' holds."
+        },
+        {
+          "field": "readme.integrations.sdk_or_api",
+          "statement": "C only in-tree: libpq client library (soname 5), ecpg embedded SQL, and a documented frontend/backend wire protocol version 3.2 over TCP (port 5432) or Unix-domain sockets; server-side extension APIs (SPI, bgworkers, logical decoding, archive modules, OAuth validators); no HTTP/REST API in the server; drivers for other languages are external projects.",
+          "citation": "src/interfaces/libpq/meson.build:3-19, 79-81; doc/src/sgml/postgres.sgml:181-183, 190-193, 227-232; doc/src/sgml/protocol.sgml:12-25; src/include/libpq/pqcomm.h:94-95",
+          "holds": true,
+          "note": "libpq/meson.build:3-19 lists the libpq sources, and 79-81 sets version '5.'+major with soversion '5' (empty on AIX and Windows). postgres.sgml:190-193 puts &libpq;, &lobj;, &ecpg; and &infoschema; in the Client Interfaces part, and 180-183 says other interfaces are distributed separately. protocol.sgml:12-17 covers TCP/IP and Unix-domain sockets with IANA port 5432. protocol.sgml:21-25 documents version 3.2, introduced in PG 18, backward compatible to 3.0. pqcomm.h:94-95 sets EARLIEST to 3.0 and LATEST to 3.2. postgres.sgml:227-232 lists spi, bgworker, logicaldecoding, replication-origins, archive-modules and oauth-validators. src/interfaces contains only libpq, libpq-oauth and ecpg, all C. An HTTP grep of src/backend hits only gettext .po headers and a quoted mail header (optimizer/plan/README:30), so no HTTP server exists."
+        },
+        {
+          "field": "claim_checks[9]",
+          "statement": "Need-driven check: the project provides a tool that defines and runs a multi-service containerised application (services, volumes, networks) - verified: no.",
+          "citation": "file search; repo-wide case-insensitive text search; .github/workflows/pg-ci.yml:123-127; doc/src/sgml/runtime.sgml:347-355, 358-403",
+          "holds": true,
+          "note": "A file search found no Dockerfile, Containerfile, compose YAML, .dockerignore or .devcontainer. A case-insensitive repo-wide search for docker|podman|kubernetes returned zero hits. A control search found .github/workflows/pg-ci.yml, which shows hidden paths were included. pg-ci.yml:123-127 names the external Debian Trixie images. runtime.sgml:347-355 defers start-up to the package's infrastructure, and 358-403 shows manual start with postgres -D and pg_ctl. The 'no' verdict stands. Minor overstatement: 'the only container reference is CI' misses two places. The glossary entry for Server says it 'denotes real hardware, a container, or a virtual machine' (doc/src/sgml/glossary.sgml:1755-1756). src/tools/ci/README:56-65 also documents the CI images. Neither defines or runs containers."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

@@ -1,0 +1,353 @@
+{
+  "contender": "deusdata/codebase-memory-mcp",
+  "revision": {
+    "contender": "deusdata/codebase-memory-mcp",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "DeusData/codebase-memory-mcp",
+        "tag": "v0.11.0",
+        "commit": "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.11.0",
+    "commit": "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798",
+    "read_at": "2026-10-02T03:02:13+00:00"
+  },
+  "dossier": {
+    "contender": "deusdata/codebase-memory-mcp",
+    "revision": {
+      "tag": "v0.11.0",
+      "commit": "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798",
+      "read_at": "2026-10-02T03:02:13+00:00"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "codebase-memory-mcp is a single native C executable (stdio MCP server, one-shot CLI, installer, optional loopback graph UI) that indexes a repository with vendored tree-sitter grammars (162 grammar directories) plus in-process type resolvers branded 'Hybrid LSP' (10 language families) into a per-project SQLite knowledge graph. Coding agents query it through 17 MCP tools in code (README says 15): symbol search returning qualified name, file and line range; callers/callees tracing; read-only Cypher; code-snippet reads; git-diff impact mapping; architecture overview; index-coverage checks; ADR notes. It contains no LLM. It does not launch or talk to language servers (no LSP client code), exposes no tool that edits source files, and reports no compiler or language-server diagnostics. `install` writes MCP entries, skills, subagent definitions and context-only hooks into up to 45 agent clients, including Claude Code and Codex CLI.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "'The fastest and most efficient code intelligence engine for AI coding agents.' Full-indexes an average repository in milliseconds, the Linux kernel (28M LOC, 75K files) in 3 minutes; answers structural queries in under 1ms; ships as a native executable with a small verified runtime-asset set.",
+          "citation": "README.md:17"
+        },
+        {
+          "claim": "Tree-sitter AST analysis across all 162 languages, enhanced with Hybrid LSP semantic type resolution for Python, TypeScript/JavaScript/JSX/TSX, PHP, C#, Go, C, C++, Java, Kotlin, Rust and Perl; a persistent knowledge graph of functions, classes, call chains, HTTP routes and cross-service links; '15 MCP tools'; no language runtime, hosted service or API key.",
+          "citation": "README.md:19"
+        },
+        {
+          "claim": "Hybrid LSP is 'a lightweight C implementation of language type-resolution algorithms, structurally inspired by and compatible with major language servers' (tsserver/typescript-go, pyright, gopls, Roslyn, Eclipse JDT, rust-analyzer). 'No language server process, no per-project setup, no API key.' It refines CALLS and CALL_REFERENCE edges (ambiguous values stay USAGE) 'so the resulting graph mirrors what an IDE Go to Definition would resolve'.",
+          "citation": "README.md:804"
+        },
+        {
+          "claim": "Languages without a Hybrid LSP pass 'fall back to textual resolution, so you always get some answer'.",
+          "citation": "README.md:824"
+        },
+        {
+          "claim": "The project is a 'structural analysis backend'. It 'does not include an LLM' and relies on the MCP client to be the intelligence layer.",
+          "citation": "README.md:266"
+        },
+        {
+          "claim": "Tool tables list Indexing tools (index_repository, list_projects, delete_project, index_status) and Querying tools (search_graph, trace_path [alias trace_call_path], detect_changes, query_graph, get_graph_schema, get_code_snippet, get_architecture, search_code, manage_adr, ingest_traces). get_code_snippet: 'Read source code for a function by qualified name'. trace_path: BFS callers/callees, depth 1-5.",
+          "citation": "README.md:666-690"
+        },
+        {
+          "claim": "Edge types: CALLS; CALL_REFERENCE (a callable used at a supported reference site that resolves to one exact target); USAGE (identifier used but a unique callable target is not proven); IMPORTS, DEFINES, IMPLEMENTS, INHERITS and others.",
+          "citation": "README.md:217-226"
+        },
+        {
+          "claim": "Claude Code integration: detected automatically, MCP config in ~/.claude.json, 'Skill + three exact-tool graph agents; SessionStart, SubagentStart, non-blocking PreToolUse for Grep/Glob/Bash, and post-Read coverage'.",
+          "citation": "README.md:493"
+        },
+        {
+          "claim": "Installed hooks are 'fail-open and context-only'. PreToolUse observes Grep/Glob/Bash and injects matching graph symbols as additionalContext; PostToolUse on Read adds coverage context; 'It never denies or replaces the requested tool call'.",
+          "citation": "README.md:546-550"
+        },
+        {
+          "claim": "Codex CLI integration: detected, $CODEX_HOME/config.toml, managed AGENTS.md activation pointer, skill, three read-only agents, SessionStart + SubagentStart; Codex users must review and trust the installed hooks through /hooks.",
+          "citation": "README.md:494, 552-555"
+        },
+        {
+          "claim": "`install` configures 45 client surfaces (39 detected automatically, 6 conditional or explicit) and never flips experimental feature flags, YOLO modes or global permission bypasses.",
+          "citation": "README.md:470-474"
+        },
+        {
+          "claim": "'runs 100% locally and collects no telemetry'; 'cbm makes no network request of its own accord — it does not check for new versions in the background, and nothing phones home'; updates run from the install script, not the binary.",
+          "citation": "README.md:174, 302"
+        },
+        {
+          "claim": "Every release includes checksums.txt (SHA-256); release pipeline claims SLSA Level 3 provenance, Sigstore cosign keyless signatures, VirusTotal scanning and a CodeQL gate; Linux '-portable' archives are fully static builds.",
+          "citation": "README.md:331, 861-868"
+        },
+        {
+          "claim": "Benchmarked on Apple M3 Pro: Linux kernel full index 3 min, Django ~6 s, Cypher <1 ms; five structural queries ~3,400 tokens vs ~412,000 file-by-file. 'Exact reproduction of the figures above requires the original inputs and raw artifacts.'",
+          "citation": "README.md:282-298"
+        }
+      ],
+      "install": [
+        {
+          "method": "install.sh one-line installer (macOS/Linux; on Linux it fetches the static '-portable' archive)",
+          "command": "curl -fsSL https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh | bash",
+          "citation": "README.md:44-47 (options --skip-config, --dir=<path>: README.md:72; Linux portable selection: install.sh:167-173)"
+        },
+        {
+          "method": "Manual archive install (macOS/Linux): download codebase-memory-mcp-<os>-<arch>.tar.gz from the latest GitHub release, then extract and run the bundled installer",
+          "command": "tar xzf codebase-memory-mcp-*.tar.gz ; ./install.sh",
+          "citation": "README.md:87-97"
+        },
+        {
+          "method": "Wrapper packages (npm / PyPI / Go); each downloads the native binary from GitHub Releases at install or first run",
+          "command": "npm install -g codebase-memory-mcp   |   pip install codebase-memory-mcp   (or: pipx install codebase-memory-mcp)   |   go install github.com/DeusData/codebase-memory-mcp/pkg/go/cmd/codebase-memory-mcp@latest",
+          "citation": "pkg/npm/README.md:15; pkg/pypi/README.md:12-14; pkg/go/cmd/codebase-memory-mcp/main.go:9; README.md:178"
+        },
+        {
+          "method": "AUR package (Arch Linux)",
+          "command": "yay -S codebase-memory-mcp-bin   (or: paru -S codebase-memory-mcp-bin)",
+          "citation": "README.md:354-364"
+        },
+        {
+          "method": "Nix flake (standard server, or UI-embedded variant)",
+          "command": "nix run github:DeusData/codebase-memory-mcp   (UI variant: nix run github:DeusData/codebase-memory-mcp#codebase-memory-mcp-ui -- --ui=true --port=9749)",
+          "citation": "README.md:366-385"
+        },
+        {
+          "method": "Build from source (C11 + C++14 compiler, zlib, git; Node.js required for --with-ui because it runs npm ci in graph-ui)",
+          "command": "git clone https://github.com/DeusData/codebase-memory-mcp.git && cd codebase-memory-mcp && scripts/build.sh --with-ui",
+          "citation": "README.md:404-424; Makefile.cbm:1096-1100"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes — README.md:327 lists codebase-memory-mcp-linux-amd64.tar.gz and README.md:331 the fully static '-portable' archives; install.sh:167-173 always selects the -portable archive on Linux; the standard dynamic build needs glibc >= 2.38 (install.sh:167-169; scripts/ci/check-glibc-compat.sh:4-8); CI builds linux-amd64 and linux-amd64-portable (.github/workflows/_build.yml:34-38, 241-245) and tests on ubuntu-latest (_test.yml:41).",
+        "wsl2": "unknown — README.md never mentions WSL2. install.sh:125-131 treats any `uname -s` of Linux as Linux, and scripts/setup.sh:64 tells Windows users 'Use WSL2 on Windows'. Code comments say WSL2's 0775 home permissions are accepted (src/daemon/ipc.c:1680-1693). No WSL2 leg exists in .github/workflows.",
+        "macos_arm64": "yes — README.md:325 lists codebase-memory-mcp-darwin-arm64.tar.gz; built on macos-14 (_build.yml:44-48) and tested on macos-14 (_test.yml:43); install strips quarantine and ad-hoc signs the binary (README.md:107; install.sh:316-326); README benchmark host is Apple M3 Pro (README.md:282).",
+        "gpu": "no — no GPU code path or requirement found in src/, internal/ or the README. Semantic search uses a bundled static int8 token-embedding table (40,856 tokens x 768 dims) derived from nomic-embed-code, so it is CPU-only (vendored/nomic/NOTICE:13-17; README.md:202)."
+      },
+      "integrations": {
+        "cli": "Yes. `codebase-memory-mcp cli <tool> [--flags]` runs any MCP tool as a one-shot local command without the daemon (README.md:631-664; src/main.c:1077-1079). Other subcommands: install, uninstall, update (prints the install-script command), config, allow-root, hook-augment, daemon start|stop|status, --ui/--port, --tool-profile (src/main.c:1085-1099, 1244-1268, 2444-2476).",
+        "mcp": "Yes. Stdio MCP server is the default mode (src/main.c:1076; manual config README.md:451-464). The tool registry defines 17 tools (src/mcp/mcp.c:465-751); README says 15. It also serves 2 prompts, explore_codebase and review_change_impact (mcp.c:1140-1172), and handles resources/list (mcp.c:17702). `--tool-profile=scout|analysis` restricts the surface to 8 or 13 tools (mcp.c:842-918). 12 tools carry readOnlyHint=true (get_file_outline is deliberately annotated non-read-only: mcp.c:772-790, tests/test_mcp.c:1400-1406). MCPB bundles and an MCP Registry entry are published (server.json; .github/workflows/release.yml:550-623).",
+        "sdk_or_api": "No client SDK found; the npm, PyPI and Go packages are installers/launchers (pkg/npm/bin.js:1-4; pkg/go/cmd/codebase-memory-mcp/main.go:1-5). A loopback-only HTTP API exists on 127.0.0.1:9749 when the UI is enabled: POST /rpc, restricted to tools/call for list_projects, get_graph_schema and get_code_snippet (src/ui/http_server.c:1766-1782, 1965-1968), plus /api/layout, /api/index, /api/index-status, /api/adr and /api/processes (http_server.c:1971-2031). No auth token exists; Host and Origin checks only (http_server.c:1812-1824, 1922-1931).",
+        "claude_code_or_codex": "Claude Code: `install` writes the MCP entry to ~/.claude.json, the skill ~/.claude/skills/codebase-memory/SKILL.md, and agents codebase-memory-scout, codebase-memory and codebase-memory-auditor (tools Read, Grep, Glob plus graph MCP tools, permissionMode: plan). It registers hooks in ~/.claude/settings.json: SessionStart (startup|resume|clear|compact), SubagentStart (*), PreToolUse (Grep|Glob|Bash) and PostToolUse (Read). All hooks are context-only and fail-open (src/cli/cli.c:8350-8483, 4431-4432, 5232-5254, 5823-5840, 6104-6119; src/cli/agent_profiles.c:149-165, 509-517; src/cli/hook_augment.c:1-17; README.md:493, 546-550). Codex CLI: managed [mcp_servers.codebase-memory-mcp] block in $CODEX_HOME/config.toml, a small AGENTS.md pointer, skill, three read-only agents, and SessionStart + SubagentStart hooks calling `codebase-memory-mcp hook-augment` (cli.c:3741-3793, 3948-3955, 8551-8565; README.md:494, 539-542, 552-555). Neither integration adds language-server navigation or post-edit diagnostics: no hook matches Edit/Write/MultiEdit (cli.c:4431-4432), and no Claude Code plugin or lspServers manifest was found in the repo."
+      },
+      "telemetry_and_network": "No telemetry, account or API key (README.md:19, 174, 302). Code agrees: src/ has no outbound socket code, only AF_UNIX daemon IPC (src/daemon/ipc.c:709, 724) and loopback TCP (src/main.c:2110, 2216; the UI server binds 127.0.0.1 in src/ui/httpd.c:229-250). `update` only prints the install-script command (src/cli/cli.c:13405-13489). The curl-based downloader/updater is compiled only under CBM_CLI_ENABLE_TEST_API (cli.c:7876-7929, 13128-13310), which CFLAGS_PROD does not define (Makefile.cbm:78-88). The daemon update-check has 'deliberately NO production provider' (src/daemon/application.c:67-80). Stale conflicting text: SECURITY.md:17-30 says an api.github.com update check runs after MCP initialize, and scripts/security-allowlist.txt:52,71 plus scripts/security-network.sh:80-90 still allow it. Network is needed only to install or update. install.sh downloads the archive and checksums.txt from GitHub Releases over HTTPS (install.sh:24-82, 184-243). The npm/PyPI/Go wrappers download from GitHub Releases at install or first run and check SHA-256 (pkg/npm/install.js:517-596; pkg/pypi/src/codebase_memory_mcp/_cli.py:277-312). scripts/setup.sh calls api.github.com for the latest tag (scripts/setup.sh:153). Local runtime services: a per-account coordination daemon on an owner-only AF_UNIX rendezvous under /tmp or /private/tmp (docs/CONFIGURATION.md:153); an optional UI at http://127.0.0.1:9749 that auto-enables on first run for UI builds when no config file exists (src/ui/config.c:125-127; docs/CONFIGURATION.md:138); subprocesses git (watcher, detect_changes) and sh/xargs/grep (search_code: src/mcp/mcp.c:12609-12640). Diagnostics are opt-in and local (CBM_DIAGNOSTICS, README.md:302-317). The CI egress test (scripts/security-network.sh:60-96, Linux only) inspects IPv4 connect() calls and passes HTTPS to any IP as 'REVIEW'."
+    },
+    "code": {
+      "languages": [
+        "C (C11; core in src/ and internal/cbm/, 162 generated tree-sitter parsers)",
+        "C++14 (internal/cbm/preprocessor.cpp; vendored simplecpp)",
+        "TypeScript/TSX (graph-ui, built with Node/Vite and embedded)",
+        "JavaScript (pkg/npm wrapper)",
+        "Python (pkg/pypi wrapper; CI/release/benchmark scripts)",
+        "Go (pkg/go wrapper)",
+        "Shell/Bash and PowerShell (install, build, CI scripts)",
+        "Assembly (.incbin of vendored/nomic/code_vectors.bin)"
+      ],
+      "entry_points": [
+        {
+          "path": "src/main.c",
+          "what": "main() at :2680. Role dispatch: stdio MCP client (default), one-shot `cli`, install/uninstall/update/config/allow-root (handle_subcommand :1227-1271), hook-augment, daemon ctl (:2444), supervised index worker."
+        },
+        {
+          "path": "src/mcp/mcp.c",
+          "what": "JSON-RPC 2.0 MCP server (18,154 lines): TOOLS[] registry with 17 tools (:465-751), tool-profile allowlists (:842-874), dispatch_tool (:17276-17343), method routing (:17694-17715)."
+        },
+        {
+          "path": "src/cli/cli.c",
+          "what": "install/uninstall/update/config and per-client config writers (14,011 lines); agent_clients.c and agent_profiles.c hold client tables and Scout/Verify/Auditor agent profiles."
+        },
+        {
+          "path": "src/cli/hook_augment.c",
+          "what": "`codebase-memory-mcp hook-augment`: fail-open, time-bounded hook that emits additionalContext for Claude Code, Codex and other clients."
+        },
+        {
+          "path": "src/daemon/",
+          "what": "Per-account coordination daemon: application.c (sessions, index jobs, watchers), runtime.c, ipc.c (AF_UNIX), bootstrap.c, version_cohort.c, project_lock.c."
+        },
+        {
+          "path": "src/ui/http_server.c",
+          "what": "Loopback-only HTTP/JSON server (httpd.c) serving the embedded 3D graph UI plus /rpc and /api/* routes."
+        },
+        {
+          "path": "internal/cbm/",
+          "what": "Extraction engine (cbm.c, extract_*.c, grammar_*.c) over 162 vendored grammars; internal/cbm/lsp/ holds the 10 in-process Hybrid LSP resolvers (py, ts, php, cs, go, c, java, kotlin, rust, perl)."
+        },
+        {
+          "path": "pkg/npm/bin.js, pkg/pypi/src/codebase_memory_mcp/_cli.py, pkg/go/cmd/codebase-memory-mcp/main.go",
+          "what": "Wrapper launchers that download a checksum-verified native binary from GitHub Releases and exec it."
+        }
+      ],
+      "architecture": "Single-process C core with helper processes. src/main.c picks a role: MCP stdio client, one-shot CLI, hook client, per-account daemon, or supervised index worker. src/daemon/ is the shared coordination daemon: AF_UNIX IPC, session/job/watch registry, exact-build admission barrier. src/mcp/mcp.c is the JSON-RPC server and 17-tool registry; compact_out.c renders token-lean output; index_supervisor.c runs crash/hang-isolated index worker subprocesses. src/pipeline/ runs multi-pass indexing (structure, definitions, calls, usages, HTTP/route linking, config, tests, git history, complexity, cross-repo); lsp_resolve.h, lsp_surface.c and pass_lsp_cross.c apply Hybrid LSP call-edge overrides (confidence floor 0.6); artifact.c exports .codebase-memory/graph.db.zst. src/store/ is the SQLite graph store with FTS5 search and Louvain clustering, queried by src/cypher/ (read-only openCypher subset). Supporting modules: src/semantic/ and src/simhash/ (similarity edges), src/discover/ (gitignore/.cbmignore), src/watcher/ (git polling), src/traces/ (ingest_traces stub), src/ui/ plus graph-ui/ (embedded React/Three.js UI), src/cli/ (installer and 45-client config writers), src/foundation/ (portability, subprocess supervision, locks, memory). internal/cbm/ holds the tree-sitter extraction engine, 162 vendored grammars and 10 in-process type resolvers in internal/cbm/lsp/. vendored/ holds sqlite3, mimalloc, yyjson, xxhash, tre and the Nomic token-embedding table. pkg/ holds npm, PyPI, Go, Homebrew, Scoop, Winget, Chocolatey and AUR wrappers.",
+      "packaging_and_release": "Release flow (.github/workflows/release.yml, manual workflow_dispatch, owner-only per MAINTAINERS.md:58): lint, tests, build, smoke + soak, draft GitHub release, verify, publish npm/PyPI/MCP Registry, un-draft. _build.yml builds 8 products: linux amd64/arm64 dynamic, linux amd64/arm64 static '-portable', darwin amd64/arm64, windows amd64/arm64. It uses `scripts/build.sh --with-ui`, derives stripped and unstripped candidates, VirusTotal-scans all 24, selects one per product, and packages byte-for-byte with scripts/package-release.sh (archive = executable, LICENSE, install script, THIRD_PARTY_NOTICES.md: package-release.sh:38-40). Artifacts: *.tar.gz, *.zip, *.mcpb, release-candidates.tsv, virustotal-candidate-results.tsv, release-selection.tsv, checksums.txt, sbom.json, *.bundle (release.yml:275-284). Integrity steps: SHA-256 checksums.txt (release.yml:194-201); build-provenance attestations for candidates, selected containers and checksums.txt (_build.yml:98-106, 433-441; release.yml:211-214); SBOM attestation for tarballs (release.yml:227-234); keyless cosign sign-blob bundles for every artifact (release.yml:236-248); npm publish with --provenance (release.yml:483-491); PyPI via twine API token with a hash-pinned toolchain and no attestation step found (release.yml:499-525); MCP Registry via GitHub OIDC (release.yml:619-623). Package versions are synced at publish time (release.yml:450-460). Checked-in Homebrew (0.10.3), AUR (0.8.1) and Winget (0.8.1) manifests lag. Only workflow definitions were read; no release artifacts were opened.",
+      "tests_and_ci": "Tests: custom C framework (tests/test_framework.h) run via scripts/test.sh (ASan+UBSan build, parallel/sharded harness; --tsan leg). tests/ has 123 .c files, 39 shell contract/guard scripts, 2 Python tests and 4 helper headers; tests/repro has about 86 files; graph-ui has 12 vitest files; wrappers have 3 npm, 1 PyPI and 2 Go test files. Static counts here: 141 suite declarations in tests/test_main.c and 7,756 TEST( definitions across 122 files, versus the README's '6,768 tests across 120 suites' (README.md:428; hard-coded badge README.md:6). Tests were not run. CI: 22 workflow files, actions pinned by SHA, Dependabot for github-actions only (.github/dependabot.yml:1-6). pr.yml (pull_request to main): _security.yml (allow-list audit, UI audit, vendored integrity, ScanCode license gate, CodeQL gate), _lint.yml (no-skips policy, cppcheck 2.20.0, clang-format-20, clang-tidy-21 memory analyzer), _test.yml (ubuntu x64/arm64, macos-14, macos-15-intel, windows; sharded), and product-code-gated smoke on ubuntu/macos-14/windows plus a ci-ok gate. codeql.yml (c-cpp, push and PR to main). scorecard.yml (weekly + push). dco.yml. dry-run.yml and release.yml (manual). nightly-soak.yml (weekly), smoke.yml, fast-repro.yml and bug-repro.yml (manual or qa/** branches). cache-warm.yml (nightly). Smoke runs security-strings, security-install, security-network (strace) and fuzz scripts (_smoke.yml:125-134). I did not verify any CI run results.",
+      "dependencies": "Core binary: no package manifest. Vendored C/C++ sources: sqlite3, mimalloc, yyjson, xxhash, tre, lz4, zstd, simplecpp, verstable, wyhash (10 libraries, THIRD_PARTY.md:99-110), tree-sitter runtime, 162 grammar directories (THIRD_PARTY.md:40 says 160) and Nomic embedding data (vendored/nomic). System needs: C and C++ compilers and zlib for builds (README.md:409-414); git and sh/xargs/grep at runtime. Manifests with direct dependency counts: pkg/npm/package.json has 0 dependencies (engines node >=18); pkg/pypi/pyproject.toml has 0 runtime dependencies and 1 build requirement (hatchling==1.28.0), and pkg/pypi/requirements-publish.txt has 29 hash-pinned publish-toolchain entries; pkg/go/go.mod has 0 requires (go 1.26.1); graph-ui/package.json has 12 dependencies, 12 devDependencies and 3 overrides; tools/tree-sitter-{arkts,chialisp,form}/package.json are grammar-authoring packages (form: 1 dependency, 1 devDependency); flake.nix takes only nixpkgs-unstable and buildInputs zlib (flake.nix:4, 71).",
+      "security_policy": "SECURITY.md plus docs/SECURITY-DISCLOSURE.md: private reporting via GitHub advisories or email, best-effort targets (7-day acknowledgement, 14-day assessment, ~90-day fix), safe harbor, described as a 'solo, volunteer-maintained project' (SECURITY.md:52-94). The supported-versions table lists only 'Latest 0.10.x' and not 0.11.x (SECURITY.md:326-335). CODE_OF_CONDUCT.md, MAINTAINERS.md and DCO are also present."
+    },
+    "claim_checks": [
+      {
+        "claim": "'15 MCP tools' (README.md:19, 40, 464, 846)",
+        "verified": "no",
+        "evidence": "src/mcp/mcp.c:465-751 defines 17 tools; dispatch handles the same 17 names plus the alias trace_call_path (mcp.c:17287-17339). get_file_outline, compare_graphs and check_index_coverage are absent from the README's 14-row tables (README.md:668-690). README.md:577-578 says Scout/Analysis profiles expose 7/11 tools, but code allows 8/13 (mcp.c:843-852). Code wins."
+      },
+      {
+        "claim": "Hybrid LSP is 'compatible with major language servers', 'mirrors what an IDE Go to Definition would resolve', with no language server process (README.md:804)",
+        "verified": "partial",
+        "evidence": "No LSP client or textDocument/* traffic exists in the source; the only mentions are comments, e.g. internal/cbm/lsp/java_lsp.h:5-12 ('without shelling out to javac'). internal/cbm/lsp/ holds 10 in-process resolver families (c, cs, go, java, kotlin, perl, php, py, rust, ts) whose output is call-edge overrides accepted only at confidence >= 0.6, otherwise registry/textual resolution (src/pipeline/lsp_resolve.h:34-39); scripts/check-lsp-originality.sh:6-9 calls it an original C implementation. 'No language server process' is true; 'compatible with' and 'mirrors' describe a design goal, not a protocol."
+      },
+      {
+        "claim": "Claude Code gets SessionStart, SubagentStart, non-blocking PreToolUse (Grep|Glob|Bash) and PostToolUse (Read) hooks that are context-only (README.md:493, 546-550)",
+        "verified": "yes",
+        "evidence": "src/cli/cli.c:4431-4432 (matchers), 5232-5254 (PreToolUse/PostToolUse upsert), 5823-5840 (SessionStart startup|resume|clear|compact), 6104-6119 (SubagentStart '*'), 8474-8483 (install output); src/cli/hook_augment.c:1-17 ('NEVER blocks a tool call'). No Edit/Write/MultiEdit matcher and no diagnostics code exist in src/cli, so there is no post-edit diagnostics hook and no LSP navigation inside Claude Code."
+      },
+      {
+        "claim": "README's tool tables list only indexing and querying tools, i.e. nothing edits source (README.md:668-690)",
+        "verified": "yes",
+        "evidence": "src/mcp/mcp.c:465-751 has no rename/replace/insert-symbol or file-edit tool. Write-capable tools are index_repository and delete_project (graph store), manage_adr (ADR document) and ingest_traces (stub); annotations at mcp.c:772-790. Installed Claude subagents are limited to Read, Grep, Glob plus graph MCP tools with permissionMode: plan (src/cli/agent_profiles.c:509-517)."
+      },
+      {
+        "claim": "get_code_snippet 'Read source code for a function by qualified name' (README.md:686), used as exact source",
+        "verified": "partial",
+        "evidence": "mcp.c:12261-12352 resolves a symbol (exact qualified name, then suffix match). mcp.c:9661-9691 and 11444-11453 read the live file lines [start_line, end_line] stored in the index, path-contained to the project root. There is no content-hash check at read time, so lines can drift after an edit until the watcher reindexes (polls every 5 s + 1 s per 500 files, capped at 60 s: src/watcher/watcher.h:5-8). Parse gaps are flagged via coverage_note (mcp.c:11549-11585); check_index_coverage compares mtime/size and is 'best-effort' (mcp.c:6279-6310, 690-692)."
+      },
+      {
+        "claim": "'100% locally', no telemetry, nothing phones home (README.md:23, 174, 302)",
+        "verified": "yes",
+        "evidence": "No outbound sockets in src/: AF_UNIX (src/daemon/ipc.c:709-724) and loopback only (src/main.c:2110, 2216; src/ui/httpd.c:229-250). `update` only prints the install-script command (src/cli/cli.c:13405-13489); the curl downloader is test-build-only (cli.c:7876-7929; Makefile.cbm:78-88); src/daemon/application.c:67-80 says there is no production update-check provider. Conflict: SECURITY.md:17-30 still documents an api.github.com update check (stale), and scripts/security-allowlist.txt:52,71 still lists that URL."
+      },
+      {
+        "claim": "ingest_traces 'Ingest runtime traces to validate HTTP_CALLS edges' (README.md:690)",
+        "verified": "no",
+        "evidence": "src/mcp/mcp.c:746 describes the tool as 'graph edge creation is not implemented'. The handler (mcp.c:17242-17264) only counts records and returns 'Runtime edge creation from traces not yet implemented'. docs/RUNTIME_TRACE_MODEL.md:49-53 confirms the handler opens and mutates no store."
+      },
+      {
+        "claim": "`install` configures 45 client surfaces including Claude Code and Codex CLI (README.md:470-474, 493-494)",
+        "verified": "yes",
+        "evidence": "README table rows README.md:493-537 number 45; src/main.c:1100-1114 prints the same list; 19 clients are table-driven (src/cli/agent_clients.h:15-35) and the rest are hard-coded in src/cli/cli.c. Claude Code: ~/.claude.json MCP entry, skill, agents, hooks (cli.c:8350-8483; agent_profiles.c:149-165). Codex: managed [mcp_servers.codebase-memory-mcp] block and hooks (cli.c:3741-3793, 3948-3955). The 39/6 automatic-vs-conditional split was not checked; the installer was not run."
+      },
+      {
+        "claim": "'The executable is self-contained — no adjacent data file is required' / 'one self-contained executable' (README.md:331, 426) vs 'small verified runtime-asset set' and 'verified external 3D-UI asset pack' (README.md:17, 34, 130, 854)",
+        "verified": "partial",
+        "evidence": "README is internally inconsistent. Code and packaging back the single-executable reading: archives hold 'one executable, no sidecars' plus LICENSE, installer and notices (scripts/package-release.sh:38-40; install.sh:268-292 enforces exactly those 4 members); npm shim says 'every platform ships exactly ONE binary' (pkg/npm/bin.js:11-13); the UI is linked in by `cbm-with-ui` (Makefile.cbm:1089-1109). Stale 'sidecar'/'external asset pack' wording remains in scripts/build.sh:32 and docs/CONFIGURATION.md:138."
+      },
+      {
+        "claim": "'162 languages' via vendored grammars, and '158 vendored tree-sitter grammars' (README.md:19 vs 229)",
+        "verified": "partial",
+        "evidence": "162 grammar directories contain parser.c under internal/cbm/vendored/grammars; the count is enforced by tests/test_language_count_contract.sh:25-46, which admits it undercounts languages sharing a grammar (:16-18). README.md:229 and docs/llms.txt:8 still say 158, and THIRD_PARTY.md:40 says 160."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Linux kernel full index (28M LOC, 75K files -> 4.81M nodes, 7.72M edges), Apple M3 Pro",
+        "metric": "wall time",
+        "value": "3 min",
+        "source": "README.md:286; docs/index.html:688",
+        "independent": false
+      },
+      {
+        "what": "Linux kernel fast-mode index (1.88M nodes), Apple M3 Pro",
+        "metric": "wall time",
+        "value": "1m 12s",
+        "source": "README.md:287",
+        "independent": false
+      },
+      {
+        "what": "Django full index (49K nodes, 196K edges), Apple M3 Pro",
+        "metric": "wall time",
+        "value": "~6 s",
+        "source": "README.md:288; docs/index.html:689",
+        "independent": false
+      },
+      {
+        "what": "Query latencies, Apple M3 Pro",
+        "metric": "latency",
+        "value": "Cypher <1 ms; regex name search <10 ms; dead-code detection ~150 ms; trace_path depth 5 <10 ms",
+        "source": "README.md:289-292",
+        "independent": false
+      },
+      {
+        "what": "Token cost of five structural questions (find function, trace chain, dead code, list routes, architecture) via graph vs file-by-file grep exploration",
+        "metric": "tokens",
+        "value": "~3,400 vs ~412,000 (99.2% reduction, ~121x); README.md:298 says exact reproduction needs the original inputs and raw artifacts",
+        "source": "README.md:296; docs/index.html:657-669",
+        "independent": false
+      },
+      {
+        "what": "Project's own preprint (arXiv:2603.27277, not opened): 31 real-world repositories vs file-by-file exploration",
+        "metric": "answer quality / tokens / tool calls",
+        "value": "83% answer quality; 10x fewer tokens; 2.1x fewer tool calls",
+        "source": "README.md:21; docs/index.html:670-676",
+        "independent": false
+      },
+      {
+        "what": "docs/BENCHMARK.md language benchmark: v0.3.0, 2026-03-01, Apple M3 Pro; 12 questions per language graded PASS/PARTIAL/FAIL by the project's own harness; 35 languages scored; predates v0.11.0 and uses a list_directory tool that no longer exists",
+        "metric": "weighted score",
+        "value": "339.5/370 = 91.8% (327 PASS, 25 PARTIAL, 18 FAIL, 41 N/A); 17 languages >=90%, 16 at 75-89% (Python, TypeScript, Go, Rust, Java 87%), 2 below 75% (OCaml 72%, Haskell 62%)",
+        "source": "docs/BENCHMARK.md:1-10, 75-81, 921-936",
+        "independent": false
+      },
+      {
+        "what": "Linux kernel subset stress test (drivers/net/ethernet/intel, 387 files) in the same v0.3.0 benchmark",
+        "metric": "index size and trace output",
+        "value": "19,993 nodes, 67,305 edges; depth-5 traces of 129K and 67.6K chars with no timeout; 11/11 questions passed",
+        "source": "docs/BENCHMARK.md:846-892",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope fit for language-server navigation: no LSP client or server integration, no symbol-level edit tool and no diagnostics. All 17 tools are indexing, query or ADR tools (src/mcp/mcp.c:465-751). 'Hybrid LSP' is in-process heuristic type resolution for 10 language families (internal/cbm/lsp/; src/pipeline/lsp_resolve.h:34-39). Claude Code hooks are context-only on Grep/Glob/Bash/Read, with no Edit/Write hook or diagnostics (src/cli/cli.c:4431-4432).",
+      "Definitions and references are graph-derived and approximate: USAGE edges mean a unique target is not proven (README.md:220); languages without a Hybrid LSP pass use textual resolution (README.md:824). The project's own benchmark scores Python/TypeScript/Go/Rust/Java at 87%, OCaml and Haskell below 75%, and notes function properties often null (docs/BENCHMARK.md:75-81, 906-917). search_code shells out to sh/xargs/grep (src/mcp/mcp.c:12609-12640).",
+      "Index staleness: get_code_snippet reads live files by stored line ranges with no content check (src/mcp/mcp.c:9661-9691, 11444-11453). The watcher polls git every 5 s + 1 s per 500 files, up to 60 s (src/watcher/watcher.h:5-8). Coverage and freshness are explicitly 'best-effort' (mcp.c:690-692).",
+      "Documentation and manifest drift at v0.11.0: README says 15 tools (code 17), 7/11-tool profiles (code 8/13), 158 vs 162 languages, and overstates ingest_traces. SECURITY.md:17-30 describes an update check the code removed (src/daemon/application.c:67-80) and lists only 0.10.x as supported (SECURITY.md:326-331). docs/BENCHMARK.md is v0.3.0. scripts/setup.sh still requires Go 1.23+ (setup.sh:47, 98). Checked-in manifests lag: Homebrew 0.10.3 (pkg/homebrew/Formula/codebase-memory-mcp.rb:4), AUR 0.8.1 (pkg/aur/PKGBUILD:3), Winget 0.8.1, npm/PyPI/server.json 0.10.8.",
+      "Maintenance concentration: every path is owned by one handle (@DeusData) and advisory reviewers are 'TBD' (.github/CODEOWNERS:11-12; MAINTAINERS.md:19-47). SECURITY.md:71-80 calls it a 'solo, volunteer-maintained project' with best-effort handling. Most behaviour sits in very large single files (src/mcp/mcp.c 18,154 lines; src/cli/cli.c 14,011 lines).",
+      "Install integrity and platform floor: install.sh checks SHA-256 against a checksums.txt fetched from the same GitHub release and does not itself verify cosign or attestations (install.sh:184-243). README also documents `scripts/setup.sh | bash`, which downloads the non-portable Linux archive with no checksum check (README.md:343; scripts/setup.sh:147-176). The standard Linux binary needs glibc >= 2.38 (install.sh:167-169; scripts/ci/check-glibc-compat.sh:4-8), yet the checked-in Homebrew formula and AUR PKGBUILD point at those non-portable archives (pkg/homebrew/Formula/codebase-memory-mcp.rb:18-26; pkg/aur/PKGBUILD:12-13). WSL2 is undocumented.",
+      "Local attack surface and config writes: install.sh runs `install -y --force` (install.sh:338-345), rewriting agent configs and hooks for up to 45 clients. Each Claude Code Grep/Glob/Bash/Read call can spawn `hook-augment` (5 s hook timeout, 2 s default in-process deadline, ~1.1 s CPU identity hash on non-no-op calls: src/cli/cli.c:4447; src/cli/hook_augment.c:65-91; src/main.c:2760-2766). A loopback UI server on 127.0.0.1:9749 auto-enables on first run for UI builds with no config file (src/ui/config.c:125-127; docs/CONFIGURATION.md:138). It has no auth token, only Host/Origin checks (src/ui/http_server.c:1812-1824, 1922-1931), serves get_code_snippet via /rpc (http_server.c:1766-1782) and can start indexing via /api/index. Indexing containment is a breadth denylist unless CBM_ALLOWED_ROOT or allow-root is set (docs/CONFIGURATION.md:196-212; src/foundation/workspace.h:68-78).",
+      "Licensing and supply chain: the project is MIT (LICENSE) but bundles ~160 third-party grammars (mostly MIT; CC0, Apache-2.0 and ISC exceptions), zstd under a dual license with BSD selected, and Apache-2.0 data derived from nomic-ai/nomic-embed-code (THIRD_PARTY.md:49-66, 107; vendored/nomic/NOTICE:1-17). One Microsoft ML engine flags some release binaries as Trojan:Script/Wacatac.B!ml, and release policy tolerates exactly one such detection (SECURITY.md:175-190, 265-270). The CI egress test passes HTTPS to any IP as 'REVIEW' and inspects only IPv4 connect() (scripts/security-network.sh:60-96), so 'no phone home' rests mainly on code review and allowlists."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "deusdata/codebase-memory-mcp",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "install.sh one-line installer (macOS/Linux; on Linux it fetches the static '-portable' archive): curl -fsSL https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh | bash; options --skip-config, --dir=<path>",
+          "citation": "README.md:44-47; README.md:72; install.sh:167-173",
+          "holds": true,
+          "note": "README.md:44-47 gives this exact command under 'One-line install (macOS / Linux)'. README.md:72 lists --skip-config and --dir=<path>, both parsed at install.sh:84-106. install.sh:170-173 sets PORTABLE=\"-portable\" whenever OS=linux and builds ARCHIVE=codebase-memory-mcp-${OS}-${ARCH}${PORTABLE}.${EXT}; the comment at :167-169 calls the build 'fully-static'. The installer was not run. Detail outside the cited lines: options passed through a pipe need `bash -s -- ...` (install.sh:8)."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1 reads 'MIT License', 'Copyright (c) 2025 DeusData', followed by the standard MIT text; the README.md:4 badge agrees. Revision confirmed: .git/HEAD = 8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798, which packed-refs maps to refs/tags/v0.11.0."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes: README.md:327 lists linux-amd64.tar.gz and :331 the fully static -portable archives; install.sh always selects -portable on Linux; the standard dynamic build needs glibc >= 2.38; CI builds linux-amd64 and linux-amd64-portable and tests on ubuntu-latest",
+          "citation": "README.md:327, 331; install.sh:167-173; scripts/ci/check-glibc-compat.sh:4-8; .github/workflows/_build.yml:34-38, 241-245; .github/workflows/_test.yml:41",
+          "holds": true,
+          "note": "All citations match. README.md:327: 'Linux (x86_64) | codebase-memory-mcp-linux-amd64.tar.gz'. README.md:331: 'Linux -portable archives contain the fully static builds'. install.sh:171 selects -portable unconditionally on linux. check-glibc-compat.sh:4-5: 'dynamically links glibc 2.38+ / GLIBCXX 3.4.32'. _build.yml:34-38 is the ubuntu-latest linux/amd64 leg of build-unix; :241-245 is the amd64/ubuntu-latest leg of build-linux-portable ('gcc -static', :235). _test.yml:41 puts ubuntu-latest in CORE_UNIX. CI run results were not checked."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Claude Code: install writes the MCP entry to ~/.claude.json, the skill, and 3 agents (codebase-memory-scout, codebase-memory, codebase-memory-auditor; Read, Grep, Glob plus graph tools; permissionMode: plan); hooks in ~/.claude/settings.json: SessionStart (startup|resume|clear|compact), SubagentStart (*), PreToolUse (Grep|Glob|Bash), PostToolUse (Read), all context-only and fail-open. Codex: managed [mcp_servers.codebase-memory-mcp] block in $CODEX_HOME/config.toml, AGENTS.md pointer, skill, 3 read-only agents, SessionStart + SubagentStart hooks via hook-augment. No Edit/Write/MultiEdit hook and no plugin or lspServers manifest.",
+          "citation": "src/cli/cli.c:8350-8483, 4431-4432, 5232-5254, 5823-5840, 6104-6119, 3741-3793, 3948-3955, 8551-8565; src/cli/agent_profiles.c:149-165, 509-517; src/cli/hook_augment.c:1-17; README.md:493-494, 539-542, 546-550, 552-555",
+          "holds": true,
+          "note": "cli.c:8359, 8370 and 8372 plan the writes for skills/codebase-memory/SKILL.md, <user_root>/.claude.json and settings.json; :8474-8483 prints the four hook groups. cli.c:4429-4432 defines the matchers 'Grep|Glob|Bash' and 'Read' with the comment 'context-only and fail open'. :5232-5254 upserts PreToolUse/PostToolUse; :5794 with :5823-5840 registers SessionStart for startup/resume/clear/compact; :6104-6119 registers SubagentStart '*'. agent_profiles.c:150-154 has the three slugs; :511-515 writes 'tools: Read, Grep, Glob' and 'permissionMode: plan'. hook_augment.c:9-12: 'NEVER blocks a tool call'. Codex: cli.c:3741-3793 is the managed TOML block; :8551-8565 the AGENTS.md pointer; :9551-9560 the skill and tiered agents; :9583 prints 'SessionStart + SubagentStart'. A repo-wide search found no 'lspServers', 'MultiEdit', Edit/Write matcher or plugin.json. Nits: the installed Codex hook command is '<absolute binary path> hook-augment' (cli.c:3814-3821, 9519-9522); the literal 'codebase-memory-mcp hook-augment' at :3948-3955 is the public/test helper. Hooks go to $CODEX_HOME/hooks.json instead when that file exists (:9561-9579). Claude paths honor $CLAUDE_CONFIG_DIR."
+        },
+        {
+          "field": "claim_checks[1]",
+          "statement": "Hybrid LSP 'compatible with major language servers' / 'mirrors what an IDE Go to Definition would resolve' / no language server process (README.md:804), rated partial: no LSP client or textDocument/* traffic; 10 in-process resolver families; call-edge overrides accepted only at confidence >= 0.6, otherwise registry/textual resolution; check-lsp-originality.sh calls it an original C implementation",
+          "citation": "README.md:804; internal/cbm/lsp/java_lsp.h:5-12; src/pipeline/lsp_resolve.h:34-39; scripts/check-lsp-originality.sh:6-9",
+          "holds": true,
+          "note": "The README.md:804 quotes match. A repo-wide search for 'textDocument/' hits only comments (java_lsp.h:10, java_lsp.c:7, tests/test_java_lsp.c:5); java_lsp.h:11 reads '*without* shelling out to javac'. No string literal names clangd, pyright, gopls, rust-analyzer, tsserver or jdtls in src/ or internal/cbm/. internal/cbm/lsp/ holds exactly 10 *_lsp.c files (c, cs, go, java, kotlin, perl, php, py, rust, ts), and all of them populate resolved_calls. lsp_resolve.h:34-39 defines CBM_LSP_CONFIDENCE_FLOOR 0.6f with fallback to the registry; the floor is applied at lsp_resolve.h:397, 446, 715, 757 and pass_parallel.c:2622, 2661, 3307, 3332. The comment at :37-38 lists only Go, C/C++, Python and PHP and is out of date. The phrase 'original C implementation' is at check-lsp-originality.sh:5, one line before the cited range 6-9. 'Partial' is a fair rating."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

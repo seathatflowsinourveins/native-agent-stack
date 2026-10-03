@@ -1,0 +1,349 @@
+{
+  "contender": "lightonai/next-plaid",
+  "revision": {
+    "contender": "lightonai/next-plaid",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "lightonai/next-plaid",
+        "tag": "v1.7.0",
+        "commit": "00e26aae0006b322727db277672211d9a0e3ccec",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v1.7.0",
+    "commit": "00e26aae0006b322727db277672211d9a0e3ccec",
+    "read_at": "2026-10-02T03:02:22+00:00"
+  },
+  "dossier": {
+    "contender": "lightonai/next-plaid",
+    "revision": {
+      "tag": "v1.7.0",
+      "commit": "00e26aae0006b322727db277672211d9a0e3ccec",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Monorepo (Cargo workspace v1.7.0, LightOn, Apache-2.0) with two surfaces. (1) ColGREP (colgrep/): a local CLI for semantic + regex + keyword code search. It splits files into code units with tree-sitter, converts each to structured text, embeds it in-process with a local ONNX ColBERT model (default lightonai/LateOn-Code-edge, fetched from Hugging Face), and stores a multi-vector PLAID index plus SQLite/FTS5 metadata per (project path, model) under the user data dir (~/.local/share/colgrep/indices on Linux). Every search first incrementally updates that index. Documented agent integrations: Claude Code (plugin with hooks + skill), Codex (AGENTS.md section + sandbox writable_roots entry), OpenCode, Hermes, Kimi Code. ColGREP has no MCP server, daemon or HTTP mode and no pluggable remote embedding service. (2) NextPlaid (next-plaid/, next-plaid-onnx/, next-plaid-api/): the multi-vector index library, an ONNX ColBERT encoder crate, and an optional separate REST API server (Docker) with a Python client/CLI that can encode text server-side; ColGREP does not call that server.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "ColGREP is 'Semantic code search for your terminal and your coding agents. Searches combine regex filtering with semantic ranking. All local, your code never leaves your machine.'",
+          "citation": "README.md:22"
+        },
+        {
+          "claim": "'No server, no API, no dependencies. ColGREP is a single Rust binary with everything baked in.' `colgrep init` builds the index; after that every search detects file changes and updates the index automatically before returning results.",
+          "citation": "README.md:49; colgrep/README.md:80"
+        },
+        {
+          "claim": "Default model is lightonai/LateOn-Code-edge; any ColBERT-style HF model via `colgrep set-model` or `--model`; HF_TOKEN for private models. Each (project, model) pair has its own index directory so switching models never corrupts existing indexes; `colgrep clear` scopes to the active model, `clear --all` wipes every index.",
+          "citation": "README.md:59-75"
+        },
+        {
+          "claim": "Agent integrations table: Claude Code (`colgrep --install-claude-code`), OpenCode, Codex (`--install-codex`), Hermes; 'Claude Code has full hooks support. OpenCode, Codex, and Hermes integrations are basic for now'. colgrep/README.md also lists Kimi Code.",
+          "citation": "README.md:79-86; colgrep/README.md:426-434"
+        },
+        {
+          "claim": "Pipeline: tree-sitter parse -> structured representation -> LateOn-Code-edge (17M, 'runs on CPU') multi-vector embeddings -> NextPlaid index (quantized, memory-mapped, incremental) -> grep-compatible search with SQLite filtering and semantic ranking, '100% local'.",
+          "citation": "README.md:90-116"
+        },
+        {
+          "claim": "Benchmark: NDCG@10 on the Semble public bench (1,251 queries x 63 repos x 19 languages, FP32, single H100): ColGREP LateOn-Code 0.859, semble potion-code-16M 0.853, ColGREP LateOn-Code-edge 0.846.",
+          "citation": "README.md:150-154; colgrep/README.md:26"
+        },
+        {
+          "claim": "NextPlaid is 'A local-first multi-vector database with a REST API' with built-in ONNX encoding ('no external inference server needed'), memory-mapped indices, 2/4-bit quantization, incremental add/delete, SQLite metadata pre-filtering, CPU-optimized with optional CUDA.",
+          "citation": "README.md:168-175"
+        },
+        {
+          "claim": "Default query runs ColBERT semantic search plus 'FTS5 trigram keyword search' fused with Reciprocal Rank Fusion (alpha=0.75); -e regex pre-filters then semantics ranks; test functions are demoted unless the query mentions 'test'.",
+          "citation": "colgrep/README.md:88-98, 345-355, 551-553"
+        },
+        {
+          "claim": "Indexes are stored outside the project (~/.local/share/colgrep/indices on Linux, ~/Library/Application Support/colgrep/indices on macOS; XDG_DATA_HOME honored); per-project dir {project}-{hash8} holds index/, state.json, project.json; 'ColGREP automatically detects and repairs index/metadata desync from interrupted operations.'",
+          "citation": "colgrep/README.md:592-608"
+        },
+        {
+          "claim": "'macOS binaries ship with Apple Accelerate + CoreML'; 'Linux & Windows binaries work immediately but run on CPU only'; acceleration on Linux/Windows via `cargo install colgrep --features ...` (openblas, cuda, cuda+tensorrt, cuda-13, directml).",
+          "citation": "colgrep/README.md:62-64, 679-696, 789-817"
+        },
+        {
+          "claim": "Claude Code integration installs session and task hooks that inject colgrep usage instructions, 'check index health before activating (skips if >3000 chunks need indexing or index is desynced)', and propagate instructions to spawned sub-agents.",
+          "citation": "colgrep/README.md:436-444"
+        },
+        {
+          "claim": "ONNX Runtime is downloaded automatically on first use (lookup: ORT_DYLIB_PATH, Python envs, system paths, auto-download to ~/.cache/onnxruntime/); config is stored at ~/.config/colgrep/config.json (XDG_CONFIG_HOME overrides).",
+          "citation": "colgrep/README.md:735-744, 420, 754"
+        },
+        {
+          "claim": "PRIVACY: source code never leaves the machine; 'single network request on first use' (model download from Hugging Face), then works offline; no telemetry/analytics/crash reports; indices stored in `.colgrep/` within the project directory.",
+          "citation": "colgrep/PRIVACY.md:5-20"
+        },
+        {
+          "claim": "NextPlaid API server (Docker ghcr.io/lightonai/next-plaid:cpu-1.7.0 / cuda-1.7.0) runs in two modes: with --model the server encodes text (*_with_encoding endpoints), without it clients send embeddings; async batched writes (202), optional rate limiting (off by default), Swagger UI, automatic index/SQLite sync repair.",
+          "citation": "next-plaid-api/README.md:97-105, 139, 778, 801"
+        }
+      ],
+      "install": [
+        {
+          "method": "Homebrew (README says macOS / Linux; the generated formula has an x86_64 Linux URL only)",
+          "command": "brew install lightonai/tap/colgrep",
+          "citation": "README.md:30; .github/workflows/update-homebrew-tap.yml:81-97"
+        },
+        {
+          "method": "Shell installer (cargo-dist prebuilt binary, macOS/Linux)",
+          "command": "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/lightonai/next-plaid/releases/latest/download/colgrep-installer.sh | sh",
+          "citation": "README.md:33; colgrep/README.md:54"
+        },
+        {
+          "method": "Cargo from crates.io (default features = CPU only; optional --features accelerate,coreml | openblas | cuda | cuda,tensorrt | cuda-13)",
+          "command": "cargo install colgrep",
+          "citation": "colgrep/README.md:680 (feature variants 683-695, 801)"
+        },
+        {
+          "method": "Build from source",
+          "command": "git clone https://github.com/lightonai/next-plaid.git && cd next-plaid && cargo install --path colgrep --features \"accelerate,coreml\"  # or your preferred features",
+          "citation": "colgrep/README.md:701-703"
+        },
+        {
+          "method": "Docker image of the optional NextPlaid API server (CPU; CUDA variant is ghcr.io/lightonai/next-plaid:cuda-1.7.0 with --gpus all)",
+          "command": "docker pull ghcr.io/lightonai/next-plaid:cpu-1.7.0",
+          "citation": "README.md:183-199; next-plaid-api/README.md:574-580"
+        },
+        {
+          "method": "pip, NextPlaid Python client (CLI extra: pip install next-plaid-client[cli])",
+          "command": "pip install next-plaid-client",
+          "citation": "README.md:204, 240"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - prebuilt x86_64-unknown-linux-gnu archive and shell installer (Cargo.toml:79-86; README.md:33), Homebrew formula has an x86_64 Linux URL (.github/workflows/update-homebrew-tap.yml:93-97), CI runs on ubuntu-latest (.github/workflows/ci.yml:44). Docs say Linux binaries are CPU-only (colgrep/README.md:64) but the release job builds them with features mkl+cuda (.github/workflows/release.yml:168-169).",
+        "wsl2": "unknown - no mention of WSL/WSL2 anywhere in the repo (repo-wide grep). The Linux x86_64 binary and Linux code paths would apply, but nothing documents or tests WSL2 (CI runners are ubuntu-latest and ubuntu-24.04-arm only, ci.yml:44).",
+        "macos_arm64": "yes - prebuilt aarch64-apple-darwin (Cargo.toml:82, runner macos-14 at Cargo.toml:91-93) built with coreml+accelerate+metal_gpu (.github/workflows/release.yml:162-164); Homebrew arm formula (update-homebrew-tap.yml:81-85); README: Accelerate + CoreML enabled (colgrep/README.md:62-63); CoreML cache dir configurable (colgrep/README.md:250-254).",
+        "gpu": "yes (optional, falls back to CPU) - cargo features cuda (CUDA 11.8/12.x), cuda-13, tensorrt, coreml, directml, migraphx, metal_gpu (colgrep/Cargo.toml:121-143); --force-cpu/--force-gpu flags (colgrep/src/cli.rs:471-477); Linux release binary is built with cuda (release.yml:168-169) so it downloads the GPU ONNX Runtime archive (colgrep/src/onnx_runtime.rs:651-671); CUDA-13-only hosts silently use CPU unless built from source with cuda-13 (colgrep/README.md:789-817); NextPlaid API has a CUDA Docker image (docker-release.yml:58-61)."
+      },
+      "integrations": {
+        "cli": "ColGREP `colgrep` (clap): default form `colgrep QUERY [PATH...]` plus subcommands search, init, status, clear, set-model, settings, update; flags -k, -e/-E/-F/-w/-s, --include/--exclude/--exclude-dir, --code-only, --semantic-only, --no-update, --model, --pool-factor, --json, -l, -c, --force-cpu/--force-gpu, --stats, --install-*/--uninstall-* (colgrep/src/cli.rs:281-781; colgrep/README.md:139-225). Also the `next-plaid` Python click CLI for the API server (next-plaid-api/python-sdk/pyproject.toml:34-35; next_plaid_client/cli.py:1-6) and `pylate-onnx-export` / `colbert-quantize` (next-plaid-onnx/python/pyproject.toml:47-49).",
+        "mcp": "none found - no 'mcp' / 'Model Context Protocol' string and no MCP-named file anywhere in the repository (repo-wide grep and glob). Agents reach ColGREP by running the `colgrep` CLI through their shell tool.",
+        "sdk_or_api": "Optional NextPlaid REST API (axum; /health, /indices*, /search*, /encode, /rerank*, Swagger UI at /swagger-ui; next-plaid-api/README.md:109-172, next-plaid-api/src/main.rs:322-505) with Python SDK next-plaid-client, sync and async via httpx (next-plaid-api/python-sdk/pyproject.toml:28; next_plaid_client/client.py:24-60; README.md:493-527). Rust crates next-plaid, next-plaid-onnx and colgrep (library API re-exports IndexBuilder, Searcher, extract_units, install_* at colgrep/src/lib.rs:8-48). colgrep-parser PyO3 bindings expose parsing and the embedding-text builder only, no indexing/search (colgrep/python-sdk/src/lib.rs:1-9, 59-60). ColGREP itself has no HTTP/RPC server mode (no listener in colgrep/src).",
+        "claude_code_or_codex": "Claude Code: `colgrep --install-claude-code` (README.md:81) writes a local marketplace under $XDG_DATA_HOME/colgrep/claude-marketplace and runs `claude plugin marketplace add` + `claude plugin install colgrep@lightonai-colgrep`; plugin = SKILL.md + hooks (SessionStart `colgrep --session-hook`, PreToolUse reminder on Grep|Glob, PreToolUse `colgrep --task-hook` on Task); requires claude CLI >= 2.0.36 (colgrep/src/install/claude_code.rs:8-30, 99-195; hook.json:3-38). The repo root is also a Claude marketplace (.claude-plugin/marketplace.json:9-19, hooks/hook.json, skills/colgrep/SKILL.md) but README documents only the install flag. Codex: `colgrep --install-codex` (README.md:83) appends SKILL.md between COLGREP_START/END markers in ~/.codex/AGENTS.md and adds the colgrep indices dir to [sandbox_workspace_write].writable_roots in ~/.codex/config.toml (colgrep/src/install/codex.rs:10-12, 36-97, 149-183, 217-268). OpenCode and Hermes get an AGENTS.md section, Kimi Code a skill file (opencode.rs:12-58; hermes.rs:11-17; kimi.rs:27-37). `--uninstall` removes all integrations, indexes and config (uninstall.rs:43-71)."
+      },
+      "telemetry_and_network": "Telemetry: none found in code (repo-wide grep for telemetry/analytics/sentry/posthog/opentelemetry hits only colgrep/PRIVACY.md:18-20, which states none is collected). ColGREP network use: (1) Hugging Face Hub model download on first use or model switch via hf-hub, using HF_TOKEN/HUGGING_FACE_HUB_TOKEN for private repos, default revision, no hash pinning (colgrep/src/model.rs:25-89); a local model directory path avoids it (model.rs:29-32). (2) ONNX Runtime 1.23.0 downloaded from github.com/microsoft/onnxruntime releases (NuGet for DirectML) on first use unless ORT_DYLIB_PATH or a cached/found copy exists, with no checksum/signature check in code (colgrep/src/onnx_runtime.rs:33, 126-155, 529-587, 603-623). (3) `colgrep update` queries github.com and pipes the installer into sh; user-invoked only, no automatic update check (colgrep/src/commands/update.rs:11-105, grep). (4) Subprocesses: git worktree list (index/worktree.rs:37-73), curl/sh/powershell (update.rs), the claude CLI (install/claude_code.rs:83-195). No account or API key is required (HF token only for private models); no code, queries or embeddings are sent anywhere (the only HTTP client in colgrep is ureq for the ORT download, plus hf-hub). PRIVACY.md:14-16 mentions only the model download and omits the ORT download. Optional NextPlaid API server (separate): no authentication, binds 0.0.0.0:8080 by default, CORS Any (next-plaid-api/src/main.rs:345-348, 521); its Docker entrypoint downloads models from huggingface.co with curl (next-plaid-api/docker-entrypoint.sh:50-67)."
+    },
+    "code": {
+      "languages": [
+        "Rust",
+        "Python",
+        "Shell",
+        "Nix"
+      ],
+      "entry_points": [
+        {
+          "path": "colgrep/src/main.rs",
+          "what": "`colgrep` binary (clap, cli.rs). Default `colgrep QUERY [PATH...]` plus subcommands search/init/status/clear/set-model/settings/update; global --install-*/--uninstall-*, --stats, --force-cpu/--force-gpu; hidden --session-hook/--task-hook used by the Claude Code plugin."
+        },
+        {
+          "path": "colgrep/src/lib.rs",
+          "what": "`colgrep` library crate re-exporting IndexBuilder, Searcher, IndexState, extract_units, ensure_model, ensure_onnx_runtime and the install_* functions (lines 8-48)."
+        },
+        {
+          "path": "next-plaid-api/src/main.rs",
+          "what": "`next-plaid-api` axum REST server (hand-parsed args --host/--port/--index-dir/--model/--cuda/--int8/--parallel...; routers at lines 322-505; Swagger UI); Docker entry via next-plaid-api/docker-entrypoint.sh."
+        },
+        {
+          "path": "next-plaid-api/python-sdk/next_plaid_client/",
+          "what": "Python SDK (client.py sync, async_client.py, models.py, exceptions.py) and the `next-plaid` click CLI (cli.py; pyproject.toml:34-35)."
+        },
+        {
+          "path": "next-plaid-onnx/src/lib.rs",
+          "what": "`next_plaid_onnx::Colbert` ONNX Runtime ColBERT encoder (lib + cdylib; CPU/CUDA/TensorRT/CoreML/DirectML providers) with hierarchy.rs token pooling; Python export CLIs `pylate-onnx-export` / `colbert-quantize` in next-plaid-onnx/python/src/colbert_export/cli.py."
+        },
+        {
+          "path": "next-plaid/src/lib.rs",
+          "what": "`next-plaid` core library: MmapIndex create/update/search/delete, ResidualCodec, SQLite `filtering`, FTS5 `text_search`, optional CUDA."
+        },
+        {
+          "path": "colgrep/src/install/",
+          "what": "Agent installers called from main.rs: claude_code.rs, codex.rs, opencode.rs, hermes.rs, kimi.rs, uninstall.rs with embedded SKILL.md, hook.json, plugin.json, marketplace.json; repo root also carries a Claude plugin (.claude-plugin/, hooks/hook.json, skills/colgrep/SKILL.md)."
+        },
+        {
+          "path": "colgrep/python-sdk/src/lib.rs",
+          "what": "`colgrep_parser` PyO3 extension (maturin; out-of-workspace crate): parse_code/detect_language/embedding-text only, no indexing or search."
+        }
+      ],
+      "architecture": "Cargo workspace (Cargo.toml:1-3) of four crates. next-plaid = core multi-vector PLAID index (index.rs, search.rs, update.rs, delete.rs, codec.rs, kmeans.rs, maxsim.rs, mmap.rs; filtering.rs = SQLite metadata with whitelist-validated SQL conditions; text_search.rs = FTS5 + score fusion; binary.rs = 1-bit storage; cuda.rs). next-plaid-onnx = ONNX Runtime ColBERT encoder (src/lib.rs, hierarchy.rs pooling) + python/ export tooling. next-plaid-api = axum server (main.rs, handlers/{documents,search,encode,rerank,metadata}.rs, state.rs with ArcSwap index slots and batch queues). colgrep = CLI: main.rs/cli.rs -> commands/{search,init,status,clear,config,hooks,update,stats}.rs -> index/mod.rs (6.4k-line IndexBuilder/Searcher: scan_files honoring .gitignore + IGNORED_DIRS, tree-sitter parsers in parser/{extract,analysis,ast,call_graph,language}.rs + per-language files, embed.rs structured text, pooled ONNX encoding pipeline, PLAID write + SQLite/FTS5 metadata, content-hash/mtime/size update plan, resumable build with .building marker, dirty-flag repair, atomic full_rebuild via index.tmp/index.old) -> ranking.rs path penalties/boosts -> display.rs. State: index/paths.rs (data dir, {project}-{xxh3(path|model)[:8]} dir name, .lock file lock), index/state.rs (state.json: per-file hash/mtime/size, ignored_files, search_count, dirty, INDEX_FORMAT_VERSION=2), project.json (canonical path + model), index/worktree.rs (seed a new git worktree's index from a sibling), config.rs (config.json in the data dir's parent), model.rs (HF download), onnx_runtime.rs (locate/download libonnxruntime), acceleration.rs. Hybrid results are collapsed to one entry per file (index/mod.rs:4571-4580). No daemon or server: every query is a fresh process that loads the ONNX model.",
+      "packaging_and_release": "cargo-dist 0.30.3 (Cargo.toml:37-39) autogenerated release.yml, triggered by version tags (release.yml:41-46), builds colgrep archives plus shell/powershell installers for aarch64-apple-darwin, x86_64-apple-darwin, x86_64-unknown-linux-gnu, x86_64-pc-windows-msvc (Cargo.toml:79-86); no Linux aarch64 binary. Per-target features are injected at build time (release.yml:157-183): macOS arm64 coreml+accelerate+metal_gpu, macOS x86_64 accelerate, Linux x86_64 mkl+cuda (CUDA toolkit 12.4 installed, release.yml:143-153), Windows directml. GitHub Release created with gh release create (release.yml:311-321). crates.io: next-plaid, next-plaid-onnx, colgrep published with `cargo publish --no-verify`, continue-on-error (release.yml:323-350). next-plaid-api is dist=false (next-plaid-api/Cargo.toml:9-10) and shipped as Docker images by a manual workflow_dispatch job (docker-release.yml:27-28, 93-104): ghcr.io/lightonai/next-plaid:{cpu,cuda}-<version> and -latest, cpu amd64+arm64, cuda amd64. Homebrew formula is regenerated into lightonai/homebrew-tap from per-archive .sha256 release assets (update-homebrew-tap.yml:45-111). PyPI: only next-plaid-client is published (python-sdk-release.yml:3-33, tag v*, trusted publishing); no workflow publishes pylate-onnx-export or colgrep-parser. Checksums: per-archive .sha256 files (update-homebrew-tap.yml:52-54); no signatures, attestations, SBOM or provenance steps in any workflow (grep). Actions are pinned to mutable tags (ci.yml:18-19); cargo-dist installed via curl|sh of a version-pinned URL (release.yml:68). Also present: flake.nix (x86_64-linux only, not documented in README, flake.nix:12) and prebuilt 0.1.0 wheels under next-plaid-api/python-sdk/dist/ and next-plaid-onnx/python/dist/ in the checkout.",
+      "tests_and_ci": "Frameworks: Rust #[test]/#[tokio::test], pytest, criterion dev-dep in next-plaid. About 1,066 Rust test attributes (colgrep 762 in 56 files, next-plaid 216 in 23, next-plaid-api 48 in 7, next-plaid-onnx 40 in 2) and about 178 Python test functions (4 files). About 51 dedicated test files: colgrep/src/parser/tests/ (36 per-language test_*.rs + common.rs/mod.rs) and colgrep/src/parser/test_core.rs; next-plaid/tests/ (8); next-plaid-api/tests/ (integration_tests.rs, start_from_scratch_env_test.rs, test_api.py); next-plaid-api/python-sdk/tests/ (test_cli.py, test_integration.py); next-plaid-onnx/python/tests/test_cli.py. There is no colgrep/tests/ directory; index, state, lock, repair and config tests are inline #[cfg(test)] (colgrep/src/index/mod.rs alone has 75). CI (.github/workflows): ci.yml (push/PR to main: rustfmt, clippy -D warnings with openblas, cargo test --features openblas on ubuntu-latest and ubuntu-24.04-arm, cargo doc -D warnings, cargo bench --no-run, onnx crate test + clippy, colgrep fmt/test/clippy, Python SDK `pytest tests/test_cli.py` only); cli-e2e.yml (builds colgrep with mkl,cuda / accelerate,coreml,metal_gpu / directml on ubuntu/macos/windows and runs the real CLI on a sample project: index+search, --include, -l, -e, --json, status, clear, re-index, relative-path assertion; downloads the model from Hugging Face at test time); release.yml (cargo-dist plan on PRs, publish on tags); docker-release.yml (manual); update-homebrew-tap.yml; python-sdk-release.yml; docs.yml (docs/build_docs.py -> GitHub Pages). Live-server tests (test_api.py, SDK test_integration.py) run via scripts/run-api-tests.sh (Makefile:104-106), which no workflow invokes. No cargo-audit, cargo-deny, dependabot or CodeQL configuration found; no rust-version/rust-toolchain pin (CI uses stable).",
+      "dependencies": "Rust manifests: Cargo.toml (workspace root; 5 [workspace.dependencies]: ndarray, serde, serde_json, thiserror, anyhow; no direct deps of its own). colgrep/Cargo.toml: 64 direct deps (36 tree-sitter crates = core + 35 grammars; next-plaid, next-plaid-onnx; hf-hub, ureq, flate2, tar, dirs, libloading; clap, colored, indicatif, syntect; serde, serde_json, toml_edit; anyhow, thiserror; regex, fancy-regex; rayon; walkdir, ignore, globset, fs2; xxhash-rust, ctrlc, atty, ndarray) + 1 dev (tempfile) + 3 target-specific (zip on Windows; exec, libc on unix); default features empty. next-plaid/Cargo.toml: 23 direct (5 optional: blas-src, openblas-src, accelerate-src, intel-mkl-src, cudarc) + 3 dev (criterion, approx, tempfile); rusqlite with bundled SQLite. next-plaid-onnx/Cargo.toml: 10 direct (2 optional: pyo3, numpy), ort pinned =2.0.0-rc.11 with load-dynamic. next-plaid-api/Cargo.toml: 21 direct (1 optional: next-plaid-onnx) + 4 dev (reqwest, ndarray-rand, tempfile, rand). colgrep/python-sdk/Cargo.toml: 4 (pyo3, colgrep path, serde, serde_json). Python manifests: next-plaid-api/python-sdk/pyproject.toml 1 runtime (httpx) + click extra + 4 dev; next-plaid-onnx/python/pyproject.toml 10 runtime (pylate, torch, transformers, safetensors, onnx, onnxscript, onnxruntime, numpy, huggingface-hub, einops) + 2 dev; colgrep/python-sdk/pyproject.toml 0 runtime (maturin build) + 1 dev; docs/benchmarks/pyproject.toml 3 runtime + extras; next-plaid-api/tests/pyproject.toml 3. Lockfiles committed: Cargo.lock, colgrep/python-sdk/Cargo.lock, and uv.lock in colgrep/python-sdk, next-plaid-api/python-sdk, next-plaid-api/tests, next-plaid-onnx/python, docs/benchmarks. Runtime non-crate dependency: libonnxruntime (downloaded or supplied) and the model files.",
+      "security_policy": "none - no SECURITY.md or vulnerability-reporting policy at the repo root, in .github/, or anywhere else (glob for SECURITY*). Only colgrep/PRIVACY.md exists (privacy statement, contact contact@lighton.ai at colgrep/PRIVACY.md:28)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Index location: colgrep/README.md:592-602 says indexes live outside the project (~/.local/share/colgrep/indices on Linux, ~/Library/Application Support/colgrep/indices on macOS, XDG_DATA_HOME honored), while colgrep/PRIVACY.md:10 says they are stored in `.colgrep/` within the project directory.",
+        "verified": "partial",
+        "evidence": "Code agrees with the README and contradicts PRIVACY.md. get_colgrep_data_dir() = $COLGREP_DATA_DIR, else $XDG_DATA_HOME or the platform data dir, + colgrep/indices (colgrep/src/index/paths.rs:69-90); per-index dir = {sanitized project name}-{first 8 hex of xxh3_64(path|model)} (paths.rs:96-123); cli.rs:66 help says the same. The string '.colgrep' appears in no Rust source (grep). The index root is the canonical directory colgrep is run in, or an existing parent index (colgrep/src/commands/search.rs:1058-1078; paths.rs:182-226); there is no git-root detection (grep)."
+      },
+      {
+        "claim": "README.md:63,75: each (project, model) pair has its own index; `colgrep set-model` keeps existing indexes for other models; `colgrep clear` is scoped to the active model and `clear --all` wipes everything. (colgrep/README.md:414 and cli.rs:53,147 instead say set-model 'clears existing indexes'.)",
+        "verified": "yes",
+        "evidence": "paths.rs:92-123 hashes path|model into the directory name; colgrep/src/commands/config.rs:78-89 (cmd_set_model) validates the model, keeps other models' indexes and only saves the preference; colgrep/src/commands/clear.rs:17-86 clears only the active model's dir unless --all. The 'clears existing indexes' wording in colgrep/README.md:414 and colgrep/src/cli.rs:53,147 is stale."
+      },
+      {
+        "claim": "README.md:49: after `colgrep init`, every search detects file changes and updates the index automatically before returning results.",
+        "verified": "yes",
+        "evidence": "search_single_path runs IndexBuilder::try_index before every search unless --no-update (colgrep/src/commands/search.rs:1103-1189; flag at cli.rs:457-459). try_index takes a non-blocking file lock; if another process holds it the search proceeds on the existing index (colgrep/src/index/mod.rs:1813-1823; search.rs:1142-1149) and a failed load is retried 3 times (search.rs:1232-1264). Change detection uses stored content hash + mtime(ns) + size (index/state.rs:75-99; mod.rs:4778-4799). 'Corrupted' load errors delete that index dir and rebuild it (search.rs:1157-1170, 1266-1309). A first build above 30,000 code units prompts only on a TTY (index/mod.rs:458, 4745-4747)."
+      },
+      {
+        "claim": "colgrep/README.md:608: 'ColGREP automatically detects and repairs index/metadata desync from interrupted operations.'",
+        "verified": "yes",
+        "evidence": "state.json is written atomically via temp file + rename (colgrep/src/index/state.rs:122-149); a `dirty` flag is set before writes (index/mod.rs:2635-2638) and repair_index_db_sync trims orphan index docs / DB rows (mod.rs:1607-1662, 2579-2585); first builds are resumable with a `.building` marker and checkpoints every ~4,096 units (mod.rs:52-57, 2141-2208); full rebuilds go to index.tmp and are swapped in atomically with index.old rollback (mod.rs:2429-2540); a missing state.json is reconstructed from the SQLite DB and count mismatches are reconciled (mod.rs:1760-1805); an INDEX_FORMAT_VERSION mismatch (currently 2) forces one rebuild (state.rs:47-51; mod.rs:1706-1723); a .lock file serializes writers with a 5 s wait (paths.rs:243-288). `colgrep status` only prints project/model/index path (commands/status.rs:36-44), no health report."
+      },
+      {
+        "claim": "README.md:49 'No server, no API, no dependencies... single Rust binary with everything baked in' and colgrep/PRIVACY.md:14-16 'single network request on first use' (model download), no other requests.",
+        "verified": "partial",
+        "evidence": "No server/API/daemon: colgrep links next-plaid and next-plaid-onnx in-process (colgrep/Cargo.toml:17-20) and has no listener (grep). But it is not self-contained: ONNX Runtime is a dynamically loaded shared library (next-plaid-onnx/Cargo.toml:35 load-dynamic) downloaded from github.com/microsoft/onnxruntime v1.23.0 on first use unless ORT_DYLIB_PATH, a cache or a local copy exists (colgrep/src/onnx_runtime.rs:33, 126-155, 529-587, 620-623), and the model comes from Hugging Face via hf-hub (colgrep/src/model.rs:38-65) unless a local directory is given (model.rs:29-32). PRIVACY.md omits the ORT download; `colgrep update` also contacts github.com (commands/update.rs:11-105, user-invoked). No telemetry/analytics code found (grep)."
+      },
+      {
+        "claim": "colgrep/README.md:90-98, 345, 551-553: default search fuses ColBERT with FTS5 trigram keyword search via Reciprocal Rank Fusion (alpha=0.75); test functions are demoted unless the query mentions 'test'.",
+        "verified": "no",
+        "evidence": "Code differs from the README: the FTS index is built with FtsTokenizer::IdentifierAware, not trigram (colgrep/src/index/mod.rs:889-894, 4297-4306); fusion is fuse_relative_score, a min-max score fusion whose comment says it beats rank-RRF (mod.rs:4458-4485); default alpha is 0.60 (colgrep/src/config.rs:463-480, COLGREP_ALPHA env override; cli.rs:735 and config.rs:173 still say 0.75, cli.rs:389 says 0.60). Afterwards it applies path-noise penalties to test/compat/example paths unless the query contains 'test', 'spec' or 'benchmark' (colgrep/src/ranking.rs:122-140, 161-164) plus path-stem, definition and file-coherence boosts and one-result-per-file collapsing (index/mod.rs:4491-4580). --semantic-only (search_with_embedding, mod.rs:4336-4364) applies none of these."
+      },
+      {
+        "claim": "colgrep/README.md:438-444: the Claude Code integration installs session and task hooks that inject usage instructions, 'check index health before activating (skips if >3000 chunks need indexing or index is desynced)' and propagate instructions to sub-agents.",
+        "verified": "partial",
+        "evidence": "Hooks exist as described: SessionStart `colgrep --session-hook`, PreToolUse reminder on Grep|Glob, PreToolUse `colgrep --task-hook` on Task (colgrep/src/install/hook.json:3-38), installed through `claude plugin marketplace add` + `claude plugin install` (install/claude_code.rs:99-195). The health check is not implemented: should_inject_colgrep_context only checks that an index for the current model exists for the project or a parent, or that the project has <=50 files (colgrep/src/commands/hooks.rs:8-25); '3000'/'desynced' occur only in the README (grep). Hooks only inject context text; they do not block Grep/Glob."
+      },
+      {
+        "claim": "README.md:83,86: Codex is supported via `colgrep --install-codex`; Codex/OpenCode/Hermes integrations are 'basic for now'.",
+        "verified": "yes",
+        "evidence": "install_codex appends the SKILL.md text between <!-- COLGREP_START/END --> markers in ~/.codex/AGENTS.md (colgrep/src/install/codex.rs:10-12, 149-183, 217-268) and adds the colgrep indices dir to [sandbox_workspace_write].writable_roots in ~/.codex/config.toml so the default workspace-write sandbox can write indexes outside the workspace (codex.rs:36-97, 229-245; issue #95). No hooks and no MCP. The AGENTS.md text is static and global, not gated on an index existing (contrast commands/hooks.rs:17-25). Paths are hard-coded to ~/.codex (codex.rs:19-22; no CODEX_HOME support, grep). Uninstall reverses both edits (codex.rs:99-147, 186-214, 271-293)."
+      },
+      {
+        "claim": "colgrep/README.md:62-64: macOS binaries ship with Accelerate + CoreML; 'Linux & Windows binaries work immediately but run on CPU only'.",
+        "verified": "no",
+        "evidence": "The release workflow builds the Linux x86_64 binary with features mkl+cuda (CUDA toolkit 12.4 installed) and Windows with directml (.github/workflows/release.yml:143-153, 168-172); the same README says the prebuilt Linux binary targets CUDA 11.8/12.x and falls back to CPU on CUDA-13-only hosts (colgrep/README.md:791-795). In code, CUDA builds skip local ONNX Runtime discovery and download the GPU ORT archive (colgrep/src/onnx_runtime.rs:144-155, 651-671) and default to FP32 instead of INT8 (colgrep/src/config.rs:279-288; cli.rs:270). CPU fallback and --force-cpu/--force-gpu exist (cli.rs:471-477; acceleration.rs:3-47). macOS arm64 additionally enables metal_gpu (release.yml:163). No Linux aarch64 binary is built (Cargo.toml:81-86)."
+      },
+      {
+        "claim": "README.md:150-154 / colgrep/README.md:26: NDCG@10 on Semble's public benchmark (1,251 queries x 63 repos x 19 languages, FP32, single H100): LateOn-Code 0.859, semble potion-code-16M 0.853, LateOn-Code-edge 0.846.",
+        "verified": "not_checkable",
+        "evidence": "Reproduction needs the Hugging Face model weights, a GPU and the external MinishLab/semble harness (colgrep/README.md:28-34); no result files are committed (docs/colgrep-bench-light.svg:22-32 is only a chart). In-repo hints: alpha was chosen as the 'empirical peak' on this same bench, with a 0.829-0.831 NDCG@10 plateau for alpha 0.55-0.70 (colgrep/src/config.rs:463-470), and path penalties mirror semble's penalties.py (colgrep/src/ranking.rs:19-20), so the headline numbers use parameters tuned on the benchmark. The headline is FP32 while the default non-CUDA configuration is INT8 (config.rs:279-288)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "ColGREP + LateOn-Code (137M) on the Semble code-search benchmark (1,251 NL queries x 63 repos x 19 languages), FP32, single H100; run and reported by the project",
+        "metric": "NDCG@10 (file-level)",
+        "value": "0.859",
+        "source": "README.md:150-154; colgrep/README.md:26; docs/colgrep-bench-light.svg:22-24",
+        "independent": false
+      },
+      {
+        "what": "ColGREP + LateOn-Code-edge (17M, the default model), same benchmark and setup",
+        "metric": "NDCG@10 (file-level)",
+        "value": "0.846",
+        "source": "README.md:150; docs/colgrep-bench-light.svg:30-32",
+        "independent": false
+      },
+      {
+        "what": "semble potion-code-16M (third-party tool, measured and reported by the ColGREP project) on the same benchmark",
+        "metric": "NDCG@10 (file-level)",
+        "value": "0.853",
+        "source": "README.md:150; docs/colgrep-bench-light.svg:26-28",
+        "independent": false
+      },
+      {
+        "what": "Hybrid alpha sweep on the Semble bench as described in a code comment (model and precision not stated)",
+        "metric": "NDCG@10 plateau for alpha 0.55-0.70",
+        "value": "0.829-0.831; 0.60 chosen as the empirical peak",
+        "source": "colgrep/src/config.rs:463-470",
+        "independent": false
+      },
+      {
+        "what": "NextPlaid API with GTE-ModernColBERT-v1 (text retrieval, not code) on BEIR arguana/fiqa/nfcorpus/quora/scidocs/scifact, H100 80GB, top_k=100",
+        "metric": "NDCG@10 range across datasets",
+        "value": "0.1914 (scidocs) to 0.8519 (quora); scifact 0.7593",
+        "source": "README.md:256-267",
+        "independent": false
+      },
+      {
+        "what": "Same NextPlaid API runs: end-to-end search and indexing including on-the-fly encoding, 16 concurrent query workers, docs uploaded in batches of 64; CPU rows use INT8 ONNX encoding on the same machine",
+        "metric": "QPS / P95 latency / indexing docs per second",
+        "value": "CPU 16.5-17.7 QPS, P95 219-455 ms; GPU 6.6-20.9 QPS, P95 126-262 ms; indexing 41.3-105.5 docs/s",
+        "source": "README.md:256-267",
+        "independent": false
+      },
+      {
+        "what": "NextPlaid API via Docker, SciFact, model lightonai/answerai-colbert-small-v1-onnx, nbits=4, batch size 30, 5,183 docs / 300 queries (checked-in result file)",
+        "metric": "NDCG@10; indexing time and throughput; search QPS",
+        "value": "NDCG@10 0.7343; index 262.07 s (19.8 docs/s); 55.3 QPS",
+        "source": "docs/benchmarks/scifact_docker_benchmark.json:6-31",
+        "independent": false
+      },
+      {
+        "what": "ColGREP agent-facing latency statement embedded in the Claude Code hook text (a claim, not a measurement artifact)",
+        "metric": "first query / later queries",
+        "value": "first query '30-90 seconds' (model load + index build); later '<5 seconds'",
+        "source": "colgrep/src/commands/hooks.rs:93-94",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Integration is shell-out only and has start-up cost: no MCP server, daemon or HTTP mode in ColGREP (no 'mcp' anywhere in the repo; no listener in colgrep/src), so Claude Code and Codex are only told via hook/AGENTS.md text to run `colgrep` (colgrep/src/commands/hooks.rs:54-104; colgrep/src/install/codex.rs:149-183). Every query is a fresh process that loads the ONNX model; the hook text itself warns the first query 'may take 30-90 seconds' (hooks.rs:93-94). A first index above 30,000 code units prompts on a TTY but auto-confirms when stdin is not a TTY (colgrep/src/index/mod.rs:458, 4745-4747).",
+      "No remote or pluggable embedding service: embeddings are computed in-process by a local ONNX ColBERT export with tokenizer.json/onnx_config.json etc. (colgrep/src/model.rs:7-19, 25-89; next-plaid-onnx/Cargo.toml:35). The only HTTP embedding endpoint in the repo is NextPlaid API's ColBERT-specific /encode (next-plaid-api/src/main.rs:376-398), which colgrep never calls (colgrep/Cargo.toml:17-20; its only network code is ureq for ORT at onnx_runtime.rs:576 and hf-hub at model.rs:38-65); no OpenAI-compatible route exists (repo-wide grep).",
+      "First-use supply chain: ONNX Runtime 1.23.0 is downloaded from github.com/microsoft/onnxruntime (NuGet for DirectML) with no checksum or signature check (colgrep/src/onnx_runtime.rs:529-587, 603-623) and model weights come from the Hugging Face default revision with no pinned revision or hash (colgrep/src/model.rs:38-65, 47). The documented installer and `colgrep update` pipe a remote script to sh (README.md:33; colgrep/src/commands/update.rs:82-91). Offline use needs a pre-seeded ORT_DYLIB_PATH and a local model directory (onnx_runtime.rs:126-142; model.rs:29-32); CUDA-feature builds, which include the Linux prebuilt, skip local ORT discovery entirely (onnx_runtime.rs:144-155).",
+      "Documentation drift: code differs from README/CLI help/PRIVACY on index location (PRIVACY.md:10 says .colgrep/ in the project; code uses the user data dir, colgrep/src/index/paths.rs:83-90), config path (docs say ~/.config/colgrep/config.json and XDG_CONFIG_HOME; code writes <data dir parent>/config.json and never reads XDG_CONFIG_HOME, colgrep/src/config.rs:588-595), keyword tokenizer/fusion/alpha (docs: trigram + RRF + 0.75; code: IdentifierAware + relative-score + 0.60, index/mod.rs:889-894, 4458-4485, config.rs:463-480), set-model (docs: clears indexes; code keeps them, colgrep/src/commands/config.rs:78-89), default path style (docs: absolute; code: relative, config.rs:414-418 and cli-e2e.yml:380-398), large-index prompt (docs: >10K units; code: 30,000, index/mod.rs:458), hook health check (README only, hooks.rs:8-25), Linux 'CPU only' (release builds with cuda, release.yml:168-169), ONNX Runtime cache dir and lookup (code: ~/.cache/colgrep/onnxruntime/<ver>/<cpu|gpu>, no system-path probing on Linux, onnx_runtime.rs:517-537), language count (README 35 code languages; Language enum has 46 variants, parser/types.rs:7-58; cli.rs:292 says 18+). Behavior must be confirmed against the binary rather than the docs.",
+      "Agent-environment coupling: indexes live outside the workspace, so Codex's default workspace-write sandbox blocks index writes unless `--install-codex` adds ~/.local/share/colgrep/indices to [sandbox_workspace_write].writable_roots in ~/.codex/config.toml (colgrep/src/install/codex.rs:36-47, 229-245) - a widening of sandbox write access whose path is fixed at install time from XDG_DATA_HOME/COLGREP_DATA_DIR (paths.rs:69-90). Installers hard-code ~/.codex and ~/.claude/settings.json (codex.rs:19-22; claude_code.rs:197-201; no CODEX_HOME/CLAUDE_CONFIG_DIR support, grep), need claude CLI >= 2.0.36 (claude_code.rs:16), and the hooks/AGENTS.md text instruct the model to use colgrep instead of Grep/Glob and never fall back to grep (hooks.rs:70, 96; skills/colgrep/SKILL.md:5).",
+      "Index lifecycle and scoping limits: the index root is the canonical directory where colgrep is first run (no git-root detection) and the directory name hashes path|model (colgrep/src/index/paths.rs:92-123), so moving/renaming a repo or switching model builds a new full index; nothing garbage-collects old ones except `colgrep clear --all` (commands/clear.rs:17-55). The default ignore list skips directories named bin, out, external, logs, tmp, temp, vendor, build, dist and others (index/mod.rs:3066-3128), files over 512 KB are skipped (mod.rs:42) and embedded text is truncated at 8 KB (embed.rs:9). A load error that looks like corruption deletes and rebuilds the whole index dir (commands/search.rs:1163-1170, 1282-1308). --binary storage disables incremental updates (colgrep/README.md:331-335; index/mod.rs:2565-2577).",
+      "Security posture: no SECURITY.md or vulnerability-reporting policy; release assets carry .sha256 files but no signatures, attestations or SBOM, and no dependency scanning (cargo-audit/deny, dependabot, CodeQL) is configured (workflow grep); GitHub Actions are pinned to mutable tags (ci.yml:18-19; python-sdk-release.yml:31). The optional NextPlaid API server has no authentication, binds 0.0.0.0:8080 by default, uses CORS Any and accepts client-supplied SQL WHERE conditions (whitelist-validated) (next-plaid-api/src/main.rs:345-348, 521; next-plaid/README.md:367); the README compose files publish port 8080 on all interfaces (next-plaid-api/README.md:590-591); the Docker image runs as non-root uid 1000 (next-plaid-api/Dockerfile:198, 218).",
+      "Maintenance, licensing and evidence quality: ort is pinned to the pre-release =2.0.0-rc.11 (next-plaid-onnx/Cargo.toml:35); no MSRV or toolchain pin (CI uses stable); stale metadata such as .claude-plugin/plugin.json version 1.1.1 vs 1.7.0 (Makefile:236-241 bump-version omits it); the Linux release binary statically links Intel MKL through the mkl feature (release.yml:169; next-plaid/Cargo.toml:23) while the repo ships only the Apache-2.0 LICENSE with no NOTICE/third-party license file, and model licenses live on Hugging Face, not in the repo. All published quality numbers are author-reported (FP32 on H100) while the default CPU configuration is INT8 (colgrep/src/config.rs:279-288), and ranking constants were tuned on the same Semble benchmark (config.rs:463-470; ranking.rs:19-20)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "lightonai/next-plaid",
+      "checks": [
+        {
+          "field": "readme.install[0] (Homebrew)",
+          "statement": "Homebrew (README says macOS / Linux; the generated formula has an x86_64 Linux URL only): `brew install lightonai/tap/colgrep`",
+          "citation": "README.md:30; .github/workflows/update-homebrew-tap.yml:81-97",
+          "holds": true,
+          "note": "README.md:29-30 reads '# Homebrew (macOS / Linux)' then 'brew install lightonai/tap/colgrep'. update-homebrew-tap.yml:81-97 generates Formula/colgrep.rb with on_macos/on_arm (aarch64-apple-darwin tarball), on_macos/on_intel (x86_64-apple-darwin) and on_linux/on_intel only (x86_64-unknown-linux-gnu). It is pushed to lightonai/homebrew-tap (lines 60-64, 113-123), which is the repo `lightonai/tap` resolves to. Linux arm64 has no URL, as stated. The checkout is HEAD 00e26aae… = refs/tags/v1.7.0, matching the dossier revision."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX Apache-2.0, file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-2 'Apache License / Version 2.0, January 2004', full terms through line 176, appendix 'Copyright 2026, Raphael Sourty, LightOn' (178-190). Consistent everywhere: root Cargo.toml:8 [workspace.package] license = \"Apache-2.0\"; colgrep/Cargo.toml:6 and colgrep/python-sdk/Cargo.toml:6 Apache-2.0; next-plaid, next-plaid-api, next-plaid-onnx use license.workspace = true; all three pyproject.toml declare Apache-2.0; the generated Homebrew formula also says Apache-2.0 (update-homebrew-tap.yml:79). No conflicting license found."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - prebuilt x86_64-unknown-linux-gnu archive and shell installer, Homebrew x86_64 Linux URL, CI on ubuntu-latest; docs say Linux binaries are CPU-only but the release job builds them with features mkl+cuda",
+          "citation": "Cargo.toml:79-86; README.md:33; .github/workflows/update-homebrew-tap.yml:93-97; .github/workflows/ci.yml:44; colgrep/README.md:64; .github/workflows/release.yml:168-169",
+          "holds": true,
+          "note": "Cargo.toml:79 installers = [\"shell\", \"powershell\"]; 81-86 targets include x86_64-unknown-linux-gnu. README.md:33 is the curl|sh colgrep-installer.sh command. update-homebrew-tap.yml:93-97 on_linux/on_intel URL for colgrep-x86_64-unknown-linux-gnu.tar.xz. ci.yml:44 'os: [ubuntu-latest, ubuntu-24.04-arm]'. colgrep/README.md:64 'Linux & Windows binaries work immediately but run on CPU only'. release.yml:168-169 '*x86_64-unknown-linux*) FEATURES='features = [\"mkl\", \"cuda\"]''; the awk injection (release.yml:179) anchors on 'dist = true', present at colgrep/Cargo.toml:11, and mkl/cuda are real features (colgrep/Cargo.toml:130, 141). CUDA toolkit 12.4 is installed for this target (release.yml:143-154). Every part holds, including the docs-vs-build contradiction."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Claude Code: --install-claude-code writes a local marketplace under $XDG_DATA_HOME/colgrep/claude-marketplace, runs `claude plugin marketplace add` + `claude plugin install colgrep@lightonai-colgrep`; plugin = SKILL.md + hooks (SessionStart --session-hook, PreToolUse reminder on Grep|Glob, PreToolUse --task-hook on Task); claude CLI >= 2.0.36; repo root is also a marketplace, README documents only the flag. Codex: --install-codex appends SKILL.md between COLGREP markers in ~/.codex/AGENTS.md and adds the indices dir to [sandbox_workspace_write].writable_roots in ~/.codex/config.toml. OpenCode/Hermes AGENTS.md, Kimi skill file; --uninstall removes all.",
+          "citation": "README.md:81, 83; colgrep/src/install/claude_code.rs:8-30, 99-195; hook.json:3-38; .claude-plugin/marketplace.json:9-19; colgrep/src/install/codex.rs:10-12, 36-97, 149-183, 217-268; opencode.rs:12-58; hermes.rs:11-17; kimi.rs:27-37; uninstall.rs:43-71",
+          "holds": true,
+          "note": "Flags: README.md:81/83 and cli.rs:393-435. claude_code.rs:10/13/16 = 'lightonai-colgrep', 'colgrep', '2.0.36'; 26-30 marketplace dir = xdg_data_home_or_default()/colgrep/claude-marketplace; 129-168 run 'claude plugin marketplace add \"<dir>\"' and 'claude plugin install colgrep@lightonai-colgrep'. hook.json:4-36 has exactly the three hooks described. Root .claude-plugin/marketplace.json:9-19 (source \".\"), hooks/hook.json and skills/colgrep/SKILL.md exist, and no *.md mentions 'marketplace'. codex.rs:11-12 markers; 150-183 appends SKILL_MD to ~/.codex/AGENTS.md; 36-97 plus 233-235 add get_colgrep_data_dir() (…/colgrep/indices, paths.rs:83-90) to writable_roots in ~/.codex/config.toml. opencode.rs → ~/.config/opencode/AGENTS.md; hermes.rs → ~/.hermes/AGENTS.md; kimi.rs → $KIMI_CODE_HOME or ~/.kimi-code/skills/colgrep/SKILL.md. uninstall.rs:43-71 uninstalls all integrations, then removes <data>/colgrep, which holds indices/ and config.json (config.rs:588-594). Nits that don't change the meaning: the marketplace path falls back to the platform data dir when XDG_DATA_HOME is unset (paths.rs:69-76); 2.0.36 only appears in error hints and is never compared."
+        },
+        {
+          "field": "claim_checks[4]",
+          "statement": "README.md:49 'No server, no API, no dependencies... single Rust binary with everything baked in' and PRIVACY.md:14-16 'single network request on first use' — verified: partial (no server/daemon, but ONNX Runtime is a dynamically loaded library downloaded from GitHub on first use, model from HF unless local; PRIVACY.md omits the ORT download; `colgrep update` contacts github.com; no telemetry)",
+          "citation": "colgrep/Cargo.toml:17-20; next-plaid-onnx/Cargo.toml:35; colgrep/src/onnx_runtime.rs:33, 126-155, 529-587, 620-623; colgrep/src/model.rs:29-32, 38-65; colgrep/PRIVACY.md:14-16; colgrep/src/commands/update.rs:11-105",
+          "holds": true,
+          "note": "README.md:49 wording confirmed. colgrep/Cargo.toml:19-20 path deps on next-plaid and next-plaid-onnx (in-process). A grep of colgrep/ for TcpListener/bind/axum/hyper finds no listener (only a parser comment and the python-sdk Cargo.lock). next-plaid-onnx/Cargo.toml:35: ort '=2.0.0-rc.11' with 'load-dynamic'. onnx_runtime.rs:33 ORT_VERSION '1.23.0'; 126-155 checks ORT_DYLIB_PATH, then find_onnx_runtime (skipped under _cuda), then downloads; 529-587 cache check plus ureq download into ~/.cache/colgrep/onnxruntime/<ver>/<cpu|gpu>; 620-623 'https://github.com/microsoft/onnxruntime/releases/download/v1.23.0'. model.rs:29-32 local dir short-circuit; 38-65 hf-hub ApiBuilder with HF_TOKEN/HUGGING_FACE_HUB_TOKEN. PRIVACY.md:14-16 claims a single model-download request and 'No other network requests', with no ORT mention. update.rs:11-105 runs curl against github.com/.../releases/latest and pipes colgrep-installer.sh to sh, only when the user runs it. Telemetry grep hits only PRIVACY.md:18-20. The 'partial' rating and its evidence are accurate."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

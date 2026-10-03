@@ -1,0 +1,292 @@
+{
+  "contender": "gitleaks/gitleaks",
+  "revision": {
+    "contender": "gitleaks/gitleaks",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "gitleaks/gitleaks",
+        "tag": "v8.30.1",
+        "commit": "83d9cd684c87d95d656c1458ef04895a7f1cbd8e",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v8.30.1",
+    "commit": "83d9cd684c87d95d656c1458ef04895a7f1cbd8e",
+    "read_at": "2026-10-02T03:02:11+00:00"
+  },
+  "dossier": {
+    "contender": "gitleaks/gitleaks",
+    "revision": {
+      "tag": "v8.30.1",
+      "commit": "83d9cd684c87d95d656c1458ef04895a7f1cbd8e",
+      "read_at": "2026-10-02T03:02:11+00:00"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Gitleaks is a Go command-line secret scanner. It scans local git history (via `git log -p`), staged or working-tree diffs, directories/files and stdin for hard-coded credentials. It uses regex rules (222 `[[rules]]` in the embedded default config/gitleaks.toml) with a keyword prefilter, optional entropy checks and allowlists. It writes findings to stdout or to JSON, CSV, JUnit, SARIF or custom-template reports. It only detects: the repo has no verification of found credentials against provider APIs, and no functionality for Actions-workflow auditing, SBOM generation, dependency-update PRs, build attestations or workflow linting (searches for cosign, sigstore, slsa, attest, provenance, sbom, cyclonedx, spdx, checksum, gpg found no hits in docs, workflows or code).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Gitleaks is a tool for detecting secrets like passwords, API keys, and tokens in git repos, files, and whatever else you wanna throw at it via stdin.",
+          "citation": "README.md:35"
+        },
+        {
+          "claim": "Gitleaks can be installed using Homebrew, Docker, or Go; it is also available in binary form for many popular platforms and OS types on the releases page; it can be implemented as a pre-commit hook or as a GitHub action using Gitleaks-Action.",
+          "citation": "README.md:67"
+        },
+        {
+          "claim": "Pre-commit: add repo https://github.com/gitleaks/gitleaks (example rev v8.24.2) with hook id `gitleaks` for native execution, or the `gitleaks-docker` ID to use the official Docker images; `SKIP=gitleaks` bypasses the hook.",
+          "citation": "README.md:112-140"
+        },
+        {
+          "claim": "GitHub Action snippet: actions/checkout with fetch-depth: 0 plus gitleaks/gitleaks-action@v2 with GITHUB_TOKEN; GITLEAKS_LICENSE is 'Only required for Organizations, not personal accounts.'",
+          "citation": "README.md:89-108"
+        },
+        {
+          "claim": "There are three scanning modes: git, dir, and stdin. git uses `git log -p` under the hood and accepts --log-opts; the dir command has aliases 'files' and 'directory'.",
+          "citation": "README.md:197-214"
+        },
+        {
+          "claim": "A baseline can be any gitleaks report; running with --baseline-path makes the report contain only new issues.",
+          "citation": "README.md:216-231"
+        },
+        {
+          "claim": "Config precedence: --config, GITLEAKS_CONFIG, GITLEAKS_CONFIG_TOML, then (target path)/.gitleaks.toml, else the built-in default. Configs can extend the default (useDefault) or another file (chain depth 2), disable inherited rules, and define rule/global allowlists (commits, paths, regexes, stopwords, targetRules).",
+          "citation": "README.md:238-261, 284-299, 339-417"
+        },
+        {
+          "claim": "Composite rules (v8.28.0): a primary rule reports only if `[[rules.required]]` auxiliary rules match within withinLines/withinColumns; described as 'an experimental feature! It's subject to change'.",
+          "citation": "README.md:423-431, 509"
+        },
+        {
+          "claim": "A `gitleaks:allow` comment on a line suppresses that finding; `.gitleaksignore` lists finding Fingerprints to ignore ('this feature is experimental and is subject to change').",
+          "citation": "README.md:511-524"
+        },
+        {
+          "claim": "--max-decode-depth enables recursive decoding and its default value '0' means disabled; supported encodings are percent, hex (>=32 chars) and base64 (>=16 chars); 'decoding only minimally increases scan times'.",
+          "citation": "README.md:176, 526-553"
+        },
+        {
+          "claim": "--max-archive-depth enables scanning inside nested archives for dir and git scans (default 0 = off); inner paths are separated with '!'.",
+          "citation": "README.md:555-592"
+        },
+        {
+          "claim": "Built-in report formats json, csv, junit and sarif; custom reports via a Go text/template file and --report-template, with sprig functions.",
+          "citation": "README.md:594-598"
+        },
+        {
+          "claim": "--redact[=percent] redacts secrets from logs and stdout (default 100%).",
+          "citation": "README.md:180"
+        },
+        {
+          "claim": "Exit codes: 0 no leaks, 1 leaks or error, 126 unknown flag; --exit-code sets the exit code used when leaks are found.",
+          "citation": "README.md:170, 645-653"
+        }
+      ],
+      "install": [
+        {
+          "method": "Homebrew (macOS)",
+          "command": "brew install gitleaks",
+          "citation": "README.md:72-73"
+        },
+        {
+          "method": "Docker Hub image",
+          "command": "docker pull zricethezav/gitleaks:latest ; docker run -v ${path_to_host_folder_to_scan}:/path zricethezav/gitleaks:latest [COMMAND] [OPTIONS] [SOURCE_PATH]",
+          "citation": "README.md:75-77"
+        },
+        {
+          "method": "GitHub Container Registry image",
+          "command": "docker pull ghcr.io/gitleaks/gitleaks:latest ; docker run -v ${path_to_host_folder_to_scan}:/path ghcr.io/gitleaks/gitleaks:latest [COMMAND] [OPTIONS] [SOURCE_PATH]",
+          "citation": "README.md:79-81"
+        },
+        {
+          "method": "From source (requires Go)",
+          "command": "git clone https://github.com/gitleaks/gitleaks.git ; cd gitleaks ; make build",
+          "citation": "README.md:83-86"
+        },
+        {
+          "method": "Prebuilt binary from the GitHub releases page",
+          "command": "download an archive from https://github.com/gitleaks/gitleaks/releases (README gives link only, no command)",
+          "citation": "README.md:67"
+        },
+        {
+          "method": "pre-commit framework hook",
+          "command": ".pre-commit-config.yaml with `repos: - repo: https://github.com/gitleaks/gitleaks / rev: v8.24.2 / hooks: - id: gitleaks`, then `pre-commit install`",
+          "citation": "README.md:112-126"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - .goreleaser.yml:8-14 builds linux/amd64 (archive name gitleaks_<ver>_linux_x64, .goreleaser.yml:28-36); Docker image published for linux/amd64 (.github/workflows/release.yml:53); CI test job runs on ubuntu-latest (.github/workflows/test.yml:15).",
+        "wsl2": "unknown - no WSL mention in README or code (searched whole tree); Linux binaries and Docker images exist and git mode only needs a `git` executable on PATH (sources/git.go:91-94), but WSL2 is neither documented nor tested in CI.",
+        "macos_arm64": "yes - .goreleaser.yml:9-16 declares darwin with arm64; README.md:72-73 documents `brew install gitleaks` under '# MacOS'. macOS is not in the CI test matrix (.github/workflows/test.yml:15 lists ubuntu-latest and windows-latest only).",
+        "gpu": "no - not applicable: CPU-only scanner (Aho-Corasick keyword prefilter plus stdlib regexp or wasilibs/go-re2: detect/detect.go:129,322; regexp/stdlib_regex.go:1; regexp/wasilibs_regex.go:1); no GPU code or mention found."
+      },
+      "integrations": {
+        "cli": "Yes - single `gitleaks` binary (cobra): `git [repo]`, `dir [path]` (aliases `file`, `directory`), `stdin`, `version`, `completion`, `help`; hidden deprecated `detect` and `protect` are still registered (README.md:144-195; cmd/git.go:22-27; cmd/directory.go:17-22; cmd/stdin.go:17-21; cmd/version.go:14-18; cmd/detect.go:43-48; cmd/protect.go:22-27). Also pre-commit hook definitions `gitleaks`, `gitleaks-docker`, `gitleaks-system` (.pre-commit-hooks.yaml:1-17) and a legacy hook script that calls the deprecated `protect` (scripts/pre-commit.py:17). The GitHub Action is a separate repository (README.md:89-108).",
+        "mcp": "none found - searched the whole tree for 'mcp' and 'model context protocol'; no server, config or docs.",
+        "sdk_or_api": "Go library only, no HTTP API: packages detect, sources, report, config under module github.com/zricethezav/gitleaks/v8 (go.mod:1). Entry points are detect.NewDetector / NewDetectorDefaultConfig and Detector.DetectSource(ctx, sources.Source) (detect/detect.go:115-151,208). README only links a GoDoc badge (README.md:13-14,31) and has no library usage section; several wrappers are marked Deprecated for v9 (detect/git.go:16-19; detect/files.go:14-16; detect/reader.go:11-14). The only listener is the opt-in localhost pprof server (cmd/diagnostics.go:136-147).",
+        "claude_code_or_codex": "none found - searched for claude, codex, copilot, cursor, AGENTS.md, CLAUDE.md, .claude, .codex; nothing. (The default ruleset includes Anthropic API-key detection rules, cmd/generate/config/rules/anthropic.go:9-18,40-49, but that is a detection rule, not an integration.)"
+      },
+      "telemetry_and_network": "No telemetry, analytics, update-check or phone-home code found. The only net/http use in non-test Go code is an opt-in pprof server on localhost:6060 enabled by `--diagnostics http` (cmd/diagnostics.go:6-7,136-147; flag at cmd/root.go:96). There is no HTTP client or outbound fetch anywhere in *.go (searched net/http, http.Get/Client, net.Dial). The config `extend.url` field exists but extendURL() is an empty TODO (config/config.go:104,416-418), so configs come only from local files or env vars (README.md:238-261). The default ruleset is embedded in the binary via go:embed (config/config.go:19-20). Scanning shells out to the local git binary (sources/git.go:91-93,139-142,209); for finding links it runs `git ls-remote --quiet --get-url` to read the configured remote URL (sources/git.go:483-513), skipped for staged/pre-commit scans (cmd/git.go:64-69); links are only string-built (detect/utils.go:23-110), I did not verify git's own network behaviour from inside this repo. No account or key is needed for the CLI; README says the separate GitHub Action needs GITLEAKS_LICENSE for Organization accounts (README.md:107; action repo not examined). Template reports remove sprig env, expandenv and getHostByName (report/template.go:33-36). Build-time network: `make build` runs `git fetch --tags` and `go mod tidy` (Makefile:4,22). The optional report_templates/myspace.tmpl references cdnjs.cloudflare.com images that a browser would load when that HTML report is opened (report_templates/myspace.tmpl:43-44). Files written: the report path (cmd/root.go:352-356,474), opt-in diagnostics outputs (cmd/diagnostics.go:152-215) and a temp file `gitleaks-archive-*` when reading zip/7z archives from non-seekable streams (sources/file.go:94). The only environment variables read are GITLEAKS_CONFIG and GITLEAKS_CONFIG_TOML (cmd/root.go:152-161)."
+    },
+    "code": {
+      "languages": [
+        "Go",
+        "TOML (embedded default rule config, config/gitleaks.toml)",
+        "Python (scripts/pre-commit.py)",
+        "Bash (scripts/profile.sh)"
+      ],
+      "entry_points": [
+        {
+          "path": "main.go",
+          "what": "Binary `gitleaks`: installs an interrupt handler (main.go:11-24) and calls cmd.Execute()."
+        },
+        {
+          "path": "cmd/root.go",
+          "what": "Cobra root command: persistent flags, config resolution (initConfig), Detector() builder, report writer, exit-code logic (cmd/root.go:44-103,132-195,249-409,438-500)."
+        },
+        {
+          "path": "cmd/git.go",
+          "what": "`gitleaks git [flags] [repo]` with --staged, --pre-commit, --log-opts, --platform (cmd/git.go:14-27)."
+        },
+        {
+          "path": "cmd/directory.go",
+          "what": "`gitleaks dir [flags] [path]` (aliases `file`, `directory`; --follow-symlinks) (cmd/directory.go:12-22)."
+        },
+        {
+          "path": "cmd/stdin.go",
+          "what": "`gitleaks stdin` scans os.Stdin (cmd/stdin.go:17-45)."
+        },
+        {
+          "path": "cmd/detect.go",
+          "what": "Hidden deprecated `detect` command (and cmd/protect.go for `protect`), still registered (cmd/detect.go:43-48; cmd/protect.go:22-27)."
+        },
+        {
+          "path": "cmd/generate/config/main.go",
+          "what": "`go generate` program that assembles cmd/generate/config/rules/*.go into config/gitleaks.toml (cmd/generate/config/main.go:18-27)."
+        },
+        {
+          "path": ".pre-commit-hooks.yaml",
+          "what": "pre-commit hook ids `gitleaks` (language golang), `gitleaks-docker`, `gitleaks-system`, all running `git --pre-commit --redact --staged --verbose` (.pre-commit-hooks.yaml:1-17)."
+        }
+      ],
+      "architecture": "Single Go module `github.com/zricethezav/gitleaks/v8` (go.mod:1). `cmd/` is the cobra CLI (root flags/config/report/exit logic in cmd/root.go; git/dir/stdin commands; `cmd/scm` platform enum for finding links; `cmd/generate/config` builds the default ruleset from `rules/*.go`, each rule self-validated with true/false-positive samples, cmd/generate/config/utils/validate.go:16-39). `config/` translates TOML via viper into rules and allowlists, resolves `extend` (depth 2), checks minVersion and embeds the default config. `sources/` yields Fragments from three sources: Git (shells out to `git log -p -U0 --all` or `git diff`, parsed with go-gitdiff, additions only: sources/git.go:93-94,402), Files (filepath.WalkDir, symlinks opt-in: sources/files.go) and File (reader/stdin, binary-MIME skip, archive extraction via mholt/archives when --max-archive-depth>0: sources/file.go). `detect/` is the engine: Aho-Corasick keyword prefilter, regex match, secretGroup, Shannon-entropy threshold, global then rule allowlists, stopwords, `gitleaks:allow`, `.gitleaksignore` fingerprints, JSON baseline, composite `required` rules, and `detect/codec` multi-pass percent/unicode/hex/base64 decoding; concurrency is a fixed 40-slot semgroup (detect/detect.go:130). `report/` holds Finding (commit, author, email, date, fingerprint) and JSON/CSV/JUnit/SARIF/template reporters. `regexp/` selects stdlib regexp (default) or wasilibs/go-re2 via build tag `gore2regex`. `logging/` (zerolog to stderr, logging/log.go:13) and `version/` (value injected by ldflags, version/version.go:4-5).",
+      "packaging_and_release": "Binaries: `.goreleaser.yml` (schema version 2) builds main.go as `gitleaks` for darwin/linux/windows x amd64/386/arm/arm64 (goarm 6,7; windows/arm excluded) with `-tags gore2regex` and ldflags `-s -w -X ...version.Version={{.Version}}` (.goreleaser.yml:1-26); archives are named gitleaks_<ver>_<os>_<x64|x32|arch>[v<arm>], zip on Windows (lines 27-39); `release.prerelease: true` (lines 40-41). The file has only builds/archives/release sections: no checksum, signing, SBOM, docker or attestation config, and no `-trimpath` or `mod_timestamp`. No workflow in .github/workflows runs GoReleaser or uploads release assets, so how release binaries and any checksums are produced and published cannot be seen in this tree. Docker: `.github/workflows/release.yml` (trigger: release published, lines 3-5) builds linux/amd64 and linux/arm64 with QEMU + Buildx and pushes to Docker Hub `zricethezav/gitleaks` and `ghcr.io/<repo>` (lines 22-57); job permissions are `contents: read` and `packages: write` only (lines 14-16); docker/* actions are pinned to commit SHAs with no version comments (lines 23,27,30,36,44,51) while `actions/checkout@v2` is tag-pinned (line 20); there is no cosign, attestation, SBOM or provenance step. Dockerfile: multi-stage `golang:1.24` to `alpine:3.22` (tag-pinned, no digests), CGO_ENABLED=0, version from `git describe --tags --abbrev=0`, built without the `gore2regex` tag (so stdlib regexp, unlike the GoReleaser build), runtime adds bash, git, openssh-client, no USER directive (root), and `git config --global --add safe.directory '*'` (Dockerfile:1-13). Unstamped builds (plain `go build`) report the placeholder 'version is set by build process' (version/version.go:4-5; cmd/version.go:21). Source build: `make build` runs `go mod tidy` then `go build` with the version taken from the latest local git tag (Makefile:4,21-23). Homebrew is referenced in the README (README.md:72-73) but its formula is not in this repo.",
+      "tests_and_ci": "Go `testing` with testify (go.mod:18) and go-cmp, table-driven. 19 `_test.go` files in config/, detect/, detect/codec/, report/, sources/ and cmd/generate/config/{base,utils}; 41 top-level `Test*` funcs in 18 files plus 8 `Benchmark*` funcs (config/allowlist_test.go, cmd/generate/config/base/config_test.go); no tests in the cmd/ CLI package; sources/git_test.go is entirely commented out as flaky (sources/git_test.go:3-10). Fixtures: 214 files under testdata/ (configs, expected reports, archives, fixture git repos stored as `dotGit` and renamed at test time, detect/detect_test.go:1368-1369). Each generated rule is checked with true/false-positive samples when the config is generated (cmd/generate/config/utils/validate.go:16-39). CI workflows: `.github/workflows/test.yml` (push and PR on all branches; matrix ubuntu-latest + windows-latest; `go build ./...`, `gotestsum --raw-command -- go test -json ./... --race`, and `go generate ./... && git diff --exit-code` to keep config/gitleaks.toml in sync, test.yml:3-37); `.github/workflows/gitleaks.yml` (self-scan with gitleaks-action on push/workflow_dispatch, only for gitleaks/gitleaks, gitleaks.yml:2-17); `.github/workflows/release.yml` (Docker publish). No macOS job, no lint step (.golangci.yaml and `make lint` exist, Makefile:25-26), no CodeQL/scorecard/dependency-review workflow. The repo's own scan config extends the default and allowlists cmd/generate/config/rules, *test.go and testdata (.gitleaks.toml:6-14).",
+      "dependencies": "go.mod is the only manifest (go 1.24.11, go.mod:3): 16 direct and 58 indirect requires; go.sum present; no vendor/ directory. Direct: BobuSumisu/aho-corasick, Masterminds/sprig/v3, charmbracelet/lipgloss, fatih/semgroup, gitleaks/go-gitdiff, google/go-cmp, h2non/filetype, hashicorp/go-version, mholt/archives, rs/zerolog, spf13/cobra, spf13/viper, stretchr/testify, golang.org/x/exp, lucasjones/reggen, wasilibs/go-re2 (go.mod:6-19,72,80). Runtime also needs a `git` executable for git mode (sources/git.go:91-94). Scripts use only the Python standard library and Bash.",
+      "security_policy": "none - no SECURITY.md or equivalent at the repo root, .github/ or docs/ (a case-insensitive search for file names containing 'security' returned nothing; README.md and CONTRIBUTING.md contain no vulnerability-reporting instructions)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Three scanning modes git/dir/stdin; git mode uses `git log -p`; `dir` aliases include `files` and `directory` (README.md:197-214).",
+        "verified": "partial",
+        "evidence": "Modes confirmed: git runs `git log -p -U0 --full-history --all --diff-filter=tuxdb` or passes user --log-opts (sources/git.go:71-95), dir walks files (sources/files.go:60-139), stdin scans os.Stdin (cmd/stdin.go:39-45). Only added lines are scanned (sources/git.go:402) and a `git` executable is required (sources/git.go:91-94). Mismatch: the registered dir aliases are `file` and `directory`, not `files` (cmd/directory.go:19)."
+      },
+      {
+        "claim": "Staged changes can be scanned before each commit: the pre-commit hook runs `gitleaks git --pre-commit --redact --staged --verbose` (README.md:112-140; .pre-commit-hooks.yaml:4).",
+        "verified": "yes",
+        "evidence": "cmd/git.go:64-69 builds the staged diff command `git diff -U0 --no-ext-diff --staged .` (sources/git.go:136-143) and skips remote lookups for staged scans; covered by TestFromGitStaged (detect/detect_test.go:1328-1397). Notes: hook `gitleaks` uses `language: golang` (needs a Go toolchain to build) and `gitleaks-docker` uses the untagged image zricethezav/gitleaks (.pre-commit-hooks.yaml:5,10); the README example pins rev v8.24.2 (README.md:118), older than this v8.30.1 checkout."
+      },
+      {
+        "claim": "Config resolution order is --config, GITLEAKS_CONFIG, GITLEAKS_CONFIG_TOML, then (target)/.gitleaks.toml, else the built-in default; configs may extend the default or a file (depth 2, useDefault and path mutually exclusive), disable inherited rules, and use allowlists incl. targetRules and composite required rules (README.md:238-261, 284-299, 339-431).",
+        "verified": "yes",
+        "evidence": "cmd/root.go:145-195 implements the order and the default is embedded with go:embed (config/config.go:19-20); maxExtendDepth=2 and the useDefault/path exclusion are at config/config.go:27,244-259; disabledRules at config/config.go:429-448; targetRules at config/config.go:233-239,269-277; required rules at config/config.go:169-180 and detect/detect.go:570-700. The `extend.url` field exists but extendURL() is an empty TODO (config/config.go:104,416-418), so there is no remote config fetch."
+      },
+      {
+        "claim": "Built-in report formats json, csv, junit and sarif, plus custom Go templates (README.md:594-598).",
+        "verified": "yes",
+        "evidence": "Mapped at cmd/root.go:380-397; format is inferred from the extension only for .csv/.json/.sarif (cmd/root.go:366-377); `-` as report path writes to stdout (cmd/root.go:77,350,470). SARIF 2.1.0 has tool.driver.name `gitleaks`, a rule list, per-result ruleId/location and partialFingerprints with commitSha/email/author/date/commitMessage (report/sarif.go:17-27,38-72,83-108,135-141), but the tool semanticVersion is the hard-coded `v8.0.0` (report/constants.go:3) and the secret itself is the snippet text (report/sarif.go:126-128). JUnit embeds each full finding as JSON in the failure body (report/junit.go:62-69); CSV writes nothing when there are no findings (report/csv.go:16-18). Nothing in the repo uploads SARIF to a code-scanning service (all three workflows read in full: no upload-sarif, no security-events permission)."
+      },
+      {
+        "claim": "`--redact[=percent]` redacts secrets from logs and stdout (README.md:180).",
+        "verified": "partial",
+        "evidence": "Findings are redacted inside filter() before they reach stdout or any report (detect/detect.go:367; detect/utils.go:158-160; report/finding.go:78-86), and redaction is off unless the flag is given (cmd/root.go:86-87). But raw secrets are written to trace/debug logs before filtering (detect/detect.go:510-514,548-551,871-874; detect/codec/decoder.go:93-101), and a percent below 100 keeps the leading (100-N)% of the secret (report/finding.go:88-100)."
+      },
+      {
+        "claim": "`--max-decode-depth` defaults to 0 so decoding is off by default; supported encodings are percent, hex and base64 (README.md:176, 529-531, 549-553).",
+        "verified": "no",
+        "evidence": "Code differs from README. The CLI flag default is 5 (cmd/root.go:91) and is applied at cmd/root.go:255, so CLI scans decode by default (loop stop at detect/detect.go:353); only a library Detector built without the flag has the zero value 0 (detect/detect.go:52). The code also decodes a `unicode` encoding (U+XXXX and backslash-u forms) that the README does not list (detect/codec/encodings.go:28-32). Hex >=32 chars and base64 >=16 chars match the README (detect/codec/encodings.go:35,40)."
+      },
+      {
+        "claim": "A baseline can be any gitleaks report (README.md:219).",
+        "verified": "partial",
+        "evidence": "Only the JSON report loads: LoadBaseline json.Unmarshal's the file (detect/baseline.go:43-47) and tests assert that CSV and SARIF baselines are rejected (detect/baseline_test.go:162-169). A failed baseline load is logged as an error and the scan continues without a baseline (cmd/root.go:324-330). The baseline file itself is excluded from scanning (detect/detect.go:296-299)."
+      },
+      {
+        "claim": "Exit codes: 0 no leaks, 1 leaks or error, 126 unknown flag; --exit-code changes the code used when leaks are found (README.md:170, 645-653).",
+        "verified": "yes",
+        "evidence": "--exit-code defaults to 1 (cmd/root.go:76); unknown flags exit 126 (cmd/root.go:226-229); a scan error always exits 1 even with --exit-code 0, otherwise findings exit with the configured code (cmd/root.go:493-499)."
+      },
+      {
+        "claim": "Binaries for many platforms on the releases page, and Docker images on Docker Hub (zricethezav/gitleaks) and ghcr.io (README.md:67, 75-81).",
+        "verified": "partial",
+        "evidence": "Docker: .github/workflows/release.yml:3-5,46-57 publishes linux/amd64 and linux/arm64 images to zricethezav/gitleaks and ghcr.io/<repo> when a release is published. Binaries: .goreleaser.yml:5-39 declares darwin/linux/windows x amd64/386/arm/arm64 archives, but no workflow in .github/workflows runs GoReleaser or uploads release assets, so the published assets and any checksums cannot be checked from this tree. Neither path has signing, attestation or SBOM configuration."
+      },
+      {
+        "claim": "Official GitHub Action `gitleaks/gitleaks-action@v2`; GITLEAKS_LICENSE is only required for Organizations, not personal accounts (README.md:89-108).",
+        "verified": "not_checkable",
+        "evidence": "The action lives in a separate repository (README.md:21,91) that is not part of this tree, so its behaviour and license terms cannot be checked here. This repo's own workflow uses it with GITHUB_TOKEN and GITLEAKS_LICENSE, guarded by github.repository == 'gitleaks/gitleaks' (.github/workflows/gitleaks.yml:9-17); the README snippet checks out with fetch-depth: 0 so history is complete (README.md:101-103)."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Release provenance is not evidenced in the repo: the only release workflow builds and pushes Docker images (.github/workflows/release.yml:3-5,50-57) with permissions limited to contents:read and packages:write (lines 14-16) and no signing, attestation, SBOM or provenance step. .goreleaser.yml has only builds/archives/release sections (no checksum, sign or sbom, no -trimpath or mod_timestamp, lines 1-42) and no workflow invokes GoReleaser or uploads binaries, so how binary checksums or signatures (if any) are produced cannot be determined from this tree.",
+      "The project's own CI and image pinning is loose: actions/checkout@v3, actions/setup-go@v2 and gitleaks/gitleaks-action@v2 are mutable tags (test.yml:18,21; gitleaks.yml:11,14), release.yml uses actions/checkout@v2 (line 20) and its SHA pins carry no version comments (lines 23-51), `go install gotest.tools/gotestsum@latest` is unpinned (test.yml:30), test.yml and gitleaks.yml set no `permissions:` block, Dockerfile bases are tag-pinned only (golang:1.24, alpine:3.22, Dockerfile:1,7) and the image runs as root with git safe.directory '*' (Dockerfile:11-13), the `gitleaks-docker` pre-commit hook references the untagged image zricethezav/gitleaks (.pre-commit-hooks.yaml:10), and no dependabot or renovate config exists.",
+      "Findings carry raw secrets unless --redact is passed: JSON/CSV/template reports include Secret and Match (report/json.go:16; report/csv.go:54-55), JUnit embeds the full finding (report/junit.go:62-69), SARIF puts the secret in region.snippet.text (report/sarif.go:126-128), --verbose prints it (detect/utils.go:226-231), and redaction is off by default (cmd/root.go:86). --redact does not scrub trace/debug logs (detect/detect.go:510-514,548-551,871-874; detect/codec/decoder.go:93-101) and --redact=N below 100 leaves the leading (100-N)% of the secret visible (report/finding.go:88-100), so a CI report file is a secret-bearing artifact.",
+      "Suppression inputs default to the scanned tree: `<target>/.gitleaks.toml` is auto-loaded as config (cmd/root.go:178-190; README.md:256-259), `.gitleaksignore` is read from the target and cwd (cmd/root.go:300-321), and inline `gitleaks:allow` comments suppress findings unless --ignore-gitleaks-allow is set (detect/detect.go:510; cmd/root.go:85). The config and baseline files are themselves not scanned (detect/detect.go:296-299). A change set can therefore carry its own suppressions; supplying --config / GITLEAKS_CONFIG / GITLEAKS_CONFIG_TOML (cmd/root.go:145-162) avoids only the target .gitleaks.toml. README labels .gitleaksignore experimental (README.md:524).",
+      "Detection only, and narrow scope: findings are regex + optional entropy + allowlist matches; no code verifies a credential against any provider API (no HTTP client in non-test code; the README references no companion verifier; report/finding.go:49-51 mentions 'eventually ML validation' as future work). The repo has no workflow auditing, SBOM generation, dependency updating, attestation or workflow linting. SARIF is emitted (report/sarif.go) but no upload to a code-scanning service exists in the repo. Git-mode coverage depends on history available in the checkout (README uses fetch-depth: 0, README.md:101-103) and only added lines are scanned (sources/git.go:402).",
+      "README and API drift: --max-decode-depth default is 5 in code vs 0 in README (cmd/root.go:91 vs README.md:176,529-531); the `files` alias is not registered (cmd/directory.go:19 vs README.md:209); unicode decoding is undocumented (detect/codec/encodings.go:28-32); baselines are JSON-only (detect/baseline.go:43-47); the README pre-commit example pins v8.24.2 (README.md:118) vs this v8.30.1; scripts/pre-commit.py still calls the deprecated hidden `protect` (scripts/pre-commit.py:17). The Go module path is github.com/zricethezav/gitleaks/v8 although the repo is gitleaks/gitleaks (go.mod:1; README.md:14), library wrappers are marked Deprecated for v9 (detect/git.go:16-19; detect/files.go:14-16; detect/reader.go:11-14), and composite rules are labelled experimental (README.md:509).",
+      "The documented GitHub integration is a separate repository (gitleaks/gitleaks-action, README.md:21,91) that was not examined; README says a GITLEAKS_LICENSE secret is required for Organization accounts (README.md:107) and this repo's own workflow passes it (gitleaks.yml:15-17). The CLI itself is MIT-licensed (LICENSE:1-3) and needs no key.",
+      "Test and maintenance coverage gaps: no tests for CLI wiring in cmd/ (flags, exit codes); sources/git_test.go is fully commented out as flaky (sources/git_test.go:3-10); CI covers ubuntu and windows only (test.yml:15) and has no lint step although .golangci.yaml and `make lint` exist (Makefile:25-26); Windows path workarounds exist in the scanner (sources/common.go:46-48). Repo metadata names a single individual (LICENSE:3; .github/FUNDING.yml:3; .github/ISSUE_TEMPLATE/maintenance.md:16); commit dates and contributor counts are not observable in this shallow clone (.git/shallow)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "gitleaks/gitleaks",
+      "checks": [
+        {
+          "field": "readme.install[1] (Docker Hub image)",
+          "statement": "docker pull zricethezav/gitleaks:latest ; docker run -v ${path_to_host_folder_to_scan}:/path zricethezav/gitleaks:latest [COMMAND] [OPTIONS] [SOURCE_PATH]",
+          "citation": "README.md:75-77",
+          "holds": true,
+          "note": "README.md:75-77 matches word for word ('# Docker (DockerHub)' plus the pull and run lines). The repo also supports it: .github/workflows/release.yml:3-5,42-57 pushes zricethezav/gitleaks (line 47) for linux/amd64,linux/arm64 (line 53) when a release is published, and Dockerfile:13 sets ENTRYPOINT [\"gitleaks\"], so [COMMAND] maps to a gitleaks subcommand. The metadata-action step (release.yml:42-48) sets no explicit tags/flavor, so whether ':latest' is pushed depends on that action's defaults, which can't be checked from inside the tree."
+        },
+        {
+          "field": "license",
+          "statement": "spdx: MIT, file: LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1 reads 'MIT License', LICENSE:3 'Copyright (c) 2019 Zachary Rice', and lines 5-21 are the standard MIT grant and warranty disclaimer. It is the only LICENSE/LICENCE/COPYING/NOTICE file in the tree."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - .goreleaser.yml:8-14 builds linux/amd64 (archive name gitleaks_<ver>_linux_x64, .goreleaser.yml:28-36); Docker image published for linux/amd64 (.github/workflows/release.yml:53); CI test job runs on ubuntu-latest (.github/workflows/test.yml:15).",
+          "citation": ".goreleaser.yml:8-14, 28-36; .github/workflows/release.yml:53; .github/workflows/test.yml:15",
+          "holds": true,
+          "note": ".goreleaser.yml:10 has linux and :13 has amd64. Only windows/arm is ignored (:20-22). The name_template (:29-36) maps amd64 to 'x64', so the archive is gitleaks_<ver>_linux_x64. release.yml:53 has 'platforms: linux/amd64,linux/arm64', and test.yml:15 has '[ ubuntu-latest, windows-latest ]'. Caveat (the dossier states it elsewhere): none of the three workflows (gitleaks.yml, release.yml, test.yml) runs GoReleaser, so the Linux binary build is only declared here. The Docker image is the Linux artifact whose publishing is visible in the tree."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "Yes - single `gitleaks` binary (cobra): `git [repo]`, `dir [path]` (aliases `file`, `directory`), `stdin`, `version`, `completion`, `help`; hidden deprecated `detect` and `protect` are still registered. Also pre-commit hook definitions `gitleaks`, `gitleaks-docker`, `gitleaks-system` and a legacy hook script that calls the deprecated `protect`. The GitHub Action is a separate repository.",
+          "citation": "README.md:144-195; cmd/git.go:22-27; cmd/directory.go:17-22; cmd/stdin.go:17-21; cmd/version.go:14-18; cmd/detect.go:43-48; cmd/protect.go:22-27; .pre-commit-hooks.yaml:1-17; scripts/pre-commit.py:17; README.md:89-108",
+          "holds": true,
+          "note": "Every citation matches. Cobra root Use \"gitleaks\" (cmd/root.go:44-45; main.go:18 calls cmd.Execute). 'git [flags] [repo]' is at cmd/git.go:23. 'dir [flags] [path]' has Aliases {\"file\",\"directory\"} at cmd/directory.go:18-19. 'stdin' is at cmd/stdin.go:18 and 'version' at cmd/version.go:15. detect and protect have Hidden: true (cmd/detect.go:47, cmd/protect.go:26) and are still added to rootCmd (cmd/detect.go:34, cmd/protect.go:19). completion and help are cobra defaults: they are listed at README.md:151,154 and nothing in cmd/ disables them (no CompletionOptions). Hook ids gitleaks/gitleaks-docker/gitleaks-system are at .pre-commit-hooks.yaml:1,7,13. scripts/pre-commit.py:17 runs 'gitleaks protect -v --staged'. README.md:91 points to the separate gitleaks/gitleaks-action repo."
+        },
+        {
+          "field": "claim_checks[5] (--max-decode-depth)",
+          "statement": "Claim: --max-decode-depth defaults to 0 so decoding is off by default; supported encodings are percent, hex and base64. Verified: no - CLI flag default is 5 (cmd/root.go:91) applied at cmd/root.go:255 so CLI scans decode by default (loop stop detect/detect.go:353); only a library Detector has zero value 0 (detect/detect.go:52); code also decodes undocumented `unicode` (detect/codec/encodings.go:28-32); hex >=32 and base64 >=16 match README (encodings.go:35,40).",
+          "citation": "README.md:176, 529-531, 549-553; cmd/root.go:91,255; detect/detect.go:52,353; detect/codec/encodings.go:28-32,35,40",
+          "holds": true,
+          "note": "The 'no' verdict and its evidence are right. README.md:176 says '(default \"0\", no decoding is done)' and README.md:529-531 says the default '0' means the feature is disabled. But cmd/root.go:91 registers Int(\"max-decode-depth\", 5, ...), and cmd/root.go:255 copies it into detector.MaxDecodeDepth. The scan loop breaks only when currentDecodeDepth > d.MaxDecodeDepth (detect/detect.go:350-355), so a default CLI scan does up to 5 decode passes. A library Detector keeps the zero value: NewDetectorContext (detect/detect.go:121-131) never sets the field declared at detect/detect.go:52. encodings.go:28-32 adds a unicode decoder that the README list (549-553: percent/hex/base64) leaves out. The hex '{32,}' (:35) and base64 '{16,}' (:40) thresholds match the README."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

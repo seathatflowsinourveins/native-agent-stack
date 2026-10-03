@@ -1,0 +1,327 @@
+{
+  "contender": "podman-container-tools/podman",
+  "revision": {
+    "contender": "podman-container-tools/podman",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "podman-container-tools/podman",
+        "tag": "v6.1.3",
+        "commit": "85b994955e0b4e30fbce9c8351cab85676140ede",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v6.1.3",
+    "commit": "85b994955e0b4e30fbce9c8351cab85676140ede",
+    "read_at": "2026-10-02T03:02:37+00:00"
+  },
+  "dossier": {
+    "contender": "podman-container-tools/podman",
+    "revision": {
+      "tag": "v6.1.3",
+      "commit": "85b994955e0b4e30fbce9c8351cab85676140ede",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Podman is a daemonless OCI container engine (CLI `podman`, core library `libpod/`, REST API, Go bindings) for containers, images, volumes, networks and pods. It runs rootless on Linux, and on macOS/Windows through a Podman-managed Linux VM (`podman machine`) (README.md:15-17,32-42). The repo moved to the podman-container-tools org (module go.podman.io/podman/v6, go.mod:1; RELEASE_NOTES.md:108). Quadlet is the in-repo systemd generator (cmd/quadlet/, pkg/systemd/quadlet/). It turns .container/.pod/.volume/.network/.kube/.build/.image/.artifact unit files into systemd services (docs/source/markdown/podman-systemd.unit.5.md:5-17,52-65), and `podman quadlet install|list|print|rm` manage those files (docs/source/markdown/podman-quadlet.1.md:14-21). Other multi-container paths in the repo: `podman kube play` for Kubernetes YAML (docs/source/markdown/podman-kube-play.1.md.in:4-27) and `podman compose`, a thin wrapper that executes an external docker-compose or podman-compose (docs/source/markdown/podman-compose.1.md.in:9-12). Isolation is container-level (namespaces, cgroups v2, seccomp, capabilities, SELinux/AppArmor); no Landlock, bubblewrap, firejail or seatbelt reference exists outside vendor/ (grep).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Podman is 'a tool for managing containers and images, volumes mounted into those containers, and pods made from groups of containers.'",
+          "citation": "README.md:15"
+        },
+        {
+          "claim": "Runs containers on Linux; on Mac and Windows it uses a Podman-managed virtual machine (`podman machine`).",
+          "citation": "README.md:16, README.md:42"
+        },
+        {
+          "claim": "Major/minor releases 4 times a year (Feb/May/Aug/Nov), patch releases at any time; 'All releases are PGP signed.'",
+          "citation": "README.md:19"
+        },
+        {
+          "claim": "Only the most recent release receives upstream support; the v5.8 series is extended (CVE and critical fixes only) until the 2nd week of June 2027.",
+          "citation": "README.md:21"
+        },
+        {
+          "claim": "Full management of container networking, using Netavark; rootless networking is handled via pasta.",
+          "citation": "README.md:35, README.md:109"
+        },
+        {
+          "claim": "Support for pods, 'groups of containers that share resources and are managed together'.",
+          "citation": "README.md:36"
+        },
+        {
+          "claim": "Support for running containers and pods without root or other elevated privileges.",
+          "citation": "README.md:37"
+        },
+        {
+          "claim": "Resource isolation of containers and pods.",
+          "citation": "README.md:38"
+        },
+        {
+          "claim": "Docker-compatible CLI that can run containers locally and on remote systems.",
+          "citation": "README.md:39"
+        },
+        {
+          "claim": "No manager daemon, for improved security and lower resource utilization at idle.",
+          "citation": "README.md:40"
+        },
+        {
+          "claim": "REST API providing both a Docker-compatible interface and an improved interface exposing advanced Podman functionality.",
+          "citation": "README.md:41"
+        },
+        {
+          "claim": "Rootless: no setuid binary needed; rootless containers 'will never have more privileges than the user that launched them'; an administrator must still do some configuration (subuid/subgid).",
+          "citation": "README.md:78-87"
+        },
+        {
+          "claim": "Out of scope: specialized image signing/pushing (Skopeo) and the Kubernetes CRI (CRI-O).",
+          "citation": "README.md:96-101"
+        },
+        {
+          "claim": "Install instructions are not in the README: 'Installation notes' link to install.md; container images are published at quay.io/podman/stable. The README never mentions Quadlet, systemd, compose, WSL or MCP (grep, no matches).",
+          "citation": "README.md:118-119, README.md:131-132"
+        }
+      ],
+      "install": [
+        {
+          "method": "Distribution packages / podman.io guide (no commands in the repo)",
+          "command": "none in repo; install.md redirects to https://podman.io/getting-started/installation (external page, not opened); DOWNLOADS.md advises vendor-packaged podman for production use",
+          "citation": "README.md:118-119; install.md:3; DOWNLOADS.md:7-11"
+        },
+        {
+          "method": "Build and install from source (Linux)",
+          "command": "make && sudo make install",
+          "citation": "Makefile:233-236 (default target all = binaries docs); Makefile:884-885 (install = install.bin install.remote install.man install.systemd); DISTRO_PACKAGE.md:10-17; CONTRIBUTING.md:106; RELEASE_NOTES.md:2348 (install no longer builds implicitly)"
+        },
+        {
+          "method": "macOS installer package from GitHub Releases (arm64 only)",
+          "command": "download podman-installer-macos-arm64.pkg from the GitHub releases page (no CLI command given). The pkg installs podman, vfkit, krunkit, gvproxy and podman-mac-helper under /opt/podman; uninstall: sudo rm -rf /opt/podman",
+          "citation": "DOWNLOADS.md:5-11; RELEASE_PROCESS.md:183; contrib/pkginstaller/README.md:14-20; contrib/pkginstaller/Makefile:53-57"
+        },
+        {
+          "method": "Build the macOS client from source",
+          "command": "brew install go go-md2man; git clone https://github.com/containers/podman go/src/github.com/containers/podman; cd go/src/github.com/containers/podman; make podman-remote; mv bin/darwin/podman bin/podman",
+          "citation": "build_osx.md:13, 21, 29-31"
+        },
+        {
+          "method": "Create the Linux VM on macOS/Windows after installing the client",
+          "command": "podman machine init && podman machine start",
+          "citation": "docs/tutorials/mac_win_client.md:38-43"
+        },
+        {
+          "method": "Linux static remote-client tarball from GitHub Releases (client only, not the engine)",
+          "command": "download podman-remote-static-linux_amd64.tar.gz or podman-remote-static-linux_arm64.tar.gz from the releases page (no CLI command given)",
+          "citation": "RELEASE_PROCESS.md:189-190; docs/tutorials/remote_client.md:19"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes. Native Podman is PR-tested on x86_64 Debian and Fedora (SUPPORT.md:25-29); .github/workflows/ci.yml:204-216,342-388 builds and tests fedora-current, fedora-prior, fedora-rawhide and debian-sid in Lima VMs. Quadlet additionally needs systemd (generator plus D-Bus: pkg/domain/infra/abi/quadlet.go:35-40) and cgroup v2 (docs/source/markdown/podman-systemd.unit.5.md:113; cgroup v1 support dropped in 6.0: RELEASE_NOTES.md:103). Linux engine binaries are not attached to GitHub releases (RELEASE_PROCESS.md:182-191).",
+        "wsl2": "yes, with a qualifier. The docs cover WSLv2 only as the backend of `podman machine`: a Podman-managed, Fedora-based WSL distro in which systemd is started in a nested PID namespace (docs/tutorials/podman-for-windows.md:13-14; docs/source/markdown/podman-machine-init.1.md.in:27-29; pkg/machine/wsl/declares.go:37-41). CI runs machine e2e for wsl and hyperv (.github/workflows/ci.yml:562-577; SUPPORT.md:35). Using native Podman inside a user-managed WSL2 distro is not documented in the repo and is outside the CI matrix ('best effort', SUPPORT.md:43-45). RELEASE_NOTES.md:36 says containers.conf force_port_listen is required 'when running Podman on WSL'. Quadlet inside the WSL machine is not covered by docs or machine e2e tests (no 'quadlet' reference under pkg/machine).",
+        "macos_arm64": "yes (client plus Linux VM, Apple Silicon only). Containers run in a VM via `podman machine` providers libkrun (default) or applehv (pkg/machine/provider/platform_darwin.go:19-35,54-57; docs/source/markdown/podman-machine.1.md:12-15,28-34; pkg/machine/e2e/README.md:69-70). Intel Macs are unsupported since 6.0 (SUPPORT.md:47-49; CONTRIBUTING.md:64). CI runs macos-machine for applehv and libkrun (ci.yml:659-676). The Makefile builds only podman-remote for darwin (Makefile:242-243), and `podman quadlet` returns 'not implemented for the remote Podman client' (pkg/domain/infra/tunnel/quadlet.go:10-30).",
+        "gpu": "yes on Linux, unknown on WSL2. `--gpus` supports NVIDIA and AMD via CDI (docs/source/markdown/options/gpus.md:7). libkrun became the macOS default provider for GPU access to AI workloads (contrib/design-docs/podman6hld.md:163-172; pkg/machine/provider/platform_darwin.go:103-112 checks for krunkit). The repo has no documentation of GPU passthrough for the WSL or Hyper-V providers."
+      },
+      "integrations": {
+        "cli": "`podman` and `podman-remote` (cmd/podman/main.go; Makefile:60 builds the remote variant with the `remote` tag). Quadlet CLI: `podman quadlet install|list|print|rm` (docs/source/markdown/podman-quadlet.1.md:14-21), local engine only (pkg/domain/infra/tunnel/quadlet.go:10-30). Also `podman kube play|down|generate|apply`, `podman compose` (cmd/podman/compose.go:22-36), `podman machine ...`. The generator binary `quadlet` is invoked by systemd as podman-system-generator / podman-user-generator (Makefile:912-916; cmd/quadlet/main.go:21-27,589-595).",
+        "mcp": "none found. Grep for MCP / model context protocol outside vendor/ returns no matches.",
+        "sdk_or_api": "REST API via `podman system service` (Unix socket by default, socket-activated by systemd: docs/source/markdown/podman-system-service.1.md:10-29,69-77). The Compat tree is Docker API current 1.44.0 / minimal 1.24.0, and the Libpod tree is current = binary version / minimal 4.0.0 (version/version.go:37-46). Quadlet REST endpoints exist under /libpod/quadlets (pkg/api/server/register_quadlets.go:12-228, built only for non-remote Linux/FreeBSD). Go client bindings at go.podman.io/podman/v6/pkg/bindings (pkg/bindings/README.md:1-10,40-57; docs/CODE_STRUCTURE.md:46-49 calls it a stable API); no Quadlet bindings package found. podman-py is a separate repo (contrib/design-docs/podman6hld.md:154-156).",
+        "claude_code_or_codex": "none found as an integration. AGENTS.md is a guide for AI coding assistants helping contributors to Podman itself (AGENTS.md:7,18). LLM_POLICY.md restricts LLM-generated communication and code contributions (LLM_POLICY.md:15-47)."
+      },
+      "telemetry_and_network": "No telemetry, analytics or phone-home code found in Podman's own sources. Grep for telemetry/analytics/sentry etc. outside vendor/ only hits docs. OpenTelemetry modules appear only as indirect deps (go.mod:178-182) and no non-vendor Go file imports them. There are no hard-coded outbound URLs in non-vendor, non-test Go code except an Apple plist DTD (cmd/podman-mac-helper/install.go:27). contrib/design-docs/podman6hld.md:238 cites Podman Desktop telemetry, which is a separate project. Network use is user-driven. Image pulls go to registries from registries.conf (docs/source/markdown/podman-run.1.md.in:59; README.md:198 pulls quay.io/podman/hello). `podman machine init` pulls docker://quay.io/podman/machine-os (vendor/go.podman.io/common/pkg/config/default.go:292; docs/tutorials/podman-for-windows.md:147-148). `podman quadlet install <url>` does a plain http.Get with no integrity check (pkg/domain/infra/abi/quadlet.go:195,255-258). `podman compose` shells out to an external provider with DOCKER_HOST set and prints a notice (cmd/podman/compose.go:190-231). Quadlet-generated units order after network-online.target (pkg/systemd/quadlet/quadlet.go:2279-2296). No project account is required; registries may need `podman login`. Optional macOS podman-mac-helper must run as root to manage /var/run/docker.sock (cmd/podman-mac-helper/main.go:33-51). The API socket grants arbitrary code execution as the service user; TCP without mutual TLS is discouraged (docs/source/markdown/podman-system-service.1.md:69-77)."
+    },
+    "code": {
+      "languages": [
+        "Go (go 1.26.0, go.mod:6)",
+        "C via cgo (pkg/rootless/rootless_linux.c, pkg/rootless/rootless_freebsd.c)",
+        "Shell and BATS (hack/, test/system/)",
+        "Python (test/apiv2/python/, test/python/)",
+        "PowerShell and WiX (winmake.ps1, contrib/win-installer/)",
+        "Makefile, systemd unit files"
+      ],
+      "entry_points": [
+        {
+          "path": "cmd/podman/main.go",
+          "what": "`podman` CLI (Cobra). The same source built with the `remote` tag is `podman-remote`; argv[0]=podmansh switches to a restricted-shell mode (main.go:57-71). Engine mode (local abi vs remote tunnel) is selected at startup (main.go:79-120)."
+        },
+        {
+          "path": "cmd/quadlet/main.go",
+          "what": "Quadlet systemd generator. Installed as libexec/podman/quadlet and symlinked as podman-system-generator and podman-user-generator (Makefile:912-916). Flags -v, -no-kmsg-log, -user, -dryrun, -version (main.go:589-595)."
+        },
+        {
+          "path": "cmd/podman/quadlet/",
+          "what": "`podman quadlet` subcommands (install.go, list.go, print.go, remove.go) calling the ContainerEngine Quadlet* methods (pkg/domain/infra/abi/quadlet.go; remote stub in pkg/domain/infra/tunnel/quadlet.go)."
+        },
+        {
+          "path": "cmd/podman/system/service.go",
+          "what": "`podman system service`: REST API server (service_abi*.go, pkg/api/server), optionally socket-activated via contrib/systemd/system/podman.socket."
+        },
+        {
+          "path": "cmd/rootlessport/main.go",
+          "what": "Rootless port-forwarding helper, installed to libexec/podman/rootlessport (Makefile:910)."
+        },
+        {
+          "path": "cmd/podman-mac-helper/main.go",
+          "what": "macOS-only root helper managing /var/run/docker.sock via launchd (main.go:25-57)."
+        },
+        {
+          "path": "cmd/podman-testing/main.go",
+          "what": "Test-support binary built with `make binaries` on Linux (Makefile:245)."
+        },
+        {
+          "path": "cmd/winpath/main.go",
+          "what": "Windows-only helper that edits the PATH registry value for the installer."
+        }
+      ],
+      "architecture": "Go monorepo (module go.podman.io/podman/v6, go.mod:1). cmd/podman is the Cobra CLI. Commands call ContainerEngine/ImageEngine interfaces (pkg/domain/entities) implemented by pkg/domain/infra/abi (local, direct libpod calls) or pkg/domain/infra/tunnel (remote, via the pkg/bindings HTTP client) (docs/CODE_STRUCTURE.md:55-66). libpod/ (Linux/FreeBSD only) is the runtime: containers, pods, volumes, SQLite state db.sql (libpod/sqlite_state.go:34), conmon plus OCI runtime execution (libpod/oci_conmon*.go), netavark/pasta networking (libpod/networking_*.go). pkg/api/ is the REST server with Docker-compat and libpod trees (pkg/api/server/register_*.go). Quadlet: cmd/quadlet/main.go (generator loop at lines 441-587), pkg/systemd/quadlet/ (quadlet.go converts Container/Pod/Volume/Network/Kube/Image/Build/Artifact groups to Service units; unitdirs.go holds root/rootless search paths; quadlet_common.go lists extensions), pkg/systemd/parser/ (unit-file parser), pkg/domain/infra/abi/quadlet.go (install/list/rm), pkg/api/handlers/libpod/quadlets.go (REST). Also pkg/machine/ (VM providers qemu/applehv/libkrun/wsl/hyperv; selection in pkg/machine/provider/), pkg/specgen/, pkg/rootless/ (Go+C), vendor/ (go.podman.io/buildah, common, image, storage), and contrib/systemd/system/ (podman.service/socket, podman-kube@.service.in:11-12).",
+      "packaging_and_release": "Release workflow .github/workflows/release.yml triggers on any pushed tag (lines 3-6), rejects -dev versions (45-49), and calls release-build-artifacts.yml. That workflow runs `make release-artifacts` (release-build-artifacts.yml:92-94; Makefile:1041-1054) to produce podman-remote zips for darwin_arm64, windows_amd64 and windows_arm64 plus podman-remote-static-linux_{amd64,arm64}.tar.gz. A macOS arm64 .pkg is built, codesigned and notarized (release-build-artifacts.yml:101-151), and Windows MSIs (amd64, arm64) are built with WiX and signed with AzureSignTool (153-250). release.yml then writes `sha256sum * > shasums` (134-136), runs `gh release create` with notes from RELEASE_NOTES.md (108-120,158-164), emails the mailing list (166-212) and opens a podman.io PR (214-225). Artifact list: RELEASE_PROCESS.md:182-191. No detached signature, cosign, SBOM or provenance-attestation step exists under .github/ (grep). Git tags are meant to be GPG-signed by the releaser (`git tag -s`, RELEASE_PROCESS.md:156,168-169); the tag signature was not inspected. All GitHub Actions are pinned by commit SHA and linted by a zizmor workflow (.github/workflows/zizmor.yml). A daily cron builds the release artifacts to validate the pipeline (release-pipeline-validation.yml:2-6). Linux distribution is via distro packages: rpm/podman.spec (subpackages docker, tests, remote, podmansh, machine: lines 125-191) and Packit to COPR/Koji/Bodhi (.packit.yaml:51-197). machine-os VM images are released from a separate repo in lock-step (RELEASE_PROCESS.md:148-162).",
+      "tests_and_ci": "Frameworks: Go testing for unit tests (`make localunit`, Makefile:673); Ginkgo v2 e2e in test/e2e (142 *_test.go files); BATS system tests in test/system (77 .bats files, plus test/upgrade and test/farm); apiv2 shell tests in test/apiv2 (26 .at files) and pytest in test/apiv2/python and test/python (12 files); compose scenarios in test/compose (13 dirs); machine e2e in pkg/machine/e2e (about 45 files); bindings tests in pkg/bindings/test. Approximate totals: about 335 Go *_test.go files outside vendor (142 test/e2e, 153 pkg/, 21 libpod/, 16 cmd+internal+hack, 4 test/utils). Quadlet coverage: cmd/quadlet/main_test.go, pkg/systemd/quadlet/unitdirs_test.go, pkg/domain/infra/abi/quadlet_utils_test.go, test/e2e/quadlet_test.go with about 310 fixture files in test/e2e/quadlet/, test/system/252-quadlet.bats, 253-podman-quadlet.bats, 254-podman-quadlet-multi.bats, test/apiv2/36-quadlets.at. The Quadlet system tests skip remote mode (252-quadlet.bats:22; 254-podman-quadlet-multi.bats:10). CI is .github/workflows/ci.yml. path-filter; validate-source (golangci-lint, pre-commit, vendor/bindings/swagger cleanliness, tests-included gate, per-commit build with a 50 KiB binary-growth cap: hack/ci/make-and-check-size.sh:38); cross build; build on fedora-current/prior/rawhide and debian-sid via lima.yml; Windows installer builds for hyperv and wsl; macOS installer build; big-tests (sys and int x root/rootless x local/remote x 4 distros); small-tests (apiv2, bindings, compose_v2, docker_py, unit, upgrade from v5.3.1 and v5.6.2); machine-linux (QEMU); windows-unit, windows-e2e, windows-machine (hyperv, wsl); macos-machine (applehv, libkrun); a 'Total Success' gate. Other workflows: release.yml, release-build-artifacts.yml, release-pipeline-validation.yml, zizmor.yml, machine-os-pr.yml, update-podmanio.yml, dev-bump.yml, cherry-pick.yml, and labeler/stale/lock/assign bots. The test jobs run on x86 runners; the arm64 machine runner is commented out (ci.yml:444-447).",
+      "dependencies": "go.mod: 73 direct requires (lines 9-81) and 108 indirect (85-192), vendored in vendor/ (vendor/modules.txt), including go.podman.io/buildah v1.45.1, common v0.69.2, image/v5 v5.41.2 and storage v1.64.1 (go.mod:67-70). test/tools/go.mod: 2 direct (go-md2man, go-swagger) and 62 indirect. test/apiv2/python/requirements.txt: 8 entries. docs/requirements.txt: 1 (myst_parser). pyproject.toml holds only black config. Build-time native: CGO_ENABLED=1 (Makefile:28-30), libseccomp, libsystemd, gpgme, btrfs, assuan headers (Makefile:61-68; ci.yml:76-89). Runtime: crun (the only runtime supported upstream), conmon, catatonit, netavark plus aardvark-dns, passt/pasta for rootless (DISTRO_PACKAGE.md:28-98). Rootless also needs /etc/subuid and /etc/subgid (docs/tutorials/rootless_tutorial.md:30-34). Quadlet needs systemd and cgroup v2. VM features need gvproxy plus qemu (Linux), vfkit/krunkit (macOS), WSL or Hyper-V (Windows).",
+      "security_policy": "SECURITY.md (3 lines) defers to the Containers Projects policy at github.com/containers/container-libs/blob/main/SECURITY.md (external, not opened). README.md:50-51 says report privately to security@lists.podman.io, and CONTRIBUTING.md:46 links the container-libs SECURITY.md under the podman-container-tools org. docs/cncf/self-assessment.md is project-written and marked 'Assessment Stage: Incomplete' (line 22), 'not intended to provide a security audit' (line 128). Release notes reference GitHub security advisories (RELEASE_NOTES.md:5,12-13,23,96)."
+    },
+    "claim_checks": [
+      {
+        "claim": "No manager daemon (README.md:40)",
+        "verified": "yes",
+        "evidence": "cmd/podman/main.go:73-75 runs the CLI in-process, and local mode calls libpod through pkg/domain/infra/abi (docs/CODE_STRUCTURE.md:62-66). The REST service is optional and socket-activated (docs/source/markdown/podman-system-service.1.md:10-29). Helper processes still exist: conmon per container and a catatonit pause process (DISTRO_PACKAGE.md:56-70); Quadlet containers are supervised by systemd units."
+      },
+      {
+        "claim": "Pods of containers that share resources (README.md:36)",
+        "verified": "yes",
+        "evidence": "Quadlet .pod units are generated by ConvertPod with Type=forking and Restart=on-failure by default (pkg/systemd/quadlet/quadlet.go:1606-1717). Containers join with Pod=<name>.pod and get BindsTo/After on the pod service (quadlet.go:2214-2240). `podman kube play` also creates pods (docs/source/markdown/podman-kube-play.1.md.in:10)."
+      },
+      {
+        "claim": "Networking via Netavark; rootless via pasta (README.md:35,109)",
+        "verified": "yes",
+        "evidence": "libpod/networking_linux.go:65-69 and libpod/networking_common.go:135 delegate to netavark Setup/Teardown. CNI and slirp4netns support were removed in 6.0 (RELEASE_NOTES.md:105-106). pasta is the rootless default and bridge the rootful default (docs/source/markdown/options/network.md:28,55-61)."
+      },
+      {
+        "claim": "Run containers and pods without root (README.md:37,78-87)",
+        "verified": "partial",
+        "evidence": "Works, but needs admin preparation: /etc/subuid and /etc/subgid plus a user-mode network tool (docs/tutorials/rootless_tutorial.md:19-34). Documented limits: ports below 1024, NFS home dirs, 65536-UID range, no CRIU checkpoint (rootless.md:5-35). Quadlet has rootless search paths and a per-user install dir (pkg/systemd/quadlet/unitdirs.go:26-36,226-253)."
+      },
+      {
+        "claim": "Resource isolation of containers and pods (README.md:38)",
+        "verified": "partial",
+        "evidence": "Containers get namespaces and cgroups, an 11-capability default set (vendor/go.podman.io/common/pkg/config/default.go:104-117) and masked /proc paths (docs/source/markdown/options/security-opt.md:34). Defaults are not deny-by-default: networking is on (bridge for root, pasta for rootless: options/network.md:28,53-61) and the root filesystem is writable (options/read-only.md:13). Restrictions are opt-in: `--network none` (network.md:45), `--read-only`, `:ro` volumes (options/volume.md:70), `network create --internal` (options/internal.md:11-25), Quadlet `Internal=` (pkg/systemd/quadlet/quadlet.go:1037-1042), Quadlet NoNewPrivileges and ReadOnly default to false (docs/source/markdown/podman-systemd.unit.5.md:809,876)."
+      },
+      {
+        "claim": "REST API with Docker-compatible and improved interfaces (README.md:41)",
+        "verified": "yes",
+        "evidence": "version/version.go:37-46 defines a Compat tree (current 1.44.0, minimal 1.24.0) and a Libpod tree (current = binary version, minimal 4.0.0). docs/source/markdown/podman-system-service.1.md:15 still says Docker v1.40; the code differs, and code is preferred."
+      },
+      {
+        "claim": "Mac and Windows supported via `podman machine` (README.md:16,42)",
+        "verified": "yes",
+        "evidence": "Providers: Linux qemu, macOS libkrun (default) and applehv, Windows wsl (default) and hyperv (docs/source/markdown/podman-machine.1.md:28-34; pkg/machine/provider/platform_darwin.go, platform_windows.go, platform_unix.go). Intel Macs and Windows 10 are dropped (SUPPORT.md:47-49). Docs say the default machine mount is $HOME:$HOME (docs/source/markdown/podman-machine-init.1.md.in:199-200), but macOS code defaults to /Users, /private and /var/folders (vendor/go.podman.io/common/pkg/config/default_darwin.go:16-22), plus the host config dir mounted at /etc/containers (default.go:282-287); code is preferred."
+      },
+      {
+        "claim": "All releases are PGP signed (README.md:19)",
+        "verified": "partial",
+        "evidence": "RELEASE_PROCESS.md:156,168-169 calls for signed git tags (`git tag -s`), but the tag signature was not inspected here. The release workflow publishes artifacts plus a plain `shasums` file (.github/workflows/release.yml:134-136,158-164) with no detached .asc, cosign, SBOM or provenance step under .github/ (grep). The macOS pkg is codesigned and notarized (release-build-artifacts.yml:142-145) and Windows MSIs are signed via AzureSignTool (197-210). RELEASE_PROCESS.md:184-185 lists Windows .exe installers while the workflow builds .msi (release-build-artifacts.yml:243)."
+      },
+      {
+        "claim": "Quadlet turns unit files into a multi-service app on systemd (AGENTS.md:18; man page podman-systemd.unit.5.md:5-17). The README is silent on Quadlet.",
+        "verified": "yes",
+        "evidence": "cmd/quadlet/main.go:529-559 converts .container, .volume, .kube, .network, .image, .build, .artifact and .pod files; extensions are listed in pkg/systemd/quadlet/quadlet_common.go:5-14. Network=, Volume=, Image=, Pod= references add Requires=/After= on the referenced unit's service (quadlet.go:1848-1892,1955-1984,2214-2240). Resource names get a systemd- prefix (quadlet.go:953-977), and units wait on network-online.target (2279-2296). Limits: `podman quadlet install|list|print|rm` is not implemented for the remote client (pkg/domain/infra/tunnel/quadlet.go:10-30) and install requires a systemd D-Bus connection (pkg/domain/infra/abi/quadlet.go:35-40). `podman generate systemd` is deprecated in favor of Quadlet (docs/source/markdown/podman-generate-systemd.1.md:10-12)."
+      },
+      {
+        "claim": "`podman quadlet install` accepts 'local files, Web URLs, and OCI artifacts' (cmd/podman/quadlet/install.go:15)",
+        "verified": "partial",
+        "evidence": "The man page lists only local files or URLs (docs/source/markdown/podman-quadlet-install.1.md.in:11). The abi code accepts local paths and directories, http(s) URLs only (isURL, pkg/domain/infra/abi/quadlet.go:255-258) and multi-document .quadlets files split on '---' with a required '# FileName=' comment (abi/quadlet.go:388-480). No OCI-artifact source handling was found in that file; code is preferred. URL downloads use http.Get without hash or signature checks (abi/quadlet.go:195)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "`podman machine start` mean startup time, WSL provider, no CA import (import via mount adds 3.9 s, via scp adds 5.1 s)",
+        "metric": "mean startup time",
+        "value": "6.2 s (+3.9 s mnt / +5.1 s scp)",
+        "source": "contrib/design-docs/import-ca-certs.md:119-125 (measured with a patched client by a project maintainer; raw data in an external gist, not opened)",
+        "independent": false
+      },
+      {
+        "what": "`podman machine start` mean startup time, Hyper-V provider, no CA import (mnt adds 3.4 s, scp adds 4.7 s)",
+        "metric": "mean startup time",
+        "value": "22.3 s (+3.4 s mnt / +4.7 s scp)",
+        "source": "contrib/design-docs/import-ca-certs.md:126-128",
+        "independent": false
+      },
+      {
+        "what": "`podman machine start` mean startup time, applehv provider, no CA import (mnt adds 1.4 s, scp adds 1.6 s)",
+        "metric": "mean startup time",
+        "value": "10.0 s (+1.4 s mnt / +1.6 s scp)",
+        "source": "contrib/design-docs/import-ca-certs.md:129-131",
+        "independent": false
+      },
+      {
+        "what": "`podman machine start` mean startup time, libkrun provider, no CA import (mnt adds 1.3 s, scp adds 1.4 s)",
+        "metric": "mean startup time",
+        "value": "9.0 s (+1.3 s mnt / +1.4 s scp)",
+        "source": "contrib/design-docs/import-ca-certs.md:132-134",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Quadlet is Linux/systemd-only and its management CLI is local-only. `podman quadlet install|list|print|rm` return 'not implemented for the remote Podman client' (pkg/domain/infra/tunnel/quadlet.go:10-30; test/system/254-podman-quadlet-multi.bats:10 skips remote). Install requires a systemd D-Bus session plus the quadlet helper (pkg/domain/infra/abi/quadlet.go:35-60). `quadlet` is not built for darwin/windows/freebsd targets (Makefile:239-246,909-919). On macOS/Windows Quadlets would have to live inside the machine VM; no repo doc and no machine e2e test (no 'quadlet' reference under pkg/machine) covers that. Some systemd [Service] options such as PrivateNetwork do not work in rootless units (rootless.md:17-18).",
+      "Platform coverage gaps. WSL2 is documented and tested only as the Podman-managed `podman machine` backend; a user-managed WSL2 distro is 'best effort' (SUPPORT.md:43-45). SUPPORT.md:35 names Windows 2022 while CI runs windows-2025-vs2026 (ci.yml:571), and SUPPORT.md:29 lists ARM64 Fedora while ci.yml shows only x86 runners (arm64 machine runner commented out, ci.yml:444-447). RELEASE_NOTES.md:36 says force_port_listen is required on WSL, but no code setting it for WSL machines exists in this repo (only libpod/networking_common.go:31 and a system test). The WSL kernel lacks some modules (pkg/machine/wsl/declares.go:93-96).",
+      "Isolation defaults are permissive and opt-in, not deny-by-default: networking is on (bridge or pasta), the root filesystem is writable, 11 default capabilities, Quadlet NoNewPrivileges/ReadOnly default false (see claim_checks). Podman provides container-level isolation only; no Landlock, bubblewrap, firejail or seatbelt code or docs exist outside vendor/ (grep). The docs state the API socket grants arbitrary code execution as the service user (docs/source/markdown/podman-system-service.1.md:69-71).",
+      "Recent sandbox-relevant security fixes. v6.1.3 fixes CVE-2026-94603: `podman run` on a checkpoint image could disable all sandboxing, including user-specified sandboxing; checkpoint-image support in `podman run` was removed (RELEASE_NOTES.md:5-8). v6.1.2 fixes host file overwrite via `podman load` / `volume import` (CVE-2025-11395, RELEASE_NOTES.md:12). v6.0.0 fixes host environment leakage into containers (CVE-2026-57231, RELEASE_NOTES.md:96). The security self-assessment is written by the project and marked 'Incomplete' (docs/cncf/self-assessment.md:22,128).",
+      "On VM platforms the host-filesystem boundary is wider than a per-container one. macOS machines mount /Users, /private and /var/folders by default (vendor/go.podman.io/common/pkg/config/default_darwin.go:16-22; the docs say $HOME:$HOME). The host user config dir is mounted at /etc/containers (default.go:282-287; WSL bind-mounts it: pkg/machine/wsl/declares.go:98-109). WSL mounts all Windows drives under /mnt (docs/source/markdown/podman-machine-init.1.md.in:202-205). Machine mounts default to read-write (podman-machine-init.1.md.in:169-171).",
+      "Release integrity and distribution. README.md:19 says all releases are PGP signed, but release assets are unsigned artifacts plus an in-workflow `shasums` file, with no attestations or SBOM (.github/workflows/release.yml:134-136; grep of .github/). No Linux engine binary is published on the release page, only podman-remote static tarballs, the macOS arm64 pkg, Windows MSIs and zips (RELEASE_PROCESS.md:182-191), so Linux installs depend on distro packages (DOWNLOADS.md:7-11) or source builds. The macOS pkg build downloads vfkit, krunkit and gvproxy by version with curl and no checksum (contrib/pkginstaller/Makefile:28,32,36).",
+      "Maintenance and stability. Only the latest release has upstream support; 5.8 is extended to June 2027 (README.md:21). 6.0 shipped many breaking changes: BoltDB to SQLite migration, removal of cgroups v1, CNI, slirp4netns and iptables, a new Quadlet install layout, and dropped Intel Mac and Windows 10 (RELEASE_NOTES.md:98-121). 19 of the 21 listed maintainers/reviewers are affiliated with one vendor (MAINTAINERS.md:13-33). The org move is still visible in docs: README badges and the spec Source0 still reference containers/podman (README.md:4-10; rpm/podman.spec:74).",
+      "Scope and licensing. No single Podman command covers 'multi-service app': Quadlet (systemd services, Linux only), `podman kube play` (Kubernetes subset: Pod, Deployment, PersistentVolumeClaim, ConfigMap, Secret, DaemonSet, Job; docs/source/markdown/podman-kube-play.1.md.in:19-27) and `podman compose` (needs an external provider, podman-compose.1.md.in:9-12) are separate paths with different semantics. Install guidance and the security reporting policy live outside this repo (install.md:3; SECURITY.md:3). The repo license is Apache-2.0 (LICENSE:1-3); the RPM spec lists Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0 for the combined vendored work (rpm/podman.spec:64)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "podman-container-tools/podman",
+      "checks": [
+        {
+          "field": "readme.install[2] (macOS installer package)",
+          "statement": "macOS installer package from GitHub Releases (arm64 only): download podman-installer-macos-arm64.pkg; it installs podman, vfkit, krunkit, gvproxy and podman-mac-helper under /opt/podman; uninstall: sudo rm -rf /opt/podman.",
+          "citation": "DOWNLOADS.md:5-11; RELEASE_PROCESS.md:183; contrib/pkginstaller/README.md:14-20; contrib/pkginstaller/Makefile:53-57",
+          "holds": true,
+          "note": "DOWNLOADS.md:7-11 calls GitHub release artifacts official and signed, and recommends distro packages for production. RELEASE_PROCESS.md:183 lists only the arm64 macOS pkg. pkginstaller/README.md:14 names podman, vfkit, gvproxy and podman-mac-helper under /opt/podman, and line 19 gives `sudo rm -rf /opt/podman`. Makefile:57 untars krunkit into the package root; the README omits krunkit, but combining the two citations is correct. Also confirmed: package.sh:85 uses --install-location /opt and package.sh:76 signs krunkit. Caveat the dossier omits: scripts/postinstall:5,8,12 writes /etc/paths.d/podman-pkg and /usr/local/etc/man.d/podman.man.conf and runs `podman-mac-helper install`; the rm -rf step leaves these behind."
+        },
+        {
+          "field": "license",
+          "statement": "License is Apache-2.0 (file LICENSE).",
+          "citation": "LICENSE:1-3",
+          "holds": true,
+          "note": "LICENSE:1-3 reads 'Apache License / Version 2.0, January 2004'. The full terms run to END OF TERMS AND CONDITIONS (line 176), followed by the standard appendix (178-191). It is the only top-level license file. rpm/podman.spec:64 lists Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0 for the combined vendored build, which matches the dossier's risk note."
+        },
+        {
+          "field": "readme.platforms.macos_arm64",
+          "statement": "yes (client plus Linux VM, Apple Silicon only): podman machine providers libkrun (default) or applehv; Intel Macs unsupported since 6.0; CI runs macos-machine for applehv and libkrun; the Makefile builds only podman-remote for darwin; `podman quadlet` returns 'not implemented for the remote Podman client'.",
+          "citation": "pkg/machine/provider/platform_darwin.go:19-35,54-57; docs/source/markdown/podman-machine.1.md:12-15,28-34; pkg/machine/e2e/README.md:69-70; SUPPORT.md:47-49; CONTRIBUTING.md:64; .github/workflows/ci.yml:659-676; Makefile:242-243; pkg/domain/infra/tunnel/quadlet.go:10-30",
+          "holds": true,
+          "note": "Every citation matches. platform_darwin.go:28 calls ParseVMType(provider, define.LibKrun). The vendored containers.conf defaults set no machine provider, and pkg/machine/define/vmtype.go:84-85 returns the fallback for an empty value, so libkrun is the effective default. SupportedProviders returns applehv and libkrun (54-57). The man page table marks libkrun* as the default. SUPPORT.md:47-49 and CONTRIBUTING.md:64 drop Intel Macs (darwin/amd64). ci.yml:673 runs the matrix [applehv, libkrun]. Makefile:242-243 builds only podman-remote for darwin/windows. cmd/podman/main.go:24 imports the quadlet commands unconditionally, with no remote gating, so the remote client reaches the tunnel stub error at tunnel/quadlet.go:10."
+        },
+        {
+          "field": "readme.integrations.sdk_or_api",
+          "statement": "REST API via `podman system service` (Unix socket by default, socket-activated by systemd); Compat tree Docker API current 1.44.0 / minimal 1.24.0, Libpod tree current = binary version / minimal 4.0.0; Quadlet REST endpoints under /libpod/quadlets built only for non-remote Linux/FreeBSD; Go bindings at go.podman.io/podman/v6/pkg/bindings with a stable API; no Quadlet bindings package; podman-py is a separate repo.",
+          "citation": "docs/source/markdown/podman-system-service.1.md:10-29,69-77; version/version.go:37-46; pkg/api/server/register_quadlets.go:12-228; pkg/bindings/README.md:1-10,40-57; docs/CODE_STRUCTURE.md:46-49; contrib/design-docs/podman6hld.md:154-156",
+          "holds": true,
+          "note": "version.go:38-45 sets Libpod {Current: Version, Minimal: 4.0.0} and Compat {1.44.0, 1.24.0}, exactly as stated. Man page lines 10-29 cover the service and systemd socket activation, and 71-77 the arbitrary-code-execution and TCP/mTLS warnings. The default Unix-socket endpoints are at lines 36-40 and 59-61, slightly outside the cited range. register_quadlets.go:1 is `//go:build !remote && (linux || freebsd)`; the function spans 12-228 and is wired in server.go:165. No 'quadlet' match under pkg/bindings. Bindings README:46 imports go.podman.io/podman/v6/pkg/bindings. CODE_STRUCTURE.md:49 says 'must have a stable API'. podman6hld.md:156 links github.com/containers/podman-py."
+        },
+        {
+          "field": "claim_checks[8] (Quadlet multi-service app)",
+          "statement": "Quadlet turns unit files into a multi-service app on systemd; the README is silent on Quadlet. Verified: yes.",
+          "citation": "cmd/quadlet/main.go:529-559; pkg/systemd/quadlet/quadlet_common.go:5-14; pkg/systemd/quadlet/quadlet.go:953-977,1848-1892,1955-1984,2214-2240,2279-2296; pkg/domain/infra/abi/quadlet.go:35-40; pkg/domain/infra/tunnel/quadlet.go:10-30; docs/source/markdown/podman-generate-systemd.1.md:10-12; AGENTS.md:18; docs/source/markdown/podman-systemd.unit.5.md:5-17",
+          "holds": true,
+          "note": "The claim and its 'yes' verdict hold. main.go:536-555 dispatches all eight extensions, matching quadlet_common.go:5-14. Network= adds Requires=/After= (quadlet.go:1871-1872); Volume= (.volume/.image/.artifact sources) adds Requires=/After= (1977-1978). Default names get the systemd- prefix (958-960, 970). Install needs systemd D-Bus (abi/quadlet.go:35-39). The remote stub errors. `generate systemd` is deprecated (10-12). README.md has no quadlet or systemd match. Two evidence details are wrong as written. (a) Pod= adds BindsTo=/After=, not Requires=/After= (quadlet.go:2229-2230), and Image= wiring is in handleImageSource (quadlet.go:2112-2132), outside the cited ranges. (b) Only system units wait on network-online.target; user units get podman-user-wait-network-online.service, and DefaultDependencies=false removes the dependency (quadlet.go:2283-2294)."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "Non-blocking, claim_checks[8] evidence: replace 'Network=, Volume=, Image=, Pod= references add Requires=/After= on the referenced unit's service (quadlet.go:1848-1892,1955-1984,2214-2240)' with 'Network=, Volume= and Image= references add Requires=/After= on the referenced unit's service (quadlet.go:1848-1892,1955-1984,2112-2132); Pod= adds BindsTo=/After= on the pod service (quadlet.go:2214-2240)'.",
+        "Non-blocking, claim_checks[8] evidence ('units wait on network-online.target') and telemetry_and_network ('Quadlet-generated units order after network-online.target'): change to 'system units add Wants=/After=network-online.target; rootless user units use podman-user-wait-network-online.service instead; DefaultDependencies=false disables this (pkg/systemd/quadlet/quadlet.go:2279-2296)'.",
+        "Non-blocking, integrations.sdk_or_api: add docs/source/markdown/podman-system-service.1.md:36-40,59-61 to the citation for 'Unix socket by default'; the cited ranges 10-29 and 69-77 do not state the default endpoints."
+      ]
+    }
+  ]
+}

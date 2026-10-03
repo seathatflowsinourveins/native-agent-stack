@@ -1,0 +1,311 @@
+{
+  "contender": "mattpocock/skills",
+  "revision": {
+    "contender": "mattpocock/skills",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "mattpocock/skills",
+        "tag": "v1.2.3",
+        "commit": "6acc160e4e0cd062dbbbd7a1b26ae92855edf07e",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v1.2.3",
+    "commit": "6acc160e4e0cd062dbbbd7a1b26ae92855edf07e",
+    "read_at": "2026-10-02T03:02:21+00:00"
+  },
+  "dossier": {
+    "contender": "mattpocock/skills",
+    "revision": {
+      "tag": "v1.2.3",
+      "commit": "6acc160e4e0cd062dbbbd7a1b26ae92855edf07e",
+      "read_at": "2026-10-02T03:02:21+00:00"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Content-only repository of agent 'skills' (Markdown SKILL.md procedures) by Matt Pocock. 35 skills in five buckets: 18 engineering + 7 productivity (the 'promoted' set of 25, shipped as a Claude Code plugin) plus 6 beta 'in-progress' and 4 'misc' skills that are installable only through the external skills.sh installer (skills/in-progress/README.md:3-9; CHANGELOG.md:132). Topics: grilling interviews, specs and tickets, TDD, bug diagnosis, code review, domain modelling, architecture surveys, merge-conflict resolution, research, prototyping. 11 promoted skills are model-invoked (description-triggered); 14 are user-invoked only. Codex support is per-skill agents/openai.yaml metadata installed via skills.sh; there is no native Codex plugin. No dedicated security-review, threat-model or vulnerability procedure exists in the tree; security-adjacent content is limited to redaction notes, the wizard's hidden secret entry, and an unpromoted Claude-Code-only git-guardrails hook. No runtime service, CLI, MCP server or SDK. File counts below were obtained with Glob/Grep/Read only (shell was unavailable).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "'My agent skills that I use every day to do real engineering - not vibe coding.'",
+          "citation": "README.md:15"
+        },
+        {
+          "claim": "'These skills are designed to be small, easy to adapt, and composable. They work with any model.'",
+          "citation": "README.md:19"
+        },
+        {
+          "claim": "Two install routes with different philosophies: the Claude Code plugin 'installs the whole set as a managed, read-only bundle that updates when I ship'; skills.sh 'copies editable skill files into your project'. 'Pick one — installing both leaves you with every skill twice.'",
+          "citation": "README.md:27"
+        },
+        {
+          "claim": "`claude plugins install mattpocock-skills` (or `/plugin install mattpocock-skills`). 'It's in Claude Code's official marketplace, so there's nothing to add first, and updates arrive automatically.'",
+          "citation": "README.md:34-44"
+        },
+        {
+          "claim": "Codex and other agents: `npx skills@latest add mattpocock/skills`; 'Pick the skills you want, and which coding agents to install them on'; make sure `setup-matt-pocock-skills` is one of them.",
+          "citation": "README.md:51-55"
+        },
+        {
+          "claim": "'A native Codex plugin is on the roadmap' (points to ADR 0002).",
+          "citation": "README.md:57"
+        },
+        {
+          "claim": "skills.sh 'writes the skills into your repo as ordinary files you own and can edit. Nothing updates behind your back'; pull updates with `npx skills update`.",
+          "citation": "README.md:70"
+        },
+        {
+          "claim": "Run `/setup-matt-pocock-skills` once per repo: it asks which issue tracker (GitHub, Linear, or local files), which triage labels, and where docs are saved.",
+          "citation": "README.md:74-80"
+        },
+        {
+          "claim": "Skills exist to fix failure modes 'with Claude Code, Codex, and other coding agents'.",
+          "citation": "README.md:86"
+        },
+        {
+          "claim": "User-invoked skills 'are reachable only when you type them'; model-invoked skills 'can be invoked by you or reached for automatically by the agent when the task fits'. A user-invoked skill may invoke model-invoked skills, never another user-invoked one.",
+          "citation": "README.md:186"
+        },
+        {
+          "claim": "Model-invoked set — Engineering: prototype, diagnosing-bugs, research, tdd, domain-modeling, codebase-design, code-review, resolving-merge-conflicts, wizard. Productivity: grilling, writing-for-agents. All other promoted skills are user-invoked.",
+          "citation": "README.md:204-214, 228-231"
+        },
+        {
+          "claim": "`/tdd` 'encourages red-green-refactor'; `/diagnosing-bugs` 'wraps best debugging practices into a disciplined loop, gated phase by phase'.",
+          "citation": "README.md:154-158"
+        },
+        {
+          "claim": "`code-review`: two-axis review (Standards and Spec) 'run as parallel sub-agents so neither pollutes the other'.",
+          "citation": "README.md:212"
+        }
+      ],
+      "install": [
+        {
+          "method": "Claude Code plugin (CLI)",
+          "command": "claude plugins install mattpocock-skills",
+          "citation": "README.md:35; .agents/install-block.md:12"
+        },
+        {
+          "method": "Claude Code plugin (inside a session)",
+          "command": "/plugin install mattpocock-skills",
+          "citation": "README.md:41; .agents/install-block.md:18"
+        },
+        {
+          "method": "skills.sh installer (Codex and other agents; also usable for Claude Code)",
+          "command": "npx skills@latest add mattpocock/skills",
+          "citation": "README.md:52, 67; .agents/install-block.md:32"
+        },
+        {
+          "method": "skills.sh, one skill only (documented in the internal install block and the in-progress README, not the top-level README)",
+          "command": "npx skills@latest add mattpocock/skills --skill=<name>",
+          "citation": ".agents/install-block.md:44; skills/in-progress/README.md:8"
+        },
+        {
+          "method": "skills.sh update",
+          "command": "npx skills update   (single skill: npx skills@latest update <name>)",
+          "citation": "README.md:70; .agents/install-block.md:48"
+        },
+        {
+          "method": "Direct-from-repo marketplace fallback (explicitly 'not documented to users'; for unreleased commits or forks)",
+          "command": "/plugin marketplace add mattpocock/skills  then  /plugin install mattpocock-skills@mattpocock",
+          "citation": ".agents/install-block.md:61; .claude-plugin/marketplace.json:2"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes (inferred, not stated): README names no OS or architecture and the repo ships no compiled artifacts; Linux is handled explicitly in skills/engineering/improve-codebase-architecture/SKILL.md:39 (xdg-open) and skills/engineering/wizard/template.sh:71; the release workflow runs on ubuntu-latest (.github/workflows/release.yml:13).",
+        "wsl2": "yes (narrow): skills/engineering/wizard/template.sh:65-75 opens URLs through wslview or explorer.exe; no other WSL statement anywhere; README is silent.",
+        "macos_arm64": "yes (inferred, not stated): no architecture-specific content; macOS is handled explicitly in skills/engineering/improve-codebase-architecture/SKILL.md:39 (open <path>) and wizard/template.sh:72; README is silent.",
+        "gpu": "no — not used or required; the repo contains prompt text, bash templates and Node maintainer scripts only, no inference code."
+      },
+      "integrations": {
+        "cli": "none found in this repo: package.json has no bin (package.json:11-15 holds only changeset scripts) and scripts/link-skills.sh:4-6 says it is 'not a supported installer'. Installation relies on Claude Code's own `claude plugins install` (README.md:35) and the external `skills` CLI run via `npx skills@latest` (README.md:52).",
+        "mcp": "none found — no MCP server or .mcp.json; .claude-plugin/plugin.json declares only a `skills` array (plugin.json:21-47). docs/engineering/setup-matt-pocock-skills.md:49 merely mentions a community Jira-over-MCP variant of the tracker doc.",
+        "sdk_or_api": "none found.",
+        "claude_code_or_codex": "Claude Code: native plugin via .claude-plugin/plugin.json (25 skills, v1.2.3) and .claude-plugin/marketplace.json (fallback); official-marketplace listing asserted in .agents/adr/0002-ship-as-a-claude-code-plugin.md:32-41 and README.md:44; user-invoked skills use `disable-model-invocation: true` frontmatter (e.g. skills/engineering/ask-matt/SKILL.md:4). Codex: no native plugin (README.md:57; ADR 0002:13-23); each of the 35 skills has agents/openai.yaml with interface.display_name/short_description and, for user-invoked skills, policy.allow_implicit_invocation: false (.agents/invocation.md:10; e.g. skills/engineering/implement/agents/openai.yaml:1-5); scripts/link-skills.sh:8-11 names ~/.claude/skills for Claude Code and ~/.agents/skills for Codex and other harnesses; AGENTS.md reads identically to CLAUDE.md (CHANGELOG.md:36 says it is a symlink). Claude-Code-only extras: misc/git-guardrails-claude-code installs a PreToolUse hook; in-progress/claude-handoff launches `claude --bg`."
+      },
+      "telemetry_and_network": "No telemetry, analytics or phone-home code exists in the repository (repo-wide search for telemetry/analytics terms found only unrelated prose; the tree has no runtime code beyond maintainer scripts and skill templates). README and docs state no telemetry policy either way, and the behaviour of the external `skills` installer (fetched at @latest, README.md:52) is not documented here. No account is needed for the skills themselves. Network and accounts arise from surrounding tools and specific skills: (1) Install — the official-marketplace listing points at the repo's git URL with a pinned sha (.agents/adr/0002-ship-as-a-claude-code-plugin.md:34,40); skills.sh fetches from GitHub. (2) Runtime — tracker skills (to-spec, to-tickets, triage, wayfinder, code-review's spec lookup) call the gh/glab CLIs against GitHub/GitLab and need an authenticated CLI (skills/engineering/setup-matt-pocock-skills/SKILL.md:44-45; issue-tracker-github.md:3-45); `research` reads external primary sources through a background agent (skills/engineering/research/SKILL.md:10); improve-codebase-architecture's HTML report loads Tailwind (https://cdn.tailwindcss.com) and Mermaid (https://cdn.jsdelivr.net/npm/mermaid@11/...) from CDNs when opened (HTML-REPORT.md:13-16, 100; docs/engineering/improve-codebase-architecture.md:60 says it breaks offline); wizard scripts open vendor dashboards and may run `gh secret set` (wizard/template.sh:65-75, 141-167). (3) README furniture only: images on res.cloudinary.com, a skills.sh badge and an aihero.dev newsletter link (README.md:2-13, 21-23)."
+    },
+    "code": {
+      "languages": [
+        "Markdown",
+        "Bash",
+        "JavaScript (Node ESM, maintainer script)",
+        "JSON",
+        "YAML"
+      ],
+      "entry_points": [
+        {
+          "path": ".claude-plugin/plugin.json",
+          "what": "Claude Code plugin manifest (name mattpocock-skills, v1.2.3, MIT); explicit `skills` array of 25 promoted skill directories (lines 21-47); no hooks, MCP or commands fields."
+        },
+        {
+          "path": ".claude-plugin/marketplace.json",
+          "what": "Makes the repo its own single-plugin marketplace (name 'mattpocock'); kept as an undocumented fallback because the official listing supersedes it (.agents/install-block.md:61)."
+        },
+        {
+          "path": "skills/<bucket>/<skill>/SKILL.md",
+          "what": "35 per-skill entry files: YAML frontmatter (name, description, optional disable-model-invocation, argument-hint) plus the procedure body; the model-invoked ones carry trigger-phrase descriptions."
+        },
+        {
+          "path": "skills/<bucket>/<skill>/agents/openai.yaml",
+          "what": "35 Codex metadata files: interface.display_name, interface.short_description, and policy.allow_implicit_invocation: false for user-invoked skills."
+        },
+        {
+          "path": "skills/engineering/ask-matt/SKILL.md",
+          "what": "User-invoked router skill mapping flows and phase boundaries across the set (hand-maintained per CLAUDE.md:21)."
+        },
+        {
+          "path": "scripts/link-skills.sh",
+          "what": "Dev-only symlinker into ~/.claude/skills and ~/.agents/skills; header says it is not a supported installer (lines 4-6)."
+        },
+        {
+          "path": "scripts/sync-plugin-version.mjs",
+          "what": "Copies package.json version into .claude-plugin/plugin.json; `--check` exits 1 on mismatch (run via `npm run version` / `npm run check-plugin-version`, package.json:13-14)."
+        },
+        {
+          "path": ".github/workflows/release.yml",
+          "what": "Only CI workflow: changesets version/tag on push to main."
+        }
+      ],
+      "architecture": "Content-only repo with no executable runtime. skills/ has five buckets (CLAUDE.md:1-7): engineering/ (18 skills) and productivity/ (7) are 'promoted' and mirrored one-to-one by the explicit `skills` array in .claude-plugin/plugin.json (lines 21-47), the top-level README and a docs page each (docs/<bucket>/<skill>.md, 25 pages); misc/ (4), in-progress/ (6, all user-invoked) and deprecated/ (empty) are installable only via skills.sh. Each skill is a folder: SKILL.md (promoted bodies run from about 7 to about 140 lines), agents/openai.yaml, and optional reference files disclosed by pointer rather than inlined (e.g. tdd/tests.md + mocking.md, codebase-design/DEEPENING.md + DESIGN-IT-TWICE.md, domain-modeling/ADR-FORMAT.md + CONTEXT-FORMAT.md, prototype/LOGIC.md + UI.md, ask-matt/PHASE-BOUNDARIES.md, triage/AGENT-BRIEF.md + OUT-OF-SCOPE.md) and templates/scripts (wizard/template.sh, diagnosing-bugs/scripts/hitl-loop.template.sh, misc/git-guardrails-claude-code/scripts/block-dangerous-git.sh). Invocation model: 11 promoted skills are model-invoked, with descriptions that stay loaded by design (skills/productivity/writing-for-agents/SKILL-MECHANICS.md:9); 14 are user-invoked only, with no model reach (SKILL-MECHANICS.md:10; .agents/invocation.md:5-10). Skills depend on one another through `/skill` prose invocation (.agents/invocation.md:16): implement→tdd,code-review (implement/SKILL.md:9-13); tdd→codebase-design (tdd/SKILL.md:26); grill-with-docs→grilling,domain-modeling; triage and improve-codebase-architecture→grilling,domain-modeling; wayfinder→research,grilling,domain-modeling; to-spec, to-tickets, triage, wayfinder and code-review→setup-matt-pocock-skills, which writes per-repo docs/agents/* config (issue tracker via gh/glab or local .scratch/ markdown). Self-contained model-invoked skills: research, resolving-merge-conflicts (CHANGELOG.md:264), grilling, wizard, prototype. Supporting material: .agents/ (ADRs, install-block.md, invocation.md, writing-docs.md), .out-of-scope/ (3 rejected-request notes), .changeset/ and scripts/ (release plumbing).",
+      "packaging_and_release": "No build step or distributable artifact; the repo itself is the artifact. Release is changesets-driven: .github/workflows/release.yml (on push to main, lines 3-6) runs checkout@v4, setup-node@v4 (Node 22), `npm ci`, then changesets/action@v1 with `version: npm run version` (changeset version + scripts/sync-plugin-version.mjs, package.json:13) and `publish: npx changeset tag` (release.yml:30-35), producing a 'chore: version skills' PR and git tags (annotated tag v1.2.3 peeling to 6acc160e…, .git/packed-refs:2-3). package.json is private (line 4), so nothing is published to npm; .changeset/config.json sets privatePackages version/tag true. No checksums, signatures, SBOM or provenance attestations appear in the workflow, and actions are pinned to major tags, not SHAs (release.yml:19, 22, 30). Distribution channels: the Claude Code official-marketplace listing, which pins a git sha and reads .claude-plugin/plugin.json (ADR 0002:34, 40), and skills.sh copying skill folders from GitHub. plugin.json (version 1.2.3, line 3) is kept equal to package.json (1.2.3, line 3) by the sync script.",
+      "tests_and_ci": "No automated tests: no test files, test directories or test framework (globs for *.test.*, *.spec.* and test/tests/__tests__ directories returned nothing; approximate test-file count 0). CI is a single workflow, .github/workflows/release.yml (versioning only; no lint, validate or test job). Maintainer checks are manual: `claude plugin validate . --strict` after touching manifests (CLAUDE.md:11) and `npm run check-plugin-version` (package.json:14), which no workflow invokes. Repo invariants (every promoted skill in README + plugin.json, a docs page per skill, invocation flags paired with openai.yaml) are enforced by convention only (CLAUDE.md:9-21; .agents/invocation.md:10).",
+      "dependencies": "One manifest: package.json — 0 runtime dependencies and 2 devDependencies (@changesets/cli ^2.30.0, @changesets/changelog-github ^0.7.0; package.json:16-19), private package, packageManager npm@10.9.4 (line 20). package-lock.json (lockfileVersion 3) has 111 node_modules entries (transitive, dev-only); its header still says version 0.0.0 (lines 3, 9). No other manifests (no requirements, go.mod, Cargo.toml, etc.). Tools that skills assume at use time but do not declare anywhere: gh and glab (tracker templates), jq (GitHub template and git-guardrails script), git, optional shellcheck (wizard/SKILL.md:41), the Claude Code CLI (`claude --bg` in in-progress/claude-handoff), and the Tailwind/Mermaid CDNs.",
+      "security_policy": "none — no SECURITY.md (searched **/SECURITY*) and no .github/SECURITY.md; .github contains only workflows/release.yml. The only security-related note is a docs FAQ saying Snyk flags diagnosing-bugs as high risk, which the docs call a false positive (docs/engineering/diagnosing-bugs.md:73-74)."
+    },
+    "claim_checks": [
+      {
+        "claim": "The Claude Code plugin 'installs the whole set as a managed, read-only bundle' (README.md:27).",
+        "verified": "yes",
+        "evidence": ".claude-plugin/plugin.json:21-47 lists 25 explicit skill paths (18 engineering, 7 productivity) with no hooks/MCP/commands fields; CLAUDE.md:9 says the plugin ships exactly the promoted set; misc/in-progress skills are excluded (skills/in-progress/README.md:3-9). Choosing a subset at install time is only offered by skills.sh (README.md:55)."
+      },
+      {
+        "claim": "'It's in Claude Code's official marketplace ... updates arrive automatically' (README.md:44).",
+        "verified": "partial",
+        "evidence": "Only repo-internal assertions can be read: .agents/adr/0002-ship-as-a-claude-code-plugin.md:32-41 (accepted 2026-08-05; listing pins a git sha so a release reaches users when the pin moves, and the pin was two commits behind main at the time) and .agents/install-block.md:5 (auto-update claim leans on external Claude Code docs, not opened). The listing lives in anthropics/claude-plugins-official, outside this checkout. plugin.json and package.json both say 1.2.3."
+      },
+      {
+        "claim": "User-invoked skills are reachable only by typing them; model-invoked ones can be reached automatically (README.md:186).",
+        "verified": "yes",
+        "evidence": "14 promoted SKILL.md files set `disable-model-invocation: true` (e.g. skills/engineering/ask-matt/SKILL.md:4, skills/productivity/grill-me/SKILL.md:4) and each pairs it with `policy.allow_implicit_invocation: false` in agents/openai.yaml (e.g. skills/engineering/implement/agents/openai.yaml:4-5); the other 11 have neither. Caveat: docs/engineering/ask-matt.md:56 reports harnesses omit user-invoked skills from the model's list and still says '13 of 22' skills carry the flag — stale against the code's 14 of 25."
+      },
+      {
+        "claim": "'They work with any model' (README.md:19).",
+        "verified": "partial",
+        "evidence": "The code contains no model-specific logic (supports portability), but nothing tests it, and the project's own docs record model/harness-dependent behaviour: diagnosing-bugs over-fires on GPT-5.6-Sol (docs/engineering/diagnosing-bugs.md:59), nested research agents reproduced in Codex (docs/engineering/research.md:35), to-tickets sub-issue linking 'worse on Codex' (docs/engineering/to-tickets.md:65)."
+      },
+      {
+        "claim": "/tdd 'encourages red-green-refactor' (README.md:154-156, 209).",
+        "verified": "partial",
+        "evidence": "Code differs from README and wins: skills/engineering/tdd/SKILL.md:3 keeps 'red-green-refactor' only as a trigger phrase, but SKILL.md:8 defines TDD as 'the red → green loop' and SKILL.md:38 says 'Refactoring is not part of the loop' (moved to code-review). docs/engineering/tdd.md:51 acknowledges the description/body mismatch as an open issue."
+      },
+      {
+        "claim": "code-review is a two-axis (Standards + Spec) review run as parallel sub-agents so neither pollutes the other (README.md:212).",
+        "verified": "yes",
+        "evidence": "skills/engineering/code-review/SKILL.md:6-11 and 58-72 define two parallel sub-agent briefs, aggregated without reranking (74-78). Not covered: any security axis (Standards = repo-documented standards plus 12 Fowler smells, SKILL.md:34-56) and any guard against sub-agents re-invoking the skill (absent from SKILL.md:58-72; docs/engineering/code-review.md:56 reports the loop)."
+      },
+      {
+        "claim": "/diagnosing-bugs is a disciplined loop 'gated phase by phase' (README.md:158, 207).",
+        "verified": "yes",
+        "evidence": "skills/engineering/diagnosing-bugs/SKILL.md:57-66 ('No red-capable command, no Phase 2'), :86 ('Do not proceed until you have reproduced and minimised'), :132-138 (required cleanup checklist). Code vs docs: SKILL.md:12-16 now has a Redact section (CHANGELOG.md:7-11, v1.2.3), while docs/engineering/diagnosing-bugs.md:71 still calls the redaction guardrail 'open and unimplemented' — the docs page is stale; code preferred."
+      },
+      {
+        "claim": "Make sure `setup-matt-pocock-skills` is installed; run it once per repo (README.md:55, 74-80).",
+        "verified": "yes",
+        "evidence": "skills/engineering/to-spec/SKILL.md:9, to-tickets/SKILL.md:11, triage/SKILL.md:43, wayfinder/SKILL.md:25 and code-review/SKILL.md:13 all depend on the docs/agents/* config it writes; .agents/adr/0001-explicit-setup-pointer-only-for-hard-dependencies.md:7 classes to-tickets, to-spec and triage as hard dependencies. The setup skill is itself user-invoked only (setup-matt-pocock-skills/SKILL.md:4) and edits CLAUDE.md in preference to AGENTS.md regardless of harness (SKILL.md:74-80)."
+      },
+      {
+        "claim": "'A native Codex plugin is on the roadmap' (README.md:57).",
+        "verified": "yes",
+        "evidence": "As a deferred item, not a built one: no .codex-plugin/ directory or Codex manifest exists in the tree (glob found none); .agents/adr/0002-ship-as-a-claude-code-plugin.md:13-23 records that Codex plugin manifests accept only a single skills path and defers the plugin. Codex support today is agents/openai.yaml metadata installed through skills.sh (.agents/invocation.md:10)."
+      },
+      {
+        "claim": "skills.sh writes editable files and 'nothing updates behind your back'; `npx skills update` pulls changes (README.md:70).",
+        "verified": "not_checkable",
+        "evidence": "The installer is the external `skills` npm package; no installer code is in this repo (scripts/link-skills.sh:4-6 disclaims being one). Project docs say edits are overwritten by `npx skills update` (docs/engineering/code-review.md:52; docs/engineering/ask-matt.md:72)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Project-reported effect of the round-based rework of the grilling skill (anecdotal design note in a changeset; no method or data given).",
+        "metric": "rounds needed to ask the same 13 questions",
+        "value": "~3 rounds instead of 13",
+        "source": "CHANGELOG.md:126",
+        "independent": false
+      },
+      {
+        "what": "Anecdotal user report relayed in project docs (original issue #530 not opened): one /research task whose background agent spawned nested research agents.",
+        "metric": "tokens consumed by one research task across three overlapping runs",
+        "value": "roughly 450k tokens",
+        "source": "docs/engineering/research.md:35",
+        "independent": false
+      },
+      {
+        "what": "Anecdotal user report relayed in project docs (not opened at source): /code-review sub-agents re-invoking the skill and fanning out.",
+        "metric": "agents spawned in one reported run",
+        "value": "50-plus agents",
+        "source": "docs/engineering/code-review.md:56",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope gap for security procedures: no skill covers threat modelling, vulnerability review, dependency audit or secure-coding checks. code-review's Standards axis is repo-documented standards plus 12 Fowler smells and 'skip anything tooling enforces' (skills/engineering/code-review/SKILL.md:34-56). Security-flavoured content is limited to diagnosing-bugs' Redact section (SKILL.md:12-16), handoff's redaction line (skills/productivity/handoff/SKILL.md:14), wizard's hidden secret entry (wizard/template.sh:113-126) and misc/git-guardrails-claude-code, which is Claude-Code-only, outside the plugin, substring-matching, and by inspection exits 0 (allows the command) if jq is missing because it has no jq check or set -e (scripts/block-dangerous-git.sh:3-25).",
+      "Catalog granularity: the plugin install is all-or-nothing (25 skills, .claude-plugin/plugin.json:21-47). By the repo's own design the 11 model-invoked skills keep always-loaded descriptions (skills/productivity/writing-for-agents/SKILL-MECHANICS.md:9) while the 14 user-invoked ones are outside model reach (SKILL-MECHANICS.md:10). Per-skill selection exists only via the external skills.sh installer (README.md:55; .agents/install-block.md:44), and skills depend on each other through /skill prose (implement→tdd,code-review: implement/SKILL.md:9-13; tdd→codebase-design: tdd/SKILL.md:26; grill-with-docs→grilling,domain-modeling: grill-with-docs/SKILL.md:7; five skills→setup-matt-pocock-skills), so a single-skill install can leave dangling references (CHANGELOG.md:231, 241; docs/engineering/tdd.md:25).",
+      "Claude Code vs Codex parity is partial and recorded as such: no native Codex plugin (README.md:57; ADR 0002:13-23); Codex once hid a skill from the model-visible list because of policy.allow_implicit_invocation: false (CHANGELOG.md:23); the setup skill picks CLAUDE.md over AGENTS.md regardless of harness (skills/engineering/setup-matt-pocock-skills/SKILL.md:74-80; docs/engineering/setup-matt-pocock-skills.md:63); docs report Claude desktop/web omit user-invoked skills from the model's list (docs/engineering/ask-matt.md:56; docs/engineering/wizard.md:77) and that the plugin's mattpocock-skills: prefix makes Claude Code's built-in /code-review hard to reach (docs/engineering/code-review.md:52).",
+      "Sub-agent skills carry no recursion guard: code-review (SKILL.md:58-72) and research (SKILL.md:6) tell the agent to spawn sub-agents without forbidding re-invocation; project docs report 50-plus agents and about 450k tokens in single runs (docs/engineering/code-review.md:56; docs/engineering/research.md:35).",
+      "Maintenance and QA: no tests and no validation CI — the only workflow is versioning (.github/workflows/release.yml); manifest and sync checks are manual (CLAUDE.md:11; package.json:14). Docs drift against code is already visible at this tag: docs/engineering/diagnosing-bugs.md:71 says redaction is unimplemented vs SKILL.md:12-16; docs/engineering/improve-codebase-architecture.md:84 says the skill names Claude Code's Agent tool vs SKILL.md:27 and CHANGELOG.md:13; docs/engineering/wizard.md:44 still advertises time remaining vs CHANGELOG.md:15 and the template; docs/engineering/ask-matt.md:56 counts 13 of 22 vs 14 of 25 in code. Docs also list open, unfixed defects (e.g. docs/engineering/to-tickets.md:65-68; docs/engineering/triage.md:74).",
+      "Release and supply chain: no release artifacts, checksums, signatures or provenance; actions pinned to major tags not SHAs (release.yml:19, 22, 30). Plugin users receive changes only when the official listing's pinned sha moves — it lagged two commits behind main when last verified (ADR 0002:40). `npx skills@latest` runs an unpinned external package at install time (README.md:52; .agents/install-block.md:53) whose behaviour, including any telemetry, is not documented in this repo.",
+      "Runtime side effects and network: improve-codebase-architecture writes an HTML report that loads Tailwind and Mermaid (major-pinned only) from CDNs with Mermaid securityLevel 'loose' (HTML-REPORT.md:13-16) and fails offline (docs/engineering/improve-codebase-architecture.md:60); wizard templates write secrets to a plaintext .env and run gh secret set, with no .gitignore handling anywhere in the wizard files (template.sh:128-154); implement commits to the current branch (implement/SKILL.md:15); triage, to-spec, to-tickets and wayfinder create, label, comment on and close GitHub/GitLab issues via gh/glab (setup-matt-pocock-skills/issue-tracker-github.md:7-45; triage/SKILL.md:13-17). These tracker skills are user-invoked only; wizard is model-invoked but its script is not run by the agent (wizard/SKILL.md:43).",
+      "Maintainership: all 41 CHANGELOG entries credit one GitHub user (CHANGELOG.md:7-270), LICENSE is MIT with a single copyright holder (LICENSE:3), and there is no CODEOWNERS, CONTRIBUTING or SECURITY file. The project lists scope it will not take (.out-of-scope/mainstream-issue-trackers-only.md; question-limits.md; setup-skill-verify-mode.md), states edits to scripts/link-skills.sh won't be approved (lines 4-6), and its docs say plugin copies are read-only and skills.sh copies are overwritten on update, so durable local customisation means forking (docs/engineering/ask-matt.md:72; docs/engineering/code-review.md:52)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "mattpocock/skills",
+      "checks": [
+        {
+          "field": "readme.install[0] (Claude Code plugin, CLI)",
+          "statement": "Install with `claude plugins install mattpocock-skills`.",
+          "citation": "README.md:35; .agents/install-block.md:12",
+          "holds": true,
+          "note": "Both cited lines contain exactly `claude plugins install mattpocock-skills`. The plugin name matches .claude-plugin/plugin.json:2. README.md:44 and install-block.md:21 say it is in the official marketplace with nothing to add first, and ADR 0002:38 records the CLI form resolving against the live listing on 2026-08-05. Revision confirmed: HEAD = 6acc160e4e0cd062dbbbd7a1b26ae92855edf07e, and tag v1.2.3 peels to it (.git/packed-refs:2-3)."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, file LICENSE.",
+          "citation": "LICENSE:1-21",
+          "holds": true,
+          "note": "LICENSE:1 reads 'MIT License', followed by the standard MIT permission and warranty text; the copyright line is 'Copyright (c) 2026 Matt Pocock' (LICENSE:3). It matches package.json:10 and .claude-plugin/plugin.json:11, both \"license\": \"MIT\"."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "Yes (inferred, not stated): the README names no OS or architecture, and the repo ships no compiled artifacts. Linux is handled in improve-codebase-architecture/SKILL.md:39 (xdg-open) and wizard/template.sh:71. The release workflow runs on ubuntu-latest (release.yml:13).",
+          "citation": "skills/engineering/improve-codebase-architecture/SKILL.md:39; skills/engineering/wizard/template.sh:71; .github/workflows/release.yml:13",
+          "holds": true,
+          "note": "SKILL.md:39 says '`xdg-open <path>` on Linux'. template.sh:71 falls back to xdg-open in open_url. release.yml:13 is `runs-on: ubuntu-latest`. A case-insensitive grep of README.md for linux/macos/windows/wsl/arm64/x86/amd64 found nothing, and a glob for exe/so/dylib/dll/wasm/node/jar/o/a/whl/tgz/zip/gz files found none. The dossier correctly labels this as inferred; ubuntu-latest is maintainer CI only, not a user platform."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Claude Code: native plugin (plugin.json, 25 skills, v1.2.3) plus a fallback marketplace.json; the official listing is asserted in ADR 0002:32-41 and README.md:44; user-invoked skills use disable-model-invocation: true. Codex: no native plugin (README.md:57; ADR 0002:13-23); each of the 35 skills has agents/openai.yaml with interface.display_name and short_description, plus policy.allow_implicit_invocation: false for user-invoked skills. link-skills.sh:8-11 names ~/.claude/skills and ~/.agents/skills. AGENTS.md is the same as CLAUDE.md (a symlink, per CHANGELOG.md:36). Claude-Code-only extras: a git-guardrails PreToolUse hook and `claude --bg` in claude-handoff.",
+          "citation": ".claude-plugin/plugin.json:3,21-47; .claude-plugin/marketplace.json; .agents/adr/0002-ship-as-a-claude-code-plugin.md:13-23,32-41; README.md:44,57; skills/engineering/ask-matt/SKILL.md:4; .agents/invocation.md:10; skills/engineering/implement/agents/openai.yaml:1-5; scripts/link-skills.sh:8-11; CHANGELOG.md:36",
+          "holds": true,
+          "note": "Every part checks out. plugin.json lines 22-46 hold 25 paths (18 engineering + 7 productivity), version 1.2.3 at line 3. ADR 0002:13-23 records that the Codex manifest takes a single skills path and defers the Codex plugin; no .codex-plugin/ exists in the tree. Globs find 35 SKILL.md and 35 agents/openai.yaml files; each openai.yaml has an `interface:` block with display_name and short_description (70 field lines across 35 files). ask-matt/SKILL.md:4, invocation.md:10 and implement/agents/openai.yaml:1-5 match. link-skills.sh:10-11 names ~/.claude/skills (Claude Code) and ~/.agents/skills (Codex and other harnesses). AGENTS.md has the same 24 lines as CLAUDE.md; Glob does not list it, as expected for a symlink, and CHANGELOG.md:36 says 'Add AGENTS.md as a symlink to CLAUDE.md'. misc/git-guardrails-claude-code/SKILL.md:8,46 sets up a PreToolUse hook, and in-progress/claude-handoff/SKILL.md:8 runs `claude --bg`."
+        },
+        {
+          "field": "claim_checks[2] (user-invoked vs model-invoked, README.md:186)",
+          "statement": "Verified yes: 14 promoted SKILL.md files set `disable-model-invocation: true`, each paired with `policy.allow_implicit_invocation: false` in agents/openai.yaml; the other 11 have neither. Caveat: docs/engineering/ask-matt.md:56 still says 13 of 22.",
+          "citation": "README.md:186; skills/engineering/ask-matt/SKILL.md:4; skills/productivity/grill-me/SKILL.md:4; skills/engineering/implement/agents/openai.yaml:4-5; docs/engineering/ask-matt.md:56",
+          "holds": true,
+          "note": "README.md:186 is quoted accurately. `disable-model-invocation: true` appears once in each of 20 SKILL.md files: 14 promoted (9 engineering + 5 productivity) and the 6 in-progress skills. `allow_implicit_invocation: false` appears in exactly the same 20 openai.yaml files. The 11 promoted skills with neither flag (prototype, diagnosing-bugs, research, tdd, domain-modeling, codebase-design, code-review, resolving-merge-conflicts, wizard, grilling, writing-for-agents) match the README's Model-invoked lists (README.md:204-214, 228-231). The cited lines all match; ask-matt.md:56 does say 'Thirteen of the plugin's twenty-two skills carry the flag', which is stale against 14 of 25 in code, as the dossier notes."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

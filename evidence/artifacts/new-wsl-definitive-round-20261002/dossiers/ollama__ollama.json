@@ -1,0 +1,290 @@
+{
+  "contender": "ollama/ollama",
+  "revision": {
+    "contender": "ollama/ollama",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "ollama/ollama",
+        "tag": "v0.35.0",
+        "commit": "cc4069396f3ad2c370c53eed2e4a42ac13adab84",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.35.0",
+    "commit": "cc4069396f3ad2c370c53eed2e4a42ac13adab84",
+    "read_at": "2026-10-02T03:02:29+00:00"
+  },
+  "dossier": {
+    "contender": "ollama/ollama",
+    "revision": {
+      "tag": "v0.35.0",
+      "commit": "cc4069396f3ad2c370c53eed2e4a42ac13adab84",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Ollama is a Go local-LLM runtime and model manager. `ollama serve` runs an HTTP server (default 127.0.0.1:11434) that pulls models from registry.ollama.ai, schedules them onto CPU/GPU, and serves native /api/* endpoints plus OpenAI-compatible (/v1/chat/completions, /v1/responses, /v1/embeddings) and Anthropic-compatible (/v1/messages) endpoints. GGUF models run through a supervised upstream llama.cpp `llama-server` subprocess; safetensors models run through an in-tree MLX engine. `ollama launch` configures coding agents (Claude Code, Codex CLI and others) to use that server. Relevant to the stated needs: it is a local model server with embedding endpoints (/api/embed, /api/embeddings, /v1/embeddings). A repo-wide search found no OTLP receiver or exporter, no metrics/log/trace store, no dashboard, no dataset/experiment store, and no code-indexing or semantic-search feature (see telemetry_and_network and risks).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Tagline: 'Start building with open models.'",
+          "citation": "README.md:9"
+        },
+        {
+          "claim": "macOS and Linux install with `curl -fsSL https://ollama.com/install.sh | sh` (macOS alternatively a manual Ollama.dmg download); Linux manual-install instructions are on docs.ollama.com/linux",
+          "citation": "README.md:13-19, README.md:29-35"
+        },
+        {
+          "claim": "'The official Ollama Docker image `ollama/ollama` is available on Docker Hub.'",
+          "citation": "README.md:37-39"
+        },
+        {
+          "claim": "Official client libraries are ollama-python and ollama-js (separate repositories); `pip install ollama` and `npm i ollama` examples are given",
+          "citation": "README.md:41-44, README.md:107-139"
+        },
+        {
+          "claim": "Running `ollama` prompts you to run a model or connect Ollama to existing agents/applications such as Claude Code, OpenClaw, OpenCode, Codex, Copilot and more",
+          "citation": "README.md:52-58"
+        },
+        {
+          "claim": "`ollama launch claude` launches a specific integration; supported integrations include Claude Code, Codex, Copilot CLI, DeepSeek Harness, Droid and OpenCode (OpenClaw via `ollama launch openclaw`)",
+          "citation": "README.md:60-76"
+        },
+        {
+          "claim": "`ollama run gemma4` chats with a model; the full model list is at ollama.com/library",
+          "citation": "README.md:78-88"
+        },
+        {
+          "claim": "'Ollama has a REST API for running and managing models'; example POST http://localhost:11434/api/chat; all endpoints are documented at docs.ollama.com/api",
+          "citation": "README.md:90-105"
+        },
+        {
+          "claim": "Supported backends: llama.cpp (the only backend listed)",
+          "citation": "README.md:141-143"
+        },
+        {
+          "claim": "Documentation links: CLI reference, REST API reference, importing models, Modelfile reference, building from source (docs/development.md)",
+          "citation": "README.md:145-151"
+        },
+        {
+          "claim": "Community 'Observability & Monitoring' integrations (third-party projects): Opik, OpenLIT ('OpenTelemetry-native monitoring for Ollama and GPUs'), Lunary, Langfuse, HoneyHive, MLflow Tracing",
+          "citation": "README.md:323-330"
+        },
+        {
+          "claim": "Community 'Database & Embeddings' integrations (third-party): pgai, MindsDB, chromem-go, Kangaroo; RAG/knowledge-base projects (RAGFlow, R2R, MaxKB and others) are listed separately",
+          "citation": "README.md:272-282, README.md:332-337"
+        },
+        {
+          "claim": "The README makes no statement about telemetry, privacy, authentication or hardening; a 'Security proxy for Ollama' (Ollama Fortress) appears only as a community project",
+          "citation": "README.md:1-357 (absence of such statements), README.md:313"
+        }
+      ],
+      "install": [
+        {
+          "method": "Linux install script (version can be pinned with OLLAMA_VERSION)",
+          "command": "curl -fsSL https://ollama.com/install.sh | sh",
+          "citation": "README.md:29-33; docs/linux.mdx:5-11; version pin docs/linux.mdx:153-161"
+        },
+        {
+          "method": "Linux manual tarball (x86_64; ROCm and ARM64 variants are documented separately)",
+          "command": "curl -fsSL https://ollama.com/download/ollama-linux-amd64.tar.zst | sudo tar x -C /usr",
+          "citation": "docs/linux.mdx:13-25 (ROCm :39-46, ARM64 :48-55)"
+        },
+        {
+          "method": "macOS install script",
+          "command": "curl -fsSL https://ollama.com/install.sh | sh",
+          "citation": "README.md:13-17; macOS branch of the script at scripts/install.sh:48-93"
+        },
+        {
+          "method": "macOS manual app install",
+          "command": "Download https://ollama.com/download/Ollama.dmg, mount it and drag Ollama.app to /Applications (the app offers to link the CLI into /usr/local/bin)",
+          "citation": "README.md:19; docs/macos.mdx:11-15"
+        },
+        {
+          "method": "Docker with NVIDIA GPU (requires NVIDIA Container Toolkit)",
+          "command": "docker run -d --gpus=all -v ollama:/root/.ollama -p 11434:11434 --name ollama ollama/ollama",
+          "citation": "docs/docker.mdx:7-9, docs/docker.mdx:52-56 (CPU-only variant :3-5)"
+        },
+        {
+          "method": "Build from source (Go, CMake 3.24+, C/C++ toolchain; GPU backends selected with -DOLLAMA_LLAMA_BACKENDS)",
+          "command": "cmake -B build . && cmake --build build --parallel 8 && ./ollama serve",
+          "citation": "docs/development.md:3-8, 19-27, 35-42; AGENTS.md:3-11"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - docs/linux.mdx:20-25 (ollama-linux-amd64.tar.zst); scripts/install.sh:34-40,171 maps x86_64 to amd64; .github/workflows/release.yaml:484-495 builds amd64 cpu, cuda_v12, cuda_v13, mlx, rocm_v7_2 and vulkan payloads. The script needs sudo, curl and zstd (scripts/install.sh:111-127,138-143).",
+        "wsl2": "yes (no dedicated WSL2 doc page) - scripts/install.sh:101-108 detects WSL2 and rejects WSL1; :243-246 warns when systemd is not running; :254-262 treats WSL2 GPU as NVIDIA passthrough only (checks nvidia-smi). docs/faq.mdx:255-257 mentions Docker GPU use with WSL2 and :259-265 WSL2 networking. No WSL2-specific CI job found in .github/workflows.",
+        "macos_arm64": "yes - docs/macos.mdx:5-8 (macOS 14+, Apple M-series CPU and GPU); docs/gpu.mdx:136-139 (Metal); docs/development.md:21,122 (macOS arm64 builds Metal inference, MLX on by default). Release is built on a macOS runner (release.yaml:29-31) with codesign and notarization (scripts/build_darwin.sh:175-286). Install script branch scripts/install.sh:48-93.",
+        "gpu": "yes for NVIDIA GeForce RTX 4090 (compute capability 8.9) - docs/gpu.mdx:5-6,18 (compute 5.0+, driver 550+); the CUDA 12 payload arch list includes 89 and the CUDA 13 payload includes 89-virtual (llama/server/CMakePresets.json:71,103); driver-floor logic in discover/cuda_compat.go:10-19,64-72; Linux release bundles carry cuda_v12/cuda_v13 dirs (release.yaml:682). Also AMD ROCm v7, Vulkan and Apple Metal (docs/gpu.mdx:55-67,136-171). Containers need nvidia-container-toolkit (docs/docker.mdx:7-9). CI only compiles the CUDA payloads (test.yaml:93-97); GPU/model tests are tag-gated integration tests (integration/README.md:5-11). If nvidia-smi is missing on bare-metal Linux the installer adds NVIDIA's CUDA repo and installs cuda-drivers (scripts/install.sh:313-451); with nvidia-smi present it stops after install (scripts/install.sh:294-297)."
+      },
+      "integrations": {
+        "cli": "yes - `ollama` cobra CLI: serve, run, pull, push, create, show, list, ps, stop, cp, rm, signin, signout and `launch [INTEGRATION]` (cmd/cmd.go:2385-2662; cmd/launch/launch.go:283-284,402-405). `ollama run <embedding-model> 'text'` prints embeddings (docs/capabilities/embeddings.mdx:17-30; --truncate/--dimensions flags at cmd/cmd.go:2466-2467).",
+        "mcp": "none found - no MCP server or client code in this repo (a grep for MCP matches only integration-config tests and comments); docs only point to an external Python MCP server for Ollama web search that lives in the ollama-python repo (docs/capabilities/web-search.mdx:310-312).",
+        "sdk_or_api": "HTTP API, default http://127.0.0.1:11434 (envconfig/config.go:20-24): native /api/{generate,chat,embed,embeddings,tags,show,ps,pull,push,create,copy,delete,version,status}, OpenAI-compatible /v1/{chat/completions,completions,embeddings,models,responses,audio/transcriptions} and Anthropic-compatible POST /v1/messages (server/routes.go:2020-2074; docs/api/introduction.mdx:13-25). In-repo Go client package api/ (api/client.go; examples in api/examples/). Official Python and JS SDKs live in separate repos (README.md:41-44; docs/api/introduction.mdx:44-51). The API 'isn't strictly versioned' (docs/api/introduction.mdx:55-57).",
+        "claude_code_or_codex": "yes - `ollama launch claude` runs Claude Code with ANTHROPIC_BASE_URL pointed at the local server (docs/integrations/claude-code.mdx:9-15; cmd/launch/claude.go:52-87); manual env-var setup at claude-code.mdx:191-209; headless `--yes` requires --model (claude-code.mdx:114-122; cmd/launch/launch.go:487). `ollama launch codex [--config|--restore]` writes ~/.codex/ollama-launch.config.toml and model.json and runs `codex --profile ollama-launch` (docs/integrations/codex.mdx:18-37,59-78; cmd/launch/codex.go:54-81,211-338) and requires Codex >= 0.134.0 (codex.go:781); `codex --oss` is the manual path (codex.mdx:39-57). Also macOS Claude Desktop and ChatGPT/Codex desktop-app connectors (docs/integrations/claude-desktop.mdx; cmd/launch/registry.go:55-67,97-108) and a loopback-only Codex gateway route /api/codex on the server (server/routes.go:2025-2027)."
+      },
+      "telemetry_and_network": "No telemetry SDK, analytics beacon, OTLP exporter/receiver, Prometheus endpoint or metrics store exists in the repo: a grep for otel|OTLP|opentelemetry|prometheus|/metrics|sentry|posthog|mixpanel|amplitude|datadog matches only README.md:326 (third-party OpenLIT listing) and unrelated tests/comments; go.mod:5-91 has no such modules; the route table server/routes.go:2020-2074 has no /metrics or OTLP paths (the comment at :2161-2168 mentions net/http/pprof but nothing in the repo imports it). docs/faq.mdx:159-161 says local runs do not send prompts/data to ollama.com and describes cloud processing; docs/cloud.mdx:88-92 repeats it. Outbound traffic found in code: (1) model pulls/pushes go to registry.ollama.ai by default (types/model/name.go:38-43) with User-Agent ollama/<ver> (<arch> <os>) Go/<ver> (server/images.go:1413) and redirects allowed to ollama.com, ollama.ai, hf.co, huggingface.co (server/images.go:1380). (2) On `ollama serve` start the server runs two background cloud caches (server/model_caches.go:17-27; routes.go:2157): model recommendations fetched from https://ollama.com/api/experimental/model-recommendations at start and every ~4h with jitter, 3s timeout (server/model_recommendations.go:23-37,151-233), and cloud model-info hydration via ollama.com /api/tags + /api/show (server/model_show_cache.go:123-131,335-392,444-497); requests are signed with the local ed25519 key ~/.ollama/id_ed25519 (server/cloud_proxy.go:372-385) which `ollama serve` creates if missing (cmd/cmd.go:2101-2163), and carry X-Ollama-Client-Version. All of this is skipped when cloud is disabled via OLLAMA_NO_CLOUD=1 or disable_ollama_cloud in ~/.ollama/server.json (envconfig/config.go:237-238,382-385,440-449; internal/cloud/policy.go:11-17; docs/faq.mdx:163-181). (3) `:cloud` models and web search/fetch are proxied to https://ollama.com:443 (override OLLAMA_CLOUD_BASE_URL) and need an Ollama account or API key (server/cloud_proxy.go:28-32,59-72,74-137; docs/api/authentication.mdx:7-34; docs/capabilities/web-search.mdx:9-11). (4) Windows/macOS desktop app only (build tag windows||darwin): hourly GET https://ollama.com/api/update with os, arch, version, timestamp, nonce, signature and, on macOS, a device UUID; the check is unconditional, only the download is gated by the auto-update setting (app/updater/updater.go:1,32-36,53-101,388-405; app/store/store.go:251-259). (5) A loopback-only Codex Desktop gateway at /api/codex forwards non-Ollama models to https://chatgpt.com/backend-api/codex or https://api.openai.com/v1 and appends one line per request (route, model, method, path, status, duration, result; no bodies) to ~/.ollama/logs/codex-proxy.log (server/codex_proxy.go:13-34; internal/proxy/codex_desktop.go:28-30,157-176,481-516). Source builds fetch llama.cpp, MLX, mlx-c and xgrammar from GitHub at configure time (llama/server/CMakeLists.txt:181-184; cmake/mlx/CMakeLists.txt:65-68). Logging: slog text logs to stderr (logutil/logutil.go:14-33; server/routes.go:2098) plus gin access logs (routes.go:2012), journald on Linux and ~/.ollama/logs/server.log on macOS (docs/troubleshooting.mdx:6-16); llama-server runs at --log-verbosity 4 (llm/llama_server.go:575-582). OLLAMA_DEBUG_LOG_REQUESTS=1 writes full request bodies plus curl replay scripts to an OS temp dir for /api/generate, /api/chat, /v1/chat/completions, /v1/completions, /v1/responses and /v1/messages (server/inference_request_log.go:33-55,112-124; routes.go:2054-2074). Claude Code/Codex telemetry: `ollama launch claude` appends env vars (ANTHROPIC_BASE_URL, DISABLE_ERROR_REPORTING=1, DISABLE_FEEDBACK_COMMAND=1, CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY=1, ...) to the inherited environment, and a test asserts DISABLE_TELEMETRY and CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC are not set (cmd/launch/claude.go:63,67-87; claude_test.go:370-375); there is no OTEL_* handling anywhere in the repo, the Codex launcher only writes its own profile/catalog files (cmd/launch/codex.go:77-79,211-338), and only the Claude Desktop profile writer sets disableEssentialTelemetry/disableNonessentialTelemetry=true (cmd/launch/claude_desktop.go:741-759)."
+    },
+    "code": {
+      "languages": [
+        "Go (primary; about 787 .go files including 353 test files)",
+        "C/C++/Objective-C (llama.cpp compat layer, MLX C bindings, xgrammar, macOS/Windows webview glue)",
+        "TypeScript/React (desktop app UI, app/ui/app)",
+        "CMake",
+        "Shell and PowerShell (install and build scripts)",
+        "Dockerfile"
+      ],
+      "entry_points": [
+        {
+          "path": "main.go",
+          "what": "`ollama` binary; calls cmd.NewCLI().ExecuteContext (main.go:11-13)"
+        },
+        {
+          "path": "cmd/cmd.go",
+          "what": "cobra CLI (NewCLI :2385-2662): serve|start, run, pull, push, create, show, list, ps, stop, cp, rm, signin, signout, launch, hidden runner (MLX) and gpu-discover; RunServer :2101-2117"
+        },
+        {
+          "path": "server/routes.go",
+          "what": "HTTP server: Serve() :2097-2219 and GenerateRoutes() :1979-2077 (native /api/*, OpenAI /v1/*, Anthropic /v1/messages, Codex gateway /api/codex)"
+        },
+        {
+          "path": "llm/llama_server.go",
+          "what": "starts and talks to the upstream llama-server subprocess bound to 127.0.0.1 with --no-webui --offline (startLlamaServer :350-443)"
+        },
+        {
+          "path": "cmd/launch/",
+          "what": "`ollama launch` integrations (claude.go, codex.go, claude_desktop.go, registry.go and others)"
+        },
+        {
+          "path": "cmd/bench/bench.go",
+          "what": "standalone benchmark CLI (`go build -o ollama-bench ./cmd/bench`) with benchstat/CSV output; can target an OpenAI-compatible URL with -openai"
+        },
+        {
+          "path": "app/cmd/app/app.go",
+          "what": "desktop tray app plus updater, Windows/macOS only (build tag windows || darwin); React UI in app/ui/app"
+        },
+        {
+          "path": "mlxrunner/",
+          "what": "MLX engine runner for safetensors models, started via the hidden `ollama runner` command (cmd/cmd.go:2569-2579)"
+        }
+      ],
+      "architecture": "Single Go module github.com/ollama/ollama (go.mod:1-3). main.go -> cmd/ (cobra CLI). server/ is the gin HTTP server: routes.go (native /api/*, OpenAI /v1/*, Anthropic /v1/messages), sched.go (model scheduler), images.go/download.go/upload.go/create.go (registry pull/push/create), cloud_proxy.go (proxy to ollama.com for :cloud models), model_caches.go/model_recommendations.go/model_show_cache.go (background cloud caches), inference_request_log.go (opt-in request-body logging). llm/ starts and talks to a `llama-server` subprocess on 127.0.0.1 for GGUF models (llm/server.go:98-111; llm/llama_server.go:350-443). llama/server and llama/compat hold the CMake wrapper that FetchContent-pulls llama.cpp (pinned by LLAMA_CPP_VERSION=b11081) and applies an Ollama compatibility patch layer (llama/compat/README.md:3-10). mlx/, mlxrunner/ and cmake/mlx implement the MLX engine for safetensors models (default on macOS arm64, optional CUDA 13; docs/development.md:120-131). discover/ does GPU discovery (CUDA, ROCm, Vulkan, Metal). openai/, anthropic/ and middleware/ translate the compatibility APIs onto the native chat path. api/ is the Go client and wire types; envconfig/ holds env-var configuration; cmd/launch/ holds agent integrations; internal/proxy holds the Claude/Codex Desktop gateways; app/ is the desktop GUI (Go + React) with updater. cmd/bench is a benchmark tool and integration/ holds end-to-end tests.",
+      "packaging_and_release": "Tag-triggered .github/workflows/release.yaml (push of v* tags, :3-6) builds: macOS arm64 app/zip/dmg/tgz, signed with an Apple identity and notarized (scripts/build_darwin.sh:175-286; release.yaml:29-94); Windows installer and zips signed via Google Cloud KMS/signtool (release.yaml:399-477; scripts/build_windows.ps1:1020-1044); Linux per-arch .tar.zst bundles (ollama-linux-<arch>.tar.zst plus -rocm, -jetpack5/6 and -mlx variants) built through Docker buildx (release.yaml:479-710, archives made at :701-705); multi-arch Docker images pushed to vars.DOCKER_REPO (release.yaml:712-745; scripts/tag_latest.sh:7-13 defaults to ollama/ollama and re-tags latest/rocm via .github/workflows/latest.yaml). The release job uploads artifacts plus install.sh and a sha256sum.txt manifest (release.yaml:748-860; checksum generation :788-790); the GitHub release is first created as draft+prerelease (:830-834). No cosign/GPG/SLSA attestations were found; Docker builds set provenance: false and sbom: false (release.yaml:543-544,637-638,657-658). Version and release mode are stamped with ldflags (release.yaml:25). Third-party licenses (llama.cpp, cpp-httplib, MLX, xgrammar) are packaged alongside (llama/server/CMakeLists.txt:618-634; cmake/mlx/CMakeLists.txt:138-169).",
+      "tests_and_ci": "Go testing with testify/go-cmp (go.mod:9,15): 353 *_test.go files, 29 of them in integration/ behind the `integration` build tag (integration/README.md:5-11), the rest are unit tests across server/, cmd/, cmd/launch/, model/, mlxrunner/, app/ and others; 22 Vitest UI test files under app/ui/app/src (package.json:15-18). cmd/bench is a throughput/TTFT benchmark CLI; no benchmark results are published in the repo. CI in .github/workflows: test.yaml (pull_request only, ignoring docs/README, :13-18) runs native superbuilds for Linux (CPU, CUDA 13 with arch 87 only, ROCm 7.2, Vulkan, MLX CUDA 13; :81-176) and Windows (CPU, CUDA 13, ROCm 7.1, Vulkan, MLX CUDA 13; :177-369), `go mod tidy --diff` (:370-375), a Go dependency-license check when go.mod changes (:377-392), `go generate` plus `go test -count=1 -bench=. -benchtime=1x ./...` on ubuntu/macos/windows with golangci-lint (:394-461), UI `npm test` on ubuntu (:431-434) and `go test -race` on ubuntu/macos (:463-501); a patches job verifies llama.cpp patches apply (:62-79). test-install.yaml runs scripts/install.sh on ubuntu/macos when it changes; test-llamacpp-update.yaml builds unsigned artifacts when LLAMA_CPP_VERSION changes; test-xgrammar.yaml runs on macOS; release.yaml and latest.yaml are release-only. Lint config is .golangci.yaml. No scheduled workflows, CodeQL, or dependabot config found under .github.",
+      "dependencies": "Go: go.mod has 76 requires = 31 direct + 45 indirect, `go 1.26.0` (go.mod:3-91). Notables: gin v1.10.0 and gin-contrib/cors (HTTP), cobra v1.7.0 (CLI), bubbletea/lipgloss (TUI, cmd/tui), mattn/go-sqlite3 (desktop app store and onboarding state, CGO), klauspost/compress (zstd), golang.org/x/crypto (ed25519 key), tree-sitter (only used by mlx/generator). No OpenTelemetry, Prometheus or vector-DB modules. UI: app/ui/app/package.json has 20 dependencies and 38 devDependencies (React 19, TanStack, Vite 6, Vitest, Storybook), lockfile app/ui/app/package-lock.json. Native: llama.cpp pinned by LLAMA_CPP_VERSION (b11081) and fetched from github.com/ggml-org/llama.cpp at CMake configure time (llama/server/CMakeLists.txt:115-117,181-184); MLX pinned by MLX_VERSION (59d600b5e64c238427d0f8d897ab7c682ef4d3d2) and mlx-c by MLX_C_VERSION (ebc88f10caa1b625e6b581437a8dea6df8a70085, mlx/CMakeLists.txt:23-28); xgrammar v0.2.7 (cmake/mlx/CMakeLists.txt:65-68).",
+      "security_policy": "SECURITY.md: report vulnerabilities privately by emailing hello@ollama.com (SECURITY.md:5-7) and give time before public disclosure; lists user best practices (update, secure hosted instances, monitor; :15-21). No response SLA, disclosure timeline, advisory process or supported-versions table is stated. CONTRIBUTING.md:13 routes security issues to it."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:60-68 - `ollama launch claude` works and supported integrations include Claude Code and Codex",
+        "verified": "yes",
+        "evidence": "cmd/launch/registry.go:36-42,85-87 registers the claude and codex runners; cmd/launch/claude.go:52-87 runs the claude binary with ANTHROPIC_BASE_URL=<OLLAMA_HOST>, ANTHROPIC_AUTH_TOKEN=ollama and per-tier model env vars; cmd/launch/codex.go:54-81,177-188 runs `codex --profile ollama-launch` with a generated provider (wire_api=responses, base_url <host>/v1/). Code requires Codex >= 0.134.0 (codex.go:781), which docs/integrations/codex.mdx does not state; headless --yes needs --model (cmd/launch/launch.go:487, matching docs/integrations/claude-code.mdx:122)."
+      },
+      {
+        "claim": "docs/integrations/claude-code.mdx:7 and docs/api/anthropic-compatibility.mdx:5,387-400 - Claude Code connects through an Anthropic Messages API subset (no count_tokens, batches, prompt caching)",
+        "verified": "yes",
+        "evidence": "server/routes.go:2074 registers only POST /v1/messages; the route table at :2020-2074 has no /v1/messages/count_tokens or batches route. The local server does not validate API keys (docs/api/anthropic-compatibility.mdx:383; docs/api/authentication.mdx:5)."
+      },
+      {
+        "claim": "README.md:90-105 - REST API on http://localhost:11434 (/api/chat), documented at docs.ollama.com/api",
+        "verified": "yes",
+        "evidence": "server/routes.go:2054-2055 (/api/generate, /api/chat); envconfig/config.go:20-24 default host 127.0.0.1:11434; docs/api/introduction.mdx:13-19 base URLs. docs/api/introduction.mdx:55-57 says the API is not strictly versioned; /api/experimental/* routes exist (routes.go:2048-2050)."
+      },
+      {
+        "claim": "README.md:141-143 - Supported backends: llama.cpp",
+        "verified": "partial",
+        "evidence": "GGUF models do run through a llama.cpp llama-server subprocess (llm/server.go:98-100; llama/server/CMakeLists.txt:181-184), but the tree also ships an MLX engine for safetensors models (docs/development.md:120-122; cmd/cmd.go:2569-2579; MLX_VERSION; cmake/mlx/CMakeLists.txt) that the README does not list. Code differs from README."
+      },
+      {
+        "claim": "docs/faq.mdx:159-161 - 'We don't see your prompts or data when you run locally'",
+        "verified": "partial",
+        "evidence": "No analytics/telemetry SDK or OTLP exporter exists in the code (see telemetry_and_network); llama-server is bound to 127.0.0.1 with --offline (llm/llama_server.go:372-377). But a default `ollama serve` still contacts ollama.com for model recommendations and cloud model info (server/model_recommendations.go:23-26,188-205; server/model_show_cache.go:123-131,335-392), the desktop app checks for updates hourly (app/updater/updater.go:33-35,388) and pulls go to registry.ollama.ai (types/model/name.go:39). Server-side handling is not checkable from this repo."
+      },
+      {
+        "claim": "docs/faq.mdx:185 - 'Ollama binds 127.0.0.1 port 11434 by default'",
+        "verified": "partial",
+        "evidence": "True for the binary (envconfig/config.go:20-24; cmd/cmd.go:2106), but the Docker image sets OLLAMA_HOST=0.0.0.0:11434 (Dockerfile:332) and the server has no authentication (docs/api/authentication.mdx:5); OLLAMA_AUTH (envconfig/config.go:231-232) is only read by the Go client (api/client.go:119,184). The Host-header check is skipped when bound to a non-loopback address (server/routes.go:1941-1951)."
+      },
+      {
+        "claim": "docs/faq.mdx:25 - 'By default, Ollama uses a context window size of 4096 tokens'",
+        "verified": "partial",
+        "evidence": "Code wins: when OLLAMA_CONTEXT_LENGTH is unset (api/types.go:1143) the server picks a VRAM tier: 262144 for >=47 GiB, 32768 for >=23 GiB, otherwise 4096 (server/routes.go:129-131,2199-2209; envconfig/config.go:338; docs/context-length.mdx:8-12). The 4096 statement holds only for <23 GiB or CPU; a 24 GB-class card falls in the 32768 tier (comment at routes.go:2200)."
+      },
+      {
+        "claim": "docs/gpu.mdx:5-6,18 - NVIDIA compute capability 5.0+ with driver 550+, GeForce RTX 4090 (8.9) listed as supported",
+        "verified": "yes",
+        "evidence": "llama/server/CMakePresets.json:71 (CUDA 12 archs include 89) and :103 (CUDA 13 includes 89-virtual); discover/cuda_compat.go:10-19,64-72 enforces driver >=550 for CUDA 12.4+ runtimes and >=570 for compute <7.0 with CUDA 12.8+; docs/troubleshooting.mdx:46-60 is stale (mentions cuda_v11/rocm_v5/cpu_avx2 libs)."
+      },
+      {
+        "claim": "docs/capabilities/embeddings.mdx:68 and docs/api/openai-compatibility.mdx:304-316 - /api/embed returns L2-normalized vectors; /v1/embeddings supports string/array input and dimensions",
+        "verified": "yes",
+        "evidence": "server/routes.go:928-1151 (EmbedHandler: batch input, truncation, normalize() at :1153-1167, dimensions truncation at :1115-1120); /v1/embeddings route at :2065 reuses EmbedHandler; llama-server is started with --embedding for embedding models (llm/llama_server.go:584-591). Token-array inputs are rejected (routes.go:960-967)."
+      },
+      {
+        "claim": "README.md:323-330 - Observability and monitoring (including OpenTelemetry-native monitoring) is offered via community integrations",
+        "verified": "yes",
+        "evidence": "Consistent with the code: the repo itself has no OTLP/OpenTelemetry/Prometheus support - grep for otel|OTLP|opentelemetry matches only README.md:326; go.mod:5-91 has no such modules; server/routes.go:2020-2074 has no /metrics or OTLP routes. These integrations are external projects, not native features."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Scope: no OTLP receiver/exporter, metrics/log/trace store, dashboards, dataset/experiment store or code-indexing/semantic-search layer in this repo - `otel|OTLP|opentelemetry` appears only in README.md:326 (third-party listing), go.mod:5-91 has no OpenTelemetry/Prometheus/vector-DB modules, server/routes.go:2020-2074 has no /metrics or OTLP routes. Observability is limited to per-response usage fields (docs/api/usage.mdx:5-15), text logs, /api/ps and /api/status (routes.go:2297-2305,2422-2454). Embedding endpoints exist (routes.go:2056-2057,2065) but nothing indexes or queries code; replay-style tooling is only cmd/bench (throughput/TTFT, benchstat/CSV) and opt-in request-body logging.",
+      "Privacy/network: default `ollama serve` makes outbound calls to ollama.com even for local use (model recommendations every ~4h and cloud model-info hydration at startup, signed with the local ~/.ollama/id_ed25519 key; server/model_recommendations.go:23-26,188-205; server/model_show_cache.go:335-392; server/cloud_proxy.go:372-385; cmd/cmd.go:2101-2163). OLLAMA_NO_CLOUD only covers cloud features (envconfig/config.go:332,440-449). The Windows/macOS desktop app always checks https://ollama.com/api/update hourly, sending os/arch/version and (macOS) a device UUID; only the download honors the auto-update setting (app/updater/updater.go:33-35,53-101,388-405; app/store/store.go:251-259).",
+      "Security: the local API has no authentication (docs/api/authentication.mdx:5; docs/api/anthropic-compatibility.mdx:383); the Docker image binds 0.0.0.0 (Dockerfile:332) and the Host-header filter only applies when bound to loopback (server/routes.go:1948-1951); default CORS origins include localhost, 0.0.0.0, app://, file://, tauri://, vscode-webview:// (envconfig/config.go:85-109). OLLAMA_DEBUG_LOG_REQUESTS=1 writes full request bodies and curl replay scripts to an OS temp dir (server/inference_request_log.go:33-47,112-124). SECURITY.md gives only an email contact, no SLA.",
+      "Supply chain: the documented install is `curl | sh` (README.md:15-17,31-33) and scripts/install.sh streams the tarball into tar without checksum or signature verification (install.sh:129-157). Releases publish only a sha256sum.txt (release.yaml:788-790,859); no cosign/GPG/SLSA attestations, Docker builds set provenance: false and sbom: false (release.yaml:543-544,637-638,657-658). Windows and macOS binaries are code-signed (scripts/build_windows.ps1:1020-1044; scripts/build_darwin.sh:247-286); Linux tarballs are not.",
+      "Maintenance/dependency chain: pre-1.0 (v0.35.0); API 'isn't strictly versioned' (docs/api/introduction.mdx:55-57). GGUF inference depends on a pinned llama.cpp tag (b11081) fetched from GitHub at configure time and patched by an Ollama-maintained compat layer that its own README calls temporary (LLAMA_CPP_VERSION:1; llama/server/CMakeLists.txt:181-184; llama/compat/README.md:3-10); llama/README.md:5-9 warns a bump can affect model loading, GPU discovery and scheduling. A second engine (MLX, pinned commits MLX_VERSION/MLX_C_VERSION, xgrammar v0.2.7) is also in tree.",
+      "Docs drift: docs/faq.mdx:25 (4096 default context) contradicts the VRAM-tiered default in code (server/routes.go:2199-2209); docs/troubleshooting.mdx:46-60 still describes cuda_v11/rocm_v5/cpu_avx2 libraries while presets build cuda_v12/cuda_v13 (llama/server/CMakePresets.json:56-111); the server comment at routes.go:2161-2168 says DefaultServeMux is used 'so we get net/http/pprof for free' but nothing in the repo imports net/http/pprof, so whether pprof endpoints are exposed was not verified.",
+      "Integration coupling: `ollama launch codex` requires Codex >= 0.134.0, rewrites ~/.codex/ollama-launch.config.toml and model.json, and may edit ~/.codex/config.toml to remove legacy entries (cmd/launch/codex.go:211-338,270-298,781). `ollama launch claude` appends env vars (DISABLE_ERROR_REPORTING=1, CLAUDE_CODE_ATTRIBUTION_HEADER=0, ...) to the inherited environment, and a test asserts DISABLE_TELEMETRY and CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC are deliberately not set (cmd/launch/claude.go:63,67-87; claude_test.go:370-375); Ollama does not configure or filter Claude Code/Codex OTEL telemetry. The Anthropic endpoint is a subset: no count_tokens, tool_choice, metadata, prompt caching, batches, citations or PDF (docs/api/anthropic-compatibility.mdx:387-400).",
+      "Platform: the RTX 4090 path relies on bundled CUDA 12/13 payloads and NVIDIA driver >=550 (docs/gpu.mdx:6; discover/cuda_compat.go:14-18). WSL2 is supported only as Linux with NVIDIA passthrough and needs systemd for the service (scripts/install.sh:243-262); there is no dedicated WSL2 doc page. The Linux installer needs sudo and zstd and, when nvidia-smi is absent, adds NVIDIA repos and installs cuda-drivers and kernel headers (install.sh:138-143,313-451). CI only builds CUDA payloads (test.yaml:93-97); GPU/model integration tests are not run by any workflow (integration/README.md:5-11)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "ollama/ollama",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Linux install script (version can be pinned with OLLAMA_VERSION): curl -fsSL https://ollama.com/install.sh | sh",
+          "citation": "README.md:29-33; docs/linux.mdx:5-11; version pin docs/linux.mdx:153-161",
+          "holds": true,
+          "note": "README.md:29-33 is the '### Linux' section with exactly this command; docs/linux.mdx:5-11 repeats it; docs/linux.mdx:153-161 documents OLLAMA_VERSION pinning (example OLLAMA_VERSION=0.5.7). The script honours the pin: scripts/install.sh:42 VER_PARAM=\"${OLLAMA_VERSION:+?version=$OLLAMA_VERSION}\" is appended to the download URLs (:136,147,155). Revision confirmed: .git/HEAD = cc4069396f3ad2c370c53eed2e4a42ac13adab84 = refs/tags/v0.35.0 in packed-refs."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1 'MIT License', LICENSE:3 'Copyright (c) Ollama', followed by the standard MIT permission and warranty text (LICENSE:5-21)."
+        },
+        {
+          "field": "readme.platforms.gpu",
+          "statement": "yes for NVIDIA GeForce RTX 4090 (compute 8.9): compute 5.0+/driver 550+, CUDA 12 archs include 89 and CUDA 13 includes 89-virtual, driver-floor logic, Linux bundles carry cuda_v12/cuda_v13; containers need nvidia-container-toolkit; CI only compiles CUDA; installer installs cuda-drivers when nvidia-smi is missing and stops when present",
+          "citation": "docs/gpu.mdx:5-6,18; llama/server/CMakePresets.json:71,103; discover/cuda_compat.go:10-19,64-72; .github/workflows/release.yaml:682; docs/docker.mdx:7-9; .github/workflows/test.yaml:93-97; integration/README.md:5-11; scripts/install.sh:294-297,313-451",
+          "holds": true,
+          "note": "gpu.mdx:6 'compute capability 5.0+ and driver version 550 and newer', :18 row 8.9 GeForce RTX 40xx lists RTX 4090. CMakePresets.json:71 cuda_v12 linux archs '...;86;89;90;...', :103 cuda_v13 linux includes '89-virtual'. cuda_compat.go:14,18 constants 550/570; :64-72 drop devices below them. release.yaml:682 packs lib/ollama/cuda_v* into ollama-linux-<arch>.tar.zst (amd64 builds cuda_v12/cuda_v13 at :487-489). docker.mdx:7-9 NVIDIA Container Toolkit. test.yaml:93-97 compile-only cuda_v13 build (arch 87). integration/README.md:5-11 tag-gated. install.sh:294-297 exits when nvidia-smi exists; :384-451 adds the NVIDIA repo and installs cuda-drivers (supported distros only, :412 exits otherwise)."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "`ollama launch claude` runs Claude Code with ANTHROPIC_BASE_URL at the local server; headless --yes requires --model; `ollama launch codex [--config|--restore]` writes ~/.codex/ollama-launch.config.toml and model.json and runs `codex --profile ollama-launch`, requires Codex >= 0.134.0; codex --oss manual path; Claude Desktop (macOS) and ChatGPT/Codex desktop connectors; loopback-only /api/codex gateway",
+          "citation": "docs/integrations/claude-code.mdx:9-15,114-122,191-209; cmd/launch/claude.go:52-87; cmd/launch/launch.go:487; docs/integrations/codex.mdx:18-37,39-57,59-78; cmd/launch/codex.go:54-81,211-338,781; docs/integrations/claude-desktop.mdx; cmd/launch/registry.go:55-67,97-108; server/routes.go:2025-2027",
+          "holds": true,
+          "note": "claude.go:58-69 exec's claude with env ANTHROPIC_BASE_URL=envconfig.Host().String(), ANTHROPIC_AUTH_TOKEN=ollama. launch.go:487 'headless --yes launch for %s requires --model <model>' matches claude-code.mdx:122. codex.go:54-81 checks version, writes config, runs codex --profile ollama-launch; :211-338 writes ~/.codex/model.json and ~/.codex/ollama-launch.config.toml; :781 minVersion v0.134.0. codex.mdx:39-57 codex --oss. claude-desktop.mdx:3 'Use Ollama models in Claude on macOS'. registry.go:55-67 claude-desktop, :97-108 chatgpt/CodexApp. routes.go:2027 r.Any(proxy.CodexDesktopPathPrefix+\"/*path\"); internal/proxy/codex_desktop.go:30 prefix \"/api/codex\", :159 rejects non-loopback."
+        },
+        {
+          "field": "claim_checks[9]",
+          "statement": "README.md:323-330 - Observability and monitoring (incl. OpenTelemetry-native) is offered via community integrations; verified yes: repo has no OTLP/OpenTelemetry/Prometheus support, go.mod has no such modules, route table has no /metrics or OTLP routes",
+          "citation": "README.md:323-330; go.mod:5-91; server/routes.go:2020-2074",
+          "holds": true,
+          "note": "README.md:323-330 'Observability & Monitoring' lists only external links (Opik, OpenLIT :326 'OpenTelemetry-native monitoring for Ollama and GPUs', Lunary, Langfuse, HoneyHive, MLflow Tracing). go.mod:5-91 has no go.opentelemetry.io or prometheus modules. routes.go:2020-2074 has no /metrics or OTLP route. Repo-wide grep for prometheus|/metrics|net/http/pprof: only a comment at routes.go:2161 plus test-data text. Wording nit: a literal case-insensitive grep for otel|OTLP|opentelemetry also hits substrings (docs/integrations/roo-code.mdx:14 'remotely', llm/llama_server.go 'noteLoadActivity', tokenizer test data 'hotel'), but README.md:326 is the only OpenTelemetry reference."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

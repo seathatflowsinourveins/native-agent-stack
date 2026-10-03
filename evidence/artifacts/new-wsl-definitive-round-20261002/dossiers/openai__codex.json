@@ -1,0 +1,291 @@
+{
+  "contender": "openai/codex",
+  "revision": {
+    "contender": "openai/codex",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "openai/codex",
+        "tag": "rust-v0.160.0",
+        "commit": "a956835d020762cb2b570053af06f643a11c0ecc",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "rust-v0.160.0",
+    "commit": "a956835d020762cb2b570053af06f643a11c0ecc",
+    "read_at": "2026-10-02T03:02:33+00:00"
+  },
+  "dossier": {
+    "contender": "openai/codex",
+    "revision": {
+      "tag": "rust-v0.160.0",
+      "commit": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "openai/codex monorepo: a Rust coding-agent runtime (`codex` multitool binary, headless `codex exec`, JSON-RPC `codex app-server`) plus two thin SDKs. The TypeScript SDK `@openai/codex-sdk` spawns `codex exec --experimental-json` and parses JSONL events. The Python SDK `openai-codex` spawns `codex app-server --listen stdio://` and speaks JSON-RPC. They run local, OS-sandboxed, resumable agent threads against the OpenAI Responses API (ChatGPT login or API key), with Amazon Bedrock and local Ollama/LM Studio as other built-in providers. It is not a deep-research product and not a multi-vendor model router.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Codex CLI is a coding agent from OpenAI that runs locally on your computer.",
+          "citation": "README.md:1"
+        },
+        {
+          "claim": "IDE extension, desktop app (`codex app`) and the cloud agent (Codex Web, chatgpt.com/codex) are separate surfaces from this CLI.",
+          "citation": "README.md:6-8"
+        },
+        {
+          "claim": "Install on Mac or Linux with `curl -fsSL https://chatgpt.com/codex/install.sh | sh`; Windows has a PowerShell installer.",
+          "citation": "README.md:16-26"
+        },
+        {
+          "claim": "Standalone installers download from https://releases.openai.com/codex by default and fall back to GitHub Releases; CODEX_INSTALLER_USE_RELEASES_OPENAI_COM=false forces GitHub Releases.",
+          "citation": "README.md:28-36"
+        },
+        {
+          "claim": "Also installable via npm (`npm install -g @openai/codex`) and Homebrew (`brew install --cask codex`).",
+          "citation": "README.md:38-48"
+        },
+        {
+          "claim": "GitHub Releases ship per-platform archives (codex-aarch64-apple-darwin.tar.gz, codex-x86_64-apple-darwin.tar.gz, codex-x86_64-unknown-linux-musl.tar.gz, codex-aarch64-unknown-linux-musl.tar.gz), each holding one platform-named entry to rename to `codex`.",
+          "citation": "README.md:53-64"
+        },
+        {
+          "claim": "Sign in with ChatGPT (Plus, Pro, Business, Edu, Enterprise); using an API key is possible but needs additional setup.",
+          "citation": "README.md:68-72"
+        },
+        {
+          "claim": "Documentation lives at developers.openai.com/codex; the in-repo docs/ pages for exec, sandbox, auth, config and execpolicy are one-line pointers to that site.",
+          "citation": "README.md:74-79; docs/exec.md:3; docs/sandbox.md:3; docs/authentication.md:3; docs/execpolicy.md:3; AGENTS.md:32"
+        },
+        {
+          "claim": "Repository is licensed under Apache-2.0.",
+          "citation": "README.md:81"
+        },
+        {
+          "claim": "TypeScript SDK: 'Embed the Codex agent in your workflows and apps'; wraps the `codex` CLI from `@openai/codex`, spawns it and exchanges JSONL events over stdin/stdout; requires Node.js 18+.",
+          "citation": "sdk/typescript/README.md:3-13"
+        },
+        {
+          "claim": "TypeScript SDK: threads are persisted in ~/.codex/sessions and can be resumed with resumeThread(); the working directory must be a Git repo unless skipGitRepoCheck is set; `env`, `config` and raw `configOverrides` control the spawned CLI.",
+          "citation": "sdk/typescript/README.md:98-160"
+        },
+        {
+          "claim": "TypeScript SDK: structured final output via a per-turn JSON Schema (`outputSchema`), including Zod via zod-to-json-schema.",
+          "citation": "sdk/typescript/README.md:53-84"
+        },
+        {
+          "claim": "Python SDK: start Codex threads, run turns, stream progress and control workspace access; `pip install openai-codex`; reuses existing Codex authentication; ChatGPT browser, device-code and API-key login flows.",
+          "citation": "sdk/python/README.md:3-59"
+        },
+        {
+          "claim": "Python SDK docs: Sandbox presets read_only / workspace_write / full_access; thread_resume; AsyncCodex; ExternalMessage for untrusted content; the matching `openai-codex-cli-bin` runtime is installed automatically.",
+          "citation": "sdk/python/docs/getting-started.md:19-20,78-137; sdk/python/docs/faq.md:40-63"
+        }
+      ],
+      "install": [
+        {
+          "method": "Standalone installer script (Linux/macOS)",
+          "command": "curl -fsSL https://chatgpt.com/codex/install.sh | sh",
+          "citation": "README.md:16-20"
+        },
+        {
+          "method": "npm (CLI)",
+          "command": "npm install -g @openai/codex",
+          "citation": "README.md:40-43"
+        },
+        {
+          "method": "Homebrew cask (README does not name a platform; Homebrew is macOS/Linux)",
+          "command": "brew install --cask codex",
+          "citation": "README.md:45-48"
+        },
+        {
+          "method": "GitHub Release archive",
+          "command": "Download codex-x86_64-unknown-linux-musl.tar.gz (Linux x86_64) or codex-aarch64-apple-darwin.tar.gz (macOS arm64) from https://github.com/openai/codex/releases/latest, extract, and rename the single entry to `codex`",
+          "citation": "README.md:52-64"
+        },
+        {
+          "method": "TypeScript SDK (npm)",
+          "command": "npm install @openai/codex-sdk",
+          "citation": "sdk/typescript/README.md:7-13"
+        },
+        {
+          "method": "Python SDK (PyPI)",
+          "command": "pip install openai-codex",
+          "citation": "sdk/python/README.md:6-12"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes: release asset x86_64-unknown-linux-musl (README.md:61; .github/workflows/rust-release.yml:109-114). Sandbox is bubblewrap + seccomp and needs user namespaces; Codex warns at startup if bwrap or userns is unavailable (codex-rs/linux-sandbox/README.md:10-22,33-52).",
+        "wsl2": "yes (documented): docs/install.md:7 lists Windows 11 via WSL2; codex-rs/linux-sandbox/README.md:19-22,37-39 says WSL2 follows the normal bubblewrap path and WSL1 is unsupported.",
+        "macos_arm64": "yes: codex-aarch64-apple-darwin.tar.gz (README.md:58); built on macos-15-xlarge (rust-release.yml:84-95); Seatbelt sandbox (codex-rs/sandboxing/src/manager.rs:50-51); docs/install.md:7 says macOS 12+.",
+        "gpu": "no: not used or required by Codex itself; inference is remote via the Responses API (codex-rs/model-provider-info/src/lib.rs:420-435). `--oss` points at a separately run Ollama/LM Studio on localhost (lib.rs:645-678; codex-rs/utils/cli/src/shared_options.rs:25-32), whose GPU use is outside this repo."
+      },
+      "integrations": {
+        "cli": "yes. `codex exec` (alias `e`; cli/src/main.rs:150-152) is the non-interactive mode. Flags: --json (alias --experimental-json), --output-schema, -o/--output-last-message, --ephemeral, --skip-git-repo-check, --ignore-user-config, --ignore-rules, subcommands resume/fork/review (codex-rs/exec/src/cli.rs:10-81,149-159). Shared flags: --model, --oss, --sandbox, --yolo, --cd, --worktree, --add-dir, -c key=value (codex-rs/utils/cli/src/shared_options.rs:21-77). Prompt can come from stdin (exec/src/lib.rs:2232-2316). User docs for exec are external (docs/exec.md:3).",
+        "mcp": "Client only. `codex mcp list|get|add|remove|login|logout` manages external MCP servers (codex-rs/cli/src/mcp_cmd.rs:70-78); per-server enabled_tools/disabled_tools (codex-rs/config/src/mcp_types.rs:294-298); `codex exec` auto-cancels MCP elicitations (exec/src/lib.rs:1997-2013). No `codex mcp-server` subcommand and no mcp-server workspace member at this revision (cli/src/main.rs:142-240; codex-rs/Cargo.toml:2-157), though .github/workflows/issue-labeler.yml:51 still mentions it.",
+        "sdk_or_api": "TypeScript SDK `@openai/codex-sdk` (sdk/typescript/src/codex.ts:11-39; spawns `codex exec --experimental-json`, exec.ts:92,196). Python SDK `openai-codex` with sync Codex and async AsyncCodex (sdk/python/src/openai_codex/api.py:78,308), which spawns `codex app-server --listen stdio://` and speaks JSON-RPC (client.py:242-281). The app-server protocol (stdio default, unix, ws; cli/src/main.rs:565-572) is labeled [experimental] in CLI help (main.rs:169-170). Also `codex exec-server`, a JSON-RPC process executor (codex-rs/exec-server/README.md:3-26). No HTTP API server found beyond the websocket transport.",
+        "claude_code_or_codex": "Codex side: this repo's own workflows call the separate `openai/codex-action` (.github/workflows/issue-labeler.yml:22; repo not inspected). Claude side: only compatibility shims. `codex-external-agent-migration` imports Claude Code/Cursor-style config, hooks, MCP, plugins and sessions (codex-rs/external-agent-migration/src/lib.rs:1; source_cla.rs:21-24). Plugin hooks get CLAUDE_PLUGIN_ROOT/CLAUDE_PLUGIN_DATA env aliases (codex-rs/hooks/src/engine/discovery.rs:267-270). No Claude/Anthropic model provider is built in and the only wire API is Responses (model-provider-info/src/lib.rs:101-131,661-684). No Claude Code plugin or skill that drives Codex was found."
+      },
+      "telemetry_and_network": "Analytics and metrics are on by default and opt-out via config. (1) `analytics.enabled` defaults to true (codex-rs/core/config.schema.json:6588-6594); `codex exec` passes DEFAULT_ANALYTICS_ENABLED=true (exec/src/lib.rs:173,644-651). Analytics events POST to `{chatgpt_base_url}/codex/analytics-events/events` (codex-rs/analytics/src/client.rs:154); they are sent with ChatGPT-backend auth, only a filtered subset with API-key auth, and dropped for other auth modes (client.rs:943-951). The events client is created unless analytics.enabled=false (core/src/session/session.rs:1602-1615), also for the app-server path the Python SDK uses. (2) OTEL log and trace exporters default to none, but the metrics exporter defaults to Statsig (codex-rs/config/src/types.rs:653-656), i.e. https://ab.chatgpt.com/otlp/v1/metrics (codex-rs/otel/src/config.rs:9-11), gated by the analytics flag (core/src/otel_init.rs:70-77); the app-server passes default_analytics_enabled=false (app-server/src/main.rs:124). I did not trace whether metrics are actually emitted under API-key auth. Prompt logging (`log_user_prompt`) and agent-response logging are opt-in (config.schema.json:3271-3282; otel/README.md:99-116). (3) Feedback uploads go to Sentry with a hard-coded DSN (codex-rs/feedback/src/lib.rs:57-58) and can be disabled with `feedback` config (config.schema.json:7254-7261). (4) `check_for_update_on_startup` defaults true (config.schema.json:6656-6659); I did not trace whether exec uses it. (5) Required services: model traffic goes to https://api.openai.com/v1 with an API key or https://chatgpt.com/backend-api/codex with ChatGPT-style auth (model-provider-info/src/lib.rs:77,420-435), or Bedrock (lib.rs:93-94), or localhost for --oss; an OpenAI/ChatGPT account or equivalent credentials are needed (README.md:68-72). With ChatGPT auth, exec fetches a workspace-managed cloud-config bundle (exec/src/lib.rs:493-500; exec/tests/suite/auth_env.rs:64-69). Hosted web search goes through the OpenAI backend (codex-rs/ext/web-search/src/extension.rs:42-56). The installer fetches from releases.openai.com or GitHub (scripts/install/install.sh:8-10). (6) SDKs tag requests: TS sets CODEX_INTERNAL_ORIGINATOR_OVERRIDE=codex_sdk_ts (sdk/typescript/src/exec.ts:45-47,186-188); Python reports client_name codex_python_sdk (client.py:208-210). Set `-c analytics.enabled=false` (TS `config` option, README:135-147) to opt out."
+    },
+    "code": {
+      "languages": [
+        "Rust (codex-rs, edition 2024, toolchain 1.95.0)",
+        "TypeScript (sdk/typescript)",
+        "Python (sdk/python, sdk/python-runtime, scripts/)",
+        "JavaScript (codex-cli/bin/codex.js)",
+        "Bazel/Starlark (MODULE.bazel, per-crate BUILD.bazel)",
+        "Shell/PowerShell (scripts/install/*)",
+        "Protobuf (exec-server relay schema)"
+      ],
+      "entry_points": [
+        {
+          "path": "codex-rs/cli/src/main.rs",
+          "what": "`codex` multitool binary (cli/Cargo.toml:9-11): subcommands exec (alias e), review, resume, fork, app-server, exec-server, mcp, sandbox, login, plugin, cloud, doctor, etc. (main.rs:142-240)"
+        },
+        {
+          "path": "codex-rs/exec/src/main.rs",
+          "what": "`codex-exec` binary (exec/Cargo.toml:8-10); run_main in exec/src/lib.rs:259 implements headless `codex exec`; also dispatches arg0 `codex-linux-sandbox` (main.rs:1-17)"
+        },
+        {
+          "path": "codex-rs/app-server/src/main.rs",
+          "what": "`codex-app-server` JSON-RPC server (stdio default, unix, ws); packaged separately in release bundles (rust-release.yml:88-94); used by the Python SDK as `codex app-server --listen stdio://`"
+        },
+        {
+          "path": "sdk/typescript/src/codex.ts",
+          "what": "`Codex` class with startThread()/resumeThread(); `Thread.run()/runStreamed()` in thread.ts; spawns `codex exec --experimental-json` (exec.ts:92)"
+        },
+        {
+          "path": "sdk/python/src/openai_codex/api.py",
+          "what": "`Codex` and `AsyncCodex` clients, Thread/TurnHandle/TurnResult; client.py launches the app-server over stdio"
+        },
+        {
+          "path": "codex-cli/bin/codex.js",
+          "what": "npm launcher that resolves the platform package (@openai/codex-<platform>) and spawns the native binary"
+        },
+        {
+          "path": "codex-rs/exec-server/",
+          "what": "`codex exec-server`: JSON-RPC subprocess/filesystem executor for remote or isolated environments (exec-server/README.md:3-26)"
+        }
+      ],
+      "architecture": "Rust Cargo workspace `codex-rs/` with 154 members (Cargo.toml:2-157), built with Cargo and Bazel. Key modules: `core/` (session/turn loop, config loading and config.schema.json, otel_init); `exec/` (headless `codex exec`: builds Config, starts an in-process app-server client, sends thread/start|resume|fork and turn/start requests, then prints human output or JSONL events, exec/src/lib.rs:986-1316); `app-server/`, `app-server-protocol/`, `app-server-client/`, `app-server-transport/` (JSON-RPC v2 API shared by TUI, exec, desktop and the Python SDK); `tui/`; `sandboxing/`, `linux-sandbox/`, `bwrap/`, `windows-sandbox-rs/`, `mxc-sandbox/` (Seatbelt, bubblewrap+seccomp, Windows restricted token); `network-proxy/` (HTTP/SOCKS5 policy proxy with allow/deny domains); `execpolicy/` (command rules); `rollout/`, `thread-store/`, `state/`, `history/` (JSONL rollouts plus SQLite under CODEX_HOME, thread-store/README.md:22-25); `models-manager/` (bundled models.json catalog incl. gpt-6.1-sol); `model-provider-info/`, `model-provider/`, `codex-api/`, `codex-client/` (Responses transport; OpenAI, Bedrock, ollama, lmstudio); `codex-mcp/` and `rmcp-client/` (MCP client); `worktree/` (--worktree); `ext/*` (extensions: web-search, goal, memories, skills, guardian-v2 auto-reviewer, agent/multi-agent, image-generation); `login/`; `otel/`, `analytics/`, `feedback/`. The SDKs are thin. TS spawns one `codex exec --experimental-json` process per turn and parses JSONL; Python keeps one long-lived `codex app-server` per client and uses pydantic models generated from codex-rs/app-server-protocol/schema/json (sdk/python/pyproject.toml:39-40). The native binary comes from npm optional packages (@openai/codex-<platform>) or the `openai-codex-cli-bin` wheel. Headless exec defaults approval policy to `never` and rejects approval, user-input and dynamic-tool requests (exec/src/lib.rs:574-576,1990-2125). Sandbox modes: read-only, workspace-write, danger-full-access (utils/cli/src/sandbox_mode_cli_arg.rs:12-18). Resume and fork are supported, and --ephemeral skips persistence.",
+      "packaging_and_release": "Tag `rust-v*.*.*` triggers .github/workflows/rust-release.yml (lines 12-15) after tag-check verifies it matches codex-rs/Cargo.toml (27-57). Builds cover macOS arm64/x64, Linux musl x64/arm64 (84-132) and Windows x64/arm64 (rust-release-windows.yml:25-61). GitHub Release assets: per-binary .tar.gz and .zst (rust-release.yml:498-533), macOS DMGs, `codex-package-<target>.tar.gz|.tar.zst` bundles with a `codex-package_SHA256SUMS` manifest (1613-1634; covers package archives only), config-schema.json (1636-1638), install.sh/install.ps1 (1674-1677), npm tarballs and Python runtime wheels. Signing: Linux binaries and package archives get cosign `.sigstore` bundles (rust-release.yml:379-382,421-427; .github/actions/linux-code-sign/action.yml:45-48); macOS binaries and DMGs are signed and notarized via Azure Key Vault/rcodesign in the protected `codesigning` environment (rust-release.yml:8-9,654-714,1174-1205); the Windows job uses an `azure-artifact-signing` environment (rust-release-windows.yml:330). install.sh verifies archive SHA-256 against codex-package_SHA256SUMS (install.sh:477-561). npm publish (`@openai/codex` + 6 platform packages, `@openai/codex-responses-api-proxy`, `@openai/codex-sdk`) uses OIDC trusted publishing with no token (rust-release.yml:1762-1923); no explicit --provenance flag was found. PyPI `openai-codex-cli-bin` wheels (manylinux_2_17, macosx) and `openai-codex` are published by python-sdk-cli-release.yml via PyPI trusted publishing after a stable CLI release (python-sdk-cli-release.yml:73-140; sdk/python/RELEASING.md:3-29); prerelease CLIs do not publish Python packages. Also DotSlash manifests (rust-release.yml:1731-1760), an R2 mirror (1697-1729) and winget (1954). No SLSA or GitHub artifact-attestation step found. Build from source: `cargo build` in codex-rs (docs/install.md:15-50).",
+      "tests_and_ci": "Rust: cargo-nextest (docs/install.md:44-47; codex-rs/.config/nextest.toml) plus Bazel test and clippy on PRs (.github/workflows/README.md:7-13); insta snapshots; wiremock mock model servers (exec/tests/suite/auth_env.rs:3-25). Counts via Glob (overlapping): 1,303 `*_tests.rs`, 772 files under `tests/` dirs, 29 `tests.rs`, roughly 2,000 unique Rust test-related files. codex-exec alone: 18 files in tests/suite plus 5 src/*_tests.rs. TS SDK: Jest, 5 test files (abort, exec, mcpConformance, run, runStreamed) using a mock Responses proxy. Python SDK: pytest, 17 test_*.py; real-runtime example tests only run with RUN_REAL_CODEX_TESTS=1 (test_real_app_server_integration.py:24-28). CI: ~28 workflow files. blocking-ci.yml gates PRs on bazel, blob-size-policy, cargo-deny, codespell, repo-checks, rust-ci and sdk (blocking-ci.yml:13-59). rust-ci.yml runs fmt, cargo shear and argument-comment-lint; rust-ci-full.yml (post-merge via postmerge-ci.yml) runs the full clippy/nextest matrix, release builds and remote-env tests (workflows/README.md:14-31). sdk.yml builds Bazel `codex` and runs TS lint/test and Python ruff+pytest against it, plus a wheel-install smoke test (sdk.yml:7-36,129-149). cargo-deny.yml; Dependabot weekly (.github/dependabot.yaml). Tests mock the model backend; no live-model quality or eval suite found.",
+      "dependencies": "codex-rs/Cargo.toml workspace: 148 internal path crates and about 190 external workspace dependencies (153 version strings + 37 inline tables; line-counted, approximate), 5 pinned git deps (microsoft/mxc x3, helix-editor/nucleo, dzbarsky/rules_rust runfiles; Cargo.toml:321-326,413,447) and 3 [patch.crates-io] forks of crossterm/tokio-tungstenite/tungstenite (639-641). codex-exec: 32 deps + 15 dev-deps (exec/Cargo.toml:24-84). codex-cli: 75 deps (+1 musl jemalloc, +2 Windows-only) and 17 dev-deps (cli/Cargo.toml:25-139). sdk/typescript/package.json: 0 runtime deps in source (published tarball adds exact `@openai/codex`, codex-cli/scripts/build_npm_package.py:315-319) and 18 devDependencies. sdk/python/pyproject.toml: 3 runtime deps (pydantic>=2.12, packaging>=26.2, openai-codex-cli-bin==0.153.4) plus dev groups ruff/pytest/datamodel-code-generator. sdk/python-runtime: 0 deps (wheel-only). Root package.json: 1 devDependency (prettier). Lockfiles: codex-rs/Cargo.lock, MODULE.bazel.lock, pnpm-lock.yaml, sdk/python/uv.lock, sdk/python-runtime/uv.lock. cargo-deny policy: license allow-list, unknown registries/git denied, git must pin rev (codex-rs/deny.toml:97-147,300-323); 11 RUSTSEC advisories are explicitly ignored (deny.toml:72-87; .cargo/audit.toml:3-15).",
+      "security_policy": "SECURITY.md: report validated vulnerabilities through the OpenAI Bugcrowd program (https://bugcrowd.com/engagements/openai); safe-operation guidance is an external doc (SECURITY.md:5-17). .github/CODEOWNERS also exists."
+    },
+    "claim_checks": [
+      {
+        "claim": "TypeScript SDK wraps the codex CLI, spawns it and exchanges JSONL events over stdin/stdout (sdk/typescript/README.md:5).",
+        "verified": "yes",
+        "evidence": "sdk/typescript/src/exec.ts:92 builds `codex exec --experimental-json`; :196 spawn; :208-209 writes the prompt to stdin; :231-239 reads stdout line by line; thread.ts:98-111 JSON.parses each line. `--experimental-json` is an alias of `--json` (codex-rs/exec/src/cli.rs:58-65)."
+      },
+      {
+        "claim": "Threads are persisted in ~/.codex/sessions and resumable with resumeThread() (sdk/typescript/README.md:98-106).",
+        "verified": "partial",
+        "evidence": "Resume maps to `codex exec ... resume <id>` (exec.ts:166-168), handled via app-server thread/resume (exec/src/lib.rs:993-1016). Persistence is rollout JSONL plus SQLite under CODEX_HOME, default ~/.codex (thread-store/README.md:22-25; scripts/install/install.sh:19), so the path is CODEX_HOME-relative. `--ephemeral` disables persistence (exec/src/cli.rs:35-37) and the TS SDK exposes no ephemeral option (threadOptions.ts:17-30). The code is more general than the README."
+      },
+      {
+        "claim": "runStreamed() yields structured events for tool calls, streaming responses and file changes (sdk/typescript/README.md:36).",
+        "verified": "partial",
+        "evidence": "The exec event enum has 8 types (thread/turn/item started|updated|completed, error) and no token-delta event (codex-rs/exec/src/exec_events.rs:11-37; TS events.ts:76-84), so events are item-level. TS item types cover command_execution, file_change, mcp_tool_call, web_search, todo_list, reasoning, agent_message, error (items.ts:120-128) but omit Rust's collab_tool_call item (exec_events.rs:120-124) and the web-search action/results fields (exec_events.rs:296-306 vs items.ts:89-94). Code is richer than the TS typings."
+      },
+      {
+        "claim": "Sandbox and approval behaviour is documented externally (docs/sandbox.md:3; SECURITY.md:15-17); the external pages were not opened.",
+        "verified": "partial",
+        "evidence": "Code facts only. `--sandbox read-only|workspace-write|danger-full-access` (utils/cli/src/sandbox_mode_cli_arg.rs:12-18; shared_options.rs:38-41). Exec forces approval policy `never` unless the resolved reviewer is auto_review (exec/src/lib.rs:571-598,758-791) and rejects approval, user-input and dynamic-tool requests (lib.rs:1990-2125). OS enforcement is Seatbelt on macOS, bubblewrap+seccomp on Linux, restricted token on Windows (sandboxing/src/manager.rs:49-63; linux-sandbox/README.md:24-52). workspace-write network_access defaults to false (core/config.schema.json:3982-3985)."
+      },
+      {
+        "claim": "Python SDK: thread starts default to ApprovalMode.auto_review (sdk/python/docs/api-reference.md:6).",
+        "verified": "yes",
+        "evidence": "api.py:138 sets the default; _approval_mode.py:29-33 maps it to approval_policy on-request with approvals_reviewer auto_review; deny_all maps to never (:34-35). Undocumented caveat: CodexClient's default approval handler returns {'decision': 'accept'} for command and file-change approvals, and the public Codex class passes no handler (client.py:833-839; api.py:86)."
+      },
+      {
+        "claim": "The Python SDK installs its matching openai-codex-cli-bin runtime automatically, and stable SDK releases track stable CLI releases (sdk/python/docs/getting-started.md:19-20).",
+        "verified": "partial",
+        "evidence": "Release flow stages SDK and runtime at the same version (sdk/python/RELEASING.md:7-9; python-sdk-cli-release.yml:58-68). The in-tree pyproject pins openai-codex-cli-bin==0.153.4 with version 0.0.0-dev (pyproject.toml:7,19) while the workspace is 0.160.0 (codex-rs/Cargo.toml:161), so the checked-in pin lags. gpt-6.1-sol needs client >= 0.153.0 (models.json:243); SDK minimum runtime is 0.151.0 (_runtime_requirements.py:13)."
+      },
+      {
+        "claim": "Sign in with ChatGPT, or use an API key (README.md:68-72).",
+        "verified": "yes",
+        "evidence": "AuthMode has ApiKey, Chatgpt and other variants (codex-rs/protocol/src/auth.rs:9-38). Exec reads CODEX_API_KEY (exec/src/lib.rs:726; login/src/auth/manager.rs:954; exec/tests/suite/auth_env.rs:15-36). TS SDK injects CODEX_API_KEY from `apiKey` (exec.ts:189-191); Python has login_api_key (api.py:107-116)."
+      },
+      {
+        "claim": "Standalone installers download from releases.openai.com by default and fall back to GitHub Releases (README.md:28).",
+        "verified": "yes",
+        "evidence": "scripts/install/install.sh:8-10 (default true, base URL), :196 and :425 (fallback to GitHub), :322 (GitHub asset URL). Archives are checked against codex-package_SHA256SUMS (install.sh:477-561), which the release job publishes (rust-release.yml:1613-1634)."
+      },
+      {
+        "claim": "docs/install.md:7 lists supported OS as macOS 12+, Ubuntu 20.04+/Debian 10+, or Windows 11 via WSL2.",
+        "verified": "partial",
+        "evidence": "Code and CI differ for Windows: README.md:22-26 documents a native PowerShell installer, rust-release-windows.yml:25-61 builds x86_64/aarch64-pc-windows-msvc, and sandboxing/src/manager.rs:54-58 has a Windows restricted-token sandbox. Linux and macOS match the release matrix (rust-release.yml:84-132)."
+      },
+      {
+        "claim": "Needs-derived (not a README claim): Codex can be run with GPT-6.1 Sol.",
+        "verified": "yes",
+        "evidence": "Bundled catalog entry slug `gpt-6.1-sol`, 'GPT-6.1-Sol', supported_in_api true, priority 1, minimal_client_version 0.153.0, reasoning levels low..ultra, context_window 272000 / max 872000, tool_mode code_mode_only (codex-rs/models-manager/models.json:178-249). Selected via --model (shared_options.rs:21-23), TS `model` option (threadOptions.ts:18), Python thread_start(model=...) (api.py:144); Bedrock id openai.gpt-6.1-sol (model-provider-info/src/lib.rs:84). No Claude/Anthropic provider is bundled; the only wire API is Responses (lib.rs:101-131,661-684)."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Claude is not supported natively. The only wire API is OpenAI Responses (codex-rs/model-provider-info/src/lib.rs:101-131), and the built-in providers are openai, amazon-bedrock, ollama and lmstudio, with a code comment declining to bundle other third-party providers (lib.rs:661-684). A Claude backend would need an external Responses-compatible gateway configured under model_providers. The hosted web-search tool is only offered for OpenAI-type providers or those flagged supports_standalone_web_search (ext/web-search/src/extension.rs:46-50).",
+      "No deep-research harness exists in the repo; a grep for 'deep research' finds only a test string. Evidence gathering is the `web.run`/web_search tool, whose citation rules are prompt text (codex-rs/ext/web-search/web_run_description.md:51-76), not code-verified. Web search defaults to `cached` rather than live (core/src/config/mod.rs:3768-3769; protocol/src/config_types.rs:376-382), and the TS item types drop web-search action/results (items.ts:89-94 vs exec_events.rs:296-306).",
+      "Headless approval limits: `codex exec` runs with approval policy `never` and rejects every approval, request_user_input, dynamic-tool-call and auth-refresh request, and auto-cancels MCP elicitations (exec/src/lib.rs:574-576,1990-2125). Workers needing escalation must use app-server/Python (auto_review) or an externally sandboxed `--yolo` run. The Python client's default approval handler auto-accepts command and file approvals if the server forwards them (sdk/python/src/openai_codex/client.py:833-839). Exec also refuses to run outside a Git repo unless --skip-git-repo-check or --yolo is set (exec/src/lib.rs:975-983).",
+      "Sandbox effectiveness depends on the host. Linux needs bubblewrap and user namespaces, warns at startup if missing, and WSL1 is unsupported (codex-rs/linux-sandbox/README.md:10-22,33-36). Some Windows configs fall back to read-only (core/src/config/config_tests.rs:10631-10636). `danger-full-access` and `--yolo` remove isolation (utils/cli/src/shared_options.rs:52-59; python _sandbox.py:26). Default sandbox and approval depend on project trust state (core/src/config/mod.rs:3732-3744; sdk/python/docs/faq.md:125).",
+      "Version coupling and protocol stability: the Python SDK depends on `codex app-server`, which the CLI labels [experimental] (cli/src/main.rs:169-170), and runs with experimental_api=True (client.py:211) while advertising 'Production/Stable' (pyproject.toml:15). It pins an exact runtime (checked-in 0.153.4 vs tree 0.160.0, pyproject.toml:19) and newer options need CLI >= 0.151.0 (_runtime_requirements.py:13). TS types lag the CLI: ApprovalMode includes 'untrusted', which the config loader rejects (threadOptions.ts:1; core/src/config/mod.rs:3726-3731), and WebSearchMode lacks 'indexed' (threadOptions.ts:15).",
+      "Governance and docs: external code contributions are not accepted (docs/contributing.md:5). User-facing behaviour for exec, sandbox, auth and config is documented only on developers.openai.com (docs/exec.md:3; AGENTS.md:32), so in-repo evidence is code-only. docs/install.md:7 is stale on native Windows. Only OpenAI-operated release channels are documented.",
+      "Telemetry and account dependence: analytics events and Statsig metrics are default-on with config opt-out (codex-rs/core/config.schema.json:6588-6594; config/src/types.rs:653-656; exec/src/lib.rs:173). A hard-coded Sentry DSN is used for feedback (feedback/src/lib.rs:57-58). Every documented model path needs an OpenAI/ChatGPT account, Bedrock credentials or a local OSS server (README.md:68-72; model-provider-info/src/lib.rs:420-435). Workspace-managed policy bundles can be fetched with ChatGPT auth and can block exec (exec/tests/suite/auth_env.rs:39-96).",
+      "Supply chain and assurance: 11 RUSTSEC advisories are ignored, mostly unmaintained transitive crates (codex-rs/deny.toml:72-87). Git-pinned and forked dependencies are used (Cargo.toml:321-326,413,447,639-641). Release signing relies on Azure Key Vault secrets and protected environments that cannot be audited from the repo (rust-release.yml:8-9,654-668). Only Linux artifacts carry cosign bundles and the checksum manifest covers only codex-package archives (rust-release.yml:379-382,1619-1621). No SLSA or GitHub attestation and no benchmarks of task quality or throughput were found."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "openai/codex",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Standalone installer script (Linux/macOS): `curl -fsSL https://chatgpt.com/codex/install.sh | sh`",
+          "citation": "README.md:16-20",
+          "holds": true,
+          "note": "README.md:16 says 'Run the following on Mac or Linux to install Codex CLI' and line 19 has the exact command. In the repo, scripts/install/install.sh:1085-1096 accepts only Darwin and Linux and tells Windows users to use install.ps1; lines 1098-1109 accept x86_64/amd64 and arm64/aarch64."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX Apache-2.0, license file LICENSE",
+          "citation": "LICENSE:1-3; README.md:81",
+          "holds": true,
+          "note": "LICENSE is the unmodified Apache License, Version 2.0 (January 2004) text, with the standard appendix at lines 178-195. README.md:81 says 'This repository is licensed under the Apache-2.0 License'."
+        },
+        {
+          "field": "platforms.linux_x86_64",
+          "statement": "yes: release asset x86_64-unknown-linux-musl; sandbox is bubblewrap + seccomp and needs user namespaces; Codex warns at startup if bwrap or userns is unavailable",
+          "citation": "README.md:61; .github/workflows/rust-release.yml:109-114; codex-rs/linux-sandbox/README.md:10-22,33-52",
+          "holds": true,
+          "note": "README.md:61 lists codex-x86_64-unknown-linux-musl.tar.gz. rust-release.yml:109-114 builds target x86_64-unknown-linux-musl, primary bundle 'codex codex-code-mode-host codex-responses-api-proxy bwrap'; lines 507-528 tar each binary as <name>.tar.gz. linux-sandbox/README.md: bwrap from PATH is preferred, otherwise the bundled codex-resources/bwrap is used with a startup warning (14-18). The same warning appears when user namespaces cannot be created (18-19, 35-36). WSL1 is rejected because it lacks user namespaces (20-22). A seccomp network filter is applied (46-47)."
+        },
+        {
+          "field": "integrations.cli",
+          "statement": "`codex exec` (alias `e`) is the non-interactive mode with --json (alias --experimental-json), --output-schema, -o/--output-last-message, --ephemeral, --skip-git-repo-check, --ignore-user-config, --ignore-rules, subcommands resume/fork/review; shared flags --model, --oss, --sandbox, --yolo, --cd, --worktree, --add-dir, -c key=value; prompt can come from stdin; exec user docs are external",
+          "citation": "codex-rs/cli/src/main.rs:150-152; codex-rs/exec/src/cli.rs:10-81,149-159; codex-rs/utils/cli/src/shared_options.rs:21-77; codex-rs/exec/src/lib.rs:2232-2316; docs/exec.md:3",
+          "holds": true,
+          "note": "Every named flag and subcommand exists at the cited lines: main.rs:150-152 (Exec, visible_alias 'e'); cli.rs:31-74 (flags, json alias 'experimental-json' at 59-65) and 149-159 (Resume/Fork/Review); shared_options.rs:21-76 (model, oss, sandbox, yolo alias, cd, worktree, add-dir). lib.rs:2232-2316 reads the prompt from stdin, and docs/exec.md:3 is a pointer to developers.openai.com. One citation is off: -c key=value is not in shared_options.rs. It is CliConfigOverrides in codex-rs/utils/cli/src/config_override.rs:29-36 (global = true), passed into exec via cli/src/main.rs:1145-1146 and exec/src/main.rs:22,34-35. The flag exists, so the statement holds; only that citation needs correcting."
+        },
+        {
+          "field": "claim_checks[9]",
+          "statement": "Needs-derived: Codex can be run with GPT-6.1 Sol (bundled catalog entry, supported_in_api true, priority 1, minimal_client_version 0.153.0, low..ultra, 272000/872000, code_mode_only; selectable via --model, TS model, Python thread_start(model=...); Bedrock id openai.gpt-6.1-sol; no Anthropic provider, Responses-only wire API)",
+          "citation": "codex-rs/models-manager/models.json:178-249; codex-rs/utils/cli/src/shared_options.rs:21-23; sdk/typescript/src/threadOptions.ts:18; sdk/python/src/openai_codex/api.py:144; codex-rs/model-provider-info/src/lib.rs:84,101-131,661-684",
+          "holds": true,
+          "note": "models.json: slug 178, tool_mode code_mode_only 194, context 272000/872000 207-208, display name 'GPT-6.1-Sol' 212, efforts low/medium/high/xhigh/max/ultra 215-240, minimal_client_version 0.153.0 243, supported_in_api true 244, priority 1 249. The catalog is compiled in via include_str! (models-manager/src/lib.rs:15), and this tree's workspace version 0.160.0 (codex-rs/Cargo.toml:161) meets the minimum. Also confirmed: --model/-m, TS `model?: string`, Python `model: str | None`, and the Bedrock const at lib.rs:84. WireApi has only Responses ('chat' errors, lib.rs:104-130). Built-in providers are openai, amazon-bedrock, amazon-bedrock-runtime, ollama and lmstudio (lib.rs:665-680); none is Anthropic."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

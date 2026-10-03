@@ -1,0 +1,301 @@
+{
+  "contender": "portkey-ai/gateway",
+  "revision": {
+    "contender": "portkey-ai/gateway",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "Portkey-AI/gateway",
+        "tag": "v1.15.2",
+        "commit": "ca7712947ec8c0887803990b746740d36011c697",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v1.15.2",
+    "commit": "ca7712947ec8c0887803990b746740d36011c697",
+    "read_at": "2026-10-02T03:02:36+00:00"
+  },
+  "dossier": {
+    "contender": "portkey-ai/gateway",
+    "revision": {
+      "tag": "v1.15.2",
+      "commit": "ca7712947ec8c0887803990b746740d36011c697",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "TypeScript/Hono HTTP proxy that exposes an OpenAI-style /v1 API (chat/completions, completions, embeddings, responses, models, files, batches, images, audio, Anthropic /v1/messages, realtime websocket) and forwards each request to one of 72 registered provider adapters (src/providers/index.ts:78-151). Provider, credentials and routing (single/fallback/loadbalance/conditional, retry, timeout, cache, guardrail hooks) are supplied per request through x-portkey-* headers or an inline x-portkey-config JSON header (src/handlers/handlerUtils.ts:836-1180). This repo has no gateway-side credential store, no auth layer on its own endpoints, and no persistent usage ledger. It runs via npx/bunx, Docker or Cloudflare Workers, and a browser Console at /public/ shows live logs. A case-insensitive whole-tree search finds no Codex, GPT-6, ChatGPT-OAuth, prompt/request-compression or MCP-server code or docs at this revision. The only 'gpt-6' hits are base64 noise in cookbook notebooks.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Route to 250+ LLMs with 1 fast & friendly API",
+          "citation": "README.md:9"
+        },
+        {
+          "claim": "Designed for fast, reliable & secure routing to 1600+ language, vision, audio, and image models; integrate with any language model in under 2 minutes",
+          "citation": "README.md:27"
+        },
+        {
+          "claim": "Blazing fast (<1ms latency) with a tiny footprint (122kb); battle tested with over 10B tokens processed everyday",
+          "citation": "README.md:29-30"
+        },
+        {
+          "claim": "Quickstart: `npx @portkey-ai/gateway` (needs Node.js and npm); gateway runs on http://localhost:8787/v1 and the Gateway Console on http://localhost:8787/public/",
+          "citation": "README.md:59-65"
+        },
+        {
+          "claim": "On the Gateway Console you can see all of your local logs in one place",
+          "citation": "README.md:114"
+        },
+        {
+          "claim": "Example 'OpenAI compatible client' is Portkey(provider='openai', Authorization='sk-***'); no base URL is shown. Supported libraries include REST and OpenAI SDKs",
+          "citation": "README.md:87-91, 102-111"
+        },
+        {
+          "claim": "Configs in the LLM gateway allow you to create routing rules, add reliability and setup guardrails",
+          "citation": "README.md:120"
+        },
+        {
+          "claim": "Fallbacks: fall back to another provider or model on failed requests; you can specify the errors on which to trigger the fallback",
+          "citation": "README.md:173"
+        },
+        {
+          "claim": "Automatic Retries: automatically retry failed requests up to 5 times, with exponential backoff",
+          "citation": "README.md:174"
+        },
+        {
+          "claim": "Load Balancing: distribute LLM requests across multiple API keys or AI providers with weights",
+          "citation": "README.md:175"
+        },
+        {
+          "claim": "Realtime APIs: call realtime APIs launched by OpenAI through the integrated websockets server",
+          "citation": "README.md:178"
+        },
+        {
+          "claim": "Secure Key Management: use your own keys or generate virtual keys on the fly",
+          "citation": "README.md:182"
+        },
+        {
+          "claim": "Smart caching supports simple and semantic* caching; Usage analytics: monitor request volume, latency, costs and error rates; footnote '*Available in hosted and enterprise versions' (the asterisk is not on Usage analytics)",
+          "citation": "README.md:187-189, 197"
+        },
+        {
+          "claim": "Portkey Cloud is the 'Recommended' deployment; an enterprise version adds org management, governance and security; 45+ providers listed",
+          "citation": "README.md:69, 149-163, 219"
+        }
+      ],
+      "install": [
+        {
+          "method": "npx (Node.js + npm)",
+          "command": "npx @portkey-ai/gateway",
+          "citation": "README.md:61; docs/installation-deployments.md:33"
+        },
+        {
+          "method": "bunx",
+          "command": "bunx @portkey-ai/gateway",
+          "citation": "docs/installation-deployments.md:41"
+        },
+        {
+          "method": "From source (Node.js server)",
+          "command": "git clone https://github.com/portkey-ai/gateway\ncd gateway\nnpm i\nnpm run build\nnode build/start-server.js",
+          "citation": "docs/installation-deployments.md:51-69"
+        },
+        {
+          "method": "Docker (Docker Hub image)",
+          "command": "docker run --rm  -p 8787:8787 portkeyai/gateway:latest",
+          "citation": "docs/installation-deployments.md:209"
+        },
+        {
+          "method": "Docker Compose",
+          "command": "wget \"https://raw.githubusercontent.com/Portkey-AI/gateway/main/docker-compose.yaml\"\ndocker compose up -d",
+          "citation": "docs/installation-deployments.md:223, 229"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - Docker image is built for linux/amd64 (.github/workflows/docker_publish.yml:41); the npx path needs only Node.js and npm (README.md:60); CI runs on ubuntu-latest (.github/workflows/npm_publish.yml:7). No Node engine range is declared (package.json has no engines field); the Dockerfile and CI use Node 20 (Dockerfile:2; npm_publish.yml:14).",
+        "wsl2": "unknown - no WSL or Windows instructions for the gateway; the only Windows mention is 'for windows add npx' in the Supabase steps (docs/installation-deployments.md:387).",
+        "macos_arm64": "unknown - macOS is not documented and no darwin CI job exists. package.json declares no native-addon dependency (package.json:43-59) and the Docker image also targets linux/arm64 (.github/workflows/docker_publish.yml:41), but no upstream statement confirms macOS arm64.",
+        "gpu": "no - not applicable: the gateway is an HTTP proxy to remote provider APIs and contains no inference code; the Ollama adapter only forwards to a user-supplied host (src/providers/ollama/api.ts:7-9)."
+      },
+      "integrations": {
+        "cli": "`npx @portkey-ai/gateway` / `node build/start-server.js` starts the server (package.json:80; src/start-server.ts:1-18). Only the flags --port=<n> and --headless exist (src/start-server.ts:14-18); no other CLI subcommands.",
+        "mcp": "none found - no MCP server or client in src/. Only leftovers: oauth/MCP cache instances (src/shared/services/cache/index.ts:267-268, 328-333, 384-391; createCacheBackendsLocal has no caller), a logger header comment 'for MCP Gateway' (src/shared/utils/logger.ts:3), and pass-through of the Anthropic `mcp_servers` request param (src/providers/anthropic-base/messages.ts:20-23).",
+        "sdk_or_api": "HTTP API: OpenAI-style routes under /v1 (src/index.ts:103-295) incl. POST/GET/DELETE /v1/responses and /v1/responses/:id/input_items (src/index.ts:233-253) and Anthropic /v1/messages (src/index.ts:135-141). Every request must carry x-portkey-provider or x-portkey-config (src/middlewares/requestValidator/index.ts:106-124) and the provider key as `Authorization: Bearer` (src/handlers/handlerUtils.ts:1148-1150). Documented clients are the Portkey Python/JS SDKs (README.md:83-98, 102-111); the repo's own tests use new Portkey({ baseURL: 'http://localhost:8787/v1', config }) (tests/integration/src/handlers/requestBuilder.ts:26-32). Guardrail plugin interface: plugins/README.md:130-155.",
+        "claude_code_or_codex": "Codex: none found anywhere in the tree (case-insensitive search, 0 hits). Claude Code: no documented integration; the code accepts Anthropic headers without the x-portkey- prefix 'for claude code support' (src/handlers/handlerUtils.ts:975-984) and serves /v1/messages and /v1/messages/count_tokens (src/index.ts:135-141). CLAUDE.md is contributor guidance for working on this repo with Claude Code (CLAUDE.md:3), not an integration."
+      },
+      "telemetry_and_network": "No analytics/telemetry SDK or phone-home call found in the server code: src/ has no telemetry/analytics/sentry/posthog code; the OTLP span builder (src/handlers/services/logsService.ts:97-162) has no caller outside tests; src/apm/index.ts:1 is just console. Server egress goes to the selected provider (e.g. https://api.openai.com/v1, src/providers/openai/api.ts:4) or to a custom host from x-portkey-custom-host / custom_host (src/handlers/services/providerContext.ts:96-107). The custom-host SSRF filter trusts localhost/127.0.0.1/::1/host.docker.internal by default and blocks private ranges unless TRUSTED_CUSTOM_HOSTS is set (src/middlewares/requestValidator/index.ts:50-62, 232-340). Conditional calls: GET /v1/models goes to a control plane only if ALBUS_BASEPATH is set and no provider/config header is sent (src/handlers/modelsHandler.ts:15, 37-48). Guardrail plugins call vendor APIs only when configured: the `portkey` plugin posts to https://api.portkey.ai/v1/execute-guardrails (plugins/portkey/globals.ts:5) using conf.json credentials.portkey.apiKey (conf.json:15-19), and default.log posts request context to a configured logURL (plugins/default/log.ts:13-19). Browser side: the Console served at /public/ (node runtime, not headless, not production; src/start-server.ts:21-51) loads Google Tag Manager (GTM-KX3PMNVR) and scripts from unpkg, cdnjs, jsdelivr and buttons.github.io (src/public/index.html:856-867, 872-873, 1142-1143), and stores per-provider form values in browser localStorage (src/public/index.html:1841-1859). No Portkey account is needed to run locally; README recommends Portkey Cloud as a hosted option (README.md:69). Logs are not persisted: log records are broadcast over SSE to open Console tabs (src/middlewares/log/index.ts:8-48; /log/stream at src/start-server.ts:72-135). Redis is optional via REDIS_CONNECTION_STRING (src/index.ts:49-51). npm install runs a postinstall script (patch-package, package.json:41)."
+    },
+    "code": {
+      "languages": [
+        "TypeScript",
+        "JavaScript (build/test config scripts)",
+        "HTML (Console UI)",
+        "JSON/YAML (config, plugin manifests, CI)"
+      ],
+      "entry_points": [
+        {
+          "path": "src/start-server.ts",
+          "what": "Node server main (shebang; package.json bin -> build/start-server.js; Rollup input). Parses --port/--headless, serves the Console, the /log/stream SSE feed and the /v1/realtime WebSocket, then calls serve() (src/start-server.ts:1-18, 138-149; package.json:80; rollup.config.js:7)."
+        },
+        {
+          "path": "src/index.ts",
+          "what": "Hono app: middleware plus every /v1 route; also the Cloudflare Workers entry (wrangler.toml:3)."
+        },
+        {
+          "path": "src/handlers/handlerUtils.ts",
+          "what": "constructConfigFromRequestHeaders, tryTargetsRecursively (single/fallback/loadbalance/conditional) and tryPost (hooks, cache, retry, upstream fetch)."
+        },
+        {
+          "path": "src/handlers/modelResponsesHandler.ts",
+          "what": "POST/GET/DELETE /v1/responses handler (Responses wire API); calls tryTargetsRecursively with endpoint createModelResponse."
+        },
+        {
+          "path": "plugins/build.ts",
+          "what": "`npm run build-plugins` (package.json:32): generates the checked-in plugins/index.ts from conf.json plugins_enabled (plugins/build.ts:4-43)."
+        },
+        {
+          "path": "Dockerfile",
+          "what": "node:20-alpine two-stage image; EXPOSE 8787; ENTRYPOINT npm, CMD run start:node (Dockerfile:2, 29, 46-50)."
+        }
+      ],
+      "architecture": "Request path: src/index.ts (Hono) -> middlewares (src/middlewares/requestValidator: header/config/custom-host validation; hooks: per-request HooksManager; cache: in-memory simple cache only when conf.json cache=true; log: SSE broadcast, node only) -> per-endpoint handlers src/handlers/*Handler.ts (unknown /v1/* paths fall through to proxyHandler) -> src/handlers/handlerUtils.ts builds a target tree from x-portkey-* headers or x-portkey-config, applies the routing strategy (src/services/conditionalRouter.ts for conditional) and runs tryPost: before-request hooks, cache lookup, retryHandler.ts, upstream fetch, response/stream mapping (responseHandlers.ts, streamHandler.ts), after-request hooks. src/handlers/services/*.ts hold the request/provider/response/log/cache/hooks context classes. Provider adapters live in src/providers/<name>/{api.ts,chatComplete.ts,...}, are registered in src/providers/index.ts, and src/services/transformToProviderRequest.ts maps the OpenAI-shaped body to each provider using a field whitelist per endpoint. Guardrail plugins: plugins/<vendor>/manifest.json plus handlers, aggregated into plugins/index.ts. Console UI: src/public/index.html. Cache backends: src/shared/services/cache (memory/file/redis/cloudflareKV).",
+      "packaging_and_release": "npm package @portkey-ai/gateway v1.15.2 (package.json:2-3): ESM bundle built by Rollup from src/start-server.ts into build/ with src/public copied to build/public (rollup.config.js:6-22); `files` whitelist is build, README.md, SECURITY.md, LICENSE, build/public (package.json:18-24); prepublishOnly runs the build (package.json:33). A published GitHub release triggers two workflows: npm_publish.yml (ubuntu-latest, Node 20.x, npm ci, `npm publish` with an NPM_TOKEN secret; no --provenance flag and no id-token permission, lines 2-21) and docker_publish.yml (QEMU+Buildx, pushes <DOCKER_ORGANISATION>/gateway to Docker Hub with tags latest and the release tag, platforms linux/amd64 and linux/arm64, lines 3-44). Neither workflow signs images, generates an SBOM, or produces checksums, and no workflow attaches binaries or checksums to the GitHub release. Dockerfile pins npm@10.9.2 (Dockerfile:14-18). Also deployable with wrangler (wrangler.toml:1-4; package.json:29).",
+      "tests_and_ci": "Jest 29 + ts-jest, node environment, 30s timeout (jest.config.js:1-8; package.json:60-77); scripts test:gateway = `jest src/` and test:plugins = `jest plugins/` (package.json:37-38). About 32 test files: 22 under plugins/ (guardrail vendor tests), 2 under src/ (src/tests/common.test.ts, which hits live provider APIs and skips providers without API keys, src/tests/common.test.ts:9-12; and src/providers/google-vertex-ai/utils.test.ts), and 8 under tests/ (7 unit tests for src/handlers/services/* plus tests/integration/src/handlers/tryPost.test.ts, which needs a .creds.json and a running gateway on localhost:8787, requestBuilder.ts:5, 26-32, 162). The integration test reads ./src/handlers/tests/test.txt (tryPost.test.ts:44), a path that does not exist; the fixture is under tests/integration/src/handlers/. No test references /v1/responses or createModelResponse. Six workflows in .github/workflows/: check_code_formatting.yml (Prettier check on PRs to main), link-checker.yml (lychee on *.md on push/PR/weekly/manual; opens an issue on failure), run_tests.yml (only on a PR comment containing 'run tests' with no author check, environment production, OPENAI_API_KEY/COHERE_API_KEY secrets; builds, starts the server with `npm run build/start-server.js` - no script of that name exists in package.json:25-42 - then runs `npm run test:gateway`; lines 9-34, 73-75), triage-label.yml (adds the 'triage' label to new issues), npm_publish.yml and docker_publish.yml (release publishing). No workflow runs plugin tests. Local hooks: husky pre-commit Prettier check and pre-push `npm run build && node start-test.js`, a 3-second headless boot smoke test (.husky/pre-commit:1; .husky/pre-push:1; package.json:39; start-test.js:5-21).",
+      "dependencies": "Root package.json: 15 runtime deps (package.json:43-59: hono, @hono/node-server, @hono/node-ws, ws, ioredis, zod, jose, avsc, async-retry, patch-package, @portkey-ai/mustache, @smithy/signature-v4, @aws-crypto/sha256-js, @cfworker/json-schema, @types/mustache) and 18 dev deps (package.json:60-79, incl. jest, ts-jest, rollup, wrangler, tsx, prettier, husky and the portkey-ai SDK). package-lock.json is present and used by `npm ci` in the publish workflow (npm_publish.yml:16-17). cookbook/integrations/vercel/package.json is a separate private example app with 16 runtime and 11 dev deps (cookbook/integrations/vercel/package.json:4, 11-41). No other dependency manifests. patches/ holds two patch-package patches (async-retry, @types/async-retry).",
+      "security_policy": ".github/SECURITY.md: supported version '1.x.x'; vulnerabilities are reported by email to support@portkey.ai (.github/SECURITY.md:3-11); no disclosure timeline or advisory process is stated. package.json `files` lists a root SECURITY.md (package.json:21) that does not exist (only .github/SECURITY.md)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Route to 250+ LLMs / 1600+ models / 45+ providers (README.md:9, 27, 219)",
+        "verified": "partial",
+        "evidence": "Code registers 72 provider adapters (src/providers/index.ts:78-151) and VALID_PROVIDERS lists 74 names including 'portkey' (src/globals.ts:117-192). The docs give inconsistent figures (README 250+/45+/1600+ models; docs/deploy-on-replit.md:5 says 100+). Model counts cannot be derived from code."
+      },
+      {
+        "claim": "Works as an OpenAI-compatible endpoint for OpenAI SDKs and other OpenAI-compatible clients (README.md:87, 106)",
+        "verified": "partial",
+        "evidence": "Routes exist for chat, completions, embeddings and responses (src/index.ts:147-253). The requested model and reasoning settings pass through: chat `reasoning_effort` (src/providers/openai/chatComplete.ts:118-120) and Responses `model` plus the whole `reasoning` object (src/providers/open-ai-base/createModelResponse.ts:53-56, 97-100). Caveats: only whitelisted fields are forwarded and the other top-level fields are dropped (src/services/transformToProviderRequest.ts:83-124); chat `model` defaults to gpt-3.5-turbo when omitted (chatComplete.ts:13-17); config `override_params` overwrites body fields (src/handlers/services/requestContext.ts:51-60); every request must carry x-portkey-provider or x-portkey-config (requestValidator/index.ts:106-124). Responses support is defined for openai, azure-openai and iointelligence only (src/providers/{openai,azure-openai,iointelligence}/index.ts)."
+      },
+      {
+        "claim": "Load Balancing across multiple API keys or providers with weights (README.md:175)",
+        "verified": "yes",
+        "evidence": "strategy.mode 'loadbalance' picks one target per request by weighted Math.random(); default weight is 1 and weight 0 is never picked (src/handlers/handlerUtils.ts:693-723). Each target can carry its own provider + api_key (src/middlewares/requestValidator/schema/config.ts:39-47, 78); the cookbook says same-provider accounts can be added (cookbook/getting-started/resilient-loadbalancing-with-failure-mitigating-fallbacks.md:195). Keys come from the client's x-portkey-config header (handlerUtils.ts:1026-1146). There is no sticky-session, health or quota logic, and a failed pick is not retried on another target unless wrapped in a fallback strategy."
+      },
+      {
+        "claim": "Fallbacks on specified errors (README.md:173)",
+        "verified": "yes",
+        "evidence": "handlerUtils.ts:663-691 tries targets in order and stops when the status is not in strategy.on_status_codes (or the response is ok when unset) or when a gateway-exception header is set; schema at config.ts:13-27."
+      },
+      {
+        "claim": "Automatic Retries up to 5 times with exponential backoff (README.md:174)",
+        "verified": "partial",
+        "evidence": "Retry exists via async-retry (src/handlers/retryHandler.ts:87-181) with default statuses 429/500/502/503/504 (src/globals.ts:38), but attempts default to 0 unless configured (src/handlers/services/requestContext.ts:148-156). The 5-cap constant MAX_RETRIES is never referenced (src/globals.ts:39) and the schema accepts any number (config.ts:66-75). Backoff is the library default with randomize:false (retryHandler.ts:174-180). docs/deploy-on-replit.md:15 says retries 'come by default', which the code contradicts."
+      },
+      {
+        "claim": "Gateway Console shows all local logs in one place (README.md:114)",
+        "verified": "partial",
+        "evidence": "Logs are SSE-broadcast only to currently connected Console tabs (src/middlewares/log/index.ts:8-48; src/start-server.ts:72-135) and the browser table keeps the latest 100 rows (src/public/index.html:2001-2004). Nothing is persisted server-side, streamed responses are recorded only as 'The response was a stream.' (log/index.ts:60-62), and the Console exists only on node when not headless and not production (start-server.ts:21-51)."
+      },
+      {
+        "claim": "Usage analytics: request volume, latency, costs and error rates (README.md:188)",
+        "verified": "no",
+        "evidence": "No code in this repo aggregates tokens, cost or error rates. Searching src/handlers, middlewares, services and shared finds only a pass-through modelPricingConfig from an external preRequestValidator that is never set here (src/handlers/handlerUtils.ts:411-416; src/handlers/services/preRequestValidatorService.ts:12-33). The Console log shows only time, method, endpoint, status, duration plus raw request/response JSON (src/public/index.html:1980-2039). README.md:197 marks only some features as hosted/enterprise; this one has no asterisk."
+      },
+      {
+        "claim": "Secure Key Management: own keys or generated virtual keys (README.md:182)",
+        "verified": "partial",
+        "evidence": "Own keys work via Authorization / api_key per request (handlerUtils.ts:1148-1150). Virtual keys have no implementation here: virtualKey appears only in types and the models handler (src/types/requestBody.ts:49, 192; src/handlers/modelsHandler.ts:32-35). The conf.example.json integrations and rate_limits (conf.example.json:20-47) are read only by initializeSettings.ts, which no file imports."
+      },
+      {
+        "claim": "Quickstart: `npx @portkey-ai/gateway` serves http://localhost:8787/v1 with the Console at /public/ (README.md:59-65)",
+        "verified": "yes",
+        "evidence": "bin -> build/start-server.js (package.json:80); default port 8787 (src/start-server.ts:13-16); /public/ route registered when not headless/production (start-server.ts:21-51); /v1 routes at src/index.ts:103-295."
+      },
+      {
+        "claim": "Blazing fast (<1ms latency), 122kb footprint, 10B+ tokens/day (README.md:29-30)",
+        "verified": "not_checkable",
+        "evidence": "No benchmark harness or results in the repo; the only benchmark script is a LogsService micro-benchmark (tests/unit/src/handlers/services/benchmark.ts:58-64, 94-157) and no build output is present. docs/deploy-on-replit.md:12, 17 give different figures (9.9x faster, ~45kb, 100B tokens)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Gateway request latency / speed",
+        "metric": "latency overhead",
+        "value": "'<1ms latency' (README); '9.9x faster' (Replit doc); no methodology or harness published",
+        "source": "README.md:29; docs/deploy-on-replit.md:12",
+        "independent": false
+      },
+      {
+        "what": "Package footprint",
+        "metric": "size",
+        "value": "122kb (README) vs ~45kb installed (Replit doc)",
+        "source": "README.md:29; docs/deploy-on-replit.md:12",
+        "independent": false
+      },
+      {
+        "what": "Production traffic ('battle tested')",
+        "metric": "tokens processed",
+        "value": "over 10B tokens everyday (README) vs over 100B tokens (Replit doc)",
+        "source": "README.md:30; docs/deploy-on-replit.md:17",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope vs the stated need: no Codex or GPT-6 handling or docs exist anywhere in the tree. OpenAI auth is only a static `Authorization: Bearer <api key>` plus optional OpenAI-Organization/Project/Beta headers (src/providers/openai/api.ts:5-27), so there is no ChatGPT/OAuth/session-token account support; OAuth code exists only for Vertex and Azure (src/providers/google-vertex-ai/utils.ts:115-152; src/providers/azure-openai/utils.ts:13-37). Features the README lists, such as virtual keys, budgets, semantic cache, RBAC and usage analytics, have hooks but no implementation in this repo and sit beside hosted/enterprise offerings (README.md:149-163, 182-189, 197, 265-275).",
+      "Pooling semantics are minimal: 'pooling' means a client-supplied list of api_key targets in an x-portkey-config header, picked by weighted Math.random() per request with no affinity, quota or health tracking (src/handlers/handlerUtils.ts:693-723, 1026-1146). Failover happens only through a fallback strategy on status codes (handlerUtils.ts:663-691); retries default to 0 (src/handlers/services/requestContext.ts:148-156) and MAX_RETRIES is unused (src/globals.ts:39). The circuit-breaker and pre-request-validator hooks are read from the Hono context but never set in this repo (handlerUtils.ts:646-658, 793-799; src/handlers/services/preRequestValidatorService.ts:12-20), and initializeSettings.ts (conf.json integrations/rate limits) is imported by nothing.",
+      "Usage recording is transient and incomplete: logs go only to open Console tabs (src/middlewares/log/index.ts:8-48), the browser keeps 100 rows (src/public/index.html:2001-2004), and streamed responses are logged as 'The response was a stream.' (log/index.ts:60-62). Streamed /v1/responses events are passed through unparsed with no usage extraction (src/handlers/streamHandler.ts:200-201), and no code computes token or cost totals. Hooks, including the default.log plugin, are skipped for createModelResponse because shouldSkipHook allows only chatComplete, complete, embed and messages (src/middlewares/hooks/index.ts:452-454). The Console exists only on node when not headless/production (src/start-server.ts:21-51).",
+      "Responses-API fidelity: the body is rebuilt from a fixed whitelist of 29 fields (src/providers/open-ai-base/createModelResponse.ts:40-157; src/services/transformToProviderRequest.ts:83-124), so any other top-level field a client sends is dropped. On non-proxy routes only provider-mapped headers (Authorization, OpenAI-Organization, OpenAI-Project, OpenAI-Beta) plus configured forward_headers go upstream (src/handlers/handlerUtils.ts:114-139; src/providers/openai/api.ts:5-27). The handler reads the body with c.req.json() (src/handlers/modelResponsesHandler.ts:15) and no code decodes compressed request bodies (no content-encoding handling in src/ beyond deleting response headers, src/handlers/services/responseService.ts:127-130), so compressed request bodies are not handled (inferred from the code, not executed). WebSocket upgrade exists only for /v1/realtime (src/start-server.ts:138-144). The gateway has no request-compression feature at all; the only compress() use is hono response compression, skipped on node/workerd/lagon (src/index.ts:57-63).",
+      "Credential exposure and network surface: provider keys travel in request headers or the inline config (handlerUtils.ts:1026-1035, 1148-1150). By code reading, the log objects carry providerOptions (including apiKey) and the upstream request headers (src/handlers/services/logsService.ts:224-228, 258-263), and the full objects are broadcast over SSE (src/middlewares/log/index.ts:75-84) from /log/stream, which has no authentication (src/start-server.ts:72-135). There is no auth or CORS middleware anywhere in src/ (src/index.ts), and serve() is called with no hostname (start-server.ts:146-149), so exposure depends on Node's default bind (not verified; node_modules is absent). The Console page loads Google Tag Manager and four third-party CDNs in the browser (src/public/index.html:856-867, 1142-1143).",
+      "Release and CI hygiene: npm publish has no provenance and the Docker image has no signing or SBOM steps, and `latest` is re-pushed on every release (.github/workflows/npm_publish.yml:18-21; docker_publish.yml:32-44). The only test workflow is comment-triggered ('run tests', no author check) with production-environment secrets and runs a nonexistent script `npm run build/start-server.js` (run_tests.yml:9-11, 28, 73-75; package.json:25-42). No workflow runs plugin tests, no tests cover /v1/responses, and most provider tests are live-API tests skipped without keys (src/tests/common.test.ts:9-12). Docs have drifted: CLAUDE.md:84 and 90 cite src/handlers/__tests__/ and conf_sample.json, which do not exist; CONTRIBUTING.md:28 cites `make format; make lint` with no Makefile; the README license badge points at Ileriayo/markdown-badges (README.md:16).",
+      "Packaging nuance: the opt-in Retry-After path (retryHandler.ts:88, 108-152) relies on a third callback argument that exists only through the repo's async-retry patch (patches/async-retry+1.3.3.patch:9-10), applied via the postinstall patch-package script (package.json:41), and patches/ is not in the npm `files` whitelist (package.json:18-24). npx installs may therefore run an unpatched async-retry (inferred, not executed). The postinstall lifecycle script also runs on consumer installs.",
+      "Maintenance visibility: the clone is shallow (one commit, tag v1.15.2), so release cadence and issue/PR history cannot be assessed from it. The package declares no Node engines range (package.json) while the Dockerfile and CI use Node 20. The SECURITY.md support table covers '1.x.x' only (.github/SECURITY.md:5-7)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "portkey-ai/gateway",
+      "checks": [
+        {
+          "field": "readme.install[0] (npx)",
+          "statement": "Install/run with `npx @portkey-ai/gateway` (needs Node.js + npm)",
+          "citation": "README.md:61; docs/installation-deployments.md:33",
+          "holds": true,
+          "note": "README.md:60-61: '# Run the gateway locally (needs Node.js and npm)' / 'npx @portkey-ai/gateway'; docs/installation-deployments.md:33: '$ npx @portkey-ai/gateway'. The package supports this: package.json:80 bin -> build/start-server.js, src/start-server.ts:1 is '#!/usr/bin/env node', `files` includes build (package.json:18-24), prepublishOnly runs the build (package.json:33)."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT, file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1 'MIT License', LICENSE:3 'Copyright (c) 2024 Portkey, Inc', lines 5-21 are the standard MIT grant and warranty disclaimer. package.json:17 also declares \"license\": \"MIT\"."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - Docker image is built for linux/amd64; the npx path needs only Node.js and npm; CI runs on ubuntu-latest; no engines field; Dockerfile and CI use Node 20",
+          "citation": ".github/workflows/docker_publish.yml:41; README.md:60; .github/workflows/npm_publish.yml:7; package.json; Dockerfile:2; npm_publish.yml:14",
+          "holds": true,
+          "note": "docker_publish.yml:41 'platforms: linux/amd64,linux/arm64'; README.md:60 'needs Node.js and npm'; npm_publish.yml:7 'runs-on: ubuntu-latest' (the release-publish job); package.json (lines 1-82) has no engines field; Dockerfile:2 'FROM node:20-alpine AS build'; npm_publish.yml:14 node-version '20.x'."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Codex: none found anywhere in the tree (case-insensitive, 0 hits). Claude Code: no documented integration; Anthropic headers accepted without x-portkey- prefix 'for claude code support'; serves /v1/messages and /v1/messages/count_tokens; CLAUDE.md is contributor guidance only",
+          "citation": "src/handlers/handlerUtils.ts:975-984; src/index.ts:135-141; CLAUDE.md:3",
+          "holds": true,
+          "note": "A case-insensitive 'codex' search returns 0 hits across the tree, including the hidden .github/, .husky/ and .vscode/. handlerUtils.ts:975 carries the comment '...without the x-${POWERED_BY}- prefix for claude code support', and 976-984 read anthropic-beta, anthropic-version and x-api-key. index.ts:135 registers POST /v1/messages and 137-141 /v1/messages/count_tokens. CLAUDE.md:3: 'This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.' A 'claude.?code' search finds only these two lines, so no docs integration exists."
+        },
+        {
+          "field": "claim_checks[1] (OpenAI-compatible endpoint, verified: partial)",
+          "statement": "Chat/completions/embeddings/responses routes exist; model and reasoning pass through; only whitelisted fields are forwarded; chat model defaults to gpt-3.5-turbo; override_params overwrites body; x-portkey-provider/config required; Responses defined only for openai, azure-openai, iointelligence",
+          "citation": "src/index.ts:147-253; src/providers/openai/chatComplete.ts:13-17, 118-120; src/providers/open-ai-base/createModelResponse.ts:53-56, 97-100; src/services/transformToProviderRequest.ts:83-124; src/handlers/services/requestContext.ts:51-60; src/middlewares/requestValidator/index.ts:106-124; src/providers/{openai,azure-openai,iointelligence}/index.ts",
+          "holds": true,
+          "note": "index.ts:147/153/159/233-253 match. chatComplete.ts:13-17 model required with default 'gpt-3.5-turbo'; 118-120 reasoning_effort. createModelResponse.ts:53-56 model, 97-100 reasoning. transformToProviderRequest.ts:83-124 copies only keys in the provider config; POST JSON bodies always take this path (requestContext.ts:211-223; transformToProviderRequest.ts:284-289). requestContext.ts:59 spreads overrideParams after the body (override_params is kept via handlerUtils.ts:1130-1131). requestValidator/index.ts:106-124 returns 400 without x-portkey-config or x-portkey-provider (POWERED_BY='portkey', globals.ts:3). A createModelResponse config exists only at openai/index.ts:65, azure-openai/index.ts:59 and iointelligence/index.ts:15. groq/api.ts:23 has an endpoint case, but groq/index.ts defines no createModelResponse config, so it can't be reached, and no provider spreads OpenAIConfig. The 'partial' rating is accurate."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

@@ -1,0 +1,332 @@
+{
+  "contender": "browser-use/browser-use",
+  "revision": {
+    "contender": "browser-use/browser-use",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "browser-use/browser-use",
+        "tag": "0.13.10",
+        "commit": "5c892e013a73e6622e6f50336e1eb0aa2c4405f2",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "0.13.10",
+    "commit": "5c892e013a73e6622e6f50336e1eb0aa2c4405f2",
+    "read_at": "2026-10-02T03:01:59+00:00"
+  },
+  "dossier": {
+    "contender": "browser-use/browser-use",
+    "revision": {
+      "tag": "0.13.10",
+      "commit": "5c892e013a73e6622e6f50336e1eb0aa2c4405f2",
+      "read_at": "2026-10-02T03:01:59+00:00"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Open-source (MIT) browser-automation project for LLM agents that drives Chrome/Chromium over CDP. At 0.13.10 the repo ships: (1) an async Python library (Agent / BrowserSession / Tools, LLM in the loop, 17 Chat* provider classes); (2) a `browser-use` CLI ('CLI 3.0') that executes Python piped on stdin against a persistent browser daemon, implemented by the separate `browser-harness==0.1.13` package rather than by this repo; (3) two stdio MCP servers; (4) a SKILL.md installer for coding agents; (5) client code for the vendor's hosted Browser Use Cloud (LLM gateway, remote browsers, @sandbox). Facts bearing on the stated needs: no command or API in the repo fetches a chosen URL and returns main text plus bibliographic metadata (title/author/date/canonical URL) deterministically. Text extraction is either LLM-written (`extract`) or a whole-DOM markdown dump that drops <title>/<meta>. Shell-callable browser steps exist only through the CLI's Python-on-stdin model (helpers defined in the external harness) and the `--cli-mcp` `browser_exec` tool; forms, tabs and screenshots are named in docs, while PDF printing exists as a library action (`save_as_pdf`) or an external interaction doc.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Browser Use lets an AI agent use a web browser the same way humans do: it opens pages, clicks buttons, types and fills in forms; you describe the task and it completes it.",
+          "citation": "README.md:44"
+        },
+        {
+          "claim": "Quickstart for coding agents (Claude Code, Codex, Cursor, Hermes, OpenClaw): paste a prompt telling the agent to install/upgrade browser-use with uv on Python 3.12, run `browser-use skill install` to register the skill, and connect it to the user's browser; on failure follow browser-harness install.md.",
+          "citation": "README.md:67-71"
+        },
+        {
+          "claim": "Python library install requires Python >= 3.11: `uv add browser-use` or `pip install browser-use`.",
+          "citation": "README.md:81-86"
+        },
+        {
+          "claim": "An LLM key is needed: BROWSER_USE_API_KEY from Browser Use Cloud, or a provider key (Google, Anthropic); the quickstart agent uses ChatBrowserUse(model='openai/gpt-5.5').",
+          "citation": "README.md:88-116"
+        },
+        {
+          "claim": "Benchmarked across 100 real-world browser tasks (BU Bench V1 chart); the full benchmark is open source in browser-use/benchmark.",
+          "citation": "README.md:124-130"
+        },
+        {
+          "claim": "#1 on the Odysseys leaderboard with an 87.4% average, ahead of computer-use agents from OpenAI, Anthropic, Google and Microsoft; Odysseys measures 200 long-horizon web tasks.",
+          "citation": "README.md:132"
+        },
+        {
+          "claim": "The open-source agent is 'Free, and runs on your own machine' with deep code-level integration; the project recommends pairing it with its cloud browsers for stealth, proxy rotation and scaling.",
+          "citation": "README.md:134-137"
+        },
+        {
+          "claim": "Use the CLI when an existing agent should do one-off browser tasks (upload a video, compare laptops, fill a job application); use the Python library for repeatable automation, custom tools, structured output and fine-grained browser control.",
+          "citation": "README.md:163-175"
+        },
+        {
+          "claim": "ChatBrowserUse completes tasks on average 3-5x faster than other models with 'SOTA accuracy'.",
+          "citation": "README.md:181"
+        },
+        {
+          "claim": "ChatBrowserUse accepts provider-prefixed model ids (anthropic/..., openai/..., google/...) so a single BROWSER_USE_API_KEY reaches all of them.",
+          "citation": "README.md:189-196"
+        },
+        {
+          "claim": "Free to use; only an LLM provider is needed (OpenAI, Google, ChatBrowserUse, or local models via Ollama).",
+          "citation": "README.md:236-239"
+        },
+        {
+          "claim": "The library is MIT-licensed; Browser Use services and data policy are covered by separate Terms of Service and Privacy Policy.",
+          "citation": "README.md:244"
+        },
+        {
+          "claim": "Authentication: reuse a real Chrome profile with saved logins (examples/browser/real_browser.py), AgentMail for temporary inboxes, or the external `profile-use` tool to sync a local profile to a remote browser.",
+          "citation": "README.md:248-255"
+        },
+        {
+          "claim": "CAPTCHAs need better fingerprinting and proxies, so use Browser Use Cloud stealth browsers; for production use the Cloud API (Chrome memory use, parallelism, proxy rotation).",
+          "citation": "README.md:259-275"
+        }
+      ],
+      "install": [
+        {
+          "method": "Paste-prompt to an agent (CLI + skill)",
+          "command": "Install or upgrade browser-use to the latest stable version with uv using Python 3.12, run `browser-use skill install` to register the skill, and connect it to my browser.",
+          "citation": "README.md:69-71"
+        },
+        {
+          "method": "uv or pip (Python library, Python >= 3.11; README does not distinguish OSes)",
+          "command": "uv add browser-use   # or: pip install browser-use",
+          "citation": "README.md:83-86"
+        },
+        {
+          "method": "Skill registration (first runs `uv tool install --python 3.12 --upgrade --force browser-use`; requires uv; `--no-install` skips that step)",
+          "command": "browser-use skill install",
+          "citation": "README.md:70; browser_use/skills/install.py:66-73,117-121"
+        },
+        {
+          "method": "Chromium for the library via Playwright (bundled docs; runs `uvx playwright install chromium`, plus `--with-deps` on Linux, plus `--no-shell`)",
+          "command": "uv pip install browser-use && uvx browser-use install",
+          "citation": "AGENTS.md:54-57; browser_use/cli.py:83-108"
+        },
+        {
+          "method": "MCP server through uvx (registry entry whose version field is stale at 0.13.5; the legacy server is `uvx \"browser-use[cli]\" --mcp`, CLAUDE.md:53-57)",
+          "command": "uvx browser-use --cli-mcp",
+          "citation": "server.json:11-27"
+        },
+        {
+          "method": "Docker (build from source; CI publishes browseruse/browseruse and ghcr.io/browser-use/browser-use)",
+          "command": "docker build . -t browseruse --no-cache && docker run -v \"$PWD/data\":/data browseruse",
+          "citation": "Dockerfile:7-10; .github/workflows/docker.yml:55-57"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - ubuntu-latest CI runs tests, wheel install and CLI smoke tests (.github/workflows/test.yaml:83, package.yaml:42, install-script.yml:48); pyproject.toml:66 lists browser-use-core wheels for linux/x86_64; the Docker image is built for linux/amd64 (.github/workflows/docker.yml:69). The library finds google-chrome/chromium or installs Playwright Chromium (browser_use/browser/chrome.py:51-58; browser_use/browser/watchdogs/local_browser_watchdog.py:360-368).",
+        "wsl2": "unknown - no mention of WSL in any file (grep); Linux code paths would apply but nothing documents or tests WSL2.",
+        "macos_arm64": "yes - pyproject.toml:64 lists browser-use-core for darwin/arm64; the CI matrix includes macos-latest (.github/workflows/install-script.yml:48, package.yaml:42; architecture not stated in the workflow); the skill documents a macOS-specific `mac-approve` flow (browser_use/skills/browser-use/SKILL.md:82-97).",
+        "gpu": "no - not required or used: no CUDA/torch code in the repo (grep); LLM inference is a remote API or an Ollama client; only Chromium GPU flags appear (browser_use/browser/profile.py:129-131)."
+      },
+      "integrations": {
+        "cli": "yes - `browser-use` (aliases browseruse, bu, browser; deprecated browser-use-tui) -> browser_use.cli:main (pyproject.toml:104-109). With no args and piped stdin it executes the Python through browser_harness.run.main() against a persistent daemon attached to the user's running Chrome (browser_use/cli.py:185-202,380-391; browser_use/skills/browser-use/SKILL.md:36-64). Also: install (Playwright Chromium), init, skill show|install, --mcp, --cli-mcp; doctor/--doctor, auth login, telemetry status|enable|disable, recordings, mac-approve and --reload are delegated to the external harness (cli.py:83-108,173-179,193-199; SKILL.md:110-120,153-161). Named cloud daemons use BU_NAME, explicit endpoints BU_CDP_URL/BU_CDP_WS (cli.py:219-224; SKILL.md:208-224). All pre-3.0 preset subcommands (open, state, screenshot, eval, cookies, ...) now exit 2 with a migration hint (cli.py:205-229,375-378).",
+        "mcp": "yes - two stdio servers. `browser-use --cli-mcp` (browser_use/mcp/cli_mcp.py; the one registered in server.json:17-22) exposes `browser_exec` (arbitrary Python in a persistent namespace with browser-harness helpers) and `browser_screenshot`. Legacy `browser-use --mcp` / `python -m browser_use.mcp` (browser_use/mcp/server.py:214-455, mcp/__main__.py) exposes 16 tools: browser_navigate/click/type/get_state/extract_content/get_html/screenshot/scroll/go_back, tab list/switch/close, session list/close/close_all, and retry_with_browser_use_agent; extract_content requires an LLM key (server.py:997-1000) and neither server has a PDF tool. Also an MCP client for Agents (browser_use/mcp/client.py).",
+        "sdk_or_api": "yes (Python) - `from browser_use import Agent, Browser/BrowserSession, BrowserProfile, Tools, ChatBrowserUse, ...` (browser_use/__init__.py:76-115). Tools actions can be called without an LLM except `extract` (tests/ci/test_action_save_as_pdf.py:104-111). Actor Page/Element/Mouse API (browser_use/actor/README.md). `@sandbox` hosted execution (browser_use/sandbox/sandbox.py:215-269). The hosted Cloud REST API is documented at api.browser-use.com/api/v4 (README.md:147-152; skills/cloud/references/api-v4.md:7) and `browser-use-sdk==3.4.2` is a dependency (pyproject.toml:49). No local HTTP server in this package.",
+        "claude_code_or_codex": "partial - `browser-use skill install [--target agents|claude|codex|copilot|cursor|gemini|openclaw|opencode|all] [--path] [--no-install]` writes SKILL.md to ~/.<assistant>/skills/browser-use/ (browser_use/skills/install.py:21-44,100-122,177-180); README.md:67-71 names Claude Code and Codex. CLAUDE.md/AGENTS.md in the repo address contributors, and a CI workflow runs anthropics/claude-code-action on @claude mentions (.github/workflows/claude.yml:69). No Claude Code plugin/marketplace manifest or .mcp.json found."
+      },
+      "telemetry_and_network": "TELEMETRY (default ON for the Python library and the legacy --mcp server): ProductTelemetry posts to PostHog (https://eu.i.posthog.com, hard-coded project key, geoip on, exception autocapture on), keyed to a device id persisted at ~/.config/browseruse/device_id or a hashed hardware fingerprint (browser_use/telemetry/service.py:17-23,28-62,88-93). Agent-run events carry the full task text, action history, URLs visited, final result, model/provider, token counts and error text (browser_use/telemetry/views.py:25-58; browser_use/agent/service.py:2220-2252); MCP-server events add the command lines of all parent processes (browser_use/mcp/server.py:155-183,1270-1289). Opt-out: ANONYMIZED_TELEMETRY=false (browser_use/config.py:58-59,201; AGENTS.md:944-965); .env.example ships it as true (.env.example:20) and the repo's CI sets it false (.github/workflows/test.yaml:87). README.md does not mention telemetry (it only links ToS/Privacy, README.md:244). CLI: every invocation passes command name, duration, exit code and the last <=500 characters of stderr to browser_harness.telemetry.capture_cli_event (browser_use/cli.py:34-57,403-415,441,456); `browser-use telemetry status|enable|disable` is routed to the external harness (cli.py:173-179); its destination and default opt-in state are not visible in this repo. ChatBrowserUse sends full prompts (task, DOM text, screenshots) plus an anonymized_telemetry flag to https://llm.api.browser-use.com (override BROWSER_USE_LLM_URL) and requires BROWSER_USE_API_KEY (browser_use/llm/browser_use/chat.py:94-105,155-161). OTHER NETWORK: Agent start fetches https://pypi.org/pypi/browser-use/json unless BROWSER_USE_VERSION_CHECK=false (browser_use/utils.py:710-727; agent/service.py:2047-2048); the first library browser launch downloads 3 extensions (uBlock Origin Lite, I still don't care about cookies, Force Background Tab) from clients2.google.com unless BROWSER_USE_DISABLE_EXTENSIONS is set (browser_use/browser/profile.py:19-25,1030-1045,1182-1191); if no browser is found it runs `uvx playwright install chromium` (--with-deps on Linux) (browser/watchdogs/local_browser_watchdog.py:124-139,360-368); the about:blank startup page loads cf.browser-use.com/logo.svg (browser/watchdogs/aboutblank_watchdog.py:180); `init` fetches templates from raw.githubusercontent.com/browser-use/template-library (browser_use/init_cmd.py:28); token-cost pricing is fetched from raw.githubusercontent.com (BerriAI/litellm) only when calculate_cost is on (browser_use/tokens/service.py:54-58; agent/service.py:192); `@sandbox` uploads function source plus cloudpickled parameters to https://sandbox.api.browser-use.com/sandbox-stream (browser_use/sandbox/sandbox.py:237,296-366). Cloud sync is residual: Agent.authenticate_cloud_sync logs 'Cloud sync has been removed' (agent/service.py:4058), yet config still exposes BROWSER_USE_CLOUD_SYNC defaulting to the telemetry setting (config.py:62-63) and browser_use/sync/service.py can still POST events to {BROWSER_USE_CLOUD_API_URL}/api/v1/events when authenticated (sync/service.py:79-90). ACCOUNTS: none for the local CLI flow (browser_use/skills/browser-use/SKILL.md:64) or for the library with a provider key or Ollama; a Browser Use Cloud account/API key is needed for ChatBrowserUse, cloud browsers (`browser-use auth login`), @sandbox and the Cloud REST API, and cloud browsers bill until stopped (SKILL.md:110-137)."
+    },
+    "code": {
+      "languages": [
+        "Python",
+        "Markdown (docs, system prompts, SKILL.md files)",
+        "Shell (bin/*.sh, docker/build-base-images.sh)",
+        "YAML and Dockerfile (CI, images)",
+        "HTML (test fixtures only)"
+      ],
+      "entry_points": [
+        {
+          "path": "browser_use/cli.py:main",
+          "what": "Console scripts browser-use / browseruse / bu / browser (browser-use-tui is a deprecated alias), pyproject.toml:104-109. No args + piped stdin executes Python via browser_harness.run.main(); also install, init, skill, --mcp, --cli-mcp; other subcommands are delegated to the external harness."
+        },
+        {
+          "path": "browser_use/mcp/cli_mcp.py:main",
+          "what": "`browser-use --cli-mcp` stdio MCP server: browser_exec (exec Python with browser-harness helpers) and browser_screenshot."
+        },
+        {
+          "path": "browser_use/mcp/server.py:main",
+          "what": "`browser-use --mcp` / `python -m browser_use.mcp` legacy stdio MCP server (16 tools incl. retry_with_browser_use_agent); emits ProductTelemetry events."
+        },
+        {
+          "path": "browser_use/skills/install.py:handle",
+          "what": "`browser-use skill show|install`: prints or installs the browser-use SKILL.md for agent assistants."
+        },
+        {
+          "path": "browser_use/init_cmd.py:main",
+          "what": "`browser-use init` / `--template`: scaffolds project templates fetched from GitHub at runtime."
+        },
+        {
+          "path": "browser_use/__init__.py",
+          "what": "Python API with lazy exports: Agent, Browser/BrowserSession, BrowserProfile, Tools/Controller, 17 Chat* LLM classes, sandbox (lines 76-115); Tools actions are callable directly (tests/ci/test_action_save_as_pdf.py:104-111)."
+        },
+        {
+          "path": "browser_use/beta/service.py",
+          "what": "`from browser_use.beta import Agent`: wrapper around a Rust `browser-use-terminal` SDK server (binary from the optional browser-use-core wheel or an install script; its source is not in this repo)."
+        },
+        {
+          "path": "Dockerfile:213",
+          "what": "ENTRYPOINT [\"browser-use\"] in an image built on python:3.12-slim with system Chromium (Dockerfile:20,156-175)."
+        }
+      ],
+      "architecture": "Event-driven async Python on a bubus event bus and the typed cdp-use CDP client (CLAUDE.md:7-30). browser_use/browser/session.py (BrowserSession: launches or attaches to Chromium over CDP; 3.5k+ lines), browser/profile.py (launch args, extensions, allowed/prohibited domains, downloads) and browser/watchdogs/ (14 watchdogs: security, downloads, popups, dom, screenshot, local_browser, crash, captcha, storage_state, har_recording, recording, permissions, aboutblank, default_action). dom/ (service.py, serializer/, markdown_extractor.py: DOM -> HTML -> markdownify -> structure-aware chunks). tools/service.py (Tools registry with default actions: search, navigate, click, input, upload_file, switch/close tab, extract [LLM], search_page, find_elements, scroll, send_keys, screenshot, save_as_pdf, dropdowns, evaluate JS, file ops, done) and tools/registry/ (action registry, <secret> placeholder + TOTP substitution). agent/service.py (LLM step loop, 4k+ lines) with message_manager/, system_prompts/*.md, judge.py. llm/ (16 provider packages incl. the ChatBrowserUse gateway client). actor/ (low-level Page/Element/Mouse). mcp/ (server.py legacy tools, cli_mcp.py exec-based, client.py). cli.py + skills/ (thin CLI shim over the external browser-harness; skill text and installer). beta/service.py (6.4k+ lines, Rust-terminal wrapper). Also sandbox/, sync/ (residual cloud sync), telemetry/, tokens/, filesystem/, screenshots/, integrations/gmail/.",
+      "packaging_and_release": "Build backend hatchling==1.32.0 (pyproject.toml:111-113); wheel/sdist include browser_use/**/*.py, system_prompts/*.md, skills/**/*.md and py.typed, and exclude tests (pyproject.toml:177-189; the dom/**/*.js include matches no file at this revision). package.yaml runs `uv build` on pushes and uploads dist/*.whl and *.tar.gz as a workflow artifact only (package.yaml:22-35), then smoke-installs the wheel on ubuntu/macos/windows x py3.11/3.13 (package.yaml:36-64). Release: publish.yml fires on a GitHub release 'published'; it first fails closed unless the `release` environment has required reviewers with prevent_self_review (publish.yml:88-109), then `uv build` and `uv publish --trusted-publishing always` via OIDC (publish.yml:118,137) and force-pushes a `stable` branch for non-rc releases (publish.yml:138-142); workflow_dispatch can create rcN pre-release tags (publish.yml:34-74). docker.yml builds linux/amd64+arm64 images to Docker Hub browseruse/browseruse and ghcr.io/browser-use/browser-use tagged by branch, PR, version and sha (docker.yml:55-69). The docker job requests `attestations: write` and `id-token: write` (docker.yml:23-27), but no workflow contains an attest, cosign, checksum or signing step (grep of .github). Provenance visible in the repo is therefore PyPI trusted publishing only. MCP registry file server.json is stale at 0.13.5 (server.json:10,16).",
+      "tests_and_ci": "pytest 9 with pytest-asyncio (auto mode), pytest-httpserver, pytest-xdist and pytest-timeout 300 s; addopts -svx (pyproject.toml:191-211,228-246). 111 test files, all under tests/ci (61 top-level plus browser/ 18, infrastructure/ 7, interactions/ 4, models/ 14, security/ 7), 1,119 test functions by grep; 7 more in-package files (browser_use/llm/tests x6, browser_use/tokens/tests x1) are not discovered by CI (test.yaml:70). Browser tests use real Chromium against pytest-httpserver pages; the LLM is mocked (tests/ci/conftest.py:75-120). Only 8 tests touch the CLI (tests/ci/test_browser_use_cli.py: 3; test_browser_use_skill_install_docs.py: 5, using fake uv/browser-harness binaries) and none exercise the harness helpers or mcp/cli_mcp.py (grep of tests/). 9 active workflows plus 1 .disabled: test.yaml (one matrix job per test file with Playwright Chromium and a 4-minute timeout, plus an evaluate-tasks job that runs 2 LLM-judged tasks from tests/agent_tasks and fails only at 0% pass: tests/ci/evaluate_tasks.py:1-5), lint.yml (ruff PLE, pre-commit incl. pyright/codespell, pyright), package.yaml, install-script.yml (CLI install smoke on ubuntu/macos/windows, uvx from local wheel and PyPI, and a check that the skill copy matches browser-harness main), publish.yml, docker.yml, eval-on-pr.yml (POSTs commit info to an external eval platform), claude.yml (claude-code-action with broad tools incl. Bash(rm:*), WebFetch(*)), stale-bot.yml.",
+      "dependencies": "pyproject.toml is the only manifest (no requirements*.txt, package.json or committed lockfile; uv.lock is gitignored, .gitignore:48). [project].dependencies: 37 entries, all exact-pinned with == (pyproject.toml:13-51), incl. browser-harness==0.1.13 (CLI backend), browser-use-sdk==3.4.2, cdp-use==1.4.5, bubus==1.5.6, mcp==2.1.1, posthog==7.7.0, markdownify==1.2.2, pypdf==6.16.2, pyotp, cloudpickle, plus LLM SDKs (openai, anthropic, google-genai, groq, ollama). Two are platform-conditional as written (pyobjc `platform_system == 'darwin'`, screeninfo `!= 'darwin'`); the lowercase 'darwin' is untested against PEP 508's capitalized platform_system. Optional extras: core 1 package (browser-use-core==0.13.3, 5 platform markers), aws 1, oci 1, video 2, examples 4, eval 4, cli 0 (empty), cli-oci and all are self-references (pyproject.toml:61-89). Dev group [tool.uv].dev-dependencies: 18 (pyproject.toml:227-247). Build requires hatchling==1.32.0. requires-python >=3.11,<4.0; .python-version is 3.12.",
+      "security_policy": ".github/SECURITY.md: report privately through a GitHub security advisory, not issues, discussions or PRs, and lists the details to include (SECURITY.md:3-17); no response SLA or supported-versions table. Regression tests cite 7 past GHSA ids (tests/ci/security/test_upload_file_containment.py:1, test_mcp_allowed_domains.py:1, test_download_filename_sanitization.py:1-2, test_ip_blocking.py:500)."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:44 - the agent opens pages, clicks buttons, types and fills in forms.",
+        "verified": "yes",
+        "evidence": "Library only: the default Tools registry has navigate, click, input, upload_file, dropdown_options/select_dropdown, switch/close tab, scroll, send_keys, screenshot, save_as_pdf and evaluate (browser_use/tools/service.py:507,778,864,1009,1042,1488,1529,1569,1683,1711,1835,2130-2147), exercised by tests/ci/test_tools.py and tests/ci/interactions/. An LLM drives them. On the CLI path nothing decides: the CLI just runs the Python piped to it (browser_use/cli.py:380-391)."
+      },
+      {
+        "claim": "README.md:67-71 - `browser-use skill install` registers the skill for the user's agent.",
+        "verified": "yes",
+        "evidence": "cli.py:370-373 routes `skill`; browser_use/skills/install.py:151-181 writes SKILL.md into ~/.agents, ~/.claude, ~/.codex, ~/.copilot, ~/.cursor, ~/.gemini, ~/.openclaw and the opencode config dir by default (install.py:11,25-44), after running unpinned `uv tool install --python 3.12 --upgrade --force browser-use` (install.py:66-73). Verified with fake uv/harness binaries in tests/ci/test_browser_use_skill_install_docs.py:105-157. Skill text comes from a `browser-harness` executable on PATH or ~/.local/bin if present, else the bundled copy (install.py:53-63,76-88)."
+      },
+      {
+        "claim": "README.md:165 - the CLI lets an existing agent (Claude Code, Codex, Cursor, Hermes, OpenClaw) control the browser.",
+        "verified": "partial",
+        "evidence": "Install targets exist for claude, codex, cursor and openclaw (plus agents, copilot, gemini, opencode) but none named hermes (browser_use/skills/install.py:25-34). Browser control itself is implemented in the external browser-harness==0.1.13 (pyproject.toml:50; browser_use/cli.py:185-202); this repo holds only the shim, the skill text and 8 CLI/skill tests that do not drive a browser (tests/ci/test_browser_use_cli.py:22-48; test_browser_use_skill_install_docs.py:50-183)."
+      },
+      {
+        "claim": "Need check - shell-callable steps for forms, sign-in, tabs, screenshots and PDF (README.md:44,165 plus the installed skill).",
+        "verified": "partial",
+        "evidence": "Helper names are documented in cli.py:241-244 and skills/remote-browser/SKILL.md:65-71 (new_tab, goto_url, page_info, capture_screenshot, click_at_xy, type_text, fill_input, press_key, scroll, js, cdp, wait_for_load, wait_for_element, list_tabs, switch_tab, close_tab) but are defined in the external harness, so not checkable here. Calls are `browser-use <<'PY' ... PY` against a daemon whose attached tab persists across calls (browser_use/skills/browser-use/SKILL.md:36-64). No PDF helper is named in this repo's CLI docs: PDF appears only as the external interaction doc print-as-pdf.md (SKILL.md:196) and raw `cdp()` (SKILL.md:151). The separate library action save_as_pdf (browser_use/tools/service.py:1564-1675) stamps date and page URL into header/footer by default (browser_use/tools/views.py:173-180). Sign-in: the skill says 'Login walls: stop and ask' except already-signed-in SSO (SKILL.md:150), and local mode reuses the user's running Chrome (SKILL.md:64). No domain allow-list or per-call timeout for the CLI is defined in this repo; `--cli-mcp` wraps exec() with no timeout (browser_use/mcp/cli_mcp.py:95-96,131-146)."
+      },
+      {
+        "claim": "README.md:55-60 - 'Extract data' (structured data exported to CSV); bundled docs: `extract` extracts data from webpages using LLM (AGENTS.md:874-876).",
+        "verified": "partial",
+        "evidence": "`extract` converts the DOM to markdown, chunks at 100,000 chars, then asks an LLM (120 s timeout) and returns <url>, <query>, <result> with LLM-written text, or schema-validated JSON plus source_url/content_stats (browser_use/tools/service.py:1067-1303; browser_use/tools/extraction/views.py:8-17). The non-LLM step extract_clean_markdown (browser_use/dom/markdown_extractor.py:23-88) returns whole-page markdown plus stats (url, char counts); the serializer drops head/meta/title (browser_use/dom/serializer/html_serializer.py:69-71) and href unless extract_links (259-261); there is no main-content/boilerplate removal and no author/date/canonical metadata or retrieval timestamp. Legacy MCP browser_extract_content needs an LLM key (browser_use/mcp/server.py:999-1000); browser_get_html returns raw HTML (server.py:946-971). No readability/metadata-extraction library is imported anywhere in browser_use/ (grep)."
+      },
+      {
+        "claim": "README.md:248-255 - handle authentication via real Chrome profiles, AgentMail, or profile-use.",
+        "verified": "partial",
+        "evidence": "examples/browser/real_browser.py exists and uses BrowserSession.from_system_chrome/list_chrome_profiles (browser_use/browser/session.py:438-487; browser_use/browser/chrome.py:38-126). Library credentials use <secret> placeholders with domain scoping and TOTP via a `bu_2fa_code` suffix (browser_use/tools/registry/service.py:427-514), and warn when sensitive_data is set without allowed_domains (browser_use/agent/service.py:534-545). `profile-use` and the profile-sync guide are external and not in the repo. CLI local mode attaches to the user's real Chrome (browser_use/skills/browser-use/SKILL.md:64-80)."
+      },
+      {
+        "claim": "README.md:134-137 and 236-239 - the open-source agent is free, runs on your own machine, and only needs an LLM provider.",
+        "verified": "partial",
+        "evidence": "MIT license (LICENSE) and local execution hold, and Ollama is supported (pyproject.toml:36). But telemetry is on by default and sends task/URL data (browser_use/telemetry/service.py:17-23; telemetry/views.py:25-58), the README's own quickstart uses ChatBrowserUse, a hosted gateway that needs an API key and references billing (browser_use/llm/browser_use/chat.py:94-105,289-295), and extension downloads, Chromium auto-install and a PyPI version check occur at runtime (browser_use/browser/profile.py:1030-1045; local_browser_watchdog.py:360-368; browser_use/utils.py:710-727). The README does not disclose telemetry."
+      },
+      {
+        "claim": "README.md:124-130 - BU Bench V1 over 100 real-world tasks; benchmark is open source.",
+        "verified": "partial",
+        "evidence": "static/accuracy_by_model_light.png exists (values recorded under benchmarks). Its top two bars are hosted Browser Use Cloud rather than the open-source library, and its y-axis starts near 25% rather than 0. The benchmark repo (browser-use/benchmark) is external and was not available; no BU Bench data or harness is in this repo. A different, older table in skills/open-source/references/models.md:27-33 gives bu-2-0 63.3% versus the chart's 68.0%."
+      },
+      {
+        "claim": "README.md:132 - #1 on the Odysseys leaderboard at 87.4%; README.md:181 - ChatBrowserUse is 3-5x faster with SOTA accuracy.",
+        "verified": "not_checkable",
+        "evidence": "No leaderboard data, latency measurements or evaluation harness for either claim exist in the repo, and the linked external pages were not opened. The only in-repo evaluation artifacts are internal beta-agent notes (BETA_AGENT_INTEGRATION_FEATURES.md:306-336) and a 2-task CI smoke eval (tests/agent_tasks/*.yaml; tests/ci/evaluate_tasks.py:1-5)."
+      },
+      {
+        "claim": "Bundled docs (AGENTS.md:275,300,326, a copy of docs.browser-use.com): max_steps default 100, max_failures 3, step_timeout 120 s.",
+        "verified": "no",
+        "evidence": "Code defaults differ: max_steps=500 (browser_use/agent/service.py:2505; run_sync at 4063), max_failures=5 (service.py:172), step_timeout=180 (service.py:198); llm_timeout defaults to None and is derived from the model (service.py:197,261-277). Navigation is unrestricted by default: allowed_domains and prohibited_domains are None and block_ip_addresses is False (browser_use/browser/profile.py:628-639; browser_use/browser/watchdogs/security_watchdog.py:213-218). The README documents none of these limits. Code was preferred over docs."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "BU Bench V1 success rate (README chart; README states 100 real-world browser tasks)",
+        "metric": "success rate (%)",
+        "value": "Cloud v4 + Opus 4.8 85.0; Cloud v4 default 78.0; claude opus-4-7 74.0; bu 2-0 68.0; gpt 5.5 66.0; gemini 3.5-flash 65.0; qwen 3.6plus 45.0; deepseek v4-flash-0731 37.0; Luna 31.0. Orange bars (first two) are the hosted Browser Use Cloud, grey bars are the open-source library with each model; y-axis starts near 25%, not 0.",
+        "source": "README.md:124-130; static/accuracy_by_model_light.png (values read visually from the image)",
+        "independent": false
+      },
+      {
+        "what": "Odysseys leaderboard (200 long-horizon web tasks), as claimed in the README",
+        "metric": "average score",
+        "value": "87.4% (claimed #1)",
+        "source": "README.md:132 (leaderboard at odysseysbench.com not opened; operator not verified)",
+        "independent": false
+      },
+      {
+        "what": "ChatBrowserUse speed relative to other models (README claim)",
+        "metric": "relative task completion time",
+        "value": "'3-5x faster' on average, 'SOTA accuracy'; no data in the repo",
+        "source": "README.md:181",
+        "independent": false
+      },
+      {
+        "what": "Older model comparison in bundled skill docs (links to browser-use.com/posts/what-model-to-use, not opened)",
+        "metric": "accuracy (and throughput for bu-ultra)",
+        "value": "bu-ultra (Cloud) 78%, ~14 tasks/hour; bu-2-0 63.3%; claude-opus-4-6 62%; claude-sonnet-4-6 59%; gemini-3-1-pro 59.3%",
+        "source": "skills/open-source/references/models.md:27-33",
+        "independent": false
+      },
+      {
+        "what": "Internal eval ledger for the Rust-backed beta agent (browser_use.beta.Agent), not the CLI or the standard Agent",
+        "metric": "LLM-judge score on 'real_v8' tasks",
+        "value": "50 tasks: average 78.5 (six timeboxed zero-score rows); another 50-task run: 49 scored rows averaged 76.29; 5-task smoke: 80/90/100/100/100",
+        "source": "BETA_AGENT_INTEGRATION_FEATURES.md:306-336",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Core CLI behaviour lives outside this repo: every CLI browser action, the daemon, auth, telemetry and `doctor` are delegated to browser-harness==0.1.13 (pyproject.toml:50; browser_use/cli.py:185-202), whose source, license and tests are not here. The shipped SKILL.md is a generated copy of browser-harness's main-branch file and CI fails if it drifts (scripts/sync_browser_harness_skill.py:11; .github/workflows/install-script.yml:40-41). Only 8 CLI/skill tests exist and none drive a browser or cli_mcp.py. The CLI was redesigned wholesale ('3.0'): all preset subcommands now exit 2 (cli.py:205-229,260-264).",
+      "No built-in fetch-and-extract-with-metadata path: the CLI has no extract/fetch command and the skill itself tells agents to use curl or a fetch tool for plain pages (browser_use/skills/browser-use/SKILL.md:28-30). The library's `extract` output is LLM-written text tagged only with <url>/<query> (browser_use/tools/service.py:1281-1283), and the non-LLM markdown path discards <title>/<meta> and does no boilerplate removal (browser_use/dom/serializer/html_serializer.py:69-71). Title, author, date, canonical URL and retrieval time are not provided.",
+      "Unsandboxed, unbounded execution against the user's real browser: the CLI and `--cli-mcp` browser_exec exec() arbitrary Python in a persistent namespace with no timeout, allow-list or tool annotations (browser_use/cli.py:380-391; browser_use/mcp/cli_mcp.py:45-79,95-96,131-146). Local mode attaches to the user's running Chrome with its logged-in sessions, and on macOS automates the remote-debugging approval via Accessibility (SKILL.md:64-97,221). Domain allow-lists and block_ip_addresses exist only in the Python library and default to allow-all (browser_use/browser/profile.py:628-639; security_watchdog.py:213-218). Regression tests cite 7 past GHSA advisories (upload path traversal, MCP allow-list bypass, download filename handling, IP blocking) (tests/ci/security/).",
+      "Telemetry defaults to on and includes task text, visited URLs and results via PostHog (browser_use/telemetry/service.py:17-23; telemetry/views.py:25-58; agent/service.py:2220-2252); the legacy MCP server also sends parent-process command lines (browser_use/mcp/server.py:155-183). The CLI forwards up to 500 characters of stderr per failed call to the external harness's telemetry (cli.py:403-415,441). The README is silent on this, and the project's own CI opts out (.github/workflows/test.yaml:87).",
+      "Vendor steering and billing: the quickstarts default to ChatBrowserUse, a hosted gateway that receives full prompts including page content and screenshots (browser_use/llm/browser_use/chat.py:95,155-161). The installed skill tells agents to proactively suggest paid cloud browsers and notes remote daemons bill until stopped (browser_use/skills/browser-use/SKILL.md:101-108,135). AGENTS.md:27,29 and skills/open-source/SKILL.md:36 instruct agents to always recommend ChatBrowserUse/cloud, and CLAUDE.md:92-108 carries persona/style directives for coding agents opened in the repo.",
+      "Install and runtime side effects: `browser-use skill install` runs unpinned `uv tool install --python 3.12 --upgrade --force browser-use`, takes skill text from whatever `browser-harness` executable is on PATH or ~/.local/bin, and by default overwrites SKILL.md in up to 9 assistant dirs under $HOME (browser_use/skills/install.py:25-44,53-63,66-73,177-180). The library auto-runs `uvx playwright install chromium` (with --with-deps on Linux) when no browser is found (browser_use/browser/watchdogs/local_browser_watchdog.py:130-135,360-368) and loads uBlock Origin Lite and cookie-banner extensions that change page content (browser_use/browser/profile.py:19-25,1030-1045). The beta agent documents `curl -fsSL https://browser-use.com/terminal/install.sh | sh` (browser_use/beta/service.py:91).",
+      "Reproducibility and provenance: no lockfile is committed (uv.lock is gitignored, .gitignore:48, while Dockerfile:191 uses `uv sync --locked`); only direct dependencies are exact-pinned. Release workflows publish via PyPI trusted publishing (publish.yml:137) but add no checksums, signatures or attestations, and docker.yml requests `attestations: write` (line 26) without an attest step. The optional `core` extra pulls compiled browser-use-core wheels whose source is not in the repo (pyproject.toml:63-69; browser_use/beta/service.py:187-221). The package version is pre-1.0 (pyproject.toml:5).",
+      "Doc/metadata drift: server.json lists 0.13.5 against package 0.13.10 (server.json:10,16); the DXT manifest is 0.5.0 with options the code lacks (browser_use/mcp/manifest.json:6,211-218); bundled docs state max_steps 100 / max_failures 3 / step_timeout 120 against code 500 / 5 / 180 (AGENTS.md:275,300,326; browser_use/agent/service.py:172,198,2505); skills still reference removed `browser-use cloud login|signup` (skills/x402/SKILL.md:42; skills/cloud/references/guides/subagent.md:50; browser_use/cli.py:218); ClearURLs is described but not loaded (browser_use/browser/profile.py:650 vs 1030-1045); tests/agent_tasks/README.md:28 names a non-existent test file."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "browser-use/browser-use",
+      "checks": [
+        {
+          "field": "readme.install[1]",
+          "statement": "uv or pip (Python library, Python >= 3.11; README does not distinguish OSes): `uv add browser-use   # or: pip install browser-use`",
+          "citation": "README.md:83-86",
+          "holds": true,
+          "note": "README.md:81 says 'Install Browser Use (Python >= 3.11)', and lines 84-85 contain exactly `uv add browser-use` and `# or: pip install browser-use`. pyproject.toml:7 agrees: requires-python '>=3.11,<4.0'. A case-insensitive grep of README.md for windows|macos|linux|ubuntu|wsl|darwin returns nothing, so 'does not distinguish OSes' holds."
+        },
+        {
+          "field": "license",
+          "statement": "spdx: MIT; file: LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1 reads 'MIT License', followed by the standard MIT grant and warranty text (line 3: Copyright (c) 2024 Gregor Zunic). pyproject.toml:10 has the matching 'License :: OSI Approved :: MIT License' classifier. HEAD is 5c892e013a73e6622e6f50336e1eb0aa2c4405f2, which equals refs/tags/0.13.10, the revision the dossier names."
+        },
+        {
+          "field": "readme.platforms.macos_arm64",
+          "statement": "yes - pyproject.toml:64 lists browser-use-core for darwin/arm64; the CI matrix includes macos-latest (.github/workflows/install-script.yml:48, package.yaml:42; architecture not stated in the workflow); the skill documents a macOS-specific `mac-approve` flow (browser_use/skills/browser-use/SKILL.md:82-97).",
+          "citation": "pyproject.toml:64; .github/workflows/install-script.yml:48; .github/workflows/package.yaml:42; browser_use/skills/browser-use/SKILL.md:82-97",
+          "holds": true,
+          "note": "All three cites match. pyproject.toml:64 is the darwin/arm64 marker for browser-use-core==0.13.3, but only inside the optional `core` extra. install-script.yml:48 and package.yaml:42 both list macos-latest with no architecture stated. On macOS those jobs install the wheel, import Agent/BrowserSession/Tools (package.yaml:63-64) and run `browser-use --help` plus the aliases (install-script.yml:72-82). SKILL.md:82-97 is the mac-approve flow. Side observation outside this statement: pyproject.toml:26/29 use lowercase `platform_system == 'darwin'`, which never matches macOS ('Darwin'). So pyobjc is skipped on Mac and screeninfo installed instead. Both imports sit in try/except (browser_use/browser/profile.py:245-265), so this costs display-size detection only and does not undercut 'yes'."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "yes - `browser-use` (aliases browseruse, bu, browser; deprecated browser-use-tui) -> browser_use.cli:main; with no args and piped stdin it executes the Python through browser_harness.run.main() against a persistent daemon attached to the user's running Chrome; also install, init, skill show|install, --mcp, --cli-mcp; doctor/--doctor, auth login, telemetry, recordings, mac-approve and --reload delegated to the external harness; BU_NAME, BU_CDP_URL/BU_CDP_WS; 'All pre-3.0 preset subcommands (open, state, screenshot, eval, cookies, ...) now exit 2 with a migration hint (cli.py:205-229,375-378).'",
+          "citation": "pyproject.toml:104-109; browser_use/cli.py:83-108,173-179,185-202,205-229,375-391; browser_use/skills/browser-use/SKILL.md:36-64,110-120,153-161,208-224",
+          "holds": false,
+          "note": "Everything holds except the last sentence. Held: pyproject.toml:104-108 map browser-use/browseruse/bu/browser to browser_use.cli:main. cli.py:380-391 reads non-tty stdin and calls _run_browser_harness, which calls browser_harness.run.main() (185-202). _dispatch (357-373) handles only --cli-mcp, --mcp, install (`uvx playwright install chromium`, 83-108), init/--template and skill (show and install are defined at skills/install.py:98-100). Everything else, including doctor, auth, telemetry and recordings, falls through to the harness. SKILL.md:64 and 208 cover the Chrome attach and BU_NAME/BU_CDP_URL/BU_CDP_WS. Broken: 'All pre-3.0 preset subcommands ... exit 2'. _LEGACY_HINTS (cli.py:206-228) maps only 22 names. The repo's own test lists removed commands it lacks: click, input, tab, wait, tunnel, register, --connect (tests/ci/test_browser_use_skill_install_docs.py:74-91). Those fall through to the external harness, so the exit-2 migration hint is not guaranteed for them. Minor nit: browser-use-tui maps to browser_use_tui_main, a deprecation wrapper around main() (pyproject.toml:109; cli.py:418-420)."
+        },
+        {
+          "field": "claim_checks[4]",
+          "statement": "README.md:55-60 'Extract data' - verified: partial. `extract` converts DOM to markdown, chunks at 100,000 chars, asks an LLM (120 s timeout) and returns <url>/<query>/<result> or schema-validated JSON plus source_url/content_stats; extract_clean_markdown returns whole-page markdown plus stats; the serializer drops head/meta/title and href unless extract_links; no main-content/boilerplate removal and no author/date/canonical metadata or retrieval timestamp; legacy MCP browser_extract_content needs an LLM key; browser_get_html returns raw HTML; no readability/metadata-extraction library is imported.",
+          "citation": "README.md:55-60; AGENTS.md:874-876; browser_use/tools/service.py:1067-1303; browser_use/tools/extraction/views.py:8-17; browser_use/dom/markdown_extractor.py:23-88; browser_use/dom/serializer/html_serializer.py:69-71,259-261; browser_use/mcp/server.py:946-971,997-1000",
+          "holds": true,
+          "note": "Every piece checks out. README.md:55-56 and AGENTS.md:876 say what the claim quotes. service.py:1079 sets MAX_CHAR_LIMIT=100000, which 1125 passes to chunk_markdown_by_structure. Both LLM calls use timeout=120.0 (1201, 1277). Free text returns <url>/<query>/<result> (1282). The structured path returns <structured_result> plus ExtractionResult(source_url, content_stats) metadata (1209-1236; views.py:8-17). markdown_extractor.py:76-86 builds stats of method, char counts and url only. Its only cleanup is JSON-blob and whitespace removal (146-191). html_serializer.py:70 skips style/script/head/meta/link/title, and 259-261 drop href. The MCP server sets self.llm only when an api_key is configured (server.py:637-643), and 999-1000 returns 'LLM not initialized (set OPENAI_API_KEY)'. browser_get_html is routed to _get_html (552-553), which returns document.documentElement.outerHTML. Greps of browser_use/ find no readability/trafilatura/bs4/lxml imports (trafilatura appears only as a logger name, logging_config.py:223-224) and no canonical/og:/author/date handling."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": [
+        "readme.integrations.cli (non-blocking): replace 'All pre-3.0 preset subcommands (open, state, screenshot, eval, cookies, ...) now exit 2 with a migration hint (cli.py:205-229,375-378)' with: 'The 22 pre-3.0 names in _LEGACY_HINTS exit 2 with a migration hint (cli.py:206-228,375-378). Those are open, state, screenshot, eval, cookies, python, run, connect, close, sessions, profile, cloud, daemon, record, mcp, --session, --headed, --cdp-url, --profile, --json, -c and --code. Other removed commands the repo itself lists (click, input, tab, wait, tunnel, register, --connect; tests/ci/test_browser_use_skill_install_docs.py:74-91) are not mapped. They pass through to the external browser_harness.run.main() (cli.py:185-202,390-391), whose response is not visible in this repo.'",
+        "risks[0] (non-blocking, same fact): make the same correction to 'all preset subcommands now exit 2 (cli.py:205-229,260-264)'."
+      ]
+    }
+  ]
+}

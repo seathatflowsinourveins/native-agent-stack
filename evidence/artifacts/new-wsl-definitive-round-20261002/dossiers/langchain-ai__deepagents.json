@@ -1,0 +1,342 @@
+{
+  "contender": "langchain-ai/deepagents",
+  "revision": {
+    "contender": "langchain-ai/deepagents",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "langchain-ai/deepagents",
+        "tag": "deepagents==0.7.21",
+        "commit": "4394bcd00b8eb46e7c423939643a0dfcfb5d8773",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "deepagents==0.7.21",
+    "commit": "4394bcd00b8eb46e7c423939643a0dfcfb5d8773",
+    "read_at": "2026-10-02T03:02:21+00:00"
+  },
+  "dossier": {
+    "contender": "langchain-ai/deepagents",
+    "revision": {
+      "tag": "deepagents==0.7.21",
+      "commit": "4394bcd00b8eb46e7c423939643a0dfcfb5d8773",
+      "read_at": "2026-10-02T03:02:21+00:00"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Python monorepo for an open-source agent harness built on LangChain `create_agent` / LangGraph (libs/ARCHITECTURE.md:12-30). Packages: `deepagents` SDK (`create_deep_agent`: planning/sub-agent/filesystem/shell/memory/skills middleware over pluggable backends), `deepagents-code` (`dcode` terminal coding agent: Textual TUI, headless `-n` mode, remote sandboxes, MCP client), `deepagents-acp` (Agent Client Protocol adapter), `deepagents-talon` (experimental alpha host for chat channels and cron), `deepagents-evals` (pytest evals plus Harbor/DRBench adapters) and partner packages (Daytona, Modal, Runloop, Vercel sandboxes; QuickJS REPL). All model access goes through LangChain chat-model packages; no vendor harness SDK (OpenAI Agents/Codex SDK, Claude Agent SDK) is used (searched). The tree names `gpt-5.6-sol` and `gpt-6-astra` but no 'GPT-6.1 Sol' identifier.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Deep Agents is an open source agent harness — an opinionated agent that runs out of the box. Extend, override, or replace any piece.",
+          "citation": "README.md:24"
+        },
+        {
+          "claim": "Model-agnostic — works with any LLM that supports tool calling: frontier, open-weight, or local.",
+          "citation": "README.md:30"
+        },
+        {
+          "claim": "Production-ready — built on LangGraph (streaming, persistence, checkpointing) with first-class tracing, evaluation, and deployment via LangSmith.",
+          "citation": "README.md:31"
+        },
+        {
+          "claim": "Sub-agents — delegate tasks to agents with isolated context windows.",
+          "citation": "README.md:35"
+        },
+        {
+          "claim": "Filesystem — read, write, edit, or search over pluggable local, sandboxed, or remote backends.",
+          "citation": "README.md:36"
+        },
+        {
+          "claim": "Shell access — run commands in your sandbox of choice.",
+          "citation": "README.md:38"
+        },
+        {
+          "claim": "Persistent memory — pluggable state and store backends for cross-session recall.",
+          "citation": "README.md:39"
+        },
+        {
+          "claim": "Human-in-the-loop — approve, edit, or reject tool calls before they run.",
+          "citation": "README.md:40"
+        },
+        {
+          "claim": "Tools — bring your own functions or any MCP server.",
+          "citation": "README.md:42"
+        },
+        {
+          "claim": "Deep Agents Code — a pre-built coding agent in your terminal, similar to Claude Code or Cursor, powered by any LLM; install with `curl -LsSf https://langch.in/dcode | bash`.",
+          "citation": "README.md:47"
+        },
+        {
+          "claim": "Quickstart: `uv add deepagents`, then `create_deep_agent(model='openai:gpt-6-astra', tools=[...], system_prompt=...)` and `agent.invoke(...)`.",
+          "citation": "README.md:51-64"
+        },
+        {
+          "claim": "Can I use this in production? Yes! Built on LangGraph, designed for production agent deployments; pair it with LangSmith for tracing, evaluation and monitoring.",
+          "citation": "README.md:81-83"
+        },
+        {
+          "claim": "Deep Agents follows a 'trust the LLM' model. The agent can do anything its tools allow. Enforce boundaries at the tool/sandbox level, not by expecting the model to self-police.",
+          "citation": "README.md:112"
+        },
+        {
+          "claim": "dcode adds remote sandboxes (LangSmith, AgentCore, Daytona, Modal, Runloop, & more) and a headless mode for scripting and CI; do not run it in an untrusted directory without a sandbox backend.",
+          "citation": "libs/code/README.md:39-49"
+        }
+      ],
+      "install": [
+        {
+          "method": "uv (SDK)",
+          "command": "uv add deepagents",
+          "citation": "README.md:51-53"
+        },
+        {
+          "method": "install script (dcode, Linux/macOS via uv tool install)",
+          "command": "curl -LsSf https://langch.in/dcode | bash",
+          "citation": "README.md:47; libs/code/README.md:15; libs/code/scripts/install.sh:5"
+        },
+        {
+          "method": "install script with provider extras",
+          "command": "DEEPAGENTS_CODE_EXTRAS=\"nvidia,ollama\" curl -LsSf https://langch.in/dcode | bash",
+          "citation": "libs/code/README.md:18-22"
+        },
+        {
+          "method": "uv tool (dcode as an ACP server for editors)",
+          "command": "uv tool install -U deepagents-code --with deepagents-acp",
+          "citation": "libs/acp/README.md:141-145"
+        },
+        {
+          "method": "GitHub Action (runs dcode headless in CI; README says pin to a reviewed SHA)",
+          "command": "uses: langchain-ai/deepagents@main",
+          "citation": "ACTION.md:20,30"
+        },
+        {
+          "method": "from source (Talon, experimental)",
+          "command": "cd libs/talon && uv sync --group test && AGENT_ASSISTANT_ID=local AGENT_MODEL=<provider>:<model-id> uv run deepagents-talon --once",
+          "citation": "libs/talon/README.md:22-26"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes — CI runs on ubuntu-latest (.github/workflows/_test.yml:16-19, .github/workflows/ci.yml:325-351); installer has a Linux path (libs/code/scripts/install.sh:378-385).",
+        "wsl2": "unknown — no WSL documentation in the tree (only a test comment, libs/code/tests/unit_tests/test_main.py:1759); install.sh would take its Linux path for `uname -s`=Linux (install.sh:378-385) but WSL2 is neither documented nor CI-tested.",
+        "macos_arm64": "yes (installer-level only) — install.sh detects Darwin and preflights Xcode Command Line Tools (libs/code/scripts/install.sh:379,402-408); libs/evals lock environments include darwin/arm64 (libs/evals/pyproject.toml:99-101); no macOS runner in any workflow (.github/workflows/*.yml use ubuntu-latest/ubuntu-24.04-arm, plus windows-latest for SDK unit tests, ci.yml:333).",
+        "gpu": "no — not required; models are called as remote APIs (README.md:79). GPU is optional only for Talon local voice/embedding extras (libs/talon/README.md:320; libs/talon/pyproject.toml:76-84) and self-hosted models."
+      },
+      "integrations": {
+        "cli": "yes — `dcode` / `deepagents-code` (libs/code/pyproject.toml:154-156) with headless `-n/--non-interactive`, `--sandbox`, `--max-turns`, `--timeout`, `--shell-allow-list`, `--allow-fs-tools`, `--model provider:model` (libs/code/deepagents_code/main.py:2494-2500,2592-2644,2718-2760,2814-2824); `deepagents-talon` (libs/talon/pyproject.toml:86-87); `deepagents-evals` (libs/evals/pyproject.toml:56-57).",
+        "mcp": "MCP client only. dcode loads MCP servers via `--mcp-config` / `.mcp.json` (libs/code/deepagents_code/main.py:2761-2777; libs/code/deepagents_code/mcp_tools.py; deps fastmcp/mcp, libs/code/pyproject.toml:92,105) and Talon does too (libs/talon/README.md:550-552). No MCP server exposed by this repo (no FastMCP server code found) and the SDK package contains no MCP code. Root .mcp.json only points contributors' tooling at LangChain docs servers (.mcp.json:1-12).",
+        "sdk_or_api": "Python SDK: `create_deep_agent` returns a LangGraph CompiledStateGraph (libs/deepagents/deepagents/__init__.py:4-7,45; graph.py:272-292); JS/TS is a separate repo (README.md:44). HTTP: dcode starts a local `langgraph dev` server (127.0.0.1, HTTP+SSE, auth noop; libs/code/THREAT_MODEL.md:66,232); `AsyncSubAgent` launches background runs on remote Agent Protocol servers (libs/deepagents/deepagents/middleware/async_subagents.py:1-10). ACP over stdio via `dcode --acp` (main.py:2871-2875; libs/acp/README.md:137-175). Composite GitHub Action (action.yml:164-165). The `deepagents deploy` CLI used by examples/deploy-* is not implemented in this tree (examples/deploy-coding-agent/README.md:17).",
+        "claude_code_or_codex": "No integration that drives Claude Code or Codex as a worker. Interop in dcode (code-level, marked experimental): reads `~/.claude/skills` and `.claude/skills` (libs/code/deepagents_code/_paths.py:369-377; agent.py:2506-2517), recognizes `.claude-plugin` / `.codex-plugin` manifests (libs/code/deepagents_code/plugins/manifest.py:23-24), `.mcp.json` follows Claude Code's format (mcp_tools.py:397). `openai_codex` provider signs in with ChatGPT OAuth (libs/code/deepagents_code/model_config.py:1018-1024; integrations/openai_codex.py:1-34). SDK has a built-in Codex harness profile for openai:gpt-5.1/5.2/5.3-codex (libs/deepagents/deepagents/profiles/harness/_openai_codex.py:27-31). dcode cannot use Claude Pro/Max/Claude Code subscriptions, only pay-as-you-go API keys (libs/code/deepagents_code/tui/widgets/auth.py:1093-1095)."
+      },
+      "telemetry_and_network": "No analytics/telemetry SDK found in libs sources (searched posthog/sentry/mixpanel/segment/opentelemetry; hits were lockfiles and internal trace-tag helpers, e.g. libs/code/deepagents_code/auto_mode.py:1051-1094). Outbound traffic: (1) the chosen LLM provider API (required); `openai:` models default to the OpenAI Responses API, which retains data server-side unless `store=False` (libs/deepagents/deepagents/graph.py:324-334; profiles/provider/_openai.py:21-24; libs/deepagents/THREAT_MODEL.md:35). (2) LangSmith: `langsmith` is a hard SDK dependency (libs/deepagents/pyproject.toml:27) and runs carry `ls_integration`/`lc_versions` metadata (graph.py:974-982) that leaves the host only if tracing is on; Talon tracing is opt-in (libs/talon/README.md:482-492); in dcode, storing a LangSmith key via `/auth` turns tracing on unless `DEEPAGENTS_CODE_LANGSMITH_TRACING=false` (libs/code/deepagents_code/config.py:1736-1804). (3) dcode defaults, all opt-out: PyPI update check and auto-update (update_check.py:4423-4477; config_manifest.py:3055-3074; env DEEPAGENTS_CODE_NO_UPDATE_CHECK / DEEPAGENTS_CODE_AUTO_UPDATE=0), hourly un-checksummed pricing-catalog fetch from raw.githubusercontent.com (cost_tracking.py:745-751; libs/code/THREAT_MODEL.md:552-557), plugin auto-update (config_manifest.py:3044-3053), SHA-256-verified ripgrep download from github.com (THREAT_MODEL.md:545-550). `DEEPAGENTS_CODE_OFFLINE` covers ripgrep, pricing and plugins (managed_tools.py:280; cost_tracking.py:767; plugins/discovery.py:349) but update_check.py never references it. (4) The installer fetches uv from astral.sh with only structural checks (libs/code/scripts/install.sh:79-81,1613). Accounts/services needed: a key per model provider; Tavily key for `web_search` (libs/code/deepagents_code/tools.py:302-313); a provider account for each remote sandbox (integrations/sandbox_registry.py:38-79; libs/talon/README.md:42); a LangGraph/Agent Protocol server for async sub-agents; LangSmith for the deploy examples (examples/deploy-coding-agent/README.md:5-12)."
+    },
+    "code": {
+      "languages": [
+        "Python (SDK >=3.11; dcode/talon/evals >=3.12)",
+        "Shell (libs/code/scripts/install.sh)",
+        "JavaScript/Node >=22.12 (Talon WhatsApp bridge; .github helper scripts)",
+        "YAML (GitHub Actions, composite action.yml)"
+      ],
+      "entry_points": [
+        {
+          "path": "libs/deepagents/deepagents/graph.py",
+          "what": "`create_deep_agent()` (line 272), exported from deepagents/__init__.py:4-7,45; returns a LangGraph CompiledStateGraph."
+        },
+        {
+          "path": "libs/code/deepagents_code/main.py",
+          "what": "`dcode` / `deepagents-code` -> `deepagents_code:cli_main` (libs/code/pyproject.toml:154-156; __main__.py:1-6); argparse CLI incl. `-n`, `--sandbox`, `--acp`, `threads`, `update`, `install`."
+        },
+        {
+          "path": "libs/code/deepagents_code/client/non_interactive.py",
+          "what": "`run_non_interactive()` (line 2571): headless one-shot run; exit codes 0/1/124/130 (lines 2697-2700)."
+        },
+        {
+          "path": "libs/code/deepagents_code/client/launch/server.py",
+          "what": "Spawns the local `langgraph dev` subprocess that both TUI and headless modes talk to via RemoteAgent (libs/code/THREAT_MODEL.md:66)."
+        },
+        {
+          "path": "libs/talon/deepagents_talon/__main__.py",
+          "what": "`deepagents-talon` host (libs/talon/pyproject.toml:86-87): channels, cron, MCP, optional sandbox."
+        },
+        {
+          "path": "libs/acp/deepagents_acp/server.py",
+          "what": "`AgentServerACP` ACP adapter; `python -m deepagents_acp` runs a test agent (deepagents_acp/__main__.py:1-14); `dcode --acp` serves dcode over stdio (main.py:2871-2875)."
+        },
+        {
+          "path": "action.yml",
+          "what": "Composite GitHub Action: `uvx --from deepagents-code dcode --non-interactive <prompt>` with sandbox/model/limit inputs and actions/cache memory (action.yml:76-91,398-402,490)."
+        },
+        {
+          "path": "libs/code/scripts/install.sh",
+          "what": "Installer served at https://langch.in/dcode; runs `uv tool install` of deepagents-code (install.sh:5,2407-2426)."
+        }
+      ],
+      "architecture": "Layers: LangGraph (state, checkpoints, interrupts) -> LangChain `create_agent` -> Deep Agents harness (libs/ARCHITECTURE.md:12-30). SDK libs/deepagents/deepagents/: `graph.py` assembles middleware, sub-agents and prompt, then calls `create_agent` with `checkpointer`/`store` passthrough and `recursion_limit` 9,999 (graph.py:961-983); `middleware/` (filesystem.py: file tools, path permissions, large-result eviction; subagents.py; async_subagents.py: remote Agent Protocol tasks; skills.py; memory.py; summarization.py; rubric.py: grader loop; patch_tool_calls.py); `backends/` (protocol.py; state.py thread-scoped default; store.py; filesystem.py; local_shell.py host shell with no isolation; sandbox.py BaseSandbox; langsmith.py LangSmithSandbox; composite.py; context_hub.py); `profiles/` (OpenAI Responses-API provider profile; harness profiles for Anthropic Opus 4.7/Sonnet 4.6/Haiku 4.5, Nemotron 3 Ultra, OpenAI Codex 5.1-5.3; _builtin_profiles.py:149-156). dcode libs/code/deepagents_code/: main.py (CLI), app.py (Textual TUI), agent.py (`create_cli_agent`), client/non_interactive.py (headless), client/launch/server.py + client/remote_client.py (local langgraph dev server + HTTP/SSE client), server_graph.py, integrations/sandbox_factory.py + sandbox_registry.py (agentcore/daytona/langsmith/modal/runloop/vercel), sessions.py (SQLite sessions.db, UUIDv7 thread ids), mcp_tools.py, tools.py (Tavily `web_search`, SSRF-guarded `fetch_url`), hooks/, plugins/, extensions/, update_check.py, cost_tracking.py. Talon libs/talon/deepagents_talon/: host.py, runtime.py, channels/ (Discord/Slack/Telegram/WhatsApp), cron/, sandbox.py, archive*/history* modules. Also libs/acp (ACP), libs/partners/* (sandbox providers; quickjs REPL middleware), libs/evals (pytest evals, deepagents_harbor, harbor_adapters/{drbench,contextbench}).",
+      "packaging_and_release": "Per-package PyPI releases driven by release-please (.github/RELEASING.md:19-25) and .github/workflows/release.yml: `uv build` (release.yml:396-398; SDK uses setuptools, pyproject.toml:70-72; dcode uses hatchling with a build hook stamping the release commit, libs/code/pyproject.toml:194-196, release.yml:400-402) -> artifact upload -> pre-release checks (wheel import + `make test`; integration tests disabled via `if: false`, release.yml:816-821) -> TestPyPI -> PyPI via Trusted Publishing OIDC with pypa/gh-action-pypi-publish pinned by SHA and `print-hash: true`, but `attestations: false` (release.yml:847-893) -> GitHub Release via ncipollo/release-action attaching `dist/*` under tag `<pkg>==<version>` (release.yml:949-961). No checksum files, signatures, SBOM or provenance steps found in workflows. Versions at this commit: deepagents 0.7.21, deepagents-code 0.1.79, deepagents-acp 0.0.12, deepagents-talon 0.0.8, langchain-daytona 0.0.8, langchain-modal 0.0.6, langchain-runloop 0.0.7, langchain-vercel-sandbox 0.0.2, langchain-quickjs 0.3.8 (.release-please-manifest.json:1-11); deepagents-evals 0.0.1 is in the release dropdown (release.yml:34) but not the manifest. Actions are pinned to commit SHAs (AGENTS.md:137). dcode's installer also provisions a pinned, SHA-256-verified ripgrep (install.sh:71-77).",
+      "tests_and_ci": "pytest (asyncio auto mode, xdist, timeout, socket-blocking `--disable-socket`, benchmark/CodSpeed), ruff (select ALL) and `ty`; warnings are errors (libs/deepagents/pyproject.toml:135-155; libs/deepagents/Makefile:19-21); Node `node --test` for the WhatsApp bridge. About 454 `test_*.py` files under libs/ (SDK 67, code 239, talon 68, evals 46, acp 6, partners 28) plus CI-helper tests in .github/scripts/tests. Network-free tests live in tests/unit_tests, networked ones in tests/integration_tests (AGENTS.md:81). Workflows (.github/workflows, ~60 files): ci.yml path-filtered lint + test per package (SDK on Python 3.11-3.14 ubuntu plus Windows 3.13; code/talon 3.12-3.14; evals 3.12-3.13; acp/partners 3.11-3.14; ci.yml:234-414), reusable _test.yml (`make test`, ripgrep, clean-tree check) and _lint.yml (`make lint`), ci.yml also builds the DRBench dataset and runs helper-script tests (ci.yml:495-569); check_* gates (lockfiles, extras sync, SDK pin, versions, release deps), PR label/scope gates, integration_tests.yml (manual dispatch with live API keys, integration_tests.yml:5), eval workflows (evals.yml, harbor.yml, unified_evals.yml, clbench.yml), release.yml, release-please.yml. No macOS runner.",
+      "dependencies": "libs/deepagents/pyproject.toml: 7 runtime deps (langchain, langchain-core, langchain-anthropic, langchain-google-genai, langsmith, packaging, wcmatch; lines 22-30) + extras aws/quickjs/video; `langchain-openai` is test-group only (line 61). libs/code/pyproject.toml: 35 runtime deps incl. exact `deepagents==0.7.20` (line 30), langchain-openai, langgraph-cli[inmem]/runtime-inmem/sdk/checkpoint-sqlite, textual, tavily-python, langsmith[sandbox], pre-release `fastmcp>=4.0.0b4` (line 92), mcp; 30 extras (21 model-provider, 5 sandbox, aggregates, media, quickjs). libs/talon/pyproject.toml: 21 runtime deps + 6 extras (needs deepagents-code>=0.1.71); its Node bridge package.json has 2 deps (qrcode-terminal, whatsapp-web.js). libs/acp: 3 deps. libs/evals: 25 runtime deps + 1 extra (harbor, modal, many provider packages). Partners: daytona 2, modal 2, runloop 2, vercel 2, quickjs 6. Each package has a uv.lock (libs/**/uv.lock).",
+      "security_policy": "none — no SECURITY.md or security-policy file in the tree; README.md:112 only links to GitHub's security tab. Auto-generated, self-described 'experimental' threat models exist: libs/deepagents/THREAT_MODEL.md (generated 2026-03-28 at commit e859077f, line 3; predates 0.7.0 behavior changes) and libs/code/THREAT_MODEL.md (generated 2026-08-19, line 5). Talon's README declines vulnerability reports for unimplemented hardening features (libs/talon/README.md:7,825)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Model-agnostic — works with any LLM that supports tool calling (README.md:30); dcode 'powered by any LLM' (README.md:47)",
+        "verified": "partial",
+        "evidence": "Any `provider:model` string or BaseChatModel is accepted and resolved through LangChain `init_chat_model` (libs/deepagents/deepagents/_models.py:35-57; dcode `create_model` accepts arbitrary specs, libs/code/deepagents_code/config.py:6636-6687). But only langchain-anthropic and langchain-google-genai are hard SDK deps (libs/deepagents/pyproject.toml:22-30); other providers need extra LangChain packages (libs/code/pyproject.toml:108-136). Tuned built-in harness profiles exist only for Anthropic Opus 4.7/Sonnet 4.6/Haiku 4.5, NVIDIA Nemotron 3 Ultra and OpenAI Codex 5.1-5.3 (profiles/_builtin_profiles.py:149-156; harness/_openai_codex.py:27-31). dcode cannot use Claude subscriptions, only API keys (tui/widgets/auth.py:1093-1095). 'GPT-6.1 Sol' appears nowhere; nearest are gpt-5.6-sol and gpt-6-astra (tui/widgets/model_selector.py:108-112; README.md:59)."
+      },
+      {
+        "claim": "Quickstart: `uv add deepagents` then `create_deep_agent(model='openai:gpt-6-astra', ...)` (README.md:51-64)",
+        "verified": "partial",
+        "evidence": "`create_deep_agent` is exported as shown (libs/deepagents/deepagents/__init__.py:4-7,45). `langchain-openai` is not an SDK runtime dependency (libs/deepagents/pyproject.toml:22-30; test group only, :61), so an `openai:` model needs a separate install (dcode bundles it, libs/code/pyproject.toml:43). The `openai:` prefix defaults to the Responses API (profiles/provider/_openai.py:21-24; graph.py:324-334), which retains data on OpenAI servers unless `store=False` is configured (libs/deepagents/THREAT_MODEL.md:35). `my_custom_tool` in the snippet is undefined. Behavior of init_chat_model when langchain-openai is missing lives in LangChain, not checked."
+      },
+      {
+        "claim": "Shell access — run commands in your sandbox of choice (README.md:38)",
+        "verified": "yes",
+        "evidence": "`SandboxBackendProtocol.execute/aexecute` (libs/deepagents/deepagents/backends/protocol.py:886-941), `BaseSandbox` (backends/sandbox.py:1536), `LangSmithSandbox` (backends/langsmith.py:56-95); partner packages for Daytona/Modal/Runloop/Vercel (libs/partners/*/pyproject.toml); dcode registry agentcore/daytona/langsmith/modal/runloop/vercel (libs/code/deepagents_code/integrations/sandbox_registry.py:38-79). Caveats: `LocalShellBackend` is unrestricted host execution (backends/local_shell.py:1-6,34-79); the default `StateBackend` has no shell (graph.py:297-303); the LangSmith sandbox SDK is flagged alpha (libs/deepagents/pyproject.toml:143-144)."
+      },
+      {
+        "claim": "Tools — bring your own functions or any MCP server (README.md:42)",
+        "verified": "partial",
+        "evidence": "`create_deep_agent(tools=...)` takes any LangChain tool or callable (libs/deepagents/deepagents/graph.py:274). The SDK package has no MCP code (case-insensitive search of libs/deepagents/deepagents found no 'mcp'); MCP lives in dcode (libs/code/deepagents_code/mcp_tools.py; libs/code/pyproject.toml:92,105) and Talon (libs/talon/README.md:550-552). SDK users must adapt MCP tools to LangChain tools themselves."
+      },
+      {
+        "claim": "Production-ready — built on LangGraph (streaming, persistence, checkpointing); persistent memory via pluggable state/store backends (README.md:31,39,83)",
+        "verified": "partial",
+        "evidence": "`checkpointer` and `store` are passed straight to `create_agent` (graph.py:968-969) and `StoreBackend`/`MemoryMiddleware` exist (backends/store.py; middleware/memory.py), but the default `StateBackend` is thread-scoped and ephemeral (backends/state.py:38-48) and the SDK ships no durable checkpointer; dcode uses SQLite (libs/code/deepagents_code/sessions.py:347-366). The SDK is classified Beta (libs/deepagents/pyproject.toml:11) and 0.7.0 shipped ~10 breaking changes (libs/deepagents/CHANGELOG.md:173-186). 'Production-ready' itself is not checkable."
+      },
+      {
+        "claim": "Sub-agents — delegate tasks to agents with isolated context windows (README.md:35)",
+        "verified": "yes",
+        "evidence": "Declarative sub-agents get their own middleware stack and run via the `task` tool (libs/deepagents/deepagents/graph.py:667-790,875-887); `CompiledSubAgent` and remote `AsyncSubAgent` are also supported (graph.py:414-450; middleware/async_subagents.py:34-77). Exception: `mode='fork'` (experimental) continues the parent's conversation instead of isolating (graph.py:428-431)."
+      },
+      {
+        "claim": "dcode remote sandboxes: LangSmith, AgentCore, Daytona, Modal, Runloop & more (libs/code/README.md:39)",
+        "verified": "yes",
+        "evidence": "BUILTIN_METADATA lists agentcore, daytona, langsmith, modal, runloop, vercel (libs/code/deepagents_code/integrations/sandbox_registry.py:38-79); flags `--sandbox`, `--sandbox-id`, `--sandbox-setup` (main.py:2718-2751); extras (libs/code/pyproject.toml:139-145). An owned sandbox is deleted on exit; one attached via `--sandbox-id` is kept (integrations/sandbox_factory.py:142-182). All providers are hosted third-party services; no local container provider ships. Auto approval mode is unavailable with a sandbox (main.py:6483-6492)."
+      },
+      {
+        "claim": "dcode headless mode for scripting and CI (libs/code/README.md:42); Action input `json` gives machine-readable output (action.yml:140-143; ACTION.md:41)",
+        "verified": "partial",
+        "evidence": "`-n` runs one task with no human approvals, shell off unless an allow-list is set; `--max-turns`, `--timeout` (exit 124), `--recursion-limit`, `--rubric` exist (libs/code/deepagents_code/main.py:2592-2687; client/non_interactive.py:2571-2700). But every headless run starts a fresh thread: `run_non_interactive` takes no resume/thread argument (main.py:1555-1556; non_interactive.py:2822) and `-r` is wired only to the TUI (main.py:6373,6515). `--max-turns` counts the initial stream plus HITL-resume passes (non_interactive.py:2291-2312). Top-level `--json` is consumed only by management commands (main.py:6122-6225; no `output_format` in non_interactive.py), so no code path was found that applies the Action's `json` input to `-n` output."
+      },
+      {
+        "claim": "'Trust the LLM' model; enforce boundaries at the tool/sandbox level (README.md:112)",
+        "verified": "yes",
+        "evidence": "Consistent with code: `LocalShellBackend` gives unrestricted host execution (libs/deepagents/deepagents/backends/local_shell.py:34-79); the SDK provides no OS-level isolation (libs/deepagents/THREAT_MODEL.md:32); SDK tool exclusion 'is not a security surface' (middleware/_tool_exclusion.py:41-44); path `permissions` apply only to built-in filesystem tools (graph.py:487-490) and raise NotImplementedError with execute-capable backends unless scoped to composite routes (middleware/filesystem.py:1849-1856,620-635). dcode's shell allow-list checks only the first token (libs/code/THREAT_MODEL.md:565-569)."
+      },
+      {
+        "claim": "Talon README: checkpoints in checkpoints.sqlite let chat history survive restarts (libs/talon/README.md:30) vs 'Conversation persistence is intentionally not durable yet' (README.md:844)",
+        "verified": "partial",
+        "evidence": "The README contradicts itself. Code wires `AsyncSqliteSaver` + `ConversationSaver` for model-backed hosts (libs/talon/deepagents_talon/__main__.py:317-330), while `DeepAgentRuntime` defaults to `InMemorySaver` if no checkpointer is passed (deepagents_talon/runtime.py:383), so line 844 looks stale. Background sub-agent workers and pending results are in memory only and discarded on restart (README.md:692). Talon is labelled experimental/alpha and not for production (README.md:5; libs/talon/pyproject.toml:14)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Unified evals 'lite' profile, GPT-5.6 sol via bare `create_deep_agent` (36 tasks: 15 autonomous harbor-index, 11 tau3 conversation, 10 context-retrieval; 3 rollouts; sandbox=docker; judge gpt-5.6-luna)",
+        "metric": "micro avg@k / micro pass@k / macro avg@k",
+        "value": "0.528 / 0.611 / 0.568",
+        "source": "libs/evals/UNIFIED_SCORECARD.md:79-93 (ranking line :17, profile :19)",
+        "independent": false
+      },
+      {
+        "what": "Same lite run, GPT-5.6 sol, autonomous (harbor-index) category only, 15 tasks",
+        "metric": "avg@k / pass@k",
+        "value": "0.311 / 0.400",
+        "source": "libs/evals/UNIFIED_SCORECARD.md:85-87",
+        "independent": false
+      },
+      {
+        "what": "Same lite run, Claude Opus 4.8",
+        "metric": "micro avg@k (autonomous avg@k / pass@k)",
+        "value": "0.407 (0.267 / 0.467)",
+        "source": "libs/evals/UNIFIED_SCORECARD.md:95-109",
+        "independent": false
+      },
+      {
+        "what": "Same lite run, Claude Sonnet 5",
+        "metric": "micro avg@k (autonomous avg@k / pass@k)",
+        "value": "0.278 (0.089 / 0.133)",
+        "source": "libs/evals/UNIFIED_SCORECARD.md:111-125",
+        "independent": false
+      },
+      {
+        "what": "GPT-5.6 terra, full profile (82 autonomous / 30 conversation / 30 context tasks, 3 rollouts, sandbox=docker, run 2026-07-15; 14 of 246 autonomous trials errored and counted as failures)",
+        "metric": "autonomous avg@k / pass@k; micro avg@k",
+        "value": "0.183 / 0.268; 0.359",
+        "source": "libs/evals/UNIFIED_SCORECARD.md:21-35",
+        "independent": false
+      },
+      {
+        "what": "GPT-5.6 luna, full profile (same task counts and settings)",
+        "metric": "autonomous avg@k / pass@k; micro avg@k",
+        "value": "0.114 / 0.159; 0.326",
+        "source": "libs/evals/UNIFIED_SCORECARD.md:51-63",
+        "independent": false
+      },
+      {
+        "what": "Context-Bench-derived 30-task context-retrieval subset calibration with bare `create_deep_agent` (source run 29881672853)",
+        "metric": "correct answers / trials",
+        "value": "Terra 510/600 (85.0%); Luna 552/600 (92.0%)",
+        "source": "libs/evals/UNIFIED_EVALS.md:175",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "API churn and maturity: 21 SDK releases between 0.7.0 (2026-07-29) and 0.7.21 (2026-09-30); 0.7.0 alone listed ~10 breaking changes (empty base prompt, TodoList removed by default, `write_file` overwrites, recursive `delete` tool, backend factories removed) (libs/deepagents/CHANGELOG.md:5,169-186). SDK is classified Beta (libs/deepagents/pyproject.toml:11); dcode 0.1.79 exact-pins `deepagents==0.7.20` while the SDK here is 0.7.21 (libs/code/pyproject.toml:30); Talon 0.0.8, ACP 0.0.12, evals 0.0.1 and sandbox partners 0.0.2-0.0.8 are alpha/0.0.x.",
+      "Isolation is delegated to third parties: the SDK provides no OS-level isolation (libs/deepagents/THREAT_MODEL.md:32); `LocalShellBackend` runs on the host (backends/local_shell.py:34-79); every built-in dcode sandbox is a hosted service needing its own account and no local container/VM provider ships (libs/code/deepagents_code/integrations/sandbox_registry.py:38-79); SDK path `permissions` cannot be combined with execute-capable backends (middleware/filesystem.py:1849-1856); the LangSmith sandbox SDK is alpha upstream (libs/deepagents/pyproject.toml:143-144); Talon sandboxing is opt-in, excludes MCP/web tools and is not a multi-tenant boundary (libs/talon/README.md:7,53).",
+      "Unattended-run safety: dcode `-n` has no human approvals and can change files and use the network (libs/code/deepagents_code/main.py:2597-2599); the shell allow-list matches only the first token so allow-listed interpreters run arbitrary code, and `all` skips checks (libs/code/THREAT_MODEL.md:449,459,565-569); a project `.env` in an untrusted checkout can run code before any approval (T12, rated High, THREAT_MODEL.md:458,559-563); the local `langgraph dev` server runs with `LANGGRAPH_AUTH_TYPE=noop` (THREAT_MODEL.md:232,453). `--max-turns` counts HITL-resume passes only (client/non_interactive.py:2291-2312); the SDK sets `recursion_limit` 9,999 (graph.py:976), with separate `--timeout` and `--recursion-limit` bounds (main.py:2635-2644,2679-2687).",
+      "Resumability and scope: headless dcode always starts a new thread (main.py:1555-1556; non_interactive.py:2822) and `-r` resumes only in the TUI (main.py:6373,6515); sessions are a local unencrypted SQLite file (sessions.py:347-366; THREAT_MODEL.md:197); durable SDK persistence needs a caller-supplied checkpointer (graph.py:968-969); Talon background workers are in memory and lost on restart (libs/talon/README.md:692) and its README contradicts itself on durability (README.md:30 vs 844). The repo is a harness, not a worker service: no job queue or HTTP job API for headless runs, and the `deepagents deploy` CLI used by the deploy examples is not in the tree (examples/deploy-coding-agent/README.md:17).",
+      "Network defaults in dcode: update check and auto-update default on (libs/code/deepagents_code/update_check.py:4423-4477), hourly un-checksummed pricing catalog from a mutable branch ref (cost_tracking.py:745-751; THREAT_MODEL.md:552-557), plugin auto-update default on (config_manifest.py:3044-3053); `DEEPAGENTS_CODE_OFFLINE` does not cover the update check (no reference in update_check.py; _env_vars.py:415-421); storing a LangSmith key via `/auth` enables tracing by default (config.py:1736-1804); OpenAI Responses API retains conversation data unless disabled (libs/deepagents/deepagents/graph.py:324-334).",
+      "Release and supply-chain integrity: PyPI attestations are disabled (.github/workflows/release.yml:892-893), GitHub releases attach only `dist/*` with no checksums, signatures or SBOM (release.yml:949-961), integration tests are skipped at release (release.yml:820-821); the installer pipes a script to bash and bootstraps uv from astral.sh with only structural checks (libs/code/scripts/install.sh:79-81,1613); dcode depends on pre-release `fastmcp>=4.0.0b4` (libs/code/pyproject.toml:92) and the installer defaults to uv's `allow` pre-release strategy (install.sh:19-20); the `openai_codex` provider reuses upstream-private langchain_openai helpers (integrations/openai_codex.py:27-33); there is no SECURITY.md in the tree.",
+      "Model fit: no 'GPT-6.1 Sol' identifier anywhere in the tree (searched `gpt-6.1`, `-sol`); nearest are `gpt-5.6-sol` (libs/code/deepagents_code/tui/widgets/model_selector.py:108,112; model_config.py:1029) and `gpt-6-astra` (README.md:59). Model IDs are free-form pass-through to LangChain, but the `openai_codex` ChatGPT-OAuth provider exposes only a curated list that lacks any GPT-6.x (model_config.py:1026-1044), the SDK has no tuned harness profile for GPT-5.6/6.x (only Codex 5.1-5.3, profiles/harness/_openai_codex.py:27-31), `langchain-openai` is not an SDK dependency (pyproject.toml:22-30) and dcode accepts only pay-as-you-go Anthropic API keys (tui/widgets/auth.py:1093-1095).",
+      "Docs, CI and licensing drift: examples reference the removed `deepagents-cli` package (examples/ralph_mode/ralph_mode.py:40); libs/deepagents/THREAT_MODEL.md (2026-03-28) predates 0.7.0 defaults (THREAT_MODEL.md:31,55 vs CHANGELOG.md:175,178) and libs/code/THREAT_MODEL.md:195 describes per-thread DB files while code uses one sessions.db (sessions.py:365); CI has no macOS runner and Windows covers only SDK unit tests (ci.yml:333; _test.yml:351-356); DRBench research evals need an arm64 Docker runner (libs/evals/datasets/drbench-evals/README.md:27-31); UNIFIED_EVALS.md says harbor-index uses LLM judges at :93 but not at :141; libs/evals vendors third-party Apache-2.0/MIT benchmark material inside an MIT tree (libs/evals/harbor_adapters/contextbench/vendor/LICENSE; libs/evals/tests/evals/tau2_airline/LICENSE)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "langchain-ai/deepagents",
+      "checks": [
+        {
+          "field": "readme.install[1] (install script, dcode)",
+          "statement": "install script (dcode, Linux/macOS via uv tool install): `curl -LsSf https://langch.in/dcode | bash`",
+          "citation": "README.md:47; libs/code/README.md:15; libs/code/scripts/install.sh:5",
+          "holds": true,
+          "note": "All three cited lines carry that exact command. install.sh:378-385 detects Darwin and Linux, :1893 sets PACKAGE=\"deepagents-code${EXTRAS}${VERSION_SPEC}\" and :2407-2427 run `uv tool install -U --python ... $PACKAGE`. MINGW/MSYS/CYGWIN map to OS=windows (:386-387) but there is no other Windows handling, so 'Linux/macOS' is a fair summary. Whether langch.in actually serves this script cannot be checked from the tree."
+        },
+        {
+          "field": "license",
+          "statement": "SPDX MIT; file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-21 is the standard MIT License text, 'Copyright (c) LangChain, Inc.'. Package metadata agrees: libs/deepagents/pyproject.toml:7,13 and libs/code/pyproject.toml:10,19 declare MIT. The Apache-2.0/MIT third-party material vendored under libs/evals (already noted in the dossier's risks) does not change the project license."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes — CI runs on ubuntu-latest; installer has a Linux path",
+          "citation": ".github/workflows/_test.yml:16-19; .github/workflows/ci.yml:325-351; libs/code/scripts/install.sh:378-385",
+          "holds": true,
+          "note": "_test.yml:16-19 declares the `os` input with default \"ubuntu-latest\", and runs-on is ${{ matrix.os }} built from inputs.os (:65-71). ci.yml:325-351 calls _test.yml for deepagents, code and talon without overriding os; only deepagents adds a windows-latest 3.13 leg (:333). install.sh:380-384 is the Linux branch of detect_os (reads /etc/os-release, OS=linux)."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "yes — dcode/deepagents-code with headless -n/--non-interactive, --sandbox, --max-turns, --timeout, --shell-allow-list, --allow-fs-tools, --model provider:model; deepagents-talon; deepagents-evals",
+          "citation": "libs/code/pyproject.toml:154-156; libs/code/deepagents_code/main.py:2494-2500,2592-2644,2718-2760,2814-2824; libs/talon/pyproject.toml:86-87; libs/evals/pyproject.toml:56-57",
+          "holds": true,
+          "note": "Script entry points: deepagents-code and dcode -> deepagents_code:cli_main (pyproject 155-156); deepagents-talon (talon :87); deepagents-evals (evals :57). Flags at the cited lines: -M/--model 2494-2500, -n 2592-2600, --max-turns 2625-2633, --timeout (exit 124) 2635-2644, --sandbox 2718-2733, -S/--shell-allow-list 2752-2760, --allow-fs-tools 2814-2824. The --model help gives bare-name examples, but the -n path passes args.model as model_name (main.py:6313) and create_model parses provider:model (config.py:6639-6653)."
+        },
+        {
+          "field": "claim_checks[0] (Model-agnostic, verified: partial)",
+          "statement": "Any provider:model string or BaseChatModel is resolved through init_chat_model; dcode create_model accepts arbitrary specs; only langchain-anthropic and langchain-google-genai are hard SDK deps; tuned built-in harness profiles only for Opus 4.7/Sonnet 4.6/Haiku 4.5, Nemotron 3 Ultra, Codex 5.1-5.3; dcode cannot use Claude subscriptions; no 'GPT-6.1 Sol', nearest gpt-5.6-sol and gpt-6-astra",
+          "citation": "libs/deepagents/deepagents/_models.py:35-57; libs/code/deepagents_code/config.py:6636-6687; libs/deepagents/pyproject.toml:22-30; libs/code/pyproject.toml:108-136; profiles/_builtin_profiles.py:149-156; harness/_openai_codex.py:27-31; tui/widgets/auth.py:1093-1095; tui/widgets/model_selector.py:108-112; README.md:59",
+          "holds": true,
+          "note": "Every cited line holds. resolve_model returns a BaseChatModel as-is or calls init_chat_model (_models.py:54-57), and graph.py:616 uses it. create_model's allowlist gate applies only when allowed_models is set (model_config.py:3705). The SDK's runtime deps (pyproject.toml:22-30) include no provider packages other than langchain-anthropic and langchain-google-genai; langchain-openai is test-only (:61). Built-in harness registrations are exactly opus_4_7, sonnet_4_6, haiku_4_5, nemotron_3_ultra and openai_codex (:152-156), plus third-party entry points (:157-158). Codex specs are openai:gpt-5.1/5.2/5.3-codex (:28-30). auth.py:1093-1095 says Claude Pro/Max and Claude Code subscriptions cannot be used. A case-insensitive search for gpt-6.1 / 6.1-sol finds nothing. Outside docs, the only gpt-6 IDs are gpt-6-astra and test fixtures (gpt-6-luna, gpt-6-terra, gpt-6-omni, gpt-6-pro), none containing 'sol', so the 'nearest' wording is reasonable."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

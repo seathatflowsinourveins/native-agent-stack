@@ -1,0 +1,344 @@
+{
+  "contender": "opendatalab/mineru",
+  "revision": {
+    "contender": "opendatalab/mineru",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "opendatalab/mineru",
+        "tag": "mineru-4.0.10-released",
+        "commit": "c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "mineru-4.0.10-released",
+    "commit": "c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93",
+    "read_at": "2026-10-02T03:02:31+00:00"
+  },
+  "dossier": {
+    "contender": "opendatalab/mineru",
+    "revision": {
+      "tag": "mineru-4.0.10-released",
+      "commit": "c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "LicenseRef-MinerU-Open-Source-License",
+      "file": "LICENSE.md"
+    },
+    "purpose": "MinerU is an open-source Python toolkit (PyPI package `mineru`) that converts PDFs, scanned images, Office/OpenDocument/RTF, EPUB, OFD, HTML/MHTML and CSV/TSV into Markdown, 'middle JSON' (schema 2.0), structured content and other renderings. It has four quality tiers: flash (native parsing, no model), basic (small OCR/layout/table/formula models), and standard/advanced (small models plus a 1.2B VLM). It ships (a) stateless tools: `mineru-kit parse` (markdown | middle_json | zip), a self-hosted V1 HTTP API server, a router, a Gradio WebUI, a VLM server and a model downloader; and (b) a 'document library' CLI/SDK (`mineru`, `DoclibClient`) backed by a local background server with SQLite + FTS5 that scans/watches folders, caches parse results by SHA-256, offers keyword (FTS5) search, and reads cached content by doc/page/block locators. The README says it is not a RAG framework or vector database (README.md:136). The Office/EPUB/HTML converters live in the external `docvortex` package, not in this repository.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Four parsing tiers: Flash for fast previews and indexing, Basic for OCR and model-based parsing, Standard / Advanced for more demanding layouts and quality requirements.",
+          "citation": "README.md:50"
+        },
+        {
+          "claim": "Multiple input formats: PDF, images, DOC/DOCX, PPT/PPTX, XLS/XLSX, RTF, ODT/ODS/ODP, EPUB, OFD, HTML/MHTML, CSV/TSV; DocVortex (separate repo) provides native document parsing.",
+          "citation": "README.md:51"
+        },
+        {
+          "claim": "Document library and agent reading: discover files, cache results, search content, continue by page or block, and preserve stable citation locators.",
+          "citation": "README.md:52"
+        },
+        {
+          "claim": "PDF and images support all four tiers; Office, OpenDocument, EPUB, OFD, HTML/MHTML and CSV/TSV use local Flash native parsing; plain text is read directly rather than parsed; documents are not automatically uploaded to the official service.",
+          "citation": "README.md:57"
+        },
+        {
+          "claim": "MinerU is not a RAG framework, vector database, or chat-with-doc application.",
+          "citation": "README.md:136"
+        },
+        {
+          "claim": "Nine rendering targets from one document model (Markdown, HTML, LaTeX, DOCX, EPUB, PDF, Structured Content, Content List V1/V2); each CLI/API exposes only a subset of them.",
+          "citation": "README.md:55"
+        },
+        {
+          "claim": "`mineru parse document.pdf --json` is the document-library/agent path and defaults to the first 10 PDF pages (continue with returned locators); stateless `mineru-kit parse` defaults to all pages.",
+          "citation": "README.md:121"
+        },
+        {
+          "claim": "Locator grammar doc:{short_id}/tier:{tier}/page:{n}[/block:{n}[/char:{offset}]] is read back with `mineru read`.",
+          "citation": "README.md:666-674"
+        },
+        {
+          "claim": "`search` only searches content MinerU has already indexed; if only low-quality/flash snippets are returned, parse or read the document at default quality before relying on the content.",
+          "citation": "README.md:731-732"
+        },
+        {
+          "claim": "Watch is for discovery and search indexing, defaults to flash, and its results are not final reading quality.",
+          "citation": "README.md:785-787"
+        },
+        {
+          "claim": "The default install works out of the box (ONNX CPU small models, llama.cpp VLM in Vulkan mode); NVIDIA GPUs should install `mineru[full]>=4.0`; on macOS the default install is already the best-throughput package.",
+          "citation": "README.md:119"
+        },
+        {
+          "claim": "Documents are parsed locally by default; a document is sent for remote parsing only when `--remote` is used; local failure cannot silently fall back to remote.",
+          "citation": "README.md:372-376"
+        },
+        {
+          "claim": "Anonymous, locally aggregated telemetry may be collected (no document contents, file names/paths, search queries, prompts, snippets, API keys, hostnames); to prevent uploads it must be disabled explicitly (`mineru telemetry disable`).",
+          "citation": "README.md:388-400"
+        },
+        {
+          "claim": "Licensed under the MinerU Open Source License, based on Apache 2.0 with additional conditions.",
+          "citation": "README.md:1028"
+        }
+      ],
+      "install": [
+        {
+          "method": "uv venv + uv pip install from PyPI (stable 4.x); optional NVIDIA extra. Linux and macOS activation documented",
+          "command": "pip install uv\nuv venv .mineru --python 3.12\nsource .mineru/bin/activate\nuv pip install -U \"mineru>=4.0,<5\"\n# optional (NVIDIA): uv pip install -U \"mineru[full]>=4.0,<5\"",
+          "citation": "README.md:73-86; README.md:119; docs/en/quick_start/extension_modules.md:18"
+        },
+        {
+          "method": "uv tool install (isolated CLI; preferred in the agent guide)",
+          "command": "uv tool install --python 3.12 \"mineru>=4.0,<5\"",
+          "citation": "README.md:307"
+        },
+        {
+          "method": "pipx",
+          "command": "pipx install \"mineru>=4.0,<5\"",
+          "citation": "README.md:324"
+        },
+        {
+          "method": "global pip",
+          "command": "pip install \"mineru>=4.0,<5\"",
+          "citation": "README.md:353"
+        },
+        {
+          "method": "Docker image build (Linux with NVIDIA GPU; WSL2 on Windows). Image installs mineru[torch]>=4.0,<5 from the package index, not from the checkout",
+          "command": "docker build -t mineru:4 -f docker/global/Dockerfile .",
+          "citation": "docs/en/quick_start/docker_deployment.md:10; docs/en/quick_start/docker_deployment.md:19"
+        },
+        {
+          "method": "Agent skill install (fetches skills/mineru/SKILL.md; the agent then installs the CLI)",
+          "command": "npx skills add opendatalab/MinerU --skill mineru --global --yes",
+          "citation": "README.md:66"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - Linux is a documented target (README.md:77-78, 538-541; docs/en/quick_start/docker_deployment.md:3). x86_64 is not named in the README; docker/global/Dockerfile:4 states x86_64 and AArch64 support and CI jobs run on ubuntu-latest (.github/workflows/cli.yml:16).",
+        "wsl2": "yes (indirect) - Docker guide targets 'Linux with NVIDIA GPUs (WSL2 on Windows)' (docs/en/quick_start/docker_deployment.md:3) and the FAQ covers a WSL2 Ubuntu 22.04 libGL error (docs/en/faq/index.md:19-29). No dedicated WSL2 install section and no WSL2 CI.",
+        "macos_arm64": "yes - pyproject.toml:44 auto-adds mineru[torch] on darwin/arm64; README.md:119 says the default macOS install is already the best-throughput package; Apple Silicon uses PyTorch/MPS + llama.cpp (README.md:537; docs/en/usage/tiers.md:31). Docker gives no MPS (docs/en/quick_start/docker_deployment.md:3). macOS runs in CI only via the manual docvortex-boundary workflow (.github/workflows/docvortex-boundary.yml:32).",
+        "gpu": "yes for NVIDIA (CUDA via mineru[full]: vLLM on Linux, LMDeploy on Windows, pyproject.toml:103-108; Volta+ with 8 GB+ VRAM and 16 GB RAM recommended for torch standard, README.md:512-517, 454-460; docker/global/Dockerfile:1) and Apple MPS (README.md:537); Vulkan through llama.cpp in the base package (README.md:119); CPU-only works for flash/basic/standard via ONNX + llama.cpp (README.md:456-458). Other accelerators (npu/gcu/musa/mlu/sdaa) need a self-installed torch/vllm (README.md:517); AMD and vendor adaptations stay on MinerU<4 (docs/en/usage/tiers.md:56; docs/en/usage/compatibility.md:3); non-NVIDIA Docker is pending (README.md:125)."
+      },
+      "integrations": {
+        "cli": "yes - `mineru` document-library CLI: parse, read, scan, watch, search, find, usage, list, show, telemetry, server, config, invalidate, forget, cleanup, version (mineru/cli/main.py:25-42, 78-93); `mineru-kit`: parse, webui, api-server, vlm-server, router, models, version (mineru/kit/main.py:15-23, 54-66); README.md:83-87, 121. Library commands need the background server (`mineru server start`, README.md:464-468).",
+        "mcp": "none found - no MCP server code in mineru/ (case-insensitive grep for 'mcp' in *.py matched only an unrelated 'memcpy' comment) and the README never mentions MCP. docs/next/roadmap.md:123 and :239 list an MCP Server as planned ('P1'); docs/zh/usage/plugin/Cherry_Studio.md:36,48 refers to a separate `mineru-mcp` package run via uvx, which is not part of this repository.",
+        "sdk_or_api": "yes - Python SDK: stateless `mineru.parser.parse/parse_async/MinerUParser/MinerUApiParser/ParseResult` (mineru/parser/__init__.py:16-57; docs/en/usage/sdk_api.md:5-91) and library client `mineru.DoclibClient` with ensure_parse, get_parse, read_content, search, find, watch/scan/config methods (mineru/__init__.py:48-56; mineru/doclib/client.py:93-398; README.md:89-117). HTTP: self-hosted V1 API via `mineru-kit api-server` with /v1/health, /models, /tiers, /uploads, /files, /parse/jobs, /usage (mineru/parser/api_server.py:1625-2059; docs/en/usage/http_api.md); it deliberately does not implement the doclib /search, /docs, /parses, /invalidate routes (docs/next/cli/mineru-kit-api-server.md:190-203). The doclib server exposes its own /api/v1 HTTP API (incl. GET /search, GET /content) over a Unix socket or loopback TCP (mineru/doclib/server.py:262-1108; docs/next/architecture.md:94).",
+        "claude_code_or_codex": "No client-specific integration found; README.md and skills/mineru/SKILL.md do not name Claude Code or Codex. The only agent integration is a generic Agent Skill (skills/mineru/SKILL.md, front matter name: mineru, which the README itself also carries at README.md:1-4) installed with the `npx skills add ...` message, which tells the agent to save it 'under the appropriate global skills directory for the current agent' (README.md:63-67). The skill drives the `mineru` CLI through a shell and instructs agents to prefer MinerU over other parsers and to record that preference in global agent memory (README.md:66, 142; skills/mineru/SKILL.md:3). Process-name detection for claude/codex/cursor etc. exists only for telemetry classification (mineru/doclib/telemetry/caller.py:12-40). CLAUDE.md is contributor guidance for coding agents working on this repo, not a user integration."
+      },
+      "telemetry_and_network": "TELEMETRY (doclib server only; mineru-kit and mineru.parser contain no telemetry code - grep of mineru/ finds it only under mineru/doclib/ and mineru/cli/). Metrics are hourly-aggregated counters with enumerated dimensions (source, caller, status, tier, server, error_code, size/duration buckets; mineru/doclib/telemetry/constants.py:152-226) plus a context of random installation_id, app version, OS, arch, Python version, install channel, CPU-count bucket and GPU vendor (mineru/doclib/telemetry/payload.py:58-68). A background loop started with the server POSTs batches to https://mineru.net/metrics/v2/metrics every 7200 s (constants.py:16,22; mineru/doclib/telemetry/service.py:235-256; mineru/doclib/app.py:180-189), HMAC-signed with an app key/secret hard-coded in source (constants.py:17-18; transport.py:12-21). Consent starts 'unset' (store.py:39); recording stops only when 'disabled' (service.py:172) and the background flush runs in every state except 'disabled' (service.py:100-102; the stricter '!= CONSENT_ENABLED' line is commented out with 'recover after prerelease'), so data is uploaded while consent is unset unless the user runs `mineru telemetry disable` (which also deletes unsent aggregates, store.py:57-60). The first-run prompt (default Yes) is skipped for agent-launched processes, --json/--help, CI env and non-TTY (mineru/cli/telemetry.py:58-59,69,84-94). docs/next/telemetry-minimum.md:114,134,349 and docs/next/roadmap.md:34 say 'unset' must not upload, and the manual `mineru telemetry flush` refuses unless enabled (mineru/doclib/server.py:1085-1092): code and design docs differ. No environment-variable kill switch found (docs/next/config.md:284 lists MINERU_TELEMETRY as undecided). DOCUMENT UPLOAD: none by default; remote parsing goes to https://mineru.net/api (mineru/doclib/config_defaults.py:14; mineru/kit/common.py:102-109) only with --remote/--remote-url or a parsing rule with the remote flag (mineru/doclib/services/parse_svc.py:643-647,706), needs a mineru.net API key (MINERU_API_KEY, README.md:884-891) and supports PDF/images only (parse_svc.py:722-727). No account is needed for local use. MODEL DOWNLOADS: on first model use from Hugging Face or ModelScope; 'auto' probes https://huggingface.co/models then falls back to ModelScope (mineru/model/download.py:150-166); repos listed in mineru/model/registry.py:15-77; no revision or checksum pinning (no such parameters in download.py); MINERU_MODEL_SOURCE=local blocks downloads (docs/en/usage/model_source.md:16,66). OTHER OUTBOUND (user-configured/off by default): LLM-aided title leveling and cross-page table merge, disabled, default base_url is DashScope (mineru/config.py:392-407; docs/en/usage/model_source.md:93); remote VLM endpoint model.vlm.server_url, unset (model_source.md:68-79); the V1 API server fetches https `url` sources server-side (mineru/parser/api_server.py:1034-1049,1384-1401); the Gradio WebUI Office preview iframes https://view.officeapps.live.com with a URL of the WebUI file (mineru/kit/gradio/app.py:1331-1340); no Gradio analytics setting found in mineru/ (Gradio's own defaults then apply; not verified). LOCAL LISTENERS: doclib on Unix socket $MINERU_HOME/doclib.sock mode 0600, TCP 127.0.0.1:15980 only when UDS is unavailable, no authentication (mineru/config.py:297-310,545-555; mineru/doclib/app.py:511-532); managed parse server 127.0.0.1:16580 (mineru/config.py:379-383); api-server and WebUI default to 127.0.0.1 (mineru/kit/commands/api_server.py:34; mineru/kit/commands/webui.py:65)."
+    },
+    "code": {
+      "languages": [
+        "Python (primary, mineru/)",
+        "JavaScript (Gradio WebUI assets in mineru/resources/*.js and 7 Node .cjs UI tests)",
+        "SQL (SQLite migrations, mineru/doclib/migrations/*.sql)",
+        "HTML/CSS (viewers and WebUI resources)",
+        "Shell (scripts/http_api_example.sh)",
+        "Dockerfile/YAML (docker/, .github/workflows/). The Rust native engine is in the external docvortex repo, not here"
+      ],
+      "entry_points": [
+        {
+          "path": "pyproject.toml:121 -> mineru/cli/main.py:96-99",
+          "what": "`mineru` console script: Typer CLI for the document library (parse, read, scan, watch, search, find, usage, list, show, telemetry, server, config, invalidate, forget, cleanup, version)"
+        },
+        {
+          "path": "pyproject.toml:122 -> mineru/kit/main.py:69-72",
+          "what": "`mineru-kit`: stateless `parse` (markdown | middle_json | zip), `webui`, `api-server`, `vlm-server`, `router`, `models`, `version`"
+        },
+        {
+          "path": "pyproject.toml:127 -> mineru/kit/commands/api_server.py:123-129 (server in mineru/parser/api_server.py)",
+          "what": "`mineru-api` / `mineru-kit api-server`: self-hosted V1 HTTP API (/v1/uploads, /files, /parse/jobs, /health, /usage); default 127.0.0.1:8000; optional --api-key"
+        },
+        {
+          "path": "pyproject.toml:123 -> mineru/kit/router/cli.py",
+          "what": "`mineru-router`: V1 API router over local GPU workers or upstream api-servers"
+        },
+        {
+          "path": "pyproject.toml:124 -> mineru/kit/commands/webui.py",
+          "what": "`mineru-webui`: Gradio WebUI (default 127.0.0.1) backed by the V1 API"
+        },
+        {
+          "path": "pyproject.toml:125 -> mineru/kit/commands/vlm_server.py",
+          "what": "`mineru-openai-server`: OpenAI-compatible VLM server (adapters for llama.cpp, vLLM, LMDeploy, MLX in mineru/kit/vlm_server/)"
+        },
+        {
+          "path": "pyproject.toml:126 -> mineru/kit/commands/models.py",
+          "what": "`mineru-models-download` (also `mineru-kit models download|verify|show`)"
+        },
+        {
+          "path": "mineru/doclib/app.py:443-532,727 (spawned by mineru/cli/commands/server.py:243)",
+          "what": "doclib server `python -m mineru.doclib.app`: FastAPI/uvicorn on a Unix socket (0600) or loopback TCP; SQLite + FTS5; background workers; started with `mineru server start`"
+        }
+      ],
+      "architecture": "(1) CLI `mineru/cli/` (Typer, commands in cli/commands/*.py) talks through `mineru/doclib/client.py` (httpx over UDS/loopback, /api/v1) to (2) the doclib server `mineru/doclib/`: app.py bootstrap; server.py routes -> services/{parse,search,scan,config,cleanup}_svc.py -> core/{db,fts,file_io}.py; SQLite WAL + FTS5 schema in migrations/*.sql; asyncio workers in background/{watch,ingest,scan_worker,parse_worker,compaction,device_monitor,parse_server_health,telemetry_flush}.py; telemetry/. Docs are SHA-256 content-addressed with 7+ hex-char short_ids (parse_svc.py:176-230). Ingestion control: `scan` (one-off), `watch add` (persistent, recursive), config exclude-rules/parsing-rules, forget, cleanup (README.md:763-837). Non-text files get an automatic flash parse on ingest; text/Markdown files are indexed directly (parse_svc.py:615-635). Quality tiers run on a managed local (127.0.0.1:16580), self-hosted or remote (mineru.net) V1 parse server, `mineru/parser/api_server.py`; flash runs in-process. (3) Parse core: parser/mineru_parser.py (MinerUParser) -> backend/analyze.py doc_analyze -> backend/analysis/{pdf/pipeline.py, office.py, epub.py, html.py, mhtml.py, ofd.py, csv.py} (non-PDF analyzers and Flash PDF text come from external `docvortex.analyzers.native`) -> backend/postprocess/ (middle JSON schema 2.0; optional LLM-aided title leveling/table merge) -> render/ (nine formats, mostly via docvortex). ML code: model/{layout,ocr,mfr,table,vlm,runtime}/ with model/registry.py + download.py. (4) Stateless tools: mineru/kit/ (commands/{parse,api_server,webui,router,vlm_server,models}.py, gradio/, router/, vlm_server/). `mineru-kit parse` expands directories non-recursively and writes <stem>.md|.json|.zip, failing on name collisions (kit/common.py:26-37,66-99); ParseResult.save writes markdown.md, middle_json.json, structured_content.json, images/ and optionally model_output.json (parser/base.py:88-110). `mineru parse --json` is a command envelope, not middle JSON (docs/en/reference/output_files.md:16). V1 API uploads/jobs live in memory only and are lost on restart; default caps are 100 files per job and 200 MiB per file (docs/en/usage/http_api.md:59; mineru/parser/api_server.py:83-84,475). Shared: mineru/types.py, config.py, filetypes.py, errors.py.",
+      "packaging_and_release": "setuptools backend (pyproject.toml:1-3), dynamic version from mineru.version.__version__ (pyproject.toml:129-130). At this tag mineru/version.py:1 reads 4.0.9 although the tag is mineru-4.0.10-released, because the release workflow's update-version job rewrites version.py on master after the tag push (.github/workflows/python-package.yml:18-62; update_version.py:32-42). Release workflow python-package.yml: triggered by tags '*released' or manual dispatch (lines 6-10); builds a wheel only (`python -m build --wheel`, line 117; no sdist) with `twine check --strict` (121), from `ref: master` rather than the tagged commit (104-108); uploads the wheel to a GitHub Release via softprops/action-gh-release pinned to a commit SHA (146-150) and publishes to PyPI with pypa/gh-action-pypi-publish@release/v1 using OIDC (id-token: write, environment pypi; 134-138,154-155). No checksum file, signature, SBOM or explicit provenance/attestation step is defined (none found in .github/workflows/). The install-check job installs `-e .[core]` (line 92) although `core` is no longer an extra (docs/en/quick_start/extension_modules.md:21). Docker: docker/global/Dockerfile and docker/china/*.Dockerfile plus docker/compose.yaml; the global image pip-installs `mineru[torch]>=4.0,<5` from the index (docker/global/Dockerfile:16) and no workflow here builds or pushes images. Source install: `uv pip install -e .` (docs/en/quick_start/index.md:89).",
+      "tests_and_ci": "pytest (pyproject.toml:147-158, addopts '-s --cov=mineru --cov-report html'); coverage's command_line runs `-m pytest tests/unittest` (pyproject.toml:160-162). tests/unittest/ holds 127 test_*.py files with 1480 `def test_` definitions (grep count), 7 Node .cjs UI tests, plus tests/benchmarks/pdf_cpu_gaps.py and tests/browser/gradio_pdf_fixtures.py; docs/next/code-map.md:35 reports about 2372 tests at an older commit (counting method unstated). Markers e2e/smoke/slow/remote/full_stack/isolated_home/lifecycle are declared (pyproject.toml:150-158) but unused in tests/ (grep); the CLI e2e suite exists only as a document (docs/next/cli/mineru-e2e-test-cases.md). tests/README.md:13 documents three pre-existing failing assertions (two Doclib extras metadata, one MFR LaTeX). Workflows (6 files in .github/workflows/): cli.yml (push to master/dev; ubuntu-latest, Python 3.12; `uv pip install .[test]`, `coverage run`, then tests/get_coverage.py which only asserts coverage >= 0.2%, tests/get_coverage.py:20); python-package.yml (release + install check on Python 3.10-3.13); docvortex-boundary.yml (manual only; ubuntu/windows/macos x Python 3.10/3.13/3.14; installs a frozen DocVortex native wheel and runs 16 selected unit-test files, lines 28-33,243-262); mkdocs.yml (strict docs build + tests/unittest/test_http_api_example_script.py; publishes GitHub Pages from master, lines 29-32,34-69); cla.yml (CLA assistant); rerun.yml (re-runs a workflow named 'ci' on a runner labelled 'pdf'; no such workflow exists, rerun.yml:5,10). No CodeQL, dependency-review or Dependabot configuration found.",
+      "dependencies": "pyproject.toml is the only Python manifest; no lock file (no uv.lock/poetry.lock/requirements*.txt except docs/requirements.txt). [project].dependencies has 38 entries (pyproject.toml:41-80): 37 third-party plus 1 self-reference (`mineru[torch]` on macOS arm64, line 44). Notable: docvortex>=0.5.4,<1 (external native-document engine, line 42), mineru-vl-utils>=2.0.5,<3, mineru-llama-cpp>=0.1.2,<1, gradio>=6.8,<7, pypdfium2>=5.10.1,<6, onnxruntime, opencv-python, openai, modelscope, huggingface-hub, jieba, fastapi/uvicorn/python-multipart/requests/httpx/packaging (unbounded). Extras (lines 82-111): dev 1 (lxml-stubs), test 8, torch 5 (torch, torchvision, transformers, accelerate, safetensors), full 4 (self-reference + vllm [linux] + lmdeploy [win32] + qwen-vl-utils [win32]), all 1 (self-reference). docs/requirements.txt pins 5 mkdocs packages. requires-python >=3.10,<3.15 (pyproject.toml:12).",
+      "security_policy": "SECURITY.md exists: supported versions 'latest' (SECURITY.md:5); report privately at https://github.com/opendatalab/MinerU/security, not in public issues (SECURITY.md:9-11); asks reporters not to disclose publicly before a fix (SECURITY.md:31)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Document library: discover files, cache results, search content, continue by page or block, preserve stable citation locators (README.md:52)",
+        "verified": "partial",
+        "evidence": "Discovery, caching, continuation and locators exist: os.walk scan and recursive watch (mineru/doclib/services/scan_svc.py:295-301; mineru/doclib/background/watch.py:96-119), SHA-256 doc identity with 7+ hex short_id (mineru/doclib/services/parse_svc.py:176-230), locator regex (mineru/doclib/locators.py:10-15), continuation markers (mineru/cli/commands/read.py:162-165). But search is FTS5 keyword-only and document-level, with no page/block locator in results (mineru/doclib/types.py:330-339; mineru/doclib/services/search_svc.py:88-108), and each document is indexed from at most 30,000 characters (mineru/doclib/services/parse_svc.py:84-85,236-239)."
+      },
+      {
+        "claim": "MinerU is not a RAG framework, vector database, or chat-with-doc application (README.md:136)",
+        "verified": "yes",
+        "evidence": "No embedding/vector/hybrid/rerank code in mineru/doclib or mineru/cli (grep for embedding|vector|rerank|bm25|faiss|chroma: no matches); content search is SQLite FTS5 only (mineru/doclib/core/fts.py:72-89; mineru/doclib/migrations/001_init.sql:93-100); the roadmap lists chunking, embeddings, vector DBs and RAG as out of scope (docs/next/roadmap.md:94-102)."
+      },
+      {
+        "claim": "Plain text is read directly rather than parsed (README.md:57,176); docs/en/usage/tiers.md:12 adds that plain text 'can be indexed and read by the document library'",
+        "verified": "partial",
+        "evidence": "Indexing is true: .md/.markdown/.mdx/.txt/etc. are ingestible and discoverable (mineru/filetypes.py:45-47,60-63) and their text (first + last 15,000 chars) is stored in FTS with tier=null (mineru/doclib/services/parse_svc.py:615-627). Reading through the library is not: `read` by locator, `parse` and `invalidate` raise parse_not_required for text file types (mineru/doclib/server.py:456-461,715-720; mineru/doclib/services/parse_svc.py:710-715). The README wording matches the code; docs/en/usage/tiers.md:12 does not (code preferred)."
+      },
+      {
+        "claim": "Multiple input formats: PDF, images, DOC/DOCX, PPT/PPTX, XLS/XLSX, RTF, ODT/ODS/ODP, EPUB, OFD, HTML/MHTML, CSV/TSV (README.md:51)",
+        "verified": "yes",
+        "evidence": "Extension whitelists and tier rules in mineru/filetypes.py:28-57 (PDF/images tiered; Office/ODF/RTF/EPUB/OFD/HTML/MHTML/CSV flash-only); routing in mineru/backend/analyze.py:50-83. The Office/EPUB/HTML converters are imported from the external docvortex package (mineru/backend/analysis/office.py:9-33; epub.py:9; html.py:9), which was not reviewed; conversion quality was not tested."
+      },
+      {
+        "claim": "Documents are not automatically uploaded to the official service; remote parsing requires explicit configuration (README.md:57,372-376)",
+        "verified": "yes",
+        "evidence": "privacy is 'remote' only when the request sets remote (mineru/doclib/services/parse_svc.py:706); local mode 'disabled' raises no_engine instead of falling back to remote (parse_svc.py:1194-1196); parsing rules reach remote only through an explicit rule flag (parse_svc.py:643-647); `mineru-kit parse` uses a remote URL only with --remote/--remote-url (mineru/kit/common.py:102-109). Telemetry is a separate upload channel (see telemetry_and_network)."
+      },
+      {
+        "claim": "The default install works out of the box: ONNX CPU small models and llama.cpp VLM in Vulkan mode (README.md:119)",
+        "verified": "partial",
+        "evidence": "Base dependencies include onnxruntime and mineru-llama-cpp (pyproject.toml:46,75), and `mineru-kit parse` runs tier standard in-process by default (mineru/kit/commands/parse.py:91), downloading models on first use (docs/en/quick_start/index.md:43; mineru/model/download.py:338-370). The library CLI differs: parse_server.local.mode defaults to 'disabled' (mineru/doclib/config_defaults.py:10), so `mineru parse` on a PDF without --tier raises quality_tier_unavailable until models are downloaded and managed mode is configured (mineru/doclib/services/parse_svc.py:1503-1510; README.md:553-569). Vulkan behaviour belongs to the external mineru-llama-cpp package and was not verified."
+      },
+      {
+        "claim": "`full` extra installs ONNX + PyTorch + llama.cpp + vLLM/lmdeploy/mlx (README.md:450)",
+        "verified": "partial",
+        "evidence": "pyproject.toml:103-108 defines full = mineru[torch] + vllm (linux) + lmdeploy and qwen-vl-utils (win32); there is no mlx package. tests/unittest/test_doclib_app_startup.py:106 asserts mlx-vlm is not in extras['full'] and docs/plans/2026-07-21-model-tier-scope-design.md:12 says MLX is installed separately. Code preferred over README."
+      },
+      {
+        "claim": "Telemetry is anonymous/aggregated and excludes contents, file names, paths and queries; disable explicitly to prevent uploads (README.md:388-400)",
+        "verified": "yes",
+        "evidence": "Payload = enumerated metric dimensions plus coarse environment context, with no content/path fields (mineru/doclib/telemetry/constants.py:152-226; payload.py:58-68). Opt-out semantics match the code: consent starts 'unset' (store.py:39) and flush skips only 'disabled' (service.py:100-102), so uploads happen until `mineru telemetry disable`. Design docs claim the opposite (docs/next/telemetry-minimum.md:349; docs/next/roadmap.md:34) and manual flush requires 'enabled' (mineru/doclib/server.py:1085-1092): code differs from those docs."
+      },
+      {
+        "claim": "`mineru parse` defaults to the first 10 PDF pages; `mineru-kit parse` defaults to all pages (README.md:121)",
+        "verified": "yes",
+        "evidence": "default_parse_range returns '1-10' (mineru/doclib/services/parse_svc.py:169-173); CLI help text (mineru/cli/commands/parse.py:89); mineru-kit parse help 'default: all pages' (mineru/kit/commands/parse.py:36)."
+      },
+      {
+        "claim": "Agent skill installable with `npx skills add opendatalab/MinerU --skill mineru --global --yes` (README.md:66)",
+        "verified": "partial",
+        "evidence": "skills/mineru/SKILL.md exists with front matter name: mineru (lines 1-4) and the same content as the README Agent Guide, so `--skill mineru` maps to a real file. The external `npx skills` installer and the target directories for Claude Code or Codex are outside this repo and not checkable; the README names no specific client."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "pipeline backend accuracy (3.0.0 release note)",
+        "metric": "OmniDocBench v1.5 score",
+        "value": "86.2 (claimed to surpass MinerU2.0-2505-0.9B VLM); OmniDocBench is maintained by the same org (README.md:1093)",
+        "source": "docs/en/reference/changelog.md:74",
+        "independent": false
+      },
+      {
+        "what": "Hybrid effort=medium vs effort=high (3.3 release note)",
+        "metric": "OmniDocBench v1.6 overall accuracy delta; parsing speed gain",
+        "value": "-0.13 points accuracy; +35% to +220% speed depending on device/scenario",
+        "source": "docs/en/reference/changelog.md:42",
+        "independent": false
+      },
+      {
+        "what": "PP-OCRv6 OCR model in the pipeline backend (3.4 release note)",
+        "metric": "OCR accuracy on OmniDocBench v1.6",
+        "value": "about +11% (no absolute figure given)",
+        "source": "docs/en/reference/changelog.md:25",
+        "independent": false
+      },
+      {
+        "what": "OCR inference/processing pipeline optimization (3.4 release note)",
+        "metric": "OCR processing speed",
+        "value": "about +100% (no absolute figure given)",
+        "source": "docs/en/reference/changelog.md:27",
+        "independent": false
+      },
+      {
+        "what": "Native DOCX parsing vs converting DOCX to PDF then parsing (3.0.0 release note)",
+        "metric": "end-to-end speed",
+        "value": "'tens of times' faster (no figures given)",
+        "source": "docs/en/reference/changelog.md:72",
+        "independent": false
+      },
+      {
+        "what": "MinerU2.5 1.2B VLM vs Gemini 2.5 Pro, GPT-4o, Qwen2.5-VL-72B, dots.ocr, MonkeyOCR, PP-StructureV3 (2.5.2 release note)",
+        "metric": "OmniDocBench accuracy (qualitative)",
+        "value": "'comprehensively surpasses' (no numbers in the repo; technical reports at arXiv 2409.18839, 2509.22186, 2604.04771 are linked at README.md:26-28 but were not opened)",
+        "source": "docs/en/reference/changelog.md:192",
+        "independent": false
+      },
+      {
+        "what": "MinerU 2.0 VLM served with sglang on one NVIDIA 4090 (2.0 release note)",
+        "metric": "peak throughput",
+        "value": "> 10,000 tokens/s",
+        "source": "docs/en/reference/changelog.md:358",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Search scope: content search is keyword-only SQLite FTS5 (unicode61 + jieba), ordered by rank, with query operators/quotes stripped, tokens implicitly AND-ed and any FTS error swallowed into an empty result (mineru/doclib/core/fts.py:72-89,137-144; mineru/doclib/migrations/001_init.sql:93-100). No embedding/vector/hybrid code exists in mineru/doclib or mineru/cli, and the roadmap puts embeddings, vector DBs, chunking and RAG out of scope (docs/next/roadmap.md:94-102). Each document gets one index row capped at 30,000 chars (first 15,000 + last 15,000), so mid-document text is not searchable (mineru/doclib/services/parse_svc.py:84-85,236-239,1372-1379); only the top 200 FTS hits are considered, so `total` never exceeds 200 (mineru/doclib/services/search_svc.py:37,110-111); results are document-level (short_id, snippet, tier, file paths) with no page/block locator (mineru/doclib/types.py:330-339). No retrieval-quality benchmark is published in the repo.",
+      "Markdown collections: Markdown/text files are discoverable and indexed (tier null) but cannot be read back through MinerU; `mineru read doc:...`, `parse` and `invalidate` raise parse_not_required for text file types, so the caller must open the file path returned by search (mineru/filetypes.py:45-47,60-63; mineru/doclib/services/parse_svc.py:615-627,710-715; mineru/doclib/server.py:456-461,715-720). `--tier`/`--min-tier` filters drop every tier-null (text/Markdown) hit (mineru/doclib/services/search_svc.py:191-200; docs/next/cli/mineru-library.md:31), and docs/en/usage/tiers.md:12 claims text can be 'read by the document library', which the code contradicts.",
+      "Telemetry default: aggregated usage data is uploaded to https://mineru.net/metrics/v2/metrics while consent is still 'unset', because consent starts unset and the background flush skips only 'disabled' (mineru/doclib/telemetry/store.py:39; service.py:100-102, where the stricter enabled-only check is commented out). The consent prompt is never shown to agent-launched processes, --json, CI or non-TTY use (mineru/cli/telemetry.py:84-94), and the upload signing key/secret is hard-coded (constants.py:17-18). Design docs say the opposite (docs/next/telemetry-minimum.md:349; docs/next/roadmap.md:34). No environment-variable switch found; opt-out is `mineru telemetry disable` (README.md:392-399). Only the doclib path (`mineru` CLI/DoclibClient) is affected; mineru-kit and mineru.parser have no telemetry code.",
+      "Setup/runtime cost: the library workflow needs a resident background server (`mineru server start`) holding SQLite state in ~/.mineru, and its local quality parse server is 'disabled' by default, so PDFs/images fail with quality_tier_unavailable/no_engine until models are downloaded and parse_server.local.mode=managed is set, or --remote/--tier flash is used (mineru/doclib/config_defaults.py:10; mineru/doclib/services/parse_svc.py:1194-1196,1503-1510; README.md:553-569). Models are fetched on first use from Hugging Face/ModelScope with no revision or checksum pinning, and the llama.cpp GGUF VLM repo sits under a personal namespace (jinzhenj/...) (mineru/model/download.py:224-244,338-370; mineru/model/registry.py:67-77). Higher tiers need substantial RAM/VRAM (README.md:454-460; docs/en/usage/tiers.md:54); AMD and vendor accelerators remain on MinerU<4 and non-NVIDIA Docker is pending (docs/en/usage/compatibility.md:3; README.md:125).",
+      "External dependency and drift: all non-PDF converters (Office, OpenDocument, RTF, EPUB, HTML/MHTML, OFD, CSV) and the Flash PDF text path are implemented in the external `docvortex` package (>=0.5.4,<1; Rust ABI3 native extension in the separate personal-account repo myhloli/docvortex), not in this repository, so that code was not reviewed (mineru/backend/analysis/office.py:9-33; epub.py:9; html.py:9; pyproject.toml:42; README.md:51; .github/workflows/docvortex-boundary.yml:59-94; CLAUDE.md:155-157). No lock file exists and several runtime deps are unbounded (pyproject.toml:47-69). Docs lag code, e.g. docvortex>=0.4.19 in docs/en/reference/output_files.md:99 and changelog.md:7 versus pyproject.toml:42, and README.md:450 lists mlx under the full extra although pyproject.toml:103-108 does not.",
+      "Release provenance and test gates: the wheel is built from `master` at workflow time rather than the tagged commit, the tagged commit's version.py reads 4.0.9 while the tag is 4.0.10 (bumped by a bot commit afterwards), only a wheel is built (no sdist), and no checksum/signature/attestation/SBOM step is defined; the install check uses a removed `core` extra (.github/workflows/python-package.yml:18-62,92,104-121,146-155; mineru/version.py:1; update_version.py:32-42). Test gates are thin: the CI coverage threshold is 0.2% (tests/get_coverage.py:20), three failing assertions are documented as pre-existing (tests/README.md:13), declared e2e/remote/full_stack markers are unused (pyproject.toml:150-158), and rerun.yml targets a workflow that does not exist (.github/workflows/rerun.yml:5,10).",
+      "Service exposure: the doclib API has no authentication and relies on socket mode 0600 or loopback TCP (mineru/config.py:297-310; the only Authorization handling in mineru/doclib is outbound, parse_server_health.py:505), while docker/compose.yaml publishes api-server, router, WebUI and VLM server on 0.0.0.0 with no --api-key (docker/compose.yaml:13-17,43-48,73-78,114-119); upstream itself warns to pair 0.0.0.0 with --api-key or a proxy (docs/en/usage/http_api.md:58). The V1 API fetches caller-supplied https URLs server-side with only scheme and size checks (no host/IP restriction found), and --allow-local-source reads server-local paths and is enabled for the managed parse server (mineru/parser/api_server.py:1034-1058,1384-1406; mineru/doclib/background/parse_server_health.py:116); the bearer key is compared with `!=` (api_server.py:2461).",
+      "Licensing and maintenance: custom 'MinerU Open Source License' (Apache-2.0 plus extra terms: a separate commercial license is required if you and your affiliates exceed 100M MAU or USD 20M monthly revenue, attribution is mandatory when offering online services, and rights terminate automatically on breach) is not a standard SPDX license (LICENSE.md:5-18; pyproject.toml:8); the project moved from AGPLv3 in 3.1.0 (docs/en/reference/changelog.md:55). Vendored OFD-to-HTML code lists LICENSE and UPSTREAM.md as package data but neither file exists in the tree (pyproject.toml:138); model weights carry their own licenses (not reviewed). 4.0 is a breaking rewrite with further unreleased breaking CLI/API changes (docs/en/reference/changelog.md:5-16), and the design docs under docs/next are mostly Chinese and marked Draft (docs/next/architecture.md:3)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "opendatalab/mineru",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "uv venv + uv pip install from PyPI (stable 4.x); optional NVIDIA extra; Linux and macOS activation documented: `pip install uv` / `uv venv .mineru --python 3.12` / `source .mineru/bin/activate` / `uv pip install -U \"mineru>=4.0,<5\"` / optional `uv pip install -U \"mineru[full]>=4.0,<5\"`",
+          "citation": "README.md:73-86; README.md:119; docs/en/quick_start/extension_modules.md:18",
+          "holds": true,
+          "note": "Commands match README.md:74, 75, 78 and 84 exactly. Line 77 reads '# Linux/macOS' and line 71 says 'Install MinerU 4.0 stable'. README.md:119 recommends installing `mineru[full]>=4.0` on NVIDIA GPUs, and extension_modules.md:18 gives exactly `uv pip install -U \"mineru[full]>=4.0,<5\"`. Two things are left out but nothing is wrong: Windows PowerShell activation is also documented (README.md:79-80), and README.md:119 says the Windows GPU torch build must be installed separately, so the optional NVIDIA line as written covers Linux."
+        },
+        {
+          "field": "license",
+          "statement": "spdx LicenseRef-MinerU-Open-Source-License; file LICENSE.md",
+          "citation": "pyproject.toml:8-9; LICENSE.md:1-27; README.md:1028",
+          "holds": true,
+          "note": "pyproject.toml:8 declares `license = \"LicenseRef-MinerU-Open-Source-License\"` and :9 `license-files = [\"LICENSE.md\"]`. LICENSE.md is the 'MinerU Open Source License': Apache-2.0 plus extra terms. Those terms require a separate commercial license above 100M MAU or USD 20M monthly revenue, require attribution for online services, and end all rights automatically on breach of those terms (lines 3-18). README.md:1028 agrees ('based on Apache 2.0 with additional conditions'). It is a custom LicenseRef, not an SPDX-listed or OSI license."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - Linux is a documented target (README.md:77-78, 538-541; docker_deployment.md:3). x86_64 is not named in the README; docker/global/Dockerfile:4 states x86_64 and AArch64 support and CI jobs run on ubuntu-latest (.github/workflows/cli.yml:16).",
+          "citation": "README.md:77-78, 538-541; docs/en/quick_start/docker_deployment.md:3; docker/global/Dockerfile:4; .github/workflows/cli.yml:16",
+          "holds": true,
+          "note": "README.md:77-78 covers Linux/macOS venv activation. docker_deployment.md:3 says the Docker setup 'targets Linux with NVIDIA GPUs (WSL2 on Windows)'. Dockerfile:4 says 'support x86_64 architecture and ARM(AArch64) architecture'. cli.yml:16 runs on ubuntu-latest, as do the python-package.yml, mkdocs.yml and cla.yml jobs. A case-insensitive search of README.md for x86_64/x86-64/amd64/aarch64/arm64 finds nothing. Minor citation slip: README.md:538 is the 'MacOS with Intel CPU' row; the Linux/Windows hardware rows are 539-543."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "none found - no MCP server code in mineru/ (grep for 'mcp' matched only an unrelated 'memcpy' comment) and the README never mentions MCP; docs/next/roadmap.md:123 and :239 list an MCP Server as planned (P1); docs/zh/usage/plugin/Cherry_Studio.md:36,48 refers to a separate `mineru-mcp` package run via uvx, not part of this repository.",
+          "citation": "grep -i mcp mineru/ and README.md; docs/next/roadmap.md:123,239; docs/zh/usage/plugin/Cherry_Studio.md:36,48",
+          "holds": true,
+          "note": "A case-insensitive search for 'mcp' across all files in mineru/ matches only mineru/model/mfr/unimernet/unimernet_hf/unimer_mbart/modeling_unimer_mbart.py:505 ('memcpy'). README.md has no match. No file anywhere in the repo has 'mcp' in its name, and pyproject.toml has no MCP dependency or entry point. roadmap.md:123 lists 'MCP Server ... P1 补齐' (to be completed in P1), and :239 under P1 says 'Server 扩展 Web UI 和 MCP Server' (the server gains a Web UI and an MCP Server). Cherry_Studio.md:36 sets the argument to `mineru-mcp`, and :48 says uvx installs and runs mineru-mcp."
+        },
+        {
+          "field": "claim_checks[7]",
+          "statement": "Telemetry is anonymous/aggregated and excludes contents, file names, paths and queries; disable explicitly to prevent uploads (verified: yes - consent starts 'unset', flush skips only 'disabled', so uploads happen until `mineru telemetry disable`; design docs and manual flush say otherwise)",
+          "citation": "README.md:388-400; mineru/doclib/telemetry/constants.py:152-226; mineru/doclib/telemetry/payload.py:58-68; mineru/doclib/telemetry/store.py:39; mineru/doclib/telemetry/service.py:100-102; docs/next/telemetry-minimum.md:349; docs/next/roadmap.md:34; mineru/doclib/server.py:1085-1092",
+          "holds": true,
+          "note": "README.md:388-392 says what the claim says. store.py:39 sets consent_state=unset at first start. service.py:100 has the enabled-only check commented out '(recover after prerelease)', and :101-102 stop the upload only when consent is disabled. The background loop (background/telemetry_flush.py:24-30, started at app.py:180,189) calls flush_once every 7200 s with no other gate, so an install left at 'unset' POSTs to https://mineru.net/metrics/v2/metrics (constants.py:16,22). The payload is installation_id, the context from payload.py:58-68 (app, version, os, arch, python, install_channel, cpu bucket, gpu vendor), and per-metric dimensions limited to the METRIC_SPECS keys (constants.py:181-226). There are no content, path or query fields. Disabling deletes unsent aggregates (store.py:57-60). telemetry-minimum.md:134,349 and roadmap.md:34 say 'unset' or non-TTY must not upload, and manual flush refuses unless enabled (server.py:1085-1092), as the dossier states. Caveat: _normalize_dimension_value (service.py:212-222) lets out-of-list values through for status, bucket, pages_bucket and output_format, so the value lists are not strictly enforced; those values are generated by the code itself."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

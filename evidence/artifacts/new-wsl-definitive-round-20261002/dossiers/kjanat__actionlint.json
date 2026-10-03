@@ -1,0 +1,324 @@
+{
+  "contender": "kjanat/actionlint",
+  "revision": {
+    "contender": "kjanat/actionlint",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "kjanat/actionlint",
+        "tag": "v1.17.0",
+        "commit": "08bb2c4f0d039744455b87aef1c647fb8b66d37b",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v1.17.0",
+    "commit": "08bb2c4f0d039744455b87aef1c647fb8b66d37b",
+    "read_at": "2026-10-02T03:02:18+00:00"
+  },
+  "dossier": {
+    "contender": "kjanat/actionlint",
+    "revision": {
+      "tag": "v1.17.0",
+      "commit": "08bb2c4f0d039744455b87aef1c647fb8b66d37b",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE.txt"
+    },
+    "purpose": "actionlint (kjanat fork of rhysd/actionlint) is a Go static checker for GitHub Actions workflow files: syntax, `${{ }}` expression typing, `uses:`/`with:` and step-output checks against local action metadata and an embedded popular-actions dataset, reusable-workflow checks, and ShellCheck/pyflakes runs on `run:` scripts (README.md:7-20; docs/checks.md:5-48). The fork adds three default-on cache-safety policies and opt-in policy checks (require-commit-hash, require-permissions, require-job-timeout, required-actions) read from .github/actionlint.yaml (README.md:9; docs/config.md:118-394). It is delivered as a CLI binary, Go library (module actionlint.kjanat.dev), Docker image, first-party Docker GitHub Action, pre-commit hooks, npm launcher package and Nix flake (README.md:9; docs/install.md). The product does not itself generate SBOMs, attestations, dependency-update PRs or code-scanning alerts; the repository's own pipeline uses Syft via GoReleaser, BuildKit sbom/provenance, actions/attest-build-provenance, Dependabot plus peter-evans/create-pull-request, and CodeQL (.goreleaser.yaml:38-41; .github/workflows/release.yml:58-72,174-255; .github/dependabot.yml:4-21; .github/workflows/upkeep.yml:55-75; .github/workflows/codeql.yml:41-54).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "actionlint is a static checker for GitHub Actions workflow files; an online playground runs it in the browser through WebAssembly.",
+          "citation": "README.md:7, README.md:139"
+        },
+        {
+          "claim": "Fork of rhysd/actionlint that carries the upstream checks plus cache safety policies enabled by default, configurable opt-in policy checks, composite action step validation, shell completion and a first-party GitHub Action; it ships attested binaries, a Docker image on GHCR and Docker Hub, and a Go module at actionlint.kjanat.dev.",
+          "citation": "README.md:9"
+        },
+        {
+          "claim": "Features: syntax check of workflow files; strong type check of `${{ }}` expressions; actions usage check of `with:` inputs and `steps.{id}.outputs`; reusable workflow check; ShellCheck and pyflakes integrations for `run:`; security checks (script injection by untrusted inputs, hard-coded credentials); glob, `needs:`, runner-label and cron validation.",
+          "citation": "README.md:13-20"
+        },
+        {
+          "claim": "actionlint focuses on finding mistakes and tries to catch as many errors as possible while keeping false positives minimal.",
+          "citation": "README.md:133"
+        },
+        {
+          "claim": "Install with npm, Homebrew, AUR, Scoop or mise, or download a release archive; `npx @kjanat/actionlint`; `go install actionlint.kjanat.dev/cmd/actionlint@latest`.",
+          "citation": "README.md:117-129"
+        },
+        {
+          "claim": "The GitHub Action is a Docker action backed by a prebuilt image containing actionlint, ShellCheck and pyflakes; it reports GitHub annotations by default, runs only on Linux, needs a reachable Docker daemon, and does not support `ubuntu-slim`.",
+          "citation": "README.md:145"
+        },
+        {
+          "claim": "The moving `v1` and `v1.16` tags point to a commit that pins the published container image by digest; `v1.17.0` is a versioned release tag; for an immutable reference use the full commit SHA resolved from a floating tag.",
+          "citation": "README.md:178-181"
+        },
+        {
+          "claim": "Action `format` input accepts github, default, oneline, json, json-lines, markdown or sarif; outputs are exit-code, result, problems-found, problem-count, output and output-file.",
+          "citation": "README.md:188, README.md:200-206"
+        },
+        {
+          "claim": "Four pre-commit hooks: `actionlint` (built with Go), `actionlint-shellcheck` (adds a Go build of ShellCheck), `actionlint-docker` (GHCR image), `actionlint-system` (executable on PATH).",
+          "citation": "README.md:233-254"
+        },
+        {
+          "claim": "The README demo section is generated from the checked fixture files by scripts/check-readme, so it cannot drift; the fork 1.16.1 demo reports `expression`, `require-commit-hash` and `parallel-steps`.",
+          "citation": "README.md:41, README.md:94"
+        },
+        {
+          "claim": "Configuration document covers runner labels, variables, secrets, default permissions, error filters, opt-in policy checks and YAML Language Server schema support.",
+          "citation": "README.md:265"
+        },
+        {
+          "claim": "Installation document covers npm, Homebrew, AUR, Scoop, aqua, mise, the community pip/uv wrapper, release archives, the download script, Docker and Go, and the status of WinGet and upstream-only package names.",
+          "citation": "README.md:263"
+        },
+        {
+          "claim": "Problems are reported through this fork's issue tracker.",
+          "citation": "README.md:9, README.md:271-275"
+        },
+        {
+          "claim": "actionlint is distributed under the MIT license.",
+          "citation": "README.md:279"
+        }
+      ],
+      "install": [
+        {
+          "method": "Release archive via gh, with attestation verification",
+          "command": "gh release download --repo kjanat/actionlint --pattern '*_linux_amd64.tar.gz' v1.17.0\ntar xf actionlint_1.17.0_linux_amd64.tar.gz\n./actionlint -version\ngh attestation verify -R kjanat/actionlint actionlint_1.17.0_linux_amd64.tar.gz",
+          "citation": "docs/install.md:125-134"
+        },
+        {
+          "method": "npm (launcher plus platform package)",
+          "command": "npm install --save-dev @kjanat/actionlint\nnpx @kjanat/actionlint",
+          "citation": "docs/install.md:90-98; README.md:122"
+        },
+        {
+          "method": "Homebrew cask (macOS and Linux)",
+          "command": "brew install --cask kjanat/tap/actionlint",
+          "citation": "docs/install.md:57-63"
+        },
+        {
+          "method": "Go toolchain (source build)",
+          "command": "go install actionlint.kjanat.dev/cmd/actionlint@latest",
+          "citation": "README.md:128; docs/install.md:287-293"
+        },
+        {
+          "method": "Docker image (GHCR; also docker.io/kjanat/actionlint)",
+          "command": "docker run --rm ghcr.io/kjanat/actionlint:latest -version",
+          "citation": "docs/usage.md:496; docs/install.md:177-178"
+        },
+        {
+          "method": "Download script pinned to a commit",
+          "command": "bash <(curl -fsSL https://raw.githubusercontent.com/kjanat/actionlint/662318dd6bbd9c0c120e35b03168bc1be69bf428/scripts/download-actionlint.bash) latest",
+          "citation": "docs/install.md:148"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - linux/amd64 release archive built with CGO_ENABLED=0 (.goreleaser.yaml:17-26; docs/install.md:112); unit tests run on ubuntu-26.04 (.github/workflows/ci.yml:17); Docker images are linux/amd64 and linux/arm64 (.github/workflows/release.yml:178).",
+        "wsl2": "unknown - README and docs never mention running under WSL2. WSL appears only in the maintainer release script that looks for Nix (scripts/bump-version/nix.go:54-73; CONTRIBUTING.md:292-293) and in an audit note that shellcheck/pyflakes were absent from a WSL run (docs/schema-audit.md:33). A static Linux binary exists (.goreleaser.yaml:17-18) but WSL2 support is not stated.",
+        "macos_arm64": "yes - darwin/arm64 archive (.goreleaser.yaml:19-21; docs/install.md:110); unit tests run on macos-latest and macos-26-intel (.github/workflows/ci.yml:17) and the Nix package is built on macos-latest as aarch64-darwin (.github/workflows/nix.yml:16); the macOS executable is not notarized (docs/install.md:79-81).",
+        "gpu": "no - not applicable: CPU-only static analysis, no GPU code or documentation (the only 'gpu' hits are runner-label examples at docs/checks.md:1795-1796 and docs/config.md:59)."
+      },
+      "integrations": {
+        "cli": "yes - `actionlint` binary (cmd/actionlint/main.go:11-17); flags at command.go:150-168; usage docs/usage.md:7-30; exit statuses 0/1/2/3 at docs/usage.md:277-284; `-completion` for bash, zsh, fish, powershell (docs/usage.md:32-72); `-format` Go templates, JSON, JSON Lines and a SARIF template (docs/usage.md:114-207; sarif.go:5-11).",
+        "mcp": "none found - no MCP server, config or documentation in the repository (the only 'mcp' hit is an unrelated ignore entry at .gitignore:5).",
+        "sdk_or_api": "Go library `actionlint.kjanat.dev` (Linter, Command, Parse, Rule interface, workflow AST, expression checker) - docs/api.md:7-51, doc.go:7-15; the version number belongs to the CLI and the library does not follow semantic versioning (docs/api.md:53-56). No HTTP API found. Also: first-party Docker GitHub Action (action.yml:1-89; annotations titled 'actionlint (<kind>)' at cmd/actionlint-action/render.go:45-64), Problem Matcher (.github/actionlint-matcher.json; docs/usage.md:566-600), pre-commit hooks (.pre-commit-hooks.yaml), npm launcher (distribution/npm/facade/package.json), config JSON Schema (actionlint.schema.json) and a js/wasm playground (playground/main.go).",
+        "claude_code_or_codex": "none found - no Claude Code or Codex plugin, skill, hook, AGENTS.md or CLAUDE.md. Incidental only: Makefile:37-45 disables the race detector when CLAUDECODE=1, and popular_actions.go:2073 lets actionlint validate inputs of `anthropics/claude-code-action@v1` when a workflow uses it."
+      },
+      "telemetry_and_network": "No telemetry, analytics or phone-home code found. The lint path is offline: the root package, cmd/actionlint and cmd/actionlint-action import no net/http (net/url only parses a Docker image reference, rule_action.go:772); popular-action metadata is embedded (docs/checks.md:2038-2039; popular_actions.go:5-7); remote reusable workflows are not downloaded (docs/config.md:139; docs/checks.md:2887); the only subprocesses are the optional shellcheck/pyflakes found on PATH or given with -shellcheck/-pyflakes (process.go:25-26,123-137; linter.go:619-638). Network is used by: `make build`/`go generate` (CONTRIBUTING.md:79-81; scripts/generate-*), whereas plain `go build` and `go install` use checked-in generated sources; install paths (GitHub releases, npm registry, GHCR/Docker Hub; download script uses curl, scripts/download-actionlint.bash:49,127, and runs `gh attestation verify` only when an authenticated gh exists, :129-134); and the Docker action, which needs a reachable Docker daemon and pulls ghcr.io/kjanat/actionlint:action-1.17.0 (README.md:145; action.yml:75) but declares no token or secret input (action.yml:7-52). No account is needed to run the tool. The browser playground runs the WASM build locally and states it sends no data outside the browser (docs/usage.md:451-452); it fetches a user-supplied URL only when opened with a `u` query parameter (playground/src/index.ts:94-97). Maintainer-only services: GHCR, Docker Hub, npm trusted publishing via OIDC, Homebrew/Scoop/WinGet/AUR tokens and Codecov via OIDC (.github/workflows/release.yml:62-70,144-148; .github/workflows/npm-release.yml:163-170; .github/workflows/ci.yml:60-61)."
+    },
+    "code": {
+      "languages": [
+        "Go",
+        "TypeScript",
+        "JavaScript (ESM .mjs)",
+        "Bash",
+        "Nix",
+        "Lua (pandoc filter)",
+        "PowerShell (scripts/touch.ps1)"
+      ],
+      "entry_points": [
+        {
+          "path": "cmd/actionlint/main.go",
+          "what": "CLI binary: builds actionlint.Command with stdin/stdout/stderr and exits with Command.Main(os.Args) (main.go:11-17)."
+        },
+        {
+          "path": "command.go",
+          "what": "Command.Main: flag parsing (-ignore, -shellcheck, -pyflakes, -format, -config-file, -init-config, -completion, -version, ...), exit statuses 0/1/2/3 (command.go:19-28,150-235)."
+        },
+        {
+          "path": "linter.go",
+          "what": "Library entry: NewLinter plus LintRepository/LintDir/LintFiles/LintStdin; assembles the rule set per file (linter.go:540-699)."
+        },
+        {
+          "path": "cmd/actionlint-action/main.go",
+          "what": "Docker GitHub Action wrapper (inputs, format rendering incl. SARIF, GITHUB_OUTPUT, output-file); image ENTRYPOINT in Dockerfile:21-23; action definition in action.yml:73-85."
+        },
+        {
+          "path": "playground/main.go",
+          "what": "js/wasm build behind the browser playground (UI in playground/src/index.ts, bundled with Vite)."
+        },
+        {
+          "path": "distribution/npm/facade/bin/actionlint.mjs",
+          "what": "npm launcher: resolves the platform package binary and spawns it, forwarding argv and exit status (lib/launch.mjs:13-34)."
+        },
+        {
+          "path": ".pre-commit-hooks.yaml",
+          "what": "Four pre-commit hooks: actionlint, actionlint-docker, actionlint-system, actionlint-shellcheck."
+        },
+        {
+          "path": "scripts/download-actionlint.bash",
+          "what": "Release download script with optional gh attestation verification (lines 129-134)."
+        }
+      ],
+      "architecture": "One flat Go package `actionlint.kjanat.dev` in the repository root (64 production .go files and 77 test files). Pipeline: Linter (linter.go) discovers the project and config (project.go; config.go with the Policy struct at :64-113; `.github/actionlint.yaml|yml` loaded at :488-491), parses workflow YAML into an AST (parse.go -> ast.go, on go.yaml.in/yaml/v4), then runs a fixed list of Rule visitors (rule.go, pass.go) per file: rule_action.go, rule_expression.go, rule_permissions.go, rule_workflow_call.go, rule_events.go, rule_matrix.go, rule_runner_label.go, rule_credentials.go, rule_shellcheck.go, rule_pyflakes.go, etc. Policy rules are added only when configured (rule_require_commit_hash.go, rule_require_permissions.go, rule_require_job_timeout.go, rule_required_actions.go; linter.go:602-613) while the three cache policies (rule_cache_policy.go, rule_workflow_call_cache.go) are default-on (linter.go:614-618). Expression `${{ }}` lexer, parser, type checker and untrusted-input detector live in expr_*.go (expr_insecure.go). Local action and reusable-workflow metadata loaders: action_metadata*.go, reusable_workflow.go. Generated data tables: popular_actions.go, all_webhooks.go, availability.go, action_metadata_availability.go, action_runtimes.go (produced by scripts/generate-* through `go generate`, refreshed weekly by .github/workflows/upkeep.yml). External-linter runner: process.go. Output: error.go (templates, JSON, pretty print), sarif.go with sarif_template.txt, completion.go, inline_suppression*.go. Satellites: cmd/actionlint-action, playground (wasm + TypeScript UI), distribution/npm (launcher and packaging), nix/ and flake.nix, packages/changelog-feed (RSS reader/monitor), .github/actions/* (7 composite CI actions), scripts/* (generators, bump-version, check-checks, check-readme, fetch-conformance). A split of the root package into subpackages is planned but unchanged in code (docs/design/package-layout.md:1-8).",
+      "packaging_and_release": "Trigger: push of a tag matching v*.*.* (.github/workflows/release.yml:2); top-level `contents: read` with per-job elevation (release.yml:9,45,77,89,261); all 90 `uses:` refs under .github are pinned to 40-hex commit SHAs (checked by grep over .github). Binaries: GoReleaser v2.18.0 (release.yml:60-61) builds ./cmd/actionlint for darwin amd64/arm64, linux 386/arm/amd64/arm64, windows 386/amd64/arm64, freebsd 386/amd64 with CGO_ENABLED=0 and version ldflags (.goreleaser.yaml:13-36); tar.gz archives (zip on Windows) carry README, LICENSE, docs and the man page (:47-60); source tarball (:62-67); SHA-256 checksums file (:43-45); SPDX SBOM per archive generated by Syft (`sboms: artifacts: archive`, :38-41; CONTRIBUTING.md:319; Syft installed at release.yml:58-59); build-provenance attestation of the checksums file with actions/attest-build-provenance (release.yml:71-72); post-release download check (release.yml:73-74). Images: CLI image (ghcr.io and docker.io) and action image (ghcr.io only), linux/amd64+arm64, BuildKit `sbom: true` and `provenance: mode=max` (release.yml:174-189,222-237), smoke-tested before push (:162-173,:210-221), image digests attested with actions/attest-build-provenance (:238-255; CHANGELOG.md:134). Floating tags v1 and v1.17 are moved to a bot commit that pins the action image digest in action.yml, after verifying the release commit signature (release.yml:256-317). npm: reusable npm-release.yml publishes 11 platform packages then the launcher through OIDC trusted publishing with npm provenance (npm-release.yml:159-207; distribution/npm/README.md:92-130); binaries are verified against the release checksums manifest before repackaging (.github/actions/npm-packages/main.go:209-263; distribution/npm/README.md:43-49). Other channels: Homebrew cask in kjanat/tap, Scoop bucket, AUR -bin and source packages (.goreleaser.yaml:69-123,176-273) plus AUR -git (.github/workflows/aur-git.yml), WinGet manifests generated but upload paused (.goreleaser.yaml:154-155), Nix flake (flake.nix), Go module via vanity path (playground/index.html:10), community-maintained PyPI wrapper (docs/install.md:297-323). Other documented install commands: `paru -S actionlint-kjanat-bin` (docs/install.md:49), `mise use github:kjanat/actionlint` (:203), `aqua g -i kjanat/actionlint` (:192), `nix run github:kjanat/actionlint -- --help` (:261). CONTRIBUTING.md:301 states published release tags and assets are immutable. No cosign/detached signature files and no reproducible-build claim found; the release builds block sets no -trimpath or mod_timestamp (.goreleaser.yaml:13-36).",
+      "tests_and_ci": "Go `testing` with go-cmp: table-driven and golden-file tests over testdata/ (examples, err, ok, projects, config, format) - CONTRIBUTING.md:174-190. About 99 Go `_test.go` files (77 in the root package, 6 in cmd/actionlint-action, 4 in fuzz/, 1 in internal/conformance, 10 under scripts/, 1 in .github/actions/npm-packages) plus about 7 JS/TS test files (node --test; Vitest in playground/src/test.ts). Native Go fuzz targets in fuzz/ (CONTRIBUTING.md:226-244); upstream conformance suite behind build tag `conformance` (docs/conformance.md; Makefile:56-59); micro-benchmarks `go test -bench Lint -benchmem` over testdata/bench (Makefile:118-119) with no published results. Tests need git, bash, ShellCheck and pyflakes on PATH (CONTRIBUTING.md:113-115). 19 workflow files in .github/workflows: ci.yml (push to master and PRs: unit tests on ubuntu-26.04 x64/arm, macos-latest, macos-26-intel, windows x64/arm; `go test -race` with coverage uploaded to Codecov via OIDC; dog-fooding actionlint on the repo's own workflows with the problem matcher; wasm playground build/test/lint; GoReleaser snapshot with Syft; tests of the local action modules; golangci-lint v2.13.1, `go mod tidy -diff`, govulncheck via `make lint`, shellcheck of scripts; Dockerfile build, hadolint and droast; Docker action image test; pre-commit ShellCheck hook test), codeql.yml (CodeQL for go, javascript-typescript and actions; push, PR, weekly), conformance.yml (3 OSes), generated-content.yml (regenerates tables and fails on diff), readme-demo.yml, matcher.yml, download.yml (download script on 3 OSes), nix.yml (3 systems), autofix.yml (dprint and modernize through autofix.ci), comment-cop.yml (pull_request_target review bot), upkeep.yml (weekly PRs: regenerated Go tables, README demo, Go toolchain bump, go-shellcheck bump), changelog-monitor.yml (daily issues from GitHub's Actions changelog feed), release.yml, npm-release.yml, changelog-release.yml, aur-git.yml, pages.yml (publishing), and manual major-tag.yml and expr-conformance-probe.yml. CI installs ShellCheck 0.11.0 with SHA-256 verification (.github/actions/setup-shellcheck/action.yml:8,74-89) and Pandoc with `gh release verify-asset` (.github/actions/setup-pandoc/action.yml:51).",
+      "dependencies": "go.mod (root): 14 direct requires (doublestar/v4, fatih/color, google/go-cmp, invopop/jsonschema, mattn/go-colorable, mattn/go-runewidth, mattn/go-shellwords, robfig/cron/v3, santhosh-tekuri/jsonschema/v6, yuin/goldmark, go.yaml.in/yaml/v4 v4.0.0-rc.6, golang.org/x/net, x/sync, x/sys) plus 6 indirect; `go 1.26`, `toolchain go1.27.1`; go.sum present (go.mod:3-31). .github/actions/npm-packages/go.mod: 0 dependencies (standard library only). package.json (private workspace root): 1 dependency and 5 devDependencies, package-lock.json lockfileVersion 3, workspaces packages/*, distribution/npm/facade, playground. distribution/npm/facade/package.json: 1 dependency (ansispeck), empty optionalDependencies in the template (11 platform packages are stamped in at pack time; distribution/npm/targets.json). playground/package.json: 12 dependencies and 10 devDependencies. packages/changelog-feed/package.json: 0 dependencies and 2 devDependencies. flake.nix: 1 input (nixpkgs-unstable) locked by flake.lock. Docker bases golang:1.27.0, koalaman/shellcheck-alpine:stable and alpine:3.24, plus unpinned apk python3 and py3-pyflakes (Dockerfile:1-19). pre-commit hook pins go-shellcheck v0.11.1 (.pre-commit-hooks.yaml:32). Update tooling: Dependabot monthly, grouped, for github-actions, gomod, npm and docker (.github/dependabot.yml:4-21) plus Upkeep PRs for generated tables, Go toolchain and go-shellcheck (.github/workflows/upkeep.yml).",
+      "security_policy": "none - no SECURITY.md or equivalent file anywhere in the repository (searched all paths for 'security'); problems are directed to the public issue tracker (README.md:271-275; CONTRIBUTING.md:32-36). Security-related automation that does exist: CodeQL (.github/workflows/codeql.yml), govulncheck in `make lint` (Makefile:70-72; ci.yml:133), Dependabot (.github/dependabot.yml)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Cache safety policies are enabled by default (README.md:9; docs/config.md:120-121).",
+        "verified": "yes",
+        "evidence": "linter.go:614-618 appends cache-write-untrusted, cache-call-unrestricted and cache-operation unless disabled; cache_policy.go:3-16 returns true when the key or Policy is nil. CHANGELOG.md:13 warns this can make previously clean workflows exit 1."
+      },
+      {
+        "claim": "Opt-in policy checks exist: require-commit-hash, require-permissions, require-job-timeout, required-actions (README.md:9,265; docs/config.md:311-394).",
+        "verified": "yes",
+        "evidence": "linter.go:602-613 registers them only when configured. rule_require_commit_hash.go:10-15,47,89 accepts only 40- or 64-hex refs (and image digests, :41-75) and skips expression and local refs (:37,106-108). rule_require_permissions.go:21-33 only tests that a `permissions:` block exists at workflow or job scope; docs/config.md:373-375 says it does not judge least privilege."
+      },
+      {
+        "claim": "Actions usage check validates `with:` inputs and `steps.{id}.outputs` (README.md:16).",
+        "verified": "partial",
+        "evidence": "Only local/self-repository actions (metadata read from the repo: rule_action.go:826-827; docs/checks.md:1993-1994) and entries of the embedded PopularActions map are checked. The lookup key is the exact `owner/repo@ref` string (rule_action.go:444; rule_expression.go:393); the map has about 247 spec keys, none a commit SHA (popular_actions.go:5-7), and docs/checks.md:2041-2042,2081-2082 say fixed-version, HEAD and unknown SHA refs are not supported or resolved online. Outputs of other actions are an open string map (rule_expression.go:397)."
+      },
+      {
+        "claim": "ShellCheck and pyflakes integrations check scripts at `run:` (README.md:18).",
+        "verified": "partial",
+        "evidence": "ShellCheck runs only for bash/sh steps (rule_shellcheck.go:159; docs/checks.md:1009-1010) and pyflakes only for `shell: python` (rule_pyflakes.go:22). Both are external executables; when missing they are silently disabled and the message appears only with -verbose (linter.go:619-638, :217-223; UPSTREAM.md:66 lists this as still affecting the fork). ShellCheck runs with --norc so .shellcheckrc is ignored (docs/usage.md:102-108)."
+      },
+      {
+        "claim": "Security checks cover script injection by untrusted inputs and hard-coded credentials (README.md:19).",
+        "verified": "partial",
+        "evidence": "Injection detection uses a fixed list of 20 untrusted properties (expr_insecure.go:102-157); docs/checks.md:1218-1235 lists only 18 and omits github.event.discussion.title/body, so the code is broader than the docs. `inputs.*` is not tracked (UPSTREAM.md:126). The credentials rule inspects only `container:` and `services.*` credentials.password (rule_credentials.go:24-40; docs/checks.md:2237-2239), not secrets in env, with or run."
+      },
+      {
+        "claim": "The project ships attested binaries (README.md:9; docs/install.md:130-134).",
+        "verified": "yes",
+        "evidence": "release.yml:45 grants attestations: write and id-token: write; release.yml:71-72 runs actions/attest-build-provenance with subject-checksums set to the GoReleaser SHA-256 checksums file (.goreleaser.yaml:43-45). The attestation is generated from that checksums file. scripts/download-actionlint.bash:129-134 verifies only when an authenticated gh exists and performs no checksum check."
+      },
+      {
+        "claim": "A Docker image is published on GHCR and Docker Hub, and the moving v1 tags pin the action image digest (README.md:9,178-181).",
+        "verified": "yes",
+        "evidence": "release.yml:149-189 pushes the CLI image to ghcr.io and docker.io for linux/amd64 and linux/arm64 with sbom: true and provenance: mode=max; the action image goes to ghcr.io only (release.yml:199-237; docs/usage.md:485-488); image digests are attested (release.yml:238-255); release.yml:273-317 rewrites action.yml to `image: docker://ghcr.io/...:action-<version>@<digest>` on a bot commit and force-moves v1 and the minor tag. action.yml:75 at the release tag itself references the image by tag only."
+      },
+      {
+        "claim": "`sarif` is an output format of the GitHub Action (README.md:188); publication to code scanning is not claimed.",
+        "verified": "partial",
+        "evidence": "The format exists: cmd/actionlint-action/inputs.go:21,31; lint.go:43-45 injects the canonical SARIF 2.1.0 template (sarif.go:5-11; sarif_template.txt:2-11 names tool driver 'GitHub Actions lint', its version and informationUri). No upload-sarif or code-scanning API step exists in any workflow or document (grep for upload-sarif, code-scanning and security-events finds only the CodeQL workflow's own permission at .github/workflows/codeql.yml:15 and permission-scope tables); the action only returns SARIF in its `output` and `output-file` outputs (cmd/actionlint-action/action.go:107-114)."
+      },
+      {
+        "claim": "The README demo section is generated and cannot drift (README.md:41).",
+        "verified": "partial",
+        "evidence": "README.md:94 still reports 'This fork 1.16.1' although this revision is v1.17.0 (CHANGELOG.md:7; action.yml:75). The section is refreshed by an Upkeep PR after each release (.github/workflows/upkeep.yml:76-122; CONTRIBUTING.md:305-306) and checked on PRs that touch the README (.github/workflows/readme-demo.yml:3-9), so it lags until that PR merges."
+      },
+      {
+        "claim": "The prebuilt image includes actionlint, ShellCheck and pyflakes (README.md:145; docs/usage.md:467-468).",
+        "verified": "yes",
+        "evidence": "Dockerfile:12-19 copies shellcheck from koalaman/shellcheck-alpine:stable (floating tag) and installs python3 and py3-pyflakes via unpinned apk; base images golang:1.27.0 and alpine:3.24 are pinned by tag, not by digest (Dockerfile:1-2,4,14)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Conformance of the Go implementation against imported upstream fixtures (actions/languageservices 1,228 cases, actions/runner 24, SchemaStore 67, YAML Test Suite 402) - initial comparison",
+        "metric": "agreements and differences over 1,721 cases",
+        "value": "1,368 agreements; 353 differences",
+        "source": "docs/conformance.md:8-13,72",
+        "independent": false
+      },
+      {
+        "what": "Same conformance suite after the 2026-09-13 schema audit",
+        "metric": "agreements and recorded differences over 1,721 cases",
+        "value": "1,394 agreements; 327 recorded differences (27 resolved, 1 new)",
+        "source": "docs/schema-audit.md:30",
+        "independent": false
+      },
+      {
+        "what": "Historical speedup from running ShellCheck processes in parallel (v1.1.2, 2021, author's own environment, not a measurement of v1.17.0)",
+        "metric": "relative run time",
+        "value": "'more than 3x faster than before'",
+        "source": "CHANGELOG.md:2496-2498",
+        "independent": false
+      },
+      {
+        "what": "Historical speedup from checking files in parallel (v1.3.1, 2021, author's own environment, not a measurement of v1.17.0)",
+        "metric": "relative run time with 3 workflow files",
+        "value": "'around 1.3x faster'",
+        "source": "CHANGELOG.md:2436-2438",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Pinning versus checking gap: with `require-commit-hash` every remote `uses:` becomes a SHA, but input/output typing and outdated-runtime detection look up the exact `owner/repo@ref` string in an embedded map of major-tag specs (rule_action.go:444-452; rule_expression.go:393; popular_actions.go:5-7) and the docs say SHA refs are not resolved online (docs/checks.md:2041-2042,2081-2082); such steps are skipped with a debug-only log. Composite action files cannot be linted directly from the CLI (UPSTREAM.md:79,88).",
+      "Maintenance and change velocity: the fork departs from upstream v1.7.12 (CHANGELOG.md:257) and shipped 12 releases (v1.8.0 to v1.17.0) between 2026-08-19 and 2026-09-13 (CHANGELOG.md:7-234); release metadata names one maintainer (.goreleaser.yaml:182,221); v1.17.0 turned on three new default policies that can make clean workflows exit 1 (CHANGELOG.md:13); the Go library is not semver and a package split is planned (docs/api.md:53-56; docs/design/package-layout.md:1-8,400-441); UPSTREAM.md:15-16,44 records 140 open upstream issues and 9 confirmed gaps in the fork.",
+      "External linters are optional and can vanish silently: ShellCheck and pyflakes are not bundled in the binary or npm package (docs/install.md:8-9; distribution/npm/facade/README.md:97-99), are skipped without a normal-mode message when absent (linter.go:619-638; UPSTREAM.md:66), and only bash/sh and python scripts are linted (rule_shellcheck.go:159; rule_pyflakes.go:22). Only the Docker image bundles both (Dockerfile:12-19).",
+      "No code-scanning publisher: SARIF exists only as an output format (README.md:188; sarif_template.txt); no upload step or doc exists in the repo, and its CodeQL workflow analyses the repo's own code, not actionlint findings (.github/workflows/codeql.yml:28-54). Built-in reporting paths are GitHub annotations (cmd/actionlint-action/render.go:45-64) and the Problem Matcher (.github/actionlint-matcher.json).",
+      "Pinning gaps in the project's own build and CI: Docker base images pinned by tag only, with floating koalaman/shellcheck-alpine:stable and unpinned apk packages (Dockerfile:1-19; hadolint DL3018 ignored at ci.yml:150); unpinned tools `govulncheck@latest` (Makefile:72, run by ci.yml:133), `modernize@latest` (autofix.yml:19), `uv tool install` of pyflakes and pre-commit (ci.yml:28,173) and the hadolint image (ci.yml:150); .mise.toml uses `latest` (lines 4-5). All 90 `uses:` refs under .github are 40-hex SHAs.",
+      "Provenance and SBOM details: the attestation is generated from the checksums file (release.yml:71-72); SBOMs are SPDX per archive via Syft with license fields that may be NOASSERTION, no CycloneDX (CONTRIBUTING.md:317-328); no detached signatures or reproducible-build claim, and the builds block sets no -trimpath or mod_timestamp (.goreleaser.yaml:13-36); the download script skips attestation verification without an authenticated gh (scripts/download-actionlint.bash:129-134) and the post-release step passes no GH_TOKEN (release.yml:73-74).",
+      "No security policy file found. 5 of 19 workflows request write scopes at workflow level: comment-cop.yml:3-4 (pull_request_target with contents and pull-requests write), major-tag.yml:11-12, expr-conformance-probe.yml:12, changelog-monitor.yml:20-22 (issues write) and codeql.yml:13-15 (security-events write); the rest default to `contents: read` with job-level elevation.",
+      "Ecosystem and platform limits: reviewdog/action-actionlint, super-linter and trunk install upstream rhysd/actionlint, not this fork (docs/usage.md:542-544,604-607,741-744); the Docker action is Linux-only and needs a Docker daemon (README.md:145); the macOS binary is not notarized (docs/install.md:79-81); Linux 386/ARM, Windows 386 and FreeBSD builds have no native CI tests (docs/install.md:116-120); WinGet is pending (docs/install.md:327-337); the module path is a vanity domain resolved by a go-import tag on the Pages site (playground/index.html:10) and the YAML parser dependency is a release candidate (go.mod:18)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "kjanat/actionlint",
+      "checks": [
+        {
+          "field": "readme.install[0] (Release archive via gh, with attestation verification)",
+          "statement": "gh release download --repo kjanat/actionlint --pattern '*_linux_amd64.tar.gz' v1.17.0; tar xf actionlint_1.17.0_linux_amd64.tar.gz; ./actionlint -version; gh attestation verify -R kjanat/actionlint actionlint_1.17.0_linux_amd64.tar.gz",
+          "citation": "docs/install.md:125-134",
+          "holds": true,
+          "note": "The four commands match docs/install.md:125-127 and :133 exactly. The archive name follows GoReleaser's default template: project 'actionlint' and no name_template in .goreleaser.yaml:47-60. The same naming appears at scripts/download-actionlint.bash:118. Verification will find an attestation because release.yml:71-72 runs actions/attest-build-provenance with subject-checksums on the SHA-256 checksums file (.goreleaser.yaml:43-45), so every archive listed there is an attestation subject."
+        },
+        {
+          "field": "license",
+          "statement": "spdx MIT, file LICENSE.txt",
+          "citation": "LICENSE.txt",
+          "holds": true,
+          "note": "LICENSE.txt:1-21 is the standard MIT text (Copyright (c) 2026 Kaj Kowalski, Copyright (c) 2021 rhysd). README.md:279 and the packaging metadata (.goreleaser.yaml:114,140,183,222) also say MIT. The only other license file, packages/changelog-feed/LICENSE, is also MIT."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - linux/amd64 release archive built with CGO_ENABLED=0; unit tests run on ubuntu-26.04; Docker images are linux/amd64 and linux/arm64",
+          "citation": ".goreleaser.yaml:17-26; docs/install.md:112; .github/workflows/ci.yml:17; .github/workflows/release.yml:178",
+          "holds": true,
+          "note": ".goreleaser.yaml:17-18 sets CGO_ENABLED=0 in the shared build defaults, and :23-26 builds linux for 386, arm, amd64 and arm64. docs/install.md:112 lists Linux x86_64 archives. The ci.yml:17 unit-test matrix includes ubuntu-26.04, and ci.yml:36-38 also builds with CGO_ENABLED=0. release.yml:178 pushes the CLI image for linux/amd64,linux/arm64; :226 does the same for the action image."
+        },
+        {
+          "field": "readme.integrations.cli",
+          "statement": "yes - actionlint binary (cmd/actionlint/main.go:11-17); flags at command.go:150-168; usage docs/usage.md:7-30; exit statuses 0/1/2/3 at docs/usage.md:277-284; -completion for bash, zsh, fish, powershell (docs/usage.md:32-72); -format Go templates, JSON, JSON Lines and a SARIF template (docs/usage.md:114-207; sarif.go:5-11)",
+          "citation": "cmd/actionlint/main.go:11-17; command.go:150-168; docs/usage.md:7-30,32-72,114-207,277-284; sarif.go:5-11",
+          "holds": true,
+          "note": "main.go:11-17 builds actionlint.Command with stdin, stdout and stderr and calls os.Exit(cmd.Main(os.Args)). command.go:150-168 defines -ignore, -shellcheck, -pyflakes, -oneline, -format, -config-file, -init-config, -no-color, -color, -verbose, -debug, -version, -stdin-filename and -completion (bash, fish, powershell, zsh). The exit constants 0-3 at command.go:19-28 match docs/usage.md:277-284. usage.md:32-72 documents completion for all four shells, and :114-207 documents Go-template, JSON, JSON Lines and SARIF output. sarif.go:5-11 embeds sarif_template.txt."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "Cache safety policies are enabled by default (README.md:9; docs/config.md:120-121) - verified: yes",
+          "citation": "linter.go:614-618; cache_policy.go:3-16; CHANGELOG.md:13; README.md:9; docs/config.md:120-121",
+          "holds": true,
+          "note": "linter.go:614-618 adds cache-write-untrusted, cache-call-unrestricted and cache-operation whenever cfg.cachePolicyEnabled(name) is true. cache_policy.go:3-16 returns true when the config is nil (no config file) or the key is unset, so only an explicit false turns a rule off. The rule names are confirmed at rule_cache_policy.go:91 and :122. docs/config.md:120-121 says the policies are 'enabled by default, including when no configuration file exists'. CHANGELOG.md:13 warns that previously clean workflows can now exit with status 1."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

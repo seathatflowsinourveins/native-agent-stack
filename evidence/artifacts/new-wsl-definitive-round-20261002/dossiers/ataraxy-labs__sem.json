@@ -1,0 +1,353 @@
+{
+  "contender": "ataraxy-labs/sem",
+  "revision": {
+    "contender": "ataraxy-labs/sem",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "ataraxy-labs/sem",
+        "tag": "v0.25.0",
+        "commit": "4cfe1374f79631b01aca5746441d826738a15448",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.25.0",
+    "commit": "4cfe1374f79631b01aca5746441d826738a15448",
+    "read_at": "2026-10-02T03:01:56+00:00"
+  },
+  "dossier": {
+    "contender": "ataraxy-labs/sem",
+    "revision": {
+      "tag": "v0.25.0",
+      "commit": "4cfe1374f79631b01aca5746441d826738a15448",
+      "read_at": "2026-10-01"
+    },
+    "license": {
+      "spdx": "MIT OR Apache-2.0",
+      "file": "LICENSE-MIT; LICENSE-APACHE"
+    },
+    "purpose": "Rust workspace that ships the `sem` CLI (plus `sem mcp`, an MCP stdio server, and the `sem-core` library). It layers on Git (libgit2 via git2, plus the git CLI in places) and uses tree-sitter parsers to report entity-level (function/class/method) diffs, blame, history, dependency-graph impact and token-budgeted context. It also ships a composite GitHub Action that posts an entity-level diff as a sticky PR comment, a `sem setup` command (global git diff.external wrapper plus hooks), and optional closed-source 'sem cloud' features (hosted index, hosted diff-review URLs, review-listener agent). Facts relevant to the stated needs: (1) Git is the only VCS base; sem adds no VCS of its own and works inside linked worktrees (crates/sem-core/src/git/bridge.rs:1516-1553). (2) Entity-level structural diffs for agents (`sem diff --format json`, MCP `sem_diff`) and for human review (`sem diff` terminal/markdown output, git diff.external wrapper) are the core feature. (3) There is no command to create, list, merge or clean up worktrees (crates/sem-cli/src/main.rs:40-505). (4) There is no GitHub PR/checks/reviews/API automation tool beyond the diff-comment Action (action/action.yml:61-124). (5) There is no LLM-driven or mention-triggered PR review on the GitHub side; the agent-review path (`sem review listen`, MCP join_review etc.) targets sem-cloud hosted reviews and needs the `claude` CLI (crates/sem-cli/src/commands/review.rs:1-90).",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Semantic version control built on Git: shows which entities (functions, methods, classes) changed instead of which lines.",
+          "citation": "README.md:14-15"
+        },
+        {
+          "claim": "Parses code with tree-sitter, extracts every function/class/method as an entity and diffs at entity level; works in any Git repo with no setup (also usable outside Git for arbitrary file comparison).",
+          "citation": "README.md:35-37, 130"
+        },
+        {
+          "claim": "`sem diff` gives an entity-level diff with rename detection, structural hashing and word-level inline highlights; supports working tree, --staged, --commit, --from/--to ranges, --stdin FileChange[] JSON input, and terminal/plain/json/markdown output.",
+          "citation": "README.md:136-172"
+        },
+        {
+          "claim": "Entity matching is three-phase: exact ID, structural hash (rename/move, ignores whitespace/comments), fuzzy >80% token overlap.",
+          "citation": "README.md:463-471"
+        },
+        {
+          "claim": "`sem diff --format json` is meant for AI agents and CI; carries beforeContent/afterContent per entity and structuralChange=false for cosmetic-only changes.",
+          "citation": "README.md:157-158, 508-555"
+        },
+        {
+          "claim": "`sem setup` replaces `git diff` output globally with entity-level diffs, installs a pre-commit hook showing the entity-level blast radius of staged changes, and (macOS/Linux) registers a Claude Code UserPromptSubmit hook for prompt-time context injection; `sem unsetup` reverts.",
+          "citation": "README.md:319-335"
+        },
+        {
+          "claim": "GitHub Action posts one sticky entity-level diff comment per PR, updated in place on each push, and calls out cosmetic-only PRs; 'No config, no API keys, never fails your build'.",
+          "citation": "README.md:337-358"
+        },
+        {
+          "claim": "`sem mcp` is a stdio MCP server with 8 entity-level tools (sem_entities, sem_diff, sem_blame, sem_impact, sem_log, sem_context, sem_find, sem_grep) plus 4 sem-cloud review tools (join_review, wait_for_branch, reply_to_branch, list_open_branches).",
+          "citation": "README.md:475"
+        },
+        {
+          "claim": "Claude Code setup: `claude mcp add sem -- sem mcp`, or `npx @ataraxy-labs/sem-skill` to also install the skill; a generic mcpServers JSON snippet for Cursor, Claude Desktop or any MCP client.",
+          "citation": "README.md:481-504"
+        },
+        {
+          "claim": "Cloud-backed queries are opt-in per repo (sem login alone uploads nothing); when not logged in or the cloud is unreachable sem computes locally with identical output; SEM_LOCAL=1 forces local.",
+          "citation": "README.md:39, 360-392"
+        },
+        {
+          "claim": "`sem review listen <diff-id-or-url>` execs a coding agent pre-configured to join a sem-cloud code review as a live listener answering reviewer questions on diff lines.",
+          "citation": "README.md:392"
+        },
+        {
+          "claim": "Telemetry is local-only by default (command names only; no code, paths, repo names or identity; no network call); `sem telemetry on|off|preview`; SEM_NO_TELEMETRY=1 or DO_NOT_TRACK=1 force record-nothing.",
+          "citation": "README.md:577-587"
+        },
+        {
+          "claim": "32 programming languages with entity extraction via tree-sitter plus JSON/YAML/TOML/EDN/CSV/Markdown/LaTeX; everything else falls back to chunk-based diffing; .semrc and .gitattributes map custom extensions.",
+          "citation": "README.md:394-461"
+        },
+        {
+          "claim": "SQLite entity cache is stored outside the repository under the OS cache dir (override SEM_CACHE_DIR); find/callers/refs/grep read an mmap index with no daemon.",
+          "citation": "README.md:132, 278-300"
+        }
+      ],
+      "install": [
+        {
+          "method": "curl installer script (Linux x86_64/arm64 and macOS arm64/x86_64; downloads the release tarball, verifies it against checksums.txt, fails closed, installs to ~/.local/bin, never uses sudo)",
+          "command": "curl -fsSL https://raw.githubusercontent.com/Ataraxy-Labs/sem/main/install.sh | sh",
+          "citation": "README.md:47-49; install.sh:19-26, 111-137, 181-240"
+        },
+        {
+          "method": "Homebrew (the `sem-cli` formula is not in this repo; the in-tree Formula/sem.rb is a stale v0.7.0 stub with an empty sha256)",
+          "command": "brew install sem-cli",
+          "citation": "README.md:51-55; Formula/sem.rb:4-6"
+        },
+        {
+          "method": "npm wrapper (postinstall downloads the platform release binary and verifies checksums.txt; Node >=20)",
+          "command": "npm install --save-dev @ataraxy-labs/sem",
+          "citation": "README.md:69-73; package.json:37-39, 44-47; scripts/postinstall.mjs:78-99; scripts/verify-checksum.mjs:8-69"
+        },
+        {
+          "method": "cargo from crates.io (README also documents building main with `cargo install --git https://github.com/Ataraxy-Labs/sem sem-cli`)",
+          "command": "cargo install sem-cli",
+          "citation": "README.md:88-98"
+        },
+        {
+          "method": "Prebuilt binary from GitHub Releases (sem-linux-x86_64.tar.gz, sem-linux-arm64.tar.gz, sem-darwin-arm64.tar.gz, sem-darwin-x86_64.tar.gz, plus checksums.txt)",
+          "command": "download from https://github.com/Ataraxy-Labs/sem/releases",
+          "citation": "README.md:100; .github/workflows/release.yml:89-113, 173-183"
+        },
+        {
+          "method": "Docker (built locally from the Dockerfile; final image is debian:bookworm-slim with ca-certificates and libssl3 only, no git CLI)",
+          "command": "docker build -t sem .\ndocker run --rm -it -u \"$(id -u):$(id -g)\" -v \"$(pwd):/repo\" sem diff",
+          "citation": "README.md:102-107; Dockerfile:1-26"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes: release artifact sem-linux-x86_64.tar.gz is built on ubuntu-latest (.github/workflows/release.yml:90-92) and install.sh supports it (install.sh:19, 130-134). Note CI runs tests only on Windows (.github/workflows/test-windows.yml:10-28).",
+        "wsl2": "unknown: WSL is not mentioned anywhere in the tree (searched). install.sh would treat it as Linux (install.sh:118-128) and use the Linux binary, but no upstream statement or CI covers it.",
+        "macos_arm64": "yes: sem-darwin-arm64.tar.gz is built on macos-14 (.github/workflows/release.yml:99-101); install.sh supports it (install.sh:19, 121-134); Homebrew documented (README.md:51-55). The Intel macOS binary is cross-compiled from macos-14 (release.yml:102-110).",
+        "gpu": "no: not applicable. CPU-only (tree-sitter parsing with rayon); no CUDA/GPU/Metal references in manifests or code (searched)."
+      },
+      "integrations": {
+        "cli": "yes: `sem` binary with subcommands diff, impact, find, callers, refs, grep, graph, blame, log, entities, context, stats, mcp, setup/unsetup, login/logout/whoami, cloud, review, telemetry, xref, repos, update, completions (crates/sem-cli/src/main.rs:40-505). All query commands accept --json/--format json (README.md:508-555).",
+        "mcp": "yes: `sem mcp` (crates/sem-cli/src/main.rs:436-446, 952-961) and a standalone `sem-mcp` binary (crates/sem-mcp/src/main.rs:4-10) run an rmcp stdio server (crates/sem-mcp/src/lib.rs:14-37). The code registers 13 tools: 9 entity-level (incl. sem_callers, absent from the README list) and 4 sem-cloud review tools (crates/sem-mcp/src/server.rs:1317-2850). Repo resolution is absolute file path hint, then SEM_REPO, then CWD (server.rs:198-234).",
+        "sdk_or_api": "Rust library `sem-core` (crates/sem-core/src/lib.rs:1-7; README.md:557-566); JSON in/out via `sem diff --stdin` and `--format json` (README.md:163-168); a wasm32-wasip2 Lix plugin crate `sem-plugin` (crates/sem-plugin/src/lib.rs:1-5); an npm wrapper that only installs the binary (package.json:1-49). No local HTTP API; the sem-cloud HTTP API is closed-source and not in this repo (default endpoint https://sem-cloud.fly.dev, crates/sem-cli/src/commands/cloud.rs:21).",
+        "claude_code_or_codex": "Claude Code: `claude mcp add sem -- sem mcp` (README.md:484); `npx @ataraxy-labs/sem-skill` installs ~/.claude/skills/sem and registers the MCP server at user scope, with optional --badge statusline and --guard PreToolUse hook (agent-skill/README.md:6-85; agent-skill/install.mjs:187-217); `sem setup` writes a UserPromptSubmit hook into ~/.claude/settings.json (crates/sem-cli/src/commands/setup.rs:313-367) that is functionally inert (hook.rs:110-121); `sem review listen` execs `claude` with the bundled integrations/claude-review-listener plugin for sem-cloud reviews (review.rs:176-188). Codex: none found (README only gives a generic mcpServers JSON snippet, README.md:493-504)."
+      },
+      "telemetry_and_network": "Core local commands (diff, impact, blame, log, entities, context, graph, find/callers/refs/grep, mcp) need no account and no network. Telemetry: default mode is `local`; per run it spools command name, CLI version, OS and timestamp to ~/.sem/telemetry-spool.jsonl (max 500 events), uploads only if the user runs `sem telemetry on` or sets SEM_TELEMETRY, POSTing to {endpoint}/v1/telemetry (default https://sem-cloud.fly.dev); SEM_NO_TELEMETRY, DO_NOT_TRACK and dev builds force off; SEM_NO_NETWORK blocks upload (crates/sem-cli/src/telemetry.rs:20-37, 72-94, 159-271). Update check (not described in the README telemetry section): every command except update/mcp/completions may spawn a detached `__update-check` that GETs https://api.github.com/repos/Ataraxy-Labs/sem/releases/latest at most daily, disabled only by SEM_NO_UPDATE_CHECK or DO_NOT_TRACK, not by SEM_NO_NETWORK (crates/sem-cli/src/commands/update.rs:34-37, 73-152; crates/sem-cli/src/main.rs:628-631); `sem update` downloads and replaces the binary from GitHub Releases (update.rs:156-265). Cloud (opt-in): login uses the GitHub device flow with scope read:user and a hard-coded client id, then exchanges it for a sem-cloud CLI token stored in ~/.sem/credentials.json (0600) (cloud.rs:21-22, 39-61, 250-342); SEM_TOKEN supplies credentials in CI (cloud.rs:776-790); per-repo consent lives in ~/.sem/cloud.json with a local request ledger ~/.sem/cloud-log.jsonl (consent.rs:1-8, 120-172); `sem cloud enable` makes an unauthenticated GitHub API call to check repo visibility (cloud.rs:915-938). With consent (or SEM_CLOUD=1) plus credentials, `sem diff` POSTs cloneUrl, fileChanges (full before/after content of changed files), diffResult and relations to /v1/diffs and shares extracted file facts via /v1/facts/put unless SEM_FACTS_REMOTE=0 (cloud.rs:1055-1082; crates/sem-cli/src/commands/diff/cloud_upload.rs:85-110, 228-252; diff/facts_remote.rs:1-86). MCP impact/context are routed to the cloud when logged in and the repo is enabled (crates/sem-mcp/src/server.rs:1790-1800, 2232-2243). SEM_LOCAL=1 or SEM_NO_NETWORK=1 force local (cloud.rs:766-774). Interactive diffs may print a weekly 'sem login' hint on stderr (cloud.rs:72-107). Other local state: ~/.sem/{stats.json,update-check.json,repos.json}, and the SQLite/index cache under SEM_CACHE_DIR, XDG_CACHE_HOME, ~/Library/Caches or ~/.cache (crates/sem-core/src/persist/disk_cache.rs:632-664). The GitHub Action uses only the workflow GITHUB_TOKEN and downloads the binary from GitHub Releases (action/action.yml:10-42). npm postinstall, install.sh and Docker build fetch from GitHub/crates.io/npm."
+    },
+    "code": {
+      "languages": [
+        "Rust (workspace crates: sem-core, sem-cli, sem-mcp, sem-cloud-client, sem-plugin)",
+        "JavaScript (Node ESM: npm wrapper, agent-skill installer, benchmarks)",
+        "TypeScript (pi/ extension)",
+        "Python (agent-skill badge/guard scripts, benchmarks, .claude hook)",
+        "Shell (install.sh, hooks)",
+        "Nix (flake.nix, package.nix)",
+        "Ruby (Formula/sem.rb)",
+        "HTML (docs/)"
+      ],
+      "entry_points": [
+        {
+          "path": "crates/sem-cli/src/main.rs",
+          "what": "`sem` binary: clap Commands enum (:40-505) and main() (:625); `sem mcp` calls sem_mcp::run() (:952-961)."
+        },
+        {
+          "path": "crates/sem-mcp/src/main.rs",
+          "what": "Standalone `sem-mcp` binary; sem_mcp::run() in crates/sem-mcp/src/lib.rs:14-37 starts the rmcp stdio server (tools in server.rs:1317-2850)."
+        },
+        {
+          "path": "crates/sem-core/src/lib.rs",
+          "what": "Rust library entry (modules format, git, index, model, parser, persist, utils)."
+        },
+        {
+          "path": "action/action.yml",
+          "what": "Composite GitHub Action: installs a release binary, runs `sem diff --format markdown`, upserts a sticky PR comment via gh api."
+        },
+        {
+          "path": "install.sh",
+          "what": "curl installer with checksum verification (Linux/macOS)."
+        },
+        {
+          "path": "bin/sem.js",
+          "what": "npm shim that spawns the binary downloaded by scripts/postinstall.mjs."
+        },
+        {
+          "path": "agent-skill/install.mjs",
+          "what": "`npx @ataraxy-labs/sem-skill`: installs the skill, registers the MCP server, optional --badge and --guard hooks."
+        },
+        {
+          "path": "integrations/claude-review-listener/",
+          "what": "Claude Code plugin for sem-cloud review listening (also crates/sem-plugin/src/lib.rs Lix WASI plugin and pi/extensions/pi-sem.ts for the pi agent)."
+        }
+      ],
+      "architecture": "Cargo workspace (crates/Cargo.toml:1-3) of five crates. sem-core (library): git/bridge.rs (libgit2 via git2 for open/diff/blob reads, plus the `git` CLI for blame porcelain, reftable ref resolution and sparse-checkout diffs; handles linked worktrees) and git/jj.rs (Jujutsu revset to SHA); parser/ (registry.rs and plugins/: code/{languages.rs,entity_extractor.rs} tree-sitter extraction, json/yaml/toml/csv/markdown/latex/vue/svelte/erb plugins and a chunk-based fallback; differ.rs compute_semantic_diff; graph.rs, scope_resolve.rs, import_resolution.rs for the cross-file entity dependency graph, impact and test detection; facts_store.rs, incremental.rs, session.rs for parse caching); model/identity.rs (entity matching: exact ID, content/structural hash, signature, fuzzy >0.8 Jaccard); index/ (mmap `index.sem` query index with trigram postings behind find/callers/refs/grep); persist/disk_cache.rs (SQLite cache.db plus zstd under the OS cache dir, keyed by canonical repo/worktree path); format/json.rs. sem-cli: main.rs (clap), commands/ (diff/, impact, blame, log, entities, context, graph, grep, query, setup, hook, cloud, consent, review, update, repos, stats), formatters/ (terminal, plain, markdown, json), telemetry.rs. sem-mcp: rmcp stdio server (server.rs with 13 tools, tools.rs params, cache.rs, watch.rs notify-based watcher, agent_review.rs/review_protocol.rs for the sem-cloud review listener). sem-cloud-client: ureq client for the closed-source sem-cloud API. sem-plugin: wasm32-wasip2 component exposing sem-core as a Lix plugin. Non-Rust parts: action/ (GitHub Action), agent-skill/ (npx installer, statusline badge, PreToolUse guard), integrations/claude-review-listener/ (Claude Code plugin), pi/ (TypeScript extension for the pi agent; needs a separate weave-mcp binary, pi/README.md:37-44), scripts/ and bin/sem.js (npm wrapper), docs/ (static site).",
+      "packaging_and_release": "release.yml runs on push to main that touches crates/sem-core/Cargo.toml (or manual dispatch with publish_crates_only) (.github/workflows/release.yml:3-15): it detects the version, runs cargo-semver-checks on sem-core, pushes tag v<version> (21-81), then builds `cargo build --release -p sem-cli` for linux x86_64, linux arm64 (cross, vendored-openssl), darwin arm64, darwin x86_64 (cross from macos-14, vendored-openssl) and windows x86_64 (83-163). Artifacts are sem-<os>-<arch>.tar.gz (plus .zip on Windows) and a single checksums.txt made with `sha256sum` and attached via softprops/action-gh-release@v2 (165-183). The same workflow publishes npm @ataraxy-labs/sem (NPM_TOKEN, 185-209), the MCP registry via GitHub OIDC (211-236), and crates sem-core, sem-cloud-client, sem-mcp, sem-cli to crates.io (CARGO_REGISTRY_TOKEN, 238-286). No signatures, attestations, SBOM or provenance steps exist (searched .github for cosign/attest/slsa/provenance; `id-token: write` appears only for MCP-registry login and Pages). The checksum file lives in the same release as the artifacts. install.sh, npm postinstall and `sem update` check it (install.sh:181-212; scripts/verify-checksum.mjs; update.rs:309-354, best-effort), the GitHub Action does not (action/action.yml:33-40). Separate manual workflow publish-skill.yml publishes @ataraxy-labs/sem-skill (agent-skill/package.json version 0.8.0). In-tree package.json and server.json say version 0.16.2 and are re-stamped at publish time (release.yml:200-201, 224-228). Other channels: Docker (local build), cargo-binstall metadata (crates/sem-cli/Cargo.toml:42-58), Nix flake (flake.nix, package.nix); winget/Scoop are documented for Windows but their manifests are not in this repo.",
+      "tests_and_ci": "Rust built-in `cargo test` harness with proptest (crates/sem-core/tests/laws_*.rs; sem-core/Cargo.toml:210-215), criterion benches (crates/sem-core/benches/{parse_profile,incremental}.rs) and tokio+axum stub servers in sem-cli tests (sem-cli/Cargo.toml:69-72). By grep, about 1,222 test attributes (#[test], #[tokio::test], proptest!) across 108 Rust files, including 38 integration-test files (25 in crates/sem-cli/tests, 12 in crates/sem-core/tests, 1 in crates/sem-mcp/tests) plus inline #[cfg(test)] modules. JS/TS uses `node --test`: 114 pi/test/**/*.test.ts files and 4 *.test.mjs files (package.json:44-48; pi/package.json:16-19). The README '900+ tests passing' badge is a static shields.io image (README.md:30), not wired to CI. CI workflows in .github/workflows: test-windows.yml (push/PR to main; windows-latest; `cargo build --release -p sem-cli`, `cargo test -p sem-core -p sem-cli`, binary exists check) is the only workflow that runs tests, with sem-mcp excluded and no Linux or macOS test job; semver.yml (cargo-semver-checks of sem-core against the latest tag; push/PR); lockfile.yml (`cargo metadata --locked`); changelog.yml (pull_request_target; requires a CHANGELOG.md addition); docs-pages.yml (deploys docs/ to GitHub Pages); publish-skill.yml (manual npm publish); release.yml (above, builds without a test gate). No clippy, rustfmt, cargo-audit or cargo-deny jobs; JS/TS tests are not run in CI.",
+      "dependencies": "Direct dependency counts per manifest: crates/sem-core/Cargo.toml has 55 [dependencies] (45 optional: 34 tree-sitter grammar crates incl. ts-parser-perl, plus git2, rayon, memmap2, rusqlite[bundled], zstd and 6 exact-pinned oxc_* crates for an off-by-default fast path; 10 always-on: tree-sitter, serde, serde_json, serde_yaml, toml, xxhash-rust, regex, thiserror, rustc-hash, ciborium) and 8 dev-deps; crates/sem-cli/Cargo.toml has 20 (1 optional: openssl-sys) plus 3 dev; crates/sem-mcp/Cargo.toml has 17 (1 optional: openssl; rmcp, tokio, notify, tracing, lru...) plus 3 dev; crates/sem-cloud-client/Cargo.toml has 3 (serde, serde_json, ureq); crates/sem-plugin/Cargo.toml has 4 (wasm32-only) plus 4 dev; crates/sem-plugin/test-harness/Cargo.toml has 10 (separate workspace, publish=false, git deps on opral/lix branch plugin-api); package.json (npm wrapper) and agent-skill/package.json have 0 runtime deps; pi/package.json has 0 runtime, 5 dev and 3 peer deps (private). crates/Cargo.lock pins 420 packages. Build needs a Rust stable toolchain (no rust-version or rust-toolchain file found), a C toolchain (bundled SQLite, libgit2, tree-sitter grammars) and OpenSSL on Linux (Dockerfile:5-20; release cross builds use the vendored-openssl feature, release.yml:96-110). Runtime: `git` on PATH for blame and some paths (crates/sem-core/src/git/bridge.rs:182-199, 305-332, 418-446), optional `claude` CLI for `sem review listen`, optional `jj` for revset resolution (crates/sem-core/src/git/jj.rs).",
+      "security_policy": "none: no SECURITY.md or other security-policy file anywhere in the tree (searched **/SECURITY*); .github contains only FUNDING.yml and workflows (no Dependabot config, CODEOWNERS or issue templates)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Semantic version control built on Git; works in any Git repo with no setup (README.md:14-15, 37, 130)",
+        "verified": "yes",
+        "evidence": "Repo access is libgit2 Repository::discover (crates/sem-core/src/git/bridge.rs:152-180) and the SQLite/index cache is written outside the repo (crates/sem-core/src/persist/disk_cache.rs:617-664). Linked worktrees work: root discovery accepts a `.git` file (bridge.rs:1516-1553) with tests (bridge.rs:2620-2655; crates/sem-cli/tests/setup_regressions.rs:259-309), and the cache key is the canonical worktree path so each worktree gets its own cache (disk_cache.rs:759-771). Caveat: the `git` binary is also invoked for `sem blame` (bridge.rs:305-332; crates/sem-cli/src/commands/blame.rs:83), reftable ref resolution (bridge.rs:182-199) and sparse-checkout diffs (bridge.rs:401-446). No `sem worktree` or any create/list/merge/clean-up command exists (crates/sem-cli/src/main.rs:40-505)."
+      },
+      {
+        "claim": "`sem diff` is an entity-level diff with rename detection, structural hashing, word-level inline highlights and terminal/plain/json/markdown output (README.md:136-172, 463-471)",
+        "verified": "yes",
+        "evidence": "Flags and formats at crates/sem-cli/src/main.rs:63-135; format dispatch at crates/sem-cli/src/commands/diff/mod.rs:1755-1760; word-level highlights via TextDiff::from_words (crates/sem-cli/src/formatters/terminal.rs:26-50); markdown tables plus summary (formatters/markdown.rs:42-266); `--patch` reads a unified diff from stdin (main.rs:96-98) and rebuilds content from local blobs/worktree files (diff/mod.rs:1165-1200). The README's 'three-phase' matching understates the code, which has exact-ID, content/structural-hash, same-signature and fuzzy (>0.8 Jaccard) phases (crates/sem-core/src/model/identity.rs:210-214, 240, 289, 350, 548-564). Terminal output is a printed report; crates/sem-cli/Cargo.toml:17-40 has no TUI dependency."
+      },
+      {
+        "claim": "`sem setup` makes `git diff` show entity-level changes everywhere and installs a pre-commit hook showing entity-level blast radius of staged changes (README.md:319-327)",
+        "verified": "partial",
+        "evidence": "setup writes ~/.local/bin/sem-diff-wrapper (`exec sem diff --label \"$1\" \"$2\" \"$5\"`) and sets global git diff.external (crates/sem-cli/src/commands/setup.rs:57-62, 150-176). It never checks for an existing diff.external; the lookup helper is used only by `unsetup` (setup.rs:87-103, 556-561), so a configured value is overwritten. The pre-commit step appends only `sem diff --staged 2>/dev/null` to the current repo's hook (path via `git rev-parse --git-path`, setup.rs:494-554): a staged entity diff, not `sem impact` output, and non-blocking. Windows skips the hook step (setup.rs:369-372)."
+      },
+      {
+        "claim": "`sem setup` registers a Claude Code UserPromptSubmit hook (`sem hook prompt-submit`) for prompt-time context injection (README.md:329)",
+        "verified": "partial",
+        "evidence": "The hook is registered in ~/.claude/settings.json on unix, with a .sem-backup copy (crates/sem-cli/src/commands/setup.rs:313-367). But `sem hook prompt-submit` can never inject anything: socket_lookup always returns None (crates/sem-cli/src/commands/hook.rs:110-121) because the resident sidecar was deleted (crates/sem-mcp/src/lib.rs:39-51; CHANGELOG.md:67, 108). The code contradicts the README's 'context injection' claim."
+      },
+      {
+        "claim": "GitHub Action posts one sticky entity-level diff comment per PR; no config, no API keys, never fails the build (README.md:337-358)",
+        "verified": "yes",
+        "evidence": "action/action.yml is a composite action: installs a Linux x86_64/arm64 release tarball (23-42), runs `sem diff --from BASE --to HEAD --format markdown` (44-59) and upserts one comment keyed by `<!-- sem-entity-diff -->` through `gh api` (61-124); every failure path is a warning or exit 0 (55-58, 117-121); only the workflow GITHUB_TOKEN is used (10-14). Fork PRs get a read-only token so the comment is skipped (action/README.md:58-60). It posts a diff table only: no LLM or agent review, no mention/comment triggers, no checks or review API calls. The tarball is executed without checksum verification and `sem-version` defaults to `latest` (action.yml:15-18, 33-40). README pins @v0.23.1 (README.md:355) and action/README.md:38 pins @v0.15.1, both older than v0.25.0."
+      },
+      {
+        "claim": "`sem mcp` exposes 8 entity-level tools plus 4 sem-cloud review tools (README.md:475)",
+        "verified": "partial",
+        "evidence": "The code registers 13 #[tool]s: sem_entities, sem_diff, sem_blame, sem_impact, sem_log, sem_context, sem_find, sem_callers, sem_grep, join_review, wait_for_branch, reply_to_branch, list_open_branches (crates/sem-mcp/src/server.rs:1317-2850). sem_callers is missing from the README list but is tested (crates/sem-mcp/tests/mcp_protocol.rs:486-579) and changelogged (CHANGELOG.md:27). crates/sem-mcp/Cargo.toml:6 and skills/sem/SKILL.md:181 still say 6 tools. sem_diff takes only base_ref/target_ref/file_path and defaults to the working tree; there is no staged or patch input (crates/sem-mcp/src/tools.rs:70-79; server.rs:1629-1638)."
+      },
+      {
+        "claim": "`sem review listen <diff-id-or-url>` execs a coding agent that joins a sem-cloud review (README.md:392)",
+        "verified": "partial",
+        "evidence": "It validates the diff against sem-cloud using SEM_CLOUD_URL/SEM_API_KEY or ~/.sem/credentials.json, then execs the `claude` CLI (default model claude-opus-5; allowlist Read/Grep/Glob plus plugin MCP tools) with --plugin-dir (crates/sem-cli/src/commands/review.rs:25-90, 176-188). The plugin dir is auto-found only by walking up from the binary to an integrations/claude-review-listener dir, so brew/npm/curl installs need SEM_LISTENER_PLUGIN_DIR (review.rs:190-232); the plugin's .mcp.json points at crates/target/debug/sem (integrations/claude-review-listener/.mcp.json:4). It concerns sem-cloud hosted reviews, not GitHub PRs, and nothing is triggered by GitHub mentions."
+      },
+      {
+        "claim": "Telemetry is local-only by default with no network call; SEM_NO_TELEMETRY/DO_NOT_TRACK force off (README.md:577-587)",
+        "verified": "partial",
+        "evidence": "The telemetry part matches: default Mode::Local, spool holds command/version/os/ts only, upload only in `on` mode and not under SEM_NO_NETWORK (crates/sem-cli/src/telemetry.rs:20-37, 72-94, 159-230, 258-271). A separate update check, not mentioned in the README, runs on most commands: a detached `__update-check` GETs api.github.com/repos/Ataraxy-Labs/sem/releases/latest at most daily unless SEM_NO_UPDATE_CHECK or DO_NOT_TRACK is set (crates/sem-cli/src/commands/update.rs:34-37, 73-152; main.rs:628-631). docs/cloud-consent.html:408 says SEM_NO_NETWORK=1 also disables update checks, but update.rs never reads it (network_disabled() is referenced only in telemetry.rs, cloud.rs, consent.rs and diff/cloud_upload.rs)."
+      },
+      {
+        "claim": "Cloud-backed queries are opt-in per repo; logging in does not upload a repo or send a query (README.md:39, 360-392)",
+        "verified": "partial",
+        "evidence": "Gating is real: login only stores credentials (crates/sem-cli/src/commands/cloud.rs:150-210); routing and upload need per-repo consent or SEM_CLOUD=1 (consent.rs:120-128; diff/cloud_upload.rs:85-110); SEM_LOCAL=1 and SEM_NO_NETWORK=1 force local (cloud.rs:766-774). Once consent exists, `sem diff` POSTs cloneUrl, fileChanges (full beforeContent/afterContent of changed files), diffResult and relations to https://sem-cloud.fly.dev/v1/diffs (cloud.rs:21, 1055-1082; crates/sem-core/src/git/types.rs:42-51) and shares extracted per-file facts through /v1/facts/put unless SEM_FACTS_REMOTE=0 (diff/cloud_upload.rs:228-252; diff/facts_remote.rs:1-86). docs/cloud-consent.html's data-boundary table (374-381) lists only login, register, impact/context, preview and log. The server is not in this repo, so its handling is not checkable."
+      },
+      {
+        "claim": "32 programming languages with entity extraction via tree-sitter (README.md:396)",
+        "verified": "partial",
+        "evidence": "crates/sem-core/Cargo.toml defines 35 lang-* features (41-98), all enabled by default via grammar-all (14, 45-61). The README table has 34 rows (README.md:398-433) and omits BSL (CHANGELOG.md:11). Other counts disagree: sem-core description says 28 (Cargo.toml:6), docs/llms.txt:75 says 27, crates/README.md:34 says 23. JSON/YAML/TOML/CSV/Markdown/LaTeX are separate plugins and unsupported types use a chunk fallback registered last (crates/sem-core/src/parser/plugins/mod.rs:17-36). Coverage is broad but the exact count is inconsistent."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Diff comprehension: Claude answers 4 questions about 3 commits of this repo from `sem diff` JSON versus raw `git diff` (ground truth is derived from sem's own diff JSON, bench/agent-accuracy.py:1-6)",
+        "metric": "mean score across 4 questions x 3 commits (model claude-sonnet-4-5-20250929, temperature 0, run 2026-02-05)",
+        "value": "overall sem 0.9589 vs git 0.4155. Per question (sem vs git): added-functions F1 93% vs 75%, files-with-modified F1 100% vs 55%, entity-type counts 91% vs 13%, exact added/modified/deleted counts 100% vs 22%",
+        "source": "bench/agent-accuracy-results.json:1-85; displayed at docs/benchmarks.html:456-515",
+        "independent": false
+      },
+      {
+        "what": "Paired agent runs, sem agent vs grep+glob+read agent, on real bugs from xarray, pylint, astropy, fsspec, langcodes (SWE-bench Verified style, hidden-test grading), about 34 pairs as of July 2026",
+        "metric": "wall-clock speedup, tokens, solve rate",
+        "value": "50-65% faster code understanding; tokens at parity; same solve rate; across all clean pairs end-to-end wall clock 'roughly at parity' (one task won by 42%, another lost by 16%, older pairs 17-23% slower)",
+        "source": "docs/benchmarks.html:181-213, 254-260, 418-452",
+        "independent": false
+      },
+      {
+        "what": "Best-case end-to-end fix pydata/xarray#6721 (n=1) and verify loop `sem impact --tests` on xarray (6,185 entities)",
+        "metric": "wall-clock and per-iteration test time",
+        "value": "220.6s / 42.8k tokens / 17 calls (grep+read) vs 127.2s / 40.5k / 14 (sem), 42% faster; verify iteration 2.90s with 826 tests vs 0.59s with 16 graph-selected tests (4.9x best case, about 1.2x when call edges fall back to lexical matching)",
+        "source": "docs/benchmarks.html:218-246, 264-319",
+        "independent": false
+      },
+      {
+        "what": "Cold single-process tool latency on sem's own codebase, plus impact on a 6,185-entity repo",
+        "metric": "milliseconds",
+        "value": "entities 30ms, blame 40ms, diff 47ms, log 85ms, impact 120ms, context 136ms; impact 264ms cold vs about 10ms warm",
+        "source": "docs/benchmarks.html:531-609",
+        "independent": false
+      },
+      {
+        "what": "Cold full-CLI graph build on large public corpora (release binary, v0.22.1 changelog)",
+        "metric": "seconds, cold",
+        "value": "home-assistant-core 5.9s, TypeScript monster 11.2s, dotnet-runtime 46.7s, llvm-project 34.7s, linux 35.2s (warm rebuilds 0.2-1.3s)",
+        "source": "CHANGELOG.md:101",
+        "independent": false
+      },
+      {
+        "what": "`sem grep` (trigram-indexed) versus ripgrep on giant repos",
+        "metric": "milliseconds per query",
+        "value": "sem 25-53ms vs rg 283-980ms (claimed 11-26x faster)",
+        "source": "CHANGELOG.md:94",
+        "independent": false
+      },
+      {
+        "what": "README timing of `sem find` on the crates/ directory of this repo",
+        "metric": "milliseconds",
+        "value": "185ms for the first call (index not built) vs 7ms once the index exists; the README says numbers depend on machine and repo size",
+        "source": "README.md:300",
+        "independent": false
+      },
+      {
+        "what": "pi package (a different product surface: pi agent plus a separate weave-mcp binary): SWE-bench Verified 10-task slice in pure code mode, and a concurrent-edit race test",
+        "metric": "tasks resolved; edits lost",
+        "value": "9/10 resolved, identical to the same agent with bash (one run, ten tasks); 0 lost edits in 1,000 raced attempts versus plain last-writer-wins losing one in 80-100% of runs",
+        "source": "pi/README.md:17-33",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Test and CI coverage gap: the only workflow that runs tests is Windows-only (`cargo test -p sem-core -p sem-cli`, .github/workflows/test-windows.yml:10-28). There is no Linux or macOS test job, sem-mcp and the 118 JS/TS test files are never run in CI, and release builds have no test gate (release.yml:83-163). The '900+ tests passing' badge is a static image (README.md:30).",
+      "Release and supply-chain integrity: releases carry only an unsigned checksums.txt generated in the same job as the artifacts (release.yml:173-174), with no signatures, attestations or SBOM. The GitHub Action downloads and runs the release tarball without verifying it, and `sem-version` defaults to `latest`, so pinning the action ref does not pin the binary (action/action.yml:15-18, 33-40). `sem update` skips verification silently when checksums.txt or a sha tool is unavailable (update.rs:309-354). Releases are cut automatically by a push to main touching crates/sem-core/Cargo.toml and publish with long-lived NPM_TOKEN and CARGO_REGISTRY_TOKEN secrets (release.yml:3-9, 209, 256). No SECURITY.md exists, so there is no documented vulnerability-reporting channel.",
+      "Scope versus the stated needs: there is no worktree create/list/merge/clean-up command (crates/sem-cli/src/main.rs:40-505; sem only reads worktrees) and no GitHub PR/checks/reviews/API automation beyond the sticky diff-comment Action (action/action.yml:61-124). The agent-review path (`sem review listen`, MCP join_review/wait_for_branch/reply_to_branch) targets proprietary sem-cloud reviews, requires the `claude` CLI and sem-cloud credentials, finds its plugin only next to a source checkout, and its plugin .mcp.json uses crates/target/debug/sem (review.rs:190-232; integrations/claude-review-listener/.mcp.json:4). The plugin README's manual recipe uses --permission-mode bypassPermissions with Bash allowed (integrations/claude-review-listener/README.md:54-60, 81-84).",
+      "Closed-source cloud backend and data egress when opted in: the default endpoint https://sem-cloud.fly.dev (crates/sem-cli/src/commands/cloud.rs:21) is not in this repo. With consent (or SEM_CLOUD=1) and credentials, `sem diff` uploads full before/after content of changed files, the diff result and extracted file facts (cloud.rs:1055-1082; diff/cloud_upload.rs:228-252; diff/facts_remote.rs:1-86), which the data-boundary table in docs/cloud-consent.html:374-381 does not list.",
+      "Network behavior not covered by the README telemetry section: a detached background update check calls api.github.com daily on most commands unless SEM_NO_UPDATE_CHECK or DO_NOT_TRACK is set (update.rs:34-37, 73-152; main.rs:628-631). SEM_NO_NETWORK does not disable it, contradicting docs/cloud-consent.html:408. Interactive diffs also print a weekly 'sem login' hint (cloud.rs:72-107).",
+      "Invasive local configuration: `sem setup` sets global git diff.external without checking for an existing value (setup.rs:162-167 versus helper used only in unsetup at 556-561), writes ~/.local/bin/sem-diff-wrapper, edits ~/.claude/settings.json (backup .sem-backup) and appends to the current repo's pre-commit hook (setup.rs:313-367, 512-554). The Claude hook it installs is a no-op (hook.rs:110-121). `npx @ataraxy-labs/sem-skill --guard` adds PreToolUse hooks to ~/.claude/settings.json that deny Grep/Read/sed on code files (agent-skill/README.md:54-78; agent-skill/install.mjs:47-82).",
+      "Documentation drift and fast-moving surface: the code disagrees with the docs on MCP tool counts (code 13 vs README 12 vs Cargo.toml/SKILL.md 6), language counts (35 features vs README 32/34 rows vs 28/27/23 elsewhere), and version pins (README Action @v0.23.1, action/README @v0.15.1, in-tree Formula/sem.rb v0.7.0 with empty sha256 and license MIT, root SKILL.md '134 tests', docs/llms.txt:57 documents a nonexistent `sem graph --entity` flag). The license is MIT OR Apache-2.0 in the manifests but shown as MIT-only in the README badge and crates/README.md:76. Six releases shipped between 2026-07-10 and 2026-09-13, including removals (`sem orient` in 0.19.0, the resident MCP sidecar in 0.22.x), so the CLI/MCP surface changes quickly (CHANGELOG.md:7, 22, 34, 50, 89, 108, 115, 149).",
+      "Runtime and platform constraints: some commands need the `git` CLI (blame via `git blame --line-porcelain`, reftable refs, sparse checkouts: crates/sem-core/src/git/bridge.rs:182-199, 305-332, 418-446), but the documented Docker image installs no git (Dockerfile:15-26); I did not run it. The binary name `sem` collides with GNU Parallel's `sem` (README.md:109-126). WSL2 is undocumented. The dependency surface is large: 420 locked crates, 34 optional third-party tree-sitter grammar crates, and bundled C code (SQLite, libgit2) (crates/Cargo.lock; sem-core/Cargo.toml:100-148)."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "ataraxy-labs/sem",
+      "checks": [
+        {
+          "field": "readme.install[0] (curl installer)",
+          "statement": "curl installer script (Linux x86_64/arm64 and macOS arm64/x86_64; downloads the release tarball, verifies it against checksums.txt, fails closed, installs to ~/.local/bin, never uses sudo): `curl -fsSL https://raw.githubusercontent.com/Ataraxy-Labs/sem/main/install.sh | sh`",
+          "citation": "README.md:47-49; install.sh:19-26, 111-137, 181-240",
+          "holds": true,
+          "note": "README.md:47-49 has the exact command. install.sh:19 lists macOS arm64/x86_64 and Linux x86_64/arm64, and :121-134 maps uname to those. :216-229 downloads sem-<os>-<arch>.tar.gz from the release. :181-212 fetches checksums.txt and errors on a fetch failure, a missing entry or a mismatch. :171-178 refuses to install without sha256sum/shasum. The only bypass is the opt-in --skip-checksum flag; SKIP_CHECKSUM is hard-set to 0 at :35, so no env var can bypass it. :23 and :233-234 say no sudo. The ~/.local/bin default is set at :16 and :33, outside the cited ranges: true, but the citation is imprecise. The documented command pipes install.sh from main, not the v0.25.0 tag, and installs the latest release by default (:32, :141-146)."
+        },
+        {
+          "field": "license",
+          "statement": "spdx: MIT OR Apache-2.0; file: LICENSE-MIT; LICENSE-APACHE",
+          "citation": "LICENSE-MIT; LICENSE-APACHE",
+          "holds": true,
+          "note": "LICENSE-MIT (MIT, Copyright (c) 2025 Ataraxy Labs) and LICENSE-APACHE (full Apache 2.0 text through 'END OF TERMS AND CONDITIONS' at :176) both exist at the repo root. Every manifest declares `MIT OR Apache-2.0`: crates/{sem-core,sem-cli,sem-mcp,sem-cloud-client,sem-plugin}/Cargo.toml:5, package.json:6 (it also ships both license files, :19-20) and agent-skill/package.json:27. The README badge says MIT only (README.md:31), which the dossier's risks already note."
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes: release artifact sem-linux-x86_64.tar.gz is built on ubuntu-latest (.github/workflows/release.yml:90-92) and install.sh supports it (install.sh:19, 130-134). Note CI runs tests only on Windows (.github/workflows/test-windows.yml:10-28).",
+          "citation": ".github/workflows/release.yml:90-92; install.sh:19, 130-134; .github/workflows/test-windows.yml:10-28",
+          "holds": true,
+          "note": "release.yml:90-92 has target x86_64-unknown-linux-gnu, os ubuntu-latest, name sem-linux-x86_64. It is a native `cargo build --release -p sem-cli` (:141-142), packaged as sem-linux-x86_64.tar.gz (:144-149) and attached with checksums.txt (:173-183). install.sh:19 lists Linux x86_64, and :130-134 maps x86_64/amd64. test-windows.yml:10-28 is a windows-latest job running `cargo test -p sem-core -p sem-cli`. Grepping every workflow for cargo test/npm test/node --test finds no other test step, so the Windows-only note is accurate."
+        },
+        {
+          "field": "readme.integrations.mcp",
+          "statement": "yes: `sem mcp` (main.rs:436-446, 952-961) and a standalone `sem-mcp` binary (sem-mcp/src/main.rs:4-10) run an rmcp stdio server (lib.rs:14-37). The code registers 13 tools: 9 entity-level (incl. sem_callers, absent from the README list) and 4 sem-cloud review tools (server.rs:1317-2850). Repo resolution is absolute file path hint, then SEM_REPO, then CWD (server.rs:198-234).",
+          "citation": "crates/sem-cli/src/main.rs:436-446, 952-961; crates/sem-mcp/src/main.rs:4-10; crates/sem-mcp/src/lib.rs:14-37; crates/sem-mcp/src/server.rs:1317-2850, 198-234",
+          "holds": true,
+          "note": "main.rs:436-446 defines `Mcp` ('Start the MCP server (stdin/stdout transport)'; --resident is a hidden no-op), and :952-961 calls sem_mcp::run(). sem-mcp/Cargo.toml:13-15 declares [[bin]] sem-mcp, whose main.rs:4-10 calls the same run(). lib.rs:14-37 serves SemServer through rmcp over a ResilientStdioTransport on stdin/stdout. server.rs has exactly 13 #[tool] methods: sem_entities 1317, sem_diff 1617, sem_blame 1665, sem_impact 1758, sem_log 1968, sem_context 2141, sem_find 2432, sem_callers 2554, sem_grep 2680, join_review 2803, wait_for_branch 2816, reply_to_branch 2829, list_open_branches 2842. README.md:475 lists 8+4 and omits sem_callers. server.rs:198-234 tries an absolute path hint via GitBridge::open, then the SEM_REPO dir, then CWD."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "Semantic version control built on Git; works in any Git repo with no setup (README.md:14-15, 37, 130). Verified: yes (libgit2 Repository::discover, cache outside the repo, linked-worktree support with tests, per-worktree cache key, git CLI used for blame/reftable/sparse checkout, no worktree create/list/merge/clean-up command).",
+          "citation": "README.md:14-15, 37, 130; crates/sem-core/src/git/bridge.rs:152-180, 182-199, 305-332, 401-446, 1516-1553, 2620-2655; crates/sem-core/src/persist/disk_cache.rs:617-664, 759-771; crates/sem-cli/tests/setup_regressions.rs:259-309; crates/sem-cli/src/commands/blame.rs:83; crates/sem-cli/src/main.rs:40-505",
+          "holds": true,
+          "note": "The README lines match the quotes. GitBridge::open calls Repository::discover (bridge.rs:155). The git CLI is used for reftable rev-parse (:185-199), `git blame --line-porcelain` (:305-332, called at blame.rs:83) and sparse-checkout `git diff --name-status` (:399-446). nearest_git_root accepts a .git file or directory (:1543-1558). The test at :2620-2656 checks that both resolvers return a linked worktree's own directory, and setup_regressions.rs:259-309 runs `git worktree add` before setup/unsetup. cache_root (disk_cache.rs:617-664) only accepts locations outside the repo (SEM_CACHE_DIR, XDG_CACHE_HOME, ~/Library/Caches, ~/.cache, temp). index.sem sits in the same per-repo directory (:597-599; index/mod.rs:33-34). repo_cache_key (:759-771) hashes the canonical root, so each worktree gets its own cache. The Commands enum (main.rs:41-505) has no worktree command; the 'worktree' hits in sem-cli/src are --patch working-tree reads in diff/mod.rs."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

@@ -1,0 +1,276 @@
+{
+  "contender": "jarrodwatts/claude-hud",
+  "revision": {
+    "contender": "jarrodwatts/claude-hud",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "jarrodwatts/claude-hud",
+        "tag": "v0.10.0",
+        "commit": "75683c6de1ac07f6bbef00d739001679dba0740c",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v0.10.0",
+    "commit": "75683c6de1ac07f6bbef00d739001679dba0740c",
+    "read_at": "2026-10-02T03:02:17+00:00"
+  },
+  "dossier": {
+    "contender": "jarrodwatts/claude-hud",
+    "revision": {
+      "tag": "v0.10.0",
+      "commit": "75683c6de1ac07f6bbef00d739001679dba0740c",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "MIT",
+      "file": "LICENSE"
+    },
+    "purpose": "Claude HUD v0.10.0 (MIT) is a Claude Code plugin whose runtime is a status-line command. Claude Code starts it as a fresh process on each refresh with a JSON session payload on stdin, and it prints a text HUD to stdout: by default two lines with model, project and git/jj branch, context-window % and subscriber rate-limit %, plus opt-in lines for tools, agents, todos, cost, speed and more (README.md:3,46-54,66; CLAUDE.md:14-21; src/index.ts:54-103). It is not a telemetry component. A case-insensitive search of src/, scripts/, tests/, dist/, commands/, docs and manifests found no OTLP/OpenTelemetry/OTEL_*, Prometheus, Loki, Grafana, Langfuse, ClickHouse, Ollama, vLLM, llama.cpp, LiteLLM, GPU/CUDA or Codex references (the only substring hits were false positives such as 'tempo' inside 'temporary'). Answers to the stated questions: local OTLP collector and privacy filter = none; store for OTLP usage metrics = none; store for OTLP events/logs = none; local dashboard/exploration tool = none (terminal text only); store for traces/datasets/experiments = none; local model server for the RTX 4090 host = none. The only data it persists is optional small JSON files: a per-day/per-week cost tally (src/daily-cost.ts), an output-speed cache (src/speed.ts) and a rate-limit snapshot written to a user-chosen path (src/external-usage.ts). None is written under default settings (src/index.ts:80-92; src/config.ts:226-293) and none is a queryable metrics, log or trace store.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "A Claude Code plugin that shows what's happening: context usage, rate limits, active tools, running agents, and todo progress, always visible below your input.",
+          "citation": "README.md:3"
+        },
+        {
+          "claim": "Claude HUD is a status line command: Claude Code runs it with session data on stdin (model, context window, cost, rate limits, prompt cache) and shows what it prints; some optional elements (tools, agents, todos) also read the session transcript; no separate window or tmux needed.",
+          "citation": "README.md:66"
+        },
+        {
+          "claim": "Claude HUD is local-only. It makes no network requests, never reads credentials, and calls no undocumented APIs.",
+          "citation": "README.md:262"
+        },
+        {
+          "claim": "It reads Claude Code's stdin, the session transcript, Claude configuration files, and git or jj metadata for the current directory. Its only writes are small state files (output speed and the cost ledger) under ~/.claude/plugins/claude-hud, with private permissions.",
+          "citation": "README.md:262"
+        },
+        {
+          "claim": "--extra-cmd runs a shell command on every refresh and puts its output on the first line; it is ignored unless CLAUDE_HUD_ALLOW_EXTRA_CMD=1 is set; 'Treat it as arbitrary code execution'.",
+          "citation": "README.md:264"
+        },
+        {
+          "claim": "display.showCost shows Claude Code's own session cost (cost.total_cost_usd); Bedrock and Vertex cost is hidden unless display.showRoutedCost is also set.",
+          "citation": "README.md:125-126,218"
+        },
+        {
+          "claim": "display.showDailyCost / showWeeklyCost: today's and weekly spend across sessions are kept in a small ledger in the plugin data directory, reset at local midnight, and accumulated from the native cost.total_cost_usd.",
+          "citation": "README.md:127-128,220"
+        },
+        {
+          "claim": "display.externalUsagePath reads a local usage-snapshot JSON; display.externalUsageWritePath writes stdin's rate limits to a private .json file in an existing directory for other local tools to read.",
+          "citation": "README.md:144-145,202-214"
+        },
+        {
+          "claim": "Usage shows whenever Claude Code sends subscriber rate_limits (after the first response); API-key, Bedrock and Vertex sessions have no subscriber limits, so it stays hidden.",
+          "citation": "README.md:194"
+        },
+        {
+          "claim": "/claude-hud:setup points your status line at the HUD; Claude Code reloads settings on its own.",
+          "citation": "README.md:23"
+        },
+        {
+          "claim": "Config lives in ~/.claude/plugins/claude-hud/config.json (or under $CLAUDE_CONFIG_DIR), with an optional per-directory $CLAUDE_CONFIG_DIR/claude-hud.json override; invalid values fall back to defaults.",
+          "citation": "README.md:76-78"
+        },
+        {
+          "claim": "CLAUDE_HUD_DISABLE=1 blanks the HUD for a session without touching settings.json.",
+          "citation": "README.md:252-258"
+        },
+        {
+          "claim": "Requirements: Claude Code v2.1.260 or later; macOS or Linux: Node.js 18+ or Bun; Windows: Node.js 18+.",
+          "citation": "README.md:280-282"
+        },
+        {
+          "claim": "License: MIT.",
+          "citation": "README.md:296"
+        }
+      ],
+      "install": [
+        {
+          "method": "Claude Code in-session plugin commands (README gives no OS-specific variant, so this applies to macOS and Linux)",
+          "command": "/plugin marketplace add jarrodwatts/claude-hud\n/plugin install claude-hud\n/reload-plugins\n/claude-hud:setup",
+          "citation": "README.md:17-20"
+        },
+        {
+          "method": "Claude Code CLI from a terminal",
+          "command": "claude plugin marketplace add jarrodwatts/claude-hud\nclaude plugin install claude-hud@claude-hud\n(then, inside a session) /reload-plugins and /claude-hud:setup",
+          "citation": "README.md:29-33"
+        },
+        {
+          "method": "From source (development checkout only; not a plugin install)",
+          "command": "git clone https://github.com/jarrodwatts/claude-hud\ncd claude-hud\nnpm ci && npm test",
+          "citation": "README.md:287-289"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - README.md:281 'macOS or Linux: Node.js 18+ or Bun'; the runtime is dependency-free JavaScript (package.json:34-38 lists dev dependencies only); CI runs ubuntu-latest on Node 18.x and 20.x (.github/workflows/ci.yml:12-15); Linux-specific memory reading from /proc/meminfo (src/memory.ts:44-46). CPU architecture is not stated anywhere.",
+        "wsl2": "yes - documented only in commands/setup.md:14 ('darwin, linux (including WSL)' are treated as posix) and commands/setup.md:18 ('In WSL, the plugin must be installed inside Linux, not on the Windows side'). README.md does not mention WSL and CI has no WSL job.",
+        "macos_arm64": "yes - README.md:281 lists macOS (no CPU architecture is distinguished; the runtime is dependency-free JavaScript). macOS-specific code: memory via /usr/bin/vm_stat (src/memory.ts:47-53) and a note that Claude Code may need a restart for the HUD to appear (src/i18n/en.ts:43-44; src/index.ts:65). The lockfile includes the TypeScript darwin-arm64 build binary (package-lock.json:102-118). There is no macOS runner in CI (.github/workflows/ci.yml).",
+        "gpu": "no - nothing in the repository uses, detects or reports a GPU (case-insensitive search for gpu/cuda/4090 found no matches). The only host gauge is approximate RAM (README.md:171; src/memory.ts:42-75), and CONTRIBUTING.md:16 puts other system gauges out of scope ('Use extra-cmd')."
+      },
+      "integrations": {
+        "cli": "No bin entry in package.json (package.json:1-39). Invoked as 'node dist/index.js' with a Claude Code JSON payload on stdin (CLAUDE.md:11; package.json:22); optional '--extra-cmd' flag (src/extra-cmd.ts:17-26); env CLAUDE_HUD_DISABLE (src/index.ts:24-27). Helper script: 'node scripts/setup.mjs inspect|install --shell posix|gitbash|powershell' (scripts/setup.mjs:3-4).",
+        "mcp": "none found - no MCP server code or MCP SDK dependency (package.json has no runtime dependencies; no server/listener code in src/ or scripts/). The HUD only displays MCP activity inferred from transcript tool names 'mcp__<server>__<tool>' (src/transcript.ts:17,70,232-233) and counts configured MCP servers (src/config-reader.ts:93-94,124-126; README.md:152).",
+        "sdk_or_api": "none found as a documented SDK or HTTP API: no server, socket or listener code, and no npm publish step in any workflow. package.json:6 sets main to dist/index.js, which exports main, isHudDisabled and resolveVcsStatus (src/index.ts:24,39,54) and is consumed only by the launcher (scripts/statusline.mjs:42-43). The only interchange is file-based JSON: display.externalUsagePath (read) and display.externalUsageWritePath (write) (README.md:144-145,202-214; src/external-usage.ts:80-160).",
+        "claude_code_or_codex": "Claude Code: yes - packaged as a Claude Code plugin with a marketplace manifest (.claude-plugin/marketplace.json:11-19) and slash commands /claude-hud:setup and /claude-hud:configure (.claude-plugin/plugin.json:9-12; commands/setup.md; commands/configure.md); registered as the statusLine command in settings.json (scripts/setup.mjs:94); consumes the status-line stdin payload (src/types.ts:6-59) and the session transcript JSONL (src/transcript.ts:355-372). Codex: none found - a case-insensitive search for 'codex' outside the lockfile and dist/ returned no matches."
+      },
+      "telemetry_and_network": "No telemetry, analytics, crash reporting or phone-home found, and no OTEL_*/OTLP handling: it does not read, forward or configure Claude Code's own OpenTelemetry settings. README.md:262 says it 'makes no network requests'; the code agrees: searches of src/, scripts/ and the committed dist/ for fetch(, http/https/net/tls/dns/dgram/http2 imports, XMLHttpRequest, WebSocket, undici/axios found nothing, and package.json:34-38 has no runtime dependencies. The only 'https://' literals build GitHub branch/commit hyperlinks (src/git.ts:119-128) and match MiniMax endpoints in ANTHROPIC_BASE_URL (src/stdin.ts:137-153). No account, API key, collector endpoint or external service is required: it needs Claude Code (>= 2.1.260 per README.md:280) and Node.js 18+ or Bun (README.md:281-282); git and jj are optional local binaries. Local subprocesses: git status/diff/rev-parse/describe with GIT_OPTIONAL_LOCKS=0 (src/git.ts:52-111; src/git-runner.ts:13-20), a read-only 'jj log' (src/jj.ts:63-76), /usr/bin/vm_stat on macOS when showMemoryUsage is on (src/memory.ts:31-38), and an arbitrary shell command only when --extra-cmd is passed and CLAUDE_HUD_ALLOW_EXTRA_CMD is set (src/extra-cmd.ts:11-22,43-55; README.md:264). Local reads: stdin payload, session transcript, config.json/claude-hud.json, and when opted in ~/.claude.json account fields (src/auth.ts:77-118) and settings/CLAUDE.md/rules/MCP counts (src/config-reader.ts:86-131). Debug output goes to stderr only when DEBUG=claude-hud (src/debug.ts:1-8). The only network-touching path in the repository is the optional last prompt choice of the setup slash command, which runs 'gh repo star jarrodwatts/claude-hud' (or 'gh api -X PUT /user/starred/...') through Claude's Bash tool if the user picks 'Yes, and star the repo' (commands/setup.md:3,90). History: v0.0.4-0.0.10 had a background OAuth usage-API client with keychain/credential lookups and proxy settings (CHANGELOG.md:318-326,344,447); it was removed in 0.0.12 (CHANGELOG.md:281) and is absent from the current code."
+    },
+    "code": {
+      "languages": [
+        "TypeScript (src/, 48 files; compiled by tsc to ES2022/NodeNext JavaScript in dist/ - tsconfig.json:1-19)",
+        "JavaScript ESM (scripts/*.mjs launcher, setup and build helper; tests/*.test.js)",
+        "Markdown slash-command definitions (commands/setup.md, commands/configure.md)"
+      ],
+      "entry_points": [
+        {
+          "path": "src/index.ts (compiled to dist/index.js)",
+          "what": "CLI main: exports main(); reads the Claude Code JSON payload from stdin, loads config, gathers the enabled data sources in parallel and prints the HUD lines to stdout; self-runs when invoked directly (src/index.ts:54-114; package.json:6)."
+        },
+        {
+          "path": "scripts/statusline.mjs",
+          "what": "Launcher that setup copies to <config dir>/plugins/claude-hud/statusline.mjs and registers as the statusLine command; it picks the newest semver directory under plugins/cache/*/claude-hud, imports src/index.ts under Bun or dist/index.js under Node, then calls main() (scripts/statusline.mjs:17-44)."
+        },
+        {
+          "path": "scripts/setup.mjs",
+          "what": "Helper CLI 'inspect|install --shell posix|gitbash|powershell': prints a JSON report and, on install, writes the launcher and the statusLine entry of settings.json after a backup (scripts/setup.mjs:3-4,58-103)."
+        },
+        {
+          "path": "commands/setup.md",
+          "what": "/claude-hud:setup slash command (allowed-tools Bash, Read, AskUserQuestion) that finds a runtime and runs scripts/setup.mjs; its last step can offer to star the repo via gh (commands/setup.md:3,20-35,55-60,84-92)."
+        },
+        {
+          "path": "commands/configure.md",
+          "what": "/claude-hud:configure slash command (allowed-tools Read, Write, AskUserQuestion) that asks layout/activity/usage/git/language questions and writes plugins/claude-hud/config.json (commands/configure.md:3,17-77)."
+        },
+        {
+          "path": ".claude-plugin/plugin.json and .claude-plugin/marketplace.json",
+          "what": "Claude Code plugin manifest (name claude-hud, version 0.10.0, command list) and marketplace manifest whose plugin source is './' (.claude-plugin/plugin.json:1-17; .claude-plugin/marketplace.json:11-19)."
+        },
+        {
+          "path": "src/windows-git-worker.ts (compiled to dist/windows-git-worker.js)",
+          "what": "Windows-only one-shot worker spawned by src/git-runner.ts to run git and tree-kill it if the parent goes away (src/windows-git-worker.ts:1-27; src/git-runner.ts:57-69)."
+        },
+        {
+          "path": "scripts/clean-dist.mjs",
+          "what": "Build helper run before tsc that deletes dist/ (package.json:17; scripts/clean-dist.mjs:7)."
+        }
+      ],
+      "architecture": "One short-lived Node/Bun process per status-line refresh (CLAUDE.md:16); no daemon, server, socket or database (searches for node:net/http/dgram, createServer, listen and sqlite found nothing in src/, scripts/, dist/). src/index.ts orchestrates: src/stdin.ts parses the Claude Code payload (shape in src/types.ts:7-59; 256 KiB cap, 250 ms no-data timeout); src/config.ts loads and validates plugins/claude-hud/config.json plus the per-directory claude-hud.json override against DEFAULT_CONFIG (src/config.ts:201-309,498-539). Enabled data sources run in parallel: src/transcript.ts (streams the session JSONL for tools, agents, todos, skills, MCP names, session token totals, compactions, served model), src/git.ts with src/git-runner.ts (and src/windows-git-worker.ts) or src/jj.ts for VCS state, src/memory.ts, src/extra-cmd.ts, src/auth.ts, src/config-reader.ts, src/daily-cost.ts (cost ledger), src/speed.ts (speed cache) and src/external-usage.ts (snapshot read/write). src/render/* turns a RenderContext into text lines without I/O (layout in expanded.ts/compact.ts; elements in parts.ts, context.ts, usage.ts, vcs.ts, lines.ts, activity.ts; width/wrapping in ansi.ts; entry in render/index.ts:19-21). src/i18n/* holds en, zh-Hans and zh-Hant label tables; src/utils/sanitize.ts strips escape, control and bidi characters from untrusted text (src/utils/sanitize.ts:1-11). Output is console.log to stdout; persistence is limited to small JSON files.",
+      "packaging_and_release": "Distributed as a Claude Code plugin straight from the git repository: the marketplace entry uses source './' (.claude-plugin/marketplace.json:14) and plugin.json is the update/cache version key (RELEASING.md:7-13). dist/ is gitignored (.gitignore:4-7) but a workflow force-commits it to main after each merge: .github/workflows/build-dist.yml:29-42 runs npm ci, npm test, npm run build, then 'git add dist/ --force' and pushes as github-actions[bot] with an [auto] message; PRs must not include dist/ (CONTRIBUTING.md:34). Pushing a v*.*.* tag triggers .github/workflows/release.yml (Node 20: npm ci, build, test, coverage; extract the CHANGELOG section; create a GitHub release with softprops/action-gh-release@v2 using notes only, no files - release.yml:3-40). No npm publish, release assets, checksums, signatures, provenance/attestations or SBOM in any workflow (search of .github for attest/cosign/sigstore/sha256/checksum/gpg/provenance/slsa/sbom/publish found only 'id-token: write' in claude.yml:25, used by the Claude Code Action). The tag v0.10.0 is an annotated tag peeling to commit 75683c6 (.git/packed-refs:2-3). At runtime the launcher selects the newest semver directory in the plugin cache (scripts/statusline.mjs:26-43).",
+      "tests_and_ci": "Node's built-in test runner ('node --test') after a TypeScript build, with c8 for coverage (package.json:17-20). 29 test files matching tests/*.test.js (about 256 top-level test()/describe() blocks by line-start count), importing the compiled dist/ (e.g. tests/readme-options.test.js:4); they cover stdin, transcript parsing, config, git/jj, cost ledger, external usage, rendering, i18n and the setup/launcher scripts (tests/setup-command.test.js), plus a golden end-to-end snapshot (tests/golden.test.js with tests/golden/cases.mjs and expected.txt), a README-keys parity test (tests/readme-options.test.js:16-20) and a dist/src parity check (tests/build-output.test.js:18-31). CI: .github/workflows/ci.yml runs on pull_request and on push to main (ignoring dist/**): job 'test' on ubuntu-latest with Node 18.x and 20.x runs npm ci and npm run test:coverage (ci.yml:3-23); job 'windows-git' on windows-latest, Node 20.x, builds and runs only tests/git.test.js and tests/git-runner.test.js (ci.yml:25-49). release.yml re-runs build, npm test and coverage on Node 20 before releasing; build-dist.yml runs npm test and build on push to main. claude.yml runs anthropics/claude-code-action@v1 on '@claude' mentions (claude.yml:3-47). No macOS or Bun job, no lint script (package.json:16-23), and no CodeQL/dependency-review/scanning workflow in .github/workflows; dependabot covers npm only (.github/dependabot.yml:2-7).",
+      "dependencies": "package.json:34-38: 0 runtime dependencies; 3 devDependencies (@types/node ^26.6.2, c8 ^11.0.0, typescript ^7.0.2). package-lock.json (lockfileVersion 3) has 82 package entries, all marked dev; 20 of them are optional per-platform native TypeScript 7 compiler binaries (package-lock.json:999-1020). No other dependency manifests. CONTRIBUTING.md:35 says 'Avoid new dependencies'. Note: c8@11.0.0 declares engines node '20 || >=22' (package-lock.json:470-472) while the CI matrix includes Node 18.x (ci.yml:15); the runtime itself has no dependencies.",
+      "security_policy": "SECURITY.md (repo root): security fixes only for the latest release series (SECURITY.md:5); report through GitHub's private advisory flow (SECURITY.md:9-10); acknowledgement within 5 business days (SECURITY.md:13). Separately, .github/ISSUE_TEMPLATE/config.yml:3-5 directs security reports to an email address, and that address is spelled differently from the owner email in .claude-plugin/marketplace.json:5 (one letter missing in the local part)."
+    },
+    "claim_checks": [
+      {
+        "claim": "Claude HUD is local-only. It makes no network requests (README.md:262).",
+        "verified": "yes",
+        "evidence": "No network API in the runtime code: searches of src/, scripts/ and the committed dist/ for fetch(, http/https/net/tls/dns/dgram/http2 imports, XMLHttpRequest, WebSocket and undici/axios found nothing; package.json:34-38 lists only dev dependencies. The only 'https://' literals are GitHub link construction (src/git.ts:125) and MiniMax endpoint matching (src/stdin.ts:137-139). Git and jj run as local read-only subprocesses (src/git.ts:59,81; src/jj.ts:73-76). Caveats outside the HUD process itself: opt-in --extra-cmd can run any shell command (src/extra-cmd.ts:45), and commands/setup.md:90 can run 'gh repo star' if the user picks that option."
+      },
+      {
+        "claim": "It never reads credentials (README.md:262).",
+        "verified": "partial",
+        "evidence": "No token, keychain or credentials-file access in src/ (a search for credential/keychain/token/oauth hits only src/auth.ts). But with display.showAuth or showAuthUser on, src/auth.ts:108-118 reads the whole ~/.claude.json (or $CLAUDE_CONFIG_DIR/.claude.json) and uses oauthAccount.organizationType, organizationRateLimitTier, emailAddress and displayName (src/auth.ts:77-99), and src/auth.ts:23-25 reads ANTHROPIC_API_KEY from the environment to test that it is non-empty (the value is not shown). With showConfigCounts, src/config-reader.ts:91-94 reads settings.json and .claude.json for key names. That is identity data plus an env-key presence check, opt-in (README.md:160-161), not secret display."
+      },
+      {
+        "claim": "Its only writes are small state files (output speed and the cost ledger) under ~/.claude/plugins/claude-hud, with private permissions (README.md:262).",
+        "verified": "partial",
+        "evidence": "The two named files match: speed state at plugins/claude-hud/speed-cache/<sha256>.json (src/speed.ts:19-22,36-45) and ledger plugins/claude-hud/daily-cost.json (src/daily-cost.ts:50-52,100-116), directories 0o700 and files 0o600, written only when showSpeed or showDailyCost/showWeeklyCost are enabled (src/index.ts:89-92; defaults false at src/config.ts:235-238). The sentence is incomplete: the render path can also write an external usage snapshot JSON to any user-chosen absolute path (src/external-usage.ts:80-118; documented elsewhere at README.md:145), the setup script writes settings.json plus a settings.json.bak.<timestamp> backup, the launcher and previous-statusline.txt (scripts/setup.mjs:79-102), and /claude-hud:configure writes config.json (commands/configure.md:73-77). Code wins over the README."
+      },
+      {
+        "claim": "Claude Code supplies session data on stdin and some elements also read the session transcript (README.md:66).",
+        "verified": "yes",
+        "evidence": "StdinData models model, context_window, cost, rate_limits, prompt_cache, workspace and more (src/types.ts:7-59) and is read from stdin with a 256 KiB cap and a 250 ms no-data timeout (src/stdin.ts:6-7,13-53). The transcript is streamed and parsed only when an enabled element needs it (tools, skills, MCP, agents, todos, config counts, session tokens, compactions, advisor, session start, last response, effort, modelSource other than stdin) or when Claude Code reports no context usage (src/index.ts:29-36,72-77; src/transcript.ts:355-372). Each run is a fresh process (CLAUDE.md:16)."
+      },
+      {
+        "claim": "display.showDailyCost/showWeeklyCost keep a small per-day ledger in the plugin data directory, reset at local midnight, accumulated from native cost.total_cost_usd (README.md:127-128,220).",
+        "verified": "yes",
+        "evidence": "src/daily-cost.ts:50-52 puts the ledger at <config dir>/plugins/claude-hud/daily-cost.json; sessions keyed by session_id accumulate Claude Code's cost.total_cost_usd (src/daily-cost.ts:157-171; src/cost.ts:7-17); the day key is the local calendar date and rolls over at local midnight (src/daily-cost.ts:54-57,141-146). It stores only a small per-session total (baseline, weekBaseline, total, ts) pruned after 24 h without updates (src/daily-cost.ts:14,133-139) and writes are throttled to 30 s (src/daily-cost.ts:13,177-179). It is a running cost tally, not a queryable metrics history."
+      },
+      {
+        "claim": "display.externalUsageWritePath writes stdin's rate limits to a private .json file for other local tools (README.md:145,214).",
+        "verified": "yes",
+        "evidence": "src/external-usage.ts:80-118 writes only when the path is absolute, ends in .json and sits in an existing directory, using an exclusive temp file, rename and chmod 0o600. Content is updated_at plus five_hour and seven_day {used_percentage, resets_at} (lines 94-98), rewritten when values change or after 30 s (lines 10,67-78). It is triggered from src/index.ts:80-82 only when stdin carries rate limits. Reader side: src/external-usage.ts:120-160 (absolute path only, freshness check against externalUsageFreshnessMs, default 300000 at src/config.ts:279). It is a file hand-off, not OTLP or an HTTP export."
+      },
+      {
+        "claim": "Requirements: Claude Code v2.1.260 or later; macOS or Linux with Node.js 18+ or Bun; Windows with Node.js 18+ (README.md:280-282).",
+        "verified": "partial",
+        "evidence": "Claude Code >= 2.1.260 appears only in documentation (README.md:280; CHANGELOG.md:9; CLAUDE.md:18); no version check exists in src/ or scripts/, and the HUD reads whichever payload fields are present (src/stdin.ts; src/types.ts:7-59). Node 18+: package.json:31-33 engines >=18.0.0 and the runtime has zero dependencies. CI exercises Linux on Node 18.x/20.x and a Windows git-test subset on Node 20 (.github/workflows/ci.yml:12-15,25-49); there is no macOS runner and no Bun job, although setup prefers Bun when found on macOS/Linux (commands/setup.md:24) and Bun runs src/index.ts directly (scripts/statusline.mjs:17)."
+      },
+      {
+        "claim": "/claude-hud:setup points your status line at the HUD (README.md:23).",
+        "verified": "yes",
+        "evidence": "scripts/setup.mjs:58-103 resolves <config dir>/settings.json, backs it up to settings.json.bak.<timestamp> (lines 85-88), saves a replaced foreign command to previous-statusline.txt (lines 89-92), copies the launcher to plugins/claude-hud/statusline.mjs (lines 79-80) and writes statusLine {type: 'command', command} while keeping other keys, via temp file plus rename preserving the file mode (lines 94-101). The command is '<node|bun path> <config dir>/plugins/claude-hud/statusline.mjs' (scripts/setup.mjs:31-32), and the launcher runs the newest installed claude-hud version from plugins/cache (scripts/statusline.mjs:29-43), consistent with commands/setup.md:63 'plugin updates never need setup again'."
+      },
+      {
+        "claim": "display.showCost shows Claude Code's own session cost, 'computed at list price or from your modelPricing table' (README.md:218).",
+        "verified": "not_checkable",
+        "evidence": "The HUD only reads cost.total_cost_usd from stdin (src/cost.ts:7-17; src/types.ts:38-44). 'modelPricing' appears nowhere in src/, tests/, dist/ or the config schema (src/config.ts:201-309), and the HUD's own pricing-table estimate was removed in 0.10.0 (CHANGELOG.md:14). Whatever computes the cost is inside Claude Code, outside this repository, so the statement cannot be confirmed from this code."
+      },
+      {
+        "claim": "elementOrder defaults to project, addedDirs, context, usage, promptCache, memory, environment, tools, skills, mcp, agents, todos, sessionTime (README.md:96).",
+        "verified": "partial",
+        "evidence": "The README lists 13 names; the code's ELEMENTS has 14, adding cacheHitRate between promptCache and memory (src/config.ts:31-46), and the default is the full list (src/config.ts:96,208). Code wins. tests/readme-options.test.js:16-20 only checks that the README documents the same config key names, not their default values."
+      }
+    ],
+    "benchmarks": [],
+    "risks": [
+      "Scope: the project is a terminal status-line renderer, not an observability or inference component. It has no OTLP receiver, privacy filter, metrics/log/trace store, dashboards, dataset/experiment tooling or model server, and no Codex support (searches found none; README.md:3,66). It sees only the stdin payload and the transcript on each refresh (src/types.ts:7-59; src/transcript.ts:355-372) and keeps no usage history beyond a per-session cost tally pruned after 24 h (src/daily-cost.ts:14,133-139) and one speed reading (src/speed.ts:10-14).",
+      "Single-vendor, version-coupled inputs: only Claude Code is supported, and payload fields are trusted with no version gate in code (CLAUDE.md:18; no version check in src/). Transcript parsing matches Claude Code-internal JSONL record types (compact_boundary, queue-operation, ultra_effort_enter/exit, advisorModel - src/transcript.ts:37-49,158-175); the repo cites an official doc only for the stdin payload (src/types.ts:6), not for the transcript format. Malformed lines are skipped and unrecognized types are simply not matched (src/transcript.ts:140-147), so format drift would degrade output rather than raise errors.",
+      "Maintenance and churn: v0.10.0 is described as a rewrite (CHANGELOG.md:9) and carries the same date as v0.9.0, 2026-10-01 (CHANGELOG.md:7,31); CONTRIBUTING.md:3 calls the repo 'small and fast-moving'; there is a single CODEOWNER (.github/CODEOWNERS:1); SECURITY.md:5 supports only the latest release series.",
+      "Release integrity: installs come from the git repository (marketplace source './' - .claude-plugin/marketplace.json:14) whose dist/ is force-committed to main by a bot workflow with contents: write (.github/workflows/build-dist.yml:11-12,36-42). GitHub releases carry notes only, with no assets, checksums, signatures, provenance or SBOM (.github/workflows/release.yml:37-40). Workflow actions are pinned to mutable tags, including third-party softprops/action-gh-release@v2 in a contents: write job (release.yml:8-9,38) and anthropics/claude-code-action@v1 with an OAuth token secret (claude.yml:35-37); dependabot watches npm only (.github/dependabot.yml:2-3).",
+      "Update path and settings mutation: /claude-hud:setup rewrites the user's settings.json (with a backup) and installs a launcher that always executes the newest plugin version found in the plugin cache (scripts/setup.mjs:79-101; scripts/statusline.mjs:29-43), so the code run on every refresh changes with plugin updates without another setup step (commands/setup.md:63).",
+      "Opt-in arbitrary code execution: --extra-cmd runs a shell command through exec on every refresh when CLAUDE_HUD_ALLOW_EXTRA_CMD is set (src/extra-cmd.ts:11-22,43-55); README.md:264 itself says to treat it as arbitrary code execution.",
+      "Documentation drift: README.md:262 names only the speed and cost files as writes, omitting the external usage snapshot and the setup/configure writes (src/external-usage.ts:80-118; scripts/setup.mjs:79-102); README.md:218 mentions a modelPricing table with no counterpart in this repo; README.md:96 omits cacheHitRate from the elementOrder default (src/config.ts:31-46); two different security-report channels exist (SECURITY.md:9-10 vs .github/ISSUE_TEMPLATE/config.yml:3-5), and the email in the latter is spelled differently from the owner email in .claude-plugin/marketplace.json:5.",
+      "Platform and CI coverage gaps: CI has no macOS or Bun job and only a git-test subset on Windows (.github/workflows/ci.yml:12-15,25-49), while setup prefers Bun when present (commands/setup.md:24). Dev-only c8@11.0.0 declares Node '20 || >=22' (package-lock.json:470-472) although the CI matrix includes 18.x (ci.yml:15). Building from source relies on a per-platform native TypeScript 7 binary (20 platforms listed, package-lock.json:999-1020); the committed dist/ means runtime users do not need to build."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "jarrodwatts/claude-hud",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Claude Code in-session plugin commands (README gives no OS-specific variant, so this applies to macOS and Linux): /plugin marketplace add jarrodwatts/claude-hud; /plugin install claude-hud; /reload-plugins; /claude-hud:setup",
+          "citation": "README.md:17-20",
+          "holds": true,
+          "note": "README.md:16-21 has exactly these four commands under 'Inside Claude Code, run:' with no OS restriction. The only Windows section (README.md:37-42) is a Node.js troubleshooting note, not a separate install method. The marketplace and the plugin are both named 'claude-hud' (.claude-plugin/marketplace.json:2,13). The /claude-hud:setup command is registered (.claude-plugin/plugin.json:9-12). Setup treats darwin and linux, including WSL, as posix (commands/setup.md:14), which fits the macOS/Linux note."
+        },
+        {
+          "field": "license",
+          "statement": "License MIT, file LICENSE",
+          "citation": "LICENSE",
+          "holds": true,
+          "note": "LICENSE:1-21 is the standard MIT License text (Copyright (c) 2026 Jarrod Watts). package.json:30 and .claude-plugin/plugin.json:15 both say \"license\": \"MIT\", and README.md:296 says 'MIT. See LICENSE.'"
+        },
+        {
+          "field": "readme.platforms.linux_x86_64",
+          "statement": "yes - README.md:281 'macOS or Linux: Node.js 18+ or Bun'; runtime is dependency-free JavaScript (package.json:34-38 dev deps only); CI runs ubuntu-latest on Node 18.x and 20.x (ci.yml:12-15); Linux-specific /proc/meminfo reading (src/memory.ts:44-46). CPU architecture is not stated anywhere.",
+          "citation": "README.md:281; package.json:34-38; .github/workflows/ci.yml:12-15; src/memory.ts:44-46",
+          "holds": true,
+          "note": "All four citations match. README.md:281 says 'macOS or Linux: Node.js 18+ or Bun'. package.json has devDependencies only at lines 34-38 and no dependencies key. ci.yml:12-15 runs ubuntu-latest with Node 18.x and 20.x. src/memory.ts:44-45 reads /proc/meminfo when process.platform === 'linux'. A case-insensitive search for x86/x64/amd64/arm64/aarch64/arch/cpu outside package-lock.json finds nothing, so no architecture requirement is stated. The only architecture names are build-only per-platform TypeScript compiler packages in the lockfile, including linux-x64 at package-lock.json:289."
+        },
+        {
+          "field": "readme.integrations.claude_code_or_codex",
+          "statement": "Claude Code: yes - plugin with marketplace manifest (.claude-plugin/marketplace.json:11-19), slash commands /claude-hud:setup and /claude-hud:configure (.claude-plugin/plugin.json:9-12), registered as statusLine command in settings.json (scripts/setup.mjs:94), consumes stdin payload (src/types.ts:6-59) and transcript JSONL (src/transcript.ts:355-372). Codex: none found.",
+          "citation": ".claude-plugin/marketplace.json:11-19; .claude-plugin/plugin.json:9-12; scripts/setup.mjs:94; src/types.ts:6-59; src/transcript.ts:355-372",
+          "holds": true,
+          "note": "marketplace.json:11-19 is the plugins entry (name claude-hud, source './'). plugin.json:9-12 lists ./commands/setup.md and ./commands/configure.md. setup.mjs:94 builds statusLine {type:'command', command}, and lines 99-101 write it to settings.json. types.ts:6 cites the statusline docs, and StdinData spans lines 7-59. transcript.ts:355-372 streams the transcript file line by line through readline. A case-insensitive search for 'codex' finds no matches anywhere in the repo, including package-lock.json and dist/ (dist/ is gitignored, so I searched it separately). The dossier's narrower 'outside the lockfile and dist/' wording is still correct."
+        },
+        {
+          "field": "claim_checks[0]",
+          "statement": "Claude HUD is local-only. It makes no network requests (README.md:262). verified: yes",
+          "citation": "README.md:262; package.json:34-38; src/git.ts:59,81,125; src/stdin.ts:137-139; src/jj.ts:73-76; src/extra-cmd.ts:45; commands/setup.md:90",
+          "holds": true,
+          "note": "README.md:262 says this as quoted. src/ and scripts/ contain no fetch(, http/https/http2/net/tls/dns/dgram imports, XMLHttpRequest, WebSocket, undici, axios, curl or wget, and neither does dist/*.js (searched separately). The only https:// strings in code build a GitHub link (src/git.ts:125) or are compared against ANTHROPIC_BASE_URL to detect MiniMax (src/stdin.ts:137-153); src/i18n/index.ts has URLs only in comments. Every runGit call is local: status, diff HEAD, rev-parse, describe (src/git.ts:59,81,101,111). jj runs with --ignore-working-copy log (src/jj.ts:73-76). The launcher only reads the local plugin cache and imports a local file (scripts/statusline.mjs:29-43). Both caveats are confirmed and opt-in: exec of a user command (src/extra-cmd.ts:45, allowed only by CLAUDE_HUD_ALLOW_EXTRA_CMD at lines 11-23), and 'gh repo star' offered at the end of setup (commands/setup.md:90)."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}

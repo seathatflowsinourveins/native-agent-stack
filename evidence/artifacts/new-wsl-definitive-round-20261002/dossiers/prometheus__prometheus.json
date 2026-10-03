@@ -1,0 +1,325 @@
+{
+  "contender": "prometheus/prometheus",
+  "revision": {
+    "contender": "prometheus/prometheus",
+    "kind": "git",
+    "repositories": [
+      {
+        "repository": "prometheus/prometheus",
+        "tag": "v3.15.0",
+        "commit": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+        "exit": 0,
+        "error": null
+      }
+    ],
+    "tag": "v3.15.0",
+    "commit": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+    "read_at": "2026-10-02T03:02:40+00:00"
+  },
+  "dossier": {
+    "contender": "prometheus/prometheus",
+    "revision": {
+      "tag": "v3.15.0",
+      "commit": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "read_at": "2026-10-02"
+    },
+    "license": {
+      "spdx": "Apache-2.0",
+      "file": "LICENSE"
+    },
+    "purpose": "Prometheus (CNCF project, v3.15.0, Apache-2.0) is a single-binary Go monitoring server and time-series database. It scrapes metrics from HTTP targets, stores samples in a local on-disk TSDB, evaluates PromQL recording/alerting rules, notifies Alertmanager, and serves a built-in query/graph web UI plus a stable JSON HTTP API (default 0.0.0.0:9090). Push-style ingestion is optional and off by default: a remote-write receiver and an OTLP/HTTP receiver that accepts metrics only (POST /api/v1/otlp/v1/metrics). Facts relevant to the stated needs: it is not an OpenTelemetry Collector (no receiver/processor/exporter pipeline, no redaction or filter stage, no OTLP/gRPC listener); it has no OTLP logs/events or traces ingestion and no store for them; its UI explores only its own PromQL/TSDB data (no saved-dashboard feature in the UI source); it has no trace/dataset/experiment store; and the repo contains no model-serving, LLM, MCP, Claude Code or Codex code (searched). All findings come from reading source and docs at the pinned commit; nothing was built or run.",
+    "readme": {
+      "claims": [
+        {
+          "claim": "Prometheus, a CNCF project, is a systems and service monitoring system. It collects metrics from configured targets at given intervals, evaluates rule expressions, displays the results, and can trigger alerts when specified conditions are observed.",
+          "citation": "README.md:21-23"
+        },
+        {
+          "claim": "Distinguishing features: a multi-dimensional data model (time series defined by metric name and key/value dimensions) and PromQL, a powerful and flexible query language.",
+          "citation": "README.md:27-28"
+        },
+        {
+          "claim": "No dependency on distributed storage; single server nodes are autonomous.",
+          "citation": "README.md:29"
+        },
+        {
+          "claim": "An HTTP pull model for time series collection; pushing time series is supported via an intermediary gateway for batch jobs.",
+          "citation": "README.md:30-31"
+        },
+        {
+          "claim": "Multiple modes of graphing and dashboarding support.",
+          "citation": "README.md:33"
+        },
+        {
+          "claim": "Support for hierarchical and horizontal federation.",
+          "citation": "README.md:34"
+        },
+        {
+          "claim": "Precompiled binaries for released versions are on prometheus.io/download; using the latest production release binary is the recommended way to install Prometheus.",
+          "citation": "README.md:46-51"
+        },
+        {
+          "claim": "Docker images are on Quay.io and Docker Hub; 'docker run --name prometheus -d -p 127.0.0.1:9090:9090 prom/prometheus' makes Prometheus reachable at http://localhost:9090/.",
+          "citation": "README.md:55-63"
+        },
+        {
+          "claim": "Building from source needs Go (version in go.mod or greater), NodeJS (version in web/ui/.nvmrc or greater) and npm 10+; 'make build' compiles the web assets in so Prometheus can run from anywhere.",
+          "citation": "README.md:67-71, 96-102"
+        },
+        {
+          "claim": "With plain 'go install', Prometheus reads web assets from web/ui/static and must be run from the repo root; the React UI is not included unless built with make assets or make build.",
+          "citation": "README.md:88-92"
+        },
+        {
+          "claim": "Service discovery plugins can be excluded at build time with the tag remove_all_sd and re-enabled individually with enable_<name>_sd; file_sd, static_sd and http_sd are always kept.",
+          "citation": "README.md:113-143"
+        },
+        {
+          "claim": "prometheus/prometheus builds a stand-alone program and is not designed for use as a library; no care has been taken to make it work well as one.",
+          "citation": "README.md:167-171"
+        },
+        {
+          "claim": "The Remote Write protobuf is published independently at buf.build (experimental); Go module tags v0.3y.z mirror v3.y.z releases.",
+          "citation": "README.md:173-198"
+        },
+        {
+          "claim": "License: Apache License 2.0.",
+          "citation": "README.md:226-228"
+        }
+      ],
+      "install": [
+        {
+          "method": "Precompiled binaries (release tarball from prometheus.io/download; Linux/macOS/other OS builds)",
+          "command": "tar xvfz prometheus-*.tar.gz; cd prometheus-*; ./prometheus --config.file=prometheus.yml",
+          "citation": "docs/getting_started.md:14-20, 64-68; README.md:46-51"
+        },
+        {
+          "method": "Docker image (Quay.io / Docker Hub)",
+          "command": "docker run --name prometheus -d -p 127.0.0.1:9090:9090 prom/prometheus",
+          "citation": "README.md:55-61"
+        },
+        {
+          "method": "Docker with persistent volume and bind-mounted config",
+          "command": "docker volume create prometheus-data; docker run -p 9090:9090 -v /path/to/prometheus.yml:/etc/prometheus/prometheus.yml -v prometheus-data:/prometheus prom/prometheus",
+          "citation": "docs/installation.md:64-79"
+        },
+        {
+          "method": "Build from source with make (web assets compiled in; needs Go, Node and pnpm in practice)",
+          "command": "git clone https://github.com/prometheus/prometheus.git; cd prometheus; make build; ./prometheus --config.file=your_config.yml",
+          "citation": "README.md:73-77, 96-102"
+        },
+        {
+          "method": "go install (UI assets read from web/ui/static; run from the repo root)",
+          "command": "go install github.com/prometheus/prometheus/cmd/...; prometheus --config.file=your_config.yml",
+          "citation": "README.md:80-92"
+        },
+        {
+          "method": "Build the Docker image locally",
+          "command": "make promu; promu crossbuild -p linux/$(go env GOHOSTARCH); make common-docker-current-arch",
+          "citation": "README.md:145-160"
+        }
+      ],
+      "platforms": {
+        "linux_x86_64": "yes - README.md:46-51 (binaries) and README.md:59-61 (Docker); CI builds and tests linux/amd64 (.github/workflows/ci.yml:15-19, 264); Dockerfile defaults to ARCH=amd64 (Dockerfile:1-3).",
+        "wsl2": "unknown - no mention of WSL in README, docs or CI (searched); the Linux binary would be the artifact but upstream neither documents nor tests WSL2.",
+        "macos_arm64": "yes (build-only evidence) - darwin/arm64 is cross-built in CI (.github/workflows/ci.yml:264) and darwin is in the crossbuild list (.promu.yml:32-41); CI test jobs run only on ubuntu-latest and windows-latest (ci.yml:15, 181) and there is no macOS-specific install doc.",
+        "gpu": "no - not applicable: CPU-only Go service; no GPU/CUDA code or docs (searched README, docs, Makefiles, cmd, go.mod; only hit is an unrelated Linode SD label at docs/configuration/configuration.md:2804)."
+      },
+      "integrations": {
+        "cli": "Two binaries: prometheus (server; cmd/prometheus/main.go, flags in docs/command-line/prometheus.md) and promtool (cmd/promtool/main.go:115-330): check config/rules/web-config/metrics/healthy/ready/service-discovery, query instant/range/series/labels/analyze, debug pprof/metrics/all, push metrics (remote-write only, 'for testing purpose only'), test rules, tsdb bench/analyze/list/dump/dump-openmetrics/create-blocks-from, promql format/label-matchers (experimental).",
+        "mcp": "none found (case-insensitive search of the whole repo for MCP and 'model context protocol' returned no matches).",
+        "sdk_or_api": "HTTP API v1 under /api/v1 with JSON responses and an OpenAPI spec at /api/v1/openapi.yaml (docs/querying/api.md:6-23): query, query_range, series, labels, targets, rules, alerts, status, TSDB admin (off by default), remote read /api/v1/read, remote-write receiver /api/v1/write (flag), plus /federate and /metrics (web/web.go:502-504; web/api/v1/api.go:489-490). OTLP receiver (off by default, flag --web.enable-otlp-receiver at cmd/prometheus/main.go:485-486): POST /api/v1/otlp/v1/metrics, Content-Type application/x-protobuf or application/json, Content-Encoding gzip or none, 32 MiB read limit, 400 for decode and out-of-order/duplicate/too-old errors, 500 otherwise (storage/remote/codec.go:44-47, 974-1025; storage/remote/write_otlp_handler.go:177-210); translation settings live under otlp: in prometheus.yml (docs/configuration/configuration.md:239-291; example documentation/examples/prometheus-otlp.yml). No client SDK ships in this repo; Go library use is explicitly unsupported (README.md:162-171); library tags are v0.3y.z (README.md:186-198; scripts/get_module_version.sh:19-24); remote-write protobuf is published to buf.build (.github/workflows/buf.yml:31-34).",
+        "claude_code_or_codex": "none found (case-insensitive search for claude, codex, anthropic, openai across the repo returned no matches). The only agent-related files are contributor guidance for AI coding agents working on the repo: AGENTS.md:1-6 and CLAUDE.md:1 (which only includes AGENTS.md); they are not a runtime integration."
+      },
+      "telemetry_and_network": "No phone-home, analytics or update-check code found: grep of *.go/*.md/*.yml for telemetry, phone-home, analytics and update-check hits only OpenTelemetry library imports and doc text; the README says nothing about telemetry or OTLP. 'Telemetry' in flag help means Prometheus's own /metrics endpoint (docs/command-line/prometheus.md:17; web/web.go:502). Web UI sources load no remote scripts, fonts or analytics (web/ui/mantine-ui/index.html:20-36; grep of web/ui found none). Inbound: one HTTP listener, default 0.0.0.0:9090, serving UI, API, /metrics, /federate and consoles (cmd/prometheus/main.go:432-433; web/web.go:501-508, 744-783); no authentication or TLS unless --web.config.file is given and that feature is marked EXPERIMENTAL (main.go:444-447; docs/configuration/https.md:6-7); CORS origin default is '.*' (main.go:497-498); lifecycle API, admin API, remote-write receiver and OTLP receiver are all off by default (main.go:470-486). The OTLP receiver is HTTP-only on that same port; there is no 4317/4318 listener or gRPC server code (ports 4317/4318 appear only as tracing-exporter test endpoints: config/config_test.go:1839, tracing/tracing_test.go:124). Outbound connections occur only for configured features: scrape targets, service-discovery providers (cloud/API credentials when configured), Alertmanager, remote_write/remote_read, and an OTLP trace exporter for Prometheus's own spans only if tracing.endpoint is set (sampling_fraction defaults to 0, insecure defaults to false) (tracing/tracing.go:86-93; docs/configuration/configuration.md:4254-4287). The default config scrapes only localhost:9090 and lists no Alertmanager (documentation/examples/prometheus.yml:7-33). No account or hosted service is required to run it. Build/CI network use: Go modules and pnpm packages (Makefile:62-68) and, for non-GO_ONLY make test, scripts/check-go-mod-version.sh queries go.dev (scripts/check-go-mod-version.sh:9-13)."
+    },
+    "code": {
+      "languages": [
+        "Go",
+        "TypeScript/TSX (web UI)",
+        "Protocol Buffers",
+        "YACC (PromQL grammar)",
+        "Jsonnet (mixin)",
+        "Shell",
+        "Makefile",
+        "YAML"
+      ],
+      "entry_points": [
+        {
+          "path": "cmd/prometheus/main.go",
+          "what": "Server binary prometheus: kingpin flags, config load, run.Group wiring of all components (main() at :376, group at :1269-1658)."
+        },
+        {
+          "path": "cmd/promtool/main.go",
+          "what": "promtool CLI (main() at :101): config/rules checks, queries, TSDB tools, rule unit tests, remote-write push for testing."
+        },
+        {
+          "path": "web/web.go",
+          "what": "HTTP server and routes: UI assets, /federate, /consoles, /metrics, /-/ready, lifecycle endpoints (New at :328, Run at :744)."
+        },
+        {
+          "path": "web/api/v1/api.go",
+          "what": "/api/v1 JSON API incl. remote read/write routes and the OTLP route (:489-490); OTLP handler built at :381-388."
+        },
+        {
+          "path": "storage/remote/write_otlp_handler.go",
+          "what": "OTLP/HTTP metrics receiver (NewOTLPWriteHandler at :58); request decode in storage/remote/codec.go:974-1025."
+        },
+        {
+          "path": "storage/remote/otlptranslator/prometheusremotewrite/metrics_to_prw.go",
+          "what": "OTLP-to-Prometheus translation (FromMetrics at :235): names, labels, metadata, histograms, target_info."
+        },
+        {
+          "path": "plugins/",
+          "what": "Build-tag-controlled registration of 26 optional service-discovery providers plus always-on file/http SD (plugins/minimum.go); imported by cmd/prometheus/main.go:70."
+        },
+        {
+          "path": "tracing/tracing.go",
+          "what": "Exports Prometheus's own spans over OTLP gRPC/HTTP when tracing.endpoint is configured (:86-93, 131-175)."
+        }
+      ],
+      "architecture": "Single Go process. cmd/prometheus/main.go parses flags and wires components in an oklog run.Group (:1269-1658): scrape and notify discovery managers (discovery/*, providers registered through plugins/*.go) feed the scrape manager (scrape/); samples go through ready/fanout storage (storage/) into the local TSDB (tsdb/: head, WAL, blocks, compaction, out-of-order window; opened at main.go:1497-1545) or, with --agent, a WAL-only agent store (tsdb/agent; main.go:1555-1613) plus optional remote write/read clients (storage/remote/). The rule manager (rules/) evaluates PromQL (promql/, grammar promql/parser/generated_parser.y) and the notifier (notifier/) sends alerts to Alertmanager. Config is YAML in config/ (reload via SIGHUP or /-/reload); data model in model/; protobuf in prompb/. Web layer: web/web.go (router, UI assets, federation, consoles, single http.Server via exporter-toolkit) and web/api/v1/api.go (JSON API). UI: web/ui/mantine-ui (default) and web/ui/react-app (old UI via --enable-feature=old-ui) with web/ui/module/{codemirror-promql,lezer-promql}. OTLP receiver path: web/api/v1/api.go:381-388,490 -> storage/remote/write_otlp_handler.go (optional OTel Collector deltatocumulative processor, :86-109) -> storage/remote/otlptranslator/prometheusremotewrite (derived from opentelemetry-collector-contrib, metrics_to_prw.go:13-15) -> AppenderV2 into the TSDB; self-metrics prometheus_api_otlp_* at write_otlp_handler.go:76-81, 249-259. Also: compliance/ (remote-write compliance tests), documentation/ (examples, Grafana-dashboard mixin for monitoring Prometheus itself), internal/tools (tool dependencies).",
+      "packaging_and_release": "Build: promu (.promu.yml) builds prometheus and promtool with tags netgo,builtinassets (UI embedded; ldflags stamp version info; .promu.yml:7-24); the release tarball includes documentation/examples/prometheus.yml, LICENSE and NOTICE (.promu.yml:25-31); crossbuild platforms are aix, darwin, dragonfly, freebsd, illumos, linux, netbsd, windows (.promu.yml:32-41). CI build covers linux/amd64, linux/arm64, linux/386, darwin/amd64, darwin/arm64, windows/amd64 and build_all covers all platforms on tags and main (.github/workflows/ci.yml:233-303). Release flow: pushing a v2.* or v3.* tag runs publish_release (contents: write, packages: write) via the external action prometheus/promci/publish_release pinned to commit 872d318 (v0.10.0) with Docker Hub, Quay.io and GHCR credentials (ci.yml:413-432); RELEASE.md:163-165 says Actions drafts the GitHub release as prombot, uploads tarballs and pushes images to Docker Hub and Quay.io; GHCR publishing was added in 3.13.0 (CHANGELOG.md:158). Images: busybox-based Dockerfile (USER nobody, EXPOSE 9090) and Dockerfile.distroless (nonroot) for amd64, arm64, armv7, ppc64le, riscv64, s390x (Dockerfile:3, 26-31; Dockerfile.distroless:4-29; Makefile.common:93-94). Main-branch artifacts: publish_main (ci.yml:398-412). UI npm modules (version 0.315.0) are published from tags with npm trusted publishing via OIDC (ci.yml:433-486). Go library tags v0.3y.z are separate git tags (RELEASE.md:168-181; scripts/get_module_version.sh:19-24); the clone's packed-refs map the annotated tag v3.15.0 to 5241a27 (.git/packed-refs:2-3). Remote-write protobuf is pushed to buf.build from main (buf.yml:31-34). Checksums, signatures, attestations or SBOMs: none are generated by anything in this repo (grep for cosign, sigstore, attest, slsa, sbom, checksum found only buf version-checksum pins, scripts/sync_repo_files.sh and RELEASE.md's optional GPG-signed git tag at :161); whether the external promci action emits sha256sums was not inspected, so unknown.",
+      "tests_and_ci": "Go: standard testing package with testify (go.mod:76) and goleak (go.mod:93), tests co-located with packages. About 278 _test.go files repo-wide (grep), 21 PromQL script tests (promql/promqltest/testdata/*.test), Go fuzz targets (util/fuzzing/fuzz_test.go), remote-write compliance tests (compliance/remote_write_sender_test.go, run with --tags=compliance at ci.yml:231), and 57 JS/TS test files (33 react-app/jest, 16 mantine-ui/vitest, 8 codemirror-promql/jest; web/ui/mantine-ui/package.json:74). OTLP-specific tests: storage/remote/write_otlp_handler_test.go plus 6 test files under storage/remote/otlptranslator/prometheusremotewrite/. Workflows in .github/workflows: ci.yml (test_go runs make GO_ONLY=1 SKIP_GOLANGCI_LINT=1 = style, license-header check, yamllint, go.mod tidy check, build, tests with -race on amd64 per Makefile.common:118-131, plus a tsdb isolation-off run and example-module builds; test_go_more runs dedupelabels/slicelabels/forcedirectio tag builds and a protobuf regen diff; test_go_386; test_version_upgrade against active LTS releases; test_go_oldest on the previous Go version; test_ui; test_windows (excludes config and web packages); test_mixins; test-compliance; build and build_all crossbuilds; check_generated_parser; golangci-lint in 4 variants; fuzzing; codeql; publish_main; publish_release; publish_ui_release), fuzzing.yml (7 fuzz targets, 4 minutes each, on PRs), codeql-analysis.yml (JavaScript only), govulncheck.yml (nightly 02:33 UTC and pushes to main), scorecards.yml (OpenSSF Scorecard), buf.yml and buf-lint.yml (protobuf lint, breaking-change check, publish), container_description.yml, prombench.yml (benchmarks on GKE via repository_dispatch), repo_sync.yml, check_release_notes.yml, approve-workflows.yml, automerge-dependabot.yml, lock.yml, stale.yml. Third-party actions are pinned by commit SHA (exception: docker://prominfra/prombench:master at prombench.yml:40). Nothing was executed during this review.",
+      "dependencies": "Go root module go.mod (go 1.26.0 at :3): 109 direct requires (no indirect marker) and 140 indirect (go.mod:5-264); lockfile go.sum. Direct deps relevant here: OTel Collector libs go.opentelemetry.io/collector/{component,consumer,pdata,processor} v1.66.0 (:78-81), opentelemetry-collector-contrib deltatocumulativeprocessor v0.160.0 (:60), prometheus/otlptranslator v1.0.0 (:238), OTel SDK and otlptrace exporters (:82-90), grpc v1.83.2 (:103), plus many cloud/SD SDKs (Azure :6-9, AWS v2 :14-24, DigitalOcean :28, Consul/Nomad/Hetzner/IONOS :44-47, Linode :51, k8s client-go :105-109, Oracle OCI :141). Other Go modules in go.work (go.work:1-9): compliance (1 direct, 14 indirect), documentation/examples/remote_storage (8/130), internal/tools (4/93), web/ui/mantine-ui/src/promql/tools (3/14). JS (pnpm; web/ui/pnpm-lock.yaml and web/ui/react-app/pnpm-lock.yaml): web/ui/package.json 0 deps/9 dev; mantine-ui/package.json 39 deps/19 dev; react-app/package.json 38 deps/33 dev/1 optional; module/codemirror-promql 2 deps/18 dev/6 peer; module/lezer-promql 0 deps/6 dev/2 peer.",
+      "security_policy": "SECURITY.md (6 lines) only points to https://prometheus.io/docs/operating/security/ for the policy and reporting process (SECURITY.md:3-6); that external page was not opened. SECURITY-INSIGHTS.yml lists the contact prometheus-team@googlegroups.com, says vulnerability reports are accepted, and names Dependabot (SCA) and CodeQL (SAST) (SECURITY-INSIGHTS.yml:28-48), but its expiration-date 2025-07-30 has passed (:3). Other automated checks: govulncheck nightly (.github/workflows/govulncheck.yml:15-16), OpenSSF Scorecard (scorecards.yml), CodeQL for JavaScript only (codeql-analysis.yml:22), Go fuzzing on PRs (fuzzing.yml)."
+    },
+    "claim_checks": [
+      {
+        "claim": "README.md:21-23 - collects metrics from configured targets at given intervals, evaluates rule expressions, displays results, triggers alerts",
+        "verified": "yes",
+        "evidence": "cmd/prometheus/main.go wires a scrape manager (:1341-1361), rule manager (:1326-1338), web handler serving UI and API (:1616-1628) and a notifier to Alertmanager (:1635-1651); the local TSDB is opened at :1497-1545. Read-only verification, nothing executed."
+      },
+      {
+        "claim": "README.md:29 - no dependency on distributed storage; single server nodes are autonomous",
+        "verified": "yes",
+        "evidence": "The TSDB opens in-process from a local directory (cmd/prometheus/main.go:1497-1545; default data/ at :500-501). docs/storage.md:59-63 says local storage is not clustered or replicated and should be managed like a single-node database; NFS is unsupported (docs/storage.md:129-133; warning at main.go:1516-1518)."
+      },
+      {
+        "claim": "README.md:33 - multiple modes of graphing and dashboarding support",
+        "verified": "partial",
+        "evidence": "In-repo pieces: built-in expression-browser UI with a multi-panel query page, graph/table views and a metrics explorer (web/ui/mantine-ui/src/pages/query/QueryPage.tsx:22-50, MetricsExplorer/MetricsExplorer.tsx:56); console templates served from a user-supplied directory (web/web.go:508; flag default 'consoles' at cmd/prometheus/main.go:488-489; no consoles directory exists in the repo and the Dockerfile copies none, Dockerfile:17-21); a stable JSON API plus OpenAPI for external dashboard tools (docs/querying/api.md:6-23); a jsonnet mixin generating Grafana dashboards for monitoring Prometheus itself, labelled work-in-progress (documentation/prometheus-mixin/README.md:3-8, 28-33). No saved-dashboard feature in the UI source (no 'dashboard' matches under web/ui/mantine-ui/src); the UI persists only settings in browser localStorage (web/ui/mantine-ui/src/state/settingsSlice.ts:29-37). Metadata of OTLP or remote-write metrics is not shown in Explore Metrics (docs/querying/api.md:1187; web/api/v1/api.go:1602-1606 builds metadata from scrape targets only)."
+      },
+      {
+        "claim": "README.md:30-31 - HTTP pull model; pushing supported via an intermediary gateway for batch jobs",
+        "verified": "partial",
+        "evidence": "Pull is implemented (scrape manager at cmd/prometheus/main.go:1341; scrape/). The push gateway is not part of this repo (only mentioned at docs/configuration/configuration.md:363). Push receivers that exist in-repo but are not mentioned by the README: remote-write receiver (web/api/v1/api.go:378-380, route :489) and OTLP metrics receiver (api.go:381-388, route :490); both default to off (cmd/prometheus/main.go:478-486)."
+      },
+      {
+        "claim": "docs/querying/api.md:1880-1891 (README is silent on OTLP) - Prometheus can be a receiver for the OTLP Metrics protocol at /api/v1/otlp/v1/metrics, enabled with --web.enable-otlp-receiver",
+        "verified": "yes",
+        "evidence": "Route at web/api/v1/api.go:490; handler built only when enabled (api.go:381-388, 2182-2188); flag default false (cmd/prometheus/main.go:485-486). Scope is narrower than OTLP in general: metrics only and HTTP only - no logs or traces handlers and no gRPC server anywhere (grep for plog, ptrace, plogotlp, ptraceotlp, pmetricotlp.Register, grpc.NewServer found none); accepts application/x-protobuf or application/json with gzip or no encoding (storage/remote/codec.go:974-1009). Code differs from the OpenAPI text that says protobuf only (web/api/v1/openapi_paths.go:695): the code also accepts JSON (codec.go:984-988). docs/stability.md:22 lists the endpoint as stable for 3.x, while delta handling sits behind experimental flags (docs/feature_flags.md:6-10, 215-223)."
+      },
+      {
+        "claim": "docs/feature_flags.md:197-198 - with otlp-deltatocumulative, delta metrics are converted to cumulative 'instead of dropping them'",
+        "verified": "partial",
+        "evidence": "Without the flag, delta Sum/Histogram metrics are not silently dropped: the converter returns 'invalid temporality and type combination for metric ...' (storage/remote/otlptranslator/prometheusremotewrite/metrics_to_prw.go:288-297; unit test metrics_to_prw_test.go:994-1004), and the handler rolls back the whole request and answers HTTP 500 (storage/remote/write_otlp_handler.go:147-155, 203-206; derived from reading the code, not executed). With the flag, OTel Collector contrib's deltatocumulative processor runs with default settings (write_otlp_handler.go:86-109; cmd/prometheus/main.go:323-325); it cannot be combined with otlp-native-delta-ingestion (main.go:361-363)."
+      },
+      {
+        "claim": "README.md:46-61 - precompiled binaries are the recommended install; Docker images are on Quay.io and Docker Hub",
+        "verified": "partial",
+        "evidence": "A publishing pipeline exists: pushing a v2.* or v3.* tag runs publish_release with Docker Hub, Quay.io and GHCR credentials (.github/workflows/ci.yml:413-432); crossbuild list and tarball contents at .promu.yml:25-41; image definitions at Dockerfile:1-31 and Dockerfile.distroless:1-29; the README omits GHCR (CHANGELOG.md:158). The external download page and published artifacts were not verifiable here, and no checksums or signatures are produced in-repo."
+      },
+      {
+        "claim": "README.md:67-71 - build needs Go per go.mod, NodeJS per .nvmrc and npm >= 10",
+        "verified": "partial",
+        "evidence": "Code differs from the README (code wins): the UI is installed, built and tested with pnpm, not npm (Makefile:62-76, 82-96; web/ui/package.json:6-13; web/ui/pnpm-lock.yaml; ci.yml:451-456). go.mod:3 says Go 1.26.0 while .promu.yml:4 and CI use 1.27 (ci.yml:19). web/ui/.nvmrc:1 is 24.20.0 and a mismatch only warns (scripts/check-node-version.sh:6-10); web/ui/README.md:20-21 still says npm >= 10 and node >= 22."
+      },
+      {
+        "claim": "README.md:113-143 - service discovery can be excluded with build tag remove_all_sd and re-enabled with enable_<name>_sd",
+        "verified": "yes",
+        "evidence": "26 optional SDs carry '//go:build !remove_all_sd || enable_<name>_sd' (for example plugins/plugin_kubernetes.go:14); plugins/minimum.go:17-18 always registers file and http SD; the plugins package is imported by cmd/prometheus/main.go:70 and cmd/promtool/main.go:57. The unconditional discovery/install/install.go:18-47 is not imported by any Go file in the repo."
+      },
+      {
+        "claim": "README.md:88-92 - with go install, web assets are read from web/ui/static so Prometheus must be run from the repo root",
+        "verified": "yes",
+        "evidence": "web/ui/ui.go:14, 30-62 (build tag !builtinassets) resolves assets relative to the working directory ('./web/ui' when the cwd basename is prometheus); the builtinassets tag embeds them instead (web/ui/assets_embed.go:14-24; .promu.yml:13-18)."
+      }
+    ],
+    "benchmarks": [
+      {
+        "what": "Average on-disk TSDB storage per ingested sample (no workload or hardware stated)",
+        "metric": "bytes per sample",
+        "value": "1-2 bytes on average",
+        "source": "docs/storage.md:110",
+        "independent": false
+      },
+      {
+        "what": "TSDB chunk population per-sample overhead reduction (release 3.13.0)",
+        "metric": "speed-up of affected queries",
+        "value": "~12-15% in benchmarks",
+        "source": "CHANGELOG.md:162",
+        "independent": false
+      },
+      {
+        "what": "Case-insensitive prefix matching for long case-insensitive regexes (release 3.13.0)",
+        "metric": "evaluation speed-up",
+        "value": "up to ~2x faster",
+        "source": "CHANGELOG.md:161",
+        "independent": false
+      },
+      {
+        "what": "V2 histogram WAL decoder allocation reduction for native histograms with created-timestamp storage (release 3.13.0)",
+        "metric": "allocation and memory reduction",
+        "value": "up to 50% fewer allocations, up to 10% less memory",
+        "source": "CHANGELOG.md:163",
+        "independent": false
+      }
+    ],
+    "risks": [
+      "Scope gap on OTLP signals: the only OTLP ingestion route is POST /api/v1/otlp/v1/metrics (web/api/v1/api.go:490) and the docs call it the OTLP Metrics receiver (docs/querying/api.md:1880-1891). No OTLP logs/events or traces handler, no OTLP/gRPC server and no logs or traces store exist in the code (grep for plog, ptrace, plogotlp, ptraceotlp, /v1/logs, /v1/traces, grpc.NewServer found none); the only OTLP traces code exports Prometheus's own spans (tracing/tracing.go:131-175). The repo also has no dataset/experiment store, model server, GPU code, MCP server or Claude Code/Codex integration.",
+      "No privacy filter or redaction stage on the OTLP path: every datapoint attribute becomes a label and only __name__ is skipped (storage/remote/otlptranslator/prometheusremotewrite/helper.go:65-70, 95-100; number_data_points.go:42-50); all non-identifying resource attributes are written to target_info (helper.go:533-579) and DisableTargetInfo is never set outside tests (metrics_to_prw_test.go:79). The otlp: settings only choose which resource attributes are additionally promoted to labels and how names are translated (config/config.go:1770-1816); relabeling is not applied to OTLP ingestion (no relabel code in write_otlp_handler.go; metric_relabel_configs is a scrape setting, docs/configuration/configuration.md:3681-3685). Attribute values therefore land as labels in the TSDB and WAL on local disk.",
+      "Delta-temporality metrics are rejected by default: the converter errors with 'invalid temporality and type combination' (metrics_to_prw.go:288-297) and, from reading the handler, any converter error rolls back the whole request and returns HTTP 500 (write_otlp_handler.go:147-155, 203-206; not executed), so a mixed payload fails entirely. Delta support is optional and experimental: otlp-deltatocumulative keeps in-memory state that is lost on restart (counter reset) and is mutex-guarded; otlp-native-delta-ingestion ignores StartTimeUnixNano and stores deltas with unknown type (docs/feature_flags.md:204-223); the two flags are mutually exclusive (cmd/prometheus/main.go:361-363).",
+      "The OTLP receiver is documented as low-volume and is strict about ordering: 'not considered an efficient way of ingesting samples... specific low-volume use cases' (docs/querying/api.md:1882-1885); out-of-order, duplicate-timestamp and too-old samples are rejected with HTTP 400 (write_otlp_handler.go:199-202) and the out-of-order window defaults to 0s (docs/configuration/configuration.md:4176; the upstream OTLP example sets 30m, documentation/examples/prometheus-otlp.yml:28-31); attribute churn can cause high memory use (docs/configuration/configuration.md:246); metadata of OTLP metrics is not served by /api/v1/metadata or the UI metrics explorer (docs/querying/api.md:1187; web/api/v1/api.go:1602-1606). No published OTLP ingest throughput or latency figures were found.",
+      "Network exposure and auth defaults: listens on 0.0.0.0:9090 (cmd/prometheus/main.go:432-433); no authentication or TLS unless an EXPERIMENTAL web config file is supplied (main.go:444-447; docs/configuration/https.md:6-7; docs/stability.md:29); CORS origin defaults to '.*' (main.go:497-498); the OTLP receiver shares this listener (web/web.go:744-783). The README Docker example binds to 127.0.0.1 (README.md:60) but the Dockerfile only declares EXPOSE 9090 (Dockerfile:27).",
+      "Platform and storage constraints: the TSDB needs a local POSIX filesystem and NFS (including EFS) is unsupported (docs/storage.md:129-133; warning at cmd/prometheus/main.go:1516-1518); default retention is 15d so older data is deleted unless configured (docs/storage.md:94-96); single node with no replication (docs/storage.md:59-63); Agent mode disables local queries and storage (docs/prometheus_agent.md:16, 28). WSL2 is neither documented nor tested upstream, GPU is not applicable, and CI test jobs run only on Linux and Windows (ci.yml:15, 181).",
+      "Maintenance and build drift: minor releases roughly every 6 weeks (RELEASE.md:7; 3.15.0 dated 2026-09-24 at CHANGELOG.md:5) with older minor branches maintained best-effort (RELEASE.md:59); the 3.14.0 changelog lists several TSDB data-loss and crash fixes (CHANGELOG.md:121-127). README build prerequisites are stale: UI builds use pnpm not npm (Makefile:62-68), go.mod says Go 1.26.0 while release builds use 1.27 (go.mod:3; .promu.yml:4), NOTICE references a react-app/package-lock.json that no longer exists (NOTICE:111), and documentation/internal_architecture.md code links are for v2.3.1 (:11). Source builds need Go plus a Node/pnpm toolchain because the UI is built from source (Makefile:112-118).",
+      "Supply-chain and release verification: no checksum, signature, attestation or SBOM step is visible in this repo's workflows or Makefiles; artifact publishing is delegated to an external pinned action (prometheus/promci/publish_release, ci.yml:425) that was not inspected; RELEASE.md only says GPG-signing the git tag is appreciated (RELEASE.md:161). CodeQL analyzes JavaScript only (codeql-analysis.yml:22); SECURITY-INSIGHTS.yml expired 2025-07-30 (:3); Dependabot config is scripts/dependabot.yml with no .github/dependabot.yml in the tree and minor/patch Dependabot PRs get auto-merge enabled (automerge-dependabot.yml:26-27); Docker base images use a floating tag (Dockerfile:3 uses :latest; Dockerfile.distroless:4 is tag-pinned only). Dependency footprint: 109 direct and 140 indirect Go modules including many cloud SDKs (go.mod:5-264). Licensing: project is Apache-2.0 (LICENSE); transitive dependency licenses were not audited."
+    ]
+  },
+  "repaired": false,
+  "verification": [
+    {
+      "contender": "prometheus/prometheus",
+      "checks": [
+        {
+          "field": "readme.install[0]",
+          "statement": "Precompiled binaries (release tarball from prometheus.io/download; Linux/macOS/other OS builds): tar xvfz prometheus-*.tar.gz; cd prometheus-*; ./prometheus --config.file=prometheus.yml",
+          "citation": "docs/getting_started.md:14-20, 64-68; README.md:46-51; .promu.yml:25-41",
+          "holds": true,
+          "note": "README.md:46-51 points to prometheus.io/download and calls the latest production release binary the recommended install. docs/getting_started.md:14-19 has the 'Download the latest release ... for your platform', 'tar xvfz prometheus-*.tar.gz' and 'cd prometheus-*' steps, and :64-68 has './prometheus --config.file=prometheus.yml'. The cited lines don't name operating systems, but the crossbuild list at .promu.yml:32-41 (aix, darwin, dragonfly, freebsd, illumos, linux, netbsd, windows) backs 'Linux/macOS/other OS'. The tarball ships documentation/examples/prometheus.yml, LICENSE and NOTICE (.promu.yml:25-31). The external download page was not opened."
+        },
+        {
+          "field": "license",
+          "statement": "spdx Apache-2.0, file LICENSE",
+          "citation": "LICENSE:1-2, 176-191; README.md:226-228",
+          "holds": true,
+          "note": "LICENSE is the Apache License, Version 2.0, January 2004 text: header at :1-2, END OF TERMS AND CONDITIONS at :176, application appendix at :178-191. README.md:226-228 says 'Apache License 2.0, see LICENSE', and Dockerfile:12 labels the image the same way. NOTICE:13-119 lists bundled third-party code under MIT and other licenses, including the UI bundles. That does not change the project's own license."
+        },
+        {
+          "field": "readme.platforms.macos_arm64",
+          "statement": "yes (build-only evidence) - darwin/arm64 is cross-built in CI (ci.yml:264) and darwin is in the crossbuild list (.promu.yml:32-41); CI test jobs run only on ubuntu-latest and windows-latest (ci.yml:15, 181); no macOS-specific install doc",
+          "citation": ".github/workflows/ci.yml:15, 181, 233-266; .promu.yml:32-41",
+          "holds": true,
+          "note": "ci.yml:264 passes '-p darwin/amd64 -p darwin/arm64' to the build job. That job is skipped on v2./v3. tag pushes and main pushes (:239-246); there build_all uses the full .promu.yml list, which includes darwin (:35). Every runs-on in .github/workflows is ubuntu-latest except ci.yml:181 (windows-latest), so there is no macOS test runner. A grep of docs/ for macOS, darwin, Homebrew and arm64 found nothing. The linux_x86_64 entry's citations also hold: README.md:46-51 and 59-61; ci.yml:15-19 (ubuntu-latest, golang-builder:1.27-base); ci.yml:264 (linux/amd64); Dockerfile:1-3 (ARCH=amd64, OS=linux)."
+        },
+        {
+          "field": "readme.integrations.sdk_or_api",
+          "statement": "HTTP API v1 with an OpenAPI spec; OTLP receiver off by default (--web.enable-otlp-receiver), POST /api/v1/otlp/v1/metrics, protobuf or JSON, gzip or none, 32 MiB read limit, 400 for decode/out-of-order/duplicate/too-old errors and 500 otherwise; settings under otlp: in prometheus.yml; no client SDK; Go library use unsupported; v0.3y.z module tags; remote-write protobuf on buf.build",
+          "citation": "docs/querying/api.md:6-23; web/web.go:502-504; web/api/v1/api.go:489-490; cmd/prometheus/main.go:485-486; storage/remote/codec.go:44-47, 974-1025; storage/remote/write_otlp_handler.go:177-210; docs/configuration/configuration.md:239-291; README.md:162-198; scripts/get_module_version.sh:19-24; .github/workflows/buf.yml:31-34",
+          "holds": true,
+          "note": "Every cited line matches. api.md:6-23 covers /api/v1 and /api/v1/openapi.yaml (the JSON format line is :27). /metrics is at web.go:502 and /federate at :504. /write and /otlp/v1/metrics are at api.go:489-490, and the query, series, labels, targets, status, alerts, rules, admin and openapi routes are at api.go:448-513. The OTLP flag defaults to false (main.go:485-486), as does the admin API flag (:473-474). codec.go:44 sets the 32 MiB limit, and :974-1025 accepts only application/x-protobuf or application/json with gzip or no encoding. write_otlp_handler.go:181 returns 400 on decode errors, :199-201 returns 400 on out-of-order, out-of-bounds, duplicate and too-old samples (out-of-bounds is missing from the dossier's list), and :205 returns 500 otherwise. configuration.md:239-291 is the otlp: block, and documentation/examples/prometheus-otlp.yml exists. get_module_version.sh:22-23 prints 0.3%02d, and buf.yml:31-34 runs 'buf push prompb'. Two wording nits that don't change the facts: (1) 'explicitly unsupported' is stronger than README.md:167-171, which says 'not designed for use as a library' and 'no deliberate inconvenience in the way', while :186-198 explains how to import it. (2) The npm module codemirror-promql contains an autocomplete-only HTTPPrometheusClient (web/ui/module/codemirror-promql/src/client/prometheus.ts:83), but it is not a general-purpose API SDK."
+        },
+        {
+          "field": "claim_checks[4]",
+          "statement": "docs/querying/api.md:1880-1891 (README is silent on OTLP) - Prometheus can be a receiver for the OTLP Metrics protocol at /api/v1/otlp/v1/metrics, enabled with --web.enable-otlp-receiver; metrics-only and HTTP-only (no logs/traces handlers, no gRPC server); code accepts JSON although OpenAPI text says protobuf only; endpoint stable for 3.x; delta handling behind experimental flags. verified: yes",
+          "citation": "docs/querying/api.md:1880-1891; web/api/v1/api.go:381-388, 490, 2182-2188; cmd/prometheus/main.go:485-486; storage/remote/codec.go:974-1009; web/api/v1/openapi_paths.go:695; docs/stability.md:22; docs/feature_flags.md:6-10, 215-223",
+          "holds": true,
+          "note": "api.md:1882-1889 says exactly this: OTLP Metrics protocol, --web.enable-otlp-receiver, endpoint /api/v1/otlp/v1/metrics. The handler is built only when the flag is on (api.go:381-388); otherwise the route returns 404 with a message to enable it (:2182-2188). A grep of all *.go files for plog, ptrace, plogotlp, ptraceotlp, pdata/plog, pdata/ptrace, otlpreceiver, pmetricotlp.Register, grpc.NewServer, /v1/logs and /v1/traces found nothing. The only otlp/v1/ paths are metrics (api.go:490, openapi.go:328). The JSON-vs-OpenAPI mismatch is real: codec.go:984-988 decodes JSON, while openapi_paths.go:695 says 'Protocol Buffer format'. stability.md:22 lists 'OTLP receiver endpoint' as stable for 3.x. feature_flags.md:6-10 describes feature flags as off by default and experimental, and :215-223 calls native delta ingestion 'a very early stage of development'. README.md has no OTLP or OpenTelemetry mention."
+        }
+      ],
+      "verdict": "pass",
+      "repairs": []
+    }
+  ]
+}
