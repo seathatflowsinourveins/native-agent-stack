@@ -15806,8 +15806,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-retire-gpt6-lane-compression-ab.md",
-      "sha256": "2e60f1ccc8be4f3772b9119e58b1020ae17d86ba62202997517ef4555baf299b",
-      "bytes": 35949
+      "sha256": "df3e84c0d300e85b40865e2eff548c1a4b9c9e55b043621dbf5a63a1ce630868",
+      "bytes": 39404
     },
     {
       "path": "docs/direct-results.md",
