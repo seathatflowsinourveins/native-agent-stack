@@ -1,0 +1,160 @@
+{
+  "evidence_class": "Actual closed native metadata operation, independent own-capture comparison and immutable source bindings.",
+  "frozen_bindings": {
+    "count": 138,
+    "freeze_sha256": "eb85a3a834541ad920735e248eba2ab5cc97e75c8bd228f14c66940a431dfdf2",
+    "unchanged": true
+  },
+  "historical_conditions": {
+    "newline_alarm": "JSON display interpretation corrected; AST confirmed native LF constants, no configuration change.",
+    "preparation_lookup": "Absent guessed filenames corrected from immutable binding paths.",
+    "unit18_type_parse": "STOP_UNCHANGED",
+    "unit19_stdin": "STOP_UNCHANGED",
+    "unit22_late_guard": "STOP_UNCHANGED",
+    "unit23_untrusted_catalog": "PRIOR_SCOPED_CUSTODY_UNCHANGED"
+  },
+  "limits": {
+    "A": "UNRUN; exact baseline inventory remains unbound",
+    "P2_protection": "HOLD_UNQUALIFIED",
+    "approval_default_savings_or_parity_claim": false,
+    "hidden_native_usage": null,
+    "hook_execution_and_natural_compaction_quality": "UNQUALIFIED",
+    "main_child_and_exact_ID_continuation": "HOLD_UNRUN",
+    "physical_EOF_OS_attribution_wire_invoice_helper_census": "UNKNOWN_OUTSIDE_METADATA_ESTIMAND",
+    "usage_status": "UNKNOWN_NOT_ZERO"
+  },
+  "metadata": {
+    "all_objects_exact_private_capture_projection": true,
+    "enabled_true_unchanged": 6,
+    "errors": 0,
+    "events": [
+      "preToolUse",
+      "postToolUse",
+      "preCompact",
+      "sessionStart",
+      "userPromptSubmit",
+      "stop"
+    ],
+    "fields_per_object": 17,
+    "keys_current_hashes_display_order_match_prior_native_objects": true,
+    "native_hash_or_key_calculation": false,
+    "only_field_changed": "trustStatus: untrusted to trusted",
+    "owned_config_state_and_native_home_custody_verified": true,
+    "selected_objects": 6,
+    "source_class": "sessionFlags",
+    "trusted": 6,
+    "warnings": 0
+  },
+  "native": {
+    "accepted_messages": 3,
+    "actual_argv_matches_frozen_35_arguments": true,
+    "attempts": 1,
+    "exit_code": 0,
+    "methods": [
+      "initialize",
+      "initialized",
+      "hooks/list"
+    ],
+    "retries": 0,
+    "tty": true,
+    "version": "0.160.0"
+  },
+  "native_observation_ms": {
+    "difference": "Separate post-check Date.now observations are 1ms later for id1 and total; retained, not backend latency.",
+    "retained_call_timestamp_terminal_elapsed": 4044,
+    "retained_call_timestamps_reply_guards": [
+      1185,
+      1197
+    ],
+    "stored_reply_guards": [
+      1185,
+      1198
+    ],
+    "stored_terminal_elapsed": 4045
+  },
+  "private_artifact_sha256": {
+    "false_alarm_receipt": "3794d7da7b8ace7bdfae10c822402a671011dc1d0888f89a4d372b620be0d0a3",
+    "independent_observation": "8019b2e072791cfaf8c52ef0c83839e025d76e1ae829c2d5ce29527baa71e3dd",
+    "native_stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native_stdout": "e0fddc73430bff49b9d2a7add4fbf26bd2f2393c692837ab8d405afccf1b0f8f",
+    "source_bindings": "d6858674d09da70ee443c5fd6457cfb654064d14418a54101c7df6047f3e68b5",
+    "worker_receipt": "0d3368b6397824dec09d4156170248ad6a4e6cddfcca651b7359ecc43b3e4106"
+  },
+  "sources": [
+    {
+      "artifact_sha256": "854f5a6b184714740500b8d3eae2bb04cb88172efccf11d38a74f2f6189c0341",
+      "lines": [
+        1497,
+        1526,
+        4931,
+        4939
+      ],
+      "path": "codex-rs/core/src/config/mod.rs",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "repository": "openai/codex",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/config/mod.rs#L1497-L1526"
+    },
+    {
+      "artifact_sha256": "b7ac42b2a895a00b6aa491eee1d3eb04d8a147ba0e77e016bde42381e067d1c0",
+      "lines": [
+        20,
+        32
+      ],
+      "path": "codex-rs/config/src/hook_config.rs",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "repository": "openai/codex",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/config/src/hook_config.rs#L20-L32"
+    },
+    {
+      "artifact_sha256": "84a3a1b13923b48bf35e0c8daf35f2dcaf1ff94444e43d55ac107bf5cb68b058",
+      "lines": [
+        15,
+        61
+      ],
+      "path": "codex-rs/hooks/src/config_rules.rs",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "repository": "openai/codex",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/hooks/src/config_rules.rs#L15-L61"
+    },
+    {
+      "artifact_sha256": "fd05ee932079df2b5128f170beaf0d8e5c8630a56eadbcf9de9f25806e772b04",
+      "lines": [
+        794,
+        820
+      ],
+      "path": "codex-rs/hooks/src/engine/discovery.rs",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "repository": "openai/codex",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/hooks/src/engine/discovery.rs#L794-L820"
+    },
+    {
+      "artifact_sha256": "7d50b22ae6fbf54b9f42d95f817e389e2e3cd25fd0238c1dced84cdd373d7ea5",
+      "lines": [
+        558,
+        604
+      ],
+      "path": "codex-rs/app-server-protocol/src/protocol/v2/plugin.rs",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "repository": "openai/codex",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/app-server-protocol/src/protocol/v2/plugin.rs#L558-L604"
+    },
+    {
+      "artifact_sha256": "98ea2f086fbd073a3648d56320afd54adbc42f4dd5c399e6acd3b669176b06c7",
+      "lines": [
+        800,
+        812,
+        1039,
+        1050
+      ],
+      "path": "src/providers/openai/codex-sdk.ts",
+      "pin": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "repository": "promptfoo/promptfoo",
+      "url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/providers/openai/codex-sdk.ts#L800-L812"
+    }
+  ],
+  "status": "SCOPED_METADATA_GATE_READY",
+  "unit_id": "unit26-p2-owned-home-B-metadata-custody",
+  "north_star_action": "Keep native long-session engineering context reliable for US-equities R&D; actual state delivery precedes separate main/child/continuation/protection measurement.",
+  "preregistration_url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5972555017",
+  "original_public_draft_sha256": "2df15c97e2fb39d6f7b6bc28396c23a1da324b79663dd3be09244513bbb59257"
+}

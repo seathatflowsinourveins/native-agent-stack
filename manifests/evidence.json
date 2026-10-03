@@ -15973,6 +15973,11 @@
       "bytes": 8081
     },
     {
+      "path": "docs/decisions/2026-10-03-native-token-owned-state-and-source-reads.md",
+      "sha256": "983437069188d48e04226e9399dcdec7e4c671bbf688ecf72a51e1d85e9f9013",
+      "bytes": 7269
+    },
+    {
       "path": "docs/decisions/2026-10-03-omniroute-sdk-worker-0160.md",
       "sha256": "9138deaedcb1662d06f5486ca1af962133c07442e52bdf610eada436b5f21790",
       "bytes": 25043
@@ -46179,8 +46184,8 @@
     },
     {
       "path": "evidence/artifacts/token-context-20261003/qualification-experiment.json",
-      "sha256": "87fd758889764333d80f510e55fd317b34ed105c6493a904f6c078ada37efe56",
-      "bytes": 145459
+      "sha256": "e4a5f144f74994a7f5c34ad174df66766d9bffb473cf715b96ad8f4138f8fe2e",
+      "bytes": 153317
     },
     {
       "path": "evidence/artifacts/token-context-20261003/resume-counter-astra-read.json",
@@ -46331,6 +46336,31 @@
       "path": "evidence/artifacts/token-context-20261003/unit23-native-pty-metadata-acceptance.json",
       "sha256": "b9edf192556792ea8e1d86815ce9a0380845cd67c4c7674eab737d9c38007cbf",
       "bytes": 4775
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit25-closed-opus-source-read.json",
+      "sha256": "0d5427fa2b5b376e482d6c2f1078a335e2b8898af0e56fa8a535cb9f94e6f470",
+      "bytes": 3290
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit25-hook-state-astra-source-read.json",
+      "sha256": "4f0c78f5293135fb8eb4d73f62c0fd7a4452761376321d0f6fcd7cdc1546a73d",
+      "bytes": 7068
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit25-hook-state-source-routes.json",
+      "sha256": "d5d25a7c6fb3f9db0c8834eb6ca9f2000cbd07949db18e6a954839195b3ee2a3",
+      "bytes": 5620
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit26-native-owned-home-hook-state.json",
+      "sha256": "667c70a842a99d225a2c1c320bdd0ddbe81d77a329e7e6684259e02b0ea475e4",
+      "bytes": 6385
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit27-narrow-opus-source-read.json",
+      "sha256": "3e9ec32ed02bb9a20f53d60a09be9dbee190c945027294a58c333e95faffa50c",
+      "bytes": 2615
     },
     {
       "path": "evidence/artifacts/token-context-20261003/unit7-codex-publication-review.json",

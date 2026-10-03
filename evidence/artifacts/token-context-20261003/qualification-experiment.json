@@ -111,7 +111,12 @@
       "unit20-native-tty-carrier-source",
       "unit21-native-tty-carrier-astra-judgment",
       "unit22-native-pty-operator-timing-stop",
-      "unit23-native-pty-metadata-acceptance"
+      "unit23-native-pty-metadata-acceptance",
+      "unit25-closed-opus-source-read",
+      "unit25-hook-state-source-routes",
+      "unit25-hook-state-astra-source-read",
+      "unit26-native-owned-home-hook-state",
+      "unit27-narrow-opus-source-read"
     ],
     "roles": [
       "command-worker",
@@ -272,7 +277,12 @@
     "Bounded Codex stdio/capability and uutils0.8 terminal/foreground timeout source checks plus installed value-free help/version; no monitored command/client/TTY mutation in source unit.",
     "One native Codex Astra/max source judgment via keyless pool on distinct actual-PTY/terminal/foreground-timeout metadata recipe; eight unique finalized native response prefixes independently reconciled.",
     "One native typed35 metadata PTY exchange returned all six exact definitions; operator exceeded both20s projection guards, improperly continued, and native foreground timeout closed124. No repair/retry/regrade.",
-    "One distinct frozen literal native-tool PTY metadata sequence, same35argv/440B payload, immediate reply projections and deadline guards before every send; exactsix metadata and native exit0 independently reconciled."
+    "One distinct frozen literal native-tool PTY metadata sequence, same35argv/440B payload, immediate reply projections and deadline guards before every send; exactsix metadata and native exit0 independently reconciled.",
+    "Closed failed native source read;13groups1175609 known prefix only; no final result/verdict. Complete usage/cost UNKNOWN; original54 bindings unchanged.",
+    "Pinned parser/provider/native state source fields and unchanged metadata artifacts verified; source support only at closure, no model-task admission.",
+    "Actual source judgment closed0 with main-only400669; helper/whole total UNKNOWN, native reconnect1 and unplanned-helper bounded orchestration unqualified. Conditional H choice rests on primary rereads.",
+    "B-only native state metadata:6exact17-field objects trusted/enabled, unchangedkeys/hashes/definitions/order,diagnostics0,guards1185/1198ms,total4045ms;all138bindingsunchanged. No handler/role/resume/protection/winner claim.",
+    "Separate source input case closed0;8exactreads,216wordcapFAIL. Full originals resolve5sourceleads. Final inclusive native2groups63827/listcost estimate, not saving/default or runtime grading acceptance."
   ],
   "observations": [
     {
@@ -3219,6 +3229,161 @@
         "total": null,
         "native_retries": null
       }
+    },
+    {
+      "id": "unit25-closed-opus-source-read",
+      "task": "unit25-closed-opus-source-read",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 87,
+      "evidence_class": "native_cli_execution",
+      "scope": "Closed failed native source read;13groups1175609 known prefix only; no final result/verdict. Complete usage/cost UNKNOWN; original54 bindings unchanged.",
+      "status": "failed",
+      "exit_code": 124,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit25-closed-opus-source-read.json",
+          "sha256": "0d5427fa2b5b376e482d6c2f1078a335e2b8898af0e56fa8a535cb9f94e6f470"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit25-hook-state-source-routes",
+      "task": "unit25-hook-state-source-routes",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 88,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Pinned parser/provider/native state source fields and unchanged metadata artifacts verified; source support only at closure, no model-task admission.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit25-hook-state-source-routes.json",
+          "sha256": "d5d25a7c6fb3f9db0c8834eb6ca9f2000cbd07949db18e6a954839195b3ee2a3"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit25-hook-state-astra-source-read",
+      "task": "unit25-hook-state-astra-source-read",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 89,
+      "evidence_class": "model_task_execution",
+      "scope": "Actual source judgment closed0 with main-only400669; helper/whole total UNKNOWN, native reconnect1 and unplanned-helper bounded orchestration unqualified. Conditional H choice rests on primary rereads.",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit25-hook-state-astra-source-read.json",
+          "sha256": "4f0c78f5293135fb8eb4d73f62c0fd7a4452761376321d0f6fcd7cdc1546a73d"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit26-native-owned-home-hook-state",
+      "task": "unit26-native-owned-home-hook-state",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 90,
+      "evidence_class": "native_cli_execution",
+      "scope": "B-only native state metadata:6exact17-field objects trusted/enabled, unchangedkeys/hashes/definitions/order,diagnostics0,guards1185/1198ms,total4045ms;all138bindingsunchanged. No handler/role/resume/protection/winner claim.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit26-native-owned-home-hook-state.json",
+          "sha256": "667c70a842a99d225a2c1c320bdd0ddbe81d77a329e7e6684259e02b0ea475e4"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "unit27-narrow-opus-source-read",
+      "task": "unit27-narrow-opus-source-read",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 91,
+      "evidence_class": "model_task_execution",
+      "scope": "Separate source input case closed0;8exactreads,216wordcapFAIL. Full originals resolve5sourceleads. Final inclusive native2groups63827/listcost estimate, not saving/default or runtime grading acceptance.",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit27-narrow-opus-source-read.json",
+          "sha256": "3e9ec32ed02bb9a20f53d60a09be9dbee190c945027294a58c333e95faffa50c"
+        }
+      ],
+      "usage": {
+        "uncached_input": 4,
+        "cache_creation": 5699,
+        "cache_read": 8743,
+        "output": 49381,
+        "reasoning_in_output": 47781,
+        "total": 63827,
+        "native_retries": null
+      }
     }
   ],
   "failures_and_skips": [
@@ -3433,6 +3598,18 @@
     {
       "run_id": "unit22-native-pty-operator-timing-stop",
       "reason": "Root exceeded both20s observationguards and continued after first violation; native outer timeout124. Partial exactsix metadata retained, not native latency or cleancompletion; no replay/regrade."
+    },
+    {
+      "run_id": "unit25-closed-opus-source-read",
+      "reason": "Closed failed native source read;13groups1175609 known prefix only; no final result/verdict. Complete usage/cost UNKNOWN; original54 bindings unchanged."
+    },
+    {
+      "run_id": "unit25-hook-state-astra-source-read",
+      "reason": "Actual source judgment closed0 with main-only400669; helper/whole total UNKNOWN, native reconnect1 and unplanned-helper bounded orchestration unqualified. Conditional H choice rests on primary rereads."
+    },
+    {
+      "run_id": "unit27-narrow-opus-source-read",
+      "reason": "Separate source input case closed0;8exactreads,216wordcapFAIL. Full originals resolve5sourceleads. Final inclusive native2groups63827/listcost estimate, not saving/default or runtime grading acceptance."
     }
   ],
   "limitations": [
@@ -3477,7 +3654,8 @@
     "Unit12 QMD D1 child model-visible truncation terminalSTOP despite complete runtime bytes; all retrieval comparisons and Claude admissionlaterUNRUN. Two Opus review failures retained:8sourceReads repair observed but final critique/wholeusage missing. Native Codex hook map corrected privately but returnedkeys/hashes missing; no contextprotection. No candidate/default/install/context-supply amendment.",
     "Units13-17: B fixtures are synthetic/directed admissions only. R2 child failure is terminal,55/judge UNRUN_FINAL; known parent252333 is receipt-only, two-role aggregate UNKNOWN. Source-only TUI/stdio/ENOSPC gates keep null native usage/exits. Astra100419 is source judgment, not approval/live metadata/default/protection. No host/other-layer change.",
     "Publication corrections: derived STOP pending-unit16 prose updated to completed source diagnosis only. Proposed generic unit17 stopped-case label corrected to actual frozen formatter/stdin/lane judgment. First two metadata integrations expected absent proposal scope/usage fields and stopped before writes; root binds declared actual scopes/counters. All original native/freeze/private drafts and old aggregate observations remain unchanged.",
-    "Units18/19 are distinct immutable metadata STOPs. Source-backed type/PTY/foreground controls in19/20 do not qualify actual six returned definitions, P2 protection, full-plugin lifecycle, helper/invoice census or a default. Counter fields remain null where no native usage was supplied; no zero usage inference."
+    "Units18/19 are distinct immutable metadata STOPs. Source-backed type/PTY/foreground controls in19/20 do not qualify actual six returned definitions, P2 protection, full-plugin lifecycle, helper/invoice census or a default. Counter fields remain null where no native usage was supplied; no zero usage inference.",
+    "Units25\u201327 preserve failed/incomplete source reads and unplanned helper usage; direct native owned-home trusted state is scoped metadata only. Source/cap/field checks do not qualify handler/main/child/resume/natural compaction or protected quality. Native cost is list estimate, invoice unknown."
   ],
   "decision_and_scope": {
     "decision": "trial",
@@ -3566,7 +3744,12 @@
       "unit13-codex-b-native-call-result-admission",
       "unit13-claude-b-native-call-result-admission",
       "unit13-r2-first-aa-stop",
-      "unit17-native-stdio-carrier-astra-judgment"
+      "unit17-native-stdio-carrier-astra-judgment",
+      "unit25-closed-opus-source-read",
+      "unit25-hook-state-source-routes",
+      "unit25-hook-state-astra-source-read",
+      "unit26-native-owned-home-hook-state",
+      "unit27-narrow-opus-source-read"
     ],
     "coverage_artifact": null
   }

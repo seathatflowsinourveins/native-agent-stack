@@ -1,0 +1,44 @@
+{
+  "scope": "A separate source input case, not a candidate/native comparative task; no saving or default claim.",
+  "status": "CLI0/native success;216-word answer exceeds200cap FAIL",
+  "frozen_bindings_unchanged": 34,
+  "actual_reads": 8,
+  "read_byte_fidelity": 8,
+  "input_bytes": 7813,
+  "usage": {
+    "unique_groups": 2,
+    "input": 4,
+    "cache_creation": 5699,
+    "cache_read": 8743,
+    "output": 49381,
+    "disjoint_total": 63827,
+    "thinking_output_subset": 47781,
+    "native_list_estimate_USD": 1.0349765999999998,
+    "invoice": "UNKNOWN"
+  },
+  "source_corrections": [
+    "Registered builtin uses official retained provider",
+    "Full native schema present in16 profiles",
+    "Fixed facts/source windows wired to4 role-task rubrics",
+    "Permissive parser retained; original actual-output+pass/score1+STOP guards acceptance",
+    "Named actual metadata resolver binds SDK0.3.263 separately from explicit CLI2.1.288"
+  ],
+  "source_pin": "promptfoo/promptfoo@34f74d34e140b5e17d23770dfb2340057b1936b8/0.123.1",
+  "history": "Original timeout124/partial-known usage unchanged, no regrade/retry",
+  "future": "Four producers/scorers UNRUN/unfrozen; no additional family-source-read gate",
+  "limits": "Hidden helpers/global startup/physical streams UNKNOWN; source metadata not runtime acceptance.",
+  "schema_version": 1,
+  "north_star_action": "Reliable model document consumption for cumulative engineering and US-equities R&D.",
+  "original_worker_receipt_sha256": "1614f545e23e7bcdaf7fa36dba3c64e25cd0731c3862279830d37703df82e209",
+  "original_worker_manifest_sha256": "a8fa2367f76bf567b9e682fe39231fa952386f9413bdf1661b933a797837dcdc",
+  "source_locator_correction_sha256": "93b4297295c40d0b24d5e83928f2ac0d3046669c7f89e16ce6cb783fb99aa8a6",
+  "source_verification_basis": "Root reread full native provider/profile/schema and installed registration/metadata mappings at49f785/6a04cd; full fact rubrics and fatal contract unchanged. Narrow projections omitted review bindings, not runtime schema/rubrics.",
+  "source_urls": [
+    "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/providers/claude-agent-sdk.ts#L1666",
+    "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/providers/claude-agent-sdk.ts#L1692",
+    "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/providers/claude-agent-sdk.ts#L2283"
+  ],
+  "word_cap_failure_retained": true,
+  "hidden_helpers_global_state_wire_invoice": "UNKNOWN",
+  "four_comparison_producers": "UNRUN_UNFROZEN_AT_SOURCE_CLOSURE"
+}
