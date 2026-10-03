@@ -9151,13 +9151,13 @@
     },
     {
       "path": "blueprints/runtime-workers/PLAN.md",
-      "sha256": "c9a859a555415c3c0c38c8eb62ce0d2377c7112df56f3a931005d61a02423f1e",
-      "bytes": 5116
+      "sha256": "bd0a90dfde0b4afc50d522f1e38eb1b611c0717e97146a956b89ef195b13ca14",
+      "bytes": 5353
     },
     {
       "path": "blueprints/runtime-workers/README.md",
-      "sha256": "d239078b9ee53b746809bbc2238475488dd6b94f1bcd0cbed8b32abdee11bd38",
-      "bytes": 6023
+      "sha256": "23934cadf98bcda926844fea79376a619a21e20e4abc01ce2fb45ea27c496c44",
+      "bytes": 6996
     },
     {
       "path": "blueprints/runtime-workers/comparisons/coding-worker-draft.json",
@@ -9165,9 +9165,24 @@
       "bytes": 7271
     },
     {
+      "path": "blueprints/runtime-workers/comparisons/evaluation-draft.json",
+      "sha256": "f5e829e4d80f74ebc5ea98ea817c87c7565fa304157a2b9a51d75a89eb7295c1",
+      "bytes": 7712
+    },
+    {
       "path": "blueprints/runtime-workers/comparisons/gateway-token-draft.json",
       "sha256": "4b57345b49904a246b4e2913c9a3dbae2f4862f80d63127399e9c23b47c98fda",
       "bytes": 5125
+    },
+    {
+      "path": "blueprints/runtime-workers/comparisons/github-workflow-draft.json",
+      "sha256": "74b202c07dda486ee84436d5436d3c304d4e5a08514553e5dea9204fa68b4fe4",
+      "bytes": 6696
+    },
+    {
+      "path": "blueprints/runtime-workers/comparisons/multi-worker-draft.json",
+      "sha256": "9be37f0116493d484b7efd612e2342dfa29b864394a6716ec3e57842de764a15",
+      "bytes": 7206
     },
     {
       "path": "blueprints/runtime-workers/comparisons/research-gatherer-draft.json",
@@ -9175,9 +9190,19 @@
       "bytes": 7702
     },
     {
+      "path": "blueprints/runtime-workers/comparisons/reviewer-draft.json",
+      "sha256": "cb773fd4e66d9cbf476f123f5799b169ea03fa915391408f456f466beafc59bf",
+      "bytes": 9241
+    },
+    {
       "path": "blueprints/runtime-workers/comparisons/role-and-lifecycle-draft.md",
-      "sha256": "038123a8d91aae7b500fbea9359bfb083514d6ddeba4f2e92f180dc0d37b1e9d",
-      "bytes": 6064
+      "sha256": "f914eda049ee3ddee72061ea736f805e6f702c789b79ad656b47d179dfab932d",
+      "bytes": 6753
+    },
+    {
+      "path": "blueprints/runtime-workers/comparisons/scheduled-automation-draft.json",
+      "sha256": "6a4ad5b1ade45d10ae175c5c3e184feb16945d6558a9a9c80b9ee917cdc952ae",
+      "bytes": 5268
     },
     {
       "path": "blueprints/runtime-workers/openhands/README.md",
@@ -15811,8 +15836,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-runtime-job-qualification.md",
-      "sha256": "93217239ed30e2704f25e470ddaeddc2674a1d1f4688d4a2f01fab3ae5e1dc2c",
-      "bytes": 9708
+      "sha256": "58f211ba4b3a3158c04b9bda6964394a5238215a62ae10114d263b39c81cde44",
+      "bytes": 10712
     },
     {
       "path": "docs/direct-results.md",
@@ -41856,8 +41881,8 @@
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/README.md",
-      "sha256": "8e7290fd7eb24dbbd4b42bc2d4b9ac17028b8b20f2025541044c65c6fdb9295b",
-      "bytes": 1686
+      "sha256": "ce29b40af4ad65bf6cc30f70ce21b9c707d58fb8415522dd484f771939f411eb",
+      "bytes": 2028
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/checks.json",
@@ -41865,9 +41890,14 @@
       "bytes": 5495
     },
     {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/protocol-source-read.json",
+      "sha256": "a93fa65143b0f2d86e44dc8ee87e373418bb4a8fb61f4cdb18568f4cc533790d",
+      "bytes": 17835
+    },
+    {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/publication-read.json",
-      "sha256": "4594cb5a20becd2ed9b4c896aed6b5d7f685041f99936ff7d17ccb470255570f",
-      "bytes": 3695
+      "sha256": "d7d0b5c36104d0c343ece42391b52b701e54625d0a2bdf9b600a397ed2fc248b",
+      "bytes": 4955
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/source-read.json",
