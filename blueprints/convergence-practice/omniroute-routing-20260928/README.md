@@ -201,11 +201,14 @@ patch has its own rollback: restore build `dd6e9607e`.
 
 ## Addendum (2026-10-03)
 
-The R02 scored run never started. The 2026-09-30 rebuild restarted 20128 with `045aa81f3`, ending **in fact** both
-the freeze under "Decisions" and the "after R02" order under "Next test and rollback". The rebuild record names
-neither R02 nor #445. No explicit release by the user is on record; this addendum neither claims nor supplies one
-and releases nothing. #445 is retired by the
+No R02 scored run is on record. 20128 left the frozen build `dd6e9607e` no later than 2026-09-29 00:42Z, when it was
+running `5fc47d970` at `81c9b6da`; that ended **in fact** the freeze under "Decisions". The 2026-09-30 rebuild, which
+restarted 20128 with `045aa81f3`, is the first published record of the patch running, so the "after R02" order under
+"Next test and rollback" was broken **in fact** no later than 2026-09-30. That record describes `045aa81f3` as part
+(i) only; part (ii) is not recorded as applied and stays open. The rebuild record names neither R02 nor #445. No
+explicit release by the user is on record; this addendum neither claims nor supplies one and releases nothing.
+#445 is retired by the
 [dated R02 retirement record](../../../docs/decisions/2026-10-03-retire-gateway-ab-r02.md), which preserves the
 design, history and evidence limits. Sources: the original `decisions.json:29-41,65-74` and
-`docs/decisions/2026-09-30-omniroute-rebuild.md:3-8,43-55`; class `source_review`. The historical instructions
-above and every pinned artifact remain unchanged.
+`docs/decisions/2026-09-30-omniroute-rebuild.md:3-8,30-32,43-55,125,135-136`; class `source_review`. The historical
+instructions above and every pinned artifact remain unchanged.

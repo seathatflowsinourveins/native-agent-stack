@@ -19,8 +19,10 @@ scope.[^policy]
 
 ## What R02 was
 
-The question was whether GPT-6 at max effort beat the gateway's default medium effort for framework (FW)
-chat/completions roles by enough to pay for its reasoning tokens. The two arms were:[^arms]
+The pinned README asked: "Does GPT-6 at max effort beat the gateway's default medium effort for framework (FW)
+chat/completions roles by enough to pay for its reasoning tokens?" Cost entered only the keep-medium branch of the
+decision rule below; the adopt-max branch, in `plan.json`'s words, "does not depend on cost".[^rule] The two arms
+were:[^arms]
 
 | Arm | Model and treatment | Evidence class |
 | --- | --- | --- |
@@ -57,16 +59,18 @@ value or a difference between them. This is `source_review` of the protocol; its
 
 ## What ran
 
-**No scored R02 call was ever made.** The pinned head remained `draft-not-frozen-not-run`; main's routing record
-also recorded that the scored run had not started and its owner was inactive. This is `source_review` of the
-retained status and decision record, not a new inspection of private gateway logs.[^not-run]
+**No scored R02 call is on record.** The pinned head remained `draft-not-frozen-not-run`, and main's routing
+record says that, as of the coordinator log's 03:3xZ entry on 2026-09-28, the scored run had not started and its
+owner was no longer active. This is `source_review` of the retained status and decision records, not a new
+inspection of private gateway logs. It shows that no scored run was recorded, not that no call could ever have
+been made.[^not-run]
 
 | Historical operation | Result and boundary | Evidence class and locator |
 | --- | --- | --- |
 | First bounded wire check, 2026-09-27 19:49Z | Two calls; request-shape evidence only | Historical `native_proven`; `bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/plan.json:401-444`; `bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/README.md:549-550` |
 | Wire re-check, 2026-09-27 21:16Z | Two more calls, four in all; request-shape evidence only | Historical `native_proven`; `bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/plan.json:473-525`; `bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/README.md:549-550` |
 | Echo check against local go-httpbin | Configs at `9d03c1ea`; no gateway call | Historical `local_integration`; `bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/plan.json:445-472`; `bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/README.md:551-553` |
-| 80 offline tests in the pinned environment | Reported historical checks on fixtures; the pinned test module contains 80 test methods, which does not itself prove their execution | `synthetic`; `bddb0072:tests/test_gateway_ab_r02_20260927.py:115-1724`; fixture boundary at `bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/README.md:554-557`; reported run count in the custody account[^reported-history] |
+| 80 offline tests in the pinned environment | Reported historical checks on fixtures; the pinned test module contains 80 test methods, which does not itself prove their execution | `synthetic`; `bddb0072:tests/test_gateway_ab_r02_20260927.py:115-1724`; fixture boundary at `bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/README.md:554-557`; reported run count in the #445 PR description[^reported-history] |
 | Dry read-back, 2026-09-28T01:23:33Z at `00a94b52` | Exit 2: `/api/monitoring/health` needed management auth | `source_review` of reported native execution; `main:evidence/artifacts/omniroute-routing-20260928/decisions.json:65-68`; `main:blueprints/convergence-practice/omniroute-routing-20260928/experiment.json:370-383` |
 | Dry read-back, 2026-09-28T01:29:29Z at `bddb0072` | Exit 0, admissible, with the keyless sources `GET /api/system/version` and the BUILD_SHA sentinel | `source_review` of reported native execution; `main:evidence/artifacts/omniroute-routing-20260928/decisions.json:71-74`; `main:blueprints/convergence-practice/omniroute-routing-20260928/experiment.json:386-395` |
 
@@ -76,17 +80,21 @@ retirement.[^readbacks]
 
 ## Review history and residuals
 
-The custody account reports three read-only GPT-6 rounds (`gpt-6-astra`, max): eight findings at `fae72c37`,
-repaired in `f58a4a65` and `4b7c58de`; four findings at `4b7c58de`, repaired in `2c584098` and `af85abec`;
-then none at `af85abec`, with the verdict "freeze-ready pending the owner's dry read-back". Class:
-`source_review` of a reported review history. The pinned README directly documents the first eight and second
-four findings; it does not retain the third-round verdict or a historical offline-test output. The reported
-model/effort, first review head and final verdict are preserved as custody-report facts, rather than presented
-as independently observed review executions.[^reviews][^reported-history]
+The #445 PR description reports three read-only GPT-6 rounds (`gpt-6-astra` at max, on one Codex thread): eight
+findings at `fae72c37`, repaired in `f58a4a65` and `4b7c58de`; four findings at `4b7c58de`, repaired in `2c584098`
+and `af85abec`; then none at `af85abec`, with the verdict "freeze-ready pending the owner's dry read-back". It adds
+that the third round's sandbox lacked numpy and scipy, so that round ran 76 tests and skipped the 4 statistical
+ones, while all 80 passed in the pinned environment. Class: `source_review` of a reported review history. The
+pinned README directly documents the first eight and second four findings; the third-round verdict and the
+offline-test runs are retained only in the PR description. The model and effort, the first review head, the final
+verdict and the test runs are preserved as author-reported facts, not as independently observed review or test
+executions.[^reviews][^reported-history]
 
-The builder's ninth defect was promptfoo 0.123.1's results sanitizer compacting JSON-looking vars
-(`dist/src/logger-ChlKG5Wv.js:1049-1057`). The repaired analysis compared `labels_json` as parsed JSON.
-Class: `source_review` of the recorded source finding, with `synthetic` offline persistence checks.[^sanitizer]
+The PR description also reports a ninth defect that the builder found and fixed: promptfoo 0.123.1's results
+sanitizer compacts JSON-looking vars (`dist/src/logger-ChlKG5Wv.js:1049-1057`). The pinned README and plan record
+that behaviour and the repair: `labels_json` is compared as parsed JSON. Class: `source_review` of the recorded
+source finding, with `synthetic` offline persistence checks; the "ninth" count and the attribution to the builder
+are author-reported.[^sanitizer][^reported-history]
 
 The OAuth occupancy override was recorded as a shared account-selection condition. Every chat request asked
 for `reserveOAuthSession: true` (OmniRoute@dd6e9607e `src/sse/handlers/chat.ts:1711`), and the selection could
@@ -106,10 +114,14 @@ Five residuals remain, all `source_review` of the design's evidence limits:
 ## Why retired
 
 **Bindings.** The arms and admissible values were bound to build `dd6e9607e` and the GPT-6 Astra model line.
-The recorded 2026-09-30 rebuild overtook that binding: its target was `2f42a9ac1`, with the 20128 affinity patch
-`045aa81f3`, build `ae5539a56`, switched over between 00:02:41Z and 00:03:00Z. That is a historical rebuild
-statement, class `source_review` of the owner's published native operation, not a statement of the current
-gateway build. The current build is the gateway owner's to state.[^bindings][^rebuild]
+`dd6e9607e` was a `release/v3.8.51` `a58000c7` build with PRs #14904 and #13788. The 2026-09-30 rebuild record's
+account of what ran before it reads: "Two builds of `release/v3.8.51` at `81c9b6da` (20128: `5fc47d970`; 20129:
+`c3fa5a15e`) since 2026-09-29 00:42Z, and before them `a58000c7` builds." So 20128 had left `dd6e9607e` no later
+than 2026-09-29 00:42Z. The receipt package for the `81c9b6da` build was never published, and this record found no
+published statement of who decided that switch or on what basis. The 2026-09-30 rebuild then moved 20128 to target
+`2f42a9ac1` with the affinity patch `045aa81f3`, build `ae5539a56`, switched over between 00:02:41Z and 00:03:00Z.
+These are historical build statements, class `source_review` of the owner's published record, not a statement of
+the current gateway build. The current build is the gateway owner's to state.[^bindings][^rebuild]
 
 **Freeze.** Two recorded decisions were affected:
 
@@ -118,20 +130,35 @@ gateway build. The current build is the gateway owner's to state.[^bindings][^re
 - The occupancy patch's apply-after-R02 order, including the user quote "Full patch after R02"
   (`main:evidence/artifacts/omniroute-routing-20260928/decisions.json:36-41`).
 
-Both ended **in fact** when the gateway owner, under the user's 2026-09-29/30 directions, rebuilt and restarted
-20128 and applied `045aa81f3`. The rebuild record names neither R02 nor #445. The roadmap's F-WK-3 items asking
-for the user's R02 freeze release and re-derived #445 admissible values were not carried by that record.
-These are `source_review` findings from comparing the preserved decisions, the rebuild record and the roadmap;
-they do not establish an explicit user release.[^rebuild][^roadmap]
+The freeze ended **in fact** no later than 2026-09-29 00:42Z. From then 20128 ran `5fc47d970` instead of the
+frozen `dd6e9607e`, so it had been restarted on another build, which the extract's 03:3xZ status had ruled out
+("20128 is not restarted"). The earliest user direction the rebuild record cites is dated 2026-09-29 20:00Z, after
+that switch, so this record does not attribute the switch to the user's directions.
+
+The approved patch had two parts. The rebuild record describes `045aa81f3` only as part (i), "a reused session pin
+outranks OAuth session occupancy", and is the first published statement that it ran on 20128. So the
+apply-after-R02 order's timing condition was broken **in fact** no later than the 2026-09-30 switch-over
+(00:03:00Z), with no R02 run on record. The rebuild record says the patch was first built in the unpublished
+`81c9b6da` package, but no published record states whether `5fc47d970` carried it, so this record does not date
+the break earlier. Part (ii), binding a fresh pin to the connection actually served, is not recorded on main as
+applied. With R02 retired, its "after R02" trigger can no longer occur, so part (ii) stays an open item for the
+patch workflow or a user decision; this record neither applies nor drops it.
+
+The rebuild record names neither R02 nor #445. The roadmap's F-WK-3 items asking for the user's R02 freeze release
+and re-derived #445 admissible values were not carried by that record. The custody notice on #445 dated the end of
+the freeze to the 2026-09-30 rebuild; the dating above corrects it from the rebuild record's own account. These are
+`source_review` findings from comparing the preserved decisions, the rebuild record and the roadmap; they do not
+establish an explicit user release.[^freeze][^rebuild][^roadmap]
 
 **No explicit release by the user is on record. This record neither claims nor supplies one, and it releases
 nothing.** It records the historical conflict without rewriting the freeze, its ordering condition or any
 pinned artifact.[^freeze]
 
-**Owner.** Main's `decisions.json:33` recorded the run owner as inactive. Before the custody notice, #445 had
-had no comment or review since 2026-09-28T01:28:20Z, according to the custody account. Session 0c's
-2026-10-02T23:58Z triage found no live owner, and no lane claimed R02 during the objection window. Class:
-`source_review` of the historical decision and the custody/platform records.[^not-run][^custody][^reported-history]
+**Owner.** Main's `decisions.json:33` recorded the run owner as inactive. The #445 timeline shows no comment or
+review before the custody notice; its last commit, `bddb0072`, is dated 2026-09-28T01:28:15Z. Session 0c reports
+that its 2026-10-02T23:58Z triage found no live owner; that triage is unpublished. No lane claimed R02 during the
+objection window. Class: `source_review` of the historical decision and the platform records, with the triage as
+the custody session's report.[^not-run][^custody][^timeline]
 
 **Use.** The 2026-10-03 #608 coexistence records treat 20128 as a shared pool with bounded windows and separate
 lane acknowledgements. Those records establish coordination, not effort or model acceptance. Class:
@@ -139,7 +166,7 @@ lane acknowledgements. Those records establish coordination, not effort or model
 
 ## Alternatives considered
 
-These are the retirement decision's alternatives, based on the design bindings, the historical rebuild and
+These are the retirement decision's alternatives, based on the design bindings, the later 20128 builds and
 the absence of a claimed owner; their evidence class is `source_review`.[^bindings][^rebuild][^custody]
 
 - **Land as written.** Rejected: the preserved bindings cannot qualify the rebuilt gateway, and landing the
@@ -172,7 +199,8 @@ part of this decision.[^policy]
 
 ## Source locators and evidence boundaries
 
-[^custody]: Original #445 custody notice [5967135175](https://github.com/seathatflowsinourveins/native-agent-stack/pull/445#issuecomment-5967135175) and #608 mirror [5967137495](https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5967137495); post-window read-only platform and coordination observations retained in the builder handoff. Class: `source_review` / independent observation. The notice reports the user's custody direction and the unowned-PR finding.
+[^custody]: Original #445 custody notice [5967135175](https://github.com/seathatflowsinourveins/native-agent-stack/pull/445#issuecomment-5967135175) and #608 mirror [5967137495](https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5967137495); post-window read-only platform and coordination observations retained in the builder handoff. Class: `source_review` / independent observation. The notice reports the unowned-PR finding, the retirement plan and the two-hour objection window. The user's 2026-10-03 custody direction is the custody session's report; neither the notice nor the mirror contains it.
+[^timeline]: The #445 issue timeline, read through the GitHub REST timeline endpoint on 2026-10-03: commits through `bddb0072` (committer date 2026-09-28T01:28:15Z), a label, cross-references and, as its first comment, the custody notice at 2026-10-03T08:22:02Z; no review event. Class: independent platform observation.
 [^policy]: `main:docs/acceptance-evidence-policy.md:24-33,46-61`; `main:docs/lanes.md:94-148`; repository evidence-preserving retirement precedent `main:docs/decisions/2026-09-25-retire-vela-velanext.md:32-46`. This record follows those policies and the assigned custody scope; it adds no native execution claim.
 [^arms]: `bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/README.md:12-23`; `bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/plan.json:5-18`. Class: `source_review`.
 [^subset]: `bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/plan.json:87-114,181-199`; `bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/README.md:25-38`. Class: `source_review`; private inputs were not read or rehashed.
@@ -181,8 +209,8 @@ part of this decision.[^policy]
 [^fingerprint]: `bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/plan.json:296-307,319-373`; `bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/README.md:501-538`. Class: `source_review`; declaration and historical provenance are separate.
 [^not-run]: `bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/README.md:3-8`; `bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/plan.json:3`; `main:evidence/artifacts/omniroute-routing-20260928/decisions.json:33`; `main:blueprints/convergence-practice/omniroute-routing-20260928/experiment.json:489`. Class: `source_review` of reported run status.
 [^readbacks]: `main:evidence/artifacts/omniroute-routing-20260928/decisions.json:65-74`; `main:blueprints/convergence-practice/omniroute-routing-20260928/experiment.json:114-115,376-395,494`. Class: `source_review`; the experiment calls these `native_cli_execution`, but its scope says the exits are from the coordinator's log and the outputs are private.
-[^reported-history]: Session native-agent-stack-0c's 2026-10-03 custody account, `contract-PR445.md:68,74-78,93`, retained privately. It supplies the reported historical test execution, review model/effort and third verdict, and precise triage/last-activity times. These details are report evidence; the pinned blobs do not retain their original execution outputs. No stronger independent-execution claim is made here.
-[^reviews]: `bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/README.md:665-714`; repair commit objects `f58a4a655f0b69d07cdc0454adb02f0285ee41b3`, `4b7c58de8a641e93ed0dd7fe7795a90bf379ee49`, `2c584098c7d8d3e7307be51b94f4ee738181aed0` and `af85abec7e5a121eaf2882e0e0d43078a6656460`, read without changing refs. Class: `source_review`; see the custody-report boundary above.
+[^reported-history]: The [#445 PR description](https://github.com/seathatflowsinourveins/native-agent-stack/pull/445), as last edited 2026-09-28T00:47:05Z (its edit history, read on 2026-10-03, shows no later edit), body lines 15, 55, 69-70 and 77-83. It is the PR author's report of the review rounds (model, effort, heads, finding counts and the third verdict), the ninth defect and the offline-test runs. Class: `source_review` of an author report; the pinned blobs do not retain the original review or test outputs, and neither the reviews nor the tests were re-executed for this record.
+[^reviews]: `bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/README.md:665-714`; repair commit objects `f58a4a655f0b69d07cdc0454adb02f0285ee41b3`, `4b7c58de8a641e93ed0dd7fe7795a90bf379ee49`, `2c584098c7d8d3e7307be51b94f4ee738181aed0` and `af85abec7e5a121eaf2882e0e0d43078a6656460`, read without changing refs. Class: `source_review`; see the author-report boundary above.
 [^sanitizer]: `bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/README.md:168-175`; `bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/plan.json:243`. Class: `source_review`; persistence fixtures remain `synthetic`.
 [^occupancy]: `bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/README.md:581-596`; `bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/plan.json:533`. Class: `source_review` of the recorded upstream trace.
 [^timeouts]: `bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/README.md:488-491,518`; `bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/plan.json:371,374`. Class: `source_review`.
@@ -190,7 +218,7 @@ part of this decision.[^policy]
 [^snapshot]: `bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/README.md:634-636,710-712`; `bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/plan.json:245,539`. Class: `source_review`.
 [^duration]: `bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/README.md:573,623-625`; `bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/plan.json:206`. Class: `source_review`.
 [^bindings]: `bddb0072:blueprints/convergence-practice/gateway-ab-r02-20260927/plan.json:7-18,319-330`. Class: `source_review`.
-[^rebuild]: `main:docs/decisions/2026-09-30-omniroute-rebuild.md:3-8,33-36,43-55`; the entire original record was checked for R02/#445 references. Class: `source_review` of the owner's historical native-operation record; no current-build observation.
+[^rebuild]: `main:docs/decisions/2026-09-30-omniroute-rebuild.md:3-8,30-36,43-55,125,131-136`; `main:blueprints/convergence-practice/omniroute-routing-20260928/README.md:15` for the base of `dd6e9607e`; the entire original record was checked for R02/#445 references, and main was searched for `5fc47d970` and `81c9b6da`. Class: `source_review` of the owner's historical native-operation record; no current-build observation.
 [^roadmap]: `main:docs/decisions/2026-09-28-ecosystem-roadmap.md:185-189,237-238`. Class: `source_review` of requirements not carried by the rebuild record.
 [^freeze]: `main:evidence/artifacts/omniroute-routing-20260928/decisions.json:29-41`; `main:blueprints/convergence-practice/omniroute-routing-20260928/README.md:103-110,163-167,192`; `main:blueprints/convergence-practice/omniroute-routing-20260928/experiment.json:489`. Class: `source_review`; the historical instructions remain unchanged.
 [^coexistence]: Original #608 comments [5966185450](https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5966185450), [5966191333](https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5966191333), [5966225109](https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5966225109) and [5966289633](https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5966289633), read in full. Class: `source_review` / platform observation of coordination only.

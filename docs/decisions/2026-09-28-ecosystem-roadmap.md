@@ -341,6 +341,9 @@ Decision rights stay as recorded:
 
 - **#445 is retired.** The Park item "re-derived on the rebuilt gateway" is replaced by the
   [dated R02 retirement record](2026-10-03-retire-gateway-ab-r02.md). F-WK-3's R02 freeze-release and admissible-value
-  items above (`:187-188`) were not carried by the 2026-09-30 rebuild record (`:3-8,43-55`, which names neither R02
-  nor #445). The rebuild ended the freeze and apply-after-R02 order in fact; no explicit user release is on record,
-  and this update releases nothing. Evidence class: `source_review` of the retained records.
+  items above (`:187-188`) were not carried by the 2026-09-30 rebuild record
+  (`2026-09-30-omniroute-rebuild.md:3-8,30-32,43-55`, which names neither R02 nor #445). The freeze ended in fact no
+  later than 2026-09-29 00:42Z, when 20128 was running `5fc47d970` at `81c9b6da` instead of the frozen `dd6e9607e`
+  (`2026-09-30-omniroute-rebuild.md:30-32`). The apply-after-R02 order was broken in fact no later than the 2026-09-30
+  rebuild, the first published record of the affinity patch on 20128. No explicit user release is on record, and this
+  update releases nothing. Evidence class: `source_review` of the retained records.
