@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "evidence_class": "native_cli_execution_and_owner_handback",
+  "scope": "Current-host account readiness and bounded native Claude coordination; no host application",
+  "sources": [
+    "anthropics/claude-code@ec44ca97dc86c33d934c8d55b24959aabf076871 (2.1.285)",
+    "https://code.claude.com/docs/en/cross-session-messaging",
+    "https://code.claude.com/docs/en/headless",
+    "docs/lanes.md#hot-file-protocol",
+    "adoption/update.md",
+    "adoption/lifecycle.md"
+  ],
+  "account_status": {
+    "github_native_auth_status_exit": 0,
+    "codex_native_login_status_exit": 0,
+    "claude_native_auth_status_exit": 0,
+    "claude_logged_in": true,
+    "credential_values_read": false,
+    "login_or_logout_performed": false,
+    "provider_validity_inferred_from_store_presence": false
+  },
+  "read_only_host_observation": {
+    "observer": "separate bounded explorer",
+    "profile": "foundation-cpu",
+    "prerequisite_status_exit": 0,
+    "required_commands_present": 11,
+    "client_wiring_status_exit": 0,
+    "client_wiring_complete": true,
+    "credential_status_exit": 0,
+    "credential_values_read": false,
+    "limit": "Wiring matches the shared checkout, not a newly applied or accepted future revision. Presence and metadata do not qualify model or broker execution."
+  },
+  "coordination_invocations": [
+    {
+      "requested_model": "opus",
+      "requested_effort": "max",
+      "exit_code": 0,
+      "num_turns": 4,
+      "capture_bytes": 35083,
+      "capture_sha256": "cbe48e7ba1ebcb100e4058da7bf1c5fc93df157a750852ba79551c42da61014a",
+      "usage_scope": "single native final aggregate; iterations not added",
+      "input": 6,
+      "cache_creation": 27335,
+      "cache_read": 62373,
+      "output": 2272,
+      "thinking_in_output": 856,
+      "total": 91986,
+      "result": "Native session discovery corrected retired names; current default and dependency owners were queued."
+    },
+    {
+      "requested_model": "opus",
+      "requested_effort": "max",
+      "exit_code": 0,
+      "num_turns": 4,
+      "capture_bytes": 97108,
+      "capture_sha256": "5c1aaf8c8f434d083d07b8ec1c75970123ef36d65a646f0bd68696a264682567",
+      "usage_scope": "single native final aggregate; iterations not added",
+      "input": 8,
+      "cache_creation": 44412,
+      "cache_read": 92074,
+      "output": 12433,
+      "thinking_in_output": 10370,
+      "total": 148927,
+      "result": "Current Gate-A and runtime owners were queued; a separate Gate-A handback was observed."
+    },
+    {
+      "requested_model": "opus",
+      "requested_effort": "max",
+      "exit_code": 0,
+      "num_turns": 4,
+      "capture_bytes": 43055,
+      "capture_sha256": "8722455967fd0dede5f10083c7e8e78d46dd527822996d1506364cabd1f64da6",
+      "allowed_tools": ["ListAgents", "SendMessage"],
+      "permission_mode": "bypassPermissions",
+      "permission_prompts": "none",
+      "settings_scope": "dedicated process only",
+      "usage_scope": "single native final aggregate; iterations not added",
+      "input": 6,
+      "cache_creation": 25462,
+      "cache_read": 61022,
+      "output": 3514,
+      "thinking_in_output": 2156,
+      "total": 90004,
+      "native_send_results": [
+        {"owner_role": "runtime", "success": true, "outcome": "queued"},
+        {"owner_role": "dependency", "success": true, "outcome": "queued"}
+      ],
+      "actual_hold_or_refusal_observed": false,
+      "read_or_agreement_observed": false,
+      "result": "Per-call autonomous mode matches the user's authorized scope. Native recipient permission rules remain in force; no recipient configuration was changed."
+    }
+  ],
+  "failed_attempts": [
+    {
+      "operation": "All-recorded convergence check before re-registering the latest in-progress receipt and decision edits",
+      "exit_code": 1,
+      "returned_error": "record discovery: invalid, changed or empty evidence manifest",
+      "correction": "Refresh owned file registrations after edits and before final integrity/convergence validation; do not bypass discovery or discard the failed condition."
+    },
+    {
+      "operation": "Publication validation of the first sanitized coordination receipt",
+      "exit_code": 1,
+      "returned_error": "contains possible local session identifier",
+      "correction": "Keep exact native message identifiers only in the private hash-bound capture; publish recipient roles and returned queue outcomes."
+    },
+    {
+      "operation": "Dedicated print process with stream-json input but no prompt or input",
+      "exit_code": 1,
+      "stderr": "Error: Input must be provided either through stdin or as a prompt argument when using --print",
+      "stdout_bytes": 12771,
+      "stdout_sha256": "beb7ead11ac7869a1a06a781b24419ae0b73ead93dea18f1f5a26a98fbddf4b7",
+      "stderr_bytes": 94,
+      "stderr_sha256": "2122456c9827a04aff9792c1149505097ac016d61c330a0df0dd73976358987c",
+      "usage": null,
+      "correction": "Use the documented one-shot -p with explicit prompt input. The corrected bounded invocation completed."
+    }
+  ],
+  "observed_owner_handback": {
+    "capture_bytes": 2580,
+    "capture_sha256": "e4645abea7fea8914f6fd5fb48088e15ff34ef37dde64d51199f5601cf5c61a1",
+    "same_conversation_renamed": true,
+    "ownership_transferred": false,
+    "u6_built_or_merged": false,
+    "quiet_window_announced": false,
+    "accepted_host_revision": null,
+    "host_apply_owner": "default-harness owner, one B1 batch from accepted main",
+    "host_apply_gate": "U6 merge and Gate-A owner go",
+    "source_only_work_allowed": true,
+    "shared_hot_files_requirement": "All shared hot-file edits in the last PR commit; rebase before merge.",
+    "limit": "Owner timestamps do not prove event ordering; source-only gate handback is not model acceptance, merge approval or host application."
+  },
+  "dependency_owner_handback": {
+    "capture_bytes": 3468,
+    "capture_sha256": "c48c4827e0957eec10b425fb36fb13b370233b146d127a938b4090869c4f838a",
+    "repair_pr": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/546",
+    "observed_head": "4a09c9c5f1e5fdb5555d4c916666f12e089cf09f",
+    "source": "https://github.com/seathatflowsinourveins/native-agent-stack/tree/4a09c9c5f1e5fdb5555d4c916666f12e089cf09f",
+    "independent_source_review": "Separate bounded explorer checked current native PR state, committed locks/pins/scan configuration and native hosted status.",
+    "openhands_urllib3": "2.8.0",
+    "openhands_pyjwt": "2.15.0",
+    "openhands_lock_sha256": "1d11bae34f09707d1ad353e24c33d25c7b004f25de9821d434e065b10969559c",
+    "osv_job_id": 110024159759,
+    "osv_job_conclusion": "success",
+    "frozen_mac_next": "Separate native scan and dated exception scoped to its unchanged historical lock; ordinary scan retains enforcement and its pre-existing exceptions.",
+    "merge_observed_at_initial_snapshot": false,
+    "later_native_merge_observation": {"exit_code": 0, "state": "MERGED", "merge_commit": "8fc86119eacfd5be9b8a139e1ed167d85748091b"},
+    "pending": ["required CI", "last cross-family review", "owner merge", "update dependent branches from accepted main"],
+    "user_login_required": false,
+    "root_relocked_files_or_added_vulnerability_ignores": false,
+    "limit": "This source/hosted-status review is not a local relock or new runtime acceptance. The owner-provided future window for PyJWT2.15.1 does not describe the already eligible2.15.0 repair."
+  },
+  "limits": [
+    "Queued native sends are not proof of peer read, approval or integration.",
+    "No working native sign-in was reset; no credential value or human conversation was read.",
+    "No global host configuration, skills, MCP registrations, routes, timers or services were applied.",
+    "Native cache and thinking counts are subsets; prior coordination invocations, provider counters and billing are not summed into a whole-workflow claim.",
+    "Usage and effective backend for the failed no-input attempt remain unknown."
+  ]
+}

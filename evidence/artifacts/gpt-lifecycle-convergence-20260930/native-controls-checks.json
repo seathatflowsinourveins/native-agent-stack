@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "scope": "Scoped control-experiment record validation; consistency and hashes only",
+  "first_attempt": {
+    "exit_code": 1,
+    "returned_error": "failures_and_skips: must cover every non-passed run exactly once",
+    "rejected_artifact": "evidence/artifacts/gpt-lifecycle-convergence-20260930/native-controls-convergence-first.json.failed",
+    "sha256": "ed62352800a5d46526d9de50d3315f38e9369d3c0e81313d1bfef41f41ed7a42"
+  },
+  "correction": "Declare the first observer's actual failed acceptance separately: command exit0, zero witnessed PIDs, semantic/contract false. Keep all three successful control observations and their narrower scope.",
+  "corrected_attempt": {"exit_code": 0, "valid": true, "observations": 4},
+  "limit": "The checker validates declared consistency and artifact hashes; it does not certify native truth, freeze timing, provider identity or complete usage."
+}

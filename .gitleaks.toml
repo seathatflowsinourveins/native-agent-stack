@@ -158,6 +158,25 @@ regexes = [
   '''^\s*"Launcher/bin/Debug/QuantConnect\.Api\.xml": "828ef6359e33844b81ca839238ffac8f2dcd10995c5629cb40956bf5d4853e5c",?\s*$'''
 ]
 
+# Pinned Codex Action source digests, independently compared with upstream Git
+# blobs. gitleaks 8.30.1's generic-key rule flags "Credentials" in these filenames.
+# Scope both the exact artifact paths AND whole lines with the two exact digests;
+# other values, fields, extra secrets on a line and other paths stay detectable.
+# Source: https://github.com/gitleaks/gitleaks/blob/v8.30.1/README.md#configuration
+[[rules.allowlists]]
+description = "Exact independently verified Codex Action credential-source file digests"
+condition = "AND"
+paths = [
+  '''^evidence/artifacts/gpt-lifecycle-convergence-20260930/source-sha256-before\.json$''',
+  '''^evidence/artifacts/gpt-lifecycle-convergence-20260930/source-sha256-after\.json$''',
+  '''^evidence/artifacts/gpt-lifecycle-convergence-20260930/action-upstream\.json$''',
+]
+regexTarget = "line"
+regexes = [
+  '''^\s*"src/linuxCredentials\.ts": "aa75358ce28991c1fc20db9c177848b40a7ebd840ad1e5b095f93552c55301fe",?\s*$''',
+  '''^\s*"test/linuxCredentials\.test\.mjs": "fe9b14006f0f41a5742c4d08973b7fced46d480cfc97b9fe2a140e490f92dbbd",?\s*$''',
+]
+
 # Content digests held under a closed set of named JSON fields (sha256/commit/pin
 # style keys), restricted to the exact files that were reviewed and produced them.
 [[rules.allowlists]]

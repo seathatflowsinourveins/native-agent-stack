@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "scope": "Owned dashboard gate metadata repair in PR550",
+  "source": {
+    "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+    "revision": "3fb8294fcedc38204018af0502ece244af7b2807",
+    "implementation": "observability/grand-dashboard/progress.py:46-49,168-175",
+    "tests": "tests/test_grand_dashboard.py"
+  },
+  "original_failures": [
+    {
+      "platform": "Linux GitHub runner",
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36746549072/job/109995692605",
+      "exit": 1,
+      "tests": 8623,
+      "errors": 8,
+      "skipped": 806,
+      "returned_footer": "Ran 8623 tests in 1308.410s\nFAILED (errors=8, skipped=806)",
+      "exception": "KeyError: 'kind' in eight GrandDashboardTests"
+    },
+    {
+      "platform": "macOS GitHub runner",
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36746549097",
+      "artifact_id": 11114096949,
+      "exit": 1,
+      "tests": 8623,
+      "errors": 8,
+      "skipped": 1116,
+      "returned_footer": "Ran 8623 tests in 1378.415s\nFAILED (errors=8, skipped=1116)",
+      "exception": "Same eight GrandDashboardTests KeyError: 'kind', independently read from original full-suite artifact",
+      "original_log_sha256": "80b83add5b9cd02052a08b23484fedd235cc07a9a811e935c6a412d6705115f3",
+      "original_zip_sha256": "d4e9f5b90e09a39520f786872232c98d0f0df2ae79d098c93199dd61ce887751"
+    }
+  ],
+  "repair": {
+    "entity": "gpt-native-lifecycle-convergence",
+    "added_kind": "gate",
+    "previous_state_length": 221,
+    "state": "Native review complete / Action143pass1skip / workflow inactive / SDK/backend and host-owner qualification open",
+    "other_entities_changed": false
+  },
+  "native_check": {
+    "cmd": "rtk python3 -m unittest tests.test_grand_dashboard -v",
+    "exit": 0,
+    "tests": 17,
+    "failed": 0,
+    "skipped": 0,
+    "returned_footer": "Ran 17 tests in 0.366s\nOK\nInstalled dashboard and two units; service activation remains explicit.",
+    "unchanged_test_module": true
+  },
+  "limits": [
+    "The install output is from synthetic fixtures; no host dashboard service, collector or emitter was installed or activated by this check.",
+    "This proves the owned metadata renderer contract only; full hosted reruns remain independent evidence.",
+    "Original failed full-suite runs and skips remain preserved; the passing local module does not convert them to passing full runs."
+  ]
+}

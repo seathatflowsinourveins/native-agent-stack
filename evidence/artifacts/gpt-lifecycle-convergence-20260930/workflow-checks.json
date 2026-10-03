@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "evidence_class": "native_cli_execution",
+  "scope": "Offline portable-workflow and selected RTK bootstrap checks on this Linux host",
+  "analyzer": {
+    "name": "zizmor",
+    "version": "1.30.1",
+    "persona": "pedantic",
+    "offline": true,
+    "config": false,
+    "ignores": false
+  },
+  "failed_attempts": [
+    {
+      "command": "rtk zizmor --offline --no-config --strict-collection --no-ignores --persona pedantic --no-progress examples/gpt-native-github/workflow.yml",
+      "exit_code": 11,
+      "returned_diagnostic": "info[anonymous-definition]: workflow or action definition without a name; examples/gpt-native-github/workflow.yml:30:3, job inspect",
+      "repair": "Added a descriptive name to the job; original failure remains recorded."
+    },
+    {
+      "command": "rtk pnpm --version",
+      "exit_code": 127,
+      "returned_output": "[rtk: No such file or directory (os error 2)]",
+      "repair": "Selected upstream-pinned pnpm 10.33.0 in an owned prefix; no host PATH change."
+    },
+    {
+      "command": "rtk python3 -c 'import yaml; print(yaml.__version__)'",
+      "exit_code": 1,
+      "returned_diagnostic": "ModuleNotFoundError: No module named 'yaml'",
+      "repair": "Used the installed native workflow analyzer; no package was installed for this inspection."
+    }
+  ],
+  "final_audit": {
+    "command": "rtk zizmor --offline --no-config --strict-collection --no-ignores --persona pedantic --no-progress examples/gpt-native-github/workflow.yml",
+    "exit_code": 0,
+    "returned_output": " INFO zizmor: 🌈 zizmor v1.30.1\nNo findings to report. Good job! (1 suppressed)\n INFO audit: zizmor: 🌈 completed examples/gpt-native-github/workflow.yml\n",
+    "suppressed_by_analyzer": 1,
+    "visible_findings": 0
+  },
+  "rtk_bootstrap": {
+    "source_revision": "1d87b8e719ce0a50c223cd93ca64dd16921f9aec",
+    "version": "0.50.0",
+    "supported_method": "Upstream release prebuilt binary",
+    "archive": "rtk-x86_64-unknown-linux-musl.tar.gz",
+    "expected_sha256": "bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89",
+    "observed_sha256": "bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89",
+    "native_download_exit_code": 0,
+    "native_archive_listing": "rtk",
+    "native_extract_exit_code": 0,
+    "native_version_exit_code": 0,
+    "native_version_output": "rtk 0.50.0",
+    "host_configuration_changed": false
+  },
+  "json_checks": {
+    "exit_code": 0,
+    "parsed_files": 2,
+    "root_schema_closed": true,
+    "all_root_properties_required": true,
+    "finding_schema_closed": true
+  },
+  "limitations": [
+    "Offline audit does not run online action checks; one analyzer suppression remains reported",
+    "No hosted GitHub job, new runner or public endpoint was started",
+    "Pinned Action fixtures do not qualify the intended provider, model route, effort or structured-output behavior",
+    "No measured token or quality advantage is inferred from this artifact"
+  ]
+}

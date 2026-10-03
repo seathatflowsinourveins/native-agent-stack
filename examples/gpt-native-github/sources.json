@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "kind": "frozen_native_gpt_source_packet",
+  "reviewed_at_utc": "2026-09-30T15:19:00Z",
+  "source_update_rule": "Refresh the relevant primary-source packet through the existing convergence research lane before freezing a new task. These pins are a dated review; the worker must not call them universally current.",
+  "engineering_contract": "docs/convergence-architecture.md",
+  "evidence_contract": "docs/acceptance-evidence-policy.md",
+  "task_evidence_rule": "Use only exact source or receipt paths selected by the coordinator for the frozen repository revision. If a required artifact is absent, report a gate; do not substitute another branch's receipt.",
+  "upstreams": [
+    {"repository": "openai/codex", "revision": "ff6aec96948b70d94983af2641a6b67c94faeff5", "version": "0.159.2", "references": ["https://github.com/openai/codex/blob/ff6aec96948b70d94983af2641a6b67c94faeff5/sdk/python/src/openai_codex/api.py", "https://github.com/openai/codex/blob/ff6aec96948b70d94983af2641a6b67c94faeff5/sdk/python/src/openai_codex/_run.py"]},
+    {"repository": "openai/codex-action", "revision": "86365089eb2b84e0a8fb0717b304f8bdcb13b20e", "version": "v1.12", "references": ["https://github.com/openai/codex-action/blob/86365089eb2b84e0a8fb0717b304f8bdcb13b20e/action.yml", "https://github.com/openai/codex-action/blob/86365089eb2b84e0a8fb0717b304f8bdcb13b20e/src/runCodexExec.ts"]},
+    {"repository": "rtk-ai/rtk", "revision": "1d87b8e719ce0a50c223cd93ca64dd16921f9aec", "version": "v0.50.0", "archive": "rtk-x86_64-unknown-linux-musl.tar.gz", "archive_sha256": "bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89", "references": ["https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/README.md", "https://github.com/rtk-ai/rtk/releases/download/v0.50.0/checksums.txt"]}
+  ]
+}

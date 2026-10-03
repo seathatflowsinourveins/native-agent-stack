@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["task_kind", "head_sha", "base_sha", "status", "verdict", "findings", "sources", "remaining_gates"],
+  "properties": {
+    "task_kind": {"type": "string", "enum": ["pr-review", "research-convergence"]},
+    "head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "status": {"type": "string", "enum": ["completed", "blocked"]},
+    "verdict": {"type": "string"},
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["severity", "location", "issue", "fix", "evidence_class"],
+        "properties": {
+          "severity": {"type": "string", "enum": ["high", "medium", "low", "informational"]},
+          "location": {"type": "string"},
+          "issue": {"type": "string"},
+          "fix": {"type": "string"},
+          "evidence_class": {"type": "string", "enum": ["primary_source", "retained_execution", "observed_this_job", "not_verified"]}
+        }
+      }
+    },
+    "sources": {"type": "array", "items": {"type": "string"}},
+    "remaining_gates": {"type": "array", "items": {"type": "string"}}
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "evidence_class": "native_cli_execution",
+  "scope": "One final substantive native Claude handoff, separate from initial coordination",
+  "native_cli_version": "2.1.285",
+  "requested_model": "opus",
+  "requested_effort": "max",
+  "exit_code": 0,
+  "num_turns": 4,
+  "tools": [
+    "ListAgents",
+    "SendMessage",
+    "SendMessage"
+  ],
+  "result": {
+    "pr": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/550",
+    "sent_head": "acccff2a64cc64cce4586831259cf56b84e2f5d7",
+    "peers": [
+      {
+        "name": "sota-default-harness-setup",
+        "native_success": true,
+        "outcome": "queued"
+      },
+      {
+        "name": "native-agent-stack-2d",
+        "native_success": true,
+        "outcome": "queued"
+      }
+    ],
+    "read_or_agreement_observed": false,
+    "global_activation_observed": false
+  },
+  "private_capture": {
+    "stdout_bytes": 38442,
+    "stdout_sha256": "4dd9b1a15636789064b30b3ffc6af8c1781c64a605f08f540e3e272740d154b4",
+    "stderr_bytes": 0
+  },
+  "usage": {
+    "scope": "single invocation native final aggregate counted once",
+    "input": 6,
+    "cache_creation": 28548,
+    "cache_read": 61725,
+    "output": 3582,
+    "thinking_in_output": 814,
+    "total": 93861,
+    "iterations_added": false,
+    "initial_invocation_added": false,
+    "billing": null,
+    "whole_workflow_complete": false
+  },
+  "limits": [
+    "Native tool results confirm queued sends only; peer read, consent, agreement, integration and activation are unobserved.",
+    "Native delivery mentions possible recipient permission-mode holds generically; no actual refusal or automatic approval rejection was observed.",
+    "PR received a later artifact discovery repair; sent head is preserved as the exact handoff snapshot.",
+    "No additional peer, gateway, session, global configuration or native account was changed."
+  ]
+}

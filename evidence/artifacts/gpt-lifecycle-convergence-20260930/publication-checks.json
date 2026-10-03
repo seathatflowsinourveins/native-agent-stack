@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "scope": "prepublication artifact checks in owned integration checkout",
+  "baseline": "11227bfdf25b55b0481a9e78985c3fed26052472",
+  "checks": [
+    {
+      "cmd": "rtk python3 scripts/validate.py",
+      "exit": 0,
+      "output": "{\"components\": 69, \"hashed_files\": 8535, \"profiles\": 4, \"receipts\": 176, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n"
+    },
+    {
+      "cmd": "rtk python3 scripts/validate_catalogs.py",
+      "exit": 0,
+      "output": "{\"beyond_star_catalog_repositories\": 102, \"models\": 20, \"public_stars\": 357, \"repository_entries\": 154, \"starred_catalog_repositories\": 46, \"unique_catalog_repositories\": 148}\nCatalog structure and evidence classes validated; source claims and native executions were not rerun.\n"
+    },
+    {
+      "cmd": "rtk python3 scripts/validate_convergence.py evidence/artifacts/gpt-lifecycle-convergence-20260930/convergence.json --root . --json",
+      "exit": 0,
+      "output": "{\"records\": [{\"errors\": [], \"observations\": 8, \"path\": \"evidence/artifacts/gpt-lifecycle-convergence-20260930/convergence.json\", \"valid\": true}], \"valid\": true}\n"
+    },
+    {
+      "cmd": "rtk python3 scripts/build_ecosystem.py --check",
+      "exit": 0,
+      "output": "{\"bytes\": 14216627, \"input_sha256\": \"1c8853350798d805efb706a817e81d649ad87ed8bf1a734e16cc153e63660da2\", \"output_sha256\": \"1fdc513adfa6d184addefa20ce62ba5e458bb2aa5e487ed951c51120bf017cf5\", \"status\": \"passed\"}\n"
+    }
+  ],
+  "failed_lookup": {
+    "cmd": "rtk gh api repos/<user>/native-agent-stack --jq '.full_name'",
+    "exit": 1,
+    "output": "gh: Not Found (HTTP 404)",
+    "correction_cmd": "rtk gh repo view --json nameWithOwner --jq .nameWithOwner",
+    "correction_exit": 0,
+    "correction_output": "seathatflowsinourveins/native-agent-stack"
+  },
+  "limitations": [
+    "Checks establish declared artifact consistency and structure, not provider execution or task-quality gains.",
+    "The decision prose and this record were added after these checks; their final registrations require a subsequent native integrity check.",
+    "Generated guide output is not committed."
+  ]
+}

@@ -1,0 +1,245 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "scope": "Repair this PR's convergence discovery failure",
+  "failed_head": "acccff2a64cc64cce4586831259cf56b84e2f5d7",
+  "ci_jobs": [
+    {
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36745161846/job/109989374084",
+      "step": "Validate declared convergence evidence and scope",
+      "exit": 1,
+      "output": "{\"records\": [{\"errors\": [\"record discovery: invalid, changed or empty evidence manifest\"], \"observations\": 0, \"valid\": false}], \"valid\": false}"
+    },
+    {
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36745162026/job/109989373925",
+      "step": "Validate declared convergence evidence",
+      "exit": 1,
+      "same_discovery_failure": true
+    }
+  ],
+  "source": "scripts/validate_convergence.py:203-245",
+  "repair": "Retain rejected first draft byte-exact as convergence-first.json.failed, explicitly link it, hash-register the artifact, and keep only corrected convergence.json declared as this experiment.",
+  "rejected_original_sha256": "2a0b46b7016a306b5489efec03860b48e884bbe8d0bced652c9dac799fd10cec",
+  "byte_exact_comparison": true,
+  "repaired_check": {
+    "cmd": "rtk python3 scripts/validate_convergence.py --all-recorded --json",
+    "exit": 0,
+    "returned_json": {
+      "records": [
+        {
+          "errors": [],
+          "observations": 3,
+          "path": "blueprints/blind-catalog-convergence/experiment.json",
+          "valid": true
+        },
+        {
+          "errors": [],
+          "observations": 3,
+          "path": "blueprints/blind-catalog-convergence/memory-experiment.json",
+          "valid": true
+        },
+        {
+          "errors": [],
+          "observations": 4,
+          "path": "blueprints/catalog-runtime-review/experiment.json",
+          "valid": true
+        },
+        {
+          "errors": [],
+          "observations": 15,
+          "path": "blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json",
+          "valid": true
+        },
+        {
+          "errors": [],
+          "observations": 3,
+          "path": "blueprints/convergence-practice/application-delivery/experiment.json",
+          "valid": true
+        },
+        {
+          "errors": [],
+          "observations": 1,
+          "path": "blueprints/convergence-practice/ci-security/experiment.json",
+          "valid": true
+        },
+        {
+          "errors": [],
+          "observations": 1,
+          "path": "blueprints/convergence-practice/document-ingestion/experiment.json",
+          "valid": true
+        },
+        {
+          "errors": [],
+          "observations": 0,
+          "path": "blueprints/convergence-practice/gpt6-family-tiering-20260926/experiment.json",
+          "valid": true
+        },
+        {
+          "errors": [],
+          "observations": 1,
+          "path": "blueprints/convergence-practice/gpu-inference/experiment.json",
+          "valid": true
+        },
+        {
+          "errors": [],
+          "observations": 3,
+          "path": "blueprints/convergence-practice/job-recovery/experiment-macos.json",
+          "valid": true
+        },
+        {
+          "errors": [],
+          "observations": 1,
+          "path": "blueprints/convergence-practice/job-recovery/experiment-wsl.json",
+          "valid": true
+        },
+        {
+          "errors": [],
+          "observations": 7,
+          "path": "blueprints/convergence-practice/local-inference-latest-20260926/experiment.json",
+          "valid": true
+        },
+        {
+          "errors": [],
+          "observations": 2,
+          "path": "blueprints/convergence-practice/mac-memory-patch/experiment.json",
+          "valid": true
+        },
+        {
+          "errors": [],
+          "observations": 1,
+          "path": "blueprints/convergence-practice/native-recovery/claude/experiment.json",
+          "valid": true
+        },
+        {
+          "errors": [],
+          "observations": 1,
+          "path": "blueprints/convergence-practice/native-recovery/experiment.json",
+          "valid": true
+        },
+        {
+          "errors": [],
+          "observations": 2,
+          "path": "blueprints/convergence-practice/native-worker/experiment.json",
+          "valid": true
+        },
+        {
+          "errors": [],
+          "observations": 20,
+          "path": "blueprints/convergence-practice/omniroute-routing-20260928/experiment.json",
+          "valid": true
+        },
+        {
+          "errors": [],
+          "observations": 1,
+          "path": "blueprints/convergence-practice/wsl-memory-maintenance/experiment.json",
+          "valid": true
+        },
+        {
+          "errors": [],
+          "observations": 2,
+          "path": "blueprints/convergence-practice/wsl-native-tools/experiment-wsl.json",
+          "valid": true
+        },
+        {
+          "errors": [],
+          "observations": 1,
+          "path": "blueprints/convergence-practice/wsl-retrieval/experiment.json",
+          "valid": true
+        },
+        {
+          "errors": [],
+          "observations": 3,
+          "path": "blueprints/convergence-practice/wsl-transport-recovery/experiment.json",
+          "valid": true
+        },
+        {
+          "errors": [],
+          "observations": 8,
+          "path": "blueprints/us-equities/sim-capacity/experiment.json",
+          "valid": true
+        },
+        {
+          "errors": [],
+          "observations": 8,
+          "path": "evidence/artifacts/gpt-lifecycle-convergence-20260930/convergence.json",
+          "valid": true
+        },
+        {
+          "errors": [],
+          "observations": 6,
+          "path": "evidence/artifacts/local-model-workloads-20260924/experiment.json",
+          "valid": true
+        },
+        {
+          "errors": [],
+          "observations": 24,
+          "path": "evidence/artifacts/memory-stack-20260925/experiment.json",
+          "valid": true
+        },
+        {
+          "errors": [],
+          "observations": 3,
+          "path": "evidence/artifacts/native-workflow-writing-recovery-20260921/experiment.json",
+          "valid": true
+        }
+      ],
+      "valid": true
+    }
+  },
+  "additional_attempts": [
+    {
+      "cmd": "rtk python3 scripts/validate_convergence.py --json",
+      "exit": 2,
+      "output": "error: choose explicit records or --all-recorded",
+      "correction": "Use CI's required --all-recorded invocation."
+    },
+    {
+      "cmd": "rtk python3 scripts/validate.py",
+      "exit": 1,
+      "output": "convergence-first.json: evidence file is not hash-listed; file missing",
+      "correction": "Stage the owned rename before validating tracked-file coverage; no content or hash bypass."
+    }
+  ],
+  "review": {
+    "role": "read-only publication explorer",
+    "verdict": "no blockers in rename/preservation and exact-digest scanner exception",
+    "limits": "No scans or model calls rerun; byte identity independently recorded by coordinator."
+  },
+  "other_ci_gate": {
+    "job": "osv-scanner",
+    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36745161738/job/109989373241",
+    "exit": 1,
+    "scope": "Existing unchanged lockfiles; separate live owner handles dependency repair",
+    "findings": [
+      {
+        "package": "pyjwt",
+        "version": "2.14.0",
+        "fixed": "2.15.0",
+        "advisory": "GHSA-42vr-xj54-vc7v",
+        "file": "blueprints/runtime-workers/openhands/requirements.lock"
+      },
+      {
+        "package": "urllib3",
+        "version": "2.7.0",
+        "fixed": "2.8.0",
+        "advisories": [
+          "GHSA-8988-9cw3-xx77",
+          "GHSA-gh4c-6fx4-qh6g",
+          "GHSA-vxq7-64xx-v4gw"
+        ],
+        "file": "blueprints/runtime-workers/openhands/requirements.lock"
+      },
+      {
+        "package": "next",
+        "version": "16.3.5",
+        "fixed": "16.3.6",
+        "advisory": "GHSA-vcvr-r3jv-pc5j",
+        "file": "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml"
+      }
+    ]
+  },
+  "limits": [
+    "Local repaired checks do not establish a later hosted CI result.",
+    "The original eight-observation record and failed conditions remain retained; discovery repair makes no new provider or quality claim."
+  ]
+}

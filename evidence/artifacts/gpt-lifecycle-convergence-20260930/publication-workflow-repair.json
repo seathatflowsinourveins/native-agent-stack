@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "publication_review": {
+    "role": "read-only explorer",
+    "verdict": "resolved; no remaining publication blockers in scope",
+    "checks": "Inspected final control/subject wiring, task and README; no tests, provider calls or edits"
+  },
+  "scope": "Publication repair after original eight-observation convergence record",
+  "issue": "Controls loaded from inspected head could be absent or modified",
+  "source": {
+    "repository": "https://github.com/actions/checkout",
+    "revision": "3d3c42e5aac5ba805825da76410c181273ba90b1",
+    "file": "README.md:116-117,261-274",
+    "contract": "Supported side-by-side checkout path"
+  },
+  "action_source": {
+    "repository": "https://github.com/openai/codex-action",
+    "revision": "86365089eb2b84e0a8fb0717b304f8bdcb13b20e",
+    "files": [
+      "src/runCodexExec.ts:150-156,255-267,415-425",
+      "src/main.ts:399-410"
+    ]
+  },
+  "repair": "Controls use workflow dispatch github.sha in controls/; immutable subject uses head_sha in subject/; Action uses absolute prompt/schema paths and subject working-directory; TASK_CONTROL_DIR names the source packet.",
+  "final_files": [
+    {
+      "path": "examples/gpt-native-github/workflow.yml",
+      "sha256": "6e6bb2ad4b48922c610671679e97d5265c8e42c02aea4467745a80b5dce7a3db"
+    },
+    {
+      "path": "examples/gpt-native-github/task.md",
+      "sha256": "9113f9e39e2611016e491886737b283488f07c85e9595b92b8238c5c7a1958ba"
+    },
+    {
+      "path": "examples/gpt-native-github/result.schema.json",
+      "sha256": "bc6204dd86bc1903aec4569ffe31c2a4045b62981f5705a087ff0631495a1fcd"
+    },
+    {
+      "path": "examples/gpt-native-github/sources.json",
+      "sha256": "249c0fb905e4d324e214b2d1fbf293f55709328513d1ef865010a9ee3957285f"
+    }
+  ],
+  "audit": {
+    "cmd": "rtk zizmor --offline --no-config --strict-collection --no-ignores --persona pedantic --no-progress examples/gpt-native-github/workflow.yml",
+    "exit": 0,
+    "output": " INFO zizmor: 🌈 zizmor v1.30.1\n INFO audit: zizmor: 🌈 completed examples/gpt-native-github/workflow.yml\nNo findings to report. Good job! (1 suppressed)\n"
+  },
+  "preserved_failed_inspection": {
+    "cmd": "rtk rg -n -A16 -B5 'promptFile|outputSchema|workingDirectory' src/main.ts src/runCodexExec.ts src/index.ts",
+    "exit": 2,
+    "diagnostic": "rg: src/index.ts: No such file or directory (os error 2)",
+    "correction": "Read existing src/main.ts and src/runCodexExec.ts; source paths confirmed by read-only publication reviewer."
+  },
+  "limits": [
+    "No hosted runner, Action job or provider call was performed for this repair.",
+    "Original workflow-checks and independent verification remain unchanged evidence for their earlier source snapshot.",
+    "The eight-observation convergence record remains unchanged; this is an additional publication correction, with its own native audit.",
+    "Final file hashes bind this audit to the repaired example; offline analysis is not provider or task-quality acceptance."
+  ]
+}
