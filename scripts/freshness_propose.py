@@ -59,6 +59,16 @@ TRADING_TABLE_HEADER = (
     "days since release/commit | dormant | archived |"
 )
 TRADING_TABLE_SEPARATOR = "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"
+RUNTIME_FRESHNESS_FILE = "runtime-freshness.json"
+RUNTIME_TABLE_HEADING = "## GPT runtime workers, SDKs and agents: pin vs upstream latest"
+RUNTIME_TABLE_HEADER = (
+    "| id | group | pin | upstream latest | behind | last release | last commit | "
+    "days since release/commit | dormant | archived |"
+)
+RUNTIME_TABLE_SEPARATOR = "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"
+# The id lists build_drift_report() always returns for the runtime table.
+RUNTIME_SUMMARY_KEYS = ("runtime", "runtime_behind", "runtime_dormant", "runtime_archived",
+                        "runtime_unfetched", "runtime_unresolved")
 _DRIFT_ROW = re.compile(r"^\|\s*([^|]+?)\s*\|.*\|$")
 _SEPARATOR_ROW = re.compile(r"\A\|[\s:|-]+\|\Z")
 EXPLORER_PATH = "docs/ecosystem/index.html"
@@ -324,6 +334,103 @@ def render_trading_markdown(document: dict, raw_repositories: dict | None = None
     return "\n".join(lines) + "\n", summary
 
 
+def load_runtime_freshness(work_dir: Path) -> dict | None:
+    """build_manifest.py's report-only runtime-freshness.json, or None when this
+    work directory has none (a run from before it existed). Present but
+    unreadable fails closed, the same way trading-freshness.json does."""
+    path = work_dir / RUNTIME_FRESHNESS_FILE
+    if not path.exists():
+        return None
+    try:
+        document = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, ValueError) as error:
+        raise FreshnessProposeError(f"could not read {path}: {error}") from error
+    if not isinstance(document, dict) or not isinstance(document.get("entries"), list):
+        raise FreshnessProposeError(f"{path}: expected a JSON object with an entries list")
+    return document
+
+
+def runtime_freshness_rows(document: dict, raw_repositories: dict | None = None):
+    """Rows for the runtime table plus ``{summary key: [ids]}`` for the rows that
+    are behind upstream, dormant, archived, unfetched or unresolved.
+
+    The reliability rule is ``trading_freshness_rows``': a row whose repository has
+    no reliable upstream data this run (no ``upstream.pushed_at``, or an
+    ``error``/``partial_errors`` freshness record) has every upstream-derived cell
+    blanked, ``dormant`` shown as unknown, and is listed as unfetched, never as
+    behind, dormant or archived. A row whose pin source did not resolve is listed
+    as unresolved whatever its fetch state; its pin cell is ``—``."""
+    rows = []
+    flagged = {key: [] for key in RUNTIME_SUMMARY_KEYS[1:]}
+    for entry in sorted(document.get("entries", []), key=lambda item: str(item.get("id"))):
+        upstream = entry.get("upstream") or {}
+        dormancy = entry.get("dormancy") or {}
+        if entry.get("error"):
+            flagged["runtime_unresolved"].append(entry.get("id"))
+        unreliable = upstream.get("pushed_at") is None or _freshness_record_has_error(
+            entry.get("repository"), raw_repositories,
+        )
+        if entry.get("pin_comparison") == "not_compared":
+            behind = f"not compared ({entry.get('pin_comparison_reason')})"
+        else:
+            behind = _yes_no(entry.get("pin_behind_upstream"))
+        if unreliable:
+            flagged["runtime_unfetched"].append(entry.get("id"))
+            cells = (None, "unknown", None, None, None, "unknown", "unknown")
+        else:
+            if entry.get("pin_behind_upstream") is True:
+                flagged["runtime_behind"].append(entry.get("id"))
+            if dormancy.get("dormant") is True:
+                flagged["runtime_dormant"].append(entry.get("id"))
+            if upstream.get("archived") is True:
+                flagged["runtime_archived"].append(entry.get("id"))
+            cells = (upstream.get("latest"), behind, dormancy.get("last_release_at"),
+                     dormancy.get("last_commit_at"), dormancy.get("days_since_activity"),
+                     _yes_no(dormancy.get("dormant")), _yes_no(upstream.get("archived")))
+        rows.append((entry.get("id"), entry.get("group"), entry.get("pin") or "—", *cells))
+    return rows, flagged
+
+
+def render_runtime_markdown(document: dict, raw_repositories: dict | None = None):
+    """The drift.md section listing the GPT runtime workers, SDKs and agents
+    against upstream. Returns ``(markdown, summary)``, the summary keyed by
+    ``RUNTIME_SUMMARY_KEYS``. Like the trading section it is informational: it has
+    its own header (never ``DRIFT_TABLE_HEADER``), so ``drifted_component_ids``
+    never reads it, and it never sets ``drift-status.txt``."""
+    rows, flagged = runtime_freshness_rows(document, raw_repositories)
+    threshold = document.get("dormancy_threshold_days")
+    errors = {entry.get("id"): entry.get("error") for entry in document.get("entries", []) if entry.get("error")}
+    lines = [
+        RUNTIME_TABLE_HEADING, "",
+        "Report-only. This table lists the GPT runtime workers, SDKs and agents that "
+        "`tools/sota-convergence/extract_layers.py` tracks. `RUNTIME_PIN_SOURCES` reads each pin from its "
+        "runtime record: the new-WSL install plan's rows by slot, the runtime-worker recipe pin record and "
+        "the native SDK constraints. `RUNTIME_WATCH_SOURCES` adds watch-only upstreams with no pin record on "
+        "main, such as pi; their pins are not compared. The same upstreams' `manifests/stack.json` and "
+        "trading card pins stay in the tables above. Rows here select nothing, are never drift and never "
+        "change `drift-status.txt`. A dormant upstream has no GitHub release and no default-branch commit "
+        f"in the last {threshold} days as of `{document.get('checked_at')}`.", "",
+    ]
+    if rows:
+        lines += [RUNTIME_TABLE_HEADER, RUNTIME_TABLE_SEPARATOR]
+        for row in rows:
+            lines.append("| " + " | ".join(md_cell(value) for value in row) + " |")
+    else:
+        lines.append("No GPT runtime row was found.")
+    for items, sentence in (
+        (flagged["runtime_behind"], "pinned runtime row(s) behind upstream latest"),
+        ([f"{item} ({errors.get(item)})" for item in flagged["runtime_unresolved"]],
+         "runtime source(s) that did not resolve, each with its reason (the row stays, not compared)"),
+        (flagged["runtime_dormant"], f"dormant upstream(s) (no release or default-branch commit in {threshold}+ days)"),
+        (flagged["runtime_archived"], "archived upstream repository(ies)"),
+        (flagged["runtime_unfetched"], "runtime row(s) with no reliable upstream data this run"),
+    ):
+        if items:
+            lines += ["", f"{len(items)} {sentence}:", "", ", ".join(md_cell(item) for item in sorted(items))]
+    summary = {"runtime": [row[0] for row in rows], **{key: sorted(ids) for key, ids in flagged.items()}}
+    return "\n".join(lines) + "\n", summary
+
+
 def _load_freshness_document(work_dir: Path) -> dict:
     """Load github-freshness.json, failing closed (N2b): raises rather than
     returning an empty/zero-like default when the file is missing,
@@ -370,7 +477,10 @@ def build_drift_report(work_dir: Path) -> dict:
     ``work_dir`` also holds build_manifest.py's ``trading-freshness.json``,
     ``drift.md`` gains the report-only trading table (``render_trading_markdown``),
     and the result gains ``trading``/``dormant``/``archived``/``trading_unfetched``
-    id lists. That table never changes ``drift-status.txt``.
+    id lists. When it also holds ``runtime-freshness.json``, the report-only GPT
+    runtime table follows (``render_runtime_markdown``). The result always carries
+    the six ``RUNTIME_SUMMARY_KEYS`` id lists, empty when that file is absent.
+    Neither table changes ``drift-status.txt``.
 
     Called both by ``catalog-freshness.yml``'s "Diff the rebuilt manifest"
     step (imported directly from a small inline script, not reimplemented
@@ -408,6 +518,11 @@ def build_drift_report(work_dir: Path) -> dict:
     if trading_document is not None:
         trading_markdown, trading_summary = render_trading_markdown(trading_document, raw_repositories)
         markdown += "\n" + trading_markdown
+    runtime_summary = {key: [] for key in RUNTIME_SUMMARY_KEYS}
+    runtime_document = load_runtime_freshness(work_dir)
+    if runtime_document is not None:
+        runtime_markdown, runtime_summary = render_runtime_markdown(runtime_document, raw_repositories)
+        markdown += "\n" + runtime_markdown
     (work_dir / "drift.md").write_text(markdown, encoding="utf-8")
     (work_dir / "drift-status.txt").write_text("true\n" if drifted else "false\n", encoding="utf-8")
     (work_dir / "upstream-errors.txt").write_text(f"{upstream_error_count(freshness_document)}\n", encoding="utf-8")
@@ -421,6 +536,7 @@ def build_drift_report(work_dir: Path) -> dict:
         "published_path": published_path.as_posix(),
         "rebuilt_path": rebuilt_path.as_posix(),
         **trading_summary,
+        **runtime_summary,
     }
 
 

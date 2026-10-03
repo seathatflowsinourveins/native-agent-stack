@@ -18,7 +18,8 @@ The model-running landscape-sweep lane of `recipes/saturation-sweep.md` has its 
    `trading-catalog.json`, `trading-by-layer.json` (consolidated onto the
    12-layer taxonomy copied live from
    `catalogs/sota-convergence/manifest-20260922.json#/taxonomy`),
-   `trading-pins.json`, `star-candidates.json` and `models.json` into `--out`.
+   `trading-pins.json`, `runtime-pins.json`, `star-candidates.json` and
+   `models.json` into `--out`.
    `trading-pins.json` holds the trading upstreams that a blueprint or runtime
    record pins but that no selected (`default`/`conditional`) us-equities card
    carries: hftbacktest, nautilus-ibapi and rust-ibapi. Each is declared in
@@ -26,6 +27,17 @@ The model-running landscape-sweep lane of `recipes/saturation-sweep.md` has its 
    is read from that record, not copied. A pointer that no longer resolves, a
    non-taxonomy layer or an id that collides with a card id raises instead of
    dropping the component.
+   `runtime-pins.json` holds the GPT runtime workers, SDKs and agents.
+   `RUNTIME_PIN_SOURCES` reads each pin from the record that installs it: the
+   new-WSL install plan's row by slot, the runtime-worker recipe's
+   `blueprints/runtime-workers/openhands/pins.json`, and the native SDK
+   constraints in `adoption/sdk/accepted-constraints.txt`.
+   `RUNTIME_WATCH_SOURCES` adds watch-only upstreams that a file on main names
+   but no record on main pins, such as pi. A malformed declaration raises. A
+   record that moved or changed shape does not, so the daily report keeps its
+   other tables: that entry is written with `"pin": null` and an `"error"`
+   naming only the declared path, its pointer, slot or requirement and a short
+   reason, and the printed summary lists it under `runtime_unresolved`.
 
    ```sh
    python3 tools/sota-convergence/extract_layers.py --repo-root . --out /path/to/work-dir
@@ -34,7 +46,7 @@ The model-running landscape-sweep lane of `recipes/saturation-sweep.md` has its 
 2. **`github_freshness.py`** -- a real network step (authenticated `gh api`
    calls; `gh auth status` must already pass). Reads the repository URLs out
    of the working files above (`foundation-layers.json`, `trading-catalog.json`,
-   `trading-pins.json` when present, and `star-candidates.json`) and writes `github-freshness.json` with
+   `trading-pins.json` and `runtime-pins.json` when present, and `star-candidates.json`) and writes `github-freshness.json` with
    stars, `pushed_at`, latest release/tag, head commit, license, archived and
    rename status per repository, plus every alias URL seen for that
    repository's normalized GitHub slug (`"aliases"` -- a `/releases/tag/vX`
@@ -108,6 +120,15 @@ The model-running landscape-sweep lane of `recipes/saturation-sweep.md` has its 
    days before `--checked-at`. `pushed_at` stands in only when the commit date
    is unknown. `dormant` is `null`, never `false`, when the run has no data
    for the repository. The manifest's key layout and rows are unchanged.
+   `--runtime-freshness-out PATH` writes the report-only
+   `runtime-freshness.json` (schema `runtime-freshness/1`) the same way, with
+   one row per `runtime-pins.json` entry (`--runtime-pins`, default
+   `<work-dir>/runtime-pins.json`; without that file the sidecar has no rows).
+   A resolved pin uses the manifest's pin-vs-upstream rule. A watch-only row,
+   or a row whose source did not resolve, is `not_compared` with reason
+   `watch_only` or `source_unresolved` and still carries its upstream and
+   dormancy. The manifest and `trading-freshness.json` are byte-identical with
+   or without this flag.
 
    ```sh
    python3 tools/sota-convergence/build_manifest.py \

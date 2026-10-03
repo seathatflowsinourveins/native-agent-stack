@@ -390,6 +390,14 @@ rust-ibapi). Each row shows pin vs upstream latest, the last release and
 default-branch commit dates, a dormancy flag (no release or commit in 180+
 days) and the archived flag. Dormant or archived rows never set
 `drift-status.txt` and are never read into the `propose` job's component ids.
+A third report-only table, built from `build_manifest.py --runtime-freshness-out`
+(`runtime-freshness.json`, also retained in the artifact), tracks the GPT runtime
+workers, SDKs and agents with the same columns: the pins in `extract_layers.py`'s
+`RUNTIME_PIN_SOURCES` (the new-WSL install plan rows, the runtime-worker recipe
+pin record and the native SDK constraints) and the watch-only upstreams in
+`RUNTIME_WATCH_SOURCES`, such as pi. It lists the pinned rows behind upstream and
+any source that did not resolve, and like the trading table it never sets
+`drift-status.txt`.
 
 `catalog-freshness.yml`'s `python3 -m unittest` step runs on this job's
 `setup-python 3.13` interpreter, which has no `requests` package installed

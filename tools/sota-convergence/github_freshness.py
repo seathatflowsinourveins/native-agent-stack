@@ -12,6 +12,7 @@ Reads (repository-relative to --work-dir):
   foundation-layers.json  (#/layers[]/components[]/repository)
   trading-catalog.json    (#/entries[]/repository)
   trading-pins.json       (#/entries[]/repository; optional)
+  runtime-pins.json       (#/entries[]/repository; optional)
   star-candidates.json    (#/star_candidates[]/repository, #/beyond_stars[]/repository)
 
 Writes --out (default <work-dir>/github-freshness.json):
@@ -51,6 +52,12 @@ WORKING_FILE_REPO_PATHS = (
     # Trading pins outside the selected catalog cards (extract_layers.py's
     # TRADING_PIN_SOURCES); absent from working directories written before it existed.
     ("trading-pins.json", lambda doc: (
+        entry.get("repository") for entry in doc.get("entries", [])
+    )),
+    # GPT runtime workers, SDKs and agents (extract_layers.py's RUNTIME_PIN_SOURCES and
+    # RUNTIME_WATCH_SOURCES); an unresolved entry may carry no repository, and the file
+    # is absent from working directories written before it existed.
+    ("runtime-pins.json", lambda doc: (
         entry.get("repository") for entry in doc.get("entries", [])
     )),
     ("star-candidates.json", lambda doc: (

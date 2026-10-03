@@ -467,6 +467,73 @@ def build_trading_freshness(trading_by_layer: dict, trading_pins: dict | None, r
 
 
 # ---------------------------------------------------------------------------
+# Runtime freshness: GPT runtime workers, SDKs and agents vs upstream, plus dormancy
+# ---------------------------------------------------------------------------
+
+# pin_comparison_reason on a runtime row whose pin is not compared for a reason
+# other than classify_pin's: its source record did not resolve, or it is watch-only.
+RUNTIME_SOURCE_UNRESOLVED = "source_unresolved"
+RUNTIME_WATCH_ONLY = "watch_only"
+
+
+def build_runtime_freshness(runtime_pins: dict | None, repositories: dict, checked_at: str,
+                            os_package_ids=DEFAULT_OS_PACKAGE_IDS,
+                            threshold_days=DORMANCY_THRESHOLD_DAYS) -> dict:
+    """One row per ``runtime-pins.json`` entry: the GPT runtime workers, SDKs and
+    agents extract_layers.py resolves from runtime records (``RUNTIME_PIN_SOURCES``)
+    plus the watch-only upstreams named on main with no pin record there
+    (``RUNTIME_WATCH_SOURCES``).
+
+    A resolved pin uses the same ``compute_upstream``/``classify_pin``/
+    ``pin_comparison_fields`` as the manifest rows. A row whose source did not
+    resolve (``error``) or that is watch-only keeps its upstream and dormancy but
+    publishes ``pin_behind_upstream: null``, ``pin_comparison: "not_compared"`` and
+    the reason ``source_unresolved`` or ``watch_only``. Every row carries
+    ``compute_dormancy``; a row without a repository gets the ``not_fetched``
+    dormancy. This is report-only data: it selects nothing and is not part of
+    the manifest."""
+    entries = []
+    for pin in sorted((runtime_pins or {}).get("entries", []), key=lambda item: str(item.get("id"))):
+        repository = pin.get("repository")
+        upstream = compute_upstream(repository, repositories) if repository else {}
+        if pin.get("error"):
+            pin_fields = {"pin_behind_upstream": None, "pin_comparison": PIN_NOT_COMPARED,
+                          "pin_comparison_reason": RUNTIME_SOURCE_UNRESOLVED}
+        elif pin.get("kind") == RUNTIME_WATCH_ONLY:
+            pin_fields = {"pin_behind_upstream": None, "pin_comparison": PIN_NOT_COMPARED,
+                          "pin_comparison_reason": RUNTIME_WATCH_ONLY}
+        else:
+            pin_fields = pin_comparison_fields(classify_pin(
+                pin.get("pin"), repository, upstream.get("latest"),
+                component_id=pin.get("id"), os_package_ids=os_package_ids))
+        entries.append({
+            "id": pin.get("id"), "group": pin.get("group"), "kind": pin.get("kind"),
+            "repository": repository, "pin": pin.get("pin"), "pin_source": pin.get("pin_source"),
+            "named_in": pin.get("named_in"), "error": pin.get("error"), "upstream": upstream, **pin_fields,
+            "dormancy": compute_dormancy(freshness_record(repository, repositories) if repository else None,
+                                         checked_at, threshold_days=threshold_days),
+        })
+    return {
+        "schema": "runtime-freshness/1",
+        "checked_at": checked_at,
+        "dormancy_threshold_days": threshold_days,
+        "dormancy_rule": DORMANCY_RULE,
+        "counts": {
+            "entries": len(entries),
+            "pin_source": sum(1 for row in entries if row["kind"] == "pin_source"),
+            "watch_only": sum(1 for row in entries if row["kind"] == RUNTIME_WATCH_ONLY),
+            "unresolved": sum(1 for row in entries if row["error"]),
+            "pin_behind_upstream": sum(1 for row in entries if row["pin_behind_upstream"] is True),
+            "not_compared": sum(1 for row in entries if row["pin_comparison"] == PIN_NOT_COMPARED),
+            "dormant": sum(1 for row in entries if row["dormancy"]["dormant"] is True),
+            "dormancy_unknown": sum(1 for row in entries if row["dormancy"]["dormant"] is None),
+            "archived": sum(1 for row in entries if row["upstream"].get("archived") is True),
+        },
+        "entries": entries,
+    }
+
+
+# ---------------------------------------------------------------------------
 # Disposition and sanitization
 # ---------------------------------------------------------------------------
 
@@ -1840,6 +1907,13 @@ def parse_args(argv=None):
                          help="Also write the report-only trading-freshness.json (every pinned trading "
                               "component vs upstream, with a dormancy signal relative to --checked-at). "
                               "The manifest itself is unchanged.")
+    parser.add_argument("--runtime-pins", type=Path, default=None,
+                         help="extract_layers.py's runtime-pins.json (default: <work-dir>/runtime-pins.json "
+                              "when it exists). Read only with --runtime-freshness-out.")
+    parser.add_argument("--runtime-freshness-out", type=Path, default=None,
+                         help="Also write the report-only runtime-freshness.json (every GPT runtime worker, "
+                              "SDK and agent in runtime-pins.json vs upstream, with a dormancy signal "
+                              "relative to --checked-at). The manifest and the trading sidecar are unchanged.")
     return parser.parse_args(argv)
 
 
@@ -1916,6 +1990,25 @@ def main(argv=None) -> int:
         args.trading_freshness_out.parent.mkdir(parents=True, exist_ok=True)
         args.trading_freshness_out.write_text(trading_text + "\n", encoding="utf-8")
         print(json.dumps({"trading_freshness": trading_freshness["counts"]}))
+
+    if args.runtime_freshness_out:
+        # Written after the manifest and the trading sidecar, which are byte-identical
+        # with or without this flag. A work dir without runtime-pins.json (written
+        # before it existed) still gets a sidecar, with zero entries.
+        runtime_pins_path = args.runtime_pins or (work_dir / "runtime-pins.json" if work_dir else None)
+        runtime_pins = (load_json(runtime_pins_path)
+                        if runtime_pins_path and runtime_pins_path.exists() else None)
+        runtime_freshness = build_runtime_freshness(
+            runtime_pins, freshness_doc.get("repositories") or {}, args.checked_at,
+            os_package_ids=tuple(args.os_package_ids),
+        )
+        runtime_text = json.dumps(sanitize_value(runtime_freshness, work_dir=work_dir_for_sanitize,
+                                                 checkout_roots=checkout_roots), indent=1)
+        json.loads(runtime_text)
+        assert_no_leak(runtime_text)
+        args.runtime_freshness_out.parent.mkdir(parents=True, exist_ok=True)
+        args.runtime_freshness_out.write_text(runtime_text + "\n", encoding="utf-8")
+        print(json.dumps({"runtime_freshness": runtime_freshness["counts"]}))
     return 0
 
 
