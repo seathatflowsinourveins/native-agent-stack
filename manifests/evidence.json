@@ -3950,8 +3950,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "51dae9e9907bda6c3a5de21c1c3dfdea79c5e0a379494ba4c6e42906abc6e114",
-      "bytes": 10704
+      "sha256": "79cf862460fc403b602dd58fe306d7daec3f2a13bd5b0459c82b57888d8818cb",
+      "bytes": 10914
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -3962,6 +3962,16 @@
       "path": ".github/pull_request_template.md",
       "sha256": "3cf7addac4078f976d74be98f02f72cb30bf35b9b642061fd2563115c3cfa6ab",
       "bytes": 2346
+    },
+    {
+      "path": ".github/requirements-ci-suite-linux.txt",
+      "sha256": "76f2a544d1d5c5724fa9607edfcfa2f5afd02bc7e013a0aef8bbcfb63135a92c",
+      "bytes": 1316
+    },
+    {
+      "path": ".github/requirements-ci-suite-macos.txt",
+      "sha256": "673c36d4f323d4e412f61e893ab6183a750856869292b330e325090f9b10a5c3",
+      "bytes": 1136
     },
     {
       "path": ".github/requirements-ci.txt",
@@ -3987,6 +3997,11 @@
       "path": ".github/workflows/catalog-freshness.yml",
       "sha256": "5c05254b9697920813e84203e58a8e690a8fc1022d67b48ebb9206e19e3a94df",
       "bytes": 23663
+    },
+    {
+      "path": ".github/workflows/macos-suite-parallel-trial.yml",
+      "sha256": "0f0bb9e6aa523890c7c783afeb5569e251015fc1ab82f72a62b76fcb43af1db3",
+      "bytes": 56566
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
@@ -5443,6 +5458,201 @@
       "path": "blueprints/convergence-practice/mac-memory-patch/verification.json",
       "sha256": "002473858c46d8facd504cb202f55ffe34fb947b228ba0d6d5d5709d1c9a1c05",
       "bytes": 1129
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/README.md",
+      "sha256": "6e221d59d5143f94738275e80b8698cbdd670e21e4412f1e154c347bc578f35f",
+      "bytes": 24695
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/compare.py",
+      "sha256": "415d648bf76c0519571c993191f0c70eaa59c392e54908a5684d54607264a3ad",
+      "bytes": 79570
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/controls/control_expectations.json",
+      "sha256": "24ad74995d07e13dfd27217af9465390bd1cc3a3a9e510da8661b199eb18308a",
+      "bytes": 3131
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/controls/crash_control/test_crash.py",
+      "sha256": "b81adbf771eaa7ea789721812d9b98bd9a7f18374edb3662cbe1f59e344f661a",
+      "bytes": 476
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/controls/test_zz_trial_controls.py",
+      "sha256": "262e368ec33d3854179afc618a7b74f276507b7f403f7af183ba080f608222d1",
+      "bytes": 1975
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/experiment.json",
+      "sha256": "305fc2fa2ddd2c0a0eba4d85d748807db87302bde59a6b6489de866bee416c08",
+      "bytes": 43208
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/fixtures/index.json",
+      "sha256": "6b605c4d7bd5b8b4fa9a5343d23f8760d5ba49dbf7b6f11de15c8a5c73312a39",
+      "bytes": 11011
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/fixtures/inventory-controls.txt",
+      "sha256": "111b7f2d8e3c0b22dd31f6b10bd00b7211aa1007cf4a2ad185c843b791a72d15",
+      "bytes": 492
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/fixtures/mutated/changed-outcome-unbalanced.log",
+      "sha256": "1db470ca8d7df3ef5dd0db9f27cd7a34f01ae8f551152fe97fc943e4b96e015c",
+      "bytes": 4074
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/fixtures/mutated/changed-outcome.log",
+      "sha256": "59df72cb29b6e8dfe0cfc47140e3760394d436cb0bf839bd1852af9451deca77",
+      "bytes": 4074
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/fixtures/mutated/dropped-line-parallel.log",
+      "sha256": "316cc1c5c873b596d59f11b6ef987cce07be5b14b095f6e00175f3488e3c366a",
+      "bytes": 3996
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/fixtures/mutated/dropped-line-serial.log",
+      "sha256": "2cc32fc260d7f73b607dc0091427672fa8dbb0686e82a076c4dd1e7e818d55f8",
+      "bytes": 3226
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/fixtures/mutated/extra-id.log",
+      "sha256": "55f415d5a6482efd51e0eec9c090c3ce1c52746f802216580ed629dc77cd4584",
+      "bytes": 4195
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/fixtures/mutated/missing-ran-line.log",
+      "sha256": "c892f49cf6f21d4325bd2b6710efb4c561537a3f2c223ada1b97eb2e5a1e0508",
+      "bytes": 4037
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/fixtures/mutated/truncated.log",
+      "sha256": "9be7b23f0cde57cd8fe1896a33d4881c1f22ce6bc5844c151f896319123be429",
+      "bytes": 504
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/fixtures/real/controls-L4C-r1.log",
+      "sha256": "cd357cf8b090e8d37c11d145f5b35aed760ee644dce9ed304f4ccdf1d6a9cefe",
+      "bytes": 4063
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/fixtures/real/controls-L4F-r1.log",
+      "sha256": "554f1ab2b89f60784342422bd66ea3039c4c5d1d7e10df5b822c861ed6c60d90",
+      "bytes": 4063
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/fixtures/real/controls-P3-r1.log",
+      "sha256": "6e9bd867d3b05367c6f3493ddb7b37e7e7bad9dd2ce325ff90d05798ceb73cb8",
+      "bytes": 4059
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/fixtures/real/controls-P3-r2.log",
+      "sha256": "073bf362e44420ce82d78f2fd17e314702ae955d9410775e8ce6c41e32cdae0e",
+      "bytes": 4059
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/fixtures/real/controls-P3-r3.log",
+      "sha256": "3825f0a575a099642e40f84e81367154ff7badfe51572151034247116719f859",
+      "bytes": 4059
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/fixtures/real/controls-P3C-r1.log",
+      "sha256": "5d6b5c01b803d710726657b3709d4d8d950cd63b002600d65d62a8377ab0b502",
+      "bytes": 4063
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/fixtures/real/controls-P3C-r2.log",
+      "sha256": "c971c4d509b23c59c31ab538e9c6aee3a72a8f8771b49a3bd67a02a2b3a73d5e",
+      "bytes": 4063
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/fixtures/real/controls-P3C-r3.log",
+      "sha256": "233993bba97d89a70b52eb12660ca462745afa034ca92efef9b15a995e6563a2",
+      "bytes": 4063
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/fixtures/real/controls-P3F-r1.log",
+      "sha256": "c82d329c79664b89f12a2c608c88f7903b17d7ec7e054b7f4b87e96c8bec0e1b",
+      "bytes": 4063
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/fixtures/real/controls-P4-r1.log",
+      "sha256": "a1c7244c442bbed334b85a305ea5b27e196cfee8c790606a2fbbda7bf39f0000",
+      "bytes": 4059
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/fixtures/real/controls-S-r1.log",
+      "sha256": "49def2cc8cd0c6a328e43490f55e98a1d69f4b8938f4bb23212f3c85923c88fb",
+      "bytes": 3293
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/fixtures/real/controls-S-r2.log",
+      "sha256": "25767c880a7a5703495234fb14868afb454870a0fdacbc8683094d7455f9fa94",
+      "bytes": 3293
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/fixtures/real/controls-S-r3.log",
+      "sha256": "2b5cea819821c2e557e57a0a2f5c7d193a494090bb2b9a91dd1819cfb72dd6af",
+      "bytes": 3293
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/fixtures/real/crash-L4C-r1.log",
+      "sha256": "0cef4717c8398f210dc3c6277d4d4906b9425ecbe671bfd7ff55bbee7a5ab08d",
+      "bytes": 108
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/fixtures/real/crash-L4F-r1.log",
+      "sha256": "0cef4717c8398f210dc3c6277d4d4906b9425ecbe671bfd7ff55bbee7a5ab08d",
+      "bytes": 108
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/fixtures/real/crash-P3-r1.log",
+      "sha256": "0cef4717c8398f210dc3c6277d4d4906b9425ecbe671bfd7ff55bbee7a5ab08d",
+      "bytes": 108
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/fixtures/real/crash-P3C-r1.log",
+      "sha256": "0cef4717c8398f210dc3c6277d4d4906b9425ecbe671bfd7ff55bbee7a5ab08d",
+      "bytes": 108
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/fixtures/real/crash-P3F-r1.log",
+      "sha256": "0cef4717c8398f210dc3c6277d4d4906b9425ecbe671bfd7ff55bbee7a5ab08d",
+      "bytes": 108
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/fixtures/real/crash-P4-r1.log",
+      "sha256": "0cef4717c8398f210dc3c6277d4d4906b9425ecbe671bfd7ff55bbee7a5ab08d",
+      "bytes": 108
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/fixtures/real/crash-S-r1.log",
+      "sha256": "9755b350b787423925119ef581f153648bd08982bbcc036ee931a39eb05e9f4d",
+      "bytes": 52
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/ids.py",
+      "sha256": "e5d416fb0f50f0d21aadadf0f1c8b3f181cd772f65a705f7db161173f8a9aa9a",
+      "bytes": 3438
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/make_fixtures.py",
+      "sha256": "930e286d80cd5dc46e73d7f7d0845686f280984d7dc274eabe1be6ea8554e6b2",
+      "bytes": 12699
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/test_b1_failure_mode.py",
+      "sha256": "3e9678ff0e2fe74557459c1cc06e8239a2fc3a3929533bc9cd5de757464472ca",
+      "bytes": 7586
+    },
+    {
+      "path": "blueprints/convergence-practice/macos-suite-parallelism-20261003/test_compare.py",
+      "sha256": "0b2dc0633e5e873f926323c97599d18a11c640d4eb133fb0e35a11f0bb0b93e3",
+      "bytes": 57574
     },
     {
       "path": "blueprints/convergence-practice/native-recovery/README.md",
@@ -15803,6 +16013,11 @@
       "path": "docs/decisions/2026-10-02-two-host-north-star-architecture.md",
       "sha256": "f3234c014072e6a567a42fcc989c7e8bf716823f52c96a633bbe76e1c8d10e26",
       "bytes": 16881
+    },
+    {
+      "path": "docs/decisions/2026-10-03-macos-suite-parallelism-trial.md",
+      "sha256": "dda340f8e62a3f1e2dcf450336eee5ae7cce24ffef0bd0fd40a1768bb7a4c992",
+      "bytes": 29646
     },
     {
       "path": "docs/direct-results.md",
@@ -50026,8 +50241,8 @@
     },
     {
       "path": "tests/test_native_maintenance.py",
-      "sha256": "04b6a74168157db1fb72fafbf1942efc66b2b5f8c6d6a655ffb2914321ca6826",
-      "bytes": 852
+      "sha256": "565ad15ac3f00618ac4504dd25f4764c44292ca246a5aea1ef1df71b8eecf8a1",
+      "bytes": 2389
     },
     {
       "path": "tests/test_native_nautilus_ci.py",
@@ -50396,8 +50611,8 @@
     },
     {
       "path": "tests/test_workflow_security_coverage.py",
-      "sha256": "10f6aaa08fb86cd17d07e764394e50e3ee1d92aadae79f0e173548a8b83d6111",
-      "bytes": 10624
+      "sha256": "e2241f1d50ce13b6e89088f0378bfeda27023accde04df9ddb7bb713ab0f43ff",
+      "bytes": 10829
     },
     {
       "path": "tests/test_wsl_memory_maintenance.py",
@@ -51011,6 +51226,7 @@
     "blueprints/convergence-practice/local-inference-latest-20260926/experiment.json",
     "blueprints/convergence-practice/gpt6-family-tiering-20260926/experiment.json",
     "blueprints/convergence-practice/omniroute-routing-20260928/experiment.json",
-    "blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json"
+    "blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json",
+    "blueprints/convergence-practice/macos-suite-parallelism-20261003/experiment.json"
   ]
 }
