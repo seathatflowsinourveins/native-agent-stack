@@ -5,6 +5,7 @@ pass-through cases below record known bypasses so no reader mistakes the
 hook for a security boundary.
 """
 
+import gc
 import io
 import itertools
 import json
@@ -4983,9 +4984,18 @@ class K4GuardTests(unittest.TestCase):
         for _ in range(K4_TIMING_MAX_ROUNDS):
             spans = {}
             for depth, text in nesting_texts.items():
-                cpu = time.process_time()
-                self.assertIsNone(guard.check(text))
-                spans[depth] = time.process_time() - cpu
+                # Timed with the cyclic collector off, restoring its prior state, as CPython's timeit.Timer.timeit does by default
+                # (Lib/timeit.py): a full (generation-2) collection costs in proportion to the whole test process's heap, not to
+                # this text, so one that lands inside the window is not input-dependent work. The helper rounds below do the same.
+                gc_was_enabled = gc.isenabled()
+                gc.disable()
+                try:
+                    cpu = time.process_time()
+                    self.assertIsNone(guard.check(text))
+                    spans[depth] = time.process_time() - cpu
+                finally:
+                    if gc_was_enabled:
+                        gc.enable()
             nesting_rounds.append(spans)
             if k4_nesting_passes(nesting_rounds):
                 break
@@ -5018,13 +5028,20 @@ class K4GuardTests(unittest.TestCase):
                             finally:
                                 _inside.append(time.process_time() - cpu)
 
+                        # Collector off while timing, as for the nesting probe above (timeit.Timer.timeit's default).
+                        gc_was_enabled = gc.isenabled()
                         with mock.patch.object(guard, name, timed):
-                            cpu = time.process_time()
+                            gc.disable()
                             try:
-                                guard.check(text)
-                            except guard.WorkBudgetExceeded:
-                                pass
-                            total = time.process_time() - cpu
+                                cpu = time.process_time()
+                                try:
+                                    guard.check(text)
+                                except guard.WorkBudgetExceeded:
+                                    pass
+                                total = time.process_time() - cpu
+                            finally:
+                                if gc_was_enabled:
+                                    gc.enable()
                         self.assertTrue(inside, f"{name} not reached at {size}")
                         helper_totals[size], totals[size] = sum(inside), total
                     return helper_totals, totals
