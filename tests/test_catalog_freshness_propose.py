@@ -899,8 +899,10 @@ class CatalogFreshnessWorkflowTextTests(unittest.TestCase):
         self.assertNotIn("actions: write", body)
 
     def test_top_level_permissions_stay_read_only(self):
+        # The workflow grants no scope (docs/decisions/2026-10-04-ci-least-privilege.md); freshness reads only.
         top_level = self.text.split("\njobs:\n", 1)[0]
-        self.assertIn("permissions:\n  contents: read", top_level)
+        self.assertRegex(top_level, r"(?m)^permissions: \{\}$")
+        self.assertIn("\n    permissions:\n      contents: read\n    outputs:\n", self._job_body("freshness"))
 
     def test_propose_job_never_references_forbidden_catalog_paths_for_writing(self):
         body = self._job_body("propose")
