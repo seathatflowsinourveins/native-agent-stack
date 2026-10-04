@@ -1,0 +1,40 @@
+"""Scratch reproduction of LockDiscoveryGuardTests' mutant harness, with per-mutant counts and a negative control."""
+import importlib.util, json, sys, types, unittest
+from pathlib import Path
+REPO = Path(sys.argv[1])
+spec = importlib.util.spec_from_file_location('t', REPO/'tests/test_wsl_retrieval.py')
+t = importlib.util.module_from_spec(spec); spec.loader.exec_module(t)
+source = (t.ROOT/'audit.py').read_text(encoding='utf-8')
+mutants = [
+    ('M0 unmutated guard', 'all scenarios', None, None),
+    ('M1 archive digest unchecked', 'test_missing_or_changed_archive_rejected', 'require(hashlib.sha256(archive).hexdigest() == LOCK_SHA256,', 'require(True,'),
+    ('M2 assessment digest unchecked', 'test_changed_assessment_lock_identity_rejected', "assessment['retained_lock']['sha256'] == LOCK_SHA256", 'True'),
+    ('M3 disk names unchecked', 'test_restored_npm_name_rejected_on_disk', "require(not restored, 'retired lock restored under", "require(True, 'retired lock restored under"),
+    ('M4 npm-shrinkwrap.json not a lock name', 'test_every_discovered_lock_name_rejected_on_disk', "'npm-shrinkwrap.json', ", ''),
+    ('M5 top-level walk only', 'test_nested_lock_name_rejected_on_disk', 'in os.walk(root)', 'in [next(os.walk(root))]'),
+    ('M6 case-sensitive names', 'test_case_varied_lock_name_rejected_on_disk', 'Path(name).name.lower() in', 'Path(name).name in'),
+    ('M7 archive tracking unchecked', 'test_untracked_archive_rejected', 'require(LOCK_ARCHIVE in tracked,', 'require(True,'),
+    ('M8 index names unchecked', 'test_lock_name_tracked_in_git_rejected', "require(not restored, 'retired lock tracked under", "require(True, 'retired lock tracked under"),
+    ('N1 negative control: message-only edit', 'test_restored_npm_name_rejected_on_disk', "'retired lock restored under a scanner-read name on disk: '", "'retired lock restored under a scanner-read name on disk:  '"),
+]
+rows = []
+for name, check, old, new in mutants:
+    if old is None:
+        suite = unittest.defaultTestLoader.loadTestsFromTestCase(t.LockDiscoveryGuardTests)
+        suite = unittest.TestSuite([c for c in suite if c._testMethodName != 'test_each_requirement_is_enforced_by_a_scenario'])
+        result = unittest.TestResult(); suite.run(result)
+        rows.append({'id': name.split()[0], 'mutant': name[3:], 'scenario': check, 'expected': 'pass',
+                     'observed': 'pass' if result.wasSuccessful() else 'fail', 'tests_run': result.testsRun,
+                     'failures': len(result.failures), 'errors': len(result.errors)})
+        continue
+    assert source.count(old) == 1, name
+    mod = types.ModuleType('mutant'); mod.__file__ = str(t.ROOT/'audit.py')
+    exec(compile(source.replace(old, new, 1), mod.__file__, 'exec'), mod.__dict__)
+    case = t.LockDiscoveryGuardTests(check); case.module = mod
+    result = unittest.TestResult(); case.run(result)
+    expected = 'pass' if name.startswith('N') else 'fail'
+    rows.append({'id': name.split()[0], 'mutant': name[3:], 'scenario': check, 'expected': expected,
+                 'observed': 'fail' if result.failures or result.errors else 'pass',
+                 'failures': len(result.failures), 'errors': len(result.errors)})
+print(json.dumps(rows, indent=1))
+print('ALL_AS_EXPECTED' if all(r['expected'] == r['observed'] for r in rows) else 'MISMATCH')

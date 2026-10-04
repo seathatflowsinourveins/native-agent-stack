@@ -83,7 +83,7 @@
         "sha256": "7bbf63c5eafd347ae5ae56c684be06ef2589d38f2aab580ca7986ca4122bc6a8"
       },
       {
-        "path": "blueprints/convergence-practice/wsl-retrieval/package-lock.json",
+        "path": "blueprints/convergence-practice/wsl-retrieval/package-lock.json.frozen",
         "sha256": "5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb"
       },
       {
@@ -122,11 +122,11 @@
       },
       {
         "path": "blueprints/convergence-practice/wsl-retrieval/audit.py",
-        "sha256": "da2c4d58d7012febb1ce70d49111ecdbf22f46867fe84c098e01c75c7af0eabd"
+        "sha256": "05fae80832470371bde09b145d7aeeb125cd4c44accee82052aa499ad5f79207"
       },
       {
         "path": "tests/test_wsl_retrieval.py",
-        "sha256": "b4e1abcc70ed75d302ca3ecabfba23bda9f53ab4a460a1d0fc16fd47453ea7fa"
+        "sha256": "72a79a26ffccc2582c536af34f25f7c18c0bdedc99040f671d86476df0d9fe91"
       },
       {
         "path": "blueprints/convergence-practice/wsl-retrieval/run.py",
