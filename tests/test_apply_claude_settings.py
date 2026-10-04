@@ -121,18 +121,25 @@ class MergeSettingsTests(unittest.TestCase):
         self.assertEqual(groups[3]["matcher"], "")
         self.assertEqual([h["command"] for h in groups[3]["hooks"]], ["d"])
 
-    def test_same_matcher_keeps_native_memory_and_carrier_entries_separate(self):
-        canonical = json.loads((ROOT / "adoption/templates/claude.settings.template.json")
-                               .read_text(encoding="utf-8"))["hooks"]["SubagentStart"]
-        self.assertEqual(len(canonical), 2)
+    def canonical_memory_and_other_entries(self):
+        """The template's native-memory SubagentStart entry and a second entry with the same matcher, so one event holds
+        two ownership groups (the carrier that used to be the second entry is held out of the default)."""
+        memory = json.loads((ROOT / "adoption/templates/claude.settings.template.json")
+                            .read_text(encoding="utf-8"))["hooks"]["SubagentStart"]
+        self.assertEqual(len(memory), 1)
+        other = {"matcher": "", "hooks": [{"type": "command", "timeout": 5,
+                                           "command": 'python3 "${HOME}/.claude/hooks/example-subagent-hook.py" 2>/dev/null || true'}]}
+        return memory + [other]
+
+    def test_same_matcher_keeps_native_memory_and_other_entries_separate(self):
+        canonical = self.canonical_memory_and_other_entries()
         base = {"hooks": {"SubagentStart": [canonical[0]]}}
         merged = acs.merge_settings(base, {"hooks": {"SubagentStart": canonical}})
         self.assertEqual(merged["hooks"]["SubagentStart"], canonical)
         self.assertEqual(acs.merge_settings(merged, {"hooks": {"SubagentStart": canonical}}), merged)
 
     def test_existing_mixed_entry_is_split_without_changing_hook_values_or_order(self):
-        canonical = json.loads((ROOT / "adoption/templates/claude.settings.template.json")
-                               .read_text(encoding="utf-8"))["hooks"]["SubagentStart"]
+        canonical = self.canonical_memory_and_other_entries()
         host = {"type": "command", "command": "true", "timeout": 7}
         original = canonical[0]["hooks"] + canonical[1]["hooks"] + [host]
         base = {"theme": "retained", "hooks": {"SubagentStart": [
@@ -202,6 +209,77 @@ class MergeSettingsTests(unittest.TestCase):
         self.assertEqual(merged["permissions"], {"allow": ["Bash(ls)"], "deny": ["X", "Y"], "defaultMode": "bypassPermissions"})
         self.assertEqual(merged["enabledPlugins"], {"host@plugin": True, "tpl@plugin": True})
         self.assertEqual(merged["statusLine"], {"type": "command", "command": "new", "padding": 1})
+
+
+class HeldOutHookTests(unittest.TestCase):
+    """The token-lane carriers are held out of the clean default: applying the template removes the hook objects an
+    earlier template installed for them, and nothing else (docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md)."""
+
+    SUB = 'python3 "/home/example/.claude/hooks/token-lanes-subagent-start.py" 2>/dev/null || true'
+    SESSION = 'python3 "/home/example/.claude/hooks/token-lanes-session-start.py" 2>/dev/null || true'
+
+    def template(self):
+        return json.loads((ROOT / "adoption/templates/claude.settings.template.json").read_text(encoding="utf-8"))
+
+    def test_the_template_runs_no_held_out_file(self):
+        text = (ROOT / "adoption/templates/claude.settings.template.json").read_text(encoding="utf-8")
+        for name in acs.HELD_OUT_HOOK_FILES:
+            self.assertNotIn(name, text)
+        self.assertEqual(len(self.template()["hooks"]["SubagentStart"]), 1)
+
+    def test_a_host_that_applied_the_older_template_ends_clean(self):
+        base = {"hostOnlyKey": "retained", "hooks": {
+            "SubagentStart": [{"matcher": "", "hooks": [{"type": "command", "command": "memory-hook"}]},
+                              {"matcher": "", "hooks": [{"type": "command", "command": self.SUB, "timeout": 5}]}],
+            "SessionStart": [{"matcher": "startup", "hooks": [{"type": "command", "command": "host-hook"}]},
+                             {"matcher": "startup|resume|clear|compact|fork",
+                              "hooks": [{"type": "command", "command": self.SESSION, "timeout": 5}]}],
+        }}
+        merged = acs.merge_settings(base, self.template())
+        self.assertNotIn("token-lanes", json.dumps(merged["hooks"]))
+        self.assertEqual(merged["hostOnlyKey"], "retained")
+        # the hosts' own entries keep their values and order; only the carrier groups are gone
+        self.assertEqual(merged["hooks"]["SubagentStart"][0], base["hooks"]["SubagentStart"][0])
+        self.assertEqual(merged["hooks"]["SessionStart"][0], base["hooks"]["SessionStart"][0])
+        self.assertEqual(acs.merge_settings(merged, self.template()), merged)
+
+    def test_a_mixed_entry_loses_only_the_carrier_hook(self):
+        host = {"type": "command", "command": "true", "timeout": 7}
+        carrier = {"type": "command", "command": self.SUB, "timeout": 5}
+        base = {"hooks": {"SubagentStart": [{"matcher": "", "hooks": [host, carrier]}]}}
+        merged = acs.merge_settings(base, {"hooks": {"Stop": [{"matcher": "", "hooks": [host]}]}})
+        self.assertEqual(merged["hooks"]["SubagentStart"], [{"matcher": "", "hooks": [host]}])
+
+    def test_an_event_that_held_only_a_carrier_is_dropped(self):
+        base = {"hooks": {"SessionStart": [{"matcher": "startup", "hooks": [{"type": "command", "command": self.SESSION}]}]}}
+        merged = acs.merge_settings(base, {"hooks": {"Stop": [{"matcher": "", "hooks": [{"type": "command", "command": "x"}]}]}})
+        self.assertEqual(sorted(merged["hooks"]), ["Stop"])
+
+    def test_a_template_that_carries_the_command_keeps_it_once(self):
+        # An adopter's own template opts the carrier back in: the live entry stays and is not duplicated.
+        entry = {"matcher": "", "hooks": [{"type": "command", "command": self.SUB, "timeout": 5}]}
+        merged = acs.merge_settings({"hooks": {"SubagentStart": [entry]}}, {"hooks": {"SubagentStart": [entry]}})
+        self.assertEqual(merged["hooks"]["SubagentStart"], [entry])
+
+    def test_only_a_hook_file_under_a_claude_hooks_directory_is_retired(self):
+        own = [{"type": "command", "command": "python3 /home/example/bin/token-lanes-subagent-start.py"},
+               {"type": "command", "command": 'python3 "/home/example/.claude/hooks/my-token-lanes-subagent-start.py"'},
+               {"type": "command", "command": "echo token-lanes-subagent-start.py"},
+               {"type": "command", "command": "python3 'unterminated"}]
+        base = {"hooks": {"SubagentStart": [{"matcher": "", "hooks": own}]}}
+        merged = acs.merge_settings(base, {"hooks": {}})
+        self.assertEqual(merged["hooks"]["SubagentStart"], [{"matcher": "", "hooks": own}])
+        self.assertFalse(any(acs.runs_held_out_hook(hook) for hook in own))
+        self.assertTrue(acs.runs_held_out_hook({"command": self.SUB}))
+
+    def test_a_template_without_hooks_leaves_the_live_hooks_alone(self):
+        base = {"hooks": {"SubagentStart": [{"matcher": "", "hooks": [{"type": "command", "command": self.SUB}]}]}}
+        self.assertEqual(acs.merge_settings(base, {"theme": "dark"})["hooks"], base["hooks"])
+
+    def test_malformed_hook_values_pass_through(self):
+        base = {"hooks": {"Stop": [{"matcher": "", "hooks": 5}, "not-a-group"], "Other": "text"}}
+        self.assertEqual(acs.retire_held_out_hooks(base["hooks"], {}), base["hooks"])
+        self.assertEqual(acs.retire_held_out_hooks("text", {}), "text")
 
 
 class ApplyIOTests(unittest.TestCase):

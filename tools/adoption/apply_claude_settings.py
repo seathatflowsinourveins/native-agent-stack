@@ -9,7 +9,11 @@ win; host-only keys, permission rules and plugins are kept; a list gains a
 missing template entry next to its template neighbours, so a deny rule stays
 ahead of a `!` carve-out), combines hooks
 per event de-duplicated by command, writes atomically, and preserves the
-original file's mode bits. Supports --dry-run (prints the would-be result and exits
+original file's mode bits. The one thing a merge removes from the live hooks is a hook
+object that runs a held-out token-lane carrier file (HELD_OUT_HOOK_FILES), so a host
+that applied an older template ends up clean; a template that itself carries the
+command keeps it, and --keep-held-out-hooks keeps the ones a host opted into (see
+adoption/hooks/claude/README.md). Supports --dry-run (prints the would-be result and exits
 without touching anything).
 """
 
@@ -29,6 +33,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_TEMPLATE = ROOT / "adoption" / "templates" / "claude.settings.template.json"
+# Hook files an earlier template installed and the clean default now holds out: the token-lane carriers, this
+# repository's own adaptation (docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md).
+HELD_OUT_HOOK_FILES = ("token-lanes-subagent-start.py", "token-lanes-session-start.py")
 
 
 class ApplyError(ValueError):
@@ -61,6 +68,53 @@ def command_key(cmd: str) -> str:
         return "\0".join(shlex.split(cmd))
     except ValueError:
         return cmd
+
+
+def runs_held_out_hook(entry: dict) -> bool:
+    """True when a hooks-array entry runs one of HELD_OUT_HOOK_FILES from a `.claude/hooks/` directory."""
+    cmd = hook_command(entry)
+    if cmd is None:
+        return False
+    try:
+        words = shlex.split(cmd)
+    except ValueError:
+        return False
+    return any("/.claude/hooks/" in word and word.rsplit("/", 1)[-1] in HELD_OUT_HOOK_FILES for word in words)
+
+
+def retire_held_out_hooks(base_hooks, incoming_hooks):
+    """`base_hooks` without the hook objects that run a held-out carrier file, unless the incoming template runs the
+    same command. A group left with no hook is dropped, and so is an event left with no group; every other group,
+    hook object and key keeps its value and order."""
+    if not isinstance(base_hooks, dict):
+        return base_hooks
+    wanted = set()
+    if isinstance(incoming_hooks, dict):
+        for groups in incoming_hooks.values():
+            for group in groups if isinstance(groups, list) else []:
+                for hook in hook_list(group) if isinstance(group, dict) else []:
+                    cmd = hook_command(hook)
+                    if cmd is not None:
+                        wanted.add(command_key(cmd))
+    retired = {}
+    for event, groups in base_hooks.items():
+        if not isinstance(groups, list):
+            retired[event] = copy.deepcopy(groups)
+            continue
+        kept_groups = []
+        for group in groups:
+            if not isinstance(group, dict) or not isinstance(group.get("hooks"), list):
+                kept_groups.append(copy.deepcopy(group))
+                continue
+            kept = [hook for hook in group["hooks"]
+                    if not (runs_held_out_hook(hook) and command_key(hook_command(hook)) not in wanted)]
+            if len(kept) == len(group["hooks"]):
+                kept_groups.append(copy.deepcopy(group))
+            elif kept:
+                kept_groups.append({**copy.deepcopy(group), "hooks": copy.deepcopy(kept)})
+        if kept_groups:
+            retired[event] = kept_groups
+    return retired
 
 
 def separate_template_hook_groups(base_groups: list, incoming_groups: list) -> list:
@@ -188,10 +242,12 @@ def deep_merge_dict(base: dict, incoming: dict) -> dict:
     return merged
 
 
-def merge_settings(base: dict, template: dict) -> dict:
+def merge_settings(base: dict, template: dict, keep_held_out: bool = False) -> dict:
     """Merge `template` (the rendered adoption template) into `base` (the
     live settings), returning a new dict. Rules:
-      - `hooks`: combined per event, de-duplicated by command (merge_hooks)
+      - `hooks`: combined per event, de-duplicated by command (merge_hooks), after the hook objects that
+        run a held-out carrier file are removed from the live hooks (retire_held_out_hooks) unless
+        keep_held_out is true
       - nested objects (modelSettings, env, permissions, statusLine,
         enabledPlugins, ...): deep-merged, so host-only keys such as extra
         permission rules, plugins or per-model levels are kept
@@ -207,7 +263,8 @@ def merge_settings(base: dict, template: dict) -> dict:
     hooks = template.get("hooks")
     merged = deep_merge_dict(base, {k: v for k, v in template.items() if k != "hooks"})
     if hooks is not None:
-        merged["hooks"] = merge_hooks(base.get("hooks"), hooks)
+        live = base.get("hooks") if keep_held_out else retire_held_out_hooks(base.get("hooks"), hooks)
+        merged["hooks"] = merge_hooks(live, hooks)
     return merged
 
 
@@ -257,7 +314,7 @@ def atomic_write(target: Path, text: str, mode: int) -> None:
         raise
 
 
-def apply(template_path: Path, target_path: Path, dry_run: bool) -> dict:
+def apply(template_path: Path, target_path: Path, dry_run: bool, keep_held_out: bool = False) -> dict:
     if not template_path.is_file():
         raise ApplyError(f"template not found: {template_path}")
     template = load_json(template_path)
@@ -273,7 +330,7 @@ def apply(template_path: Path, target_path: Path, dry_run: bool) -> dict:
         base = {}
         original_mode = 0o600
 
-    merged = merge_settings(base, template)
+    merged = merge_settings(base, template, keep_held_out)
     rendered = json.dumps(merged, indent=2, ensure_ascii=False) + "\n"
 
     if dry_run:
@@ -299,6 +356,9 @@ def build_parser() -> argparse.ArgumentParser:
                               "this tool does not substitute ${...} placeholders itself)")
     parser.add_argument("--target", default=str(Path.home() / ".claude" / "settings.json"),
                          help="Live settings.json to merge into (default: ~/.claude/settings.json)")
+    parser.add_argument("--keep-held-out-hooks", action="store_true",
+                         help="Keep the live hook entries that run a held-out token-lane carrier file instead of "
+                              "removing them (for a host that opted in; adoption/hooks/claude/README.md)")
     parser.add_argument("--dry-run", action="store_true",
                          help="Print the merged result to stdout; write nothing, back up nothing")
     return parser
@@ -308,7 +368,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     try:
-        apply(Path(args.template), Path(args.target), args.dry_run)
+        apply(Path(args.template), Path(args.target), args.dry_run, args.keep_held_out_hooks)
     except ApplyError as error:
         print(f"apply failed: {error}", file=sys.stderr)
         return 1

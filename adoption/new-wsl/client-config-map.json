@@ -158,26 +158,6 @@
     },
     {
       "match": [
-        "claude/settings/hook/*/*token-lanes-subagent-start.py*",
-        "claude/settings/hook/*/*token-lanes-session-start.py*",
-        "claude/profile/hook-file/token-lanes-block.md",
-        "claude/profile/hook-file/token-lanes-block.main.md",
-        "claude/profile/hook-file/token-lanes-block.builder.md",
-        "claude/profile/hook-file/token-lanes-block.researcher.md",
-        "claude/profile/hook-file/token-lanes-block.reviewer.md",
-        "claude/profile/hook-file/token-lanes-block.scout.md",
-        "claude/profile/hook-file/token-lanes-block.verifier.md",
-        "claude/profile/hook-file/token-lanes-session-start.py",
-        "claude/profile/hook-file/token-lanes-subagent-start.py"
-      ],
-      "wiring": "not_wired:the token-lane carriers are this repository's own adaptation, not a feature of an upstream tool, so the clean default holds them out (the owner's directive of 2026-10-04, docs/decisions/2026-10-04-new-wsl-clean-default-holdouts.md); the files stay byte-pinned in adoption/hooks/claude/SHA256SUMS for a host that opts in",
-      "names": [
-        "token-lanes"
-      ],
-      "note": "The token-lane carriers: python3 and the nine files install_claude_profile.py copies (the SubagentStart hook with its default block and five role blocks, and the SessionStart hook with its main-session block). Held out of this distribution's default; an adopter opts in by installing the profile's hook files and the two hook entries of the shared template."
-    },
-    {
-      "match": [
         "claude/settings/plugin/context-mode@context-mode",
         "claude/settings/marketplace/context-mode",
         "codex/config/marketplaces.context-mode.*",

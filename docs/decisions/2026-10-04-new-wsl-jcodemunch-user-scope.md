@@ -25,8 +25,8 @@ a new project and in a new worktree alike.
 - **NativeStack:** its Claude Code already has the server at user scope (`claude mcp get jcodemunch`: "User config
   (available in all your projects)", connected), with the opt-out below and three local switches that turn off context
   providers, git blame and AI summaries; those three are not carried, so 2604 keeps upstream's defaults for them. Its Codex
-  config does not register the server, and the additions of this record do not reach it: Codex sessions on NativeStack
-  start without jCodeMunch until its Codex config gets the same entry (the shared Codex template still says per project).
+  config does not register the server yet: the shared Codex user template carries the entry now, and registering it on
+  NativeStack is one of the host steps of the NativeStack-clean record.
 
 - **Registration:** the pinned README (jgravelle/jcodemunch-mcp at 8f7b34ab, README.md L119-122) documents
   `claude mcp add -s user jcodemunch jcodemunch-mcp` after `uv tool install jcodemunch-mcp`. Codex gets
@@ -40,8 +40,11 @@ a new project and in a new worktree alike.
   an unapproved call. The approval mode is an authorization piece: written only with `--with-authorization-settings`,
   and only while the `code-index` slot installs jcodemunch.
 - **Not run:** `jcodemunch-mcp init`, which writes enforcement hooks and a prompt policy into the client.
-- **Unchanged:** the shared Claude and Codex templates and every other host keep the per-project opt-in
-  (`adoption/bootstrap.md`, "jCodeMunch, per project"). The record counts move to 404 pieces, 354 wired, 35 not wired and
+- **Shared templates:** this record first registered the server through the 2604 additions only. The NativeStack-clean change
+  (`docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md`, decision 6) moves the same entries into
+  `adoption/mcp/claude-user.json` and the Codex user template, because the repository's tests make the two user-scope sets mirror
+  each other, so every host that installs the profile from the shared templates now gets the server; the per-project forms of
+  `adoption/bootstrap.md` remain for a project that wants its own registration. The record counts move to 404 pieces, 354 wired, 35 not wired and
   15 authorization.
 
 ## The cost, measured

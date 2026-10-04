@@ -23,27 +23,6 @@ service_tier = "fast"
 [mcp_servers.ai-memory]
 default_tools_approval_mode = "approve"
 
-# jgravelle/jcodemunch-mcp 1.108.319, README.md at 8f7b34abe16fb459e0bf1c04747d584216dfe32e (L119-122: `claude mcp add -s user
-# jcodemunch jcodemunch-mcp`): the native MCP registration at user scope, on the user's directive of 2026-10-04 that every fresh
-# session starts with the tools ready (docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md). JCODEMUNCH_SHARE_SAVINGS=0 in
-# the server's env block is the documented opt-out of its anonymous savings counter (CONFIGURATION.md L231, SECURITY.md L311 at the
-# same revision). The code-index install-plan row installs this console script; `jcodemunch-mcp init`, which writes a prompt
-# policy and hooks, is not run here. The entry is the one adoption/templates/project.codex.config.template.toml registers per
-# project, moved to user scope: its tools carry no MCP annotations, so under approval_policy = "never" Codex refuses every call
-# unless the approval mode approves them (codex-rs/codex-mcp/src/mcp/mod.rs L89-L98 at rust-v0.157.1; authorization, as above),
-# and enabled_tools names the three verbs of its front door (jcodemunch-mcp 1.108.319, counter.py FRONT_DOOR). CODE_INDEX_PATH
-# stays unset: upstream's default is ~/.code-index (README.md L225).
-[mcp_servers.jcodemunch]
-command = "${ECO_ROOT}/bin/jcodemunch-mcp"
-startup_timeout_sec = 60
-enabled_tools = ["route", "menu", "order"]
-default_tools_approval_mode = "approve"
-
-[mcp_servers.jcodemunch.env]
-RTK_TELEMETRY_DISABLED = "1"
-PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
-JCODEMUNCH_SHARE_SAVINGS = "0"
-
 # semble 0.6.1 (MinishLab/semble, a uv tool), the code-search slot's interim install (definitive manifest, amendment 3;
 # wave-2 code-search ruling, changes 2-5). Stdio, CPU only, no port. Its two tools carry no MCP annotations, so Codex
 # 0.160.0 asks before each call unless the approval mode approves them (authorization, as above); enabled_tools names
