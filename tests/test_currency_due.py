@@ -25,6 +25,7 @@ from pathlib import Path
 from unittest import mock
 
 from scripts import currency_due as cd
+from scripts import upstream_surface_watch as usw
 
 ROOT = Path(__file__).resolve().parents[1]
 SYSTEMD_DIR = ROOT / "adoption/templates/systemd"
@@ -1130,17 +1131,23 @@ class SurfaceWatchTests(unittest.TestCase):
                 "sha256": "0" * 64, "bytes": 1, "origin": origin, "required": not cross_check,
                 "cross_check": cross_check}
 
+    NO_VERSION = object()  # report(schema_version=...): write no schema_version key
+
     def report(self, checkout: Checkout, generated_at: str = "2026-09-29T12:00:00Z", unreviewed=None,
-               raw: str | None = None, sources=None, run_at: str | None = None, kinds_not_observed=None) -> None:
+               raw: str | None = None, sources=None, run_at: str | None = None, kinds_not_observed=None,
+               schema_version: object = 1) -> None:
         path = checkout.state / "surface-watch" / "latest.json"
         path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
         if sources is None:
             sources = [self.source("claude-env-vars-page", "network", generated_at)]
-        document = {"schema_version": 1, "generated_at": generated_at, "run_at": run_at or generated_at, "new": [],
-                    "removed": [], "stage_changed": [], "unreviewed": self.KEYS if unreviewed is None else unreviewed,
+        document = {"schema_version": schema_version, "generated_at": generated_at, "run_at": run_at or generated_at,
+                    "new": [], "removed": [], "stage_changed": [],
+                    "unreviewed": self.KEYS if unreviewed is None else unreviewed,
                     "coverage": {"mode": "network", "from_cache": [], "sources": sources,
                                  "kinds_not_observed": {} if kinds_not_observed is None else kinds_not_observed},
                     "summary_line": "surface watch: 3 unreviewed of 3 new; details: python3 x --dry-run"}
+        if schema_version is self.NO_VERSION:
+            del document["schema_version"]
         path.write_text(raw if raw is not None else json.dumps(document), encoding="utf-8")
 
     def document(self, checkout: Checkout) -> dict:
@@ -1236,10 +1243,32 @@ class SurfaceWatchTests(unittest.TestCase):
             with self.subTest(kinds_not_observed=value):
                 checkout = Checkout(self)
                 before = self.earlier_surface_notice(checkout)
-                self.report(checkout, raw=json.dumps({"generated_at": NOW, "unreviewed": [], "coverage": {
+                self.report(checkout, raw=json.dumps({"schema_version": 1, "generated_at": NOW, "unreviewed": [], "coverage": {
                     "sources": [self.source("claude-env-vars-page", "network", NOW)],
                     "kinds_not_observed": value}}))
                 self.assert_surface_gap_keeps_notice(checkout, before, "surface watch output unreadable")
+
+    def test_a_report_of_another_schema_version_is_unreadable_and_keeps_the_notice(self):
+        # latest.json carries schema_version. After an upgrade, a rollback or a partly updated live checkout an older
+        # currency_due.py must not read a report whose generated_at and unreviewed fields may mean something else.
+        for label, version in (("a newer one", 2), ("an older one", 0), ("a string", "1"), ("a boolean", True),
+                               ("a float", 1.0), ("null", None), ("absent", self.NO_VERSION)):
+            with self.subTest(schema_version=label):
+                checkout = Checkout(self)
+                before = self.earlier_surface_notice(checkout)
+                self.report(checkout, unreviewed=[], schema_version=version)
+                document = self.assert_surface_gap_keeps_notice(checkout, before, "surface watch output unreadable")
+                self.assertIn("schema_version", document["details"][-1]["surface_watch_reason"])
+
+    def test_a_report_of_the_supported_schema_version_is_still_read(self):
+        # Control: the refusals above are not a blanket refusal of every report.
+        checkout = Checkout(self)
+        self.report(checkout, unreviewed=["codex:feature:brand_new"], schema_version=cd.SURFACE_SCHEMA_VERSION)
+        document = self.document(checkout)
+        self.assertEqual(document["due"].get("surface_unreviewed"), 1)
+
+    def test_the_supported_schema_version_is_the_one_the_watch_writes(self):
+        self.assertEqual(cd.SURFACE_SCHEMA_VERSION, usw.SCHEMA_VERSION)
 
     def test_coverage_malformed_sources_are_unreadable(self):
         for sources in (None, {}, "source", 1, [None], [[]], ["source"], [{}], [{"origin": None}],
@@ -1247,7 +1276,7 @@ class SurfaceWatchTests(unittest.TestCase):
             with self.subTest(sources=sources):
                 checkout = Checkout(self)
                 before = self.earlier_surface_notice(checkout)
-                self.report(checkout, raw=json.dumps({"generated_at": NOW, "unreviewed": [], "coverage": {
+                self.report(checkout, raw=json.dumps({"schema_version": 1, "generated_at": NOW, "unreviewed": [], "coverage": {
                     "sources": sources, "kinds_not_observed": {}}}))
                 self.assert_surface_gap_keeps_notice(checkout, before, "surface watch output unreadable")
 
@@ -1410,11 +1439,11 @@ class SurfaceWatchTests(unittest.TestCase):
 
     def test_an_unreadable_report_is_an_incomplete_check_never_an_error(self):
         cases = {"not JSON": "{not json", "an array": "[]",
-                 "no unreviewed list": json.dumps({"generated_at": NOW, "unreviewed": "x"}),
-                 "keys that are not strings": json.dumps({"generated_at": NOW, "unreviewed": [1]}),
-                 "no time": json.dumps({"generated_at": "yesterday", "unreviewed": []}),
-                 "no per-source records": json.dumps({"generated_at": NOW, "unreviewed": []}),
-                 "a cached source without a time": json.dumps({"generated_at": NOW, "unreviewed": [], "coverage": {
+                 "no unreviewed list": json.dumps({"schema_version": 1, "generated_at": NOW, "unreviewed": "x"}),
+                 "keys that are not strings": json.dumps({"schema_version": 1, "generated_at": NOW, "unreviewed": [1]}),
+                 "no time": json.dumps({"schema_version": 1, "generated_at": "yesterday", "unreviewed": []}),
+                 "no per-source records": json.dumps({"schema_version": 1, "generated_at": NOW, "unreviewed": []}),
+                 "a cached source without a time": json.dumps({"schema_version": 1, "generated_at": NOW, "unreviewed": [], "coverage": {
                      "sources": [{"source": "s", "origin": "cache", "fetched_utc": None}]}}),
                  "nested too deeply": "[" * 200000 + "]" * 200000}
         for label, raw in cases.items():

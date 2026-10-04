@@ -111,6 +111,7 @@ SURFACE_FILE = "latest.json"
 SURFACE_MAX_AGE_DAYS = 3
 SURFACE_FUTURE_SKEW = timedelta(hours=1)  # a report time further ahead of the clock than this is not trusted
 SURFACE_SAMPLES = 10  # unreviewed keys or coverage gaps kept in the details
+SURFACE_SCHEMA_VERSION = 1  # the latest.json schema_version this reader understands (scripts/upstream_surface_watch.py SCHEMA_VERSION; a test keeps the two equal)
 # The report's states in the coverage entry. No watch state directory is only a coverage note: the watch unit may not
 # be installed on this host. A report that cannot answer (missing after observation, stale, future-dated, unreadable
 # or only partly observed) is an incomplete check, as an
@@ -510,7 +511,8 @@ def surface_findings(surface, now: datetime) -> tuple[int | None, list[dict], di
     observed (apart from report-only cross-checks). None (a caller that collected
     no state) checks nothing; a missing report without a watch state directory is the coverage note SURFACE_NOT_RUN;
     a report lost after observation is SURFACE_STALE, and a stale, future-dated or
-    unreadable one is SURFACE_STALE or SURFACE_UNREADABLE; unobserved kinds or unavailable/skipped non-cross-check
+    unreadable one (including a schema_version other than SURFACE_SCHEMA_VERSION) is SURFACE_STALE or
+    SURFACE_UNREADABLE; unobserved kinds or unavailable/skipped non-cross-check
     sources make it SURFACE_PARTIAL. Each is an incomplete check (incomplete()), never a count or an error of the run."""
     if surface is None:
         return None, [], {"surface_watch": None}
@@ -522,6 +524,12 @@ def surface_findings(surface, now: datetime) -> tuple[int | None, list[dict], di
         return None, [], {"surface_watch": SURFACE_NOT_RUN, "surface_watch_reason": "no latest.json"}
     if set(record) == {"error"}:
         return None, [], {"surface_watch": SURFACE_UNREADABLE, "surface_watch_reason": record["error"]}
+    version = record.get("schema_version", "(absent)")
+    if type(version) is not int or version != SURFACE_SCHEMA_VERSION:  # not True or 1.0, which equal 1
+        # After an upgrade, a rollback or a partly updated live checkout another version's generated_at and unreviewed
+        # fields may mean something else, so such a report is no answer, never a count.
+        return None, [], {"surface_watch": SURFACE_UNREADABLE, "surface_watch_reason":
+                          f"latest.json schema_version {repr(version)[:40]}, not the supported {SURFACE_SCHEMA_VERSION}"}
     when, unreviewed = record_time(record.get("generated_at")), record.get("unreviewed")
     ran = record_time(record.get("run_at")) if "run_at" in record else when
     if when is None or ran is None or not isinstance(unreviewed, list) or not all(isinstance(key, str)
