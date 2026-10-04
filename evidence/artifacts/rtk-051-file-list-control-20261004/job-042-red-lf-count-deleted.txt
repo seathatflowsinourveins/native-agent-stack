@@ -1,0 +1,25 @@
+.FF
+======================================================================
+FAIL: test_rtk_exactness_grep_guard_rejects_wrong_lf_record_count (tests.test_native_token_ci.NativeTokenCIContracts.test_rtk_exactness_grep_guard_rejects_wrong_lf_record_count) (records=2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>/tests/test_native_token_ci.py", line 1266, in test_rtk_exactness_grep_guard_rejects_wrong_lf_record_count
+    self.assertEqual({label for label, passed in checks.items() if not passed}, {failing})
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Items in the second set but not the first:
+'rtk-exactness-grep-non-plain-path-list-stays-verbatim'
+
+======================================================================
+FAIL: test_rtk_exactness_grep_guard_rejects_wrong_lf_record_count (tests.test_native_token_ci.NativeTokenCIContracts.test_rtk_exactness_grep_guard_rejects_wrong_lf_record_count) (records=4)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>/tests/test_native_token_ci.py", line 1266, in test_rtk_exactness_grep_guard_rejects_wrong_lf_record_count
+    self.assertEqual({label for label, passed in checks.items() if not passed}, {failing})
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Items in the second set but not the first:
+'rtk-exactness-grep-non-plain-path-list-stays-verbatim'
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.002s
+
+FAILED (failures=2)

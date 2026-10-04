@@ -1,0 +1,562 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "base_head": "45a7218c0",
+  "captured_at": "2026-10-04T20:35:12.845215+00:00",
+  "scope": "Selected original sanitized Run.command records; omitted other exactness commands. Not an upstream suite or model run.",
+  "original_receipt_sha256": "34f18f36e4a3b88bba08bc3368549e683bd124e8c99c4dd7a339d18f394ffa1a",
+  "source_files": [
+    {
+      "path": "scripts/native_token_ci.py",
+      "sha256": "4c25e7d13eb9f1ee11418427b6bf9c65800ac55f5b6e6fc7e9f70e21efbc068d"
+    },
+    {
+      "path": "manifests/stack.json",
+      "sha256": "bcbc611c905081a00ca6762d8fad0e478841b0e101a9adc4ce4d09450710c943"
+    }
+  ],
+  "status": "passed",
+  "checks": [
+    {
+      "label": "rtk-exactness-git-show-blob-window-changes-its-tail",
+      "passed": true
+    },
+    {
+      "label": "rtk-exactness-diff-missing-file-preserves-native-exit-code",
+      "passed": true
+    },
+    {
+      "label": "rtk-exactness-branch-list-misreports-a-worktree-branch-as-remote-only",
+      "passed": true
+    },
+    {
+      "label": "rtk-exactness-log-caps-at-ten-commits-and-drops-the-merge",
+      "passed": true
+    },
+    {
+      "label": "rtk-exactness-find-on-a-missing-directory-masks-the-exit-code",
+      "passed": true
+    },
+    {
+      "label": "rtk-exactness-jq-truncates-rows-and-width",
+      "passed": true
+    },
+    {
+      "label": "rtk-exactness-controls-diff-unchanged-and-grep-fold-lossless",
+      "passed": true
+    },
+    {
+      "label": "rtk-exactness-grep-non-plain-path-list-stays-verbatim",
+      "passed": true
+    },
+    {
+      "label": "rtk-exactness-grep-explicit-plain-path-list-folds-losslessly",
+      "passed": true
+    },
+    {
+      "label": "rtk-exactness-proxy-restores-native-output-and-exit",
+      "passed": true
+    }
+  ],
+  "cases": {
+    "t1-git-show-blob": {
+      "native": {
+        "exit": 0,
+        "bytes": 30000,
+        "lines": 400,
+        "stdout_sha256": "33dcc7a0c0115da6cf8e9ecf1012221e72e35df14f9d833e61825764ea4501a1"
+      },
+      "rtk": {
+        "exit": 0,
+        "bytes": 8258,
+        "lines": 110,
+        "stdout_sha256": "254f54e44b874b22a251a830f7b67c52fe4c3263ee23e8af0a8c94a4ceb4caa1"
+      },
+      "proxy": {
+        "exit": 0,
+        "bytes": 30000,
+        "lines": 400,
+        "stdout_sha256": "33dcc7a0c0115da6cf8e9ecf1012221e72e35df14f9d833e61825764ea4501a1"
+      }
+    },
+    "t1b-git-c-show-blob": {
+      "native": {
+        "exit": 0,
+        "bytes": 30000,
+        "lines": 400,
+        "stdout_sha256": "33dcc7a0c0115da6cf8e9ecf1012221e72e35df14f9d833e61825764ea4501a1"
+      },
+      "rtk": {
+        "exit": 0,
+        "bytes": 8267,
+        "lines": 110,
+        "stdout_sha256": "b2061f08f7341a38690e6b092aaf3ec113019accac32eb176d0adb020133a310"
+      },
+      "proxy": {
+        "exit": 0,
+        "bytes": 30000,
+        "lines": 400,
+        "stdout_sha256": "33dcc7a0c0115da6cf8e9ecf1012221e72e35df14f9d833e61825764ea4501a1"
+      }
+    },
+    "t2-diff-missing-file": {
+      "native": {
+        "exit": 2,
+        "bytes": 0,
+        "lines": 0,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "rtk": {
+        "exit": 2,
+        "bytes": 0,
+        "lines": 0,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "proxy": {
+        "exit": 2,
+        "bytes": 0,
+        "lines": 0,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "t2b-diff-two-files": {
+      "native": {
+        "exit": 1,
+        "bytes": 23,
+        "lines": 4,
+        "stdout_sha256": "ee59707a39a95e78dc651a9f3ffa61000e8501f933c992b7d53f0809671a57c1"
+      },
+      "rtk": {
+        "exit": 1,
+        "bytes": 23,
+        "lines": 4,
+        "stdout_sha256": "ee59707a39a95e78dc651a9f3ffa61000e8501f933c992b7d53f0809671a57c1"
+      },
+      "proxy": {
+        "exit": 1,
+        "bytes": 23,
+        "lines": 4,
+        "stdout_sha256": "ee59707a39a95e78dc651a9f3ffa61000e8501f933c992b7d53f0809671a57c1"
+      }
+    },
+    "t3-git-branch-all": {
+      "native": {
+        "exit": 0,
+        "bytes": 101,
+        "lines": 5,
+        "stdout_sha256": "1663d39a00a94c74fe07f478833c667afa737eb03578d39d0e9381edc5cdd0cd"
+      },
+      "rtk": {
+        "exit": 0,
+        "bytes": 50,
+        "lines": 4,
+        "stdout_sha256": "ac9b8453ba2f81550aee6d75d865b4673637aab9bb19dea5c6cf2b06c29f8b5f"
+      },
+      "proxy": {
+        "exit": 0,
+        "bytes": 101,
+        "lines": 5,
+        "stdout_sha256": "1663d39a00a94c74fe07f478833c667afa737eb03578d39d0e9381edc5cdd0cd"
+      }
+    },
+    "t4-git-log": {
+      "native": {
+        "exit": 0,
+        "bytes": 2312,
+        "lines": 96,
+        "stdout_sha256": "448df04208dfcc2aed84a935a4d576b2b601fdd7eaef1ddc5078890a7c678381"
+      },
+      "rtk": {
+        "exit": 0,
+        "bytes": 471,
+        "lines": 10,
+        "stdout_sha256": "48cd2a314406245b157629a19e80f2164709dd479e30eb6f2fd9c8813d75d29a"
+      },
+      "proxy": {
+        "exit": 0,
+        "bytes": 2312,
+        "lines": 96,
+        "stdout_sha256": "448df04208dfcc2aed84a935a4d576b2b601fdd7eaef1ddc5078890a7c678381"
+      }
+    },
+    "t4b-git-log-subjects": {
+      "native": {
+        "exit": 0,
+        "bytes": 66,
+        "lines": 16,
+        "stdout_sha256": "d91ea1e2aee709d9457e03584492ae6e1fc7ad3e270d3646bf6a1af824ad5b8c"
+      },
+      "rtk": {
+        "exit": 0,
+        "bytes": 52,
+        "lines": 15,
+        "stdout_sha256": "c4fa8b829c2cc1779c974fe972969971904c9439b637168c712267c314bf667c"
+      },
+      "proxy": {
+        "exit": 0,
+        "bytes": 66,
+        "lines": 16,
+        "stdout_sha256": "d91ea1e2aee709d9457e03584492ae6e1fc7ad3e270d3646bf6a1af824ad5b8c"
+      }
+    },
+    "t5-find-missing-dir": {
+      "native": {
+        "exit": 1,
+        "bytes": 0,
+        "lines": 0,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "rtk": {
+        "exit": 0,
+        "bytes": 0,
+        "lines": 0,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "proxy": {
+        "exit": 1,
+        "bytes": 0,
+        "lines": 0,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "t6-grep-file-list": {
+      "native": {
+        "exit": 0,
+        "bytes": 60,
+        "lines": 3,
+        "stdout_sha256": "10cbbe62c9d8f6f78f4be9bca00c0bdc78742ce0f8158287b5dd275618e457e9"
+      },
+      "rtk": {
+        "exit": 0,
+        "bytes": 45,
+        "lines": 4,
+        "stdout_sha256": "12b025570adb76a33aab0cb6c977a7b9f99f248e8b4d1a5a075c6fce280ed7cb"
+      },
+      "proxy": {
+        "exit": 0,
+        "bytes": 60,
+        "lines": 3,
+        "stdout_sha256": "10cbbe62c9d8f6f78f4be9bca00c0bdc78742ce0f8158287b5dd275618e457e9"
+      }
+    },
+    "t6b-grep-non-plain-file-list": {
+      "native": {
+        "exit": 0,
+        "bytes": 94,
+        "lines": 3,
+        "stdout_sha256": "32ee9e781bee05d26d65854c556cd3931064126e34b675fa9c6bd7f71e82b6cb"
+      },
+      "rtk": {
+        "exit": 0,
+        "bytes": 94,
+        "lines": 3,
+        "stdout_sha256": "32ee9e781bee05d26d65854c556cd3931064126e34b675fa9c6bd7f71e82b6cb"
+      },
+      "proxy": {
+        "exit": 0,
+        "bytes": 94,
+        "lines": 3,
+        "stdout_sha256": "32ee9e781bee05d26d65854c556cd3931064126e34b675fa9c6bd7f71e82b6cb"
+      }
+    },
+    "t6c-grep-plain-file-list": {
+      "native": {
+        "exit": 0,
+        "bytes": 93,
+        "lines": 3,
+        "stdout_sha256": "9e6cfac999563c7e05681fa34774eca848adb0bf3ba6576d5fcf88d060159afc"
+      },
+      "rtk": {
+        "exit": 0,
+        "bytes": 56,
+        "lines": 4,
+        "stdout_sha256": "93c188650600d6a6de3b014d0d3e13871f6959d015bf4c552174f325e1791cd1"
+      },
+      "proxy": {
+        "exit": 0,
+        "bytes": 93,
+        "lines": 3,
+        "stdout_sha256": "9e6cfac999563c7e05681fa34774eca848adb0bf3ba6576d5fcf88d060159afc"
+      }
+    },
+    "t7-jq-rows": {
+      "native": {
+        "exit": 0,
+        "bytes": 2142,
+        "lines": 60,
+        "stdout_sha256": "5bd155466367297acd48d4f280a50ae5e8b9d61f225579709c132cc1c428c039"
+      },
+      "rtk": {
+        "exit": 0,
+        "bytes": 1288,
+        "lines": 42,
+        "stdout_sha256": "dfdd5655a25297030e39a9df11c6a05db1863633468b98f8306fb4187543fe02"
+      },
+      "proxy": {
+        "exit": 0,
+        "bytes": 2142,
+        "lines": 60,
+        "stdout_sha256": "5bd155466367297acd48d4f280a50ae5e8b9d61f225579709c132cc1c428c039"
+      }
+    }
+  },
+  "commands": [
+    {
+      "label": "version-rtk",
+      "argv": [
+        "<TOOL:rtk>",
+        "--version"
+      ],
+      "cwd": "<WORK>",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.002,
+      "stdout_raw_sha256": "4169c361169964ece559b74bb5244b6519037ce2065b455f0ae6c28550202107",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "rtk 0.51.0\n",
+      "stderr": ""
+    },
+    {
+      "label": "rtk-exactness-t2b-diff-two-files-native",
+      "argv": [
+        "diff",
+        "a.txt",
+        "b.txt"
+      ],
+      "cwd": "<WORK>/rtk-exactness/clone",
+      "exit_code": 1,
+      "expected_exit": "any",
+      "timed_out": false,
+      "elapsed_seconds": 0.002,
+      "stdout_raw_sha256": "ee59707a39a95e78dc651a9f3ffa61000e8501f933c992b7d53f0809671a57c1",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "2c2\n< beta\n---\n> gamma\n",
+      "stderr": ""
+    },
+    {
+      "label": "rtk-exactness-t2b-diff-two-files-rtk",
+      "argv": [
+        "<TOOL:rtk>",
+        "diff",
+        "a.txt",
+        "b.txt"
+      ],
+      "cwd": "<WORK>/rtk-exactness/clone",
+      "exit_code": 1,
+      "expected_exit": "any",
+      "timed_out": false,
+      "elapsed_seconds": 0.014,
+      "stdout_raw_sha256": "ee59707a39a95e78dc651a9f3ffa61000e8501f933c992b7d53f0809671a57c1",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "2c2\n< beta\n---\n> gamma\n",
+      "stderr": ""
+    },
+    {
+      "label": "rtk-exactness-t2b-diff-two-files-proxy",
+      "argv": [
+        "<TOOL:rtk>",
+        "proxy",
+        "diff",
+        "a.txt",
+        "b.txt"
+      ],
+      "cwd": "<WORK>/rtk-exactness/clone",
+      "exit_code": 1,
+      "expected_exit": "any",
+      "timed_out": false,
+      "elapsed_seconds": 0.02,
+      "stdout_raw_sha256": "ee59707a39a95e78dc651a9f3ffa61000e8501f933c992b7d53f0809671a57c1",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "2c2\n< beta\n---\n> gamma\n",
+      "stderr": ""
+    },
+    {
+      "label": "rtk-exactness-t6-grep-file-list-native",
+      "argv": [
+        "grep",
+        "-rl",
+        "needle",
+        "src"
+      ],
+      "cwd": "<WORK>/rtk-exactness/clone",
+      "exit_code": 0,
+      "expected_exit": "any",
+      "timed_out": false,
+      "elapsed_seconds": 0.003,
+      "stdout_raw_sha256": "10cbbe62c9d8f6f78f4be9bca00c0bdc78742ce0f8158287b5dd275618e457e9",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "src/deep/pkg/f3.txt\nsrc/deep/pkg/f2.txt\nsrc/deep/pkg/f1.txt\n",
+      "stderr": ""
+    },
+    {
+      "label": "rtk-exactness-t6-grep-file-list-rtk",
+      "argv": [
+        "<TOOL:rtk>",
+        "grep",
+        "-rl",
+        "needle",
+        "src"
+      ],
+      "cwd": "<WORK>/rtk-exactness/clone",
+      "exit_code": 0,
+      "expected_exit": "any",
+      "timed_out": false,
+      "elapsed_seconds": 0.017,
+      "stdout_raw_sha256": "12b025570adb76a33aab0cb6c977a7b9f99f248e8b4d1a5a075c6fce280ed7cb",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "src/deep/pkg/ (3 files)\nf3.txt\nf2.txt\nf1.txt\n",
+      "stderr": ""
+    },
+    {
+      "label": "rtk-exactness-t6-grep-file-list-proxy",
+      "argv": [
+        "<TOOL:rtk>",
+        "proxy",
+        "grep",
+        "-rl",
+        "needle",
+        "src"
+      ],
+      "cwd": "<WORK>/rtk-exactness/clone",
+      "exit_code": 0,
+      "expected_exit": "any",
+      "timed_out": false,
+      "elapsed_seconds": 0.016,
+      "stdout_raw_sha256": "10cbbe62c9d8f6f78f4be9bca00c0bdc78742ce0f8158287b5dd275618e457e9",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "src/deep/pkg/f3.txt\nsrc/deep/pkg/f2.txt\nsrc/deep/pkg/f1.txt\n",
+      "stderr": ""
+    },
+    {
+      "label": "rtk-exactness-t6b-grep-non-plain-file-list-native",
+      "argv": [
+        "grep",
+        "-l",
+        "needle",
+        "grep-non-plain/deep/pkg/f1.txt\r",
+        "grep-non-plain/deep/pkg/f2.txt",
+        "grep-non-plain/deep/pkg/f3.txt"
+      ],
+      "cwd": "<WORK>/rtk-exactness/clone",
+      "exit_code": 0,
+      "expected_exit": "any",
+      "timed_out": false,
+      "elapsed_seconds": 0.003,
+      "stdout_raw_sha256": "32ee9e781bee05d26d65854c556cd3931064126e34b675fa9c6bd7f71e82b6cb",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "grep-non-plain/deep/pkg/f1.txt\r\ngrep-non-plain/deep/pkg/f2.txt\ngrep-non-plain/deep/pkg/f3.txt\n",
+      "stderr": ""
+    },
+    {
+      "label": "rtk-exactness-t6b-grep-non-plain-file-list-rtk",
+      "argv": [
+        "<TOOL:rtk>",
+        "grep",
+        "-l",
+        "needle",
+        "grep-non-plain/deep/pkg/f1.txt\r",
+        "grep-non-plain/deep/pkg/f2.txt",
+        "grep-non-plain/deep/pkg/f3.txt"
+      ],
+      "cwd": "<WORK>/rtk-exactness/clone",
+      "exit_code": 0,
+      "expected_exit": "any",
+      "timed_out": false,
+      "elapsed_seconds": 0.017,
+      "stdout_raw_sha256": "32ee9e781bee05d26d65854c556cd3931064126e34b675fa9c6bd7f71e82b6cb",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "grep-non-plain/deep/pkg/f1.txt\r\ngrep-non-plain/deep/pkg/f2.txt\ngrep-non-plain/deep/pkg/f3.txt\n",
+      "stderr": ""
+    },
+    {
+      "label": "rtk-exactness-t6b-grep-non-plain-file-list-proxy",
+      "argv": [
+        "<TOOL:rtk>",
+        "proxy",
+        "grep",
+        "-l",
+        "needle",
+        "grep-non-plain/deep/pkg/f1.txt\r",
+        "grep-non-plain/deep/pkg/f2.txt",
+        "grep-non-plain/deep/pkg/f3.txt"
+      ],
+      "cwd": "<WORK>/rtk-exactness/clone",
+      "exit_code": 0,
+      "expected_exit": "any",
+      "timed_out": false,
+      "elapsed_seconds": 0.016,
+      "stdout_raw_sha256": "32ee9e781bee05d26d65854c556cd3931064126e34b675fa9c6bd7f71e82b6cb",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "grep-non-plain/deep/pkg/f1.txt\r\ngrep-non-plain/deep/pkg/f2.txt\ngrep-non-plain/deep/pkg/f3.txt\n",
+      "stderr": ""
+    },
+    {
+      "label": "rtk-exactness-t6c-grep-plain-file-list-native",
+      "argv": [
+        "grep",
+        "-l",
+        "needle",
+        "grep-non-plain/deep/pkg/f1.txt",
+        "grep-non-plain/deep/pkg/f2.txt",
+        "grep-non-plain/deep/pkg/f3.txt"
+      ],
+      "cwd": "<WORK>/rtk-exactness/clone",
+      "exit_code": 0,
+      "expected_exit": "any",
+      "timed_out": false,
+      "elapsed_seconds": 0.003,
+      "stdout_raw_sha256": "9e6cfac999563c7e05681fa34774eca848adb0bf3ba6576d5fcf88d060159afc",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "grep-non-plain/deep/pkg/f1.txt\ngrep-non-plain/deep/pkg/f2.txt\ngrep-non-plain/deep/pkg/f3.txt\n",
+      "stderr": ""
+    },
+    {
+      "label": "rtk-exactness-t6c-grep-plain-file-list-rtk",
+      "argv": [
+        "<TOOL:rtk>",
+        "grep",
+        "-l",
+        "needle",
+        "grep-non-plain/deep/pkg/f1.txt",
+        "grep-non-plain/deep/pkg/f2.txt",
+        "grep-non-plain/deep/pkg/f3.txt"
+      ],
+      "cwd": "<WORK>/rtk-exactness/clone",
+      "exit_code": 0,
+      "expected_exit": "any",
+      "timed_out": false,
+      "elapsed_seconds": 0.02,
+      "stdout_raw_sha256": "93c188650600d6a6de3b014d0d3e13871f6959d015bf4c552174f325e1791cd1",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "grep-non-plain/deep/pkg/ (3 files)\nf1.txt\nf2.txt\nf3.txt\n",
+      "stderr": ""
+    },
+    {
+      "label": "rtk-exactness-t6c-grep-plain-file-list-proxy",
+      "argv": [
+        "<TOOL:rtk>",
+        "proxy",
+        "grep",
+        "-l",
+        "needle",
+        "grep-non-plain/deep/pkg/f1.txt",
+        "grep-non-plain/deep/pkg/f2.txt",
+        "grep-non-plain/deep/pkg/f3.txt"
+      ],
+      "cwd": "<WORK>/rtk-exactness/clone",
+      "exit_code": 0,
+      "expected_exit": "any",
+      "timed_out": false,
+      "elapsed_seconds": 0.02,
+      "stdout_raw_sha256": "9e6cfac999563c7e05681fa34774eca848adb0bf3ba6576d5fcf88d060159afc",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "grep-non-plain/deep/pkg/f1.txt\ngrep-non-plain/deep/pkg/f2.txt\ngrep-non-plain/deep/pkg/f3.txt\n",
+      "stderr": ""
+    }
+  ],
+  "cleanup": {
+    "owned_temporary_directory_absent": true,
+    "retained_output_exists": true
+  }
+}
