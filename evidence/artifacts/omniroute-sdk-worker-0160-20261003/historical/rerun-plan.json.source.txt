@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "scope": "Bounded native enhancement acceptance after the preserved 300-second failure",
+  "original_plan": {
+    "path": "examples/omniroute-codex-sdk/acceptance-plan.json",
+    "sha256": "5b046e6e30802bbe66d837030ae3c215d6fd401d524d48f51302269450d65d94"
+  },
+  "trigger": "Dagu readiness passed and actual MCP calls and Astra oracle passed, but the parent turn aborted at its 300-second deadline. The initial spawn had rejected a gateway-prefixed default before loading the role.",
+  "source": "https://github.com/openai/codex/blob/ff6aec96948b70d94983af2641a6b67c94faeff5/codex-rs/core/src/agent/child_config.rs#L196-L235",
+  "repairs": [
+    "Leave subagent model and effort defaults unset; inherit explicit Sol/Max parent, then apply runtime-judge Astra/Max role.",
+    "Carry the repository's RTK and on-demand context instructions through native developer_instructions.",
+    "Keep six explicit Dagu root environment imports, preserve complete JSONL with rtk proxy uv, worker deadline600 and graph deadline720."
+  ],
+  "unchanged_contract": [
+    "Read the required selected skill body.",
+    "Use Context Mode ctx_execute to count unchanged test() calls and Serena initial_instructions/get_symbols_overview for math.js.",
+    "Spawn exactly one native runtime-judge with no redundant model/effort override; observe inherited OmniRoute provider, requested Astra-Max/Max, unchanged rtk npm test exactly once exit0.",
+    "Require completed parent/native graph and closed local SDK cleanup; preserve a failure rather than promoting component successes.",
+    "Keep math.js, math.test.js and package.json hashes unchanged. Keep parent/child cumulative counters separate and failed/interrupted usage coverage partial."
+  ],
+  "automatic_retry": false,
+  "scheduler_started": false
+}

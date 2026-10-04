@@ -348,19 +348,30 @@ change) and `adoption-bootstrap.yml`'s `bootstrap-linux`, `bootstrap-macos` and
 `adoption/**` or `blueprints/convergence-practice/wsl-native-tools/pins.json`
 change, or on a pull request that touches the same paths -- described in full
 further below). None of these appear in `main-ruleset.json`'s required status
-checks; a required check must run on every PR, and a scheduled or path-gated
-lane does not. Update 2026-09-22: `sbom-vuln` is no longer report-only; it
+checks; a required check must report on every PR, and a scheduled lane or a
+workflow skipped by a `paths:` filter does not (GitHub leaves its check
+pending). Update 2026-09-22: `sbom-vuln` is no longer report-only; it
 fails its own job on a High or Critical grype match (see "Secret and
 supply-chain scanning"), but it is still not a required check.
 `adoption-bootstrap.yml`'s fifth job, `validate-macos`, is the exception
-(2026-09-25): its workflow's `pull_request` trigger carries no `paths:` filter
-at all, so `validate-macos` itself reports a status on every pull request and
-is a required check (see "validate-macos required (2026-09-25)" in
+(2026-09-25, scoped 2026-10-03): its workflow's `pull_request` trigger carries
+no `paths:` filter, so `validate-macos` reports on every pull request and is a
+required check (see "validate-macos required (2026-09-25)" in
 [docs/decisions/2026-09-22-github-automation-closure.md](decisions/2026-09-22-github-automation-closure.md)).
-A `changes` job, added in the same workflow, diffs the pull request's base and
-head with plain `git` (no new third-party action) to keep the other three jobs
-path-gated on `pull_request` the same way GitHub's own `paths:` filter already
-path-gates them on `push`.
+Since 2026-10-03 it reports one of three results, as a `changes` job in the
+same workflow decides from the pull request's diff
+([docs/decisions/2026-10-03-macos-ci-scope.md](decisions/2026-10-03-macos-ci-scope.md)):
+a full run when the pull request changes a listed macOS-relevant path; a
+changed-tests run of only the top-level test modules it changed, which is a
+scoped result and not a macOS full-suite pass; or `skipped` when it changes
+neither. A job skipped by its own job-level `if:` reports `skipped`, which
+GitHub accepts for a required check; this repository records it as untested,
+not passed. Push, schedule and dispatch runs always run in full. The same
+`changes` job diffs the base and head with plain `git` (no third-party action)
+to keep the other three jobs path-gated on `pull_request` the same way GitHub's
+own `paths:` filter path-gates them on `push`, and `bootstrap-macos` and
+`bootstrap-macos-brew` run on a pull request only when `validate-macos` runs in
+full.
 
 `catalog-freshness.yml` reuses `tools/sota-convergence/extract_layers.py` and
 `github_freshness.py` unchanged, then rebuilds a manifest with
@@ -508,7 +519,7 @@ commands for the immutable tag releases. [`.github/pull_request_template.md`](..
 requires scope with a Lane line (exactly one `lane:*` label), base commit, a `### SOTA sources` section
 (enforced by the required `sota-sources` check), a per-claim evidence-class table, exact local
 commands run, a decision-record path and a checklist covering SHA pins,
-`contents: read`, no secrets, no paid hosting and preserved peer-owned
+top-level `permissions: {}`, no secrets, no paid hosting and preserved peer-owned
 untracked files.
 
 ## Ruleset upgrade, 2026-09-22
@@ -851,8 +862,8 @@ to the full commit SHA of `v2.4.4`
 annotated tag with `gh api repos/ossf/scorecard-action/git/tags/<sha>`) on a
 weekly schedule, `workflow_dispatch`, and push to `main`. `publish_results`
 is `false` -- results are never published to the public `api.scorecard.dev`
-dataset or badge. The workflow's top-level permission is `contents: read`;
-since 2026-09-22 the `analysis` job alone also holds `security-events: write`,
+dataset or badge. The workflow's top-level permissions are `{}` (since 2026-10-04)
+and the `analysis` job holds `contents: read`; since 2026-09-22 it alone also holds `security-events: write`,
 which it uses only to upload the SARIF report to code scanning with
 `github/codeql-action/upload-sarif` v4.38.1 (free for this public repository,
 no GitHub Advanced Security purchase). The SARIF report is also retained as a
@@ -1137,7 +1148,7 @@ reviewer's act. See "Live test, 2026-09-23" in the decision record.
 
 `propose` is the one job in this workflow with write permissions
 (`contents: write`, `pull-requests: write`, scoped to the job, not the
-workflow -- the top-level `permissions:` block stays `contents: read`),
+workflow -- the top-level `permissions:` block is `{}` and `freshness` holds `contents: read`),
 because it is the one job that opens a PR; it needs no `actions: write`
 since it no longer dispatches other workflows. It is still never a required
 check and it never merges anything by itself.

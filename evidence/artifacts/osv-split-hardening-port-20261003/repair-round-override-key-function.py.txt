@@ -1,0 +1,59 @@
+"""Retained re-run of the repair round's override-key-function control (PR #673).
+
+The original probe kept no command or script. This re-runs the same two inputs against the
+same two commits' functions, loaded from committed blobs rather than the working tree:
+48bbe5c5f (the reviewed head, before the repair) and 4d7f4dd0e (the repair). It prints the
+lines in the receipt's inline before/after format, then compares them with that record as
+committed at 4d7f4dd0e.
+
+Run from the repository root:
+TMPDIR=<scratch> PYTHONDONTWRITEBYTECODE=1 nice -n 19 python3 <scratch>/override-key-function.py
+"""
+import json
+import subprocess
+import types
+from pathlib import Path
+
+MODULE = 'tests/test_osv_lockfile_coverage.py'
+RECEIPT = 'evidence/receipts/osv-split-hardening-port-20261003.json'
+BEFORE = '48bbe5c5f8090c52eab4b99fb1514fa8b20c3238'
+AFTER = '4d7f4dd0e41aafb2e0f9ce1dabda93e3c1b2ea36'
+INPUTS = (
+    ('double-alias', {'name': 'lib', 'Name': 'next', 'ecosystem': 'PyPI', 'Ecosystem': 'npm', 'ignore': True}),
+    ('regex+Ecosystem', {'name': 'nex[t]', 'nameIsRegex': True, 'ecosystem': 'PyPI', 'Ecosystem': 'npm', 'ignore': True}),
+)
+
+
+def stamp():
+    return subprocess.check_output(['date', '-u', '+%Y-%m-%dT%H:%M:%SZ'], text=True).strip()
+
+
+def show(revision, path):
+    return subprocess.check_output(['git', 'show', f'{revision}:{path}'], text=True)
+
+
+def load(revision):
+    module = types.ModuleType(f'policy_{revision[:9]}')
+    module.__file__ = str(Path(MODULE).resolve())  # ROOT = parents[1], the repository root
+    exec(compile(show(revision, MODULE), f'{revision[:9]}:{MODULE}', 'exec'), module.__dict__)
+    return module
+
+
+before, after = load(BEFORE), load(AFTER)
+lines = []
+for label, entry in INPUTS:
+    config = {'PackageOverrides': [entry]}
+    lines.append(f'head 48bbe5c5f {label} override_problems: {json.dumps(before.override_problems(config))} '
+                 f'ignore_entry_problems: {json.dumps(before.ignore_entry_problems(config))}')
+for label, entry in INPUTS:
+    config = {'PackageOverrides': [entry]}
+    lines.append(f'repair {label} override_problems: {json.dumps(after.override_problems(config))}')
+for line in lines:
+    print(f'{stamp()} {line}')
+
+control = next(item for item in json.loads(show(AFTER, RECEIPT))['repair_round']['controls']
+               if item['id'] == 'override-key-function')
+recorded = control['before'] + control['after']
+match = lines == recorded
+print(f'{stamp()} printed lines equal the receipt\'s inline before/after record at {AFTER[:9]}: {match}')
+raise SystemExit(0 if match else 1)

@@ -46,12 +46,19 @@
         {
           "name": "OpenAI Agents SDK",
           "repository": "https://github.com/openai/openai-agents-python",
-          "disposition": "conditional",
-          "rationale": "Fits an application-owned API agent; it is not a substitute for the established subscription-backed native Codex account and behavior.",
+          "disposition": "unqualified",
+          "rationale": "Source review corrected on 2026-10-03. The managed Agents API requires OPENAI_API_KEY and bills at API rates. The open-source SDK supports OpenAI-compatible endpoints through OPENAI_BASE_URL. Its experimental codex_tool forwards an explicit codex_options.api_key, otherwise resolves CODEX_API_KEY or OPENAI_API_KEY from options.env, then the process environment, then the set_default_openai_key value, and exports the resolved key as CODEX_API_KEY to the local Codex CLI. The native Codex login applies only when no key resolves, or when the caller supplies a Codex instance without api_key and preserves its native authentication environment/configuration. SDK requests through OmniRoute have not been measured. The 2026-10-02 Codex-practice audit item AD-5, hold on Agents SDK codex_tool adoption, remains unresolved: no demonstrated orchestration requirement or accepted newly preregistered comparison of codex_tool, the Codex thread API and codex exec --json plus resume, and codex_tool is still experimental.",
           "evidence_kind": "source_review",
           "evidence_refs": [
-            "docs/foundation-closure-20260921.md",
-            "catalogs/us-equities/agents-operations.json"
+            "docs/decisions/2026-10-03-foundation-catalog-drift.md",
+            "https://developers.openai.com/api/docs/guides/agents-api/overview",
+            "https://github.com/openai/openai-agents-python/blob/v0.23.1/src/agents/extensions/experimental/codex/codex_tool.py#L584-L628",
+            "https://github.com/openai/openai-agents-python/blob/v0.23.1/src/agents/extensions/experimental/codex/codex_tool.py#L631-L639",
+            "https://github.com/openai/openai-agents-python/blob/v0.23.1/src/agents/extensions/experimental/codex/thread.py#L108-L111",
+            "https://github.com/openai/openai-agents-python/blob/v0.23.1/src/agents/extensions/experimental/codex/exec.py#L226-L240",
+            "https://github.com/openai/openai-agents-python/blob/v0.23.1/docs/config.md#L84-L88",
+            "https://github.com/openai/openai-agents-python/blob/v0.23.1/docs/tools.md#L890-L894",
+            "catalogs/sota-convergence/manifest-20260926.json"
           ]
         },
         {
@@ -4558,7 +4565,7 @@
       "requirement": "Give a worker structured events, custom tools or session control through a supported SDK when the native CLI's bounded review is not enough.",
       "current_choice": "Codex SDK/CLI (component codex) for supported start/run/resume; Claude Agent SDK, OpenHands SDK, Temporal and LangGraph remain source-reviewed, unselected alternatives.",
       "decision": "retain",
-      "rationale": "Codex SDK integration is accepted only within its recorded tests and needs no new runtime; the SDK table in docs/foundation-closure-20260921.md (lines 78-84) reviewed the alternatives on 2026-09-21 and none has since been revisited by any lane.",
+      "rationale": "Codex SDK integration is accepted only within its recorded tests and needs no new runtime. The 2026-09-21 SDK table in docs/foundation-closure-20260921.md has its header at line 80 and five candidate rows at lines 82-86, with no OpenAI Agents SDK row. The 2026-10-03 source revisit adds that SDK as unqualified without qualifying its experimental codex_tool or its requests through OmniRoute; see docs/decisions/2026-10-03-foundation-catalog-drift.md.",
       "evidence_refs": [
         "docs/foundation-closure-20260921.md",
         "catalogs/foundation/decisions.json"
@@ -4578,6 +4585,25 @@
           "evidence_refs": [
             "catalogs/foundation/decisions.json",
             "docs/foundation-closure-20260921.md"
+          ]
+        },
+        {
+          "name": "OpenAI Agents SDK",
+          "repository": "https://github.com/openai/openai-agents-python",
+          "disposition": "unqualified",
+          "rationale": "Source review at v0.23.1 supports an OpenAI-compatible SDK endpoint. Experimental codex_tool forwards an explicit codex_options.api_key, otherwise resolves CODEX_API_KEY or OPENAI_API_KEY from options.env, then the process environment, then the set_default_openai_key value, and exports the resolved key as CODEX_API_KEY. The native Codex login applies only when no key resolves, or when the caller supplies a Codex instance without api_key and preserves its native authentication environment/configuration. The managed Agents API separately requires an API key and bills at API rates. SDK requests through OmniRoute have not been measured. The 2026-10-02 Codex-practice audit item AD-5, hold on Agents SDK codex_tool adoption, stays on hold until a needed orchestration capability, graduation from experimental and an accepted newly preregistered comparison of codex_tool, the Codex thread API and codex exec --json plus resume justify adoption, with complete usage and effect/recovery checks. This candidate comparison is separate from the sealed three-arm workers comparison. The completed two-family fit refutation is retained at evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/agent-sdks/6/fit; correcting the Claude vote's managed-API premise does not qualify the candidate.",
+          "evidence_kind": "source_review",
+          "evidence_refs": [
+            "docs/decisions/2026-10-03-foundation-catalog-drift.md",
+            "evidence/artifacts/landscape-sweep-20260926/returns.json",
+            "catalogs/sota-convergence/manifest-20260926.json",
+            "https://developers.openai.com/api/docs/guides/agents-api/overview",
+            "https://github.com/openai/openai-agents-python/blob/v0.23.1/src/agents/extensions/experimental/codex/codex_tool.py#L584-L628",
+            "https://github.com/openai/openai-agents-python/blob/v0.23.1/src/agents/extensions/experimental/codex/codex_tool.py#L631-L639",
+            "https://github.com/openai/openai-agents-python/blob/v0.23.1/src/agents/extensions/experimental/codex/thread.py#L108-L111",
+            "https://github.com/openai/openai-agents-python/blob/v0.23.1/src/agents/extensions/experimental/codex/exec.py#L226-L240",
+            "https://github.com/openai/openai-agents-python/blob/v0.23.1/docs/config.md#L84-L88",
+            "https://github.com/openai/openai-agents-python/blob/v0.23.1/docs/tools.md#L890-L894"
           ]
         },
         {

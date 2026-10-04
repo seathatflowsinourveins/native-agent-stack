@@ -69,7 +69,9 @@ K4 also inspects credential_run.py started commands, usage and secret mentions
 (only a valid --only NAME argument before -- grants a name-mention exemption).
 It restricts visible local HTTP management requests to the exact method/path/
 query/body matrix in docs/secret-storage.md: provider-limits POST on 20128 may
-synchronize live quota state; compression preview POST is 20129-only. Actual
+synchronize live quota state; compression preview POST is 20129-only. The new
+WSL distribution's gateway port 21128 takes 20128's rows, and its WebSocket
+port 21129 none. Actual
 omniroute api/sync commands refuse. Other tightenings cover manager environment
 writes, literal keyring feeds with quote provenance, explicit ps personalities,
 canary comparison/user-run invocations, both Claude OAuth/messaging token names,
@@ -362,6 +364,24 @@ WRAPPER_VALUE_FLAGS = {
         "--timestamp", "--what", "--when",
         "--capsule", "--kill-subgroup"},
 }
+# The long options of the coreutils launchers, each with whether it takes a value. GNU coreutils (long_options and getopt_long in src/timeout.c,
+# nice.c, stdbuf.c and nohup.c at v9.7 and v9.12, where GETOPT_HELP_OPTION_DECL and GETOPT_VERSION_OPTION_DECL add --help and --version) and
+# uutils coreutils (uu_app in src/uu/<name>/src/<name>.rs at 0.8.0, 0.10.0 and 0.12.0, where clap adds --help and --version), read
+# 2026-10-04, have the same ones. Both take an unambiguous prefix for the option (getopt_long; clap's `.infer_long_args(true)`) and refuse an
+# ambiguous one, so long_option_takes_value reads `timeout --sig KILL 5 cmd` as `timeout --signal KILL 5 cmd`. No flag here begins a value
+# option's name, so a prefix that names value options only takes the next word.
+WRAPPER_LONG_OPTIONS = {
+    "timeout": {"--foreground": False, "--kill-after": True, "--preserve-status": False, "--signal": True, "--verbose": False,
+                "--help": False, "--version": False},
+    "nice": {"--adjustment": True, "--help": False, "--version": False},
+    "stdbuf": {"--input": True, "--output": True, "--error": True, "--help": False, "--version": False},
+    "nohup": {"--help": False, "--version": False},
+}
+# Multi-call binaries that run the utility their first argument names: uutils coreutils' (src/bin/coreutils.rs main at 0.8.0: a binary whose
+# name ends in `utils` takes the utility from its next argument), which Ubuntu 26.04 installs as /usr/bin/coreutils (rust-coreutils
+# 0.8.0-0ubuntu3, the file list of resolute on packages.ubuntu.com, read 2026-10-04): `coreutils printenv` runs printenv.
+# GNU v9.12 src/coreutils.c:145-176 dispatches --coreutils-prog=NAME and --coreutils-prog-shebang=NAME (coreutils_command).
+MULTICALL_LAUNCHERS = {"coreutils"}
 SHELLS = {"sh", "bash", "zsh", "dash", "ksh"}
 SOURCERS = {".", "source"}
 FIND_EXEC = {"-exec", "-execdir", "-ok", "-okdir"}
@@ -454,6 +474,18 @@ PS_ARG_OPTIONS = {"-o", "-O", "-p", "-u", "-U", "-C", "-g", "-G", "-t", "-q", "-
                   "--pid", "--format", "--sort", "--ppid", "--user"}
 PS_MACOS_ARG_OPTIONS = PS_ARG_OPTIONS - {"-C"}
 ENV_ARG_OPTIONS = {"-u", "--unset", "-C", "--chdir", "-S", "--split-string"}
+# env as GNU coreutils and uutils read it (2026-10-04), for this version's reading (env_option_takes_value); ENV_ARG_OPTIONS stays the table of
+# c26800f3's reading (prior_env_command_start), so a command that reading refused stays refused when this one reads an option's value
+# instead (`env -a printenv X`). The short options that take a value: GNU env.c shortopts "+a:C:iS:u:v0" at v9.7 and v9.12 (-a is not in
+# 9.4) and uutils env.rs uu_app at 0.8.0 to 0.12.0 (-a, -C, -f, -S, -u; -f is uutils' only); in a cluster the first of them takes the rest
+# of the word or, when it ends the word, the next word (`-vu NAME`). The long options and whether each takes the next word: GNU longopts
+# (--env0-from from v9.12) and uutils' (--file); --block-signal, --default-signal and --ignore-signal take a value only after `=`
+# (optional_argument; clap's require_equals).
+ENV_VALUE_LETTERS = frozenset("aCfSu")
+ENV_LONG_OPTIONS = {
+    "--argv0": True, "--chdir": True, "--env0-from": True, "--file": True, "--split-string": True, "--unset": True,
+    "--ignore-environment": False, "--null": False, "--debug": False, "--list-signal-handling": False, "--block-signal": False,
+    "--default-signal": False, "--ignore-signal": False, "--help": False, "--version": False}
 TRACE_OPTIONS = {"xtrace", "verbose"}
 MAX_DEPTH = 3
 # Levels of command substitution inside double quotes that expand() reads (substitution_bodies), and the work it
@@ -578,6 +610,7 @@ HINTS = {
     "ps_personality_selector": "a ps personality can change environment-display flags; agent commands cannot select it",
     "canary_user_terminal_required": "canary_proof.py comparison/user-run belong in the user terminal; a pty is not authorization",
     "interpreter_environment_unclassified": "environment access could not be classified; use an explicit single non-secret key or a separately reviewed script",
+    "env_split_unclassified": "env's split string is invalid or depends on inherited variable values; use a literal command and arguments",
     "environment_dump_in_credential_run": "credential_run.py gives the started command keys; masking is a second layer; use a client that consumes its environment without printing it",
     "credential_run_usage": "there are no value-returning subcommands; use --check or ID -- COMMAND; see docs/secret-storage.md",
     "secret_name_search": "search repository code with the Grep tool instead of a shell search for a "
@@ -1007,7 +1040,7 @@ def wrapper_options(words: list[str], index: int, wrapper: str,
             name, glued, value = word.partition("=")
             if glued:
                 options.append((name, value))
-            elif word in value_flags:
+            elif word in value_flags or long_option_takes_value(WRAPPER_LONG_OPTIONS.get(wrapper, {}), word):
                 index = skip_redirections(words, index, moved)
                 options.append((word, words[index] if index < len(words) else None))
                 index += 1
@@ -1028,6 +1061,16 @@ def wrapper_options(words: list[str], index: int, wrapper: str,
     return options, index
 
 
+def long_option_takes_value(table: dict[str, bool], word: str) -> bool:
+    """Whether the long option `word` (`--name`, no `=`) takes the next word by `table` (each long option: whether it takes a value): the
+    option itself, or an unambiguous prefix of one, as getopt_long and clap's infer_long_args both read it (WRAPPER_LONG_OPTIONS). A prefix
+    that names value options only takes the next word; one that also names a flag is ambiguous, an error for both, and reads as a flag."""
+    if word in table:
+        return table[word]
+    named = [takes for name, takes in table.items() if name.startswith(word)]
+    return bool(named) and all(named)
+
+
 def skip_wrapper_options(words: list[str], index: int, wrapper: str, moved: list[str] | None = None) -> int:
     """Index of the first word after a launcher's own options (wrapper_options)."""
     return wrapper_options(words, index, wrapper, moved)[1]
@@ -1037,7 +1080,35 @@ def strip_prefix(words: list[str]) -> list[str]:
     """The command itself: without assignments, output redirections before it (`> out cmd`), and
     launchers with their options (timeout also with its duration). A leading input redirection stays,
     for segment_reason's check of what is redirected in."""
-    return words[prefix_end(words):]
+    words = words[prefix_end(words):]
+    while (dispatched := coreutils_command(words)) is not None:
+        words = dispatched[prefix_end(dispatched):]
+    return words
+
+
+def coreutils_command(words: list[str]) -> list[str] | None:
+    """GNU v9.12 src/coreutils.c:145-176: embedded utility argv; the shebang spelling also drops the script operand.
+    Positional uutils dispatch stays in prefix_end. These are exact GNU spellings, not getopt abbreviations."""
+    if len(words) < 2 or program_of(words) not in MULTICALL_LAUNCHERS:
+        return None
+    spend("words", len(words) + 1)
+    arguments: list[str] = []
+    moved: list[str] = []
+    index = 1
+    while index < len(words):
+        following = skip_redirections(words, index, moved)
+        if following == index:
+            arguments.append(words[index])
+            index += 1
+        else:
+            index = following
+    if not arguments:
+        return None
+    option, equal, utility = arguments[0].partition("=")
+    if not equal or option not in {"--coreutils-prog", "--coreutils-prog-shebang"}:
+        return None
+    start = 2 if option == "--coreutils-prog-shebang" else 1
+    return [utility, *arguments[start:], *moved]
 
 
 def prefix_end(words: list[str], index: int = 0, moved: list[str] | None = None, ends: dict[int, int] | None = None) -> int:
@@ -1062,7 +1133,19 @@ def prefix_end(words: list[str], index: int = 0, moved: list[str] | None = None,
         elif (name := word.rsplit("/", 1)[-1]) in WRAPPERS or name == "timeout":
             index = skip_wrapper_options(words, index + 1, name, moved)
             if name == "timeout":
-                index += 1  # timeout's mandatory duration comes before the command
+                # The mandatory duration, then the command. GNU timeout (getopt_long "+fk:ps:v", src/timeout.c at v9.7 and v9.12) runs the
+                # word right after the duration; uutils timeout (clap, `.trailing_var_arg(true)` on the command: timeout.rs:177 at 0.8.0,
+                # :171 at 0.10.0, :173 at 0.12.0) still reads options and an end-of-options `--` there, so `timeout 5 -- cmd` and
+                # `timeout 5 -s KILL cmd` run cmd on Ubuntu 26.04. A hyphen-leading executable path such as -/printenv is nevertheless
+                # a real command under GNU's reading (glibc-2.42 posix/execvpe.c:81-89). Preserve it instead of treating it as options.
+                index = skip_redirections(words, index + 1, moved)
+                if index < len(words) and not (words[index].startswith("-") and "/" in words[index]):
+                    index = skip_wrapper_options(words, index, name, moved)
+        elif name in MULTICALL_LAUNCHERS:
+            following = skip_redirections(words, index + 1, moved)
+            if following < len(words) and words[following].startswith(("--coreutils-prog=", "--coreutils-prog-shebang=")):
+                break  # coreutils_command builds argv, because the utility name is inside the dispatch option
+            index = following  # `coreutils printenv` runs printenv
         else:
             break
     if ends is not None:
@@ -1075,22 +1158,216 @@ def program_of(words: list[str]) -> str:
     return words[0].rsplit("/", 1)[-1] if words else ""
 
 
-def env_command_start(words: list[str], at: int = 0, moved: list[str] | None = None) -> int | None:
-    """Index of the command `env [options] [NAME=value ...] command` runs, where env is words[at], or None for a dump. A redirection
-    among its words is no option and no value (skip_redirections); an input redirection skipped goes to `moved`."""
+class EnvSplitUnclassified(ValueError):
+    """An env split string cannot be resolved from literal argv without inspecting the host environment."""
+
+
+def split_env_string(text: str) -> list[str]:
+    """Literal GNU v9.12 src/env.c build_argv grammar, also used by uutils env's split_iterator.rs (0.8.0/0.12.0).
+    This is argv splitting, not shell evaluation: quotes, ASCII whitespace, comments at argument starts, and env's escapes.
+    Inherited ${NAME} values stay unknown; refuse those rather than reading any environment or credential value."""
+    spend("reads", len(text) + 1)
+    result: list[str] = []
+    argument: list[str] = []
+    quote = ""
+    started = False
+    index = 0
+    escapes = {"f": "\f", "n": "\n", "r": "\r", "t": "\t", "v": "\v",
+               "\\": "\\", "'": "'", '"': '"', "#": "#", "$": "$"}
+    while index < len(text):
+        char = text[index]
+        index += 1
+        if char in {"'", '"'} and (not quote or quote == char):
+            quote = "" if quote else char
+            started = True
+        elif char == "\\":
+            if index == len(text):
+                raise EnvSplitUnclassified()
+            escaped = text[index]
+            index += 1
+            if quote == "'" and escaped not in {"\\", "'"}:
+                argument.extend(("\\", escaped))
+                started = True
+            elif escaped == "c" and quote != "'":
+                if quote == '"':
+                    raise EnvSplitUnclassified()
+                break
+            elif escaped == "_" and quote != "'":
+                if quote == '"':
+                    argument.append(" ")
+                    started = True
+                elif started:
+                    result.append("".join(argument))
+                    argument = []
+                    started = False
+            elif escaped in escapes:
+                argument.append(escapes[escaped])
+                started = True
+            else:
+                raise EnvSplitUnclassified()
+        elif not quote and char in " \t\n\v\f\r":
+            if started:
+                result.append("".join(argument))
+                argument = []
+                started = False
+        elif not quote and char == "#" and not started:
+            break
+        elif char == "$" and quote != "'":
+            raise EnvSplitUnclassified()
+        else:
+            argument.append(char)
+            started = True
+    if quote:
+        raise EnvSplitUnclassified()
+    if started:
+        result.append("".join(argument))
+    return result
+
+
+def env_split_argv(words: list[str], at: int = 0) -> list[str] | None:
+    """One GNU env -S expansion, or None when its option prefix has no split string. GNU env.c parse_split_string resets getopt,
+    inserts split arguments before the trailing argv, and retains effects of earlier options. Discarding already consumed options here
+    keeps their values from being mistaken for commands; raw segments still check files. uutils_env_argv supplies the independent reading.
+    Generated argv and repeated splitting spend the existing work budget."""
+    if program_of(words[at:at + 1]) != "env":
+        return None
     index = at + 1
+    moved: list[str] = []
     while index < len(words):
         index = skip_redirections(words, index, moved)
         if index >= len(words):
             break
         word = words[index]
-        if word in ENV_ARG_OPTIONS:
+        index += 1
+        if word in {"-", "--"} or not word.startswith("-"):
+            break
+        payload: str | None = None
+        separate = False
+        split = False
+        if word.startswith("--"):
+            option, equal, attached = word.partition("=")
+            names = [option] if option in ENV_LONG_OPTIONS else [name for name in ENV_LONG_OPTIONS if name.startswith(option)]
+            split = names == ["--split-string"]
+            if split:
+                payload, separate = (attached, False) if equal else (None, True)
+        else:
+            letters = word[1:]
+            first = next((position for position, letter in enumerate(letters) if letter in ENV_VALUE_LETTERS), None)
+            split = first is not None and letters[first] == "S"
+            if split:
+                payload = letters[first + 1:]
+                separate = not payload
+        if split:
+            if separate:
+                index = skip_redirections(words, index, moved)
+                if index >= len(words):
+                    raise EnvSplitUnclassified()
+                payload = words[index]
+                index += 1
+            arguments = split_env_string(payload or "")
+            spend("words", len(words) - index + len(arguments) + len(moved) + 2)
+            return [words[at], *arguments, *words[index:], *moved]
+        if env_option_takes_value(word):
+            index = skip_redirections(words, index, moved) + 1
+    return None
+
+
+def uutils_env_argv(words: list[str]) -> list[str] | None:
+    """A preprocessing candidate based on uutils 0.10.0/0.12.0 env.rs process_all_string_arguments, or None without a split option.
+    Value widths also cover clap-inferred long options through env_option_takes_value. Unlike GNU getopt,
+    preprocessing continues past words containing '=' and expands only the literal --split-string/-S/-vS/-vvS prefixes. Other split
+    spellings remain for clap: infer_long_args accepts abbreviations and ordinary clusters but discards their value without expansion.
+    Process the original argv once: generated words go directly to clap, where even a literal split option's value is discarded.
+    The prior reading checks this argv with splitting disabled and retains the GNU and historical table candidates alongside it."""
+    if program_of(words) != "env":
+        return None
+    result = [words[0]]
+    moved: list[str] = []
+    index = 1
+    expecting_arg = False
+    split_seen = False
+    while index < len(words):
+        index = skip_redirections(words, index, moved)
+        if index >= len(words):
+            break
+        word = words[index]
+        spend("reads", 1)
+        if not expecting_arg and (word == "--" or not (word.startswith("-") or "=" in word)):
+            result.extend(words[index:])
+            break
+        index += 1
+        expecting_arg = False
+        prefix = next((prefix for prefix in ("--split-string", "-S", "-vS", "-vvS") if word.startswith(prefix)), None)
+        if prefix is not None:
+            split_seen = True
+            payload = word[len(prefix):]
+            if word == prefix:
+                index = skip_redirections(words, index, moved)
+                if index >= len(words):
+                    raise EnvSplitUnclassified()
+                payload = words[index]
+                index += 1
+            elif prefix == "--split-string" and payload.startswith("="):
+                payload = payload[1:]
+            result.extend(split_env_string(payload))
+        else:
+            if word.startswith("--"):
+                option = word.partition("=")[0]
+                names = [option] if option in ENV_LONG_OPTIONS else [name for name in ENV_LONG_OPTIONS if name.startswith(option)]
+                split_seen |= names == ["--split-string"]
+                expecting_arg = env_option_takes_value(word)
+            elif word.startswith("-"):
+                first = next((letter for letter in word[1:] if letter in ENV_VALUE_LETTERS), None)
+                split_seen |= first == "S"
+                expecting_arg = word[-1:] in {"a", "C", "f", "u"}
+            result.append(word)
+    if not split_seen:
+        return None
+    spend("words", len(result) + len(moved) + 1)
+    return result + moved
+
+
+def env_command_start(words: list[str], at: int = 0, moved: list[str] | None = None, *, split_strings: bool = True) -> int | None:
+    """Index of the command `env [options] [NAME=value ...] command` runs, where env is words[at], or None for a dump. An option takes the
+    next word for its value as GNU or uutils env reads it (env_option_takes_value). A redirection among its words is no option and no value
+    (skip_redirections); an input redirection skipped goes to `moved`. With a split string the returned index belongs to its effective argv,
+    which env_split_argv builds; launcher_chain stops before that transformation instead of applying its index to the original list.
+    split_strings=False locates the program after uutils preprocessing; clap consumes any remaining split option without expanding it."""
+    while split_strings and (expanded := env_split_argv(words, at)) is not None:
+        words, at = expanded, 0  # callers that need original indices stop before a split-string env (launcher_chain)
+    index = at + 1
+    options = True
+    while index < len(words):
+        index = skip_redirections(words, index, moved)
+        if index >= len(words):
+            break
+        word = words[index]
+        if options and word in {"-", "--"}:
+            options = False
+            index += 1
+        elif options and env_option_takes_value(word):
             index = skip_redirections(words, index + 1, moved) + 1
-        elif word.startswith("-") or re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", word):
+        elif options and word.startswith("-"):
+            index += 1
+        elif re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", word):
+            options = False  # GNU getopt stops before assignments; uutils clap sees assignments after its separate preprocessing pass
             index += 1
         else:
             return index
     return None
+
+
+def env_option_takes_value(word: str) -> bool:
+    """Whether env takes the word after `word` for the value of an option (ENV_VALUE_LETTERS, ENV_LONG_OPTIONS): a value option of either
+    implementation, an unambiguous prefix of a long one (`--un NAME`), or a cluster that a value letter ends (`-vu NAME`; in `-uNAME` and
+    `-vuNAME` the value is the rest of the word)."""
+    if word in ENV_ARG_OPTIONS:
+        return True
+    if word.startswith("--"):
+        return "=" not in word and long_option_takes_value(ENV_LONG_OPTIONS, word)
+    letters = word[1:] if word.startswith("-") else ""
+    first = next((at for at, letter in enumerate(letters) if letter in ENV_VALUE_LETTERS), None)
+    return first is not None and first == len(letters) - 1
 
 
 def systemctl_call(words: list[str]) -> tuple[list[str], list[str]]:
@@ -1290,6 +1567,8 @@ def launcher_chain(words: list[str]) -> tuple[list[list[str]], int, list[str]]:
     while at < len(words):
         program = program_of(words[at:at + 1])
         if program == "env":
+            if env_split_argv(words, at) is not None:
+                break  # command_segments reads the generated argv, which is not a tail of the original words
             start = env_command_start(words, at, moved)
             if start is None:
                 break
@@ -1424,8 +1703,17 @@ def command_segments(command: str, depth: int = 0, comments: list[tuple[int, int
                 for redirected in input_redirection_segments(words):  # `$(< FILE)` is `$(cat FILE)`; zsh's `< FILE` alone reads it too
                     emit(redirected)
                 program = program_of(words)
+                if program in MULTICALL_LAUNCHERS:
+                    dispatched = coreutils_command(words)
+                    if dispatched is not None:
+                        words = strip_prefix(dispatched)
+                        continue
                 if program == "env":
-                    break  # launcher_chain walked every env that starts a command: this one prints its environment
+                    expanded = env_split_argv(words)
+                    if expanded is not None:
+                        words = strip_prefix(expanded)
+                        continue
+                    break  # launcher_chain walked every ordinary env that starts a command: this one prints its environment
                 if program == "rtk":
                     words = strip_prefix(rtk_command(words))  # `rtk run` and the file readers
                     continue
@@ -1614,7 +1902,14 @@ def reader_arguments(words: list[str]) -> list[str] | None:
                 if following.startswith("-") and "/" not in following:
                     continue  # an option word is no assignment, redirection or launcher name, and no reader: the walk would stop on it
                 start = prefix_end(words, position + 1, ends=ends)
-                if program_of(words[start:start + 1]) in READERS:
+                launched = program_of(words[start:start + 1])
+                if launched in MULTICALL_LAUNCHERS:
+                    dispatch_at = skip_redirections(words, start + 1)
+                    if dispatch_at < len(words):
+                        option, equal, utility = words[dispatch_at].partition("=")
+                        if equal and option in {"--coreutils-prog", "--coreutils-prog-shebang"}:
+                            launched = utility
+                if launched in READERS:
                     return words[1:]
     return None
 
@@ -1842,11 +2137,17 @@ def segment_reason(words: list[str]) -> str | None:
 # script (`systemd-run --description kernel_keyring.py exec n X -- keyctl print 1`), a redirection operator that the old walk took for the
 # value of `sudo -u`, a path-qualified wrapper whose option value was the script, the value after a clustered ps option. check() therefore
 # reads a command the old way as well when the reading above allows it, and refuses what either refuses: no command that guard refused
-# passes, by construction instead of by finding each walk that differs. The functions below are that guard's own and read its tables
-# (every table they use is unchanged since, and SECRET_NAMES only grew); they differ from it only where no verdict changes: they spend
-# from the work budget, `find -exec` is walked by index, the mentions of an injected variable use the linear test of
+# passes, except the documented harmless corrections, by retaining its candidates instead of replacing a historical walk with a newer one.
+# That holds where the exact-name prior stripper reaches the env word; six runtime-inert spellings behind path-qualified or systemd-run
+# launchers are recorded as harmless corrections in docs/decisions/2026-09-24-secret-storage.md (round three).
+# The prior reading keeps the GNU split branch, adds the uutils preprocessing branch, and walks the c26800f3 option table over the raw and
+# generated env argvs. A command any branch refuses is refused. GNU coreutils dispatch also keeps the raw keyring start before unwrapping.
+# The functions below retain that guard's ordinary tables and tokenizer (SECRET_NAMES only grew), while charging the work budget and
+# adding these launcher branches. `find -exec` is walked by index, the mentions of an injected variable use the linear test of
 # mentions_injected_variable, identical started commands are read once, and a text's words come from lex(), whose legacy reading is that
-# guard's tokenizer.
+# guard's tokenizer. One change adds refusals (2026-10-04): after timeout's duration, prior_prefix_end steps over the options and the `--`
+# that uutils timeout still reads there, as prefix_end does. Where c26800f3 took the word after the duration for the command, that word
+# may begin with `-`; a hyphen-leading path is preserved for GNU, while options and `--` keep the uutils reading.
 PRIOR_LAUNCHED_PROGRAMS = SHELLS | AWKS | JQS | ENVIRONMENT_PRINTERS | {"ps", "set", "export", "declare", "typeset", "readonly", "local"}
 
 
@@ -1873,7 +2174,8 @@ def prior_skip_wrapper_options(words: list[str], index: int, wrapper: str) -> in
 
 def prior_prefix_end(words: list[str], index: int = 0, ends: dict[int, int] | None = None) -> int:
     """Index of the command in words[index:] as the strip_prefix of c26800f3 found it: past assignments, output redirections and the
-    wrappers of WRAPPERS named exactly (timeout with its duration). `ends` as in prefix_end."""
+    wrappers of WRAPPERS named exactly (timeout with its duration, then the options and `--` that uutils reads after it: see the note
+    above). `ends` as in prefix_end."""
     steps: list[int] = []
     while index < len(words):
         if ends is not None:
@@ -1890,7 +2192,10 @@ def prior_prefix_end(words: list[str], index: int = 0, ends: dict[int, int] | No
         elif word in WRAPPERS or word == "timeout":
             index = prior_skip_wrapper_options(words, index + 1, word)
             if word == "timeout":
-                index += 1  # timeout's mandatory duration comes before the command
+                # the mandatory duration, then the options and `--` uutils timeout reads after it (prefix_end has the sources)
+                index += 1
+                if index < len(words) and not (words[index].startswith("-") and "/" in words[index]):
+                    index = prior_skip_wrapper_options(words, index, word)
         else:
             break
     if ends is not None:
@@ -1904,7 +2209,8 @@ def prior_strip_prefix(words: list[str]) -> list[str]:
 
 
 def prior_env_command_start(words: list[str]) -> int | None:
-    """Index of the command `env [options] [NAME=value ...] command` runs as c26800f3 read it, or None for a dump."""
+    """Index in this argv of env's command using c26800f3's ENV_ARG_OPTIONS table, or None for its no-command refusal.
+    No expansion changes this index: prior_expand applies this table to every raw, GNU-expanded and uutils-preprocessed candidate."""
     index = 1
     while index < len(words):
         word = words[index]
@@ -1936,23 +2242,52 @@ def prior_keyring_exec(words: list[str]) -> tuple[str | None, list[str]] | None:
 
 def prior_expand(command: str, depth: int = 0) -> list[list[str]]:
     """The command segments that c26800f3 read: of the command, of `sh -c '...'`, `eval ...`, `env ... command`, the command that a
-    keyring exec starts and the command an `rtk` invocation runs. Each text is one `texts` and each segment its words and one `words` of
-    the work budget: this walk copies the rest of the words at every hop, so a long chain of env, rtk or keyring hops spends the budget
-    and is refused as too complex instead of outlasting the hook."""
+    keyring exec starts and the command an `rtk` invocation runs, plus the GNU and uutils env candidates. Each text is one `texts` and each
+    distinct segment its words and one `words` of the work budget. A work list keeps every candidate when another branch continues or
+    ends; duplicate segments reuse their reading. A long chain spends the existing budget instead of outlasting the hook."""
     spend("texts", 1)
     result: list[list[str]] = []
-    for raw in segments(lex(command, legacy=True)):
-        words = prior_strip_prefix(raw)
+    pending = [prior_strip_prefix(raw) for raw in segments(lex(command, legacy=True))]
+    pending.reverse()  # pop the original segments in their historical order
+    seen: dict[tuple, list[str]] = {}
+    while pending:
+        words = pending.pop()
         while words:
+            key = segment_identity(words)
+            kept = seen.get(key)
+            if kept is not None:
+                note_identity_collision(kept, words)
+                break
             spend("words", len(words) + 1)
+            seen[key] = words
             result.append(words)
             program = program_of(words)
+            if program in MULTICALL_LAUNCHERS:
+                started = prior_keyring_exec(words)
+                if started is not None:
+                    pending.append(prior_strip_prefix(started[1]))
+                dispatched = coreutils_command(words)
+                if dispatched is not None:
+                    words = prior_strip_prefix(dispatched)
+                    continue
             if program == "env":
-                start = prior_env_command_start(words)
-                if start is None:
-                    break
-                words = prior_strip_prefix(words[start:])
-                continue
+                candidates = [words]
+                gnu = env_split_argv(words)
+                if gnu is not None:
+                    candidates.append(gnu)
+                    pending.append(gnu)  # GNU restarts option parsing, so generated split options can expand again
+                uutils = uutils_env_argv(words)
+                if uutils is not None:
+                    candidates.append(uutils)
+                    start = env_command_start(uutils, split_strings=False)
+                    pending.append(["env"] if start is None else prior_strip_prefix(uutils[start:]))
+                for argv in candidates:
+                    start = prior_env_command_start(argv)
+                    if start is None:
+                        pending.append(["env"])  # retain this candidate's no-command refusal independently of other branches
+                    else:
+                        pending.append(prior_strip_prefix(argv[start:]))
+                break
             if program == "rtk":
                 words = prior_strip_prefix(rtk_command(words))
                 continue
@@ -2113,17 +2448,24 @@ def check(command: str) -> str | None:
     start_work()
     try:
         return read_command(command)
+    except EnvSplitUnclassified:
+        return "env_split_unclassified"
     finally:
         stop_work()
 
 
 def read_command(command: str, top: bool = True) -> str | None:
-    """The reason to refuse command inside the current work budget. First B(T), the verdict of the guard at dc33b48a, unchanged: its
-    whole-text rules, then this version's reading of the words and, when that allows, the reading of c26800f3, with dc33b48a's names,
-    stores and segment identity (_baseline True). A command B refuses keeps B's reason. Only a command B allows gets the K4 tightenings
-    (k4_tightenings), each of which can only refuse.
+    """The reason to refuse command inside the current work budget. First B(T), the verdict of the guard at dc33b48a, unchanged but for the
+    launcher grammar of 2026-10-04 (prefix_end, wrapper_options, env_command_start), which reads the command GNU and uutils coreutils start
+    where dc33b48a read an option, its value or a `--`: its whole-text rules, then this version's reading of the words and, when that allows,
+    the reading of c26800f3, with dc33b48a's names, stores and segment identity (_baseline True). A command B refuses keeps B's reason. Only
+    a command B allows gets the K4 tightenings (k4_tightenings), each of which can only refuse.
 
-    The one loosening (L1, contract-v2 section 7.1) is form F: a top-level Python or Node program on stdin through exactly one quoted
+    The launcher repair of 2026-10-04 reads GNU split-string argv in the current reading and keeps the union of GNU, uutils and historical
+    table candidates in the prior reading. A harmless literal command passes only when every candidate allows it; an inferred uutils split
+    option can discard its value and dump the environment.
+
+    The contract-v2 loosening (L1, section 7.1) is form F: a top-level Python or Node program on stdin through exactly one quoted
     here-document that ends the command (k4_form_f). For F, the two word readings read the command with the body emptied (amendment A5:
     the operator line directly followed by its terminator line, and texts of that masked command), while the whole-text rules and the
     keyring-code rule still read the original text, body included, and the body is read as Python or JavaScript code by the K4 CODE rules
@@ -2218,11 +2560,13 @@ def current_reading(command: str, texts: tuple[str, str], words_list: list[list[
 # data-tree name, a manager verb, a here-document operator, an environment source. Quote removal never splits these literals (they hold no
 # quote or backslash) and every word of a command is made of its unquoted() characters in order, so one scan of the unquoted text tells which
 # rules can apply at all: an ordinary command pays one charged pass for K4, and a rule whose literal is absent does no work.
-K4_ANCHOR = re.compile(r"<<|CLAUDE_CODE_|omniroute|credential_run\.py|kernel_keyring\.py|tvly-keyring|2012|curl|environment|environ"
-                       r"|process|PS_PERSONALITY|CMD_ENV|I_WANT_A_BROKEN_PS|canary_proof\.py")
+K4_ANCHOR = re.compile(r"<<|CLAUDE_CODE_|omniroute|credential_run\.py|kernel_keyring\.py|tvly-keyring|2012|2112|curl|environment"
+                       r"|environ|process|PS_PERSONALITY|CMD_ENV|I_WANT_A_BROKEN_PS|canary_proof\.py")
 K4_ANCHOR_KEYS = {"environment": ("environment", "environ")}
-# The gateway rules run when a gateway port shows, the omniroute CLI is named, or curl runs (its URL globbing can spell a port: 2012[8-9]).
-K4_GATEWAY_ANCHORS = frozenset({"2012", "omniroute", "curl"})
+# The gateway rules run when a gateway port shows (2012x on the workstation, 2112x on the new WSL distribution), the omniroute CLI
+# is named, or curl runs (its URL globbing can spell a port: 2012[8-9]).
+K4_GATEWAY_PORT_ANCHORS = frozenset({"2012", "2112"})
+K4_GATEWAY_ANCHORS = K4_GATEWAY_PORT_ANCHORS | {"omniroute", "curl"}
 # A K4 walk differs from B's only where a runner or keyring start (or tvly-keyring) can hide a shell string or start a command, or where a
 # string-tuple deduplication dropped a segment with other descriptors (note_identity_collision).
 K4_SELECTORS = frozenset({"PS_PERSONALITY", "CMD_ENV", "I_WANT_A_BROKEN_PS"})
@@ -4164,11 +4508,11 @@ def k4_gateway_reason(r: K4Reading, segments: list[list[str]]) -> str | None:
     port shows, in interpreter code (k4_gateway_code): region bodies, inline code, and the words of a command line whose options could not
     all be read."""
     reason = k4_gateway_shell(segments)
-    if reason or "2012" not in r.anchors:
+    if reason or not (K4_GATEWAY_PORT_ANCHORS & r.anchors):
         return reason
     for unit in k4_code_units(r, segments):
         k4_charge(unit.code)
-        if "2012" not in unit.code:
+        if not any(anchor in unit.code for anchor in K4_GATEWAY_PORT_ANCHORS):
             continue
         if unit.kind == "uncertain":
             if any(k4_gateway_url(found.group(), unresolved=True) for found in K4_GW_FIND.finditer(unit.code)):
@@ -4182,27 +4526,33 @@ def k4_gateway_reason(r: K4Reading, segments: list[list[str]]) -> str | None:
     return None
 
 
-K4_GW_HEAD = re.compile(r"^(?:http://)?(?:(?P<user>[^/\s@?#]*)@)?(?P<host>127\.0\.0\.1|localhost|\[::1\]|10\.0\.2\.2|host\.docker\.internal):(?P<port>20128|20129)(?P<rest>(?:[/\\?#].*)?)$", re.I | re.S)
+# The covered gateway ports: the workstation's two gateways (20128, and the second instance on 20129), and the new WSL
+# distribution's gateway (21128: dashboard, /v1 and /api in one port) and its live-dashboard WebSocket (21129), added on
+# 2026-10-03 before that gateway holds accounts (wave-2 custody ruling, change 11; the gateway dossier's port list).
+K4_GW_PORTS = ("20128", "20129", "21128", "21129")
+K4_GW_HEAD = re.compile(r"^(?:http://)?(?:(?P<user>[^/\s@?#]*)@)?(?P<host>127\.0\.0\.1|localhost|\[::1\]|10\.0\.2\.2|host\.docker\.internal):(?P<port>20128|20129|21128|21129)(?P<rest>(?:[/\\?#].*)?)$", re.I | re.S)
 K4_PERCENT_ESCAPE = re.compile(r"%([0-9A-Fa-f]{2})")
 # A covered target inside other text (the words of an interpreter command line whose options could not all be read).
 K4_GW_FIND = re.compile(r"(?:[Hh][Tt][Tt][Pp]://)?(?:127\.0\.0\.1|[Ll][Oo][Cc][Aa][Ll][Hh][Oo][Ss][Tt]|\[::1\]|10\.0\.2\.2"
-                        r"|[Hh][Oo][Ss][Tt]\.[Dd][Oo][Cc][Kk][Ee][Rr]\.[Ii][Nn][Tt][Ee][Rr][Nn][Aa][Ll]):2012[89][^\s'\"]*")
+                        r"|[Hh][Oo][Ss][Tt]\.[Dd][Oo][Cc][Kk][Ee][Rr]\.[Ii][Nn][Tt][Ee][Rr][Nn][Aa][Ll]):(?:2012[89]|2112[89])[^\s'\"]*")
 K4_GW_ID = re.compile(r"\A[A-Za-z0-9-]{1,64}\Z")
 K4_GW_NUMBER = re.compile(r"\A[0-9]{1,5}\Z")
 K4_GW_METHOD = re.compile(r"\A[A-Z]+\Z")
 K4_GW_ENCODE_DATA = re.compile(r"\A[A-Za-z0-9_-]+=[A-Za-z0-9_.~-]*\Z")
+# 21128 takes the rows of 20128, the gateway it replaces; 21129 is a WebSocket with no management route, so no row names
+# it and every covered /api/ request to it refuses.
 K4_GW_ROWS = {
-    ('GET', '/api/health'): ((20128, 20129), 'none', False),
-    ('GET', '/api/settings/compression'): ((20128, 20129), 'none', False),
-    ('GET', '/api/context/combos'): ((20128, 20129), 'none', False),
-    ('GET', '/api/model-capability-overrides'): ((20128, 20129), 'none', False),
-    ('GET', '/api/resilience'): ((20128, 20129), 'none', False),
-    ('GET', '/api/settings/feature-flags'): ((20128, 20129), 'none', False),
-    ('GET', '/api/cache'): ((20128, 20129), 'none', False),
-    ('GET', '/api/analytics/compression'): ((20128, 20129), 'analytics', False),
-    ('GET', '/api/usage/call-logs'): ((20128, 20129), 'logs', False),
-    ('GET', '/api/usage/provider-limits'): ((20128,), 'none', True),
-    ('POST', '/api/usage/provider-limits'): ((20128,), 'none', True),
+    ('GET', '/api/health'): ((20128, 20129, 21128), 'none', False),
+    ('GET', '/api/settings/compression'): ((20128, 20129, 21128), 'none', False),
+    ('GET', '/api/context/combos'): ((20128, 20129, 21128), 'none', False),
+    ('GET', '/api/model-capability-overrides'): ((20128, 20129, 21128), 'none', False),
+    ('GET', '/api/resilience'): ((20128, 20129, 21128), 'none', False),
+    ('GET', '/api/settings/feature-flags'): ((20128, 20129, 21128), 'none', False),
+    ('GET', '/api/cache'): ((20128, 20129, 21128), 'none', False),
+    ('GET', '/api/analytics/compression'): ((20128, 20129, 21128), 'analytics', False),
+    ('GET', '/api/usage/call-logs'): ((20128, 20129, 21128), 'logs', False),
+    ('GET', '/api/usage/provider-limits'): ((20128, 21128), 'none', True),
+    ('POST', '/api/usage/provider-limits'): ((20128, 21128), 'none', True),
     ('POST', '/api/compression/preview'): ((20129,), 'none', False),
 }
 # curl 8.5.0 (`curl --help all` and curl(1), read 2026-09-30): the transport and output options the documented replay uses and a few more
@@ -4268,7 +4618,7 @@ def k4_curl_expansions(url: str) -> list[str] | None:
 def k4_gateway_url(url: str, method='GET', body=False, additions=(), unresolved=False) -> bool:
     """Whether one request is a covered management request the frozen matrix (contract-v2 section 5.1, K4_GW_ROWS) does not permit.
     Covered: scheme http (a scheme-less client operand is http, amendment A11), host 127.0.0.1, localhost, [::1], 10.0.2.2 or
-    host.docker.internal (ASCII case folded), port 20128 or 20129. Under /api/ every request refuses unless its effective method, complete
+    host.docker.internal (ASCII case folded), port 20128, 20129, 21128 or 21129 (K4_GW_PORTS). Under /api/ every request refuses unless its effective method, complete
     path (exact segments; <id> a single [A-Za-z0-9-]{1,64} segment of the call-logs route), query (none; exactly since=all on analytics;
     limit=D and/or offset=D, D of 1 to 5 ASCII digits, once each, joined by one `&`, on call-logs) and body condition (none on provider-limits)
     match a row. Management targeting is evident when the path, dot and slash segments resolved and percent escapes decoded, reaches /api;
@@ -4306,7 +4656,7 @@ def k4_gateway_url(url: str, method='GET', body=False, additions=(), unresolved=
     row = K4_GW_ROWS.get((method, path))
     if row is None and method == 'GET' and path.startswith('/api/usage/call-logs/') \
             and K4_GW_ID.fullmatch(path[len('/api/usage/call-logs/'):]):
-        row = ((20128, 20129), 'none', False)
+        row = ((20128, 20129, 21128), 'none', False)
     if row is None or int(found['port']) not in row[0] or (row[2] and body):
         return True
     if query is None:
@@ -4411,7 +4761,8 @@ def k4_curl_requests(words: list[str]) -> bool:
                 targets = k4_curl_expansions(url)
                 if targets is None:
                     lowered = url.lower()
-                    if '/' in url and ('2012' in url or any(name in lowered for name in K4_GW_HOST_NAMES)):
+                    if '/' in url and (any(anchor in url for anchor in K4_GATEWAY_PORT_ANCHORS)
+                                       or any(name in lowered for name in K4_GW_HOST_NAMES)):
                         return True  # an unreadable glob over what could be a covered management URL
                     continue
             for target in targets:
@@ -4670,9 +5021,9 @@ def k4_gateway_code(code, tokens, structure, language):
     spend('words', 6 * (len(tokens) + 1))
     pairs, calls, _output, _iteration = structure
     targets = [(at, token) for at, token in enumerate(tokens) if token.kind == 'string'
-        and ('20128' in token.value or '20129' in token.value) and k4_gateway_url(token.value, unresolved=True)]
+        and any(port in token.value for port in K4_GW_PORTS) and k4_gateway_url(token.value, unresolved=True)]
     if not targets:
-        if 'HTTPConnection' in code and '/api/' in code and ('20128' in code or '20129' in code) \
+        if 'HTTPConnection' in code and '/api/' in code and any(port in code for port in K4_GW_PORTS) \
                 and any(host in code for host in ('127.0.0.1', 'localhost', '::1', '10.0.2.2', 'host.docker.internal')):
             return 'gateway_credential_route'
         return None

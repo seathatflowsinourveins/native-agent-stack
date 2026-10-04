@@ -1,6 +1,6 @@
 {
  "generated_at_utc": "2026-10-02T02:12:15Z",
- "revised_at_utc": "2026-10-02T22:57:25Z",
+ "revised_at_utc": "2026-10-03T18:26:54Z",
  "source": "origin/main definitive manifest, one row per foundation row",
  "owners": [
   {
@@ -184,18 +184,18 @@
   {
    "layer": "semantic-rag",
    "slot": "code-search",
-   "owner": "Not installed until the deciding measurement returns (the families split between semble and SocratiCode)",
-   "repository": "",
-   "installed": false,
-   "note": "waits for or was settled by a measurement: outside the combination rule"
+   "owner": "semble 0.6.1",
+   "repository": "https://github.com/MinishLab/semble",
+   "installed": true,
+   "note": "interim install under amendment 3 (wave-2 records of 2026-10-03); the pins are the wave-2 code-search ruling's, in install-plan.json; repository metadata was not read for this row"
   },
   {
    "layer": "semantic-rag",
    "slot": "embedding-model",
-   "owner": "Not installed until the deciding measurement returns",
-   "repository": "",
-   "installed": false,
-   "note": "one blind GPT order selected nothing and the other three models that each add a second server; the critic's choice was not among the judged candidates"
+   "owner": "Qwen3-Embedding-0.6B through Ollama (qwen3-embedding:0.6b, Q8_0, as qwen3-embedding-8k, context 8,192)",
+   "repository": "https://github.com/QwenLM/Qwen3-Embedding",
+   "installed": true,
+   "note": "settled by the local-model measurement of 2026-10-02 and 2026-10-03; the pin is the Ollama library manifest digest, in install-plan.json; repository metadata was not read for this row"
   },
   {
    "layer": "semantic-rag",
@@ -261,10 +261,10 @@
   {
    "layer": "durable-memory",
    "slot": "memory-owner",
-   "owner": "Not installed until the memory head-to-head returns (the blind round's documented-fit pick is ai-memory)",
-   "repository": "",
-   "installed": false,
-   "note": "waits for or was settled by a measurement: outside the combination rule"
+   "owner": "ai-memory 2.5.2",
+   "repository": "https://github.com/akitaonrails/ai-memory",
+   "installed": true,
+   "note": "interim install under amendment 3 (wave-2 records of 2026-10-03); the pin is the wave-2 memory dossier's, in install-plan.json; repository metadata was not read for this row"
   },
   {
    "layer": "token-efficiency",
@@ -277,10 +277,18 @@
   {
    "layer": "token-efficiency",
    "slot": "context-supply",
-   "owner": "No context-supply layer: the usage meter only",
-   "repository": "",
-   "installed": false,
-   "note": "decided by both families in the decision round on a measured comparison: no context-supply layer"
+   "owner": "context-mode 1.0.169",
+   "repository": "https://github.com/mksglu/context-mode",
+   "installed": true,
+   "note": "interim install under amendment 3 (wave-2 records of 2026-10-03); the pins are the wave-2 context ruling's, in install-plan.json; repository metadata was not read for this row"
+  },
+  {
+   "layer": "token-efficiency",
+   "slot": "statusline",
+   "owner": "claude-hud 0.10.0 (Claude Code status line plugin); Codex shows its native footer, tui.status_line",
+   "repository": "https://github.com/jarrodwatts/claude-hud",
+   "installed": true,
+   "note": "added by the wave-2 batch of the layer consensus (2026-10-03); the pin is the wave-2 usage ruling's, in install-plan.json; repository metadata was not read for this row"
   },
   {
    "layer": "observation-inference",
@@ -367,10 +375,10 @@
   {
    "layer": "observation-inference",
    "slot": "local-generation-model",
-   "owner": "Not installed until the deciding measurement returns",
-   "repository": "",
-   "installed": false,
-   "note": "the two blind GPT orders and the Claude critic chose different models, and the fit of the critic's choice is inferred, not measured"
+   "owner": "Swift-1.5-Qwen3.8-27B IQ3_S through Ollama (swift-iq3s-s2o-64k, context 64,000)",
+   "repository": "https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-27B-GSQ-RCO-GGUF",
+   "installed": true,
+   "note": "settled by the local-model measurement of 2026-10-02; the pins are the Hugging Face revision and the file's sha256, in install-plan.json; repository metadata was not read for this row"
   },
   {
    "layer": "observation-inference",

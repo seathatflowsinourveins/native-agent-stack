@@ -1,0 +1,77 @@
+import copy
+import io
+import subprocess
+import tempfile
+import unittest
+from pathlib import Path
+from unittest.mock import patch
+
+import tests.test_osv_lockfile_coverage as module
+import tests.test_workflow_hardening as hardening
+
+
+def stamp():
+    return subprocess.check_output(['date', '-u', '+%Y-%m-%dT%H:%M:%SZ'], text=True).strip()
+
+
+def report(label, expectation, result, output):
+    caught = not result.wasSuccessful()
+    observed = 'caught' if caught else 'survives'
+    lines = [line for line in output.getvalue().splitlines()
+             if line.startswith(('AssertionError', 'FAIL:', 'ERROR:')) or line.endswith((' ... ok', ' ... FAIL', ' ... ERROR'))]
+    print(f'{stamp()} {label}: expected {expectation}, observed {observed}; '
+          f'ran {result.testsRun}, failures {len(result.failures)}, errors {len(result.errors)}')
+    for line in lines:
+        print('   ' + line)
+    return observed == expectation
+
+
+def run_config(label, expectation, config, tests):
+    output = io.StringIO()
+    with tempfile.TemporaryDirectory() as directory:
+        config_path = Path(directory) / 'osv-scanner.toml'
+        config_path.write_text(module.CONFIG.read_text(encoding='utf-8'), encoding='utf-8')
+        with patch.object(module, 'CONFIG', config_path), \
+             patch.object(module.FrozenScanTests, 'ordinary_config', config), \
+             patch.object(module.tomllib, 'loads', wraps=module.tomllib.loads) as loads:
+            loads.side_effect = lambda text: config if text == config_path.read_text() else loads._mock_wraps(text)
+            result = unittest.TextTestRunner(stream=output, verbosity=2).run(unittest.TestSuite(tests))
+    return report(label, expectation, result, output)
+
+
+matches = []
+
+# Minor finding 2: the later-upload !cancelled() assertions against the review base's workflow text.
+base_workflow = subprocess.check_output(
+    ['git', 'show', '463a57b98:.github/workflows/security-scan.yml'], text=True)
+output = io.StringIO()
+with patch.object(hardening.SecurityScanTests, 'text', base_workflow):
+    result = unittest.TextTestRunner(stream=output, verbosity=2).run(unittest.TestSuite(
+        [hardening.SecurityScanTests('test_failure_path_semantics_keep_findings_uploadable')]))
+matches.append(report('base-workflow (463a57b98) upload guards', 'caught', result, output))
+output = io.StringIO()
+result = unittest.TextTestRunner(stream=output, verbosity=2).run(unittest.TestSuite(
+    [hardening.SecurityScanTests('test_failure_path_semantics_keep_findings_uploadable')]))
+matches.append(report('head workflow upload guards', 'survives', result, output))
+
+good = copy.deepcopy(module.FrozenScanTests.ordinary_config)
+
+# Minor finding 2: R4-key (an ID key beside id) on this head.
+aliased = copy.deepcopy(good)
+aliased['IgnoredVulns'][0]['ID'] = 'GHSA-vfj7-8cjw-p6xm'
+matches.append(run_config('R4-key on head', 'caught', aliased, [
+    module.IgnorePolicyTests('test_every_ignore_has_id_reason_and_a_near_expiry'),
+    module.FrozenScanTests('test_the_ordinary_config_has_no_exception_for_a_frozen_advisory')]))
+
+# Should-fix finding 1: case-aliased override keys against both call sites of override_problems.
+for label, entry in (('Ecosystem alias', {'name': 'nex[t]', 'nameIsRegex': True, 'ecosystem': 'PyPI', 'Ecosystem': 'npm', 'ignore': True}),
+                     ('Name+Ecosystem alias', {'name': 'lib', 'Name': 'next', 'ecosystem': 'PyPI', 'Ecosystem': 'npm', 'ignore': True})):
+    config = copy.deepcopy(good)
+    config.setdefault('PackageOverrides', []).append(
+        {**entry, 'reason': 'synthetic repair control', 'effectiveUntil': module.date.today() + module.timedelta(days=30)})
+    for test in (module.FrozenScanTests('test_the_ordinary_config_has_no_exception_for_a_frozen_advisory'),
+                 module.IgnorePolicyTests('test_no_other_suppression_mechanism_bypasses_the_policy')):
+        matches.append(run_config(f'{label} -> {test.id().rsplit(".", 2)[-2]}', 'caught', config, [test]))
+
+print(f'{stamp()} all observations match expectations: {all(matches)}')
+raise SystemExit(0 if all(matches) else 1)

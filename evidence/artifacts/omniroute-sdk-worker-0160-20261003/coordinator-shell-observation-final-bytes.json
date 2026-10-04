@@ -1,0 +1,38 @@
+{
+  "observed_at": "2026-10-03T04:59:09Z to 2026-10-03T04:59:18Z (file times of the run's stderr and stdout; coordinator Bash, not nested in any Codex sandbox)",
+  "worker": "examples/omniroute-codex-sdk/worker.py at the B3 candidate, committed unchanged as head 33aef763bbb43ddeb2851b9c8e060691bcbbaa0e",
+  "worker_sha256": "30f85ea8f8dcbfe443697c79f3c4bb11df6b65f79abb5f0e5ea6aa978e8bdf01",
+  "worker_source_binding": "the working-tree file hashed 30f85ea8f8dcbfe443697c79f3c4bb11df6b65f79abb5f0e5ea6aa978e8bdf01, equal to the blob at 33aef763; its mtime 2026-10-03T04:26:35Z precedes the run",
+  "command": "uv run --locked --script examples/omniroute-codex-sdk/worker.py --workspace <candidate checkout> --codex-home <private home copied from the earlier observation's home, session state removed> --sandbox read-only --timeout 600 --native-result <private file> --prompt -",
+  "task": "run `ls examples/omniroute-codex-sdk | wc -l` with the shell tool and reply with the number",
+  "worker_exit": 0,
+  "status": "completed",
+  "final_response": "13",
+  "items": {
+    "userMessage": 1,
+    "commandExecution": 1,
+    "reasoning": 1,
+    "agentMessage": 1
+  },
+  "command_execution": {
+    "command": "/bin/bash -lc 'ls examples/omniroute-codex-sdk | wc -l'",
+    "exitCode": 0,
+    "status": "completed",
+    "aggregatedOutput": "13\n"
+  },
+  "native_runtime": "0.160.0 (serverInfo)",
+  "route": "cx/gpt-6.1-sol-max, effort max requested",
+  "usage_scope": "native_thread_cumulative",
+  "usage_total": {
+    "inputTokens": 38759,
+    "cachedInputTokens": 19200,
+    "outputTokens": 94,
+    "reasoningOutputTokens": 23,
+    "totalTokens": 38853
+  },
+  "duration_ms": 8393,
+  "cleanup_status": "closed",
+  "native_result_sha256": "a7f42b979381c5096517baacd710445e276f15f8ccfbb607de9dbc6d806eafa6",
+  "same_head_fixture_runs": "test_worker.py twice before the live task: exit 0, Ran 25 tests, OK, each run",
+  "meaning": "native shell execution through the worker completes on the final B3 bytes, outside any Codex sandbox. Backend effort is unobserved; requested effort is not wire effort."
+}

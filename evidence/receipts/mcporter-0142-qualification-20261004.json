@@ -1,0 +1,176 @@
+{
+  "schema_version": 1,
+  "id": "mcporter-0142-qualification-20261004",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-10-04T08:06:10Z",
+  "component_ids": [
+    "mcporter"
+  ],
+  "claim": "The retained NativeStack WSL2 run on 2026-10-04 installed mcporter 0.14.2 and returned version 0.14.2 with exit 0. Registry provenance matched openclaw/mcporter release.yml at v0.14.2, and a scratch npm audit verified 43 registry signatures and 15 attestations. Ad-hoc stdio jcodemunch session statistics and context-mode ctx_stats calls returned exit 0. Configured-daemon calls failed on a stale rendezvous and were not recovered. This receipt republishes sanitized historical host observations, not a new host execution.",
+  "limitations": [
+    "No macOS execution and no upstream test suite run. The npm tarball hash is artifact evidence and does not pin the transitive dependency tree or rolldown platform binding.",
+    "Configured-server list/call failures are retained. The stale daemon was not recovered and keep-alive transport acceptance is not claimed; dist/daemon/client.js was recorded byte-identical across 0.14.1 and 0.14.2.",
+    "npm audit signatures --global failed with EAUDITGLOBAL (exit 1); only the later scratch-project audit succeeded. The ad-hoc MCP statistics are self-reports, not provider counts or savings.",
+    "The Mac keeps its separately qualified MCPorter 0.13.13 pin until a Mac qualifies 0.14.2. The platform-independent tarball artifact check is not Mac execution or Mac qualification."
+  ],
+  "data": {
+    "observed_date_utc": "2026-10-04",
+    "host_scope": "NativeStack, WSL2 Linux x86_64; historical user-level installation",
+    "previous_version": "0.14.1",
+    "version": "0.14.2",
+    "release": "https://github.com/openclaw/mcporter/releases/tag/v0.14.2",
+    "tag_commit": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+    "host_recorded_at_utc": "2026-10-04T07:40:13Z",
+    "verify_exit": 0,
+    "evidence_classes": [
+      "upstream_native_operation",
+      "local_integration",
+      "artifact_check"
+    ],
+    "host_source_locator": "$HOME/.local/state/native-agent-stack/coordination/token-layer-20261004/nativestack-exec",
+    "sanitization": "Only component-scoped commands, exit codes, times, versions, checksums and bounded verification summaries are published. Private installation prefixes become <stack-home>, the execution directory becomes <host-run>, worktree paths become <owned-worktree>, and home paths become $HOME. No credentials, raw transcripts, user names or email addresses are copied. Native scratch directory paths become <scratch>; local session identifiers are omitted.",
+    "steps": [
+      {
+        "step": "npm_meta",
+        "cmd": "npm view mcporter@0.14.2 version time.modified deprecated scripts dist.integrity --json",
+        "rc": 0,
+        "at": "2026-10-04T07:37:29Z"
+      },
+      {
+        "step": "provenance",
+        "cmd": "python3 <host-run>/npm_prov.py mcporter 0.14.2",
+        "rc": 0,
+        "at": "2026-10-04T07:37:29Z"
+      },
+      {
+        "step": "install",
+        "cmd": "npm install --global --prefix <stack-home>/tools/mcporter-0.14.2 mcporter@0.14.2",
+        "rc": 0,
+        "at": "2026-10-04T07:37:30Z"
+      },
+      {
+        "step": "verify_versioned",
+        "cmd": "<stack-home>/tools/mcporter-0.14.2/bin/mcporter --version",
+        "rc": 0,
+        "at": "2026-10-04T07:37:39Z"
+      },
+      {
+        "step": "audit_signatures",
+        "cmd": "npm audit signatures --global --prefix <stack-home>/tools/mcporter-0.14.2",
+        "rc": 1,
+        "at": "2026-10-04T07:37:39Z"
+      },
+      {
+        "step": "after_version",
+        "cmd": "<stack-home>/bin/mcporter --version",
+        "rc": 0,
+        "at": "2026-10-04T07:37:40Z"
+      },
+      {
+        "step": "usage_list",
+        "cmd": "timeout 90 <stack-home>/bin/mcporter --config $HOME/.mcporter/mcporter.json list context-mode --brief --no-oauth",
+        "rc": 1,
+        "at": "2026-10-04T07:37:40Z"
+      },
+      {
+        "step": "usage_ctx_stats",
+        "cmd": "timeout 120 <stack-home>/bin/mcporter --config $HOME/.mcporter/mcporter.json call context-mode.ctx_stats --args {} --output text --no-oauth",
+        "rc": 1,
+        "at": "2026-10-04T07:37:41Z"
+      },
+      {
+        "step": "usage_list",
+        "cmd": "timeout 90 <stack-home>/bin/mcporter --config <stack-home>/config/mcporter.json list context-mode --brief --no-oauth",
+        "rc": 0,
+        "at": "2026-10-04T07:38:22Z"
+      },
+      {
+        "step": "usage_ctx_stats",
+        "cmd": "timeout 120 <stack-home>/bin/mcporter --config <stack-home>/config/mcporter.json call context-mode.ctx_stats --args {} --output text --no-oauth",
+        "rc": 1,
+        "at": "2026-10-04T07:38:22Z"
+      },
+      {
+        "step": "audit_install",
+        "cmd": "bash -c cd '<scratch>' && npm init -y >/dev/null && npm install --ignore-scripts --no-fund --no-audit mcporter@0.14.2",
+        "rc": 0,
+        "at": "2026-10-04T07:38:23Z"
+      },
+      {
+        "step": "audit_signatures",
+        "cmd": "bash -c cd '<scratch>' && npm audit signatures",
+        "rc": 0,
+        "at": "2026-10-04T07:38:30Z"
+      },
+      {
+        "step": "usage_stdio_jcodemunch",
+        "cmd": "timeout 120 nice -n 19 <stack-home>/bin/mcporter call --stdio jcodemunch-mcp --env CODE_INDEX_PATH=$HOME/.code-index --env JCODEMUNCH_SHARE_SAVINGS=0 --name jcodemunch --tool order --args {\"action\":\"get_session_stats\",\"args\":{}} --output json --no-oauth",
+        "rc": 0,
+        "at": "2026-10-04T07:39:19Z"
+      },
+      {
+        "step": "usage_stdio_ctx_stats",
+        "cmd": "timeout 120 nice -n 19 <stack-home>/bin/mcporter call --stdio <stack-home>/bin/node $HOME/.codex/plugins/cache/context-mode/context-mode/1.0.169/start.mjs --name context-mode --tool ctx_stats --args {} --output text --no-oauth",
+        "rc": 0,
+        "at": "2026-10-04T07:39:21Z"
+      }
+    ],
+    "artifact_checks": [
+      {
+        "asset": "mcporter-0.14.2.tgz",
+        "url": "https://registry.npmjs.org/mcporter/-/mcporter-0.14.2.tgz",
+        "sha256": "f5baa5a02be64d5d75722c5739975eee79d393eb2761496f70a53474688f8f6b",
+        "bytes": 3585823,
+        "sha1": "ee7d91e7362e7dc5b44b5fcc5cfdea7cfaedb1fd",
+        "sha512_integrity": "sha512-3ajjKzPLe/39hN582XqMuOw3S9vHQfLpSBq72zVakT03xso3GDXHcht/eVLu/l2MDqulIOtLevnTKreUxymHJQ==",
+        "fresh_download_matches_registry_integrity": true,
+        "check_date_utc": "2026-10-04",
+        "provenance_attestation": "https://registry.npmjs.org/-/npm/v1/attestations/mcporter@0.14.2",
+        "scope": "Platform-independent registry wrapper; Linux host execution retained separately; macOS artifact-checked only."
+      }
+    ],
+    "verification_summaries": {
+      "version": "0.14.2; exit 0",
+      "provenance": "Integrity matched; openclaw/mcporter release.yml at v0.14.2, commit aa0f55f9",
+      "audit": "Scratch project: 43 signatures and 15 attestations verified; initial global audit failed EAUDITGLOBAL",
+      "usage": "Ad-hoc stdio jcodemunch order get_session_stats and context-mode ctx_stats returned 0",
+      "configured_daemon": "Stale rendezvous refused replacement; failed calls retained, no recovery attempted"
+    },
+    "research": {
+      "workflow": "Installed search-first/SKILL.md; bounded selection from the four requested maintained upstream stable releases, with source checks retained in catalogs/landscape/upstream-snapshot.json.",
+      "template_commit": "3058b2379086677871d092cc6197e907445a03a9",
+      "upstream_check_source": "upstream-checks.json; recorded 2026-10-04; private locator $HOME/.local/state/native-agent-stack/coordination/bounded-jobs-20261004/job-009-token-pin-move/upstream",
+      "completeness_critic": "Covered stable release/tag commits, Linux execution, Darwin artifacts, npm integrity/provenance, native plugin installation and RTK positional-shell migration. Missing modalities remain explicit: macOS execution, new live-client/provider acceptance and upstream suites. No alternative tool adoption, skill installation, gateway route or account changes are needed for this bounded pin move."
+    },
+    "private_source_hashes": [
+      {
+        "file": "RECORD.json",
+        "sha256": "14d4be237b5498c78839dcf314eec1dd1f1521a9a4065df87000c0d8ed651388"
+      },
+      {
+        "file": "components/mcporter.json",
+        "sha256": "7d26f4abb29a7d6e56c13868dc81e6158139458f85165399e949bdfd62c4d4a9"
+      },
+      {
+        "file": "mcporter.log",
+        "sha256": "850820c5cd2801c5d51eb3a4b1897543aa6b66b19ceb7a555ea1772e0e4659f3"
+      },
+      {
+        "file": "mcporter.note.txt",
+        "sha256": "4d5c39e3ab03eda4abac5f0ec259400fa2328fc4023bf7507b26d0ade77a225c"
+      },
+      {
+        "file": "mcporter_usage.log",
+        "sha256": "82b1497ec174ff6cbfa4c928deb7ad6a6aaf57ec97dd4df2b2ca15eed2e17048"
+      },
+      {
+        "file": "mcporter_usage2.log",
+        "sha256": "624697175565487663f2786259ce814f8a3895f3273656b073d160008de8ea10"
+      },
+      {
+        "file": "steps.jsonl",
+        "sha256": "93c27b4653da9418185f0c9abe154327340e908e3bd29bc0ee5335e81658297e"
+      }
+    ]
+  }
+}
