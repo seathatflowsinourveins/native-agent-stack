@@ -749,6 +749,59 @@ BLOCKED["bash <<'EOF'\nprintf ' #x'\nprintenv\nEOF\n#" + "x" * 200000] = "enviro
 # The first review's ps input in full: 70,000 `E`, a letter that is no flag and a dump (a regular expression backtracked on it for 13 s, past the
 # hook timeout; PATHOLOGICAL times it, this row blocks it behind rtk proxy and a keyring exec as well).
 BLOCKED["ps " + "E" * 70000 + "q; printenv"] = "environment_dump"
+# Launcher grammar of GNU coreutils and of uutils coreutils, which Ubuntu 26.04 ships as its coreutils (rust-coreutils 0.8.0-0ubuntu3, with
+# the multi-call binary /usr/bin/coreutils: the package file list of resolute on packages.ubuntu.com, read 2026-10-04). Each row runs a command
+# the guard refuses on a host of one implementation or both, as the sources read on 2026-10-04 show. uutils timeout (clap; uu_app in
+# src/uu/timeout/src/timeout.rs, `.trailing_var_arg(true)` at :177 of 0.8.0, :171 of 0.10.0 and :173 of 0.12.0, `.infer_long_args(true)` on
+# the next line) still reads options and an end-of-options `--` after the duration and runs the command after them, where GNU timeout
+# (getopt_long "+fk:ps:v", src/timeout.c at v9.7 and v9.12) runs the word right after the duration (`--`: exit 127). Both accept an
+# unambiguous prefix of a long option (getopt_long; clap's infer_long_args) in timeout, nice, stdbuf and env. env takes a value after
+# -a/--argv0 (GNU env.c from v9.7, uutils env.rs), -f/--file (uutils only) and --env0-from (GNU v9.12), and the last letter of a cluster
+# (`-vu NAME`) takes the next word. The multi-call binary runs the utility its first argument names (src/bin/coreutils.rs main, 0.8.0).
+# The strings are input data for check(), never run; every name in them is a placeholder.
+LAUNCHER_GRAMMAR_BLOCKED = {
+    # The coordinator's evidence rows (allowed at f77a35eb) and the timeout forms of the brief.
+    "timeout 5 -- printenv APCA_API_SECRET_KEY": "environment_dump",
+    "timeout 5 -- env": "environment_dump",
+    "timeout 5s -- gdb -p 1": "process_trace",
+    "timeout --signal=TERM 5 -- printenv APCA_API_SECRET_KEY": "environment_dump",
+    "timeout -- 5 printenv EXAMPLE_TOKEN": "environment_dump",  # `--` before the duration: getopt and clap both end options there
+    "timeout -k 2 5 -- printenv EXAMPLE_TOKEN": "environment_dump",
+    "timeout 5 -- nice -n 1 -- printenv EXAMPLE_TOKEN": "environment_dump",
+    "timeout 5 -- env -u EXAMPLE_NAME": "environment_dump",
+    # Options after the duration (uutils), with a redirection among them and a launcher named by its path.
+    "timeout 5 -s KILL printenv EXAMPLE_TOKEN": "environment_dump",
+    "timeout 5s --signal=KILL -v printenv EXAMPLE_TOKEN": "environment_dump",
+    "timeout 5 -k 1 --foreground -- cat .env": "dotenv_read",
+    "timeout 5 < /dev/null -- printenv EXAMPLE_TOKEN": "environment_dump",
+    "/usr/bin/timeout 5 -- gdb -p 1": "process_trace",
+    # Abbreviated long options (GNU getopt_long and clap's infer_long_args accept an unambiguous prefix).
+    "timeout --sig KILL 5 printenv EXAMPLE_TOKEN": "environment_dump",
+    "timeout --kill 2 5 -- printenv EXAMPLE_TOKEN": "environment_dump",
+    "nice --adj 5 printenv EXAMPLE_TOKEN": "environment_dump",
+    "stdbuf --out L printenv EXAMPLE_TOKEN": "environment_dump",
+    "env --un EXAMPLE_NAME printenv EXAMPLE_TOKEN": "environment_dump",
+    # env's value options and clusters; `env -f FILE` alone prints the environment it built.
+    "env -a NAME printenv EXAMPLE_TOKEN": "environment_dump",
+    "env --argv0 NAME printenv EXAMPLE_TOKEN": "environment_dump",
+    "env -f FILE printenv EXAMPLE_TOKEN": "environment_dump",
+    "env -f FILE": "environment_dump",
+    "env --env0-from FILE printenv EXAMPLE_TOKEN": "environment_dump",
+    "env -vu EXAMPLE_NAME printenv EXAMPLE_TOKEN": "environment_dump",
+    "env -vC /tmp printenv EXAMPLE_TOKEN": "environment_dump",
+    "env -vS 'printenv EXAMPLE_TOKEN'": "environment_dump",
+    # The uutils multi-call binary.
+    "coreutils printenv EXAMPLE_TOKEN": "environment_dump",
+    "/usr/bin/coreutils env": "environment_dump",
+    "coreutils timeout 5 -- cat .env": "dotenv_read",
+    "sudo coreutils env": "environment_dump",
+    # Refused before and still (a no-loosening control, not a failing-first row). The current reading reads -a's value and finds
+    # `coreutils EXAMPLE_TOKEN`; the prior reading keeps c26800f3's env table, takes -a for a flag and refuses printenv. On Linux the uutils
+    # 0.8.0 multi-call binary names the utility from the executed path, not argv[0] (binary_path in src/common/validation.rs), so this runs
+    # nothing there; a uutils build for another system takes argv[0] and would run printenv.
+    "env -a printenv coreutils EXAMPLE_TOKEN": "environment_dump",
+}
+BLOCKED.update(LAUNCHER_GRAMMAR_BLOCKED)
 
 # The documented kernel keyring form (docs/secret-storage.md, recipes/tavily.md), and the same with a
 # variable that is not one of the guard's secret names, so only the keyring rules can catch it.
@@ -1175,6 +1228,25 @@ ALLOWED = [
     "python3 scripts/kernel_keyring.py status",
     "python3 scripts/kernel_keyring.py exec --help",
 ]
+# Negative controls of LAUNCHER_GRAMMAR_BLOCKED: the same launcher forms around a command that shows nothing stay allowed.
+LAUNCHER_GRAMMAR_ALLOWED = [
+    "timeout 5 -- ls",
+    "timeout -- 5 ls -l",
+    "timeout -k 2 5 -- sleep 1",
+    "timeout 5s -v -- sleep 1",
+    "timeout 5 -s TERM sleep 1",
+    "timeout --sig TERM 5 -- sleep 1",
+    "timeout 5 -- nice -n 1 -- ls",
+    "nice --adj 5 ls",
+    "stdbuf --out L ls",
+    "env --un EXAMPLE_NAME ls",
+    "env -a NAME ls -l",
+    "env -vu EXAMPLE_NAME ls",
+    "coreutils ls -l",
+    "coreutils --version",
+    "/usr/bin/coreutils sleep 1",
+]
+ALLOWED.extend(LAUNCHER_GRAMMAR_ALLOWED)
 
 # Negative corpus: ordinary repository and shell work that must never be blocked.
 SAFE_CORPUS = [
@@ -1981,6 +2053,45 @@ class SecretPathGuardTests(unittest.TestCase):
         for command in SAFE_CORPUS:
             with self.subTest(command=command):
                 self.assertIsNone(guard.check(command))
+
+    def test_launcher_grammar_of_gnu_and_uutils_coreutils(self):
+        # LAUNCHER_GRAMMAR_BLOCKED and LAUNCHER_GRAMMAR_ALLOWED (sources above them): every launcher form that runs a refused command on a
+        # GNU or a uutils host is refused, and the same forms around a harmless command pass.
+        for command, reason in LAUNCHER_GRAMMAR_BLOCKED.items():
+            with self.subTest(command=command):
+                self.assertEqual(guard.check(command), reason)
+        for command in LAUNCHER_GRAMMAR_ALLOWED:
+            with self.subTest(command=command):
+                self.assertIsNone(guard.check(command))
+
+    def test_both_readings_take_the_command_after_timeouts_duration(self):
+        # Both word readings (strip_prefix and the prior reading's prior_strip_prefix) step over timeout's options, its duration, then the
+        # options and the `--` that uutils timeout still reads after the duration. A second `--` is the command for GNU and uutils alike.
+        for text, command in (
+                ("timeout 5 -- printenv X", ["printenv", "X"]),
+                ("timeout -- 5 printenv X", ["printenv", "X"]),
+                ("timeout -k 2 5 -- printenv X", ["printenv", "X"]),
+                ("timeout --signal=TERM 5 -- printenv X", ["printenv", "X"]),
+                ("timeout 5 -s KILL -v printenv X", ["printenv", "X"]),
+                ("timeout 5 -- nice -n 1 -- printenv X", ["printenv", "X"]),
+                ("timeout 5 -- -- printenv X", ["--", "printenv", "X"]),
+                ("timeout 5 printenv X", ["printenv", "X"])):
+            with self.subTest(command=text):
+                self.assertEqual(guard.strip_prefix(text.split()), command)
+                self.assertEqual(guard.prior_strip_prefix(text.split()), command)
+
+    def test_the_current_reading_reads_gnu_and_uutils_env_and_the_multicall_binary(self):
+        # The current reading reads env's value options of both implementations, clusters and long-option prefixes, and the multi-call
+        # binary; the prior reading keeps c26800f3's table (ENV_ARG_OPTIONS), so a command it refused stays refused.
+        for text, start in (("env -a NAME printenv X", 3), ("env --argv0 NAME printenv X", 3), ("env -f FILE printenv X", 3),
+                            ("env --file FILE printenv X", 3), ("env --env0-from FILE printenv X", 3), ("env -vu NAME printenv X", 3),
+                            ("env -uNAME printenv X", 2), ("env --un NAME printenv X", 3), ("env --unset=NAME printenv X", 2),
+                            ("env --ignore-signal printenv X", 2), ("env -i printenv X", 2), ("env -f FILE", None)):
+            with self.subTest(command=text):
+                self.assertEqual(guard.env_command_start(text.split()), start)
+        self.assertEqual(guard.prior_env_command_start("env -a printenv X".split()), 2)
+        self.assertEqual(guard.strip_prefix("/usr/bin/coreutils printenv X".split()), ["printenv", "X"])
+        self.assertEqual(guard.prior_strip_prefix("coreutils printenv X".split()), ["coreutils", "printenv", "X"])
 
     def test_every_secret_name_is_caught_by_a_search(self):
         for name in guard.SECRET_NAMES:

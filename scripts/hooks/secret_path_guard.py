@@ -364,6 +364,23 @@ WRAPPER_VALUE_FLAGS = {
         "--timestamp", "--what", "--when",
         "--capsule", "--kill-subgroup"},
 }
+# The long options of the coreutils launchers, each with whether it takes a value. GNU coreutils (long_options and getopt_long in src/timeout.c,
+# nice.c, stdbuf.c and nohup.c at v9.7 and v9.12, where GETOPT_HELP_OPTION_DECL and GETOPT_VERSION_OPTION_DECL add --help and --version) and
+# uutils coreutils (uu_app in src/uu/<name>/src/<name>.rs at 0.8.0, 0.10.0 and 0.12.0, where clap adds --help and --version), read
+# 2026-10-04, have the same ones. Both take an unambiguous prefix for the option (getopt_long; clap's `.infer_long_args(true)`) and refuse an
+# ambiguous one, so long_option_takes_value reads `timeout --sig KILL 5 cmd` as `timeout --signal KILL 5 cmd`. No flag here begins a value
+# option's name, so a prefix that names value options only takes the next word.
+WRAPPER_LONG_OPTIONS = {
+    "timeout": {"--foreground": False, "--kill-after": True, "--preserve-status": False, "--signal": True, "--verbose": False,
+                "--help": False, "--version": False},
+    "nice": {"--adjustment": True, "--help": False, "--version": False},
+    "stdbuf": {"--input": True, "--output": True, "--error": True, "--help": False, "--version": False},
+    "nohup": {"--help": False, "--version": False},
+}
+# Multi-call binaries that run the utility their first argument names: uutils coreutils' (src/bin/coreutils.rs main at 0.8.0: a binary whose
+# name ends in `utils` takes the utility from its next argument), which Ubuntu 26.04 installs as /usr/bin/coreutils (rust-coreutils
+# 0.8.0-0ubuntu3, the file list of resolute on packages.ubuntu.com, read 2026-10-04): `coreutils printenv` runs printenv.
+MULTICALL_LAUNCHERS = {"coreutils"}
 SHELLS = {"sh", "bash", "zsh", "dash", "ksh"}
 SOURCERS = {".", "source"}
 FIND_EXEC = {"-exec", "-execdir", "-ok", "-okdir"}
@@ -456,6 +473,18 @@ PS_ARG_OPTIONS = {"-o", "-O", "-p", "-u", "-U", "-C", "-g", "-G", "-t", "-q", "-
                   "--pid", "--format", "--sort", "--ppid", "--user"}
 PS_MACOS_ARG_OPTIONS = PS_ARG_OPTIONS - {"-C"}
 ENV_ARG_OPTIONS = {"-u", "--unset", "-C", "--chdir", "-S", "--split-string"}
+# env as GNU coreutils and uutils read it (2026-10-04), for this version's reading (env_option_takes_value); ENV_ARG_OPTIONS stays the table of
+# c26800f3's reading (prior_env_command_start), so a command that reading refused stays refused when this one reads an option's value
+# instead (`env -a printenv X`). The short options that take a value: GNU env.c shortopts "+a:C:iS:u:v0" at v9.7 and v9.12 (-a is not in
+# 9.4) and uutils env.rs uu_app at 0.8.0 to 0.12.0 (-a, -C, -f, -S, -u; -f is uutils' only); in a cluster the first of them takes the rest
+# of the word or, when it ends the word, the next word (`-vu NAME`). The long options and whether each takes the next word: GNU longopts
+# (--env0-from from v9.12) and uutils' (--file); --block-signal, --default-signal and --ignore-signal take a value only after `=`
+# (optional_argument; clap's require_equals).
+ENV_VALUE_LETTERS = frozenset("aCfSu")
+ENV_LONG_OPTIONS = {
+    "--argv0": True, "--chdir": True, "--env0-from": True, "--file": True, "--split-string": True, "--unset": True,
+    "--ignore-environment": False, "--null": False, "--debug": False, "--list-signal-handling": False, "--block-signal": False,
+    "--default-signal": False, "--ignore-signal": False, "--help": False, "--version": False}
 TRACE_OPTIONS = {"xtrace", "verbose"}
 MAX_DEPTH = 3
 # Levels of command substitution inside double quotes that expand() reads (substitution_bodies), and the work it
@@ -1009,7 +1038,7 @@ def wrapper_options(words: list[str], index: int, wrapper: str,
             name, glued, value = word.partition("=")
             if glued:
                 options.append((name, value))
-            elif word in value_flags:
+            elif word in value_flags or long_option_takes_value(WRAPPER_LONG_OPTIONS.get(wrapper, {}), word):
                 index = skip_redirections(words, index, moved)
                 options.append((word, words[index] if index < len(words) else None))
                 index += 1
@@ -1028,6 +1057,16 @@ def wrapper_options(words: list[str], index: int, wrapper: str,
                     options.append((f"-{letters[first]}", words[index] if index < len(words) else None))
                     index += 1
     return options, index
+
+
+def long_option_takes_value(table: dict[str, bool], word: str) -> bool:
+    """Whether the long option `word` (`--name`, no `=`) takes the next word by `table` (each long option: whether it takes a value): the
+    option itself, or an unambiguous prefix of one, as getopt_long and clap's infer_long_args both read it (WRAPPER_LONG_OPTIONS). A prefix
+    that names value options only takes the next word; one that also names a flag is ambiguous, an error for both, and reads as a flag."""
+    if word in table:
+        return table[word]
+    named = [takes for name, takes in table.items() if name.startswith(word)]
+    return bool(named) and all(named)
 
 
 def skip_wrapper_options(words: list[str], index: int, wrapper: str, moved: list[str] | None = None) -> int:
@@ -1064,7 +1103,14 @@ def prefix_end(words: list[str], index: int = 0, moved: list[str] | None = None,
         elif (name := word.rsplit("/", 1)[-1]) in WRAPPERS or name == "timeout":
             index = skip_wrapper_options(words, index + 1, name, moved)
             if name == "timeout":
-                index += 1  # timeout's mandatory duration comes before the command
+                # The mandatory duration, then the command. GNU timeout (getopt_long "+fk:ps:v", src/timeout.c at v9.7 and v9.12) runs the
+                # word right after the duration; uutils timeout (clap, `.trailing_var_arg(true)` on the command: timeout.rs:177 at 0.8.0,
+                # :171 at 0.10.0, :173 at 0.12.0) still reads options and an end-of-options `--` there, so `timeout 5 -- cmd` and
+                # `timeout 5 -s KILL cmd` run cmd on Ubuntu 26.04. Where the two differ, GNU runs a word that begins with `-` (`--` exits
+                # 127), never a program a rule names, so the walk reads the command uutils runs (2026-10-04).
+                index = skip_wrapper_options(words, index + 1, name, moved)
+        elif name in MULTICALL_LAUNCHERS:
+            index = skip_redirections(words, index + 1, moved)  # `coreutils printenv` runs printenv
         else:
             break
     if ends is not None:
@@ -1078,21 +1124,35 @@ def program_of(words: list[str]) -> str:
 
 
 def env_command_start(words: list[str], at: int = 0, moved: list[str] | None = None) -> int | None:
-    """Index of the command `env [options] [NAME=value ...] command` runs, where env is words[at], or None for a dump. A redirection
-    among its words is no option and no value (skip_redirections); an input redirection skipped goes to `moved`."""
+    """Index of the command `env [options] [NAME=value ...] command` runs, where env is words[at], or None for a dump. An option takes the
+    next word for its value as GNU or uutils env reads it (env_option_takes_value). A redirection among its words is no option and no value
+    (skip_redirections); an input redirection skipped goes to `moved`."""
     index = at + 1
     while index < len(words):
         index = skip_redirections(words, index, moved)
         if index >= len(words):
             break
         word = words[index]
-        if word in ENV_ARG_OPTIONS:
+        if env_option_takes_value(word):
             index = skip_redirections(words, index + 1, moved) + 1
         elif word.startswith("-") or re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", word):
             index += 1
         else:
             return index
     return None
+
+
+def env_option_takes_value(word: str) -> bool:
+    """Whether env takes the word after `word` for the value of an option (ENV_VALUE_LETTERS, ENV_LONG_OPTIONS): a value option of either
+    implementation, an unambiguous prefix of a long one (`--un NAME`), or a cluster that a value letter ends (`-vu NAME`; in `-uNAME` and
+    `-vuNAME` the value is the rest of the word)."""
+    if word in ENV_ARG_OPTIONS:
+        return True
+    if word.startswith("--"):
+        return "=" not in word and long_option_takes_value(ENV_LONG_OPTIONS, word)
+    letters = word[1:] if word.startswith("-") else ""
+    first = next((at for at, letter in enumerate(letters) if letter in ENV_VALUE_LETTERS), None)
+    return first is not None and first == len(letters) - 1
 
 
 def systemctl_call(words: list[str]) -> tuple[list[str], list[str]]:
@@ -1848,7 +1908,9 @@ def segment_reason(words: list[str]) -> str | None:
 # (every table they use is unchanged since, and SECRET_NAMES only grew); they differ from it only where no verdict changes: they spend
 # from the work budget, `find -exec` is walked by index, the mentions of an injected variable use the linear test of
 # mentions_injected_variable, identical started commands are read once, and a text's words come from lex(), whose legacy reading is that
-# guard's tokenizer.
+# guard's tokenizer. One change adds refusals (2026-10-04): after timeout's duration, prior_prefix_end steps over the options and the `--`
+# that uutils timeout still reads there, as prefix_end does. Where c26800f3 took the word after the duration for the command, that word
+# began with `-` (no program a rule names), so the change only reads the command uutils runs.
 PRIOR_LAUNCHED_PROGRAMS = SHELLS | AWKS | JQS | ENVIRONMENT_PRINTERS | {"ps", "set", "export", "declare", "typeset", "readonly", "local"}
 
 
@@ -1875,7 +1937,8 @@ def prior_skip_wrapper_options(words: list[str], index: int, wrapper: str) -> in
 
 def prior_prefix_end(words: list[str], index: int = 0, ends: dict[int, int] | None = None) -> int:
     """Index of the command in words[index:] as the strip_prefix of c26800f3 found it: past assignments, output redirections and the
-    wrappers of WRAPPERS named exactly (timeout with its duration). `ends` as in prefix_end."""
+    wrappers of WRAPPERS named exactly (timeout with its duration, then the options and `--` that uutils reads after it: see the note
+    above). `ends` as in prefix_end."""
     steps: list[int] = []
     while index < len(words):
         if ends is not None:
@@ -1892,7 +1955,8 @@ def prior_prefix_end(words: list[str], index: int = 0, ends: dict[int, int] | No
         elif word in WRAPPERS or word == "timeout":
             index = prior_skip_wrapper_options(words, index + 1, word)
             if word == "timeout":
-                index += 1  # timeout's mandatory duration comes before the command
+                # the mandatory duration, then the options and `--` uutils timeout reads after it (prefix_end has the sources)
+                index = prior_skip_wrapper_options(words, index + 1, word)
         else:
             break
     if ends is not None:
@@ -2120,10 +2184,11 @@ def check(command: str) -> str | None:
 
 
 def read_command(command: str, top: bool = True) -> str | None:
-    """The reason to refuse command inside the current work budget. First B(T), the verdict of the guard at dc33b48a, unchanged: its
-    whole-text rules, then this version's reading of the words and, when that allows, the reading of c26800f3, with dc33b48a's names,
-    stores and segment identity (_baseline True). A command B refuses keeps B's reason. Only a command B allows gets the K4 tightenings
-    (k4_tightenings), each of which can only refuse.
+    """The reason to refuse command inside the current work budget. First B(T), the verdict of the guard at dc33b48a, unchanged but for the
+    launcher grammar of 2026-10-04 (prefix_end, wrapper_options, env_command_start), which reads the command GNU and uutils coreutils start
+    where dc33b48a read an option, its value or a `--`: its whole-text rules, then this version's reading of the words and, when that allows,
+    the reading of c26800f3, with dc33b48a's names, stores and segment identity (_baseline True). A command B refuses keeps B's reason. Only
+    a command B allows gets the K4 tightenings (k4_tightenings), each of which can only refuse.
 
     The one loosening (L1, contract-v2 section 7.1) is form F: a top-level Python or Node program on stdin through exactly one quoted
     here-document that ends the command (k4_form_f). For F, the two word readings read the command with the body emptied (amendment A5:

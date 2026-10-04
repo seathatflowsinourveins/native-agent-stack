@@ -237,3 +237,86 @@ offers a narrower token than fine-grained read access to gated repositories.
 
 **Evidence class.** Docs and source review plus `local_integration` unit tests
 with synthetic sentinel files. No token was created, read or used.
+
+## Addendum 2026-10-04: launcher grammar of GNU and uutils coreutils
+
+**Decision.** The guard reads a launcher the way both coreutils
+implementations do, because Ubuntu 26.04 ships uutils (rust-coreutils 0.8.0,
+with the multi-call binary `/usr/bin/coreutils`) as its coreutils.
+
+- After `timeout`'s duration, both word readings step over the options and
+  the `--` that uutils still reads there. `timeout 5 -- CMD` runs CMD on
+  uutils and exits 127 on GNU.
+- The current reading also reads:
+  - an unambiguous prefix of a long option of `timeout`, `nice`, `stdbuf`
+    and `env` (`--sig`, `--adj`);
+  - env's value options of both implementations (`-a`/`--argv0`,
+    `-f`/`--file`, `--env0-from`);
+  - an env cluster that a value letter ends (`-vu NAME`);
+  - `coreutils UTIL` as `UTIL`.
+- The prior reading keeps c26800f3's env table, so a command refused
+  before stays refused. A replay of 6,582 commands (test strings, fenced
+  documentation lines and blocks, a launcher matrix) against the base
+  guard found 0 loosened, 0 reason changes and 0 documented commands newly
+  refused.
+
+**Verified** from sources read 2026-10-04, cited in the guard beside each
+table:
+
+- uutils `src/uu/timeout/src/timeout.rs`, where `uu_app` sets
+  `.trailing_var_arg(true)` (line 177 at 0.8.0, 171 at 0.10.0, 173 at 0.12.0)
+  and `.infer_long_args(true)`;
+- uutils 0.8.0's `env.rs`, `nice.rs`, `stdbuf.rs`, `nohup.rs`,
+  `src/bin/coreutils.rs` and `src/common/validation.rs`;
+- GNU coreutils `src/timeout.c` (`getopt_long` with `"+fk:ps:v"`), `env.c`,
+  `nice.c`, `stdbuf.c` and `nohup.c` at v9.7 and v9.12;
+- the rust-coreutils 0.8.0-0ubuntu3 file list for resolute.
+
+**Measured** with the official uutils 0.8.0 release binary (its sha256
+matches the release's published digest) beside GNU 9.4, with only `echo` as
+the started command:
+
+- uutils runs `timeout 5 -- CMD`, `timeout -k 2 5 -- CMD`,
+  `timeout 5 -s KILL CMD`, `timeout 5 -v CMD`, `env -a NAME CMD` and
+  `env -f FILE CMD`, where GNU exits 127 or 125;
+- both run the abbreviated forms and `env -vu NAME CMD`;
+- both exit 127 for `timeout -- 5 -- CMD` and `timeout 5 -- -- CMD`;
+- on Linux an argv0 override does not choose the multi-call binary's
+  utility, because `binary_path` reads the executed path.
+
+**Alternatives rejected.**
+
+- Reading GNU's grammar alone leaves the uutils forms open on the new hosts.
+- Refusing every `timeout ... --` blocks harmless commands such as
+  `timeout 5 -- ls`.
+- A separate K4 tightening would duplicate the walk that every rule,
+  `find -exec`, the keyring exec and `rtk proxy` share.
+
+**Would overturn it.**
+
+- uutils drops `trailing_var_arg` or `infer_long_args` from these launchers.
+- Either implementation adds a launcher option that takes a value.
+- A documented command is refused only because of this reading.
+  `timeout -- 5 -- CMD`, which runs nothing on either implementation, is
+  refused on purpose.
+
+**Open.**
+
+- `env -S STRING` followed by more words.
+- Long-option prefixes of the launchers outside coreutils (C sudo, xargs,
+  time, ionice, the systemd launchers), which were not audited here.
+  sudo-rs v0.2.15 matches long options exactly.
+- GNU's single-binary `coreutils --coreutils-prog=NAME`, and other
+  multi-call binaries.
+- The lane counter in `examples/claude-native/workflows/child-usage.mjs`,
+  which reads `timeout` the GNU way.
+
+**Evidence class.**
+
+- Pinned source review.
+- `local_integration` unit tests, failing first at `f77a35eb`.
+- A local differential replay.
+- A local run of the release binary on Ubuntu 24.04.
+
+Ubuntu 26.04 was not run here. The coordinator's measurement there (uutils
+0.8.0 runs `timeout 5 -- CMD`, GNU 9.7 exits 127) is cited, not reproduced.
