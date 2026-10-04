@@ -23,6 +23,13 @@
 # writes only ${XDG_STATE_HOME:-~/.local/state}/native-agent-stack/surface-watch/ (cache/ and latest.json, mode
 # 0600). It runs `codex features list` with an empty temporary HOME and CODEX_HOME, so the host's Codex home is
 # neither read nor written. PATH holds the ecosystem bin directory for gh and codex, as in stack-currency.service.
+# The paper window: stack-currency.timer is Persistent=true with RandomizedDelaySec=15m, so after a day the host was down the
+# catch-up can start this networked run within 15 minutes of WSL starting, which can be during a paper session. ExecCondition=
+# runs `upstream_surface_watch.py --paper-window-check` first: it exits 1 on a weekday from 09:00 to 16:30 America/New_York (the
+# US regular session with a 30-minute margin each side) and 0 otherwise. systemd.service(5), ExecCondition=: an exit status of
+# 1 to 254 skips the remaining commands and "the unit is not marked as failed", so the watch is deferred to the next daily run,
+# and stack-currency.service, which only Wants= this unit, still runs and counts the last report (at most three days old; an
+# older one is "surface watch stale"). The check reads no state and makes no request.
 # TimeoutStartSec=600 is the bound on the whole run. The script's 60 s HTTP timeout is urllib's timeout for each
 # blocking socket operation (the connect, each read), not for a whole fetch, so a slow body can outlast it; each
 # subprocess (a gh api call, codex --version, codex features list) has a 60 s timeout. docs/upstream-surface-watch.md.
@@ -39,4 +46,5 @@ IOSchedulingPriority=7
 TimeoutStartSec=600
 Environment=PATH=%h/.local/share/codex-ecosystem/bin:%h/.local/bin:/usr/local/bin:/usr/bin:/bin
 Environment=PYTHONDONTWRITEBYTECODE=1
+ExecCondition=/usr/bin/python3 @REPOSITORY@/scripts/upstream_surface_watch.py --paper-window-check
 ExecStart=/usr/bin/python3 @REPOSITORY@/scripts/upstream_surface_watch.py --network

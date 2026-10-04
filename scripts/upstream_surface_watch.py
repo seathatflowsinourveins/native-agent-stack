@@ -67,10 +67,13 @@ directory scripts/currency_due.py reads.
   python3 scripts/upstream_surface_watch.py --dry-run --json     # the latest.json document
   python3 scripts/upstream_surface_watch.py --summary            # one line, at most 160 characters
   python3 scripts/upstream_surface_watch.py --check-dispositions # validate the dispositions catalog only
+  python3 scripts/upstream_surface_watch.py --paper-window-check # exit 1 inside the paper window (the service's ExecCondition)
   python3 scripts/upstream_surface_watch.py --network --write-baseline [--force]
 
 Exit codes: 0 the run finished (new names or not); 1 the baseline or dispositions catalog is invalid, or a write
 failed; 2 a usage error; 3 an anchor is missing; 4 a source could not be fetched and has no usable cache.
+--paper-window-check is a condition, not a run: it exits 0 outside the paper window and 1 inside it (paper_window_active()),
+which is how upstream-surface-watch.service defers the networked run while a paper session may be trading.
 """
 
 from __future__ import annotations
@@ -91,6 +94,7 @@ import urllib.parse
 import urllib.request
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 ROOT = Path(__file__).resolve().parents[1]
 STATE_NAME = "native-agent-stack"
@@ -1515,12 +1519,7 @@ def run(args) -> tuple[dict, str]:
         raise UsageError(f"--state-dir must be outside the checkout ({root})")
     baseline_path = (args.baseline or root / BASELINE_PATH).expanduser().resolve()
     dispositions_path = (args.dispositions or root / DISPOSITIONS_PATH).expanduser().resolve()
-    if args.now is None:
-        now = datetime.now(timezone.utc).replace(microsecond=0)
-    else:
-        if not ISO_UTC.fullmatch(args.now):
-            raise UsageError(f"--now must look like 2026-10-04T00:00:00Z, got {args.now!r}")
-        now = datetime.strptime(args.now, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+    now = clock_now(args.now)
     now_text = utc_text(now)
     latest_path = state / LATEST_FILE
     command = details_command(root, state, args, args.network and args.dry_run)
@@ -1679,6 +1678,52 @@ def render_text(document: dict, action: str) -> str:
     return "\n".join(lines)
 
 
+# The paper window. The paper lane trades US equities, whose regular session is 09:30-16:00 America/New_York on weekdays
+# (https://www.nyse.com/markets/hours-calendars); the window adds 30 minutes on each side for an entry or a flatten that
+# runs a little early or late. A holiday inside it is deferred too: a deferral costs one day, a run that overlaps a paper
+# session costs a measurement or a network slot. The Persistent=true catch-up of stack-currency.timer is the case it
+# guards: it can start the watch within 15 minutes of WSL starting, which can be during the session.
+PAPER_WINDOW_ZONE = "America/New_York"
+PAPER_WINDOW_OPENS = 9 * 60            # 09:00, minutes after midnight in PAPER_WINDOW_ZONE
+PAPER_WINDOW_CLOSES = 16 * 60 + 30     # 16:30, exclusive
+
+
+def paper_window_active(now: datetime) -> bool:
+    """True from 09:00 to 16:30 America/New_York (the end exclusive) on a weekday. ``now`` must be timezone-aware."""
+    local = now.astimezone(ZoneInfo(PAPER_WINDOW_ZONE))
+    return local.weekday() < 5 and PAPER_WINDOW_OPENS <= local.hour * 60 + local.minute < PAPER_WINDOW_CLOSES
+
+
+def clock_now(text: str | None) -> datetime:
+    """The --now value as a UTC time (UsageError when it is not YYYY-MM-DDTHH:MM:SSZ), or the clock."""
+    if text is None:
+        return datetime.now(timezone.utc).replace(microsecond=0)
+    if not ISO_UTC.fullmatch(text):
+        raise UsageError(f"--now must look like 2026-10-04T00:00:00Z, got {text!r}")
+    return datetime.strptime(text, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+
+
+def paper_window_check(args) -> int:
+    """The service's ExecCondition: 1 (the unit is skipped, not failed: systemd.service(5), ExecCondition=) inside the
+    paper window, 0 outside it, 2 on a usage error. It reads no state and makes no request."""
+    try:
+        now = clock_now(args.now)
+    except UsageError as error:
+        print(f"upstream_surface_watch.py: {error}", file=sys.stderr)
+        return error.exit_code
+    try:
+        inside = paper_window_active(now)
+    except (ZoneInfoNotFoundError, ValueError) as error:   # no tz database: run the watch rather than never run it
+        print(f"upstream_surface_watch.py: cannot tell the paper window ({type(error).__name__}: {error}); not deferring",
+              file=sys.stderr)
+        return 0
+    if inside:
+        print(f"upstream_surface_watch.py: {utc_text(now)} is inside the paper window (weekdays 09:00-16:30 "
+              f"{PAPER_WINDOW_ZONE}): the watch is deferred to the next run", file=sys.stderr)
+        return 1
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--root", type=Path, default=ROOT, help="the checkout whose catalogs are read (default: this)")
@@ -1704,6 +1749,9 @@ def build_parser() -> argparse.ArgumentParser:
                         help="the npm dist-tag of @anthropic-ai/claude-code under watch (default latest)")
     parser.add_argument("--codex-bin", help="the codex executable to probe (default: codex on PATH; none skips it)")
     parser.add_argument("--now", help="evaluate at this UTC time (YYYY-MM-DDTHH:MM:SSZ); default: the clock")
+    parser.add_argument("--paper-window-check", action="store_true",
+                        help="exit 1 inside the paper window (weekdays 09:00-16:30 America/New_York), else 0; "
+                             "the watch service's ExecCondition (no fetch, no state)")
     return parser
 
 
@@ -1729,6 +1777,10 @@ def check_dispositions(args) -> int:
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+    if args.paper_window_check:
+        if args.write_baseline or args.network or args.cross_check or args.check_dispositions:
+            parser.error("--paper-window-check is a condition only; drop the other mode options")
+        return paper_window_check(args)
     if args.check_dispositions:
         if args.write_baseline or args.network or args.cross_check:
             parser.error("--check-dispositions validates the catalog only; drop the other mode options")
